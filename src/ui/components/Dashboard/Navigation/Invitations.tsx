@@ -3,7 +3,7 @@ import hooks from "ui/hooks";
 import "./Invitations.css";
 import { Workspace } from "ui/types";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 import classNames from "classnames";
 
 function InvitationCard({
@@ -19,7 +19,7 @@ function InvitationCard({
     <div
       className={classNames(
         borderStyles,
-        "relative rounded-lg border bg-white px-6 py-2 shadow-sm flex items-center space-x-3 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+        "relative rounded-lg border bg-white px-6 py-2 shadow-sm flex space-x-3 focus-within:ring-2 focus-within:ring-offset-2"
       )}
     >
       <div className="flex-1 min-w-0 select-none">

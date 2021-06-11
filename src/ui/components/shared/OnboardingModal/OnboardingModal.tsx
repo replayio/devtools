@@ -1,7 +1,6 @@
-import classNames from "classnames";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import Modal from "../NewModal";
@@ -74,7 +73,7 @@ function Navigation({
         <button
           onClick={onSkipOrDone}
           type="button"
-          className="float-right inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="float-right inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           {current == total ? "Got it!" : "Skip"}
         </button>

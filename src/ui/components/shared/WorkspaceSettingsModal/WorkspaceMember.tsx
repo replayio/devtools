@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import hooks from "ui/hooks";
 import { WorkspaceUser } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
-import useToken from "ui/utils/useToken";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
-import { NonRegisteredTeamMember } from "ui/hooks/invitations";
 const { prefs } = require("ui/utils/prefs");
 
 import "./WorkspaceMember.css";
@@ -15,12 +13,12 @@ import MaterialIcon from "../MaterialIcon";
 
 type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
 
-export function NonRegisteredWorkspaceMember({ member }: { member: NonRegisteredTeamMember }) {
+export function NonRegisteredWorkspaceMember({ member }: { member: WorkspaceUser }) {
   return (
     <li className="workspace-member">
       <MaterialIcon>mail_outline</MaterialIcon>
       <div className="workspace-member-content">
-        <div className="title">{member.invitedEmail}</div>
+        <div className="title">{member.email}</div>
       </div>
       <div className="permission-container">
         <span>Pending</span>
@@ -32,12 +30,10 @@ export function NonRegisteredWorkspaceMember({ member }: { member: NonRegistered
 function Role({
   member,
   setWorkspaceId,
-  workspaceId,
   hideModal,
 }: {
   member: WorkspaceUser;
   setWorkspaceId: any;
-  workspaceId: string;
   hideModal: any;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -109,24 +105,19 @@ function Role({
   return <div className="member-permissions">{content}</div>;
 }
 
-function WorkspaceMember({ member, setWorkspaceId, hideModal, workspaceId }: WorkspaceMemberProps) {
+function WorkspaceMember({ member, setWorkspaceId, hideModal }: WorkspaceMemberProps) {
   return (
     <li className="workspace-member">
       <img src={member.user!.picture} />
       <div className="workspace-member-content">
         <div className="title">{member.user!.name}</div>
       </div>
-      <Role
-        member={member}
-        setWorkspaceId={setWorkspaceId}
-        workspaceId={workspaceId!}
-        hideModal={hideModal}
-      />
+      <Role member={member} setWorkspaceId={setWorkspaceId} hideModal={hideModal} />
     </li>
   );
 }
 
-const connector = connect((state: UIState) => ({ workspaceId: selectors.getWorkspaceId(state) }), {
+const connector = connect(() => ({}), {
   setWorkspaceId: actions.setWorkspaceId,
   hideModal: actions.hideModal,
 });

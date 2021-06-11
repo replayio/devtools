@@ -1,7 +1,7 @@
 import React, { Dispatch, ReactElement, SetStateAction } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
 import { Menu } from "@headlessui/react";
 import { Workspace } from "ui/types";

@@ -13,7 +13,7 @@ import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 import { UIStore } from "ui/actions";
-import { setAnalysisPoints } from "ui/actions/app";
+import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
 const { prefs } = require("ui/utils/prefs");
 
@@ -113,6 +113,12 @@ function saveLogpointHits(
   }
   for (const location of locations) {
     store.dispatch(setAnalysisPoints(points, location, condition));
+  }
+}
+
+function saveAnalysisError(locations: Location[], condition: string) {
+  for (const location of locations) {
+    store.dispatch(setAnalysisError(location, condition));
   }
 }
 
@@ -219,7 +225,9 @@ export async function setLogpoint(
   if (showInConsole && primitiveFronts) {
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
-      showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+      if (points !== "error") {
+        showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+      }
       return;
     }
   }
@@ -256,7 +264,12 @@ export async function setLogpoint(
     };
   }
 
-  await analysisManager.runAnalysis(params, handler);
+  try {
+    await analysisManager.runAnalysis(params, handler);
+  } catch {
+    saveAnalysisError(locations, condition);
+    return;
+  }
 
   // The analysis points may have arrived in any order, so we have to sort
   // them after they arrive.

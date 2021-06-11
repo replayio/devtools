@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
-import useToken from "ui/utils/useToken";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import { useGetUserInfo } from "ui/hooks/users";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
 
@@ -90,8 +90,8 @@ function PrivacyNote({ isPrivate, isOwner }) {
 }
 
 function Collaborators({ setExpanded, recordingId, setModal }) {
-  const { token } = useToken();
-  if (!token) {
+  const { id } = useGetUserInfo();
+  if (!id) {
     return null;
   }
 

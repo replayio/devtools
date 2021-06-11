@@ -5,7 +5,7 @@
 
 .recording-list table.dashboard-viewer-content-table {
   display: grid;
-  grid-template-columns: 30px 112px auto auto auto auto auto auto auto;
+  grid-template-columns: 30px 112px auto 100px 150px 100px 60px 60px 50px;
 }
 
 .dashboard-viewer-header-title {
@@ -113,7 +113,6 @@
 }
 
 .recording-list .recording-item .screenshot {
-  background: var(--theme-toolbar-background);
   height: 100%;
   min-height: 80px; /* match the image's height to avoid shifting */
   display: flex;
@@ -124,7 +123,7 @@
 .recording-list .recording-item .screenshot img {
   width: 100%;
   object-fit: contain;
-  height: 80px;
+  height: 50px;
 }
 
 .recording-list .recording-item.selected {
@@ -251,6 +250,4 @@
 }
 
 .page-url:hover {
-  color: var(--dark-blue) !important;
-  text-decoration: underline;
 }

@@ -3,7 +3,7 @@ const Dropdown = require("devtools/client/debugger/src/components/shared/Dropdow
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";

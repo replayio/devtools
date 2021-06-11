@@ -1,8 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import Modal from "ui/components/shared/Modal";
 
 import "./LoginModal.css";
@@ -29,7 +29,7 @@ function LoginModal() {
             <button
               type="button"
               onClick={onClick}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Sign In
             </button>

@@ -82,7 +82,9 @@ function CommentEditor({
           disabled={!submitEnabled}
           className={classNames(
             "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-gray-600",
-            submitEnabled ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300"
+            submitEnabled
+              ? "bg-primaryAccent hover:bg-primaryAccentHover text-white"
+              : "bg-gray-300"
           )}
         >
           Post

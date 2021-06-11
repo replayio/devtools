@@ -46,9 +46,42 @@ spawnChecked("ls", {
   stdio: "inherit",
 });
 
-spawn("node_modules/.bin/webpack-dev-server", {
+const devServerProcess = spawn("node_modules/.bin/webpack-dev-server", {
   detached: true,
-  stdio: "inherit",
+  stdio: ["inherit", "pipe", "inherit"],
 });
 
-require("../../../test/run");
+(async function () {
+  console.log("Waiting for Webpack server start");
+  await Promise.race([
+    new Promise(r => {
+      devServerProcess.stdout.on("data", chunk => {
+        process.stdout.write(chunk);
+        // Once the dev server starts outputting stuff, we assume it has started
+        // its server and it is safe to curl.
+        r();
+      });
+    }),
+    new Promise(r => setTimeout(r, 10 * 1000)).then(() => {
+      throw new Error("Failed to start dev server");
+    }),
+  ]);
+  console.log("Waiting for Webpack build");
+
+  // Wait for the initial Webpack build to complete before
+  // trying to run the tests so the tests don't run
+  // the risk of timing out if the build itself is slow.
+  spawnChecked(
+    "curl",
+    ["--max-time", "600", "--range", "0-50", "http://localhost:8080/dist/main.js"],
+    {
+      stdio: "inherit",
+    }
+  );
+  console.log("Done Initial Webpack build");
+
+  require("../../../test/run");
+})().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

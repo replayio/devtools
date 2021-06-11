@@ -37,18 +37,15 @@ function DeletedScreen({ url }: { url: string }) {
         >
           <h2 className="font-bold text-3xl text-gray-900">{`Redirecting...`}</h2>
           <div className="text-gray-500 space-y-6 text-xl">
-            <div>{`Sit tight! We'll bring you back to that website in a few seconds.`}</div>
+            <div>{`Sit tight! We'll take you back to the library in a few seconds.`}</div>
           </div>
           <div className="space-y-1">
-            <div className="overflow-hidden overflow-ellipsis whitespace-pre text-base text-gray-500">
-              {url}
-            </div>
             <button
               type="button"
               onClick={navigateToUrl}
               className={classNames(
                 "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 justify-center",
-                "text-white bg-blue-600 hover:bg-blue-700"
+                "text-white bg-primaryAccent hover:bg-primaryAccentHover"
               )}
             >
               Go now
@@ -83,7 +80,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         value={isSaving ? `Uploading…` : `Save & Upload`}
         className={classNames(
           "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 justify-center cursor-pointer",
-          "text-white bg-blue-600 hover:bg-blue-700"
+          "text-white bg-primaryAccent hover:bg-primaryAccentHover"
         )}
       ></input>
     </div>
@@ -202,7 +199,7 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
   }
 
   if (status === "deleted") {
-    return <DeletedScreen url={recording.url} />;
+    return <DeletedScreen url="/view" />;
   }
 
   return (

@@ -10,7 +10,7 @@ import {
   loadedRegions,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import {
   PanelName,
   PrimaryPanelName,
@@ -44,6 +44,10 @@ export type SetModalAction = Action<"set_modal"> & {
 
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[];
+  location: Location;
+  condition: string;
+};
+export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
   location: Location;
   condition: string;
 };
@@ -88,6 +92,7 @@ export type AppActions =
   | SetUploadingAction
   | SetModalAction
   | SetAnalysisPointsAction
+  | SetAnalysisErrorAction
   | SetEventsForType
   | SetViewMode
   | SetNarrowMode
@@ -196,6 +201,14 @@ export function setAnalysisPoints(
   return {
     type: "set_analysis_points",
     analysisPoints: points,
+    location,
+    condition,
+  };
+}
+
+export function setAnalysisError(location: Location, condition = ""): SetAnalysisErrorAction {
+  return {
+    type: "set_analysis_error",
     location,
     condition,
   };

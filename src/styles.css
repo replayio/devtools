@@ -34,7 +34,8 @@ html {
   height: 100%;
 }
 
-#graphics, #graphicsVideo {
+#graphics,
+#graphicsVideo {
   position: absolute;
   transform-origin: top left;
 }

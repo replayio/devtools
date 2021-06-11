@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import BlankScreen from "./BlankScreen";
 import classNames from "classnames";
@@ -37,7 +37,7 @@ function RefreshButton() {
       disabled={clicked}
       className={classNames(
         "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-        "text-white bg-blue-600 hover:bg-blue-700"
+        "text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {clicked ? `Refreshing...` : `Refresh`}
@@ -58,7 +58,7 @@ function SignInButton() {
       onClick={onClick}
       className={classNames(
         "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-        "text-white bg-blue-600 hover:bg-blue-700"
+        "text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       Sign In
@@ -130,3 +130,4 @@ const connector = connect((state: UIState) => ({
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(_AppErrors);
+export { ExpectedErrorScreen, UnexpectedErrorScreen };

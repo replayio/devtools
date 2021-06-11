@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
+import { WorkspaceUser } from "ui/types";
 import MaterialIcon from "../MaterialIcon";
 import WorkspaceForm from "./WorkspaceForm";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import "./WorkspaceSettingsModal.css";
 
 const content1 = `Manage members here so that everyone who belongs to this team can see each other's replays.`;
+
+export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
+  return (
+    <ul className="workspace-members">
+      {members.map(member =>
+        member.email ? (
+          <NonRegisteredWorkspaceMember member={member} key={`non-registered-${member.email}`} />
+        ) : (
+          <WorkspaceMember member={member} key={`registered-${member.userId}`} />
+        )
+      )}
+    </ul>
+  );
+}
 
 function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
   const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId!);
@@ -29,20 +44,7 @@ function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
           <WorkspaceForm />
           <div className="workspace-members-container">
             <div className="subheader">MEMBERS</div>
-            <ul className="workspace-members">
-              {members &&
-                !loading &&
-                members.map((member, i) =>
-                  member.userId ? (
-                    <WorkspaceMember member={member} key={`registered-${member.userId}`} />
-                  ) : (
-                    <NonRegisteredWorkspaceMember
-                      member={member as any}
-                      key={`non-registered-${(member as any).invitedEmail}`}
-                    />
-                  )
-                )}
-            </ul>
+            {members && !loading ? <WorkspaceMembers members={members} /> : null}
           </div>
         </main>
       </Modal>

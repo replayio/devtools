@@ -24,6 +24,7 @@ import { waitForTime } from "protocol/utils";
 const { features } = require("ui/utils/prefs");
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
+import { isRepaintEnabled } from "protocol/enable-repaint";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -144,12 +145,14 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     try {
-      const { screen, mouse } = await getGraphicsAtTime(time);
+      if (!isRepaintEnabled()) {
+        const { screen, mouse } = await getGraphicsAtTime(time);
 
-      if (screen && selectors.getCurrentTime(getState()) == time) {
-        dispatch(setTimelineState({ screenShot: screen, mouse }));
-        paintGraphics(screen, mouse);
-        Video.seek(time);
+        if (screen && selectors.getCurrentTime(getState()) == time) {
+          dispatch(setTimelineState({ screenShot: screen, mouse }));
+          paintGraphics(screen, mouse);
+          Video.seek(time);
+        }
       }
 
       dispatch(precacheScreenshots(time));
@@ -194,7 +197,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
 
-    if (!updateGraphics) {
+    if (!updateGraphics || isRepaintEnabled()) {
       return;
     }
 

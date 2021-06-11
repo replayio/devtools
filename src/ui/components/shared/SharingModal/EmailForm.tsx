@@ -49,7 +49,7 @@ function AutocompleteAction({
   if (status === "loading") {
     return (
       <button
-        className="inline-flex items-center px-3 py-2 space-x-2 border border-transparent font-medium rounded-md focus:outline-none text-white bg-blue-700"
+        className="inline-flex items-center px-3 py-2 space-x-2 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent"
         disabled
       >
         <Spinner className="animate-spin h-6 w-6 text-white" />
@@ -80,7 +80,7 @@ function AutocompleteAction({
 
   return (
     <button
-      className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-blue-600 hover:bg-blue-700"
+      className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent hover:bg-primaryAccentHover"
       onClick={onClick}
     >
       <PaperAirplaneIcon className="h-6 w-6 text-white transform rotate-90" />

@@ -1,32 +1,33 @@
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
-import DevTools from "./DevTools";
-const Account = require("./Account").default;
 import AppErrors from "./shared/Error";
 const LoginModal = require("./shared/LoginModal").default;
-const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
 import OnboardingModal from "./shared/OnboardingModal/index";
 import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
 import { setTelemetryContext } from "ui/utils/telemetry";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
-import { ModalType } from "ui/state/app";
-import useToken from "ui/utils/useToken";
+import { ModalType, UnexpectedError } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
 import { useGetRecording } from "ui/hooks/recordings";
 
 import "styles.css";
 import UploadingScreen from "./UploadingScreen";
+import TeamMemberOnboardingModal from "./shared/OnboardingModal/TeamMemberOnboardingModal";
+import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
+import { useApolloClient } from "@apollo/client";
+import BlankScreen from "./shared/BlankScreen";
+import { setUnexpectedError } from "ui/actions/session";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -49,6 +50,12 @@ function AppModal({ modal }: { modal: ModalType }) {
     case "onboarding": {
       return <OnboardingModal />;
     }
+    case "team-member-onboarding": {
+      return <TeamMemberOnboardingModal />;
+    }
+    case "team-leader-onboarding": {
+      return <TeamLeaderOnboardingModal />;
+    }
     default: {
       return null;
     }
@@ -66,11 +73,42 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
+function useCheckForApolloError() {
+  const client = useApolloClient();
+
+  if (!client) {
+    const error: UnexpectedError = {
+      message: "Database error",
+      content:
+        "We seem to be having problems connecting to the database. Please refresh this page and try again.",
+      action: "refresh",
+    };
+
+    return error;
+  }
+
+  return null;
+}
+
+function App({
+  theme,
+  recordingId,
+  modal,
+  updateNarrowMode,
+  setFontLoading,
+  setUnexpectedError,
+  children,
+}: AppProps) {
   const auth = useAuth0();
-  const { claims } = useToken();
   const userInfo = useGetUserInfo();
   const recordingInfo = useGetRecording(recordingId);
+  const apolloError = useCheckForApolloError();
+
+  useEffect(() => {
+    if (apolloError) {
+      setUnexpectedError(apolloError);
+    }
+  }, [apolloError]);
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
@@ -84,7 +122,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   useEffect(() => {
     if (!userInfo.loading) {
-      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.internal);
+      setTelemetryContext(userInfo.id, userInfo.email, userInfo.internal);
     }
   }, [userInfo]);
 
@@ -103,6 +141,10 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
     }
   }, [auth, userInfo, recordingInfo]);
 
+  if (apolloError) {
+    return <BlankScreen />;
+  }
+
   if (hasLoadingParam()) {
     return <UploadingScreen />;
   }
@@ -113,7 +155,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   return (
     <>
-      {recordingId ? <DevTools recordingId={recordingId} /> : <Account />}
+      {children}
       {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </>
@@ -130,8 +172,9 @@ const connector = connect(
   {
     updateNarrowMode: actions.updateNarrowMode,
     setFontLoading: actions.setFontLoading,
+    setUnexpectedError,
   }
 );
-export type AppProps = ConnectedProps<typeof connector>;
+export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
 
 export default connector(App);

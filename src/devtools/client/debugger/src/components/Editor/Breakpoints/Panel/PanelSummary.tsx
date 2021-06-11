@@ -29,10 +29,6 @@ function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const pausedOnHit = analysisPoints?.find(
-    point => point.point == executionPoint && point.time == currentTime
-  );
-
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
   const isEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
 
@@ -61,6 +57,14 @@ function PanelSummary({
     );
   }
 
+  if (analysisPoints === "error") {
+    return (
+      <div className="summary">
+        <div className="invisible">Failed</div>
+      </div>
+    );
+  }
+
   if (isHot) {
     return (
       <div className="summary">
@@ -71,6 +75,10 @@ function PanelSummary({
       </div>
     );
   }
+
+  const pausedOnHit = analysisPoints.find(
+    point => point.point == executionPoint && point.time == currentTime
+  );
 
   return (
     <div className="summary" onClick={e => handleClick(e, "logValue")}>
@@ -96,7 +104,7 @@ function PanelSummary({
         <button
           type="button"
           onClick={addComment}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Add a comment
         </button>

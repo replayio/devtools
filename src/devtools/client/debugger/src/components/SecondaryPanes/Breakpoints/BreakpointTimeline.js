@@ -70,7 +70,7 @@ function BreakpointTimeline({
     hoveredItem?.location && !isMatchingLocation(hoveredItem?.location, breakpoint.location);
 
   const handleClick = e => {
-    if (e.metaKey && analysisPoints?.length) {
+    if (e.metaKey && analysisPoints !== "error" && analysisPoints?.length) {
       const newZoomRegion = getNewZoomRegion(zoomRegion, analysisPoints);
       setZoomRegion(newZoomRegion);
       setZoomedBreakpoint(breakpoint);
@@ -88,7 +88,7 @@ function BreakpointTimeline({
       >
         <div className="progress-line full" />
         <div className="progress-line" style={{ width: `${percent}%` }} />
-        {analysisPoints.length < prefs.maxHitsDisplayed
+        {analysisPoints !== "error" && analysisPoints.length < prefs.maxHitsDisplayed
           ? analysisPoints.map((p, i) => (
               <BreakpointTimelinePoint
                 breakpoint={breakpoint}

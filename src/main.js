@@ -4,7 +4,7 @@ const url = new URL(window.location.href);
 
 // Coercing recordingId to undefined so that it is not passed to auth0
 const recordingId = url.searchParams.get("id") || undefined;
-const dispatch = url.searchParams.get("dispatch");
+
 const test = url.searchParams.get("test");
 
 // During testing, make sure we clear local storage before importing
@@ -22,85 +22,65 @@ if (test) {
 // be good if this was less fragile...
 //
 
-const { initSocket } = require("protocol/socket");
-const { setupLogpoints } = require("./protocol/logpoint");
-const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
-const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
-const { setupTimeline, setupApp, setModal } = require("ui/actions").actions;
-const { setupGraphics, updateEnableRepaint } = require("protocol/graphics");
-const { setupMessages } = require("devtools/client/webconsole/actions/messages");
-
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
-const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
-const { createSession } = require("ui/actions/session");
-const {
-  initOutputSyntaxHighlighting,
-} = require("./devtools/client/webconsole/utils/syntax-highlighted");
-const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
-const { selectors } = require("ui/reducers");
-const { getUserSettings } = require("ui/hooks/settings");
+const React = require("react");
+const { useEffect, useState } = React;
+const ReactDOM = require("react-dom");
+const { Provider } = require("react-redux");
+const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
+const tokenManager = require("ui/utils/tokenManager").default;
+const { setupTelemetry } = require("ui/utils/telemetry");
+const { ApolloWrapper } = require("ui/utils/apolloClient");
+const App = require("ui/components/App").default;
+const BlankLoadingScreen = require("ui/components/shared/BlankScreen").BlankLoadingScreen;
 
 require("image/image.css");
 
-let initialized = false;
-async function initialize() {
-  window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
+document.body.addEventListener("contextmenu", e => e.preventDefault());
 
-  // Initialize the socket so we can communicate with the server
-  initSocket(store, dispatch);
-  createSession(store, recordingId);
+setupTelemetry({ recordingId });
 
-  document.body.addEventListener("contextmenu", e => e.preventDefault());
+const BrowserError = React.lazy(() => import("views/browser/error"));
 
-  // Set the current mouse position on the window. This is used in places where
-  // testing element.matches(":hover") does not work right for some reason.
-  document.body.addEventListener("mousemove", e => {
-    window.mouseClientX = e.clientX;
-    window.mouseClientY = e.clientY;
-  });
-  window.elementIsHovered = elem => {
-    if (!elem) {
-      return false;
+function PageSwitch() {
+  const [pageWithStore, setPageWithStore] = useState(null);
+
+  useEffect(() => {
+    async function importAndInitialize() {
+      const imported = await (recordingId ? import("./app") : import("./library"));
+      const pageWithStore = await imported.initialize();
+      setPageWithStore(pageWithStore);
     }
-    const { left, top, right, bottom } = elem.getBoundingClientRect();
-    const { mouseClientX, mouseClientY } = window;
-    return (
-      left <= mouseClientX && mouseClientX <= right && top <= mouseClientY && mouseClientY <= bottom
-    );
-  };
+    importAndInitialize();
+  }, []);
+
+  if (!pageWithStore) {
+    return null;
+  }
+
+  const { Page, store } = pageWithStore;
+  return (
+    <Provider store={store}>
+      <App>
+        <Page />
+      </App>
+    </Provider>
+  );
 }
 
-(async () => {
-  window.gToolbox = new DevToolsToolbox();
-  store = await bootstrapStore();
-
-  // Don't initialize the socket when opening the Library.
-  if (!initialized && recordingId) {
-    initialized = true;
-    await initialize();
-  }
-
-  const theme = selectors.getTheme(store.getState());
-  document.body.parentElement.className = theme || "";
-
-  if (url.searchParams.has("settings")) {
-    store.dispatch(setModal("settings"));
-  }
-
-  if (recordingId) {
-    setupApp(recordingId, store);
-    setupTimeline(recordingId, store);
-    setupEventListeners(recordingId, store);
-    setupGraphics(store);
-    initOutputSyntaxHighlighting();
-    setupMessages(store);
-    setupLogpoints(store);
-    setupExceptions(store);
-  }
-
-  bootstrapApp({}, { recordingId }, store);
-
-  const settings = await getUserSettings();
-  updateEnableRepaint(settings.enableRepaint);
-})();
+ReactDOM.render(
+  <React.Suspense fallback={() => <div>Loading</div>}>
+    <Router>
+      <Switch>
+        <Route exact path="/browser/error" component={BrowserError} />
+        <Route>
+          <tokenManager.Auth0Provider>
+            <ApolloWrapper recordingId={recordingId}>
+              <PageSwitch />
+            </ApolloWrapper>
+          </tokenManager.Auth0Provider>
+        </Route>
+      </Switch>
+    </Router>
+  </React.Suspense>,
+  document.querySelector("#app")
+);

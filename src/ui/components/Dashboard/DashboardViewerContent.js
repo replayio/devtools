@@ -4,6 +4,53 @@ import Recording from "./RecordingItem/index";
 import sortBy from "lodash/sortBy";
 import { isReplayBrowser } from "ui/utils/environment";
 
+function getErrorText() {
+  if (isReplayBrowser()) {
+    return "Please open a new tab and press the blue record button to record a Replay";
+  }
+
+  return <DownloadLinks />;
+}
+
+function DownloadLinks() {
+  const [clicked, setClicked] = useState(false);
+
+  if (clicked) {
+    return (
+      <div className="flex flex-col space-y-8" style={{ maxWidth: "32rem" }}>
+        <div>Download started.</div>
+        <div>{`Once the download is finished, open the Replay Browser installer to install Replay`}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col space-y-8" style={{ maxWidth: "32rem" }}>
+      <div>{`There's nothing here yet. To create your first replay, you first need to download the Replay Browser`}</div>
+      <div className="grid gap-4 grid-cols-2">
+        <a
+          href="https://replay.io/downloads/replay.dmg"
+          className={
+            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
+          }
+          onClick={() => setClicked(true)}
+        >
+          Download for Mac
+        </a>
+        <a
+          href="https://replay.io/downloads/linux-replay.tar.bz2"
+          className={
+            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
+          }
+          onClick={() => setClicked(true)}
+        >
+          Download for Linux
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardViewerContent({
   recordings,
   selectedIds,
@@ -24,9 +71,7 @@ export default function DashboardViewerContent({
     if (timeFilter != "all" || associationFilter != "all" || searchString) {
       errorText = "No replays found, please expand your search";
     } else {
-      errorText = isReplayBrowser()
-        ? "Please open a new tab and press the blue record button to record a Replay"
-        : "Please open the Replay browser and press the blue record button to get started.";
+      errorText = getErrorText();
     }
 
     return (

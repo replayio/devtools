@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
+import * as actions from "ui/actions/app";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 
 function ShareButton({ setModal, recordingId }: PropsFromRedux) {

@@ -5,7 +5,7 @@ import "./ViewToggle.css";
 import { setViewMode } from "../../actions/app";
 import { getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { isTest } from "ui/utils/environment";
 
 function Handle({ text, mode, localViewMode, handleToggle, motion }) {

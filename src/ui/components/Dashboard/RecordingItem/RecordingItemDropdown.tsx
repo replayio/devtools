@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
+import * as actions from "ui/actions/app";
+import * as selectors from "ui/reducers/app";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { RecordingId } from "@recordreplay/protocol";
@@ -67,15 +67,15 @@ const DropdownPanel = ({
     <div className="dropdown-panel">
       {!editingTitle ? (
         <div className="menu-item" onClick={() => setEditingTitle(true)}>
-          Edit Title
+          Edit title
         </div>
       ) : null}
       <div className="menu-item" onClick={() => onDeleteRecording(recordingId)}>
-        Delete Recording
+        Delete
       </div>
       <Privacy isPrivate={isPrivate} toggleIsPrivate={toggleIsPrivate} />
       <div className="menu-item" onClick={() => setModal("sharing", { recordingId })}>
-        Open sharing preferences
+        Share
       </div>
       {currentWorkspaceId ? (
         <div className="menu-item" onClick={() => updateRecording(null)}>

@@ -1,14 +1,12 @@
 import {
   RecordingId,
-  sessionError,
   SessionId,
   PointDescription,
   Location,
   MouseEvent,
   loadedRegions,
 } from "@recordreplay/protocol";
-import { RecordingTarget } from "protocol/thread/thread";
-import { ReactElement } from "react";
+import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 
 export type PanelName = "console" | "debugger" | "inspector";
@@ -20,7 +18,9 @@ export type ModalType =
   | "settings"
   | "new-workspace"
   | "workspace-settings"
-  | "onboarding";
+  | "onboarding"
+  | "team-member-onboarding"
+  | "team-leader-onboarding";
 export type WorkspaceId = string;
 export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Personal";
 
@@ -72,7 +72,7 @@ export interface AppState {
 }
 
 export interface AnalysisPoints {
-  [key: string]: PointDescription[];
+  [key: string]: PointDescription[] | "error";
 }
 
 interface Events {

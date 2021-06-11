@@ -15,14 +15,6 @@ Test.describe(
     await Test.reverseStepOverToLine(19);
     await Test.checkPausedMessage("number: 1");
 
-    // When rewinding before the first message, that message is still considered
-    // the paused one so that the remaining messages can be grayed out. This also
-    // isn't ideal.
-    await Test.addBreakpoint("doc_rr_logs.html", 16);
-    await Test.rewindToLine(16);
-    await Test.removeAllBreakpoints();
-    await Test.checkPausedMessage("number: 1");
-
     await Test.warpToMessage("number: 2");
     await Test.checkPausedMessage("number: 2");
 

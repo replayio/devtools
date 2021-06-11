@@ -20,6 +20,7 @@ export interface Recording {
   duration: number;
   date: string;
   private: boolean;
+  ownerNeedsInvite: boolean;
   user?: User;
   userId?: string;
   isInitialized: boolean;
@@ -37,7 +38,8 @@ export interface Workspace {
 export interface WorkspaceUser {
   membershipId: string;
   pending: boolean;
-  invitedEmail?: string;
+  email?: string;
   user?: User;
   userId?: string;
+  createdAt?: string;
 }

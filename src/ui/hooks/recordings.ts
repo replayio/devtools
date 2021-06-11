@@ -1,10 +1,10 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { Recording } from "ui/types";
+import { Recording, User } from "ui/types";
 import { ExpectedError, WorkspaceId } from "ui/state/app";
-import useToken from "ui/utils/useToken";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
+import useAuth0 from "ui/utils/useAuth0";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -20,6 +20,7 @@ export const GET_RECORDING = gql`
       createdAt
       private
       isInitialized
+      ownerNeedsInvite
       owner {
         id
         name
@@ -150,7 +151,9 @@ function convertRecording(rec: any): Recording | undefined {
     return undefined;
   }
 
-  const collaborators = rec.collaborators?.edges?.map((e: any) => e.node.user.id);
+  const collaborators = rec.collaborators?.edges
+    ?.filter((e: any) => e.node.user)
+    .map((e: any) => e.node.user.id);
 
   return {
     id: rec.uuid,
@@ -166,6 +169,7 @@ function convertRecording(rec: any): Recording | undefined {
     workspace: rec.workspace,
     comments: rec.comments,
     collaborators,
+    ownerNeedsInvite: rec.ownerNeedsInvite,
   };
 }
 
@@ -221,8 +225,14 @@ export function useGetOwnersAndCollaborators(
           collaborators {
             edges {
               node {
+                ... on RecordingPendingEmailCollaborator {
+                  id
+                  email
+                  createdAt
+                }
                 ... on RecordingPendingUserCollaborator {
                   id
+                  createdAt
                   user {
                     id
                     name
@@ -231,6 +241,7 @@ export function useGetOwnersAndCollaborators(
                 }
                 ... on RecordingUserCollaborator {
                   id
+                  createdAt
                   user {
                     id
                     name
@@ -258,10 +269,17 @@ export function useGetOwnersAndCollaborators(
 
   let collaborators: CollaboratorDbData[] = [];
   if (data?.recording?.collaborators) {
-    collaborators = data.recording.collaborators.edges.map(({ node }: any) => ({
-      collaborationId: node.id,
-      user: node.user,
-    }));
+    collaborators = data.recording.collaborators.edges
+      .map(({ node }: any) => ({
+        collaborationId: node.id,
+        user: node.user,
+        email: node.email,
+        createdAt: node.createdAt,
+      }))
+      .sort(
+        (a: CollaboratorDbData, b: CollaboratorDbData) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
   }
   const recording = convertRecording(data.recording);
   return { collaborators, recording, loading, error };
@@ -720,21 +738,36 @@ export function useUpdateRecordingTitle() {
 }
 
 export function useHasExpectedError(recordingId: RecordingId): ExpectedError | undefined {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
+  const { isAuthenticated } = useAuth0();
   const { recording, isAuthorized, loading } = useGetRecording(recordingId);
+  const { userId } = useGetUserId();
 
-  // Recordings are only unavailable when the graphql api is down
-  if (!recording) {
+  if (loading) {
     return undefined;
   }
 
-  if (loading || isAuthorized) {
+  if (recording?.ownerNeedsInvite) {
+    const isAuthor = userId && userId == recording.userId;
+
+    if (isAuthor) {
+      return {
+        message: "Your replay can not be viewed",
+        content:
+          "Your Replay account is currently unactivated because you have not been invited to Replay by an existing user. Until you are invited, your authored Replays will be unviewable.",
+      };
+    } else {
+      return {
+        message: "This replay can not be viewed",
+        content: "The author for this replay is currently using an unactivated account.",
+      };
+    }
+  }
+
+  if (isAuthorized) {
     return undefined;
   }
 
-  if (userId) {
+  if (isAuthenticated) {
     return {
       message: "You don't have permission to view this replay",
       content:
