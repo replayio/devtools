@@ -9,7 +9,10 @@ const test = url.searchParams.get("test");
 
 // During testing, make sure we clear local storage before importing
 // any code that might instantiate preferences from local storage.
-if (test) {
+// If the url contains a "navigated" parameter, we assume this is the
+// second part of a test that contains a navigation and don't clear
+// local storage in that case.
+if (test && !url.searchParams.get("navigated")) {
   localStorage.clear();
   require("devtools-modules").asyncStorage.clear();
 }
