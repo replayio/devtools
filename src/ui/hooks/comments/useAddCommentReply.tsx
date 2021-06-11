@@ -30,13 +30,14 @@ export default function useAddCommentReply() {
   }
 
   return (reply: NewReplyVariable, recordingId: RecordingId) => {
+    const temporaryId = new Date().toISOString();
     addCommentReply({
       variables: { input: reply },
       optimisticResponse: {
         addCommentReply: {
           success: true,
           commentReply: {
-            id: new Date().toISOString(),
+            id: temporaryId,
             __typename: "CommentReply",
           },
           __typename: "AddCommentReply",
@@ -77,7 +78,12 @@ export default function useAddCommentReply() {
 
         const newParentComment = {
           ...parentComment,
-          replies: [...parentComment.replies, newReply],
+          replies: [
+            ...parentComment.replies.filter(
+              (r: any) => r.id !== temporaryId && r.id !== commentReply.id
+            ),
+            newReply,
+          ],
         };
         const newData = {
           ...data,
