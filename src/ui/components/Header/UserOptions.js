@@ -36,6 +36,14 @@ function UserOptions({ recordingId, setModal }) {
     }
     window.location = dashboardUrl;
   };
+  const onDocsClick = () => {
+    const docsUrl = `https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02`;
+
+    if (event.metaKey) {
+      return window.open(docsUrl, "_blank");
+    }
+    window.open("https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02", "_blank");
+  };
   const onLaunchClick = () => {
     const launchUrl = `${window.location.origin}/welcome`;
     if (event.metaKey) {
@@ -61,13 +69,17 @@ function UserOptions({ recordingId, setModal }) {
         expanded={expanded}
         orientation="bottom"
       >
-        <button className="row" onClick={onLaunchClick}>
-          <MaterialIcon>download</MaterialIcon>
-          <span>Download Replay</span>
+        <button className="row" onClick={onDocsClick}>
+          <MaterialIcon>menu_book</MaterialIcon>
+          <span>Docs</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
           <MaterialIcon>settings</MaterialIcon>
           <span>Settings</span>
+        </button>
+        <button className="row" onClick={onLaunchClick}>
+          <MaterialIcon>download</MaterialIcon>
+          <span>Download Replay</span>
         </button>
         <LoginButton />
       </Dropdown>
