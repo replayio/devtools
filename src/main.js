@@ -31,6 +31,7 @@ const ReactDOM = require("react-dom");
 const { Provider } = require("react-redux");
 const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
 const tokenManager = require("ui/utils/tokenManager").default;
+const { isRecordingInitialized } = require("ui/hooks/recordings");
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
 const App = require("ui/components/App").default;
@@ -49,7 +50,17 @@ function PageSwitch() {
 
   useEffect(() => {
     async function importAndInitialize() {
-      const imported = await (recordingId ? import("./app") : import("./library"));
+      let imported;
+      if (recordingId) {
+        const recordingInitialized = await isRecordingInitialized(recordingId);
+        if (recordingInitialized === false && !test) {
+          imported = await import("./upload");
+        } else {
+          imported = await import("./app");
+        }
+      } else {
+        imported = await import("./library");
+      }
       const pageWithStore = await imported.initialize();
       setPageWithStore(pageWithStore);
     }

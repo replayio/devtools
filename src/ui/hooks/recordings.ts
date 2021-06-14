@@ -1,5 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
+import { query } from "ui/utils/apolloClient";
 import { Recording, User } from "ui/types";
 import { ExpectedError, WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
@@ -126,6 +127,29 @@ const GET_MY_RECORDINGS = gql`
     }
   }
 `;
+
+/**
+ * Returns true if the recording is accessible and initialized, false if it is
+ * accessible but uninitialized and undefined if it is inaccessible (private
+ * or uninitialized and owned by someone else)
+ */
+export async function isRecordingInitialized(
+  recordingId: RecordingId
+): Promise<boolean | undefined> {
+  const result = await query({
+    query: gql`
+      query IsRecordingAccessible($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          isInitialized
+        }
+      }
+    `,
+    variables: { recordingId },
+  });
+
+  return result.data.recording?.isInitialized;
+}
 
 export function useGetRecording(
   recordingId: RecordingId | null
