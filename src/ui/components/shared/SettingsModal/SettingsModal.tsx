@@ -29,6 +29,11 @@ const settings: Settings = [
   //   ],
   // },
   {
+    title: "Invitations",
+    icon: "stars",
+    items: [],
+  },
+  {
     title: "Experimental",
     icon: "biotech",
     items: [
@@ -57,11 +62,6 @@ const settings: Settings = [
         needsRefresh: false,
       },
     ],
-  },
-  {
-    title: "Invitations",
-    icon: "stars",
-    items: [],
   },
   {
     title: "Support",
