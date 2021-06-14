@@ -42,7 +42,7 @@ function UserOptions({ recordingId, setModal }) {
     if (event.metaKey) {
       return window.open(docsUrl, "replaydocs");
     }
-    window.open("https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02", "replaydocs");
+    window.open(docsUrl, "replaydocs");
   };
   const onLaunchClick = () => {
     const launchUrl = `${window.location.origin}/welcome`;
