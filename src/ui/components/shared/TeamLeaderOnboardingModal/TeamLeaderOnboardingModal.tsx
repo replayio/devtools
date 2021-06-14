@@ -273,11 +273,14 @@ type SlideBody4Props = PropsFromRedux & {
 };
 
 function SlideBody4({ setWorkspaceId, hideModal, newWorkspace }: SlideBody4Props) {
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+
   const onClick = () => {
     prefs.defaultLibraryTeam = JSON.stringify(newWorkspace.id);
     window.history.pushState({}, document.title, window.location.pathname);
 
     setWorkspaceId(newWorkspace.id);
+    updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });
     hideModal();
   };
 

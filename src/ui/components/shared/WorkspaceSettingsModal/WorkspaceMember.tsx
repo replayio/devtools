@@ -38,6 +38,7 @@ function Role({
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const { userId: localUserId } = hooks.useGetUserId();
   const { userId, membershipId } = member;
 
@@ -57,7 +58,7 @@ function Role({
       if (isPersonal) {
         hideModal();
         setWorkspaceId(null);
-        prefs.defaultLibraryTeam = JSON.stringify(null);
+        updateDefaultWorkspace({ variables: { workspaceId: null } });
       }
     }
   };

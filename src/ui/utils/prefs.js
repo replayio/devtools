@@ -30,7 +30,6 @@ pref("devtools.dev-secondary-panel-height", "50%");
 pref("devtools.video", !!urlPrefs.video);
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
-pref("devtools.defaultLibraryTeam", "null");
 pref("devtools.libraryFilterTime", "all");
 pref("devtools.libraryFilterAssociation", "all");
 
@@ -60,7 +59,6 @@ export const prefs = new PrefsHelper("devtools", {
   video: ["Bool", "video"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
-  defaultLibraryTeam: ["String", "defaultLibraryTeam"],
   libraryFilterTime: ["String", "libraryFilterTime"],
   libraryFilterAssociation: ["String", "libraryFilterAssociation"],
 });
