@@ -47,9 +47,9 @@ function Header({
 }
 
 function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
-  const userInfo = useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
+  const { nags, loading: loading3 } = useGetUserInfo();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   useEffect(() => {
@@ -64,7 +64,7 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
   useEffect(
     function handleOnboardingModals() {
       // Wait for both queries to finish loading
-      if (loading1 || loading2) {
+      if (loading1 || loading2 || loading3) {
         return;
       }
 
@@ -76,11 +76,11 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
         setModal("team-member-onboarding");
       }
 
-      if (!isLinkedFromEmail && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
+      if (!isLinkedFromEmail && nags && !nags.includes(Nag.FIRST_REPLAY)) {
         setModal("onboarding");
       }
     },
-    [userInfo, loading1, loading2]
+    [loading1, loading2, loading3]
   );
 
   if (loading1 || loading2) {
