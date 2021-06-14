@@ -1,11 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Feature requests
-    url: https://www.notion.so/replayio/Planning-321adf7736444d398b71d2e378e53381
-    about: Share suggestions so we can plan accordingly.
-  - name: Product feedback
-    url: https://www.notion.so/replayio/Planning-321adf7736444d398b71d2e378e53381
-    about: Share feedback so we can incorporate your use cases.
-  - name: Comments + Questions
+  - name: GitHub Discussions
+    url: https://github.com/RecordReplay/devtools/discussions
+    about: Share product feedback, feature requests, ask questions
+  - name: Discord Community
     url: https://discord.gg/hw3eDwvChz
-    about: Join our Discord community so we can get to know you!
+    about: Stop by if you would like to discuss Replay
