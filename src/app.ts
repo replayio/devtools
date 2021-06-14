@@ -85,7 +85,6 @@ export async function initialize() {
 
   const settings = await getUserSettings();
   updateEnableRepaint(settings.enableRepaint);
-  store.dispatch(setWorkspaceId(settings.defaultWorkspaceId));
 
   return { store, Page: DevTools };
 }
