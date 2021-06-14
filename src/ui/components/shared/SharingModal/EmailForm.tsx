@@ -13,39 +13,12 @@ function validateEmail(email: string) {
 type ActionStatus = "pending" | "loading" | "error" | "completed";
 
 function AutocompleteAction({
-  email,
-  recordingId,
-  setShowAutocomplete,
+  status,
+  handleSubmit,
 }: {
-  email: string;
-  recordingId: RecordingId;
-  setShowAutocomplete: Dispatch<SetStateAction<boolean>>;
+  status: ActionStatus;
+  handleSubmit: () => void;
 }) {
-  const [status, setStatus] = useState<ActionStatus>("pending");
-  const { addNewCollaborator } = hooks.useAddNewCollaborator(
-    function onCompleted() {
-      setStatus("completed");
-      setTimeout(() => {
-        setStatus("pending");
-        setShowAutocomplete(false);
-      }, 2000);
-    },
-    function onError() {
-      setStatus("error");
-      setTimeout(() => {
-        setStatus("pending");
-        setShowAutocomplete(false);
-      }, 2000);
-    }
-  );
-
-  const onClick = () => {
-    addNewCollaborator({
-      variables: { recordingId, email },
-    });
-    setStatus("loading");
-  };
-
   if (status === "loading") {
     return (
       <button
@@ -81,7 +54,7 @@ function AutocompleteAction({
   return (
     <button
       className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      onClick={onClick}
+      onClick={handleSubmit}
     >
       <PaperAirplaneIcon className="h-6 w-6 text-white transform rotate-90" />
       <span>Add</span>
@@ -89,30 +62,26 @@ function AutocompleteAction({
   );
 }
 
-function Autocomplete({
-  email,
-  recordingId,
-  setShowAutocomplete,
-}: {
-  email: string;
-  recordingId: RecordingId;
-  setShowAutocomplete: Dispatch<SetStateAction<boolean>>;
-}) {
-  return (
-    <div className="autocomplete bg-white">
-      <div className="content">{`${email}`}</div>
-      <AutocompleteAction
-        email={email}
-        recordingId={recordingId}
-        setShowAutocomplete={setShowAutocomplete}
-      />
-    </div>
-  );
-}
-
 export default function EmailForm({ recordingId }: { recordingId: RecordingId }) {
   const [inputValue, setInputValue] = useState("");
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [status, setStatus] = useState<ActionStatus>("pending");
+  const { addNewCollaborator } = hooks.useAddNewCollaborator(
+    function onCompleted() {
+      setStatus("completed");
+      setTimeout(() => {
+        setStatus("pending");
+        setShowAutocomplete(false);
+      }, 2000);
+    },
+    function onError() {
+      setStatus("error");
+      setTimeout(() => {
+        setStatus("pending");
+        setShowAutocomplete(false);
+      }, 2000);
+    }
+  );
 
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
@@ -125,9 +94,19 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
       setShowAutocomplete(false);
     }
   };
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    addNewCollaborator({
+      variables: { recordingId, email: inputValue },
+    });
+    setStatus("loading");
+  };
 
   return (
-    <div className="new-collaborator-form">
+    <form className="new-collaborator-form" onSubmit={handleSubmit}>
       <input
         type="textarea"
         placeholder="Search emails here"
@@ -135,12 +114,11 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
         onChange={onChange}
       />
       {showAutocomplete ? (
-        <Autocomplete
-          email={inputValue}
-          recordingId={recordingId}
-          setShowAutocomplete={setShowAutocomplete}
-        />
+        <div className="autocomplete bg-white">
+          <div className="content">{inputValue}</div>
+          <AutocompleteAction {...{ status, handleSubmit }} />
+        </div>
       ) : null}
-    </div>
+    </form>
   );
 }
