@@ -49,38 +49,11 @@ function Dropdown({
   value: string;
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }) {
-  const { key, needsRefresh } = item;
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-
-  const displayedWorkspaces: { id: string | null; name: string }[] = [
-    { id: null, name: "My Library" },
-  ];
-
-  if (workspaces) {
-    displayedWorkspaces.push(...workspaces);
-    displayedWorkspaces.sort();
-  }
-
-  const onChange = (selectedValue: string | null) => {
-    if (needsRefresh) {
-      setShowRefresh(true);
-    }
-
-    updateDefaultWorkspace({
-      variables: {
-        workspaceId: selectedValue,
-      },
-    });
-  };
-
-  if (loading) {
-    return null;
-  }
+  const onChange = () => {};
 
   return (
     <div className="w-64">
-      <SelectMenu selected={value} setSelected={onChange} options={displayedWorkspaces} />
+      <SelectMenu selected={value} setSelected={onChange} options={[]} />
     </div>
   );
 }

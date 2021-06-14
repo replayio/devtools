@@ -50,12 +50,14 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
   const userInfo = useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   useEffect(() => {
     // After rendering null, update the workspaceId to display the user's library
     // instead of the non-existent team.
     if (!loading2 && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
       setWorkspaceId(null);
+      updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
   }, [workspaces, loading2]);
 

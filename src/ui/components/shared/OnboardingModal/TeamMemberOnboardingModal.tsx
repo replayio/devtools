@@ -40,6 +40,7 @@ function TeamMemberOnboardingModal({
   const [status, setState] = useState<Status>("pending");
   const userInfo = hooks.useGetUserInfo();
   const updateUserNags = hooks.useUpdateUserNags();
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   // Keep the workspace info (id, name) here so that we can reference it even after the
   // user accepts the invitation. Otherwise, it disappears from the query.
   const [workspaceTarget] = useState(workspace);
@@ -63,7 +64,8 @@ function TeamMemberOnboardingModal({
     });
 
     setWorkspaceId(workspaceTarget.id);
-    prefs.defaultLibraryTeam = JSON.stringify(workspaceTarget.id);
+    updateDefaultWorkspace({ variables: { workspaceId: workspaceTarget.id } });
+
     setTimeout(
       () => (window.location.href = window.location.origin + window.location.pathname),
       1000

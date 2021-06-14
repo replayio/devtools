@@ -29,7 +29,7 @@ function initialAppState(): AppState {
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
     canvas: null,
-    workspaceId: JSON.parse(prefs.defaultLibraryTeam),
+    workspaceId: null,
     defaultSettingsTab: "Personal",
     recordingTarget: null,
     fontLoading: true,
