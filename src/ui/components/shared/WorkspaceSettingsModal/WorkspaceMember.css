@@ -63,13 +63,13 @@
   flex-direction: row;
 }
 
-.workspace-settings-modal .member-permissions .material-icons {
+.workspace-settings-modal .workspace-member .permission-container .material-icons {
   font-size: 16px;
   color: var(--theme-comment);
   visibility: hidden;
 }
 
-.workspace-settings-modal .member-permissions:hover .material-icons {
+.workspace-settings-modal .permission-container:hover .material-icons {
   visibility: visible;
 }
 
