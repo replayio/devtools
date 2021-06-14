@@ -61,28 +61,27 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
     }
   }, [workspaces, loading2]);
 
-  useEffect(() => {
-    // Wait for both queries to finish loading
-    if (loading1 || loading2) {
-      return;
-    }
+  useEffect(
+    function handleOnboardingModals() {
+      // Wait for both queries to finish loading
+      if (loading1 || loading2) {
+        return;
+      }
 
-    const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
+      const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
 
-    // Only show the team member onboarding modal if there's only one outstanding pending team.
-    if (isTeamMemberInvite() && pendingWorkspaces?.length === 1) {
-      setModal("team-member-onboarding");
-      // Skip showing the regular onboarding to make sure the new user lands in the right team first.
-      return;
-    } else if (isTeamLeaderInvite()) {
-      setModal("team-leader-onboarding");
-      return;
-    }
+      if (isTeamLeaderInvite()) {
+        setModal("team-leader-onboarding");
+      } else if (pendingWorkspaces?.length === 1) {
+        setModal("team-member-onboarding");
+      }
 
-    if (!isLinkedFromEmail && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
-      setModal("onboarding");
-    }
-  }, [userInfo, loading1, loading2]);
+      if (!isLinkedFromEmail && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
+        setModal("onboarding");
+      }
+    },
+    [userInfo, loading1, loading2]
+  );
 
   if (loading1 || loading2) {
     return null;
