@@ -45,6 +45,7 @@ class NodePicker extends React.Component {
     ThreadFront.loadMouseTargets();
     this.addNodePickerListeners();
     this.props.setIsNodePickerActive(true);
+    this.props.setSelectedPanel("inspector");
   }
 
   addNodePickerListeners() {
@@ -135,4 +136,5 @@ class NodePicker extends React.Component {
 
 export default connect(null, {
   setIsNodePickerActive: actions.setIsNodePickerActive,
+  setSelectedPanel: actions.setSelectedPanel,
 })(NodePicker);
