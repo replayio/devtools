@@ -30,7 +30,7 @@ function initialAppState(): AppState {
     isNodePickerActive: false,
     canvas: null,
     workspaceId: null,
-    defaultSettingsTab: "Personal",
+    defaultSettingsTab: "Invitations",
     recordingTarget: null,
     fontLoading: true,
     recordingWorkspace: null,
