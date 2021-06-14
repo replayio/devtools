@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { isTeamMemberInvite } from "ui/utils/environment";
 import BlankScreen from "../BlankScreen";
 import Modal from "../NewModal";
 import Spinner from "../Spinner";
@@ -41,6 +42,7 @@ function TeamMemberOnboardingModal({
   const userInfo = hooks.useGetUserInfo();
   const updateUserNags = hooks.useUpdateUserNags();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+  const rejectPendingInvitation = hooks.useRejectPendingInvitation(() => {});
   // Keep the workspace info (id, name) here so that we can reference it even after the
   // user accepts the invitation. Otherwise, it disappears from the query.
   const [workspaceTarget] = useState(workspace);
@@ -55,6 +57,10 @@ function TeamMemberOnboardingModal({
   const onAccept = () => {
     setState("loading");
     acceptPendingInvitation({ variables: { workspaceId: workspaceTarget.id } });
+  };
+  const onDecline = () => {
+    hideModal();
+    rejectPendingInvitation({ variables: { workspaceId: workspace.id } });
   };
   const onGo = () => {
     // Skip showing the user the first replay nag, since they will be going straight to a team.
@@ -77,13 +83,24 @@ function TeamMemberOnboardingModal({
   if (status == "pending") {
     callToAction = (
       <div className="space-y-2 flex flex-col items-center">
-        <button
-          onClick={onAccept}
-          type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          Accept the invitation
-        </button>
+        <div className="space-x-4 flex flex-row">
+          <button
+            onClick={onAccept}
+            type="button"
+            className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Accept
+          </button>
+          {!isTeamMemberInvite() ? (
+            <button
+              onClick={onDecline}
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-400 hover:bg-gray-500"
+            >
+              Decline
+            </button>
+          ) : null}
+        </div>
         <button className="text-gray-400 text-base underline" onClick={onSkip}>
           Skip this step
         </button>
@@ -117,8 +134,8 @@ function TeamMemberOnboardingModal({
 
   return (
     <>
-      <BlankScreen className="fixed" />
-      <Modal options={{ maskTransparency: "transparent" }}>
+      {isTeamMemberInvite() ? <BlankScreen className="fixed" /> : null}
+      <Modal options={{ maskTransparency: isTeamMemberInvite() ? "transparent" : "translucent" }}>
         <div
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
           style={{ width: "520px" }}

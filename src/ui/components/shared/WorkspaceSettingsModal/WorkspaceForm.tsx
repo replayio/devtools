@@ -15,15 +15,7 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
   const [isFocused, setIsFocused] = useState(false);
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {});
 
-  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const newValue = e.currentTarget.value;
-
-    // To allow subsequent adding of new team member emails. Otherwise, they have
-    // to click into the input every time they enter somebody new.
-    if (newValue) {
-      setIsFocused(true);
-    }
-
+  const handleChange = (newValue: string) => {
     setInputValue(newValue);
     setIsValidEmail(validateEmail(newValue));
   };
@@ -32,8 +24,7 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
       e.preventDefault();
     }
 
-    setInputValue("");
-    setIsFocused(false);
+    handleChange("");
     inviteNewWorkspaceMember({ variables: { workspaceId, email: inputValue } });
   };
 
@@ -44,7 +35,7 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
         type="textarea"
         placeholder="Search emails here"
         value={inputValue}
-        onChange={onChange}
+        onChange={e => handleChange(e.currentTarget.value)}
         onSubmit={handleInvite}
         onFocus={() => setTimeout(() => setIsFocused(true), 200)}
         onBlur={() => setTimeout(() => setIsFocused(false), 200)}

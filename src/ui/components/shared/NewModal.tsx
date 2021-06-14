@@ -21,7 +21,7 @@ export default function Modal({
     >
       <div
         className={classNames("bg-black w-full h-full absolute", {
-          "opacity-5": maskTransparency === "translucent",
+          "opacity-10": maskTransparency === "translucent",
           "opacity-0": maskTransparency === "transparent",
         })}
       />
