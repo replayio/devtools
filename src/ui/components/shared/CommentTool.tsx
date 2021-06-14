@@ -8,6 +8,7 @@ import "./CommentTool.css";
 import { Comment, Reply } from "ui/state/comments";
 import classNames from "classnames";
 import { Canvas } from "ui/state/app";
+import { ThreadFront } from "protocol/thread";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -158,7 +159,7 @@ function CommentTool({
         {pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment" ? (
           <span>{"Move the marker"}</span>
         ) : (
-          <span>{"Add Comment"}</span>
+          `Add comment ${ThreadFront.currentPointHasFrames ? "to this line of code" : ""}`
         )}
       </div>
     </div>
