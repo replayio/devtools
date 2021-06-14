@@ -18,6 +18,12 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
 
+    // To allow subsequent adding of new team member emails. Otherwise, they have
+    // to click into the input every time they enter somebody new.
+    if (newValue) {
+      setIsFocused(true);
+    }
+
     setInputValue(newValue);
     setIsValidEmail(validateEmail(newValue));
   };
