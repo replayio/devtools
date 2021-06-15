@@ -46,25 +46,36 @@ function Header({
   );
 }
 
-function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
+function useGetLibraryData() {
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
+
+  if (loading1 || loading2 || loading3) {
+    return { workspaces, pendingWorkspaces, nags, loading: true };
+  }
+
+  return { workspaces, pendingWorkspaces, nags };
+}
+
+function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
+  const { workspaces, pendingWorkspaces, nags, loading } = useGetLibraryData();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
-  useEffect(() => {
-    // After rendering null, update the workspaceId to display the user's library
-    // instead of the non-existent team.
-    if (!loading2 && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
-      setWorkspaceId(null);
-      updateDefaultWorkspace({ variables: { workspaceId: null } });
-    }
-  }, [workspaces, loading2]);
-
+  useEffect(
+    function handleDeletedTeam() {
+      // After rendering null, update the workspaceId to display the user's library
+      // instead of the non-existent team.
+      if (!loading && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+        setWorkspaceId(null);
+        updateDefaultWorkspace({ variables: { workspaceId: null } });
+      }
+    },
+    [loading]
+  );
   useEffect(
     function handleOnboardingModals() {
-      // Wait for both queries to finish loading
-      if (loading1 || loading2 || loading3) {
+      if (loading) {
         return;
       }
 
@@ -80,10 +91,10 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
         setModal("onboarding");
       }
     },
-    [loading1, loading2, loading3]
+    [loading]
   );
 
-  if (loading1 || loading2) {
+  if (loading) {
     return null;
   }
 
