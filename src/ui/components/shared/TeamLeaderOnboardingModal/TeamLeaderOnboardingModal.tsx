@@ -247,10 +247,10 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           </div>
           {invalidInput ? <div>Invalid email address</div> : null}
         </form>
-        {!loading && pendingMembers ? (
+        {!loading && sortedMembers ? (
           <div className="overflow-auto flex-grow">
             <div className="flex flex-col space-y-2">
-              {pendingMembers.map(m => (
+              {sortedMembers.map(m => (
                 <div key={m.email}>{m.email}</div>
               ))}
             </div>
