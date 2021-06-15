@@ -18,7 +18,6 @@ const { setupExceptions } = require("devtools/client/debugger/src/actions/logExc
 import { selectors } from "ui/reducers";
 import { getUserSettings } from "ui/hooks/settings";
 import DevTools from "ui/components/DevTools";
-import { setWorkspaceId } from "ui/actions/app";
 
 const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id")!;
