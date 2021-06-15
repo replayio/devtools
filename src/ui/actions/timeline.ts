@@ -210,7 +210,8 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
         return;
       }
 
-      paintGraphics(screen, mouse);
+      const playing = !!selectors.getPlayback(getState());
+      paintGraphics(screen, mouse, playing);
       Video.seek(currentTime);
     } catch {}
   };
