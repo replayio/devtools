@@ -45,6 +45,7 @@ pref("devtools.features.widgetHover", false);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
 pref("devtools.features.videoPlayback", false);
+pref("devtools.features.launchBrowser", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -76,6 +77,7 @@ export const features = new PrefsHelper("devtools.features", {
   reactDevtools: ["Bool", "reactDevtools"],
   smoothPlayback: ["Bool", "smoothPlayback"],
   videoPlayback: ["Bool", "videoPlayback"],
+  launchBrowser: ["Bool", "launchBrowser"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

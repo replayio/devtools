@@ -11,6 +11,7 @@ import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
+import LaunchButton from "../shared/LaunchButton";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -41,6 +42,8 @@ function Header({
 
         <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
       </div>
+      <div className="flex-auto" />
+      <LaunchButton />
       <UserOptions mode="account" />
     </div>
   );

@@ -40,6 +40,7 @@ document.body.addEventListener("contextmenu", e => e.preventDefault());
 setupTelemetry({ recordingId });
 
 const BrowserError = React.lazy(() => import("views/browser/error"));
+const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
 
 function PageSwitch() {
   const [pageWithStore, setPageWithStore] = useState(null);
@@ -72,6 +73,7 @@ ReactDOM.render(
     <Router>
       <Switch>
         <Route exact path="/browser/error" component={BrowserError} />
+        <Route exact path="/browser/launch" component={BrowserLaunch} />
         <Route>
           <tokenManager.Auth0Provider>
             <ApolloWrapper recordingId={recordingId}>

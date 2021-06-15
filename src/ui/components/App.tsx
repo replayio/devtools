@@ -5,6 +5,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import AppErrors from "./shared/Error";
 const LoginModal = require("./shared/LoginModal").default;
 import SharingModal from "./shared/SharingModal";
+import LaunchBrowserModal from "./shared/LaunchBrowserModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
@@ -55,6 +56,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "team-leader-onboarding": {
       return <TeamLeaderOnboardingModal />;
+    }
+    case "browser-launch": {
+      return <LaunchBrowserModal />;
     }
     default: {
       return null;
