@@ -55,11 +55,11 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
   useEffect(() => {
     // After rendering null, update the workspaceId to display the user's library
     // instead of the non-existent team.
-    if (!loading2 && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+    if (!loading1 && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
       setWorkspaceId(null);
       updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
-  }, [workspaces, loading2]);
+  }, [workspaces, loading1]);
 
   useEffect(
     function handleOnboardingModals() {
@@ -83,7 +83,7 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
     [loading1, loading2, loading3]
   );
 
-  if (loading1 || loading2) {
+  if (loading1 || loading2 || loading3) {
     return null;
   }
 
