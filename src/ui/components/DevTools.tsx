@@ -73,7 +73,7 @@ function DevTools({
   }, [expectedError]);
 
   if (expectedError) {
-    return null;
+    return <BlankLoadingScreen />;
   }
 
   // Skip loading screens when running tests

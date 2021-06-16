@@ -31,7 +31,6 @@ const tokenManager = require("ui/utils/tokenManager").default;
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
 const App = require("ui/components/App").default;
-const BlankLoadingScreen = require("ui/components/shared/BlankScreen").BlankLoadingScreen;
 
 require("image/image.css");
 

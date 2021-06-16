@@ -154,7 +154,7 @@ function App({
   }
 
   if (!isDeployPreview() && auth.isLoading) {
-    return null;
+    return <BlankScreen />;
   }
 
   return (
