@@ -77,6 +77,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
               node {
                 id
                 name
+                invitationCode
                 members {
                   edges {
                     node {

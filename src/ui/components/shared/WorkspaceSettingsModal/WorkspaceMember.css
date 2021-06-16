@@ -1,75 +1,64 @@
-.workspace-settings-modal .workspace-members-container {
-  list-style-type: none;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-}
-
-.workspace-settings-modal .workspace-members-container > :not(:first-child) {
-  margin-top: 8px;
-}
-
-.workspace-settings-modal .workspace-members {
+.workspace-members-container .workspace-members {
   list-style-type: none;
   overflow: auto;
 }
 
-.workspace-settings-modal .workspace-members > :not(:first-child) {
+.workspace-members-container .workspace-members > :not(:first-child) {
   margin-top: 8px;
 }
 
-.workspace-settings-modal .workspace-member {
+.workspace-members-container .workspace-member {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.workspace-settings-modal .workspace-member > :not(:first-child) {
+.workspace-members-container .workspace-member > :not(:first-child) {
   margin-left: 8px;
 }
 
-.workspace-settings-modal .workspace-member img {
+.workspace-members-container .workspace-member img {
   border-radius: 50%;
   height: 28px;
   width: 28px;
 }
 
-.workspace-settings-modal .workspace-member-content {
+.workspace-members-container .workspace-member-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
-.workspace-settings-modal .workspace-member-content .subtitle {
+.workspace-members-container .workspace-member-content .subtitle {
   font-size: 12px;
   color: var(--theme-comment);
 }
 
-.workspace-settings-modal .workspace-member .material-icons {
+.workspace-members-container .workspace-member .material-icons {
   font-size: 28px;
 }
 
 /* Permissions dropdown */
 
-.workspace-settings-modal .member-permissions .expand-dropdown {
+.workspace-members-container .member-permissions .expand-dropdown {
   padding: 0px;
   color: var(--theme-toolbar-color);
   background: inherit;
 }
 
-.workspace-settings-modal .permission-container {
+.workspace-members-container .permission-container {
   display: flex;
   align-items: center;
   flex-direction: row;
 }
 
-.workspace-settings-modal .workspace-member .permission-container .material-icons {
+.workspace-members-container .workspace-member .permission-container .material-icons {
   font-size: 16px;
   color: var(--theme-comment);
   visibility: hidden;
 }
 
-.workspace-settings-modal .permission-container:hover .material-icons {
+.workspace-members-container .permission-container:hover .material-icons {
   visibility: visible;
 }
 

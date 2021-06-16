@@ -11,9 +11,9 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
-import { validateEmail } from "../WorkspaceSettingsModal/WorkspaceForm";
 import InvitationLink from "./InvitationLink";
 const { prefs } = require("ui/utils/prefs");
 

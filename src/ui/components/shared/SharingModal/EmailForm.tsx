@@ -4,11 +4,7 @@ import hooks from "ui/hooks";
 import Spinner from "../Spinner";
 import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
 import "./EmailForm.css";
-
-function validateEmail(email: string) {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
-}
+import { validateEmail } from "ui/utils/helpers";
 
 type ActionStatus = "pending" | "loading" | "error" | "completed";
 

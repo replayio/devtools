@@ -4,11 +4,13 @@ import React from "react";
 export default function Modal({
   actions,
   children,
+  onMaskClick = () => {},
   options = {
     maskTransparency: "transparent",
   },
 }: {
   actions?: React.ReactNode;
+  onMaskClick?: () => void;
   children: React.ReactElement | React.ReactElement[];
   options?: {
     maskTransparency: "transparent" | "translucent";
@@ -26,6 +28,7 @@ export default function Modal({
           "opacity-10": maskTransparency === "translucent",
           "opacity-0": maskTransparency === "transparent",
         })}
+        onClick={onMaskClick}
       />
       <div className="z-10 relative">
         {children}
