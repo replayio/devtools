@@ -82,7 +82,7 @@ function HeaderTitle({ recording, recordingId }) {
 
   return (
     <span
-      className="input focus:ring-blue-500 ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent w-full border-black"
+      className="input focus:ring-blue-500 ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent w-full border-black whitespace-pre overflow-hidden overflow-ellipsis"
       role="textbox"
       spellCheck="false"
       contentEditable
@@ -114,14 +114,14 @@ function Header({ recordingId, sessionId, recordingTarget }) {
 
   return (
     <div id="header">
-      <div className="header-left">
+      <div className="header-left overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
             content={"Back to Library"}
             handleClick={e => onNavigateBack(e)}
           />
-        )}{" "}
+        )}
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
