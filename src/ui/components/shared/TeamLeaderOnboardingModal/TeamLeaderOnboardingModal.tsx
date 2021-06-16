@@ -13,11 +13,11 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { validateEmail } from "ui/utils/helpers";
 import BlankScreen from "../BlankScreen";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
-import { validateEmail } from "../WorkspaceSettingsModal/WorkspaceForm";
 const { prefs } = require("ui/utils/prefs");
 
 function ModalButton({
