@@ -104,6 +104,12 @@ function Form({
   isPublic: boolean;
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 }) {
+  const selectedWorkspace = workspaces.find(w => w.id === selectedWorkspaceId);
+  const privateText =
+    selectedWorkspaceId === null
+      ? `Only you can view this Replay`
+      : `Restricted to people in team "${selectedWorkspace!.name}"`;
+
   return (
     <>
       <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
@@ -128,7 +134,7 @@ function Form({
               onChange={() => setIsPublic(true)}
             />
             <label htmlFor="public">
-              <span className="font-semibold">Public:</span> Available to anyone with the link
+              <span className="font-semibold">Public: </span>Available to anyone with the link
             </label>
           </div>
           <div className="space-x-2 items-center">
@@ -141,7 +147,8 @@ function Form({
               onChange={() => setIsPublic(false)}
             />
             <label htmlFor="private">
-              <span className="font-semibold">Private:</span> Available to people you choose
+              <span className="font-semibold">Private: </span>
+              {privateText}
             </label>
           </div>
         </div>
