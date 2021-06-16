@@ -267,12 +267,15 @@ function convertScope(protocolScope) {
 }
 
 async function getFrameScopes(frame) {
-  const scopes = await ThreadFront.getScopes(frame.asyncIndex, frame.protocolId);
+  const { scopes, originalScopesUnavailable } = await ThreadFront.getScopes(
+    frame.asyncIndex,
+    frame.protocolId
+  );
   const converted = scopes.map(convertScope);
   for (let i = 0; i + 1 < converted.length; i++) {
     converted[i].parent = converted[i + 1];
   }
-  return converted[0];
+  return { scopes: converted[0], originalScopesUnavailable };
 }
 
 async function blackBox(sourceActor, isBlackBoxed, range) {

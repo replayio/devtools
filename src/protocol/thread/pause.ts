@@ -71,7 +71,7 @@ export type WiredFrame = Omit<Frame, "this"> & {
 };
 
 export type WiredScope = Omit<Scope, "bindings" | "object"> & {
-  bindings?: { name: string; value: ValueFront };
+  bindings?: WiredNamedValue[];
   object?: ValueFront;
 };
 
@@ -311,11 +311,21 @@ export class Pause {
     // related objects when loading original scopes and we don't deal with that
     // properly.
     let scopeChain = await this.ensureScopeChain(frame.scopeChain);
+    let originalScopesUnavailable = false;
     if (frame.originalScopeChain && !ThreadFront.hasPreferredGeneratedSource(frame.location)) {
-      scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
+      const originalScopeChain = await this.ensureScopeChain(frame.originalScopeChain);
+
+      // if all original variables are unavailable (usually due to sourcemap issues),
+      // we show the generated scope chain with a warning message instead
+      originalScopesUnavailable = originalScopeChain.every(scope =>
+        (scope.bindings || []).every(binding => binding.value.isUnavailable())
+      );
+      if (!originalScopesUnavailable) {
+        scopeChain = originalScopeChain;
+      }
     }
 
-    return scopeChain;
+    return { scopes: scopeChain, originalScopesUnavailable };
   }
 
   sendMessage<P, R>(
@@ -349,13 +359,13 @@ export class Pause {
   }
 
   // Synchronously get a DOM front for an object whose preview is known.
-  getDOMFront(objectId: ObjectId) {
+  getDOMFront(objectId: ObjectId): NodeFront | RuleFront | StyleFront | StyleSheetFront | null {
     // Make sure we don't create multiple node fronts for the same object.
     if (!objectId) {
       return null;
     }
     if (this.domFronts.has(objectId)) {
-      return this.domFronts.get(objectId);
+      return this.domFronts.get(objectId)!;
     }
     const data = this.objects.get(objectId);
     assert(data && data.preview);

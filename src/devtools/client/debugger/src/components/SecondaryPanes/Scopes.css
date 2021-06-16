@@ -99,3 +99,12 @@ html[dir="rtl"] .scopes-content .object-node {
   line-height: 15px;
   min-width: fit-content;
 }
+
+.scopes-list .warning {
+  margin: 4px 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--theme-warning-border);
+  background-color: var(--theme-warning-background);
+  color: var(--theme-warning-color);
+  white-space: normal;
+}
