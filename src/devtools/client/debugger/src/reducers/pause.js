@@ -105,7 +105,8 @@ function update(state = createPauseState(), action) {
         ...state.frameScopes,
         [selectedFrameId]: {
           pending: status !== "done",
-          scope: value,
+          originalScopesUnavailable: !!value?.originalScopesUnavailable,
+          scope: value?.scopes,
         },
       };
 

@@ -131,6 +131,7 @@ class Scopes extends PureComponent {
       setExpandedScope,
       expandedScopes,
       selectedFrame,
+      originalScopesUnavailable,
     } = this.props;
     const { scopes } = this.state;
 
@@ -146,6 +147,9 @@ class Scopes extends PureComponent {
       }));
       return (
         <div className="pane scopes-list">
+          {originalScopesUnavailable ? (
+            <div className="warning">The variables could not be mapped to their original names</div>
+          ) : null}
           <ObjectInspector
             roots={roots}
             autoExpandAll={false}
@@ -187,9 +191,10 @@ const mapStateToProps = state => {
   const cx = getThreadContext(state);
   const selectedFrame = getSelectedFrame(state);
   const frameScope = getFrameScope(state, selectedFrame?.id);
-  const { scope, pending } = frameScope || {
+  const { scope, pending, originalScopesUnavailable } = frameScope || {
     scope: null,
     pending: false,
+    originalScopesUnavailable: false,
   };
 
   return {
@@ -198,6 +203,7 @@ const mapStateToProps = state => {
     isLoading: pending,
     why: getPauseReason(state),
     frameScopes: scope,
+    originalScopesUnavailable,
     expandedScopes: getLastExpandedScopes(state),
   };
 };
