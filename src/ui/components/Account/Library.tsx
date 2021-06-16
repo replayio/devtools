@@ -58,8 +58,16 @@ function LibraryLoader(props: PropsFromRedux) {
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
-  const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(() => setRenderLibrary(true));
+  const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted);
 
+  function onCompleted() {
+    // This allows the server enough time to refresh the pending workspaces
+    // with the new team before we render the Library.
+    setTimeout(() => {
+      window.history.pushState({}, document.title, window.location.pathname);
+      setRenderLibrary(true);
+    }, 1000);
+  }
   useEffect(function handleTeamInvitationCode() {
     const code = hasTeamInvitationCode();
 

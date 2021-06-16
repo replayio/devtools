@@ -92,7 +92,7 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
 export function useClaimTeamInvitationCode(onCompleted: () => void) {
   const [inviteNewWorkspaceMember] = useMutation(
     gql`
-      mutation ClaimTeamInvitationCode($code: uuid!) {
+      mutation ClaimTeamInvitationCode($code: ID!) {
         claimTeamInvitationCode(input: { code: $code }) {
           success
         }
