@@ -5,6 +5,7 @@ import React, {
   MouseEventHandler,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -15,6 +16,7 @@ import { Workspace, WorkspaceUser } from "ui/types";
 import BlankScreen from "../BlankScreen";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
+import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import { validateEmail } from "../WorkspaceSettingsModal/WorkspaceForm";
 const { prefs } = require("ui/utils/prefs");
 
@@ -157,6 +159,7 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   function onNewWorkspaceCompleted(workspace: Workspace) {
+    console.log({ workspace });
     setNewWorkspace(workspace);
     updateDefaultWorkspace({
       variables: {
@@ -247,15 +250,19 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           </div>
           {invalidInput ? <div>Invalid email address</div> : null}
         </form>
-        {!loading && sortedMembers ? (
-          <div className="overflow-auto flex-grow">
+        <div className="overflow-auto flex-grow">
+          {!loading && sortedMembers ? (
             <div className="flex flex-col space-y-2">
               {sortedMembers.map(m => (
                 <div key={m.email}>{m.email}</div>
               ))}
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
+        <div className="flex flex-col space-y-2">
+          <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
+          <InvitationLink text={newWorkspace!.invitationCode} />
+        </div>
       </SlideContent>
       <div className="grid">
         <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
@@ -332,13 +339,15 @@ function OnboardingModal(props: PropsFromRedux) {
     slide = <SlideBody4 {...{ ...newProps, newWorkspace: newWorkspace! }} />;
   }
 
+  const height = current === 3 ? "520px" : "360px";
+
   return (
     <>
       <BlankScreen className="fixed" />
       <Modal options={{ maskTransparency: "translucent" }}>
         <div
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
-          style={{ width: "520px", height: "360px" }}
+          style={{ width: "520px", height }}
         >
           {slide}
         </div>

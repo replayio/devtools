@@ -14,6 +14,7 @@ import { Workspace, WorkspaceUser } from "ui/types";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { validateEmail } from "../WorkspaceSettingsModal/WorkspaceForm";
+import InvitationLink from "./InvitationLink";
 const { prefs } = require("ui/utils/prefs");
 
 function ModalButton({
@@ -212,15 +213,19 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           </div>
           {invalidInput ? <div>Invalid email address</div> : null}
         </form>
-        {!loading && sortedMembers ? (
-          <div className="overflow-auto flex-grow">
+        <div className="overflow-auto flex-grow">
+          {!loading && sortedMembers ? (
             <div className="flex flex-col space-y-2">
               {sortedMembers.map(m => (
                 <div key={m.email}>{m.email}</div>
               ))}
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
+        <div className="flex flex-col space-y-2">
+          <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
+          <InvitationLink text={newWorkspace!.invitationCode} />
+        </div>
       </SlideContent>
       <div className="grid">
         <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />

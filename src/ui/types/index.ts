@@ -32,6 +32,7 @@ export interface Recording {
 export interface Workspace {
   name: string;
   id: string;
+  invitationCode: string;
   members?: User[];
 }
 

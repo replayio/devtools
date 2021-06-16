@@ -11,6 +11,7 @@ export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
           success
           workspace {
             id
+            invitationCode
           }
         }
       }
