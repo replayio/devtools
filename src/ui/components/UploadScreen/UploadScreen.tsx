@@ -6,7 +6,6 @@ import hooks from "ui/hooks";
 import TeamSelect from "./TeamSelect";
 const { getFormattedTime } = require("ui/utils/timeline");
 import ReplayTitle from "./ReplayTitle";
-import { selectors } from "ui/reducers";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
 import { Recording, Workspace } from "ui/types";
