@@ -205,7 +205,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
         <div className="text-xl">{`Next, we need to add your team members to your team.`}</div>
         <form className="flex flex-col" onSubmit={handleAddMember}>
           <div className="flex-grow flex flex-row space-x-4">
-            <TextInput placeholder="Team name" value={inputValue} onChange={onChange} />
+            <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
             <ModalButton onClick={handleAddMember} disabled={isLoading}>
               {isLoading ? "Loading" : "Invite"}
             </ModalButton>
