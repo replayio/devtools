@@ -157,7 +157,10 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
 
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
-  const [isPublic, setIsPublic] = useState(!recording.private);
+  // The actual replay in the database is public by default, for test purposes.
+  // Before being initialized, public/private behaves similarly since non-authors
+  // can't view the replay.
+  const [isPublic, setIsPublic] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
     userSettings?.defaultWorkspaceId || null
   );
