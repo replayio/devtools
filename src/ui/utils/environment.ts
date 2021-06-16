@@ -28,6 +28,10 @@ export function isTeamLeaderInvite() {
   return new URL(window.location.href).searchParams.get("replayinvite");
 }
 
+export function hasTeamInvitationCode() {
+  return new URL(window.location.href).searchParams.get("invitationcode");
+}
+
 export function isTest() {
   return getTest() != null;
 }
