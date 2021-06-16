@@ -89,6 +89,21 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
   return inviteNewWorkspaceMember;
 }
 
+export function useClaimTeamInvitationCode(onCompleted: () => void) {
+  const [inviteNewWorkspaceMember] = useMutation(
+    gql`
+      mutation ClaimTeamInvitationCode($code: uuid!) {
+        claimTeamInvitationCode(input: { code: $code }) {
+          success
+        }
+      }
+    `,
+    { refetchQueries: ["GetPendingWorkspaces"], onCompleted }
+  );
+
+  return inviteNewWorkspaceMember;
+}
+
 export function useDeleteUserFromWorkspace() {
   const [deleteUserFromWorkspace] = useMutation(
     gql`
