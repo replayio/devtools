@@ -98,7 +98,7 @@ export function useClaimTeamInvitationCode(onCompleted: () => void) {
         }
       }
     `,
-    { refetchQueries: ["GetPendingWorkspaces"], onCompleted }
+    { refetchQueries: ["GetPendingWorkspaces"], onCompleted, onError: onCompleted }
   );
 
   return inviteNewWorkspaceMember;

@@ -159,7 +159,6 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   function onNewWorkspaceCompleted(workspace: Workspace) {
-    console.log({ workspace });
     setNewWorkspace(workspace);
     updateDefaultWorkspace({
       variables: {
@@ -237,6 +236,7 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
 
+  console.log({ newWorkspace });
   return (
     <>
       <SlideContent headerText="Your team members">
@@ -259,10 +259,7 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
             </div>
           ) : null}
         </div>
-        <div className="flex flex-col space-y-2">
-          <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
-          <InvitationLink text={newWorkspace!.invitationCode} />
-        </div>
+        <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>
       <div className="grid">
         <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />

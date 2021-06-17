@@ -222,10 +222,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
             </div>
           ) : null}
         </div>
-        <div className="flex flex-col space-y-2">
-          <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
-          <InvitationLink text={newWorkspace!.invitationCode} />
-        </div>
+        <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>
       <div className="grid">
         <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
@@ -234,7 +231,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
   );
 }
 
-type SlideBody4Props = PropsFromRedux & {
+type SlideBody3Props = PropsFromRedux & {
   setCurrent: Dispatch<SetStateAction<number>>;
   setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
   newWorkspace: Workspace;
@@ -242,7 +239,7 @@ type SlideBody4Props = PropsFromRedux & {
   current: number;
 };
 
-function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody4Props) {
+function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const onClick = () => {
@@ -296,12 +293,14 @@ function OnboardingModal(props: PropsFromRedux) {
     slide = <SlideBody3 {...{ ...newProps, newWorkspace: newWorkspace! }} />;
   }
 
+  const height = current == 2 ? "520px" : "360px";
+
   return (
     <>
-      <Modal options={{ maskTransparency: "transparent" }}>
+      <Modal options={{ maskTransparency: "translucent" }}>
         <div
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
-          style={{ width: "520px", height: "360px" }}
+          style={{ width: "520px", height }}
         >
           {slide}
         </div>
