@@ -119,7 +119,7 @@ function Library({
       setModal("team-member-onboarding");
     }
 
-    if (!isLinkedFromEmail && !nags.includes(Nag.FIRST_REPLAY)) {
+    if (!isLinkedFromEmail && !hasTeamInvitationCode && !nags.includes(Nag.FIRST_REPLAY)) {
       setModal("onboarding");
     }
   }, []);

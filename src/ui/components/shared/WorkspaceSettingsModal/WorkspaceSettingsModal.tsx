@@ -53,17 +53,6 @@ export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
   );
 }
 
-function useGetInvitationUrl(workspaceId: string) {
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-
-  if (loading) {
-    return "Loading invitation URL";
-  }
-
-  const workspace = workspaces.find(w => workspaceId == w.id);
-  return workspace!.invitationCode;
-}
-
 function WorkspaceForm({ workspaceId }: PropsFromRedux) {
   const [inputValue, setInputValue] = useState("");
   const [invalidInput, setInvalidInput] = useState(false);
@@ -104,7 +93,6 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
 
 function WorkspaceSettingsModal(props: PropsFromRedux) {
   const { members } = hooks.useGetWorkspaceMembers(props.workspaceId!);
-  const invitationUrlText = useGetInvitationUrl(props.workspaceId!);
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
@@ -125,12 +113,7 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
                 </div>
               </div>
             </div>
-            {
-              <div className="flex flex-col space-y-4">
-                <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
-                <InvitationLink text={invitationUrlText} />
-              </div>
-            }
+            <InvitationLink workspaceId={props.workspaceId!} />
           </div>
         </div>
         <button className="absolute top-4 right-4" onClick={props.hideModal}>

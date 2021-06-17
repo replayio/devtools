@@ -33,6 +33,8 @@ export interface Workspace {
   name: string;
   id: string;
   invitationCode: string;
+  domain: string;
+  isDomainLimitedCode: boolean;
   members?: User[];
 }
 

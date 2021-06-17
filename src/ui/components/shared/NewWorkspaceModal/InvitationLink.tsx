@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
+import hooks from "ui/hooks";
 
-export default function InvitationLink({ text }: { text: string }) {
+function InvitationURL({ code }: { code: string }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const displayedText = `https://replay.io/view?invitationcode=${text}`;
+  const displayedText = `https://replay.io/view?invitationcode=${code}`;
 
   const onClick = () => {
     navigator.clipboard.writeText(displayedText);
@@ -31,6 +32,46 @@ export default function InvitationLink({ text }: { text: string }) {
           Copied
         </div>
       ) : null}
+    </div>
+  );
+}
+
+export default function InvitationLink({ workspaceId }: { workspaceId: string }) {
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const updateWorkspaceCodeDomainLimitations = hooks.useUpdateWorkspaceCodeDomainLimitations();
+
+  const workspace = workspaces.find(w => workspaceId == w.id);
+
+  const handleToggle = () => {
+    if (!workspace) {
+      return;
+    }
+    updateWorkspaceCodeDomainLimitations({
+      variables: { workspaceId, isLimited: !workspace.isDomainLimitedCode },
+    });
+  };
+
+  return (
+    <div className="flex flex-col space-y-4">
+      <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
+      <InvitationURL code={workspace ? workspace.invitationCode : "Loading URL"} />
+      <div className="space-x-4 flex flex-row items-center px-2">
+        <input
+          id="domain-limited"
+          className="outline-none focus:outline-none"
+          type="checkbox"
+          disabled={!workspace}
+          checked={!!workspace?.isDomainLimitedCode}
+          onChange={handleToggle}
+        />
+        <label htmlFor="domain-limited">
+          Only users with{" "}
+          <span className="font-medium text-gray-700">
+            {workspace ? `a ${workspace.domain} address` : `a matching email address domain`}
+          </span>{" "}
+          can use this link
+        </label>
+      </div>
     </div>
   );
 }
