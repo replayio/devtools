@@ -32,7 +32,7 @@ function _UploadScreenWrapper({ setExpectedError }: PropsFromRedux) {
   });
 
   if (expectedError) {
-    return null;
+    return <BlankLoadingScreen />;
   }
 
   return recording ? <UploadScreen recording={recording} /> : <BlankLoadingScreen />;
