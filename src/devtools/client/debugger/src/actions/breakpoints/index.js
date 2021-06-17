@@ -17,6 +17,7 @@ import {
   getBreakpointsForSource,
   getFirstBreakpointPosition,
   getSymbols,
+  getThreadContext,
 } from "../../selectors";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import {
@@ -162,9 +163,10 @@ export function toggleBreakpointAtLine(cx, line) {
   };
 }
 
-export function runAnalysisOnLine(cx, line) {
+export function runAnalysisOnLine(line) {
   return ({ dispatch, getState }) => {
     const state = getState();
+    const cx = getThreadContext(state);
     const source = getSelectedSource(state);
 
     if (!source) {
