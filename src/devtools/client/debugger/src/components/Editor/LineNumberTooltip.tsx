@@ -39,7 +39,6 @@ type LineNumberTooltipProps = PropsFromRedux & { editor: any };
 
 function LineNumberTooltip({
   editor,
-  cx,
   runAnalysisOnLine,
   analysisPoints,
   setHoveredLineNumberLocation,
@@ -63,7 +62,7 @@ function LineNumberTooltip({
       lastHoveredLineNumber.current = lineNumber;
       setTimeout(() => {
         if (lineNumber === lastHoveredLineNumber.current) {
-          runAnalysisOnLine(cx, lineNumber);
+          runAnalysisOnLine(lineNumber);
         }
       }, 100);
     }
@@ -114,7 +113,6 @@ function LineNumberTooltip({
 
 const connector = connect(
   (state: UIState) => ({
-    cx: getThreadContext(state),
     analysisPoints: selectors.getPointsForHoveredLineNumber(state),
   }),
   {
