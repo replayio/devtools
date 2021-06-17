@@ -47,7 +47,8 @@ export interface AppState {
   sessionId: SessionId | null;
   theme: string;
   splitConsoleOpen: boolean;
-  indexed: boolean;
+  recordingDuration: number;
+  indexing: number;
   loading: number;
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;
