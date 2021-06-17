@@ -150,7 +150,7 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, p
       executionPointTime: time,
       executionPointHasFrames: true,
       logpointId: logGroupId,
-      pauseId: pause.pauseId,
+      pauseId: pause?.pauseId,
     };
 
     dispatch(dispatchMessageAdd(packet));
