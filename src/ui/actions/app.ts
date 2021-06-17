@@ -119,14 +119,9 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
 
   ThreadFront.ensureProcessed("basic", undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
-  ).then(() => {
-    store.dispatch(setLoading(100));
-  });
+  ).then(() => store.dispatch(setLoading(100)));
 
-  ThreadFront.ensureProcessed("executionIndexed").then(() => {
-    console.log("indexed");
-    store.dispatch(setIndexing(100));
-  });
+  ThreadFront.ensureProcessed("executionIndexed").then(() => store.dispatch(setIndexing(100)));
 
   ThreadFront.listenForLoadChanges((parameters: loadedRegions) =>
     store.dispatch({ type: "set_loaded_regions", parameters })
@@ -135,15 +130,11 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
 
 function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return ({ dispatch, getState }) => {
-    let endPoint = Math.max(...regions.map(r => r.end), 0);
-    if (endPoint == 0) {
+    const endPoint = selectors.getRecordingDuration(getState());
+
+    // Wait until we have started loading regions
+    if (endPoint === 0) {
       return;
-    }
-    const state = getState();
-    if (endPoint > selectors.getRecordingDuration(state)) {
-      dispatch(setRecordingDuration(endPoint));
-    } else {
-      endPoint = selectors.getRecordingDuration(state);
     }
 
     const unprocessedProgress = regions.reduce(
