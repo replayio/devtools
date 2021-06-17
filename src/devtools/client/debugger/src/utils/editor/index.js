@@ -71,6 +71,10 @@ export function fromEditorLine(line) {
 }
 
 export function toEditorColumn(lineText, column) {
+  if (!lineText) {
+    return 0;
+  }
+
   let pointOffset = 0;
   let unitOffset = 0;
   for (const c of lineText) {
