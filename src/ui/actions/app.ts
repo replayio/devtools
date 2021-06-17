@@ -26,8 +26,9 @@ import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
+export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
-export type IndexedAction = Action<"indexed">;
+export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
 export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
@@ -81,8 +82,9 @@ export type SetLoadedRegions = Action<"set_loaded_regions"> & {
 
 export type AppActions =
   | SetupAppAction
+  | SetRecordingDurationAction
   | LoadingAction
-  | IndexedAction
+  | IndexingAction
   | SetSessionIdAction
   | UpdateThemeAction
   | SetSplitConsoleAction
@@ -118,12 +120,12 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   ThreadFront.ensureProcessed("basic", undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
   ).then(() => {
-    store.dispatch({ type: "loading", loading: 100 });
+    store.dispatch(setLoading(100));
   });
 
   ThreadFront.ensureProcessed("executionIndexed").then(() => {
     console.log("indexed");
-    store.dispatch({ type: "indexed" });
+    store.dispatch(setIndexing(100));
   });
 
   ThreadFront.listenForLoadChanges((parameters: loadedRegions) =>
@@ -131,23 +133,44 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   );
 }
 
-function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
+function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const loading = selectors.getLoading(getState());
-    const endPoint = Math.max(...regions.map(r => r.end), 0);
+    let endPoint = Math.max(...regions.map(r => r.end), 0);
     if (endPoint == 0) {
       return;
+    }
+    const state = getState();
+    if (endPoint > selectors.getRecordingDuration(state)) {
+      dispatch(setRecordingDuration(endPoint));
+    } else {
+      endPoint = selectors.getRecordingDuration(state);
     }
 
     const unprocessedProgress = regions.reduce(
       (sum, region) => sum + (region.end - region.begin),
       0
     );
-
     const processedProgress = endPoint - unprocessedProgress;
-    const percentProgress = Math.max((processedProgress / endPoint) * 100, loading);
-    dispatch({ type: "loading", loading: percentProgress });
+    const percentProgress = (processedProgress / endPoint) * 100;
+
+    if (level === "basic") {
+      dispatch(setLoading(percentProgress));
+    } else {
+      dispatch(setIndexing(percentProgress));
+    }
   };
+}
+
+function setRecordingDuration(duration: number): SetRecordingDurationAction {
+  return { type: "set_recording_duration", duration };
+}
+
+function setLoading(loading: number): LoadingAction {
+  return { type: "loading", loading };
+}
+
+function setIndexing(indexing: number): IndexingAction {
+  return { type: "indexing", indexing };
 }
 
 export function updateTheme(theme: string): UpdateThemeAction {

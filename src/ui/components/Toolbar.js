@@ -8,35 +8,26 @@ import "react-circular-progressbar/dist/styles.css";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-function getLoadingPercentage(loadedRegions) {
-  const { loaded, loading } = loadedRegions;
-  if (!loaded[0] || !loading[0]) {
-    return null;
-  }
-  return (loaded[0].end - loaded[0].begin) / (loading[0].end - loading[0].begin);
-}
-
-function IndexingLoader({ loadedRegions }) {
+function IndexingLoader({ progressPercentage }) {
   const [isDone, setDone] = useState(false);
-  const progressPercentage = getLoadingPercentage(loadedRegions);
 
   useEffect(() => {
     let timeout;
-    if (!isDone && progressPercentage == 1) {
+    if (!isDone && progressPercentage == 100) {
       timeout = setTimeout(() => setDone(true), 2000);
     }
 
     return () => clearTimeout(timeout);
-  }, [loadedRegions]);
+  }, [progressPercentage]);
 
   if (isDone || progressPercentage === null) {
     return null;
   }
 
   return (
-    <div className="w-8 h-8" title={`Indexing (${(progressPercentage * 100).toFixed()}%)`}>
+    <div className="w-8 h-8" title={`Indexing (${progressPercentage.toFixed()}%)`}>
       <CircularProgressbar
-        value={progressPercentage * 100}
+        value={progressPercentage}
         strokeWidth={10}
         styles={buildStyles({ pathColor: `#353535`, trailColor: `#ECECED` })}
       />
@@ -49,8 +40,7 @@ function Toolbar({
   setSelectedPrimaryPanel,
   togglePaneCollapse,
   panelCollapsed,
-  loadedRegions,
-  isPaused,
+  progressPercentage,
   viewMode,
 }) {
   const onClick = panel => {
@@ -113,7 +103,7 @@ function Toolbar({
           </>
         ) : null}
       </div>
-      <IndexingLoader {...{ loadedRegions }} />
+      <IndexingLoader {...{ progressPercentage }} />
     </div>
   );
 }
@@ -124,8 +114,7 @@ export default connect(
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedPanel: selectors.getSelectedPanel(state),
-    loadedRegions: selectors.getLoadedRegions(state),
-    isPaused: selectors.getFrames(state)?.length > 0,
+    progressPercentage: selectors.getIndexing(state),
     viewMode: selectors.getViewMode(state),
   }),
   {

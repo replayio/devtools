@@ -16,7 +16,8 @@ function initialAppState(): AppState {
     selectedPanel: prefs.selectedPanel,
     selectedPrimaryPanel: "comments",
     initializedPanels: [],
-    indexed: false,
+    recordingDuration: 0,
+    indexing: 0,
     loading: 4,
     uploading: null,
     sessionId: null,
@@ -47,12 +48,24 @@ export default function update(
       return { ...state, recordingId: action.recordingId };
     }
 
+    case "set_recording_duration": {
+      return { ...state, recordingDuration: action.duration };
+    }
+
+    case "indexing": {
+      return { ...state, indexing: action.indexing };
+    }
+
     case "set_uploading": {
       return { ...state, uploading: action.uploading };
     }
 
     case "set_loaded_regions": {
-      return { ...state, loadedRegions: action.parameters };
+      const recordingDuration = Math.max(
+        ...action.parameters.loading.map(r => r.end),
+        state.recordingDuration
+      );
+      return { ...state, loadedRegions: action.parameters, recordingDuration };
     }
 
     case "set_expected_error": {
@@ -85,10 +98,6 @@ export default function update(
 
     case "loading": {
       return { ...state, loading: action.loading };
-    }
-
-    case "indexed": {
-      return { ...state, indexed: true };
     }
 
     case "set_session_id": {
@@ -198,7 +207,9 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPrimaryPanel;
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
-export const getIndexed = (state: UIState) => state.app.indexed;
+export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
+export const getIndexing = (state: UIState) => state.app.indexing;
+export const getIndexed = (state: UIState) => state.app.indexing == 100;
 export const getLoading = (state: UIState) => state.app.loading;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getUploading = (state: UIState) => state.app.uploading;
