@@ -48,7 +48,7 @@ function Header({
       </div>
       <div className="flex-auto" />
       <LaunchButton />
-      <UserOptions mode="account" />
+      <UserOptions mode="account" noBrowserItem />
     </div>
   );
 }
