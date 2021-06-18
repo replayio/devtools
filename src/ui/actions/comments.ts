@@ -5,6 +5,16 @@ import { PendingComment, Event, Comment, Reply } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import { setSelectedPrimaryPanel } from "./app";
+import escapeHtml from "escape-html";
+const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
+const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
+const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
+const { getSymbols } = require("devtools/client/debugger/src/reducers/ast");
+const { setSymbols } = require("devtools/client/debugger/src/actions/sources/symbols");
+const {
+  waitForEditor,
+  getCodeMirror,
+} = require("devtools/client/debugger/src/utils/editor/create-editor");
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -39,19 +49,60 @@ export function createComment(
   return async ({ dispatch }) => {
     dispatch(setSelectedPrimaryPanel("comments"));
 
+    const sourceLocation = await ThreadFront.getCurrentPauseSourceLocation();
+    const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
+
     const pendingComment: PendingComment = {
       type: "new_comment",
       comment: {
         content: "",
+        primaryLabel: labels?.primary || null,
+        secondaryLabel: labels?.secondary || null,
         time,
         point,
         hasFrames: ThreadFront.currentPointHasFrames,
-        sourceLocation: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+        sourceLocation: sourceLocation || null,
         position,
       },
     };
 
     dispatch(setPendingComment(pendingComment));
+  };
+}
+
+export function createLabels(sourceLocation: {
+  sourceId: string;
+  sourceUrl: string;
+  line: number;
+}): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
+  return async ({ getState, dispatch }) => {
+    const { sourceUrl, line } = sourceLocation;
+    const filename = getFilenameFromURL(sourceUrl);
+    const state = getState();
+
+    let symbols = getSymbols(state, { id: sourceLocation.sourceId });
+    if (!symbols) {
+      symbols = await dispatch(setSymbols({ source: { id: sourceLocation.sourceId } }));
+    }
+    const closestFunction = findClosestFunction(symbols, sourceLocation);
+    const primary = closestFunction?.name || `${filename}:${line}`;
+
+    let snippet = getTextAtLocation(state, sourceLocation.sourceId, sourceLocation) || "";
+    if (!snippet) {
+      const sourceContent = await ThreadFront.getSourceContents(sourceLocation.sourceId);
+      const lineText = sourceContent.contents.split("\n")[line - 1];
+      snippet = lineText?.slice(0, 100).trim();
+    }
+    let secondary = "";
+    if (snippet) {
+      await waitForEditor();
+      const CodeMirror = getCodeMirror();
+      CodeMirror.runMode(snippet, "javascript", (text: string, className: string | null) => {
+        const openingTag = className ? `<span class="cm-${className}">` : "<span>";
+        secondary += `${openingTag}${escapeHtml(text)}</span>`;
+      });
+    }
+    return { primary, secondary };
   };
 }
 
@@ -71,13 +122,15 @@ export function editItem(item: Comment | Reply): UIThunkAction {
       };
       dispatch(setPendingComment(pendingComment));
     } else {
-      const { content, sourceLocation, id, position } = item;
+      const { content, primaryLabel, secondaryLabel, sourceLocation, id, position } = item;
 
       // Editing a comment.
       const pendingComment: PendingComment = {
         type: "edit_comment",
         comment: {
           content,
+          primaryLabel,
+          secondaryLabel,
           time,
           point,
           hasFrames,
