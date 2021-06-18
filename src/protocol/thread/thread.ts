@@ -802,16 +802,12 @@ class _ThreadFront {
   }
 
   async getCurrentPauseSourceLocation() {
-    if (!this.currentPause?.frames) {
-      return;
-    }
-
-    const frame = this.currentPause.frames.get("0");
+    const frame = (await this.currentPause?.getFrames())?.[0];
     if (!frame) {
       return;
     }
     const { location } = frame;
-    const preferredLocation = this.getPreferredLocationRaw(location);
+    const preferredLocation = await this.getPreferredLocation(location);
     if (!preferredLocation) {
       return;
     }
