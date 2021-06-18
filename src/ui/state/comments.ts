@@ -26,6 +26,8 @@ interface User {
 
 export interface Comment {
   content: string;
+  primaryLabel: string;
+  secondaryLabel: string;
   createdAt: string;
   hasFrames: boolean;
   sourceLocation: SourceLocation | null;
@@ -83,6 +85,8 @@ export type PendingComment =
 
 export interface PendingNewComment extends PendingBlankComment {
   content: "";
+  primaryLabel: string | null;
+  secondaryLabel: string | null;
   position: CommentPosition | null;
 }
 
@@ -92,6 +96,8 @@ export interface PendingNewReply extends PendingBlankComment {
 }
 
 export interface PendingEditComment extends PendingBlankComment {
+  primaryLabel: string | null;
+  secondaryLabel: string | null;
   position: CommentPosition;
   parentId?: null;
   id: string;

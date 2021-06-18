@@ -54,10 +54,12 @@ function NewCommentEditor({
       return;
     }
 
-    const { time, point, hasFrames, sourceLocation } = comment;
+    const { primaryLabel, secondaryLabel, time, point, hasFrames, sourceLocation } = comment;
 
     const newComment = {
       content: inputValue,
+      primaryLabel,
+      secondaryLabel,
       point,
       time,
       hasFrames,

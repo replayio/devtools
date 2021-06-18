@@ -11,6 +11,8 @@ export const GET_COMMENTS = gql`
       comments {
         id
         content
+        primaryLabel
+        secondaryLabel
         createdAt
         updatedAt
         hasFrames
