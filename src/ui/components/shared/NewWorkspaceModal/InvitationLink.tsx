@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import hooks from "ui/hooks";
+import { Workspace } from "ui/types";
 
 function InvitationURL({ code }: { code: string }) {
   const [showCopied, setShowCopied] = useState(false);
@@ -36,42 +37,54 @@ function InvitationURL({ code }: { code: string }) {
   );
 }
 
-export default function InvitationLink({ workspaceId }: { workspaceId: string }) {
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const updateWorkspaceCodeDomainLimitations = hooks.useUpdateWorkspaceCodeDomainLimitations();
-
-  const workspace = workspaces.find(w => workspaceId == w.id);
-
   const handleToggle = () => {
     if (!workspace) {
       return;
     }
     updateWorkspaceCodeDomainLimitations({
-      variables: { workspaceId, isLimited: !workspace.isDomainLimitedCode },
+      variables: { workspaceId: workspace.id, isLimited: !workspace.isDomainLimitedCode },
     });
   };
+
+  if (workspace?.domain == "gmail.com") {
+    return null;
+  }
+
+  const emptyWorkspaceLink = "Only users with a matching email address domain can use this link";
+  const workspaceLink = (
+    <span>
+      only users with a <span className="font-medium text-gray-700">{workspace.domain}</span>{" "}
+      address can use this link
+    </span>
+  );
+
+  return (
+    <div className="space-x-4 flex flex-row items-center px-2">
+      <input
+        id="domain-limited"
+        className="outline-none focus:outline-none"
+        type="checkbox"
+        disabled={!workspace}
+        checked={!!workspace?.isDomainLimitedCode}
+        onChange={handleToggle}
+      />
+      <label htmlFor="domain-limited">{workspace ? workspaceLink : emptyWorkspaceLink}</label>
+    </div>
+  );
+}
+
+export default function InvitationLink({ workspaceId }: { workspaceId: string }) {
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+
+  const workspace = workspaces.find(w => workspaceId == w.id);
 
   return (
     <div className="flex flex-col space-y-4">
       <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
       <InvitationURL code={workspace ? workspace.invitationCode : "Loading URL"} />
-      <div className="space-x-4 flex flex-row items-center px-2">
-        <input
-          id="domain-limited"
-          className="outline-none focus:outline-none"
-          type="checkbox"
-          disabled={!workspace}
-          checked={!!workspace?.isDomainLimitedCode}
-          onChange={handleToggle}
-        />
-        <label htmlFor="domain-limited">
-          Only users with{" "}
-          <span className="font-medium text-gray-700">
-            {workspace ? `a ${workspace.domain} address` : `a matching email address domain`}
-          </span>{" "}
-          can use this link
-        </label>
-      </div>
+      <InvationDomainCheck workspace={workspace} />
     </div>
   );
 }
