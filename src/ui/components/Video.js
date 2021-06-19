@@ -36,15 +36,17 @@ function Video({ recordingId, playback, isNodePickerActive, pendingComment, reco
     }
   };
 
+  const showCommentTool = isPaused && !isNodeTarget && isAuthenticated && !isNodePickerActive;
+
   return (
     <div id="video">
       <video id="graphicsVideo" />
       <canvas id="graphics" onMouseDown={onMouseDown} />
-      <CommentsOverlay>
-        {isPaused && !isNodeTarget && isAuthenticated ? (
+      {showCommentTool ? (
+        <CommentsOverlay>
           <CommentLoader recordingId={recordingId} />
-        ) : null}
-      </CommentsOverlay>
+        </CommentsOverlay>
+      ) : null}
       <div id="highlighter-root"></div>
     </div>
   );

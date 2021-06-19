@@ -20,7 +20,8 @@ export type ModalType =
   | "workspace-settings"
   | "onboarding"
   | "team-member-onboarding"
-  | "team-leader-onboarding";
+  | "team-leader-onboarding"
+  | "browser-launch";
 export type WorkspaceId = string;
 export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Personal";
 
@@ -46,7 +47,8 @@ export interface AppState {
   sessionId: SessionId | null;
   theme: string;
   splitConsoleOpen: boolean;
-  indexed: boolean;
+  recordingDuration: number;
+  indexing: number;
   loading: number;
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;

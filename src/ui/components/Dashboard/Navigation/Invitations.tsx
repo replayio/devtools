@@ -73,6 +73,7 @@ function AcceptedInvitation({
   setWorkspaceId: (id: string) => void;
   hideAcceptedInvitation: (team: Workspace) => void;
 }) {
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const [shouldHide, setShouldHide] = useState(false);
 
   const onHide = () => {
@@ -81,6 +82,7 @@ function AcceptedInvitation({
   const onGo = () => {
     setShouldHide(true);
     setWorkspaceId(workspace.id);
+    updateDefaultWorkspace({ variables: { workspaceId: workspace.id } });
   };
 
   useEffect(() => {

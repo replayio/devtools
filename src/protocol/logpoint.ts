@@ -24,7 +24,7 @@ export const LogpointHandlers: {
     key: ExecutionPoint,
     time: number,
     mappedLocation: Location,
-    pause: Pause,
+    pause: Pause | undefined,
     valueFronts: ValueFront[]
   ) => void;
   onPointLoading?: (
@@ -95,8 +95,7 @@ async function showPrimitiveLogpoints(
     assert(frame);
     const location = await ThreadFront.getPreferredLocation(frame);
     assert(location);
-    const pause = ThreadFront.ensurePause(point, time);
-    LogpointHandlers.onResult(logGroupId, point, time, location, pause, values);
+    LogpointHandlers.onResult(logGroupId, point, time, location, undefined, values);
   }
 }
 

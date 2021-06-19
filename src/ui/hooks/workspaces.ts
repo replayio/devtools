@@ -11,6 +11,9 @@ export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
           success
           workspace {
             id
+            invitationCode
+            domain
+            isDomainLimitedCode
           }
         }
       }
@@ -76,6 +79,9 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
               node {
                 id
                 name
+                invitationCode
+                domain
+                isDomainLimitedCode
                 members {
                   edges {
                     node {
@@ -113,4 +119,23 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
   }
 
   return { workspaces, loading };
+}
+
+export function useUpdateWorkspaceCodeDomainLimitations() {
+  const [updateWorkspaceCodeDomainLimitations] = useMutation(
+    gql`
+      mutation UpdateWorkspaceCodeDomainLimitations($workspaceId: ID!, $isLimited: Boolean!) {
+        updateWorkspaceCodeDomainLimitations(
+          input: { workspaceId: $workspaceId, isLimited: $isLimited }
+        ) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetNonPendingWorkspaces"],
+    }
+  );
+
+  return updateWorkspaceCodeDomainLimitations;
 }

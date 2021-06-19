@@ -68,7 +68,10 @@ async function clientRemoveBreakpoint(client, dispatch, location) {
 
 async function getCorrespondingLocations(location, dispatch) {
   const { line, column } = location;
-  const sourceIds = await ThreadFront.getCorrespondingSourceIds(location.sourceId);
+  const sourceIds = ThreadFront.getCorrespondingSourceIds(
+    location.sourceId,
+    location.sourceUrl || (await ThreadFront.getSourceURL(location.sourceId))
+  );
   await Promise.all(
     sourceIds.map(sourceId => dispatch(setBreakpointPositions({ sourceId, line })))
   );
@@ -187,7 +190,10 @@ export function runAnalysis(cx, initialLocation, options) {
     recordEvent("run_analysis");
 
     const { line } = initialLocation;
-    const sourceIds = await ThreadFront.getCorrespondingSourceIds(initialLocation.sourceId);
+    const sourceIds = ThreadFront.getCorrespondingSourceIds(
+      initialLocation.sourceId,
+      initialLocation.sourceUrl || (await ThreadFront.getSourceURL(initialLocation.sourceId))
+    );
     await Promise.all(
       sourceIds.map(sourceId => dispatch(setBreakpointPositions({ sourceId, line })))
     );

@@ -10,7 +10,9 @@ import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
 
-function UserOptions({ recordingId, setModal }) {
+const { features } = require("ui/utils/prefs");
+
+function UserOptions({ recordingId, setModal, noBrowserItem }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
@@ -28,21 +30,25 @@ function UserOptions({ recordingId, setModal }) {
     return <LoginButton />;
   }
 
-  const onLibraryClick = () => {
-    const dashboardUrl = `${window.location.origin}/view`;
+  const onDocsClick = () => {
+    const docsUrl = `https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02`;
 
     if (event.metaKey) {
-      return window.open(dashboardUrl);
+      return window.open(docsUrl, "replaydocs");
     }
-    window.location = dashboardUrl;
+    window.open(docsUrl, "replaydocs");
   };
   const onLaunchClick = () => {
-    const launchUrl = `${window.location.origin}/welcome`;
-    if (event.metaKey) {
-      return window.open(launchUrl);
+    if (features.launchBrowser) {
+      setModal("browser-launch");
+    } else {
+      const launchUrl = `${window.location.origin}/welcome`;
+      if (event.metaKey) {
+        return window.open(launchUrl);
+      }
+      // right now we just send you to the download screen, but eventually this will launch Replay
+      window.location = launchUrl;
     }
-    // right now we just send you to the download screen, but eventually this will launch Replay
-    window.location = launchUrl;
   };
   const onShareClick = () => {
     setExpanded(false);
@@ -61,14 +67,27 @@ function UserOptions({ recordingId, setModal }) {
         expanded={expanded}
         orientation="bottom"
       >
-        <button className="row" onClick={onLaunchClick}>
-          <MaterialIcon>download</MaterialIcon>
-          <span>Download Replay</span>
+        <button className="row" onClick={onDocsClick}>
+          <MaterialIcon>menu_book</MaterialIcon>
+          <span>Docs</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
           <MaterialIcon>settings</MaterialIcon>
           <span>Settings</span>
         </button>
+        {features.launchBrowser ? (
+          window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
+            <button className="row" onClick={onLaunchClick}>
+              <MaterialIcon>download</MaterialIcon>
+              <span>Launch Replay</span>
+            </button>
+          )
+        ) : (
+          <button className="row" onClick={onLaunchClick}>
+            <MaterialIcon>download</MaterialIcon>
+            <span>Download Replay</span>
+          </button>
+        )}
         <LoginButton />
       </Dropdown>
     </div>

@@ -14,15 +14,40 @@ import MaterialIcon from "../MaterialIcon";
 type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
 
 export function NonRegisteredWorkspaceMember({ member }: { member: WorkspaceUser }) {
+  const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
+  const [expanded, setExpanded] = useState(false);
+
+  const handleDelete = () => {
+    setExpanded(false);
+    const message = `Are you sure you want to remove ${member.email} from this team?`;
+
+    if (window.confirm(message)) {
+      deleteUserFromWorkspace({ variables: { membershipId: member.membershipId } });
+    }
+  };
+
   return (
     <li className="workspace-member">
       <MaterialIcon>mail_outline</MaterialIcon>
       <div className="workspace-member-content">
         <div className="title">{member.email}</div>
       </div>
-      <div className="permission-container">
-        <span>Pending</span>
-      </div>
+      <PortalDropdown
+        buttonContent={
+          <div className="permission-container">
+            <MaterialIcon>expand_more</MaterialIcon>
+            <span>Pending</span>
+          </div>
+        }
+        setExpanded={setExpanded}
+        expanded={expanded}
+        buttonStyle=""
+        position="bottom-right"
+      >
+        <div className="permissions-dropdown-item" onClick={handleDelete}>
+          Remove
+        </div>
+      </PortalDropdown>
     </li>
   );
 }
@@ -38,6 +63,7 @@ function Role({
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const { userId: localUserId } = hooks.useGetUserId();
   const { userId, membershipId } = member;
 
@@ -57,7 +83,7 @@ function Role({
       if (isPersonal) {
         hideModal();
         setWorkspaceId(null);
-        prefs.defaultLibraryTeam = JSON.stringify(null);
+        updateDefaultWorkspace({ variables: { workspaceId: null } });
       }
     }
   };

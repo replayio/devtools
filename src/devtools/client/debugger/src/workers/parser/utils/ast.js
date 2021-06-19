@@ -13,12 +13,10 @@ import { getSource } from "../sources";
 let ASTs = new Map();
 
 function _parse(code, opts) {
-  try {
-    return babelParser.parse(code, {
-      ...opts,
-      tokens: true,
-    });
-  } catch (e) {}
+  return babelParser.parse(code, {
+    ...opts,
+    tokens: true,
+  });
 }
 
 const sourceOptions = {

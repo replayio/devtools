@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Dashboard from "../Dashboard/index";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
@@ -10,7 +10,12 @@ import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
+import {
+  isTeamLeaderInvite,
+  isTeamMemberInvite,
+  hasTeamInvitationCode,
+} from "ui/utils/environment";
+import LaunchButton from "../shared/LaunchButton";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -41,55 +46,88 @@ function Header({
 
         <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
       </div>
-      <UserOptions mode="account" />
+      <div className="flex-auto" />
+      <LaunchButton />
+      <UserOptions mode="account" noBrowserItem />
     </div>
   );
 }
 
-function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
-  const userInfo = useGetUserInfo();
+function LibraryLoader(props: PropsFromRedux) {
+  const [renderLibrary, setRenderLibrary] = useState(false);
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
+  const { nags, loading: loading3 } = useGetUserInfo();
+  const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted);
 
-  useEffect(() => {
-    // After rendering null, update the workspaceId to display the user's library
-    // instead of the non-existent team.
-    if (!loading2 && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
-      setWorkspaceId(null);
-    }
-  }, [workspaces, loading2]);
+  function onCompleted() {
+    // This allows the server enough time to refresh the pending workspaces
+    // with the new team before we render the Library.
+    setTimeout(() => {
+      window.history.pushState({}, document.title, window.location.pathname);
+      setRenderLibrary(true);
+    }, 1000);
+  }
+  useEffect(function handleTeamInvitationCode() {
+    const code = hasTeamInvitationCode();
 
-  useEffect(() => {
-    // Wait for both queries to finish loading
-    if (loading1 || loading2) {
+    if (!code) {
+      setRenderLibrary(true);
       return;
     }
 
-    const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
+    claimTeamInvitationCode({ variables: { code } });
+  }, []);
 
-    // Only show the team member onboarding modal if there's only one outstanding pending team.
-    if (isTeamMemberInvite() && pendingWorkspaces?.length === 1) {
-      setModal("team-member-onboarding");
-      // Skip showing the regular onboarding to make sure the new user lands in the right team first.
-      return;
-    } else if (isTeamLeaderInvite()) {
-      setModal("team-leader-onboarding");
-      return;
-    }
-
-    if (!isLinkedFromEmail && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
-      setModal("onboarding");
-    }
-  }, [userInfo, loading1, loading2]);
-
-  if (loading1 || loading2) {
+  if (loading1 || loading2 || loading3 || !renderLibrary) {
     return null;
   }
+
+  return <Library {...{ ...props, workspaces, pendingWorkspaces, nags }} />;
+}
+
+type LibraryProps = PropsFromRedux & {
+  workspaces: Workspace[];
+  pendingWorkspaces?: Workspace[];
+  nags: Nag[];
+};
+
+function Library({
+  setWorkspaceId,
+  setModal,
+  currentWorkspaceId,
+  workspaces,
+  pendingWorkspaces,
+  nags,
+}: LibraryProps) {
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+
+  useEffect(function handleDeletedTeam() {
+    // After rendering null, update the workspaceId to display the user's library
+    // instead of the non-existent team.
+    if (![{ id: null }, ...workspaces].some(ws => ws.id === currentWorkspaceId)) {
+      setWorkspaceId(null);
+      updateDefaultWorkspace({ variables: { workspaceId: null } });
+    }
+  }, []);
+  useEffect(function handleOnboardingModals() {
+    const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
+
+    if (isTeamLeaderInvite()) {
+      setModal("team-leader-onboarding");
+    } else if (pendingWorkspaces?.length === 1) {
+      setModal("team-member-onboarding");
+    }
+
+    if (!isLinkedFromEmail && !hasTeamInvitationCode && !nags.includes(Nag.FIRST_REPLAY)) {
+      setModal("onboarding");
+    }
+  }, []);
 
   // Handle cases where the default workspace ID in prefs is for a team
   // that the user is no longer a part of. This occurs when the user is removed
   // from a team that is stored as their default library team in prefs. We return
-  // null here, and reset the currentWorkspaceId to the user's library in `useEffect`.
+  // null here, and reset the currentWorkspaceId to the user's library in `handleDeletedTeam`.
   if (![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
     return null;
   }
@@ -116,4 +154,4 @@ const connector = connect(
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(Library);
+export default connector(LibraryLoader);

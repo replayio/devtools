@@ -5,6 +5,7 @@ import React, {
   MouseEventHandler,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -12,10 +13,11 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { validateEmail } from "ui/utils/helpers";
 import BlankScreen from "../BlankScreen";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
-import { validateEmail } from "../WorkspaceSettingsModal/WorkspaceForm";
+import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 const { prefs } = require("ui/utils/prefs");
 
 function ModalButton({
@@ -234,28 +236,30 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
 
+  console.log({ newWorkspace });
   return (
     <>
       <SlideContent headerText="Your team members">
         <div className="text-xl">{`Next, we need to add your team members to your team.`}</div>
         <form className="flex flex-col" onSubmit={handleAddMember}>
           <div className="flex-grow flex flex-row space-x-4">
-            <TextInput placeholder="Team name" value={inputValue} onChange={onChange} />
+            <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
             <ModalButton onClick={handleAddMember} disabled={isLoading}>
               {isLoading ? "Loading" : "Invite"}
             </ModalButton>
           </div>
           {invalidInput ? <div>Invalid email address</div> : null}
         </form>
-        {!loading && pendingMembers ? (
-          <div className="overflow-auto flex-grow">
+        <div className="overflow-auto flex-grow">
+          {!loading && sortedMembers ? (
             <div className="flex flex-col space-y-2">
-              {pendingMembers.map(m => (
+              {sortedMembers.map(m => (
                 <div key={m.email}>{m.email}</div>
               ))}
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
+        <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>
       <div className="grid">
         <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
@@ -273,11 +277,14 @@ type SlideBody4Props = PropsFromRedux & {
 };
 
 function SlideBody4({ setWorkspaceId, hideModal, newWorkspace }: SlideBody4Props) {
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+
   const onClick = () => {
     prefs.defaultLibraryTeam = JSON.stringify(newWorkspace.id);
     window.history.pushState({}, document.title, window.location.pathname);
 
     setWorkspaceId(newWorkspace.id);
+    updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });
     hideModal();
   };
 
@@ -329,13 +336,15 @@ function OnboardingModal(props: PropsFromRedux) {
     slide = <SlideBody4 {...{ ...newProps, newWorkspace: newWorkspace! }} />;
   }
 
+  const height = current === 3 ? "520px" : "360px";
+
   return (
     <>
       <BlankScreen className="fixed" />
       <Modal options={{ maskTransparency: "translucent" }}>
         <div
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
-          style={{ width: "520px", height: "360px" }}
+          style={{ width: "520px", height }}
         >
           {slide}
         </div>

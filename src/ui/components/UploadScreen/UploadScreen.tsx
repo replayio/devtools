@@ -6,7 +6,6 @@ import hooks from "ui/hooks";
 import TeamSelect from "./TeamSelect";
 const { getFormattedTime } = require("ui/utils/timeline");
 import ReplayTitle from "./ReplayTitle";
-import { selectors } from "ui/reducers";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
 import { Recording, Workspace } from "ui/types";
@@ -104,6 +103,12 @@ function Form({
   isPublic: boolean;
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 }) {
+  const selectedWorkspace = workspaces.find(w => w.id === selectedWorkspaceId);
+  const privateText =
+    selectedWorkspaceId === null
+      ? `Only you can view this Replay`
+      : `Restricted to people in team "${selectedWorkspace!.name}"`;
+
   return (
     <>
       <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
@@ -128,7 +133,7 @@ function Form({
               onChange={() => setIsPublic(true)}
             />
             <label htmlFor="public">
-              <span className="font-semibold">Public:</span> Available to anyone with the link
+              <span className="font-semibold">Public: </span>Available to anyone with the link
             </label>
           </div>
           <div className="space-x-2 items-center">
@@ -141,7 +146,8 @@ function Form({
               onChange={() => setIsPublic(false)}
             />
             <label htmlFor="private">
-              <span className="font-semibold">Private:</span> Available to people you choose
+              <span className="font-semibold">Private: </span>
+              {privateText}
             </label>
           </div>
         </div>
@@ -157,7 +163,10 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
 
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
-  const [isPublic, setIsPublic] = useState(!recording.private);
+  // The actual replay in the database is public by default, for test purposes.
+  // Before being initialized, public/private behaves similarly since non-authors
+  // can't view the replay.
+  const [isPublic, setIsPublic] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
     userSettings?.defaultWorkspaceId || null
   );

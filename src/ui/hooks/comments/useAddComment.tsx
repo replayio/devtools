@@ -31,13 +31,14 @@ export default function useAddComment() {
   }
 
   return (comment: NewCommentVariable, recordingId: RecordingId) => {
+    const temporaryId = new Date().toISOString();
     addComment({
       variables: { input: comment },
       optimisticResponse: {
         addComment: {
           success: true,
           comment: {
-            id: new Date().toISOString(),
+            id: temporaryId,
             __typename: "Comment",
           },
           __typename: "AddComment",
@@ -76,7 +77,12 @@ export default function useAddComment() {
           ...data,
           recording: {
             ...data.recording,
-            comments: [...data.recording.comments, newComment],
+            comments: [
+              ...data.recording.comments.filter(
+                (c: any) => c.id !== temporaryId && c.id !== commentId
+              ),
+              newComment,
+            ],
           },
         };
 

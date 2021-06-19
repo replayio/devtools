@@ -4,6 +4,8 @@ import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import { sanityCheckMiddleware } from "ui/utils/sanitize";
 const configureStore = require("devtools/client/debugger/src/actions/utils/create-store").default;
 import reducer from "ui/reducers/app";
+import { getUserSettings } from "ui/hooks/settings";
+import { setWorkspaceId } from "ui/actions/app";
 const Account = require("ui/components/Account").default;
 
 export async function initialize() {
@@ -15,6 +17,9 @@ export async function initialize() {
 
   const createStore = configureStore();
   const store = createStore(combineReducers({ app: reducer }), {}, middleware);
+
+  const settings = await getUserSettings();
+  store.dispatch(setWorkspaceId(settings.defaultWorkspaceId));
 
   return { store, Page: Account };
 }

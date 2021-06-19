@@ -28,7 +28,7 @@ export function ApolloWrapper({
   const { loading, token, error } = useToken();
 
   if (!isTest() && loading) {
-    return recordingId ? <BlankLoadingScreen /> : null;
+    return null;
   }
 
   if (error) {

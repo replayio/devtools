@@ -1,17 +1,43 @@
-import React from "react";
+import classNames from "classnames";
+import React, { ChangeEvent, MouseEventHandler, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-const Modal = require("ui/components/shared/Modal").default;
+import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { WorkspaceUser } from "ui/types";
+import { validateEmail } from "ui/utils/helpers";
+import { TextInput } from "../Forms";
 import MaterialIcon from "../MaterialIcon";
-import WorkspaceForm from "./WorkspaceForm";
+import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
-import "./WorkspaceSettingsModal.css";
 
-const content1 = `Manage members here so that everyone who belongs to this team can see each other's replays.`;
+function ModalButton({
+  children,
+  onClick = () => {},
+  className,
+  disabled = false,
+}: {
+  children: React.ReactElement | string;
+  className?: string;
+  onClick?: MouseEventHandler;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={classNames(
+        className,
+        "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
 export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
   return (
@@ -27,28 +53,76 @@ export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
   );
 }
 
-function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
-  const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId!);
+function WorkspaceForm({ workspaceId }: PropsFromRedux) {
+  const [inputValue, setInputValue] = useState("");
+  const [invalidInput, setInvalidInput] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
+    setInputValue("");
+    setIsLoading(false);
+  });
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+  const handleAddMember = (e: React.FormEvent | React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!validateEmail(inputValue)) {
+      setInvalidInput(true);
+      return;
+    }
+
+    setInvalidInput(false);
+    setIsLoading(true);
+    inviteNewWorkspaceMember({ variables: { workspaceId, email: inputValue } });
+  };
 
   return (
-    <div className="workspace-settings-modal">
-      <Modal>
-        <main>
-          <h1>
-            <MaterialIcon>settings</MaterialIcon>
-            <span>Team Settings</span>
-          </h1>
-          <div className="new-workspace-content">
-            <p>{content1}</p>
+    <form className="flex flex-col" onSubmit={handleAddMember}>
+      <div className="flex-grow flex flex-row space-x-4">
+        <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
+        <ModalButton onClick={handleAddMember} disabled={isLoading}>
+          {isLoading ? "Loading" : "Invite"}
+        </ModalButton>
+      </div>
+      {invalidInput ? <div className="text-red-500 text-sm">Invalid email address</div> : null}
+    </form>
+  );
+}
+
+function WorkspaceSettingsModal(props: PropsFromRedux) {
+  const { members } = hooks.useGetWorkspaceMembers(props.workspaceId!);
+
+  return (
+    <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
+      <div
+        className="p-12 bg-white rounded-lg shadow-xl text-xl relative flex flex-col justify-between"
+        style={{ width: "520px", height: "520px" }}
+      >
+        <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
+          <h2 className="font-bold text-3xl text-gray-900">{`Team settings`}</h2>
+          <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
+            <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
+            <WorkspaceForm {...props} />
+            <div className="text-gray-700 text-sm uppercase font-semibold">{`Members`}</div>
+            <div className="overflow-auto flex-grow">
+              <div className="workspace-members-container flex flex-col space-y-2">
+                <div className="flex flex-col space-y-2">
+                  {members ? <WorkspaceMembers members={members} /> : null}
+                </div>
+              </div>
+            </div>
+            <InvitationLink workspaceId={props.workspaceId!} />
           </div>
-          <WorkspaceForm />
-          <div className="workspace-members-container">
-            <div className="subheader">MEMBERS</div>
-            {members && !loading ? <WorkspaceMembers members={members} /> : null}
+        </div>
+        <button className="absolute top-4 right-4" onClick={props.hideModal}>
+          <div>
+            <MaterialIcon>close</MaterialIcon>
           </div>
-        </main>
-      </Modal>
-    </div>
+        </button>
+      </div>
+    </Modal>
   );
 }
 
