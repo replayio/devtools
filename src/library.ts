@@ -6,6 +6,8 @@ const configureStore = require("devtools/client/debugger/src/actions/utils/creat
 import reducer from "ui/reducers/app";
 import { getUserSettings } from "ui/hooks/settings";
 import { setWorkspaceId } from "ui/actions/app";
+const { prefs, features } = require("ui/utils/prefs");
+
 const Account = require("ui/components/Account").default;
 
 export async function initialize() {
@@ -20,6 +22,12 @@ export async function initialize() {
 
   const settings = await getUserSettings();
   store.dispatch(setWorkspaceId(settings.defaultWorkspaceId));
+
+  (window as any).app = {
+    store,
+    prefs,
+    features,
+  };
 
   return { store, Page: Account };
 }
