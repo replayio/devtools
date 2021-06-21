@@ -45,18 +45,18 @@ function CommentItem({
           />
           <div className="flex-1 overflow-hidden">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium overflow-hidden overflow-ellipsis whitespace-pre">
+              <h3 className="text-md font-medium overflow-hidden overflow-ellipsis whitespace-pre">
                 {comment.user.name}
               </h3>
               <CommentActions comment={comment} isRoot={"replies" in comment} />
             </div>
-            <p className="text-lg text-gray-500 overflow-hidden overflow-ellipsis whitespace-pre">
+            <p className="text-md text-gray-500 overflow-hidden overflow-ellipsis whitespace-pre">
               {relativeDate}
             </p>
           </div>
         </div>
       </div>
-      <div className="space-y-6 px-4 pt-4 pb-4 text-lg">{comment.content}</div>
+      <div className="space-y-6 px-4 pt-4 pb-4 text-md">{comment.content}</div>
     </div>
   );
 }
