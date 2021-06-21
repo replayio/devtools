@@ -31,7 +31,7 @@ const ReactDOM = require("react-dom");
 const { Provider } = require("react-redux");
 const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
 const tokenManager = require("ui/utils/tokenManager").default;
-const { isRecordingInitialized } = require("ui/hooks/recordings");
+const { isRecordingInitialized, getRecordingOwnerUserId } = require("ui/hooks/recordings");
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
 const App = require("ui/components/App").default;
@@ -53,7 +53,12 @@ function PageSwitch() {
       let imported;
       if (recordingId) {
         const recordingInitialized = await isRecordingInitialized(recordingId);
-        if (recordingInitialized === false && !test) {
+        const userId = await getRecordingOwnerUserId(recordingId);
+
+        // Add a check to make sure the recording has an associated user ID.
+        // We skip the upload step if there's no associated user ID, which
+        // is the case for CI test recordings.
+        if (recordingInitialized === false && !test && userId) {
           imported = await import("./upload");
         } else {
           imported = await import("./app");
