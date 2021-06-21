@@ -1,0 +1,21 @@
+.transcript-panel {
+  flex-grow: 1;
+  overflow: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  height: 100%;
+}
+
+.transcript-panel > :not(:first-child) {
+  margin-top: 16px;
+}
+
+.transcript-list {
+  flex-grow: 1;
+  overflow: auto;
+  width: 100%;
+  padding: 1px 24px 24px;
+}

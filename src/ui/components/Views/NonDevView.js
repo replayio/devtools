@@ -3,9 +3,11 @@ import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
 import Video from "../Video";
+import Toolbox from "../Toolbox";
 import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import Transcript from "ui/components/Transcript";
+import Events from "ui/components/Events";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import Dropdown from "ui/components/shared/Dropdown";
 
@@ -82,7 +84,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       startPanel={
         <div className="horizontal-panels">
           <Toolbar />
-          <Transcript />
+          <Toolbox />
         </div>
       }
       endPanel={viewer}

@@ -1,0 +1,57 @@
+import React, { useEffect } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { selectors } from "ui/reducers";
+import sortBy from "lodash/sortBy";
+import hooks from "ui/hooks";
+import "./Events.css";
+import { UIState } from "ui/state";
+import { Comment, PendingNewComment } from "ui/state/comments";
+import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
+import useAuth0 from "ui/utils/useAuth0";
+import useDraftJS from "ui/components/Comments/TranscriptComments/CommentEditor/use-draftjs";
+
+function Events({ recordingId, pendingComment }: PropsFromRedux) {
+  const { comments } = hooks.useGetComments(recordingId!);
+  const { recording, loading } = hooks.useGetRecording(recordingId!);
+  const { userId } = hooks.useGetUserId();
+  const load = useDraftJS();
+  const isAuthor = userId && userId == recording?.userId;
+
+  useEffect(() => {
+    let idle: NodeJS.Timeout | undefined = setTimeout(() => {
+      load().then(() => {
+        idle = undefined;
+      });
+    }, 1000);
+
+    return () => idle && clearTimeout(idle);
+  }, []);
+
+  if (loading) {
+    return null;
+  }
+
+  const displayedComments: (Comment | PendingNewComment)[] = [...comments];
+  if (pendingComment?.type == "new_comment") {
+    displayedComments.push(pendingComment.comment);
+  }
+
+  const { isAuthenticated } = useAuth0();
+
+  return (
+    <div className="right-sidebar">
+      <div className="right-sidebar-toolbar">
+        <div className="right-sidebar-toolbar-item">Events</div>
+      </div>
+      <div className="transcript-panel">
+        <div className="transcript-list space-y-4">Here's where events will go</div>
+      </div>
+    </div>
+  );
+}
+const connector = connect((state: UIState) => ({
+  recordingId: selectors.getRecordingId(state),
+  pendingComment: selectors.getPendingComment(state),
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(Events);

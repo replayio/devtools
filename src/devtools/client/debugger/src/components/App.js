@@ -51,6 +51,7 @@ import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
 import Transcript from "ui/components/Transcript";
+import Events from "ui/components/Events";
 import { waitForEditor } from "../utils/editor/create-editor";
 
 class Debugger extends Component {
@@ -214,6 +215,9 @@ class Debugger extends Component {
       }
       case "comments": {
         return <Transcript />;
+      }
+      case "events": {
+        return <Events />;
       }
       default: {
         return null;
