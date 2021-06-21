@@ -139,3 +139,22 @@ export function useUpdateWorkspaceCodeDomainLimitations() {
 
   return updateWorkspaceCodeDomainLimitations;
 }
+
+export function useDeleteWorkspace() {
+  const [deleteWorkspace] = useMutation(
+    gql`
+      mutation DeleteWorkspace($workspaceId: ID!, $shouldDeleteRecordings: Boolean!) {
+        deleteWorkspace(
+          input: { workspaceId: $workspaceId, shouldDeleteRecordings: $shouldDeleteRecordings }
+        ) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetNonPendingWorkspaces"],
+    }
+  );
+
+  return deleteWorkspace;
+}

@@ -93,12 +93,28 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
 
 function WorkspaceSettingsModal(props: PropsFromRedux) {
   const { members } = hooks.useGetWorkspaceMembers(props.workspaceId!);
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+  const deleteWorkspace = hooks.useDeleteWorkspace();
+
+  const handleDeleteTeam = () => {
+    const line1 = `Unexpected bad things will happen if you don't read this!`;
+    const line2 = `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`;
+    const line3 = `Click OK to proceed.`;
+    const message = `${line1}\n\n${line2}\n\n${line3}`;
+
+    if (window.confirm(message)) {
+      deleteWorkspace();
+      props.hideModal();
+      props.setWorkspaceId(null);
+      updateDefaultWorkspace({ variables: { workspaceId: null } });
+    }
+  };
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
       <div
         className="p-12 bg-white rounded-lg shadow-xl text-xl relative flex flex-col justify-between"
-        style={{ width: "520px", height: "520px" }}
+        style={{ width: "520px", height: "600px" }}
       >
         <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
           <h2 className="font-bold text-3xl text-gray-900">{`Team settings`}</h2>
@@ -114,6 +130,21 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
               </div>
             </div>
             <InvitationLink workspaceId={props.workspaceId!} />
+            <div className="flex flex-col space-y-4">
+              <div className="text-gray-700 text-sm uppercase font-semibold">{`Danger Zone`}</div>
+              <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
+                <div className="flex flex-col">
+                  <div className="font-semibold">Delete this team</div>
+                  <div className="">{`This cannot be reversed.`}</div>
+                </div>
+                <button
+                  onClick={handleDeleteTeam}
+                  className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-white bg-red-600 hover:bg-red-700"
+                >
+                  Delete this team
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <button className="absolute top-4 right-4" onClick={props.hideModal}>
@@ -128,6 +159,7 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
 
 const connector = connect((state: UIState) => ({ workspaceId: selectors.getWorkspaceId(state) }), {
   hideModal: actions.hideModal,
+  setWorkspaceId: actions.setWorkspaceId,
 });
 export type PropsFromRedux = ConnectedProps<typeof connector>;
 
