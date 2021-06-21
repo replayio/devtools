@@ -166,7 +166,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
 function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [invalidInput, setInvalidInput] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { members, loading } = hooks.useGetWorkspaceMembers(newWorkspace!.id);
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
     setInputValue("");
@@ -191,11 +191,14 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     e.preventDefault();
 
     if (!validateEmail(inputValue)) {
-      setInvalidInput(true);
+      setErrorMessage("Invalid email address");
+      return;
+    } else if (pendingMembers.map(m => m.email).includes(inputValue)) {
+      setErrorMessage("Address has already been invited");
       return;
     }
 
-    setInvalidInput(false);
+    setErrorMessage(null);
     setIsLoading(true);
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
@@ -211,7 +214,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
               {isLoading ? "Loading" : "Invite"}
             </ModalButton>
           </div>
-          {invalidInput ? <div>Invalid email address</div> : null}
+          {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         <div className="overflow-auto flex-grow">
           {!loading && sortedMembers ? (

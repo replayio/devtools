@@ -53,15 +53,20 @@ export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
   );
 }
 
-function WorkspaceForm({ workspaceId }: PropsFromRedux) {
+type WorkspaceFormProps = PropsFromRedux & {
+  members?: WorkspaceUser[];
+};
+
+function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
   const [inputValue, setInputValue] = useState("");
-  const [invalidInput, setInvalidInput] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
     setInputValue("");
     setIsLoading(false);
   });
 
+  const memberEmails = (members || []).filter(m => m.email).map(m => m.email!);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -69,11 +74,14 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
     e.preventDefault();
 
     if (!validateEmail(inputValue)) {
-      setInvalidInput(true);
+      setErrorMessage("Invalid email address");
+      return;
+    } else if (memberEmails.includes(inputValue)) {
+      setErrorMessage("Address has already been invited");
       return;
     }
 
-    setInvalidInput(false);
+    setErrorMessage(null);
     setIsLoading(true);
     inviteNewWorkspaceMember({ variables: { workspaceId, email: inputValue } });
   };
@@ -86,7 +94,7 @@ function WorkspaceForm({ workspaceId }: PropsFromRedux) {
           {isLoading ? "Loading" : "Invite"}
         </ModalButton>
       </div>
-      {invalidInput ? <div className="text-red-500 text-sm">Invalid email address</div> : null}
+      {errorMessage ? <div className="text-red-500 text-sm">{errorMessage}</div> : null}
     </form>
   );
 }
@@ -104,7 +112,7 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
           <h2 className="font-bold text-3xl text-gray-900">{`Team settings`}</h2>
           <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
             <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-            <WorkspaceForm {...props} />
+            <WorkspaceForm {...{ ...props, members }} />
             <div className="text-gray-700 text-sm uppercase font-semibold">{`Members`}</div>
             <div className="overflow-auto flex-grow">
               <div className="workspace-members-container flex flex-col space-y-2">
