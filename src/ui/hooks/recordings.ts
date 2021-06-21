@@ -151,6 +151,26 @@ export async function isRecordingInitialized(
   return result.data.recording?.isInitialized;
 }
 
+export async function getRecordingOwnerUserId(
+  recordingId: RecordingId
+): Promise<string | undefined> {
+  const result = await query({
+    query: gql`
+      query GetRecordingUserId($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          owner {
+            id
+          }
+        }
+      }
+    `,
+    variables: { recordingId },
+  });
+
+  return result.data.recording?.owner?.id;
+}
+
 export function useGetRecording(
   recordingId: RecordingId | null
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {

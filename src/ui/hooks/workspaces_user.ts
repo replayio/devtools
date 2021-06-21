@@ -75,6 +75,11 @@ export function useGetWorkspaceMembers(workspaceId: string) {
 }
 
 export function useInviteNewWorkspaceMember(onCompleted: () => void) {
+  // Eventually we should handle error states better. For now, this is sufficient
+  // to handle error cases where a user tries to add an already invited/existing
+  // user to a team.
+  const onError = onCompleted;
+
   const [inviteNewWorkspaceMember] = useMutation(
     gql`
       mutation InviteNewWorkspaceMember($email: String!, $workspaceId: ID!) {
@@ -83,7 +88,7 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
         }
       }
     `,
-    { refetchQueries: ["GetWorkspaceMembers"], onCompleted }
+    { refetchQueries: ["GetWorkspaceMembers"], onCompleted, onError }
   );
 
   return inviteNewWorkspaceMember;
