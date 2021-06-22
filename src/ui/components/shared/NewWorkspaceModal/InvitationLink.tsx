@@ -78,7 +78,10 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
 export default function InvitationLink({ workspaceId }: { workspaceId: string }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
-  const workspace = workspaces.find(w => workspaceId == w.id);
+  const workspace = workspaces?.find(w => workspaceId == w.id);
+  if (!workspace) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col space-y-4">
