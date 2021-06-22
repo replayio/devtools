@@ -86,6 +86,11 @@ function checkPendingBreakpoints(cx, sourceId) {
       return;
     }
 
+    for (const bp of pendingBreakpoints) {
+      const line = bp.location.line;
+      dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
+    }
+
     // load the source text if there is a pending breakpoint for it
     await dispatch(loadSourceText({ cx, source }));
 

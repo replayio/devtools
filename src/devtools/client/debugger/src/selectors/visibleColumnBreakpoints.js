@@ -4,6 +4,7 @@
 //
 
 import groupBy from "lodash/groupBy";
+import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";
 
 import {
@@ -14,7 +15,7 @@ import {
   getBreakpointPositions,
   getBreakpointPositionsForSource,
 } from "../selectors";
-import { getVisibleBreakpoints } from "./visibleBreakpoints";
+import { getVisibleBreakpoints, getVisibleRequestedBreakpoints } from "./visibleBreakpoints";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
 
@@ -98,8 +99,8 @@ function convertToList(breakpointPositions) {
   return [].concat(...Object.values(breakpointPositions));
 }
 
-export function getColumnBreakpoints(positions, breakpoints, viewport, selectedSource) {
-  if (!positions || !selectedSource) {
+export function getColumnBreakpoints(breakpoints, requestedBreakpoints, viewport, selectedSource) {
+  if (!selectedSource) {
     return [];
   }
 
@@ -108,7 +109,12 @@ export function getColumnBreakpoints(positions, breakpoints, viewport, selectedS
   // - the position is in the current viewport
   // - there is atleast one other breakpoint on that line
   // - there is a breakpoint on that line
-  const breakpointMap = groupBreakpoints(breakpoints, selectedSource);
+  const allBreakpoints = [...breakpoints, ...requestedBreakpoints];
+  let positions = uniqBy(
+    allBreakpoints.map(bp => bp.location),
+    ({ sourceId, line }) => `${sourceId}:${line}`
+  );
+  const breakpointMap = groupBreakpoints(allBreakpoints, selectedSource);
   positions = filterVisible(positions, selectedSource, viewport);
   positions = filterInLine(positions, selectedSource, selectedSource.content);
   positions = filterByBreakpoints(positions, selectedSource, breakpointMap);
@@ -134,8 +140,8 @@ const getVisibleBreakpointPositions = createSelector(
 );
 
 export const visibleColumnBreakpoints = createSelector(
-  getVisibleBreakpointPositions,
   getVisibleBreakpoints,
+  getVisibleRequestedBreakpoints,
   getViewport,
   getSelectedSourceWithContent,
   getColumnBreakpoints
