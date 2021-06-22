@@ -820,9 +820,8 @@ export function useHasExpectedError(recordingId: RecordingId): ExpectedError | u
   }
 
   return {
-    message: "You need to sign in to view this replay",
-    content:
-      "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
+    message: "",
+    content: "",
     action: "sign-in",
   };
 }
