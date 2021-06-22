@@ -43,7 +43,7 @@
   padding: 4px 10px;
   cursor: default;
   height: calc(var(--editor-header-height) - 1px);
-  font-size: 12px;
+  font-size: 15px;
   background-color: transparent;
   vertical-align: bottom;
 }
@@ -56,8 +56,7 @@
   width: 100%;
   height: 2px;
   background-color: var(--tab-line-color, transparent);
-  transition: transform 250ms var(--animation-curve),
-    opacity 250ms var(--animation-curve);
+  transition: transform 250ms var(--animation-curve), opacity 250ms var(--animation-curve);
   opacity: 0;
   transform: scaleX(0);
 }
