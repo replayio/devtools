@@ -36,8 +36,7 @@ function RefreshButton() {
       onClick={onClick}
       disabled={clicked}
       className={classNames(
-        "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-        "text-white bg-primaryAccent hover:bg-primaryAccentHover"
+        "w-full inline-flex items-center justify-center px-24 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {clicked ? `Refreshing...` : `Refresh`}
@@ -57,11 +56,10 @@ function SignInButton() {
       type="button"
       onClick={onClick}
       className={classNames(
-        "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-        "text-white bg-primaryAccent hover:bg-primaryAccentHover"
+        "w-full inline-flex items-center justify-center px-24 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
-      Sign In
+      Sign in to Replay
     </button>
   );
 }
@@ -88,8 +86,8 @@ function Error({ error }: { error: ExpectedError | UnexpectedError }) {
           <img className="w-16 h-16 mx-auto" src="images/logo.svg" />
         </div>
         <div className="text-center space-y-4">
-          <div className="font-bold text-2xl">{message}</div>
-          <div className="text-xl text-gray-500">{content}</div>
+          {message ? <div className="font-bold text-2xl">{message}</div> : null}
+          {content ? <div className="text-xl text-gray-500">{content}</div> : null}
         </div>
         {action ? <ActionButton action={action} /> : null}
       </div>
