@@ -55,7 +55,7 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const emptyWorkspaceLink = "Only users with a matching email address domain can use this link";
   const workspaceLink = (
     <span>
-      only users with a <span className="font-medium text-gray-700">{workspace.domain}</span>{" "}
+      Only users with a <span className="font-medium text-gray-700">{workspace.domain}</span>{" "}
       address can use this link
     </span>
   );
