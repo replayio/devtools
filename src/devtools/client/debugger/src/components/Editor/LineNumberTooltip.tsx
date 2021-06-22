@@ -39,6 +39,7 @@ type LineNumberTooltipProps = PropsFromRedux & { editor: any };
 
 function LineNumberTooltip({
   editor,
+  indexed,
   runAnalysisOnLine,
   analysisPoints,
   setHoveredLineNumberLocation,
@@ -88,6 +89,10 @@ function LineNumberTooltip({
     return null;
   }
 
+  if (!indexed) {
+    return <StaticTooltip targetNode={lineNumberNode}>Indexing</StaticTooltip>;
+  }
+
   // Show a loading state immediately while we wait for the analysis points
   // to be generated.
   if (!analysisPoints) {
@@ -113,6 +118,7 @@ function LineNumberTooltip({
 
 const connector = connect(
   (state: UIState) => ({
+    indexed: selectors.getIndexed(state),
     analysisPoints: selectors.getPointsForHoveredLineNumber(state),
   }),
   {
