@@ -32,11 +32,9 @@ class Breakpoint extends PureComponent {
   }
 
   makeMarker() {
-    const { breakpoint } = this.props;
     const bp = breakpointSvg.cloneNode(true);
 
     bp.className = classnames("editor new-breakpoint", {
-      "breakpoint-disabled": breakpoint.disabled,
       "folding-enabled": features.codeFolding,
     });
 
