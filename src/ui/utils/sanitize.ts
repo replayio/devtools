@@ -35,7 +35,7 @@ export function sanitize(obj: any, path: string, category: string, logSanitized:
   if (Array.isArray(obj)) {
     return obj.map((item, i) => sanitize(item, `${path}[${i}]`, category, logSanitized));
   }
-  if (typeof obj === "object") {
+  if (typeof obj === "object" && !(obj instanceof HTMLElement)) {
     const sanitized: Record<string, any> = {};
     for (const key in obj) {
       sanitized[key] = sanitize(obj[key], `${path}.${key}`, category, logSanitized);

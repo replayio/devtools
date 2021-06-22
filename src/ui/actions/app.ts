@@ -62,6 +62,8 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
+export type SetVideoUrl = Action<"set_video_url"> & { videoUrl: string };
+export type SetVideoNode = Action<"set_video_node"> & { videoNode: HTMLVideoElement | null };
 export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId | null };
 export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
   tabTitle: SettingsTabTitle;
@@ -99,6 +101,8 @@ export type AppActions =
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
   | SetCanvas
+  | SetVideoUrl
+  | SetVideoNode
   | SetWorkspaceId
   | SetDefaultSettingsTab
   | SetRecordingTargetAction
@@ -249,6 +253,14 @@ export function setHoveredLineNumberLocation(
 
 export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
   return { type: "set_is_node_picker_active", active };
+}
+
+export function setVideoUrl(videoUrl: string): SetVideoUrl {
+  return { type: "set_video_url", videoUrl };
+}
+
+export function setVideoNode(videoNode: HTMLVideoElement | null): SetVideoNode {
+  return { type: "set_video_node", videoNode };
 }
 
 export function setCanvas(canvas: Canvas): SetCanvas {

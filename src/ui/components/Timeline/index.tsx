@@ -34,9 +34,9 @@ import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 
-const { prefs } = require("ui/utils/prefs");
+const { prefs, features } = require("ui/utils/prefs");
 
-function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
+function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
     <button onClick={onClick}>
       <MaterialIcon className="refresh pause_play_circle material-icons-round">
@@ -141,12 +141,18 @@ class Timeline extends Component<PropsFromRedux> {
       stopPlayback,
       replayPlayback,
       clearPendingComment,
+      videoUrl,
     } = this.props;
+    const disabled = !videoUrl && features.videoPlayback;
     const replay = () => {
+      if (disabled) return;
+
       clearPendingComment();
       replayPlayback();
     };
     const togglePlayback = () => {
+      if (disabled) return;
+
       clearPendingComment();
       if (playback) {
         stopPlayback();
@@ -158,14 +164,14 @@ class Timeline extends Component<PropsFromRedux> {
     if (currentTime == recordingDuration) {
       return (
         <div className="commands">
-          <ReplayButton onClick={replay} />
+          <ReplayButton onClick={replay} disabled={disabled} />
         </div>
       );
     }
 
     return (
       <div className="commands">
-        <button onClick={togglePlayback}>
+        <button onClick={togglePlayback} disabled={disabled}>
           {playback ? (
             <MaterialIcon className="pause_play_circle material-icons-round">
               pause_circle_outline
@@ -327,6 +333,7 @@ const connector = connect(
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
     hoveredItem: selectors.getHoveredItem(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),
+    videoUrl: selectors.getVideoUrl(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

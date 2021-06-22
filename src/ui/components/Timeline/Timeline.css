@@ -92,6 +92,12 @@
   background: var(--theme-toolbar-background-hover);
 }
 
+.timeline .commands > button[disabled] {
+  opacity: 0.4;
+  cursor: default;
+  background: transparent;
+}
+
 .timeline .commands > button .img {
   width: 28px;
   height: 28px;
