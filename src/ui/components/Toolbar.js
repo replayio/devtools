@@ -8,8 +8,16 @@ import "react-circular-progressbar/dist/styles.css";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-function IndexingLoader({ progressPercentage }) {
+function IndexingLoader({ progressPercentage, viewMode }) {
   const [isDone, setDone] = useState(false);
+
+  // Set the indexing loader to done immediately, if
+  // the loader just mounted and is at 100
+  useEffect(() => {
+    if (progressPercentage == 100) {
+      setDone(true);
+    }
+  }, []);
 
   useEffect(() => {
     let timeout;
@@ -20,7 +28,7 @@ function IndexingLoader({ progressPercentage }) {
     return () => clearTimeout(timeout);
   }, [progressPercentage]);
 
-  if (isDone || progressPercentage === null) {
+  if (isDone || progressPercentage === null || viewMode == "non-dev") {
     return null;
   }
 
@@ -103,7 +111,7 @@ function Toolbar({
           </>
         ) : null}
       </div>
-      <IndexingLoader {...{ progressPercentage }} />
+      <IndexingLoader {...{ progressPercentage, viewMode }} />
     </div>
   );
 }
