@@ -18,9 +18,9 @@
   background-color: var(--theme-accordion-header-background);
   border-bottom: 1px solid var(--theme-splitter-color);
   display: flex;
-  font-size: 12px;
+  font-size: 15px;
   line-height: calc(16 / 12);
-  padding: 4px 6px;
+  padding: 8px;
   width: 100%;
   align-items: center;
   margin: 0px;
