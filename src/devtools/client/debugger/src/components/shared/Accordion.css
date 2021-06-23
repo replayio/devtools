@@ -41,7 +41,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--theme-toolbar-color);
+  color: var(--theme-body-color);
 }
 
 .accordion ._header .header-buttons {
