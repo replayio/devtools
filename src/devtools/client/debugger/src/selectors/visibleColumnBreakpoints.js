@@ -110,6 +110,8 @@ export function getColumnBreakpoints(breakpoints, requestedBreakpoints, viewport
   // - there is atleast one other breakpoint on that line
   // - there is a breakpoint on that line
   const allBreakpoints = [...breakpoints, ...requestedBreakpoints];
+  // collect all breakpoint positions but make sure that we don't have 2 positions
+  // for the same line in the same source
   let positions = uniqBy(
     allBreakpoints.map(bp => bp.location),
     ({ sourceId, line }) => `${sourceId}:${line}`
