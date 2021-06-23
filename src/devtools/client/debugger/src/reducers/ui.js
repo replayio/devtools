@@ -44,6 +44,11 @@ function update(state = createUIState(), action) {
       return { ...state, startPanelCollapsed: action.paneCollapsed };
     }
 
+    case "set_selected_primary_panel": {
+      prefs.startPanelCollapsed = false;
+      return { ...state, startPanelCollapsed: false };
+    }
+
     case "TOGGLE_SOURCES": {
       prefs.sourcesCollapsed = action.sourcesCollapsed;
       return { ...state, sourcesCollapsed: action.sourcesCollapsed };
