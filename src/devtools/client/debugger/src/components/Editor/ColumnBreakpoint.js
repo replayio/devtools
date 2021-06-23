@@ -54,6 +54,10 @@ class ColumnBreakpoint extends Component {
     }
 
     const { line, column } = columnBreakpoint.location;
+    if (column === undefined) {
+      return;
+    }
+
     const widget = makeBookmark(columnBreakpoint, {
       onClick: this.onClick,
       onContextMenu: this.onContextMenu,
