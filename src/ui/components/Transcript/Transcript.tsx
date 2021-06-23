@@ -41,7 +41,7 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
   return (
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item">Comments</div>
+        <div className="right-sidebar-toolbar-item comments">Comments</div>
       </div>
       <div className="transcript-panel">
         {displayedComments.length > 0 ? (

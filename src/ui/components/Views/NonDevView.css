@@ -17,6 +17,10 @@
   background-color: var(--theme-accordion-header-background);
 }
 
+.comments {
+  margin-bottom: 1px;
+}
+
 .right-sidebar-toolbar-item {
   font-size: 15px;
   font-weight: 400;
