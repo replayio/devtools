@@ -45,7 +45,7 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
       </div>
       <div className="transcript-panel">
         {displayedComments.length > 0 ? (
-          <div className="transcript-list space-y-4">
+          <div className="transcript-list space-y-2">
             {sortBy(displayedComments, ["time"]).map(comment => {
               return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
             })}
