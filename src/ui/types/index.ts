@@ -29,12 +29,17 @@ export interface Recording {
   comments?: any;
 }
 
+export interface PendingWorkspaceInvitation extends Workspace {
+  inviterEmail: string | null;
+}
+
 export interface Workspace {
   name: string;
   id: string;
   invitationCode: string;
   domain: string;
   isDomainLimitedCode: boolean;
+  recordingCount?: number;
   members?: User[];
 }
 
