@@ -67,7 +67,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         onClick={onDiscard}
         disabled={isSaving || isDeleting}
         className={classNames(
-          "inline-flex items-center px-4 py-2 border border-gray-200 text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccentHover justify-center",
+          "inline-flex items-center px-4 py-2 border border-gray-200 text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center",
           "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         )}
       >

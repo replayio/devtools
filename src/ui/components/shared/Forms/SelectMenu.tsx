@@ -14,7 +14,7 @@ function Option({ name, id }: { name: string; id: string | null }) {
       key={id}
       className={({ active }) =>
         classnames(
-          active ? "text-white bg-primaryAccentHover" : "text-gray-900",
+          active ? "text-white bg-primaryAccent" : "text-gray-900",
           "cursor-default select-none relative py-2 pl-3 pr-9"
         )
       }
@@ -30,7 +30,7 @@ function Option({ name, id }: { name: string; id: string | null }) {
           {selected ? (
             <span
               className={classnames(
-                active ? "text-white" : "text-primaryAccentHover",
+                active ? "text-white" : "text-primaryAccent",
                 "absolute inset-y-0 right-0 flex items-center pr-4"
               )}
             >
@@ -69,7 +69,7 @@ export default function SelectMenu({
               </Listbox.Label>
             ) : null}
             <div className={`mt-1 relative z-10 ${className}`}>
-              <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccentHover focus:border-primaryAccentHover text-lg">
+              <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover text-lg">
                 <span className="block truncate">{selectedName}</span>
                 <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                   <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />

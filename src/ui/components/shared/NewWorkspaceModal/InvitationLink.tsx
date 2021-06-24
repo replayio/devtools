@@ -21,7 +21,7 @@ function InvitationURL({ code }: { code: string }) {
   return (
     <div className="relative flex flex-col items-center">
       <input
-        className="focus:ring-primaryAccentHover focus:border-primaryAccentHover block w-full text-lg border px-3 py-2 border-gray-300 rounded-md"
+        className="focus:ring-primaryAccent focus:border-primaryAccent block w-full text-lg border px-3 py-2 border-gray-300 rounded-md"
         type="text"
         value={displayedText}
         onKeyPress={e => e.preventDefault()}

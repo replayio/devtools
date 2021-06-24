@@ -31,7 +31,7 @@ function DownloadLinks() {
         <a
           href="https://replay.io/downloads/replay.dmg"
           className={
-            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
+            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-blue-600 hover:bg-blue-700"
           }
           onClick={() => setClicked(true)}
         >
@@ -40,7 +40,7 @@ function DownloadLinks() {
         <a
           href="https://replay.io/downloads/linux-replay.tar.bz2"
           className={
-            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
+            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-blue-600 hover:bg-blue-700"
           }
           onClick={() => setClicked(true)}
         >
