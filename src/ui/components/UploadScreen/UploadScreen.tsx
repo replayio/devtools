@@ -8,10 +8,10 @@ const { getFormattedTime } = require("ui/utils/timeline");
 import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
-import { Recording, Workspace } from "ui/types";
+import { Recording, UserSettings, Workspace } from "ui/types";
 import { BlankLoadingScreen } from "../shared/BlankScreen";
 
-type UploadScreenProps = PropsFromRedux & { recording: Recording };
+type UploadScreenProps = PropsFromRedux & { recording: Recording; userSettings: UserSettings };
 type Status = "saving" | "deleting" | "deleted" | null;
 
 function DeletedScreen({ url }: { url: string }) {
@@ -156,8 +156,8 @@ function SharingSettings({
               onChange={() => setIsPublic(true)}
             />
             <label htmlFor="public">
-              <span className="font-semibold text-red-800">Public: </span>This replay can be viewed
-              by anyone with the link
+              <span className="font-semibold">Public: </span>This replay can be viewed by anyone
+              with the link
             </label>
           </div>
           <div className="space-x-2 items-center">
@@ -226,10 +226,9 @@ function SharingPreview({
   );
 }
 
-function UploadScreen({ recordingId, recording }: UploadScreenProps) {
+function UploadScreen({ recordingId, recording, userSettings }: UploadScreenProps) {
   const [showSharingSettings, setShowSharingSettings] = useState(false);
   // This is pre-loaded in the parent component.
-  const { userSettings } = hooks.useGetUserSettings();
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
   const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
 
