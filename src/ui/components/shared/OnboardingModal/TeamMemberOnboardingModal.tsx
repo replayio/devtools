@@ -1,15 +1,17 @@
+import classNames from "classnames";
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { PendingWorkspaceInvitation } from "ui/types";
 import { isTeamMemberInvite } from "ui/utils/environment";
 import BlankScreen from "../BlankScreen";
 import Modal from "../NewModal";
 import Spinner from "../Spinner";
-const { prefs } = require("ui/utils/prefs");
 
-type Status = "pending" | "loading" | "loaded";
+type Status = "pending" | "loading" | "loaded" | "declined";
+type Actions = "accept" | "decline";
 
 function TeamMemberOnboardingModalLoader({ hideModal, setWorkspaceId }: PropsFromRedux) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
@@ -24,63 +26,47 @@ function TeamMemberOnboardingModalLoader({ hideModal, setWorkspaceId }: PropsFro
     );
   }
 
-  const workspace = pendingWorkspaces[0];
-
-  return <TeamMemberOnboardingModal {...{ hideModal, setWorkspaceId, workspace }} />;
+  return (
+    <TeamMemberOnboardingModal {...{ hideModal, setWorkspaceId, workspaces: pendingWorkspaces }} />
+  );
 }
 
-type TeamMemberOnboardingModalProps = PropsFromRedux & {
-  workspace: { id: string; name: string };
-};
-
-function TeamMemberOnboardingModal({
-  hideModal,
-  setWorkspaceId,
+function TeamMemberInvitation({
   workspace,
-}: TeamMemberOnboardingModalProps) {
+  onGo,
+  onAction,
+}: {
+  workspace: PendingWorkspaceInvitation;
+  onAction: (action: Actions) => void;
+  onGo: (id: string) => void;
+  hideModal: () => void;
+}) {
   const [status, setState] = useState<Status>("pending");
-  const userInfo = hooks.useGetUserInfo();
-  const updateUserNags = hooks.useUpdateUserNags();
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-  const rejectPendingInvitation = hooks.useRejectPendingInvitation(() => {});
   // Keep the workspace info (id, name) here so that we can reference it even after the
   // user accepts the invitation. Otherwise, it disappears from the query.
   const [workspaceTarget] = useState(workspace);
-  const acceptPendingInvitation = hooks.useAcceptPendingInvitation(() => setState("loaded"));
+  const rejectPendingInvitation = hooks.useRejectPendingInvitation(() => {
+    onAction("decline");
+  });
+  const acceptPendingInvitation = hooks.useAcceptPendingInvitation(() => {
+    onAction("accept");
+    setState("loaded");
+  });
 
-  const onSkip = () => {
-    if (window.confirm(`Are you sure you want to skip this step?`)) {
-      window.history.pushState({}, document.title, window.location.pathname);
-      hideModal();
-    }
-  };
   const onAccept = () => {
     setState("loading");
     acceptPendingInvitation({ variables: { workspaceId: workspaceTarget.id } });
   };
   const onDecline = () => {
-    hideModal();
+    setState("declined");
     rejectPendingInvitation({ variables: { workspaceId: workspace.id } });
-  };
-  const onGo = () => {
-    // Skip showing the user the first replay nag, since they will be going straight to a team.
-    const newNags = [...userInfo.nags, Nag.FIRST_REPLAY];
-    updateUserNags({
-      variables: { newNags },
-    });
-
-    setWorkspaceId(workspaceTarget.id);
-    updateDefaultWorkspace({ variables: { workspaceId: workspaceTarget.id } });
-
-    setTimeout(
-      () => (window.location.href = window.location.origin + window.location.pathname),
-      1000
-    );
   };
 
   let callToAction;
 
-  if (status == "pending") {
+  if (status == "declined") {
+    callToAction = <div className="text-gray-500 select-none">Declined</div>;
+  } else if (status == "pending") {
     callToAction = (
       <div className="space-y-2 flex flex-col items-center">
         <div className="space-x-4 flex flex-row">
@@ -101,9 +87,6 @@ function TeamMemberOnboardingModal({
             </button>
           ) : null}
         </div>
-        <button className="text-gray-400 text-base underline" onClick={onSkip}>
-          Skip this step
-        </button>
       </div>
     );
   } else if (status == "loading") {
@@ -112,7 +95,7 @@ function TeamMemberOnboardingModal({
         <button
           disabled
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
           <Spinner className="animate-spin h-6 w-6 text-white" />
         </button>
@@ -122,27 +105,123 @@ function TeamMemberOnboardingModal({
     callToAction = (
       <div className="space-y-2 flex flex-col items-center">
         <button
-          onClick={onGo}
+          onClick={() => onGo(workspaceTarget.id)}
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
-          {`Bring me to ${workspaceTarget.name}`}
+          {`Open`}
         </button>
       </div>
     );
   }
 
   return (
+    <div className="flex flex-row items-center justify-between space-x-8">
+      <div className="flex flex-col text-gray-500 overflow-hidden">
+        <h2 className="text-2xl font-semibold text-gray-900 whitespace-pre overflow-ellipsis overflow-hidden">{`${workspaceTarget.name} team`}</h2>
+        <div className="overflow-hidden whitespace-pre overflow-ellipsis">{`${workspaceTarget.recordingCount} replays`}</div>
+        <div className="overflow-hidden whitespace-pre overflow-ellipsis">
+          {workspaceTarget.inviterEmail
+            ? `Invited by ${workspaceTarget.inviterEmail}`
+            : `Invited through invite link`}
+        </div>
+      </div>
+      {callToAction}
+    </div>
+  );
+}
+
+type TeamMemberOnboardingModalProps = PropsFromRedux & {
+  workspaces: PendingWorkspaceInvitation[];
+};
+
+function TeamMemberOnboardingModal({
+  hideModal,
+  setWorkspaceId,
+  workspaces,
+}: TeamMemberOnboardingModalProps) {
+  const [displayedWorkspaces] = useState(workspaces);
+  const [actions, setActions] = useState<Actions[]>([]);
+  const userInfo = hooks.useGetUserInfo();
+  const updateUserNags = hooks.useUpdateUserNags();
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+  const isFinished = actions.length === displayedWorkspaces.length;
+
+  const onAction = (action: Actions) => setActions([...actions, action]);
+  const onSkip = () => {
+    // We should show a confirm prompt if a user still has invitation actions to do,
+    // or they're trying to skip when they accepted an invitation and should be
+    // nudged to open that team.
+    if (isFinished && !actions.includes("accept")) {
+      window.history.pushState({}, document.title, window.location.pathname);
+      hideModal();
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to skip this step?`)) {
+      window.history.pushState({}, document.title, window.location.pathname);
+      hideModal();
+    }
+  };
+  const onGo = (workspaceId: string) => {
+    const line1 = `You still have remaining invitations.`;
+    const line2 = `Are you sure you want to proceed?`;
+
+    if (isFinished || window.confirm(`${line1}\n\n${line2}`)) {
+      if (!userInfo.nags.includes(Nag.FIRST_REPLAY)) {
+        // Skip showing the user the first replay nag, since they will be going straight to a team.
+        const newNags = [...userInfo.nags, Nag.FIRST_REPLAY];
+        updateUserNags({
+          variables: { newNags },
+        });
+      }
+
+      setWorkspaceId(workspaceId);
+      updateDefaultWorkspace({ variables: { workspaceId } });
+      hideModal();
+
+      // Remove any URL parameters. This applies when a user clicks on a team invite
+      // link from their email.
+      window.history.pushState({}, document.title, window.location.pathname);
+
+      return;
+    }
+  };
+
+  const headerText =
+    displayedWorkspaces.length == 1
+      ? `You have a new team invitation`
+      : `You have new team invitations`;
+
+  return (
     <>
       {isTeamMemberInvite() ? <BlankScreen className="fixed" /> : null}
-      <Modal options={{ maskTransparency: isTeamMemberInvite() ? "transparent" : "translucent" }}>
+      <Modal
+        onMaskClick={onSkip}
+        options={{ maskTransparency: isTeamMemberInvite() ? "transparent" : "translucent" }}
+      >
         <div
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
           style={{ width: "520px" }}
         >
-          <div className="space-y-8 flex flex-col items-center">
-            <h2 className="font-bold text-3xl text-gray-900">{`You're invited to join the ${workspaceTarget.name} team`}</h2>
-            {callToAction}
+          <div className="space-y-8 flex flex-col">
+            <h2 className="font-bold text-3xl text-gray-900">{headerText}</h2>
+            {displayedWorkspaces.map(workspace => (
+              <TeamMemberInvitation
+                {...{ hideModal, onGo, workspace, onAction }}
+                key={workspace.id}
+              />
+            ))}
+            {isFinished && !actions.includes("accept") ? (
+              <button
+                className={classNames(
+                  "py-2 font-medium rounded-md bg-primaryAccent hover:bg-primaryAccentHover text-white"
+                )}
+                onClick={onSkip}
+              >
+                Done
+              </button>
+            ) : null}
           </div>
         </div>
       </Modal>
