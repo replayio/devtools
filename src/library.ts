@@ -21,6 +21,7 @@ export async function initialize() {
   const store = createStore(combineReducers({ app: reducer }), {}, middleware);
 
   const settings = await getUserSettings();
+  console.log({ settings });
   store.dispatch(setWorkspaceId(settings.defaultWorkspaceId));
 
   (window as any).app = {
