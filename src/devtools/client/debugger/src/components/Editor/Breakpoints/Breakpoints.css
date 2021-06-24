@@ -4,14 +4,14 @@
 
 .theme-light {
   --gutter-hover-background-color: #dde1e4;
-  --breakpoint-fill: var(--blue-50);
-  --breakpoint-stroke: var(--blue-60);
+  --breakpoint-fill: var(--primary-accent);
+  --breakpoint-stroke: var(--primary-accent-hover);
 }
 
 .theme-dark {
   --gutter-hover-background-color: #414141;
-  --breakpoint-fill: var(--blue-55);
-  --breakpoint-stroke: var(--blue-40);
+  --breakpoint-fill: var(--primary-accent);
+  --breakpoint-stroke: var(--primary-accent-hover);
 }
 
 .theme-light,

@@ -87,7 +87,7 @@ function TeamMemberOnboardingModal({
           <button
             onClick={onAccept}
             type="button"
-            className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
           >
             Accept
           </button>
@@ -112,7 +112,7 @@ function TeamMemberOnboardingModal({
         <button
           disabled
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
           <Spinner className="animate-spin h-6 w-6 text-white" />
         </button>
@@ -124,7 +124,7 @@ function TeamMemberOnboardingModal({
         <button
           onClick={onGo}
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
           {`Bring me to ${workspaceTarget.name}`}
         </button>

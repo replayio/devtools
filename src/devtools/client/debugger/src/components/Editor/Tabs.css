@@ -62,8 +62,8 @@
 }
 
 .source-tab.active {
-  --tab-line-color: var(--tab-line-selected-color);
-  color: var(--theme-toolbar-selected-color);
+  --tab-line-color: var(--primary-accent);
+  color: var(--primary-accent);
   border-bottom-color: transparent;
 }
 
