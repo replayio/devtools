@@ -115,7 +115,7 @@ function Library({
 
     if (isTeamLeaderInvite()) {
       setModal("team-leader-onboarding");
-    } else if (pendingWorkspaces?.length) {
+    } else if (pendingWorkspaces?.length === 1) {
       setModal("team-member-onboarding");
     }
 
