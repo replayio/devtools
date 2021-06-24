@@ -303,6 +303,5 @@ export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspa
 }
 
 export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
-  console.log(showVideoPanel);
   return { type: "set_show_video_panel", showVideoPanel };
 }

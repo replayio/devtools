@@ -192,8 +192,6 @@ function SharingPreview({
   selectedWorkspaceId: string | null;
 }) {
   const personalWorkspace = { id: null, name: "My Library" };
-  const workspace = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId);
-  console.log({ workspace });
   const workspaceName = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId)!
     .name;
   let icon;
