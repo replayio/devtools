@@ -41,7 +41,7 @@ deletes the comment */
 }
 
 .comments-container .img.comment-marker.primary-highlight:not(.paused) {
-  background-color: var(--new-blue-800);
+  background-color: var(--secondary-accent);
 }
 
 .create-comment {
