@@ -62,6 +62,12 @@ export async function createSession(store: UIStore, recordingId: string) {
     ThreadFront.setSessionId(sessionId);
     const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
     store.dispatch(actions.setRecordingTarget(recordingTarget));
+
+    // We don't want to show the non-dev version of the app for node replays.
+    if (recordingTarget === "node") {
+      store.dispatch(actions.setViewMode("dev"));
+    }
+
     store.dispatch(actions.setUploading(null));
     prefs.recordingId = recordingId;
   } catch (e) {
