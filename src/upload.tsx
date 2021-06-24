@@ -19,7 +19,7 @@ function _UploadScreenWrapper({ setExpectedError }: PropsFromRedux) {
   const expectedError = useHasExpectedError(recordingId);
   const { recording } = useGetRecording(recordingId);
   // Make sure to get the user's settings before showing the upload screen.
-  const { loading } = hooks.useGetUserSettings();
+  const { userSettings, loading } = hooks.useGetUserSettings();
 
   useEffect(() => {
     if (expectedError) {
@@ -38,7 +38,7 @@ function _UploadScreenWrapper({ setExpectedError }: PropsFromRedux) {
     return <BlankLoadingScreen />;
   }
 
-  return recording ? <UploadScreen recording={recording} /> : <BlankLoadingScreen />;
+  return recording ? <UploadScreen {...{ userSettings, recording }} /> : <BlankLoadingScreen />;
 }
 
 const connector = connect(null, { setExpectedError });
