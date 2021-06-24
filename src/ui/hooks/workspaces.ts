@@ -1,5 +1,5 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { PendingWorkspaceInvitation, Workspace } from "ui/types";
+import { Workspace } from "ui/types";
 
 const NO_WORKSPACES: Workspace[] = [];
 
@@ -44,9 +44,7 @@ export function useGetPendingWorkspaces() {
                 workspace {
                   id
                   name
-                  recordingCount
                 }
-                inviterEmail
               }
             }
           }
@@ -62,13 +60,10 @@ export function useGetPendingWorkspaces() {
     console.error("Apollo error while fetching pending workspace invitations:", error);
   }
 
-  let pendingWorkspaces: PendingWorkspaceInvitation[] | undefined = undefined;
+  let pendingWorkspaces: Workspace[] | undefined = undefined;
   if (data?.viewer) {
     pendingWorkspaces = data.viewer.workspaceInvitations.edges.map(
-      ({ node: { workspace, inviterEmail } }: any) => ({
-        ...workspace,
-        inviterEmail,
-      })
+      ({ node }: any) => node.workspace
     );
   }
   return { pendingWorkspaces, loading };
