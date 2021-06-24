@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
@@ -13,7 +13,7 @@ import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 
-function DevView({ updateTimelineDimensions, narrowMode, recordingTarget }) {
+function DevView({ updateTimelineDimensions, narrowMode, recordingTarget, showVideoPanel }) {
   const handleMove = num => {
     updateTimelineDimensions();
     prefs.toolboxHeight = `${num}px`;
@@ -90,7 +90,7 @@ function DevView({ updateTimelineDimensions, narrowMode, recordingTarget }) {
           vert={true}
           onMove={handleMove}
           startPanel={<Toolbox />}
-          endPanel={<Viewer />}
+          endPanel={showVideoPanel ? <Viewer /> : <SecondaryToolbox />}
           endPanelControl={false}
         />
         <div id="timeline-container">
@@ -105,6 +105,7 @@ export default connect(
   state => ({
     narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
+    showVideoPanel: selectors.getShowVideoPanel(state),
   }),
   {
     updateTimelineDimensions,

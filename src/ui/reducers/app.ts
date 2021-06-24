@@ -36,6 +36,7 @@ function initialAppState(): AppState {
     fontLoading: true,
     recordingWorkspace: null,
     loadedRegions: null,
+    showVideoPanel: true,
   };
 }
 
@@ -194,6 +195,10 @@ export default function update(
       return { ...state, recordingWorkspace: action.workspace };
     }
 
+    case "set_show_video_panel": {
+      return { ...state, showVideoPanel: action.showVideoPanel };
+    }
+
     default: {
       return state;
     }
@@ -245,3 +250,4 @@ export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettin
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getFontLoading = (state: UIState) => state.app.fontLoading;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
+export const getShowVideoPanel = (state: UIState) => state.app.showVideoPanel;

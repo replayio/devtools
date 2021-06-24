@@ -5,6 +5,7 @@ import hooks from "ui/hooks";
 import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
@@ -12,7 +13,14 @@ import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import { ReactDevtoolsPanel } from "./ReactDevTools";
 
-function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
+function PanelButtons({
+  selectedPanel,
+  setSelectedPanel,
+  narrowMode,
+  isNode,
+  showVideoPanel,
+  setShowVideoPanel,
+}) {
   const { userSettings } = hooks.useGetUserSettings();
 
   const showReact = userSettings.showReact;
@@ -29,7 +37,7 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
   };
 
   return (
-    <div className="panel-buttons">
+    <div className="flex flex-row items-center overflow-hidden">
       {showElements && !isNode && <NodePicker />}
       <button
         className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
@@ -87,10 +95,19 @@ function InspectorPanel() {
   );
 }
 
-function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode, recordingTarget }) {
+function SecondaryToolbox({
+  selectedPanel,
+  setSelectedPanel,
+  narrowMode,
+  recordingTarget,
+  showVideoPanel,
+  setShowVideoPanel,
+}) {
   const { userSettings } = hooks.useGetUserSettings();
   const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
+  const toggleShowVideoPanel = () => setShowVideoPanel(!showVideoPanel);
+
   return (
     <div className={classnames(`secondary-toolbox`, { node: isNode })}>
       <header className="secondary-toolbox-header">
@@ -99,7 +116,14 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode, recordi
           selectedPanel={selectedPanel}
           setSelectedPanel={setSelectedPanel}
           isNode={isNode}
+          showVideoPanel={showVideoPanel}
+          setShowVideoPanel={setShowVideoPanel}
         />
+        <button className="" onClick={toggleShowVideoPanel}>
+          <MaterialIcon className="hover:text-primaryAccent">
+            {showVideoPanel ? "videocam_off" : "videocam"}
+          </MaterialIcon>
+        </button>
       </header>
       <div className="secondary-toolbox-content">
         {selectedPanel === "console" ? <ConsolePanel /> : null}
@@ -116,6 +140,7 @@ export default connect(
     selectedPanel: selectors.getSelectedPanel(state),
     narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
+    showVideoPanel: selectors.getShowVideoPanel(state),
   }),
-  { setSelectedPanel: actions.setSelectedPanel }
+  { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
 )(SecondaryToolbox);
