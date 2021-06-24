@@ -43,11 +43,11 @@
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
 
-  --primary-accent: #1b7fe3;
-  --primary-accent-hover: #2569ad;
+  --primary-accent: orange;
+  --primary-accent-hover: pink;
   --primary-accent-light: #86bff9;
 
-  --secondary-accent: #8330f4;
+  --secondary-accent: red;
   --secondary-accent-stroke: #f9f5ff;
 
   --new-blue-50: #eff7ff;
@@ -140,7 +140,7 @@
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
   --theme-toolbar-background: var(--grey-10);
-  --theme-toolbar-selected-color: var(--blue-60);
+  --theme-toolbar-selected-color: var(--primary-accent);
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
   --theme-toolbar-background-alt: #f5f5f5;

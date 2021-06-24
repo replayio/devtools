@@ -11,7 +11,7 @@
 }
 
 .sharing-modal .filler {
-  background: linear-gradient(to bottom right, #64D4FB, #52A6F9);
+  background: linear-gradient(to bottom right, #64d4fb, #52a6f9);
 }
 
 .sharing-modal .modal-container .modal-content {
@@ -57,7 +57,7 @@
 }
 
 .sharing-modal .privacy-choice.selected {
-  background: var(--new-blue-50)
+  background: var(--new-blue-50);
 }
 
 .sharing-modal .privacy-choice .title {
@@ -69,7 +69,7 @@
 }
 
 .sharing-modal .privacy-choice.selected .description {
-  color: var(--new-blue-700);
+  color: var(--primaryAccentHover);
 }
 
 .sharing-modal .privacy-warning {

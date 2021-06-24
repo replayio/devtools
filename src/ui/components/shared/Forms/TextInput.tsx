@@ -17,7 +17,7 @@ export default function TextInput({
       id={id}
       onChange={onChange}
       value={value}
-      className="focus:ring-blue-500 focus:border-blue-500 block w-full text-lg border px-3 py-2 border-gray-300 rounded-md"
+      className="focus:ring-blue-500 focus:primaryAccentHover block w-full text-lg border px-3 py-2 border-gray-300 rounded-md"
       placeholder={placeholder}
     />
   );
