@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import "./Invitations.css";
-import { Workspace } from "ui/types";
+import { PendingWorkspaceInvitation, Workspace } from "ui/types";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import classNames from "classnames";
@@ -69,9 +69,9 @@ function AcceptedInvitation({
   setWorkspaceId,
   hideAcceptedInvitation,
 }: {
-  workspace: Workspace;
+  workspace: PendingWorkspaceInvitation;
   setWorkspaceId: (id: string) => void;
-  hideAcceptedInvitation: (team: Workspace) => void;
+  hideAcceptedInvitation: (team: PendingWorkspaceInvitation) => void;
 }) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const [shouldHide, setShouldHide] = useState(false);
@@ -110,7 +110,9 @@ function AcceptedInvitation({
 
 function Invitations({ setWorkspaceId }: PropsFromRedux) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
-  const [acceptedInvitations, setAcceptedInvitations] = useState<Array<Workspace>>([]);
+  const [acceptedInvitations, setAcceptedInvitations] = useState<Array<PendingWorkspaceInvitation>>(
+    []
+  );
 
   if (loading) {
     return null;
@@ -128,7 +130,7 @@ function Invitations({ setWorkspaceId }: PropsFromRedux) {
     return null;
   }
 
-  const hideAcceptedInvitation = (team: Workspace) => {
+  const hideAcceptedInvitation = (team: PendingWorkspaceInvitation) => {
     const invitationIndex = acceptedInvitations.indexOf(team);
 
     if (invitationIndex < 0) {
