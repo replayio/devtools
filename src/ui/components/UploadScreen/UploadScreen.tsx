@@ -86,18 +86,37 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
   );
 }
 
-function Form({
+function ReplayPreview({ recording, screenData }: { recording: Recording; screenData: string }) {
+  return (
+    <div className="space-y-1">
+      <div className="block text-sm uppercase font-semibold text-gray-700">Preview</div>
+      <div
+        className="relative bg-gray-100 border border-gray-300 rounded-lg"
+        style={{ height: "200px" }}
+      >
+        <img src={screenData} className="h-full m-auto" />
+        <div
+          style={{ maxWidth: "50%" }}
+          className="shadow-md bg-gray-500 text-white bottom-4 left-4 rounded-full px-3 py-0.5 absolute text-base select-none"
+        >
+          <div className="whitespace-pre overflow-hidden overflow-ellipsis">{recording.url}</div>
+        </div>
+        <div className="shadow-md bg-gray-500 text-white bottom-4 right-4 rounded-full px-3 py-0.5 absolute text-base select-none">
+          {getFormattedTime(recording!.duration)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SharingSettings({
   workspaces,
-  inputValue,
-  setInputValue,
   selectedWorkspaceId,
   setSelectedWorkspaceId,
   isPublic,
   setIsPublic,
 }: {
   workspaces: Workspace[];
-  inputValue: string;
-  setInputValue: Dispatch<SetStateAction<string>>;
   selectedWorkspaceId: string | null;
   setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
   isPublic: boolean;
@@ -105,13 +124,17 @@ function Form({
 }) {
   const selectedWorkspace = workspaces.find(w => w.id === selectedWorkspaceId);
   const privateText =
-    selectedWorkspaceId === null
-      ? `Only you can view this Replay`
-      : `Restricted to people in team "${selectedWorkspace!.name}"`;
+    selectedWorkspaceId === null ? (
+      `Only you can view this Replay`
+    ) : (
+      <span>
+        This replay can be viewed by anyone from{" "}
+        <span className="font-semibold">{selectedWorkspace!.name}</span>
+      </span>
+    );
 
   return (
     <>
-      <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
       <div className="text-gray-700">
         <label className="block text-sm uppercase font-semibold ">Team</label>
         {workspaces.length ? (
@@ -133,7 +156,8 @@ function Form({
               onChange={() => setIsPublic(true)}
             />
             <label htmlFor="public">
-              <span className="font-semibold">Public: </span>Available to anyone with the link
+              <span className="font-semibold text-red-800">Public: </span>This replay can be viewed
+              by anyone with the link
             </label>
           </div>
           <div className="space-x-2 items-center">
@@ -156,10 +180,60 @@ function Form({
   );
 }
 
+function SharingPreview({
+  toggleShowSharingSettings,
+  isPublic,
+  workspaces,
+  selectedWorkspaceId,
+}: {
+  toggleShowSharingSettings: () => void;
+  isPublic: boolean;
+  workspaces: Workspace[];
+  selectedWorkspaceId: string | null;
+}) {
+  const personalWorkspace = { id: null, name: "My Library" };
+  const workspace = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId);
+  console.log({ workspace });
+  const workspaceName = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId)!
+    .name;
+  let icon;
+
+  if (!isPublic) {
+    if (selectedWorkspaceId) {
+      icon = "groups";
+    } else {
+      icon = "person";
+    }
+  } else {
+    icon = "public";
+  }
+
+  return (
+    <div className="flex flex-row items-center space-x-4">
+      <span className="material-icons">{icon}</span>
+      <div className="flex flex-col flex-grow overflow-hidden">
+        <div className="overflow-hidden overflow-ellipsis whitespace-pre">
+          Save to <span className="font-semibold">{`${workspaceName}`}</span>
+        </div>
+        {isPublic ? (
+          <div className="overflow-hidden overflow-ellipsis whitespace-pre font-red-800">
+            This replay can be viewed by anyone with the link
+          </div>
+        ) : null}
+      </div>
+      <button className="text-blue-700 underline p-2" onClick={toggleShowSharingSettings}>
+        Edit
+      </button>
+    </div>
+  );
+}
+
 function UploadScreen({ recordingId, recording }: UploadScreenProps) {
-  const { userSettings, loading: loading1 } = hooks.useGetUserSettings();
-  const { screenData, loading: loading2 } = hooks.useGetRecordingPhoto(recordingId!);
-  const { workspaces, loading: loading3 } = hooks.useGetNonPendingWorkspaces();
+  const [showSharingSettings, setShowSharingSettings] = useState(false);
+  // This is pre-loaded in the parent component.
+  const { userSettings } = hooks.useGetUserSettings();
+  const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
+  const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
 
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
@@ -186,6 +260,8 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
     };
   }, []);
 
+  const toggleShowSharingSettings = () => setShowSharingSettings(!showSharingSettings);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -203,7 +279,7 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
     deleteRecording({ variables: { recordingId } });
   };
 
-  if (loading1 || loading2 || loading3) {
+  if (loading1 || loading2) {
     return <BlankLoadingScreen />;
   }
 
@@ -222,33 +298,22 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
           style={{ width: "520px" }}
         >
           <h2 className="font-bold text-3xl text-gray-900">Save and Upload</h2>
-          <div
-            className="relative bg-gray-100 border border-gray-300 rounded-lg"
-            style={{ height: "200px" }}
-          >
-            <img src={screenData} className="h-full m-auto" />
-            <div
-              style={{ maxWidth: "50%" }}
-              className="shadow-md bg-gray-500 text-white bottom-4 left-4 rounded-full px-3 py-0.5 absolute text-base select-none"
-            >
-              <div className="whitespace-pre overflow-hidden overflow-ellipsis">
-                {recording.url}
-              </div>
-            </div>
-            <div className="shadow-md bg-gray-500 text-white bottom-4 right-4 rounded-full px-3 py-0.5 absolute text-base select-none">
-              {getFormattedTime(recording!.duration)}
-            </div>
-          </div>
           <form className="space-y-6" onSubmit={e => onSubmit(e)}>
-            <Form
-              workspaces={workspaces}
-              inputValue={inputValue}
-              setInputValue={setInputValue}
-              selectedWorkspaceId={selectedWorkspaceId}
-              setSelectedWorkspaceId={setSelectedWorkspaceId}
-              isPublic={isPublic}
-              setIsPublic={setIsPublic}
-            />
+            <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
+            <ReplayPreview recording={recording} screenData={screenData!} />
+            {showSharingSettings ? (
+              <SharingSettings
+                workspaces={workspaces}
+                selectedWorkspaceId={selectedWorkspaceId}
+                setSelectedWorkspaceId={setSelectedWorkspaceId}
+                isPublic={isPublic}
+                setIsPublic={setIsPublic}
+              />
+            ) : (
+              <SharingPreview
+                {...{ toggleShowSharingSettings, isPublic, workspaces, selectedWorkspaceId }}
+              />
+            )}
             <Actions onDiscard={onDiscard} status={status} />
           </form>
         </div>
