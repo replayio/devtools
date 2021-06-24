@@ -71,6 +71,7 @@ export interface AppState {
   fontLoading: boolean;
   recordingWorkspace: Workspace | null;
   loadedRegions: loadedRegions | null;
+  showVideoPanel: boolean;
 }
 
 export interface AnalysisPoints {

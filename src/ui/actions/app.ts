@@ -79,6 +79,9 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
   parameters: loadedRegions;
 };
+export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
+  showVideoPanel: boolean;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -106,7 +109,8 @@ export type AppActions =
   | SetRecordingTargetAction
   | SetFontLoading
   | SetRecordingWorkspaceAction
-  | SetLoadedRegions;
+  | SetLoadedRegions
+  | SetShowVideoPanelAction;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -296,4 +300,9 @@ export function setFontLoading(value: boolean): SetFontLoading {
 
 export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspaceAction {
   return { type: "set_recording_workspace", workspace };
+}
+
+export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
+  console.log(showVideoPanel);
+  return { type: "set_show_video_panel", showVideoPanel };
 }
