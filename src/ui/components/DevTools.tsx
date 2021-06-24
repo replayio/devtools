@@ -102,7 +102,11 @@ function DevTools({
   return (
     <>
       <Header />
-      {!prefs.video && viewMode == "dev" ? <DevView /> : <NonDevView />}
+      {(!prefs.video && viewMode == "dev") || recordingTarget == "node" ? (
+        <DevView />
+      ) : (
+        <NonDevView />
+      )}
     </>
   );
 }
