@@ -14,7 +14,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import CommentCardFooter from "./CommentCardFooter";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
-const hoveredStyles = "shadow-xl border-blue-600 hover:border-blue-600";
+const hoveredStyles = "shadow-xl border-secondaryAccent hover:border-secondaryAccent";
 
 function CommentItem({
   pendingComment,
@@ -108,7 +108,7 @@ function CommentCard({
         onMouseLeave={() => setHoveredComment(null)}
       >
         <div
-          className={classNames("bg-white rounded-xl border border-blue-400 shadow-lg", {
+          className={classNames("bg-white rounded-xl border border-primaryAccent shadow-lg", {
             [hoveredStyles]: hoveredComment == "pendingCommentId" && isPaused,
           })}
         >
@@ -127,11 +127,14 @@ function CommentCard({
       onMouseLeave={() => setHoveredComment(null)}
     >
       <div
-        className={classNames("bg-white rounded-xl border border-gray-300 hover:border-blue-400", {
-          "border-blue-400 shadow-lg": isPaused,
-          "cursor-pointer": !isPaused,
-          [hoveredStyles]: hoveredComment == comment.id && isPaused,
-        })}
+        className={classNames(
+          "bg-white rounded-xl border border-gray-300 hover:border-primaryAccent",
+          {
+            "border-primaryAccent shadow-lg": isPaused,
+            "cursor-pointer": !isPaused,
+            [hoveredStyles]: hoveredComment == comment.id && isPaused,
+          }
+        )}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
         <CommentItem comment={comment} pendingComment={pendingComment} />
