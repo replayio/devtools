@@ -25,20 +25,9 @@ function ExistingCommentEditor({ comment, type, clearPendingComment }: ExistingC
     const { id } = pendingComment;
 
     if (type === "edit_comment") {
-      updateComment({
-        variables: {
-          newContent: inputValue,
-          commentId: id,
-          position: pendingComment.position,
-        },
-      });
+      updateComment(id, inputValue, pendingComment.position);
     } else {
-      updateCommentReply({
-        variables: {
-          newContent: inputValue,
-          commentId: id,
-        },
-      });
+      updateCommentReply(id, inputValue);
     }
   };
 

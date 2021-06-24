@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { Comment } from "ui/state/comments";
+import { Comment, CommentPosition } from "ui/state/comments";
 
 const NO_COMMENTS: Comment[] = [];
 export const GET_COMMENTS = gql`
@@ -83,7 +83,26 @@ export function useUpdateComment() {
     console.error("Apollo error while updating a comment:", error);
   }
 
-  return updateCommentContent;
+  return (commentId: string, newContent: string, position: CommentPosition | null) => {
+    updateCommentContent({
+      variables: { commentId, newContent, position },
+      optimisticResponse: {
+        updateComment: {
+          success: true,
+          __typename: "UpdateComment",
+        },
+      },
+      update: cache => {
+        cache.modify({
+          id: cache.identify({ id: commentId, __typename: "Comment" }),
+          fields: {
+            content: () => newContent,
+            position: () => position,
+          },
+        });
+      },
+    });
+  };
 }
 
 export function useUpdateCommentReply() {
@@ -101,7 +120,23 @@ export function useUpdateCommentReply() {
     console.error("Apollo error while updating a comment:", error);
   }
 
-  return updateCommentReplyContent;
+  return (commentId: string, newContent: string) => {
+    updateCommentReplyContent({
+      variables: { commentId, newContent },
+      optimisticResponse: {
+        updateComment: {
+          success: true,
+          __typename: "UpdateCommentReply",
+        },
+      },
+      update: cache => {
+        cache.modify({
+          id: cache.identify({ id: commentId, __typename: "CommentReply" }),
+          fields: { content: () => newContent },
+        });
+      },
+    });
+  };
 }
 
 export async function getFirstComment(
