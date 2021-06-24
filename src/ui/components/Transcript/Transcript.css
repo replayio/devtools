@@ -9,8 +9,12 @@
   height: 100%;
 }
 
-.transcript-panel > :not(:first-child) {
-  margin-top: 16px;
+.transcript-panel > :first-child {
+  padding-top: 4px;
+}
+
+.transcript-panel {
+  margin-top: 0;
 }
 
 .transcript-list {

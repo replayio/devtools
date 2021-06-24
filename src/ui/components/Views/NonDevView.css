@@ -13,7 +13,7 @@
   padding: 8px;
   justify-content: space-between;
   border-bottom: 1px solid var(--theme-splitter-color);
-  margin-bottom: 8px;
+  margin-bottom: 0;
   background-color: var(--theme-accordion-header-background);
 }
 

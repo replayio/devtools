@@ -14,7 +14,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import CommentCardFooter from "./CommentCardFooter";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
-const hoveredStyles = "shadow-xl border-secondaryAccent hover:border-secondaryAccent";
+const hoveredStyles = "border-secondaryAccent hover:border-secondaryAccent";
 
 function CommentItem({
   pendingComment,
@@ -108,7 +108,7 @@ function CommentCard({
         onMouseLeave={() => setHoveredComment(null)}
       >
         <div
-          className={classNames("bg-white rounded-xl border border-primaryAccent shadow-lg", {
+          className={classNames("bg-white rounded-lg border border-primaryAccent shadow-sm", {
             [hoveredStyles]: hoveredComment == "pendingCommentId" && isPaused,
           })}
         >
@@ -128,9 +128,9 @@ function CommentCard({
     >
       <div
         className={classNames(
-          "bg-white rounded-xl border border-gray-300 hover:border-primaryAccent",
+          "bg-white rounded-lg border border-gray-300 hover:border-primaryAccent",
           {
-            "border-primaryAccent shadow-lg": isPaused,
+            "border-primaryAccent shadow-sm": isPaused,
             "cursor-pointer": !isPaused,
             [hoveredStyles]: hoveredComment == comment.id && isPaused,
           }
