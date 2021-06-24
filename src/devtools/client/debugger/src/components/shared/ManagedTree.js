@@ -10,9 +10,31 @@ import "./ManagedTree.css";
 class ManagedTree extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      expanded: props.expanded || new Set(),
-    };
+
+    const expanded = props.expanded || new Set();
+
+    if (props.listItems) {
+      props.listItems.forEach(item => expanded.add(props.getPath(item)));
+    }
+
+    if (props.highlightItems && props.highlightItems.length) {
+      // This file is visible, so we highlight it.
+      if (expanded.has(props.getPath(props.highlightItems[0]))) {
+        props.onFocus(props.highlightItems[0]);
+      } else {
+        // Look at folders starting from the top-level until finds a
+        // closed folder and highlights this folder
+        const index = props.highlightItems
+          .reverse()
+          .findIndex(item => !expanded.has(props.getPath(item)) && item.name !== "root");
+
+        if (props.highlightItems[index]) {
+          props.onFocus(props.highlightItems[index]);
+        }
+      }
+    }
+
+    this.state = { expanded };
   }
 
   static defaultProps = {

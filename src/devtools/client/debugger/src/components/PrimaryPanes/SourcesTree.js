@@ -63,10 +63,22 @@ class SourcesTree extends Component {
     super(props);
     const { debuggeeUrl, sources } = this.props;
 
-    this.state = createTree({
+    const state = createTree({
       debuggeeUrl,
       sources,
     });
+
+    if (props.shownSource) {
+      const listItems = getDirectories(props.shownSource, state.sourceTree);
+      state.listItems = listItems;
+    }
+
+    if (props.selectedSource) {
+      const highlightItems = getDirectories(props.selectedSource, state.sourceTree);
+      state.highlightItems = highlightItems;
+    }
+
+    this.state = state;
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
