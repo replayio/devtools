@@ -17,7 +17,7 @@ import {
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
-import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
+import { PauseEventArgs } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
@@ -51,16 +51,14 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch, getState } = store;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);
-  const description = await ThreadFront.getRecordingDescription();
-  dispatch(setRecordingDescription(description));
+  const { duration } = await ThreadFront.getRecordingDescription();
+
+  dispatch(setRecordingDescription(duration));
   window.addEventListener("resize", () => dispatch(updateTimelineDimensions()));
 
   await ThreadFront.waitForSession();
   const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
   let { point, time } = endpoint;
-  if ("lastScreen" in description && description.lastScreen) {
-    addLastScreen(description.lastScreen, point, time);
-  }
 
   const zoomRegion = selectors.getZoomRegion(getState());
   const newZoomRegion = { ...zoomRegion, endTime: time };
@@ -160,19 +158,15 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
   };
 }
 
-function setRecordingDescription({ duration, lastScreen }: RecordingDescription): UIThunkAction {
+function setRecordingDescription(duration: number): UIThunkAction {
   return ({ dispatch, getState }) => {
     const zoomRegion = selectors.getZoomRegion(getState());
-
-    // Paint the last screen to get it up quickly, even though we don't know yet
-    // which execution point this is and have warped here.
-    // paintGraphics(lastScreen);
 
     dispatch(
       setTimelineState({
         recordingDuration: duration,
         currentTime: duration,
-        screenShot: lastScreen,
+        screenShot: null,
         zoomRegion: { ...zoomRegion, endTime: duration },
       })
     );
