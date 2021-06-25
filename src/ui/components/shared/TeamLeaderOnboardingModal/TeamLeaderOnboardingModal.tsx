@@ -189,7 +189,7 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={onSkip}
-          className="items-center px-4 py-2 border border-gray-200 text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="items-center px-4 py-2 border border-textFieldBorder text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
           Skip
         </button>
