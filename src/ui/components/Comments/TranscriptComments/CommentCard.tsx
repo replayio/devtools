@@ -128,7 +128,7 @@ function CommentCard({
     >
       <div
         className={classNames(
-          "bg-white rounded-lg border border-gray-300 hover:border-primaryAccent",
+          "bg-white rounded-lg border border-gray-200 hover:border-primaryAccent",
           {
             "border-primaryAccent shadow-sm": isPaused,
             "cursor-pointer": !isPaused,

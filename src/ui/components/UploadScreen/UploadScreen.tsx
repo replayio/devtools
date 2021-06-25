@@ -91,17 +91,17 @@ function ReplayPreview({ recording, screenData }: { recording: Recording; screen
     <div className="space-y-1">
       <div className="block text-sm uppercase font-semibold text-gray-700">Preview</div>
       <div
-        className="relative bg-gray-100 border border-gray-300 rounded-lg"
+        className="relative bg-gray-100 border border-gray-200 rounded-lg"
         style={{ height: "200px" }}
       >
         <img src={screenData} className="h-full m-auto" />
         <div
           style={{ maxWidth: "50%" }}
-          className="shadow-md bg-gray-500 text-white bottom-4 left-4 rounded-full px-3 py-0.5 absolute text-base select-none"
+          className="shadow-md bg-gray-200 text-white bottom-4 left-4 rounded-full px-3 py-0.5 absolute text-base select-none"
         >
           <div className="whitespace-pre overflow-hidden overflow-ellipsis">{recording.url}</div>
         </div>
-        <div className="shadow-md bg-gray-500 text-white bottom-4 right-4 rounded-full px-3 py-0.5 absolute text-base select-none">
+        <div className="shadow-md bg-gray-200 text-white bottom-4 right-4 rounded-full px-3 py-0.5 absolute text-base select-none">
           {getFormattedTime(recording!.duration)}
         </div>
       </div>

@@ -59,7 +59,7 @@ function Invitation({ workspace, onAccept }: { workspace: Workspace; onAccept: (
     <InvitationCard
       teamName={workspace.name}
       actions={actions}
-      borderStyles={"border-gray-300 hover:border-gray-400 "}
+      borderStyles={"border-gray-200 hover:border-gray-200 "}
     />
   );
 }
