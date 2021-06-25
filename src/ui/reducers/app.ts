@@ -20,6 +20,7 @@ function initialAppState(): AppState {
     indexing: 0,
     loading: 4,
     uploading: null,
+    awaitingSourcemaps: false,
     sessionId: null,
     modal: null,
     modalOptions: null,
@@ -61,6 +62,10 @@ export default function update(
 
     case "set_uploading": {
       return { ...state, uploading: action.uploading };
+    }
+
+    case "set_awaiting_sourcemaps": {
+      return { ...state, awaitingSourcemaps: action.awaitingSourcemaps };
     }
 
     case "set_loaded_regions": {
@@ -234,6 +239,7 @@ export const getIndexed = (state: UIState) => state.app.indexing == 100;
 export const getLoading = (state: UIState) => state.app.loading;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getUploading = (state: UIState) => state.app.uploading;
+export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;
 export const getRecordingId = (state: UIState) => state.app.recordingId;
 export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
