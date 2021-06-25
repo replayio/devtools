@@ -1,4 +1,5 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
+import { query } from "ui/utils/apolloClient";
 
 export const GET_USER_ID = gql`
   query GetUserId {
@@ -6,6 +7,20 @@ export const GET_USER_ID = gql`
       user {
         id
       }
+    }
+  }
+`;
+
+const GET_USER_INFO = gql`
+  query GetUser {
+    viewer {
+      user {
+        id
+      }
+      email
+      internal
+      nags
+      acceptedTOSVersion
     }
   }
 `;
@@ -21,29 +36,33 @@ export type UserInfo = {
   internal: boolean;
   loading: boolean;
   nags: Nag[];
+  acceptedTOSVersion: number | null;
 };
 
 export enum Nag {
   FIRST_REPLAY = "first_replay",
 }
 
+export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefined> {
+  const result = await query({
+    query: GET_USER_INFO,
+    variables: {},
+  });
+  const viewer = result?.data?.viewer;
+  if (!viewer) {
+    return undefined;
+  }
+  return {
+    id: viewer.user.id,
+    email: viewer.email,
+    internal: viewer.internal,
+    nags: viewer.nags,
+    acceptedTOSVersion: viewer.acceptedTOSVersion,
+  };
+}
+
 export function useGetUserInfo() {
-  const { data, loading, error } = useQuery(
-    gql`
-      query GetUser {
-        viewer {
-          user {
-            id
-            name
-            picture
-          }
-          email
-          internal
-          nags
-        }
-      }
-    `
-  );
+  const { data, loading, error } = useQuery(GET_USER_INFO);
 
   if (error) {
     console.error("Apollo error while fetching user:", error);
@@ -55,8 +74,9 @@ export function useGetUserInfo() {
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
+  const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
 
-  return { loading, id, email, internal, nags, name, picture };
+  return { loading, id, email, internal, nags, name, picture, acceptedTOSVersion };
 }
 
 export function useUpdateUserNags() {
@@ -76,4 +96,18 @@ export function useUpdateUserNags() {
   }
 
   return updateUserNags;
+}
+
+export function useAcceptTOS() {
+  const [acceptTOS] = useMutation(
+    gql`
+      mutation AcceptTOS($version: Int!) {
+        acceptTermsOfService(input: { version: $version }) {
+          success
+        }
+      }
+    `
+  );
+
+  return acceptTOS;
 }
