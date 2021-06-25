@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
-import { installObserver } from "../../protocol/graphics";
+import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
@@ -18,13 +18,31 @@ function CommentLoader({ recordingId }) {
   return <CommentTool comments={comments} />;
 }
 
-function Video({ recordingId, playback, isNodePickerActive, pendingComment, recordingTarget }) {
+function Video({
+  recordingId,
+  currentTime,
+  playback,
+  isNodePickerActive,
+  pendingComment,
+  recordingTarget,
+  setVideoNode,
+  videoUrl,
+}) {
   const { isAuthenticated } = useAuth0();
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
   useEffect(() => {
     installObserver();
+  }, []);
+
+  // Seek and resume playback if playing when swapping between Viewer and DevTools
+  useEffect(() => {
+    if (playback) {
+      refreshGraphics();
+      VideoPlayer.seek(currentTime);
+      VideoPlayer.play();
+    }
   }, []);
 
   // This is intentionally mousedown. Otherwise, the NodePicker's mouseup callback fires
@@ -40,7 +58,7 @@ function Video({ recordingId, playback, isNodePickerActive, pendingComment, reco
 
   return (
     <div id="video">
-      <video id="graphicsVideo" />
+      <video id="graphicsVideo" src={videoUrl} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {showCommentTool ? (
         <CommentsOverlay>
@@ -56,11 +74,14 @@ export default connect(
   state => ({
     pendingComment: selectors.getPendingComment(state),
     isNodePickerActive: selectors.getIsNodePickerActive(state),
+    currentTime: selectors.getCurrentTime(state),
     playback: selectors.getPlayback(state),
     recordingTarget: selectors.getRecordingTarget(state),
     recordingId: selectors.getRecordingId(state),
+    videoUrl: selectors.getVideoUrl(state),
   }),
   {
+    setVideoNode: actions.setVideoNode,
     togglePlayback: actions.togglePlayback,
     clearPendingComment: actions.clearPendingComment,
   }

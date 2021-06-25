@@ -30,6 +30,8 @@ function initialAppState(): AppState {
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
     canvas: null,
+    videoUrl: null,
+    videoNode: null,
     workspaceId: null,
     defaultSettingsTab: "Invitations",
     recordingTarget: null,
@@ -175,6 +177,20 @@ export default function update(
       };
     }
 
+    case "set_video_node": {
+      return {
+        ...state,
+        videoNode: action.videoNode,
+      };
+    }
+
+    case "set_video_url": {
+      return {
+        ...state,
+        videoUrl: action.videoUrl,
+      };
+    }
+
     case "set_workspace_id": {
       return { ...state, workspaceId: action.workspaceId };
     }
@@ -245,6 +261,8 @@ export const getEventsForType = (state: UIState, type: string) =>
   state.app.events[type] || NO_EVENTS;
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
+export const getVideoUrl = (state: UIState) => state.app.videoUrl;
+export const getVideoNode = (state: UIState) => state.app.videoNode;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;

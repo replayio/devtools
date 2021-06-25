@@ -128,29 +128,22 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
 }
 
 class VideoPlayer {
+  store: UIStore | null = null;
   video: HTMLVideoElement | null = null;
   all = new Uint8Array();
   blob?: Blob;
   videoReadyCallback?: (video: HTMLVideoElement) => any;
-  commands?: Promise<HTMLVideoElement>;
+  commands?: Promise<void>;
 
-  init() {
-    this.video = document.querySelector("#graphicsVideo");
-    this.setSrc();
+  init(store: UIStore) {
+    this.store = store;
+    this.commands = Promise.resolve();
   }
 
-  setSrc() {
-    if (!this.commands) {
-      this.commands = new Promise(resolve => {
-        this.videoReadyCallback = resolve;
-      });
-    }
-
-    if (this.video && this.blob && !this.video.src) {
-      this.video.src = URL.createObjectURL(this.blob);
-      if (this.videoReadyCallback) {
-        this.videoReadyCallback(this.video);
-      }
+  createUrl() {
+    if (this.blob) {
+      const url = URL.createObjectURL(this.blob);
+      this.store?.dispatch(actions.setVideoUrl(url));
     }
   }
 
@@ -158,7 +151,7 @@ class VideoPlayer {
     if (!fragment) {
       if (this.all) {
         this.blob = new Blob([this.all], { type: 'video/webm; codecs="vp9"' });
-        this.setSrc();
+        this.createUrl();
       }
     } else {
       const buffer = decode(fragment);
@@ -173,20 +166,23 @@ class VideoPlayer {
   seek(timeMs: number) {
     this.commands =
       this.commands &&
-      this.commands.then(async video => {
-        await video.pause();
-        video.currentTime = timeMs / 1000;
-
-        return video;
+      this.commands.then(async () => {
+        const video = this.store?.getState().app.videoNode;
+        if (video) {
+          video.pause();
+          video.currentTime = timeMs / 1000;
+        }
       });
   }
 
   play() {
     this.commands =
       this.commands &&
-      this.commands?.then(async video => {
-        await video.play();
-        return video;
+      this.commands?.then(async () => {
+        const video = this.store?.getState().app.videoNode;
+        if (video) {
+          await video.play();
+        }
       });
   }
 }
@@ -200,6 +196,8 @@ export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
     store.dispatch(actions.setCanvas(canvas));
   };
+
+  Video.init(store);
 
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
     paintPointsWaiter = client.Graphics.findPaints({}, sessionId);
@@ -382,8 +380,8 @@ export function paintGraphics(
 }
 
 function clearGraphics() {
+  // Keeping gLastImage around to use it as a fallback for video sizing
   gDrawImage = null;
-  gLastImage = null;
   gDrawMouse = null;
   refreshGraphics();
 }
@@ -416,15 +414,43 @@ function drawClick(cx: CanvasRenderingContext2D, x: number, y: number) {
   cx.stroke();
 }
 
+function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | null | undefined) {
+  const maxScale = 1 / (gDevicePixelRatio || 1);
+  let bounds = { height: 0, width: 0, left: 0, top: 0, scale: 1 };
+
+  if (image && image.width > 0 && image.height > 0) {
+    bounds.width = image.width;
+    bounds.height = image.height;
+  } else if (gLastImage) {
+    // fall back to the last image if the current image hasn't loaded
+    bounds.width = gLastImage.width;
+    bounds.height = gLastImage.height;
+  } else {
+    return bounds;
+  }
+
+  bounds.scale = Math.min(
+    containerBounds.width / bounds.width,
+    containerBounds.height / bounds.height,
+    maxScale
+  );
+
+  const drawWidth = bounds.width * bounds.scale;
+  const drawHeight = bounds.height * bounds.scale;
+  bounds.left = (containerBounds.width - drawWidth) / 2;
+  bounds.top = (containerBounds.height - drawHeight) / 2;
+
+  return bounds;
+}
+
 export function refreshGraphics() {
   const video = document.getElementById("video");
   if (!video) {
     return;
   }
 
-  const bounds = video.getBoundingClientRect();
   const canvas = document.getElementById("graphics") as HTMLCanvasElement;
-  const graphicsVideo = document.getElementById("graphicsVideo") as HTMLCanvasElement;
+  const graphicsVideo = document.getElementById("graphicsVideo") as HTMLVideoElement;
 
   // Find an image to draw.
   let image;
@@ -436,48 +462,37 @@ export function refreshGraphics() {
     }
   }
 
-  Video.init();
-
   canvas.style.visibility = "visible";
   const cx = canvas.getContext("2d")!;
+  const bounds = calculateBounds(video.getBoundingClientRect(), image);
 
-  if (image) {
-    const maxScale = 1 / (gDevicePixelRatio || 1);
-    const scale = Math.min(bounds.width / image.width, bounds.height / image.height, maxScale);
+  if (bounds) {
+    canvas.width = bounds.width;
+    canvas.height = bounds.height;
+    graphicsVideo.style.width = bounds.width + "px";
+    graphicsVideo.style.height = bounds.height + "px";
 
-    const drawWidth = image.width * scale;
-    const drawHeight = image.height * scale;
-    const offsetLeft = (bounds.width - drawWidth) / 2;
-    const offsetTop = (bounds.height - drawHeight) / 2;
+    canvas.style.transform = graphicsVideo.style.transform = `scale(${bounds.scale})`;
+    canvas.style.left = graphicsVideo.style.left = String(bounds.left);
+    canvas.style.top = graphicsVideo.style.top = String(bounds.top);
 
-    canvas.width = image.width;
-    canvas.height = image.height;
-    graphicsVideo.style.width = image.width + "px";
-    graphicsVideo.style.height = image.height + "px";
-
-    canvas.style.transform = graphicsVideo.style.transform = `scale(${scale})`;
-    canvas.style.left = graphicsVideo.style.left = String(offsetLeft);
-    canvas.style.top = graphicsVideo.style.top = String(offsetTop);
-
-    cx.drawImage(image, 0, 0);
+    if (image) {
+      cx.drawImage(image, 0, 0);
+    }
 
     onRefreshGraphics({
-      scale,
+      ...bounds,
       gDevicePixelRatio,
-      width: image.width,
-      height: image.height,
-      left: offsetLeft,
-      top: offsetTop,
     });
 
     // Apply the same transforms to any displayed highlighter.
     const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
     if (highlighterContainer && gDevicePixelRatio) {
-      highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
-      highlighterContainer.style.left = String(offsetLeft);
-      highlighterContainer.style.top = String(offsetTop);
-      highlighterContainer.style.width = String(image.width);
-      highlighterContainer.style.height = String(image.height);
+      highlighterContainer.style.transform = `scale(${bounds.scale * gDevicePixelRatio})`;
+      highlighterContainer.style.left = String(bounds.left);
+      highlighterContainer.style.top = String(bounds.top);
+      highlighterContainer.style.width = String(bounds.width);
+      highlighterContainer.style.height = String(bounds.height);
     }
   } else {
     cx.clearRect(0, 0, canvas.width, canvas.height);
