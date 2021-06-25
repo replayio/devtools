@@ -4,6 +4,9 @@ import { UserSettings } from "ui/types";
 import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
 import SettingsBodyItem from "./SettingsBodyItem";
+import { useGetUserInfo } from "ui/hooks/users";
+import Spinner from "../Spinner";
+import useAuth0 from "ui/utils/useAuth0";
 
 interface SettingsBodyProps {
   selectedSetting: Setting;
@@ -41,6 +44,35 @@ function Support() {
   );
 }
 
+function Personal() {
+  const { logout } = useAuth0();
+  const { loading, name, picture, email } = useGetUserInfo();
+
+  if (loading) {
+    return <Spinner className="animate-spin -ml-1 mr-3 h-8 w-8 text-gray-500" />;
+  }
+
+  return (
+    <div className="space-y-16">
+      <div className="flex flex-row space-x-4 items-center">
+        <img src={picture} className="rounded-full w-16" />
+        <div>
+          <div className="text-xl">{name}</div>
+          <div className="text-xl text-gray-500">{email}</div>
+        </div>
+      </div>
+      <div>
+        <button
+          onClick={() => logout({ returnTo: `${window.location.origin}/view` })}
+          className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+        >
+          Log Out
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsBody({ selectedSetting, userSettings }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
   const [showRefresh, setShowRefresh] = useState(false);
@@ -62,6 +94,13 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
         <ul className="overflow-hidden flex">
           <ReplayInvitations />
         </ul>
+      </main>
+    );
+  } else if (title == "Personal") {
+    return (
+      <main>
+        <h1>{title}</h1>
+        <Personal />
       </main>
     );
   }

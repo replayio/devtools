@@ -34,6 +34,8 @@ export function useGetUserInfo() {
         viewer {
           user {
             id
+            name
+            picture
           }
           email
           internal
@@ -48,11 +50,13 @@ export function useGetUserInfo() {
   }
 
   const id: string = data?.viewer?.user.id;
+  const name: string = data?.viewer?.user.name;
+  const picture: string = data?.viewer?.user.picture;
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
 
-  return { loading, id, email, internal, nags };
+  return { loading, id, email, internal, nags, name, picture };
 }
 
 export function useUpdateUserNags() {
