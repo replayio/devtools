@@ -4,7 +4,8 @@ import type Draft from "draft-js";
 import { User } from "ui/types";
 
 import useDraftJS, { DraftJSModule, LazyLoadDraftConfig } from "./use-draftjs";
-import { addMentions, convertToMarkdown, mentionsEnabled } from "./mention";
+import { addMentions, convertToMarkdown } from "./mention";
+const { features } = require("ui/utils/prefs");
 
 import "./DraftJSEditor.css";
 
@@ -180,8 +181,15 @@ export default function DraftJSEditor({
       Editor: { default: Editor },
     },
   } = config;
-  const { EmojiSuggestions } = emojiPlugin;
-  const { MentionSuggestions } = mentionPlugin;
+
+  const plugins = [];
+  if (features.commentEmojis) {
+    plugins.push(emojiPlugin);
+  }
+
+  if (features.commentMentions) {
+    plugins.push(mentionPlugin);
+  }
 
   return (
     <div
@@ -195,19 +203,21 @@ export default function DraftJSEditor({
         handleKeyCommand={handleKeyCommand}
         keyBindingFn={keyBindingFn}
         placeholder={placeholder}
-        plugins={[emojiPlugin, mentionsEnabled() && mentionPlugin]}
+        plugins={plugins}
         ref={editorNode}
         webDriverTestID="draftjs-editor"
       />
-      <EmojiSuggestions />
-      <MentionSuggestions
-        suggestions={filteredUsers}
-        onSearchChange={({ value }: { trigger: string; value: string }) =>
-          setMentionSearchText(value)
-        }
-        onOpenChange={setOpen}
-        open={open}
-      />
+      {features.commentEmojis && <emojiPlugin.EmojiSuggestions />}
+      {features.commentMentions && (
+        <mentionPlugin.MentionSuggestions
+          suggestions={filteredUsers}
+          onSearchChange={({ value }: { trigger: string; value: string }) =>
+            setMentionSearchText(value)
+          }
+          onOpenChange={setOpen}
+          open={open}
+        />
+      )}
     </div>
   );
 }
