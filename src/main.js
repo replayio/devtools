@@ -32,14 +32,18 @@ const { Provider } = require("react-redux");
 const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
 const tokenManager = require("ui/utils/tokenManager").default;
 const { isRecordingInitialized, getRecordingOwnerUserId } = require("ui/hooks/recordings");
+const { getUserInfo } = require("ui/hooks/users");
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
 const App = require("ui/components/App").default;
-import { IntercomProvider } from "react-use-intercom";
-import { bootIntercom } from "ui/utils/intercom";
-import useAuth0 from "ui/utils/useAuth0";
+const { IntercomProvider } = require("react-use-intercom");
+const { bootIntercom } = require("ui/utils/intercom");
+const useAuth0 = require("ui/utils/useAuth0").default;
+const { features } = require("ui/utils/prefs");
 
 require("image/image.css");
+
+const minimumTOSVersion = 1;
 
 document.body.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -62,13 +66,18 @@ function PageSwitch() {
       let imported;
       if (recordingId) {
         const recordingInitialized = await isRecordingInitialized(recordingId);
-        const userId = await getRecordingOwnerUserId(recordingId);
+        const ownerId = await getRecordingOwnerUserId(recordingId);
+        const userInfo = await getUserInfo();
 
         // Add a check to make sure the recording has an associated user ID.
         // We skip the upload step if there's no associated user ID, which
         // is the case for CI test recordings.
-        if (recordingInitialized === false && !test && userId) {
-          imported = await import("./upload");
+        if (recordingInitialized === false && !test && ownerId) {
+          if (!features.termsOfService || userInfo?.acceptedTOSVersion >= minimumTOSVersion) {
+            imported = await import("./upload");
+          } else {
+            imported = await import("./accept-tos");
+          }
         } else {
           imported = await import("./app");
         }
