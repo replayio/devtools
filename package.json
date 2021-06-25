@@ -10,7 +10,6 @@
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "cypress:open": "cypress open",
     "build-cra-e2e-test": "node test/examples/cra/build"
   },
   "dependencies": {
@@ -98,9 +97,6 @@
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.1",
     "autoprefixer": "^10.2.5",
-    "cypress": "^6.5.0",
-    "cypress-localstorage-commands": "^1.4.0",
-    "cypress-real-events": "^1.2.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",
