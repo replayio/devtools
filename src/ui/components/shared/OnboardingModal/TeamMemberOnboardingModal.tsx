@@ -81,7 +81,7 @@ function TeamMemberInvitation({
             <button
               onClick={onDecline}
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-400 hover:bg-gray-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-gray-500 bg-gray-200 hover:bg-gray-300"
             >
               Decline
             </button>

@@ -50,6 +50,8 @@
   --secondary-accent: #8330f4;
   --secondary-accent-stroke: #f9f5ff;
 
+  --text-field-border: var(--cool-gray-300);
+
   --new-blue-50: #eff7ff;
   --new-blue-100: #dbedff;
   --new-blue-200: #b9dbfd;

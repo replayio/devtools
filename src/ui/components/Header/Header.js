@@ -82,7 +82,7 @@ function HeaderTitle({ recording, recordingId }) {
 
   return (
     <span
-      className="input focus:ring-blue-500 ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent w-full border-black whitespace-pre overflow-hidden overflow-ellipsis"
+      className="input focus:ring-primaryAccent ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent w-full border-black whitespace-pre overflow-hidden overflow-ellipsis"
       role="textbox"
       spellCheck="false"
       contentEditable
