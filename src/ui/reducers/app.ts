@@ -34,7 +34,7 @@ function initialAppState(): AppState {
     videoUrl: null,
     videoNode: null,
     workspaceId: null,
-    defaultSettingsTab: "Invitations",
+    defaultSettingsTab: "Personal",
     recordingTarget: null,
     fontLoading: true,
     recordingWorkspace: null,

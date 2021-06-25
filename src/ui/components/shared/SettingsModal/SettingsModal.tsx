@@ -14,20 +14,11 @@ import { SettingsTabTitle } from "ui/state/app";
 import * as actions from "ui/actions/app";
 
 const settings: Settings = [
-  // {
-  //   title: "Personal",
-  //   icon: "person",
-  //   items: [
-  //     {
-  //       label: "Default workspace",
-  //       type: "dropdown",
-  //       key: "defaultWorkspaceId",
-  //       description: "New replays will be saved here automatically",
-  //       disabled: false,
-  //       needsRefresh: false,
-  //     },
-  //   ],
-  // },
+  {
+    title: "Personal",
+    icon: "person",
+    items: [],
+  },
   {
     title: "Invitations",
     icon: "stars",
