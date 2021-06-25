@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactElement } from "react";
+import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "../hooks";
 
@@ -13,7 +13,6 @@ import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { BlankLoadingScreen } from "./shared/BlankScreen";
-import UploadScreen from "./UploadScreen";
 
 function DevTools({
   loading,
@@ -23,18 +22,14 @@ function DevTools({
   setExpectedError,
   selectedPanel,
   viewMode,
-  recordingTarget,
-  setViewMode,
   setRecordingWorkspace,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { recording, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
   const expectedError = hooks.useHasExpectedError(recordingId);
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
-  const { userId: cachedUserId, loading: userIdQueryLoading } = hooks.useGetUserId();
 
-  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading || userIdQueryLoading;
-  const isAuthor = cachedUserId && recording && cachedUserId === recording.userId;
+  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -59,14 +54,6 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    // Force switch to viewer mode if the recording is being initialized
-    // by the author.
-    if (!isTest() && isAuthor && !recording?.isInitialized) {
-      setViewMode("non-dev");
-    }
-  }, [recording, cachedUserId]);
-
-  useEffect(() => {
     if (expectedError) {
       setExpectedError(expectedError);
     }
@@ -79,10 +66,6 @@ function DevTools({
   // Skip loading screens when running tests
   if (!isTest() && queriesAreLoading) {
     return <BlankLoadingScreen />;
-  }
-
-  if (!isTest() && recording && !recording.isInitialized && isAuthor) {
-    return <UploadScreen recording={recording} />;
   }
 
   if (!isTest() && (recordingDuration === null || uploading)) {
@@ -115,13 +98,9 @@ const connector = connect(
     recordingDuration: selectors.getRecordingDuration(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
-    narrowMode: selectors.getNarrowMode(state),
-    recordingTarget: selectors.getRecordingTarget(state),
   }),
   {
-    updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
-    setViewMode: actions.setViewMode,
     setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
