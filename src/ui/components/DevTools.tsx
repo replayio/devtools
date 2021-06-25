@@ -17,6 +17,7 @@ import { BlankLoadingScreen } from "./shared/BlankScreen";
 function DevTools({
   loading,
   uploading,
+  awaitingSourcemaps,
   recordingDuration,
   recordingId,
   setExpectedError,
@@ -63,16 +64,22 @@ function DevTools({
     return <BlankLoadingScreen />;
   }
 
-  // Skip loading screens when running tests
-  if (!isTest() && queriesAreLoading) {
-    return <BlankLoadingScreen />;
+  if (!isTest() && (uploading || awaitingSourcemaps || queriesAreLoading)) {
+    let message;
+
+    // The backend send events in this order: uploading replay -> uploading sourcemaps.
+    if (awaitingSourcemaps) {
+      message = "Uploading sourcemaps";
+    } else if (uploading) {
+      message = "Uploading Replay";
+    } else {
+      message = "Fetching data";
+    }
+
+    return <BlankLoadingScreen statusMessage={message} />;
   }
 
-  if (!isTest() && (recordingDuration === null || uploading)) {
-    return <BlankLoadingScreen />;
-  }
-
-  if (!finishedLoading) {
+  if (!finishedLoading || recordingDuration === null) {
     return (
       <SkeletonLoader
         setFinishedLoading={setFinishedLoading}
@@ -98,6 +105,7 @@ const connector = connect(
     recordingDuration: selectors.getRecordingDuration(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
+    awaitingSourcemaps: selectors.getAwaitingSourcemaps(state),
   }),
   {
     setExpectedError: actions.setExpectedError,

@@ -51,6 +51,7 @@ export interface AppState {
   indexing: number;
   loading: number;
   uploading: UploadInfo | null;
+  awaitingSourcemaps: boolean;
   expectedError: ExpectedError | null;
   unexpectedError: UnexpectedError | null;
   modal: ModalType | null;

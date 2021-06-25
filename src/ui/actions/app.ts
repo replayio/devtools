@@ -38,6 +38,9 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
 };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
+export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
+  awaitingSourcemaps: boolean;
+};
 export type SetModalAction = Action<"set_modal"> & {
   modal: ModalType | null;
   options: { recordingId: string } | null;
@@ -114,7 +117,8 @@ export type AppActions =
   | SetFontLoading
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
-  | SetShowVideoPanelAction;
+  | SetShowVideoPanelAction
+  | SetAwaitingSourcemapsAction;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -203,6 +207,10 @@ export function setInitializedPanels(panel: PanelName): SetInitializedPanelsActi
 
 export function setUploading(uploading: UploadInfo | null): SetUploadingAction {
   return { type: "set_uploading", uploading };
+}
+
+export function setAwaitingSourcemaps(awaitingSourcemaps: boolean): SetAwaitingSourcemapsAction {
+  return { type: "set_awaiting_sourcemaps", awaitingSourcemaps };
 }
 
 export function setModal(

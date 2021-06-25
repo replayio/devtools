@@ -30,6 +30,9 @@ export async function createSession(store: UIStore, recordingId: string) {
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(onUploadedData(data))
   );
+  addEventListener("Recording.awaitingSourcemaps", () =>
+    store.dispatch(actions.setAwaitingSourcemaps(true))
+  );
   addEventListener("Recording.sessionError", (error: sessionError) =>
     store.dispatch(
       setUnexpectedError({
@@ -69,6 +72,7 @@ export async function createSession(store: UIStore, recordingId: string) {
     }
 
     store.dispatch(actions.setUploading(null));
+    store.dispatch(actions.setAwaitingSourcemaps(false));
     prefs.recordingId = recordingId;
   } catch (e) {
     if (e.code == 31) {
