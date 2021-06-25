@@ -1,4 +1,6 @@
+import classNames from "classnames";
 import React, { Dispatch, SetStateAction } from "react";
+import ReactTooltip from "react-tooltip";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -28,6 +30,9 @@ function PanelSummary({
 }: PanelSummaryProps) {
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
+  const reactTooltip = (
+    <ReactTooltip delayHide={200} delayShow={200} place={"right"} multiline={true} />
+  );
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
   const isEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
@@ -68,10 +73,14 @@ function PanelSummary({
   if (isHot) {
     return (
       <div className="summary">
-        <div className="flex items-center overflow-hidden space-x-2">
+        <div
+          className="flex items-center overflow-hidden space-x-2"
+          data-tip={`This log is hidden from the console because <br /> it was hit ${prefs.maxHitsDisplayed}+ times`}
+        >
           <MaterialIcon className="text-xl">warning</MaterialIcon>
           <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
         </div>
+        {reactTooltip}
       </div>
     );
   }
@@ -80,21 +89,35 @@ function PanelSummary({
     point => point.point == executionPoint && point.time == currentTime
   );
 
+  let tooltipContent: any = {};
+
+  if (!isEditable) {
+    tooltipContent[
+      "data-tip"
+    ] = `This log is not editable because <br /> it was hit ${prefs.maxHitsEditable}+ times`;
+  }
+
   return (
     <div className="summary" onClick={e => handleClick(e, "logValue")}>
-      <div className="options">
+      <div className="options" {...tooltipContent}>
         {conditionValue ? (
           <button
-            className="condition hover:bg-gray-100"
-            type="button"
+            className={classNames(
+              "condition",
+              isEditable ? "hover:bg-gray-200 hover:text-primaryAccent" : "cursor-auto"
+            )}
+            disabled={!isEditable}
             onClick={e => handleClick(e, "condition")}
           >
             if (<span className="expression">{conditionValue}</span>)
           </button>
         ) : null}
         <button
-          className="log hover:bg-gray-200"
-          type="button"
+          className={classNames(
+            "log",
+            isEditable ? "hover:bg-gray-200 hover:text-primaryAccent" : "cursor-auto"
+          )}
+          disabled={!isEditable}
           onClick={e => handleClick(e, "logValue")}
         >
           log(<span className="expression">{logValue}</span>)
@@ -119,6 +142,7 @@ function PanelSummary({
           Add a comment
         </button>
       )}
+      {reactTooltip}
     </div>
   );
 }
