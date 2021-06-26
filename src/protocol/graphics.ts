@@ -355,6 +355,15 @@ let gDrawImage: HTMLImageElement | null = null;
 // current image loads.
 let gLastImage: HTMLImageElement | null = null;
 
+// Caching last image bounds
+let gLastBounds: {
+  height: number;
+  width: number;
+  left: number;
+  top: number;
+  scale: number;
+} | null = null;
+
 // Mouse information to draw.
 let gDrawMouse: MouseAndClickPosition | null = null;
 
@@ -421,12 +430,8 @@ function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | nul
   if (image && image.width > 0 && image.height > 0) {
     bounds.width = image.width;
     bounds.height = image.height;
-  } else if (gLastImage) {
-    // fall back to the last image if the current image hasn't loaded
-    bounds.width = gLastImage.width;
-    bounds.height = gLastImage.height;
   } else {
-    return bounds;
+    return gLastBounds || bounds;
   }
 
   bounds.scale = Math.min(
@@ -440,6 +445,7 @@ function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | nul
   bounds.left = (containerBounds.width - drawWidth) / 2;
   bounds.top = (containerBounds.height - drawHeight) / 2;
 
+  gLastBounds = bounds;
   return bounds;
 }
 
