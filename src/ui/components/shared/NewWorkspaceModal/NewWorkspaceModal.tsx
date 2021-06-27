@@ -52,7 +52,7 @@ function SlideContent({
 }) {
   return (
     <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
-      <h2 className="font-bold text-3xl text-gray-900">{headerText}</h2>
+      <h2 className="font-bold text-3xl ">{headerText}</h2>
       <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
         {children}
       </div>

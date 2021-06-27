@@ -125,11 +125,11 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
         style={{ width: "520px", height: "600px" }}
       >
         <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
-          <h2 className="font-bold text-3xl text-gray-900">{`Team settings`}</h2>
-          <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
+          <h2 className="font-bold text-3xl ">{`Team settings`}</h2>
+          <div className="flex flex-col flex-grow space-y-4 overflow-hidden">
             <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
             <WorkspaceForm {...{ ...props, members }} />
-            <div className="text-gray-700 text-sm uppercase font-semibold">{`Members`}</div>
+            <div className=" text-sm uppercase font-semibold">{`Members`}</div>
             <div className="overflow-auto flex-grow">
               <div className="workspace-members-container flex flex-col space-y-2">
                 <div className="flex flex-col space-y-2">
@@ -139,7 +139,7 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
             </div>
             <InvitationLink workspaceId={props.workspaceId!} />
             <div className="flex flex-col space-y-4">
-              <div className="text-gray-700 text-sm uppercase font-semibold">{`Danger Zone`}</div>
+              <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
               <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
                 <div className="flex flex-col">
                   <div className="font-semibold">Delete this team</div>

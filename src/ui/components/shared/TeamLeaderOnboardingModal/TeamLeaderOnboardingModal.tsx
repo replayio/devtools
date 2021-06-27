@@ -55,7 +55,7 @@ function SlideContent({
 }) {
   return (
     <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
-      <h2 className="font-bold text-3xl text-gray-900">{headerText}</h2>
+      <h2 className="font-bold text-3xl ">{headerText}</h2>
       <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
         {children}
       </div>
@@ -189,7 +189,7 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={onSkip}
-          className="items-center px-4 py-2 border border-textFieldBorder text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="items-center px-4 py-2 border border-textFieldBorder text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center text-gray-500 hover:bg-gray-100 hover:"
         >
           Skip
         </button>

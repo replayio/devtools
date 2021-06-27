@@ -44,7 +44,7 @@ export default function UploadingScreen() {
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-12 relative flex flex-col"
           style={{ width: "400px" }}
         >
-          <h2 className="font-bold text-3xl text-gray-900">{header}</h2>
+          <h2 className="font-bold text-3xl ">{header}</h2>
           <div className="text-gray-500 space-y-6">{content} </div>
         </div>
       </Modal>
