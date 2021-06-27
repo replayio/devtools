@@ -65,7 +65,7 @@ function TeamMemberInvitation({
   let callToAction;
 
   if (status == "declined") {
-    callToAction = <div className="text-gray-500 select-none">Declined</div>;
+    callToAction = <div className="select-none">Declined</div>;
   } else if (status == "pending") {
     callToAction = (
       <div className="space-y-2 flex flex-col items-center">
@@ -81,7 +81,7 @@ function TeamMemberInvitation({
             <button
               onClick={onDecline}
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-gray-500 bg-gray-200 hover:bg-gray-300"
+              className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md bg-gray-200 hover:bg-gray-300"
             >
               Decline
             </button>
@@ -118,7 +118,7 @@ function TeamMemberInvitation({
   return (
     <div className="flex flex-row items-center justify-between space-x-8">
       <div className="flex flex-col text-gray-500 overflow-hidden">
-        <h2 className="text-2xl font-semibold text-gray-900 whitespace-pre overflow-ellipsis overflow-hidden">{`${workspaceTarget.name} team`}</h2>
+        <h2 className="text-2xl font-semibold  whitespace-pre overflow-ellipsis overflow-hidden">{`${workspaceTarget.name} team`}</h2>
         <div className="overflow-hidden whitespace-pre overflow-ellipsis">{`${workspaceTarget.recordingCount} replays`}</div>
         <div className="overflow-hidden whitespace-pre overflow-ellipsis">
           {workspaceTarget.inviterEmail
@@ -205,7 +205,7 @@ function TeamMemberOnboardingModal({
           style={{ width: "520px" }}
         >
           <div className="space-y-8 flex flex-col">
-            <h2 className="font-bold text-3xl text-gray-900">{headerText}</h2>
+            <h2 className="font-bold text-3xl ">{headerText}</h2>
             {displayedWorkspaces.map(workspace => (
               <TeamMemberInvitation
                 {...{ hideModal, onGo, workspace, onAction }}

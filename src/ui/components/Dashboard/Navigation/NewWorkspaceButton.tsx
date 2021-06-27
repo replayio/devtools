@@ -19,7 +19,7 @@ function NewWorkspaceButton({ setModal }: NewWorkspaceButtonProps) {
           href="#"
           className={classnames(
             "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 items-center",
-            active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+            active ? "bg-gray-100 " : ""
           )}
           onClick={onClick}
         >

@@ -55,7 +55,7 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const emptyWorkspaceLink = "Only users with a matching email address domain can use this link";
   const workspaceLink = (
     <span>
-      Only users with a <span className="font-medium text-gray-700">{workspace.domain}</span>{" "}
+      Only users with a <span className="font-medium ">{workspace.domain}</span>{" "}
       address can use this link
     </span>
   );
@@ -85,7 +85,7 @@ export default function InvitationLink({ workspaceId }: { workspaceId: string })
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="text-gray-700 text-sm uppercase font-semibold">{`Invite link`}</div>
+      <div className=" text-sm uppercase font-semibold">{`Invite link`}</div>
       <InvitationURL code={workspace ? workspace.invitationCode : "Loading URL"} />
       <InvationDomainCheck workspace={workspace} />
     </div>
