@@ -1,14 +1,14 @@
 import React from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Avatar from "ui/components/Avatar";
+import { handleIntercomLogout } from "ui/utils/intercom";
 
 const LoginButton = () => {
-  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-  const logoutUrl = `${window.location.origin}/view`;
+  const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
 
   if (isAuthenticated) {
     return (
-      <button className="row logout" onClick={() => logout({ returnTo: logoutUrl })}>
+      <button className="row logout" onClick={() => handleIntercomLogout(logout)}>
         <Avatar player={user} isFirstPlayer={true} />
         <span>Sign Out</span>
       </button>

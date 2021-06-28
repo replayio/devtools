@@ -6,6 +6,7 @@ import "./SettingsBody.css";
 import SettingsBodyItem from "./SettingsBodyItem";
 import { useGetUserInfo } from "ui/hooks/users";
 import Spinner from "../Spinner";
+import { handleIntercomLogout } from "ui/utils/intercom";
 import useAuth0 from "ui/utils/useAuth0";
 
 interface SettingsBodyProps {
@@ -63,7 +64,7 @@ function Personal() {
       </div>
       <div>
         <button
-          onClick={() => logout({ returnTo: `${window.location.origin}/view` })}
+          onClick={() => handleIntercomLogout(logout)}
           className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
         >
           Log Out

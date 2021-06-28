@@ -35,6 +35,9 @@ const { isRecordingInitialized, getRecordingOwnerUserId } = require("ui/hooks/re
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
 const App = require("ui/components/App").default;
+import { IntercomProvider } from "react-use-intercom";
+import { bootIntercom } from "ui/utils/intercom";
+import useAuth0 from "ui/utils/useAuth0";
 
 require("image/image.css");
 
@@ -47,7 +50,13 @@ const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
 
 function PageSwitch() {
   const [pageWithStore, setPageWithStore] = useState(null);
+  const { isAuthenticated, user } = useAuth0();
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      bootIntercom({ email: user.email });
+    }
+  }, [isAuthenticated]);
   useEffect(() => {
     async function importAndInitialize() {
       let imported;
@@ -95,7 +104,9 @@ ReactDOM.render(
         <Route>
           <tokenManager.Auth0Provider>
             <ApolloWrapper recordingId={recordingId}>
-              <PageSwitch />
+              <IntercomProvider appId={"k7f741xx"}>
+                <PageSwitch />
+              </IntercomProvider>
             </ApolloWrapper>
           </tokenManager.Auth0Provider>
         </Route>
