@@ -92,7 +92,7 @@ function DevTools({
   return (
     <>
       <Header />
-      {!prefs.video && viewMode == "dev" ? <DevView /> : <NonDevView />}
+      {viewMode == "dev" ? <DevView /> : <NonDevView />}
     </>
   );
 }
