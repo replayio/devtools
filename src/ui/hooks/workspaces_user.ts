@@ -94,7 +94,7 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
   return inviteNewWorkspaceMember;
 }
 
-export function useClaimTeamInvitationCode(onCompleted: () => void) {
+export function useClaimTeamInvitationCode(onCompleted: () => void, onError: () => void) {
   const [inviteNewWorkspaceMember] = useMutation(
     gql`
       mutation ClaimTeamInvitationCode($code: ID!) {
@@ -103,7 +103,7 @@ export function useClaimTeamInvitationCode(onCompleted: () => void) {
         }
       }
     `,
-    { refetchQueries: ["GetPendingWorkspaces"], onCompleted, onError: onCompleted }
+    { refetchQueries: ["GetPendingWorkspaces"], onCompleted, onError }
   );
 
   return inviteNewWorkspaceMember;

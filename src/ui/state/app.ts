@@ -28,7 +28,7 @@ export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Per
 export interface ExpectedError {
   message: string;
   content: string;
-  action?: "sign-in" | "refresh";
+  action?: "sign-in" | "refresh" | "library";
 }
 
 export type UnexpectedError = {
