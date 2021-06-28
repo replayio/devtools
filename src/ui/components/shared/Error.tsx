@@ -64,6 +64,24 @@ function SignInButton() {
   );
 }
 
+function LibraryButton() {
+  const onClick = () => {
+    window.location.href = `${window.location.origin}/view`;
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={classNames(
+        "w-full inline-flex items-center justify-center px-24 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
+      )}
+    >
+      Okay
+    </button>
+  );
+}
+
 function ActionButton({ action }: { action: string }) {
   let button;
 
@@ -71,6 +89,8 @@ function ActionButton({ action }: { action: string }) {
     button = <RefreshButton />;
   } else if (action == "sign-in") {
     button = <SignInButton />;
+  } else if (action == "library") {
+    button = <LibraryButton />;
   }
 
   return <div>{button}</div>;

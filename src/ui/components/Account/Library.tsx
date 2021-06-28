@@ -16,6 +16,8 @@ import {
   hasTeamInvitationCode,
 } from "ui/utils/environment";
 import LaunchButton from "../shared/LaunchButton";
+import Modal from "ui/components/shared/NewModal";
+import { setExpectedError } from "ui/actions/session";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -55,10 +57,11 @@ function Header({
 
 function LibraryLoader(props: PropsFromRedux) {
   const [renderLibrary, setRenderLibrary] = useState(false);
+  const [showClaimError, setShowClaimError] = useState(false);
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
-  const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted);
+  const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted, onError);
 
   function onCompleted() {
     // This allows the server enough time to refresh the pending workspaces
@@ -67,6 +70,10 @@ function LibraryLoader(props: PropsFromRedux) {
       window.history.pushState({}, document.title, window.location.pathname);
       setRenderLibrary(true);
     }, 1000);
+  }
+  function onError() {
+    // If there's an error while claiming a code, don't go ahead and render the library.
+    setShowClaimError(true);
   }
   useEffect(function handleTeamInvitationCode() {
     const code = hasTeamInvitationCode();
@@ -78,6 +85,21 @@ function LibraryLoader(props: PropsFromRedux) {
 
     claimTeamInvitationCode({ variables: { code } });
   }, []);
+  useEffect(
+    function handleInvalidTeamInvitationCode() {
+      if (!showClaimError) {
+        return;
+      }
+
+      props.setExpectedError({
+        message: "This team invitation code is invalid",
+        content:
+          "There seems to be a problem with your team invitation link. Please ask your team administrator to send you an up-to-date link.",
+        action: "library",
+      });
+    },
+    [showClaimError]
+  );
 
   if (loading1 || loading2 || loading3 || !renderLibrary) {
     return null;
@@ -151,6 +173,7 @@ const connector = connect(
   {
     setWorkspaceId: actions.setWorkspaceId,
     setModal: actions.setModal,
+    setExpectedError,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
