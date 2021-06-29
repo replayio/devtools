@@ -30,7 +30,7 @@ class PanelEditor extends PureComponent {
       newOptions.condition = condition;
     }
 
-    await setBreakpointOptions(cx, breakpoint.location, newOptions);
+    setBreakpointOptions(cx, breakpoint.location, newOptions);
 
     return toggleEditingOff();
   };
