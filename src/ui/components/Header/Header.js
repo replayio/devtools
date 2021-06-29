@@ -43,7 +43,7 @@ function Links({ recordingId, sessionId, recordingTarget }) {
     <div className="links">
       {showShare ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} sessionId={sessionId} />
-      {!prefs.video && recordingTarget != "node" && <ViewToggle />}
+      {recordingTarget != "node" && <ViewToggle />}
       <UserOptions />
     </div>
   );
