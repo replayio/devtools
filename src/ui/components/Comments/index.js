@@ -26,7 +26,7 @@ function Comments({ recordingId, pendingComment, hoveredItem }) {
   // them manually here. If a pending comment has an ID, it already exists in the
   // comments data and we don't have to insert it.
   if (pendingComment && !pendingComment.id) {
-    comments.push(pendingComment);
+    comments.push(pendingComment.comment);
   }
 
   const sortedComments = sortBy(comments, comment => comment.time);
