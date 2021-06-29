@@ -41,7 +41,7 @@ function ModalButton({
 
 export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
   return (
-    <ul className="workspace-members">
+    <ul className="flex flex-col space-y-3">
       {members.map(member =>
         member.email ? (
           <NonRegisteredWorkspaceMember member={member} key={`non-registered-${member.email}`} />

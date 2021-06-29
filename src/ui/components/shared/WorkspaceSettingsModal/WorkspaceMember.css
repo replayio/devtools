@@ -3,63 +3,12 @@
   overflow: auto;
 }
 
-.workspace-members-container .workspace-members > :not(:first-child) {
-  margin-top: 8px;
-}
-
-.workspace-members-container .workspace-member {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.workspace-members-container .workspace-member > :not(:first-child) {
-  margin-left: 8px;
-}
-
-.workspace-members-container .workspace-member img {
-  border-radius: 50%;
-  height: 28px;
-  width: 28px;
-}
-
-.workspace-members-container .workspace-member-content {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.workspace-members-container .workspace-member-content .subtitle {
-  font-size: 12px;
-  color: var(--theme-comment);
-}
-
-.workspace-members-container .workspace-member .material-icons {
-  font-size: 28px;
-}
-
 /* Permissions dropdown */
 
 .workspace-members-container .member-permissions .expand-dropdown {
   padding: 0px;
   color: var(--theme-toolbar-color);
   background: inherit;
-}
-
-.workspace-members-container .permission-container {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-}
-
-.workspace-members-container .workspace-member .permission-container .material-icons {
-  font-size: 16px;
-  color: var(--theme-comment);
-  visibility: hidden;
-}
-
-.workspace-members-container .permission-container:hover .material-icons {
-  visibility: visible;
 }
 
 .permissions-dropdown-item {

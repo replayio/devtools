@@ -14,6 +14,7 @@ import { Workspace, WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
+import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import InvitationLink from "./InvitationLink";
 const { prefs } = require("ui/utils/prefs");
 
@@ -217,13 +218,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         <div className="overflow-auto flex-grow">
-          {!loading && sortedMembers ? (
-            <div className="flex flex-col space-y-2">
-              {sortedMembers.map(m => (
-                <div key={m.email}>{m.email}</div>
-              ))}
-            </div>
-          ) : null}
+          {!loading && sortedMembers ? <WorkspaceMembers members={sortedMembers} /> : null}
         </div>
         <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>
