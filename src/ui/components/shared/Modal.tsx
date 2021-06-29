@@ -3,7 +3,13 @@ import { connect } from "react-redux";
 import * as actions from "ui/actions/app";
 import "./Modal.css";
 
-function Modal({ hideModal, children, showClose = true }) {
+interface ModalProps {
+  hideModal(): any;
+  showClose: boolean;
+  children: React.ReactNode;
+}
+
+function Modal({ hideModal, children, showClose = true }: ModalProps) {
   return (
     <div className="modal-container">
       <div className="modal-mask" onClick={hideModal} />

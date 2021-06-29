@@ -3,7 +3,7 @@ import "./LoadingProgressBar.css";
 
 export default function LoadingProgressBar({ initialProgress = 0 }) {
   const [displayedProgress, setDisplayedProgress] = useState(initialProgress);
-  const key = useRef(null);
+  const key = useRef<any>(null);
 
   useEffect(() => {
     return () => {

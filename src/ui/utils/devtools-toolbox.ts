@@ -1,16 +1,36 @@
 import Highlighter from "highlighter/highlighter";
 import { ThreadFront } from "protocol/thread";
 import { defer, EventEmitter } from "protocol/utils";
-import { actions } from "ui/actions";
+import { actions, UIStore } from "ui/actions";
 
 import { DebuggerPanel } from "devtools/client/debugger/panel";
 import { Inspector } from "devtools/client/inspector/inspector";
 import Selection from "devtools/client/framework/selection";
 
+export type StartablePanelName = "debugger" | "inspector" | "react-components";
+
+export type PanelName = StartablePanelName | "console" | "comments" | "viewer";
+
+declare global {
+  const store: UIStore;
+}
+
 /**
  * Manages the panels that initialization of the developer tools toolbox.
  */
 export class DevToolsToolbox {
+  panels: Partial<Record<PanelName, any>>;
+  panelWaiters: Partial<Record<PanelName, Promise<unknown>>>;
+  threadFront: typeof ThreadFront;
+  selection: Selection;
+  currentTool: string | null;
+
+  // added by EventEmitter.decorate(this)
+  eventListeners!: Map<string, ((value?: any) => void)[]>;
+  on!: (name: string, handler: (value?: any) => void) => void;
+  off!: (name: string, handler: (value?: any) => void) => void;
+  emit!: (name: string, value?: any) => void;
+
   constructor() {
     this.panels = {};
     this.panelWaiters = {};
@@ -21,7 +41,7 @@ export class DevToolsToolbox {
     EventEmitter.decorate(this);
   }
 
-  async init(selectedPanel) {
+  async init(selectedPanel: PanelName) {
     await this.threadFront.initializeToolbox();
 
     // The debugger has to be started immediately on init so that when we click
@@ -36,15 +56,15 @@ export class DevToolsToolbox {
     return Highlighter;
   }
 
-  getPanel(name) {
+  getPanel(name: PanelName) {
     return this.panels[name];
   }
 
-  getOrStartPanel(name) {
+  getOrStartPanel(name: StartablePanelName) {
     return this.getPanel(name) || this.startPanel(name);
   }
 
-  startPanel = async name => {
+  startPanel = async (name: StartablePanelName) => {
     if (name === "react-components") {
       return;
     }
@@ -64,7 +84,7 @@ export class DevToolsToolbox {
     const panel = new panels[name](this);
 
     if (name !== "inspector") {
-      await panel.open();
+      await (panel as DebuggerPanel).open();
     }
 
     this.panels[name] = panel;
@@ -74,7 +94,7 @@ export class DevToolsToolbox {
     return panel;
   };
 
-  async selectTool(name) {
+  async selectTool(name: PanelName) {
     // See comments at gToolbox.init(selectedPanel) in DevTools.js
     // for more context. The toolbox needs to be initialized on
     // recordingLoaded however if we start at the "Comments"
@@ -84,18 +104,23 @@ export class DevToolsToolbox {
       return;
     }
 
-    let panel = await this.getOrStartPanel(name);
+    let panel = await this.getOrStartPanel(name as StartablePanelName);
     this.emit("select", name);
 
     this.currentTool = name;
     return panel;
   }
 
-  toggleSplitConsole(open) {
+  toggleSplitConsole(open: boolean) {
     store.dispatch(actions.setSplitConsole(open));
   }
 
-  async viewSourceInDebugger(url, line, column, id) {
+  async viewSourceInDebugger(
+    url: string | undefined,
+    line: number | undefined,
+    column: number | undefined,
+    id: string | undefined
+  ) {
     const dbg = this.getPanel("debugger");
     if (!dbg) {
       return;
