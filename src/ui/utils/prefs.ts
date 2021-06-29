@@ -27,7 +27,6 @@ pref("devtools.toolbox-height", "50%");
 pref("devtools.non-dev-side-panel-width", "25%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "50%");
-pref("devtools.video", !!urlPrefs.video);
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.libraryFilterTime", "all");
@@ -58,7 +57,6 @@ export const prefs = new PrefsHelper("devtools", {
   nonDevSidePanelWidth: ["String", "non-dev-side-panel-width"],
   viewMode: ["String", "view-mode"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
-  video: ["Bool", "video"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
   libraryFilterTime: ["String", "libraryFilterTime"],

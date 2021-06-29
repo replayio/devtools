@@ -18,6 +18,7 @@ import BlankScreen from "../BlankScreen";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
+import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 const { prefs } = require("ui/utils/prefs");
 
 function ModalButton({
@@ -239,7 +240,6 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
 
-  console.log({ newWorkspace });
   return (
     <>
       <SlideContent headerText="Your team members">
@@ -254,13 +254,7 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         <div className="overflow-auto flex-grow">
-          {!loading && sortedMembers ? (
-            <div className="flex flex-col space-y-2">
-              {sortedMembers.map(m => (
-                <div key={m.email}>{m.email}</div>
-              ))}
-            </div>
-          ) : null}
+          {!loading && sortedMembers ? <WorkspaceMembers members={sortedMembers} /> : null}
         </div>
         <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>

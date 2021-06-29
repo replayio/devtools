@@ -13,6 +13,17 @@ import MaterialIcon from "../MaterialIcon";
 
 type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
 
+function Status({ children }: { children: string }) {
+  return (
+    <div className="flex flex-row items-center group">
+      <MaterialIcon className="material-icons opacity-0 group-hover:opacity-100">
+        expand_more
+      </MaterialIcon>
+      <span>{children}</span>
+    </div>
+  );
+}
+
 export function NonRegisteredWorkspaceMember({ member }: { member: WorkspaceUser }) {
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
   const [expanded, setExpanded] = useState(false);
@@ -27,18 +38,13 @@ export function NonRegisteredWorkspaceMember({ member }: { member: WorkspaceUser
   };
 
   return (
-    <li className="workspace-member">
-      <MaterialIcon>mail_outline</MaterialIcon>
-      <div className="workspace-member-content">
-        <div className="title">{member.email}</div>
+    <li className="flex flex-row items-center space-x-2">
+      <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
+        <MaterialIcon className="text-3xl">mail_outline</MaterialIcon>
       </div>
+      <div className="flex-grow">{member.email}</div>
       <PortalDropdown
-        buttonContent={
-          <div className="permission-container">
-            <MaterialIcon>expand_more</MaterialIcon>
-            <span>Pending</span>
-          </div>
-        }
+        buttonContent={<Status>Pending</Status>}
         setExpanded={setExpanded}
         expanded={expanded}
         buttonStyle=""
@@ -90,12 +96,7 @@ function Role({
 
   let content = (
     <PortalDropdown
-      buttonContent={
-        <div className="permission-container">
-          <MaterialIcon>expand_more</MaterialIcon>
-          <span>Admin</span>
-        </div>
-      }
+      buttonContent={<Status>Admin</Status>}
       setExpanded={setExpanded}
       expanded={expanded}
       buttonStyle=""
@@ -110,12 +111,7 @@ function Role({
   if (member.pending) {
     content = (
       <PortalDropdown
-        buttonContent={
-          <div className="permission-container">
-            <MaterialIcon>expand_more</MaterialIcon>
-            <span>Pending</span>
-          </div>
-        }
+        buttonContent={<Status>Pending</Status>}
         setExpanded={setExpanded}
         expanded={expanded}
         buttonStyle=""
@@ -128,16 +124,18 @@ function Role({
     );
   }
 
-  return <div className="member-permissions">{content}</div>;
+  return content;
 }
 
 function WorkspaceMember({ member, setWorkspaceId, hideModal }: WorkspaceMemberProps) {
   return (
-    <li className="workspace-member">
-      <img src={member.user!.picture} />
-      <div className="workspace-member-content">
-        <div className="title">{member.user!.name}</div>
-      </div>
+    <li className="flex flex-row items-center space-x-2">
+      <img
+        src={member.user!.picture}
+        className="rounded-full"
+        style={{ width: "28px", height: "28px" }}
+      />
+      <div className="flex-grow">{member.user!.name}</div>
       <Role member={member} setWorkspaceId={setWorkspaceId} hideModal={hideModal} />
     </li>
   );
