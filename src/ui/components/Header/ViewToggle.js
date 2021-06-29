@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 import "./ViewToggle.css";
-import { setViewMode } from "../../actions/app";
+import { setSelectedPrimaryPanel, setViewMode } from "../../actions/app";
+import { actions } from "ui/actions";
 import { getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
@@ -36,7 +37,7 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }) {
   );
 }
 
-function ViewToggle({ viewMode, recordingId, setViewMode }) {
+function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPanel }) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
@@ -62,6 +63,9 @@ function ViewToggle({ viewMode, recordingId, setViewMode }) {
     // before re-rendering all of devtools in the new viewMode.
     clearTimeout(toggleTimeoutKey.current);
     toggleTimeoutKey.current = setTimeout(() => {
+      if (mode === "non-dev") {
+        setSelectedPrimaryPanel("comments");
+      }
       setViewMode(mode);
     }, 300);
   };
@@ -103,5 +107,6 @@ export default connect(
   }),
   {
     setViewMode,
+    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }
 )(ViewToggle);
