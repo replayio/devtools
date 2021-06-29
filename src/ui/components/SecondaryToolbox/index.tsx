@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import Video from "../Video";
@@ -12,6 +12,17 @@ import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import { ReactDevtoolsPanel } from "./ReactDevTools";
+import { UIState } from "ui/state";
+import { PanelName } from "ui/state/app";
+
+interface PanelButtonsProps {
+  narrowMode: boolean;
+  selectedPanel: PanelName;
+  setSelectedPanel: (panel: PanelName) => any;
+  isNode: boolean;
+  showVideoPanel: boolean;
+  setShowVideoPanel: (showVideoPanel: boolean) => any;
+}
 
 function PanelButtons({
   selectedPanel,
@@ -20,13 +31,13 @@ function PanelButtons({
   isNode,
   showVideoPanel,
   setShowVideoPanel,
-}) {
+}: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
 
   const showReact = userSettings.showReact;
   const showElements = userSettings.showElements;
 
-  const onClick = panel => {
+  const onClick = (panel: PanelName) => {
     setSelectedPanel(panel);
 
     // The comments panel doesn't have to be initialized by the toolbox,
@@ -102,7 +113,7 @@ function SecondaryToolbox({
   recordingTarget,
   showVideoPanel,
   setShowVideoPanel,
-}) {
+}: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
   const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
@@ -135,12 +146,15 @@ function SecondaryToolbox({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     selectedPanel: selectors.getSelectedPanel(state),
     narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
-)(SecondaryToolbox);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(SecondaryToolbox);

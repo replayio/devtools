@@ -1,7 +1,18 @@
+import { ZoomRegion } from "ui/state/timeline";
 import { timelineMarkerWidth } from "../constants";
 
 // calculate pixel distance from two times
-export function getPixelDistance({ to, from, zoom, overlayWidth }) {
+export function getPixelDistance({
+  to,
+  from,
+  zoom,
+  overlayWidth,
+}: {
+  to: number;
+  from: number;
+  zoom: ZoomRegion;
+  overlayWidth: number;
+}) {
   const toPos = getVisiblePosition({ time: to, zoom });
   const fromPos = getVisiblePosition({ time: from, zoom });
 
@@ -10,7 +21,7 @@ export function getPixelDistance({ to, from, zoom, overlayWidth }) {
 
 // Get the position of a time on the visible part of the timeline,
 // in the range [0, 1] if the timeline is fully zommed out.
-export function getVisiblePosition({ time, zoom }) {
+export function getVisiblePosition({ time, zoom }: { time: number; zoom: ZoomRegion }) {
   if (!time) {
     return 0;
   }
@@ -18,13 +29,19 @@ export function getVisiblePosition({ time, zoom }) {
   return (time - zoom.startTime) / (zoom.endTime - zoom.startTime);
 }
 
+interface GetOffsetParams {
+  time: number;
+  overlayWidth: number;
+  zoom: ZoomRegion;
+}
+
 // Get the pixel offset for a time.
-export function getPixelOffset({ time, overlayWidth, zoom }) {
+export function getPixelOffset({ time, overlayWidth, zoom }: GetOffsetParams) {
   return getVisiblePosition({ time, zoom }) * overlayWidth;
 }
 
 // Get the percent value for the left offset of a message.
-export function getLeftOffset({ overlayWidth, time, zoom }) {
+export function getLeftOffset({ overlayWidth, time, zoom }: GetOffsetParams) {
   const position = getVisiblePosition({ time, zoom }) * 100;
   const messageWidth = (timelineMarkerWidth / overlayWidth) * 100;
 
@@ -32,7 +49,12 @@ export function getLeftOffset({ overlayWidth, time, zoom }) {
 }
 
 // Get the percent value for the left offset of a comment.
-export function getCommentLeftOffset({ overlayWidth, time, zoom, commentWidth }) {
+export function getCommentLeftOffset({
+  overlayWidth,
+  time,
+  zoom,
+  commentWidth,
+}: GetOffsetParams & { commentWidth: number }) {
   const position = getVisiblePosition({ time, zoom }) * 100;
   const messageWidth = (commentWidth / overlayWidth) * 100;
 
@@ -40,7 +62,12 @@ export function getCommentLeftOffset({ overlayWidth, time, zoom, commentWidth })
 }
 
 // Get the percent value for the left offset of a comment marker.
-export function getMarkerLeftOffset({ overlayWidth, time, zoom, markerWidth }) {
+export function getMarkerLeftOffset({
+  overlayWidth,
+  time,
+  zoom,
+  markerWidth,
+}: GetOffsetParams & { markerWidth: number }) {
   const position = getVisiblePosition({ time, zoom }) * 100;
   const commentMarkerWidth = (markerWidth / overlayWidth) * 100;
 
@@ -48,14 +75,24 @@ export function getMarkerLeftOffset({ overlayWidth, time, zoom, markerWidth }) {
 }
 
 // Get the percent value for the midpoint of a time in the timeline.
-export function getTimeMidpoint({ overlayWidth, time, zoom }) {
+export function getTimeMidpoint({ overlayWidth, time, zoom }: GetOffsetParams) {
   const position = getVisiblePosition({ time, zoom }) * 100;
   const pausedLocationMarkerWidth = (1 / overlayWidth) * 100;
 
   return Math.max(position + pausedLocationMarkerWidth / 2, 0);
 }
 
-export function getNewZoomRegion({ hoverTime, newScale, zoomRegion, recordingDuration }) {
+export function getNewZoomRegion({
+  hoverTime,
+  newScale,
+  zoomRegion,
+  recordingDuration,
+}: {
+  hoverTime: number;
+  newScale: number;
+  zoomRegion: ZoomRegion;
+  recordingDuration: number;
+}) {
   let scale = zoomRegion.scale;
   let length = zoomRegion.endTime - zoomRegion.startTime;
   let leftToHover = hoverTime - zoomRegion.startTime;
@@ -77,7 +114,7 @@ export function getNewZoomRegion({ hoverTime, newScale, zoomRegion, recordingDur
 }
 
 // Format a time value to mm:ss
-export function getFormattedTime(time) {
+export function getFormattedTime(time: number) {
   const date = new Date(time);
   const seconds = date.getSeconds().toString().padStart(2, "0");
   const minutes = date.getMinutes();

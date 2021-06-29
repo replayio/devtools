@@ -1,4 +1,4 @@
-export function getAvatarColor(avatarID) {
+export function getAvatarColor(avatarID?: number) {
   if (!avatarID) {
     return "#696969";
   }

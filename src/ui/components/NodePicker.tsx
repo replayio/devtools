@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 
 import { EventEmitter } from "protocol/utils";
@@ -8,16 +8,27 @@ import { ThreadFront } from "protocol/thread";
 import { getDevicePixelRatio } from "protocol/graphics";
 import Highlighter from "highlighter/highlighter";
 
-export const nodePicker = {};
+export const nodePicker: any = {};
 
-class NodePicker extends React.Component {
-  state = {};
-  lastPickerPosition = null;
+interface Position {
+  x: number;
+  y: number;
+}
 
-  constructor(props) {
+interface NodePickerState {
+  nodePickerActive?: any;
+}
+
+class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
+  lastPickerPosition: Position | null = null;
+  nodePickerRemoveTime?: number;
+
+  constructor(props: PropsFromRedux) {
     super(props);
-    EventEmitter.decorate(nodePicker);
 
+    this.state = {};
+
+    EventEmitter.decorate(nodePicker);
     // Used in the test harness for picking a node.
     gToolbox.nodePicker = this;
   }
@@ -59,8 +70,8 @@ class NodePicker extends React.Component {
   }
 
   // Get the x/y coordinate of a mouse event wrt the recording's DOM.
-  mouseEventCanvasPosition(e) {
-    const canvas = document.getElementById("graphics");
+  mouseEventCanvasPosition(e: MouseEvent) {
+    const canvas = document.getElementById("graphics")!;
     const bounds = canvas.getBoundingClientRect();
     if (
       e.clientX < bounds.left ||
@@ -84,7 +95,7 @@ class NodePicker extends React.Component {
     };
   }
 
-  nodePickerMouseMove = async e => {
+  nodePickerMouseMove = async (e: MouseEvent) => {
     const pos = this.mouseEventCanvasPosition(e);
     this.lastPickerPosition = pos;
     const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
@@ -95,14 +106,14 @@ class NodePicker extends React.Component {
     }
   };
 
-  nodePickerMouseClick = e => {
+  nodePickerMouseClick = (e: MouseEvent) => {
     this.props.setIsNodePickerActive(false);
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
     gToolbox.selectTool("inspector");
   };
 
   // This is exposed separately for use in testing.
-  async nodePickerMouseClickInCanvas(pos) {
+  async nodePickerMouseClickInCanvas(pos: Position | null) {
     this.setState({ nodePickerActive: false });
     this.removeNodePickerListeners();
     this.nodePickerRemoveTime = Date.now();
@@ -134,7 +145,10 @@ class NodePicker extends React.Component {
   }
 }
 
-export default connect(null, {
+const connector = connect(null, {
   setIsNodePickerActive: actions.setIsNodePickerActive,
   setSelectedPanel: actions.setSelectedPanel,
-})(NodePicker);
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(NodePicker);

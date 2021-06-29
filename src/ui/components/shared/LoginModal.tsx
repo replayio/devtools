@@ -1,16 +1,17 @@
 import React from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
 import Modal from "ui/components/shared/Modal";
 
 import "./LoginModal.css";
+import { UIState } from "ui/state";
 
 function LoginModal() {
   const { loginWithRedirect } = useAuth0();
 
-  const onClick = e => {
+  const onClick: React.MouseEventHandler = e => {
     loginWithRedirect({ appState: { returnTo: window.location.href } });
   };
 
@@ -40,10 +41,4 @@ function LoginModal() {
   );
 }
 
-export default connect(
-  state => ({
-    modal: selectors.getModal(state),
-    recordingId: selectors.getRecordingId(state),
-  }),
-  { hideModal: actions.hideModal }
-)(LoginModal);
+export default LoginModal;

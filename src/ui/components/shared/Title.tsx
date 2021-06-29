@@ -2,13 +2,21 @@ import React, { useState, useEffect } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import hooks from "ui/hooks";
 
+interface TitleProps {
+  defaultTitle: string;
+  recordingId: string;
+  setEditingTitle(editing: boolean): any;
+  editingTitle: boolean;
+  allowEditOnTitleClick: boolean;
+}
+
 export default function Title({
   defaultTitle,
   recordingId,
   setEditingTitle,
   editingTitle,
   allowEditOnTitleClick,
-}) {
+}: TitleProps) {
   const { isAuthenticated } = useAuth0();
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const [title, setTitle] = useState(defaultTitle);
@@ -22,7 +30,7 @@ export default function Title({
     updateRecordingTitle({ variables: { recordingId, title } });
     setEditingTitle(false);
   };
-  const handleKeyDown = event => {
+  const handleKeyDown: React.KeyboardEventHandler = event => {
     if (event.key == "Enter") {
       saveTitle();
     } else if (event.key == "Escape") {

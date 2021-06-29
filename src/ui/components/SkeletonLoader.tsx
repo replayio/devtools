@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { ThreadFront } from "protocol/thread";
 import { prefs } from "../utils/prefs";
 import { selectors } from "../reducers";
 
 import "./SkeletonLoader.css";
+import { UIState } from "ui/state";
 
-function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode }) {
+type SkeletonProps = PropsFromRedux & {
+  setFinishedLoading(finished: boolean): void;
+  progress: number;
+  content: React.ReactNode;
+};
+
+function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode }: SkeletonProps) {
   const [displayedProgress, setDisplayedProgress] = useState(0);
-  const key = useRef(null);
+  const key = useRef<any>(null);
   const backgroundColor = `hsl(0, 0%, 98%)`;
 
   useEffect(() => {
@@ -51,7 +58,12 @@ function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode })
   );
 }
 
-function Header({ progress, content }) {
+interface HeaderProps {
+  progress: number;
+  content: React.ReactNode;
+}
+
+function Header({ progress, content }: HeaderProps) {
   return (
     <header id="header">
       <div className="header-left"></div>
@@ -64,10 +76,14 @@ function Header({ progress, content }) {
   );
 }
 
-function NonDevMain({ backgroundColor, displayedProgress }) {
+interface MainProps {
+  displayedProgress: number;
+}
+
+function NonDevMain({ displayedProgress }: MainProps) {
   return (
     <main>
-      <div className="comments" style={{ width: prefs.nonDevSidePanelWidth }}></div>
+      <div className="comments" style={{ width: prefs.nonDevSidePanelWidth as string }}></div>
       <section>
         <div className="video"></div>
         <div className="timeline">
@@ -81,7 +97,7 @@ function NonDevMain({ backgroundColor, displayedProgress }) {
   );
 }
 
-function DevMain({ displayedProgress }) {
+function DevMain({ displayedProgress }: MainProps) {
   return (
     <main>
       <section style={{ width: "100%" }}>
@@ -97,6 +113,9 @@ function DevMain({ displayedProgress }) {
   );
 }
 
-export default connect(state => ({
+const connector = connect((state: UIState) => ({
   viewMode: selectors.getViewMode(state),
-}))(SkeletonLoader);
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(SkeletonLoader);

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { selectors } from "../reducers";
@@ -7,8 +7,9 @@ import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
 import { useAuth0 } from "@auth0/auth0-react";
+import { UIState } from "ui/state";
 
-function CommentLoader({ recordingId }) {
+function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
 
   if (loading) {
@@ -27,7 +28,7 @@ function Video({
   recordingTarget,
   setVideoNode,
   videoUrl,
-}) {
+}: PropsFromRedux) {
   const { isAuthenticated } = useAuth0();
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
@@ -58,7 +59,7 @@ function Video({
 
   return (
     <div id="video">
-      <video id="graphicsVideo" src={videoUrl} ref={setVideoNode} />
+      <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {showCommentTool ? (
         <CommentsOverlay>
@@ -70,14 +71,14 @@ function Video({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     pendingComment: selectors.getPendingComment(state),
     isNodePickerActive: selectors.getIsNodePickerActive(state),
     currentTime: selectors.getCurrentTime(state),
     playback: selectors.getPlayback(state),
     recordingTarget: selectors.getRecordingTarget(state),
-    recordingId: selectors.getRecordingId(state),
+    recordingId: selectors.getRecordingId(state)!,
     videoUrl: selectors.getVideoUrl(state),
   }),
   {
@@ -85,4 +86,7 @@ export default connect(
     togglePlayback: actions.togglePlayback,
     clearPendingComment: actions.clearPendingComment,
   }
-)(Video);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(Video);
