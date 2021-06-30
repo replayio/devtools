@@ -39,18 +39,22 @@ export function setTelemetryContext(
   userEmail: string | undefined,
   isInternal: boolean
 ) {
-  let sentryContext: Record<string, string | boolean> = { isInternal };
+  Sentry.setTag("userInternal", isInternal);
+  if (userId && userEmail) {
+    Sentry.setUser({ id: userId, email: userEmail });
+    Sentry.setTag("userEmail", userEmail);
+    Sentry.setTag("anonymous", false);
+  } else {
+    Sentry.setTag("anonymous", true);
+  }
+
   if (userId) {
     mixpanel.identify(userId);
-    sentryContext["userId"] = userId;
   }
 
   if (userEmail) {
     mixpanel.people.set({ $email: userEmail });
-    sentryContext["userEmail"] = userEmail;
   }
-
-  Sentry.setContext("user", sentryContext);
 }
 
 export async function sendTelemetryEvent(event: string, tags: any = {}) {
