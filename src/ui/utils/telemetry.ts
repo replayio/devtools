@@ -7,10 +7,10 @@ export function setupTelemetry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
 
-  if (skipTelemetry()) {
-    mixpanel.disable();
-    return;
-  }
+  // if (skipTelemetry()) {
+  //   mixpanel.disable();
+  //   return;
+  // }
 
   Sentry.init({
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
@@ -40,19 +40,19 @@ export function setTelemetryContext(
   isInternal: boolean
 ) {
   Sentry.setTag("internal", isInternal);
-  if (!userId && !userEmail) {
+  if (userId && userEmail) {
+    Sentry.setUser({ id: userId, email: userEmail });
+    Sentry.setTag("userEmail", userEmail);
+  } else {
     Sentry.setTag("anonymous", true);
-    return;
   }
 
   if (userId) {
     mixpanel.identify(userId);
-    Sentry.setTag("userId", userId);
   }
 
   if (userEmail) {
     mixpanel.people.set({ $email: userEmail });
-    Sentry.setTag("userEmail", userEmail);
   }
 }
 

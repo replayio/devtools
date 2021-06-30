@@ -7,7 +7,10 @@ import { UIState } from "ui/state";
 const { features } = require("ui/utils/prefs");
 
 function ShareButton({ setModal, recordingId }: PropsFromRedux) {
-  const onClick = () => setModal("browser-launch");
+  const onClick = () => {
+    console.log("hi");
+    throw new Error("AHHHHHH");
+  };
 
   if (window.__IS_RECORD_REPLAY_RUNTIME__ || !features.launchBrowser) return null;
 
