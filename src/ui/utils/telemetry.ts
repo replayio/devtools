@@ -7,10 +7,10 @@ export function setupTelemetry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
 
-  // if (skipTelemetry()) {
-  //   mixpanel.disable();
-  //   return;
-  // }
+  if (skipTelemetry()) {
+    mixpanel.disable();
+    return;
+  }
 
   Sentry.init({
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
