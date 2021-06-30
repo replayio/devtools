@@ -16,7 +16,7 @@ export type PanelName =
   | "viewer"
   | "react-components"
   | "comments";
-export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events";
+export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
 export type ModalType =
   | "sharing"

@@ -75,17 +75,6 @@ function Toolbar({
             handleClick={() => onClick("comments")}
           />
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "events",
-          })}
-        >
-          <IconWithTooltip
-            icon={<MaterialIcon className="list toolbar-panel-icon">list</MaterialIcon>}
-            content={"Events"}
-            handleClick={() => onClick("events")}
-          />
-        </div>
 
         {viewMode == "dev" ? (
           <>

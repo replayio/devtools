@@ -5,7 +5,7 @@ import Timeline from "../Timeline";
 import Video from "../Video";
 import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import SidePanel from "ui/components/SidePanel";
+import Transcript from "ui/components/Transcript";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import Dropdown from "ui/components/shared/Dropdown";
 
@@ -33,7 +33,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel }) {
+function NonDevView({ updateTimelineDimensions, narrowMode }) {
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -60,7 +60,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
           maxSize="80%"
           vert={false}
           startPanel={<Video />}
-          endPanel={<SidePanel />}
+          endPanel={<Transcript />}
           endPanelControl={false}
         />
         <div id="timeline-container">
@@ -82,7 +82,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
       startPanel={
         <div className="horizontal-panels">
           <Toolbar />
-          <SidePanel />
+          <Transcript />
         </div>
       }
       endPanel={viewer}
@@ -94,7 +94,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
 export default connect(
   state => ({
     narrowMode: selectors.getNarrowMode(state),
-    selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
   }),
   {
     updateTimelineDimensions,

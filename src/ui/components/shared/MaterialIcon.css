@@ -1,3 +1,7 @@
+.material-icons {
+  color: var(--theme-icon-color);
+}
+
 .material-icons.invisible {
   visibility: hidden;
 }
