@@ -38,7 +38,7 @@ const { prefs, features } = require("ui/utils/prefs");
 
 function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
-    <button onClick={onClick}>
+    <button onClick={onClick} disabled={disabled}>
       <MaterialIcon className="refresh pause_play_circle material-icons-round">
         refresh
       </MaterialIcon>
