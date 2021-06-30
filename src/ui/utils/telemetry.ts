@@ -39,10 +39,11 @@ export function setTelemetryContext(
   userEmail: string | undefined,
   isInternal: boolean
 ) {
-  Sentry.setTag("internal", isInternal);
+  Sentry.setTag("userInternal", isInternal);
   if (userId && userEmail) {
     Sentry.setUser({ id: userId, email: userEmail });
     Sentry.setTag("userEmail", userEmail);
+    Sentry.setTag("anonymous", false);
   } else {
     Sentry.setTag("anonymous", true);
   }
