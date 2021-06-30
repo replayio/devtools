@@ -33,6 +33,11 @@ var j = RangeError("foo");
 var k = document.getElementById("foo");
 var l = bar;
 var m = [undefined, true, 3, null, "z", 40n];
+var n = new Proxy({ a: 0 }, {
+  get(target, prop, receiver) {
+    dump("Hello\n");
+  }
+});
 console.log(a);
 console.log(b);
 console.log(c);
@@ -46,6 +51,7 @@ console.log(j);
 console.log(k);
 console.log(l);
 console.log(m);
+console.log(n);
 console.log("Done");
 window.setTimeout(recordingFinished);
 }

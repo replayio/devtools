@@ -26,6 +26,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   Test.checkJumpIcon(msg);
 
   await Test.waitForMessage('Array(6) [ undefined, true, 3, null, "z", 40n ]');
+  await Test.waitForMessage('Proxy {  }');
 
   await Test.warpToMessage("Done");
 
