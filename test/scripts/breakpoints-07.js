@@ -45,8 +45,8 @@
     Test.app.actions.setViewMode("dev");
 
     // open the Pause Information panel
-    const pauseInfoButton = await Test.waitUntil(
-      () => document.querySelectorAll("#toolbox-toolbar .toolbar-panel-button button")[2]
+    const pauseInfoButton = await Test.waitUntil(() =>
+      document.querySelector("#toolbox-toolbar .toolbar-panel-button.debug button")
     );
     pauseInfoButton.click();
 
