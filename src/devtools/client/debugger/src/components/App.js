@@ -19,7 +19,7 @@ import {
   getQuickOpenEnabled,
   getOrientation,
 } from "../selectors";
-import { getSelectedPanel, getSelectedPrimaryPanel } from "ui/reducers/app.ts";
+import { getSelectedPanel } from "ui/reducers/app.ts";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
@@ -43,14 +43,12 @@ import "./shared/menu.css";
 
 import SplitBox from "devtools-splitter";
 import ProjectSearch from "./ProjectSearch";
-import PrimaryPanes from "./PrimaryPanes";
 import Editor from "./Editor";
-import SecondaryPanes from "./SecondaryPanes";
 import WelcomeBox from "./WelcomeBox";
 import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
-import Transcript from "ui/components/Transcript";
+import SidePanel from "ui/components/SidePanel";
 import { waitForEditor } from "../utils/editor/create-editor";
 
 class Debugger extends Component {
@@ -202,25 +200,6 @@ class Debugger extends Component {
     }
   }
 
-  getPanel = () => {
-    const { selectedPrimaryPanel } = this.props;
-
-    switch (selectedPrimaryPanel) {
-      case "explorer": {
-        return <PrimaryPanes />;
-      }
-      case "debug": {
-        return <SecondaryPanes />;
-      }
-      case "comments": {
-        return <Transcript />;
-      }
-      default: {
-        return null;
-      }
-    }
-  };
-
   renderLayout = () => {
     const { startPanelCollapsed } = this.props;
 
@@ -237,7 +216,7 @@ class Debugger extends Component {
         startPanelCollapsed={startPanelCollapsed}
         startPanel={
           <div className="panes" style={{ width: "100%" }}>
-            {this.getPanel()}
+            <SidePanel />
           </div>
         }
         endPanel={this.renderEditorPane()}
@@ -305,7 +284,6 @@ const mapStateToProps = state => ({
   quickOpenEnabled: getQuickOpenEnabled(state),
   orientation: getOrientation(state),
   selectedPanel: getSelectedPanel(state),
-  selectedPrimaryPanel: getSelectedPrimaryPanel(state),
 });
 
 export default connect(mapStateToProps, {

@@ -43,20 +43,18 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
       <div className="right-sidebar-toolbar">
         <div className="right-sidebar-toolbar-item comments">Comments</div>
       </div>
-      <div className="transcript-panel">
+      <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full">
         {displayedComments.length > 0 ? (
-          <div className="transcript-list space-y-2">
+          <div className="p-2 overflow-auto w-full flex-grow space-y-2">
             {sortBy(displayedComments, ["time"]).map(comment => {
               return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
             })}
           </div>
         ) : (
-          <div className="transcript-list space-y-4 text-lg text-gray-500">
-            <div className="transcript-list space-y-4 text-lg text-gray-500">
-              {isAuthenticated
-                ? "None yet! Please click the video to add a comment."
-                : "Please log in to add a comment to this replay."}
-            </div>
+          <div className="transcript-list p-2 self-stretch space-y-4 text-lg text-gray-500">
+            {isAuthenticated
+              ? "None yet! Please click the video to add a comment."
+              : "Please log in to add a comment to this replay."}
           </div>
         )}
       </div>
