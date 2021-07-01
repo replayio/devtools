@@ -15,6 +15,7 @@ import { isTest } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
 import { BlankLoadingScreen } from "ui/components/shared/BlankScreen";
+import { isMock } from "ui/utils/environment";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -45,6 +46,10 @@ export function ApolloWrapper({
 }
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
+  if (isMock()) {
+    throw new Error("Apollo query during mock test");
+  }
+
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.query({ variables, query });
 }
@@ -56,6 +61,10 @@ export async function mutate({
   variables: any;
   mutation: DocumentNode;
 }) {
+  if (isMock()) {
+    throw new Error("Apollo mutate during mock test");
+  }
+
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.mutate({ variables, mutation });
 }

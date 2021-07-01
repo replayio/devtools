@@ -5,6 +5,7 @@ import { Recording, User } from "ui/types";
 import { ExpectedError, WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
+import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 
 function isTest() {
@@ -136,6 +137,12 @@ const GET_MY_RECORDINGS = gql`
 export async function isRecordingInitialized(
   recordingId: RecordingId
 ): Promise<boolean | undefined> {
+  if (isMock()) {
+    return waitForMockEnvironment().then(
+      env => env.database.isRecordingInitialized(recordingId)
+    );
+  }
+
   const result = await query({
     query: gql`
       query IsRecordingAccessible($recordingId: UUID!) {
@@ -154,6 +161,12 @@ export async function isRecordingInitialized(
 export async function getRecordingOwnerUserId(
   recordingId: RecordingId
 ): Promise<string | undefined> {
+  if (isMock()) {
+    return waitForMockEnvironment().then(
+      env => env.database.getRecordingOwnerUserId(recordingId)
+    );
+  }
+
   const result = await query({
     query: gql`
       query GetRecordingUserId($recordingId: UUID!) {
@@ -174,6 +187,11 @@ export async function getRecordingOwnerUserId(
 export function useGetRecording(
   recordingId: RecordingId | null
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
+  if (isMock()) {
+    const env = mockEnvironment();
+    return env ? env.database.useGetRecording(recordingId) : { loading: true };
+  }
+
   const { data, error, loading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
     skip: !recordingId,

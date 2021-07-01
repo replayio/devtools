@@ -1,5 +1,5 @@
 import { useAuth0 as useOrigAuth0, Auth0ContextInterface } from "@auth0/auth0-react";
-import { isTest } from "./environment";
+import { isTest, isMock } from "./environment";
 
 const TEST_AUTH = {
   isLoading: false,
@@ -23,7 +23,7 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
 export default function useAuth0() {
   const auth = useOrigAuth0();
 
-  if (isTest()) {
+  if (isTest() || isMock()) {
     return TEST_AUTH;
   }
 
