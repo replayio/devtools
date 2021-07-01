@@ -44,7 +44,7 @@ pref("devtools.features.transcriptHover", false);
 pref("devtools.features.widgetHover", false);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
-pref("devtools.features.videoPlayback", false);
+pref("devtools.features.videoPlayback", true);
 pref("devtools.features.launchBrowser", true);
 
 export const prefs = new PrefsHelper("devtools", {
