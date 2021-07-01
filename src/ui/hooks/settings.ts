@@ -40,9 +40,7 @@ const testSettings: UserSettings = {
 
 export async function getUserSettings(): Promise<UserSettings> {
   if (isMock()) {
-    return waitForMockEnvironment().then(
-      env => env.database.getUserSettings()
-    );
+    return waitForMockEnvironment().then(env => env.database.getUserSettings());
   }
 
   const result = await query({ query: GET_USER_SETTINGS, variables: {} });

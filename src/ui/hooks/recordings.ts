@@ -138,9 +138,7 @@ export async function isRecordingInitialized(
   recordingId: RecordingId
 ): Promise<boolean | undefined> {
   if (isMock()) {
-    return waitForMockEnvironment().then(
-      env => env.database.isRecordingInitialized(recordingId)
-    );
+    return waitForMockEnvironment().then(env => env.database.isRecordingInitialized(recordingId));
   }
 
   const result = await query({
@@ -162,9 +160,7 @@ export async function getRecordingOwnerUserId(
   recordingId: RecordingId
 ): Promise<string | undefined> {
   if (isMock()) {
-    return waitForMockEnvironment().then(
-      env => env.database.getRecordingOwnerUserId(recordingId)
-    );
+    return waitForMockEnvironment().then(env => env.database.getRecordingOwnerUserId(recordingId));
   }
 
   const result = await query({
