@@ -42,13 +42,13 @@ function ensureEnv(env) {
   return val;
 }
 
-spawnChecked("npm", ["install"]);
+// spawnChecked("npm", ["install"]);
 
-const gitSha = ensureEnv("INPUT_GIT_SHA");
-spawnChecked("earthly", ["--build-arg", `GIT_SHA=${gitSha}`, "+dist"]);
+// const gitSha = ensureEnv("INPUT_GIT_SHA");
+// spawnChecked("earthly", ["--build-arg", `GIT_SHA=${gitSha}`, "+dist"]);
 
-upload("index.html", "view");
-uploadDir("dist");
-uploadDir("src/image/images", "images");
+// upload("index.html", "view");
+// uploadDir("dist");
+// uploadDir("src/image/images", "images");
 
-invalidateCloudFront();
+// invalidateCloudFront();

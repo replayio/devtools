@@ -8,7 +8,7 @@ const APP_ID = "k7f741xx";
 
 export function handleIntercomLogout(logout: (options?: LogoutOptions) => void) {
   window.Intercom("shutdown");
-  logout({ returnTo: `${window.location.origin}/view` });
+  logout({ returnTo: window.location.origin });
 }
 
 export function bootIntercom(data: any) {

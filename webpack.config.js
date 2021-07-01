@@ -1,6 +1,7 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
 const Visualizer = require("webpack-visualizer-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -9,9 +10,6 @@ module.exports = {
     searchWorker: "./src/devtools/client/debugger/src/workers/search/worker",
   },
   devtool: "source-map",
-  output: {
-    publicPath: "dist/",
-  },
   devServer: {
     before: app => {
       app.get("/test", (req, res) => {
@@ -38,6 +36,13 @@ module.exports = {
     new MiniCssExtractPlugin(),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
     new webpack.EnvironmentPlugin({ REPLAY_RELEASE: undefined }),
+    new CopyPlugin({
+      patterns: [
+        { from: "index.html" },
+        { from: "favicon.svg" },
+        { from: "src/image/images", to: "images" },
+      ],
+    }),
   ].filter(Boolean),
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],

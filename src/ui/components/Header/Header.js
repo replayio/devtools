@@ -99,7 +99,7 @@ function Header({ recordingId, sessionId, recordingTarget }) {
   const { isAuthenticated } = useAuth0();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
-  const dashboardUrl = `${window.location.origin}/view`;
+  const dashboardUrl = window.location.origin;
 
   const onNavigateBack = event => {
     if (event.metaKey) {

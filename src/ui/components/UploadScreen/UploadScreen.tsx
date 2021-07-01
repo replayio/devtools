@@ -281,7 +281,7 @@ function UploadScreen({ recordingId, recording, userSettings }: UploadScreenProp
   }
 
   if (status === "deleted") {
-    return <DeletedScreen url="/view" />;
+    return <DeletedScreen url="/" />;
   }
 
   return (

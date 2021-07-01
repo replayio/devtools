@@ -10,7 +10,7 @@ function CopyUrl({ recordingId }) {
   const [copyClicked, setCopyClicked] = useState(false);
 
   const handleCopyClick = () => {
-    navigator.clipboard.writeText(`https://replay.io/view?id=${recordingId}`);
+    navigator.clipboard.writeText(`https://app.replay.io/?id=${recordingId}`);
     setCopyClicked(true);
     setTimeout(() => setCopyClicked(false), 2000);
   };
@@ -29,7 +29,7 @@ function CopyUrl({ recordingId }) {
     <div className="row link">
       <input
         type="text"
-        value={`https://replay.io/view?id=${recordingId}`}
+        value={`https://app.replay.io/?id=${recordingId}`}
         onKeyPress={e => e.preventDefault()}
         onChange={e => e.preventDefault()}
       />

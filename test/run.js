@@ -220,7 +220,7 @@ function spawnGecko(env) {
     fs.mkdirSync(profile);
     args.push("-profile", profile);
 
-    // Change the startup page from replay.io/view so that we don't create
+    // Change the startup page from app.replay.io so that we don't create
     // a recording for the latter if RECORD_ALL_CONTENT is set.
     fs.writeFileSync(`${profile}/prefs.js`, `user_pref("browser.startup.homepage", "about:blank");\n`);
   }
@@ -302,7 +302,7 @@ async function runTestViewer(path, local, timeout, env) {
     // Log an error which github will recognize.
     let msg = `::error ::Failure ${local}`;
     if (recordingId) {
-      msg += ` https://replay.io/view?id=${recordingId}`;
+      msg += ` https://app.replay.io/?id=${recordingId}`;
     }
     spawnChecked("echo", [msg], { stdio: "inherit" });
   }

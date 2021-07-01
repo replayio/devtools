@@ -66,7 +66,7 @@ function SignInButton() {
 
 function LibraryButton() {
   const onClick = () => {
-    window.location.href = `${window.location.origin}/view`;
+    window.location.href = window.location.origin;
   };
 
   return (

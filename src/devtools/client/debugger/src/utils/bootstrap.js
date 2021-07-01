@@ -12,12 +12,10 @@ import { persistTabs } from "../utils/tabs";
 export let parser;
 
 export function bootstrapWorkers(panelWorkers) {
-  const workerPath = "dist";
-
   parser = new ParserDispatcher();
 
-  parser.start(`${workerPath}/parserWorker.js`);
-  search.start(`${workerPath}/searchWorker.js`);
+  parser.start("parserWorker.js");
+  search.start("searchWorker.js");
   return { ...panelWorkers, parser, search };
 }
 
