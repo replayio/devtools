@@ -65,7 +65,7 @@ function Toolbar({
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
       <div id="toolbox-toolbar">
         <div
-          className={classnames("toolbar-panel-button", {
+          className={classnames("toolbar-panel-button comments", {
             active: selectedPrimaryPanel == "comments",
           })}
         >
@@ -76,7 +76,7 @@ function Toolbar({
           />
         </div>
         <div
-          className={classnames("toolbar-panel-button", {
+          className={classnames("toolbar-panel-button events", {
             active: selectedPrimaryPanel == "events",
           })}
         >
@@ -90,7 +90,7 @@ function Toolbar({
         {viewMode == "dev" ? (
           <>
             <div
-              className={classnames("toolbar-panel-button", {
+              className={classnames("toolbar-panel-button explorer", {
                 active: selectedPrimaryPanel == "explorer",
               })}
             >
@@ -105,7 +105,7 @@ function Toolbar({
               />
             </div>
             <div
-              className={classnames("toolbar-panel-button", {
+              className={classnames("toolbar-panel-button debug", {
                 active: selectedPrimaryPanel == "debug",
               })}
             >
