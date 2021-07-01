@@ -32,12 +32,41 @@ export function hasTeamInvitationCode() {
   return new URL(window.location.href).searchParams.get("invitationcode");
 }
 
+// Return whether we are running one of the tests in our e2e test suite.
+// We will be connected to a live backend and testing debugging features.
 export function isTest() {
   return getTest() != null;
 }
 
+// Return whether we are running a mock test. The backend servers which we
+// connect to will be mocked, and we can test behaviors we can't easily
+// replicate when connected to a live backend.
+export function isMock() {
+  return !!url.searchParams.get("mock");
+}
+
+export async function waitForMockEnvironment() {
+  if (!isMock()) {
+    return null;
+  }
+  // The mock test runner will install a "mockEnvironment" on the window.
+  const mywindow: any = window;
+  while (!mywindow.mockEnvironment) {
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  return mywindow.mockEnvironment;
+}
+
+export function mockEnvironment() {
+  const mywindow: any = window;
+  if (!mywindow.mockEnvironment) {
+    throw new Error("Missing mock environment");
+  }
+  return mywindow.mockEnvironment;
+}
+
 export function skipTelemetry() {
-  return isTest() || isDevelopment();
+  return isTest() || isMock() || isDevelopment();
 }
 
 export function isDeployPreview() {

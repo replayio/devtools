@@ -12,6 +12,7 @@ import {
 import { setUnexpectedError } from "ui/actions/session";
 import { UIStore } from "ui/actions";
 import { Action, Dispatch } from "redux";
+import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 
 interface Message {
   id: number;
@@ -46,6 +47,14 @@ window.addEventListener("beforeunload", () => {
 });
 
 export function initSocket(store: UIStore, address?: string) {
+  if (isMock()) {
+    waitForMockEnvironment().then(env => {
+      env.setOnSocketMessage(onSocketMessage);
+      onSocketOpen();
+    });
+    return;
+  }
+
   socket = new WebSocket(address || "wss://dispatch.replay.io");
 
   socket.onopen = makeInfallible(onSocketOpen);
@@ -79,7 +88,12 @@ const doSend = makeInfallible(msg => {
   window.performance?.mark(`${msg.method}_start`);
   const str = JSON.stringify(msg);
   gSentBytes += str.length;
-  socket.send(str);
+
+  if (isMock()) {
+    mockEnvironment().sendSocketMessage(str);
+  } else {
+    socket.send(str);
+  }
 });
 
 function onSocketOpen() {
