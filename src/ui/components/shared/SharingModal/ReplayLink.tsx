@@ -5,7 +5,7 @@ import { RecordingId } from "@recordreplay/protocol";
 export default function ReplayLink({ recordingId }: { recordingId: RecordingId }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const url = `https://replay.io/view?id=${recordingId}`;
+  const url = `https://app.replay.io/?id=${recordingId}`;
 
   const onClick = () => {
     navigator.clipboard.writeText(url);

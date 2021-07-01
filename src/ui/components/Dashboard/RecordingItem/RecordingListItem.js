@@ -16,7 +16,7 @@ function getDurationString(durationMs) {
 
 function CopyLinkButton({ recordingId }) {
   const [clicked, setClicked] = useState(false);
-  const linkUrl = `${window.location.origin}/view?id=${recordingId}`;
+  const linkUrl = `${window.location.origin}/?id=${recordingId}`;
 
   const handleCopyClick = e => {
     e.stopPropagation();

@@ -43,9 +43,9 @@ export function setupAppHelper(store) {
       const params = new URLSearchParams(document.location.search.substring(1));
 
       if (params.get("id")) {
-        window.location = `http://replay.io/view?id=${params.get("id")}`;
+        window.location = `http://app.replay.io/?id=${params.get("id")}`;
       } else {
-        window.location = "http://replay.io/view";
+        window.location = "http://app.replay.io/";
       }
     },
   };

@@ -19,7 +19,7 @@ export default function RecordingItem({
     updateIsPrivate({ variables: { recordingId: data.id, isPrivate: !isPrivate } });
   };
   const onNavigate = event => {
-    let url = `/view?id=${data.id}`;
+    let url = `/?id=${data.id}`;
     const isTesting = new URL(window.location.href).searchParams.get("e2etest");
 
     if (isTesting) {

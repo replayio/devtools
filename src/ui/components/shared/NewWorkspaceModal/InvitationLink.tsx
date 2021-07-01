@@ -5,7 +5,7 @@ import { Workspace } from "ui/types";
 function InvitationURL({ code }: { code: string }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const displayedText = `https://replay.io/view?invitationcode=${code}`;
+  const displayedText = `https://app.replay.io/?invitationcode=${code}`;
 
   const onClick = () => {
     navigator.clipboard.writeText(displayedText);
