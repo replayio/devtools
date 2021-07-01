@@ -1,6 +1,8 @@
+const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
 const Visualizer = require("webpack-visualizer-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -10,6 +12,7 @@ module.exports = {
   },
   devtool: "source-map",
   output: {
+    path: path.join(__dirname, "dist/dist"),
     publicPath: "dist/",
   },
   devServer: {
@@ -38,6 +41,12 @@ module.exports = {
     new MiniCssExtractPlugin(),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
     new webpack.EnvironmentPlugin({ REPLAY_RELEASE: undefined }),
+    new CopyPlugin({
+      patterns: [
+        { from: "src/image/images", to: "../images" },
+        { from: "index.html", to: "../view", toType: "file" },
+      ],
+    }),
   ].filter(Boolean),
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
