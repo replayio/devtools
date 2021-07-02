@@ -26,20 +26,15 @@ function Event({
     <button
       onClick={() => onSeek(event.point, event.time)}
       className={classNames(
-        "flex flex-row justify-between text-xl p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
-        isPaused ? "text-primaryAccent" : "text-gray-800"
+        "flex flex-row justify-between p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
+        isPaused ? "text-primaryAccent" : ""
       )}
     >
       <div className="flex flex-row space-x-2 items-center">
         <MaterialIcon highlighted={isPaused}>ads_click</MaterialIcon>
         <div className={classNames(isPaused ? "font-semibold" : "")}>Mouse Click</div>
       </div>
-      <div
-        className={classNames(
-          "font-mono text-lg",
-          isPaused ? "text-primaryAccent" : "text-gray-500"
-        )}
-      >
+      <div className={classNames("", isPaused ? "text-primaryAccent" : "")}>
         {getFormattedTime(event.time)}
       </div>
     </button>
@@ -57,7 +52,7 @@ function Events({ mousedownEvents, seek, currentTime, executionPoint }: PropsFro
         <div className="right-sidebar-toolbar-item">Events</div>
       </div>
       <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white h-full">
-        <div className="flex flex-col p-2 self-stretch space-y-2 text-lg w-full text-gray-500">
+        <div className="flex flex-col p-2 self-stretch space-y-2 w-full">
           {mousedownEvents.map((e, i) => (
             <Event key={i} onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
           ))}
