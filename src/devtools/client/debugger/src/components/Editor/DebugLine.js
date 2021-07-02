@@ -4,6 +4,7 @@
 
 //
 import { PureComponent } from "react";
+import { ThreadFront } from "protocol/thread";
 import {
   toEditorLine,
   toEditorColumn,
@@ -114,6 +115,12 @@ const mapStateToProps = state => {
   const frame = getVisibleSelectedFrame(state);
   const previewLocation = getPausePreviewLocation(state);
   const location = previewLocation || (frame && frame.location);
+  if (location) {
+    location.sourceId = ThreadFront.pickCorrespondingSourceId(
+      location.sourceId,
+      location.sourceUrl
+    );
+  }
   return {
     frame,
     location,
