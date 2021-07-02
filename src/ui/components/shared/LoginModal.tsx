@@ -20,7 +20,7 @@ function LoginModal() {
       <Modal showClose={false}>
         <div className="px-8 py-4 space-y-6">
           <div className="place-content-center">
-            <img className="w-16 h-16 mx-auto" src="images/logo.svg" />
+            <img className="w-16 h-16 mx-auto" src="/images/logo.svg" />
           </div>
           <div className="text-center space-y-2">
             <div className="font-bold text-2xl">Sign in required</div>

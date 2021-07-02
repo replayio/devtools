@@ -88,7 +88,7 @@
 }
 
 .error-content {
-  background-image: url(images/stargazing.svg);
+  background-image: url(/images/stargazing.svg);
   background-repeat: no-repeat;
   background-position: center;
 }
