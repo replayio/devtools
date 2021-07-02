@@ -10,6 +10,9 @@ module.exports = {
     searchWorker: "./src/devtools/client/debugger/src/workers/search/worker",
   },
   devtool: "source-map",
+  output: {
+    filename: "[name].js?v=[contenthash]",
+  },
   devServer: {
     before: app => {
       app.get("/test", (req, res) => {
