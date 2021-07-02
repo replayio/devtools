@@ -11,6 +11,7 @@ module.exports = {
   },
   devtool: "source-map",
   output: {
+    publicPath: "/",
     filename: "[name].js?v=[contenthash]",
   },
   devServer: {
@@ -41,6 +42,7 @@ module.exports = {
     new webpack.EnvironmentPlugin({ REPLAY_RELEASE: undefined }),
     new CopyPlugin({
       patterns: [
+        { from: "vercel.json" },
         { from: "index.html" },
         { from: "favicon.svg" },
         { from: "src/image/images", to: "images" },

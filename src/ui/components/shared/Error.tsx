@@ -103,7 +103,7 @@ function Error({ error }: { error: ExpectedError | UnexpectedError }) {
     <section className="max-w-2xl w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="p-16 h-84 space-y-12 items-center flex flex-col">
         <div className="space-y-4 place-content-center">
-          <img className="w-16 h-16 mx-auto" src="images/logo.svg" />
+          <img className="w-16 h-16 mx-auto" src="/images/logo.svg" />
         </div>
         <div className="text-center space-y-4">
           {message ? <div className="font-bold text-2xl">{message}</div> : null}
