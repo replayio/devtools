@@ -41,6 +41,7 @@ module.exports = {
     new webpack.EnvironmentPlugin({ REPLAY_RELEASE: undefined }),
     new CopyPlugin({
       patterns: [
+        { from: "vercel.json" },
         { from: "index.html" },
         { from: "favicon.svg" },
         { from: "src/image/images", to: "images" },
