@@ -274,6 +274,10 @@ async function runTestViewer(path, local, timeout, env) {
 
     if (/TestPassed/.test(data.toString())) {
       passed = true;
+      const nodeRecordingId = maybeGetBackendNodeRecordingId();
+      if (nodeRecordingId) {
+        console.log(`Test passed, found backend node recording ${nodeRecordingId}`);
+      }
     }
     process.stdout.write(data);
   }
@@ -303,6 +307,10 @@ async function runTestViewer(path, local, timeout, env) {
     let msg = `::error ::Failure ${local}`;
     if (recordingId) {
       msg += ` https://app.replay.io/?id=${recordingId}`;
+    }
+    const nodeRecordingId = maybeGetBackendNodeRecordingId();
+    if (nodeRecordingId) {
+      msg += ` https://app.replay.io/?id=${nodeRecordingId}`;
     }
     spawnChecked("echo", [msg], { stdio: "inherit" });
   }
@@ -470,4 +478,20 @@ function addTestRecordingId(recordingId) {
   } catch (e) {
     console.error("addTestRecordingId failed", e);
   }
+}
+
+function maybeGetBackendNodeRecordingId() {
+  // When running in backend CI, we may be recording node processes that are
+  // part of the backend itself. Read the last node recording ID if available.
+  if (process.env.RECORD_NODE) {
+    const { stdout } = spawnSync(
+      "replay-recordings",
+      ["ls", "--directory", process.env.RECORD_NODE]
+    );
+    const recordings = JSON.parse(stdout);
+    if (recordings.length) {
+      return recordings[recordings.length - 1].recordingId;
+    }
+  }
+  return null;
 }
