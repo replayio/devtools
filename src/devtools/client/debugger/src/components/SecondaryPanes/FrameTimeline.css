@@ -21,36 +21,49 @@ body.scrubbing {
 .frame-timeline-container {
   border-bottom: 1px solid var(--theme-splitter-color);
   background-color: var(--accordion-header-background);
-  padding: 8px;
+  padding: 12px 10px;
+}
+
+.frame-timeline-container:hover {
+  cursor: pointer;
 }
 
 .frame-timeline-bar {
-  background-color: var(--progressbar-background);
-  border: 1px solid var(--theme-splitter-color);
+  background-color: var(--light-color-background-inactive);
   width: 100%;
-  height: 20px;
+  height: 4px;
   position: relative;
+  border-radius: 4px;
 }
 
-.frame-timeline-marker {
-  background-color: var(--replay-head-background);
+.frame-timeline-progress::after {
+  content: " ";
+  background-color: var(--replaying-marker-future-fill);
   display: inline-block;
-  opacity: 0.4;
-  width: 2px;
-  height: 100%;
+  width: 9px;
+  height: 9px;
+  border-radius: 8px;
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  display: none;
+}
+.frame-timeline-container:hover .frame-timeline-progress::after {
+  display: block;
 }
 
-.scrubbing .frame-timeline-marker,
 .scrubbing .frame-timeline-bar,
 .scrubbing .frame-timeline-container,
 .frame-timeline-marker:hover {
-  cursor: ew-resize;
+  cursor: grabbing;
 }
 
 .frame-timeline-progress {
-  background-color: var(--progress-playing-background);
+  background-color: var(--replaying-marker-future-fill);
+  position: relative;
   width: 50%;
   height: 100%;
   position: relative;
   display: inline-block;
+  border-radius: 4px;
 }
