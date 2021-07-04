@@ -13,6 +13,7 @@ const {
   spawnChecked,
   defer,
 } = require("./utils");
+const { listAllRecordings } = require("@recordreplay/recordings-cli");
 
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
   ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
@@ -484,11 +485,7 @@ function maybeGetBackendNodeRecordingId() {
   // When running in backend CI, we may be recording node processes that are
   // part of the backend itself. Read the last node recording ID if available.
   if (process.env.RECORD_NODE) {
-    const { stdout } = spawnSync(
-      "replay-recordings",
-      ["ls", "--directory", process.env.RECORD_NODE]
-    );
-    const recordings = JSON.parse(stdout);
+    const recordings = listAllRecordings({ directory: process.env.RECORD_NODE });
     if (recordings.length) {
       return recordings[recordings.length - 1].recordingId;
     }
