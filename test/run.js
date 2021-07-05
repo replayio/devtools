@@ -41,6 +41,7 @@ function processArgs() {
       --separate: Record examples in a separate browser instance.
       --timeout N: Use a timeout of N seconds for tests (default 240).
       --target TARGET: Only run tests using given TARGET
+      --server ADDRESS: Set server to connect to (default wss://dispatch.replay.io).
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -71,6 +72,9 @@ function processArgs() {
       case "--target":
         onlyTarget = process.argv[++i];
         break;
+      case "--server":
+        dispatchServer = process.argv[++i];
+        break;
       case "--help":
       case "-h":
       default:
@@ -100,7 +104,9 @@ function processEnvironmentVariables() {
   }
 
   // Get the address to use for the dispatch server.
-  dispatchServer = process.env.RECORD_REPLAY_SERVER || DefaultDispatchServer;
+  if (!dispatchServer) {
+    dispatchServer = process.env.RECORD_REPLAY_SERVER || DefaultDispatchServer;
+  }
 
   if (!onlyTarget) {
     onlyTarget = process.env.TEST_ONLY_TARGET;
