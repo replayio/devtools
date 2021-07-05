@@ -317,7 +317,7 @@ async function runTestViewer(path, local, timeout, env) {
     }
     const nodeRecordingId = maybeGetBackendNodeRecordingId();
     if (nodeRecordingId) {
-      msg += ` https://app.replay.io/?id=${nodeRecordingId}`;
+      msg += ` node https://app.replay.io/?id=${nodeRecordingId}`;
     }
     spawnChecked("echo", [msg], { stdio: "inherit" });
   }
@@ -493,7 +493,9 @@ function maybeGetBackendNodeRecordingId() {
   if (process.env.RECORD_NODE) {
     const recordings = listAllRecordings({ directory: process.env.RECORD_NODE });
     if (recordings.length) {
-      return recordings[recordings.length - 1].recordingId;
+      const { recordingId } = recordings[recordings.length - 1];
+      addTestRecordingId(recordingId);
+      return recordingId;
     }
   }
   return null;
