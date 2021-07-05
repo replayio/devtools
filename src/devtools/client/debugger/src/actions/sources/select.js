@@ -104,6 +104,7 @@ export function selectLocation(cx, initialLocation, { keepContext = true } = {})
       return dispatch(clearSelectedLocation(cx));
     }
 
+    await ThreadFront.ensureAllSources();
     const sourceId = ThreadFront.pickCorrespondingSourceId(initialSource.id, initialSource.url);
     const source = getSource(getState(), sourceId);
     const location = { ...initialLocation, sourceId };
