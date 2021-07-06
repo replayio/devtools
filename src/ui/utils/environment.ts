@@ -1,5 +1,16 @@
+import { MockedResponse } from "@apollo/client/testing";
+
+export interface MockEnvironment {
+  graphqlMocks: MockedResponse[];
+  setOnSocketMessage(callback: (arg: { data: string }) => unknown): void;
+  sendSocketMessage(str: string): void;
+}
+
 declare global {
   var __IS_RECORD_REPLAY_RUNTIME__: boolean;
+  interface Window {
+    mockEnvironment?: MockEnvironment;
+  }
 }
 
 const url = new URL(window.location.href);
@@ -50,19 +61,17 @@ export async function waitForMockEnvironment() {
     return null;
   }
   // The mock test runner will install a "mockEnvironment" on the window.
-  const mywindow: any = window;
-  while (!mywindow.mockEnvironment) {
+  while (!window.mockEnvironment) {
     await new Promise(resolve => setTimeout(resolve, 50));
   }
-  return mywindow.mockEnvironment;
+  return window.mockEnvironment;
 }
 
 export function mockEnvironment() {
-  const mywindow: any = window;
-  if (!mywindow.mockEnvironment) {
+  if (!window.mockEnvironment) {
     throw new Error("Missing mock environment");
   }
-  return mywindow.mockEnvironment;
+  return window.mockEnvironment;
 }
 
 export function skipTelemetry() {

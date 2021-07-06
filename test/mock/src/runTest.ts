@@ -1,21 +1,23 @@
-const playwright = require("@recordreplay/playwright");
-const fs = require("fs");
-require("dotenv").config();
+import playwright, { Page } from "@recordreplay/playwright";
+import dotenv from "dotenv";
 
-let browserName = process.env.PLAYWRIGHT_CHROMIUM ? "chromium" : "firefox";
+dotenv.config();
+
+type BrowserName = "chromium" | "firefox";
+let browserName: BrowserName = process.env.PLAYWRIGHT_CHROMIUM ? "chromium" : "firefox";
 const launchOptions = {
   headless: !!process.env.PLAYWRIGHT_HEADLESS,
 };
 
 let depth = 0;
 const pad = () => "".padStart(depth * 2);
-const indent = (value) =>
+const indent = (value: any) =>
   String(value)
     .split("\n")
-    .map((l) => pad() + l)
+    .map(l => pad() + l)
     .join("\n");
 
-const log = (...args) => {
+const log = (...args: any[]) => {
   if (depth) {
     console.log(pad().substr(1), ...args);
   } else {
@@ -23,9 +25,9 @@ const log = (...args) => {
   }
 };
 
-function wrapped(cbk, pageLog = log, inline = false) {
+function wrapped<T>(cbk: (...args: any[]) => Promise<T>, pageLog = log, inline = false) {
   const i = inline ? 0 : 1;
-  return async (name, ...args) => {
+  return async (name: string, ...args: any[]) => {
     try {
       await pageLog(inline ? name : `> ${name}`);
       depth += i;
@@ -45,23 +47,19 @@ function wrapped(cbk, pageLog = log, inline = false) {
   };
 }
 
-function bindPageActions(page) {
-  const actions = {};
+function bindPageActions(page: Page) {
+  const actions: any = {};
 
   // Create page-bound actions
-  const pageLog = (...args) => {
+  const pageLog = (...args: any[]) => {
     log(...args);
-    return page.evaluate((extArgs) => {
+    return page.evaluate((extArgs: any) => {
       console.log("Test Step:", ...extArgs);
     }, args);
   };
 
-  const pageAction = wrapped(async (cbk) => await cbk(page, actions), pageLog);
-  const pageStep = wrapped(
-    async (cbk) => await cbk(page, actions),
-    pageLog,
-    true
-  );
+  const pageAction = wrapped(async cbk => await cbk(page, actions), pageLog);
+  const pageStep = wrapped(async cbk => await cbk(page, actions), pageLog, true);
 
   actions.log = pageLog;
   actions.action = pageAction;
@@ -70,24 +68,25 @@ function bindPageActions(page) {
   return actions;
 }
 
-const action = wrapped(async (cbk) => await cbk());
+const action = wrapped(async cbk => await cbk());
 
-const runTest = wrapped(async (cbk) => {
+export const runTest = wrapped(async cbk => {
   const browser = await playwright[browserName].launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
-  const startTime = new Date();
-  const pageLog = (...args) => {
+  const pageLog = (...args: string[]) => {
     log(...args);
-    page.evaluate((extArgs) => {
-      console.log("Test Step:", ...extArgs);
-    }, args).catch(e => {});
+    page
+      .evaluate(extArgs => {
+        console.log("Test Step:", ...extArgs);
+      }, args)
+      .catch(e => {});
   };
 
   pageLog("Browser launched");
   let success = true;
 
-  page.on("console", console.log);
+  // page.on("console", console.log);
 
   await action("Running example", async () => {
     try {
@@ -108,12 +107,10 @@ const runTest = wrapped(async (cbk) => {
   await browser.close();
 });
 
-function devtoolsURL({ id }) {
+export function devtoolsURL({ id }: { id: string }) {
   let url = "http://localhost:8080/view?mock=1";
   if (id) {
     url += `&id=${id}`;
   }
   return url;
 }
-
-module.exports = { runTest, devtoolsURL };

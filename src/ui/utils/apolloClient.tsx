@@ -32,7 +32,7 @@ export function ApolloWrapper({
     useEffect(() => {
       async function waitForMocks() {
         const mockEnvironment = await waitForMockEnvironment();
-        setMocks(mockEnvironment.graphqlMocks);
+        setMocks(mockEnvironment!.graphqlMocks);
       }
       waitForMocks();
     }, []);

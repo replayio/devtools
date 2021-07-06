@@ -1,13 +1,14 @@
 // Test getting a session error on startup.
 
-const { runTest, devtoolsURL } = require("../src/runTest");
-const { installMockEnvironment } = require("../src/mockEnvironment");
-const { v4: uuid } = require("uuid");
-const {
+import { runTest, devtoolsURL } from "../src/runTest";
+import { installMockEnvironment } from "../src/mockEnvironment";
+import { v4 as uuid } from "uuid";
+import {
   createRecordingIsInitializedMock,
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
-} = require("../src/graphql");
+} from "../src/graphql";
+import { Page } from "@recordreplay/playwright";
 
 const recordingId = uuid();
 const userId = uuid();
@@ -18,7 +19,7 @@ const graphqlMocks = [
 ];
 
 // Test that getting a session error while loading a replay shows an appropriate error.
-runTest("sessionError", async page => {
+runTest("sessionError", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
   await installMockEnvironment(page, { sessionError: true, graphqlMocks });
   await page.textContent("text=Unexpected session error");
