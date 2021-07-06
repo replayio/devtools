@@ -87,6 +87,8 @@ const runTest = wrapped(async (cbk) => {
   pageLog("Browser launched");
   let success = true;
 
+  page.on("console", console.log);
+
   await action("Running example", async () => {
     try {
       await cbk(page, bindPageActions(page));

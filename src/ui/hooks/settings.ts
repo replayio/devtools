@@ -4,23 +4,7 @@ import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { UserSettings } from "../types";
-import { isMock, waitForMockEnvironment } from "ui/utils/environment";
-
-const GET_USER_SETTINGS = gql`
-  query GetUserSettings {
-    viewer {
-      settings {
-        showElements
-        showReact
-        enableTeams
-        enableRepaint
-      }
-      defaultWorkspace {
-        id
-      }
-    }
-  }
-`;
+import { GET_USER_SETTINGS } from "ui/graphql/settings";
 
 const emptySettings: UserSettings = {
   showElements: false,
@@ -39,10 +23,6 @@ const testSettings: UserSettings = {
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
-  if (isMock()) {
-    return waitForMockEnvironment().then(env => env.database.getUserSettings());
-  }
-
   const result = await query({ query: GET_USER_SETTINGS, variables: {} });
 
   if (isTest()) {

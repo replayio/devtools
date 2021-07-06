@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
 import {
@@ -9,13 +9,12 @@ import {
   from,
   HttpLink,
 } from "@apollo/client";
+import { MockedProvider } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
-import { isTest } from "ui/utils/environment";
+import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
-import { BlankLoadingScreen } from "ui/components/shared/BlankScreen";
-import { isMock } from "ui/utils/environment";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -27,6 +26,31 @@ export function ApolloWrapper({
   children: ReactNode;
 }) {
   const { loading, token, error } = useToken();
+
+  if (isMock()) {
+    const [mocks, setMocks] = useState<any>();
+    useEffect(() => {
+      async function waitForMocks() {
+        const mockEnvironment = await waitForMockEnvironment();
+        setMocks(mockEnvironment.graphqlMocks);
+      }
+      waitForMocks();
+    }, []);
+
+    if (!mocks) {
+      return null;
+    }
+
+    return (
+      <MockedProvider
+        mocks={mocks}
+        cache={createApolloCache()}
+        ref={mockRef => clientWaiter.resolve(mockRef!.state.client)}
+      >
+        <>{children}</>
+      </MockedProvider>
+    );
+  }
 
   if (!isTest() && loading) {
     return null;
@@ -46,10 +70,6 @@ export function ApolloWrapper({
 }
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
-  if (isMock()) {
-    throw new Error("Apollo query during mock test");
-  }
-
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.query({ variables, query });
 }
@@ -61,10 +81,6 @@ export async function mutate({
   variables: any;
   mutation: DocumentNode;
 }) {
-  if (isMock()) {
-    throw new Error("Apollo mutate during mock test");
-  }
-
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.mutate({ variables, mutation });
 }
@@ -81,28 +97,7 @@ export function createApolloClient(token: string | undefined, recordingId: strin
   });
 
   const options: any = {
-    cache: new InMemoryCache({
-      typePolicies: {
-        AuthenticatedUser: {
-          keyFields: [],
-        },
-        Recording: {
-          keyFields: ["uuid"],
-          fields: {
-            comments: {
-              merge: false,
-            },
-          },
-        },
-        Comment: {
-          fields: {
-            replies: {
-              merge: false,
-            },
-          },
-        },
-      },
-    }),
+    cache: createApolloCache(),
     link: from([retryLink, errorLink, httpLink]),
   };
 
@@ -110,6 +105,31 @@ export function createApolloClient(token: string | undefined, recordingId: strin
   clientWaiter.resolve(apolloClient);
 
   return apolloClient;
+}
+
+function createApolloCache() {
+  return new InMemoryCache({
+    typePolicies: {
+      AuthenticatedUser: {
+        keyFields: [],
+      },
+      Recording: {
+        keyFields: ["uuid"],
+        fields: {
+          comments: {
+            merge: false,
+          },
+        },
+      },
+      Comment: {
+        fields: {
+          replies: {
+            merge: false,
+          },
+        },
+      },
+    },
+  });
 }
 
 function createHttpLink(token: string | undefined, recordingId: string | undefined) {
