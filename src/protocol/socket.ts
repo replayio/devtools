@@ -49,7 +49,7 @@ window.addEventListener("beforeunload", () => {
 export function initSocket(store: UIStore, address?: string) {
   if (isMock()) {
     waitForMockEnvironment().then(env => {
-      env.setOnSocketMessage(onSocketMessage);
+      env!.setOnSocketMessage(onSocketMessage as any);
       onSocketOpen();
     });
     return;

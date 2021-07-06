@@ -1,14 +1,15 @@
 // Test loading an invalid or unauthorized recording ID.
 
-const { runTest, devtoolsURL } = require("../src/runTest");
-const { installMockEnvironment } = require("../src/mockEnvironment");
-const { v4: uuid } = require("uuid");
-const {
+import { runTest, devtoolsURL } from "../src/runTest";
+import { installMockEnvironment } from "../src/mockEnvironment";
+import { v4 as uuid } from "uuid";
+import {
   createRecordingIsInitializedMock,
   createRecordingOwnerUserIdMock,
   createGetRecordingMock,
   createUserSettingsMock,
-} = require("../src/graphql");
+} from "../src/graphql";
+import { Page } from "@recordreplay/playwright";
 
 /*
 // Test that using a recording ID that isn't a valid UUID shows an appropriate error.
@@ -28,8 +29,8 @@ const graphqlMocks = [
 ];
 
 // Test that getting an invalid recording ID error from the backend shows an appropriate error.
-runTest("invalidRecordingID", async page => {
+runTest("invalidRecordingID", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { unknownRecording: true, graphqlMocks });
+  await installMockEnvironment(page, { graphqlMocks });
   await page.textContent("text=You don't have permission to view this replay");
 });

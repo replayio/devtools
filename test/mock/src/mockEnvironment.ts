@@ -1,20 +1,40 @@
 // Handling for the mockEnvironment property which is installed on the window object in mock tests.
 
+import { MockedResponse } from "@apollo/client/testing";
+import { Page } from "@recordreplay/playwright";
+import type { MockEnvironment } from "ui/utils/environment";
+
+declare global {
+  interface Window {
+    mockEnvironment?: MockEnvironment;
+  }
+}
+
+export interface MockOptions {
+  graphqlMocks: MockedResponse[];
+  sessionError?: boolean;
+}
+
+interface Error {
+  code: number;
+  message: string;
+}
+
 // This script runs within the browser process.
-function doInstall(options) {
-  const Errors = {
+function doInstall(options: MockOptions) {
+  const Errors: Record<string, Error> = {
     MissingDescription: { code: 28, message: "No description added for recording" },
   };
 
-  function makeResult(result) {
+  function makeResult(result: any) {
     return { result };
   }
 
-  function makeError(error) {
+  function makeError(error: Error) {
     return { error };
   }
 
-  const messageHandlers = {
+  const messageHandlers: Record<string, (arg?: any) => any> = {
     "Recording.getDescription": () => makeError(Errors.MissingDescription),
     "Recording.createSession": () => {
       const sessionId = "mock-test-session";
@@ -31,19 +51,19 @@ function doInstall(options) {
     },
   };
 
-  let receiveMessageCallback;
+  let receiveMessageCallback: (arg: { data: string }) => unknown;
 
-  function emitEvent(method, params) {
+  function emitEvent(method: string, params: any) {
     const event = { method, params };
     receiveMessageCallback({ data: JSON.stringify(event) });
   }
 
   window.mockEnvironment = {
     graphqlMocks: options.graphqlMocks,
-    setOnSocketMessage(callback) {
+    setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
       receiveMessageCallback = callback;
     },
-    async sendSocketMessage(str) {
+    async sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
       if (!messageHandlers[msg.method]) {
         console.error(`Missing mock message handler for ${msg.method}`);
@@ -56,8 +76,6 @@ function doInstall(options) {
   };
 }
 
-function installMockEnvironment(page, options = {}) {
-  page.evaluate(doInstall, options);
+export function installMockEnvironment(page: Page, options: MockOptions = { graphqlMocks: [] }) {
+  page.evaluate<void, MockOptions>(doInstall, options);
 }
-
-module.exports = { installMockEnvironment };
