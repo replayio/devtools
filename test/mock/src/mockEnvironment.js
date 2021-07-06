@@ -2,40 +2,6 @@
 
 // This script runs within the browser process.
 function doInstall(options) {
-  const database = {
-    isRecordingInitialized(recordingId) {
-      return !options.unknownRecording;
-    },
-    getRecordingOwnerUserId(recordingId) {
-      return null;
-    },
-    getUserSettings() {
-      return {
-        showElements: false,
-        showReact: false,
-        enableTeams: true,
-        enableRepaint: false,
-        defaultWorkspaceId: null,
-      };
-    },
-    useGetRecording(recordingId) {
-      if (options.unknownRecording) {
-        return { isAuthorized: false, loading: false };
-      }
-      return {
-        recording: {
-          id: recordingId,
-          url: "mock-test-url",
-          title: "mock-test-title",
-          private: false,
-          isInitialized: true,
-        },
-        isAuthorized: true,
-        loading: false,
-      };
-    },
-  };
-
   const Errors = {
     MissingDescription: { code: 28, message: "No description added for recording" },
   };
@@ -73,7 +39,7 @@ function doInstall(options) {
   }
 
   window.mockEnvironment = {
-    database,
+    graphqlMocks: options.graphqlMocks,
     setOnSocketMessage(callback) {
       receiveMessageCallback = callback;
     },
