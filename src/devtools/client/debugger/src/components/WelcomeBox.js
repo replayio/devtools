@@ -20,7 +20,7 @@ function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
             tabIndex="0"
             onClick={() => openQuickOpen()}
           >
-            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+P")}</span>
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+p")}</span>
             <span className="shortcutLabel">{"%S Go to file".substring(2)}</span>
           </p>
 
@@ -30,7 +30,7 @@ function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
             tabIndex="0"
             onClick={() => openQuickOpen("@", true)}
           >
-            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+O")}</span>
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+o")}</span>
             <span className="shortcutLabel">{"%S Search functions".substring(2)}</span>
           </p>
           <p
@@ -39,7 +39,7 @@ function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
             tabIndex="0"
             onClick={setActiveSearch.bind(null, "project")}
           >
-            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+Shift+F")}</span>
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+Shift+f")}</span>
             <span className="shortcutLabel">{"%S Find in files".substring(2)}</span>
           </p>
           <p

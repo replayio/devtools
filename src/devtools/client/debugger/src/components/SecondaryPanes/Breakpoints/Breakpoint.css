@@ -118,7 +118,7 @@
   font-size: 11px;
   margin-top: 1px;
   margin-right: 1em;
-  font-family: Menlo, Consolas, monospace;
+  font-family: var(--monospace-font-family);
   color: var(--blue-80);
 }
 

@@ -27,10 +27,6 @@
   font-size: 1.25em;
 }
 
-.shortcutKeys {
-  font-family: Courier;
-}
-
 .shortcutKey,
 .shortcutLabel {
   flex: 1;
@@ -49,7 +45,6 @@
   direction: ltr;
   text-align: right;
   padding-right: 10px;
-  font-family: var(--monospace-font-family);
   font-size: 14px;
   line-height: 18px;
   color: var(--theme-body-color);
