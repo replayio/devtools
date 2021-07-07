@@ -30,7 +30,7 @@
 }
 
 .breakpoint-panel .action {
-  color: var(--dark-blue);
+  color: var(--primaryAccent);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -181,7 +181,7 @@
 }
 
 .breakpoint-panel button.save {
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
   color: white;
 }
 

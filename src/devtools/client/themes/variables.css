@@ -43,9 +43,9 @@
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
 
-  --primary-accent: #1b7fe3;
-  --primary-accent-hover: #2569ad;
-  --primary-accent-light: #86bff9;
+  --primary-accent: #007aff;
+  --primary-accent-hover: #0067d7;
+  --primary-accent-light: #85bfff;
 
   --secondary-accent: #8330f4;
   --secondary-accent-stroke: #f9f5ff;

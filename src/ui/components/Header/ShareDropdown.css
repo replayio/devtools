@@ -30,7 +30,7 @@
 }
 
 #header .share .dropdown-container .row button {
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
   color: var(--theme-toolbar-background);
   padding: 8px 12px;
   line-height: 16px;
@@ -65,7 +65,7 @@
   display: flex;
   height: 32px;
   width: 100%;
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
   color: white;
   border-radius: 4px;
   animation: hop 300ms linear alternate 1;
@@ -95,8 +95,8 @@
 }
 
 #header .share .dropdown-container .row.privacy button.toggle.on {
-  border: 2px solid var(--dark-blue);
-  background: var(--dark-blue);
+  border: 2px solid var(--primaryAccent);
+  background: var(--primaryAccentHover);
 }
 
 #header .share .dropdown-container .row.privacy button.toggle.off {

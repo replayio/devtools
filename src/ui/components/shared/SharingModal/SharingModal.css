@@ -57,7 +57,7 @@
 }
 
 .sharing-modal .privacy-choice.selected {
-  background: var(--new-blue-50);
+  background: var(--primaryAccent);
 }
 
 .sharing-modal .privacy-choice .title {
