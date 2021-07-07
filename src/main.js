@@ -64,26 +64,29 @@ function PageSwitch() {
   useEffect(() => {
     async function importAndInitialize() {
       let imported;
-      if (recordingId) {
-        const recordingInitialized = await isRecordingInitialized(recordingId);
-        const ownerId = await getRecordingOwnerUserId(recordingId);
-        const userInfo = await getUserInfo();
+      const userInfo = await getUserInfo();
 
-        // Add a check to make sure the recording has an associated user ID.
-        // We skip the upload step if there's no associated user ID, which
-        // is the case for CI test recordings.
-        if (recordingInitialized === false && !test && ownerId) {
-          if (!features.termsOfService || userInfo?.acceptedTOSVersion >= minimumTOSVersion) {
+      if (features.termsOfService && userInfo?.acceptedTOSVersion < minimumTOSVersion) {
+        imported = await import("./accept-tos");
+      } else {
+        if (recordingId) {
+          const recordingInitialized = await isRecordingInitialized(recordingId);
+          const ownerId = await getRecordingOwnerUserId(recordingId);
+
+          // Add a check to make sure the recording has an associated user ID.
+          // We skip the upload step if there's no associated user ID, which
+          // is the case for CI test recordings.
+
+          if (recordingInitialized === false && !test && ownerId) {
             imported = await import("./upload");
           } else {
-            imported = await import("./accept-tos");
+            imported = await import("./app");
           }
         } else {
-          imported = await import("./app");
+          imported = await import("./library");
         }
-      } else {
-        imported = await import("./library");
       }
+
       const pageWithStore = await imported.initialize();
       setPageWithStore(pageWithStore);
     }
