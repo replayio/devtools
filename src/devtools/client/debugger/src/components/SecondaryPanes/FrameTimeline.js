@@ -23,11 +23,6 @@ function getBoundingClientRect(element) {
 
 class FrameTimeline extends Component {
   _timeline;
-  _marker;
-
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     scrubbing: false,
@@ -148,37 +143,10 @@ class FrameTimeline extends Component {
     return Math.floor((filteredPositions.length / framePositions.positions.length) * 100);
   }
 
-  renderMarker() {
-    return <div className="frame-timeline-marker" ref={r => (this._marker = r)} />;
-  }
-
-  renderProgress() {
-    const progress = this.getVisibleProgress();
-
-    return (
-      <div
-        className="frame-timeline-progress"
-        style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
-      />
-    );
-  }
-
-  renderTimeline() {
-    return (
-      <div
-        className="frame-timeline-bar"
-        onMouseDown={this.onMouseDown}
-        ref={r => (this._timeline = r)}
-      >
-        {this.renderProgress()}
-        {this.renderMarker()}
-      </div>
-    );
-  }
-
   render() {
     const { scrubbing } = this.state;
     const { framePositions } = this.props;
+    const progress = this.getVisibleProgress();
 
     if (!framePositions) {
       return null;
@@ -186,7 +154,16 @@ class FrameTimeline extends Component {
 
     return (
       <div className={classnames("frame-timeline-container", { scrubbing })}>
-        {this.renderTimeline()}
+        <div
+          className="frame-timeline-bar"
+          onMouseDown={this.onMouseDown}
+          ref={r => (this._timeline = r)}
+        >
+          <div
+            className="frame-timeline-progress"
+            style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
+          />
+        </div>
       </div>
     );
   }
