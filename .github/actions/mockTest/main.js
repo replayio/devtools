@@ -42,7 +42,8 @@ console.log(new Date(), "Installed devtools and started webpack build");
   );
   console.log("Done Initial Webpack build");
 
-  spawnChecked("node", [`${__devtools}/test/mock/run`], { stdio: "inherit" });
+  spawnChecked("node", [`${devtools}/test/mock/run`], { stdio: "inherit" });
+  process.exit(0);
 })().catch(err => {
   console.error(err);
   process.exit(1);
