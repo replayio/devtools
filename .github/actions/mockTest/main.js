@@ -5,8 +5,8 @@ const devtools = `${__dirname}/../../..`;
 
 console.log(new Date(), "Start");
 
-spawnChecked("npm", ["install"], { cwd: devtools, stdio: "inherit" });
-spawn("npm", ["start"], { cwd: devtools, stdio: "inherit" });
+spawnCheckedRetry("npm", ["install"], { cwd: devtools, stdio: "inherit" });
+const devServerProcess = spawn("npm", ["start"], { cwd: devtools, stdio: "inherit" });
 
 console.log(new Date(), "Installed devtools and started webpack build");
 
@@ -51,4 +51,16 @@ function spawnChecked(...args) {
   if (rv.status != 0 || rv.error) {
     throw new Error("Spawned process failed");
   }
+}
+
+function spawnCheckedRetry(...args) {
+  for (let i = 0; i < 5; i++) {
+    try {
+      spawnChecked(...args);
+      return;
+    } catch (e) {
+      console.error("Spawned process failed");
+    }
+  }
+  throw new Error("Spawned process failed repeatedly, giving up.");
 }
