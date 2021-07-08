@@ -141,8 +141,11 @@ function Library({
       setModal("team-member-onboarding");
     }
 
-    if (!isLinkedFromEmail && !hasTeamInvitationCode && !nags.includes(Nag.FIRST_REPLAY)) {
-      setModal("onboarding");
+    const showFirstReplayTutorial =
+      !nags.includes(Nag.FIRST_REPLAY_2) && window.__IS_RECORD_REPLAY_RUNTIME__;
+
+    if (!isLinkedFromEmail && !hasTeamInvitationCode() && showFirstReplayTutorial) {
+      setModal("first-replay");
     }
   }, []);
 
