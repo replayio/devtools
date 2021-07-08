@@ -7,15 +7,18 @@ import {
   createRecordingIsInitializedMock,
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
+  createGetUserMock,
 } from "../src/graphql";
 import { Page } from "@recordreplay/playwright";
 
 const recordingId = uuid();
 const userId = uuid();
+const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   createUserSettingsMock(),
   createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
-  createRecordingOwnerUserIdMock({ recordingId, user: { id: userId, uuid: userId } }),
+  createRecordingOwnerUserIdMock({ recordingId, user }),
+  createGetUserMock({ user }),
 ];
 
 // Test that getting a session error while loading a replay shows an appropriate error.

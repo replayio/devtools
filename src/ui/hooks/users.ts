@@ -1,5 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
+import { GET_USER_INFO } from "ui/graphql/users";
 
 export const GET_USER_ID = gql`
   query GetUserId {
@@ -7,20 +8,6 @@ export const GET_USER_ID = gql`
       user {
         id
       }
-    }
-  }
-`;
-
-const GET_USER_INFO = gql`
-  query GetUser {
-    viewer {
-      user {
-        id
-      }
-      email
-      internal
-      nags
-      acceptedTOSVersion
     }
   }
 `;

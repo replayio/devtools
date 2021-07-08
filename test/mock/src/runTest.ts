@@ -105,6 +105,8 @@ export const runTest = wrapped(async cbk => {
   await page.close();
   await context.close();
   await browser.close();
+
+  process.exit(success ? 0 : 1);
 });
 
 export function devtoolsURL({ id }: { id: string }) {

@@ -63,15 +63,15 @@ function doInstall(options: MockOptions) {
     setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
       receiveMessageCallback = callback;
     },
-    async sendSocketMessage(str: string) {
+    sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
       if (!messageHandlers[msg.method]) {
         console.error(`Missing mock message handler for ${msg.method}`);
         return new Promise(resolve => {});
       }
-      const { result, error } = await messageHandlers[msg.method](msg.params);
+      const { result, error } = messageHandlers[msg.method](msg.params);
       const response = { id: msg.id, result, error };
-      receiveMessageCallback({ data: JSON.stringify(response) });
+      setTimeout(() => receiveMessageCallback({ data: JSON.stringify(response) }), 0);
     },
   };
 }

@@ -8,6 +8,7 @@ import {
   createRecordingOwnerUserIdMock,
   createGetRecordingMock,
   createUserSettingsMock,
+  createGetUserMock,
 } from "../src/graphql";
 import { Page } from "@recordreplay/playwright";
 
@@ -21,11 +22,13 @@ runTest("notUUID", async page => {
 
 const recordingId = uuid();
 const userId = uuid();
+const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   createUserSettingsMock(),
   createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
-  createRecordingOwnerUserIdMock({ recordingId, user: { id: userId, uuid: userId } }),
+  createRecordingOwnerUserIdMock({ recordingId, user }),
   createGetRecordingMock({ recordingId }),
+  createGetUserMock({ user }),
 ];
 
 // Test that getting an invalid recording ID error from the backend shows an appropriate error.
