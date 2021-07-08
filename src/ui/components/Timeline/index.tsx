@@ -258,6 +258,32 @@ class Timeline extends Component<PropsFromRedux> {
     );
   }
 
+  renderUnloadedRegions() {
+    const { loadedRegions, zoomRegion } = this.props;
+
+    if (!loadedRegions) {
+      return null;
+    }
+
+    const { begin, end } = loadedRegions[0];
+    const { endTime } = zoomRegion;
+    const loadedRegionStart = getVisiblePosition({ time: begin, zoom: zoomRegion }) * 100;
+    const loadedRegionEnd = getVisiblePosition({ time: endTime - end, zoom: zoomRegion }) * 100;
+
+    return (
+      <>
+        <div
+          className="unloaded-regions start"
+          style={{ width: `${clamp(loadedRegionStart, 0, 100)}%` }}
+        />
+        <div
+          className="unloaded-regions end"
+          style={{ width: `${clamp(loadedRegionEnd, 0, 100)}%` }}
+        />
+      </>
+    );
+  }
+
   render() {
     const {
       zoomRegion,
@@ -269,6 +295,7 @@ class Timeline extends Component<PropsFromRedux> {
       viewMode,
       selectedPanel,
       recordingDuration,
+      loadedRegions,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
@@ -296,6 +323,7 @@ class Timeline extends Component<PropsFromRedux> {
               style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
+            {this.renderUnloadedRegions()}
             {this.isHovering() && percent >= 0 && percent <= 100 ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
@@ -319,6 +347,7 @@ class Timeline extends Component<PropsFromRedux> {
 
 const connector = connect(
   (state: UIState) => ({
+    loadedRegions: selectors.getLoadedRegions(state)?.loaded,
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
