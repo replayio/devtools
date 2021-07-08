@@ -1,0 +1,6 @@
+name: "Mock Test"
+description: "Run mock tests"
+
+runs:
+  using: "node12"
+  main: "./main.js"

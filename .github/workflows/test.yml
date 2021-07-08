@@ -148,3 +148,10 @@ jobs:
       - uses: ./.github/actions/test
         with:
           stripe: 7/8
+  mock-test:
+    name: Mock Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+     - uses: actions/checkout@v2
+     - uses: ./.github/actions/mockTest

@@ -2,16 +2,18 @@ const { spawnSync } = require("child_process");
 const manifest = require("./manifest");
 const { listAllRecordings, uploadRecording } = require("@recordreplay/recordings-cli");
 
+const devtools = `${__dirname}/../..`;
+
 async function main() {
   let allPassed = true;
   for (const script of manifest) {
     console.log(`Starting test ${script}`);
     const rv = spawnSync(
-      "ts-node",
+      `${devtools}/node_modules/.bin/ts-node`,
       ["-r", "tsconfig-paths/register", `test/mock/scripts/${script}`],
       {
         stdio: "inherit",
-        cwd: `${__dirname}/../..`,
+        cwd: devtools,
         env: {
           ...process.env,
           PLAYWRIGHT_HEADLESS: "1",
@@ -33,6 +35,7 @@ async function main() {
       allPassed = false;
     }
   }
+  console.log(allPassed ? "All tests passed." : "Had test failures.");
   process.exit(allPassed ? 0 : 1);
 }
 
