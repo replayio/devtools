@@ -6,7 +6,7 @@ export default function TextInput({
   onChange,
   id,
 }: {
-  placeholder: string;
+  placeholder?: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   id?: string;
