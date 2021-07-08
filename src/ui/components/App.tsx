@@ -29,6 +29,7 @@ import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
 import { useApolloClient } from "@apollo/client";
 import BlankScreen from "./shared/BlankScreen";
 import { setUnexpectedError } from "ui/actions/session";
+import FirstReplayModal from "./shared/FirstReplayModal";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -59,6 +60,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "browser-launch": {
       return <LaunchBrowserModal />;
+    }
+    case "first-replay": {
+      return <FirstReplayModal />;
     }
     default: {
       return null;

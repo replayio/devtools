@@ -28,6 +28,7 @@ export type UserInfo = {
 
 export enum Nag {
   FIRST_REPLAY = "first_replay",
+  FIRST_REPLAY_2 = "first_replay_2",
 }
 
 export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefined> {

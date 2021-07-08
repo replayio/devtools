@@ -2,10 +2,9 @@ import React, { useRef, useState } from "react";
 import "./ReplayLink.css";
 import { RecordingId } from "@recordreplay/protocol";
 
-export default function ReplayLink({ recordingId }: { recordingId: RecordingId }) {
+export function UrlCopy({ url }: { url: string }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const url = `https://app.replay.io/?id=${recordingId}`;
 
   const onClick = () => {
     navigator.clipboard.writeText(url);
@@ -34,4 +33,8 @@ export default function ReplayLink({ recordingId }: { recordingId: RecordingId }
       ) : null}
     </div>
   );
+}
+
+export default function ReplayLink({ recordingId }: { recordingId: RecordingId }) {
+  return <UrlCopy url={`https://app.replay.io/?id=${recordingId}`} />;
 }
