@@ -36,7 +36,7 @@ function ModalButton({
       disabled={disabled}
       className={classNames(
         className,
-        "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-blue-600 hover:bg-blue-700"
+        "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {children}
@@ -104,7 +104,7 @@ function NextButton({
       className={classNames(
         "items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent",
         {
-          "text-white bg-blue-600 hover:bg-blue-700": current < total,
+          "text-white bg-primaryAccent hover:bg-primaryAccentHover": current < total,
         }
       )}
     >
@@ -149,11 +149,11 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
 
   return (
     <>
-      <SlideContent headerText="Your team name">
-        <div className="text-xl">{`To start, what would you like your team's name to be?`}</div>
+      <SlideContent headerText="Team name">
+        <div className="text-xl">{`Please name your team`}</div>
         {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
         <div className="py-4 flex flex-col">
-          <TextInput placeholder="Team name" value={inputValue} onChange={onChange} />
+          <TextInput value={inputValue} onChange={onChange} />
         </div>
         {/* </form> */}
       </SlideContent>
@@ -259,7 +259,7 @@ function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props
           onClick={onClick}
           className={classNames(
             "items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent",
-            "text-white bg-blue-600 hover:bg-blue-700"
+            "text-white bg-primaryAccent hover:bg-primaryAccentHover"
           )}
         >
           {`Take me to my team`}

@@ -183,12 +183,12 @@
   font-size: 1rem;
   margin-left: 8px;
   visibility: hidden;
-  color: var(--dark-blue);
+  color: var(--primaryAccent);
   cursor: pointer;
 }
 
 .recording-list .recording-item .item-title-label-actions button .img {
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
   margin-right: 4px;
 }
 
@@ -199,7 +199,7 @@
 
 .recording-list .recording-item .item-title-label-actions button:hover,
 .recording-list .recording-item .item-title-label-actions button.clicked {
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
   color: white;
 }
 

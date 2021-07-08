@@ -32,13 +32,13 @@
   align-items: center;
   cursor: pointer;
   line-height: 16px;
-  border: 1px solid var(--dark-blue);
-  color: var(--dark-blue);
+  border: 1px solid var(--primaryAccent);
+  color: var(--primaryAccent);
 }
 
 .dashboard-viewer-header-actions .batch-action .img {
   margin-right: 4px;
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
 }
 
 .dashboard-viewer-header-actions .batch-action.disabled {
@@ -62,12 +62,12 @@
   align-items: center;
   cursor: pointer;
   line-height: 16px;
-  border: 1px solid var(--dark-blue);
-  color: var(--dark-blue);
+  border: 1px solid var(--primaryAccent);
+  color: var(--primaryAccentHover);
   margin-right: 12px;
 }
 
 .editing .dashboard-viewer-header-actions button.toggle-editing {
   color: white;
-  background-color: var(--dark-blue);
+  background-color: var(--primaryAccentHover);
 }

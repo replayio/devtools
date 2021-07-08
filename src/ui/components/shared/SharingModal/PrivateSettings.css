@@ -1,9 +1,8 @@
 .sharing-modal .private-settings {
   background: var(--theme-body-background);
-  padding: 40px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  font-size: 14px;
   border-left: 1px solid var(--cool-gray-300);
 }
 

@@ -122,7 +122,7 @@
 
 .error-content button:hover {
   box-shadow: 0px 0px 5px 0px var(--light-grey);
-  background-color: var(--dark-blue);
+  background-color: var(--primaryAccentHover);
 }
 
 .error-content button.clicked {

@@ -65,7 +65,7 @@
 }
 
 .sharing-modal .permission button.delete:hover {
-  background: var(--dark-blue);
+  background: var(--primaryAccentHover);
 }
 
 .sharing-modal .permission button.delete .img {

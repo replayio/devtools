@@ -27,10 +27,9 @@
 
 .sharing-modal .sharing-modal-content {
   background: var(--theme-body-background);
-  padding: 40px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  font-size: 14px;
 }
 
 .sharing-modal .sharing-modal-content > :not(:first-child) {
@@ -57,7 +56,7 @@
 }
 
 .sharing-modal .privacy-choice.selected {
-  background: var(--new-blue-50);
+  background: var(--primaryAccent);
 }
 
 .sharing-modal .privacy-choice .title {
