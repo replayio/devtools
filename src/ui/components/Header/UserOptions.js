@@ -78,7 +78,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }) {
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
             <button className="row" onClick={onLaunchClick}>
-              <MaterialIcon>download</MaterialIcon>
+              <MaterialIcon>launch</MaterialIcon>
               <span>Launch Replay</span>
             </button>
           )
