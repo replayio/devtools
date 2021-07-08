@@ -66,7 +66,11 @@ function PageSwitch() {
       let imported;
       const userInfo = await getUserInfo();
 
-      if (features.termsOfService && userInfo?.acceptedTOSVersion < minimumTOSVersion) {
+      if (
+        features.termsOfService &&
+        userInfo &&
+        (userInfo.acceptedTOSVersion || 0) < minimumTOSVersion
+      ) {
         imported = await import("./accept-tos");
       } else {
         if (recordingId) {
