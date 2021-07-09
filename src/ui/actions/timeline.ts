@@ -21,7 +21,7 @@ import { PauseEventArgs } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
-const { features } = require("ui/utils/prefs");
+import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { isRepaintEnabled } from "protocol/enable-repaint";
@@ -463,7 +463,7 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
   return ({ dispatch, getState }) => {
     const { target } = hoveredItem;
 
-    const hoverEnabledForTarget = features[`${target}Hover`];
+    const hoverEnabledForTarget = (features as any)[`${target}Hover`];
     if (!hoverEnabledForTarget) {
       return;
     }

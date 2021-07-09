@@ -1,6 +1,6 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-const Modal = require("ui/components/shared/Modal").default;
+import Modal from "ui/components/shared/Modal";
 import ReplayLink from "./ReplayLink";
 import hooks from "ui/hooks";
 

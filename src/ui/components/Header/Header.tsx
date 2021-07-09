@@ -1,22 +1,24 @@
 import React, { useRef, useState } from "react";
 
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import Avatar from "ui/components/Avatar";
 import { useGetActiveSessions } from "ui/hooks/sessions";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
-import { prefs } from "ui/utils/prefs";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
+import { RecordingId } from "@recordreplay/protocol";
+import { Recording } from "ui/types";
+import { UIState } from "ui/state";
 
 import "./Header.css";
 
-function Avatars({ recordingId }) {
-  const { users, loading, error } = useGetActiveSessions(recordingId);
+function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
+  const { users, loading, error } = useGetActiveSessions(recordingId || "00000000-0000-0000-0000-000000000000");
 
   if (loading || error) {
     return null;
@@ -24,14 +26,14 @@ function Avatars({ recordingId }) {
 
   return (
     <div className="avatars">
-      {users.map((player, i) => (
+      {users!.map((player, i) => (
         <Avatar player={player} isFirstPlayer={false} key={i} index={i} />
       ))}
     </div>
   );
 }
 
-function Links({ recordingId, sessionId, recordingTarget }) {
+function Links({ recordingId, recordingTarget }: Pick<PropsFromRedux, "recordingId" | "recordingTarget">) {
   const { isAuthenticated } = useAuth0();
   const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
   const isCollaborator =
@@ -42,7 +44,7 @@ function Links({ recordingId, sessionId, recordingTarget }) {
   return (
     <div className="links">
       {showShare ? <ShareButton /> : null}
-      <Avatars recordingId={recordingId} sessionId={sessionId} />
+      <Avatars recordingId={recordingId} />
       {recordingTarget != "node" && <ViewToggle />}
       <UserOptions />
     </div>
@@ -52,9 +54,9 @@ function Links({ recordingId, sessionId, recordingTarget }) {
 // This is a workaround for getting an automatically-resizing horizontal text input
 // so that switching between the editing and non-editing states is smoonth.
 // https://stackoverflow.com/questions/45306325/react-contenteditable-and-cursor-position
-function HeaderTitle({ recording, recordingId }) {
+function HeaderTitle({ recording, recordingId }: { recording: Recording; recordingId: RecordingId }) {
   const [inputValue, setInputValue] = useState(recording.title);
-  const inputNode = useRef(null);
+  const inputNode = useRef<HTMLSpanElement>(null);
   const { userId } = hooks.useGetUserId();
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const isAuthor = userId && userId == recording.userId;
@@ -67,14 +69,14 @@ function HeaderTitle({ recording, recordingId }) {
     );
   }
 
-  const onKeyPress = e => {
+  const onKeyPress: React.KeyboardEventHandler = (e: any) => {
     if (e.code == "Enter" || e.code == "Escape") {
       e.preventDefault();
-      inputNode.current.blur();
+      inputNode.current!.blur();
     }
   };
   const onBlur = () => {
-    const currentValue = inputNode.current.innerHTML;
+    const currentValue = inputNode.current!.innerHTML;
 
     updateRecordingTitle({ variables: { recordingId, title: currentValue } });
     setInputValue(currentValue);
@@ -95,17 +97,17 @@ function HeaderTitle({ recording, recordingId }) {
   );
 }
 
-function Header({ recordingId, sessionId, recordingTarget }) {
+function Header({ recordingId, sessionId, recordingTarget }: PropsFromRedux) {
   const { isAuthenticated } = useAuth0();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
   const dashboardUrl = window.location.origin;
 
-  const onNavigateBack = event => {
+  const onNavigateBack: React.MouseEventHandler = event => {
     if (event.metaKey) {
       return window.open(dashboardUrl);
     }
-    window.location = dashboardUrl;
+    (window as any).location = dashboardUrl;
   };
 
   if (loading) {
@@ -128,13 +130,16 @@ function Header({ recordingId, sessionId, recordingTarget }) {
           <div className="title">Recordings</div>
         )}
       </div>
-      <Links recordingId={recordingId} sessionId={sessionId} recordingTarget={recordingTarget} />
+      <Links recordingId={recordingId} recordingTarget={recordingTarget} />
     </div>
   );
 }
 
-export default connect(state => ({
+const connector = connect((state: UIState) => ({
   recordingId: selectors.getRecordingId(state),
   sessionId: selectors.getSessionId(state),
   recordingTarget: selectors.getRecordingTarget(state),
-}))(Header);
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(Header);

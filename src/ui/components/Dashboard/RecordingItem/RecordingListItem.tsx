@@ -8,17 +8,19 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import hooks from "ui/hooks";
 import { ChatAltIcon } from "@heroicons/react/outline";
 import "./RecordingListItem.css";
+import { RecordingItemProps } from "./RecordingItem";
+import { RecordingId } from "@recordreplay/protocol";
 
-function getDurationString(durationMs) {
+function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
   return `${seconds} sec`;
 }
 
-function CopyLinkButton({ recordingId }) {
+function CopyLinkButton({ recordingId }: { recordingId: RecordingId }) {
   const [clicked, setClicked] = useState(false);
   const linkUrl = `${window.location.origin}/?id=${recordingId}`;
 
-  const handleCopyClick = e => {
+  const handleCopyClick: React.MouseEventHandler = e => {
     e.stopPropagation();
     setClicked(true);
     navigator.clipboard.writeText(linkUrl);
@@ -33,7 +35,7 @@ function CopyLinkButton({ recordingId }) {
   );
 }
 
-function ItemOptions({ Panel }) {
+function ItemOptions({ Panel }: { Panel: React.ReactNode }) {
   return (
     <div className="more" onClick={e => e.stopPropagation()}>
       <Dropdown
@@ -45,7 +47,12 @@ function ItemOptions({ Panel }) {
   );
 }
 
-function ItemPrivacy({ isPrivate, toggleIsPrivate }) {
+interface ItemPrivacyProps {
+  isPrivate: boolean;
+  toggleIsPrivate(): void;
+}
+
+function ItemPrivacy({ isPrivate, toggleIsPrivate }: ItemPrivacyProps) {
   return (
     <div className="permissions" onClick={toggleIsPrivate}>
       {isPrivate ? "Private" : "Public"}
@@ -53,7 +60,7 @@ function ItemPrivacy({ isPrivate, toggleIsPrivate }) {
   );
 }
 
-function ItemCreatedDate({ date }) {
+function ItemCreatedDate({ date }: { date: string }) {
   let content = formatDistanceToNow(new Date(date), { addSuffix: true });
 
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
@@ -66,11 +73,13 @@ function ItemCreatedDate({ date }) {
   return <div className="secondary">{content}</div>;
 }
 
-function ItemDuration({ duration }) {
+function ItemDuration({ duration }: { duration: number }) {
   return <div>{getDurationString(duration)}</div>;
 }
 
-function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUrl }) {
+type ItemTitleProps = Pick<RecordingListItemProps, "data" | "editing" | "editingTitle" | "setEditingTitle">;
+
+function ItemTitle({ data, editing, editingTitle, setEditingTitle }: ItemTitleProps) {
   return (
     <div className="item-title">
       <div className="item-title-label">
@@ -92,7 +101,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUr
   );
 }
 
-function ItemScreenshot({ recordingId }) {
+function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
     <div className="screenshot">
@@ -101,7 +110,12 @@ function ItemScreenshot({ recordingId }) {
   );
 }
 
-function ItemCheckbox({ toggleChecked, selected }) {
+interface ItemCheckboxProps {
+  toggleChecked(): void;
+  selected: boolean;
+}
+
+function ItemCheckbox({ toggleChecked, selected }: ItemCheckboxProps) {
   return (
     <input
       type="checkbox"
@@ -110,6 +124,14 @@ function ItemCheckbox({ toggleChecked, selected }) {
       checked={selected}
     />
   );
+}
+
+interface RecordingListItemProps extends RecordingItemProps {
+  Panel: React.ReactNode;
+  onNavigate(event: React.MouseEvent): void;
+  editingTitle: boolean;
+  setEditingTitle(editing: boolean): void;
+  toggleIsPrivate(): void;
 }
 
 export default function RecordingListItem({
@@ -123,7 +145,7 @@ export default function RecordingListItem({
   removeSelectedId,
   selected,
   editing,
-}) {
+}: RecordingListItemProps) {
   const { userId, loading } = hooks.useGetUserId();
   if (loading) {
     return null;
@@ -140,17 +162,12 @@ export default function RecordingListItem({
     }
   };
 
-  const handleClick = e => {
+  const handleClick: React.MouseEventHandler = e => {
     if (editing) {
       toggleChecked();
     } else {
       onNavigate(e);
     }
-  };
-
-  const handleClickUrl = e => {
-    e.stopPropagation();
-    window.open(data.url, "_blank");
   };
 
   return (
@@ -167,7 +184,6 @@ export default function RecordingListItem({
           editing={editing}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
-          handleClickUrl={handleClickUrl}
         />
       </td>
       <td>

@@ -7,7 +7,7 @@ import { UIStore, UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
-const { prefs } = require("ui/utils/prefs");
+import { prefs } from "ui/utils/prefs";
 import { getTest, isTest, isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 

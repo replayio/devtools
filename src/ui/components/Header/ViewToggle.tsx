@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import "./ViewToggle.css";
-import { setSelectedPrimaryPanel, setViewMode } from "../../actions/app";
+import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
 import { getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { isTest } from "ui/utils/environment";
+import { UIState } from "ui/state";
+import { ViewMode } from "ui/state/app";
 
-function Handle({ text, mode, localViewMode, handleToggle, motion }) {
+interface HandleProps {
+  text: string;
+  mode: ViewMode;
+  localViewMode: ViewMode;
+  handleToggle(mode: ViewMode): void;
+  motion: (typeof import("framer-motion"))["motion"];
+}
+
+function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps) {
   const isActive = mode == localViewMode;
 
   const onClick = () => {
@@ -37,13 +47,13 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }) {
   );
 }
 
-function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPanel }) {
+function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPanel }: PropsFromRedux) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
-  const [framerMotion, setFramerMotion] = useState(null);
+  const [framerMotion, setFramerMotion] = useState<typeof import("framer-motion") | null>(null);
   const [localViewMode, setLocalViewMode] = useState(viewMode);
-  const toggleTimeoutKey = useRef(null);
+  const toggleTimeoutKey = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
@@ -56,12 +66,12 @@ function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPane
 
   const { motion, AnimateSharedLayout } = framerMotion;
 
-  const handleToggle = mode => {
+  const handleToggle = (mode: ViewMode) => {
     setLocalViewMode(mode);
 
     // Delay updating the viewMode in redux so that the toggle can fully animate
     // before re-rendering all of devtools in the new viewMode.
-    clearTimeout(toggleTimeoutKey.current);
+    clearTimeout(toggleTimeoutKey.current!);
     toggleTimeoutKey.current = setTimeout(() => {
       if (mode === "non-dev") {
         setSelectedPrimaryPanel("comments");
@@ -70,9 +80,9 @@ function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPane
     }, 300);
   };
 
-  const shouldHide = isAuthor && !recording.isInitialized && !isTest();
+  const shouldHide = isAuthor && !recording?.isInitialized && !isTest();
 
-  if (loading | shouldHide) {
+  if (loading || shouldHide) {
     return null;
   }
 
@@ -100,8 +110,8 @@ function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPane
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     viewMode: getViewMode(state),
     recordingId: selectors.getRecordingId(state),
   }),
@@ -109,4 +119,7 @@ export default connect(
     setViewMode,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }
-)(ViewToggle);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(ViewToggle);

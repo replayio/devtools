@@ -3,8 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-
-const { features } = require("ui/utils/prefs");
+import { features } from "ui/utils/prefs";
 
 function ShareButton({ setModal, recordingId }: PropsFromRedux) {
   const onClick = () => setModal("browser-launch");

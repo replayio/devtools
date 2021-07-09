@@ -19,7 +19,6 @@ import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
-const { prefs } = require("ui/utils/prefs");
 
 function ModalButton({
   children,
@@ -277,7 +276,6 @@ function SlideBody4({ setWorkspaceId, hideModal, newWorkspace }: SlideBody4Props
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const onClick = () => {
-    prefs.defaultLibraryTeam = JSON.stringify(newWorkspace.id);
     window.history.pushState({}, document.title, window.location.pathname);
 
     setWorkspaceId(newWorkspace.id);

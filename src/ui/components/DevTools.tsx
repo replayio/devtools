@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "../hooks";
 
-const Header = require("./Header/index").default;
-const SkeletonLoader = require("./SkeletonLoader").default;
+import Header from "./Header/index";
+import SkeletonLoader from "./SkeletonLoader";
 const NonDevView = require("./Views/NonDevView").default;
 const DevView = require("./Views/DevView").default;
-const { prefs } = require("ui/utils/prefs");
 import { isTest } from "ui/utils/environment";
 
 import { actions } from "../actions";

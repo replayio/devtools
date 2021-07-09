@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-const DashboardViewer = require("./DashboardViewer").default;
-const Loader = require("../shared/Loader").default;
+import DashboardViewer from "./DashboardViewer";
+import Loader from "../shared/Loader";
 import * as selectors from "ui/reducers/app";
 
 import { UIState } from "ui/state";

@@ -14,9 +14,8 @@ import React from "react";
 import classnames from "classnames";
 import clamp from "lodash/clamp";
 
-import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
-const Comments = require("../Comments").default;
+import Comments from "../Comments";
 
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
@@ -26,7 +25,7 @@ import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 import EventMarker from "./EventMarker";
 
-const { getVisiblePosition, getFormattedTime } = require("ui/utils/timeline");
+import { getVisiblePosition, getFormattedTime } from "ui/utils/timeline";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Timeline.css";
@@ -34,7 +33,7 @@ import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 
-const { prefs, features } = require("ui/utils/prefs");
+import { prefs, features } from "ui/utils/prefs";
 
 function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
@@ -143,7 +142,7 @@ class Timeline extends Component<PropsFromRedux> {
       clearPendingComment,
       videoUrl,
     } = this.props;
-    const disabled = !videoUrl && features.videoPlayback;
+    const disabled = !videoUrl && features.videoPlayback as boolean;
     const replay = () => {
       if (disabled) return;
 
@@ -338,7 +337,7 @@ class Timeline extends Component<PropsFromRedux> {
         <div className="timeline-time">
           <span className="time-current">{getFormattedTime(currentTime)}</span>
           <span className="time-divider">/</span>
-          <span className="time-total">{getFormattedTime(recordingDuration)}</span>
+          <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
         </div>
       </div>
     );

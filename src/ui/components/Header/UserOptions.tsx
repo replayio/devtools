@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import hooks from "ui/hooks";
@@ -9,10 +9,14 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
+import { UIState } from "ui/state";
+import { features } from "ui/utils/prefs";
 
-const { features } = require("ui/utils/prefs");
+interface UserOptionsProps extends PropsFromRedux {
+  noBrowserItem?: boolean;
+}
 
-function UserOptions({ recordingId, setModal, noBrowserItem }) {
+function UserOptions({ recordingId, setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
@@ -30,7 +34,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }) {
     return <LoginButton />;
   }
 
-  const onDocsClick = () => {
+  const onDocsClick: React.MouseEventHandler = event => {
     const docsUrl = `https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02`;
 
     if (event.metaKey) {
@@ -38,7 +42,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }) {
     }
     window.open(docsUrl, "replaydocs");
   };
-  const onLaunchClick = () => {
+  const onLaunchClick: React.MouseEventHandler = event => {
     if (features.launchBrowser) {
       setModal("browser-launch");
     } else {
@@ -47,7 +51,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }) {
         return window.open(launchUrl);
       }
       // right now we just send you to the download screen, but eventually this will launch Replay
-      window.location = launchUrl;
+      (window as any).location = launchUrl;
     }
   };
   const onShareClick = () => {
@@ -94,6 +98,9 @@ function UserOptions({ recordingId, setModal, noBrowserItem }) {
   );
 }
 
-export default connect(state => ({ recordingId: selectors.getRecordingId(state) }), {
+const connector = connect((state: UIState) => ({ recordingId: selectors.getRecordingId(state)! }), {
   setModal: actions.setModal,
-})(UserOptions);
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(UserOptions);

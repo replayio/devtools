@@ -5,8 +5,8 @@ import "./Modal.css";
 
 interface ModalProps {
   hideModal(): any;
-  showClose: boolean;
-  children: React.ReactNode;
+  showClose?: boolean;
+  children?: React.ReactNode;
 }
 
 function Modal({ hideModal, children, showClose = true }: ModalProps) {

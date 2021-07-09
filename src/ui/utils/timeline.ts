@@ -21,7 +21,7 @@ export function getPixelDistance({
 
 // Get the position of a time on the visible part of the timeline,
 // in the range [0, 1] if the timeline is fully zommed out.
-export function getVisiblePosition({ time, zoom }: { time: number; zoom: ZoomRegion }) {
+export function getVisiblePosition({ time, zoom }: { time: number | null; zoom: ZoomRegion }) {
   if (!time) {
     return 0;
   }

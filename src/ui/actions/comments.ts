@@ -144,7 +144,9 @@ export function editItem(item: Comment | Reply): UIThunkAction {
   };
 }
 
-export function seekToComment(item: Comment | Reply | Event): UIThunkAction {
+export function seekToComment(
+  item: Comment | Reply | Event | PendingComment["comment"]
+): UIThunkAction {
   return ({ dispatch, getState }) => {
     dispatch(clearPendingComment());
 
