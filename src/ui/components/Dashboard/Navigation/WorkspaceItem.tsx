@@ -8,7 +8,6 @@ import { Workspace } from "ui/types";
 import { UserGroupIcon, UserIcon } from "@heroicons/react/solid";
 import classnames from "classnames";
 import hooks from "ui/hooks";
-const { prefs } = require("ui/utils/prefs");
 
 type WorkspaceItemProps = PropsFromRedux & {
   workspace: Workspace | { id: null; name: string; members: never[] };

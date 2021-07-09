@@ -2,14 +2,23 @@ import React, { useState } from "react";
 import hooks from "ui/hooks";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
+import { Recording } from "ui/types";
+import { RecordingId } from "@recordreplay/protocol";
 
+export interface RecordingItemProps {
+  data: Recording;
+  selected: boolean;
+  addSelectedId: (recordingId: RecordingId) => void;
+  removeSelectedId: (recordingId: RecordingId) => void;
+  editing: boolean;
+}
 export default function RecordingItem({
   data,
   selected,
   addSelectedId,
   removeSelectedId,
   editing,
-}) {
+}: RecordingItemProps) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.private);
   const updateIsPrivate = hooks.useUpdateIsPrivate();
@@ -18,7 +27,7 @@ export default function RecordingItem({
     setIsPrivate(!isPrivate);
     updateIsPrivate({ variables: { recordingId: data.id, isPrivate: !isPrivate } });
   };
-  const onNavigate = event => {
+  const onNavigate: React.MouseEventHandler = event => {
     let url = `/?id=${data.id}`;
     const isTesting = new URL(window.location.href).searchParams.get("e2etest");
 
@@ -29,7 +38,7 @@ export default function RecordingItem({
     if (event.metaKey) {
       return window.open(url);
     }
-    window.location = url;
+    (window as any).location = url;
   };
 
   const Panel = (

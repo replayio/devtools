@@ -4,7 +4,7 @@ import "./IconWithTooltip.css";
 interface IconWithTooltipProps {
   icon: React.ReactNode;
   content: string;
-  handleClick(): any;
+  handleClick: React.MouseEventHandler;
 }
 
 // This component is designed only for the primary toolbox icons (24x24) to the left

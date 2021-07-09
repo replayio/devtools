@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import classnames from "classnames";
-import Recording from "./RecordingItem/index";
+import RecordingItem from "./RecordingItem/index";
 import sortBy from "lodash/sortBy";
 import { isReplayBrowser } from "ui/utils/environment";
+import { Recording } from "ui/types";
+import { RecordingId } from "@recordreplay/protocol";
+import { AssociationFilter, TimeFilter } from "./DashboardViewer";
 
 function getErrorText() {
   if (isReplayBrowser()) {
@@ -51,6 +54,16 @@ function DownloadLinks() {
   );
 }
 
+interface DashboardViewerContentProps {
+  recordings: Recording[];
+  selectedIds: RecordingId[];
+  setSelectedIds(ids: RecordingId[]): void;
+  editing: boolean;
+  timeFilter: TimeFilter;
+  associationFilter: AssociationFilter;
+  searchString: string;
+}
+
 export default function DashboardViewerContent({
   recordings,
   selectedIds,
@@ -59,11 +72,11 @@ export default function DashboardViewerContent({
   timeFilter,
   associationFilter,
   searchString,
-}) {
+}: DashboardViewerContentProps) {
   const [ascOrder, setAscOrder] = useState(false);
   let sortedRecordings = sortBy(recordings, recording => {
     const order = ascOrder ? 1 : -1;
-    return order * new Date(recording.date);
+    return order * (new Date(recording.date)).getTime();
   });
 
   if (!recordings.length) {
@@ -97,6 +110,11 @@ export default function DashboardViewerContent({
   );
 }
 
+interface RecordingsListProps extends Pick<DashboardViewerContentProps, "recordings" | "selectedIds" | "setSelectedIds" | "editing"> {
+  ascOrder: boolean;
+  setAscOrder(ascOrder: boolean): void;
+}
+
 function RecordingsList({
   recordings,
   selectedIds,
@@ -104,9 +122,9 @@ function RecordingsList({
   editing,
   ascOrder,
   setAscOrder,
-}) {
-  const addSelectedId = recordingId => setSelectedIds([...selectedIds, recordingId]);
-  const removeSelectedId = recordingId =>
+}: RecordingsListProps) {
+  const addSelectedId = (recordingId: RecordingId) => setSelectedIds([...selectedIds, recordingId]);
+  const removeSelectedId = (recordingId: RecordingId) =>
     setSelectedIds(selectedIds.filter(id => id !== recordingId));
 
   return (
@@ -123,7 +141,7 @@ function RecordingsList({
       <tbody className="dashboard-viewer-content-body">
         {recordings &&
           recordings.map(recording => (
-            <Recording
+            <RecordingItem
               data={recording}
               key={recording.id}
               selected={selectedIds.includes(recording.id)}
@@ -137,13 +155,15 @@ function RecordingsList({
   );
 }
 
+type DashboardViewerContentHeaderProps = Pick<RecordingsListProps, "recordings" | "selectedIds" | "setSelectedIds" | "ascOrder" | "setAscOrder">;
+
 function DashboardViewerContentHeader({
   recordings,
   selectedIds,
   setSelectedIds,
   ascOrder,
   setAscOrder,
-}) {
+}: DashboardViewerContentHeaderProps) {
   const handleHeaderCheckboxClick = () => {
     if (selectedIds.length) {
       setSelectedIds([]);
@@ -155,7 +175,7 @@ function DashboardViewerContentHeader({
   return (
     <tr>
       <th>
-        <input type="checkbox" onChange={handleHeaderCheckboxClick} checked={selectedIds.length} />
+        <input type="checkbox" onChange={handleHeaderCheckboxClick} checked={!!selectedIds.length} />
       </th>
       <th>PREVIEW</th>
       <th>TITLE</th>

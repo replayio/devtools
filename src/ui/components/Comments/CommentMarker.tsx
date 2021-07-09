@@ -1,15 +1,23 @@
 import React from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
+import { UIState } from "ui/state";
+import { Comment, PendingComment } from "ui/state/comments";
 
 const markerWidth = 19;
 
-class CommentMarker extends React.Component {
-  calculateLeftOffset(time) {
+interface CommentMarkerProps extends PropsFromRedux {
+  comment: Comment | PendingComment["comment"];
+  comments: (Comment | PendingComment["comment"])[];
+  isPrimaryHighlighted: boolean;
+}
+
+class CommentMarker extends React.Component<CommentMarkerProps> {
+  calculateLeftOffset(time: number) {
     const { timelineDimensions, zoomRegion } = this.props;
 
     return getMarkerLeftOffset({
@@ -43,7 +51,7 @@ class CommentMarker extends React.Component {
 
     // We don't want to show the replies on the timeline
     // just the parent comment.
-    if (comment.parentId) {
+    if ("parentId" in comment && comment.parentId) {
       return null;
     }
 
@@ -51,7 +59,7 @@ class CommentMarker extends React.Component {
       return null;
     }
 
-    const { time, id } = comment;
+    const { time } = comment;
     const pausedAtComment = currentTime == time;
 
     return (
@@ -60,7 +68,7 @@ class CommentMarker extends React.Component {
           paused: pausedAtComment,
           "primary-highlight": isPrimaryHighlighted,
         })}
-        onMouseEnter={() => setHoveredComment(comment.id)}
+        onMouseEnter={() => setHoveredComment((comment as any).id)}
         onMouseLeave={() => setHoveredComment(null)}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
@@ -71,8 +79,8 @@ class CommentMarker extends React.Component {
   }
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
@@ -81,4 +89,7 @@ export default connect(
     seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
   }
-)(CommentMarker);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(CommentMarker);

@@ -4,7 +4,7 @@ import { getRecordingId } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import TeamSelect from "./TeamSelect";
-const { getFormattedTime } = require("ui/utils/timeline");
+import { getFormattedTime } from "ui/utils/timeline";
 import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";

@@ -1,5 +1,5 @@
 import React, { MouseEventHandler } from "react";
-const { getVisiblePosition } = require("../../utils/timeline");
+import { getVisiblePosition } from "../../utils/timeline";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { actions } from "../../actions";

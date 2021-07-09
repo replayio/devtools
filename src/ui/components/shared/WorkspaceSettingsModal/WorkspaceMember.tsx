@@ -3,10 +3,7 @@ import hooks from "ui/hooks";
 import { WorkspaceUser } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
-import { UIState } from "ui/state";
-const { prefs } = require("ui/utils/prefs");
 
 import "./WorkspaceMember.css";
 import MaterialIcon from "../MaterialIcon";

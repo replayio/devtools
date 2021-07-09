@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-const Modal = require("ui/components/shared/Modal").default;
+import Modal from "ui/components/shared/Modal";
 import hooks from "ui/hooks";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsBody from "./SettingsBody";

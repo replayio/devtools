@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
 import AppErrors from "./shared/Error";
-const LoginModal = require("./shared/LoginModal").default;
+import LoginModal from "./shared/LoginModal";
 import SharingModal from "./shared/SharingModal";
 import LaunchBrowserModal from "./shared/LaunchBrowserModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";

@@ -2,8 +2,11 @@ import React from "react";
 import "./DashboardViewerHeader.css";
 import BatchActionDropdown from "./BatchActionDropdown";
 import "./DashboardViewerHeader.css";
+import { RecordingId } from "@recordreplay/protocol";
 
-function HeaderActions({ selectedIds, setSelectedIds, editing, toggleEditing }) {
+type HeaderActionsProps = Pick<DashboardViewerHeaderProps, "selectedIds" | "setSelectedIds" | "editing" | "toggleEditing">;
+
+function HeaderActions({ selectedIds, setSelectedIds, editing, toggleEditing }: HeaderActionsProps) {
   return (
     <div className="dashboard-viewer-header-actions">
       {editing ? (
@@ -16,13 +19,21 @@ function HeaderActions({ selectedIds, setSelectedIds, editing, toggleEditing }) 
   );
 }
 
+interface DashboardViewerHeaderProps {
+  selectedIds: RecordingId[];
+  setSelectedIds(ids: RecordingId[]): void;
+  editing: boolean;
+  toggleEditing(): void;
+  filters: React.ReactNode;
+}
+
 export default function DashboardViewerHeader({
   selectedIds,
   setSelectedIds,
   editing,
   toggleEditing,
   filters,
-}) {
+}: DashboardViewerHeaderProps) {
   return (
     <header className="dashboard-viewer-header">
       <HeaderActions

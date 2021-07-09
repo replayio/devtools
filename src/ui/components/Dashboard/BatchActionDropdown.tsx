@@ -1,5 +1,5 @@
 import React from "react";
-const Dropdown = require("devtools/client/debugger/src/components/shared/Dropdown").default;
+import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import { connect, ConnectedProps } from "react-redux";

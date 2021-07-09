@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import classnames from "classnames";
-const DashboardViewerHeader = require("./DashboardViewerHeader").default;
-const DashboardViewerContent = require("./DashboardViewerContent").default;
+import DashboardViewerHeader from "./DashboardViewerHeader";
+import DashboardViewerContent from "./DashboardViewerContent";
 import { SelectMenu, TextInput } from "ui/components/shared/Forms";
-const { prefs } = require("ui/utils/prefs");
+import { prefs } from "ui/utils/prefs";
 import { Recording } from "ui/types";
 import hooks from "ui/hooks";
+import { RecordingId } from "@recordreplay/protocol";
 
 const TIME_IN_MS = {
   day: 86400000,
@@ -13,8 +14,8 @@ const TIME_IN_MS = {
   month: 86400000 * 30,
 };
 
-type TimeFilter = "all" | "month" | "week" | "day";
-type AssociationFilter = "all" | "collaborator" | "comment" | "author";
+export type TimeFilter = "all" | "month" | "week" | "day";
+export type AssociationFilter = "all" | "collaborator" | "comment" | "author";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -60,11 +61,11 @@ function filterRecordings(
 
 export default function DashboardViewer({ recordings }: { recordings: Recording[] }) {
   const [editing, setEditing] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedIds, setSelectedIds] = useState<RecordingId[]>([]);
   const [searchString, setSearchString] = useState<string>("");
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>(prefs.libraryFilterTime);
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>(prefs.libraryFilterTime as TimeFilter);
   const [associationFilter, setAssociationFilter] = useState<AssociationFilter>(
-    prefs.libraryFilterAssociation
+    prefs.libraryFilterAssociation as AssociationFilter
   );
 
   const toggleEditing = () => {
@@ -95,8 +96,6 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
         setSelectedIds={setSelectedIds}
         editing={editing}
         toggleEditing={toggleEditing}
-        searchString={searchString}
-        setSearchString={setSearchString}
         filters={
           <>
             <SelectMenu

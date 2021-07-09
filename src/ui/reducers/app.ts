@@ -1,8 +1,8 @@
-import { AppState } from "ui/state/app";
+import { AppState, PanelName, ViewMode } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-const { prefs } = require("../utils/prefs");
+import { prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 
@@ -12,8 +12,8 @@ function initialAppState(): AppState {
     expectedError: null,
     unexpectedError: null,
     theme: "theme-light",
-    splitConsoleOpen: prefs.splitConsole,
-    selectedPanel: prefs.selectedPanel,
+    splitConsoleOpen: prefs.splitConsole as boolean,
+    selectedPanel: prefs.selectedPanel as PanelName,
     selectedPrimaryPanel: "comments",
     initializedPanels: [],
     recordingDuration: 0,
@@ -26,7 +26,7 @@ function initialAppState(): AppState {
     modalOptions: null,
     analysisPoints: {},
     events: {},
-    viewMode: prefs.viewMode,
+    viewMode: prefs.viewMode as ViewMode,
     narrowMode: false,
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,

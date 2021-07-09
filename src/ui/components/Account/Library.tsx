@@ -16,9 +16,8 @@ import {
   hasTeamInvitationCode,
 } from "ui/utils/environment";
 import LaunchButton from "../shared/LaunchButton";
-import Modal from "ui/components/shared/NewModal";
 import { setExpectedError } from "ui/actions/session";
-const UserOptions = require("ui/components/Header/UserOptions").default;
+import UserOptions from "ui/components/Header/UserOptions";
 
 function Header({
   nonPendingWorkspaces,
@@ -50,7 +49,7 @@ function Header({
       </div>
       <div className="flex-auto" />
       <LaunchButton />
-      <UserOptions mode="account" noBrowserItem />
+      <UserOptions noBrowserItem />
     </div>
   );
 }

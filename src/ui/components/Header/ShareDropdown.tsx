@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { useGetUserInfo } from "ui/hooks/users";
+import { useIsOwner, useGetRecording, useToggleIsPrivate } from "ui/hooks/recordings";
 import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
+import { RecordingId } from "@recordreplay/protocol";
+import { UIState } from "ui/state";
 
-function CopyUrl({ recordingId }) {
+function CopyUrl({ recordingId }: { recordingId: RecordingId }) {
   const [copyClicked, setCopyClicked] = useState(false);
 
   const handleCopyClick = () => {
@@ -41,7 +44,7 @@ function CopyUrl({ recordingId }) {
   );
 }
 
-function Privacy({ isPrivate, toggleIsPrivate }) {
+function Privacy({ isPrivate, toggleIsPrivate }: { isPrivate: boolean; toggleIsPrivate(): void }) {
   return (
     <div className="row privacy" onClick={toggleIsPrivate}>
       <div className={`icon img ${isPrivate ? "locked" : "unlocked"}`} />
@@ -63,7 +66,7 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
   );
 }
 
-function PrivacyNote({ isPrivate, isOwner }) {
+function PrivacyNote({ isPrivate, isOwner }: { isPrivate: boolean; isOwner: boolean }) {
   if (!isOwner) {
     return null;
   }
@@ -89,7 +92,7 @@ function PrivacyNote({ isPrivate, isOwner }) {
   );
 }
 
-function Collaborators({ setExpanded, recordingId, setModal }) {
+function Collaborators({ setExpanded, recordingId, setModal }: PropsFromRedux & { setExpanded(expanded: boolean): void }) {
   const { id } = useGetUserInfo();
   if (!id) {
     return null;
@@ -97,7 +100,7 @@ function Collaborators({ setExpanded, recordingId, setModal }) {
 
   const handleClick = () => {
     setModal("sharing", { recordingId });
-    setExpanded(null);
+    setExpanded(false);
   };
 
   return (
@@ -114,8 +117,14 @@ function Collaborators({ setExpanded, recordingId, setModal }) {
   );
 }
 
-function OwnerSettings({ recordingId, isPrivate, isOwner }) {
-  const updateIsPrivate = hooks.useToggleIsPrivate(recordingId, isPrivate);
+interface OwnerSettingsProps {
+  recordingId: RecordingId;
+  isPrivate: boolean;
+  isOwner: boolean;
+}
+
+function OwnerSettings({ recordingId, isPrivate, isOwner }: OwnerSettingsProps) {
+  const updateIsPrivate = useToggleIsPrivate(recordingId, isPrivate);
 
   if (!isOwner) {
     return null;
@@ -128,12 +137,12 @@ function OwnerSettings({ recordingId, isPrivate, isOwner }) {
   );
 }
 
-function ShareDropdown({ recordingId, setModal }) {
+function ShareDropdown({ recordingId, setModal }: PropsFromRedux) {
   const [expanded, setExpanded] = useState(false);
-  const isOwner = hooks.useIsOwner(recordingId);
-  const { recording } = hooks.useGetRecording(recordingId);
+  const isOwner = useIsOwner(recordingId);
+  const { recording } = useGetRecording(recordingId);
 
-  const isPrivate = recording.private;
+  const isPrivate = !!recording?.private;
   const buttonContent = <div className="img share" />;
 
   return (
@@ -153,11 +162,14 @@ function ShareDropdown({ recordingId, setModal }) {
   );
 }
 
-export default connect(
-  state => ({
-    recordingId: selectors.getRecordingId(state),
+const connector = connect(
+  (state: UIState) => ({
+    recordingId: selectors.getRecordingId(state)!,
   }),
   {
     setModal: actions.setModal,
   }
-)(ShareDropdown);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(ShareDropdown);

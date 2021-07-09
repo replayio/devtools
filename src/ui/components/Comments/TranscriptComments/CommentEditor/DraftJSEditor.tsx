@@ -5,7 +5,7 @@ import { User } from "ui/types";
 
 import useDraftJS, { DraftJSModule, LazyLoadDraftConfig } from "./use-draftjs";
 import { addMentions, convertToMarkdown } from "./mention";
-const { features } = require("ui/utils/prefs");
+import { features } from "ui/utils/prefs";
 
 import "./DraftJSEditor.css";
 
