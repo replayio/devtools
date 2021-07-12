@@ -11,7 +11,7 @@ import { isTest } from "ui/utils/environment";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { BlankLoadingScreen } from "./shared/BlankScreen";
+import { BlankLoadingScreen, BlankProgressScreen } from "./shared/BlankScreen";
 
 function DevTools({
   loading,
@@ -79,13 +79,7 @@ function DevTools({
   }
 
   if (!finishedLoading || recordingDuration === null) {
-    return (
-      <SkeletonLoader
-        setFinishedLoading={setFinishedLoading}
-        progress={loading}
-        content={"Scanning the recording..."}
-      />
-    );
+    return <BlankProgressScreen setFinishedLoading={setFinishedLoading} progress={loading} />;
   }
 
   return (
