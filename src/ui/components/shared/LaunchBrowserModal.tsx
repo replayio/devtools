@@ -29,7 +29,7 @@ function LaunchBrowser({
             </p>
             {children}
             <p className="text-sm">
-              Don&apos;t have Replay installed? <a href="/welcome">Download Now</a>
+              Don&apos;t have Replay installed? <a href="https://replay.io/welcome">Download Now</a>
             </p>
           </div>
         </div>
