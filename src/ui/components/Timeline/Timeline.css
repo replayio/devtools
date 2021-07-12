@@ -124,7 +124,8 @@
   width: 0%;
   height: 3px;
   border-radius: 4px;
-  background: var(--primary-accent);
+  /* border-top: 3px dashed var(--primary-accent); */
+  border-top: 3px solid var(--primary-accent);
   position: absolute;
   pointer-events: none;
   margin-top: auto;
@@ -139,15 +140,33 @@
 
 .timeline .progress-line.full {
   width: 100%;
-  background: var(--progressbar-background);
+  border-top-color: var(--progressbar-background);
 }
 
 .timeline .progress-line.preview-min {
-  background: #c0c0c0;
+  border-top-color: #c0c0c0;
 }
 
 .timeline .progress-line.preview-max {
-  background: #dadada;
+  border-top-color: #dadada;
+}
+
+.timeline .unloaded-regions {
+  width: 0%;
+  height: 3px;
+  border-radius: 4px;
+  height: 3px;
+  background-image: url("/images/dotted-mask.svg");
+  position: absolute;
+  pointer-events: none;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+}
+
+.timeline .unloaded-regions.end {
+  right: 0
 }
 
 .timeline .zoomboundary {
