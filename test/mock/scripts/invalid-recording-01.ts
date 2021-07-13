@@ -10,6 +10,7 @@ import {
   createUserSettingsMock,
   createGetUserMock,
 } from "../src/graphql";
+import { basicMessageHandlers } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
 
 const recordingId = uuid();
@@ -19,12 +20,13 @@ const graphqlMocks = [
   ...createUserSettingsMock(),
   createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
   createRecordingOwnerUserIdMock({ recordingId, user }),
-  createGetRecordingMock({ recordingId }),
+  ...createGetRecordingMock({ recordingId }),
   ...createGetUserMock({ user }),
 ];
+const messageHandlers = basicMessageHandlers();
 
 runTest("invalidRecordingID", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { graphqlMocks });
+  await installMockEnvironment(page, { graphqlMocks, messageHandlers });
   await page.textContent("text=You don't have permission to view this replay");
 });

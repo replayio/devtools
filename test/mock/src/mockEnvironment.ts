@@ -10,53 +10,60 @@ declare global {
   }
 }
 
-export interface MockOptions {
+export interface MockHandlerHelpers {
+  Errors: Record<string, Error>;
+  makeResult: (result: any) => any;
+  makeError: (error: Error) => any;
+  emitEvent: (method: string, params: any) => void;
+};
+
+type MockHandler = (params: any, helpers: MockHandlerHelpers) => any;
+export type MockHandlerRecord = Record<string, MockHandler>;
+
+interface MockOptions {
   graphqlMocks: MockedResponse[];
-  sessionError?: boolean;
+  messageHandlers: MockHandlerRecord;
 }
 
-interface Error {
+interface MockOptionsJSON {
+  graphqlMocks: MockedResponse[];
+  messageHandlers: Record<string, string>;
+}
+
+export interface Error {
   code: number;
   message: string;
 }
 
 // This script runs within the browser process.
-function doInstall(options: MockOptions) {
-  const Errors: Record<string, Error> = {
-    MissingDescription: { code: 28, message: "No description added for recording" },
-  };
-
-  function makeResult(result: any) {
-    return { result };
-  }
-
-  function makeError(error: Error) {
-    return { error };
-  }
-
-  const messageHandlers: Record<string, (arg?: any) => any> = {
-    "Recording.getDescription": () => makeError(Errors.MissingDescription),
-    "Recording.createSession": () => {
-      const sessionId = "mock-test-session";
-      if (options.sessionError) {
-        setTimeout(() => {
-          emitEvent("Recording.sessionError", {
-            sessionId,
-            code: 1,
-            message: "Session died unexpectedly",
-          });
-        }, 2000);
-      }
-      return makeResult({ sessionId });
+function doInstall(options: MockOptionsJSON) {
+  const helpers = {
+    Errors: {
+      MissingDescription: { code: 28, message: "No description added for recording" },
+    },
+    makeResult(result: any) {
+      return { result };
+    },
+    makeError(error: Error) {
+      return { error };
+    },
+    emitEvent(method: string, params: any) {
+      const event = { method, params };
+      receiveMessageCallback({ data: JSON.stringify(event) });
     },
   };
 
-  let receiveMessageCallback: (arg: { data: string }) => unknown;
+  const messageHandlers: Record<string, MockHandler> = {};
 
-  function emitEvent(method: string, params: any) {
-    const event = { method, params };
-    receiveMessageCallback({ data: JSON.stringify(event) });
+  // We manually iterate the keys here to avoid typescript transformations which
+  // won't work after evaluating this in the browser content process.
+  const keys = Object.keys(options.messageHandlers);
+  for (let i = 0; i < keys.length; i++) {
+    const name = keys[i];
+    eval(`messageHandlers["${name}"] = ${options.messageHandlers[name]};`);
   }
+
+  let receiveMessageCallback: (arg: { data: string }) => unknown;
 
   window.mockEnvironment = {
     graphqlMocks: options.graphqlMocks,
@@ -67,15 +74,26 @@ function doInstall(options: MockOptions) {
       const msg = JSON.parse(str);
       if (!messageHandlers[msg.method]) {
         console.error(`Missing mock message handler for ${msg.method}`);
-        return new Promise(resolve => {});
+        return;
       }
-      const { result, error } = messageHandlers[msg.method](msg.params);
+      const { result, error } = messageHandlers[msg.method](msg.params, helpers);
       const response = { id: msg.id, result, error };
       setTimeout(() => receiveMessageCallback({ data: JSON.stringify(response) }), 0);
     },
   };
 }
 
-export function installMockEnvironment(page: Page, options: MockOptions = { graphqlMocks: [] }) {
-  page.evaluate<void, MockOptions>(doInstall, options);
+export async function installMockEnvironment(page: Page, options: MockOptions) {
+  const optionsJSON: MockOptionsJSON = {
+    graphqlMocks: options.graphqlMocks,
+    messageHandlers: {},
+  };
+  for (const name of Object.keys(options.messageHandlers)) {
+    optionsJSON.messageHandlers[name] = options.messageHandlers[name].toString();
+  }
+  try {
+    await page.evaluate<void, MockOptionsJSON>(doInstall, optionsJSON);
+  } catch (e) {
+    console.log("ERROR", e);
+  }
 }

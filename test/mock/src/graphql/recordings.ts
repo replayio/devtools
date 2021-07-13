@@ -5,7 +5,7 @@ import {
   IS_RECORDING_ACCESSIBLE,
 } from "ui/graphql/recordings";
 import { Recording } from "ui/types";
-import { GraphQLError } from "graphql";
+import { cloneResponse } from "./utils";
 
 const mockRecording = {
   url: "https://mock.org",
@@ -72,8 +72,8 @@ export function createRecordingOwnerUserIdMock(opts: {
 export function createGetRecordingMock(opts: {
   recordingId: string;
   recording?: Partial<Recording>;
-}): MockedResponse {
-  return {
+}): MockedResponse[] {
+  const rv = {
     request: {
       query: GET_RECORDING,
       variables: { recordingId: opts.recordingId },
@@ -90,4 +90,5 @@ export function createGetRecordingMock(opts: {
         : null,
     },
   };
+  return cloneResponse(rv, 5);
 }
