@@ -5,6 +5,7 @@ import {
   IS_RECORDING_ACCESSIBLE,
 } from "ui/graphql/recordings";
 import { Recording } from "ui/types";
+import { GraphQLError } from "graphql";
 
 const mockRecording = {
   url: "https://mock.org",
