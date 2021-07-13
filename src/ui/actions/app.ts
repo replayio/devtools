@@ -8,6 +8,7 @@ import {
   Location,
   MouseEvent,
   loadedRegions,
+  TimeStampedPoint,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import * as selectors from "ui/reducers/app";
@@ -140,9 +141,22 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
     store.dispatch(setIndexing(100));
   });
 
-  ThreadFront.listenForLoadChanges((parameters: loadedRegions) =>
-    store.dispatch({ type: "set_loaded_regions", parameters })
-  );
+  ThreadFront.listenForLoadChanges((parameters: any) => {
+    function getTime(arg: number | TimeStampedPoint) {
+      return typeof arg === "number" ? arg : arg.time;
+    }
+    function getTimeRange(arg: any) {
+      return {
+        begin: getTime(arg.begin),
+        end: getTime(arg.end),
+      };
+    }
+    const loadedRegions = {
+      loading: parameters.loading.map((region: any) => getTimeRange(region)),
+      loaded: parameters.loaded.map((region: any) => getTimeRange(region)),
+    };
+    store.dispatch({ type: "set_loaded_regions", parameters: loadedRegions });
+  });
 }
 
 function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
