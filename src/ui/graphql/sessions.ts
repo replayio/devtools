@@ -1,17 +1,17 @@
 import { gql } from "@apollo/client";
 
 export const GET_ACTIVE_SESSIONS = gql`
-query GetActiveSessions($recordingId: UUID!) {
-  recording(uuid: $recordingId) {
-    uuid
-    activeSessions {
-      id
-      user {
+  query GetActiveSessions($recordingId: UUID!) {
+    recording(uuid: $recordingId) {
+      uuid
+      activeSessions {
         id
-        name
-        picture
+        user {
+          id
+          name
+          picture
+        }
       }
     }
   }
-}
 `;

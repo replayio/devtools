@@ -14,13 +14,10 @@ interface Session {
 
 export function useGetActiveSessions(recordingId: RecordingId) {
   const { userId, loading: userLoading } = useGetUserId();
-  const { data, error, loading } = useQuery(
-    GET_ACTIVE_SESSIONS,
-    {
-      variables: { recordingId },
-      pollInterval: 5000,
-    }
-  );
+  const { data, error, loading } = useQuery(GET_ACTIVE_SESSIONS, {
+    variables: { recordingId },
+    pollInterval: 5000,
+  });
 
   if (error) {
     console.error("Apollo error while getting active sessions", error);

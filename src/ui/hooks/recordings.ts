@@ -362,12 +362,9 @@ export function useUpdateIsPrivate() {
 
 export function useIsOwner(recordingId: RecordingId) {
   const { userId } = useGetUserId();
-  const { data, loading, error } = useQuery(
-    GET_RECORDING_USER_ID,
-    {
-      variables: { recordingId },
-    }
-  );
+  const { data, loading, error } = useQuery(GET_RECORDING_USER_ID, {
+    variables: { recordingId },
+  });
 
   if (loading) {
     return false;

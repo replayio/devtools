@@ -38,15 +38,15 @@ export const GET_COMMENTS = gql`
 `;
 
 export const GET_COMMENTS_TIME = gql`
-query GetCommentsTime($recordingId: UUID!) {
-  recording(uuid: $recordingId) {
-    uuid
-    comments {
-      id
-      hasFrames
-      point
-      time
+  query GetCommentsTime($recordingId: UUID!) {
+    recording(uuid: $recordingId) {
+      uuid
+      comments {
+        id
+        hasFrames
+        point
+        time
+      }
     }
   }
-}
 `;
