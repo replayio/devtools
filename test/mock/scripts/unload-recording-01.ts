@@ -1,7 +1,7 @@
-// Test some behavior in mock tests.
+// Check that unloaded regions in the recording are reflected in the UI.
 
-import { runTest, devtoolsURL } from "../src/runTest";
-import { installMockEnvironment } from "../src/mockEnvironment";
+import { runTest, devtoolsURL, waitUntil } from "../src/runTest";
+import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import {
   createRecordingIsInitializedMock,
@@ -32,12 +32,44 @@ const graphqlMocks = [
   ...createEmptyCommentsMock({ recordingId }),
   ...createGetActiveSessionsMock({ recordingId }),
 ];
-const messageHandlers = basicMessageHandlers();
-const bindings = basicBindings();
+const bindings = {
+  ...basicBindings(),
+  endpoint: {
+    point: "100000",
+    time: 100000,
+  },
+};
+const messageHandlers = {
+  ...basicMessageHandlers(),
+  "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
+    h.emitEvent("Session.loadedRegions", {
+      loaded: [{
+        begin: { point: "50000", time: 50000 },
+        end: h.bindings.endpoint,
+      }],
+      loading: [{
+        begin: { point: "50000", time: 50000 },
+        end: h.bindings.endpoint,
+      }],
+    });
+    return new Promise(resolve => {});
+  },
+};
 
-// Test that getting a session error while loading a replay shows an appropriate error.
 runTest("unloadRecording", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
   await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  await page.click("text=Devtools");
+  await waitUntil(async () => {
+    const bar = await page.$(".progress-bar");
+    const unloaded = await page.$(".unloaded-regions.start");
+    if (bar && unloaded) {
+      const barBox = await bar.boundingBox();
+      const unloadedBox = await unloaded.boundingBox();
+      if (barBox && unloadedBox) {
+        return unloadedBox.width >= barBox.width * 0.45;
+      }
+    }
+    return false;
+  });
 });

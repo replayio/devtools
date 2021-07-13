@@ -7,6 +7,10 @@ export function basicBindings() {
       kind: "scriptSource",
       url: "https://mock.test/source.js",
     },
+    endpoint: {
+      point: "100000",
+      time: 100000,
+    },
   };
 }
 
@@ -27,12 +31,21 @@ export function basicMessageHandlers(): MockHandlerRecord {
     "Session.ensureProcessed": () => ({}),
     "Session.findMouseEvents": () => ({}),
     "Session.getBuildId": () => ({ buildId: "mock-build-id" }),
-    "Session.getEndpoint": () => ({
-      endpoint: {
-        point: "1000",
-        time: 1000,
-      },
+    "Session.getEndpoint": (params: any, h: MockHandlerHelpers) => ({
+      endpoint: h.bindings.endpoint,
     }),
-    "Session.listenForLoadChanges": () => new Promise(resolve => {}),
+    "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
+      h.emitEvent("Session.loadedRegions", {
+        loaded: [{
+          begin: { point: "0", time: 0 },
+          end: h.bindings.endpoint,
+        }],
+        loading: [{
+          begin: { point: "0", time: 0 },
+          end: h.bindings.endpoint,
+        }],
+      });
+      return new Promise(resolve => {});
+    },
   };
 };
