@@ -15,6 +15,7 @@ export interface MockHandlerHelpers {
   makeResult: (result: any) => any;
   makeError: (error: Error) => any;
   emitEvent: (method: string, params: any) => void;
+  bindings: Record<string, any>;
 };
 
 type MockHandler = (params: any, helpers: MockHandlerHelpers) => any;
@@ -23,11 +24,13 @@ export type MockHandlerRecord = Record<string, MockHandler>;
 interface MockOptions {
   graphqlMocks: MockedResponse[];
   messageHandlers: MockHandlerRecord;
+  bindings: Record<string, any>;
 }
 
 interface MockOptionsJSON {
   graphqlMocks: MockedResponse[];
   messageHandlers: Record<string, string>;
+  bindings: Record<string, any>;
 }
 
 export interface Error {
@@ -37,6 +40,10 @@ export interface Error {
 
 // This script runs within the browser process.
 function doInstall(options: MockOptionsJSON) {
+  function setImmediate(callback: () => void) {
+    setTimeout(callback, 0);
+  }
+
   const helpers = {
     Errors: {
       MissingDescription: { code: 28, message: "No description added for recording" },
@@ -48,9 +55,12 @@ function doInstall(options: MockOptionsJSON) {
       return { error };
     },
     emitEvent(method: string, params: any) {
-      const event = { method, params };
-      receiveMessageCallback({ data: JSON.stringify(event) });
+      setImmediate(() => {
+        const event = { method, params };
+        receiveMessageCallback({ data: JSON.stringify(event) });
+      });
     },
+    bindings: options.bindings,
   };
 
   const messageHandlers: Record<string, MockHandler> = {};
@@ -78,7 +88,7 @@ function doInstall(options: MockOptionsJSON) {
       }
       const { result, error } = messageHandlers[msg.method](msg.params, helpers);
       const response = { id: msg.id, result, error };
-      setTimeout(() => receiveMessageCallback({ data: JSON.stringify(response) }), 0);
+      setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
     },
   };
 }
@@ -87,6 +97,7 @@ export async function installMockEnvironment(page: Page, options: MockOptions) {
   const optionsJSON: MockOptionsJSON = {
     graphqlMocks: options.graphqlMocks,
     messageHandlers: {},
+    bindings: options.bindings,
   };
   for (const name of Object.keys(options.messageHandlers)) {
     optionsJSON.messageHandlers[name] = options.messageHandlers[name].toString();
