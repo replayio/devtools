@@ -111,7 +111,9 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
     const message = `${line1}\n\n${line2}\n\n${line3}`;
 
     if (window.confirm(message)) {
-      deleteWorkspace();
+      deleteWorkspace({
+        variables: { workspaceId: props.workspaceId, shouldDeleteRecordings: true },
+      });
       props.hideModal();
       props.setWorkspaceId(null);
       updateDefaultWorkspace({ variables: { workspaceId: null } });
