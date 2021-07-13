@@ -19,7 +19,7 @@ const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   ...createUserSettingsMock(),
   createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
-  createRecordingOwnerUserIdMock({ recordingId, user }),
+  ...createRecordingOwnerUserIdMock({ recordingId, user }),
   ...createGetRecordingMock({ recordingId }),
   ...createGetUserMock({ user }),
 ];

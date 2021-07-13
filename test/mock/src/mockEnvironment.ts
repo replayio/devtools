@@ -12,8 +12,6 @@ declare global {
 
 export interface MockHandlerHelpers {
   Errors: Record<string, Error>;
-  makeResult: (result: any) => any;
-  makeError: (error: Error) => any;
   emitEvent: (method: string, params: any) => void;
   bindings: Record<string, any>;
 };
@@ -46,6 +44,7 @@ function doInstall(options: MockOptionsJSON) {
 
   const helpers = {
     Errors: {
+      InternalError: { code: 1, message: "Internal error" },
       MissingDescription: { code: 28, message: "No description added for recording" },
     },
     makeResult(result: any) {
@@ -86,9 +85,29 @@ function doInstall(options: MockOptionsJSON) {
         console.error(`Missing mock message handler for ${msg.method}`);
         return;
       }
-      const { result, error } = messageHandlers[msg.method](msg.params, helpers);
-      const response = { id: msg.id, result, error };
-      setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+      let promise;
+      try {
+        promise = messageHandlers[msg.method](msg.params, helpers);
+        if (!(promise instanceof Promise)) {
+          promise = Promise.resolve(promise);
+        }
+      } catch (e) {
+        promise = Promise.reject(e);
+      }
+      promise.then(result => {
+        const response = { id: msg.id, result };
+        setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+      }, e => {
+        let error;
+        if (e.code && e.message) {
+          error = e;
+        } else {
+          console.error(`Mock message handler error ${e}`);
+          error = helpers.Errors.InternalError;
+        }
+        const response = { id: msg.id, error };
+        setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+      });
     },
   };
 }

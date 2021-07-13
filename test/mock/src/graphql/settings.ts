@@ -21,5 +21,5 @@ export function createUserSettingsMock(): MockedResponse[] {
       },
     },
   };
-  return cloneResponse(rv, 2);
+  return cloneResponse(rv, 10);
 }

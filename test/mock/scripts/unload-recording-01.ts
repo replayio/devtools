@@ -9,6 +9,8 @@ import {
   createUserSettingsMock,
   createGetUserMock,
   createGetRecordingMock,
+  createEmptyCommentsMock,
+  createGetActiveSessionsMock,
 } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
@@ -24,9 +26,11 @@ const recording = {
 const graphqlMocks = [
   ...createUserSettingsMock(),
   createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
-  createRecordingOwnerUserIdMock({ recordingId, user }),
+  ...createRecordingOwnerUserIdMock({ recordingId, user }),
   ...createGetUserMock({ user }),
   ...createGetRecordingMock({ recordingId, recording }),
+  ...createEmptyCommentsMock({ recordingId }),
+  ...createGetActiveSessionsMock({ recordingId }),
 ];
 const messageHandlers = basicMessageHandlers();
 const bindings = basicBindings();

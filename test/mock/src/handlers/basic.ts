@@ -12,22 +12,27 @@ export function basicBindings() {
 
 export function basicMessageHandlers(): MockHandlerRecord {
   return {
+    "Console.findMessages": () => ({}),
     "Debugger.findSources": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Debugger.newSource", h.bindings.DefaultSource);
-      return h.makeResult({});
+      return {};
     },
-    "Session.ensureProcessed": (params: any, h: MockHandlerHelpers) => {
-      return h.makeResult({});
-    },
-    "Session.getBuildId": (params: any, h: MockHandlerHelpers) => {
-      return h.makeResult({ buildId: "mock-build-id" });
-    },
+    "Graphics.findPaints": () => ({}),
+    "Graphics.getDevicePixelRatio": () => ({ ratio: 1 }),
+    "Graphics.getPlaybackVideo": () => ({}),
     "Recording.getDescription": (params: any, h: MockHandlerHelpers) => {
-      return h.makeError(h.Errors.MissingDescription);
+      throw h.Errors.MissingDescription;
     },
-    "Recording.createSession": (params: any, h: MockHandlerHelpers) => {
-      const sessionId = "mock-test-session";
-      return h.makeResult({ sessionId });
-    },
+    "Recording.createSession": () => ({ sessionId: "mock-test-session" }),
+    "Session.ensureProcessed": () => ({}),
+    "Session.findMouseEvents": () => ({}),
+    "Session.getBuildId": () => ({ buildId: "mock-build-id" }),
+    "Session.getEndpoint": () => ({
+      endpoint: {
+        point: "1000",
+        time: 1000,
+      },
+    }),
+    "Session.listenForLoadChanges": () => new Promise(resolve => {}),
   };
 };

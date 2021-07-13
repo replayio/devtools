@@ -363,16 +363,7 @@ export function useUpdateIsPrivate() {
 export function useIsOwner(recordingId: RecordingId) {
   const { userId } = useGetUserId();
   const { data, loading, error } = useQuery(
-    gql`
-      query GetOwnerUserId($recordingId: UUID!) {
-        recording(uuid: $recordingId) {
-          uuid
-          owner {
-            id
-          }
-        }
-      }
-    `,
+    GET_RECORDING_USER_ID,
     {
       variables: { recordingId },
     }

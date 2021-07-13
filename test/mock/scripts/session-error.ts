@@ -18,7 +18,7 @@ const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   ...createUserSettingsMock(),
   createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
-  createRecordingOwnerUserIdMock({ recordingId, user }),
+  ...createRecordingOwnerUserIdMock({ recordingId, user }),
   ...createGetUserMock({ user }),
 ];
 const messageHandlers = {
@@ -32,7 +32,7 @@ const messageHandlers = {
         message: "Session died unexpectedly",
       });
     }, 2000);
-    return h.makeResult({ sessionId });
+    return { sessionId };
   },
 };
 const bindings = basicBindings();
