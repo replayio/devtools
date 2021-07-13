@@ -59,6 +59,9 @@ export function setTelemetryContext(
 
 export async function sendTelemetryEvent(event: string, tags: any = {}) {
   try {
+    if (skipTelemetry()) {
+      return;
+    }
     const response = await fetch("https://telemetry.replay.io/", {
       method: "POST",
       headers: {
