@@ -2,6 +2,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
 const Visualizer = require("webpack-visualizer-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
 module.exports = {
   entry: {
@@ -48,6 +49,7 @@ module.exports = {
         { from: "src/image/images", to: "images" },
       ],
     }),
+    new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }),
   ].filter(Boolean),
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
