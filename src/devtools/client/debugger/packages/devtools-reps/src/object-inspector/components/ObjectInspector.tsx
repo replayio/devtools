@@ -141,7 +141,11 @@ class OI extends PureComponent<ObjectInspectorProps> {
     this.forceUpdate();
 
     if (expand && needsToLoadChildren(item)) {
-      await getValue(item).loadChildren();
+      try {
+        await getValue(item).loadChildren();
+      } catch {
+        this.expandedPaths.delete(item.path);
+      }
       this.forceUpdate();
     }
   };
