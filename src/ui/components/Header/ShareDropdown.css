@@ -30,7 +30,7 @@
 }
 
 #header .share .dropdown-container .row button {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
   color: var(--theme-toolbar-background);
   padding: 8px 12px;
   line-height: 16px;
@@ -65,7 +65,7 @@
   display: flex;
   height: 32px;
   width: 100%;
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
   color: white;
   border-radius: 4px;
   animation: hop 300ms linear alternate 1;
@@ -96,7 +96,7 @@
 
 #header .share .dropdown-container .row.privacy button.toggle.on {
   border: 2px solid var(--primaryAccent);
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
 }
 
 #header .share .dropdown-container .row.privacy button.toggle.off {

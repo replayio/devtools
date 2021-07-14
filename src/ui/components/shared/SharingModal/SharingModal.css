@@ -68,7 +68,7 @@
 }
 
 .sharing-modal .privacy-choice.selected .description {
-  color: var(--primaryAccentHover);
+  color: var(--primary-accent-hover);
 }
 
 .sharing-modal .privacy-warning {

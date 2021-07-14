@@ -10,7 +10,7 @@
 }
 
 .portal-dropdown-wrapper button.secondary .img {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
 } */
 
 .portal-dropdown-wrapper button .img:not(:last-child) {

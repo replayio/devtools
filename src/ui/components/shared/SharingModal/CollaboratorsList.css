@@ -65,7 +65,7 @@
 }
 
 .sharing-modal .permission button.delete:hover {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
 }
 
 .sharing-modal .permission button.delete .img {

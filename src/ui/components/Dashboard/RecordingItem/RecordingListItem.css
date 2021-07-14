@@ -188,7 +188,7 @@
 }
 
 .recording-list .recording-item .item-title-label-actions button .img {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
   margin-right: 4px;
 }
 
@@ -199,7 +199,7 @@
 
 .recording-list .recording-item .item-title-label-actions button:hover,
 .recording-list .recording-item .item-title-label-actions button.clicked {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
   color: white;
 }
 

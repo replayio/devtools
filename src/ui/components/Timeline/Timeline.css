@@ -104,7 +104,7 @@
 }
 
 .timeline .commands > button:hover .img {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent-hover);
 }
 
 .timeline .command-button.active:hover {
