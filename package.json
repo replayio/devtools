@@ -29,7 +29,7 @@
     "@headlessui/react": "^1.0.0",
     "@heroicons/react": "^1.0.1",
     "@recordreplay/playwright": "^1.10.3",
-    "@recordreplay/protocol": "^0.8.2",
+    "@recordreplay/protocol": "^0.9.0",
     "@recordreplay/recordings-cli": "^0.3.1",
     "@sentry/react": "^6.8.0",
     "@sentry/tracing": "^6.8.0",

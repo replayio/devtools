@@ -70,7 +70,7 @@ export default function update(
 
     case "set_loaded_regions": {
       const recordingDuration = Math.max(
-        ...action.parameters.loading.map(r => r.end),
+        ...action.parameters.loading.map(r => r.end.time),
         state.recordingDuration
       );
       return { ...state, loadedRegions: action.parameters, recordingDuration };
@@ -277,4 +277,6 @@ export const getRecordingWorkspace = (state: UIState) => state.app.recordingWork
 export const getShowVideoPanel = (state: UIState) => state.app.showVideoPanel;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
   typeof time !== "number" ||
-  !!getLoadedRegions(state)?.loaded.some(region => time >= region.begin && time <= region.end);
+  !!getLoadedRegions(state)?.loaded.some(
+    region => time >= region.begin.time && time <= region.end.time
+  );

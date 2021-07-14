@@ -142,7 +142,7 @@ class Timeline extends Component<PropsFromRedux> {
       clearPendingComment,
       videoUrl,
     } = this.props;
-    const disabled = !videoUrl && features.videoPlayback as boolean;
+    const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
       if (disabled) return;
 
@@ -266,8 +266,9 @@ class Timeline extends Component<PropsFromRedux> {
 
     const { begin, end } = loadedRegions[0];
     const { endTime } = zoomRegion;
-    const loadedRegionStart = getVisiblePosition({ time: begin, zoom: zoomRegion }) * 100;
-    const loadedRegionEnd = getVisiblePosition({ time: endTime - end, zoom: zoomRegion }) * 100;
+    const loadedRegionStart = getVisiblePosition({ time: begin.time, zoom: zoomRegion }) * 100;
+    const loadedRegionEnd =
+      getVisiblePosition({ time: endTime - end.time, zoom: zoomRegion }) * 100;
 
     return (
       <>

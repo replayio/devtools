@@ -8,8 +8,6 @@ import {
   Location,
   MouseEvent,
   loadedRegions,
-  TimeStampedPoint,
-  TimeRange,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import * as selectors from "ui/reducers/app";
@@ -124,20 +122,6 @@ export type AppActions =
 
 const NARROW_MODE_WIDTH = 800;
 
-/*
- * Backwards-compat helpers to get time range from either
- * a regular TimeRange or a TimeStampedPointRange.
- */
-function getTime(arg: number | TimeStampedPoint): number {
-  return typeof arg === "number" ? arg : arg.time;
-}
-function getTimeRange(arg: any): TimeRange {
-  return {
-    begin: getTime(arg.begin),
-    end: getTime(arg.end),
-  };
-}
-
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
 
@@ -156,18 +140,14 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
     store.dispatch(setIndexing(100));
   });
 
-  ThreadFront.listenForLoadChanges((parameters: any) => {
-    const loadedRegions = {
-      loading: parameters.loading.map((region: any) => getTimeRange(region)),
-      loaded: parameters.loaded.map((region: any) => getTimeRange(region)),
-    };
-    store.dispatch({ type: "set_loaded_regions", parameters: loadedRegions });
+  ThreadFront.listenForLoadChanges(parameters => {
+    store.dispatch({ type: "set_loaded_regions", parameters });
   });
 }
 
 function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return ({ dispatch, getState }) => {
-    let endPoint = Math.max(...regions.map(r => getTimeRange(r).end), 0);
+    let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {
       return;
     }
@@ -179,7 +159,7 @@ function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAc
     }
 
     const unprocessedProgress = regions.reduce(
-      (sum, region) => sum + (getTimeRange(region).end - getTimeRange(region).begin),
+      (sum, region) => sum + (region.end.time - region.begin.time),
       0
     );
     const processedProgress = endPoint - unprocessedProgress;
