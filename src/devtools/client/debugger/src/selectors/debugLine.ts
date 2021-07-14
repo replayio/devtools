@@ -10,6 +10,8 @@ export function getDebugLineLocation(state: UIState) {
   if (!location) {
     return undefined;
   }
+  // this is bad design: a redux selector should only use redux state, but here we use
+  // the state stored in ThreadFront. This will be fixed in #3065.
   location.sourceId = ThreadFront.pickCorrespondingSourceId(location.sourceId, location.sourceUrl);
   const source = getSourceWithContent(state, location.sourceId);
   if (source && source.content && hasDocument(location.sourceId)) {
