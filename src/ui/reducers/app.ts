@@ -275,3 +275,6 @@ export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getFontLoading = (state: UIState) => state.app.fontLoading;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const getShowVideoPanel = (state: UIState) => state.app.showVideoPanel;
+export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
+  typeof time !== "number" ||
+  !!getLoadedRegions(state)?.loaded.some(region => time >= region.begin && time <= region.end);
