@@ -130,29 +130,37 @@ class ConsoleOutput extends Component {
       pausedExecutionPoint,
       closestMessage,
       hoveredItem,
+      loadedRegions,
     } = this.props;
 
-    const messageNodes = visibleMessages.map((messageId, i) => {
-      const message = messages.get(messageId);
-      const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
-      const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
+    const messageNodes = visibleMessages
+      .filter(messageId => {
+        const time = messages.get(messageId).executionPointTime;
+        return loadedRegions.loaded.some(
+          region => time >= region.begin.time && time <= region.end.time
+        );
+      })
+      .map((messageId, i) => {
+        const message = messages.get(messageId);
+        const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
+        const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
-      return createElement(MessageContainer, {
-        dispatch,
-        key: messageId,
-        messageId,
-        message,
-        open: messagesUi.includes(messageId),
-        payload: messagesPayload.get(messageId),
-        timestampsVisible,
+        return createElement(MessageContainer, {
+          dispatch,
+          key: messageId,
+          messageId,
+          message,
+          open: messagesUi.includes(messageId),
+          payload: messagesPayload.get(messageId),
+          timestampsVisible,
 
-        pausedExecutionPoint,
-        isPaused: closestMessage?.id == messageId,
-        isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
-        isPrimaryHighlighted,
-        shouldScrollIntoView,
+          pausedExecutionPoint,
+          isPaused: closestMessage?.id == messageId,
+          isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
+          isPrimaryHighlighted,
+          shouldScrollIntoView,
+        });
       });
-    });
 
     return dom.div(
       {
@@ -184,6 +192,7 @@ function mapStateToProps(state) {
     timestampsVisible: state.consoleUI.timestampsVisible,
     playback: selectors.getPlayback(state),
     hoveredItem: selectors.getHoveredItem(state),
+    loadedRegions: selectors.getLoadedRegions(state),
   };
 }
 const mapDispatchToProps = dispatch => ({
