@@ -3,6 +3,9 @@ import classnames from "classnames";
 import { Tree } from "devtools/client/debugger/src/components/shared/tree";
 import ObjectInspectorItem from "./ObjectInspectorItem";
 import { createUnavailableValueFront, ValueFront } from "protocol/thread";
+import { connect, ConnectedProps } from "react-redux";
+import { UIState } from "ui/state";
+import { isRegionLoaded } from "ui/reducers/app";
 const Utils = require("../utils");
 const { renderRep, shouldRenderRootsInReps } = Utils;
 const {
@@ -25,7 +28,7 @@ export interface Item {
   childrenLoaded?: boolean;
 }
 
-interface ObjectInspectorProps {
+interface PropsFromParent {
   roots: Item[];
   focusable?: boolean;
   disableWrap?: boolean;
@@ -40,6 +43,8 @@ interface ObjectInspectorProps {
   onFocus?: (item: Item | undefined) => void;
   rootsChanged?: () => void;
 }
+
+type ObjectInspectorProps = PropsFromRedux & PropsFromParent;
 
 // This implements a component that renders an interactive inspector
 // for looking at JavaScript objects. It expects descriptions of
@@ -125,7 +130,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
   };
 
   setExpanded = async (item: Item, expand: boolean) => {
-    if (!this.isNodeExpandable(item)) {
+    if (!this.isNodeExpandable(item) || !this.props.isRegionLoaded) {
       return;
     }
     if (expand) {
@@ -237,7 +242,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
   }
 }
 
-export default function ObjectInspector(props: ObjectInspectorProps) {
+function ObjectInspector(props: ObjectInspectorProps) {
   const { roots } = props;
 
   if (roots.length == 0) {
@@ -250,3 +255,9 @@ export default function ObjectInspector(props: ObjectInspectorProps) {
 
   return <OI {...props} />;
 }
+
+const connector = connect((state: UIState, { roots }: PropsFromParent) => ({
+  isRegionLoaded: isRegionLoaded(state, roots[0]?.contents.getPause()?.time),
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(ObjectInspector);
