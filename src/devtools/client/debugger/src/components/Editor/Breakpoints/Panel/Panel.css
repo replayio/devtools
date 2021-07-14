@@ -181,12 +181,12 @@
 }
 
 .breakpoint-panel button.save {
-  background: var(--primaryAccentHover);
+  background: var(--primary-accent);
   color: white;
 }
 
 .breakpoint-panel button.save:hover {
-  background: #2270ec;
+  background: var(--primary-accent-hover);
   color: white;
 }
 
