@@ -44,28 +44,28 @@ function releaseActor(actor) {
   return;
 }
 
-function resume(point) {
-  return ThreadFront.resume(point);
+function resume(point, loadedRegions) {
+  return ThreadFront.resume(point, loadedRegions);
 }
 
-function stepIn(point) {
-  return ThreadFront.stepIn(point);
+function stepIn(point, loadedRegions) {
+  return ThreadFront.stepIn(point, loadedRegions);
 }
 
-function stepOver(point) {
-  return ThreadFront.stepOver(point);
+function stepOver(point, loadedRegions) {
+  return ThreadFront.stepOver(point, loadedRegions);
 }
 
-function stepOut(point) {
-  return ThreadFront.stepOut(point);
+function stepOut(point, loadedRegions) {
+  return ThreadFront.stepOut(point, loadedRegions);
 }
 
-function rewind(point) {
-  return ThreadFront.rewind(point);
+function rewind(point, loadedRegions) {
+  return ThreadFront.rewind(point, loadedRegions);
 }
 
-function reverseStepOver(point) {
-  return ThreadFront.reverseStepOver(point);
+function reverseStepOver(point, loadedRegions) {
+  return ThreadFront.reverseStepOver(point, loadedRegions);
 }
 
 async function sourceContents({ actor }) {

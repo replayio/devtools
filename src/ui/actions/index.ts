@@ -17,7 +17,7 @@ import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eve
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
 
-type DebuggerAction = Action<"RESUME">;
+type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 
 export type UIAction =
   | AppActions

@@ -6,6 +6,7 @@
 
 import { ThreadFront } from "protocol/thread";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
+import { isRegionLoaded } from "ui/reducers/app";
 
 export function highlightDomElement(grip) {
   return async ({ toolbox }) => {
@@ -32,9 +33,9 @@ export function unHighlightDomElement(grip) {
 }
 
 export function openNodeInInspector(valueFront) {
-  return async ({ toolbox }) => {
+  return async ({ getState, toolbox }) => {
     const pause = valueFront.getPause();
-    if (ThreadFront.currentPause !== pause) {
+    if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
     }
 

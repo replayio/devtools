@@ -646,7 +646,11 @@ class _ThreadFront {
     return target;
   }
 
-  private async _resumeOperation(command: FindTargetCommand, selectedPoint: ExecutionPoint) {
+  private async _resumeOperation(
+    command: FindTargetCommand,
+    selectedPoint: ExecutionPoint,
+    loadedRegions: loadedRegions
+  ) {
     // Don't allow resumes until we've finished loading and did the initial
     // warp to the endpoint.
     await this.initializedWaiter.promise;
@@ -668,29 +672,45 @@ class _ThreadFront {
     }, 0);
 
     const point = selectedPoint || this.currentPoint;
-    resumeTarget = await this._findResumeTarget(point, command);
-    if (resumeEmitted) {
+    try {
+      resumeTarget = await this._findResumeTarget(point, command);
+    } catch {
+      this.emit("paused", {
+        point: this.currentPoint,
+        hasFrames: this.currentPointHasFrames,
+        time: this.currentTime,
+      });
+    }
+    if (
+      resumeTarget &&
+      loadedRegions.loaded.every(
+        region => resumeTarget!.time < region.begin.time || resumeTarget!.time > region.end.time
+      )
+    ) {
+      resumeTarget = null;
+    }
+    if (resumeTarget && resumeEmitted) {
       warpToTarget();
     }
   }
 
-  rewind(point: ExecutionPoint) {
-    this._resumeOperation(client.Debugger.findRewindTarget, point);
+  rewind(point: ExecutionPoint, loadedRegions: loadedRegions) {
+    this._resumeOperation(client.Debugger.findRewindTarget, point, loadedRegions);
   }
-  resume(point: ExecutionPoint) {
-    this._resumeOperation(client.Debugger.findResumeTarget, point);
+  resume(point: ExecutionPoint, loadedRegions: loadedRegions) {
+    this._resumeOperation(client.Debugger.findResumeTarget, point, loadedRegions);
   }
-  reverseStepOver(point: ExecutionPoint) {
-    this._resumeOperation(client.Debugger.findReverseStepOverTarget, point);
+  reverseStepOver(point: ExecutionPoint, loadedRegions: loadedRegions) {
+    this._resumeOperation(client.Debugger.findReverseStepOverTarget, point, loadedRegions);
   }
-  stepOver(point: ExecutionPoint) {
-    this._resumeOperation(client.Debugger.findStepOverTarget, point);
+  stepOver(point: ExecutionPoint, loadedRegions: loadedRegions) {
+    this._resumeOperation(client.Debugger.findStepOverTarget, point, loadedRegions);
   }
-  stepIn(point: ExecutionPoint) {
-    this._resumeOperation(client.Debugger.findStepInTarget, point);
+  stepIn(point: ExecutionPoint, loadedRegions: loadedRegions) {
+    this._resumeOperation(client.Debugger.findStepInTarget, point, loadedRegions);
   }
-  stepOut(point: ExecutionPoint) {
-    this._resumeOperation(client.Debugger.findStepOutTarget, point);
+  stepOut(point: ExecutionPoint, loadedRegions: loadedRegions) {
+    this._resumeOperation(client.Debugger.findStepOutTarget, point, loadedRegions);
   }
 
   async resumeTarget(point: ExecutionPoint) {

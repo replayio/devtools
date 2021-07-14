@@ -253,10 +253,15 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction {
-  return () => {
+  return ({ getState, dispatch }) => {
+    if (!selectors.isRegionLoaded(getState(), time)) {
+      return;
+    }
+
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 
     updateUrl({ point, time, hasFrames });
+    dispatch({ type: "CLEAR_FRAME_POSITIONS" });
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
     } else {

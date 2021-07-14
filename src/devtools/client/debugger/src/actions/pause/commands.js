@@ -4,19 +4,14 @@
 
 //
 
-import {
-  getThreadContext,
-  getExecutionPoint,
-  getResumePoint,
-  getFramePositions,
-} from "../../selectors";
+import { getExecutionPoint, getResumePoint, getFramePositions } from "../../selectors";
+import { getLoadedRegions } from "ui/reducers/app";
 import { PROMISE } from "../utils/middleware/promise";
 import { recordEvent } from "../../utils/telemetry";
 
 import { setFramePositions } from "./setFramePositions";
 
 const { log } = require("protocol/socket");
-const { ThreadFront } = require("protocol/thread");
 
 /**
  * Debugger commands like stepOver, stepIn, stepUp
@@ -46,7 +41,7 @@ export function command(cx, type) {
       type: "COMMAND",
       command: type,
       cx,
-      [PROMISE]: client[type](nextPoint),
+      [PROMISE]: client[type](nextPoint, getLoadedRegions(getState())),
     });
   };
 }
