@@ -84,7 +84,10 @@ export function useAcceptTOS() {
           success
         }
       }
-    `
+    `,
+    {
+      refetchQueries: ["GetUser"],
+    }
   );
 
   return acceptTOS;
