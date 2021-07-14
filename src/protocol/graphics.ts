@@ -178,10 +178,12 @@ class VideoPlayer {
   play() {
     this.commands =
       this.commands &&
-      this.commands?.then(async () => {
+      this.commands.then(() => {
         const video = this.store?.getState().app.videoNode;
+        const currentTime = this.store?.getState().timeline.currentTime;
         if (video) {
-          await video.play();
+          video.currentTime = (currentTime || 0) / 1000;
+          return video.play();
         }
       });
   }
