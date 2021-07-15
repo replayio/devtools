@@ -34,7 +34,7 @@ async function waitUntil(fn) {
 
 function start() {
   app.actions.setViewMode("dev");
-  return waitUntil(() => app.selectors.getLoading() == 100 && app.selectors.getViewMode() == "dev");
+  return waitUntil(() => isFullyLoaded() && app.selectors.getViewMode() == "dev");
 }
 
 function finish() {
@@ -44,6 +44,16 @@ function finish() {
   // This is pretty goofy but this is recognized during automated tests and sent
   // to the UI process to indicate the test has finished.
   dump(`RecReplaySendAsyncMessage TestFinished`);
+}
+
+function isFullyLoaded() {
+  const loadedRegions = app.selectors.getLoadedRegions();
+  return (
+    loadedRegions &&
+    loadedRegions.loading.length > 0 &&
+    loadedRegions.loaded.length > 0 &&
+    loadedRegions.loading[0].end.point === loadedRegions.loaded[0].end.point
+  );
 }
 
 async function clickElement(selector) {
