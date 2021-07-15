@@ -260,7 +260,7 @@ class Timeline extends Component<PropsFromRedux> {
   renderUnloadedRegions() {
     const { loadedRegions, zoomRegion } = this.props;
 
-    if (!loadedRegions) {
+    if (!loadedRegions || loadedRegions.length === 0) {
       return null;
     }
 
