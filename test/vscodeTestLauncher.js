@@ -1,6 +1,9 @@
 const path = require("path");
 const { fork } = require("child_process");
 
+const e2eTestPrefix = "e2e/";
+const mockTestPrefix = "mock/";
+
 /**
  * This script integrates the tests with the Test Explorer extension for VS Code.
  * It (ab)uses the launcher script feature of the Mocha Test Explorer extension
@@ -9,37 +12,105 @@ const { fork } = require("child_process");
  * You can set environment variables for the tests using the `mochaExplorer.env` setting
  * in `.vscode/settings.json`.
  */
-process.on("message", args => {
+process.on("message", async args => {
   if (args.action === "loadTests") {
-    const manifest = require("./manifest");
-    const onlyTarget = process.env.TEST_ONLY_TARGET;
-
-    const tests = manifest
-      .filter(({ targets }) => !onlyTarget || targets.includes(onlyTarget))
-      .map(({ script }) => {
-        return { type: "test", id: script, label: script, debuggable: false };
-      });
-
-    process.send({ type: "suite", id: "root", label: "RecordReplay", children: tests });
+    loadTests();
   } else if (args.action === "runTests") {
+    const e2eTests = pickTests(args.tests, e2eTestPrefix);
+    if (e2eTests.length > 0) {
+      await runE2ETests(e2eTests);
+    }
+
+    const mockTests = pickTests(args.tests, mockTestPrefix);
+    if (mockTests.length > 0) {
+      await runMockTests(mockTests);
+    }
+
+    process.exit();
+  }
+});
+
+function pickTests(tests, prefix) {
+  return tests.filter(test => test.startsWith(prefix)).map(test => test.substring(prefix.length));
+}
+
+function loadTests() {
+  const e2eManifest = require("./manifest");
+  const onlyTarget = process.env.TEST_ONLY_TARGET;
+  const e2eTests = e2eManifest
+    .filter(({ targets }) => !onlyTarget || targets.includes(onlyTarget))
+    .map(({ script }) => ({
+      type: "test",
+      id: e2eTestPrefix + script,
+      label: script,
+      debuggable: false,
+    }));
+
+  const mockManifest = require("./mock/manifest");
+  const mockTests = mockManifest.map(script => ({
+    type: "test",
+    id: mockTestPrefix + script,
+    label: script,
+    debuggable: false,
+  }));
+
+  process.send({
+    type: "suite",
+    id: "root",
+    label: "RecordReplay",
+    children: [
+      {
+        type: "suite",
+        id: "e2e",
+        label: "E2E",
+        children: e2eTests,
+      },
+      {
+        type: "suite",
+        id: "mock",
+        label: "Mock",
+        children: mockTests,
+      },
+    ],
+  });
+}
+
+function runE2ETests(tests) {
+  return runTests(
+    path.join(__dirname, "run.js"),
+    [].concat(...tests.map(test => ["--pattern", test])),
+    e2eTestPrefix,
+    /Starting test (.*) target/,
+    /TestPassed/
+  );
+}
+
+function runMockTests(tests) {
+  return runTests(
+    path.join(__dirname, "mock/run.js"),
+    [].concat(...tests.map(test => ["--script", test])),
+    mockTestPrefix,
+    /Starting test (.*)/,
+    /Test succeeded/
+  );
+}
+
+function runTests(runScript, runArgs, testPrefix, startRegex, successRegex) {
+  return new Promise(resolve => {
     let currentTest = "";
 
-    const childProc = fork(
-      path.join(__dirname, "run.js"),
-      [].concat(...args.tests.map(test => ["--pattern", test])),
-      { stdio: "pipe" }
-    );
+    const childProc = fork(runScript, runArgs, { stdio: "pipe" });
 
     const processOutput = output => {
-      const match = /Starting test (.*) target/.exec(output);
+      const match = startRegex.exec(output);
       if (match) {
         if (currentTest) {
           process.send({ type: "test", test: currentTest, state: "failed" });
         }
-        currentTest = match[1];
+        currentTest = testPrefix + match[1];
         process.send({ type: "test", test: currentTest, state: "running" });
       }
-      if (/TestPassed/.test(output) && currentTest) {
+      if (successRegex.test(output) && currentTest) {
         process.send({ type: "test", test: currentTest, state: "passed" });
         currentTest = "";
       }
@@ -60,7 +131,7 @@ process.on("message", args => {
       if (currentTest) {
         process.send({ type: "test", test: currentTest, state: "failed" });
       }
-      process.exit();
+      resolve();
     });
-  }
-});
+  });
+}

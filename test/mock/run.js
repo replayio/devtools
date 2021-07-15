@@ -3,10 +3,29 @@ const manifest = require("./manifest");
 const { listAllRecordings, uploadRecording } = require("@recordreplay/recordings-cli");
 
 const devtools = `${__dirname}/../..`;
+const scriptsToRun = [];
+
+function processArgs() {
+  for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    switch (arg) {
+      case "--script":
+        const script = process.argv[++i];
+        if (manifest.includes(script)) {
+          scriptsToRun.push(script);
+        } else {
+          console.log(`${script} does not appear in the manifest`);
+        }
+        break;
+    }
+  }
+}
 
 async function main() {
   let allPassed = true;
-  for (const script of manifest) {
+  processArgs();
+  const scripts = scriptsToRun.length > 0 ? scriptsToRun : manifest;
+  for (const script of scripts) {
     console.log(`Starting test ${script}`);
     const rv = spawnSync(
       `${devtools}/node_modules/.bin/ts-node`,
