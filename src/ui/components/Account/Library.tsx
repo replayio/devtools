@@ -47,7 +47,7 @@ function Header({
 
         <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
       </div>
-      <div className="flex-auto" />
+      <div className="flex-grow h-full" />
       <LaunchButton />
       <UserOptions noBrowserItem />
     </div>
