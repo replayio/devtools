@@ -479,8 +479,8 @@ export function refreshGraphics() {
     graphicsVideo.style.height = bounds.height + "px";
 
     canvas.style.transform = graphicsVideo.style.transform = `scale(${bounds.scale})`;
-    canvas.style.left = graphicsVideo.style.left = String(bounds.left);
-    canvas.style.top = graphicsVideo.style.top = String(bounds.top);
+    canvas.style.left = graphicsVideo.style.left = String(bounds.left) + "px";
+    canvas.style.top = graphicsVideo.style.top = String(bounds.top) + "px";
 
     if (image) {
       cx.drawImage(image, 0, 0);
