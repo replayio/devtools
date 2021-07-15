@@ -422,8 +422,8 @@ export class ValueFront {
 Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 export type PrimitiveValue = string | number | boolean | null | undefined;
-export function createPrimitiveValueFront(value: PrimitiveValue) {
-  return new ValueFront(null, { value });
+export function createPrimitiveValueFront(value: PrimitiveValue, pause: Pause | null = null) {
+  return new ValueFront(pause, { value });
 }
 
 export function createElementsFront(elements: ValueFronts) {

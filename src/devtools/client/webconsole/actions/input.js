@@ -65,7 +65,7 @@ function evaluateExpression(expression) {
       return dispatch(
         onExpressionEvaluated({
           type: "evaluationResult",
-          result: createPrimitiveValueFront(msg),
+          result: createPrimitiveValueFront(msg, ThreadFront.pauseForAsyncIndex(asyncIndex)),
           evalId,
         })
       );
@@ -87,7 +87,10 @@ async function evaluateJSAsync(expression, options = {}) {
 
   let v;
   if (failed || !(returned || exception)) {
-    v = createPrimitiveValueFront("Error: Evaluation failed");
+    v = createPrimitiveValueFront(
+      "Error: Evaluation failed",
+      ThreadFront.pauseForAsyncIndex(asyncIndex)
+    );
   } else if (returned) {
     v = returned;
   } else {
