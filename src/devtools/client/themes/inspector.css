@@ -18,6 +18,7 @@ window {
 /* The main Inspector panel container. */
 .inspector-responsive-container {
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
