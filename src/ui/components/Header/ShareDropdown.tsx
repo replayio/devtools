@@ -92,7 +92,11 @@ function PrivacyNote({ isPrivate, isOwner }: { isPrivate: boolean; isOwner: bool
   );
 }
 
-function Collaborators({ setExpanded, recordingId, setModal }: PropsFromRedux & { setExpanded(expanded: boolean): void }) {
+function Collaborators({
+  setExpanded,
+  recordingId,
+  setModal,
+}: PropsFromRedux & { setExpanded(expanded: boolean): void }) {
   const { id } = useGetUserInfo();
   if (!id) {
     return null;

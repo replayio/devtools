@@ -76,7 +76,7 @@ export default function DashboardViewerContent({
   const [ascOrder, setAscOrder] = useState(false);
   let sortedRecordings = sortBy(recordings, recording => {
     const order = ascOrder ? 1 : -1;
-    return order * (new Date(recording.date)).getTime();
+    return order * new Date(recording.date).getTime();
   });
 
   if (!recordings.length) {
@@ -110,7 +110,11 @@ export default function DashboardViewerContent({
   );
 }
 
-interface RecordingsListProps extends Pick<DashboardViewerContentProps, "recordings" | "selectedIds" | "setSelectedIds" | "editing"> {
+interface RecordingsListProps
+  extends Pick<
+    DashboardViewerContentProps,
+    "recordings" | "selectedIds" | "setSelectedIds" | "editing"
+  > {
   ascOrder: boolean;
   setAscOrder(ascOrder: boolean): void;
 }
@@ -155,7 +159,10 @@ function RecordingsList({
   );
 }
 
-type DashboardViewerContentHeaderProps = Pick<RecordingsListProps, "recordings" | "selectedIds" | "setSelectedIds" | "ascOrder" | "setAscOrder">;
+type DashboardViewerContentHeaderProps = Pick<
+  RecordingsListProps,
+  "recordings" | "selectedIds" | "setSelectedIds" | "ascOrder" | "setAscOrder"
+>;
 
 function DashboardViewerContentHeader({
   recordings,
@@ -175,7 +182,11 @@ function DashboardViewerContentHeader({
   return (
     <tr>
       <th>
-        <input type="checkbox" onChange={handleHeaderCheckboxClick} checked={!!selectedIds.length} />
+        <input
+          type="checkbox"
+          onChange={handleHeaderCheckboxClick}
+          checked={!!selectedIds.length}
+        />
       </th>
       <th>PREVIEW</th>
       <th>TITLE</th>

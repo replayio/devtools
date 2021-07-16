@@ -77,7 +77,10 @@ function ItemDuration({ duration }: { duration: number }) {
   return <div>{getDurationString(duration)}</div>;
 }
 
-type ItemTitleProps = Pick<RecordingListItemProps, "data" | "editing" | "editingTitle" | "setEditingTitle">;
+type ItemTitleProps = Pick<
+  RecordingListItemProps,
+  "data" | "editing" | "editingTitle" | "setEditingTitle"
+>;
 
 function ItemTitle({ data, editing, editingTitle, setEditingTitle }: ItemTitleProps) {
   return (

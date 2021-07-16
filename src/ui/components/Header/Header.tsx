@@ -18,7 +18,9 @@ import { UIState } from "ui/state";
 import "./Header.css";
 
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
-  const { users, loading, error } = useGetActiveSessions(recordingId || "00000000-0000-0000-0000-000000000000");
+  const { users, loading, error } = useGetActiveSessions(
+    recordingId || "00000000-0000-0000-0000-000000000000"
+  );
 
   if (loading || error) {
     return null;
@@ -33,7 +35,10 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   );
 }
 
-function Links({ recordingId, recordingTarget }: Pick<PropsFromRedux, "recordingId" | "recordingTarget">) {
+function Links({
+  recordingId,
+  recordingTarget,
+}: Pick<PropsFromRedux, "recordingId" | "recordingTarget">) {
   const { isAuthenticated } = useAuth0();
   const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
   const isCollaborator =
@@ -54,7 +59,13 @@ function Links({ recordingId, recordingTarget }: Pick<PropsFromRedux, "recording
 // This is a workaround for getting an automatically-resizing horizontal text input
 // so that switching between the editing and non-editing states is smoonth.
 // https://stackoverflow.com/questions/45306325/react-contenteditable-and-cursor-position
-function HeaderTitle({ recording, recordingId }: { recording: Recording; recordingId: RecordingId }) {
+function HeaderTitle({
+  recording,
+  recordingId,
+}: {
+  recording: Recording;
+  recordingId: RecordingId;
+}) {
   const [inputValue, setInputValue] = useState(recording.title);
   const inputNode = useRef<HTMLSpanElement>(null);
   const { userId } = hooks.useGetUserId();

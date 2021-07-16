@@ -16,7 +16,7 @@ interface HandleProps {
   mode: ViewMode;
   localViewMode: ViewMode;
   handleToggle(mode: ViewMode): void;
-  motion: (typeof import("framer-motion"))["motion"];
+  motion: typeof import("framer-motion")["motion"];
 }
 
 function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps) {
@@ -47,7 +47,12 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps
   );
 }
 
-function ViewToggle({ viewMode, recordingId, setViewMode, setSelectedPrimaryPanel }: PropsFromRedux) {
+function ViewToggle({
+  viewMode,
+  recordingId,
+  setViewMode,
+  setSelectedPrimaryPanel,
+}: PropsFromRedux) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
