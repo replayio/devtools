@@ -90,7 +90,7 @@ function PanelButtons({
 
 function ConsolePanel() {
   return (
-    <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
+    <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
         <WebConsoleApp />
       </div>
