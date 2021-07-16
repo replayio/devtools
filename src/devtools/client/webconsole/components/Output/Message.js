@@ -99,7 +99,8 @@ class Message extends Component {
       this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
       this.props.pausedExecutionPoint !== nextProps.pausedExecutionPoint ||
       this.props.isPaused !== nextProps.isPaused ||
-      this.props.timestampsVisible !== nextProps.timestampsVisible
+      this.props.timestampsVisible !== nextProps.timestampsVisible ||
+      this.props.open !== nextProps.open
     );
   }
 
