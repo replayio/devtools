@@ -53,7 +53,7 @@ function ErrorRep(props) {
       ? props.renderStacktrace(parseStackString(preview.stack.primitive()))
       : getStacktraceElements(props, preview);
 
-    if (!isEvaluationError) {
+    if (!isEvaluationError(stacktrace)) {
       content.push(stacktrace);
     }
   }
@@ -236,7 +236,7 @@ function supportsObject(object, noGrip = false) {
 }
 
 function isEvaluationError(stacktrace) {
-  return stacktrace.props.stacktrace[0].filename !== "debugger eval code";
+  return stacktrace.props.stacktrace[0].filename === "debugger eval code";
 }
 
 // Exports from this module
