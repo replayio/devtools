@@ -67,6 +67,22 @@
 /* It's important to set min-height: 0 here, otherwise the console output
 overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) */
 .secondary-toolbox .secondary-toolbox-content {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   min-height: 0;
+  height: 100%;
+}
+
+.secondary-toolbox .toolbox-bottom-panels {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.secondary-toolbox .toolbox-bottom-panels .toolbox-panel {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
