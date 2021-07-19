@@ -258,9 +258,10 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderUnloadedRegions() {
-    const { loadedRegions, zoomRegion } = this.props;
+    const { loadedRegions, isFinishedLoadingRegions, zoomRegion } = this.props;
 
-    if (!loadedRegions || loadedRegions.length === 0) {
+    // Check loadedRegions to keep typescript happy.
+    if (!loadedRegions || !isFinishedLoadingRegions) {
       return null;
     }
 
@@ -348,6 +349,7 @@ class Timeline extends Component<PropsFromRedux> {
 const connector = connect(
   (state: UIState) => ({
     loadedRegions: selectors.getLoadedRegions(state)?.loaded,
+    isFinishedLoadingRegions: selectors.isFinishedLoadingRegions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),

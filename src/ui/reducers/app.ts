@@ -5,6 +5,7 @@ import { SessionActions } from "ui/actions/session";
 import { prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { isSameTimeStampedPointRange } from "ui/utils/timeline";
 
 function initialAppState(): AppState {
   return {
@@ -280,3 +281,21 @@ export const isRegionLoaded = (state: UIState, time: number | null | undefined) 
   !!getLoadedRegions(state)?.loaded.some(
     region => time >= region.begin.time && time <= region.end.time
   );
+export const isFinishedLoadingRegions = (state: UIState) => {
+  const loadedRegions = getLoadedRegions(state)?.loaded;
+  const loadingRegions = getLoadedRegions(state)?.loading;
+
+  if (
+    !loadingRegions ||
+    !loadedRegions ||
+    loadingRegions.length === 0 ||
+    loadedRegions.length === 0
+  ) {
+    return false;
+  }
+
+  const loading = loadingRegions[0];
+  const loaded = loadedRegions[0];
+
+  return isSameTimeStampedPointRange(loading, loaded);
+};
