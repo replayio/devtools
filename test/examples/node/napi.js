@@ -20,5 +20,7 @@ function testBufferUtil() {
   const mask = Buffer.from([5,6,7,8]);
   bufferutil.unmask(buf, mask);
   console.log(`Unmasked ${JSON.stringify([...buf])}`);
+  bufferutil.mask(buf, mask, buf, 0, 4);
+  console.log(`Remasked ${JSON.stringify([...buf])}`);
 }
 testBufferUtil();
