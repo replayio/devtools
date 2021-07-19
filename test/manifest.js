@@ -144,6 +144,11 @@ module.exports = [
     script: "node_console-01.js",
     targets: ["node"],
   },
+  {
+    example: "node/error.js",
+    script: "node_console-02.js",
+    targets: ["node"],
+  },
 
   //////////////////////////////////////////////////////////////////////////////
   // Logpoints
