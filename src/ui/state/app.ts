@@ -30,7 +30,7 @@ export type ModalType =
   | "browser-launch"
   | "first-replay";
 export type WorkspaceId = string;
-export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Personal";
+export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Personal" | "Legal";
 
 export interface ExpectedError {
   message: string;

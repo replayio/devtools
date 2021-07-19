@@ -59,6 +59,11 @@ const settings: Settings = [
     icon: "support",
     items: [],
   },
+  {
+    title: "Legal",
+    icon: "gavel",
+    items: [],
+  },
 ];
 
 function SettingsModal({ defaultSettingsTab }: PropsFromRedux) {
