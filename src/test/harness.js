@@ -20,13 +20,26 @@ function waitForElapsedTime(time, ms) {
   }
 }
 
-async function waitUntil(fn) {
-  for (let i = 0; i < 200; i++) {
+const WaitTimeout = 1000 * 60;
+
+async function waitUntil(fn, timeout = WaitTimeout) {
+  const start = Date.now();
+  while (true) {
     const rv = fn();
     if (rv) {
       return rv;
     }
-    await waitForTime(i < 10 ? 50 : 100);
+    const elapsed = Date.now() - start;
+    if (elapsed >= timeout) {
+      break;
+    }
+    if (elapsed < 1000) {
+      await waitForTime(50);
+    } else if (elapsed < 5000) {
+      await waitForTime(200);
+    } else {
+      await waitForTime(1000);
+    }
   }
   console.trace("waitUntil() timed out");
   throw new Error("waitUntil() timed out");
@@ -34,7 +47,7 @@ async function waitUntil(fn) {
 
 function start() {
   app.actions.setViewMode("dev");
-  return waitUntil(() => isFullyLoaded() && app.selectors.getViewMode() == "dev");
+  return waitUntil(() => isFullyLoaded() && app.selectors.getViewMode() == "dev", 1000 * 120);
 }
 
 function finish() {
