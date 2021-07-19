@@ -10,7 +10,7 @@ export default function Viewer() {
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={1}
       initialSize={prefs.secondaryPanelHeight}
-      onResizeEnd={num => {
+      onResizeEnd={(num: number) => {
         prefs.secondaryPanelHeight = `${num}px`;
       }}
       minSize="20%"

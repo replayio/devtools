@@ -1,11 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { connect } from "react-redux";
-import Header from "./Header/index";
+import { connect, ConnectedProps } from "react-redux";
 import Prompt from "./shared/Prompt";
-import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
+import {
+  screenshotCache,
+  nextPaintEvent,
+  getClosestPaintPoint,
+  TimeStampedPointWithPaintHash,
+} from "protocol/graphics";
 import { selectors } from "../reducers";
+import { UIState } from "ui/state";
+import { ScreenShot } from "@recordreplay/protocol";
 
-async function getScreenshotSafely(paintPoint) {
+async function getScreenshotSafely(paintPoint: TimeStampedPointWithPaintHash | null) {
   if (!paintPoint) {
     return null;
   }
@@ -15,8 +21,8 @@ async function getScreenshotSafely(paintPoint) {
   } catch (e) {}
 }
 
-function useGetPreviewScreen({ loading, recordingDuration }) {
-  const [screen, setScreen] = useState(null);
+function useGetPreviewScreen({ loading, recordingDuration }: PropsFromRedux) {
+  const [screen, setScreen] = useState<ScreenShot | null>(null);
   const mounted = useRef(false);
 
   useEffect(() => {
@@ -25,7 +31,7 @@ function useGetPreviewScreen({ loading, recordingDuration }) {
 
   useEffect(() => {
     async function getAndSetScreen() {
-      const time = (loading / 100) * recordingDuration;
+      const time = (loading / 100) * (recordingDuration || 0);
       let screen;
 
       const closestPaintPoint = getClosestPaintPoint(time);
@@ -51,7 +57,7 @@ function useGetPreviewScreen({ loading, recordingDuration }) {
   return screen;
 }
 
-function PreviewContainer({ screen }) {
+function PreviewContainer({ screen }: { screen: ScreenShot | null }) {
   if (!screen) {
     return <div className="preview-container empty" />;
   }
@@ -60,7 +66,7 @@ function PreviewContainer({ screen }) {
   return <div className="preview-container" style={{ backgroundImage: image }}></div>;
 }
 
-function RecordingLoadingScreen({ loading, recordingDuration }) {
+function RecordingLoadingScreen({ loading, recordingDuration }: PropsFromRedux) {
   const screen = useGetPreviewScreen({ loading, recordingDuration });
 
   return (
@@ -75,10 +81,13 @@ function RecordingLoadingScreen({ loading, recordingDuration }) {
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     loading: selectors.getLoading(state),
     recordingDuration: selectors.getRecordingDuration(state),
   }),
   {}
-)(RecordingLoadingScreen);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(RecordingLoadingScreen);

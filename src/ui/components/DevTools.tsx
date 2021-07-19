@@ -3,9 +3,8 @@ import { connect, ConnectedProps } from "react-redux";
 import hooks from "../hooks";
 
 import Header from "./Header/index";
-import SkeletonLoader from "./SkeletonLoader";
-const NonDevView = require("./Views/NonDevView").default;
-const DevView = require("./Views/DevView").default;
+import NonDevView from "./Views/NonDevView";
+import DevView from "./Views/DevView";
 import { isTest } from "ui/utils/environment";
 
 import { actions } from "../actions";

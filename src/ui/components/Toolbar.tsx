@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
 import classnames from "classnames";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { UIState } from "ui/state";
+import { PrimaryPanelName } from "ui/state/app";
 
-function IndexingLoader({ progressPercentage, viewMode }) {
+function IndexingLoader({
+  progressPercentage,
+  viewMode,
+}: Pick<PropsFromRedux, "progressPercentage" | "viewMode">) {
   const [isDone, setDone] = useState(false);
 
   // Set the indexing loader to done immediately, if
@@ -20,7 +25,7 @@ function IndexingLoader({ progressPercentage, viewMode }) {
   }, []);
 
   useEffect(() => {
-    let timeout;
+    let timeout: NodeJS.Timeout;
     if (!isDone && progressPercentage == 100) {
       timeout = setTimeout(() => setDone(true), 2000);
     }
@@ -50,8 +55,8 @@ function Toolbar({
   panelCollapsed,
   progressPercentage,
   viewMode,
-}) {
-  const onClick = panel => {
+}: PropsFromRedux) {
+  const onClick = (panel: PrimaryPanelName) => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
       togglePaneCollapse();
     }
@@ -127,8 +132,8 @@ function Toolbar({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     initializedPanels: selectors.getInitializedPanels(state),
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
@@ -140,4 +145,7 @@ export default connect(
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
     togglePaneCollapse: actions.togglePaneCollapse,
   }
-)(Toolbar);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(Toolbar);

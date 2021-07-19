@@ -24,6 +24,8 @@ export class DevToolsToolbox {
   threadFront: typeof ThreadFront;
   selection: Selection;
   currentTool: string | null;
+  timeline?: any;
+  nodePicker?: any;
 
   // added by EventEmitter.decorate(this)
   eventListeners!: Map<string, ((value?: any) => void)[]>;

@@ -2,7 +2,7 @@ import { bindActionCreators } from "redux";
 import { ThreadFront } from "protocol/thread";
 
 import { prefs, features } from "ui/utils/prefs";
-import { actions } from "ui/actions";
+import { actions, UIStore } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
@@ -11,7 +11,13 @@ import {
   features as inspectorFeatures,
 } from "devtools/client/inspector/prefs";
 
-export function setupAppHelper(store) {
+declare global {
+  interface Window {
+    app: object;
+  }
+}
+
+export function setupAppHelper(store: UIStore) {
   window.app = {
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
@@ -34,26 +40,27 @@ export function setupAppHelper(store) {
       const params = new URLSearchParams(document.location.search.substring(1));
 
       if (params.get("id")) {
-        window.location = `http://localhost:8080/index.html?id=${params.get("id")}`;
+        window.location.href = `http://localhost:8080/index.html?id=${params.get("id")}`;
       } else {
-        window.location = "http://localhost:8080/index.html";
+        window.location.href = "http://localhost:8080/index.html";
       }
     },
     prod: () => {
       const params = new URLSearchParams(document.location.search.substring(1));
 
       if (params.get("id")) {
-        window.location = `http://app.replay.io/?id=${params.get("id")}`;
+        window.location.href = `http://app.replay.io/?id=${params.get("id")}`;
       } else {
-        window.location = "http://app.replay.io/";
+        window.location.href = "http://app.replay.io/";
       }
     },
   };
 }
 
-function bindSelectors(obj) {
+function bindSelectors(obj: any) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {
-    bound[selector] = (a, b, c) => obj.selectors[selector](obj.store.getState(), a, b, c);
+    bound[selector] = (a: any, b: any, c: any) =>
+      obj.selectors[selector](obj.store.getState(), a, b, c);
     return bound;
-  }, {});
+  }, {} as any);
 }
