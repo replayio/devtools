@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import React, { useEffect } from "react";
+import { connect, ConnectedProps } from "react-redux";
 
 import Timeline from "../Timeline";
 import Viewer from "../Viewer";
@@ -12,9 +12,15 @@ import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
+import { UIState } from "ui/state";
 
-function DevView({ updateTimelineDimensions, narrowMode, recordingTarget, showVideoPanel }) {
-  const handleMove = num => {
+function DevView({
+  updateTimelineDimensions,
+  narrowMode,
+  recordingTarget,
+  showVideoPanel,
+}: PropsFromRedux) {
+  const handleMove = (num: number) => {
     updateTimelineDimensions();
     prefs.toolboxHeight = `${num}px`;
   };
@@ -29,7 +35,7 @@ function DevView({ updateTimelineDimensions, narrowMode, recordingTarget, showVi
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
-          initialSize={prefs.toolboxHeight}
+          initialSize={prefs.toolboxHeight as string}
           minSize="20%"
           maxSize="80%"
           vert={false}
@@ -59,7 +65,7 @@ function DevView({ updateTimelineDimensions, narrowMode, recordingTarget, showVi
             <SplitBox
               style={{ width: "100%", overflow: "hidden" }}
               splitterSize={1}
-              initialSize={prefs.toolboxHeight}
+              initialSize={prefs.toolboxHeight as string}
               minSize="20%"
               maxSize="80%"
               vert={true}
@@ -84,7 +90,7 @@ function DevView({ updateTimelineDimensions, narrowMode, recordingTarget, showVi
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
-          initialSize={prefs.toolboxHeight}
+          initialSize={prefs.toolboxHeight as string}
           minSize="20%"
           maxSize="80%"
           vert={true}
@@ -101,8 +107,8 @@ function DevView({ updateTimelineDimensions, narrowMode, recordingTarget, showVi
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
@@ -110,4 +116,7 @@ export default connect(
   {
     updateTimelineDimensions,
   }
-)(DevView);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(DevView);

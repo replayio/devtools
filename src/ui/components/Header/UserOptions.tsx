@@ -51,7 +51,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }: UserOptionsProps)
         return window.open(launchUrl);
       }
       // right now we just send you to the download screen, but eventually this will launch Replay
-      (window as any).location = launchUrl;
+      window.location.href = launchUrl;
     }
   };
   const onShareClick = () => {

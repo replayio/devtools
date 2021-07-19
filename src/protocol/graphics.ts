@@ -91,7 +91,7 @@ function closerEntry<T1 extends Timed, T2 extends Timed>(
 // Paint / Mouse Event Points
 //////////////////////////////
 
-interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
+export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
   paintHash: string;
 }
 

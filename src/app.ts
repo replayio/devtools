@@ -1,6 +1,6 @@
 import { initSocket } from "protocol/socket";
 import { setupLogpoints } from "./protocol/logpoint";
-const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
+import { bootstrapStore } from "ui/utils/bootstrap/bootstrapStore";
 import { actions } from "ui/actions";
 const { setupTimeline, setupApp, setModal } = actions;
 import { setupGraphics } from "protocol/graphics";
@@ -9,7 +9,7 @@ const { setupMessages } = require("devtools/client/webconsole/actions/messages")
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
-const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
+import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { createSession } from "ui/actions/session";
 const {
   initOutputSyntaxHighlighting,
@@ -18,16 +18,16 @@ const { setupExceptions } = require("devtools/client/debugger/src/actions/logExc
 import { selectors } from "ui/reducers";
 import { getUserSettings } from "ui/hooks/settings";
 import DevTools from "ui/components/DevTools";
-import { setWorkspaceId } from "ui/actions/app";
 
 const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id")!;
 const dispatch = url.searchParams.get("dispatch") || undefined;
 
 declare global {
+  const gToolbox: DevToolsToolbox;
   interface Window {
     L10N: any;
-    gToolbox: any;
+    gToolbox: DevToolsToolbox;
     store: any;
     mouseClientX?: number;
     mouseClientY?: number;

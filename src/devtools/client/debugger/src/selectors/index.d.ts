@@ -16,3 +16,4 @@ export function getVisibleSelectedFrame(state: UIState): SelectedFrame | null;
 export function getSourceWithContent(state: UIState, sourceId: string): any;
 export function getPausePreviewLocation(state: UIState): UrlLocation;
 export function getDebugLineLocation(state: UIState): UrlLocation | undefined;
+export function getPaneCollapse(state: UIState): boolean;

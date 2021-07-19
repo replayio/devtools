@@ -1,16 +1,23 @@
 import React from "react";
 import { compareNumericStrings } from "protocol/utils";
 
-import {
+const {
   createBridge,
   createStore,
-  initialize as createDevTools,
-} from "react-devtools-inline/frontend";
+  initialize: createDevTools,
+} = require("react-devtools-inline/frontend");
 import { ThreadFront } from "protocol/thread";
+import { ExecutionPoint } from "@recordreplay/protocol";
 
-let bridge, store, wall, DevTools;
-let rerenderComponentsTab;
-const messages = [];
+interface Message {
+  point: ExecutionPoint;
+  time: number;
+  message: any;
+}
+
+let bridge: any, store: any, wall: any, DevTools: any;
+let rerenderComponentsTab: Function | undefined;
+const messages: Message[] = [];
 const inspected = new Set();
 
 let isSetup = false;
@@ -48,8 +55,8 @@ function InitReactDevTools() {
 
   wall = {
     emit() {},
-    listen(listener) {
-      wall._listener = msg => {
+    listen(listener: any) {
+      wall._listener = (msg: any) => {
         try {
           listener(msg);
         } catch (err) {
@@ -57,7 +64,7 @@ function InitReactDevTools() {
         }
       };
     },
-    async send(event, payload) {
+    async send(event: any, payload: any) {
       if (event == "inspectElement") {
         if (inspected.has(payload.id) && !payload.path) {
           wall._listener({
@@ -96,14 +103,14 @@ function InitReactDevTools() {
   }
 }
 
-async function sendRequest(event, payload) {
+async function sendRequest(event: any, payload: any) {
   const response = await ThreadFront.evaluate(
     0,
-    0,
+    undefined,
     ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(payload)})`
   );
   if (response.returned) {
-    const result = await response.returned.getJSON();
+    const result: any = await response.returned.getJSON();
     wall._listener({ event: result.event, payload: result.data });
     return { event: result.event, payload: result.data };
   }

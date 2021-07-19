@@ -1,10 +1,12 @@
 import { prefs, asyncStore } from "../prefs";
 import { combineReducers, applyMiddleware } from "redux";
+import { UIStore } from "ui/actions";
+import { UIState } from "ui/state";
 import { reducers, selectors } from "../../reducers";
 import { setupAppHelper } from "./helpers";
-import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
-const { getPrefsService } = require("devtools/client/webconsole/utils/prefs");
-const { getConsoleInitialState } = require("devtools/client/webconsole/store");
+const configureStore = require("devtools/client/debugger/src/actions/utils/create-store").default;
+import { getPrefsService } from "devtools/client/webconsole/utils/prefs";
+import { getConsoleInitialState } from "devtools/client/webconsole/store";
 
 import { clientCommands } from "devtools/client/debugger/src/client/commands";
 import LogRocket from "ui/utils/logrocket";
@@ -27,7 +29,10 @@ async function getInitialState() {
   };
 }
 
-function registerStoreObserver(store, subscriber) {
+function registerStoreObserver(
+  store: UIStore,
+  subscriber: (state: UIState, oldState: UIState) => void
+) {
   let oldState = store.getState();
   store.subscribe(() => {
     const state = store.getState();
@@ -36,13 +41,13 @@ function registerStoreObserver(store, subscriber) {
   });
 }
 
-function updatePrefs(state, oldState) {
-  function updatePref(field, selector) {
+function updatePrefs(state: UIState, oldState: UIState) {
+  function updatePref(field: keyof typeof prefs, selector: Function) {
     if (selector(state) != selector(oldState)) {
       prefs[field] = selector(state);
     }
   }
-  function updateAsyncPref(field, selector) {
+  function updateAsyncPref(field: keyof typeof asyncStore, selector: Function) {
     if (selector(state) != selector(oldState)) {
       asyncStore[field] = selector(state);
     }
@@ -51,7 +56,7 @@ function updatePrefs(state, oldState) {
   updatePref("viewMode", selectors.getViewMode);
   updatePref("splitConsole", selectors.isSplitConsoleOpen);
   updatePref("selectedPanel", selectors.getSelectedPanel);
-  updateAsyncPref("eventListenerBreakpoints", state => state.eventListenerBreakpoints);
+  updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
 }
 
 export const bootstrapStore = async function bootstrapStore() {
@@ -63,7 +68,7 @@ export const bootstrapStore = async function bootstrapStore() {
   const prefsService = getPrefsService();
 
   const createStore = configureStore({
-    makeThunkArgs: args => {
+    makeThunkArgs: (args: object) => {
       return {
         ...args,
         client: clientCommands,

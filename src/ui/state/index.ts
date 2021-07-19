@@ -20,4 +20,5 @@ export interface UIState {
   pseudoClasses: PseudoClassesState;
   rules: RulesState;
   computed: ComputedState;
+  eventListenerBreakpoints: any;
 }

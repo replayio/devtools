@@ -118,7 +118,7 @@ function Header({ recordingId, sessionId, recordingTarget }: PropsFromRedux) {
     if (event.metaKey) {
       return window.open(dashboardUrl);
     }
-    (window as any).location = dashboardUrl;
+    window.location.href = dashboardUrl;
   };
 
   if (loading) {

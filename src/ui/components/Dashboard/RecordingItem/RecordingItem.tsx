@@ -38,7 +38,7 @@ export default function RecordingItem({
     if (event.metaKey) {
       return window.open(url);
     }
-    (window as any).location = url;
+    window.location.href = url;
   };
 
   const Panel = (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 
 import Timeline from "../Timeline";
 import Video from "../Video";
@@ -13,9 +13,10 @@ import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 import "./NonDevView.css";
+import { UIState } from "ui/state";
 
 export function EventsFilter() {
-  const [expanded, setExpanded] = useState(TextTrackCueList);
+  const [expanded, setExpanded] = useState(false);
 
   const buttonContent = <div className="img settings" />;
 
@@ -33,7 +34,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel }) {
+function NonDevView({ updateTimelineDimensions, narrowMode }: PropsFromRedux) {
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -43,7 +44,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
     </div>
   );
 
-  const handleMove = num => {
+  const handleMove = (num: number) => {
     updateTimelineDimensions();
     prefs.nonDevSidePanelWidth = `${num}px`;
   };
@@ -54,7 +55,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
-          initialSize={prefs.nonDevSidePanelWidth}
+          initialSize={prefs.nonDevSidePanelWidth as string}
           minSize="20%"
           onMove={handleMove}
           maxSize="80%"
@@ -74,7 +75,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={1}
-      initialSize={prefs.nonDevSidePanelWidth}
+      initialSize={prefs.nonDevSidePanelWidth as string}
       minSize="20%"
       onMove={handleMove}
       maxSize="80%"
@@ -91,12 +92,15 @@ function NonDevView({ updateTimelineDimensions, narrowMode, selectedPrimaryPanel
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     narrowMode: selectors.getNarrowMode(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
   }),
   {
     updateTimelineDimensions,
   }
-)(NonDevView);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(NonDevView);
