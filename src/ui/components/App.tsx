@@ -30,6 +30,7 @@ import { useApolloClient } from "@apollo/client";
 import BlankScreen from "./shared/BlankScreen";
 import { setUnexpectedError } from "ui/actions/session";
 import FirstReplayModal from "./shared/FirstReplayModal";
+import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -109,6 +110,7 @@ function App({
 }: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
+  const { isAuthenticated } = useAuth0();
   const recordingInfo = useGetRecording(recordingId);
   const apolloError = useCheckForApolloError();
 
@@ -159,6 +161,10 @@ function App({
 
   if (!isDeployPreview() && auth.isLoading) {
     return <BlankScreen />;
+  }
+
+  if (!isTest() && isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {
+    return <TOSScreen />;
   }
 
   return (
