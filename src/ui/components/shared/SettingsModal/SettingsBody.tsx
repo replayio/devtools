@@ -4,7 +4,6 @@ import { UserSettings } from "ui/types";
 import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
 import SettingsBodyItem from "./SettingsBodyItem";
-import { useGetUserInfo } from "ui/hooks/users";
 import Spinner from "../Spinner";
 import { handleIntercomLogout } from "ui/utils/intercom";
 import useAuth0 from "ui/utils/useAuth0";
@@ -46,12 +45,8 @@ function Support() {
 }
 
 function Personal() {
-  const { logout } = useAuth0();
-  const { loading, name, picture, email } = useGetUserInfo();
-
-  if (loading) {
-    return <Spinner className="animate-spin -ml-1 mr-3 h-8 w-8 text-gray-500" />;
-  }
+  const { logout, user } = useAuth0();
+  const { name, picture, email } = user;
 
   return (
     <div className="space-y-16">
