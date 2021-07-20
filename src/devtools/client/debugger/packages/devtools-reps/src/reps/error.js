@@ -236,7 +236,7 @@ function supportsObject(object, noGrip = false) {
 }
 
 function isEvaluationError(stacktrace) {
-  return stacktrace.props.stacktrace[0].filename === "debugger eval code";
+  return stacktrace.props.stacktrace[0]?.filename === "debugger eval code";
 }
 
 // Exports from this module
