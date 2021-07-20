@@ -39,7 +39,7 @@ function onInspectIconClick(object: ValueFront, e: React.MouseEvent) {
 }
 
 function renderStacktrace(stacktrace: SmartTraceStackFrame[]) {
-  return <SmartTrace key="stacktrace" stacktrace={stacktrace} />;
+  return <SmartTrace key="stacktrace" stacktrace={stacktrace} mapSources={true} />;
 }
 
 const connector = connect(null, {

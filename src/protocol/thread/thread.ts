@@ -359,6 +359,15 @@ class _ThreadFront {
     });
   }
 
+  getGeneratedSourceIdsForURL(url: string) {
+    // Ignore IDs which are original versions of another ID with the same URL.
+    const ids = this.urlSources.map.get(url) || [];
+    return ids.filter(id => {
+      const generatedIds = this.sources.get(id)?.generatedSourceIds;
+      return (generatedIds || []).every(generatedId => !ids.includes(generatedId));
+    });
+  }
+
   async getSourceContents(sourceId: SourceId) {
     assert(this.sessionId);
     const { contents, contentType } = await client.Debugger.getSourceContents(
