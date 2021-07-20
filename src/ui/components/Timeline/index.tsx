@@ -17,6 +17,7 @@ import clamp from "lodash/clamp";
 import Tooltip from "./Tooltip";
 import Comments from "../Comments";
 
+import { ThreadFront } from "protocol/thread";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
 import { actions } from "ui/actions";
@@ -114,14 +115,26 @@ class Timeline extends Component<PropsFromRedux> {
   };
 
   onPlayerMouseUp: MouseEventHandler = e => {
-    const { hoverTime, seek, hoveredItem, clearPendingComment } = this.props;
+    const {
+      hoverTime,
+      seek,
+      hoveredItem,
+      clearPendingComment,
+      setTimelineToTime,
+      setTimelineState,
+    } = this.props;
     const hoveringOverMarker = hoveredItem?.target === "timeline";
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
-        seek(event.point, mouseTime, false);
+        if (!seek(event.point, mouseTime, false)) {
+          // if seeking to the new point failed because it is in an unloaded region,
+          // we reset the timeline to the current time
+          setTimelineToTime(ThreadFront.currentTime, true);
+          setTimelineState({ currentTime: ThreadFront.currentTime });
+        }
         clearPendingComment();
       }
     }

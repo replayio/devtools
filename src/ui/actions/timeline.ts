@@ -252,10 +252,10 @@ export function seek(
   time: number,
   hasFrames: boolean,
   pauseId?: PauseId
-): UIThunkAction {
+): UIThunkAction<boolean> {
   return ({ getState, dispatch }) => {
     if (!selectors.isRegionLoaded(getState(), time)) {
-      return;
+      return false;
     }
 
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
@@ -267,6 +267,7 @@ export function seek(
     } else {
       ThreadFront.timeWarp(point, time, hasFrames);
     }
+    return true;
   };
 }
 
