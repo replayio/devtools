@@ -8,23 +8,19 @@ const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPan
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
 function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
-  switch (selectedPrimaryPanel) {
-    case "explorer": {
-      return <PrimaryPanes />;
-    }
-    case "debug": {
-      return <SecondaryPanes />;
-    }
-    case "comments": {
-      return <Transcript />;
-    }
-    case "events": {
-      return <Events />;
-    }
-    default: {
-      return null;
-    }
+  let sidepanel;
+
+  if (selectedPrimaryPanel === "explorer") {
+    sidepanel = <PrimaryPanes />;
+  } else if (selectedPrimaryPanel === "debug") {
+    sidepanel = <SecondaryPanes />;
+  } else if (selectedPrimaryPanel === "comments") {
+    sidepanel = <Transcript />;
+  } else if (selectedPrimaryPanel === "events") {
+    sidepanel = <Events />;
   }
+
+  return <div style={{ width: "400px" }}>{sidepanel}</div>;
 }
 
 const connector = connect((state: UIState) => ({

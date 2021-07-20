@@ -72,6 +72,19 @@ function NonDevView({ updateTimelineDimensions, narrowMode }: PropsFromRedux) {
   }
 
   return (
+    <div className="horizontal-panels">
+      <div
+        className="flex flex-row overflow-hidden h-full"
+        style={{ borderRight: "1px solid var(--theme-splitter-color)" }}
+      >
+        <Toolbar />
+        <SidePanel />
+      </div>
+      {viewer}
+    </div>
+  );
+
+  return (
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={1}
