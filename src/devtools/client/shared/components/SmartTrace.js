@@ -27,6 +27,7 @@ class SmartTrace extends Component {
       // Function that will be called when the SmartTrace is ready, i.e. once it was
       // rendered.
       onReady: PropTypes.func,
+      mapSources: PropTypes.bool,
     };
   }
 
@@ -47,9 +48,13 @@ class SmartTrace extends Component {
   }
 
   UNSAFE_componentWillMount() {
+    if (!this.props.mapSources) {
+      return;
+    }
+
     const mappedStack = this.props.stacktrace.map(async frame => {
       const { lineNumber, columnNumber, filename } = frame;
-      const sourceIds = ThreadFront.getSourceIdsForURL(filename);
+      const sourceIds = ThreadFront.getGeneratedSourceIdsForURL(filename);
       if (sourceIds.length != 1) {
         return frame;
       }
@@ -92,7 +97,7 @@ class SmartTrace extends Component {
       return null;
     }
 
-    const { onViewSourceInDebugger, onViewSource } = this.props;
+    const { onViewSourceInDebugger, onViewSource, mapSources } = this.props;
 
     const stacktrace = this.state.isSourceMapped ? this.state.stacktrace : this.props.stacktrace;
 
@@ -130,7 +135,7 @@ class SmartTrace extends Component {
       disableFrameTruncate: true,
       disableContextMenu: true,
       frameworkGroupingOn: true,
-      displayFullUrl: !this.state || !this.state.isSourceMapped,
+      displayFullUrl: mapSources && (!this.state || !this.state.isSourceMapped),
       panel: "webconsole",
     });
   }
