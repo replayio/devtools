@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
-const { actions } = require("ui/actions");
-const SmartTrace = require("devtools/client/shared/components/SmartTrace");
+import { actions } from "ui/actions";
+import SmartTrace from "devtools/client/shared/components/SmartTrace";
 
 export default connect(null, {
   onViewSourceInDebugger: actions.onViewSourceInDebugger,

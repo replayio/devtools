@@ -1,11 +1,12 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { ValueFront } from "protocol/thread";
-const { actions } = require("ui/actions");
+import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
+import { actions } from "ui/actions";
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;
 const ObjectInspector = reps.objectInspector.ObjectInspector.default;
-const SmartTrace = require("devtools/client/webconsole/utils/connected-smart-trace").default;
+import SmartTrace from "devtools/client/webconsole/utils/connected-smart-trace";
 
 type ObjectInspectorProps = PropsFromRedux & {
   value: ValueFront;
@@ -37,7 +38,7 @@ function onInspectIconClick(object: ValueFront, e: React.MouseEvent) {
   return actions.openNodeInInspector(object);
 }
 
-function renderStacktrace(stacktrace: any) {
+function renderStacktrace(stacktrace: SmartTraceStackFrame[]) {
   return <SmartTrace key="stacktrace" stacktrace={stacktrace} />;
 }
 
