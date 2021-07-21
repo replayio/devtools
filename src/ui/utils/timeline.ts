@@ -1,3 +1,4 @@
+import { TimeStampedPointRange } from "@recordreplay/protocol";
 import { ZoomRegion } from "ui/state/timeline";
 import { timelineMarkerWidth } from "../constants";
 
@@ -120,4 +121,15 @@ export function getFormattedTime(time: number) {
   const minutes = date.getMinutes();
 
   return `${minutes}:${seconds}`;
+}
+
+export function isSameTimeStampedPointRange(
+  range1: TimeStampedPointRange,
+  range2: TimeStampedPointRange
+) {
+  const sameBegin =
+    range1.begin.point === range2.begin.point && range1.begin.time === range2.begin.time;
+  const sameEnd = range1.end.point === range2.end.point && range1.end.time === range2.end.time;
+
+  return sameBegin && sameEnd;
 }
