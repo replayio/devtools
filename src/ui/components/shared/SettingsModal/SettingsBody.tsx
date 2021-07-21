@@ -7,6 +7,7 @@ import SettingsBodyItem from "./SettingsBodyItem";
 import Spinner from "../Spinner";
 import { handleIntercomLogout } from "ui/utils/intercom";
 import useAuth0 from "ui/utils/useAuth0";
+import MaterialIcon from "../MaterialIcon";
 
 interface SettingsBodyProps {
   selectedSetting: Setting;
@@ -69,6 +70,41 @@ function Personal() {
   );
 }
 
+function Legal() {
+  return (
+    <div className="space-y-16 text-lg pr-48">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="text-2xl">
+            <a
+              className="underline"
+              href="https://replay.io/tos.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Terms of Use
+            </a>
+          </div>
+          <div>{`The Terms of Use help define Replay's relationship with you as you interact with our services.`}</div>
+        </div>
+        <div className="space-y-2">
+          <div className="text-2xl">
+            <a
+              className="underline"
+              href="https://replay.io/privacy.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Privacy Policy
+            </a>
+          </div>
+          <div>{`Our Privacy Policy outlines how you can update, manage, and delete your information.`}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsBody({ selectedSetting, userSettings }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
   const [showRefresh, setShowRefresh] = useState(false);
@@ -97,6 +133,13 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
       <main>
         <h1>{title}</h1>
         <Personal />
+      </main>
+    );
+  } else if (title == "Legal") {
+    return (
+      <main>
+        <h1>{title}</h1>
+        <Legal />
       </main>
     );
   }
