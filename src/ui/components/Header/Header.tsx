@@ -7,7 +7,7 @@ import { useGetActiveSessions } from "ui/hooks/sessions";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import hooks from "ui/hooks";
-import { isTest } from "ui/utils/environment";
+import { isDemo, isTest } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
@@ -121,6 +121,9 @@ function Header({ recordingId, sessionId, recordingTarget }: PropsFromRedux) {
     window.location.href = dashboardUrl;
   };
 
+  if (isDemo()) {
+    return <div id=""></div>;
+  }
   if (loading) {
     return <div id="header"></div>;
   }

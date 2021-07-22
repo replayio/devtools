@@ -9,6 +9,7 @@ import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
 import { PrimaryPanelName } from "ui/state/app";
+import { isDemo } from "ui/utils/environment";
 
 function IndexingLoader({
   progressPercentage,
@@ -65,6 +66,10 @@ function Toolbar({
       setSelectedPrimaryPanel(panel);
     }
   };
+
+  if (isDemo()) {
+    return <div></div>;
+  }
 
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
