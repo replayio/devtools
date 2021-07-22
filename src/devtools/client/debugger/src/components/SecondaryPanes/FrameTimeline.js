@@ -12,6 +12,7 @@ import { actions } from "ui/actions";
 
 import classnames from "classnames";
 import "./FrameTimeline.css";
+import ReactTooltip from "react-tooltip";
 
 function getBoundingClientRect(element) {
   if (!element) {
@@ -153,7 +154,10 @@ class FrameTimeline extends Component {
     }
 
     return (
-      <div className={classnames("frame-timeline-container", { scrubbing })}>
+      <div
+        data-tip="Frame Progress"
+        className={classnames("frame-timeline-container", { scrubbing })}
+      >
         <div
           className="frame-timeline-bar"
           onMouseDown={this.onMouseDown}
@@ -164,6 +168,7 @@ class FrameTimeline extends Component {
             style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
           />
         </div>
+        <ReactTooltip delayHide={200} delayShow={200} place={"top"} />
       </div>
     );
   }
