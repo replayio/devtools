@@ -7,8 +7,10 @@ import Events from "ui/components/Events";
 const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPanes").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
-function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
-  let sidepanel;
+const SIDEPANEL_WIDTH = 320;
+
+function SidePanel({ selectedPrimaryPanel, narrowMode }: PropsFromRedux) {
+  let sidepanel, style;
 
   if (selectedPrimaryPanel === "explorer") {
     sidepanel = <PrimaryPanes />;
@@ -20,10 +22,21 @@ function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
     sidepanel = <Events />;
   }
 
-  return <div style={{ width: "400px" }}>{sidepanel}</div>;
+  if (!narrowMode) {
+    style = {
+      width: `${SIDEPANEL_WIDTH}px`,
+      height: "100%",
+      borderRight: "1px solid var(--theme-splitter-color)",
+    };
+  } else {
+    style = { width: "100%", height: "100%", borderRight: "1px solid var(--theme-splitter-color)" };
+  }
+
+  return <div style={style}>{sidepanel}</div>;
 }
 
 const connector = connect((state: UIState) => ({
+  narrowMode: selectors.getNarrowMode(state),
   selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
