@@ -13,7 +13,6 @@ import Tab from "./Tab";
 import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
 import { isPretty } from "../../utils/source";
 import actions from "../../actions";
-import { isDemo } from "ui/utils/environment";
 
 import "./Tabs.css";
 
@@ -167,9 +166,6 @@ class Tabs extends PureComponent {
   }
 
   render() {
-    if (isDemo()) {
-      return null;
-    }
     return <div className="source-header">{this.renderTabs()}</div>;
   }
 }
