@@ -50,6 +50,7 @@ import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
 import SidePanel from "ui/components/SidePanel";
 import { waitForEditor } from "../utils/editor/create-editor";
+import { isDemo } from "ui/utils/environment";
 
 class Debugger extends Component {
   onLayoutChange;
@@ -202,6 +203,10 @@ class Debugger extends Component {
 
   renderLayout = () => {
     const { startPanelCollapsed } = this.props;
+
+    if (isDemo()) {
+      return this.renderEditorPane();
+    }
 
     return (
       <div className="horizontal-panels">
