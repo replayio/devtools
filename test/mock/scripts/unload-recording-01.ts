@@ -25,7 +25,7 @@ const recording = {
 };
 const graphqlMocks = [
   ...createUserSettingsMock(),
-  createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
+  ...createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
   ...createRecordingOwnerUserIdMock({ recordingId, user }),
   ...createGetUserMock({ user }),
   ...createGetRecordingMock({ recordingId, recording }),

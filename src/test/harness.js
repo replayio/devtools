@@ -86,7 +86,8 @@ function selectDebugger() {
 }
 
 async function selectInspector() {
-  return clickElement("button.inspector-panel-button");
+  await clickElement("button.inspector-panel-button");
+  await waitUntil(() => document.querySelector(".inspector"));
 }
 
 async function selectReactDevTools() {

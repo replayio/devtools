@@ -1,6 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
+import { query, extractGraphQLError } from "ui/utils/apolloClient";
 import { Recording } from "ui/types";
 import { ExpectedError, WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
@@ -112,6 +112,20 @@ export async function isRecordingInitialized(
   return result.data.recording?.isInitialized;
 }
 
+export function useIsRecordingInitialized(
+  recordingId: RecordingId | null
+): { initialized: boolean | undefined; loading: boolean; graphQLError: string | undefined } {
+  const { data, loading, error } = useQuery(IS_RECORDING_ACCESSIBLE, {
+    variables: { recordingId },
+    skip: !recordingId,
+  });
+  return {
+    initialized: data?.recording?.isInitialized,
+    loading,
+    graphQLError: extractGraphQLError(error),
+  };
+}
+
 export async function getRecordingOwnerUserId(
   recordingId: RecordingId
 ): Promise<string | undefined> {
@@ -121,6 +135,16 @@ export async function getRecordingOwnerUserId(
   });
 
   return result.data.recording?.owner?.id;
+}
+
+export function useGetRecordingOwnerUserId(
+  recordingId: RecordingId | null
+): { userId: string | undefined; loading: boolean } {
+  const { data, loading } = useQuery(GET_RECORDING_USER_ID, {
+    variables: { recordingId },
+    skip: !recordingId,
+  });
+  return { userId: data?.recording?.owner?.id, loading };
 }
 
 export function useGetRecording(

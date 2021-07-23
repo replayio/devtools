@@ -154,7 +154,7 @@ function App({
     return <UploadingScreen />;
   }
 
-  if (!isDeployPreview() && auth.isLoading) {
+  if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
     return <BlankScreen />;
   }
 

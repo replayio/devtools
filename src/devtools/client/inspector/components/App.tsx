@@ -11,6 +11,8 @@ import ComputedApp from "devtools/client/inspector/computed/components/ComputedA
 const LayoutApp = require("devtools/client/inspector/layout/components/LayoutApp");
 import { selectors } from "ui/reducers";
 
+import "ui/setup/dynamic/inspector";
+
 export interface InspectorPanel {
   id: string;
   title: string;

@@ -8,6 +8,7 @@ import {
   NormalizedCacheObject,
   from,
   HttpLink,
+  ApolloError,
 } from "@apollo/client";
 import { MockedProvider, MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
@@ -18,13 +19,7 @@ import { PopupBlockedError } from "ui/components/shared/Error";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
-export function ApolloWrapper({
-  children,
-  recordingId,
-}: {
-  recordingId: string | undefined;
-  children: ReactNode;
-}) {
+export function ApolloWrapper({ children }: { children: ReactNode }) {
   const { loading, token, error } = useToken();
 
   if (isMock()) {
@@ -68,9 +63,7 @@ export function ApolloWrapper({
     }
   }
 
-  return (
-    <ApolloProvider client={createApolloClient(token, recordingId)}>{children}</ApolloProvider>
-  );
+  return <ApolloProvider client={createApolloClient(token)}>{children}</ApolloProvider>;
 }
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
@@ -89,10 +82,10 @@ export async function mutate({
   return await apolloClient.mutate({ variables, mutation });
 }
 
-export function createApolloClient(token: string | undefined, recordingId: string | undefined) {
+export function createApolloClient(token: string | undefined) {
   const retryLink = createRetryLink();
   const errorLink = createErrorLink();
-  const httpLink = createHttpLink(token, recordingId);
+  const httpLink = createHttpLink(token);
 
   const options: any = {
     cache: createApolloCache(),
@@ -103,6 +96,20 @@ export function createApolloClient(token: string | undefined, recordingId: strin
   clientWaiter.resolve(apolloClient);
 
   return apolloClient;
+}
+
+/**
+ * Check if the given ApolloError is a GraphQL error (and not a network error)
+ * and extract the GraphQL error message.
+ * Apollo's error reporting is inconsistent and GraphQL errors may appear as
+ * network errors containing the GraphQL error in an undocumented property.
+ */
+export function extractGraphQLError(error: ApolloError | undefined): string | undefined {
+  if (!error) {
+    return undefined;
+  }
+  const graphQLError = error.graphQLErrors?.[0] || (error.networkError as any)?.result?.errors?.[0];
+  return (typeof graphQLError === "string" ? graphQLError : graphQLError?.message) || error.message;
 }
 
 function createApolloCache() {
@@ -130,7 +137,7 @@ function createApolloCache() {
   });
 }
 
-function createHttpLink(token: string | undefined, recordingId: string | undefined) {
+function createHttpLink(token: string | undefined) {
   const headers: Record<string, string> = {};
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
