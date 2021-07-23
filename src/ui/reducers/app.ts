@@ -6,6 +6,7 @@ import { prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isSameTimeStampedPointRange } from "ui/utils/timeline";
+import { isDemo } from "ui/utils/environment";
 
 function initialAppState(): AppState {
   return {

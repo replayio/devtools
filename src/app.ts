@@ -19,6 +19,8 @@ import { selectors } from "ui/reducers";
 import { getUserSettings } from "ui/hooks/settings";
 import DevTools from "ui/components/DevTools";
 
+const { setupDemo } = require("ui/utils/demo");
+
 const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id")!;
 const dispatch = url.searchParams.get("dispatch") || undefined;
@@ -85,6 +87,6 @@ export async function initialize() {
 
   const settings = await getUserSettings();
   updateEnableRepaint(settings.enableRepaint);
-
+  setupDemo();
   return { store, Page: DevTools };
 }

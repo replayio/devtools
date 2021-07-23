@@ -14,6 +14,7 @@ import { actions } from "../../actions";
 import { ReactDevtoolsPanel } from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { PanelName } from "ui/state/app";
+import { isDemo } from "ui/utils/environment";
 
 interface PanelButtonsProps {
   narrowMode: boolean;
@@ -121,21 +122,23 @@ function SecondaryToolbox({
 
   return (
     <div className={classnames(`secondary-toolbox`, { node: isNode })}>
-      <header className="secondary-toolbox-header">
-        <PanelButtons
-          narrowMode={narrowMode}
-          selectedPanel={selectedPanel}
-          setSelectedPanel={setSelectedPanel}
-          isNode={isNode}
-          showVideoPanel={showVideoPanel}
-          setShowVideoPanel={setShowVideoPanel}
-        />
-        <button className="" onClick={toggleShowVideoPanel}>
-          <MaterialIcon className="hover:text-primaryAccent">
-            {showVideoPanel ? "videocam_off" : "videocam"}
-          </MaterialIcon>
-        </button>
-      </header>
+      {!isDemo() && (
+        <header className="secondary-toolbox-header">
+          <PanelButtons
+            narrowMode={narrowMode}
+            selectedPanel={selectedPanel}
+            setSelectedPanel={setSelectedPanel}
+            isNode={isNode}
+            showVideoPanel={showVideoPanel}
+            setShowVideoPanel={setShowVideoPanel}
+          />
+          <button className="" onClick={toggleShowVideoPanel}>
+            <MaterialIcon className="hover:text-primaryAccent">
+              {showVideoPanel ? "videocam_off" : "videocam"}
+            </MaterialIcon>
+          </button>
+        </header>
+      )}
       <div className="secondary-toolbox-content">
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}

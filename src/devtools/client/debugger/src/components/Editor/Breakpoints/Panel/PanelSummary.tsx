@@ -7,6 +7,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { getRecordingId } from "ui/reducers/app";
 import { UIState } from "ui/state";
+import { isDemo } from "ui/utils/environment";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
 
@@ -123,7 +124,7 @@ function PanelSummary({
           log(<span className="expression">{logValue}</span>)
         </button>
       </div>
-      {pausedOnHit ? (
+      {isDemo() ? null : pausedOnHit ? (
         <button
           type="button"
           onClick={addComment}
