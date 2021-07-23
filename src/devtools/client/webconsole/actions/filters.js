@@ -40,6 +40,21 @@ export function filterToggle(filter) {
   };
 }
 
+export function filterUpdate(filter, value) {
+  return ({ dispatch, getState, prefsService }) => {
+    const filters = getAllFilters(getState());
+    const filtersState = { ...filters, [filter]: value };
+
+    dispatch({
+      type: FILTER_TOGGLE,
+      filtersState,
+      filter,
+    });
+
+    prefsService.setBoolPref(PREFS.FILTER[filter.toUpperCase()], filtersState[filter]);
+  };
+}
+
 export function filtersClear() {
   return ({ dispatch, getState, prefsService }) => {
     const filtersState = getAllFilters(getState());

@@ -17,6 +17,7 @@ import {
 import { getFilename, shouldBlackbox } from "../../utils/source";
 import AccessibleImage from "../shared/AccessibleImage";
 import { ThreadFront } from "protocol/thread";
+import { isDemo } from "ui/utils/environment";
 
 import "./Footer.css";
 
@@ -145,6 +146,9 @@ class SourceFooter extends PureComponent {
   }
 
   render() {
+    if (isDemo) {
+      return null;
+    }
     return (
       <div className="source-footer">
         <div className="source-footer-start">{this.renderCommands()}</div>

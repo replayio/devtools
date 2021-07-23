@@ -29,6 +29,7 @@ const ConsoleSettings = createFactory(
   require("devtools/client/webconsole/components/FilterBar/ConsoleSettings")
 );
 const SearchBox = createFactory(require("devtools/client/shared/components/SearchBox"));
+const { isDemo } = require("ui/utils/environment");
 
 const PropTypes = require("prop-types");
 
@@ -49,6 +50,9 @@ class FilterBar extends Component {
   }
 
   componentDidMount() {
+    if (isDemo()) {
+      return;
+    }
     this.filterInputMinWidth = 150;
     try {
       const filterInput = this.wrapperNode.querySelector(".devtools-searchbox");
@@ -222,6 +226,10 @@ class FilterBar extends Component {
         settingsButton
       ),
     ];
+
+    if (isDemo()) {
+      return null;
+    }
 
     return dom.div(
       {

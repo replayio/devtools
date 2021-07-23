@@ -9,7 +9,7 @@ const { connect } = require("devtools/client/shared/redux/visibility-handler-con
 const { actions } = require("ui/actions");
 const ReactDOM = require("react-dom");
 const { selectors } = require("ui/reducers");
-const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
+const { isDemo } = require("ui/utils/environment");
 
 const PropTypes = require("prop-types");
 const {
@@ -53,7 +53,7 @@ class ConsoleOutput extends Component {
   scrollToClosestMessage() {
     const { closestMessage } = this.props;
 
-    if (!closestMessage) {
+    if (!closestMessage || isDemo()) {
       return;
     }
 
