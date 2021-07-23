@@ -2,12 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
 import React, { Component, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import { connect } from "../utils/connect";
-import { prefs, features } from "../utils/prefs";
+import { features } from "../utils/prefs";
 import actions from "../actions";
 import A11yIntention from "./A11yIntention";
 import { ShortcutsModal } from "./ShortcutsModal";
@@ -36,12 +35,8 @@ import "devtools/client/themes/variables.css";
 import "devtools/client/themes/webconsole.css";
 import "devtools/client/themes/common.css";
 
-// $FlowIgnore
-//import "devtools-launchpad/src/components/Root.css";
-
 import "./shared/menu.css";
 
-import SplitBox from "devtools-splitter";
 import ProjectSearch from "./ProjectSearch";
 import Editor from "./Editor";
 import WelcomeBox from "./WelcomeBox";
@@ -171,7 +166,7 @@ class Debugger extends Component {
     return (
       <div className="editor-pane">
         <div className="editor-container">
-          <EditorTabs horizontal={horizontal} />
+          {!isDemo() && <EditorTabs horizontal={horizontal} />}
           <Editor startPanelSize={startPanelSize} />
           {!this.props.selectedSource ? (
             <WelcomeBox
@@ -179,7 +174,7 @@ class Debugger extends Component {
               toggleShortcutsModal={() => this.toggleShortcutsModal()}
             />
           ) : null}
-          <EditorFooter horizontal={horizontal} />
+          {!isDemo() && <EditorFooter horizontal={horizontal} />}
           <ProjectSearch />
         </div>
       </div>
