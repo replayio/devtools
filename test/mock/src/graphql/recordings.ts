@@ -30,8 +30,8 @@ const mockRecording = {
 export function createRecordingIsInitializedMock(opts: {
   recordingId: string;
   isInitialized: boolean;
-}): MockedResponse {
-  return {
+}): MockedResponse[] {
+  const rv = {
     request: {
       query: IS_RECORDING_ACCESSIBLE,
       variables: { recordingId: opts.recordingId },
@@ -45,6 +45,7 @@ export function createRecordingIsInitializedMock(opts: {
       },
     },
   };
+  return cloneResponse(rv, 5);
 }
 
 export function createRecordingOwnerUserIdMock(opts: {
@@ -59,15 +60,17 @@ export function createRecordingOwnerUserIdMock(opts: {
     result: {
       data: opts.user
         ? {
-            uuid: opts.user.uuid,
-            owner: {
-              id: opts.user.id,
+            recording: {
+              uuid: opts.recordingId,
+              owner: {
+                id: opts.user.id,
+              },
             },
           }
         : null,
     },
   };
-  return cloneResponse(rv, 5);
+  return cloneResponse(rv, 10);
 }
 
 export function createGetRecordingMock(opts: {

@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
-import InspectorApp from "devtools/client/inspector/components/App";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import "./SecondaryToolbox.css";
@@ -14,6 +13,8 @@ import { ReactDevtoolsPanel } from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
+
+const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
   selectedPanel: PanelName;
@@ -91,7 +92,9 @@ function ConsolePanel() {
 function InspectorPanel() {
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
-      <InspectorApp />
+      <React.Suspense fallback={null}>
+        <InspectorApp />
+      </React.Suspense>
     </div>
   );
 }

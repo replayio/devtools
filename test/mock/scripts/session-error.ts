@@ -8,6 +8,7 @@ import {
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
   createGetUserMock,
+  createGetRecordingMock,
 } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
@@ -17,8 +18,9 @@ const userId = uuid();
 const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   ...createUserSettingsMock(),
-  createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
+  ...createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
   ...createRecordingOwnerUserIdMock({ recordingId, user }),
+  ...createGetRecordingMock({ recordingId }),
   ...createGetUserMock({ user }),
 ];
 const messageHandlers = {

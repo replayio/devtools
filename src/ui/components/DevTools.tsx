@@ -3,20 +3,23 @@ import { connect, ConnectedProps } from "react-redux";
 import hooks from "../hooks";
 
 import Header from "./Header/index";
-import NonDevView from "./Views/NonDevView";
-import DevView from "./Views/DevView";
 import { isTest } from "ui/utils/environment";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { BlankLoadingScreen, BlankProgressScreen } from "./shared/BlankScreen";
+import NonDevView from "./Views/NonDevView";
+import WaitForReduxSlice from "./WaitForReduxSlice";
 
-function DevTools({
+import "ui/setup/dynamic/devtools";
+
+const DevView = React.lazy(() => import("./Views/DevView"));
+
+function _DevTools({
   loading,
   uploading,
   awaitingSourcemaps,
-  recordingDuration,
   recordingId,
   setExpectedError,
   selectedPanel,
@@ -53,10 +56,10 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    if (expectedError) {
+    if (recordingId && expectedError) {
       setExpectedError(expectedError);
     }
-  }, [expectedError]);
+  }, [recordingId, expectedError]);
 
   if (expectedError) {
     return <BlankLoadingScreen />;
@@ -79,7 +82,7 @@ function DevTools({
     return <BlankLoadingScreen statusMessage={message} background={color} />;
   }
 
-  if (!finishedLoading || recordingDuration === null) {
+  if (!finishedLoading) {
     return <BlankProgressScreen setFinishedLoading={setFinishedLoading} progress={loading} />;
   }
 
@@ -96,7 +99,6 @@ const connector = connect(
     recordingId: selectors.getRecordingId(state)!,
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
-    recordingDuration: selectors.getRecordingDuration(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
     awaitingSourcemaps: selectors.getAwaitingSourcemaps(state),
@@ -107,4 +109,12 @@ const connector = connect(
   }
 );
 type DevToolsProps = ConnectedProps<typeof connector>;
-export default connector(DevTools);
+const ConnectedDevTools = connector(_DevTools);
+
+const DevTools = () => (
+  <WaitForReduxSlice slice="messages">
+    <ConnectedDevTools />
+  </WaitForReduxSlice>
+);
+
+export default DevTools;
