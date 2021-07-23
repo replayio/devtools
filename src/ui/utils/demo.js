@@ -1,4 +1,6 @@
 import { isDemo } from "ui/utils/environment";
+import { ThreadFront } from "protocol/thread";
+
 export async function setupDemo() {
   if (!isDemo()) {
     return;
@@ -6,6 +8,8 @@ export async function setupDemo() {
   const cx = app.selectors.getContext();
 
   app.actions.setViewMode("dev");
+
+  await ThreadFront.ensureProcessed("executionIndexed");
   await app.actions.selectSource(cx, "o15");
   await app.actions.addBreakpoint(
     cx,
