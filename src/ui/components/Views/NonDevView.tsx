@@ -34,7 +34,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions, narrowMode }: PropsFromRedux) {
+function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -49,28 +49,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode }: PropsFromRedux) {
     prefs.nonDevSidePanelWidth = `${num}px`;
   };
 
-  if (narrowMode) {
-    return (
-      <>
-        <SplitBox
-          style={{ width: "100%", overflow: "hidden" }}
-          splitterSize={1}
-          initialSize={prefs.nonDevSidePanelWidth as string}
-          minSize="20%"
-          onMove={handleMove}
-          maxSize="80%"
-          vert={false}
-          startPanel={<Video />}
-          endPanel={<SidePanel />}
-          endPanelControl={false}
-        />
-        <div id="timeline-container">
-          <Timeline />
-        </div>
-      </>
-    );
-  }
-
   return (
     <div className="horizontal-panels">
       <div className="flex flex-row h-full">
@@ -84,7 +62,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode }: PropsFromRedux) {
 
 const connector = connect(
   (state: UIState) => ({
-    narrowMode: selectors.getNarrowMode(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
   }),
   {

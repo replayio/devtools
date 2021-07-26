@@ -14,12 +14,7 @@ import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 import { UIState } from "ui/state";
 
-function DevView({
-  updateTimelineDimensions,
-  narrowMode,
-  recordingTarget,
-  showVideoPanel,
-}: PropsFromRedux) {
+function DevView({ updateTimelineDimensions, recordingTarget, showVideoPanel }: PropsFromRedux) {
   const handleMove = (num: number) => {
     updateTimelineDimensions();
     prefs.toolboxHeight = `${num}px`;
@@ -28,33 +23,6 @@ function DevView({
   useEffect(() => {
     installObserver();
   }, []);
-
-  if (narrowMode) {
-    return (
-      <>
-        <SplitBox
-          style={{ width: "100%", overflow: "hidden" }}
-          splitterSize={1}
-          initialSize={prefs.toolboxHeight as string}
-          minSize="20%"
-          maxSize="80%"
-          vert={false}
-          onMove={handleMove}
-          startPanel={
-            <div className="horizontal-panels">
-              <Toolbar />
-              <Toolbox />
-            </div>
-          }
-          endPanel={<SecondaryToolbox />}
-          endPanelControl={false}
-        />
-        <div id="timeline-container">
-          <Timeline />
-        </div>
-      </>
-    );
-  }
 
   if (recordingTarget == "node") {
     return (
@@ -109,7 +77,6 @@ function DevView({
 
 const connector = connect(
   (state: UIState) => ({
-    narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
   }),
