@@ -71,17 +71,6 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNarrowMode">) {
-  const viewport = document.querySelector("body");
-
-  const observer = new ResizeObserverPolyfill(function maybeUpdateNarrowMode() {
-    const viewportWidth = viewport!.getBoundingClientRect().width;
-    updateNarrowMode(viewportWidth);
-  });
-
-  observer.observe(viewport!);
-}
-
 function useCheckForApolloError() {
   const client = useApolloClient();
 
@@ -103,7 +92,6 @@ function App({
   theme,
   recordingId,
   modal,
-  updateNarrowMode,
   setFontLoading,
   setUnexpectedError,
   children,
@@ -138,7 +126,6 @@ function App({
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
-    installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
   useEffect(() => {
@@ -184,7 +171,6 @@ const connector = connect(
     sessionId: selectors.getSessionId(state),
   }),
   {
-    updateNarrowMode: actions.updateNarrowMode,
     setFontLoading: actions.setFontLoading,
     setUnexpectedError,
   }

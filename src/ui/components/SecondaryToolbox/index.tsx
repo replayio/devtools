@@ -2,7 +2,6 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
-import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -17,7 +16,6 @@ import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 
 interface PanelButtonsProps {
-  narrowMode: boolean;
   selectedPanel: PanelName;
   setSelectedPanel: (panel: PanelName) => any;
   isNode: boolean;
@@ -28,7 +26,6 @@ interface PanelButtonsProps {
 function PanelButtons({
   selectedPanel,
   setSelectedPanel,
-  narrowMode,
   isNode,
   showVideoPanel,
   setShowVideoPanel,
@@ -67,14 +64,6 @@ function PanelButtons({
           <div className="label">Elements</div>
         </button>
       )}
-      {narrowMode && !isNode ? (
-        <button
-          className={classnames("viewer-panel-button", { expanded: selectedPanel === "viewer" })}
-          onClick={() => onClick("viewer")}
-        >
-          <div className="label">Viewer</div>
-        </button>
-      ) : null}
       {showReact && !isNode && (
         <button
           className={classnames("components-panel-button", {
@@ -110,7 +99,6 @@ function InspectorPanel() {
 function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
-  narrowMode,
   recordingTarget,
   showVideoPanel,
   setShowVideoPanel,
@@ -125,7 +113,6 @@ function SecondaryToolbox({
       {!isDemo() && (
         <header className="secondary-toolbox-header">
           <PanelButtons
-            narrowMode={narrowMode}
             selectedPanel={selectedPanel}
             setSelectedPanel={setSelectedPanel}
             isNode={isNode}
@@ -142,7 +129,6 @@ function SecondaryToolbox({
       <div className="secondary-toolbox-content">
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
-        {selectedPanel === "viewer" && narrowMode ? <Video /> : null}
         {showReact && selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
       </div>
     </div>
@@ -152,7 +138,6 @@ function SecondaryToolbox({
 const connector = connect(
   (state: UIState) => ({
     selectedPanel: selectors.getSelectedPanel(state),
-    narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
   }),

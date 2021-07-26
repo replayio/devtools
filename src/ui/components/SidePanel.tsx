@@ -9,8 +9,8 @@ const SecondaryPanes = require("devtools/client/debugger/src/components/Secondar
 
 const SIDEPANEL_WIDTH = 320;
 
-function SidePanel({ selectedPrimaryPanel, narrowMode }: PropsFromRedux) {
-  let sidepanel, style;
+function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
+  let sidepanel;
 
   if (selectedPrimaryPanel === "explorer") {
     sidepanel = <PrimaryPanes />;
@@ -22,21 +22,20 @@ function SidePanel({ selectedPrimaryPanel, narrowMode }: PropsFromRedux) {
     sidepanel = <Events />;
   }
 
-  if (!narrowMode) {
-    style = {
-      width: `${SIDEPANEL_WIDTH}px`,
-      height: "100%",
-      borderRight: "1px solid var(--theme-splitter-color)",
-    };
-  } else {
-    style = { width: "100%", height: "100%", borderRight: "1px solid var(--theme-splitter-color)" };
-  }
-
-  return <div style={style}>{sidepanel}</div>;
+  return (
+    <div
+      style={{
+        width: `${SIDEPANEL_WIDTH}px`,
+        height: "100%",
+        borderRight: "1px solid var(--theme-splitter-color)",
+      }}
+    >
+      {sidepanel}
+    </div>
+  );
 }
 
 const connector = connect((state: UIState) => ({
-  narrowMode: selectors.getNarrowMode(state),
   selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

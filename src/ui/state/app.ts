@@ -74,7 +74,6 @@ export interface AppState {
   initializedPanels: PanelName[];
   analysisPoints: AnalysisPoints;
   viewMode: ViewMode;
-  narrowMode: boolean;
   hoveredLineNumberLocation: Location | null;
   events: Events;
   isNodePickerActive: boolean;

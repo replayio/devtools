@@ -29,7 +29,6 @@ function initialAppState(): AppState {
     analysisPoints: {},
     events: {},
     viewMode: prefs.viewMode as ViewMode,
-    narrowMode: false,
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
     canvas: null,
@@ -156,13 +155,6 @@ export default function update(
       return { ...state, viewMode: action.viewMode };
     }
 
-    case "set_narrow_mode": {
-      return {
-        ...state,
-        narrowMode: action.narrowMode,
-      };
-    }
-
     case "set_hovered_line_number_location": {
       return {
         ...state,
@@ -258,7 +250,6 @@ export const getAnalysisPointsForLocation = (
   return state.app.analysisPoints[getLocationAndConditionKey(location, condition)];
 };
 export const getViewMode = (state: UIState) => state.app.viewMode;
-export const getNarrowMode = (state: UIState) => state.app.narrowMode;
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);

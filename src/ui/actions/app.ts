@@ -60,7 +60,6 @@ export type SetEventsForType = Action<"set_events"> & {
   eventType: Event;
 };
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
-export type SetNarrowMode = Action<"set_narrow_mode"> & { narrowMode: boolean };
 export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
   location: Location | null;
 };
@@ -105,7 +104,6 @@ export type AppActions =
   | SetAnalysisErrorAction
   | SetEventsForType
   | SetViewMode
-  | SetNarrowMode
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
   | SetCanvas
@@ -119,8 +117,6 @@ export type AppActions =
   | SetLoadedRegions
   | SetShowVideoPanelAction
   | SetAwaitingSourcemapsAction;
-
-const NARROW_MODE_WIDTH = 800;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
@@ -263,21 +259,6 @@ export function setEventsForType(events: MouseEvent[], eventType: Event): SetEve
 
 export function setViewMode(viewMode: ViewMode): SetViewMode {
   return { type: "set_view_mode", viewMode };
-}
-
-function setNarrowMode(narrowMode: boolean): SetNarrowMode {
-  return { type: "set_narrow_mode", narrowMode };
-}
-
-export function updateNarrowMode(viewportWidth: number): UIThunkAction {
-  return ({ dispatch, getState }) => {
-    const narrowMode = selectors.getNarrowMode(getState());
-    const newNarrowMode = viewportWidth <= NARROW_MODE_WIDTH;
-
-    if (newNarrowMode != narrowMode) {
-      dispatch(setNarrowMode(newNarrowMode));
-    }
-  };
 }
 
 export function setHoveredLineNumberLocation(
