@@ -4,7 +4,7 @@ import { SettingItem } from "./types";
 import hooks from "ui/hooks";
 import { SelectMenu } from "ui/components/shared/Forms";
 import { updateEnableRepaint } from "protocol/enable-repaint";
-import "./SettingsBodyItem.css";
+import { SettingsBodyHeader } from "./SettingsBody";
 
 interface SettingsBodyItemProps {
   item: SettingItem;
@@ -82,10 +82,10 @@ export default function SettingsBodyItem({
   const { label, key, description } = item;
 
   return (
-    <li>
-      <label className="setting-item" htmlFor={key}>
-        <div className="label">{label}</div>
-        {description && <div className="description">{description}</div>}
+    <li className="flex flex-row items-center">
+      <label className="space-y-2 pr-48 flex-grow cursor-pointer" htmlFor={key}>
+        <SettingsBodyHeader>{label}</SettingsBodyHeader>
+        {description && <div>{description}</div>}
       </label>
       <Input item={item} value={userSettings[key]} setShowRefresh={setShowRefresh} />
     </li>

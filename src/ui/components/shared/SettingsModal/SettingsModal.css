@@ -5,10 +5,6 @@
   user-select: none;
 }
 
-.settings-modal h1 {
-  font-size: 20px;
-}
-
 .settings-modal .modal-container .modal-content {
   height: 400px;
   width: 780px;
