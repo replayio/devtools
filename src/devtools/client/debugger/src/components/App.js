@@ -205,7 +205,7 @@ class Debugger extends Component {
 
     return (
       <div className="horizontal-panels">
-        <SidePanel />
+        {!startPanelCollapsed ? <SidePanel /> : null}
         {this.renderEditorPane()}
       </div>
     );
