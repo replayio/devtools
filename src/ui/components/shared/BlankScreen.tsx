@@ -25,7 +25,7 @@ export default function BlankScreen({
   return (
     <main
       className={`w-full h-full grid ${className}`}
-      style={{ background: backgroundStyle, padding: "5px", backgroundSize: "cover" }}
+      style={{ background: backgroundStyle, backgroundSize: "cover" }}
     >
       {children}
     </main>
