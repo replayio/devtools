@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import ReactDOM from "react-dom";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -7,33 +6,12 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 const { prefs } = require("ui/utils/prefs");
 import "./LineNumberTooltip.css";
+import StaticTooltip from "./StaticTooltip";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
   updateHoveredLineNumber,
 } = require("devtools/client/debugger/src/actions/breakpoints/index");
-const { getThreadContext } = require("devtools/client/debugger/src/reducers/pause");
-
-type StaticTooltipProps = {
-  targetNode: HTMLElement;
-  children: JSX.Element | string;
-  className?: string;
-};
-
-export function StaticTooltip({ targetNode, children, className }: StaticTooltipProps) {
-  const { top, left } = targetNode.getBoundingClientRect();
-  const docWidth = document.querySelector("html")!.getBoundingClientRect().width;
-
-  return ReactDOM.createPortal(
-    <div
-      className={`static-tooltip ${className}`}
-      style={{ top: `${top}px`, right: `${docWidth - left}px` }}
-    >
-      {children}
-    </div>,
-    targetNode
-  );
-}
 
 type LineNumberTooltipProps = PropsFromRedux & { editor: any };
 

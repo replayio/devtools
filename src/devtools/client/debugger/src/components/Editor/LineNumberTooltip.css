@@ -3,7 +3,6 @@
   line-height: 16px;
   background: var(--grey-30);
   margin-top: -5px;
-  margin-right: 8px;
   padding: 4px 8px;
   border-radius: 4px;
   animation: static-tooltip 200ms ease;
