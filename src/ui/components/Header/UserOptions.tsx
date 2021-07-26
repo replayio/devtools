@@ -43,6 +43,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }: UserOptionsProps)
     window.open(docsUrl, "replaydocs");
   };
   const onLaunchClick: React.MouseEventHandler = event => {
+    setExpanded(false);
     if (features.launchBrowser) {
       setModal("browser-launch");
     } else {
