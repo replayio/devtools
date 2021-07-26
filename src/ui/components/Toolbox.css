@@ -44,7 +44,6 @@
   float: left;
   display: flex;
   cursor: default;
-  line-height: 35px;
   color: var(--theme-toolbar-color);
   align-items: center;
   border-radius: 4px;
