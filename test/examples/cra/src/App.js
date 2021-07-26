@@ -25,6 +25,8 @@ function App() {
       await waitForTime(100);
       console.log("Removed an entry");
 
+      console.error(new Error("Baz"));
+
       // eslint-disable-next-line no-undef
       dump(`RecReplaySendAsyncMessage Example__Finished`);
     }

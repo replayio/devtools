@@ -8,7 +8,7 @@ const APP_NAME = "cra-e2e-test-app";
 const buildDir = fse.mkdtempSync(path.join(os.tmpdir(), "devtools-cra-e2e-test-"));
 const distDir = path.join(__dirname, "dist");
 
-spawnSync("npx", ["create-react-app", APP_NAME], {
+spawnSync("npm", ["init", "react-app", APP_NAME], {
   cwd: buildDir,
   stdio: "inherit",
 });

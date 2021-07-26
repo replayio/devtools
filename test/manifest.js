@@ -140,6 +140,11 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
+    example: "cra/dist/index.html",
+    script: "sourcemap_stacktrace.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/basic.js",
     script: "node_console-01.js",
     targets: ["node"],
