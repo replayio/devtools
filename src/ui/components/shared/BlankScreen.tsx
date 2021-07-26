@@ -6,6 +6,7 @@ import Spinner from "./Spinner";
 const BACKGROUNDS = {
   white: "white",
   "blue-gradient": "linear-gradient(to bottom right, #68DCFC, #4689F8)",
+  graphic: "url('https://source.unsplash.com/random/800×800/?nature')",
 };
 
 export default function BlankScreen({
@@ -22,7 +23,10 @@ export default function BlankScreen({
     background && BACKGROUNDS[background] ? BACKGROUNDS[background] : BACKGROUNDS["blue-gradient"];
 
   return (
-    <main className={`w-full h-full grid ${className}`} style={{ background: backgroundStyle }}>
+    <main
+      className={`w-full h-full grid ${className}`}
+      style={{ background: backgroundStyle, padding: "5px", backgroundSize: "cover" }}
+    >
       {children}
     </main>
   );
@@ -89,11 +93,11 @@ export function BlankProgressScreen({
   }, [displayedProgress]);
 
   return (
-    <BlankScreen background="white">
+    <BlankScreen background="graphic">
       <div className="m-auto">
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 bg-white opacity-90 rounded-md p-8">
           <div className="text-xl">Preparing Replay</div>
-          <div className="w-96 relative h-2 bg-gray-200 rounded-lg overflow-hidden">
+          <div className="w-40 relative h-1 bg-gray-200 rounded-lg overflow-hidden">
             <div
               className="absolute t-0 h-full bg-primaryAccent"
               style={{ width: `${displayedProgress}%`, transitionDuration: "200ms" }}
