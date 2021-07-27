@@ -4,7 +4,6 @@ import { ApiKey, UserSettings } from "ui/types";
 import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
 import SettingsBodyItem from "./SettingsBodyItem";
-import Spinner from "../Spinner";
 import { handleIntercomLogout } from "ui/utils/intercom";
 import useAuth0 from "ui/utils/useAuth0";
 import hooks from "ui/hooks";
@@ -27,23 +26,28 @@ function RefreshPrompt() {
 
 function Support() {
   return (
-    <li>
-      <label className="setting-item">
-        <div className="label">Join us on Discord</div>
-        <div className="description">
-          Come chat with us on our{" "}
-          <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noreferrer">
-            Discord server.
-          </a>
-        </div>
-        <br />
-        <div className="label">Send us an email</div>
-        <div className="description">
-          You can also send an email at <a href="mailto:support@replay.io">support@replay.io</a>. It
-          goes straight to the people making the product, and we'd love to hear your feedback!
-        </div>
-      </label>
-    </li>
+    <>
+      <li className="flex flex-row items-center">
+        <label className="space-y-2 pr-48 flex-grow">
+          <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
+          <div className="description">
+            Come chat with us on our{" "}
+            <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noreferrer">
+              Discord server.
+            </a>
+          </div>
+        </label>
+      </li>
+      <li className="flex flex-row items-center">
+        <label className="space-y-2 pr-48 flex-grow">
+          <SettingsBodyHeader>Send us an email</SettingsBodyHeader>
+          <div className="description">
+            You can also send an email at <a href="mailto:support@replay.io">support@replay.io</a>.
+            It goes straight to the people making the product, and we'd love to hear your feedback!
+          </div>
+        </label>
+      </li>
+    </>
   );
 }
 
@@ -57,13 +61,13 @@ function Personal() {
         <img src={picture} className="rounded-full w-16" />
         <div>
           <div className="text-xl">{name}</div>
-          <div className="text-xl text-gray-500">{email}</div>
+          <div className="text-gray-500">{email}</div>
         </div>
       </div>
       <div>
         <button
           onClick={() => handleIntercomLogout(logout)}
-          className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+          className="max-w-max items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
         >
           Log Out
         </button>
@@ -74,10 +78,10 @@ function Personal() {
 
 function Legal() {
   return (
-    <div className="space-y-16 text-lg pr-48">
+    <div className="space-y-16 pr-48">
       <div className="space-y-4">
         <div className="space-y-2">
-          <div className="text-2xl">
+          <SettingsBodyHeader>
             <a
               className="underline"
               href="https://replay.io/tos.html"
@@ -86,11 +90,11 @@ function Legal() {
             >
               Terms of Use
             </a>
-          </div>
+          </SettingsBodyHeader>
           <div>{`The Terms of Use help define Replay's relationship with you as you interact with our services.`}</div>
         </div>
         <div className="space-y-2">
-          <div className="text-2xl">
+          <SettingsBodyHeader>
             <a
               className="underline"
               href="https://replay.io/privacy.html"
@@ -99,7 +103,7 @@ function Legal() {
             >
               Privacy Policy
             </a>
-          </div>
+          </SettingsBodyHeader>
           <div>{`Our Privacy Policy outlines how you can update, manage, and delete your information.`}</div>
         </div>
       </div>
@@ -161,7 +165,7 @@ function APIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
               )}
             </div>
             <button
-              className="inline-flex items-center px-3 py-2 h-12 border border-transparent text-lg leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
+              className="inline-flex items-center px-3 py-2 h-12 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
               onClick={() => setKeyValue(undefined)}
             >
               Done
@@ -196,14 +200,14 @@ function APIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
             <button
               type="submit"
               disabled={addLoading}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-lg leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
+              className="inline-flex items-center px-3 py-2 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
             >
               Add
             </button>
           </form>
           <div className="flex-auto overflow-auto">
             {sortedKeys.map(apiKey => (
-              <div className="flex flex-row items-center py-2 text-lg" key={apiKey.id}>
+              <div className="flex flex-row items-center py-2" key={apiKey.id}>
                 <span className="flex-auto">{apiKey.label}</span>
                 <button
                   className="inline-flex items-center p-3 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
@@ -227,6 +231,18 @@ function APIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
   );
 }
 
+function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)[] }) {
+  return <main className="text-lg">{children}</main>;
+}
+
+export function SettingsHeader({ children }: { children: React.ReactChild }) {
+  return <h1 className="text-3xl">{children}</h1>;
+}
+
+export function SettingsBodyHeader({ children }: { children: React.ReactChild }) {
+  return <h2 className="text-2xl">{children}</h2>;
+}
+
 export default function SettingsBody({ selectedSetting, userSettings }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
   const [showRefresh, setShowRefresh] = useState(false);
@@ -234,48 +250,48 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
   // Special screens that don't change anything in the settings table.
   if (title == "Support") {
     return (
-      <main>
-        <h1>{title}</h1>
+      <SettingsBodyWrapper>
+        <SettingsHeader>{title}</SettingsHeader>
         <ul>
           <Support />
         </ul>
-      </main>
+      </SettingsBodyWrapper>
     );
   } else if (title == "Invitations") {
     return (
-      <main>
-        <h1>{title}</h1>
+      <SettingsBodyWrapper>
+        <SettingsHeader>{title}</SettingsHeader>
         <ul className="overflow-hidden flex">
           <ReplayInvitations />
         </ul>
-      </main>
+      </SettingsBodyWrapper>
     );
   } else if (title == "Personal") {
     return (
-      <main>
-        <h1>{title}</h1>
+      <SettingsBodyWrapper>
+        <SettingsHeader>{title}</SettingsHeader>
         <Personal />
-      </main>
+      </SettingsBodyWrapper>
     );
   } else if (title == "Legal") {
     return (
-      <main>
-        <h1>{title}</h1>
+      <SettingsBodyWrapper>
+        <SettingsHeader>{title}</SettingsHeader>
         <Legal />
-      </main>
+      </SettingsBodyWrapper>
     );
   } else if (title == "API Keys") {
     return (
-      <main>
-        <h1>{title}</h1>
+      <SettingsBodyWrapper>
+        <SettingsHeader>{title}</SettingsHeader>
         <APIKeys apiKeys={userSettings.apiKeys} />
-      </main>
+      </SettingsBodyWrapper>
     );
   }
 
   return (
-    <main>
-      <h1>{title}</h1>
+    <SettingsBodyWrapper>
+      <SettingsHeader>{title}</SettingsHeader>
       <ul>
         {items.map((item, index) => (
           <SettingsBodyItem
@@ -286,6 +302,6 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
         ))}
       </ul>
       {showRefresh ? <RefreshPrompt /> : null}
-    </main>
+    </SettingsBodyWrapper>
   );
 }
