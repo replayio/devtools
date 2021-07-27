@@ -1,6 +1,6 @@
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require("webpack");
-const Visualizer = require("webpack-visualizer-plugin");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const Visualizer = require("webpack-visualizer-plugin2");
 const CopyPlugin = require("copy-webpack-plugin");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
@@ -38,9 +38,9 @@ module.exports = {
     },
   },
   plugins: [
-    new MiniCssExtractPlugin(),
+    new NodePolyfillPlugin(),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
-    new webpack.EnvironmentPlugin({ REPLAY_RELEASE: undefined }),
+    new webpack.EnvironmentPlugin({ REPLAY_RELEASE: null }),
     new CopyPlugin({
       patterns: [
         { from: "vercel.json" },
@@ -94,7 +94,9 @@ module.exports = {
             loader: "css-loader",
             options: {
               importLoaders: 1,
-              url: (url, resourcePath) => resourcePath.endsWith("/src/image/image.css"),
+              url: {
+                filter: (url, resourcePath) => resourcePath.endsWith("/src/image/image.css"),
+              },
             },
           },
           "postcss-loader",
@@ -106,16 +108,12 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: [
-          {
-            loader: "url-loader",
-          },
-        ],
+        type: "asset/inline",
       },
     ],
   },
   externals: [
-    function (context, request, callback) {
+    function ({ context, request }, callback) {
       if (/^fs$/.test(request)) {
         return callback(null, "{}");
       }
