@@ -31,6 +31,9 @@ pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.libraryFilterTime", "all");
 pref("devtools.libraryFilterAssociation", "all");
+// Defaults to "" to disable premium/non-premium-related behavior. Set it to
+// "premium" for premium, and "non-premium" for non-premium.
+pref("devtools.premiumFeatures", "");
 
 // app features
 pref("devtools.features.comments", true);
@@ -62,6 +65,7 @@ export const prefs = new PrefsHelper("devtools", {
   maxHitsEditable: ["Int", "maxHitsEditable"],
   libraryFilterTime: ["String", "libraryFilterTime"],
   libraryFilterAssociation: ["String", "libraryFilterAssociation"],
+  premiumFeatures: ["String", "premiumFeatures"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

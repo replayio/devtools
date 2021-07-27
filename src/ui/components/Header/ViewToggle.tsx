@@ -9,20 +9,34 @@ import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
-import { ViewMode } from "ui/state/app";
+import { ModalType, ViewMode } from "ui/state/app";
+import { isNotPremium, isPremiumPrefsEnabled } from "ui/utils/helpers";
 
 interface HandleProps {
   text: string;
   mode: ViewMode;
   localViewMode: ViewMode;
   handleToggle(mode: ViewMode): void;
+  setModal: (modal: ModalType) => void;
   motion: typeof import("framer-motion")["motion"];
 }
 
-function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps) {
+function Handle({ text, mode, localViewMode, handleToggle, motion, setModal }: HandleProps) {
   const isActive = mode == localViewMode;
 
   const onClick = () => {
+    const userIsInViewer = mode === "dev";
+
+    if (isPremiumPrefsEnabled() && userIsInViewer) {
+      if (isNotPremium()) {
+        console.log("This person is not premium, so show the modal");
+        setModal("get-premium");
+        return;
+      } else {
+        console.log("This person is premium, so proceed");
+      }
+    }
+
     if (!isActive) {
       handleToggle(mode);
     }
@@ -52,6 +66,7 @@ function ViewToggle({
   recordingId,
   setViewMode,
   setSelectedPrimaryPanel,
+  setModal,
 }: PropsFromRedux) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
@@ -101,6 +116,7 @@ function ViewToggle({
             localViewMode={localViewMode}
             handleToggle={handleToggle}
             motion={motion}
+            setModal={setModal}
           />
           <Handle
             text="DevTools"
@@ -108,6 +124,7 @@ function ViewToggle({
             localViewMode={localViewMode}
             handleToggle={handleToggle}
             motion={motion}
+            setModal={setModal}
           />
         </div>
       </button>
@@ -122,6 +139,7 @@ const connector = connect(
   }),
   {
     setViewMode,
+    setModal: actions.setModal,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }
 );

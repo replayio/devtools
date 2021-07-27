@@ -28,7 +28,8 @@ export type ModalType =
   | "team-member-onboarding"
   | "team-leader-onboarding"
   | "browser-launch"
-  | "first-replay";
+  | "first-replay"
+  | "get-premium";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"

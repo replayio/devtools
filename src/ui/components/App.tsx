@@ -31,6 +31,7 @@ import BlankScreen from "./shared/BlankScreen";
 import { setUnexpectedError } from "ui/actions/session";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
+import GetPremiumModal from "./shared/GetPremiumModal";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -64,6 +65,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "first-replay": {
       return <FirstReplayModal />;
+    }
+    case "get-premium": {
+      return <GetPremiumModal />;
     }
     default: {
       return null;
