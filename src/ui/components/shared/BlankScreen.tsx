@@ -38,7 +38,7 @@ export function BlankLoadingScreen({ statusMessage }: { statusMessage?: string }
   return (
     <BlankScreen>
       <div className="m-auto">
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 bg-white opacity-90 rounded-md p-8">
           <div className={classNames("text-white text-xl", { invisible: !statusMessage })}>
             {statusMessage || defaultStatusMessage}
           </div>
@@ -93,7 +93,7 @@ export function BlankProgressScreen({
       <div className="m-auto">
         <div className="flex flex-col items-center space-y-4">
           <div className="text-xl">Preparing Replay</div>
-          <div className="w-96 relative h-2 bg-gray-200 rounded-lg overflow-hidden">
+          <div className="w-40 relative h-1 bg-gray-200 rounded-lg overflow-hidden">
             <div
               className="absolute t-0 h-full bg-primaryAccent"
               style={{ width: `${displayedProgress}%`, transitionDuration: "200ms" }}
