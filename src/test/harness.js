@@ -1,10 +1,12 @@
 // Harness for use by automated tests. Adapted from various test devtools
 // test harnesses.
 
+const { sendMessage, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { assert, waitForTime } = require("protocol/utils");
 const mapValues = require("lodash/mapValues");
 const isEqual = require("lodash/isEqual");
+const { defer } = require("../protocol/utils");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
 
@@ -182,6 +184,13 @@ function getFirstBreakpointColumn(line, sourceId) {
 async function removeAllBreakpoints() {
   await dbg.actions.removeAllBreakpoints(getContext());
   await ThreadFront.waitForInvalidateCommandsToFinish();
+}
+
+async function unloadRegion(begin, end) {
+  await sendMessage("Session.unloadRegion", { region: { begin, end } }, ThreadFront.sessionId);
+}
+async function loadRegion(begin, end, timeout) {
+  await sendMessage("Session.loadRegion", { region: { begin, end } }, ThreadFront.sessionId);
 }
 
 function isPaused() {
@@ -714,6 +723,8 @@ const testCommands = {
   setBreakpointOptions,
   disableBreakpoint,
   removeAllBreakpoints,
+  loadRegion,
+  unloadRegion,
   waitForPaused,
   waitForPausedLine,
   rewindToLine,
@@ -773,10 +784,17 @@ const testCommands = {
 };
 
 const commands = mapValues(testCommands, (command, name) => {
-  return async (...args) => {
+  return (...args) => {
     console.log(`Starting ${name}`, ...args);
     const startTime = new Date();
-    const result = await command(...args);
+    let result = command(...args);
+    if (result !== null && typeof result === "object" && typeof result.then === "function") {
+      return result.then(async result => {
+        const duration = new Date() - startTime;
+        console.log(`Finished ${name} in ${duration}ms`);
+        return result;
+      });
+    }
     const duration = new Date() - startTime;
     console.log(`Finished ${name} in ${duration}ms`);
     return result;
