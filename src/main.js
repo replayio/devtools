@@ -25,6 +25,7 @@ if (test && !url.searchParams.get("navigated")) {
 // be good if this was less fragile...
 //
 
+require("ui/utils/whatwg-url-fix");
 const React = require("react");
 const { useEffect, useState } = React;
 const ReactDOM = require("react-dom");
