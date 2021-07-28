@@ -1,0 +1,12 @@
+name: Check main bundle size
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Deps
+        run: npm install
+      - uses: ./.github/actions/checkBundleSize

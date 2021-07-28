@@ -1,0 +1,6 @@
+name: "Check main bundle size"
+description: "Check main bundle size"
+
+runs:
+  using: "node12"
+  main: "./main.js"
