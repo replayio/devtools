@@ -1,5 +1,6 @@
 const webpack = require("webpack");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const Visualizer = require("webpack-visualizer-plugin2");
 const CopyPlugin = require("copy-webpack-plugin");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
@@ -13,7 +14,7 @@ module.exports = {
   devtool: "source-map",
   output: {
     publicPath: "/",
-    filename: "[name].js?v=[contenthash]",
+    filename: "[name].[fullhash].js",
   },
   devServer: {
     before: app => {
@@ -39,12 +40,12 @@ module.exports = {
   },
   plugins: [
     new NodePolyfillPlugin(),
+    new HtmlWebpackPlugin({ template: "index.html", chunks: ["main"] }),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
     new webpack.EnvironmentPlugin({ REPLAY_RELEASE: null }),
     new CopyPlugin({
       patterns: [
         { from: "vercel.json" },
-        { from: "index.html" },
         { from: "favicon.svg" },
         { from: "src/image/images", to: "images" },
       ],
