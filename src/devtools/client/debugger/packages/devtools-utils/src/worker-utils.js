@@ -10,10 +10,10 @@ function WorkerDispatcher() {
 }
 
 WorkerDispatcher.prototype = {
-  start(url, win = window) {
-    this.worker = new win.Worker(url);
+  start(workerFactory, workerName) {
+    this.worker = workerFactory();
     this.worker.onerror = () => {
-      console.error(`Error in worker ${url}`);
+      console.error(`Error in ${workerName} worker`);
     };
   },
 

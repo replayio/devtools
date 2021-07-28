@@ -14,8 +14,8 @@ export let parser;
 export function bootstrapWorkers(panelWorkers) {
   parser = new ParserDispatcher();
 
-  parser.start("parserWorker.js");
-  search.start("searchWorker.js");
+  parser.start(() => new Worker(new URL("../workers/parser/worker", import.meta.url)), "parser");
+  search.start(() => new Worker(new URL("../workers/search/worker", import.meta.url)), "search");
   return { ...panelWorkers, parser, search };
 }
 
