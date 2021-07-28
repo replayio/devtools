@@ -66,7 +66,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "sharp": "^0.27.0",
     "utf-8-validate": "^5.0.4",
-    "whatwg-url": "^8.1.0"
+    "whatwg-url": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
