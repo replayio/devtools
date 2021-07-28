@@ -137,7 +137,13 @@ function Library({
     if (isTeamLeaderInvite()) {
       setModal("team-leader-onboarding");
     } else if (pendingWorkspaces?.length) {
-      setModal("team-member-onboarding");
+      // Show the single invite modal to users who have just signed up for Replay
+      // because they were invited to a team.
+      if (pendingWorkspaces.length === 1 && workspaces.length === 0) {
+        setModal("single-invite");
+      } else {
+        setModal("team-member-onboarding");
+      }
     }
 
     const showFirstReplayTutorial =

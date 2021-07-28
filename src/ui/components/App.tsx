@@ -32,6 +32,7 @@ import BlankScreen from "./shared/BlankScreen";
 import { setUnexpectedError } from "ui/actions/session";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
+import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -56,6 +57,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "team-member-onboarding": {
       return <TeamMemberOnboardingModal />;
+    }
+    case "single-invite": {
+      return <SingleInviteModal />;
     }
     case "team-leader-onboarding": {
       return <TeamLeaderOnboardingModal />;
