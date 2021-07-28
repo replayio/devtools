@@ -6,7 +6,7 @@ const devtools = `${__dirname}/../../..`;
 console.log(new Date(), "Start");
 
 spawnCheckedRetry("npm", ["install"], { cwd: devtools, stdio: "inherit" });
-const devServerProcess = spawn("node_modules/.bin/webpack-dev-server", {
+const devServerProcess = spawn("node_modules/.bin/webpack", ["serve"], {
   cwd: devtools,
   stdio: ["inherit", "pipe", "inherit"],
 });
