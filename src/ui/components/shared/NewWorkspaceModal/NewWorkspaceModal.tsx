@@ -293,7 +293,7 @@ function OnboardingModal(props: PropsFromRedux) {
 
   return (
     <>
-      <Modal options={{ maskTransparency: "translucent" }}>
+      <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
         <div
           className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
           style={{ width: "520px", height }}
