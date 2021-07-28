@@ -16,11 +16,12 @@ import * as actions from "ui/actions/app";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
 import { setTelemetryContext } from "ui/utils/telemetry";
-import { setUserInBrowserPrefs } from "ui/utils/browser";
+import { setUserInBrowserPrefs, setAccessTokenInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType, UnexpectedError } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
 import { useGetRecording } from "ui/hooks/recordings";
+import useToken from "ui/utils/useToken";
 
 import "styles.css";
 import UploadingScreen from "./UploadingScreen";
@@ -101,6 +102,7 @@ function App({
   const { isAuthenticated } = useAuth0();
   const recordingInfo = useGetRecording(recordingId);
   const apolloError = useCheckForApolloError();
+  const tokenInfo = useToken();
 
   useEffect(() => {
     if (apolloError) {
@@ -127,6 +129,12 @@ function App({
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
   }, [theme]);
+
+  useEffect(() => {
+    if (!tokenInfo.loading && !tokenInfo.error) {
+      setAccessTokenInBrowserPrefs(typeof tokenInfo.token === "string" ? tokenInfo.token : null);
+    }
+  }, [tokenInfo]);
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);

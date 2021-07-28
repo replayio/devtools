@@ -9,3 +9,14 @@ export function setUserInBrowserPrefs(user: { sub: string } | null) {
     })
   );
 }
+
+export function setAccessTokenInBrowserPrefs(token: string | null) {
+  window.dispatchEvent(
+    new window.CustomEvent("WebChannelMessageToChrome", {
+      detail: JSON.stringify({
+        id: "record-replay-token",
+        message: { token },
+      }),
+    })
+  );
+}
