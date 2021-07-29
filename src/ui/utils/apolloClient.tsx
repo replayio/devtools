@@ -9,7 +9,7 @@ import {
   from,
   HttpLink,
 } from "@apollo/client";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider, MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
 import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
@@ -28,7 +28,7 @@ export function ApolloWrapper({
   const { loading, token, error } = useToken();
 
   if (isMock()) {
-    const [mocks, setMocks] = useState<any>();
+    const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
     useEffect(() => {
       async function waitForMocks() {
         const mockEnvironment = await waitForMockEnvironment();
@@ -41,9 +41,13 @@ export function ApolloWrapper({
       return null;
     }
 
+    const retryLink = createRetryLink();
+    const errorLink = createErrorLink();
+    const mockLink = createMockLink(mocks);
+
     return (
       <MockedProvider
-        mocks={mocks}
+        link={from([retryLink, errorLink, mockLink])}
         cache={createApolloCache()}
         ref={mockRef => clientWaiter.resolve(mockRef!.state.client)}
       >
@@ -86,15 +90,9 @@ export async function mutate({
 }
 
 export function createApolloClient(token: string | undefined, recordingId: string | undefined) {
-  const retryLink = new RetryLink();
+  const retryLink = createRetryLink();
+  const errorLink = createErrorLink();
   const httpLink = createHttpLink(token, recordingId);
-  const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors) {
-      console.error("[Apollo GraphQL error]", graphQLErrors);
-    } else if (networkError) {
-      console.warn("[Apollo Network error]", networkError);
-    }
-  });
 
   const options: any = {
     cache: createApolloCache(),
@@ -143,4 +141,22 @@ function createHttpLink(token: string | undefined, recordingId: string | undefin
     headers,
     fetch,
   });
+}
+
+function createErrorLink() {
+  return onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+      console.error("[Apollo GraphQL error]", graphQLErrors);
+    } else if (networkError) {
+      console.warn("[Apollo Network error]", networkError);
+    }
+  });
+}
+
+function createRetryLink() {
+  return new RetryLink();
+}
+
+function createMockLink(mocks: MockedResponse<Record<string, any>>[]) {
+  return new MockLink(mocks);
 }
