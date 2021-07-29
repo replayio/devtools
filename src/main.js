@@ -41,6 +41,8 @@ const { IntercomProvider } = require("react-use-intercom");
 const { bootIntercom } = require("ui/utils/intercom");
 const useAuth0 = require("ui/utils/useAuth0").default;
 const { features } = require("ui/utils/prefs");
+const { validateUUID } = require("ui/utils/helpers");
+const { setExpectedError } = require("ui/actions/session");
 
 require("image/image.css");
 
@@ -65,6 +67,7 @@ function PageSwitch() {
   useEffect(() => {
     async function importAndInitialize() {
       let imported;
+      let error;
       const userInfo = await getUserInfo();
 
       if (
@@ -75,17 +78,34 @@ function PageSwitch() {
         imported = await import("./accept-tos");
       } else {
         if (recordingId) {
-          const recordingInitialized = await isRecordingInitialized(recordingId);
-          const ownerId = await getRecordingOwnerUserId(recordingId);
-
-          // Add a check to make sure the recording has an associated user ID.
-          // We skip the upload step if there's no associated user ID, which
-          // is the case for CI test recordings.
-
-          if (recordingInitialized === false && !test && ownerId) {
-            imported = await import("./upload");
+          if (!validateUUID(recordingId)) {
+            error = {
+              message: "Invalid ID",
+              content: `"${recordingId}" is not a valid recording ID`,
+            };
+            imported = await import("./blank");
           } else {
-            imported = await import("./app");
+            try {
+              const recordingInitialized = await isRecordingInitialized(recordingId);
+              const ownerId = await getRecordingOwnerUserId(recordingId);
+
+              // Add a check to make sure the recording has an associated user ID.
+              // We skip the upload step if there's no associated user ID, which
+              // is the case for CI test recordings.
+
+              if (recordingInitialized === false && !test && ownerId) {
+                imported = await import("./upload");
+              } else {
+                imported = await import("./app");
+              }
+            } catch (err) {
+              const msg = err.networkError?.result?.errors?.[0]?.message || err.message;
+              error = {
+                message: "Error",
+                content: msg,
+              };
+              imported = await import("./blank");
+            }
           }
         } else {
           imported = await import("./library");
@@ -93,6 +113,9 @@ function PageSwitch() {
       }
 
       const pageWithStore = await imported.initialize();
+      if (error) {
+        pageWithStore.store.dispatch(setExpectedError(error));
+      }
       setPageWithStore(pageWithStore);
     }
     importAndInitialize();
