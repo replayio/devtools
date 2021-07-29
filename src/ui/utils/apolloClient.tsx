@@ -154,7 +154,15 @@ function createErrorLink() {
 }
 
 function createRetryLink() {
-  return new RetryLink();
+  return new RetryLink({
+    attempts: {
+      retryIf: error => {
+        // GraphQL errors appear in error?.result?.errors.
+        // We don't want to retry requests that failed due to GraphQL errors.
+        return !error?.result?.errors?.length;
+      },
+    },
+  });
 }
 
 function createMockLink(mocks: MockedResponse<Record<string, any>>[]) {
