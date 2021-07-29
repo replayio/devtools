@@ -99,7 +99,12 @@ function PageSwitch() {
                 imported = await import("./app");
               }
             } catch (err) {
-              const msg = err.networkError?.result?.errors?.[0]?.message || err.message;
+              // The shape of errors we get from Apollo is very inconsistent,
+              // we try to extract a meaningful error message
+              const graphQLError = err.graphQLErrors?.[0] || err.networkError?.result?.errors?.[0];
+              const msg =
+                (typeof graphQLError === "string" ? graphQLError : graphQLError?.message) ||
+                err.message;
               error = {
                 message: "Error",
                 content: msg,
