@@ -34,11 +34,20 @@ export function setupTelemetry(context: Record<string, any>) {
   Sentry.setContext("recording", { ...context, url: window.location.href });
 }
 
+type TelemetryUser = {
+  userId: string | undefined;
+  userEmail: string | undefined;
+  isInternal: boolean;
+};
+
+let telemetryUser: TelemetryUser;
+
 export function setTelemetryContext(
   userId: string | undefined,
   userEmail: string | undefined,
   isInternal: boolean
 ) {
+  telemetryUser = { userId, userEmail, isInternal };
   Sentry.setTag("userInternal", isInternal);
   if (userId && userEmail) {
     Sentry.setUser({ id: userId, email: userEmail });
@@ -67,7 +76,7 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ event, ...tags }),
+      body: JSON.stringify({ event, ...tags, user: telemetryUser }),
     });
     if (!response.ok) {
       console.error(`Sent telemetry event ${event} but got status code ${response.status}`);
