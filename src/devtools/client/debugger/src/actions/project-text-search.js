@@ -11,7 +11,7 @@
 
 import { isFulfilled } from "../utils/async-value";
 import { findSourceMatches } from "../workers/search";
-import { getSource, hasPrettySource, getSourceList, getSourceContent } from "../selectors";
+import { getSource, getSourceList, getSourceContent } from "../selectors";
 import { isThirdParty } from "../utils/source";
 import { loadSourceText } from "./sources/loadSourceText";
 import {
@@ -19,6 +19,7 @@ import {
   getTextSearchOperation,
   getTextSearchStatus,
 } from "../reducers/project-text-search";
+import { ThreadFront } from "protocol/thread";
 
 export function addSearchQuery(cx, query) {
   return { type: "ADD_QUERY", cx, query };
@@ -77,7 +78,7 @@ export function searchSources(cx, query) {
     await dispatch(addSearchQuery(cx, query));
     dispatch(updateSearchStatus(cx, statusType.fetching));
     const validSources = getSourceList(getState()).filter(
-      source => !hasPrettySource(getState(), source.id) && !isThirdParty(source)
+      source => !ThreadFront.isMinifiedSource(source.id) && !isThirdParty(source)
     );
     for (const source of validSources) {
       if (cancelled) {
