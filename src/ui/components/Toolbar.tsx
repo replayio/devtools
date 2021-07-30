@@ -72,7 +72,7 @@ function Toolbar({
   }
 
   return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
+    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-8">
       <div id="toolbox-toolbar">
         <div
           className={classnames("toolbar-panel-button comments", {
