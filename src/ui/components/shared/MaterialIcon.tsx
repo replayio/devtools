@@ -5,28 +5,29 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import "./MaterialIcon.css";
 
-type MaterialIconProps = PropsFromRedux &
-  React.HTMLProps<HTMLDivElement> & {
-    children: string;
-    highlighted?: boolean;
-  };
+type MaterialIconProps = PropsFromRedux & {
+  children: string;
+  highlighted?: boolean;
+  className?: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
 
 function MaterialIcon({
   children,
   fontLoading,
   highlighted,
   className,
-  ...rest
+  onClick,
 }: MaterialIconProps) {
   return (
     <div
-      {...rest}
       className={classnames(
         "material-icons",
         className,
         highlighted ? "text-primaryAccent" : "text-gray-800",
         { invisible: fontLoading }
       )}
+      onClick={onClick}
     >
       {children}
     </div>
