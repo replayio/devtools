@@ -69,7 +69,9 @@ class ConsoleOutput extends Component {
       return;
     }
 
-    element.scrollIntoView({ block: "center", behavior: "smooth" });
+    // Chrome sometimes ignores element.scrollIntoView() here,
+    // calling it with a little delay fixes it
+    setTimeout(() => element.scrollIntoView({ block: "center", behavior: "smooth" }));
   }
 
   maybeScrollToResult(prevProps) {
