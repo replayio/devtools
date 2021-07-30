@@ -46,7 +46,7 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
               {` button to start recording.`}
             </div>
             <UrlCopy url={FIRST_REPLAY_TARGET} />
-            <PrimaryButton color="blue" size="2xl" onClick={handleOpen}>
+            <PrimaryButton color="blue" onClick={handleOpen}>
               {`Open this website in a new tab`}
             </PrimaryButton>
           </div>

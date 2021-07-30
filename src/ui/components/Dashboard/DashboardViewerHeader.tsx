@@ -3,7 +3,7 @@ import "./DashboardViewerHeader.css";
 import BatchActionDropdown from "./BatchActionDropdown";
 import "./DashboardViewerHeader.css";
 import { RecordingId } from "@recordreplay/protocol";
-import { PrimaryButton } from "../shared/Button";
+import { SecondaryButton } from "../shared/Button";
 
 type HeaderActionsProps = Pick<
   DashboardViewerHeaderProps,
@@ -21,9 +21,9 @@ function HeaderActions({
       {editing ? (
         <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
       ) : null}
-      <PrimaryButton size="xl" color="blue" onClick={toggleEditing}>
+      <SecondaryButton color="blue" onClick={toggleEditing}>
         {editing ? "Done" : "Edit"}
-      </PrimaryButton>
+      </SecondaryButton>
     </div>
   );
 }
