@@ -64,6 +64,7 @@ function DevTools({
 
   if (!isTest() && (uploading || awaitingSourcemaps || queriesAreLoading)) {
     let message;
+    let color: "blue-gradient" | "white" = "blue-gradient";
 
     // The backend send events in this order: uploading replay -> uploading sourcemaps.
     if (awaitingSourcemaps) {
@@ -71,10 +72,11 @@ function DevTools({
     } else if (uploading) {
       message = "Uploading Replay";
     } else {
+      color = "white";
       message = "Fetching data";
     }
 
-    return <BlankLoadingScreen statusMessage={message} />;
+    return <BlankLoadingScreen statusMessage={message} background={color} />;
   }
 
   if (!finishedLoading || recordingDuration === null) {

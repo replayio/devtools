@@ -28,21 +28,36 @@ export default function BlankScreen({
   );
 }
 
-// General use loading screen with an indefinite spinner, a message and a blue background
-export function BlankLoadingScreen({ statusMessage }: { statusMessage?: string }) {
+// General use loading screen with an indefinite spinner, a message and a blue/white background
+export function BlankLoadingScreen({
+  statusMessage,
+  background = "blue-gradient",
+}: {
+  statusMessage?: string;
+  background?: "white" | "blue-gradient";
+}) {
   const defaultStatusMessage = "Loading";
 
   // The status message is optional, and so it's possible for the loading screen spinner
   // to bounce up and down. That's why we keep a defaultStatusMessage as the div's content,
   // but keep it invisible if there's no statusMessage provided.
   return (
-    <BlankScreen>
+    <BlankScreen background={background}>
       <div className="m-auto">
         <div className="flex flex-col items-center space-y-4 bg-white opacity-90 rounded-md p-8">
-          <div className={classNames("text-white text-xl", { invisible: !statusMessage })}>
+          <div
+            className={classNames("text-xl", {
+              invisible: !statusMessage,
+              "text-white": background === "blue-gradient",
+            })}
+          >
             {statusMessage || defaultStatusMessage}
           </div>
-          <Spinner className="animate-spin -ml-1 mr-3 h-8 w-8 text-white" />
+          <Spinner
+            className={classNames("animate-spin -ml-1 mr-3 h-8 w-8", {
+              "text-white": background === "blue-gradient",
+            })}
+          />
         </div>
       </div>
     </BlankScreen>
