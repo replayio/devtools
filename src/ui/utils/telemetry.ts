@@ -35,34 +35,30 @@ export function setupTelemetry(context: Record<string, any>) {
 }
 
 type TelemetryUser = {
-  userId: string | undefined;
-  userEmail: string | undefined;
-  isInternal: boolean;
+  id: string | undefined;
+  email: string | undefined;
+  internal: boolean;
 };
 
-let telemetryUser: TelemetryUser;
+let telemetryUser: TelemetryUser | undefined;
 
-export function setTelemetryContext(
-  userId: string | undefined,
-  userEmail: string | undefined,
-  isInternal: boolean
-) {
-  telemetryUser = { userId, userEmail, isInternal };
-  Sentry.setTag("userInternal", isInternal);
-  if (userId && userEmail) {
-    Sentry.setUser({ id: userId, email: userEmail });
-    Sentry.setTag("userEmail", userEmail);
+export function setTelemetryContext(telemetryUser: TelemetryUser) {
+  const { id, email, internal } = telemetryUser;
+  Sentry.setTag("userInternal", internal);
+  if (id && email) {
+    Sentry.setUser({ id: id, email: email });
+    Sentry.setTag("userEmail", email);
     Sentry.setTag("anonymous", false);
   } else {
     Sentry.setTag("anonymous", true);
   }
 
-  if (userId) {
-    mixpanel.identify(userId);
+  if (id) {
+    mixpanel.identify(id);
   }
 
-  if (userEmail) {
-    mixpanel.people.set({ $email: userEmail });
+  if (email) {
+    mixpanel.people.set({ $email: email });
   }
 }
 

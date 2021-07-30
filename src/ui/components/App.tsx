@@ -120,7 +120,7 @@ function App({
 
   useEffect(() => {
     if (!userInfo.loading) {
-      setTelemetryContext(userInfo.id, userInfo.email, userInfo.internal);
+      setTelemetryContext(userInfo);
     }
   }, [userInfo]);
 
