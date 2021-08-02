@@ -42,11 +42,10 @@ type TelemetryUser = {
 
 let telemetryUser: TelemetryUser | undefined;
 
-export function setTelemetryContext(telemetryUser: TelemetryUser) {
-  const { id, email, internal } = telemetryUser;
+export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
   Sentry.setTag("userInternal", internal);
   if (id && email) {
-    Sentry.setUser({ id: id, email: email });
+    Sentry.setUser({ id, email });
     Sentry.setTag("userEmail", email);
     Sentry.setTag("anonymous", false);
   } else {
