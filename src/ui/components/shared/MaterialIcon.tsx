@@ -16,6 +16,7 @@ function MaterialIcon({
   fontLoading,
   highlighted,
   className,
+  dispatch, // unused
   ...rest
 }: MaterialIconProps) {
   return (

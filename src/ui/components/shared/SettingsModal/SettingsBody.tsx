@@ -9,6 +9,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import hooks from "ui/hooks";
 import TextInput from "../Forms/TextInput";
 import MaterialIcon from "../MaterialIcon";
+import APIKeys from "../APIKeys";
 
 interface SettingsBodyProps {
   selectedSetting: Setting;
@@ -111,123 +112,24 @@ function Legal() {
   );
 }
 
-function APIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
-  const [keyValue, setKeyValue] = useState<string>();
-  const [label, setLabel] = useState<string>("");
-  const [copied, setCopied] = useState(false);
+function UserAPIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
   const { addUserApiKey, loading: addLoading, error: addError } = hooks.useAddUserApiKey();
-  const {
-    deleteUserApiKey,
-    loading: deleteLoading,
-    error: deleteError,
-  } = hooks.useDeleteUserApiKey();
-
-  useEffect(() => {
-    if (copied) {
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [copied, setCopied]);
-
-  const sortedKeys = useMemo(
-    () =>
-      [...apiKeys].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      ),
-    [apiKeys]
-  );
+  const { deleteUserApiKey } = hooks.useDeleteUserApiKey();
 
   return (
-    <div className="space-y-8 flex flex-col flex-auto h-0">
-      <label className="setting-item">
-        <div className="description">
-          API Keys allow you to upload recordings programmatically from your automated tests or from
-          your continuous integration environment.
-        </div>
-      </label>
-      {addError ? (
-        <div>Unable to add an API key at this time. Please try again later.</div>
-      ) : keyValue ? (
-        <>
-          <div className="flex items-center justify-between space-x-4">
-            <div className="flex flex-auto items-center px-3 h-12 border border-textFieldBorder rounded-md bg-blue-100">
-              <span>{keyValue}</span>
-              {copied ? (
-                <div className="mx-3 text-primaryAccent">Copied!</div>
-              ) : (
-                <MaterialIcon
-                  className="material-icons mx-3 w-7 h-7 text-primaryAccent"
-                  onClick={() =>
-                    navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))
-                  }
-                >
-                  assignment_outline
-                </MaterialIcon>
-              )}
-            </div>
-            <button
-              className="inline-flex items-center px-3 py-2 h-12 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
-              onClick={() => setKeyValue(undefined)}
-            >
-              Done
-            </button>
-          </div>
-          <div className="flex items-center px-3 h-12 border border-textFieldBorder rounded-md bg-red-100">
-            Make sure to copy your API key now. You won{"'"}t be able to see it again!
-          </div>
-        </>
-      ) : (
-        <>
-          <form
-            onSubmit={ev => {
-              label &&
-                addUserApiKey({ variables: { label: label, scopes: ["create:recording"] } }).then(
-                  resp => {
-                    setKeyValue(resp.data.createUserAPIKey.keyValue);
-                    setLabel("");
-                  }
-                );
-
-              ev.preventDefault();
-            }}
-            className="space-x-2"
-          >
-            <TextInput
-              disabled={addLoading}
-              placeholder="API Key Label"
-              onChange={e => setLabel((e.target as HTMLInputElement).value)}
-              value={label}
-            />
-            <button
-              type="submit"
-              disabled={addLoading}
-              className="inline-flex items-center px-3 py-2 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
-            >
-              Add
-            </button>
-          </form>
-          <div className="flex-auto overflow-auto">
-            {sortedKeys.map(apiKey => (
-              <div className="flex flex-row items-center py-2" key={apiKey.id}>
-                <span className="flex-auto">{apiKey.label}</span>
-                <button
-                  className="inline-flex items-center p-3 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
-                  onClick={() => {
-                    const message =
-                      "This action will permanently delete this API key. \n\nAre you sure you want to proceed?";
-
-                    if (window.confirm(message)) {
-                      deleteUserApiKey({ variables: { id: apiKey.id } });
-                    }
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <APIKeys
+      apiKeys={apiKeys}
+      description="API Keys allow you to upload recordings programmatically from your automated tests or from your continuous integration environment."
+      loading={addLoading}
+      error={addError}
+      addKey={(label, scopes) =>
+        addUserApiKey({ variables: { label: label, scopes } }).then(
+          resp => resp.data.createUserAPIKey
+        )
+      }
+      deleteKey={id => deleteUserApiKey({ variables: { id } })}
+      scopes={["admin:all"]}
+    />
   );
 }
 
@@ -284,7 +186,7 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
     return (
       <SettingsBodyWrapper>
         <SettingsHeader>{title}</SettingsHeader>
-        <APIKeys apiKeys={userSettings.apiKeys} />
+        <UserAPIKeys apiKeys={userSettings.apiKeys} />
       </SettingsBodyWrapper>
     );
   }

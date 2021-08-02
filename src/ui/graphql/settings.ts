@@ -41,3 +41,38 @@ export const DELETE_USER_API_KEY = gql`
     }
   }
 `;
+
+export const GET_WORKSPACE_API_KEYS = gql`
+  query GetWorkspaceApiKeys($workspaceId: ID!) {
+    node(id: $workspaceId) {
+      ... on Workspace {
+        apiKeys {
+          id
+          createdAt
+          label
+          scopes
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_WORKSPACE_API_KEY = gql`
+  mutation CreateWorkspaceAPIKey($workspaceId: ID!, $label: String!, $scopes: [String!]!) {
+    createWorkspaceAPIKey(input: { workspaceId: $workspaceId, label: $label, scopes: $scopes }) {
+      key {
+        id
+        label
+      }
+      keyValue
+    }
+  }
+`;
+
+export const DELETE_WORKSPACE_API_KEY = gql`
+  mutation DeleteWorkspaceAPIKey($id: ID!) {
+    deleteWorkspaceAPIKey(input: { id: $id }) {
+      success
+    }
+  }
+`;
