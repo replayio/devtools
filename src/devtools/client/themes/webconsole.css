@@ -330,10 +330,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 30%;
+  position: relative;
+  min-width: 120px;
 }
 
 .message-location a {
   color: var(--frame-link-source);
+}
+
+.message-jump-button {
+  display: none;
+  background: white;
+  width: 100%;
+  position: absolute;
+}
+
+.message:hover .message-jump-button {
+  display: block;
 }
 
 .webconsole-app .message-location:empty {

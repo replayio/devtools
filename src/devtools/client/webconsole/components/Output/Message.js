@@ -153,22 +153,44 @@ class Message extends Component {
   renderOverlayButton() {
     const {
       executionPoint,
-      executionPointTime,
-      executionPointHasFrames,
-      dispatch,
       pausedExecutionPoint = Number.POSITIVE_INFINITY,
       type,
       frame,
-      message,
-      isFirstMessageForPoint,
     } = this.props;
 
     if (!pausedExecutionPoint || !executionPoint || !frame) {
       return undefined;
     }
 
-    let overlayType, label, onClick;
-    let onRewindClick = () => {
+    if (
+      ["command", "result"].includes(type) ||
+      BigInt(executionPoint) !== BigInt(pausedExecutionPoint)
+    ) {
+      return;
+    }
+
+    return dom.div(
+      { className: `overlay-container debug` },
+      dom.div({ className: "button" }, dom.div({ className: "img" }))
+    );
+  }
+
+  renderJumpButton() {
+    const {
+      executionPoint,
+      executionPointTime,
+      executionPointHasFrames,
+      dispatch,
+      pausedExecutionPoint = Number.POSITIVE_INFINITY,
+      frame,
+      message,
+    } = this.props;
+
+    if (!pausedExecutionPoint || !executionPoint || !frame) {
+      return undefined;
+    }
+
+    let onClick = () => {
       dispatch(
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
@@ -176,31 +198,12 @@ class Message extends Component {
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
 
-    if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
-      overlayType = "fast-forward";
-      label = "Fast Forward";
-      onClick = onRewindClick;
-    } else if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
-      overlayType = "rewind";
-      label = "Rewind";
-      onClick = onRewindClick;
-    } else if (!isFirstMessageForPoint) {
-      // Handle cases where executionPoint is the same as pauseExecutionPoint.
-      return;
-    } else if (!["command", "result"].includes(type)) {
-      overlayType = "debug";
-      label = "Debug";
-
-      return dom.div(
-        { className: `overlay-container debug` },
-        dom.div({ className: "button" }, dom.div({ className: "img" }))
-      );
-    }
-
-    return dom.div(
-      { className: `overlay-container ${overlayType}`, onClick },
-      dom.div({ className: "info" }, dom.div({ className: "label" }, label)),
-      dom.div({ className: "button" }, dom.div({ className: "img" }))
+    return dom.button(
+      {
+        className: "rounded-md bg-primaryAccent text-white w-full px-1 focus:outline-none",
+        onClick,
+      },
+      "Replay to here"
     );
   }
 
@@ -376,6 +379,7 @@ class Message extends Component {
     // Configure the location.
     const location = dom.span(
       { className: "message-location devtools-monospace" },
+      dom.span({ className: "message-jump-button" }, this.renderJumpButton()),
       frame
         ? FrameView({
             frame,
