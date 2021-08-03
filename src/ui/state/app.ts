@@ -26,6 +26,7 @@ export type ModalType =
   | "workspace-settings"
   | "onboarding"
   | "team-member-onboarding"
+  | "single-invite"
   | "team-leader-onboarding"
   | "browser-launch"
   | "first-replay";

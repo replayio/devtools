@@ -7,7 +7,7 @@ import { Nag } from "ui/hooks/users";
 import { PendingWorkspaceInvitation } from "ui/types";
 import { isTeamMemberInvite } from "ui/utils/environment";
 import BlankScreen from "../BlankScreen";
-import Modal from "../NewModal";
+import Modal, { ModalContent } from "../NewModal";
 import Spinner from "../Spinner";
 
 type Status = "pending" | "loading" | "loaded" | "declined";
@@ -200,10 +200,7 @@ function TeamMemberOnboardingModal({
         onMaskClick={onSkip}
         options={{ maskTransparency: isTeamMemberInvite() ? "transparent" : "translucent" }}
       >
-        <div
-          className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
-          style={{ width: "520px" }}
-        >
+        <ModalContent>
           <div className="space-y-8 flex flex-col">
             <h2 className="font-bold text-3xl ">{headerText}</h2>
             {displayedWorkspaces.map(workspace => (
@@ -223,7 +220,7 @@ function TeamMemberOnboardingModal({
               </button>
             ) : null}
           </div>
-        </div>
+        </ModalContent>
       </Modal>
     </>
   );

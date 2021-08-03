@@ -67,6 +67,7 @@ function Button({
   className,
   onClick = () => {},
 }: ButtonProps & {
+  color: Colors;
   size: ButtonSizes;
   style: ButtonStyles;
 }) {
@@ -86,18 +87,17 @@ function Button({
 }
 
 interface ButtonProps {
-  color: Colors;
   children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
 }
 
-export const PrimaryButton = (props: ButtonProps) => (
+export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="2xl" style="primary" />
 );
-export const SecondaryButton = (props: ButtonProps) => (
+export const SecondaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="2xl" style="secondary" />
 );
 export const DisabledButton = (props: ButtonProps) => (
-  <Button {...props} size="2xl" style="disabled" className="cursor-default" />
+  <Button {...props} size="2xl" style="disabled" className="cursor-default" color="gray" />
 );
