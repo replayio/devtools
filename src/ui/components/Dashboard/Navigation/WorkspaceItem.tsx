@@ -16,7 +16,8 @@ type WorkspaceItemProps = PropsFromRedux & {
 function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: WorkspaceItemProps) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
-  const onClick = () => {
+  const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     setWorkspaceId(workspace.id);
     updateDefaultWorkspace({
       variables: { workspaceId: workspace.id },

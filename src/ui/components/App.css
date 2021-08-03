@@ -1,36 +1,3 @@
-#app {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  align-items: stretch;
-  height: 100%;
-  width: 100%;
-  font-family: system-ui, Arial, sans-serif;
-  color: var(--theme-body-color);
-  --light-grey: #969696;
-  --dark-grey: #696969;
-  --light-blue: #61cdff;
-  --dark-blue: #2d7eff;
-  --faint-red: rgba(255, 0, 0, 0.5);
-}
-
-/* NOTE: this is added to protect against React DevTools */
-html {
-  font-size: 12px !important;
-}
-
-html, body {
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 #video {
   height: 100%;
   position: relative;
