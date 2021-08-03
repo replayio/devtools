@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { getRecordingId } from "ui/reducers/app";
-import { UIState } from "ui/state";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import hooks from "ui/hooks";
 import TeamSelect from "./TeamSelect";
 import { getFormattedTime } from "ui/utils/timeline";
@@ -12,7 +9,10 @@ import { Recording, UserSettings, Workspace } from "ui/types";
 import { BlankLoadingScreen } from "../shared/BlankScreen";
 import MaterialIcon from "../shared/MaterialIcon";
 
-type UploadScreenProps = PropsFromRedux & { recording: Recording; userSettings: UserSettings };
+const url = new URL(window.location.href);
+const recordingId = url.searchParams.get("id");
+
+type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
 type Status = "saving" | "deleting" | "deleted" | null;
 
 function DeletedScreen({ url }: { url: string }) {
@@ -241,7 +241,7 @@ function SharingPreview({
   );
 }
 
-function UploadScreen({ recordingId, recording, userSettings }: UploadScreenProps) {
+export default function UploadScreen({ recording, userSettings }: UploadScreenProps) {
   const [showSharingSettings, setShowSharingSettings] = useState(false);
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
@@ -337,9 +337,3 @@ function UploadScreen({ recordingId, recording, userSettings }: UploadScreenProp
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  recordingId: getRecordingId(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(UploadScreen);
