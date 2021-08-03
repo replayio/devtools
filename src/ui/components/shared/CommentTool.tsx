@@ -71,7 +71,7 @@ function CommentTool({
   comments,
   canvas,
   setPendingComment,
-  createComment,
+  createFrameComment,
 }: CommentToolProps) {
   const [showHelper, setShowHelper] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
@@ -107,7 +107,7 @@ function CommentTool({
     // If there's no pending comment at that point and time, create one
     // with the mouse click as its position.
     if (!pendingComment) {
-      createComment(currentTime, executionPoint, mouseEventCanvasPosition(e));
+      createFrameComment(currentTime, executionPoint, mouseEventCanvasPosition(e));
       return;
     }
 
@@ -176,7 +176,7 @@ const connector = connect(
   }),
   {
     setPendingComment: actions.setPendingComment,
-    createComment: actions.createComment,
+    createFrameComment: actions.createFrameComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
