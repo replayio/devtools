@@ -5,8 +5,7 @@
     console.log(`# Test that breakpoints work across navigations.`);
     await Test.start();
 
-    // this source is loaded twice, wait until the server has sent us both instances
-    await Test.waitForSourceCount("bundle_input.js", 2);
+    await Test.waitForSource("bundle_input.js");
 
     Test.app.actions.openQuickOpen();
     Test.app.actions.setQuickOpenQuery("bundle");

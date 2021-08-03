@@ -1,14 +1,13 @@
 import { client } from "./socket";
 import { defer } from "./utils";
 import { Location, MappedLocation } from "@recordreplay/protocol";
+import { ThreadFront } from "./thread";
 
 export class MappedLocationCache {
   // Map locations encoded as strings to the corresponding MappedLocations
   private cache = new Map<string, MappedLocation>();
 
   private runningRequests = new Map<string, Promise<MappedLocation>>();
-
-  sessionId: string | undefined;
 
   async getMappedLocation(location: Location): Promise<MappedLocation> {
     const cacheKey = this.encodeLocation(location);
@@ -21,7 +20,7 @@ export class MappedLocationCache {
       return await this.runningRequests.get(cacheKey)!;
     }
 
-    if (!this.sessionId) {
+    if (!ThreadFront.sessionId) {
       return [location];
     }
 
@@ -29,8 +28,10 @@ export class MappedLocationCache {
     this.runningRequests.set(cacheKey, promise);
     const { mappedLocation } = await client.Debugger.getMappedLocation(
       { location },
-      this.sessionId
+      ThreadFront.sessionId!
     );
+    await ThreadFront.ensureAllSources();
+    ThreadFront.updateMappedLocation(mappedLocation);
     this.runningRequests.delete(cacheKey);
     resolve(mappedLocation);
 

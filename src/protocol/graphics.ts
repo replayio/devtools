@@ -223,6 +223,7 @@ export function setupGraphics(store: UIStore) {
       return;
     }
 
+    await ThreadFront.ensureAllSources();
     ThreadFront.ensureCurrentPause();
     const pause = ThreadFront.currentPause;
     assert(pause);

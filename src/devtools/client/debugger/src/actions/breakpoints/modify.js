@@ -6,8 +6,6 @@
 
 import mixpanel from "mixpanel-browser";
 
-import { ThreadFront } from "protocol/thread";
-
 import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
@@ -56,28 +54,6 @@ import { getTextAtPosition } from "../../utils/source";
 // breakpoint will be added to the reducer, to restore the above invariant.
 // See syncBreakpoint.js for more.
 
-async function clientSetBreakpoint(client, dispatch, breakpoint) {
-  const locations = await getCorrespondingLocations(breakpoint.location, dispatch);
-  await client.setMultiSourceBreakpoint(locations, breakpoint.options);
-}
-
-async function clientRemoveBreakpoint(client, dispatch, location) {
-  const locations = await getCorrespondingLocations(location, dispatch);
-  await Promise.all(locations.map(loc => client.removeBreakpoint(loc)));
-}
-
-async function getCorrespondingLocations(location, dispatch) {
-  const { line, column } = location;
-  const sourceIds = ThreadFront.getCorrespondingSourceIds(
-    location.sourceId,
-    location.sourceUrl || (await ThreadFront.getSourceURL(location.sourceId))
-  );
-  await Promise.all(
-    sourceIds.map(sourceId => dispatch(setBreakpointPositions({ sourceId, line })))
-  );
-  return sourceIds.map(sourceId => ({ sourceId, line, column }));
-}
-
 export function enableBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
@@ -92,7 +68,7 @@ export function enableBreakpoint(cx, initialBreakpoint) {
       breakpoint: { ...breakpoint, disabled: false },
     });
 
-    await clientSetBreakpoint(client, dispatch, breakpoint);
+    await client.setBreakpoint(breakpoint.location, breakpoint.options);
   };
 }
 
@@ -178,25 +154,17 @@ export function addBreakpoint(
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
       // to remove any installed breakpoint in the server.
-      await clientRemoveBreakpoint(client, dispatch, location);
+      await client.removeBreakpoint(location);
     } else {
-      await clientSetBreakpoint(client, dispatch, breakpoint);
+      await client.setBreakpoint(breakpoint.location, breakpoint.options);
     }
   };
 }
 
 export function runAnalysis(cx, initialLocation, options) {
-  return async ({ dispatch, getState, client }) => {
+  return async ({ getState, client }) => {
     recordEvent("run_analysis");
 
-    const { line } = initialLocation;
-    const sourceIds = ThreadFront.getCorrespondingSourceIds(
-      initialLocation.sourceId,
-      initialLocation.sourceUrl || (await ThreadFront.getSourceURL(initialLocation.sourceId))
-    );
-    await Promise.all(
-      sourceIds.map(sourceId => dispatch(setBreakpointPositions({ sourceId, line })))
-    );
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     if (!location) {
@@ -214,9 +182,7 @@ export function runAnalysis(cx, initialLocation, options) {
       return;
     }
 
-    const { column } = location;
-    const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
-    client.runMultiSourceAnalysis(locations, options);
+    client.runAnalysis(location, options);
   };
 }
 
@@ -242,7 +208,7 @@ export function removeBreakpoint(cx, initialBreakpoint) {
 
     // If the breakpoint is disabled then it is not installed in the server.
     if (!breakpoint.disabled) {
-      await clientRemoveBreakpoint(client, dispatch, breakpoint.location);
+      await client.removeBreakpoint(breakpoint.location);
     }
   };
 }
@@ -274,7 +240,7 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
     }
 
     // remove breakpoint from the server
-    await clientRemoveBreakpoint(client, dispatch, target);
+    await client.removeBreakpoint(target);
   };
 }
 
@@ -292,7 +258,7 @@ export function disableBreakpoint(cx, initialBreakpoint) {
       breakpoint: { ...breakpoint, disabled: true },
     });
 
-    await clientRemoveBreakpoint(client, dispatch, breakpoint.location);
+    await client.removeBreakpoint(breakpoint.location);
   };
 }
 
@@ -312,6 +278,6 @@ export function setBreakpointOptions(cx, location, options = {}) {
       breakpoint,
     });
 
-    await clientSetBreakpoint(client, dispatch, breakpoint);
+    await client.setBreakpoint(breakpoint.location, breakpoint.options);
   };
 }

@@ -196,6 +196,8 @@ export class Pause {
   private _updateDataFronts({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(frame => {
       (frame as WiredFrame).this = new ValueFront(this, frame.this);
+      ThreadFront.updateMappedLocation(frame.location);
+      ThreadFront.updateMappedLocation(frame.functionLocation);
     });
 
     (scopes || []).forEach(scope => {
@@ -265,6 +267,8 @@ export class Pause {
           this,
           prototypeId ? { object: prototypeId } : { value: null }
         );
+
+        ThreadFront.updateMappedLocation(object.preview.functionLocation);
       }
 
       this.objects.get(object.objectId)!.preview = object.preview as WiredObjectPreview;
@@ -484,6 +488,9 @@ export class Pause {
       const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
         frameId,
       });
+      for (const step of steps) {
+        ThreadFront.updateMappedLocation(step.frame);
+      }
       this.frameSteps.set(frameId, steps);
     }
     return this.frameSteps.get(frameId)!;

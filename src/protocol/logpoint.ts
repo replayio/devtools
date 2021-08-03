@@ -65,6 +65,7 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
       key: point,
       value: { time, pauseId, location, values, data, frameworkListeners },
     }) => {
+      await ThreadFront.ensureAllSources();
       const pause = new Pause(ThreadFront.sessionId!);
       pause.instantiate(pauseId, point, time, /* hasFrames */ true);
       pause.addData(data);
@@ -213,6 +214,20 @@ function formatLogpoint({ text, condition }: { text: string; condition: string }
 
 export async function setLogpoint(
   logGroupId: string,
+  location: Location,
+  text: string,
+  condition: string,
+  showInConsole: boolean = true
+) {
+  await ThreadFront.ensureAllSources();
+  const sourceIds = ThreadFront.getCorrespondingSourceIds(location.sourceId);
+  const { line, column } = location;
+  const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
+  setMultiSourceLogpoint(logGroupId, locations, text, condition, showInConsole);
+}
+
+async function setMultiSourceLogpoint(
+  logGroupId: string,
   locations: Location[],
   text: string,
   condition: string,
@@ -230,6 +245,10 @@ export async function setLogpoint(
       return;
     }
   }
+
+  await Promise.all(
+    locations.map(({ sourceId }) => ThreadFront.getBreakpointPositionsCompressed(sourceId))
+  );
 
   const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
@@ -323,12 +342,12 @@ export function setLogpointByURL(
   condition: string,
   showInConsole: boolean = true
 ) {
-  const sourceIds = ThreadFront.getSourceIdsForURL(url);
+  const sourceIds = ThreadFront.getChosenSourceIdsForUrl(url).map(({ sourceId }) => sourceId);
   if (sourceIds.length === 0) {
     return;
   }
   const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
-  setLogpoint(logGroupId, locations, text, condition, showInConsole);
+  setMultiSourceLogpoint(logGroupId, locations, text, condition, showInConsole);
 }
 
 // Event listener logpoints use a multistage analysis. First, the normal

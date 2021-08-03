@@ -461,6 +461,7 @@ async function executeInConsole(value) {
   await window.jsterm.editorWaiter;
   window.jsterm.setValue(value);
   window.jsterm.execute();
+  await new Promise(resolve => setTimeout(resolve, 1));
 }
 
 function waitForFrameTimeline(width) {
@@ -766,6 +767,7 @@ const testCommands = {
   checkHighlighterVisible,
   checkHighlighterShape,
   getRecordingTarget,
+  waitForSource,
   waitForSourceCount,
 };
 

@@ -29,6 +29,7 @@ function evaluateExpression(expression) {
     }
 
     const { asyncIndex, frameId } = toolbox.getPanel("debugger").getFrameId();
+    await ThreadFront.ensureAllSources();
     const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
     assert(pause);
 
