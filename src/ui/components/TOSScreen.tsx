@@ -58,7 +58,7 @@ export default function TOSScreen() {
             </a>{" "}
             which outline how we treat the personal information we collect as you use our services.
           </div>
-          <PrimaryButton color="blue" size="2xl" onClick={handleAccept}>
+          <PrimaryButton color="blue" onClick={handleAccept}>
             I’ve read and accept the terms of service
           </PrimaryButton>
         </div>

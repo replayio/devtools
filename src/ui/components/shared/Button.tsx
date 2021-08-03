@@ -2,9 +2,9 @@ import classNames from "classnames";
 import React from "react";
 
 type ButtonSizes = "sm" | "md" | "lg" | "xl" | "2xl";
-type ButtonStyles = "primary" | "secondary" | "white";
+type ButtonStyles = "primary" | "secondary" | "disabled";
 type ColorScale = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-type Colors = "gray" | "blue" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink";
+type Colors = "gray" | "blue" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "white";
 
 const STANDARD_CLASSES = {
   sm:
@@ -18,7 +18,7 @@ const STANDARD_CLASSES = {
     "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
 };
 
-function getColorCode(color: any, num: ColorScale) {
+function getColorCode(color: Colors, num: ColorScale) {
   // We convert blue-600 and blue-700 to primaryAccent and primaryAccentHover
   if (color === "blue") {
     if (num === 600) {
@@ -31,26 +31,29 @@ function getColorCode(color: any, num: ColorScale) {
   return `${color}-${num}`;
 }
 
-function getTextClass(color: any) {
+function getTextClass(color: Colors) {
   if (color === "white") {
     return "text-white";
   }
 
-  return `text-${color}-700`;
+  return `text-${getColorCode(color, 700)}`;
 }
 
-function getColorClasses(color: any, style: ButtonStyles) {
+function getColorClasses(color: Colors, style: ButtonStyles) {
   let textStyle, bgStyle;
 
   if (style === "primary") {
     textStyle = getTextClass("white");
-    bgStyle = `bg-${getColorCode(color, 600)} hover:bg-${getColorCode(color, 700)}`;
+    bgStyle = `bg-primaryAccent hover:bg-${getColorCode(color, 700)}`;
   } else if (style === "secondary") {
     textStyle = getTextClass(color);
-    bgStyle = `bg-${getColorCode(color, 100)} hover:bg-${getColorCode(color, 200)}`;
+    bgStyle = `bg-white border-${getColorCode(color, 600)} hover:border-${getColorCode(
+      color,
+      700
+    )}`;
   } else {
     textStyle = getTextClass("gray");
-    bgStyle = `bg-white hover:bg-gray-50`;
+    bgStyle = `bg-gray-300`;
   }
 
   return `${textStyle} ${bgStyle}`;
@@ -63,8 +66,8 @@ function Button({
   color,
   className,
   onClick = () => {},
-  disabled = false,
 }: ButtonProps & {
+  size: ButtonSizes;
   style: ButtonStyles;
 }) {
   const standardClasses = STANDARD_CLASSES[size];
@@ -74,7 +77,7 @@ function Button({
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
+      disabled={style === "disabled"}
       className={classNames(standardClasses, colorClasses, focusClasses, className)}
     >
       {children}
@@ -83,14 +86,18 @@ function Button({
 }
 
 interface ButtonProps {
-  size: ButtonSizes;
-  color: any;
+  color: Colors;
   children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
-  disabled?: boolean;
 }
 
-export const PrimaryButton = (props: ButtonProps) => <Button {...props} style="primary" />;
-export const SecondaryButton = (props: ButtonProps) => <Button {...props} style="secondary" />;
-export const WhiteButton = (props: ButtonProps) => <Button {...props} style="white" />;
+export const PrimaryButton = (props: ButtonProps) => (
+  <Button {...props} size="2xl" style="primary" />
+);
+export const SecondaryButton = (props: ButtonProps) => (
+  <Button {...props} size="2xl" style="secondary" />
+);
+export const DisabledButton = (props: ButtonProps) => (
+  <Button {...props} size="2xl" style="disabled" className="cursor-default" />
+);
