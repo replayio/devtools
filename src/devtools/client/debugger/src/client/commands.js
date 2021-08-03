@@ -17,7 +17,6 @@ const {
   setExceptionLogpoint,
   removeLogpoint,
 } = require("protocol/logpoint");
-const { assert } = require("protocol/utils");
 
 let currentThreadFront;
 let currentTarget;
@@ -128,33 +127,13 @@ function setBreakpoint(location, options) {
   if (sourceId) {
     promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
     if (logValue) {
-      promises.push(setLogpoint(logGroupId, [{ sourceId, line, column }], logValue, condition));
+      promises.push(setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition));
     }
   } else {
     promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
     if (logValue) {
       promises.push(setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition));
     }
-  }
-  return Promise.all(promises);
-}
-
-function setMultiSourceBreakpoint(locations, options) {
-  assert(locations.every(loc => loc.sourceId));
-  options = maybeGenerateLogGroupId(options);
-  for (const location of locations) {
-    maybeClearLogpoint(location);
-    breakpoints[locationKey(location)] = { location, options };
-  }
-
-  const { condition, logValue, logGroupId } = options;
-  const promises = [];
-  for (const location of locations) {
-    const { sourceId, line, column } = location;
-    promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
-  }
-  if (logValue) {
-    promises.push(setLogpoint(logGroupId, locations, logValue, condition));
   }
   return Promise.all(promises);
 }
@@ -177,19 +156,10 @@ function runAnalysis(location, options) {
   const showInConsole = false;
 
   if (sourceId) {
-    setLogpoint(logGroupId, [{ sourceId, line, column }], logValue, condition, showInConsole);
+    setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition, showInConsole);
   } else {
     setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition, showInConsole);
   }
-}
-
-function runMultiSourceAnalysis(locations, options) {
-  options = maybeGenerateLogGroupId(options);
-  const { condition, logValue, logGroupId } = options;
-  assert(locations.every(loc => loc.sourceId));
-  const showInConsole = false;
-
-  setLogpoint(logGroupId, locations, logValue, condition, showInConsole);
 }
 
 async function evaluateExpressions(sources, options) {
@@ -409,14 +379,12 @@ const clientCommands = {
   getSourceActorBreakableLines,
   hasBreakpoint,
   setBreakpoint,
-  setMultiSourceBreakpoint,
   setXHRBreakpoint,
   removeXHRBreakpoint,
   addWatchpoint,
   removeWatchpoint,
   removeBreakpoint,
   runAnalysis,
-  runMultiSourceAnalysis,
   evaluate,
   evaluateExpressions,
   navigate,

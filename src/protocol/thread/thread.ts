@@ -132,10 +132,14 @@ class _ThreadFront {
   sourceWaiters = new ArrayMap<string, () => void>();
 
   // Waiter which resolves when all sources have been loaded.
-  allSourcesWaiter = defer<void>();
+  private allSourcesWaiter = defer<void>();
+  private hasAllSources = false;
 
   // Map URL to sourceId[].
   urlSources = new ArrayMap<string, SourceId>();
+
+  // Map each preferred or alternate sourceId to the sourceIds of identical sources
+  private correspondingSourceIds = new Map<SourceId, SourceId[]>();
 
   // Map sourceId to sourceId[], reversing the generatedSourceIds map.
   originalSources = new ArrayMap<SourceId, SourceId>();
@@ -190,7 +194,6 @@ class _ThreadFront {
 
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
-    this.mappedLocations.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
     log(`GotSessionId ${sessionId}`);
@@ -203,6 +206,7 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     await this.initializedWaiter.promise;
+    await this.ensureAllSources();
     this.ensureCurrentPause();
 
     if (this.testName) {
@@ -303,7 +307,11 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
     this.onSource = onSource;
 
-    client.Debugger.findSources({}, sessionId).then(() => this.allSourcesWaiter.resolve());
+    client.Debugger.findSources({}, sessionId).then(() => {
+      this.groupSourceIds();
+      this.hasAllSources = true;
+      this.allSourcesWaiter.resolve();
+    });
     client.Debugger.addNewSourceListener(source => {
       let { sourceId, kind, url, generatedSourceIds } = source;
       this.sources.set(sourceId, { kind, url, generatedSourceIds });
@@ -316,8 +324,14 @@ class _ThreadFront {
       const waiters = this.sourceWaiters.map.get(sourceId);
       (waiters || []).forEach(resolve => resolve());
       this.sourceWaiters.map.delete(sourceId);
-      onSource(source);
     });
+
+    await this.ensureAllSources();
+    for (const [sourceId, source] of this.sources) {
+      if (sourceId === this.getCorrespondingSourceIds(sourceId)[0]) {
+        onSource({ sourceId, ...source });
+      }
+    }
   }
 
   getSourceKind(sourceId: SourceId) {
@@ -409,18 +423,25 @@ class _ThreadFront {
     this.skipPausing = skip;
   }
 
-  async setBreakpoint(sourceId: SourceId, line: number, column: number, condition?: string) {
-    const location = { sourceId, line, column };
+  async setBreakpoint(initialSourceId: SourceId, line: number, column: number, condition?: string) {
     try {
       this._invalidateResumeTargets(async () => {
         assert(this.sessionId);
-        const { breakpointId } = await client.Debugger.setBreakpoint(
-          { location, condition },
-          this.sessionId
+        await this.ensureAllSources();
+        const sourceIds = this.getCorrespondingSourceIds(initialSourceId);
+        await Promise.all(
+          sourceIds.map(async sourceId => {
+            await ThreadFront.getBreakpointPositionsCompressed(sourceId);
+            const location = { sourceId, line, column };
+            const { breakpointId } = await client.Debugger.setBreakpoint(
+              { location, condition },
+              this.sessionId!
+            );
+            if (breakpointId) {
+              this.breakpoints.set(breakpointId, { location });
+            }
+          })
         );
-        if (breakpointId) {
-          this.breakpoints.set(breakpointId, { location });
-        }
       });
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
@@ -441,9 +462,15 @@ class _ThreadFront {
     );
   }
 
-  async removeBreakpoint(sourceId: SourceId, line: number, column: number) {
+  async removeBreakpoint(initialSourceId: SourceId, line: number, column: number) {
+    await this.ensureAllSources();
+    const sourceIds = this.getCorrespondingSourceIds(initialSourceId);
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
-      if (location.sourceId == sourceId && location.line == line && location.column == column) {
+      if (
+        sourceIds.includes(location.sourceId) &&
+        location.line == line &&
+        location.column == column
+      ) {
         this.breakpoints.delete(breakpointId);
         this._invalidateResumeTargets(async () => {
           assert(this.sessionId);
@@ -482,13 +509,14 @@ class _ThreadFront {
     }
   }
 
-  getFrames() {
+  async getFrames() {
     if (!this.currentPointHasFrames) {
       return [];
     }
 
+    await this.ensureAllSources();
     this.ensureCurrentPause();
-    return this.currentPause!.getFrames();
+    return await this.currentPause!.getFrames();
   }
 
   lastAsyncPause() {
@@ -499,6 +527,7 @@ class _ThreadFront {
   }
 
   async loadAsyncParentFrames() {
+    await this.ensureAllSources();
     const basePause = this.lastAsyncPause();
     assert(basePause);
     const baseFrames = await basePause.getFrames();
@@ -524,13 +553,15 @@ class _ThreadFront {
     return asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
   }
 
-  getScopes(asyncIndex: number, frameId: FrameId) {
+  async getScopes(asyncIndex: number, frameId: FrameId) {
+    await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause);
-    return pause.getScopes(frameId);
+    return await pause.getScopes(frameId);
   }
 
   async evaluate(asyncIndex: number, frameId: FrameId | undefined, text: string) {
+    await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause);
     const rv = await pause.evaluate(frameId, text);
@@ -638,6 +669,7 @@ class _ThreadFront {
 
   private async _findResumeTarget(point: ExecutionPoint, command: FindTargetCommand) {
     assert(this.sessionId);
+    await this.ensureAllSources();
 
     // Check already-known resume targets.
     const key = `${point}:${command.name}`;
@@ -649,6 +681,7 @@ class _ThreadFront {
     const epoch = this.resumeTargetEpoch;
     const { target } = await command({ point }, this.sessionId);
     if (epoch == this.resumeTargetEpoch) {
+      this.updateMappedLocation(target.frame);
       this.resumeTargets.set(key, target);
     }
 
@@ -745,7 +778,8 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     client.Console.findMessages({}, sessionId);
-    client.Console.addNewMessageListener(({ message }) => {
+    client.Console.addNewMessageListener(async ({ message }) => {
+      await this.ensureAllSources();
       const pause = new Pause(sessionId);
       pause.instantiate(
         message.pauseId,
@@ -759,6 +793,10 @@ class _ThreadFront {
           v => new ValueFront(pause, v)
         );
       }
+      this.updateMappedLocation(message.point.frame);
+      if (message.sourceId) {
+        message.sourceId = this.getCorrespondingSourceIds(message.sourceId)[0];
+      }
       onConsoleMessage(pause, message);
     });
   }
@@ -767,6 +805,7 @@ class _ThreadFront {
     if (!this.sessionId) {
       return null;
     }
+    await this.ensureAllSources();
     this.ensureCurrentPause();
     const pause = this.currentPause;
     await this.currentPause!.loadDocument();
@@ -782,6 +821,7 @@ class _ThreadFront {
     if (!this.sessionId) {
       return [];
     }
+    await this.ensureAllSources();
     this.ensureCurrentPause();
     const pause = this.currentPause;
     const nodes = await this.currentPause!.searchDOM(query);
@@ -793,6 +833,7 @@ class _ThreadFront {
       return;
     }
     const pause = this.currentPause;
+    await this.ensureAllSources();
     this.ensureCurrentPause();
     await this.currentPause!.loadMouseTargets();
     return pause == this.currentPause;
@@ -803,6 +844,7 @@ class _ThreadFront {
       return null;
     }
     const pause = this.currentPause;
+    await this.ensureAllSources();
     this.ensureCurrentPause();
     const nodeBounds = await this.currentPause!.getMouseTarget(x, y);
     return pause == this.currentPause ? nodeBounds : null;
@@ -819,15 +861,19 @@ class _ThreadFront {
     return pause == this.currentPause ? node : null;
   }
 
-  getFrameSteps(asyncIndex: number, frameId: FrameId) {
+  async getFrameSteps(asyncIndex: number, frameId: FrameId) {
+    await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause);
-    return pause.getFrameSteps(frameId);
+    return await pause.getFrameSteps(frameId);
   }
 
   getPreferredLocationRaw(locations: MappedLocation) {
     const { sourceId } = this._chooseSourceId(locations.map(l => l.sourceId));
-    return locations.find(l => l.sourceId == sourceId);
+    const preferredLocation = locations.find(l => l.sourceId == sourceId);
+    assert(preferredLocation);
+    this.updateLocation(preferredLocation);
+    return preferredLocation;
   }
 
   async getCurrentPauseSourceLocation() {
@@ -861,7 +907,7 @@ class _ThreadFront {
   // this is the most original location, except when preferSource has been used
   // to prefer a generated source instead.
   async getPreferredLocation(locations: MappedLocation) {
-    await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
+    await this.ensureAllSources();
     return this.getPreferredLocationRaw(locations);
   }
 
@@ -1047,28 +1093,51 @@ class _ThreadFront {
     return this._chooseSourceIdList(this.getSourceIdsForURL(url));
   }
 
-  // Given the sourceId of a preferred or alternate source and its URL,
-  // get all sourceIds of preferred/alternate sources with the same URL.
-  getCorrespondingSourceIds(sourceId: SourceId, url: string | undefined) {
-    if (!url) {
-      return [sourceId];
-    }
+  private groupSourceIds() {
+    for (const [sourceId, source] of this.sources.entries()) {
+      if (!source.url) {
+        this.correspondingSourceIds.set(sourceId, [sourceId]);
+        continue;
+      }
+      if (this.correspondingSourceIds.has(sourceId)) {
+        continue;
+      }
 
-    const groups = this.getChosenSourceIdsForUrl(url);
-    const isPreferred = groups.some(group => group.sourceId === sourceId);
-    if (!isPreferred) {
-      assert(groups.some(group => group.alternateId === sourceId));
-    }
+      const groups = this.getChosenSourceIdsForUrl(source.url);
+      assert(groups.length > 0);
+      const sourceIds = groups.map(group => group.sourceId);
+      for (const sourceId of sourceIds) {
+        this.correspondingSourceIds.set(sourceId, sourceIds);
+      }
+      const alternateIds = groups
+        .map(group => group.alternateId)
+        .filter((alternateId): alternateId is SourceId => !!alternateId);
+      for (const alternateId of alternateIds) {
+        this.correspondingSourceIds.set(alternateId, alternateIds);
+      }
 
-    return groups.map(group => (isPreferred ? group.sourceId : group.alternateId!));
+      if (!this.correspondingSourceIds.has(sourceId)) {
+        this.correspondingSourceIds.set(sourceId, [sourceId]);
+      }
+    }
   }
 
-  pickCorrespondingSourceId(sourceId: SourceId, url: string | undefined) {
-    return this.getCorrespondingSourceIds(sourceId, url)[0];
+  getCorrespondingSourceIds(sourceId: SourceId) {
+    assert(this.hasAllSources);
+    return this.correspondingSourceIds.get(sourceId) || [sourceId];
   }
 
-  pickSourceIdForUrl(url: string) {
-    return this.getChosenSourceIdsForUrl(url)[0]?.sourceId;
+  updateLocation(location: Location) {
+    location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
+  }
+
+  updateMappedLocation(mappedLocation: MappedLocation | undefined) {
+    if (!mappedLocation) {
+      return;
+    }
+    for (const location of mappedLocation) {
+      this.updateLocation(location);
+    }
   }
 }
 

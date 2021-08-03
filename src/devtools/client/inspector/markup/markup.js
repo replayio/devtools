@@ -82,6 +82,7 @@ class MarkupView {
   async loadNewDocument() {
     this.isLoadingPostponed = false;
 
+    await ThreadFront.ensureAllSources();
     ThreadFront.ensureCurrentPause();
     const pause = ThreadFront.currentPause;
     if (this.selection.nodeFront && this.selection.nodeFront.pause !== pause) {

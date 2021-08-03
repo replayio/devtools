@@ -88,7 +88,7 @@ export function selectSource(cx, sourceId, options = {}) {
  * @memberof actions/sources
  * @static
  */
-export function selectLocation(cx, initialLocation, { keepContext = true } = {}) {
+export function selectLocation(cx, location, { keepContext = true } = {}) {
   return async ({ dispatch, getState, client }) => {
     const currentSource = getSelectedSource(getState());
 
@@ -98,16 +98,11 @@ export function selectLocation(cx, initialLocation, { keepContext = true } = {})
       return;
     }
 
-    const initialSource = getSource(getState(), initialLocation.sourceId);
-    if (!initialSource) {
+    const source = getSource(getState(), location.sourceId);
+    if (!source) {
       // If there is no source we deselect the current selected source
       return dispatch(clearSelectedLocation(cx));
     }
-
-    await ThreadFront.ensureAllSources();
-    const sourceId = ThreadFront.pickCorrespondingSourceId(initialSource.id, initialSource.url);
-    const source = getSource(getState(), sourceId);
-    const location = { ...initialLocation, sourceId };
 
     const activeSearch = getActiveSearch(getState());
     if (activeSearch && activeSearch !== "file") {

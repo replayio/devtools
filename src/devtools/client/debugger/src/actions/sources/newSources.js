@@ -80,12 +80,6 @@ function checkPendingBreakpoints(cx, sourceId) {
       return;
     }
 
-    await ThreadFront.ensureAllSources();
-    const pickedSourceId = ThreadFront.pickCorrespondingSourceId(sourceId, source.url);
-    if (sourceId !== pickedSourceId) {
-      return;
-    }
-
     for (const bp of pendingBreakpoints) {
       const line = bp.location.line;
       dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
