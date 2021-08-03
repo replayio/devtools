@@ -19,7 +19,10 @@ const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id");
 
 const BrowserError = React.lazy(() => import("views/browser/error"));
+const BrowserImport = React.lazy(() => import("views/browser/import-settings"));
 const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
+const BrowserNewTab = React.lazy(() => import("views/browser/new-tab"));
+const BrowserWelcome = React.lazy(() => import("views/browser/welcome"));
 const Upload = React.lazy(() => import("views/upload"));
 const Account = React.lazy(() => import("ui/components/Account"));
 const DevTools = React.lazy(() => import("ui/components/DevTools"));
@@ -91,7 +94,10 @@ const AppRouting = () => (
     <Router>
       <Switch>
         <Route exact path="/browser/error" component={BrowserError} />
+        <Route exact path="/browser/import-settings" component={BrowserImport} />
         <Route exact path="/browser/launch" component={BrowserLaunch} />
+        <Route exact path="/browser/new-tab" component={BrowserNewTab} />
+        <Route exact path="/browser/welcome" component={BrowserWelcome} />
         <Route>
           <tokenManager.Auth0Provider>
             <ApolloWrapper>
