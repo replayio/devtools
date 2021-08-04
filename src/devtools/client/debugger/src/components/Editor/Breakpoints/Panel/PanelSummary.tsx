@@ -24,7 +24,8 @@ function PanelSummary({
   recordingId,
   toggleEditingOn,
   setInputToFocus,
-  createComment,
+  createFrameComment,
+  createFloatingCodeComment,
   executionPoint,
   currentTime,
   analysisPoints,
@@ -47,10 +48,15 @@ function PanelSummary({
     toggleEditingOn();
     setInputToFocus(input);
   };
-  const addComment = (e: React.MouseEvent) => {
+  const addHitComment = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    createComment(currentTime, executionPoint, null);
+    createFrameComment(currentTime, executionPoint, null);
+  };
+  const addFloatingCodeComment = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    createFloatingCodeComment(currentTime, executionPoint, breakpoint);
   };
 
   // For loading cases where the analysisPoints haven't been received from the server yet.
@@ -124,25 +130,15 @@ function PanelSummary({
           log(<span className="expression">{logValue}</span>)
         </button>
       </div>
-      {isDemo() ? null : pausedOnHit ? (
+      {!isDemo() ? (
         <button
           type="button"
-          onClick={addComment}
+          onClick={pausedOnHit ? addHitComment : addFloatingCodeComment}
           className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
           Add a comment
         </button>
-      ) : (
-        <button
-          type="button"
-          disabled={true}
-          onClick={e => e.stopPropagation()}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-gray-500 bg-gray-200"
-          style={{ cursor: "auto" }}
-        >
-          Add a comment
-        </button>
-      )}
+      ) : null}
       {reactTooltip}
     </div>
   );
@@ -159,7 +155,10 @@ const connector = connect(
       breakpoint.options.condition
     ),
   }),
-  { createComment: actions.createComment }
+  {
+    createFrameComment: actions.createFrameComment,
+    createFloatingCodeComment: actions.createFloatingCodeComment,
+  }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(PanelSummary);

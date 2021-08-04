@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { PendingComment, Event, Comment, Reply } from "ui/state/comments";
+import { PendingComment, Event, Comment, Reply, SourceLocation } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import { setSelectedPrimaryPanel } from "./app";
@@ -44,29 +44,64 @@ export function toggleShowLoneEvents(): UIThunkAction {
 export function createComment(
   time: number,
   point: string,
-  position: { x: number; y: number } | null
+  position: { x: number; y: number } | null,
+  hasFrames: boolean,
+  sourceLocation: SourceLocation | null
 ): UIThunkAction {
   return async ({ dispatch }) => {
-    dispatch(setSelectedPrimaryPanel("comments"));
-
-    const sourceLocation = await ThreadFront.getCurrentPauseSourceLocation();
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
+    const primaryLabel = labels?.primary || null;
+    const secondaryLabel = labels?.secondary || null;
 
     const pendingComment: PendingComment = {
       type: "new_comment",
       comment: {
         content: "",
-        primaryLabel: labels?.primary || null,
-        secondaryLabel: labels?.secondary || null,
         time,
         point,
-        hasFrames: ThreadFront.currentPointHasFrames,
-        sourceLocation: sourceLocation || null,
         position,
+        primaryLabel,
+        secondaryLabel,
+        hasFrames,
+        sourceLocation,
       },
     };
 
+    dispatch(setSelectedPrimaryPanel("comments"));
     dispatch(setPendingComment(pendingComment));
+  };
+}
+
+export function createFrameComment(
+  time: number,
+  point: string,
+  position: { x: number; y: number } | null
+): UIThunkAction {
+  return async ({ dispatch }) => {
+    const sourceLocation = await ThreadFront.getCurrentPauseSourceLocation();
+    dispatch(createComment(time, point, position, true /* hasFrames */, sourceLocation || null));
+  };
+}
+
+export function createFloatingCodeComment(
+  time: number,
+  point: string,
+  breakpoint: any
+): UIThunkAction {
+  return async ({ dispatch }) => {
+    const { location: sourceLocation } = breakpoint;
+    dispatch(createComment(time, point, null, false /* hasFrames */, sourceLocation || null));
+  };
+}
+
+export function createNoFrameComment(
+  time: number,
+  point: string,
+  position: { x: number; y: number } | null
+): UIThunkAction {
+  return async ({ dispatch }) => {
+    const sourceLocation = await ThreadFront.getCurrentPauseSourceLocation();
+    dispatch(createComment(time, point, position, false /* hasFrames */, sourceLocation || null));
   };
 }
 
