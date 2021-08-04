@@ -11,6 +11,9 @@ import { UIState } from "ui/state";
 import { PrimaryPanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 
+// TODO [ryanjduffy]: Refactor shared styling more completely
+import "./Toolbox.css";
+
 function IndexingLoader({
   progressPercentage,
   viewMode,
