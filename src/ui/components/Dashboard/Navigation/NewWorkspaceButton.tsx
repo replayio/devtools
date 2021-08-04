@@ -8,7 +8,8 @@ import classnames from "classnames";
 type NewWorkspaceButtonProps = PropsFromRedux & {};
 
 function NewWorkspaceButton({ setModal }: NewWorkspaceButtonProps) {
-  const onClick = () => {
+  const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     setModal("new-workspace");
   };
 

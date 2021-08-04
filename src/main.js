@@ -1,4 +1,5 @@
 require("tailwindcss/tailwind.css");
+require("./base.css");
 
 const url = new URL(window.location.href);
 const test = url.searchParams.get("test");
@@ -24,10 +25,27 @@ if (test && !url.searchParams.get("navigated")) {
 require("ui/utils/whatwg-url-fix");
 const React = require("react");
 const ReactDOM = require("react-dom");
-const { bootstrapApp } = require("ui/setup");
-const AppRouting = require("views/routing").default;
-require("image/image.css");
+const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
 
-bootstrapApp();
+const BrowserError = React.lazy(() => import("views/browser/error"));
+const BrowserImport = React.lazy(() => import("views/browser/import-settings"));
+const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
+const BrowserNewTab = React.lazy(() => import("views/browser/new-tab"));
+const BrowserWelcome = React.lazy(() => import("views/browser/welcome"));
+const AppRouter = React.lazy(() => import("views/app"));
 
-ReactDOM.render(<AppRouting />, document.querySelector("#app"));
+ReactDOM.render(
+  <React.Suspense fallback={<div>Loading</div>}>
+    <Router>
+      <Switch>
+        <Route exact path="/browser/error" component={BrowserError} />
+        <Route exact path="/browser/import-settings" component={BrowserImport} />
+        <Route exact path="/browser/launch" component={BrowserLaunch} />
+        <Route exact path="/browser/new-tab" component={BrowserNewTab} />
+        <Route exact path="/browser/welcome" component={BrowserWelcome} />
+        <Route component={AppRouter} />
+      </Switch>
+    </Router>
+  </React.Suspense>,
+  document.querySelector("#app")
+);

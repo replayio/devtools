@@ -28,7 +28,8 @@ function Header({
   currentWorkspaceId: string | null;
   setModal: (modal: ModalType) => void;
 }) {
-  const onSettingsClick = () => {
+  const onSettingsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     setModal("workspace-settings");
   };
 

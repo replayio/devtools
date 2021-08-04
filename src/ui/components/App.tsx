@@ -23,7 +23,7 @@ import { useGetUserInfo } from "ui/hooks/users";
 import { useGetRecording } from "ui/hooks/recordings";
 import useToken from "ui/utils/useToken";
 
-import "styles.css";
+import "./App.css";
 import UploadingScreen from "./UploadingScreen";
 import TeamMemberOnboardingModal from "./shared/OnboardingModal/TeamMemberOnboardingModal";
 import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";

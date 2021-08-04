@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { connect, ConnectedProps, Provider } from "react-redux";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { IntercomProvider } from "react-use-intercom";
 import { isTest } from "ui/utils/environment";
 import { validateUUID } from "ui/utils/helpers";
@@ -14,18 +13,17 @@ import { useGetUserSettings } from "ui/hooks/settings";
 import { useIsRecordingInitialized, useGetRecordingOwnerUserId } from "ui/hooks/recordings";
 import BlankScreen from "ui/components/shared/BlankScreen";
 import App from "ui/components/App";
+import { bootstrapApp } from "ui/setup";
+import "image/image.css";
 
 const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id");
 
-const BrowserError = React.lazy(() => import("views/browser/error"));
-const BrowserImport = React.lazy(() => import("views/browser/import-settings"));
-const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
-const BrowserNewTab = React.lazy(() => import("views/browser/new-tab"));
-const BrowserWelcome = React.lazy(() => import("views/browser/welcome"));
 const Upload = React.lazy(() => import("views/upload"));
 const Account = React.lazy(() => import("ui/components/Account"));
 const DevTools = React.lazy(() => import("ui/components/DevTools"));
+
+bootstrapApp();
 
 function PageSwitch({ setExpectedError, setWorkspaceId }: PropsFromRedux) {
   const { isAuthenticated, user } = useAuth0();
@@ -90,32 +88,19 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const ConnectedPageSwitch = connector(PageSwitch);
 
 const AppRouting = () => (
-  <React.Suspense fallback={<div>Loading</div>}>
-    <Router>
-      <Switch>
-        <Route exact path="/browser/error" component={BrowserError} />
-        <Route exact path="/browser/import-settings" component={BrowserImport} />
-        <Route exact path="/browser/launch" component={BrowserLaunch} />
-        <Route exact path="/browser/new-tab" component={BrowserNewTab} />
-        <Route exact path="/browser/welcome" component={BrowserWelcome} />
-        <Route>
-          <tokenManager.Auth0Provider>
-            <ApolloWrapper>
-              <IntercomProvider appId={"k7f741xx"}>
-                <Provider store={window.store}>
-                  <App>
-                    <React.Suspense fallback={<div>Loading</div>}>
-                      <ConnectedPageSwitch />
-                    </React.Suspense>
-                  </App>
-                </Provider>
-              </IntercomProvider>
-            </ApolloWrapper>
-          </tokenManager.Auth0Provider>
-        </Route>
-      </Switch>
-    </Router>
-  </React.Suspense>
+  <tokenManager.Auth0Provider>
+    <ApolloWrapper>
+      <IntercomProvider appId={"k7f741xx"}>
+        <Provider store={window.store}>
+          <App>
+            <React.Suspense fallback={<div>Loading</div>}>
+              <ConnectedPageSwitch />
+            </React.Suspense>
+          </App>
+        </Provider>
+      </IntercomProvider>
+    </ApolloWrapper>
+  </tokenManager.Auth0Provider>
 );
 
 export default AppRouting;
