@@ -11,6 +11,7 @@ import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import MaterialIcon from "../MaterialIcon";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
+import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 
 function ModalButton({
@@ -104,6 +105,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 }
 
 function WorkspaceSettingsModal(props: PropsFromRedux) {
+  const [selectedTab, setSelectedTab] = useState<string>();
   const { members } = hooks.useGetWorkspaceMembers(props.workspaceId!);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const deleteWorkspace = hooks.useDeleteWorkspace();
@@ -131,35 +133,50 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
         style={{ width: "520px", height: "600px" }}
       >
         <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
-          <h2 className="font-bold text-3xl ">{`Team settings`}</h2>
-          <div className="flex flex-col flex-grow space-y-4 overflow-hidden">
-            <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-            <WorkspaceForm {...{ ...props, members }} />
-            <div className=" text-sm uppercase font-semibold">{`Members`}</div>
-            <div className="overflow-auto flex-grow">
-              <div className="workspace-members-container flex flex-col space-y-2">
-                <div className="flex flex-col space-y-2">
-                  {members ? <WorkspaceMembers members={members} /> : null}
+          {selectedTab === "api-keys" && props.workspaceId ? (
+            <>
+              <h2 className="font-bold text-3xl ">Team API Keys</h2>
+              <WorkspaceAPIKeys workspaceId={props.workspaceId} />
+            </>
+          ) : (
+            <>
+              <h2 className="font-bold text-3xl ">Team settings</h2>
+              <div className="flex flex-col flex-grow space-y-4 overflow-hidden">
+                <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
+                <WorkspaceForm {...{ ...props, members }} />
+                <div className=" text-sm uppercase font-semibold">{`Members`}</div>
+                <div className="overflow-auto flex-grow">
+                  <div className="workspace-members-container flex flex-col space-y-2">
+                    <div className="flex flex-col space-y-2">
+                      {members ? <WorkspaceMembers members={members} /> : null}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <InvitationLink workspaceId={props.workspaceId!} />
-            <div className="flex flex-col space-y-4">
-              <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
-              <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
-                <div className="flex flex-col">
-                  <div className="font-semibold">Delete this team</div>
-                  <div className="">{`This cannot be reversed.`}</div>
+                <InvitationLink workspaceId={props.workspaceId!} />
+                <div className="flex flex-col space-y-4">
+                  <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
+                  <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
+                    <div className="flex flex-col">
+                      <div className="font-semibold">Delete this team</div>
+                      <div className="">{`This cannot be reversed.`}</div>
+                    </div>
+                    <button
+                      onClick={handleDeleteTeam}
+                      className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
+                    >
+                      Delete this team
+                    </button>
+                  </div>
                 </div>
                 <button
-                  onClick={handleDeleteTeam}
-                  className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
+                  className="text-primaryAccent hover:underline self-start"
+                  onClick={() => setSelectedTab("api-keys")}
                 >
-                  Delete this team
+                  API Keys
                 </button>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
         <button className="absolute top-4 right-4" onClick={props.hideModal}>
           <div>

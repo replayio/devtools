@@ -14,11 +14,13 @@ export interface UserSettings {
   defaultWorkspaceId: null | string;
 }
 
+export type ApiKeyScope = "admin:all" | "write:sourcemap";
+
 export interface ApiKey {
   id: string;
   createdAt: string;
   label: string;
-  scopes: string[];
+  scopes: ApiKeyScope[];
 }
 
 export interface ApiKeyResponse {
@@ -54,6 +56,7 @@ export interface Workspace {
   isDomainLimitedCode: boolean;
   recordingCount?: number;
   members?: User[];
+  apiKeys?: ApiKey[];
 }
 
 export interface WorkspaceUser {
