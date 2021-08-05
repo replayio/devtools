@@ -2,10 +2,10 @@ import { bootstrapStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
-import { setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
 import { getTheme } from "ui/reducers/app";
 import { setModal } from "ui/actions/app";
+import { setupTelemetry } from "ui/utils/telemetry";
 
 declare global {
   interface Window {
@@ -14,11 +14,9 @@ declare global {
 }
 
 const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id");
 
 export function bootstrapApp() {
-  setupTelemetry({ recordingId });
-
+  setupTelemetry();
   setupDOMHelpers();
 
   const store = bootstrapStore();

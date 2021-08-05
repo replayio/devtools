@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { skipTelemetry } from "./environment";
 
-export function setupTelemetry(context: Record<string, any>) {
+export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
 
@@ -28,10 +28,11 @@ export function setupTelemetry(context: Record<string, any>) {
       return event;
     },
   });
+}
 
-  mixpanel.register({ recordingId: context.recordingId });
-
-  Sentry.setContext("recording", { ...context, url: window.location.href });
+export function registerRecording(recordingId: string) {
+  mixpanel.register({ recordingId });
+  Sentry.setContext("recording", { recordingId, url: window.location.href });
 }
 
 export function setTelemetryContext(

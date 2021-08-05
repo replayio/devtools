@@ -28,11 +28,11 @@ export default function RecordingItem({
     updateIsPrivate({ variables: { recordingId: data.id, isPrivate: !isPrivate } });
   };
   const onNavigate: React.MouseEventHandler = event => {
-    let url = `/?id=${data.id}`;
+    let url = `/${data.id}`;
     const isTesting = new URL(window.location.href).searchParams.get("e2etest");
 
     if (isTesting) {
-      url += `&e2etest=true`;
+      url += `?e2etest=true`;
     }
 
     if (event.metaKey) {

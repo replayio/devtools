@@ -56,10 +56,12 @@ declare global {
 }
 
 const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id")!;
+const recordingId = url.pathname.match(/\/([a-z0-9-]+)/i)?.pop();
 const dispatch = url.searchParams.get("dispatch") || undefined;
 
 (async () => {
+  if (!recordingId) return;
+
   window.gToolbox = new DevToolsToolbox();
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");

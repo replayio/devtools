@@ -10,6 +10,7 @@ import { ChatAltIcon } from "@heroicons/react/outline";
 import "./RecordingListItem.css";
 import { RecordingItemProps } from "./RecordingItem";
 import { RecordingId } from "@recordreplay/protocol";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 
 function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);

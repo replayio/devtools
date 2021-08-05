@@ -12,8 +12,6 @@ import { BlankLoadingScreen, BlankProgressScreen } from "./shared/BlankScreen";
 import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 
-import "ui/setup/dynamic/devtools";
-
 const DevView = React.lazy(() => import("./Views/DevView"));
 
 function _DevTools({
@@ -112,9 +110,9 @@ type DevToolsProps = ConnectedProps<typeof connector>;
 const ConnectedDevTools = connector(_DevTools);
 
 const DevTools = () => (
-  <WaitForReduxSlice slice="messages">
-    <ConnectedDevTools />
-  </WaitForReduxSlice>
+  // <WaitForReduxSlice slice="messages">
+  <ConnectedDevTools />
+  // </WaitForReduxSlice>
 );
 
 export default DevTools;

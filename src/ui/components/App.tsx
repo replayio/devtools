@@ -33,6 +33,9 @@ import { setUnexpectedError } from "ui/actions/session";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
+import { useGetUserSettings } from "ui/hooks/settings";
+import { bootIntercom } from "ui/utils/intercom";
+
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -99,6 +102,7 @@ function App({
   modal,
   setFontLoading,
   setUnexpectedError,
+  setWorkspaceId,
   children,
 }: AppProps) {
   const auth = useAuth0();
@@ -107,6 +111,19 @@ function App({
   const recordingInfo = useGetRecording(recordingId);
   const apolloError = useCheckForApolloError();
   const tokenInfo = useToken();
+  const { userSettings, loading: settingsLoading } = useGetUserSettings();
+
+  useEffect(() => {
+    if (userSettings) {
+      setWorkspaceId(userSettings.defaultWorkspaceId);
+    }
+  }, [userSettings]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      bootIntercom({ email: auth.user!.email });
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (apolloError) {
@@ -158,7 +175,7 @@ function App({
     return <UploadingScreen />;
   }
 
-  if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
+  if (!isDeployPreview() && (auth.isLoading || userInfo.loading || !userSettings)) {
     return <BlankScreen />;
   }
 
@@ -185,6 +202,7 @@ const connector = connect(
   {
     setFontLoading: actions.setFontLoading,
     setUnexpectedError,
+    setWorkspaceId: actions.setWorkspaceId,
   }
 );
 export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
