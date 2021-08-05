@@ -12,6 +12,7 @@ import { setExpectedError } from "ui/actions/session";
 import { useGetUserSettings } from "ui/hooks/settings";
 import { useIsRecordingInitialized, useGetRecordingOwnerUserId } from "ui/hooks/recordings";
 import BlankScreen from "ui/components/shared/BlankScreen";
+import ErrorBoundary from "ui/components/ErrorBoundary";
 import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
@@ -93,9 +94,11 @@ const AppRouting = () => (
       <IntercomProvider appId={"k7f741xx"}>
         <Provider store={window.store}>
           <App>
-            <React.Suspense fallback={<BlankScreen background="white" />}>
-              <ConnectedPageSwitch />
-            </React.Suspense>
+            <ErrorBoundary>
+              <React.Suspense fallback={<BlankScreen background="white" />}>
+                <ConnectedPageSwitch />
+              </React.Suspense>
+            </ErrorBoundary>
           </App>
         </Provider>
       </IntercomProvider>
