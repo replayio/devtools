@@ -13,14 +13,11 @@ import OnboardingModal from "./shared/OnboardingModal/index";
 import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
-import ResizeObserverPolyfill from "resize-observer-polyfill";
-import LogRocket from "ui/utils/logrocket";
 import { setTelemetryContext } from "ui/utils/telemetry";
 import { setUserInBrowserPrefs, setAccessTokenInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType, UnexpectedError } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
-import { useGetRecording } from "ui/hooks/recordings";
 import useToken from "ui/utils/useToken";
 
 import "./App.css";
@@ -93,18 +90,10 @@ function useCheckForApolloError() {
   return null;
 }
 
-function App({
-  theme,
-  recordingId,
-  modal,
-  setFontLoading,
-  setUnexpectedError,
-  children,
-}: AppProps) {
+function App({ theme, modal, setFontLoading, setUnexpectedError, children }: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
   const { isAuthenticated } = useAuth0();
-  const recordingInfo = useGetRecording(recordingId);
   const apolloError = useCheckForApolloError();
   const tokenInfo = useToken();
 
@@ -144,12 +133,6 @@ function App({
     setUserInBrowserPrefs(auth.user);
   }, [auth.user]);
 
-  useEffect(() => {
-    if (!recordingInfo.loading && !userInfo.loading && recordingInfo.recording) {
-      LogRocket.createSession(recordingInfo.recording, userInfo, auth);
-    }
-  }, [auth, userInfo, recordingInfo]);
-
   if (apolloError) {
     return <BlankScreen />;
   }
@@ -159,7 +142,7 @@ function App({
   }
 
   if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
-    return <BlankScreen />;
+    return <BlankScreen background="white" />;
   }
 
   if (!isTest() && isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {

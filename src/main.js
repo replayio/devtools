@@ -33,9 +33,10 @@ const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
 const BrowserNewTab = React.lazy(() => import("views/browser/new-tab"));
 const BrowserWelcome = React.lazy(() => import("views/browser/welcome"));
 const AppRouter = React.lazy(() => import("views/app"));
+const BlankScreen = require("ui/components/shared/BlankScreen").default;
 
 ReactDOM.render(
-  <React.Suspense fallback={<div>Loading</div>}>
+  <React.Suspense fallback={<BlankScreen background="white" />}>
     <Router>
       <Switch>
         <Route exact path="/browser/error" component={BrowserError} />

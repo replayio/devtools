@@ -11,8 +11,10 @@ import { UIState } from "ui/state";
 import { BlankLoadingScreen, BlankProgressScreen } from "./shared/BlankScreen";
 import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
+import LogRocket from "ui/utils/logrocket";
 
 import "ui/setup/dynamic/devtools";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -28,6 +30,8 @@ function _DevTools({
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { recording, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
+  const auth = useAuth0();
+  const userInfo = hooks.useGetUserInfo();
   const expectedError = hooks.useHasExpectedError(recordingId);
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
 
@@ -60,6 +64,11 @@ function _DevTools({
       setExpectedError(expectedError);
     }
   }, [recordingId, expectedError]);
+  useEffect(() => {
+    if (!recordingQueryLoading && !userInfo.loading && recording) {
+      LogRocket.createSession(recording, userInfo, auth);
+    }
+  }, [auth, userInfo, recording]);
 
   if (expectedError) {
     return <BlankLoadingScreen />;
@@ -96,7 +105,6 @@ function _DevTools({
 
 const connector = connect(
   (state: UIState) => ({
-    recordingId: selectors.getRecordingId(state)!,
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     selectedPanel: selectors.getSelectedPanel(state),
@@ -108,12 +116,19 @@ const connector = connect(
     setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
-type DevToolsProps = ConnectedProps<typeof connector>;
+type DevToolsProps = ConnectedProps<typeof connector> & {
+  recordingId: string;
+};
 const ConnectedDevTools = connector(_DevTools);
+
+// Todo: This is a short term fix. Fix how we initialize the devtools app
+// so that we can assume that the recording ID is already in the store.
+const url = new URL(window.location.href);
+const recordingId = url.searchParams.get("id")!;
 
 const DevTools = () => (
   <WaitForReduxSlice slice="messages">
-    <ConnectedDevTools />
+    <ConnectedDevTools recordingId={recordingId} />
   </WaitForReduxSlice>
 );
 
