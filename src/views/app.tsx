@@ -93,7 +93,7 @@ const AppRouting = () => (
       <IntercomProvider appId={"k7f741xx"}>
         <Provider store={window.store}>
           <App>
-            <React.Suspense fallback={<div>Loading</div>}>
+            <React.Suspense fallback={<BlankScreen background="white" />}>
               <ConnectedPageSwitch />
             </React.Suspense>
           </App>
