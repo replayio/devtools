@@ -10,8 +10,8 @@ button {
 
 .split-box .debugger {
   display: flex;
-  flex: 1;
-  height: 100%;
+  flex: 1 1 auto;
+  width: 0;
 }
 
 #toolbox-content-debugger .tree-indent {
