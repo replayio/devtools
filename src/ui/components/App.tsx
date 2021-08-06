@@ -115,7 +115,7 @@ function App({ theme, modal, setFontLoading, setUnexpectedError, children }: App
 
   useEffect(() => {
     if (!userInfo.loading) {
-      setTelemetryContext(userInfo.id, userInfo.email, userInfo.internal);
+      setTelemetryContext(userInfo);
     }
   }, [userInfo]);
 

@@ -34,26 +34,30 @@ export function setupTelemetry(context: Record<string, any>) {
   Sentry.setContext("recording", { ...context, url: window.location.href });
 }
 
-export function setTelemetryContext(
-  userId: string | undefined,
-  userEmail: string | undefined,
-  isInternal: boolean
-) {
-  Sentry.setTag("userInternal", isInternal);
-  if (userId && userEmail) {
-    Sentry.setUser({ id: userId, email: userEmail });
-    Sentry.setTag("userEmail", userEmail);
+type TelemetryUser = {
+  id: string | undefined;
+  email: string | undefined;
+  internal: boolean;
+};
+
+let telemetryUser: TelemetryUser | undefined;
+
+export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
+  Sentry.setTag("userInternal", internal);
+  if (id && email) {
+    Sentry.setUser({ id, email });
+    Sentry.setTag("userEmail", email);
     Sentry.setTag("anonymous", false);
   } else {
     Sentry.setTag("anonymous", true);
   }
 
-  if (userId) {
-    mixpanel.identify(userId);
+  if (id) {
+    mixpanel.identify(id);
   }
 
-  if (userEmail) {
-    mixpanel.people.set({ $email: userEmail });
+  if (email) {
+    mixpanel.people.set({ $email: email });
   }
 }
 
@@ -67,7 +71,7 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ event, ...tags }),
+      body: JSON.stringify({ event, ...tags, user: telemetryUser }),
     });
     if (!response.ok) {
       console.error(`Sent telemetry event ${event} but got status code ${response.status}`);
