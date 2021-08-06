@@ -87,7 +87,8 @@ function selectDebugger() {
 
 async function selectInspector() {
   await clickElement("button.inspector-panel-button");
-  await waitUntil(() => document.querySelector(".inspector"));
+  // ensure that the inspector is fully initialized, including its legacy components
+  await waitUntil(() => document.querySelector(".inspector .html-arrowscrollbox-inner"));
 }
 
 async function selectReactDevTools() {
