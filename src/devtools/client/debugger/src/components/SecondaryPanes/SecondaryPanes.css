@@ -27,6 +27,7 @@
 
 .secondary-panes-wrapper {
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -34,6 +35,12 @@
 .secondary-panes .accordion {
   flex: 1 0 auto;
   margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.secondary-panes .accordion li {
+  display: contents;
 }
 
 .secondary-panes-wrapper .accordion li:last-child ._content {
