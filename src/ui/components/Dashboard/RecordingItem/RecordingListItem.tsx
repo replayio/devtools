@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LazyLoad from "react-lazyload";
 import classnames from "classnames";
 import Title from "../../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
@@ -179,7 +180,9 @@ export default function RecordingListItem({
         <ItemCheckbox toggleChecked={toggleChecked} selected={selected} />{" "}
       </td>
       <td>
-        <ItemScreenshot recordingId={recordingId} />
+        <LazyLoad height={80} scrollContainer=".recording-list" once>
+          <ItemScreenshot recordingId={recordingId} />
+        </LazyLoad>
       </td>
       <td>
         <ItemTitle
