@@ -56,7 +56,7 @@ function CommentEditor({
   };
 
   return (
-    <div className="comment-input-container p-4" onClick={e => e.stopPropagation()}>
+    <div className="comment-input-container p-2" onClick={e => e.stopPropagation()}>
       <div className="comment-input text-lg">
         <DraftJSEditor
           handleCancel={handleCancel}
@@ -81,10 +81,10 @@ function CommentEditor({
           onClick={onSubmit}
           disabled={!submitEnabled}
           className={classNames(
-            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-gray-600",
+            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium",
             submitEnabled
-              ? "bg-primaryAccent hover:bg-primaryAccentHover text-white"
-              : "bg-gray-300"
+              ? "bg-primaryAccent text-white hover:bg-primaryAccentHover"
+              : "text-white bg-gray-300"
           )}
         >
           Post
