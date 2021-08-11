@@ -253,11 +253,7 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
-  return ({ getState, dispatch }) => {
-    if (!selectors.isRegionLoaded(getState(), time)) {
-      return false;
-    }
-
+  return ({ dispatch }) => {
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 
     updateUrl({ point, time, hasFrames });
