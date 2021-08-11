@@ -67,13 +67,12 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
     if (skipTelemetry()) {
       return;
     }
-    tags["user"] = telemetryUser;
     const response = await fetch("https://telemetry.replay.io/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ event, ...tags }),
+      body: JSON.stringify({ event, ...tags, user: telemetryUser }),
     });
     if (!response.ok) {
       console.error(`Sent telemetry event ${event} but got status code ${response.status}`);
