@@ -71,3 +71,24 @@ deletes the comment */
   display: flex;
   align-items: center;
 }
+
+.onboarding-text h2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--theme-body-color);
+}
+
+.onboarding-text {
+  text-align: center;
+  font-size: 15px;
+  padding: 20px;
+}
+
+.onboarding-text .large-icon {
+  font-size: 44px;
+  color: #c9c9c9;
+}
+
+.onboarding-text .arrow {
+  margin: 0 auto;
+}
