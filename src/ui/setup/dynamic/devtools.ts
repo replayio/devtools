@@ -1,6 +1,6 @@
 import { bindActionCreators } from "redux";
 
-import { initSocket } from "protocol/socket";
+import { initSocket, client } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
@@ -55,6 +55,17 @@ declare global {
   const gToolbox: DevToolsToolbox;
 }
 
+function setupAppHelper(store) {
+  window.app = {
+    client,
+    threadFront: ThreadFront,
+    actions: bindActionCreators(actions, store.dispatch),
+    selectors: bindSelectors({ store, selectors }),
+    console: { prefs: consolePrefs },
+    debugger: setupDebuggerHelper(),
+  };
+}
+
 const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id")!;
 const dispatch = url.searchParams.get("dispatch") || undefined;
@@ -63,13 +74,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
   window.gToolbox = new DevToolsToolbox();
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
-
-  window.app.threadFront = ThreadFront;
-  window.app.actions = bindActionCreators(actions, store.dispatch);
-  window.app.selectors = bindSelectors({ store, selectors });
-  window.app.console = { prefs: consolePrefs };
-  window.app.debugger = setupDebuggerHelper();
-
+  setupAppHelper(store);
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();

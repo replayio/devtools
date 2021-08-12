@@ -1,5 +1,6 @@
 import { UIStore } from "ui/actions";
 import { prefs, features } from "ui/utils/prefs";
+const { client } = require("protocol/socket");
 
 declare global {
   interface Window {
@@ -9,6 +10,7 @@ declare global {
     store: UIStore;
     prefs: typeof prefs;
     features: typeof features;
+    client: typeof client;
     dumpPrefs: () => string;
     local: () => void;
     prod: () => void;
@@ -20,6 +22,7 @@ export function setupAppHelper(store: UIStore) {
     store,
     prefs,
     features,
+    client,
 
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
