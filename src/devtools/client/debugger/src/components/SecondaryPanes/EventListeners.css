@@ -26,6 +26,11 @@
   user-select: none;
 }
 
+.event-listener-header-label {
+  display: flex;
+  align-items: center;
+}
+
 .event-listener-header {
   display: flex;
   align-items: center;
@@ -119,9 +124,9 @@
   -moz-context-properties: fill;
   fill: var(--theme-icon-dimmed-color);
   text-align: match-parent;
-  background-color: #EEE;
+  background-color: #eee;
   border-radius: 4px;
-  background-color: #EEE;
+  background-color: #eee;
   line-height: 16px;
   padding: 8px;
   border-radius: 4px;
