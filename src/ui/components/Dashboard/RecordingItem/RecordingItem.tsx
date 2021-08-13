@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import hooks from "ui/hooks";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
@@ -19,6 +20,7 @@ export default function RecordingItem({
   removeSelectedId,
   editing,
 }: RecordingItemProps) {
+  const history = useHistory();
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.private);
   const updateIsPrivate = hooks.useUpdateIsPrivate();
@@ -28,17 +30,17 @@ export default function RecordingItem({
     updateIsPrivate({ variables: { recordingId: data.id, isPrivate: !isPrivate } });
   };
   const onNavigate: React.MouseEventHandler = event => {
-    let url = `/?id=${data.id}`;
+    let url = `/recording/${data.id}`;
     const isTesting = new URL(window.location.href).searchParams.get("e2etest");
 
     if (isTesting) {
-      url += `&e2etest=true`;
+      url += `?e2etest=true`;
     }
 
     if (event.metaKey) {
       return window.open(url);
     }
-    window.location.href = url;
+    history.push(url);
   };
 
   const Panel = (

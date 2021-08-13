@@ -202,7 +202,7 @@ async function runTest(test, example, target) {
     RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
     RECORD_REPLAY_TEST_URL:
       exampleRecordingId
-        ? `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}&dispatch=${dispatchServer}`
+        ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
         : `http://localhost:8080/test/examples/${example}`,
     // If we need to record the example we have to use the target dispatch server.
     // If we already have the example, use the default dispatch server. When running in CI
@@ -261,7 +261,7 @@ async function runTestViewer(path, local, timeout, env) {
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
-    if (match && match[2].startsWith("http://localhost:8080/view")) {
+    if (match && match[2].startsWith("http://localhost:8080/recording")) {
       recordingId = match[1];
 
       if (env.RECORD_REPLAY_SERVER == DefaultDispatchServer) {
@@ -313,11 +313,11 @@ async function runTestViewer(path, local, timeout, env) {
     // Log an error which github will recognize.
     let msg = `::error ::Failure ${local}`;
     if (recordingId) {
-      msg += ` https://app.replay.io/?id=${recordingId}`;
+      msg += ` https://app.replay.io/recording/${recordingId}`;
     }
     const nodeRecordingId = maybeGetBackendNodeRecordingId();
     if (nodeRecordingId) {
-      msg += ` node https://app.replay.io/?id=${nodeRecordingId}`;
+      msg += ` node https://app.replay.io/recording/${nodeRecordingId}`;
     }
     spawnChecked("echo", [msg], { stdio: "inherit" });
   }

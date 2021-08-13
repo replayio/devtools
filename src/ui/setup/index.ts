@@ -14,10 +14,9 @@ declare global {
 }
 
 const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id");
 
 export function bootstrapApp() {
-  setupTelemetry({ recordingId });
+  setupTelemetry();
 
   setupDOMHelpers();
 
