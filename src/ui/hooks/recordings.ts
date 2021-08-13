@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query, extractGraphQLError } from "ui/utils/apolloClient";
@@ -95,6 +96,11 @@ const GET_MY_RECORDINGS = gql`
     }
   }
 `;
+
+export function useGetRecordingId() {
+  const { recordingId } = useParams<{ recordingId: string }>();
+  return recordingId;
+}
 
 /**
  * Returns true if the recording is accessible and initialized, false if it is

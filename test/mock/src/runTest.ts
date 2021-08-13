@@ -110,10 +110,11 @@ export const runTest = wrapped(async cbk => {
 });
 
 export function devtoolsURL({ id }: { id: string }) {
-  let url = "http://localhost:8080/view?mock=1";
+  let url = "http://localhost:8080/";
   if (id) {
-    url += `&id=${id}`;
+    url += `recording/${id}/`;
   }
+  url += "?mock=1";
   return url;
 }
 

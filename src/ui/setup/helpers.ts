@@ -1,4 +1,5 @@
 import { UIStore } from "ui/actions";
+import { getRecordingId } from "ui/utils/environment";
 import { prefs, features } from "ui/utils/prefs";
 
 declare global {
@@ -16,6 +17,8 @@ declare global {
 }
 
 export function setupAppHelper(store: UIStore) {
+  const recordingId = getRecordingId();
+
   window.app = {
     store,
     prefs,
@@ -24,21 +27,17 @@ export function setupAppHelper(store: UIStore) {
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {
-      const params = new URLSearchParams(document.location.search.substring(1));
-
-      if (params.get("id")) {
-        window.location.href = `http://localhost:8080/index.html?id=${params.get("id")}`;
+      if (recordingId) {
+        window.location.href = `http://localhost:8080/recording/${recordingId}`;
       } else {
-        window.location.href = "http://localhost:8080/index.html";
+        window.location.href = "http://localhost:8080/";
       }
     },
     prod: () => {
-      const params = new URLSearchParams(document.location.search.substring(1));
-
-      if (params.get("id")) {
-        window.location.href = `http://app.replay.io/?id=${params.get("id")}`;
+      if (recordingId) {
+        window.location.href = `https://app.replay.io/recording/${recordingId}`;
       } else {
-        window.location.href = "http://app.replay.io/";
+        window.location.href = "https://app.replay.io/";
       }
     },
   };

@@ -35,6 +35,7 @@ const {
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
 import { getUserSettings } from "ui/hooks/settings";
+import { getRecordingId } from "ui/utils/environment";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 
@@ -56,10 +57,12 @@ declare global {
 }
 
 const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id")!;
+const recordingId = getRecordingId();
 const dispatch = url.searchParams.get("dispatch") || undefined;
 
 (async () => {
+  if (!recordingId) return;
+
   window.gToolbox = new DevToolsToolbox();
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");

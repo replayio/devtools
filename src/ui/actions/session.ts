@@ -8,7 +8,7 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 import { prefs } from "ui/utils/prefs";
-import { getTest, isTest, isDevelopment } from "ui/utils/environment";
+import { getTest, isTest, isDevelopment, getRecordingId } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { ExpectedError, UnexpectedError } from "ui/state/app";
@@ -110,7 +110,7 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
     sendTelemetryEvent("DevtoolsExpectedError", {
       message: error.message,
       action: error.action,
-      recordingId: selectors.getRecordingId(state),
+      recordingId: getRecordingId(),
       sessionId: selectors.getSessionId(state),
       environment: isDevelopment() ? "dev" : "prod",
     });
@@ -125,7 +125,7 @@ export function setUnexpectedError(error: UnexpectedError): UIThunkAction {
 
     sendTelemetryEvent("DevtoolsUnexpectedError", {
       ...error,
-      recordingId: selectors.getRecordingId(state),
+      recordingId: getRecordingId(),
       sessionId: selectors.getSessionId(state),
       environment: isDevelopment() ? "dev" : "prod",
     });

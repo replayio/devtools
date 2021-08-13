@@ -36,5 +36,5 @@ export function UrlCopy({ url }: { url: string }) {
 }
 
 export default function ReplayLink({ recordingId }: { recordingId: RecordingId }) {
-  return <UrlCopy url={`https://app.replay.io/?id=${recordingId}`} />;
+  return <UrlCopy url={`https://app.replay.io/recording/${recordingId}`} />;
 }

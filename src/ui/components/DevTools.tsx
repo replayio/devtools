@@ -27,7 +27,7 @@ function _DevTools({
   selectedPanel,
   viewMode,
   setRecordingWorkspace,
-}: DevToolsProps) {
+}: PropsFromRedux) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { recording, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
   const auth = useAuth0();
@@ -105,6 +105,7 @@ function _DevTools({
 
 const connector = connect(
   (state: UIState) => ({
+    recordingId: selectors.getRecordingId(state)!,
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     selectedPanel: selectors.getSelectedPanel(state),
@@ -116,19 +117,12 @@ const connector = connect(
     setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
-type DevToolsProps = ConnectedProps<typeof connector> & {
-  recordingId: string;
-};
+type PropsFromRedux = ConnectedProps<typeof connector>;
 const ConnectedDevTools = connector(_DevTools);
-
-// Todo: This is a short term fix. Fix how we initialize the devtools app
-// so that we can assume that the recording ID is already in the store.
-const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id")!;
 
 const DevTools = () => (
   <WaitForReduxSlice slice="messages">
-    <ConnectedDevTools recordingId={recordingId} />
+    <ConnectedDevTools />
   </WaitForReduxSlice>
 );
 

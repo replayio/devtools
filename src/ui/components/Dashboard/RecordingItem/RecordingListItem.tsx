@@ -19,7 +19,7 @@ function getDurationString(durationMs: number) {
 
 function CopyLinkButton({ recordingId }: { recordingId: RecordingId }) {
   const [clicked, setClicked] = useState(false);
-  const linkUrl = `${window.location.origin}/?id=${recordingId}`;
+  const linkUrl = `${window.location.origin}/recording/${recordingId}`;
 
   const handleCopyClick: React.MouseEventHandler = e => {
     e.stopPropagation();

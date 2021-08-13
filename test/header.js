@@ -64,7 +64,7 @@ async function waitForViewRecording() {
     dump(`TestHarnessWaitForViewRecording\n`);
 
     // This is the server used for hosting the devtools in run.js. This is cheesy...
-    if (await waitForLoad("localhost:8080/view?id=")) {
+    if (await waitForLoad("localhost:8080/recording/")) {
       break;
     }
   }

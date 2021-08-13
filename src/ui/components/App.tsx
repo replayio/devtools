@@ -14,10 +14,12 @@ import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
 import { setTelemetryContext } from "ui/utils/telemetry";
+import { bootIntercom } from "ui/utils/intercom";
 import { setUserInBrowserPrefs, setAccessTokenInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType, UnexpectedError } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
+import { useGetUserSettings } from "ui/hooks/settings";
 import useToken from "ui/utils/useToken";
 
 import "./App.css";
@@ -90,12 +92,31 @@ function useCheckForApolloError() {
   return null;
 }
 
-function App({ theme, modal, setFontLoading, setUnexpectedError, children }: AppProps) {
+function App({
+  theme,
+  modal,
+  setFontLoading,
+  setUnexpectedError,
+  setWorkspaceId,
+  children,
+}: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
-  const { isAuthenticated } = useAuth0();
   const apolloError = useCheckForApolloError();
   const tokenInfo = useToken();
+  const { userSettings, loading: settingsLoading } = useGetUserSettings();
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      bootIntercom({ email: auth.user.email });
+    }
+  }, [auth.isAuthenticated]);
+
+  useEffect(() => {
+    if (userSettings) {
+      setWorkspaceId(userSettings.defaultWorkspaceId);
+    }
+  }, [userSettings]);
 
   useEffect(() => {
     if (apolloError) {
@@ -141,11 +162,11 @@ function App({ theme, modal, setFontLoading, setUnexpectedError, children }: App
     return <UploadingScreen />;
   }
 
-  if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
+  if (!isDeployPreview() && (auth.isLoading || userInfo.loading || settingsLoading)) {
     return <BlankScreen background="white" />;
   }
 
-  if (!isTest() && isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {
+  if (!isTest() && auth.isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {
     return <TOSScreen />;
   }
 
@@ -168,6 +189,7 @@ const connector = connect(
   {
     setFontLoading: actions.setFontLoading,
     setUnexpectedError,
+    setWorkspaceId: actions.setWorkspaceId,
   }
 );
 export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };

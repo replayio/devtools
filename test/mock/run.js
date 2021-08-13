@@ -45,7 +45,7 @@ async function main() {
       if (recordings.length) {
         const recordingId = await uploadRecording(recordings[recordings.length - 1].id);
         if (recordingId) {
-          url = `https://app.replay.io?id=${recordingId}`;
+          url = `https://app.replay.io/recording/${recordingId}`;
         }
       }
       // Log an error which github will recognize.

@@ -1,4 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
+import { matchPath } from "react-router-dom";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
@@ -92,6 +93,11 @@ export function isDeployPreview() {
 // such as sourcemaps to load
 export function hasLoadingParam() {
   return url.searchParams.get("loading") != null;
+}
+
+export function getRecordingId() {
+  return matchPath<{ recordingId: string }>(window.location.pathname, "/recording/:recordingId")
+    ?.params.recordingId;
 }
 
 export function getPausePointParams() {
