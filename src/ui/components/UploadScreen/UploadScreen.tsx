@@ -8,9 +8,7 @@ import Modal from "ui/components/shared/NewModal";
 import { Recording, UserSettings, Workspace } from "ui/types";
 import { BlankLoadingScreen } from "../shared/BlankScreen";
 import MaterialIcon from "../shared/MaterialIcon";
-
-const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id");
+import { useGetRecordingId } from "ui/hooks/recordings";
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
 type Status = "saving" | "deleting" | "deleted" | null;
@@ -242,6 +240,7 @@ function SharingPreview({
 }
 
 export default function UploadScreen({ recording, userSettings }: UploadScreenProps) {
+  const recordingId = useGetRecordingId();
   const [showSharingSettings, setShowSharingSettings] = useState(false);
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);

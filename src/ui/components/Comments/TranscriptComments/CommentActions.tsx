@@ -6,15 +6,14 @@ import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import "./CommentActions.css";
 import { DotsHorizontalIcon } from "@heroicons/react/solid";
-import { UIState } from "ui/state";
-import { getRecordingId } from "ui/reducers/app";
 
 type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
   isRoot: boolean;
 };
 
-function CommentActions({ comment, editItem, isRoot, recordingId }: CommentActionsProps) {
+function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
+  const recordingId = hooks.useGetRecordingId();
   const { userId } = hooks.useGetUserId();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReply = hooks.useDeleteCommentReply();
@@ -76,7 +75,7 @@ function CommentActions({ comment, editItem, isRoot, recordingId }: CommentActio
   );
 }
 
-const connector = connect((state: UIState) => ({ recordingId: getRecordingId(state) }), {
+const connector = connect(null, {
   editItem: actions.editItem,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

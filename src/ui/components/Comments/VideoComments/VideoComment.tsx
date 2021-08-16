@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { selectors } from "ui/reducers";
 import classnames from "classnames";
 import { actions } from "ui/actions";
@@ -64,7 +64,6 @@ const connector = connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     pendingComment: selectors.getPendingComment(state),
-    recordingId: selectors.getRecordingId(state),
     canvas: selectors.getCanvas(state),
     hoveredComment: selectors.getHoveredComment(state),
   }),

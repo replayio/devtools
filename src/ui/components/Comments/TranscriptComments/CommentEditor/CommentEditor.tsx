@@ -1,11 +1,9 @@
 import React, { useMemo, useState } from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import CommentTool from "ui/components/shared/CommentTool";
 import {
   Comment,
   PendingEditComment,
@@ -24,12 +22,8 @@ type CommentEditorProps = PropsFromRedux & {
   handleSubmit: (inputValue: string) => void;
 };
 
-function CommentEditor({
-  comment,
-  handleSubmit,
-  clearPendingComment,
-  recordingId,
-}: CommentEditorProps) {
+function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEditorProps) {
+  const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
   const [api, setApi] = useState<DraftJSAPI>();
   const [submitEnabled, setSubmitEnabled] = useState<boolean>(false);
@@ -96,7 +90,6 @@ function CommentEditor({
 
 const connector = connect(
   (state: UIState) => ({
-    recordingId: selectors.getRecordingId(state),
     pendingComment: selectors.getPendingComment(state),
   }),
   {

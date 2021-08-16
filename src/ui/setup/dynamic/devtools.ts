@@ -105,7 +105,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
   initSocket(store, dispatch);
   createSession(store, recordingId);
 
-  setupApp(recordingId, store);
+  setupApp(store);
   setupTimeline(recordingId, store);
   setupEventListeners(recordingId, store);
   setupGraphics(store);

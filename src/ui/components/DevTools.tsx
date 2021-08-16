@@ -22,12 +22,12 @@ function _DevTools({
   loading,
   uploading,
   awaitingSourcemaps,
-  recordingId,
   setExpectedError,
   selectedPanel,
   viewMode,
   setRecordingWorkspace,
 }: PropsFromRedux) {
+  const recordingId = hooks.useGetRecordingId();
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { recording, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
   const auth = useAuth0();
@@ -105,7 +105,6 @@ function _DevTools({
 
 const connector = connect(
   (state: UIState) => ({
-    recordingId: selectors.getRecordingId(state)!,
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     selectedPanel: selectors.getSelectedPanel(state),

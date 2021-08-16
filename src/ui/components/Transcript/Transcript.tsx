@@ -11,9 +11,10 @@ import useAuth0 from "ui/utils/useAuth0";
 import useDraftJS from "ui/components/Comments/TranscriptComments/CommentEditor/use-draftjs";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
-  const { comments } = hooks.useGetComments(recordingId!);
-  const { recording, loading } = hooks.useGetRecording(recordingId!);
+function Transcript({ pendingComment }: PropsFromRedux) {
+  const recordingId = hooks.useGetRecordingId();
+  const { comments } = hooks.useGetComments(recordingId);
+  const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const load = useDraftJS();
   const isAuthor = userId && userId == recording?.userId;
@@ -69,7 +70,6 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
   );
 }
 const connector = connect((state: UIState) => ({
-  recordingId: selectors.getRecordingId(state),
   pendingComment: selectors.getPendingComment(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

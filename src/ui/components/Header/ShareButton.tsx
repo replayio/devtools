@@ -1,10 +1,10 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
+import { useGetRecordingId } from "ui/hooks/recordings";
 
-function ShareButton({ setModal, recordingId }: PropsFromRedux) {
+function ShareButton({ setModal }: PropsFromRedux) {
+  const recordingId = useGetRecordingId();
   const onClick = () => setModal("sharing", { recordingId: recordingId! });
 
   return (
@@ -18,7 +18,7 @@ function ShareButton({ setModal, recordingId }: PropsFromRedux) {
   );
 }
 
-const connector = connect((state: UIState) => ({ recordingId: selectors.getRecordingId(state) }), {
+const connector = connect(null, {
   setModal: actions.setModal,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

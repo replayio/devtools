@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useGetUserInfo } from "ui/hooks/users";
-import { useIsOwner, useGetRecording, useToggleIsPrivate } from "ui/hooks/recordings";
-import * as selectors from "ui/reducers/app";
+import {
+  useIsOwner,
+  useGetRecording,
+  useToggleIsPrivate,
+  useGetRecordingId,
+} from "ui/hooks/recordings";
 import * as actions from "ui/actions/app";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
-import { RecordingId } from "@recordreplay/protocol";
-import { UIState } from "ui/state";
 
-function CopyUrl({ recordingId }: { recordingId: RecordingId }) {
+function CopyUrl() {
+  const recordingId = useGetRecordingId();
   const [copyClicked, setCopyClicked] = useState(false);
 
   const handleCopyClick = () => {
@@ -94,9 +97,9 @@ function PrivacyNote({ isPrivate, isOwner }: { isPrivate: boolean; isOwner: bool
 
 function Collaborators({
   setExpanded,
-  recordingId,
   setModal,
 }: PropsFromRedux & { setExpanded(expanded: boolean): void }) {
+  const recordingId = useGetRecordingId();
   const { id } = useGetUserInfo();
   if (!id) {
     return null;
@@ -122,12 +125,12 @@ function Collaborators({
 }
 
 interface OwnerSettingsProps {
-  recordingId: RecordingId;
   isPrivate: boolean;
   isOwner: boolean;
 }
 
-function OwnerSettings({ recordingId, isPrivate, isOwner }: OwnerSettingsProps) {
+function OwnerSettings({ isPrivate, isOwner }: OwnerSettingsProps) {
+  const recordingId = useGetRecordingId();
   const updateIsPrivate = useToggleIsPrivate(recordingId, isPrivate);
 
   if (!isOwner) {
@@ -141,7 +144,8 @@ function OwnerSettings({ recordingId, isPrivate, isOwner }: OwnerSettingsProps) 
   );
 }
 
-function ShareDropdown({ recordingId, setModal }: PropsFromRedux) {
+function ShareDropdown({ setModal }: PropsFromRedux) {
+  const recordingId = useGetRecordingId();
   const [expanded, setExpanded] = useState(false);
   const isOwner = useIsOwner(recordingId);
   const { recording } = useGetRecording(recordingId);
@@ -157,23 +161,18 @@ function ShareDropdown({ recordingId, setModal }: PropsFromRedux) {
         setExpanded={setExpanded}
         expanded={expanded}
       >
-        <CopyUrl recordingId={recordingId} />
-        <OwnerSettings recordingId={recordingId} isPrivate={isPrivate} isOwner={isOwner} />
+        <CopyUrl />
+        <OwnerSettings isPrivate={isPrivate} isOwner={isOwner} />
         <PrivacyNote isPrivate={isPrivate} isOwner={isOwner} />
-        <Collaborators recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
+        <Collaborators setExpanded={setExpanded} setModal={setModal} />
       </Dropdown>
     </div>
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    recordingId: selectors.getRecordingId(state)!,
-  }),
-  {
-    setModal: actions.setModal,
-  }
-);
+const connector = connect(null, {
+  setModal: actions.setModal,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(ShareDropdown);

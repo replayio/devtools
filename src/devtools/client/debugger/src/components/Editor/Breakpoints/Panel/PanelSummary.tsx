@@ -5,7 +5,6 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
-import { getRecordingId } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { isDemo } from "ui/utils/environment";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
@@ -21,7 +20,6 @@ type PanelSummaryProps = PropsFromRedux & {
 
 function PanelSummary({
   breakpoint,
-  recordingId,
   toggleEditingOn,
   setInputToFocus,
   createFrameComment,
@@ -147,7 +145,6 @@ function PanelSummary({
 const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: any }) => ({
     executionPoint: getExecutionPoint(state),
-    recordingId: getRecordingId(state),
     currentTime: selectors.getCurrentTime(state),
     analysisPoints: selectors.getAnalysisPointsForLocation(
       state,

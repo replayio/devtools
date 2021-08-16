@@ -35,10 +35,8 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   );
 }
 
-function Links({
-  recordingId,
-  recordingTarget,
-}: Pick<PropsFromRedux, "recordingId" | "recordingTarget">) {
+function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
+  const recordingId = hooks.useGetRecordingId();
   const { isAuthenticated } = useAuth0();
   const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
   const isCollaborator =
@@ -108,8 +106,9 @@ function HeaderTitle({
   );
 }
 
-function Header({ recordingId, sessionId, recordingTarget }: PropsFromRedux) {
+function Header({ recordingTarget }: PropsFromRedux) {
   const { isAuthenticated } = useAuth0();
+  const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
   const dashboardUrl = window.location.origin;
@@ -144,13 +143,12 @@ function Header({ recordingId, sessionId, recordingTarget }: PropsFromRedux) {
           <div className="title">Recordings</div>
         )}
       </div>
-      <Links recordingId={recordingId} recordingTarget={recordingTarget} />
+      <Links recordingTarget={recordingTarget} />
     </div>
   );
 }
 
 const connector = connect((state: UIState) => ({
-  recordingId: selectors.getRecordingId(state),
   sessionId: selectors.getSessionId(state),
   recordingTarget: selectors.getRecordingTarget(state),
 }));
