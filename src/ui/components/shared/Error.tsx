@@ -48,7 +48,10 @@ function SignInButton() {
   const { loginWithRedirect } = useAuth0();
 
   const onClick = () => {
-    loginWithRedirect({ appState: { returnTo: window.location.href } });
+    loginWithRedirect({
+      redirectUri: window.location.origin,
+      appState: { returnTo: window.location.href },
+    });
   };
 
   return (

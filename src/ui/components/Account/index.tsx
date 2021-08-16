@@ -13,7 +13,11 @@ import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
   const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
-  const onLogin = () => loginWithRedirect({ appState: { returnTo: window.location.href } });
+  const onLogin = () =>
+    loginWithRedirect({
+      redirectUri: window.location.origin,
+      appState: { returnTo: window.location.href },
+    });
 
   if (forceOpenAuth) {
     onLogin();
