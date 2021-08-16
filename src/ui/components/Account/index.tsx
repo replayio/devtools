@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import { isTeamMemberInvite } from "ui/utils/environment";
+import { createReplayURL } from "views/app";
 import Library from "./Library";
 
 import "./Account.css";
@@ -55,6 +57,18 @@ function WelcomePage() {
 
 export default function Account() {
   const { isAuthenticated } = useAuth0();
+  const history = useHistory();
+  const searchParams = new URLSearchParams(window.location.search);
+
+  useEffect(() => {
+    if (searchParams.get("id")) {
+      history.replace(createReplayURL(searchParams));
+    }
+  }, []);
+
+  if (searchParams.get("id")) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <WelcomePage />;
