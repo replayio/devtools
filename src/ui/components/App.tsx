@@ -182,7 +182,6 @@ function App({
 const connector = connect(
   (state: UIState) => ({
     theme: selectors.getTheme(state),
-    recordingId: selectors.getRecordingId(state),
     modal: selectors.getModal(state),
     sessionId: selectors.getSessionId(state),
   }),

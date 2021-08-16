@@ -10,7 +10,8 @@ import "./Comments.css";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
 
-function Comments({ recordingId, pendingComment, hoveredItem }: PropsFromRedux) {
+function Comments({ pendingComment, hoveredItem }: PropsFromRedux) {
+  const recordingId = hooks.useGetRecordingId();
   const { comments: hasuraComments, loading, error } = hooks.useGetComments(recordingId);
 
   // Don't render anything if the comments are loading. For now, we fail silently
@@ -52,7 +53,6 @@ function Comments({ recordingId, pendingComment, hoveredItem }: PropsFromRedux) 
 
 const connector = connect((state: UIState) => ({
   playback: selectors.getPlayback(state),
-  recordingId: selectors.getRecordingId(state)!,
   pendingComment: selectors.getPendingComment(state),
   hoveredItem: selectors.getHoveredItem(state),
 }));

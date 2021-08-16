@@ -6,11 +6,9 @@ import { prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isSameTimeStampedPointRange } from "ui/utils/timeline";
-import { isDemo } from "ui/utils/environment";
 
 function initialAppState(): AppState {
   return {
-    recordingId: null,
     expectedError: null,
     unexpectedError: null,
     theme: "theme-light",
@@ -49,10 +47,6 @@ export default function update(
   action: AppActions | SessionActions
 ): AppState {
   switch (action.type) {
-    case "setup_app": {
-      return { ...state, recordingId: action.recordingId };
-    }
-
     case "set_recording_duration": {
       return { ...state, recordingDuration: action.duration };
     }
@@ -234,7 +228,6 @@ export const getLoading = (state: UIState) => state.app.loading;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;
-export const getRecordingId = (state: UIState) => state.app.recordingId;
 export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;

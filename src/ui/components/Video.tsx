@@ -20,7 +20,6 @@ function CommentLoader({ recordingId }: { recordingId: string }) {
 }
 
 function Video({
-  recordingId,
   currentTime,
   playback,
   isNodePickerActive,
@@ -30,6 +29,7 @@ function Video({
   videoUrl,
 }: PropsFromRedux) {
   const { isAuthenticated } = useAuth0();
+  const recordingId = hooks.useGetRecordingId();
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
@@ -78,7 +78,6 @@ const connector = connect(
     currentTime: selectors.getCurrentTime(state),
     playback: selectors.getPlayback(state),
     recordingTarget: selectors.getRecordingTarget(state),
-    recordingId: selectors.getRecordingId(state)!,
     videoUrl: selectors.getVideoUrl(state),
   }),
   {

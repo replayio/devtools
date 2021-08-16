@@ -47,12 +47,8 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps
   );
 }
 
-function ViewToggle({
-  viewMode,
-  recordingId,
-  setViewMode,
-  setSelectedPrimaryPanel,
-}: PropsFromRedux) {
+function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFromRedux) {
+  const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
@@ -118,7 +114,6 @@ function ViewToggle({
 const connector = connect(
   (state: UIState) => ({
     viewMode: getViewMode(state),
-    recordingId: selectors.getRecordingId(state),
   }),
   {
     setViewMode,

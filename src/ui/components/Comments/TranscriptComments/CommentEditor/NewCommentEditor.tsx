@@ -1,9 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
-import { UIState } from "ui/state";
 import { PendingNewComment, PendingNewReply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
 
@@ -12,12 +10,8 @@ interface NewCommentEditorProps extends PropsFromRedux {
   type: "new_reply" | "new_comment";
 }
 
-function NewCommentEditor({
-  comment,
-  type,
-  clearPendingComment,
-  recordingId,
-}: NewCommentEditorProps) {
+function NewCommentEditor({ comment, type, clearPendingComment }: NewCommentEditorProps) {
+  const recordingId = hooks.useGetRecordingId();
   const addComment = hooks.useAddComment();
   const addCommentReply = hooks.useAddCommentReply();
 
@@ -79,11 +73,8 @@ function NewCommentEditor({
   return <CommentEditor {...{ comment, handleSubmit }} />;
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    recordingId: selectors.getRecordingId(state),
-  }),
-  { clearPendingComment: actions.clearPendingComment }
-);
+const connector = connect(null, {
+  clearPendingComment: actions.clearPendingComment,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(NewCommentEditor);

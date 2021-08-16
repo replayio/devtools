@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import * as selectors from "ui/reducers/app";
 import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
@@ -9,14 +8,14 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
-import { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
 }
 
-function UserOptions({ recordingId, setModal, noBrowserItem }: UserOptionsProps) {
+function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
+  const recordingId = hooks.useGetRecordingId();
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
@@ -99,7 +98,7 @@ function UserOptions({ recordingId, setModal, noBrowserItem }: UserOptionsProps)
   );
 }
 
-const connector = connect((state: UIState) => ({ recordingId: selectors.getRecordingId(state)! }), {
+const connector = connect(null, {
   setModal: actions.setModal,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

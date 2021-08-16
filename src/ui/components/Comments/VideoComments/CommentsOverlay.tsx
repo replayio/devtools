@@ -38,10 +38,10 @@ function findComment({
 function CommentsOverlay({
   pendingComment,
   canvas,
-  recordingId,
   currentTime,
   children,
 }: PropsFromRedux & { children: React.ReactNode }) {
+  const recordingId = hooks.useGetRecordingId();
   const { comments: hasuraComments } = hooks.useGetComments(recordingId);
 
   if (!canvas) {
@@ -71,15 +71,11 @@ function CommentsOverlay({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    currentTime: selectors.getCurrentTime(state),
-    pendingComment: selectors.getPendingComment(state),
-    recordingId: selectors.getRecordingId(state)!,
-    canvas: selectors.getCanvas(state),
-  }),
-  null
-);
+const connector = connect((state: UIState) => ({
+  currentTime: selectors.getCurrentTime(state),
+  pendingComment: selectors.getPendingComment(state),
+  canvas: selectors.getCanvas(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(CommentsOverlay);

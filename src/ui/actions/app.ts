@@ -25,7 +25,6 @@ import {
 import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 
-export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type IndexingAction = Action<"indexing"> & { indexing: number };
@@ -88,7 +87,6 @@ export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 };
 
 export type AppActions =
-  | SetupAppAction
   | SetRecordingDurationAction
   | LoadingAction
   | IndexingAction
@@ -118,9 +116,7 @@ export type AppActions =
   | SetShowVideoPanelAction
   | SetAwaitingSourcemapsAction;
 
-export function setupApp(recordingId: RecordingId, store: UIStore) {
-  store.dispatch({ type: "setup_app", recordingId });
-
+export function setupApp(store: UIStore) {
   ThreadFront.waitForSession().then(sessionId =>
     store.dispatch({ type: "set_session_id", sessionId })
   );
