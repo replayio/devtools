@@ -44,7 +44,11 @@ export function BlankLoadingScreen({
   return (
     <BlankScreen background={background}>
       <div className="m-auto">
-        <div className="flex flex-col items-center space-y-4 bg-white opacity-90 rounded-md p-8">
+        <div
+          className={classNames("flex flex-col items-center space-y-4  opacity-90 rounded-md p-8", {
+            "bg-white": background == "white",
+          })}
+        >
           <div
             className={classNames("text-xl", {
               invisible: !statusMessage,
