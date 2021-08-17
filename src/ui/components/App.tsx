@@ -98,6 +98,7 @@ function App({
   setFontLoading,
   setUnexpectedError,
   setWorkspaceId,
+  isRedirectFromLogin,
   children,
 }: AppProps) {
   const auth = useAuth0();
@@ -166,8 +167,8 @@ function App({
     return <BlankScreen background="white" />;
   }
 
-  if (!isTest() && auth.isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {
-    return <TOSScreen />;
+  if (!isTest() && auth.isAuthenticated && userInfo.acceptedTOSVersion < LATEST_TOS_VERSION) {
+    return <TOSScreen {...{ isRedirectFromLogin }} />;
   }
 
   return (
@@ -191,6 +192,9 @@ const connector = connect(
     setWorkspaceId: actions.setWorkspaceId,
   }
 );
-export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
+export type AppProps = ConnectedProps<typeof connector> & {
+  children: ReactNode;
+  isRedirectFromLogin: boolean;
+};
 
 export default connector(App);

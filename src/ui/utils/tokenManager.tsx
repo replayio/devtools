@@ -1,7 +1,7 @@
 import { Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0-react";
 import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
-import React, { ReactNode } from "react";
+import React, { Dispatch, ReactNode, SetStateAction } from "react";
 import { useHistory } from "react-router-dom";
 import { assert, defer, Deferred } from "protocol/utils";
 import { isTest } from "./environment";
@@ -47,20 +47,18 @@ class TokenManager {
     // }
   }
 
-  Auth0Provider = ({ children }: { children: ReactNode }) => {
+  Auth0Provider = ({ children, onRedirect }: { children: ReactNode; onRedirect: () => void }) => {
     const history = useHistory();
 
     const onRedirectCallback = (appState: AppState) => {
+      onRedirect();
+
       if (appState?.returnTo) {
         window.location.href = appState.returnTo;
       } else {
         history.push(window.location.pathname);
       }
     };
-
-    // if (isTest()) {
-    //   return <>{children}</>;
-    // }
 
     return (
       <Auth0Provider

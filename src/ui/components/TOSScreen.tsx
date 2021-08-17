@@ -6,10 +6,19 @@ import Modal from "./shared/NewModal";
 
 export const LATEST_TOS_VERSION = 1;
 
-export default function TOSScreen() {
+export default function TOSScreen({ isRedirectFromLogin }: { isRedirectFromLogin: boolean }) {
+  const [isAcceptLoading, setIsAcceptLoading] = useState(false);
   const acceptTOS = useAcceptTOS();
-
   const handleAccept = () => acceptTOS({ variables: { version: LATEST_TOS_VERSION } });
+
+  if (isRedirectFromLogin) {
+    if (!isAcceptLoading) {
+      handleAccept();
+      setIsAcceptLoading(true);
+    }
+
+    return <BlankScreen background="white" />;
+  }
 
   return (
     <>

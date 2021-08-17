@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch, useHistory } from "react-router-dom";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
@@ -15,27 +15,31 @@ const Account = React.lazy(() => import("ui/components/Account"));
 
 bootstrapApp();
 
-const AppRouting = () => (
-  <tokenManager.Auth0Provider>
-    <ApolloWrapper>
-      <IntercomProvider appId={"k7f741xx"}>
-        <Provider store={window.store}>
-          <App>
-            <ErrorBoundary>
-              <React.Suspense fallback={<BlankScreen background="white" />}>
-                <Switch>
-                  <Route path="/recording/:recordingId" component={Recording} />
-                  <Route exact path="/" component={Account} />
-                  <Route exact path="/view" component={ViewRedirect} />
-                </Switch>
-              </React.Suspense>
-            </ErrorBoundary>
-          </App>
-        </Provider>
-      </IntercomProvider>
-    </ApolloWrapper>
-  </tokenManager.Auth0Provider>
-);
+const AppRouting = () => {
+  const [isRedirectFromLogin, setIsRedirectFromLogin] = useState(false);
+
+  return (
+    <tokenManager.Auth0Provider onRedirect={() => setIsRedirectFromLogin(true)}>
+      <ApolloWrapper>
+        <IntercomProvider appId={"k7f741xx"}>
+          <Provider store={window.store}>
+            <App {...{ isRedirectFromLogin }}>
+              <ErrorBoundary>
+                <React.Suspense fallback={<BlankScreen background="white" />}>
+                  <Switch>
+                    <Route path="/recording/:recordingId" component={Recording} />
+                    <Route exact path="/" component={Account} />
+                    <Route exact path="/view" component={ViewRedirect} />
+                  </Switch>
+                </React.Suspense>
+              </ErrorBoundary>
+            </App>
+          </Provider>
+        </IntercomProvider>
+      </ApolloWrapper>
+    </tokenManager.Auth0Provider>
+  );
+};
 
 // This component replaces a legacy /view route with its current equivalent
 function ViewRedirect() {
