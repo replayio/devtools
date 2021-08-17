@@ -47,7 +47,7 @@ pref("devtools.features.smoothPlayback", true);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
-pref("devtools.features.eventCount", false);
+pref("devtools.features.eventCount", true);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
