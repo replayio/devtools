@@ -8,6 +8,7 @@ import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../s
 import { selectLocation } from "../sources";
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
+import { trackEvent } from "ui/utils/telemetry";
 
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;
@@ -49,6 +50,7 @@ function fetchAsyncFrames(cx) {
 export function paused({ executionPoint, time }) {
   return async function ({ dispatch, getState }) {
     dispatch({ type: "PAUSED", executionPoint, time });
+    trackEvent("paused");
 
     // Get a context capturing the newly paused and selected thread.
     const cx = getThreadContext(getState());

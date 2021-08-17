@@ -31,6 +31,7 @@ pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.libraryFilterTime", "all");
 pref("devtools.libraryFilterAssociation", "all");
+pref("devtools.logTelemetryEvent", false);
 
 // app features
 pref("devtools.features.comments", true);
@@ -63,6 +64,7 @@ export const prefs = new PrefsHelper("devtools", {
   maxHitsEditable: ["Int", "maxHitsEditable"],
   libraryFilterTime: ["String", "libraryFilterTime"],
   libraryFilterAssociation: ["String", "libraryFilterAssociation"],
+  logTelemetryEvent: ["Bool", "logTelemetryEvent"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

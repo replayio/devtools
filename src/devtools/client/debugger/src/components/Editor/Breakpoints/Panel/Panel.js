@@ -8,7 +8,6 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import "./Panel.css";
 import { connect } from "react-redux";

@@ -24,6 +24,7 @@ import {
 } from "ui/state/app";
 import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
+import { trackEvent } from "ui/utils/telemetry";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -254,6 +255,7 @@ export function setEventsForType(events: MouseEvent[], eventType: Event): SetEve
 }
 
 export function setViewMode(viewMode: ViewMode): SetViewMode {
+  trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
   return { type: "set_view_mode", viewMode };
 }
 
