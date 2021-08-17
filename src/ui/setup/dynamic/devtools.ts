@@ -74,6 +74,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
   window.app.debugger = setupDebuggerHelper();
 
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
+  eventListenerBreakpoints.eventTypePoints ??= {};
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
 
