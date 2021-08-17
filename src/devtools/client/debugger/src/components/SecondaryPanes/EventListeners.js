@@ -150,11 +150,12 @@ class EventListeners extends Component {
 
     const expanded = expandedCategories.includes(category.name);
 
-    const events = !expanded
-      ? []
-      : category.events.filter(event => eventTypePoints[event.id].length > 0);
+    const categoryEvents = category.events || [];
+    const events = expanded
+      ? categoryEvents.filter(event => eventTypePoints[event.id]?.length > 0)
+      : [];
 
-    const categoryCount = category.events
+    const categoryCount = categoryEvents
       .map(event => eventTypePoints[event.id].length)
       .reduce((sum, count) => sum + count, 0);
 
