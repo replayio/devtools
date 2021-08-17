@@ -12,6 +12,7 @@ export function initialEventListenerState() {
     categories: [],
     expanded: [],
     logEventBreakpoints: prefs.logEventBreakpoints,
+    eventTypePoints: {},
   };
 }
 
@@ -22,6 +23,9 @@ function update(state = initialEventListenerState(), action) {
 
     case "RECEIVE_EVENT_LISTENER_TYPES":
       return { ...state, categories: action.categories };
+
+    case "RECEIVE_EVENT_LISTENER_POINTS":
+      return { ...state, eventTypePoints: action.eventTypePoints };
 
     case "UPDATE_EVENT_LISTENER_EXPANDED":
       return { ...state, expanded: action.expanded };
@@ -41,6 +45,10 @@ export function getEventListenerBreakpointTypes(state) {
 
 export function getEventListenerExpanded(state) {
   return state.eventListenerBreakpoints.expanded;
+}
+
+export function getEventListenerPoints(state) {
+  return state.eventListenerBreakpoints.eventTypePoints;
 }
 
 export default update;

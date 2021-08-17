@@ -12,6 +12,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
+import { features } from "ui/utils/prefs";
 
 import "./EventListeners.css";
 
@@ -143,18 +144,69 @@ class EventListeners extends Component {
     );
   }
 
+  renderCategoryItem(category, index) {
+    const { eventTypePoints } = this.props;
+    const { expandedCategories } = this.props;
+
+    const expanded = expandedCategories.includes(category.name);
+
+    const events = !expanded
+      ? []
+      : category.events.filter(event => eventTypePoints[event.id].length > 0);
+
+    const categoryCount = category.events
+      .map(event => eventTypePoints[event.id].length)
+      .reduce((sum, count) => sum + count, 0);
+
+    if (categoryCount == 0) {
+      return null;
+    }
+
+    return (
+      <li className="event-listener-group" key={index}>
+        {this.renderCategoryHeadingWithCount(category, categoryCount)}
+        <ul>{events.map(event => this.renderListenerEvent(event, category.name))}</ul>
+      </li>
+    );
+  }
+
   renderCategoriesList() {
     const { categories } = this.props;
 
+    if (!features.eventCount) {
+      return (
+        <ul className="event-listeners-list">
+          {categories.map((category, index) => {
+            return (
+              <li className="event-listener-group" key={index}>
+                {this.renderCategoryHeading(category)}
+                {this.renderCategoryListing(category)}
+              </li>
+            );
+          })}
+        </ul>
+      );
+    }
+
     return (
       <ul className="event-listeners-list">
-        {categories.map((category, index) => {
-          return (
-            <li className="event-listener-group" key={index}>
-              {this.renderCategoryHeading(category)}
-              {this.renderCategoryListing(category)}
-            </li>
-          );
+        {categories.map((category, index) => this.renderCategoryItem(category, index))}
+      </ul>
+    );
+  }
+
+  renderCategoryListing(category) {
+    const { expandedCategories } = this.props;
+
+    const expanded = expandedCategories.includes(category.name);
+    if (!expanded) {
+      return null;
+    }
+
+    return (
+      <ul>
+        {category.events.map(event => {
+          return this.renderListenerEvent(event, category.name);
         })}
       </ul>
     );
@@ -181,13 +233,32 @@ class EventListeners extends Component {
     );
   }
 
+  renderCategoryHeadingWithCount(category, count) {
+    const { expandedCategories } = this.props;
+
+    const expanded = expandedCategories.includes(category.name);
+
+    return (
+      <div className="event-listener-header" onClick={() => this.onCategoryToggle(category.name)}>
+        <div className="event-listener-header-label">
+          <button className="event-listener-expand">
+            <AccessibleImage className={classnames("arrow", { expanded })} />
+          </button>
+          <label className="event-listener-label">
+            <span className="event-listener-category">{category.name}</span>
+          </label>
+        </div>
+        <div>{count}</div>
+      </div>
+    );
+  }
+
   renderCategoryHeading(category) {
     const { activeEventListeners, expandedCategories } = this.props;
     const { events } = category;
 
     const expanded = expandedCategories.includes(category.name);
     const checked = events.every(({ id }) => activeEventListeners.includes(id));
-    const indeterminate = !checked && events.some(({ id }) => activeEventListeners.includes(id));
 
     return (
       <div className="event-listener-header" onClick={() => this.onCategoryToggle(category.name)}>
@@ -201,45 +272,38 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoryListing(category) {
-    const { expandedCategories } = this.props;
-
-    const expanded = expandedCategories.includes(category.name);
-    if (!expanded) {
-      return null;
-    }
-
-    return (
-      <ul>
-        {category.events.map(event => {
-          return this.renderListenerEvent(event, category.name);
-        })}
-      </ul>
-    );
-  }
-
   renderCategory(category) {
     return <span className="category-label">{category} ▸ </span>;
   }
 
   renderListenerEvent(event, category) {
-    const { activeEventListeners } = this.props;
+    const { activeEventListeners, eventTypePoints } = this.props;
     const { searchText } = this.state;
+
+    const points = eventTypePoints[event.id];
+    if (features.eventCount && points.length == 0) {
+      return null;
+    }
 
     return (
       <li className="event-listener-event" key={event.id}>
-        <label className="event-listener-label">
-          <input
-            type="checkbox"
-            value={event.id}
-            onChange={e => this.onEventTypeClick(event.id, e.target.checked)}
-            checked={activeEventListeners.includes(event.id)}
-          />
-          <span className="event-listener-name">
-            {searchText ? this.renderCategory(category) : null}
-            {event.name}
-          </span>
-        </label>
+        <div className="flex flex-row justify-between">
+          <label className="event-listener-label">
+            <input
+              type="checkbox"
+              value={event.id}
+              onChange={e => this.onEventTypeClick(event.id, e.target.checked)}
+              checked={activeEventListeners.includes(event.id)}
+            />
+            <span className="event-listener-name">
+              {searchText ? this.renderCategory(category) : null}
+              {event.name}
+            </span>
+          </label>
+          {features.eventCount ? (
+            <span className="event-listener-count">{points.length}</span>
+          ) : null}
+        </div>
       </li>
     );
   }
@@ -257,68 +321,8 @@ class EventListeners extends Component {
     );
   }
 
-  renderSimple() {
-    const simpleCategories = ["Mouse", "Keyboard"];
-
-    return (
-      <div className="event-listeners-content">
-        {simpleCategories.map((category, i) => this.renderSimpleEvent(category, i))}
-      </div>
-    );
-  }
-
-  renderSimpleEvent(categoryName, index) {
-    const { categories, activeEventListeners } = this.props;
-
-    const category = categories.find(cat => cat.name == categoryName);
-    let eventIds = category.events.map(event => event.id);
-
-    if (categoryName == "Mouse") {
-      eventIds = mouseClicks;
-    }
-
-    const isAllActive = eventIds.every(event => activeEventListeners.includes(event));
-    const indeterminate =
-      !isAllActive && eventIds.some(event => activeEventListeners.includes(event));
-
-    return (
-      <div className="event-listener-event" key={index}>
-        <input
-          id={`${categoryName.toLowerCase()}-events`}
-          type="checkbox"
-          checked={isAllActive}
-          onChange={() => this.onCategoryClick(eventIds, !isAllActive)}
-          ref={el => el && (el.indeterminate = indeterminate)}
-        />
-        <label className="event-listener-name" htmlFor={`${categoryName.toLowerCase()}-events`}>
-          {categoryName}
-        </label>
-      </div>
-    );
-  }
-
   render() {
-    const { mode } = this.state;
-
-    return (
-      <div className="event-listeners">
-        <div className="event-listeners-modes">
-          <button
-            className={mode == "simple" ? "selected" : ""}
-            onClick={() => this.setState({ mode: "simple" })}
-          >
-            Simple
-          </button>
-          <button
-            className={mode == "advanced" ? "advanced" : ""}
-            onClick={() => this.setState({ mode: "advanced" })}
-          >
-            Advanced
-          </button>
-        </div>
-        {mode == "simple" ? this.renderSimple() : this.renderAdvanced()}
-      </div>
-    );
+    return <div className="event-listeners">{this.renderAdvanced()}</div>;
   }
 }
 
@@ -326,6 +330,7 @@ const mapStateToProps = state => ({
   activeEventListeners: selectors.getActiveEventListeners(state),
   categories: selectors.getEventListenerBreakpointTypes(state),
   expandedCategories: selectors.getEventListenerExpanded(state),
+  eventTypePoints: selectors.getEventListenerPoints(state),
 });
 
 export default connect(mapStateToProps, {
