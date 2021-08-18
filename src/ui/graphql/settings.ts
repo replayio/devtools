@@ -84,3 +84,23 @@ export const UPDATE_WORKSPACE_MEMBER_ROLE = gql`
     }
   }
 `;
+
+export const GET_WORKSPACE_SUBSCRIPTION = gql`
+  query GetWorkspaceSubscription($workspaceId: ID!) {
+    node(id: $workspaceId) {
+      ... on Workspace {
+        subscription {
+          id
+          createdAt
+          effectiveFrom
+          effectiveUntil
+          status
+          trialEnds
+          plan {
+            key
+          }
+        }
+      }
+    }
+  }
+`;

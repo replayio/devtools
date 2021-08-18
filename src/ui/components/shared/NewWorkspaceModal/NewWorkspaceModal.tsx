@@ -13,6 +13,7 @@ import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
 import { validateEmail } from "ui/utils/helpers";
+import { features } from "ui/utils/prefs";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
@@ -145,7 +146,13 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     removeUrlParameters();
     hideModal();
   };
-  const handleSave = () => createNewWorkspace({ variables: { name: inputValue, userId } });
+  const handleSave = () =>
+    createNewWorkspace({
+      variables: {
+        name: inputValue,
+        planKey: features.teamSubscription ? "test-beta-v1" : undefined,
+      },
+    });
 
   return (
     <>

@@ -12,6 +12,7 @@ import {
   GET_USER_SETTINGS,
   GET_WORKSPACE_API_KEYS,
   UPDATE_WORKSPACE_MEMBER_ROLE,
+  GET_WORKSPACE_SUBSCRIPTION,
 } from "ui/graphql/settings";
 
 const emptySettings: UserSettings = {
@@ -174,4 +175,15 @@ export function useUpdateWorkspaceMemberRole() {
   });
 
   return { updateWorkspaceMemberRole, loading, error };
+}
+
+export function useGetWorkspaceSubscription(workspaceId: string) {
+  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "subscription"> }>(
+    GET_WORKSPACE_SUBSCRIPTION,
+    {
+      variables: { workspaceId },
+    }
+  );
+
+  return { data, loading, error };
 }
