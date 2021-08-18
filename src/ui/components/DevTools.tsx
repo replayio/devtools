@@ -66,7 +66,7 @@ function _DevTools({
   }, [recordingId, expectedError]);
   useEffect(() => {
     if (!recordingQueryLoading && !userInfo.loading && recording) {
-      LogRocket.createSession(recording, userInfo, auth);
+      LogRocket.createSession({ recording, userInfo, auth });
     }
   }, [auth, userInfo, recording]);
 
