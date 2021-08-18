@@ -1,8 +1,9 @@
+import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import hooks from "ui/hooks";
 import { Workspace } from "ui/types";
 
-function InvitationURL({ code }: { code: string }) {
+function InvitationURL({ code, isLarge }: { code: string; isLarge: boolean }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
   const displayedText = `https://app.replay.io/?invitationcode=${code}`;
@@ -21,7 +22,10 @@ function InvitationURL({ code }: { code: string }) {
   return (
     <div className="relative flex flex-col items-center">
       <input
-        className="focus:ring-primaryAccent focus:border-primaryAccent block w-full text-lg border px-3 py-2 border-textFieldBorder rounded-md"
+        className={classNames(
+          isLarge ? "text-2xl" : "text-lg",
+          "focus:ring-primaryAccent focus:border-primaryAccent block w-full border px-3 py-2 border-textFieldBorder rounded-md"
+        )}
         type="text"
         value={displayedText}
         onKeyPress={e => e.preventDefault()}
@@ -55,8 +59,8 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const emptyWorkspaceLink = "Only users with a matching email address domain can use this link";
   const workspaceLink = (
     <span>
-      Only users with a <span className="font-medium ">{workspace.domain}</span>{" "}
-      address can use this link
+      Only users with a <span className="font-medium ">{workspace.domain}</span> address can use
+      this link
     </span>
   );
 
@@ -75,7 +79,15 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   );
 }
 
-export default function InvitationLink({ workspaceId }: { workspaceId: string }) {
+export default function InvitationLink({
+  workspaceId,
+  showDomainCheck = true,
+  isLarge = false,
+}: {
+  workspaceId: string;
+  showDomainCheck?: boolean;
+  isLarge?: boolean;
+}) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
   const workspace = workspaces?.find(w => workspaceId == w.id);
@@ -84,10 +96,13 @@ export default function InvitationLink({ workspaceId }: { workspaceId: string })
   }
 
   return (
-    <div className="flex flex-col space-y-4">
-      <div className=" text-sm uppercase font-semibold">{`Invite link`}</div>
-      <InvitationURL code={workspace ? workspace.invitationCode : "Loading URL"} />
-      <InvationDomainCheck workspace={workspace} />
+    <div className="flex flex-col space-y-4 w-full">
+      <div className=" text-sm uppercase font-bold">{`Invite via link`}</div>
+      <InvitationURL
+        code={workspace ? workspace.invitationCode : "Loading URL"}
+        isLarge={isLarge}
+      />
+      {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
     </div>
   );
 }

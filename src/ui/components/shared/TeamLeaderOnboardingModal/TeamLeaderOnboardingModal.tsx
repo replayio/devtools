@@ -11,14 +11,31 @@ import React, {
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
-import { Nag } from "ui/hooks/users";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import BlankScreen from "../BlankScreen";
+import { DisabledLgButton, PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
+const Circles = require("../Circles").default;
+
+const DOWNLOAD_PAGE_INDEX = 4;
+
+export const ReplayLogo = () => <img className="w-24 h-24" src="/images/logo.svg" />;
+
+function DownloadButtonContent({ text, imgUrl }: { text: string; imgUrl: string }) {
+  return (
+    <div
+      className="flex flex-row items-center w-full justify-between"
+      style={{ minWidth: "120px" }}
+    >
+      <span>{text}</span>
+      <img className="w-8 h-8" src={imgUrl} />
+    </div>
+  );
+}
 
 function ModalButton({
   children,
@@ -38,7 +55,7 @@ function ModalButton({
       disabled={disabled}
       className={classNames(
         className,
-        "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+        "max-w-max items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {children}
@@ -46,35 +63,22 @@ function ModalButton({
   );
 }
 
-function SlideContent({
-  headerText,
-  children,
-}: {
-  headerText: string;
-  children: React.ReactElement | (React.ReactElement | null)[];
-}) {
-  return (
-    <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
-      <h2 className="font-bold text-3xl ">{headerText}</h2>
-      <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
-        {children}
-      </div>
-    </div>
-  );
+export function ModalHeader({ children }: { children: string }) {
+  return <div className="text-7xl font-semibold">{children}</div>;
 }
 
 function NextButton({
   current,
-  total,
+  text,
   setCurrent,
   onNext,
   allowNext,
 }: {
   current: number;
-  total: number;
+  text?: string;
   setCurrent: Dispatch<SetStateAction<number>>;
   hideModal: typeof actions.hideModal;
-  onNext?: () => void;
+  onNext: () => void;
   allowNext: boolean;
 }) {
   const [nextClicked, setNextClicked] = useState<boolean>(false);
@@ -96,61 +100,46 @@ function NextButton({
   }, [allowNext, nextClicked]);
 
   const inferLoading = nextClicked && !allowNext;
-  const buttonText = inferLoading ? "Loading" : "Next";
+  const buttonText = inferLoading ? "Loading" : text || "Next";
 
   return (
-    <button
-      onClick={onClick}
-      disabled={current == total}
-      type="button"
-      className={classNames(
-        "items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent",
-        {
-          "text-white bg-primaryAccent hover:bg-primaryAccentHover": current < total,
-        }
-      )}
-    >
+    <PrimaryLgButton color="blue" onClick={onClick}>
       {buttonText}
-    </button>
+    </PrimaryLgButton>
   );
 }
 
 type SlideBodyProps = PropsFromRedux & {
-  setCurrent: Dispatch<SetStateAction<number>>;
+  onNext: () => void;
   setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
+  setCurrent: Dispatch<SetStateAction<number>>;
+  skipToDownload: () => void;
   newWorkspace: Workspace | null;
-  total: number;
   current: number;
 };
 
-function SlideBody1({ hideModal, setCurrent, total, current }: SlideBodyProps) {
-  const userInfo = hooks.useGetUserInfo();
-  const updateUserNags = hooks.useUpdateUserNags();
-
-  useEffect(() => {
-    // Skip showing the user the first replay nag, since they will be going straight to a team
-    // once this flow is finished.
-    const newNags = [...userInfo.nags, Nag.FIRST_REPLAY];
-    updateUserNags({
-      variables: { newNags },
-    });
-  }, []);
-
-  const content = (
-    <div className="text-xl">{`We're excited to have you! Next, we'll guide you through creating your own team and inviting your team members to Replay.`}</div>
-  );
-
+function IntroPage({ skipToDownload, onNext }: SlideBodyProps) {
   return (
     <>
-      <SlideContent headerText="Welcome to Replay">{content}</SlideContent>
-      <div className="grid">
-        <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
+      <ReplayLogo />
+      <ModalHeader>Set up your team</ModalHeader>
+      <div className="text-center">
+        Replay teams are the easiest way to collaborate on bug reports, pull requests, and technical
+        questions
+      </div>
+      <div className="space-x-4 pt-16">
+        <PrimaryLgButton color="blue" onClick={onNext}>
+          Create a team
+        </PrimaryLgButton>
+        <SecondaryLgButton color="blue" onClick={skipToDownload}>
+          Skip for now
+        </SecondaryLgButton>
       </div>
     </>
   );
 }
 
-function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: SlideBodyProps) {
+function TeamNamePage({ hideModal, setNewWorkspace, setCurrent, current, onNext }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [allowNext, setAllowNext] = useState<boolean>(false);
   const { id: userId } = hooks.useGetUserInfo();
@@ -171,35 +160,40 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     setInputValue(e.target.value);
   };
   const onSkip = () => {
+    // Strip any query parameters so they don't bump into this onboarding flow again.
     window.history.pushState({}, document.title, window.location.pathname);
     hideModal();
   };
-  const handleSave = () => createNewWorkspace({ variables: { name: inputValue, userId } });
+  const handleSave = () => {
+    createNewWorkspace({ variables: { name: inputValue, userId } });
+  };
 
   return (
     <>
-      <SlideContent headerText="Your team name">
-        <div className="text-xl">{`To start, what would you like your team's name to be?`}</div>
-        {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
-        <div className="py-4 flex flex-col">
-          <TextInput placeholder="Team name" value={inputValue} onChange={onChange} />
-        </div>
-        {/* </form> */}
-      </SlideContent>
-      <div className="grid grid-cols-2 gap-4">
-        <button
-          onClick={onSkip}
-          className="items-center px-4 py-2 border border-textFieldBorder text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center text-gray-500 hover:bg-gray-100 hover:"
-        >
-          Skip
-        </button>
-        <NextButton onNext={handleSave} {...{ current, total, setCurrent, hideModal, allowNext }} />
+      <ReplayLogo /> <ModalHeader>Your team name</ModalHeader>
+      <div className="text-center">
+        We recommend keeping it simple and using your company or project name
+      </div>
+      <div className="py-4 flex flex-col w-full">
+        <TextInput
+          placeholder="Team name"
+          value={inputValue}
+          onChange={onChange}
+          textSize={"xl"}
+          center={true}
+        />
+      </div>
+      <div className="space-x-4 pt-16">
+        <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
+        <SecondaryLgButton color="blue" onClick={onSkip}>
+          Skip for now
+        </SecondaryLgButton>
       </div>
     </>
   );
 }
 
-function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: SlideBodyProps) {
+function TeamMemberInvitationPage({ newWorkspace, setWorkspaceId, onNext }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -207,6 +201,10 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
     setInputValue("");
     setIsLoading(false);
+  });
+
+  useEffect(() => {
+    setWorkspaceId(newWorkspace!.id);
   });
 
   // This is hacky. A member entry will only have an e-mail if it was pending. If
@@ -241,105 +239,143 @@ function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: Sli
 
   return (
     <>
-      <SlideContent headerText="Your team members">
-        <div className="text-xl">{`Next, we need to add your team members to your team.`}</div>
-        <form className="flex flex-col" onSubmit={handleAddMember}>
+      <ReplayLogo /> <ModalHeader>Invite your team members</ModalHeader>
+      <div className="text-center">
+        Replay is for your whole team. Invite anyone who you would like to be able to record and
+        discuss replays with
+      </div>
+      <div className="text-2xl w-full space-y-4">
+        <form className="flex flex-col w-full space-y-4 text-2xl" onSubmit={handleAddMember}>
+          <div className="text-sm uppercase font-bold">{`Invite via email`}</div>
           <div className="flex-grow flex flex-row space-x-4">
-            <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
+            <TextInput
+              placeholder="Email address"
+              value={inputValue}
+              onChange={onChange}
+              textSize={"lg"}
+            />
             <ModalButton onClick={handleAddMember} disabled={isLoading}>
               {isLoading ? "Loading" : "Invite"}
             </ModalButton>
           </div>
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
-        <div className="overflow-auto flex-grow">
-          {!loading && sortedMembers ? <WorkspaceMembers members={sortedMembers} /> : null}
-        </div>
-        <InvitationLink workspaceId={newWorkspace!.id} />
-      </SlideContent>
-      <div className="grid">
-        <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
+        {!loading && sortedMembers ? (
+          <div className="overflow-auto w-full text-2xl " style={{ height: "180px" }}>
+            <WorkspaceMembers members={sortedMembers} />
+          </div>
+        ) : null}
+        <InvitationLink workspaceId={newWorkspace!.id} showDomainCheck={false} isLarge={true} />
+      </div>
+      <div className="space-x-4 pt-16">
+        <PrimaryLgButton color="blue" onClick={onNext}>
+          Next
+        </PrimaryLgButton>
       </div>
     </>
   );
 }
 
-type SlideBody4Props = PropsFromRedux & {
-  setCurrent: Dispatch<SetStateAction<number>>;
-  setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
-  newWorkspace: Workspace;
-  total: number;
-  current: number;
-};
-
-function SlideBody4({ setWorkspaceId, hideModal, newWorkspace }: SlideBody4Props) {
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-
-  const onClick = () => {
-    window.history.pushState({}, document.title, window.location.pathname);
-
-    setWorkspaceId(newWorkspace.id);
-    updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });
-    hideModal();
+function DownloadPage({ hideModal, onNext }: SlideBodyProps) {
+  const startDownload = (url: string) => {
+    window.open(url, "_blank");
+    onNext();
+  };
+  const handleMac = () => {
+    startDownload("https://replay.io/downloads/replay.dmg");
+  };
+  const handleLinux = () => {
+    window.open("https://replay.io/downloads/linux-replay.tar.bz2");
+    onNext();
   };
 
   return (
     <>
-      <SlideContent headerText="Team setup complete">
-        <div className="text-xl">{`Now every time you create a Replay, it's marked private and is saved in your team's library. That means only your team members can view it.`}</div>
-        <div className="text-xl">
-          {`To learn more about creating a Replay, `}
-          <a
-            className="underline"
-            href="https://replay.io/welcome"
-            target="_blank"
-            rel="noreferrer"
-          >
-            click here
-          </a>
-          {`.`}
+      <ReplayLogo /> <ModalHeader>Download Replay</ModalHeader>
+      <div className="text-center">
+        Record your first replay with the Replay browser, or go directly to your team’s library
+      </div>
+      <div className="py-4 flex flex-row w-full space-x-4 justify-center">
+        <PrimaryLgButton color="blue" onClick={handleMac}>
+          <DownloadButtonContent text="Mac" imgUrl="/images/icon-apple.svg" />
+        </PrimaryLgButton>
+        <PrimaryLgButton color="blue" onClick={handleLinux}>
+          <DownloadButtonContent text="Linux" imgUrl="/images/icon-linux.svg" />
+        </PrimaryLgButton>
+        <div title="Coming soon">
+          <DisabledLgButton>
+            <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
+          </DisabledLgButton>
         </div>
-        <div className="flex flex-col flex-grow justify-end">
-          <ModalButton onClick={onClick}>{`Take me to my team`}</ModalButton>
-        </div>
-      </SlideContent>
+      </div>
+      <div className="space-x-4 pt-16">
+        <SecondaryLgButton color="blue" onClick={hideModal}>
+          Skip for now
+        </SecondaryLgButton>
+      </div>
+    </>
+  );
+}
+
+function DownloadingPage({ hideModal }: SlideBodyProps) {
+  return (
+    <>
+      <ReplayLogo />
+      <ModalHeader>Downloading Replay ...</ModalHeader>
+      <div className="text-center">
+        {`Once the download is finished, install and open the Replay browser. We'll see you there!`}
+      </div>
+      <div className="space-x-4 pt-16">
+        <PrimaryLgButton color="blue" onClick={hideModal}>
+          Take me to my library
+        </PrimaryLgButton>
+      </div>
     </>
   );
 }
 
 function OnboardingModal(props: PropsFromRedux) {
   const [current, setCurrent] = useState<number>(1);
+  const [randomNumber, setRandomNumber] = useState<number>(Math.random());
   const [newWorkspace, setNewWorkspace] = useState<Workspace | null>(null);
 
   let slide;
   const newProps = {
     ...props,
-    setCurrent,
+    onNext: () => {
+      setCurrent(current + 1);
+      setRandomNumber(Math.random());
+    },
+    skipToDownload: () => {
+      setCurrent(DOWNLOAD_PAGE_INDEX);
+      setRandomNumber(Math.random());
+    },
     setNewWorkspace,
+    setCurrent,
     newWorkspace,
     current,
-    total: 4,
   };
 
   if (current === 1) {
-    slide = <SlideBody1 {...newProps} />;
+    slide = <IntroPage {...newProps} />;
   } else if (current === 2) {
-    slide = <SlideBody2 {...newProps} />;
+    slide = <TeamNamePage {...newProps} />;
   } else if (current === 3) {
-    slide = <SlideBody3 {...newProps} />;
+    slide = <TeamMemberInvitationPage {...newProps} />;
+  } else if (current === DOWNLOAD_PAGE_INDEX) {
+    slide = <DownloadPage {...newProps} />;
   } else {
-    slide = <SlideBody4 {...{ ...newProps, newWorkspace: newWorkspace! }} />;
+    slide = <DownloadingPage {...newProps} />;
   }
-
-  const height = current === 3 ? "520px" : "360px";
 
   return (
     <>
-      <BlankScreen className="fixed" />
-      <Modal options={{ maskTransparency: "translucent" }}>
+      <BlankScreen className="fixed" background="white" />
+      <Circles randomNumber={randomNumber} />
+      <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
         <div
-          className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
-          style={{ width: "520px", height }}
+          className="p-12 text-4xl space-y-16 relative flex flex-col items-center"
+          style={{ width: "800px" }}
         >
           {slide}
         </div>

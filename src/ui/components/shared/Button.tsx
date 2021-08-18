@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React from "react";
 
-type ButtonSizes = "sm" | "md" | "lg" | "xl" | "2xl";
+type ButtonSizes = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 type ButtonStyles = "primary" | "secondary" | "disabled";
 type ColorScale = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 type Colors = "gray" | "blue" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "white";
@@ -16,6 +16,8 @@ const STANDARD_CLASSES = {
     "inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
   "2xl":
     "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
+  "3xl":
+    "inline-flex items-center px-6 py-3 border border-transparent text-2xl font-medium rounded-md",
 };
 
 function getColorCode(color: Colors, num: ColorScale) {
@@ -91,6 +93,16 @@ interface ButtonProps {
   className?: string;
   onClick?: () => void;
 }
+
+export const PrimaryLgButton = (props: ButtonProps & { color: Colors }) => (
+  <Button {...props} size="3xl" style="primary" />
+);
+export const SecondaryLgButton = (props: ButtonProps & { color: Colors }) => (
+  <Button {...props} size="3xl" style="secondary" />
+);
+export const DisabledLgButton = (props: ButtonProps) => (
+  <Button {...props} size="3xl" style="disabled" className="cursor-default" color="gray" />
+);
 
 export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="2xl" style="primary" />
