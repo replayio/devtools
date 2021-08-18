@@ -2,10 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import mixpanel from "mixpanel-browser";
-
 import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
@@ -20,15 +16,14 @@ import {
   getPendingBreakpointList,
 } from "../../selectors";
 
-import { getRecordingWorkspace } from "ui/reducers/app";
 import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
 import { setSkipPausing } from "../pause/skipPausing";
 
-import { recordEvent } from "../../utils/telemetry";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
+import { trackEvent } from "ui/utils/telemetry";
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -72,14 +67,6 @@ export function enableBreakpoint(cx, initialBreakpoint) {
   };
 }
 
-async function trackBreakpoint(workspace) {
-  let context = {};
-  if (workspace?.name) {
-    context = { workspaceName: workspace.name };
-  }
-  mixpanel.track("breakpoint", context);
-}
-
 export function addBreakpoint(
   cx,
   initialLocation,
@@ -89,12 +76,6 @@ export function addBreakpoint(
   shouldCancel = () => false
 ) {
   return async ({ dispatch, getState, client }) => {
-    recordEvent("add_breakpoint");
-    const workspace = getRecordingWorkspace(getState());
-    if (shouldTrack) {
-      trackBreakpoint(workspace);
-    }
-
     const { sourceId, column, line } = initialLocation;
 
     dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
@@ -163,8 +144,6 @@ export function addBreakpoint(
 
 export function runAnalysis(cx, initialLocation, options) {
   return async ({ getState, client }) => {
-    recordEvent("run_analysis");
-
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     if (!location) {
@@ -192,8 +171,6 @@ export function removeRequestedBreakpoint(location) {
 
 export function removeBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client }) => {
-    recordEvent("remove_breakpoint");
-
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint) {
       return;
@@ -272,6 +249,7 @@ export function setBreakpointOptions(cx, location, options = {}) {
     // Note: setting a breakpoint's options implicitly enables it.
     breakpoint = { ...breakpoint, disabled: false, options };
 
+    trackEvent("edit breakpoint");
     dispatch({
       type: "SET_BREAKPOINT",
       cx,

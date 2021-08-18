@@ -1,7 +1,10 @@
 import mixpanel from "mixpanel-browser";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
-import { skipTelemetry } from "./environment";
+import { isDevelopment, skipTelemetry } from "./environment";
+import { Workspace } from "ui/types";
+import { isTest } from "./environment";
+import { prefs } from "./prefs";
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -42,6 +45,11 @@ type TelemetryUser = {
 };
 
 let telemetryUser: TelemetryUser | undefined;
+let workspaceContext: Workspace | undefined;
+
+export function setWorkspaceContext(workspace: Workspace) {
+  workspaceContext = workspace;
+}
 
 export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
   telemetryUser = { id, email, internal };
@@ -81,4 +89,22 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
   } catch (e) {
     console.error(`Couldn't send telemetry event ${event}`, e);
   }
+}
+
+export async function trackEvent(event: string, additionalContext?: Object) {
+  // we should be able to opt-in to logging telemetry events in development
+  if (!prefs.logTelemetryEvent && (isTest() || isDevelopment())) {
+    return;
+  }
+
+  const context = {
+    workspace: workspaceContext?.name || "",
+    ...additionalContext,
+  };
+
+  if (prefs.logTelemetryEvent) {
+    console.log("mixpanel event", { event, context });
+  }
+
+  mixpanel.track(event, context);
 }

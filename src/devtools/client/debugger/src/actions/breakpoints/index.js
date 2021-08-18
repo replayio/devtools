@@ -33,6 +33,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import remapLocations from "./remapLocations";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
+import { trackEvent } from "ui/utils/telemetry";
 
 // this will need to be changed so that addCLientBreakpoint is removed
 
@@ -223,6 +224,8 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
       return;
     }
 
+    trackEvent("add breakpoint");
+
     const breakpointLocation = {
       sourceId: source.id,
       sourceUrl: source.url,
@@ -233,9 +236,8 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
     const options = {
       logValue: getLogValue(source, state, breakpointLocation),
     };
-    const shouldTrack = true;
 
-    return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled, shouldTrack));
+    return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };
 }
 
@@ -258,9 +260,10 @@ export function addBreakpointAtColumn(cx, location) {
     const options = {
       logValue: getLogValue(source, state, location),
     };
-    const shouldTrack = true;
 
-    return dispatch(addBreakpoint(cx, breakpointLocation, options, false, shouldTrack));
+    trackEvent("add column breakpoint");
+
+    return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
 }
 

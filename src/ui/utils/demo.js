@@ -25,3 +25,7 @@ export async function setupDemo() {
   root.style.setProperty("--editor-header-height", "0px");
   root.style.setProperty("--editor-footer-height", "0px");
 }
+
+export function isDemoReplay(recording) {
+  return recording?.title == "Your first replay";
+}

@@ -4,6 +4,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import { CommentPosition, PendingNewComment } from "ui/state/comments";
 import { GET_USER_ID } from "ui/graphql/users";
 import { GET_COMMENTS } from "ui/graphql/comments";
+import { trackEvent } from "ui/utils/telemetry";
 
 interface NewCommentVariable extends Omit<PendingNewComment, "content"> {
   content: string;
@@ -32,6 +33,8 @@ export default function useAddComment() {
 
   return (comment: NewCommentVariable, recordingId: RecordingId) => {
     const temporaryId = new Date().toISOString();
+    trackEvent("create comment");
+
     addComment({
       variables: { input: comment },
       optimisticResponse: {

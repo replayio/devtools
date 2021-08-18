@@ -17,6 +17,7 @@ const CollapseButton = require("devtools/client/webconsole/components/Output/Col
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
+const { trackEvent } = require("ui/utils/telemetry");
 
 class Message extends Component {
   static get propTypes() {
@@ -169,6 +170,7 @@ class Message extends Component {
 
     let overlayType, label, onClick;
     let onRewindClick = () => {
+      trackEvent("console seek");
       dispatch(
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
