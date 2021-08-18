@@ -9,6 +9,9 @@ import Library from "./Library";
 import "./Account.css";
 import "../Header/Header.css";
 import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
+import BlankScreen from "../shared/BlankScreen";
+import Modal from "../shared/NewModal";
+import { Button } from "../shared/Button";
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
@@ -28,34 +31,29 @@ function WelcomePage() {
     setUserInBrowserPrefs(null);
   }, []);
 
+  const text = isTeamMemberInvite()
+    ? "In order to join your team, we first need you to sign in."
+    : "Welcome to Replay - the new way to record, replay, and debug web applications!";
+
   return (
-    <main
-      className="w-full h-full grid"
-      style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
-    >
-      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="p-16 h-84 space-y-12">
+    <>
+      <BlankScreen className="fixed" background="white" />
+      <Modal options={{ maskTransparency: "transparent" }}>
+        <div
+          className="p-12 bg-white text-xl space-y-8 relative flex flex-col items-center"
+          style={{ width: "520px" }}
+        >
           <div className="space-y-4 place-content-center">
             <img className="w-16 h-16 mx-auto" src="/images/logo.svg" />
           </div>
-          {isTeamMemberInvite() ? (
-            <div className="text-center space-y-2">
-              <div className="font-bold text-2xl">Almost there!</div>
-              <div className="font-medium text-xl">
-                In order to join your team, we first need you to sign in.
-              </div>
-            </div>
-          ) : null}
-          <a
-            href="#"
-            onClick={onLogin}
-            className="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-          >
-            Sign in to Replay
-          </a>
+          <div className="text-3xl font-semibold">👋 Welcome</div>
+          <div className="text-center">{text}</div>
+          <Button size="2xl" style="primary" color="blue">
+            Sign in
+          </Button>
         </div>
-      </section>
-    </main>
+      </Modal>
+    </>
   );
 }
 

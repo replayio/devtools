@@ -22,7 +22,7 @@ function initialAppState(): AppState {
     uploading: null,
     awaitingSourcemaps: false,
     sessionId: null,
-    modal: null,
+    modal: "team-leader-onboarding",
     modalOptions: null,
     analysisPoints: {},
     events: {},

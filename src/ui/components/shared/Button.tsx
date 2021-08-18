@@ -59,7 +59,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
   return `${textStyle} ${bgStyle}`;
 }
 
-function Button({
+export function Button({
   size,
   children,
   style,
