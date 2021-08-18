@@ -26,7 +26,7 @@ function initialAppState(): AppState {
     modalOptions: null,
     analysisPoints: {},
     events: {},
-    viewMode: prefs.viewMode as ViewMode,
+    viewMode: "non-dev" as ViewMode,
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
     canvas: null,
