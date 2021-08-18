@@ -10,10 +10,10 @@ import { extendStore } from "../store";
 import app from "ui/reducers/app";
 import timeline from "ui/reducers/timeline";
 import comments from "ui/reducers/comments";
+import reactDevTools from "ui/reducers/reactDevTools";
 import { selectors } from "ui/reducers";
-import { createSession } from "ui/actions/session";
 import { actions } from "ui/actions";
-const { setupApp, setupTimeline, setModal } = actions;
+const { setupApp, setupTimeline, setupReactDevTools, createSession } = actions;
 
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
@@ -90,6 +90,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
     app,
     timeline,
     comments,
+    reactDevTools,
     ...debuggerReducers,
     ...consoleReducers.reducers,
   };
@@ -116,6 +117,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
   setupMessages(store);
   setupLogpoints(store);
   setupExceptions(store);
+  setupReactDevTools(store);
 
   const settings = await getUserSettings();
   updateEnableRepaint(settings.enableRepaint);

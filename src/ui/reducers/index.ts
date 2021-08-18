@@ -1,6 +1,7 @@
 import app, * as appSelectors from "./app";
 import timeline, * as timelineSelectors from "./timeline";
 import comments, * as commentsSelectors from "./comments";
+import reactDevTools, * as reactDevToolsSelectors from "./reactDevTools";
 import * as eventListenerBreakpointsSelectors from "devtools/client/debugger/src/reducers/event-listeners";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import consoleReducers from "devtools/client/webconsole/reducers";
@@ -12,6 +13,7 @@ export const reducers = {
   app,
   timeline,
   comments,
+  reactDevTools,
   ...debuggerReducers,
   ...consoleReducers.reducers,
   ...inspectorReducers,
@@ -21,6 +23,7 @@ export const selectors = {
   ...appSelectors,
   ...timelineSelectors,
   ...commentsSelectors,
+  ...reactDevToolsSelectors,
   ...eventListenerBreakpointsSelectors,
   ...consoleSelectors,
   ...debuggerSelectors,

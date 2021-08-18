@@ -9,7 +9,7 @@ import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
-import { ReactDevtoolsPanel } from "./ReactDevTools";
+import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
@@ -20,16 +20,14 @@ interface PanelButtonsProps {
   selectedPanel: PanelName;
   setSelectedPanel: (panel: PanelName) => any;
   isNode: boolean;
-  showVideoPanel: boolean;
-  setShowVideoPanel: (showVideoPanel: boolean) => any;
+  hasReactComponents: boolean;
 }
 
 function PanelButtons({
   selectedPanel,
   setSelectedPanel,
   isNode,
-  showVideoPanel,
-  setShowVideoPanel,
+  hasReactComponents,
 }: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
 
@@ -65,7 +63,7 @@ function PanelButtons({
           <div className="label">Elements</div>
         </button>
       )}
-      {showReact && !isNode && (
+      {hasReactComponents && showReact && (
         <button
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
@@ -105,6 +103,7 @@ function SecondaryToolbox({
   recordingTarget,
   showVideoPanel,
   setShowVideoPanel,
+  hasReactComponents,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
   const showReact = userSettings.showReact;
@@ -119,8 +118,7 @@ function SecondaryToolbox({
             selectedPanel={selectedPanel}
             setSelectedPanel={setSelectedPanel}
             isNode={isNode}
-            showVideoPanel={showVideoPanel}
-            setShowVideoPanel={setShowVideoPanel}
+            hasReactComponents={hasReactComponents}
           />
           <button className="" onClick={toggleShowVideoPanel}>
             <MaterialIcon className="hover:text-primaryAccent">
@@ -143,6 +141,7 @@ const connector = connect(
     selectedPanel: selectors.getSelectedPanel(state),
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
+    hasReactComponents: selectors.hasReactComponents(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
 );
