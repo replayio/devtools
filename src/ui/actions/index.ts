@@ -4,12 +4,14 @@ import * as appActions from "./app";
 import * as timelineActions from "./timeline";
 import * as sessionActions from "./session";
 import * as commentsActions from "./comments";
+import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkAction } from "ui/utils/thunk";
 import { UIState } from "ui/state";
 import type { AppActions } from "./app";
 import type { TimelineActions } from "./timeline";
 import type { CommentsAction } from "./comments";
 import { SessionActions } from "./session";
+import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
@@ -23,6 +25,7 @@ export type UIAction =
   | AppActions
   | TimelineActions
   | CommentsAction
+  | ReactDevToolsAction
   | MarkupAction
   | EventTooltipAction
   | SessionActions
@@ -47,6 +50,7 @@ export const actions = {
   ...appActions,
   ...timelineActions,
   ...commentsActions,
+  ...reactDevToolsActions,
   ...eventListeners,
   ...debuggerActions,
   ...consoleActions,
