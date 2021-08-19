@@ -9,19 +9,24 @@ import { AuthContext } from "ui/utils/useAuth0";
 let setup = false;
 
 export default {
-  createSession: (recording: Recording, userInfo: UserInfo, auth: AuthContext) => {
+  createSession: ({
+    recording,
+    userInfo,
+    auth,
+  }: {
+    recording?: Recording;
+    userInfo: UserInfo;
+    auth: AuthContext;
+  }) => {
     // Skip if the recording was either created or viewed by an internal user
-    if (recording.user?.internal || userInfo.internal) {
-      return;
-    }
-
-    if (skipTelemetry()) {
+    if (recording?.user?.internal || userInfo.internal || skipTelemetry()) {
       return;
     }
 
     if (setup) {
       return;
     }
+
     setup = true;
     setupLogRocketReact(LogRocket);
     LogRocket.init("4sdo4i/replay");

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Dashboard from "../Dashboard/index";
 import { connect, ConnectedProps } from "react-redux";
+import { useAuth0 } from "@auth0/auth0-react";
+import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
 import WorkspaceDropdown from "../Dashboard/Navigation/WorkspaceDropdown";
@@ -58,6 +60,8 @@ function Header({
 function LibraryLoader(props: PropsFromRedux) {
   const [renderLibrary, setRenderLibrary] = useState(false);
   const [showClaimError, setShowClaimError] = useState(false);
+  const auth = useAuth0();
+  const userInfo = hooks.useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
@@ -75,6 +79,13 @@ function LibraryLoader(props: PropsFromRedux) {
     // If there's an error while claiming a code, don't go ahead and render the library.
     setShowClaimError(true);
   }
+
+  useEffect(() => {
+    if (!userInfo.loading) {
+      LogRocket.createSession({ userInfo, auth });
+    }
+  }, [auth, userInfo]);
+
   useEffect(function handleTeamInvitationCode() {
     const code = hasTeamInvitationCode();
 
