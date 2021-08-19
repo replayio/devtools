@@ -170,6 +170,7 @@ function TeamNamePage({
   };
   const handleSave = () => {
     createNewWorkspace({ variables: { name: inputValue, userId } });
+    trackEvent("created-team");
   };
 
   return (
@@ -243,6 +244,7 @@ function TeamMemberInvitationPage({
     setErrorMessage(null);
     setIsLoading(true);
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
+    trackEvent("invited-team-member");
   };
 
   return (
@@ -350,7 +352,7 @@ function OnboardingModal(props: PropsFromRedux) {
 
   useEffect(() => {
     trackEvent("started-onboarding");
-  });
+  }, []);
 
   const onNext = () => {
     setCurrent(current + 1);
@@ -358,7 +360,7 @@ function OnboardingModal(props: PropsFromRedux) {
   };
   const onSkipToDownload = (location: string) => {
     setCurrent(DOWNLOAD_PAGE_INDEX);
-    trackEvent("skipped-create-team", location);
+    trackEvent("skipped-create-team", { skippedFrom: location });
     setRandomNumber(Math.random());
   };
   const onSkipToLibrary = () => {
@@ -367,7 +369,7 @@ function OnboardingModal(props: PropsFromRedux) {
   };
   const onFinished = () => {
     window.history.pushState({}, document.title, window.location.pathname);
-    trackEvent("finished-onboarding", location);
+    trackEvent("finished-onboarding");
     props.hideModal();
   };
 

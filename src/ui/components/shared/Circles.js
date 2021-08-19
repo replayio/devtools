@@ -82,7 +82,6 @@ function Circle({ label }) {
 }
 
 export default function Circles({ randomNumber }) {
-  console.log("HEEEY");
   const circles = [
     [<Circle label="bigTopRight" key={1} />, <Circle label="smallBottomLeft" key={2} />],
     [<Circle label="smallLeftBottom" key={1} />, <Circle label="bigRightTop" key={2} />],
@@ -90,8 +89,6 @@ export default function Circles({ randomNumber }) {
     [<Circle label="smallTopRight" key={1} />, <Circle label="bigCenterLeft" key={2} />],
     [<Circle label="smallTopCenter" key={1} />, <Circle label="bigBottomRight" key={2} />],
   ];
-
-  console.log(circles);
 
   return <div>HI{circles[Math.floor(randomNumber * 5)]}</div>;
 }
