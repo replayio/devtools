@@ -1,5 +1,8 @@
 .portal-dropdown-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 /* 
 .portal-dropdown-wrapper button.secondary {

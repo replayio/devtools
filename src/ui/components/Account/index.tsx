@@ -2,13 +2,21 @@ import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
-import { isTeamMemberInvite } from "ui/utils/environment";
+import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
 import { createReplayURL } from "views/app";
 import Library from "./Library";
 
 import "./Account.css";
 import "../Header/Header.css";
 import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
+import BlankScreen from "../shared/BlankScreen";
+import Modal from "../shared/NewModal";
+import { PrimaryLgButton } from "../shared/Button";
+import {
+  ModalHeader,
+  ReplayLogo,
+} from "../shared/TeamLeaderOnboardingModal/TeamLeaderOnboardingModal";
+const Circles = require("ui/components/shared/Circles").default;
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
@@ -27,6 +35,32 @@ function WelcomePage() {
   useEffect(() => {
     setUserInBrowserPrefs(null);
   }, []);
+
+  if (isTeamLeaderInvite()) {
+    return (
+      <>
+        <BlankScreen className="fixed" background="white" />
+        <Circles randomNumber={Math.random()} />
+        <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
+          <div
+            className="p-12 bg-white text-4xl space-y-16 relative flex flex-col items-center"
+            style={{ width: "800px" }}
+          >
+            <ReplayLogo />
+            <ModalHeader>👋 Welcome</ModalHeader>
+            <div className="text-center">
+              {"Welcome to Replay - the new way to record, replay, and debug web applications!"}
+            </div>
+            <div className="space-x-4 pt-16">
+              <PrimaryLgButton color="blue" onClick={onLogin}>
+                Sign in
+              </PrimaryLgButton>
+            </div>
+          </div>
+        </Modal>
+      </>
+    );
+  }
 
   return (
     <main
