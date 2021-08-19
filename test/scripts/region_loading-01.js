@@ -5,7 +5,8 @@ Test.describe(
     const { assert } = Test;
 
     const loadTimerange = [0, 5000];
-    const unloadTimerange = [0, loadTimerange[1] / 2];
+    // Unload 90% of the recording.
+    const unloadTimerange = [0, (loadTimerange[1] * 0.9)|0];
     const totalMessageCount = 50;
 
     await Test.selectSource("doc_rr_region_loading.html");
