@@ -114,7 +114,7 @@ type SlideBodyProps = PropsFromRedux & {
   onNext: () => void;
   setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
   setCurrent: Dispatch<SetStateAction<number>>;
-  onSkipToDownload: (location: string) => void;
+  onSkipToDownload: (location?: string) => void;
   onSkipToLibrary: () => void;
   onFinished: () => void;
   newWorkspace: Workspace | null;
@@ -278,7 +278,7 @@ function TeamMemberInvitationPage({
         <InvitationLink workspaceId={newWorkspace!.id} showDomainCheck={false} isLarge={true} />
       </div>
       <div className="space-x-4 pt-16">
-        <PrimaryLgButton color="blue" onClick={() => onSkipToDownload("team-member-page")}>
+        <PrimaryLgButton color="blue" onClick={() => onSkipToDownload()}>
           Next
         </PrimaryLgButton>
       </div>
@@ -360,10 +360,13 @@ function OnboardingModal(props: PropsFromRedux) {
   };
   const onSkipToDownload = (location: string) => {
     setCurrent(DOWNLOAD_PAGE_INDEX);
-    trackEvent("skipped-create-team", { skippedFrom: location });
+    if (location) {
+      trackEvent("skipped-create-team", { skippedFrom: location });
+    }
     setRandomNumber(Math.random());
   };
   const onSkipToLibrary = () => {
+    window.history.pushState({}, document.title, window.location.pathname);
     trackEvent("skipped-replay-download");
     props.hideModal();
   };
