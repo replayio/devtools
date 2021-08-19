@@ -129,14 +129,6 @@
   margin-top: 0px;
 }
 
-/* We already paint a top border on jsterm-input-container (and we need to keep
- * it when scrolling console content), so remove the last item's border. */
-.webconsole-app:not(.jsterm-editor) .message:last-child {
-  border-bottom-width: 0;
-  /* Adjust the min-height since we now only have a single border. */
-  min-height: calc(var(--console-row-height) + 1px);
-}
-
 /*
  * By default, prevent any element in message to overflow.
  * We exclude network messages as it may cause issues in the network detail panel.
@@ -277,7 +269,6 @@
 }
 
 .webconsole-app .message.paused:not(.paused-before) > .message-body-wrapper {
-  border-top-width: 2px;
   margin: calc(var(--console-output-vertical-padding) - 1px) 0
     var(--console-output-vertical-padding);
 }
