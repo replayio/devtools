@@ -43,7 +43,7 @@ function WelcomePage() {
         <Circles randomNumber={Math.random()} />
         <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
           <div
-            className="p-12 bg-white text-4xl space-y-16 relative flex flex-col items-center"
+            className="p-12 text-4xl space-y-16 relative flex flex-col items-center"
             style={{ width: "800px" }}
           >
             <ReplayLogo />
