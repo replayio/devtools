@@ -113,12 +113,13 @@ type SlideBodyProps = PropsFromRedux & {
   onNext: () => void;
   setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
   setCurrent: Dispatch<SetStateAction<number>>;
-  skipToDownload: () => void;
+  onSkipToDownload: () => void;
+  onFinished: () => void;
   newWorkspace: Workspace | null;
   current: number;
 };
 
-function IntroPage({ skipToDownload, onNext }: SlideBodyProps) {
+function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
   return (
     <>
       <ReplayLogo />
@@ -131,7 +132,7 @@ function IntroPage({ skipToDownload, onNext }: SlideBodyProps) {
         <PrimaryLgButton color="blue" onClick={onNext}>
           Create a team
         </PrimaryLgButton>
-        <SecondaryLgButton color="blue" onClick={skipToDownload}>
+        <SecondaryLgButton color="blue" onClick={onSkipToDownload}>
           Skip for now
         </SecondaryLgButton>
       </div>
@@ -139,7 +140,13 @@ function IntroPage({ skipToDownload, onNext }: SlideBodyProps) {
   );
 }
 
-function TeamNamePage({ hideModal, setNewWorkspace, setCurrent, current, onNext }: SlideBodyProps) {
+function TeamNamePage({
+  hideModal,
+  setNewWorkspace,
+  setCurrent,
+  current,
+  onSkipToDownload,
+}: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [allowNext, setAllowNext] = useState<boolean>(false);
   const { id: userId } = hooks.useGetUserInfo();
@@ -158,11 +165,6 @@ function TeamNamePage({ hideModal, setNewWorkspace, setCurrent, current, onNext 
   }
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-  };
-  const onSkip = () => {
-    // Strip any query parameters so they don't bump into this onboarding flow again.
-    window.history.pushState({}, document.title, window.location.pathname);
-    hideModal();
   };
   const handleSave = () => {
     createNewWorkspace({ variables: { name: inputValue, userId } });
@@ -185,7 +187,7 @@ function TeamNamePage({ hideModal, setNewWorkspace, setCurrent, current, onNext 
       </div>
       <div className="space-x-4 pt-16">
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
-        <SecondaryLgButton color="blue" onClick={onSkip}>
+        <SecondaryLgButton color="blue" onClick={onSkipToDownload}>
           Skip for now
         </SecondaryLgButton>
       </div>
@@ -276,7 +278,7 @@ function TeamMemberInvitationPage({ newWorkspace, setWorkspaceId, onNext }: Slid
   );
 }
 
-function DownloadPage({ hideModal, onNext }: SlideBodyProps) {
+function DownloadPage({ onFinished, onNext }: SlideBodyProps) {
   const startDownload = (url: string) => {
     window.open(url, "_blank");
     onNext();
@@ -285,8 +287,7 @@ function DownloadPage({ hideModal, onNext }: SlideBodyProps) {
     startDownload("https://replay.io/downloads/replay.dmg");
   };
   const handleLinux = () => {
-    window.open("https://replay.io/downloads/linux-replay.tar.bz2");
-    onNext();
+    startDownload("https://replay.io/downloads/linux-replay.tar.bz2");
   };
 
   return (
@@ -309,7 +310,7 @@ function DownloadPage({ hideModal, onNext }: SlideBodyProps) {
         </div>
       </div>
       <div className="space-x-4 pt-16">
-        <SecondaryLgButton color="blue" onClick={hideModal}>
+        <SecondaryLgButton color="blue" onClick={onFinished}>
           Skip for now
         </SecondaryLgButton>
       </div>
@@ -317,7 +318,7 @@ function DownloadPage({ hideModal, onNext }: SlideBodyProps) {
   );
 }
 
-function DownloadingPage({ hideModal }: SlideBodyProps) {
+function DownloadingPage({ onFinished }: SlideBodyProps) {
   return (
     <>
       <ReplayLogo />
@@ -326,7 +327,7 @@ function DownloadingPage({ hideModal }: SlideBodyProps) {
         {`Once the download is finished, install and open the Replay browser. We'll see you there!`}
       </div>
       <div className="space-x-4 pt-16">
-        <PrimaryLgButton color="blue" onClick={hideModal}>
+        <PrimaryLgButton color="blue" onClick={onFinished}>
           Take me to my library
         </PrimaryLgButton>
       </div>
@@ -346,9 +347,13 @@ function OnboardingModal(props: PropsFromRedux) {
       setCurrent(current + 1);
       setRandomNumber(Math.random());
     },
-    skipToDownload: () => {
+    onSkipToDownload: () => {
       setCurrent(DOWNLOAD_PAGE_INDEX);
       setRandomNumber(Math.random());
+    },
+    onFinished: () => {
+      window.history.pushState({}, document.title, window.location.pathname);
+      props.hideModal();
     },
     setNewWorkspace,
     setCurrent,
