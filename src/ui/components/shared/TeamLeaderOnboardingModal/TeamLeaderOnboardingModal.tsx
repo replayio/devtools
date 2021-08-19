@@ -299,6 +299,9 @@ function DownloadPage({ onFinished, onNext, onSkipToLibrary }: SlideBodyProps) {
     trackEvent("downloaded-linux");
     startDownload("https://replay.io/downloads/linux-replay.tar.bz2");
   };
+  const handleWindows = () => {
+    trackEvent("downloaded-windows");
+  };
 
   return (
     <>
@@ -313,7 +316,7 @@ function DownloadPage({ onFinished, onNext, onSkipToLibrary }: SlideBodyProps) {
         <PrimaryLgButton color="blue" onClick={handleLinux}>
           <DownloadButtonContent text="Linux" imgUrl="/images/icon-linux.svg" />
         </PrimaryLgButton>
-        <div title="Coming soon">
+        <div title="Coming soon" onClick={handleWindows}>
           <DisabledLgButton>
             <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
           </DisabledLgButton>
@@ -358,7 +361,7 @@ function OnboardingModal(props: PropsFromRedux) {
     setCurrent(current + 1);
     setRandomNumber(Math.random());
   };
-  const onSkipToDownload = (location: string) => {
+  const onSkipToDownload = (location?: string) => {
     setCurrent(DOWNLOAD_PAGE_INDEX);
     if (location) {
       trackEvent("skipped-create-team", { skippedFrom: location });
