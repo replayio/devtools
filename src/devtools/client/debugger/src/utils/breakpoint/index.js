@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { ThreadFront } from "protocol/thread";
 import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
 import assert from "../assert";
 import { features } from "../prefs";
@@ -47,7 +48,7 @@ export function makePendingLocationId(location) {
   const sourceUrlString = sourceUrl || "";
   const columnString = column || "";
 
-  return `${sourceUrlString}:${line}:${columnString}`;
+  return `${ThreadFront.recordingId}:${sourceUrlString}:${line}:${columnString}`;
 }
 
 export function makeBreakpointLocation(state, location) {
