@@ -19,6 +19,7 @@ import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
+import { trackEvent } from "ui/utils/telemetry";
 const Circles = require("../Circles").default;
 
 const DOWNLOAD_PAGE_INDEX = 4;
@@ -113,7 +114,8 @@ type SlideBodyProps = PropsFromRedux & {
   onNext: () => void;
   setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
   setCurrent: Dispatch<SetStateAction<number>>;
-  onSkipToDownload: () => void;
+  onSkipToDownload: (location: string) => void;
+  onSkipToLibrary: () => void;
   onFinished: () => void;
   newWorkspace: Workspace | null;
   current: number;
@@ -132,7 +134,7 @@ function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
         <PrimaryLgButton color="blue" onClick={onNext}>
           Create a team
         </PrimaryLgButton>
-        <SecondaryLgButton color="blue" onClick={onSkipToDownload}>
+        <SecondaryLgButton color="blue" onClick={() => onSkipToDownload("intro-page")}>
           Skip for now
         </SecondaryLgButton>
       </div>
@@ -187,7 +189,7 @@ function TeamNamePage({
       </div>
       <div className="space-x-4 pt-16">
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
-        <SecondaryLgButton color="blue" onClick={onSkipToDownload}>
+        <SecondaryLgButton color="blue" onClick={() => onSkipToDownload("team-name-page")}>
           Skip for now
         </SecondaryLgButton>
       </div>
@@ -195,7 +197,11 @@ function TeamNamePage({
   );
 }
 
-function TeamMemberInvitationPage({ newWorkspace, setWorkspaceId, onNext }: SlideBodyProps) {
+function TeamMemberInvitationPage({
+  newWorkspace,
+  setWorkspaceId,
+  onSkipToDownload,
+}: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -270,7 +276,7 @@ function TeamMemberInvitationPage({ newWorkspace, setWorkspaceId, onNext }: Slid
         <InvitationLink workspaceId={newWorkspace!.id} showDomainCheck={false} isLarge={true} />
       </div>
       <div className="space-x-4 pt-16">
-        <PrimaryLgButton color="blue" onClick={onNext}>
+        <PrimaryLgButton color="blue" onClick={() => onSkipToDownload("team-member-page")}>
           Next
         </PrimaryLgButton>
       </div>
@@ -278,15 +284,17 @@ function TeamMemberInvitationPage({ newWorkspace, setWorkspaceId, onNext }: Slid
   );
 }
 
-function DownloadPage({ onFinished, onNext }: SlideBodyProps) {
+function DownloadPage({ onFinished, onNext, onSkipToLibrary }: SlideBodyProps) {
   const startDownload = (url: string) => {
     window.open(url, "_blank");
     onNext();
   };
   const handleMac = () => {
+    trackEvent("downloaded-mac");
     startDownload("https://replay.io/downloads/replay.dmg");
   };
   const handleLinux = () => {
+    trackEvent("downloaded-linux");
     startDownload("https://replay.io/downloads/linux-replay.tar.bz2");
   };
 
@@ -310,7 +318,7 @@ function DownloadPage({ onFinished, onNext }: SlideBodyProps) {
         </div>
       </div>
       <div className="space-x-4 pt-16">
-        <SecondaryLgButton color="blue" onClick={onFinished}>
+        <SecondaryLgButton color="blue" onClick={onSkipToLibrary}>
           Skip for now
         </SecondaryLgButton>
       </div>
@@ -340,26 +348,41 @@ function OnboardingModal(props: PropsFromRedux) {
   const [randomNumber, setRandomNumber] = useState<number>(Math.random());
   const [newWorkspace, setNewWorkspace] = useState<Workspace | null>(null);
 
-  let slide;
+  useEffect(() => {
+    trackEvent("started-onboarding");
+  });
+
+  const onNext = () => {
+    setCurrent(current + 1);
+    setRandomNumber(Math.random());
+  };
+  const onSkipToDownload = (location: string) => {
+    setCurrent(DOWNLOAD_PAGE_INDEX);
+    trackEvent("skipped-create-team", location);
+    setRandomNumber(Math.random());
+  };
+  const onSkipToLibrary = () => {
+    trackEvent("skipped-replay-download");
+    props.hideModal();
+  };
+  const onFinished = () => {
+    window.history.pushState({}, document.title, window.location.pathname);
+    trackEvent("finished-onboarding", location);
+    props.hideModal();
+  };
+
   const newProps = {
     ...props,
-    onNext: () => {
-      setCurrent(current + 1);
-      setRandomNumber(Math.random());
-    },
-    onSkipToDownload: () => {
-      setCurrent(DOWNLOAD_PAGE_INDEX);
-      setRandomNumber(Math.random());
-    },
-    onFinished: () => {
-      window.history.pushState({}, document.title, window.location.pathname);
-      props.hideModal();
-    },
+    onNext,
+    onSkipToDownload,
+    onSkipToLibrary,
+    onFinished,
     setNewWorkspace,
     setCurrent,
     newWorkspace,
     current,
   };
+  let slide;
 
   if (current === 1) {
     slide = <IntroPage {...newProps} />;
