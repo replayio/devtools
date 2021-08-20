@@ -67,18 +67,22 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
 
   const { motion, AnimateSharedLayout } = framerMotion;
 
-  const handleToggle = (mode: ViewMode) => {
+  const handleToggle = async (mode: ViewMode) => {
     setLocalViewMode(mode);
+    const preloadPromise = import("../Views/DevView");
 
     // Delay updating the viewMode in redux so that the toggle can fully animate
     // before re-rendering all of devtools in the new viewMode.
     clearTimeout(toggleTimeoutKey.current!);
-    toggleTimeoutKey.current = setTimeout(() => {
-      if (mode === "non-dev") {
-        setSelectedPrimaryPanel("comments");
-      }
-      setViewMode(mode);
-    }, 300);
+    const delayPromise = new Promise<void>(resolve => {
+      toggleTimeoutKey.current = setTimeout(() => resolve(), 300);
+    });
+    await Promise.all([preloadPromise, delayPromise]);
+
+    if (mode === "non-dev") {
+      setSelectedPrimaryPanel("comments");
+    }
+    setViewMode(mode);
   };
 
   const shouldHide = isAuthor && !recording?.isInitialized && !isTest();
