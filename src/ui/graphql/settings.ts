@@ -76,3 +76,11 @@ export const DELETE_WORKSPACE_API_KEY = gql`
     }
   }
 `;
+
+export const UPDATE_WORKSPACE_MEMBER_ROLE = gql`
+  mutation UpdateWorkspaceMemberRole($id: ID!, $roles: [String!]!) {
+    updateWorkspaceMemberRole(input: { id: $id, roles: $roles }) {
+      success
+    }
+  }
+`;

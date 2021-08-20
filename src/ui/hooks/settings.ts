@@ -3,7 +3,7 @@ import { query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
-import type { UserSettings, Workspace } from "../types";
+import type { UserSettings, Workspace, WorkspaceUserRole } from "../types";
 import {
   ADD_USER_API_KEY,
   ADD_WORKSPACE_API_KEY,
@@ -11,6 +11,7 @@ import {
   DELETE_WORKSPACE_API_KEY,
   GET_USER_SETTINGS,
   GET_WORKSPACE_API_KEYS,
+  UPDATE_WORKSPACE_MEMBER_ROLE,
 } from "ui/graphql/settings";
 
 const emptySettings: UserSettings = {
@@ -162,4 +163,15 @@ export function useDeleteWorkspaceApiKey() {
   });
 
   return { deleteWorkspaceApiKey, loading, error };
+}
+
+export function useUpdateWorkspaceMemberRole() {
+  const [updateWorkspaceMemberRole, { loading, error }] = useMutation<
+    any,
+    { id: string; roles: WorkspaceUserRole[] }
+  >(UPDATE_WORKSPACE_MEMBER_ROLE, {
+    refetchQueries: ["GetWorkspaceMembers"],
+  });
+
+  return { updateWorkspaceMemberRole, loading, error };
 }

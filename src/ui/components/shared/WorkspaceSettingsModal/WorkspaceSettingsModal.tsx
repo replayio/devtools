@@ -40,7 +40,13 @@ function ModalButton({
   );
 }
 
-export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
+export function WorkspaceMembers({
+  members,
+  isAdmin,
+}: {
+  members: WorkspaceUser[];
+  isAdmin: boolean;
+}) {
   const sortedMembers = members.sort(
     (a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending)
   );
@@ -49,9 +55,13 @@ export function WorkspaceMembers({ members }: { members: WorkspaceUser[] }) {
     <ul className="flex flex-col space-y-3">
       {sortedMembers.map(member =>
         member.email ? (
-          <NonRegisteredWorkspaceMember member={member} key={`non-registered-${member.email}`} />
+          <NonRegisteredWorkspaceMember
+            member={member}
+            key={`non-registered-${member.email}`}
+            isAdmin={isAdmin}
+          />
         ) : (
-          <WorkspaceMember member={member} key={`registered-${member.userId}`} />
+          <WorkspaceMember member={member} key={`registered-${member.userId}`} isAdmin={isAdmin} />
         )
       )}
     </ul>
@@ -88,7 +98,9 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 
     setErrorMessage(null);
     setIsLoading(true);
-    inviteNewWorkspaceMember({ variables: { workspaceId, email: inputValue } });
+    inviteNewWorkspaceMember({
+      variables: { workspaceId, email: inputValue, roles: ["viewer", "debugger"] },
+    });
   };
 
   return (
@@ -109,6 +121,9 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
   const { members } = hooks.useGetWorkspaceMembers(props.workspaceId!);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const deleteWorkspace = hooks.useDeleteWorkspace();
+  const { userId: localUserId } = hooks.useGetUserId();
+
+  const isAdmin = members?.find(m => m.userId === localUserId)?.roles?.includes("admin") || false;
 
   const handleDeleteTeam = () => {
     const line1 = `Unexpected bad things will happen if you don't read this!`;
@@ -148,26 +163,28 @@ function WorkspaceSettingsModal(props: PropsFromRedux) {
                 <div className="overflow-auto flex-grow">
                   <div className="workspace-members-container flex flex-col space-y-2">
                     <div className="flex flex-col space-y-2">
-                      {members ? <WorkspaceMembers members={members} /> : null}
+                      {members ? <WorkspaceMembers members={members} isAdmin={isAdmin} /> : null}
                     </div>
                   </div>
                 </div>
-                <InvitationLink workspaceId={props.workspaceId!} />
-                <div className="flex flex-col space-y-4">
-                  <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
-                  <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
-                    <div className="flex flex-col">
-                      <div className="font-semibold">Delete this team</div>
-                      <div className="">{`This cannot be reversed.`}</div>
+                <InvitationLink workspaceId={props.workspaceId!} showDomainCheck={isAdmin} />
+                {isAdmin ? (
+                  <div className="flex flex-col space-y-4">
+                    <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
+                    <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
+                      <div className="flex flex-col">
+                        <div className="font-semibold">Delete this team</div>
+                        <div className="">{`This cannot be reversed.`}</div>
+                      </div>
+                      <button
+                        onClick={handleDeleteTeam}
+                        className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
+                      >
+                        Delete this team
+                      </button>
                     </div>
-                    <button
-                      onClick={handleDeleteTeam}
-                      className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
-                    >
-                      Delete this team
-                    </button>
                   </div>
-                </div>
+                ) : null}
                 <button
                   className="text-primaryAccent hover:underline self-start"
                   onClick={() => setSelectedTab("api-keys")}

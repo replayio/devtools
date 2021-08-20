@@ -217,7 +217,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         <div className="overflow-auto flex-grow">
-          {!loading && sortedMembers ? <WorkspaceMembers members={sortedMembers} /> : null}
+          {!loading && sortedMembers ? <WorkspaceMembers members={sortedMembers} isAdmin /> : null}
         </div>
         <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>
