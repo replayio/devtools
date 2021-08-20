@@ -1,6 +1,7 @@
 import React, { ReactNode, useState, useEffect } from "react";
 import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
+import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import {
   ApolloClient,
   ApolloProvider,
@@ -82,7 +83,7 @@ export async function mutate({
   return await apolloClient.mutate({ variables, mutation });
 }
 
-export function createApolloClient(token: string | undefined) {
+export const createApolloClient = memoizeLast(function (token: string | undefined) {
   const retryLink = createRetryLink();
   const errorLink = createErrorLink();
   const httpLink = createHttpLink(token);
@@ -96,7 +97,7 @@ export function createApolloClient(token: string | undefined) {
   clientWaiter.resolve(apolloClient);
 
   return apolloClient;
-}
+});
 
 /**
  * Check if the given ApolloError is a GraphQL error (and not a network error)
