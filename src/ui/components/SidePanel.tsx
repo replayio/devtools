@@ -7,7 +7,7 @@ import Events from "ui/components/Events";
 const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPanes").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
-const SIDEPANEL_WIDTH = 320;
+const SIDEPANEL_WIDTH = 240;
 
 function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
   let sidepanel;
