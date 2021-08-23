@@ -4,24 +4,33 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
-import BlankScreen from "../BlankScreen";
-import { DisabledButton, PrimaryButton, SecondaryButton } from "../Button";
-import Modal, { ModalContent } from "../NewModal";
+import { removeUrlParameters } from "ui/utils/environment";
+import { trackEvent } from "ui/utils/telemetry";
+import { PrimaryLgButton, SecondaryLgButton } from "../Button";
+import { DownloadingPage } from "../Onboarding/DownloadingPage";
+import { DownloadPage } from "../Onboarding/DownloadPage";
+import {
+  OnboardingActions,
+  OnboardingBody,
+  OnboardingContent,
+  OnboardingHeader,
+  OnboardingModalContainer,
+} from "../Onboarding/index";
 import Spinner from "../Spinner";
 
 function ModalLoader() {
   return (
-    <>
-      <BlankScreen className="fixed" />
-      <Modal options={{ maskTransparency: "translucent" }}>
-        <div className="p-12 bg-white rounded-lg shadow-xl text-xl relative flex">
-          <Spinner className="animate-spin h-6 w-6 text-gray-500" />
-        </div>
-      </Modal>
-    </>
+    <OnboardingModalContainer>
+      <OnboardingContent>
+        <Spinner className="animate-spin h-6 w-6 text-gray-500" />
+      </OnboardingContent>
+    </OnboardingModalContainer>
   );
 }
 
+// This is the main component that we export. This kicks off the process of auto-accepting
+// the invitation to the workspace that the user was invited to. First, this separately queries
+// the workspace so we have it ready.
 function SingleInviteModalLoader(props: PropsFromRedux) {
   const [workspace, setWorkspace] = useState<null | PendingWorkspaceInvitation>(null);
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
@@ -39,6 +48,7 @@ function SingleInviteModalLoader(props: PropsFromRedux) {
   return <AutoAccept {...{ ...props, workspace }} />;
 }
 
+// Once we have the workspace, this component should handle auto-accepting that invitation.
 function AutoAccept(props: SingleInviteModalProps) {
   const { setWorkspaceId, workspace } = props;
   const [accepted, setAccepted] = useState(false);
@@ -62,82 +72,35 @@ function AutoAccept(props: SingleInviteModalProps) {
 }
 
 function InitialScreen({
-  onSkip,
-  onDownload,
+  onSkipToLibrary,
+  onNext,
   name,
   inviterEmail,
 }: {
-  onSkip: () => void;
-  onDownload: () => void;
+  onSkipToLibrary: () => void;
+  onNext: () => void;
   name: string | null;
   inviterEmail: string | null;
 }) {
   return (
-    <ModalContent>
-      <div className="space-y-12 flex flex-col">
-        <h2 className="font-bold text-3xl ">{`Welcome to Replay`}</h2>
-        <div className="text-gray-500">
-          {`You've been added to the team `}
-          <strong>{name}</strong>
-          {` by `}
-          <strong>{inviterEmail}</strong>
-          {`. Would you like to go that team, or download Replay?`}
-        </div>
-        <div className="space-x-4">
-          <SecondaryButton color="blue" onClick={onSkip}>
-            {`Go to ${name}`}
-          </SecondaryButton>
-          <PrimaryButton color="blue" onClick={onDownload}>
-            {`Download Replay`}
-          </PrimaryButton>
-        </div>
-      </div>
-    </ModalContent>
-  );
-}
-
-function DownloadScreen({ onDownloading }: { onDownloading: () => void }) {
-  const handleMac = () => {
-    onDownloading();
-    window.open("https://replay.io/downloads/replay.dmg", "_blank");
-  };
-  const handleLinux = () => {
-    onDownloading();
-    window.open("https://replay.io/downloads/linux-replay.tar.bz2", "_blank");
-  };
-
-  return (
-    <ModalContent>
-      <div className="space-y-12 flex flex-col">
-        <h2 className="font-bold text-3xl ">{`Get the Replay browser`}</h2>
-        <div className="text-gray-500">{`To start recording replays, you have to first download the Replay browser. Please select your operating system below.`}</div>
-        <div className="space-x-4 flex flex-row">
-          <PrimaryButton color="blue" onClick={handleMac}>
-            Mac
-          </PrimaryButton>
-          <PrimaryButton color="blue" onClick={handleLinux}>
-            Linux
-          </PrimaryButton>
-          <DisabledButton>Windows</DisabledButton>
-        </div>
-      </div>
-    </ModalContent>
-  );
-}
-
-function DownloadingScreen({ hideModal }: { hideModal: () => void }) {
-  return (
-    <ModalContent>
-      <div className="space-y-12 flex flex-col">
-        <h2 className="font-bold text-3xl ">{`Hang tight!`}</h2>
-        <div className="text-gray-500">{`Replay is downloading now. Please check your download folder.`}</div>
-        <div className="space-x-4 flex flex-row">
-          <PrimaryButton color="blue" onClick={hideModal}>
-            Got it
-          </PrimaryButton>
-        </div>
-      </div>
-    </ModalContent>
+    <>
+      <OnboardingHeader>Welcome to Replay</OnboardingHeader>
+      <OnboardingBody>
+        {`You've been added to the team `}
+        <strong>{name}</strong>
+        {` by `}
+        <strong>{inviterEmail}</strong>
+        {`. Would you like to go that team, or download Replay?`}
+      </OnboardingBody>
+      <OnboardingActions>
+        <SecondaryLgButton color="blue" onClick={onSkipToLibrary}>
+          {`Go to ${name}`}
+        </SecondaryLgButton>
+        <PrimaryLgButton color="blue" onClick={onNext}>
+          {`Download Replay`}
+        </PrimaryLgButton>
+      </OnboardingActions>
+    </>
   );
 }
 
@@ -145,32 +108,53 @@ type SingleInviteModalProps = PropsFromRedux & {
   workspace: PendingWorkspaceInvitation;
 };
 
+// This modal is used whenever a user is invited to Replay via a team invitation,
+// and there's only one outstanding team invitation for that user. This should guide them
+// through 1) creating a team, and/or 2) downloading the Replay browser.
 function SingleInviteModal({ hideModal, workspace }: SingleInviteModalProps) {
-  const [showDownload, setShowDownload] = useState(false);
-  const [showDownloading, setShowDownloading] = useState(false);
+  const [current, setCurrent] = useState<number>(1);
+  const [randomNumber, setRandomNumber] = useState<number>(Math.random());
   const { name, inviterEmail } = workspace;
 
-  const onSkip = () => hideModal();
-  const onDownload = () => setShowDownload(true);
-  const onDownloading = () => setShowDownloading(true);
+  const onSkipToLibrary = () => {
+    removeUrlParameters();
+    trackEvent("skipped-replay-download");
+    hideModal();
+  };
+  const onNext = () => {
+    setCurrent(current + 1);
+    setRandomNumber(Math.random());
+  };
+  const onFinished = () => {
+    removeUrlParameters();
+    trackEvent("finished-onboarding");
+    hideModal();
+  };
+
+  const props = {
+    onSkipToLibrary,
+    onNext,
+    name,
+    inviterEmail,
+    hideModal,
+  };
 
   let content;
 
-  if (showDownloading) {
-    content = <DownloadingScreen {...{ hideModal }} />;
-  } else if (showDownload) {
-    content = <DownloadScreen {...{ onDownloading }} />;
+  if (current === 1) {
+    content = <InitialScreen {...props} />;
+  } else if (current === 2) {
+    content = <DownloadPage {...{ onNext, onSkipToLibrary }} />;
+  } else if (current === 3) {
+    content = <DownloadingPage {...{ onFinished }} />;
   } else {
-    content = <InitialScreen {...{ onSkip, onDownload, name, inviterEmail }} />;
+    content = <div>hello</div>;
   }
 
   return (
-    <>
-      <BlankScreen className="fixed" />
-      <Modal onMaskClick={hideModal} options={{ maskTransparency: "transparent" }}>
-        {content}
-      </Modal>
-    </>
+    <OnboardingModalContainer {...{ randomNumber }}>
+      <OnboardingContent>{content}</OnboardingContent>
+    </OnboardingModalContainer>
   );
 }
 

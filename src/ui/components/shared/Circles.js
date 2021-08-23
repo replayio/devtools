@@ -90,5 +90,5 @@ export default function Circles({ randomNumber }) {
     [<Circle label="smallTopCenter" key={1} />, <Circle label="bigBottomRight" key={2} />],
   ];
 
-  return <div>HI{circles[Math.floor(randomNumber * 5)]}</div>;
+  return <div>{circles[Math.floor(randomNumber * 5)]}</div>;
 }

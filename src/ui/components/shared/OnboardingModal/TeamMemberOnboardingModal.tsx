@@ -5,7 +5,7 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { PendingWorkspaceInvitation } from "ui/types";
-import { isTeamMemberInvite } from "ui/utils/environment";
+import { isTeamMemberInvite, removeUrlParameters } from "ui/utils/environment";
 import BlankScreen from "../BlankScreen";
 import Modal, { ModalContent } from "../NewModal";
 import Spinner from "../Spinner";
@@ -153,13 +153,13 @@ function TeamMemberOnboardingModal({
     // or they're trying to skip when they accepted an invitation and should be
     // nudged to open that team.
     if (isFinished && !actions.includes("accept")) {
-      window.history.pushState({}, document.title, window.location.pathname);
+      removeUrlParameters();
       hideModal();
       return;
     }
 
     if (window.confirm(`Are you sure you want to skip this step?`)) {
-      window.history.pushState({}, document.title, window.location.pathname);
+      removeUrlParameters();
       hideModal();
     }
   };
@@ -182,7 +182,7 @@ function TeamMemberOnboardingModal({
 
       // Remove any URL parameters. This applies when a user clicks on a team invite
       // link from their email.
-      window.history.pushState({}, document.title, window.location.pathname);
+      removeUrlParameters();
 
       return;
     }
