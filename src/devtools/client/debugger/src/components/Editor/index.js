@@ -76,7 +76,6 @@ class Editor extends PureComponent {
   componentDidMount() {
     const { shortcuts } = this.context;
 
-    shortcuts.on("CmdOrCtrl+B", this.onToggleBreakpoint);
     shortcuts.on("CmdOrCtrl+W", this.onClosePress);
     shortcuts.on("Esc", this.onEscape);
     this.updateEditor(this.props);
@@ -176,18 +175,6 @@ class Editor extends PureComponent {
     const line = getCursorLine(codeMirror);
     return fromEditorLine(line);
   }
-
-  onToggleBreakpoint = (key, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const line = this.getCurrentLine();
-    if (typeof line !== "number") {
-      return;
-    }
-
-    this.props.toggleBreakpointAtLine(this.props.cx, line);
-  };
 
   onEditorScroll = debounce(this.props.updateViewport, 75);
 
