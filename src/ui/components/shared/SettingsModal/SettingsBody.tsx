@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
-import { Setting, Settings } from "./types";
+import { Setting } from "./types";
 import SettingsBodyItem from "./SettingsBodyItem";
 
 import "./SettingsBody.css";
@@ -14,15 +14,6 @@ interface SettingsBodyProps<
   selectedSetting: Setting<T, V, P>;
   values?: V;
   panelProps: P;
-}
-
-function RefreshPrompt() {
-  return (
-    <div className="refresh-prompt">
-      <span>You need to refresh this page for the changes to take effect.</span>
-      <button onClick={() => location.reload()}>Refresh</button>
-    </div>
-  );
 }
 
 function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)[] }) {
@@ -43,7 +34,6 @@ export default function SettingsBody<
   P extends Record<string, unknown>
 >({ onChange, panelProps, selectedSetting, values }: SettingsBodyProps<T, V, P>) {
   const { title } = selectedSetting;
-  const [showRefresh, setShowRefresh] = useState(false);
 
   if ("component" in selectedSetting) {
     return (
@@ -61,16 +51,9 @@ export default function SettingsBody<
       <SettingsHeader>{title}</SettingsHeader>
       <ul>
         {selectedSetting.items.map((item, index) => (
-          <SettingsBodyItem
-            item={item}
-            values={values}
-            key={index}
-            setShowRefresh={setShowRefresh}
-            onChange={onChange}
-          />
+          <SettingsBodyItem item={item} values={values} key={index} onChange={onChange} />
         ))}
       </ul>
-      {showRefresh ? <RefreshPrompt /> : null}
     </SettingsBodyWrapper>
   );
 }

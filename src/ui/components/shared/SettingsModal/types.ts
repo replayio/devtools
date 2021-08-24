@@ -37,7 +37,6 @@ export interface SettingItem<V> {
   key: keyof V;
   description: string | null;
   disabled: boolean;
-  needsRefresh: boolean;
 }
 
 export type SettingItemKey = keyof UserSettings;

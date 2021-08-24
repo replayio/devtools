@@ -157,7 +157,6 @@ const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
         key: "showElements",
         description: "Inspect HTML markup and CSS styling",
         disabled: false,
-        needsRefresh: false,
       },
       {
         label: "Enable React DevTools",
@@ -165,7 +164,6 @@ const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
         key: "showReact",
         description: "Inspect the React component tree",
         disabled: false,
-        needsRefresh: false,
       },
       {
         label: "Enable repainting",
@@ -173,7 +171,6 @@ const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
         key: "enableRepaint",
         description: "Repaint the DOM on demand",
         disabled: false,
-        needsRefresh: false,
       },
     ],
   },

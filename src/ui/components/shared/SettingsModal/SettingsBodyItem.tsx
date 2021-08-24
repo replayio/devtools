@@ -7,21 +7,16 @@ interface SettingsBodyItemProps<V> {
   item: SettingItem<V>;
   onChange?: (key: SettingItem<V>["key"], value: any) => void;
   values: V;
-  setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
 type InputProps<V, Value = any> = {
   value: Value;
-} & Pick<SettingsBodyItemProps<V>, "item" | "onChange" | "setShowRefresh">;
+} & Pick<SettingsBodyItemProps<V>, "item" | "onChange">;
 
-function Checkbox<K>({ item, value, onChange, setShowRefresh }: InputProps<K, boolean>) {
-  const { key, needsRefresh } = item;
+function Checkbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
+  const { key } = item;
 
   const toggleSetting = () => {
-    if (needsRefresh) {
-      setShowRefresh(true);
-    }
-
     if (onChange) {
       const newValue = !value;
       onChange(key, newValue);
@@ -49,12 +44,7 @@ function Input<K>({ item, value, ...rest }: InputProps<K>) {
   return <Dropdown {...rest} item={item} value={value} />;
 }
 
-export default function SettingsBodyItem<K>({
-  item,
-  values,
-  setShowRefresh,
-  onChange,
-}: SettingsBodyItemProps<K>) {
+export default function SettingsBodyItem<K>({ item, values, onChange }: SettingsBodyItemProps<K>) {
   const { label, key, description } = item;
 
   return (
@@ -63,7 +53,7 @@ export default function SettingsBodyItem<K>({
         <SettingsBodyHeader>{label}</SettingsBodyHeader>
         {description && <div>{description}</div>}
       </label>
-      <Input item={item} value={values[key]} setShowRefresh={setShowRefresh} onChange={onChange} />
+      <Input item={item} value={values[key]} onChange={onChange} />
     </li>
   );
 }
