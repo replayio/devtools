@@ -19,11 +19,6 @@
   margin-top: 32px
 }
 
-.settings-modal form {
-  display: flex;
-  flex-direction: row;
-}
-
 /* Refresh Prompt */
 
 .settings-modal .refresh-prompt {
