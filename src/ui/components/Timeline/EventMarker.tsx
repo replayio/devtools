@@ -1,9 +1,8 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { RecordingEvent } from "ui/state/timeline";
-import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import { ReplayEvent } from "ui/state/app";
 import Marker from "./Marker";
 
 function EventMarker({
@@ -35,7 +34,7 @@ const connector = connect((state: UIState) => ({
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type EventMarkerProps = PropsFromRedux & {
-  event: RecordingEvent;
+  event: ReplayEvent;
   isPrimaryHighlighted: boolean;
 };
 

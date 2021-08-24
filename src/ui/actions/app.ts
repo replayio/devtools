@@ -1,13 +1,16 @@
 import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
 import {
-  RecordingId,
   SessionId,
   unprocessedRegions,
   PointDescription,
   Location,
   MouseEvent,
   loadedRegions,
+  KeyboardEvent,
+  MouseEventKind,
+  KeyboardEventKind,
+  NavigationEvent,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import * as selectors from "ui/reducers/app";
@@ -15,12 +18,12 @@ import {
   PanelName,
   PrimaryPanelName,
   ViewMode,
-  Event,
   ModalType,
   UploadInfo,
   Canvas,
   WorkspaceId,
   SettingsTabTitle,
+  EventKind,
 } from "ui/state/app";
 import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
@@ -56,8 +59,8 @@ export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
   condition: string;
 };
 export type SetEventsForType = Action<"set_events"> & {
-  events: MouseEvent[];
-  eventType: Event;
+  events: (MouseEvent | KeyboardEvent | NavigationEvent)[];
+  eventType: EventKind;
 };
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
@@ -246,7 +249,10 @@ export function setAnalysisError(location: Location, condition = ""): SetAnalysi
   };
 }
 
-export function setEventsForType(events: MouseEvent[], eventType: Event): SetEventsForType {
+export function setEventsForType(
+  events: (MouseEvent | KeyboardEvent | NavigationEvent)[],
+  eventType: EventKind
+): SetEventsForType {
   return {
     type: "set_events",
     eventType,

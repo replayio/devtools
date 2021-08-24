@@ -1,10 +1,11 @@
-import { MouseEvent } from "@recordreplay/protocol";
+import { KeyboardEvent, NavigationEvent } from "@recordreplay/protocol";
 import classNames from "classnames";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
@@ -15,24 +16,57 @@ function Event({
   executionPoint,
   event,
 }: {
-  event: MouseEvent;
+  event: ReplayEvent;
   currentTime: any;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
 }) {
   const isPaused = event.time === currentTime && executionPoint === event.point;
 
+  let text: string;
+  let icon: string;
+
+  if (event.kind?.includes("mouse")) {
+    text = "Mouse Click";
+    icon = "ads_click";
+  } else if (event.kind?.includes("navigation")) {
+    const ev = event as NavigationEvent;
+    text = `Navigation (${ev.url})`;
+    icon = "place";
+  } else {
+    icon = "keyboard";
+    let ev = event as KeyboardEvent;
+    let eventText;
+
+    if (ev.kind === "keydown") {
+      eventText = `Key Down`;
+    } else if (ev.kind === "keyup") {
+      eventText = `Key Up`;
+    } else {
+      eventText = `Key Press`;
+    }
+
+    text = `${eventText} (${ev.key})`;
+  }
+
   return (
     <button
       onClick={() => onSeek(event.point, event.time)}
       className={classNames(
-        "flex flex-row justify-between p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
+        "flex flex-row items-center justify-between p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
         isPaused ? "text-primaryAccent" : ""
       )}
     >
-      <div className="flex flex-row space-x-2 items-center">
-        <MaterialIcon highlighted={isPaused}>ads_click</MaterialIcon>
-        <div className={classNames(isPaused ? "font-semibold" : "")}>Mouse Click</div>
+      <div className="flex flex-row space-x-2 items-center overflow-hidden">
+        <MaterialIcon highlighted={isPaused}>{icon}</MaterialIcon>
+        <div
+          className={classNames(
+            isPaused ? "font-semibold" : "",
+            "overflow-ellipsis overflow-hidden whitespace-pre"
+          )}
+        >
+          {text}
+        </div>
       </div>
       <div className={classNames("", isPaused ? "text-primaryAccent" : "")}>
         {getFormattedTime(event.time)}
@@ -41,7 +75,7 @@ function Event({
   );
 }
 
-function Events({ mousedownEvents, seek, currentTime, executionPoint }: PropsFromRedux) {
+function Events({ events, seek, currentTime, executionPoint }: PropsFromRedux) {
   const onSeek = (point: string, time: number) => {
     seek(point, time, false);
   };
@@ -53,7 +87,7 @@ function Events({ mousedownEvents, seek, currentTime, executionPoint }: PropsFro
       </div>
       <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white h-full">
         <div className="flex flex-col p-2 self-stretch space-y-2 w-full">
-          {mousedownEvents.map((e, i) => (
+          {events.map((e, i) => (
             <Event key={i} onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
           ))}
         </div>
@@ -64,7 +98,7 @@ function Events({ mousedownEvents, seek, currentTime, executionPoint }: PropsFro
 
 const connector = connect(
   (state: UIState) => ({
-    mousedownEvents: selectors.getEventsForType(state, "mousedown"),
+    events: selectors.getFlatEvents(state),
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
   }),
