@@ -55,7 +55,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
 }
 
 // This is a workaround for getting an automatically-resizing horizontal text input
-// so that switching between the editing and non-editing states is smoonth.
+// so that switching between the editing and non-editing states is smooth.
 // https://stackoverflow.com/questions/45306325/react-contenteditable-and-cursor-position
 function HeaderTitle({
   recording,
@@ -93,7 +93,7 @@ function HeaderTitle({
 
   return (
     <span
-      className="input focus:ring-primaryAccent ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent w-full border-black whitespace-pre overflow-hidden overflow-ellipsis"
+      className="input focus:ring-primaryAccent ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis"
       role="textbox"
       spellCheck="false"
       contentEditable
@@ -129,7 +129,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div id="header">
-      <div className="header-left overflow-hidden">
+      <div className="header-left overflow-hidden flex-grow">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
