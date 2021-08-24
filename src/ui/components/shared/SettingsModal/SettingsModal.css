@@ -15,3 +15,7 @@
   justify-content: stretch;
   min-height: auto;
 }
+
+.settings-modal.settings-modal-large .modal-container .modal-content {
+  height: 600px;
+}

@@ -1,23 +1,42 @@
-import { SettingsTabTitle } from "ui/state/app";
+import React from "react";
 import { UserSettings } from "ui/types";
 
-export type Settings = Setting[];
+export type Settings<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+> = Setting<T, V, P>[];
 
 export type SettingType = "checkbox" | "dropdown";
 
-export interface Setting {
-  title: SettingsTabTitle;
-  items: SettingItem[];
+export interface SettingWithItems<T extends string, V extends Record<string, unknown>> {
+  title: T;
+  items: SettingItem<V>[];
   icon?: string;
 }
 
-export interface SettingItem {
+export interface SettingWithComponent<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+> {
+  title: T;
+  component: React.ComponentType<{ settings?: V } & P>;
+  icon?: string;
+}
+
+export type Setting<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+> = SettingWithItems<T, V> | SettingWithComponent<T, V, P>;
+
+export interface SettingItem<V> {
   label: string;
   type: SettingType;
-  key: SettingItemKey;
+  key: keyof V;
   description: string | null;
   disabled: boolean;
-  needsRefresh: boolean;
 }
 
 export type SettingItemKey = keyof UserSettings;

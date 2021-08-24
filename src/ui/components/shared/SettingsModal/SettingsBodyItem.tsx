@@ -1,54 +1,32 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { ApiKey, UserSettings } from "ui/types";
 import { SettingItem } from "./types";
-import hooks from "ui/hooks";
 import { SelectMenu } from "ui/components/shared/Forms";
-import { updateEnableRepaint } from "protocol/enable-repaint";
 import { SettingsBodyHeader } from "./SettingsBody";
 
-interface SettingsBodyItemProps {
-  item: SettingItem;
-  userSettings: UserSettings;
-  setShowRefresh: Dispatch<SetStateAction<boolean>>;
+interface SettingsBodyItemProps<V> {
+  item: SettingItem<V>;
+  onChange?: (key: SettingItem<V>["key"], value: any) => void;
+  values: V;
 }
 
-function Checkbox({
-  item,
-  value,
-  setShowRefresh,
-}: {
-  item: SettingItem;
-  value: boolean;
-  setShowRefresh: Dispatch<SetStateAction<boolean>>;
-}) {
-  const { key, needsRefresh } = item;
+type InputProps<V, Value = any> = {
+  value: Value;
+} & Pick<SettingsBodyItemProps<V>, "item" | "onChange">;
 
-  const updateUserSetting = hooks.useUpdateUserSetting(key, "Boolean");
+function Checkbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
+  const { key } = item;
+
   const toggleSetting = () => {
-    if (needsRefresh) {
-      setShowRefresh(true);
-    }
-
-    const newValue = !value;
-    updateUserSetting({ variables: { newValue } });
-
-    if (key === "enableRepaint") {
-      updateEnableRepaint(newValue);
+    if (onChange) {
+      const newValue = !value;
+      onChange(key, newValue);
     }
   };
 
-  return <input type="checkbox" id={key} checked={value} onChange={toggleSetting} />;
+  return <input type="checkbox" id={String(key)} checked={value} onChange={toggleSetting} />;
 }
 
-function Dropdown({
-  item,
-  value,
-  setShowRefresh,
-}: {
-  item: SettingItem;
-  value: string;
-  setShowRefresh: Dispatch<SetStateAction<boolean>>;
-}) {
+function Dropdown<K>({ value }: InputProps<K>) {
   const onChange = () => {};
 
   return (
@@ -58,36 +36,24 @@ function Dropdown({
   );
 }
 
-function Input({
-  item,
-  value,
-  setShowRefresh,
-}: {
-  item: SettingItem;
-  value: boolean | string | ApiKey[] | null;
-  setShowRefresh: Dispatch<SetStateAction<boolean>>;
-}) {
-  if (item.type == "checkbox") {
-    return <Checkbox {...{ item, value: value as boolean, setShowRefresh }} />;
+function Input<K>({ item, value, ...rest }: InputProps<K>) {
+  if (item.type == "checkbox" && typeof value === "boolean") {
+    return <Checkbox {...rest} item={item} value={value} />;
   }
 
-  return <Dropdown {...{ item, value: value as string, setShowRefresh }} />;
+  return <Dropdown {...rest} item={item} value={value} />;
 }
 
-export default function SettingsBodyItem({
-  item,
-  userSettings,
-  setShowRefresh,
-}: SettingsBodyItemProps) {
+export default function SettingsBodyItem<K>({ item, values, onChange }: SettingsBodyItemProps<K>) {
   const { label, key, description } = item;
 
   return (
     <li className="flex flex-row items-center">
-      <label className="space-y-2 pr-48 flex-grow cursor-pointer" htmlFor={key}>
+      <label className="space-y-2 pr-48 flex-grow cursor-pointer" htmlFor={String(key)}>
         <SettingsBodyHeader>{label}</SettingsBodyHeader>
         {description && <div>{description}</div>}
       </label>
-      <Input item={item} value={userSettings[key]} setShowRefresh={setShowRefresh} />
+      <Input item={item} value={values[key]} onChange={onChange} />
     </li>
   );
 }

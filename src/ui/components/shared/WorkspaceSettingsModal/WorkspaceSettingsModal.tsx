@@ -11,6 +11,8 @@ import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import MaterialIcon from "../MaterialIcon";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
+import SettingsModal from "../SettingsModal";
+import { Settings } from "../SettingsModal/types";
 import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 
@@ -116,92 +118,115 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
   );
 }
 
-function WorkspaceSettingsModal(props: PropsFromRedux) {
-  const [selectedTab, setSelectedTab] = useState<string>();
-  const { members } = hooks.useGetWorkspaceMembers(props.workspaceId!);
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-  const deleteWorkspace = hooks.useDeleteWorkspace();
+export type SettingsTabTitle = "Team Members" | "Billing" | "API Keys" | "Delete Team";
+
+const settings: Settings<
+  SettingsTabTitle,
+  {},
+  {
+    settings?: any;
+    isAdmin: boolean;
+    workspaceId: string;
+    hideModal: PropsFromRedux["hideModal"];
+    setWorkspaceId: PropsFromRedux["setWorkspaceId"];
+  }
+> = [
+  {
+    title: "Team Members",
+    icon: "group",
+    component: function TeamMebers({ isAdmin, workspaceId, settings, ...rest }) {
+      const { members } = hooks.useGetWorkspaceMembers(workspaceId);
+
+      return (
+        <div className="flex flex-col flex-grow space-y-4 overflow-hidden">
+          <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
+          <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
+          <div className=" text-sm uppercase font-semibold">{`Members`}</div>
+          <div className="overflow-auto flex-grow">
+            <div className="workspace-members-container flex flex-col space-y-2">
+              <div className="flex flex-col space-y-2">
+                {members ? <WorkspaceMembers members={members} isAdmin={isAdmin} /> : null}
+              </div>
+            </div>
+          </div>
+          <InvitationLink workspaceId={workspaceId} showDomainCheck={isAdmin} />
+        </div>
+      );
+    },
+  },
+  // {
+  //   title: "Billing",
+  //   icon: "payment",
+  //   component: function Billing() {
+  //     return <div>Billing to come</div>;
+  //   },
+  // },
+  {
+    title: "API Keys",
+    icon: "vpn_key",
+    component: WorkspaceAPIKeys,
+  },
+  {
+    title: "Delete Team",
+    icon: "cancel",
+    component: function DeleteTeam({ hideModal, setWorkspaceId, workspaceId }) {
+      const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+      const deleteWorkspace = hooks.useDeleteWorkspace();
+
+      const handleDeleteTeam = () => {
+        const line1 = `Unexpected bad things will happen if you don't read this!`;
+        const line2 = `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`;
+        const line3 = `Click OK to proceed.`;
+        const message = `${line1}\n\n${line2}\n\n${line3}`;
+
+        if (window.confirm(message)) {
+          deleteWorkspace({
+            variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
+          });
+          hideModal();
+          setWorkspaceId(null);
+          updateDefaultWorkspace({ variables: { workspaceId: null } });
+        }
+      };
+
+      return (
+        <div className="flex flex-col space-y-4">
+          <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
+          <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
+            <div className="flex flex-col">
+              <div className="font-semibold">Delete this team</div>
+              <div className="">{`This cannot be reversed.`}</div>
+            </div>
+            <button
+              onClick={handleDeleteTeam}
+              className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
+            >
+              Delete this team
+            </button>
+          </div>
+        </div>
+      );
+    },
+  },
+];
+
+function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
+  const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
+
+  if (!workspaceId) return null;
 
   const isAdmin = members?.find(m => m.userId === localUserId)?.roles?.includes("admin") || false;
 
-  const handleDeleteTeam = () => {
-    const line1 = `Unexpected bad things will happen if you don't read this!`;
-    const line2 = `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`;
-    const line3 = `Click OK to proceed.`;
-    const message = `${line1}\n\n${line2}\n\n${line3}`;
-
-    if (window.confirm(message)) {
-      deleteWorkspace({
-        variables: { workspaceId: props.workspaceId, shouldDeleteRecordings: true },
-      });
-      props.hideModal();
-      props.setWorkspaceId(null);
-      updateDefaultWorkspace({ variables: { workspaceId: null } });
-    }
-  };
-
   return (
-    <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
-      <div
-        className="p-12 bg-white rounded-lg shadow-xl text-xl relative flex flex-col justify-between"
-        style={{ width: "520px", height: "600px" }}
-      >
-        <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
-          {selectedTab === "api-keys" && props.workspaceId ? (
-            <>
-              <h2 className="font-bold text-3xl ">Team API Keys</h2>
-              <WorkspaceAPIKeys workspaceId={props.workspaceId} />
-            </>
-          ) : (
-            <>
-              <h2 className="font-bold text-3xl ">Team settings</h2>
-              <div className="flex flex-col flex-grow space-y-4 overflow-hidden">
-                <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-                <WorkspaceForm {...{ ...props, members }} />
-                <div className=" text-sm uppercase font-semibold">{`Members`}</div>
-                <div className="overflow-auto flex-grow">
-                  <div className="workspace-members-container flex flex-col space-y-2">
-                    <div className="flex flex-col space-y-2">
-                      {members ? <WorkspaceMembers members={members} isAdmin={isAdmin} /> : null}
-                    </div>
-                  </div>
-                </div>
-                <InvitationLink workspaceId={props.workspaceId!} showDomainCheck={isAdmin} />
-                {isAdmin ? (
-                  <div className="flex flex-col space-y-4">
-                    <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
-                    <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
-                      <div className="flex flex-col">
-                        <div className="font-semibold">Delete this team</div>
-                        <div className="">{`This cannot be reversed.`}</div>
-                      </div>
-                      <button
-                        onClick={handleDeleteTeam}
-                        className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
-                      >
-                        Delete this team
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
-                <button
-                  className="text-primaryAccent hover:underline self-start"
-                  onClick={() => setSelectedTab("api-keys")}
-                >
-                  API Keys
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-        <button className="absolute top-4 right-4" onClick={props.hideModal}>
-          <div>
-            <MaterialIcon>close</MaterialIcon>
-          </div>
-        </button>
-      </div>
-    </Modal>
+    <SettingsModal
+      hiddenTabs={!isAdmin ? ["Delete Team"] : undefined}
+      defaultSelectedTab="Team Members"
+      panelProps={{ isAdmin, workspaceId, ...rest }}
+      settings={settings}
+      size="lg"
+      title="Team Settings"
+    />
   );
 }
 

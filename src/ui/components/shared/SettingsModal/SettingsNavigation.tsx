@@ -2,27 +2,36 @@ import React from "react";
 import classnames from "classnames";
 import { Setting, Settings } from "./types";
 import "./SettingsNavigation.css";
-import { SettingsTabTitle } from "ui/state/app";
 import MaterialIcon from "../MaterialIcon";
 import { SettingsHeader } from "./SettingsBody";
 
-interface SettingNavigationItemProps {
-  setting: Setting;
-  selectedTab: SettingsTabTitle;
-  setSelectedTab: (title: SettingsTabTitle) => void;
+interface SettingNavigationItemProps<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+> {
+  setting: Setting<T, V, P>;
+  selectedTab?: T;
+  setSelectedTab: (title: T) => void;
 }
 
-interface SettingNavigationProps {
-  settings: Settings;
-  selectedTab: SettingsTabTitle;
-  setSelectedTab: (title: SettingsTabTitle) => void;
+interface SettingNavigationProps<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+> {
+  settings: Settings<T, V, P>;
+  selectedTab?: T;
+  setSelectedTab: (title: T) => void;
+  title?: string;
+  hiddenTabs?: T[];
 }
 
-function SettingNavigationItem({
-  setting,
-  selectedTab,
-  setSelectedTab,
-}: SettingNavigationItemProps) {
+function SettingNavigationItem<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+>({ setting, selectedTab, setSelectedTab }: SettingNavigationItemProps<T, V, P>) {
   const { title, icon } = setting;
   const onClick = () => {
     setSelectedTab(title);
@@ -36,18 +45,26 @@ function SettingNavigationItem({
   );
 }
 
-export default function SettingNavigation({
+export default function SettingNavigation<
+  T extends string,
+  V extends Record<string, unknown>,
+  P extends Record<string, unknown>
+>({
+  hiddenTabs,
   settings,
   selectedTab,
   setSelectedTab,
-}: SettingNavigationProps) {
+  title = "Settings",
+}: SettingNavigationProps<T, V, P>) {
   return (
     <nav>
-      <SettingsHeader>Settings</SettingsHeader>
+      <SettingsHeader>{title}</SettingsHeader>
       <ul>
-        {settings.map((setting, index) => (
-          <SettingNavigationItem {...{ setting, selectedTab, setSelectedTab }} key={index} />
-        ))}
+        {settings
+          .filter(setting => !hiddenTabs || !hiddenTabs.includes(setting.title))
+          .map((setting, index) => (
+            <SettingNavigationItem {...{ setting, selectedTab, setSelectedTab }} key={index} />
+          ))}
       </ul>
     </nav>
   );

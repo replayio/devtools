@@ -8,7 +8,7 @@ import SharingModal from "./shared/SharingModal";
 import LaunchBrowserModal from "./shared/LaunchBrowserModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
-import SettingsModal from "./shared/SettingsModal/index";
+import UserSettingsModal from "./shared/UserSettingsModal";
 import OnboardingModal from "./shared/OnboardingModal/index";
 import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
@@ -43,7 +43,7 @@ function AppModal({ modal }: { modal: ModalType }) {
       return <LoginModal />;
     }
     case "settings": {
-      return <SettingsModal />;
+      return <UserSettingsModal />;
     }
     case "new-workspace": {
       return <NewWorkspaceModal />;

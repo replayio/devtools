@@ -5,14 +5,14 @@ export interface User {
   internal: boolean;
 }
 
-export interface UserSettings {
+export type UserSettings = {
   apiKeys: ApiKey[];
   showElements: boolean;
   showReact: boolean;
   enableTeams: boolean;
   enableRepaint: boolean;
   defaultWorkspaceId: null | string;
-}
+};
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";
 
