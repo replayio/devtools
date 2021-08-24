@@ -52,12 +52,14 @@ export function getPendingBreakpoints(state) {
   return state.pendingBreakpoints;
 }
 
-export function getPendingBreakpointList(state) {
-  return Object.values(getPendingBreakpoints(state));
+export function getPendingBreakpointList(state, recordingId) {
+  return Object.entries(getPendingBreakpoints(state))
+    .filter(([key]) => key.startsWith(recordingId))
+    .map(([_, value]) => value);
 }
 
-export function getPendingBreakpointsForSource(state, source) {
-  return getPendingBreakpointList(state).filter(pendingBreakpoint => {
+export function getPendingBreakpointsForSource(state, source, recordingId) {
+  return getPendingBreakpointList(state, recordingId).filter(pendingBreakpoint => {
     return pendingBreakpoint.location.sourceUrl === source.url;
   });
 }

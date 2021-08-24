@@ -74,7 +74,11 @@ function checkPendingBreakpoints(cx, sourceId) {
       return;
     }
 
-    const pendingBreakpoints = getPendingBreakpointsForSource(getState(), source);
+    const pendingBreakpoints = getPendingBreakpointsForSource(
+      getState(),
+      source,
+      ThreadFront.recordingId
+    );
 
     if (pendingBreakpoints.length === 0) {
       return;

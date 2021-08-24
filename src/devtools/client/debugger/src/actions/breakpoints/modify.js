@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { ThreadFront } from "protocol/thread";
+
 import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
@@ -205,7 +207,7 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
     }
 
     // Remove any remaining pending breakpoints matching the generated location.
-    const pending = getPendingBreakpointList(getState());
+    const pending = getPendingBreakpointList(getState(), ThreadFront.recordingId);
     for (const { location } of pending) {
       if (location.sourceUrl == target.sourceUrl && comparePosition(location, target)) {
         dispatch({
