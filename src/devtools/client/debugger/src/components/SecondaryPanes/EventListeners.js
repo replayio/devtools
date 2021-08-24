@@ -171,28 +171,47 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoriesList() {
+  renderCategories() {
     const { categories } = this.props;
 
+    const commonCategories = categories.filter(category =>
+      ["Keyboard", "Mouse"].includes(category.name)
+    );
+    const otherCategories = categories.filter(
+      category => !["Keyboard", "Mouse"].includes(category.name)
+    );
+
+    return (
+      <div className="flex flex-col space-y-2">
+        {commonCategories.length
+          ? this.renderCategoriesSection("Common Events", commonCategories)
+          : null}
+        {this.renderCategoriesSection("Other Events", otherCategories)}
+      </div>
+    );
+  }
+
+  renderCategoriesSection(label, categories) {
+    let content;
+
     if (!features.eventCount) {
-      return (
-        <ul className="event-listeners-list">
-          {categories.map((category, index) => {
-            return (
-              <li className="event-listener-group" key={index}>
-                {this.renderCategoryHeading(category)}
-                {this.renderCategoryListing(category)}
-              </li>
-            );
-          })}
-        </ul>
-      );
+      content = categories.map((category, index) => {
+        return (
+          <li className="event-listener-group" key={index}>
+            {this.renderCategoryHeading(category)}
+            {this.renderCategoryListing(category)}
+          </li>
+        );
+      });
+    } else {
+      content = categories.map((category, index) => this.renderCategoryItem(category, index));
     }
 
     return (
-      <ul className="event-listeners-list">
-        {categories.map((category, index) => this.renderCategoryItem(category, index))}
-      </ul>
+      <div className="flex flex-col space-y-1">
+        <div className="text-lg font-medium">{label}</div>
+        <ul className="event-listeners-list">{content}</ul>
+      </div>
     );
   }
 
@@ -316,7 +335,7 @@ class EventListeners extends Component {
       <>
         <div className="event-search-container">{this.renderSearchInput()}</div>
         <div className="event-listeners-content">
-          {searchText ? this.renderSearchResultsList() : this.renderCategoriesList()}
+          {searchText ? this.renderSearchResultsList() : this.renderCategories()}
         </div>
       </>
     );
