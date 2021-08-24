@@ -1,114 +1,28 @@
-import classNames from "classnames";
-import React, {
-  ChangeEvent,
-  Dispatch,
-  MouseEventHandler,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
-import BlankScreen from "../BlankScreen";
-import { DisabledLgButton, PrimaryLgButton, SecondaryLgButton } from "../Button";
+import { PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { TextInput } from "../Forms";
-import Modal from "../NewModal";
+import {
+  OnboardingActions,
+  OnboardingBody,
+  OnboardingButton,
+  OnboardingContent,
+  OnboardingHeader,
+  NextButton,
+  OnboardingModalContainer,
+} from "../Onboarding/index";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import { trackEvent } from "ui/utils/telemetry";
-const Circles = require("../Circles").default;
+import { removeUrlParameters } from "ui/utils/environment";
+import { DownloadPage } from "../Onboarding/DownloadPage";
+import { DownloadingPage } from "../Onboarding/DownloadingPage";
 
 const DOWNLOAD_PAGE_INDEX = 4;
-
-export const ReplayLogo = () => <img className="w-24 h-24" src="/images/logo.svg" />;
-
-function DownloadButtonContent({ text, imgUrl }: { text: string; imgUrl: string }) {
-  return (
-    <div
-      className="flex flex-row items-center w-full justify-between"
-      style={{ minWidth: "120px" }}
-    >
-      <span>{text}</span>
-      <img className="w-8 h-8" src={imgUrl} />
-    </div>
-  );
-}
-
-function ModalButton({
-  children,
-  onClick = () => {},
-  className,
-  disabled = false,
-}: {
-  children: React.ReactElement | string;
-  className?: string;
-  onClick?: MouseEventHandler;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={classNames(
-        className,
-        "max-w-max items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-export function ModalHeader({ children }: { children: string }) {
-  return <div className="text-7xl font-semibold">{children}</div>;
-}
-
-function NextButton({
-  current,
-  text,
-  setCurrent,
-  onNext,
-  allowNext,
-}: {
-  current: number;
-  text?: string;
-  setCurrent: Dispatch<SetStateAction<number>>;
-  hideModal: typeof actions.hideModal;
-  onNext: () => void;
-  allowNext: boolean;
-}) {
-  const [nextClicked, setNextClicked] = useState<boolean>(false);
-
-  const onClick = () => {
-    if (onNext) {
-      onNext();
-    }
-    setNextClicked(true);
-  };
-
-  useEffect(() => {
-    // Only navigate to the next slide the work that eventually turns
-    // allowNext to true is finished. This allows us to do mutations
-    // in between navigations.
-    if (allowNext && nextClicked) {
-      setCurrent(current + 1);
-    }
-  }, [allowNext, nextClicked]);
-
-  const inferLoading = nextClicked && !allowNext;
-  const buttonText = inferLoading ? "Loading" : text || "Next";
-
-  return (
-    <PrimaryLgButton color="blue" onClick={onClick}>
-      {buttonText}
-    </PrimaryLgButton>
-  );
-}
 
 type SlideBodyProps = PropsFromRedux & {
   onNext: () => void;
@@ -124,20 +38,19 @@ type SlideBodyProps = PropsFromRedux & {
 function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
   return (
     <>
-      <ReplayLogo />
-      <ModalHeader>Set up your team</ModalHeader>
-      <div className="text-center">
+      <OnboardingHeader>Set up your team</OnboardingHeader>
+      <OnboardingBody>
         Replay teams are the easiest way to collaborate on bug reports, pull requests, and technical
         questions
-      </div>
-      <div className="space-x-4 pt-16">
+      </OnboardingBody>
+      <OnboardingActions>
         <PrimaryLgButton color="blue" onClick={onNext}>
           Create a team
         </PrimaryLgButton>
         <SecondaryLgButton color="blue" onClick={() => onSkipToDownload("intro-page")}>
           Skip for now
         </SecondaryLgButton>
-      </div>
+      </OnboardingActions>
     </>
   );
 }
@@ -175,10 +88,10 @@ function TeamNamePage({
 
   return (
     <>
-      <ReplayLogo /> <ModalHeader>Your team name</ModalHeader>
-      <div className="text-center">
+      <OnboardingHeader>Your team name</OnboardingHeader>
+      <OnboardingBody>
         We recommend keeping it simple and using your company or project name
-      </div>
+      </OnboardingBody>
       <div className="py-4 flex flex-col w-full">
         <TextInput
           placeholder="Team name"
@@ -188,12 +101,12 @@ function TeamNamePage({
           center={true}
         />
       </div>
-      <div className="space-x-4 pt-16">
+      <OnboardingActions>
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
         <SecondaryLgButton color="blue" onClick={() => onSkipToDownload("team-name-page")}>
           Skip for now
         </SecondaryLgButton>
-      </div>
+      </OnboardingActions>
     </>
   );
 }
@@ -249,11 +162,11 @@ function TeamMemberInvitationPage({
 
   return (
     <>
-      <ReplayLogo /> <ModalHeader>Invite your team members</ModalHeader>
-      <div className="text-center">
+      <OnboardingHeader>Invite your team members</OnboardingHeader>
+      <OnboardingBody>
         Replay is for your whole team. Invite anyone who you would like to be able to record and
         discuss replays with
-      </div>
+      </OnboardingBody>
       <div className="text-2xl w-full space-y-4">
         <form className="flex flex-col w-full space-y-4 text-2xl" onSubmit={handleAddMember}>
           <div className="text-sm uppercase font-bold">{`Invite via email`}</div>
@@ -264,9 +177,9 @@ function TeamMemberInvitationPage({
               onChange={onChange}
               textSize={"lg"}
             />
-            <ModalButton onClick={handleAddMember} disabled={isLoading}>
+            <OnboardingButton onClick={handleAddMember} disabled={isLoading}>
               {isLoading ? "Loading" : "Invite"}
-            </ModalButton>
+            </OnboardingButton>
           </div>
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
@@ -277,77 +190,18 @@ function TeamMemberInvitationPage({
         ) : null}
         <InvitationLink workspaceId={newWorkspace!.id} showDomainCheck={false} isLarge={true} />
       </div>
-      <div className="space-x-4 pt-16">
+      <OnboardingActions>
         <PrimaryLgButton color="blue" onClick={() => onSkipToDownload()}>
           Next
         </PrimaryLgButton>
-      </div>
+      </OnboardingActions>
     </>
   );
 }
 
-function DownloadPage({ onFinished, onNext, onSkipToLibrary }: SlideBodyProps) {
-  const startDownload = (url: string) => {
-    window.open(url, "_blank");
-    onNext();
-  };
-  const handleMac = () => {
-    trackEvent("downloaded-mac");
-    startDownload("https://replay.io/downloads/replay.dmg");
-  };
-  const handleLinux = () => {
-    trackEvent("downloaded-linux");
-    startDownload("https://replay.io/downloads/linux-replay.tar.bz2");
-  };
-  const handleWindows = () => {
-    trackEvent("downloaded-windows");
-  };
-
-  return (
-    <>
-      <ReplayLogo /> <ModalHeader>Download Replay</ModalHeader>
-      <div className="text-center">
-        Record your first replay with the Replay browser, or go directly to your team’s library
-      </div>
-      <div className="py-4 flex flex-row w-full space-x-4 justify-center">
-        <PrimaryLgButton color="blue" onClick={handleMac}>
-          <DownloadButtonContent text="Mac" imgUrl="/images/icon-apple.svg" />
-        </PrimaryLgButton>
-        <PrimaryLgButton color="blue" onClick={handleLinux}>
-          <DownloadButtonContent text="Linux" imgUrl="/images/icon-linux.svg" />
-        </PrimaryLgButton>
-        <div title="Coming soon" onClick={handleWindows}>
-          <DisabledLgButton>
-            <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
-          </DisabledLgButton>
-        </div>
-      </div>
-      <div className="space-x-4 pt-16">
-        <SecondaryLgButton color="blue" onClick={onSkipToLibrary}>
-          Skip for now
-        </SecondaryLgButton>
-      </div>
-    </>
-  );
-}
-
-function DownloadingPage({ onFinished }: SlideBodyProps) {
-  return (
-    <>
-      <ReplayLogo />
-      <ModalHeader>Downloading Replay ...</ModalHeader>
-      <div className="text-center">
-        {`Once the download is finished, install and open the Replay browser. We'll see you there!`}
-      </div>
-      <div className="space-x-4 pt-16">
-        <PrimaryLgButton color="blue" onClick={onFinished}>
-          Take me to my library
-        </PrimaryLgButton>
-      </div>
-    </>
-  );
-}
-
+// This modal is used whenever a user is invited to Replay via the Replay invitations
+// tab in the settings panel. This should guide them through 1) creating a team, and/or
+// 2) downloading the Replay browser.
 function OnboardingModal(props: PropsFromRedux) {
   const [current, setCurrent] = useState<number>(1);
   const [randomNumber, setRandomNumber] = useState<number>(Math.random());
@@ -369,12 +223,12 @@ function OnboardingModal(props: PropsFromRedux) {
     setRandomNumber(Math.random());
   };
   const onSkipToLibrary = () => {
-    window.history.pushState({}, document.title, window.location.pathname);
+    removeUrlParameters();
     trackEvent("skipped-replay-download");
     props.hideModal();
   };
   const onFinished = () => {
-    window.history.pushState({}, document.title, window.location.pathname);
+    removeUrlParameters();
     trackEvent("finished-onboarding");
     props.hideModal();
   };
@@ -399,24 +253,15 @@ function OnboardingModal(props: PropsFromRedux) {
   } else if (current === 3) {
     slide = <TeamMemberInvitationPage {...newProps} />;
   } else if (current === DOWNLOAD_PAGE_INDEX) {
-    slide = <DownloadPage {...newProps} />;
+    slide = <DownloadPage {...{ onNext, onSkipToLibrary }} />;
   } else {
-    slide = <DownloadingPage {...newProps} />;
+    slide = <DownloadingPage {...{ onFinished }} />;
   }
 
   return (
-    <>
-      <BlankScreen className="fixed" background="white" />
-      <Circles randomNumber={randomNumber} />
-      <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
-        <div
-          className="p-12 text-4xl space-y-16 relative flex flex-col items-center"
-          style={{ width: "800px" }}
-        >
-          {slide}
-        </div>
-      </Modal>
-    </>
+    <OnboardingModalContainer {...{ randomNumber }}>
+      <OnboardingContent>{slide}</OnboardingContent>
+    </OnboardingModalContainer>
   );
 }
 

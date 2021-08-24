@@ -116,3 +116,7 @@ export function getPausePointParams() {
 
   return null;
 }
+
+export function removeUrlParameters() {
+  window.history.pushState({}, document.title, window.location.pathname);
+}

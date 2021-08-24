@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { truncate } from "lodash";
 import React from "react";
 
 export default function Modal({

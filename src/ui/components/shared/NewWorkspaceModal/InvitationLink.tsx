@@ -3,13 +3,20 @@ import React, { useRef, useState } from "react";
 import hooks from "ui/hooks";
 import { Workspace } from "ui/types";
 
-function InvitationURL({ code, isLarge }: { code: string; isLarge: boolean }) {
+export function TextInputCopy({
+  text,
+  isLarge = false,
+  isCenter = false,
+}: {
+  text: string;
+  isLarge?: boolean;
+  isCenter?: boolean;
+}) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const displayedText = `https://app.replay.io/?invitationcode=${code}`;
 
   const onClick = () => {
-    navigator.clipboard.writeText(displayedText);
+    navigator.clipboard.writeText(text);
 
     if (timeoutKey.current) {
       clearTimeout(timeoutKey.current);
@@ -20,20 +27,21 @@ function InvitationURL({ code, isLarge }: { code: string; isLarge: boolean }) {
   };
 
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-col items-center w-full">
       <input
         className={classNames(
           isLarge ? "text-2xl" : "text-lg",
+          isCenter ? "text-center" : "",
           "focus:ring-primaryAccent focus:border-primaryAccent block w-full border px-3 py-2 border-textFieldBorder rounded-md"
         )}
         type="text"
-        value={displayedText}
+        value={text}
         onKeyPress={e => e.preventDefault()}
         onChange={e => e.preventDefault()}
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="absolute bottom-full p-2 bg-black bg-opacity-90 text-white shadow-2xl rounded-lg mb-2">
+        <div className="absolute bottom-full p-2 bg-black bg-opacity-90 text-white shadow-2xl rounded-lg mb-2 text-lg">
           Copied
         </div>
       ) : null}
@@ -95,13 +103,14 @@ export default function InvitationLink({
     return null;
   }
 
+  const inputText = loading
+    ? "Loading URL"
+    : `https://app.replay.io/?invitationcode=${workspace.invitationCode}`;
+
   return (
     <div className="flex flex-col space-y-4 w-full">
       <div className=" text-sm uppercase font-bold">{`Invite via link`}</div>
-      <InvitationURL
-        code={workspace ? workspace.invitationCode : "Loading URL"}
-        isLarge={isLarge}
-      />
+      <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
     </div>
   );

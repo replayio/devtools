@@ -16,6 +16,7 @@ import {
   isTeamLeaderInvite,
   isTeamMemberInvite,
   hasTeamInvitationCode,
+  removeUrlParameters,
 } from "ui/utils/environment";
 import LaunchButton from "../shared/LaunchButton";
 import { setExpectedError } from "ui/actions/session";
@@ -71,7 +72,7 @@ function LibraryLoader(props: PropsFromRedux) {
     // This allows the server enough time to refresh the pending workspaces
     // with the new team before we render the Library.
     setTimeout(() => {
-      window.history.pushState({}, document.title, window.location.pathname);
+      removeUrlParameters();
       setRenderLibrary(true);
     }, 1000);
   }

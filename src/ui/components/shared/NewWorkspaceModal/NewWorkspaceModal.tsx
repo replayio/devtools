@@ -11,6 +11,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { removeUrlParameters } from "ui/utils/environment";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
@@ -141,7 +142,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     setInputValue(e.target.value);
   };
   const onSkip = () => {
-    window.history.pushState({}, document.title, window.location.pathname);
+    removeUrlParameters();
     hideModal();
   };
   const handleSave = () => createNewWorkspace({ variables: { name: inputValue, userId } });
@@ -240,7 +241,7 @@ function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const onClick = () => {
-    window.history.pushState({}, document.title, window.location.pathname);
+    removeUrlParameters();
 
     setWorkspaceId(newWorkspace.id);
     updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });

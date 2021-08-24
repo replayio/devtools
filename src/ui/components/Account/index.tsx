@@ -9,14 +9,14 @@ import Library from "./Library";
 import "./Account.css";
 import "../Header/Header.css";
 import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
-import BlankScreen from "../shared/BlankScreen";
-import Modal from "../shared/NewModal";
 import { PrimaryLgButton } from "../shared/Button";
 import {
-  ModalHeader,
-  ReplayLogo,
-} from "../shared/TeamLeaderOnboardingModal/TeamLeaderOnboardingModal";
-const Circles = require("ui/components/shared/Circles").default;
+  OnboardingActions,
+  OnboardingBody,
+  OnboardingContent,
+  OnboardingHeader,
+  OnboardingModalContainer,
+} from "../shared/Onboarding/index";
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
@@ -38,27 +38,19 @@ function WelcomePage() {
 
   if (isTeamLeaderInvite()) {
     return (
-      <>
-        <BlankScreen className="fixed" background="white" />
-        <Circles randomNumber={Math.random()} />
-        <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
-          <div
-            className="p-12 text-4xl space-y-16 relative flex flex-col items-center"
-            style={{ width: "800px" }}
-          >
-            <ReplayLogo />
-            <ModalHeader>👋 Welcome</ModalHeader>
-            <div className="text-center">
-              {"Welcome to Replay - the new way to record, replay, and debug web applications!"}
-            </div>
-            <div className="space-x-4 pt-16">
-              <PrimaryLgButton color="blue" onClick={onLogin}>
-                Sign in
-              </PrimaryLgButton>
-            </div>
-          </div>
-        </Modal>
-      </>
+      <OnboardingModalContainer>
+        <OnboardingContent>
+          <OnboardingHeader>👋 Welcome</OnboardingHeader>
+          <OnboardingBody>
+            {"Welcome to Replay - the new way to record, replay, and debug web applications!"}
+          </OnboardingBody>
+          <OnboardingActions>
+            <PrimaryLgButton color="blue" onClick={onLogin}>
+              Sign in
+            </PrimaryLgButton>
+          </OnboardingActions>
+        </OnboardingContent>
+      </OnboardingModalContainer>
     );
   }
 
