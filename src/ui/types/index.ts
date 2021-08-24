@@ -59,6 +59,8 @@ export interface Workspace {
   apiKeys?: ApiKey[];
 }
 
+export type WorkspaceUserRole = "viewer" | "debugger" | "admin";
+
 export interface WorkspaceUser {
   membershipId: string;
   pending: boolean;
@@ -66,4 +68,5 @@ export interface WorkspaceUser {
   user?: User;
   userId?: string;
   createdAt?: string;
+  roles?: WorkspaceUserRole[];
 }
