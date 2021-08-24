@@ -30,6 +30,7 @@ export function basicMessageHandlers(): MockHandlerRecord {
     "Recording.createSession": () => ({ sessionId: "mock-test-session" }),
     "Session.ensureProcessed": () => ({}),
     "Session.findMouseEvents": () => ({}),
+    "Session.findAnnotations": () => ({}),
     "Session.getBuildId": () => ({ buildId: "mock-build-id" }),
     "Session.getEndpoint": (params: any, h: MockHandlerHelpers) => ({
       endpoint: h.bindings.endpoint,
@@ -47,5 +48,15 @@ export function basicMessageHandlers(): MockHandlerRecord {
       });
       return new Promise(resolve => {});
     },
+    "Session.createPause": () => ({ pauseId: "mock-test-pause", stack: [], data: {} }),
+    "Analysis.createAnalysis": () => ({ analysisId: "mock-test-analysis" }),
+    "Analysis.addLocation": () => ({}),
+    "Analysis.addFunctionEntryPoints": () => ({}),
+    "Analysis.addEventHandlerEntryPoints": () => ({}),
+    "Analysis.addExceptionPoints": () => ({}),
+    "Analysis.addRandomPoints": () => ({}),
+    "Analysis.runAnalysis": () => ({}),
+    "Analysis.findAnalysisPoints": () => ({}),
+    "Analysis.releaseAnalysis": () => ({}),
   };
 };

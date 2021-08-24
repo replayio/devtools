@@ -74,6 +74,7 @@ export function createRecordingOwnerUserIdMock(opts: {
 }
 
 export function createGetRecordingMock(opts: {
+  userId?: string;
   recordingId: string;
   recording?: Partial<Recording>;
 }): MockedResponse[] {
@@ -88,6 +89,10 @@ export function createGetRecordingMock(opts: {
             recording: {
               uuid: opts.recordingId,
               ...mockRecording,
+              owner: {
+                ...mockRecording.owner,
+                id: opts.userId || mockRecording.owner.id,
+              },
               ...opts.recording,
             },
           }
