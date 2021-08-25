@@ -1,4 +1,4 @@
-const getComponents = () => document.querySelectorAll("[class^=Components] [class^=Wrapper]");
+const getComponents = () => document.querySelectorAll("[class^=Tree] [class^=Wrapper]");
 const getInspectedItems = () =>
   document.querySelectorAll("[class^=InspectedElement] [class^=Name]");
 const getInspectedItem = name => [...getInspectedItems()].find(item => item.textContent === name);
