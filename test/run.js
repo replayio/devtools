@@ -9,6 +9,14 @@ const Manifest = require("./manifest");
 const { findGeckoPath, createTestScript, tmpFile, spawnChecked, defer } = require("./utils");
 const { listAllRecordings } = require("@recordreplay/recordings-cli");
 
+// This API key allows access to the whole team that holds all these test
+// recordings. If someone wanted to, they could go in and delete the workspace
+// or recordings in it or anything. While thats not great, it's also not
+// the end of the world. If someone does that, we can always change
+// this code to only run in CI in the main repo and have this as a secret.
+// It's a lot easier to hardcode it for now though.
+const replayApiKey = "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ";
+
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
   ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
   : {};
@@ -246,6 +254,7 @@ async function runTestViewer(path, local, timeout, env) {
     RECORD_REPLAY_TEST_SCRIPT: testScript,
     RECORD_REPLAY_LOCAL_TEST: local,
     RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
+    RECORD_REPLAY_API_KEY: replayApiKey,
   });
 
   let passed = false;
@@ -380,6 +389,7 @@ async function createExampleNodeRecording(example) {
       ...process.env,
       RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
       RECORD_REPLAY_DISPATCH: dispatchServer,
+      RECORD_REPLAY_API_KEY: replayApiKey,
     },
     stdio: "inherit",
   });
@@ -400,6 +410,7 @@ async function createExampleBrowserRecording(url, target) {
         ...process.env,
         RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
         RECORD_REPLAY_DISPATCH: dispatchServer,
+        RECORD_REPLAY_API_KEY: replayApiKey,
       },
     });
   } else {
@@ -415,6 +426,7 @@ async function createExampleBrowserRecording(url, target) {
       RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
       RECORD_REPLAY_SERVER: dispatchServer,
       RECORD_ALL_CONTENT: "1",
+      RECORD_REPLAY_API_KEY: replayApiKey,
     });
   }
 
