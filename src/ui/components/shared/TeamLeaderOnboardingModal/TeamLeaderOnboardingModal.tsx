@@ -184,7 +184,7 @@ function TeamMemberInvitationPage({
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         {!loading && sortedMembers ? (
-          <div className="overflow-auto w-full text-2xl " style={{ height: "180px" }}>
+          <div className="overflow-auto w-full text-2xl " style={{ maxHeight: "180px" }}>
             <WorkspaceMembers members={sortedMembers} isAdmin />
           </div>
         ) : null}
