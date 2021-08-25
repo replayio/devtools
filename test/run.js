@@ -6,13 +6,7 @@ const https = require("https");
 const { spawn, spawnSync } = require("child_process");
 const url = require("url");
 const Manifest = require("./manifest");
-const {
-  findGeckoPath,
-  createTestScript,
-  tmpFile,
-  spawnChecked,
-  defer,
-} = require("./utils");
+const { findGeckoPath, createTestScript, tmpFile, spawnChecked, defer } = require("./utils");
 const { listAllRecordings } = require("@recordreplay/recordings-cli");
 
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
@@ -200,10 +194,9 @@ async function runTest(test, example, target) {
     // running tests. This reduces server load if we are recording the viewer
     // itself.
     RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
-    RECORD_REPLAY_TEST_URL:
-      exampleRecordingId
-        ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
-        : `http://localhost:8080/test/examples/${example}`,
+    RECORD_REPLAY_TEST_URL: exampleRecordingId
+      ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
+      : `http://localhost:8080/test/examples/${example}`,
     // If we need to record the example we have to use the target dispatch server.
     // If we already have the example, use the default dispatch server. When running in CI
     // against a local version of the backend, this allows us to record the viewer using the
@@ -229,7 +222,10 @@ function spawnGecko(env) {
 
     // Change the startup page from app.replay.io so that we don't create
     // a recording for the latter if RECORD_ALL_CONTENT is set.
-    fs.writeFileSync(`${profile}/prefs.js`, `user_pref("browser.startup.homepage", "about:blank");\n`);
+    fs.writeFileSync(
+      `${profile}/prefs.js`,
+      `user_pref("browser.startup.homepage", "about:blank");\n`
+    );
   }
 
   if (process.env.HEADLESS) {
@@ -292,8 +288,7 @@ async function runTestViewer(path, local, timeout, env) {
   function logFailure(why) {
     // This is used in backend CI to move dump files into a shared directory
     // after test failures.
-    if (process.env.TEST_FAILURE_DUMP_SOURCE &&
-        process.env.TEST_FAILURE_DUMP_TARGET) {
+    if (process.env.TEST_FAILURE_DUMP_SOURCE && process.env.TEST_FAILURE_DUMP_TARGET) {
       try {
         const source = process.env.TEST_FAILURE_DUMP_SOURCE;
         const target = process.env.TEST_FAILURE_DUMP_TARGET;
@@ -380,18 +375,14 @@ async function createExampleNodeRecording(example) {
   }
 
   const recordingIdFile = tmpFile();
-  spawnSync(
-    process.env.RECORD_REPLAY_NODE,
-    [`${__dirname}/examples/${example}`],
-    {
-      env: {
-        ...process.env,
-        RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
-        RECORD_REPLAY_DISPATCH: dispatchServer,
-      },
-      stdio: "inherit",
+  spawnSync(process.env.RECORD_REPLAY_NODE, [`${__dirname}/examples/${example}`], {
+    env: {
+      ...process.env,
+      RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
+      RECORD_REPLAY_DISPATCH: dispatchServer,
     },
-  );
+    stdio: "inherit",
+  });
   return getRecordingId(recordingIdFile);
 }
 
@@ -429,7 +420,7 @@ async function createExampleBrowserRecording(url, target) {
 
   if (!process.env.RECORD_REPLAY_NO_TIMEOUT) {
     setTimeout(() => browser.kill(), 30 * 1000);
-  };
+  }
 
   function onOutput(data) {
     process.stderr.write(data);
