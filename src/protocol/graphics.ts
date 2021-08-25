@@ -21,7 +21,6 @@ import { selectors } from "ui/reducers";
 import { isRepaintEnabled } from "./enable-repaint";
 
 const { features } = require("ui/utils/prefs");
-import groupBy from "lodash/groupBy";
 
 export const screenshotCache = new ScreenshotCache();
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
@@ -136,31 +135,6 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
   store.dispatch(actions.setEventsForType(gMouseClickEvents, "mousedown"));
 }
 
-function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
-  events.forEach(entry => {
-    insertEntrySorted(gKeyboardEvents, entry);
-  });
-
-  const keyboardEvents = groupBy(events, event => event.kind);
-
-  Object.keys(keyboardEvents).map(event => {
-    store.dispatch(actions.setEventsForType(keyboardEvents[event], event));
-  });
-}
-
-function onNavigationEvents(events: NavigationEvent[], store: UIStore) {
-  events.forEach(entry => {
-    insertEntrySorted(gNavigationEvents, entry);
-  });
-
-  store.dispatch(
-    actions.setEventsForType(
-      gNavigationEvents.map(e => ({ ...e, kind: "navigation" })),
-      "navigation"
-    )
-  );
-}
-
 class VideoPlayer {
   store: UIStore | null = null;
   video: HTMLVideoElement | null = null;
@@ -241,12 +215,6 @@ export function setupGraphics(store: UIStore) {
 
     client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events, store));
-
-    client.Session.findKeyboardEvents({}, sessionId);
-    client.Session.addKeyboardEventsListener(({ events }) => onKeyboardEvents(events, store));
-
-    client.Session.findNavigationEvents({}, sessionId);
-    client.Session.addNavigationEventsListener(({ events }) => onNavigationEvents(events, store));
 
     if (features.videoPlayback) {
       client.Graphics.getPlaybackVideo({}, sessionId);

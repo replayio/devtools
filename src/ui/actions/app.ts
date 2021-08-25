@@ -8,8 +8,6 @@ import {
   MouseEvent,
   loadedRegions,
   KeyboardEvent,
-  MouseEventKind,
-  KeyboardEventKind,
   NavigationEvent,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
@@ -24,10 +22,14 @@ import {
   WorkspaceId,
   SettingsTabTitle,
   EventKind,
+  ReplayEvent,
 } from "ui/state/app";
 import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { trackEvent } from "ui/utils/telemetry";
+import { client } from "../../protocol/socket";
+import groupBy from "lodash/groupBy";
+import { compareBigInt } from "ui/utils/helpers";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -121,9 +123,15 @@ export type AppActions =
   | SetAwaitingSourcemapsAction;
 
 export function setupApp(store: UIStore) {
-  ThreadFront.waitForSession().then(sessionId =>
-    store.dispatch({ type: "set_session_id", sessionId })
-  );
+  ThreadFront.waitForSession().then(sessionId => {
+    store.dispatch({ type: "set_session_id", sessionId });
+
+    client.Session.findKeyboardEvents({}, sessionId);
+    client.Session.addKeyboardEventsListener(({ events }) => onKeyboardEvents(events, store));
+
+    client.Session.findNavigationEvents({}, sessionId);
+    client.Session.addNavigationEventsListener(({ events }) => onNavigationEvents(events, store));
+  });
 
   ThreadFront.ensureProcessed("basic", undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
@@ -167,6 +175,30 @@ function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAc
       dispatch(setIndexing(percentProgress));
     }
   };
+}
+
+function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
+  const sortedEvents = events.sort((a: KeyboardEvent, b: KeyboardEvent) =>
+    compareBigInt(BigInt(a.point), BigInt(b.point))
+  );
+  const keyboardEvents = groupBy(sortedEvents, event => event.kind);
+
+  Object.keys(keyboardEvents).map(event => {
+    store.dispatch(setEventsForType(keyboardEvents[event], event));
+  });
+}
+
+function onNavigationEvents(events: NavigationEvent[], store: UIStore) {
+  const sortedEvents = events.sort((a: NavigationEvent, b: NavigationEvent) =>
+    compareBigInt(BigInt(a.point), BigInt(b.point))
+  );
+
+  store.dispatch(
+    setEventsForType(
+      sortedEvents.map(e => ({ ...e, kind: "navigation" })),
+      "navigation"
+    )
+  );
 }
 
 function setRecordingDuration(duration: number): SetRecordingDurationAction {

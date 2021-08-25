@@ -6,6 +6,7 @@ import { prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isSameTimeStampedPointRange } from "ui/utils/timeline";
+import { compareBigInt } from "ui/utils/helpers";
 
 function initialAppState(): AppState {
   return {
@@ -259,7 +260,7 @@ export const getFlatEvents = (state: UIState) => {
   );
 
   const sortedEvents = events.sort((a: ReplayEvent, b: ReplayEvent) =>
-    BigInt(a.point) < BigInt(b.point) ? -1 : BigInt(a.point) > BigInt(b.point) ? 1 : 0
+    compareBigInt(BigInt(a.point), BigInt(b.point))
   );
 
   return sortedEvents;

@@ -31,7 +31,7 @@ function Event({
     icon = "ads_click";
   } else if (event.kind?.includes("navigation")) {
     const ev = event as NavigationEvent;
-    text = `Navigation (${ev.url})`;
+    text = `Navigation ${ev.url}`;
     icon = "place";
   } else {
     icon = "keyboard";
@@ -46,7 +46,7 @@ function Event({
       eventText = `Key Press`;
     }
 
-    text = `${eventText} (${ev.key})`;
+    text = `${eventText} ${ev.key}`;
   }
 
   return (
