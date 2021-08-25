@@ -137,6 +137,7 @@ function SharingSettings({
   isPublic: boolean;
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 }) {
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const selectedWorkspace = workspaces.find(w => w.id === selectedWorkspaceId);
   const privateText =
     selectedWorkspaceId === null ? (
@@ -147,15 +148,19 @@ function SharingSettings({
         <span className="font-semibold">{selectedWorkspace!.name}</span>
       </span>
     );
+  const handleWorkspaceSelect = (id: string | null) => {
+    updateDefaultWorkspace({
+      variables: { workspaceId: id },
+    });
+    setSelectedWorkspaceId(id);
+  };
 
   return (
     <>
       <div className="">
         <label className="block text-sm uppercase font-semibold ">Team</label>
         {workspaces.length ? (
-          <TeamSelect
-            {...{ workspaces, selectedWorkspaceId, setSelectedWorkspaceId, label: "Team" }}
-          />
+          <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
         ) : null}
       </div>
       <div className=" text-lg space-y-2">

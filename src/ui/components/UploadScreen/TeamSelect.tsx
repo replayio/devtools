@@ -5,18 +5,18 @@ import { SelectMenu } from "ui/components/shared/Forms";
 export default function TeamSelect({
   workspaces,
   selectedWorkspaceId,
-  setSelectedWorkspaceId,
+  handleWorkspaceSelect,
 }: {
   workspaces: Workspace[];
   selectedWorkspaceId: string | null;
-  setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
+  handleWorkspaceSelect: (id: string | null) => void;
 }) {
   const displayedWorkspaces = [{ id: null, name: "My Library" }, ...workspaces].sort();
 
   return (
     <SelectMenu
       selected={selectedWorkspaceId}
-      setSelected={setSelectedWorkspaceId}
+      setSelected={handleWorkspaceSelect}
       options={displayedWorkspaces}
     />
   );
