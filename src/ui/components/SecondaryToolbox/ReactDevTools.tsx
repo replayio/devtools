@@ -77,7 +77,7 @@ function createReactDevTools(annotations: Annotation[], currentPoint: ExecutionP
   const target = { postMessage() {} };
   const wall = new ReplayWall();
   const bridge = createBridge(target, wall);
-  const store = createStore(bridge);
+  const store = createStore(bridge, { supportsNativeInspection: false });
   const ReactDevTools = initialize(target, { bridge, store });
 
   for (const { message, point } of annotations) {
@@ -102,6 +102,12 @@ function ReactDevtoolsPanel({ annotations, currentPoint }: PropsFromRedux) {
       enabledInspectedElementContextMenu={false}
       overrideTab="components"
       showTabBar={false}
+      readOnly={true}
+      hideSettings={true}
+      hideToggleErrorAction={true}
+      hideToggleSuspenseAction={true}
+      hideLogAction={true}
+      hideViewSourceAction={true}
     />
   );
 }

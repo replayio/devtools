@@ -6,6 +6,12 @@ declare module "react-devtools-inline/frontend" {
     enabledInspectedElementContextMenu: boolean;
     overrideTab: string;
     showTabBar: boolean;
+    readOnly?: boolean;
+    hideSettings?: boolean;
+    hideToggleErrorAction?: boolean;
+    hideToggleSuspenseAction?: boolean;
+    hideLogAction?: boolean;
+    hideViewSourceAction?: boolean;
   }
   export type ReactDevTools = ReactElement<ReactDevToolsProps>;
 
@@ -20,7 +26,10 @@ declare module "react-devtools-inline/frontend" {
   export interface Store {}
 
   export function createBridge(target: Target, wall: Wall): Bridge;
-  export function createStore(bridge: Bridge): Store;
+  export function createStore(
+    bridge: Bridge,
+    config?: { supportsNativeInspection?: boolean }
+  ): Store;
   export function initialize(
     target: Target,
     bridgeAndStore: { bridge: Bridge; store: Store }
