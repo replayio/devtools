@@ -210,14 +210,18 @@ function SharingPreview({
   const workspaceName = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId)!
     .name;
   let icon;
+  let text;
 
   if (!isPublic) {
     if (selectedWorkspaceId) {
+      text = `Shared privately with ${workspaceName}`;
       icon = "groups";
     } else {
+      text = `Only you can view this`;
       icon = "person";
     }
   } else {
+    text = "This replay can be viewed by anyone with the link";
     icon = "public";
   }
 
@@ -225,14 +229,7 @@ function SharingPreview({
     <div className="flex flex-row items-center space-x-4">
       <span className="material-icons">{icon}</span>
       <div className="flex flex-col flex-grow overflow-hidden">
-        <div className="overflow-hidden overflow-ellipsis whitespace-pre">
-          Save to <span className="font-semibold">{`${workspaceName}`}</span>
-        </div>
-        {isPublic ? (
-          <div className="overflow-hidden overflow-ellipsis whitespace-pre font-red-800">
-            This replay can be viewed by anyone with the link
-          </div>
-        ) : null}
+        <div className="overflow-hidden overflow-ellipsis whitespace-pre">{text}</div>
       </div>
       <button className="text-blue-700 underline p-2" onClick={toggleShowSharingSettings}>
         Edit
