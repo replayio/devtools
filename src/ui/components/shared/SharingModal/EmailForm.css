@@ -1,8 +1,8 @@
-.sharing-modal .private-settings .new-collaborator-form {
+.sharing-modal .new-collaborator-form {
   position: relative;
 }
 
-.sharing-modal .private-settings .new-collaborator-form input[type="textarea"] {
+.sharing-modal .new-collaborator-form input[type="textarea"] {
   width: 100%;
   font-size: 14px;
   padding: 8px;
@@ -11,7 +11,7 @@
   border-radius: 8px;
 }
 
-.sharing-modal .private-settings .new-collaborator-form .autocomplete {
+.sharing-modal .new-collaborator-form .autocomplete {
   position: absolute;
   width: 100%;
   top: 100%;
@@ -25,11 +25,11 @@
   border-radius: 4px;
 }
 
-.sharing-modal .private-settings .new-collaborator-form .autocomplete .content {
+.sharing-modal .new-collaborator-form .autocomplete .content {
   flex-grow: 1;
 }
 
-.sharing-modal .private-settings .new-collaborator-form .autocomplete button.action-add {
+.sharing-modal .new-collaborator-form .autocomplete button.action-add {
   cursor: pointer;
   background: var(--primary-accent);
   color: white;

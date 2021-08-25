@@ -28,7 +28,7 @@ function Collaborator({
     iconAndName = (
       <>
         <div className="bg-gray-200 rounded-full" style={{ padding: "5px", marginRight: "8px" }}>
-          <MaterialIcon className="text-white">mail_outline</MaterialIcon>
+          <MaterialIcon className="text-white align-middle">mail_outline</MaterialIcon>
         </div>
         <div className="main">
           <div className="name">{collaborator.email}</div>
