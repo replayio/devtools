@@ -7,9 +7,11 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import {
   TimeStampedPoint,
   MouseEvent,
+  KeyboardEvent,
   paintPoints,
   ScreenShot,
   findPaintsResult,
+  NavigationEvent,
 } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
@@ -102,6 +104,12 @@ const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, pa
 
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
+
+// All mouse events that have occurred in the recording, in order.
+const gKeyboardEvents: KeyboardEvent[] = [];
+
+// All mouse events that have occurred in the recording, in order.
+const gNavigationEvents: NavigationEvent[] = [];
 
 // All mouse click events that have occurred in the recording, in order.
 const gMouseClickEvents: MouseEvent[] = [];

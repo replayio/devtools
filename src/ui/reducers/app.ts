@@ -1,4 +1,4 @@
-import { AppState, PanelName, ViewMode } from "ui/state/app";
+import { AppState, EventKind, PanelName, ReplayEvent, ViewMode } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
@@ -6,6 +6,7 @@ import { prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isSameTimeStampedPointRange } from "ui/utils/timeline";
+import { compareBigInt } from "ui/utils/helpers";
 
 function initialAppState(): AppState {
   return {
@@ -251,6 +252,19 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>
   state.app.events[type] || NO_EVENTS;
+export const getFlatEvents = (state: UIState) => {
+  let events: ReplayEvent[] = [];
+
+  Object.keys(state.app.events).map(
+    (eventKind: EventKind) => (events = [...events, ...state.app.events[eventKind]])
+  );
+
+  const sortedEvents = events.sort((a: ReplayEvent, b: ReplayEvent) =>
+    compareBigInt(BigInt(a.point), BigInt(b.point))
+  );
+
+  return sortedEvents;
+};
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;

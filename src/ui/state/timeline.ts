@@ -43,11 +43,3 @@ interface HoveredLocation extends Location {
   line: number;
   column: number;
 }
-
-export interface RecordingEvent {
-  clientX: number;
-  clientY: number;
-  kind: MouseEventKind;
-  point: string;
-  time: number;
-}

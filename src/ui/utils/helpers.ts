@@ -7,3 +7,7 @@ export function validateUUID(uuid: string) {
   const re = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
   return re.test(uuid);
 }
+
+export function compareBigInt(point1: BigInt, point2: BigInt) {
+  return point1 < point2 ? -1 : point1 > point2 ? 1 : 0;
+}

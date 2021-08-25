@@ -5,6 +5,10 @@ import {
   Location,
   MouseEvent,
   loadedRegions,
+  KeyboardEvent,
+  NavigationEvent,
+  KeyboardEventKind,
+  MouseEventKind,
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
@@ -94,10 +98,12 @@ export interface AnalysisPoints {
 }
 
 interface Events {
-  [key: string]: MouseEvent[];
+  [key: string]: ReplayEvent[];
 }
 
-export type Event = "mousedown";
+export type ReplayEvent = MouseEvent | KeyboardEvent | NavigationEvent;
+
+export type EventKind = MouseEventKind | KeyboardEventKind | string;
 
 export interface Canvas {
   gDevicePixelRatio: number;
