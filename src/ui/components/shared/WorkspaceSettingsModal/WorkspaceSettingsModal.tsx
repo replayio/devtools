@@ -6,6 +6,7 @@ import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
+import { features } from "ui/utils/prefs";
 import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
@@ -14,6 +15,7 @@ import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import SettingsModal from "../SettingsModal";
 import { Settings } from "../SettingsModal/types";
 import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
+import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 
 function ModalButton({
@@ -154,13 +156,11 @@ const settings: Settings<
       );
     },
   },
-  // {
-  //   title: "Billing",
-  //   icon: "payment",
-  //   component: function Billing() {
-  //     return <div>Billing to come</div>;
-  //   },
-  // },
+  {
+    title: "Billing",
+    icon: "payment",
+    component: WorkspaceSubscription,
+  },
   {
     title: "API Keys",
     icon: "vpn_key",
@@ -217,10 +217,19 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
   if (!workspaceId) return null;
 
   const isAdmin = members?.find(m => m.userId === localUserId)?.roles?.includes("admin") || false;
+  const hiddenTabs: SettingsTabTitle[] = [];
+
+  if (!isAdmin) {
+    hiddenTabs.push("Delete Team");
+  }
+
+  if (!features.teamSubscription) {
+    hiddenTabs.push("Billing");
+  }
 
   return (
     <SettingsModal
-      hiddenTabs={!isAdmin ? ["Delete Team"] : undefined}
+      hiddenTabs={hiddenTabs}
       defaultSelectedTab="Team Members"
       panelProps={{ isAdmin, workspaceId, ...rest }}
       settings={settings}

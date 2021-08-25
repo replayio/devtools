@@ -28,6 +28,23 @@ export interface ApiKeyResponse {
   keyValue: string;
 }
 
+export interface Subscription {
+  id: string;
+  createdAt: string;
+  seatCount: number;
+  effectiveFrom?: string;
+  effectiveTo?: string;
+  createdBy: User;
+  status: string;
+  trialEnds: string | null;
+  plan: {
+    id: string;
+    name: string;
+    key: string;
+    createdAt: string;
+  };
+}
+
 export interface Recording {
   id: string;
   url: string;
@@ -57,6 +74,7 @@ export interface Workspace {
   recordingCount?: number;
   members?: User[];
   apiKeys?: ApiKey[];
+  subscription?: Subscription;
 }
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";

@@ -21,6 +21,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { removeUrlParameters } from "ui/utils/environment";
 import { DownloadPage } from "../Onboarding/DownloadPage";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
+import { features } from "ui/utils/prefs";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -82,7 +83,12 @@ function TeamNamePage({
     setInputValue(e.target.value);
   };
   const handleSave = () => {
-    createNewWorkspace({ variables: { name: inputValue, userId } });
+    createNewWorkspace({
+      variables: {
+        name: inputValue,
+        planKey: features.teamSubscription ? "test-beta-v1" : undefined,
+      },
+    });
     trackEvent("created-team");
   };
 
