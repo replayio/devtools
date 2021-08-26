@@ -111,7 +111,7 @@ export function BlankProgressScreen({
     <BlankScreen background="white">
       <div className="m-auto">
         <div className="flex flex-col items-center space-y-4">
-          <div className="text-xl">Preparing Replay</div>
+          <div className="text-xl">Preparing replay</div>
           <div className="w-40 relative h-1 bg-gray-200 rounded-lg overflow-hidden">
             <div
               className="absolute t-0 h-full bg-primaryAccent"
