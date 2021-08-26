@@ -22,3 +22,11 @@ export function commaListOfThings(things: string[]) {
 
   return `${listOfThings.join(", ")}, and ${finalThing}`;
 }
+
+export function isValidTeamName(name: string) {
+  if (name.trim() === "") {
+    return false;
+  }
+
+  return true;
+}
