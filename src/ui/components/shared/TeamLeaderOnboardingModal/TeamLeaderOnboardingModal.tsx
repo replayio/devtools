@@ -86,7 +86,7 @@ function TeamNamePage({
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: features.teamSubscription ? "test-beta-v1" : undefined,
+        planKey: "team-v1",
       },
     });
     trackEvent("created-team");
