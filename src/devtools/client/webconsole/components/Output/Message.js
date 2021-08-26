@@ -231,7 +231,7 @@ class Message extends Component {
 
   renderErrorState() {
     const newBugUrl =
-      "https://bugzilla.mozilla.org/enter_bug.cgi?product=DevTools&component=Console";
+      "https://github.com/RecordReplay/devtools/issues/new?assignees=&labels=&template=bug_report.md&title=Console%20error:";
     const timestampEl = this.renderTimestamp();
 
     return dom.div(
