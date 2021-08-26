@@ -82,7 +82,7 @@ function _DevTools({
     if (awaitingSourcemaps) {
       message = "Uploading sourcemaps";
     } else if (uploading) {
-      message = "Uploading Replay";
+      message = "Uploading replay";
     } else {
       color = "white";
       message = "Fetching data";

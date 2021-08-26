@@ -70,7 +70,7 @@ function PanelButtons({
           })}
           onClick={() => onClick("react-components")}
         >
-          <div className="label">⚛️ Components</div>
+          <div className="label">⚛️ React</div>
         </button>
       )}
     </div>
