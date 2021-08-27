@@ -59,6 +59,7 @@ function Toolbar({
   panelCollapsed,
   progressPercentage,
   viewMode,
+  isPaused,
 }: PropsFromRedux) {
   const onClick = (panel: PrimaryPanelName) => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
@@ -120,6 +121,7 @@ function Toolbar({
             <div
               className={classnames("toolbar-panel-button debug", {
                 active: selectedPrimaryPanel == "debug",
+                paused: isPaused,
               })}
             >
               <IconWithTooltip
@@ -148,6 +150,7 @@ const connector = connect(
     selectedPanel: selectors.getSelectedPanel(state),
     progressPercentage: selectors.getIndexing(state),
     viewMode: selectors.getViewMode(state),
+    isPaused: selectors.hasFrames(state),
   }),
   {
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
