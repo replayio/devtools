@@ -176,7 +176,7 @@ class VideoPlayer {
       this.commands &&
       this.commands.then(async () => {
         const video = this.store?.getState().app.videoNode;
-        if (video) {
+        if (features.videoPlayback && video) {
           video.pause();
           video.currentTime = timeMs / 1000;
         }
@@ -189,7 +189,7 @@ class VideoPlayer {
       this.commands.then(() => {
         const video = this.store?.getState().app.videoNode;
         const currentTime = this.store?.getState().timeline.currentTime;
-        if (video) {
+        if (features.videoPlayback && video) {
           video.currentTime = (currentTime || 0) / 1000;
           return video.play();
         }
