@@ -10,7 +10,11 @@ import "./WorkspaceMember.css";
 import MaterialIcon from "../MaterialIcon";
 import { useEffect } from "react";
 
-type WorkspaceMemberProps = { member: WorkspaceUser; isAdmin: boolean } & PropsFromRedux;
+type WorkspaceMemberProps = {
+  member: WorkspaceUser;
+  isAdmin: boolean;
+  canLeave?: boolean;
+} & PropsFromRedux;
 
 const memberRoleLabels: Record<WorkspaceUserRole, string> = {
   admin: "Admin",
@@ -92,9 +96,20 @@ function WorkspaceMemberRoles({ member }: { member: WorkspaceUser }) {
   );
 }
 
-function Status({ member, hideArrow = false }: { member: WorkspaceUser; hideArrow?: boolean }) {
+function Status({
+  member,
+  hideArrow = false,
+  title,
+}: {
+  member: WorkspaceUser;
+  hideArrow?: boolean;
+  title?: string;
+}) {
   return (
-    <div className={classnames("flex flex-row items-center group", { italic: member.pending })}>
+    <div
+      className={classnames("flex flex-row items-center group", { italic: member.pending })}
+      title={title}
+    >
       <span>
         {memberRoleLabels[getMemberRole(member)]}
         {member.pending ? " (pending)" : ""}
@@ -157,6 +172,7 @@ export function NonRegisteredWorkspaceMember({
 }
 
 function Role({
+  canLeave,
   member,
   setWorkspaceId,
   hideModal,
@@ -166,6 +182,7 @@ function Role({
   setWorkspaceId: any;
   hideModal: any;
   isAdmin: boolean;
+  canLeave: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
@@ -194,6 +211,16 @@ function Role({
     }
   };
 
+  if (!canLeave) {
+    return (
+      <Status
+        member={member}
+        hideArrow
+        title="Promote another team member to admin in order to leave this team"
+      />
+    );
+  }
+
   if (!isAdmin && localUserId !== userId) {
     return <Status member={member} hideArrow />;
   }
@@ -215,7 +242,13 @@ function Role({
   );
 }
 
-function WorkspaceMember({ member, setWorkspaceId, hideModal, isAdmin }: WorkspaceMemberProps) {
+function WorkspaceMember({
+  member,
+  setWorkspaceId,
+  hideModal,
+  isAdmin,
+  canLeave = false,
+}: WorkspaceMemberProps) {
   return (
     <li className="flex flex-row items-center space-x-2">
       <img
@@ -229,6 +262,7 @@ function WorkspaceMember({ member, setWorkspaceId, hideModal, isAdmin }: Workspa
         setWorkspaceId={setWorkspaceId}
         hideModal={hideModal}
         isAdmin={isAdmin}
+        canLeave={canLeave}
       />
     </li>
   );
