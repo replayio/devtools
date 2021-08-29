@@ -7,6 +7,7 @@ const { spawnSync } = require("child_process");
 const GeckoInstallDirectories = [
   "/Applications/Replay.app", // macOS
   `${process.env.HOME}/replay`, // linux
+  "C:\\Program Files\\replay", // windows
 ];
 
 const GeckoSuffixes = [
@@ -16,6 +17,7 @@ const GeckoSuffixes = [
   "firefox", // linux unbranded
   "dist/bin/replay", // linux, testing with local build.
   "dist/bin/firefox", // linux local unbranded
+  "replay.exe", // windows
 ];
 
 // Get the executable to use when starting gecko.
