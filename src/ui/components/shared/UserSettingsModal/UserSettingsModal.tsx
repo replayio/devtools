@@ -17,6 +17,7 @@ import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 
 import ReplayInvitations from "./ReplayInvitations";
+import { UserInfo } from "ui/hooks/users";
 
 function Support() {
   return (
@@ -127,7 +128,7 @@ function UserAPIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
   );
 }
 
-const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
+const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings, {}> => [
   {
     title: "Personal",
     icon: "person",
@@ -152,13 +153,6 @@ const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
     icon: "biotech",
     items: [
       {
-        label: "Enable the Elements pane",
-        type: "checkbox",
-        key: "showElements",
-        description: "Inspect HTML markup and CSS styling",
-        disabled: false,
-      },
-      {
         label: "Enable React DevTools",
         type: "checkbox",
         key: "showReact",
@@ -166,11 +160,20 @@ const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
         disabled: false,
       },
       {
+        label: "Enable the Elements pane",
+        type: "checkbox",
+        key: "showElements",
+        description: "Inspect HTML markup and CSS styling",
+        disabled: false,
+        comingSoon: !internal,
+      },
+      {
         label: "Enable repainting",
         type: "checkbox",
         key: "enableRepaint",
         description: "Repaint the DOM on demand",
         disabled: false,
+        comingSoon: !internal,
       },
     ],
   },
@@ -188,6 +191,7 @@ const settings: Settings<SettingsTabTitle, UserSettings, {}> = [
 
 export function UserSettingsModal(props: PropsFromRedux) {
   const { userSettings, loading } = hooks.useGetUserSettings();
+  const { internal, loading: userInfoLoading } = hooks.useGetUserInfo();
 
   // TODO: This is bad and should be updated with a better generalized hook
   const updateRepaint = hooks.useUpdateUserSetting("enableRepaint", "Boolean");
@@ -205,10 +209,11 @@ export function UserSettingsModal(props: PropsFromRedux) {
     }
   };
 
+  const settings = getSettings(internal);
   return (
     <SettingsModal
       defaultSelectedTab={props.defaultSettingsTab}
-      loading={loading}
+      loading={loading || userInfoLoading}
       onChange={onChange}
       panelProps={{}}
       settings={settings}
