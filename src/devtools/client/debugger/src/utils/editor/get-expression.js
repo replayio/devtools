@@ -39,6 +39,11 @@ export function getExpressionFromCoords(cm, coord) {
       return null;
     }
 
+    // Bail from the loop if we run into a spread operator
+    if (line.substring(tokenBefore.startColumn, tokenBefore.endColumn) === "...") {
+      break;
+    }
+
     startHighlight = tokenBefore.startColumn;
   }
 
