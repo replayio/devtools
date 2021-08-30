@@ -4,18 +4,26 @@ import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import { PendingNewComment, PendingNewReply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
+import { useAuth0 } from "@auth0/auth0-react";
+import { setModal } from "ui/actions/app";
 
 interface NewCommentEditorProps extends PropsFromRedux {
   comment: PendingNewComment | PendingNewReply;
   type: "new_reply" | "new_comment";
 }
 
-function NewCommentEditor({ comment, type, clearPendingComment }: NewCommentEditorProps) {
+function NewCommentEditor({ comment, type, clearPendingComment, setModal }: NewCommentEditorProps) {
+  const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const addComment = hooks.useAddComment();
   const addCommentReply = hooks.useAddCommentReply();
 
   const handleSubmit = (inputValue: string) => {
+    if (!isAuthenticated) {
+      setModal("login");
+      return;
+    }
+
     if (type == "new_reply") {
       handleReplySave(comment as PendingNewReply, inputValue);
     } else {
@@ -75,6 +83,7 @@ function NewCommentEditor({ comment, type, clearPendingComment }: NewCommentEdit
 
 const connector = connect(null, {
   clearPendingComment: actions.clearPendingComment,
+  setModal: actions.setModal,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(NewCommentEditor);
