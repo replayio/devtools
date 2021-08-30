@@ -321,10 +321,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 30%;
+  position: relative;
 }
 
 .message-location a {
   color: var(--frame-link-source);
+}
+
+.message-jump-button {
+  display: none;
+}
+
+.message:hover .frame-link-source {
+  display: none;
+}
+
+.message:hover .message-jump-button {
+  display: block;
 }
 
 .webconsole-app .message-location:empty {
@@ -1071,4 +1084,28 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-output .overlay-container:hover .info .label {
   opacity: 100%;
+}
+
+.message .replay-button {
+  font-size: 14px;
+  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
+  padding: 1px;
+  position: absolute;
+  right: 0px;
+  left: auto;
+}
+
+.message .comment-button {
+  font-size: 10px;
+  line-height: 14px;
+  padding: 1px 3px;
+  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
+  position: absolute;
+  right: 0px;
+  left: auto;
+}
+
+.message-jump-button span {
+  visibility: hidden;
+  padding-left: 20px;
 }
