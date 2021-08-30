@@ -16,6 +16,7 @@ const FrameView = createFactory(require("devtools/client/shared/components/Frame
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
+const classNames = require("classnames");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
 const { trackEvent } = require("ui/utils/telemetry");
 
@@ -189,8 +190,7 @@ class Message extends Component {
         title: "Add Comment",
         onClick,
       },
-      dom.div({ className: "material-icons comment-button rounded-md" }, "add_comment"),
-      dom.span({ className: "rounded-md bg-primaryAccent w-full px-1 " }, "Add Comment")
+      dom.div({ className: "material-icons comment-button rounded-md" }, "add_comment")
     );
   }
 
@@ -217,17 +217,28 @@ class Message extends Component {
 
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
-    let text = BigInt(executionPoint) < BigInt(pausedExecutionPoint) ? "Rewind" : "Fast Forward";
+    let text, isRewind, icon;
+
+    if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
+      text = "Rewind";
+      isRewind = true;
+      icon = "skip_previous";
+    } else {
+      text = "Fast Forward";
+      isRewind = false;
+      icon = "skip_next";
+    }
 
     return dom.button(
       {
-        className:
-          "message-jump focus:outline-none font-sans text-white flex flex-row-reverse items-center",
+        className: classNames(
+          isRewind ? "rewind" : "fast-forward",
+          "message-jump focus:outline-none font-sans text-white flex flex-row-reverse items-center"
+        ),
         title: text,
         onClick,
       },
-      dom.div({ className: "material-icons replay-button rounded-md" }, "skip_previous"),
-      dom.span({ className: "rounded-md bg-primaryAccent w-full px-1 " }, text)
+      dom.div({ className: "material-icons replay-button rounded-md" }, icon)
     );
   }
 

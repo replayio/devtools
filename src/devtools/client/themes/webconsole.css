@@ -312,6 +312,8 @@
 }
 
 .webconsole-app .message-location {
+  display: flex;
+  flex-direction: row;
   float: right;
   color: var(--frame-link-source);
   /* Makes the file name truncated (and ellipsis shown) on the left side */
@@ -326,18 +328,6 @@
 
 .message-location a {
   color: var(--frame-link-source);
-}
-
-.message-jump-button {
-  display: none;
-}
-
-.message:hover .frame-link-source {
-  display: none;
-}
-
-.message:hover .message-jump-button {
-  display: block;
 }
 
 .webconsole-app .message-location:empty {
@@ -1071,7 +1061,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-output .overlay-container:not(.debug):hover .button {
-  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
+  background: linear-gradient(to bottom right, #68DCFC, #4689F8);
   box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
 }
 
@@ -1086,26 +1076,25 @@ a.learn-more-link.webconsole-learn-more-link {
   opacity: 100%;
 }
 
+.message .replay-button,
+.message .comment-button {
+  background: var(--primary-accent);
+  margin-left: 4px;
+  visibility: hidden;
+}
+
 .message .replay-button {
   font-size: 14px;
-  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
-  padding: 1px;
-  position: absolute;
-  right: 0px;
-  left: auto;
+  padding: 1px 2px 1px 1px;
 }
 
 .message .comment-button {
   font-size: 10px;
   line-height: 14px;
-  padding: 1px 3px;
-  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
-  position: absolute;
-  right: 0px;
-  left: auto;
+  padding: 1px 5px 1px 3px;
 }
 
-.message-jump-button span {
-  visibility: hidden;
-  padding-left: 20px;
+.message:hover .replay-button,
+.message:hover .comment-button {
+  visibility: visible;
 }
