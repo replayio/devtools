@@ -1,10 +1,11 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import hooks from "ui/hooks";
-import { Recording, Workspace } from "ui/types";
+import { Workspace } from "ui/types";
 import TeamSelect from "ui/components/UploadScreen/TeamSelect";
 import { PrimaryButton } from "../Button";
 import Collaborators from "./Collaborators";
 import { CollaboratorDbData } from "./CollaboratorsList";
+import { commaListOfThings } from "ui/utils/helpers";
 
 type SharedWithProps = {
   workspaces: Workspace[];
@@ -100,15 +101,4 @@ function getCollaboratorsSummary(workspace: Workspace, collaboratorCount: number
   }
 
   return <div className="pr-8">Shared with {commaListOfThings(sharees)}</div>;
-}
-
-function commaListOfThings(things: string[]) {
-  const listOfThings = [...things];
-  const finalThing = listOfThings.pop();
-
-  if (things.length <= 1) {
-    return finalThing;
-  }
-
-  return `${listOfThings.join(", ")}, and ${finalThing}`;
 }
