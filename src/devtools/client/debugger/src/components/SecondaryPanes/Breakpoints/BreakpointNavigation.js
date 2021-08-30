@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classnames from "classnames";
 import findLast from "lodash/findLast";
 import find from "lodash/find";
@@ -18,6 +18,8 @@ function BreakpointNavigation({
   analysisPoints,
   setZoomedBreakpoint = () => {},
 }) {
+  const [lastExecutionPoint, setLastExecutionPoint] = useState(null);
+
   const navigateToPoint = point => {
     if (point) {
       seek(point.point, point.time, true);
@@ -32,6 +34,11 @@ function BreakpointNavigation({
     next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
+  useEffect(() => {
+    if (executionPoint && lastExecutionPoint !== executionPoint)
+      setLastExecutionPoint(executionPoint);
+  }, [executionPoint]);
+
   return (
     <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
       {!isEmpty ? (
@@ -43,7 +50,7 @@ function BreakpointNavigation({
       {executionPoint ? (
         <BreakpointNavigationStatus
           indexed={indexed}
-          executionPoint={executionPoint}
+          executionPoint={lastExecutionPoint}
           analysisPoints={analysisPoints}
         />
       ) : null}
