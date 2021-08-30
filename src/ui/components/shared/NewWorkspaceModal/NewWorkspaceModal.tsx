@@ -168,7 +168,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: features.teamSubscription ? "test-beta-v1" : undefined,
+        planKey: "team-v1",
       },
     });
   };
