@@ -5,6 +5,7 @@ import Spinner from "../Spinner";
 import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
 import "./EmailForm.css";
 import { validateEmail } from "ui/utils/helpers";
+import { TextInput } from "../Forms";
 
 type ActionStatus = "pending" | "loading" | "error" | "completed";
 
@@ -95,6 +96,11 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
       e.preventDefault();
     }
 
+    // Don't submit if the email is not a valid email
+    if (!validateEmail(inputValue)) {
+      return;
+    }
+
     addNewCollaborator({
       variables: { recordingId, email: inputValue },
     });
@@ -103,12 +109,7 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
 
   return (
     <form className="new-collaborator-form" onSubmit={handleSubmit}>
-      <input
-        type="textarea"
-        placeholder="Search emails here"
-        value={inputValue}
-        onChange={onChange}
-      />
+      <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
       {showAutocomplete ? (
         <div className="autocomplete bg-white">
           <div className="content">{inputValue}</div>

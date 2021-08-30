@@ -1,16 +1,10 @@
-.sharing-modal .modal-content .private-settings .permissions-list {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: auto;
-}
-
 .sharing-modal .permission {
   display: flex;
   align-items: center;
   padding: 8px;
   transition: background 200ms ease-in-out;
   border-radius: 4px;
+  line-height: normal;
 }
 
 .sharing-modal .permission:hover {

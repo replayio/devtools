@@ -1,15 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import Modal from "ui/components/shared/Modal";
+import Modal from "ui/components/shared/NewModal";
 import ReplayLink from "./ReplayLink";
 import hooks from "ui/hooks";
-
-import "./SharingModal.css";
+import { useGetUserSettings } from "ui/hooks/settings";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import PrivateSettings from "./PrivateSettings";
+import { UserSettings, Workspace } from "ui/types";
+import { PrimaryButton } from "../Button";
+import { actions } from "ui/actions";
+import { SharedWith } from "./SharedWith";
+import { CollaboratorDbData } from "./CollaboratorsList";
 
-function SharingModal({ modalOptions }: PropsFromRedux) {
+function SharingModalWrapper(props: PropsFromRedux) {
+  const { userSettings, loading: loading1 } = useGetUserSettings();
+  const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
+  const { collaborators, loading: loading3 } = hooks.useGetOwnersAndCollaborators(
+    props.modalOptions!.recordingId
+  );
+
+  if (loading1 || loading2 || loading3) {
+    // Todo: Use an actual loader here
+    return null;
+  }
+
+  return (
+    <SharingModal {...{ ...props, userSettings, workspaces }} collaborators={collaborators!} />
+  );
+}
+
+type SharingModalProps = PropsFromRedux & {
+  userSettings: UserSettings;
+  workspaces: Workspace[];
+  collaborators: CollaboratorDbData[];
+};
+
+function SharingModal({
+  modalOptions,
+  userSettings,
+  workspaces,
+  collaborators,
+  hideModal,
+}: SharingModalProps) {
   const { recordingId } = modalOptions!;
   const { isPrivate } = hooks.useGetIsPrivate(recordingId!);
   const toggleIsPrivate = hooks.useToggleIsPrivate(recordingId!, isPrivate);
@@ -26,62 +58,55 @@ function SharingModal({ modalOptions }: PropsFromRedux) {
   };
 
   return (
-    <div className="sharing-modal">
-      <Modal>
-        <section className="sharing-modal-content">
-          <h1>Share</h1>
-          <ReplayLink recordingId={recordingId} />
-          <div className="privacy-choices">
-            <div className={`privacy-choice ${!isPrivate ? "selected" : ""}`}>
-              <input
-                type="radio"
-                id="public"
-                name="privacy"
-                checked={!isPrivate || false}
-                onChange={setPublic}
-              />
-              <label htmlFor="public">
-                <div className="title">Public</div>
-                <div className="description">Available to anyone who has the link</div>
-              </label>
-            </div>
-            <div className={`privacy-choice ${isPrivate ? "selected" : ""}`}>
-              <input
-                type="radio"
-                id="private"
-                name="privacy"
-                checked={isPrivate || false}
-                onChange={setPrivate}
-              />
-              <label htmlFor="private">
-                <div className="title">Private</div>
-                <div className="description">Available to people you choose</div>
-              </label>
+    <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
+      <div
+        className="sharing-modal p-12 space-y-8 relative flex flex-col bg-white text-lg rounded-lg"
+        style={{ width: "600px" }}
+      >
+        <h1 className="text-3xl">Sharing</h1>
+        <section className="space-y-8">
+          <SharedWith
+            defaultWorkspaceId={userSettings?.defaultWorkspaceId || null}
+            {...{ workspaces, recordingId, collaborators }}
+          />
+          <div className="space-y-4">
+            <h2 className="text-2xl">Get Link</h2>
+            <ReplayLink recordingId={recordingId} />
+            <div className="flex flex-row items-center">
+              {isPrivate ? (
+                <div className="w-full justify-between flex flex-row items-center">
+                  <div>
+                    <strong>Restricted</strong> Only people added can open this link
+                  </div>
+                  <PrimaryButton color="blue" onClick={setPublic}>
+                    Change to anyone
+                  </PrimaryButton>
+                </div>
+              ) : (
+                <div className="w-full flex flex-row justify-between items-center">
+                  <div>
+                    <strong>Anyone</strong> on the internet with this link can view
+                  </div>
+                  <PrimaryButton color="blue" onClick={setPrivate}>
+                    Change to restricted
+                  </PrimaryButton>
+                </div>
+              )}
             </div>
           </div>
-          {!isPrivate && (
-            <div className="privacy-warning">
-              <strong>Note:</strong> Replay records everything that happens in the browser,
-              including passwords you’ve typed and everything visible on the screen. &nbsp;
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://www.notion.so/replayio/Security-2af70ebdfb1c47e5b9246f25ca377ef2"
-                className="underline"
-              >
-                Learn more
-              </a>
-            </div>
-          )}
         </section>
-        <PrivateSettings recordingId={recordingId} />
-      </Modal>
-    </div>
+      </div>
+    </Modal>
   );
 }
 
-const connector = connect((state: UIState) => ({
-  modalOptions: selectors.getModalOptions(state),
-}));
+const connector = connect(
+  (state: UIState) => ({
+    modalOptions: selectors.getModalOptions(state),
+  }),
+  {
+    hideModal: actions.hideModal,
+  }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(SharingModal);
+export default connector(SharingModalWrapper);

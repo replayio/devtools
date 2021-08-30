@@ -124,7 +124,7 @@ function ReplayPreview({ recording, screenData }: { recording: Recording; screen
   );
 }
 
-function SharingSettings({
+export function SharingSettings({
   workspaces,
   selectedWorkspaceId,
   setSelectedWorkspaceId,
@@ -163,7 +163,7 @@ function SharingSettings({
           <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
         ) : null}
       </div>
-      <div className=" text-lg space-y-2">
+      <div className="text-lg space-y-2">
         <label className="block text-sm uppercase font-semibold ">Privacy</label>
         <div className="space-y-1">
           <div className="space-x-2 items-center">
