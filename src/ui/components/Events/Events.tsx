@@ -24,14 +24,17 @@ function Event({
   const isPaused = event.time === currentTime && executionPoint === event.point;
 
   let text: string;
+  let title: string;
   let icon: string;
 
   if (event.kind?.includes("mouse")) {
     text = "Mouse Click";
+    title = "Mouse Click Event";
     icon = "ads_click";
   } else if (event.kind?.includes("navigation")) {
     const ev = event as NavigationEvent;
-    text = `Navigation ${ev.url}`;
+    text = `${ev.url}`;
+    title = "Navigation Event";
     icon = "place";
   } else {
     icon = "keyboard";
@@ -47,11 +50,13 @@ function Event({
     }
 
     text = `${eventText} ${ev.key}`;
+    title = `${eventText} event`;
   }
 
   return (
     <button
       onClick={() => onSeek(event.point, event.time)}
+      title={title}
       className={classNames(
         "flex flex-row items-center justify-between p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
         isPaused ? "text-primaryAccent" : ""
