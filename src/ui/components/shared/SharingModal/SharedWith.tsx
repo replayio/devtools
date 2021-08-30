@@ -83,8 +83,6 @@ function SharedWithForm({
 function getCollaboratorsSummary(workspace: Workspace, collaboratorCount: number) {
   const sharees = [];
 
-  console.log({ workspace });
-
   if (workspace && workspace.members?.filter(a => a).length) {
     sharees.push(
       `${workspace.members?.filter(a => a).length} member${

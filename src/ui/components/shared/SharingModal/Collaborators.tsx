@@ -11,8 +11,6 @@ type CollaboratorsProps = {
 export default function Collaborators({ recordingId }: CollaboratorsProps) {
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
-  console.log({ collaborators });
-
   if (loading || !collaborators || !recording) {
     return null;
   }
