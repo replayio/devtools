@@ -12,8 +12,8 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
-import { validateEmail } from "ui/utils/helpers";
 import { features } from "ui/utils/prefs";
+import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
@@ -22,11 +22,9 @@ import InvitationLink from "./InvitationLink";
 function ModalButton({
   children,
   onClick = () => {},
-  className,
   disabled = false,
 }: {
   children: React.ReactElement | string;
-  className?: string;
   onClick?: MouseEventHandler;
   disabled?: boolean;
 }) {
@@ -35,10 +33,9 @@ function ModalButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={classNames(
-        className,
+      className={
         "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
+      }
     >
       {children}
     </button>
@@ -59,6 +56,21 @@ function SlideContent({
         {children}
       </div>
     </div>
+  );
+}
+
+function DisabledNextButton() {
+  return (
+    <button
+      disabled={true}
+      type="button"
+      className={classNames(
+        "items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none",
+        "text-gray-600 bg-gray-300"
+      )}
+    >
+      Next
+    </button>
   );
 }
 
@@ -124,6 +136,7 @@ type SlideBodyProps = PropsFromRedux & {
 
 function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
+  const [inputError, setInputError] = useState<string | null>(null);
   const [allowNext, setAllowNext] = useState<boolean>(false);
   const { id: userId } = hooks.useGetUserInfo();
 
@@ -140,19 +153,25 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     setAllowNext(true);
   }
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (isValidTeamName(e.target.value)) {
+      setInputError(null);
+    }
+
     setInputValue(e.target.value);
   };
-  const onSkip = () => {
-    removeUrlParameters();
-    hideModal();
-  };
-  const handleSave = () =>
+  const handleSave = () => {
+    if (!isValidTeamName(inputValue)) {
+      setInputError("The team name cannot be blank");
+      return;
+    }
+
     createNewWorkspace({
       variables: {
         name: inputValue,
         planKey: features.teamSubscription ? "test-beta-v1" : undefined,
       },
     });
+  };
 
   return (
     <>
@@ -161,11 +180,19 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
         {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
         <div className="py-4 flex flex-col">
           <TextInput value={inputValue} onChange={onChange} />
+          {inputError ? <div className="text-red-500">{inputError}</div> : null}
         </div>
         {/* </form> */}
       </SlideContent>
       <div className="grid">
-        <NextButton onNext={handleSave} {...{ current, total, setCurrent, hideModal, allowNext }} />
+        {isValidTeamName(inputValue) ? (
+          <NextButton
+            onNext={handleSave}
+            {...{ current, total, setCurrent, hideModal, allowNext }}
+          />
+        ) : (
+          <DisabledNextButton />
+        )}
       </div>
     </>
   );
