@@ -1,17 +1,12 @@
 import { useParams } from "react-router-dom";
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { query, extractGraphQLError } from "ui/utils/apolloClient";
+import { query } from "ui/utils/apolloClient";
 import { Recording } from "ui/types";
-import { ExpectedError, WorkspaceId } from "ui/state/app";
+import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
-import useAuth0 from "ui/utils/useAuth0";
-import {
-  GET_RECORDING,
-  GET_RECORDING_USER_ID,
-  IS_RECORDING_ACCESSIBLE,
-} from "ui/graphql/recordings";
+import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -102,36 +97,6 @@ export function useGetRecordingId() {
   return recordingId;
 }
 
-/**
- * Returns true if the recording is accessible and initialized, false if it is
- * accessible but uninitialized and undefined if it is inaccessible (private
- * or uninitialized and owned by someone else)
- */
-export async function isRecordingInitialized(
-  recordingId: RecordingId
-): Promise<boolean | undefined> {
-  const result = await query({
-    query: IS_RECORDING_ACCESSIBLE,
-    variables: { recordingId },
-  });
-
-  return result.data.recording?.isInitialized;
-}
-
-export function useIsRecordingInitialized(
-  recordingId: RecordingId | null
-): { initialized: boolean | undefined; loading: boolean; graphQLError: string | undefined } {
-  const { data, loading, error } = useQuery(IS_RECORDING_ACCESSIBLE, {
-    variables: { recordingId },
-    skip: !recordingId,
-  });
-  return {
-    initialized: data?.recording?.isInitialized,
-    loading,
-    graphQLError: extractGraphQLError(error),
-  };
-}
-
 export async function getRecordingOwnerUserId(
   recordingId: RecordingId
 ): Promise<string | undefined> {
@@ -151,6 +116,14 @@ export function useGetRecordingOwnerUserId(
     skip: !recordingId,
   });
   return { userId: data?.recording?.owner?.id, loading };
+}
+
+export async function getRecording(recordingId: RecordingId) {
+  const result = await query({
+    query: GET_RECORDING,
+    variables: { recordingId },
+  });
+  return convertRecording(result.data?.recording);
 }
 
 export function useGetRecording(
@@ -749,50 +722,4 @@ export function useUpdateRecordingTitle() {
   );
 
   return updateRecordingTitle;
-}
-
-export function useHasExpectedError(recordingId: RecordingId): ExpectedError | undefined {
-  const { isAuthenticated } = useAuth0();
-  const { recording, isAuthorized, loading } = useGetRecording(recordingId);
-  const { userId } = useGetUserId();
-
-  if (loading) {
-    return undefined;
-  }
-
-  if (recording?.ownerNeedsInvite) {
-    const isAuthor = userId && userId == recording.userId;
-
-    if (isAuthor) {
-      return {
-        message: "Your replay can not be viewed",
-        content:
-          "Your Replay account is currently unactivated because you have not been invited to Replay by an existing user. Until you are invited, your authored Replays will be unviewable.",
-      };
-    } else {
-      return {
-        message: "This replay can not be viewed",
-        content: "The author for this replay is currently using an unactivated account.",
-      };
-    }
-  }
-
-  if (isAuthorized) {
-    return undefined;
-  }
-
-  if (isAuthenticated) {
-    return {
-      message: "You don't have permission to view this replay",
-      content:
-        "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
-      action: "library",
-    };
-  }
-
-  return {
-    message: "",
-    content: "",
-    action: "sign-in",
-  };
 }

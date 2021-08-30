@@ -4,7 +4,6 @@ import * as Sentry from "@sentry/react";
 import { skipTelemetry } from "./environment";
 import { Recording } from "ui/types";
 import { UserInfo } from "ui/hooks/users";
-import { AuthContext } from "ui/utils/useAuth0";
 
 let setup = false;
 
@@ -12,14 +11,14 @@ export default {
   createSession: ({
     recording,
     userInfo,
-    auth,
+    auth0User,
   }: {
     recording?: Recording;
-    userInfo: UserInfo;
-    auth: AuthContext;
+    userInfo?: Omit<UserInfo, "loading">;
+    auth0User: any;
   }) => {
     // Skip if the recording was either created or viewed by an internal user
-    if (recording?.user?.internal || userInfo.internal || skipTelemetry()) {
+    if (recording?.user?.internal || userInfo?.internal || skipTelemetry()) {
       return;
     }
 
@@ -37,11 +36,11 @@ export default {
     });
 
     // only identify the session if there is a logged in user
-    if (auth?.user) {
-      LogRocket.identify(auth.user.sub, {
-        name: auth.user.name,
-        email: auth.user.email,
-        id: auth.user.email,
+    if (auth0User) {
+      LogRocket.identify(auth0User.sub, {
+        name: auth0User.name,
+        email: auth0User.email,
+        id: auth0User.email,
       });
     }
   },

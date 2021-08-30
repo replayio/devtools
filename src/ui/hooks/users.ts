@@ -2,6 +2,14 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { GET_USER_INFO, GET_USER_ID } from "ui/graphql/users";
 
+export async function getUserId() {
+  const result = await query({
+    query: GET_USER_ID,
+    variables: {},
+  });
+  return result?.data?.viewer?.user?.id;
+}
+
 export function useGetUserId() {
   const { data, loading, error } = useQuery(GET_USER_ID);
   return { userId: data?.viewer?.user.id, loading, error };

@@ -1,58 +1,38 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { isTest } from "ui/utils/environment";
-import { validateUUID } from "ui/utils/helpers";
-import { setExpectedError } from "ui/actions/session";
-import {
-  useIsRecordingInitialized,
-  useGetRecordingOwnerUserId,
-  useGetRecordingId,
-} from "ui/hooks/recordings";
-import BlankScreen from "ui/components/shared/BlankScreen";
-import { registerRecording } from "ui/utils/telemetry";
+import { getAccessibleRecording } from "ui/actions/session";
+import { Recording as RecordingInfo } from "ui/types";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { LoadingScreen } from "ui/components/shared/BlankScreen";
 import Upload from "views/upload";
 import DevTools from "ui/components/DevTools";
 
-function Recording({ setExpectedError }: PropsFromRedux) {
+function Recording({ getAccessibleRecording }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
-  const {
-    initialized: recordingInitialized,
-    loading: initializedLoading,
-    graphQLError,
-  } = useIsRecordingInitialized(recordingId);
-  const { userId: ownerId, loading: ownerIdLoading } = useGetRecordingOwnerUserId(recordingId);
-
+  const [recording, setRecording] = useState<RecordingInfo | null>();
   useEffect(() => {
-    if (!validateUUID(recordingId)) {
-      return setExpectedError({
-        message: "Invalid ID",
-        content: `"${recordingId}" is not a valid recording ID`,
-      });
+    async function getRecording() {
+      setRecording(await getAccessibleRecording(recordingId));
     }
-    if (graphQLError) {
-      return setExpectedError({ message: "Error", content: graphQLError });
-    }
-  }, [graphQLError]);
+    getRecording();
+  }, []);
 
-  useEffect(() => {
-    registerRecording(recordingId);
-  }, [recordingId]);
-
-  if (initializedLoading || ownerIdLoading || !validateUUID(recordingId) || graphQLError) {
-    return <BlankScreen />;
+  if (!recording) {
+    return <LoadingScreen />;
   }
 
   // Add a check to make sure the recording has an associated user ID.
   // We skip the upload step if there's no associated user ID, which
   // is the case for CI test recordings.
-  if (recordingInitialized === false && !isTest() && ownerId) {
+  if (recording.isInitialized === false && !isTest() && recording.userId) {
     return <Upload />;
   } else {
     return <DevTools />;
   }
 }
 
-const connector = connect(null, { setExpectedError });
+const connector = connect(null, { getAccessibleRecording });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(Recording);

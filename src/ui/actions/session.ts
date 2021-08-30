@@ -1,17 +1,25 @@
-import { sendMessage, addEventListener } from "protocol/socket";
-import { sessionError, uploadedData } from "@recordreplay/protocol";
+import { sendMessage } from "protocol/socket";
+import { uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
 
 import tokenManager from "ui/utils/tokenManager";
-import { UIStore, UIThunkAction } from "ui/actions";
+import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
+import { assert, waitForTime } from "protocol/utils";
+import { validateUUID } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
-import { getTest, isTest, isDevelopment, getRecordingId } from "ui/utils/environment";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
+import { getTest, isDevelopment, getRecordingId, isTest, isMock } from "ui/utils/environment";
+import LogRocket from "ui/utils/logrocket";
+import { registerRecording, sendTelemetryEvent } from "ui/utils/telemetry";
+import { extractGraphQLError } from "ui/utils/apolloClient";
 
 import { ExpectedError, UnexpectedError } from "ui/state/app";
+import { getRecording } from "ui/hooks/recordings";
+import { getUserId, getUserInfo } from "ui/hooks/users";
+import { jumpToInitialPausePoint } from "./timeline";
+import { Recording } from "ui/types";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -25,77 +33,175 @@ declare global {
   }
 }
 
-// Create a session to use while debugging.
-export async function createSession(store: UIStore, recordingId: string) {
-  addEventListener("Recording.uploadedData", (data: uploadedData) =>
-    store.dispatch(onUploadedData(data))
-  );
-  addEventListener("Recording.awaitingSourcemaps", () =>
-    store.dispatch(actions.setAwaitingSourcemaps(true))
-  );
-  addEventListener("Recording.sessionError", (error: sessionError) =>
-    store.dispatch(
-      setUnexpectedError({
-        ...error,
-        message: "Unexpected session error",
-        content: "The session has closed due to an error. Please refresh the page.",
-        action: "refresh",
-      })
-    )
-  );
+export function getAccessibleRecording(
+  recordingId: string
+): UIThunkAction<Promise<Recording | null>> {
+  return async ({ dispatch }) => {
+    if (!validateUUID(recordingId)) {
+      dispatch(
+        setExpectedError({
+          message: "Invalid ID",
+          content: `"${recordingId}" is not a valid recording ID`,
+        })
+      );
+      return null;
+    }
 
-  try {
-    ThreadFront.setTest(getTest() || undefined);
-    ThreadFront.recordingId = recordingId;
-
-    if (!isTest()) {
-      tokenManager.addListener(({ token }) => {
-        if (token) {
-          sendMessage("Authentication.setAccessToken", { accessToken: token });
+    try {
+      const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
+      if (!recording || recording.isInitialized) {
+        const expectedError = getRecordingNotAccessibleError(recording, userId);
+        if (expectedError) {
+          dispatch(setExpectedError(expectedError));
+          return null;
         }
-      });
-      await tokenManager.getToken();
-    }
-
-    const { sessionId } = await sendMessage("Recording.createSession", {
-      recordingId,
-    });
-
-    window.sessionId = sessionId;
-    ThreadFront.setSessionId(sessionId);
-    const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
-    store.dispatch(actions.setRecordingTarget(recordingTarget));
-
-    // We don't want to show the non-dev version of the app for node replays.
-    if (recordingTarget === "node") {
-      store.dispatch(actions.setViewMode("dev"));
-    }
-
-    store.dispatch(actions.setUploading(null));
-    store.dispatch(actions.setAwaitingSourcemaps(false));
-    prefs.recordingId = recordingId;
-  } catch (e) {
-    if (e.code == 31) {
-      const currentError = selectors.getUnexpectedError(store.getState());
-
-      // Don't overwrite an existing error.
-      if (!currentError) {
-        store.dispatch(
-          setUnexpectedError({
-            message: "Unexpected session error",
-            content: "The session has closed due to an error. Please refresh the page.",
-            action: "refresh",
-            ...e,
-          })
-        );
       }
-    } else {
-      throw e;
+      return recording!;
+    } catch (err) {
+      dispatch(setExpectedError({ message: "Error", content: extractGraphQLError(err)! }));
+      return null;
     }
-  }
+  };
 }
 
-function onUploadedData({ uploaded, length }: uploadedData): UIThunkAction {
+function getRecordingNotAccessibleError(
+  recording?: Recording,
+  userId?: string
+): ExpectedError | undefined {
+  const isAuthorized = !!(isTest() || recording);
+  const isAuthenticated = !!(isTest() || isMock() || tokenManager.auth0Client?.isAuthenticated);
+
+  if (recording?.ownerNeedsInvite) {
+    const isAuthor = userId && userId == recording.userId;
+
+    if (isAuthor) {
+      return {
+        message: "Your replay can not be viewed",
+        content:
+          "Your Replay account is currently unactivated because you have not been invited to Replay by an existing user. Until you are invited, your authored Replays will be unviewable.",
+      };
+    } else {
+      return {
+        message: "This replay can not be viewed",
+        content: "The author for this replay is currently using an unactivated account.",
+      };
+    }
+  }
+
+  if (isAuthorized) {
+    return undefined;
+  }
+
+  if (isAuthenticated) {
+    return {
+      message: "You don't have permission to view this replay",
+      content:
+        "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+      action: "library",
+    };
+  }
+
+  return {
+    message: "",
+    content: "",
+    action: "sign-in",
+  };
+}
+
+// Create a session to use while debugging.
+export function createSession(recordingId: string): UIThunkAction {
+  return async ({ getState, dispatch }) => {
+    try {
+      const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
+      assert(recording);
+
+      if (recording.title) {
+        document.title = `${recording.title} - Replay`;
+      }
+      if (recording.workspace) {
+        dispatch(actions.setRecordingWorkspace(recording.workspace));
+      }
+
+      LogRocket.createSession({
+        recording,
+        userInfo,
+        auth0User: tokenManager.auth0Client?.user,
+      });
+      registerRecording(recordingId);
+
+      ThreadFront.setTest(getTest() || undefined);
+      ThreadFront.recordingId = recordingId;
+
+      const { sessionId } = await sendMessage("Recording.createSession", {
+        recordingId,
+      });
+      dispatch(showLoadingProgress());
+
+      window.sessionId = sessionId;
+      ThreadFront.setSessionId(sessionId);
+      const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
+      dispatch(actions.setRecordingTarget(recordingTarget));
+
+      // We don't want to show the non-dev version of the app for node replays.
+      if (recordingTarget === "node") {
+        dispatch(actions.setViewMode("dev"));
+      }
+
+      dispatch(actions.setUploading(null));
+      dispatch(actions.setAwaitingSourcemaps(false));
+      prefs.recordingId = recordingId;
+
+      dispatch(jumpToInitialPausePoint());
+    } catch (e) {
+      if (e.code == 31) {
+        const currentError = selectors.getUnexpectedError(getState());
+
+        // Don't overwrite an existing error.
+        if (!currentError) {
+          dispatch(
+            setUnexpectedError({
+              message: "Unexpected session error",
+              content: "The session has closed due to an error. Please refresh the page.",
+              action: "refresh",
+              ...e,
+            })
+          );
+        }
+      } else {
+        throw e;
+      }
+    }
+  };
+}
+
+function showLoadingProgress(): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    let displayedProgress = selectors.getLoading(getState());
+    while (displayedProgress < 100) {
+      await waitForTime(200);
+
+      let progress = selectors.getLoading(getState());
+      const increment = Math.random();
+      const decayed = increment * ((100 - displayedProgress) / 40);
+      displayedProgress = Math.max(displayedProgress + decayed, progress);
+
+      dispatch(actions.setDisplayedLoadingProgress(displayedProgress));
+    }
+
+    const selectedPanel = selectors.getSelectedPanel(getState());
+    // This shouldn't hit when the selectedPanel is "comments"
+    // as that's not dealt with in toolbox, however we still
+    // need to init the toolbox so we're not checking for
+    // that here.
+    gToolbox.init(selectedPanel);
+
+    await waitForTime(300);
+    await ThreadFront.initializedWaiter.promise;
+    dispatch(actions.setLoadingFinished(true));
+  };
+}
+
+export function onUploadedData({ uploaded, length }: uploadedData): UIThunkAction {
   return ({ dispatch }) => {
     const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
     const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;

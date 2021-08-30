@@ -17,6 +17,7 @@ import { RetryLink } from "@apollo/client/link/retry";
 import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
+import { LoadingScreen } from "ui/components/shared/BlankScreen";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -53,7 +54,7 @@ export function ApolloWrapper({ children }: { children: ReactNode }) {
   }
 
   if (!isTest() && loading) {
-    return null;
+    return <LoadingScreen />;
   }
 
   if (error) {

@@ -20,6 +20,8 @@ function initialAppState(): AppState {
     recordingDuration: 0,
     indexing: 0,
     loading: 4,
+    displayedLoadingProgress: null,
+    loadingFinished: false,
     uploading: null,
     awaitingSourcemaps: false,
     sessionId: null,
@@ -102,6 +104,14 @@ export default function update(
 
     case "loading": {
       return { ...state, loading: action.loading };
+    }
+
+    case "set_displayed_loading_progress": {
+      return { ...state, displayedLoadingProgress: action.progress };
+    }
+
+    case "set_loading_finished": {
+      return { ...state, loadingFinished: action.finished };
     }
 
     case "set_session_id": {
@@ -226,6 +236,8 @@ export const getRecordingDuration = (state: UIState) => state.app.recordingDurat
 export const getIndexing = (state: UIState) => state.app.indexing;
 export const getIndexed = (state: UIState) => state.app.indexing == 100;
 export const getLoading = (state: UIState) => state.app.loading;
+export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
+export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;

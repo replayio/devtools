@@ -30,7 +30,7 @@ export interface TokenState {
 type TokenListener = (state: TokenState) => void;
 
 class TokenManager {
-  private auth0Client: Auth0ContextInterface | undefined;
+  auth0Client: Auth0ContextInterface | undefined;
   private deferredState = defer<TokenState>();
   private currentState?: TokenState;
   private isTokenRequested = false;

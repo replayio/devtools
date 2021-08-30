@@ -1,6 +1,7 @@
 import { bindActionCreators } from "redux";
 
-import { initSocket } from "protocol/socket";
+import { sessionError, uploadedData } from "@recordreplay/protocol";
+import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
@@ -35,7 +36,6 @@ const {
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
 import { getUserSettings } from "ui/hooks/settings";
-import { getRecordingId } from "ui/utils/environment";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 
@@ -57,12 +57,9 @@ declare global {
 }
 
 const url = new URL(window.location.href);
-const recordingId = getRecordingId();
 const dispatch = url.searchParams.get("dispatch") || undefined;
 
 (async () => {
-  if (!recordingId) return;
-
   window.gToolbox = new DevToolsToolbox();
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
@@ -107,11 +104,27 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
 
   // Initialize the socket so we can communicate with the server
   initSocket(store, dispatch);
-  createSession(store, recordingId);
+
+  addEventListener("Recording.uploadedData", (data: uploadedData) =>
+    store.dispatch(actions.onUploadedData(data))
+  );
+  addEventListener("Recording.awaitingSourcemaps", () =>
+    store.dispatch(actions.setAwaitingSourcemaps(true))
+  );
+  addEventListener("Recording.sessionError", (error: sessionError) =>
+    store.dispatch(
+      actions.setUnexpectedError({
+        ...error,
+        message: "Unexpected session error",
+        content: "The session has closed due to an error. Please refresh the page.",
+        action: "refresh",
+      })
+    )
+  );
 
   setupApp(store);
-  setupTimeline(recordingId, store);
-  setupEventListeners(recordingId, store);
+  setupTimeline(store);
+  setupEventListeners(store);
   setupGraphics(store);
   initOutputSyntaxHighlighting();
   setupMessages(store);

@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const IS_RECORDING_ACCESSIBLE = gql`
-  query IsRecordingAccessible($recordingId: UUID!) {
-    recording(uuid: $recordingId) {
-      uuid
-      isInitialized
-    }
-  }
-`;
-
 export const GET_RECORDING_USER_ID = gql`
   query GetRecordingUserId($recordingId: UUID!) {
     recording(uuid: $recordingId) {

@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { LoadingScreen } from "./shared/BlankScreen";
 
 interface PropsFromParent {
   slice: string;
@@ -7,7 +8,7 @@ interface PropsFromParent {
 }
 
 function WaitForReduxSlice({ hasSlice, children }: PropsFromParent & PropsFromRedux) {
-  return hasSlice ? <>{children}</> : null;
+  return hasSlice ? <>{children}</> : <LoadingScreen />;
 }
 
 const connector = connect((state: any, { slice }: PropsFromParent) => ({
