@@ -67,6 +67,8 @@ export interface AppState {
   recordingDuration: number;
   indexing: number;
   loading: number;
+  displayedLoadingProgress: number | null;
+  loadingFinished: boolean;
   uploading: UploadInfo | null;
   awaitingSourcemaps: boolean;
   expectedError: ExpectedError | null;

@@ -15,9 +15,11 @@ import {
 } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
-import { actions, UIStore, UIThunkAction } from "ui/actions";
+import { UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
-import { selectors } from "ui/reducers";
+import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
+import { setPlaybackPrecachedTime } from "ui/actions/timeline";
+import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { isRepaintEnabled } from "./enable-repaint";
 
 const { features } = require("ui/utils/prefs");
@@ -132,7 +134,7 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
     }
   });
 
-  store.dispatch(actions.setEventsForType(gMouseClickEvents, "mousedown"));
+  store.dispatch(setEventsForType(gMouseClickEvents, "mousedown"));
 }
 
 class VideoPlayer {
@@ -151,7 +153,7 @@ class VideoPlayer {
   createUrl() {
     if (this.blob) {
       const url = URL.createObjectURL(this.blob);
-      this.store?.dispatch(actions.setVideoUrl(url));
+      this.store?.dispatch(setVideoUrl(url));
     }
   }
 
@@ -204,7 +206,7 @@ let paintPointsWaiter: Promise<findPaintsResult>;
 
 export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
-    store.dispatch(actions.setCanvas(canvas));
+    store.dispatch(setCanvas(canvas));
   };
 
   Video.init(store);
@@ -571,7 +573,7 @@ export function precacheScreenshots(startTime: number): UIThunkAction {
   return async ({ dispatch, getState }) => {
     await paintPointsWaiter;
 
-    const recordingDuration = selectors.getRecordingDuration(getState());
+    const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;
     }
@@ -581,7 +583,7 @@ export function precacheScreenshots(startTime: number): UIThunkAction {
       return;
     }
     if (startTime < precacheStartTime) {
-      dispatch(actions.setPlaybackPrecachedTime(startTime));
+      dispatch(setPlaybackPrecachedTime(startTime));
     }
     precacheStartTime = startTime;
 
@@ -597,8 +599,8 @@ export function precacheScreenshots(startTime: number): UIThunkAction {
         const graphicsPromise = getGraphicsAtTime(time, true);
 
         const precachedTime = Math.max(time - snapInterval, startTime);
-        if (precachedTime > selectors.getPlaybackPrecachedTime(getState())) {
-          dispatch(actions.setPlaybackPrecachedTime(precachedTime));
+        if (precachedTime > getPlaybackPrecachedTime(getState())) {
+          dispatch(setPlaybackPrecachedTime(precachedTime));
         }
 
         await graphicsPromise;
@@ -613,8 +615,8 @@ export function precacheScreenshots(startTime: number): UIThunkAction {
     if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
       precachedTime = recordingDuration;
     }
-    if (precachedTime > selectors.getPlaybackPrecachedTime(getState())) {
-      dispatch(actions.setPlaybackPrecachedTime(precachedTime));
+    if (precachedTime > getPlaybackPrecachedTime(getState())) {
+      dispatch(setPlaybackPrecachedTime(precachedTime));
     }
   };
 }

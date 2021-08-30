@@ -21,6 +21,7 @@ import {
 import LaunchButton from "../shared/LaunchButton";
 import { setExpectedError } from "ui/actions/session";
 import UserOptions from "ui/components/Header/UserOptions";
+import { LoadingScreen } from "../shared/BlankScreen";
 
 function Header({
   nonPendingWorkspaces,
@@ -83,7 +84,7 @@ function LibraryLoader(props: PropsFromRedux) {
 
   useEffect(() => {
     if (!userInfo.loading) {
-      LogRocket.createSession({ userInfo, auth });
+      LogRocket.createSession({ userInfo, auth0User: auth.user });
     }
   }, [auth, userInfo]);
 
@@ -114,7 +115,7 @@ function LibraryLoader(props: PropsFromRedux) {
   );
 
   if (loading1 || loading2 || loading3 || !renderLibrary) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return <Library {...{ ...props, workspaces, pendingWorkspaces, nags }} />;
@@ -172,7 +173,7 @@ function Library({
   // from a team that is stored as their default library team in prefs. We return
   // null here, and reset the currentWorkspaceId to the user's library in `handleDeletedTeam`.
   if (![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (

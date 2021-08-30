@@ -6,7 +6,7 @@ import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
 import { Recording, UserSettings, Workspace } from "ui/types";
-import { BlankLoadingScreen } from "../shared/BlankScreen";
+import { LoadingScreen } from "../shared/BlankScreen";
 import MaterialIcon from "../shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
@@ -297,7 +297,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
   };
 
   if (loading1 || loading2) {
-    return <BlankLoadingScreen />;
+    return <LoadingScreen />;
   }
 
   if (status === "deleted") {

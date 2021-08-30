@@ -1,6 +1,13 @@
 import classNames from "classnames";
-import { ThreadFront } from "protocol/thread";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { connect, ConnectedProps } from "react-redux";
+import {
+  getAwaitingSourcemaps,
+  getDisplayedLoadingProgress,
+  getLoadingFinished,
+  getUploading,
+} from "ui/reducers/app";
+import { UIState } from "ui/state";
 import Spinner from "./Spinner";
 
 const BACKGROUNDS = {
@@ -31,12 +38,12 @@ export default function BlankScreen({
 // General use loading screen with an indefinite spinner, a message and a blue/white background
 export function BlankLoadingScreen({
   statusMessage,
-  background = "blue-gradient",
+  background = "white",
 }: {
   statusMessage?: string;
   background?: "white" | "blue-gradient";
 }) {
-  const defaultStatusMessage = "Loading";
+  const defaultStatusMessage = "Fetching data";
 
   // The status message is optional, and so it's possible for the loading screen spinner
   // to bounce up and down. That's why we keep a defaultStatusMessage as the div's content,
@@ -69,44 +76,7 @@ export function BlankLoadingScreen({
 }
 
 // White progress screen used for showing the scanning progress of a replay
-export function BlankProgressScreen({
-  setFinishedLoading,
-  progress = 1,
-}: {
-  setFinishedLoading(finished: boolean): void;
-  progress: number;
-}) {
-  const [displayedProgress, setDisplayedProgress] = useState(0);
-  const key = useRef<any>(null);
-
-  useEffect(() => {
-    return () => clearTimeout(key.current);
-  }, []);
-
-  useEffect(() => {
-    if (displayedProgress == 100) {
-      // This gives the Loader component some time (300ms) to bring the progress
-      // bar to 100% before unmounting this loader and showing the application.
-      setTimeout(async () => {
-        await ThreadFront.initializedWaiter.promise;
-        setFinishedLoading(true);
-      }, 300);
-    }
-
-    // This handles the artificial progress bump. It has a randomized increment
-    // whose effect is decayed as the progress approaches 100/100. Whenever the
-    // underlying progress is higher than the artificial progress, we update to use
-    // the underlying progress. Expected behavior assuming no underlying progress is:
-    // 10s (50%) 20s (70%) 30s (85%) 45s (95%) 60s (98%)
-    key.current = setTimeout(() => {
-      const increment = Math.random();
-      const decayed = increment * ((100 - displayedProgress) / 40);
-      const newDisplayedProgress = Math.max(displayedProgress + decayed, progress);
-
-      setDisplayedProgress(newDisplayedProgress);
-    }, 200);
-  }, [displayedProgress]);
-
+export function BlankProgressScreen({ progress }: { progress: number }) {
   return (
     <BlankScreen background="white">
       <div className="m-auto">
@@ -115,7 +85,7 @@ export function BlankProgressScreen({
           <div className="w-40 relative h-1 bg-gray-200 rounded-lg overflow-hidden">
             <div
               className="absolute t-0 h-full bg-primaryAccent"
-              style={{ width: `${displayedProgress}%`, transitionDuration: "200ms" }}
+              style={{ width: `${progress}%`, transitionDuration: "200ms" }}
             />
           </div>
         </div>
@@ -123,3 +93,35 @@ export function BlankProgressScreen({
     </BlankScreen>
   );
 }
+
+function _LoadingScreen({ uploading, awaitingSourcemaps, progress, finished }: PropsFromRedux) {
+  if (!awaitingSourcemaps && !uploading && progress && !finished) {
+    return <BlankProgressScreen progress={progress} />;
+  }
+
+  let message;
+  let color: "blue-gradient" | "white" = "white";
+
+  // The backend send events in this order: uploading replay -> uploading sourcemaps.
+  if (awaitingSourcemaps) {
+    color = "blue-gradient";
+    message = "Uploading sourcemaps";
+  } else if (uploading) {
+    color = "blue-gradient";
+    message = "Uploading replay";
+  } else {
+    message = "Fetching data";
+  }
+
+  return <BlankLoadingScreen statusMessage={message} background={color} />;
+}
+
+const connector = connect((state: UIState) => ({
+  uploading: getUploading(state),
+  awaitingSourcemaps: getAwaitingSourcemaps(state),
+  progress: getDisplayedLoadingProgress(state),
+  finished: getLoadingFinished(state),
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export const LoadingScreen = connector(_LoadingScreen);

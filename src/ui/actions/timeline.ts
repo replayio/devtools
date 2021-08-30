@@ -1,8 +1,7 @@
-import { ExecutionPoint, PauseId, RecordingId } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { client, log } from "protocol/socket";
 import {
-  addLastScreen,
   getGraphicsAtTime,
   paintGraphics,
   mostRecentPaintOrMouseEvent,
@@ -14,13 +13,14 @@ import {
   snapTimeForPlayback,
   Video,
 } from "protocol/graphics";
-import { selectors } from "ui/reducers";
+import { getCurrentTime, getHoverTime, getPlayback, getZoomRegion } from "ui/reducers/timeline";
+import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
-import { waitForTime } from "protocol/utils";
+import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
@@ -47,35 +47,12 @@ export type TimelineActions =
   | SetHoveredItemAction
   | SetPlaybackPrecachedTimeAction;
 
-export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
-  const { dispatch, getState } = store;
+export async function setupTimeline(store: UIStore) {
+  const { dispatch } = store;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);
-  const { duration } = await ThreadFront.getRecordingDescription();
 
-  dispatch(setRecordingDescription(duration));
   window.addEventListener("resize", () => dispatch(updateTimelineDimensions()));
-
-  await ThreadFront.waitForSession();
-  const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
-  let { point, time } = endpoint;
-
-  const zoomRegion = selectors.getZoomRegion(getState());
-  const newZoomRegion = { ...zoomRegion, endTime: time };
-  dispatch(
-    setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
-  );
-
-  let hasFrames = false;
-  const initialPausePoint = await getInitialPausePoint(recordingId);
-  if (initialPausePoint) {
-    point = initialPausePoint.point;
-    hasFrames = initialPausePoint.hasFrames;
-    time = initialPausePoint.time;
-  }
-
-  ThreadFront.timeWarp(point, time, hasFrames, /* force */ true);
-  ThreadFront.initializedWaiter.resolve();
 
   const shortcuts = new KeyShortcuts({
     Left: ev => {
@@ -90,6 +67,36 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
     },
   });
   shortcuts.attach(window.document);
+}
+
+export function jumpToInitialPausePoint(): UIThunkAction {
+  return async ({ getState, dispatch }) => {
+    assert(ThreadFront.recordingId);
+
+    const { duration } = await ThreadFront.getRecordingDescription();
+    dispatch(setRecordingDescription(duration));
+
+    await ThreadFront.waitForSession();
+    const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+    let { point, time } = endpoint;
+
+    const zoomRegion = getZoomRegion(getState());
+    const newZoomRegion = { ...zoomRegion, endTime: time };
+    dispatch(
+      setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
+    );
+
+    let hasFrames = false;
+    const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId);
+    if (initialPausePoint) {
+      point = initialPausePoint.point;
+      hasFrames = initialPausePoint.hasFrames;
+      time = initialPausePoint.time;
+    }
+
+    ThreadFront.timeWarp(point, time, hasFrames, /* force */ true);
+    ThreadFront.initializedWaiter.resolve();
+  };
 }
 
 async function getInitialPausePoint(recordingId: string) {
@@ -119,7 +126,7 @@ async function getInitialPausePoint(recordingId: string) {
 
 function onWarp(store: UIStore) {
   return function (point: ExecutionPoint, time: number) {
-    const { startTime, endTime } = selectors.getZoomRegion(store.getState());
+    const { startTime, endTime } = getZoomRegion(store.getState());
     if (time < startTime) {
       const startEvent = mostRecentPaintOrMouseEvent(startTime);
       if (startEvent) {
@@ -146,7 +153,7 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
       if (!isRepaintEnabled()) {
         const { screen, mouse } = await getGraphicsAtTime(time);
 
-        if (screen && selectors.getCurrentTime(getState()) == time) {
+        if (screen && getCurrentTime(getState()) == time) {
           dispatch(setTimelineState({ screenShot: screen, mouse }));
           paintGraphics(screen, mouse);
           Video.seek(time);
@@ -160,7 +167,7 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
 
 function setRecordingDescription(duration: number): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const zoomRegion = selectors.getZoomRegion(getState());
+    const zoomRegion = getZoomRegion(getState());
 
     dispatch(
       setTimelineState({
@@ -196,15 +203,15 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
     }
 
     try {
-      const currentTime = selectors.getCurrentTime(getState());
+      const currentTime = getCurrentTime(getState());
       const screenshotTime = time || currentTime;
       const { screen, mouse } = await getGraphicsAtTime(screenshotTime);
 
-      if (selectors.getHoverTime(getState()) !== time) {
+      if (getHoverTime(getState()) !== time) {
         return;
       }
 
-      const playing = !!selectors.getPlayback(getState());
+      const playing = !!getPlayback(getState());
       paintGraphics(screen, mouse, playing);
       Video.seek(currentTime);
     } catch {}
@@ -288,7 +295,7 @@ export function seekToTime(targetTime: number): UIThunkAction {
 
 export function togglePlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const playback = selectors.getPlayback(getState());
+    const playback = getPlayback(getState());
 
     if (playback) {
       dispatch(stopPlayback());
@@ -303,8 +310,8 @@ export function startPlayback(): UIThunkAction {
     log(`StartPlayback`);
 
     const state = getState();
-    const currentTime = selectors.getCurrentTime(state);
-    const { endTime } = selectors.getZoomRegion(state);
+    const currentTime = getCurrentTime(state);
+    const { endTime } = getZoomRegion(state);
 
     const startDate = Date.now();
     const startTime = currentTime >= endTime ? 0 : currentTime;
@@ -324,7 +331,7 @@ export function stopPlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
     log(`StopPlayback`);
 
-    const playback = selectors.getPlayback(getState());
+    const playback = getPlayback(getState());
 
     if (playback) {
       dispatch(seekToTime(playback.time));
@@ -357,7 +364,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
       nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
       dispatch(precacheScreenshots(nextGraphicsTime));
     };
-    const shouldContinuePlayback = () => selectors.getPlayback(getState());
+    const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
 
     Video.play();
@@ -425,8 +432,8 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
 export function goToPrevPaint(): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const currentTime = selectors.getCurrentTime(getState());
-    const { startTime } = selectors.getZoomRegion(getState());
+    const currentTime = getCurrentTime(getState());
+    const { startTime } = getZoomRegion(getState());
 
     if (currentTime == startTime) {
       return;
@@ -444,8 +451,8 @@ export function goToPrevPaint(): UIThunkAction {
 
 export function goToNextPaint(): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const currentTime = selectors.getCurrentTime(getState());
-    const { endTime } = selectors.getZoomRegion(getState());
+    const currentTime = getCurrentTime(getState());
+    const { endTime } = getZoomRegion(getState());
 
     if (currentTime == endTime) {
       return;
@@ -473,7 +480,7 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
     dispatch({ type: "set_hovered_item", hoveredItem });
 
     // Don't update the video if user is adding a new comment.
-    const updateGraphics = !selectors.getPendingComment(getState());
+    const updateGraphics = !getPendingComment(getState());
     dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
   };
 }

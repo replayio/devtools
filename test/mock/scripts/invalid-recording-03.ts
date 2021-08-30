@@ -3,10 +3,10 @@
 import { runTest, devtoolsURL } from "../src/runTest";
 import { installMockEnvironment } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
-import { createGetRecordingMock, createGetUserMock } from "../src/graphql";
+import { createGetUserMock } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
-import { IS_RECORDING_ACCESSIBLE } from "ui/graphql/recordings";
+import { GET_RECORDING } from "ui/graphql/recordings";
 import { GraphQLError } from "graphql";
 
 const errorMessage = "Error from GraphQL";
@@ -15,18 +15,14 @@ const userId = uuid();
 const user = { id: userId, uuid: userId };
 const errorMock = {
   request: {
-    query: IS_RECORDING_ACCESSIBLE,
+    query: GET_RECORDING,
     variables: { recordingId },
   },
   result: {
     errors: [new GraphQLError(errorMessage)],
   },
 };
-const graphqlMocks = [
-  ...createGetUserMock({ user }),
-  ...createGetRecordingMock({ recordingId, recording: {} }),
-  errorMock,
-];
+const graphqlMocks = [...createGetUserMock({ user }), errorMock];
 const messageHandlers = basicMessageHandlers();
 const bindings = basicBindings();
 

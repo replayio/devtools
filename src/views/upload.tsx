@@ -1,23 +1,14 @@
 import React, { useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { setExpectedError } from "ui/actions/session";
-import { useGetRecording, useGetRecordingId, useHasExpectedError } from "ui/hooks/recordings";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserSettings } from "ui/hooks/settings";
-import { BlankLoadingScreen } from "ui/components/shared/BlankScreen";
+import BlankScreen, { BlankLoadingScreen } from "ui/components/shared/BlankScreen";
 import UploadScreen from "ui/components/UploadScreen";
 
-function _UploadScreenWrapper({ setExpectedError }: PropsFromRedux) {
+function UploadScreenWrapper() {
   const recordingId = useGetRecordingId();
-  const expectedError = useHasExpectedError(recordingId);
   const { recording } = useGetRecording(recordingId);
   // Make sure to get the user's settings before showing the upload screen.
   const { userSettings, loading } = useGetUserSettings();
-
-  useEffect(() => {
-    if (expectedError) {
-      setExpectedError(expectedError);
-    }
-  }, [expectedError]);
 
   useEffect(() => {
     if (recording?.isInitialized) {
@@ -26,14 +17,11 @@ function _UploadScreenWrapper({ setExpectedError }: PropsFromRedux) {
     }
   });
 
-  if (expectedError || loading) {
+  if (loading) {
     return <BlankLoadingScreen />;
   }
 
-  return recording ? <UploadScreen {...{ userSettings, recording }} /> : <BlankLoadingScreen />;
+  return recording ? <UploadScreen {...{ userSettings, recording }} /> : <BlankScreen />;
 }
 
-const connector = connect(null, { setExpectedError });
-type PropsFromRedux = ConnectedProps<typeof connector>;
-const UploadScreenWrapper = connector(_UploadScreenWrapper);
 export default UploadScreenWrapper;

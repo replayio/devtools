@@ -14,7 +14,7 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analy
 
 import { features } from "ui/utils/prefs";
 
-export async function setupEventListeners(_, store) {
+export async function setupEventListeners(store) {
   store.dispatch(getEventListenerBreakpointTypes());
 
   const eventListeners = getActiveEventListeners(store.getState());

@@ -10,7 +10,7 @@ import {
   KeyboardEvent,
   NavigationEvent,
 } from "@recordreplay/protocol";
-import { ThreadFront } from "protocol/thread";
+import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import {
   PanelName,
@@ -22,17 +22,21 @@ import {
   WorkspaceId,
   SettingsTabTitle,
   EventKind,
-  ReplayEvent,
 } from "ui/state/app";
-import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { trackEvent } from "ui/utils/telemetry";
-import { client } from "../../protocol/socket";
+import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
+import { isTest } from "ui/utils/environment";
+import tokenManager from "ui/utils/tokenManager";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
+export type SetDisplayedLoadingProgressAction = Action<"set_displayed_loading_progress"> & {
+  progress: number | null;
+};
+export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finished: boolean };
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
@@ -95,6 +99,8 @@ export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 export type AppActions =
   | SetRecordingDurationAction
   | LoadingAction
+  | SetDisplayedLoadingProgressAction
+  | SetLoadingFinishedAction
   | IndexingAction
   | SetSessionIdAction
   | UpdateThemeAction
@@ -123,6 +129,15 @@ export type AppActions =
   | SetAwaitingSourcemapsAction;
 
 export function setupApp(store: UIStore) {
+  if (!isTest()) {
+    tokenManager.addListener(({ token }) => {
+      if (token) {
+        sendMessage("Authentication.setAccessToken", { accessToken: token });
+      }
+    });
+    tokenManager.getToken();
+  }
+
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch({ type: "set_session_id", sessionId });
 
@@ -207,6 +222,16 @@ function setRecordingDuration(duration: number): SetRecordingDurationAction {
 
 function setLoading(loading: number): LoadingAction {
   return { type: "loading", loading };
+}
+
+export function setDisplayedLoadingProgress(
+  progress: number | null
+): SetDisplayedLoadingProgressAction {
+  return { type: "set_displayed_loading_progress", progress };
+}
+
+export function setLoadingFinished(finished: boolean): SetLoadingFinishedAction {
+  return { type: "set_loading_finished", finished };
 }
 
 function setIndexing(indexing: number): IndexingAction {

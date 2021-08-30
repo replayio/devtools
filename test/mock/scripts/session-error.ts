@@ -4,7 +4,6 @@ import { runTest, devtoolsURL } from "../src/runTest";
 import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import {
-  createRecordingIsInitializedMock,
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
   createGetUserMock,
@@ -18,9 +17,8 @@ const userId = uuid();
 const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   ...createUserSettingsMock(),
-  ...createRecordingIsInitializedMock({ recordingId, isInitialized: true }),
   ...createRecordingOwnerUserIdMock({ recordingId, user }),
-  ...createGetRecordingMock({ recordingId }),
+  ...createGetRecordingMock({ recordingId, recording: {} }),
   ...createGetUserMock({ user }),
 ];
 const messageHandlers = {
