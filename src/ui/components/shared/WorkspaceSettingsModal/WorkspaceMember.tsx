@@ -151,9 +151,7 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon className="text-3xl">mail_outline</MaterialIcon>
       </div>
-      <Redacted>
-        <div className="flex-grow">{member.email}</div>
-      </Redacted>
+      <Redacted className="flex-grow">{member.email}</Redacted>
       <PortalDropdown
         buttonContent={<Status member={member} />}
         setExpanded={setExpanded}
