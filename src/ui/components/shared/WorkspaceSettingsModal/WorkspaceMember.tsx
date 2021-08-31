@@ -10,7 +10,11 @@ import MaterialIcon from "../MaterialIcon";
 
 import "./WorkspaceMember.css";
 
-type WorkspaceMemberProps = { member: WorkspaceUser; isAdmin: boolean } & PropsFromRedux;
+type WorkspaceMemberProps = {
+  member: WorkspaceUser;
+  isAdmin: boolean;
+  canLeave?: boolean;
+} & PropsFromRedux;
 
 const memberRoleLabels: Record<WorkspaceUserRole, string> = {
   admin: "Admin",
@@ -55,7 +59,7 @@ function WorkspaceMemberRoleOption({
   );
 }
 
-function WorkspaceMemberRoles({ member }: { member: WorkspaceUser }) {
+function WorkspaceMemberRoles({ isAdmin, member }: { isAdmin: boolean; member: WorkspaceUser }) {
   const role: WorkspaceUserRole = getMemberRole(member);
   const { updateWorkspaceMemberRole } = hooks.useUpdateWorkspaceMemberRole();
   const [selectedRole, setSelectedRole] = useState<WorkspaceUserRole>(role);
@@ -87,14 +91,27 @@ function WorkspaceMemberRoles({ member }: { member: WorkspaceUser }) {
     <div>
       <WorkspaceMemberRoleOption value="viewer" onSelect={selectRole} selected={selectedRole} />
       <WorkspaceMemberRoleOption value="debugger" onSelect={selectRole} selected={selectedRole} />
-      <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={selectedRole} />
+      {isAdmin ? (
+        <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={selectedRole} />
+      ) : null}
     </div>
   );
 }
 
-function Status({ member, hideArrow = false }: { member: WorkspaceUser; hideArrow?: boolean }) {
+function Status({
+  member,
+  hideArrow = false,
+  title,
+}: {
+  member: WorkspaceUser;
+  hideArrow?: boolean;
+  title?: string;
+}) {
   return (
-    <div className={classnames("flex flex-row items-center group", { italic: member.pending })}>
+    <div
+      className={classnames("flex flex-row items-center group", { italic: member.pending })}
+      title={title}
+    >
       <span>
         {memberRoleLabels[getMemberRole(member)]}
         {member.pending ? " (pending)" : ""}
@@ -134,31 +151,26 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon className="text-3xl">mail_outline</MaterialIcon>
       </div>
-      <Redacted>
-        <div className="flex-grow">{member.email}</div>
-      </Redacted>
-      {isAdmin ? (
-        <PortalDropdown
-          buttonContent={<Status member={member} />}
-          setExpanded={setExpanded}
-          expanded={expanded}
-          buttonStyle=""
-          position="bottom-right"
-        >
-          <WorkspaceMemberRoles member={member} />
-          <hr />
-          <div className="permissions-dropdown-item" onClick={handleDelete}>
-            Remove
-          </div>
-        </PortalDropdown>
-      ) : (
-        <Status member={member} hideArrow />
-      )}
+      <Redacted className="flex-grow">{member.email}</Redacted>
+      <PortalDropdown
+        buttonContent={<Status member={member} />}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        buttonStyle=""
+        position="bottom-right"
+      >
+        <WorkspaceMemberRoles member={member} isAdmin={isAdmin} />
+        <hr />
+        <div className="permissions-dropdown-item" onClick={handleDelete}>
+          Remove
+        </div>
+      </PortalDropdown>
     </li>
   );
 }
 
 function Role({
+  canLeave,
   member,
   setWorkspaceId,
   hideModal,
@@ -168,6 +180,7 @@ function Role({
   setWorkspaceId: any;
   hideModal: any;
   isAdmin: boolean;
+  canLeave: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
@@ -196,8 +209,14 @@ function Role({
     }
   };
 
-  if (!isAdmin && localUserId !== userId) {
-    return <Status member={member} hideArrow />;
+  if (!canLeave) {
+    return (
+      <Status
+        member={member}
+        hideArrow
+        title="Promote another team member to admin in order to leave this team"
+      />
+    );
   }
 
   return (
@@ -208,7 +227,7 @@ function Role({
       buttonStyle=""
       position="bottom-right"
     >
-      {isAdmin && localUserId !== userId ? <WorkspaceMemberRoles member={member} /> : null}
+      {localUserId !== userId ? <WorkspaceMemberRoles member={member} isAdmin={isAdmin} /> : null}
       <hr />
       <div className="permissions-dropdown-item" onClick={handleDelete}>
         {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
@@ -217,7 +236,13 @@ function Role({
   );
 }
 
-function WorkspaceMember({ member, setWorkspaceId, hideModal, isAdmin }: WorkspaceMemberProps) {
+function WorkspaceMember({
+  member,
+  setWorkspaceId,
+  hideModal,
+  isAdmin,
+  canLeave = false,
+}: WorkspaceMemberProps) {
   return (
     <li className="flex flex-row items-center space-x-2">
       <img
@@ -233,6 +258,7 @@ function WorkspaceMember({ member, setWorkspaceId, hideModal, isAdmin }: Workspa
         setWorkspaceId={setWorkspaceId}
         hideModal={hideModal}
         isAdmin={isAdmin}
+        canLeave={canLeave}
       />
     </li>
   );

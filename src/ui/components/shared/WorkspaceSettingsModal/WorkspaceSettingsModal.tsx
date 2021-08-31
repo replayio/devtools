@@ -55,6 +55,9 @@ export function WorkspaceMembers({
     (a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending)
   );
 
+  const canLeave = members.length > 1;
+  const canAdminLeave = canLeave && members.filter(a => a.roles?.includes("admin")).length > 1;
+
   return (
     <ul className="flex flex-col space-y-3">
       {sortedMembers.map(member =>
@@ -65,7 +68,12 @@ export function WorkspaceMembers({
             isAdmin={isAdmin}
           />
         ) : (
-          <WorkspaceMember member={member} key={`registered-${member.userId}`} isAdmin={isAdmin} />
+          <WorkspaceMember
+            member={member}
+            key={`registered-${member.userId}`}
+            isAdmin={isAdmin}
+            canLeave={member.roles?.includes("admin") ? canAdminLeave : canLeave}
+          />
         )
       )}
     </ul>
@@ -216,11 +224,18 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
 
   if (!workspaceId) return null;
 
-  const isAdmin = members?.find(m => m.userId === localUserId)?.roles?.includes("admin") || false;
+  const roles = members?.find(m => m.userId === localUserId)?.roles;
+  const isAdmin = roles?.includes("admin") || false;
+  const isDebugger = roles?.includes("debugger") || false;
   const hiddenTabs: SettingsTabTitle[] = [];
 
   if (!isAdmin) {
     hiddenTabs.push("Delete Team");
+    hiddenTabs.push("Billing");
+  }
+
+  if (!isDebugger) {
+    hiddenTabs.push("API Keys");
   }
 
   return (
