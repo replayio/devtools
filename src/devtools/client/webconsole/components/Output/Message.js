@@ -16,7 +16,6 @@ const FrameView = createFactory(require("devtools/client/shared/components/Frame
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
-const classNames = require("classnames");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
 const { trackEvent } = require("ui/utils/telemetry");
 
@@ -152,64 +151,25 @@ class Message extends Component {
     }
   }
 
-  renderPausedMessageIndicator() {
-    const {
-      executionPoint,
-      pausedExecutionPoint = Number.POSITIVE_INFINITY,
-      type,
-      frame,
-    } = this.props;
-
-    if (!pausedExecutionPoint || !executionPoint || !frame) {
-      return undefined;
-    }
-
-    const isPausableType = !["command", "result"].includes(type);
-    const isPausedAtMessage = BigInt(executionPoint) === BigInt(pausedExecutionPoint);
-
-    if (!isPausableType || !isPausedAtMessage) {
-      return null;
-    }
-
-    return dom.div(
-      { className: `overlay-container debug` },
-      dom.div({ className: "button" }, dom.div({ className: "img" }))
-    );
-  }
-
-  renderCommentButton() {
-    const { executionPoint, executionPointTime, dispatch } = this.props;
-
-    let onClick = () => {
-      dispatch(actions.createComment(executionPointTime, executionPoint, null));
-    };
-
-    return dom.button(
-      {
-        className: "focus:outline-none font-sans text-white flex flex-row-reverse items-center",
-        title: "Add Comment",
-        onClick,
-      },
-      dom.div({ className: "material-icons comment-button rounded-md" }, "add_comment")
-    );
-  }
-
-  renderJumpButton() {
+  renderOverlayButton() {
     const {
       executionPoint,
       executionPointTime,
       executionPointHasFrames,
       dispatch,
       pausedExecutionPoint = Number.POSITIVE_INFINITY,
+      type,
       frame,
       message,
+      isFirstMessageForPoint,
     } = this.props;
 
     if (!pausedExecutionPoint || !executionPoint || !frame) {
       return undefined;
     }
 
-    let onClick = () => {
+    let overlayType, label, onClick;
+    let onRewindClick = () => {
       trackEvent("console seek");
       dispatch(
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
@@ -217,28 +177,32 @@ class Message extends Component {
 
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
-    let text, isRewind, icon;
 
-    if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
-      text = "Rewind";
-      isRewind = true;
-      icon = "skip_previous";
-    } else {
-      text = "Fast Forward";
-      isRewind = false;
-      icon = "skip_next";
+    if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
+      overlayType = "fast-forward";
+      label = "Fast Forward";
+      onClick = onRewindClick;
+    } else if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
+      overlayType = "rewind";
+      label = "Rewind";
+      onClick = onRewindClick;
+    } else if (!isFirstMessageForPoint) {
+      // Handle cases where executionPoint is the same as pauseExecutionPoint.
+      return;
+    } else if (!["command", "result"].includes(type)) {
+      overlayType = "debug";
+      label = "Debug";
+
+      return dom.div(
+        { className: `overlay-container debug` },
+        dom.div({ className: "button" }, dom.div({ className: "img" }))
+      );
     }
 
-    return dom.button(
-      {
-        className: classNames(
-          isRewind ? "rewind" : "fast-forward",
-          "message-jump focus:outline-none font-sans text-white flex flex-row-reverse items-center"
-        ),
-        title: text,
-        onClick,
-      },
-      dom.div({ className: "material-icons replay-button rounded-md" }, icon)
+    return dom.div(
+      { className: `overlay-container ${overlayType}`, onClick },
+      dom.div({ className: "info" }, dom.div({ className: "label" }, label)),
+      dom.div({ className: "button" }, dom.div({ className: "img" }))
     );
   }
 
@@ -355,7 +319,7 @@ class Message extends Component {
 
     const timestampEl = this.renderTimestamp();
     const icon = this.renderIcon();
-    const pausedMessageIndicator = this.renderPausedMessageIndicator();
+    const overlayButton = this.renderOverlayButton();
 
     // Figure out if there is an expandable part to the message.
     let attachment = null;
@@ -414,9 +378,6 @@ class Message extends Component {
     // Configure the location.
     const location = dom.span(
       { className: "message-location devtools-monospace" },
-      isPaused
-        ? dom.span({ className: "message-jump-button" }, this.renderCommentButton())
-        : dom.span({ className: "message-jump-button" }, this.renderJumpButton()),
       frame
         ? FrameView({
             frame,
@@ -454,7 +415,7 @@ class Message extends Component {
         "aria-live": type === MESSAGE_TYPE.COMMAND ? "off" : "polite",
         ref: node => (this.messageNode = node),
       },
-      pausedMessageIndicator,
+      overlayButton,
       timestampEl,
       MessageIndent({
         indent,
