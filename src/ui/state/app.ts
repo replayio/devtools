@@ -103,6 +103,7 @@ interface Events {
 
 export type ReplayEvent = MouseEvent | KeyboardEvent | NavigationEvent;
 
+export type EventCategory = "mouse" | "keyboard" | "navigation";
 export type EventKind = MouseEventKind | KeyboardEventKind | string;
 
 export interface Canvas {

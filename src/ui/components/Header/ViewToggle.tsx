@@ -6,7 +6,6 @@ import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
 import { getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
-import * as selectors from "ui/reducers/app";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
 import { ViewMode } from "ui/state/app";
@@ -55,9 +54,11 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
   const [framerMotion, setFramerMotion] = useState<typeof import("framer-motion") | null>(null);
   const [localViewMode, setLocalViewMode] = useState(viewMode);
   const toggleTimeoutKey = useRef<NodeJS.Timeout | null>(null);
+  const preloadPromise = useRef<Promise<typeof import("../Views/DevView")> | null>(null);
 
   useEffect(() => {
     import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
+    preloadPromise.current = import("../Views/DevView");
   }, []);
 
   // Don't show anything while waiting for framer-motion to be imported.
@@ -69,7 +70,6 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
 
   const handleToggle = async (mode: ViewMode) => {
     setLocalViewMode(mode);
-    const preloadPromise = import("../Views/DevView");
 
     // Delay updating the viewMode in redux so that the toggle can fully animate
     // before re-rendering all of devtools in the new viewMode.

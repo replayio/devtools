@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
-import { validateEmail } from "ui/utils/helpers";
+import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { TextInput } from "../Forms";
 import {
@@ -65,6 +65,7 @@ function TeamNamePage({
 }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [allowNext, setAllowNext] = useState<boolean>(false);
+  const [inputError, setInputError] = useState<string | null>(null);
   const { id: userId } = hooks.useGetUserInfo();
 
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
@@ -80,13 +81,21 @@ function TeamNamePage({
     setAllowNext(true);
   }
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (isValidTeamName(e.target.value)) {
+      setInputError(null);
+    }
     setInputValue(e.target.value);
   };
   const handleSave = () => {
+    if (!isValidTeamName(inputValue)) {
+      setInputError("The team name cannot be blank");
+      return;
+    }
+
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: features.teamSubscription ? "test-beta-v1" : undefined,
+        planKey: "team-v1",
       },
     });
     trackEvent("created-team");
@@ -106,6 +115,7 @@ function TeamNamePage({
           textSize={"xl"}
           center={true}
         />
+        {inputError ? <div className="text-red-500">{inputError}</div> : null}
       </div>
       <OnboardingActions>
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />

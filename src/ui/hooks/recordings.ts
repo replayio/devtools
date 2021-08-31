@@ -786,6 +786,7 @@ export function useHasExpectedError(recordingId: RecordingId): ExpectedError | u
       message: "You don't have permission to view this replay",
       content:
         "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+      action: "library",
     };
   }
 

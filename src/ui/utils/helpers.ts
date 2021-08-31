@@ -11,3 +11,22 @@ export function validateUUID(uuid: string) {
 export function compareBigInt(point1: BigInt, point2: BigInt) {
   return point1 < point2 ? -1 : point1 > point2 ? 1 : 0;
 }
+
+export function commaListOfThings(things: string[]) {
+  const listOfThings = [...things];
+  const finalThing = listOfThings.pop();
+
+  if (things.length <= 1) {
+    return finalThing;
+  }
+
+  return `${listOfThings.join(", ")}, and ${finalThing}`;
+}
+
+export function isValidTeamName(name: string) {
+  if (name.trim() === "") {
+    return false;
+  }
+
+  return true;
+}

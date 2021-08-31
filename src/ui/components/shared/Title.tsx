@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import hooks from "ui/hooks";
+import { Redacted } from "../Redacted";
 
 interface TitleProps {
   defaultTitle: string;
@@ -59,11 +60,17 @@ export default function Title({
 
   if (allowEditOnTitleClick) {
     return (
-      <div className="title" onClick={handleClick} title="Click to edit the title.">
-        {title}
-      </div>
+      <Redacted>
+        <div className="title" onClick={handleClick} title="Click to edit the title.">
+          {title}
+        </div>
+      </Redacted>
     );
   }
 
-  return <div className="title">{title}</div>;
+  return (
+    <Redacted>
+      <div className="title">{title}</div>
+    </Redacted>
+  );
 }

@@ -11,6 +11,7 @@ import { ChatAltIcon } from "@heroicons/react/outline";
 import "./RecordingListItem.css";
 import { RecordingItemProps } from "./RecordingItem";
 import { RecordingId } from "@recordreplay/protocol";
+import { Redacted } from "ui/components/Redacted";
 
 function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -100,7 +101,9 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }: ItemTitlePr
           </div>
         ) : null}
       </div>
-      <div className="page-url">{data.url}</div>
+      <Redacted>
+        <div className="page-url">{data.url}</div>
+      </Redacted>
     </div>
   );
 }
@@ -108,9 +111,11 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }: ItemTitlePr
 function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
-    <div className="screenshot">
-      {screenData && <img src={screenData} alt="recording screenshot" />}
-    </div>
+    <Redacted>
+      <div className="screenshot">
+        {screenData && <img src={screenData} alt="recording screenshot" />}
+      </div>
+    </Redacted>
   );
 }
 
@@ -202,7 +207,9 @@ export default function RecordingListItem({
         <ItemPrivacy isPrivate={data.private} toggleIsPrivate={toggleIsPrivate} />
       </td>
       <td>
-        <div className="owner">{data.user && <AuthAvatar user={data.user} />}</div>
+        <Redacted>
+          <div className="owner">{data.user && <AuthAvatar user={data.user} />}</div>
+        </Redacted>
       </td>
       <td>
         {data.comments.length ? (

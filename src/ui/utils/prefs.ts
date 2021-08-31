@@ -32,6 +32,7 @@ pref("devtools.maxHitsEditable", 200);
 pref("devtools.libraryFilterTime", "all");
 pref("devtools.libraryFilterAssociation", "all");
 pref("devtools.logTelemetryEvent", false);
+pref("devtools.showRedactions", false);
 
 // app features
 pref("devtools.features.comments", true);
@@ -49,7 +50,6 @@ pref("devtools.features.videoPlayback", false);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
 pref("devtools.features.eventCount", true);
-pref("devtools.features.teamSubscription", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -66,6 +66,7 @@ export const prefs = new PrefsHelper("devtools", {
   libraryFilterTime: ["String", "libraryFilterTime"],
   libraryFilterAssociation: ["String", "libraryFilterAssociation"],
   logTelemetryEvent: ["Bool", "logTelemetryEvent"],
+  showRedactions: ["Bool", "showRedactions"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
@@ -85,7 +86,6 @@ export const features = new PrefsHelper("devtools.features", {
   launchBrowser: ["Bool", "launchBrowser"],
   termsOfService: ["Bool", "termsOfService"],
   eventCount: ["Bool", "eventCount"],
-  teamSubscription: ["Bool", "teamSubscription"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

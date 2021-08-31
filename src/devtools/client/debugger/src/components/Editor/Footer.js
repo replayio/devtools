@@ -51,46 +51,6 @@ class SourceFooter extends PureComponent {
     }
   }
 
-  blackBoxButton() {
-    const { cx, selectedSource, toggleBlackBox } = this.props;
-    const sourceLoaded = selectedSource && selectedSource.content;
-
-    if (!selectedSource) {
-      return;
-    }
-
-    if (!shouldBlackbox(selectedSource)) {
-      return;
-    }
-
-    const blackboxed = selectedSource.isBlackBoxed;
-
-    const tooltip = blackboxed ? "Unblackbox source" : "Blackbox source";
-
-    const type = "black-box";
-
-    return (
-      <button
-        onClick={() => toggleBlackBox(cx, selectedSource)}
-        className={classnames("action", type, {
-          active: sourceLoaded,
-          blackboxed,
-        })}
-        key={type}
-        title={tooltip}
-        aria-label={tooltip}
-      >
-        <AccessibleImage className="blackBox" />
-      </button>
-    );
-  }
-
-  renderCommands() {
-    const commands = [this.blackBoxButton()].filter(Boolean);
-
-    return commands.length ? <div className="commands">{commands}</div> : null;
-  }
-
   renderSourceSummary() {
     const { alternateSource, selectedSource, showAlternateSource } = this.props;
 
@@ -147,7 +107,6 @@ class SourceFooter extends PureComponent {
   render() {
     return (
       <div className="source-footer">
-        <div className="source-footer-start">{this.renderCommands()}</div>
         <div className="source-footer-end">
           {this.renderSourceSummary()}
           {this.renderCursorPosition()}

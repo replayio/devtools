@@ -238,10 +238,6 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
     hiddenTabs.push("API Keys");
   }
 
-  if (!features.teamSubscription) {
-    hiddenTabs.push("Billing");
-  }
-
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}

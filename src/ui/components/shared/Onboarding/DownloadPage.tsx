@@ -60,7 +60,7 @@ export function DownloadPage({
     <>
       <OnboardingHeader>Download Replay</OnboardingHeader>
       <OnboardingBody>
-        Record your first replay with the Replay browser, or go directly to your team’s library
+        Record your first replay with the Replay browser, or go directly to your library
       </OnboardingBody>
       <DownloadButtons onNext={onNext} />
       <OnboardingActions>

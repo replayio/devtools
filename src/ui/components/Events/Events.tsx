@@ -8,6 +8,7 @@ import { UIState } from "ui/state";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
+import Spinner from "../shared/Spinner";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function Event({
@@ -24,14 +25,17 @@ function Event({
   const isPaused = event.time === currentTime && executionPoint === event.point;
 
   let text: string;
+  let title: string;
   let icon: string;
 
   if (event.kind?.includes("mouse")) {
     text = "Mouse Click";
+    title = "Mouse Click Event";
     icon = "ads_click";
   } else if (event.kind?.includes("navigation")) {
     const ev = event as NavigationEvent;
-    text = `Navigation ${ev.url}`;
+    text = `${ev.url}`;
+    title = "Navigation Event";
     icon = "place";
   } else {
     icon = "keyboard";
@@ -47,11 +51,13 @@ function Event({
     }
 
     text = `${eventText} ${ev.key}`;
+    title = `${eventText} event`;
   }
 
   return (
     <button
       onClick={() => onSeek(event.point, event.time)}
+      title={title}
       className={classNames(
         "flex flex-row items-center justify-between p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
         isPaused ? "text-primaryAccent" : ""
@@ -75,7 +81,55 @@ function Event({
   );
 }
 
-function Events({ events, seek, currentTime, executionPoint }: PropsFromRedux) {
+function EventsLoaderItem({ category, isLoading }: { category: string; isLoading: boolean }) {
+  return (
+    <div className="flex flex-row space-x-2 items-center overflow-hidden">
+      {isLoading ? (
+        <div
+          className="flex flex-col items-center justify-center"
+          style={{ minHeight: "22px", minWidth: "22px" }}
+        >
+          <Spinner className="animate-spin h-6 w-6" />
+        </div>
+      ) : (
+        <MaterialIcon>done</MaterialIcon>
+      )}
+      <span>{category} events</span>
+    </div>
+  );
+}
+
+function EventsLoader({
+  eventCategoriesLoading,
+}: {
+  eventCategoriesLoading: { [key: string]: boolean };
+}) {
+  return (
+    <div className="space-y-4 flex flex-col w-full p-4 bg-gray-100 rounded-lg">
+      <strong>Loading events:</strong>
+      <div className="flex flex-col w-full space-y-1">
+        {Object.keys(eventCategoriesLoading).map(category => {
+          return (
+            <EventsLoaderItem
+              category={category}
+              isLoading={eventCategoriesLoading[category]}
+              key={category}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Events({
+  events,
+  eventCategoriesLoading,
+  seek,
+  currentTime,
+  executionPoint,
+  progressPercentage,
+}: PropsFromRedux) {
   const onSeek = (point: string, time: number) => {
     seek(point, time, false);
   };
@@ -87,6 +141,7 @@ function Events({ events, seek, currentTime, executionPoint }: PropsFromRedux) {
       </div>
       <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white h-full">
         <div className="flex flex-col p-2 self-stretch space-y-2 w-full">
+          {progressPercentage < 100 ? <EventsLoader {...{ eventCategoriesLoading }} /> : null}
           {events.map((e, i) => (
             <Event key={i} onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
           ))}
@@ -101,6 +156,8 @@ const connector = connect(
     events: selectors.getFlatEvents(state),
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
+    progressPercentage: selectors.getIndexing(state),
+    eventCategoriesLoading: selectors.getEventCategoriesLoading(state),
   }),
   {
     seek: actions.seek,

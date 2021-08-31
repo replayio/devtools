@@ -2,14 +2,13 @@ import React from "react";
 import hooks from "ui/hooks";
 import EmailForm from "./EmailForm";
 import CollaboratorsList from "./CollaboratorsList";
-import "./PrivateSettings.css";
 import { RecordingId } from "@recordreplay/protocol";
 
-type PrivateSettingsProps = {
+type CollaboratorsProps = {
   recordingId: RecordingId;
 };
 
-export default function PrivateSettings({ recordingId }: PrivateSettingsProps) {
+export default function Collaborators({ recordingId }: CollaboratorsProps) {
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
   if (loading || !collaborators || !recording) {
@@ -17,8 +16,7 @@ export default function PrivateSettings({ recordingId }: PrivateSettingsProps) {
   }
 
   return (
-    <section className="private-settings">
-      <h1>Collaborators</h1>
+    <section className="flex flex-col w-full space-y-2">
       <EmailForm recordingId={recordingId} />
       <CollaboratorsList {...{ recording, collaborators }} />
     </section>

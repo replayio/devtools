@@ -5,6 +5,7 @@ import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
 import { Menu } from "@headlessui/react";
 import { Workspace } from "ui/types";
+import { Redacted } from "ui/components/Redacted";
 import { UserGroupIcon, UserIcon } from "@heroicons/react/solid";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -45,7 +46,9 @@ function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: Worksp
           onClick={onClick}
         >
           {icon}
-          <div className="overflow-ellipsis overflow-hidden whitespace-pre">{workspace.name}</div>
+          <Redacted>
+            <div className="overflow-ellipsis overflow-hidden whitespace-pre">{workspace.name}</div>
+          </Redacted>
         </a>
       )}
     </Menu.Item>
