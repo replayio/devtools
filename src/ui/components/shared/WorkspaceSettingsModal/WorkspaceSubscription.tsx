@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React from "react";
 import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
@@ -59,6 +60,18 @@ function getPlanDetails(key: string) {
 
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
   const { data, loading } = hooks.useGetWorkspaceSubscription(workspaceId);
+  const { cancelWorkspaceSubscription, loading: cancelLoading } =
+    hooks.useCancelWorkspaceSubscription();
+
+  const handleCancelSubscription = () => {
+    if (cancelLoading) return;
+
+    cancelWorkspaceSubscription({
+      variables: {
+        workspaceId,
+      },
+    });
+  };
 
   if (loading) return null;
 
@@ -79,7 +92,43 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
               </strong>
             </div>
           ) : null}
+          {data.node.subscription.status === "canceled" && data.node.subscription.effectiveUntil ? (
+            <div className="p-4 bg-yellow-100 rounded-lg border border-yellow-600 flex flex-row items-center">
+              <MaterialIcon className="mr-4">access_time</MaterialIcon>
+              Subscription ends&nbsp;
+              <strong>
+                {new Intl.DateTimeFormat("en", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                }).format(new Date(data.node.subscription.effectiveUntil))}
+              </strong>
+            </div>
+          ) : null}
           {getPlanDetails(data.node.subscription.plan.key)}
+          {data.node.subscription.status === "active" ||
+          data.node.subscription.status === "trialing" ? (
+            <div className="flex flex-col space-y-4">
+              <div className=" text-sm uppercase font-semibold">Danger Zone</div>
+              <div className="border border-red-300 flex flex-row items-center justify-between rounded-lg p-4">
+                <div className="flex flex-col">
+                  <div className="font-semibold">Cancel Subscription</div>
+                  <div className="">
+                    Cancellation will take effect at the end of the current billing period.
+                  </div>
+                </div>
+                <button
+                  onClick={handleCancelSubscription}
+                  className={classNames(
+                    "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
+                    { "opacity-60": cancelLoading }
+                  )}
+                >
+                  Cancel Subscription
+                </button>
+              </div>
+            </div>
+          ) : null}
         </>
       ) : (
         <p>This team does not have an active subscription</p>

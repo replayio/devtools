@@ -1,5 +1,13 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { PendingWorkspaceInvitation, Workspace } from "ui/types";
+import {
+  CANCEL_WORKSPACE_SUBSCRIPTION,
+  ADD_WORKSPACE_API_KEY,
+  DELETE_WORKSPACE_API_KEY,
+  GET_WORKSPACE_API_KEYS,
+  UPDATE_WORKSPACE_MEMBER_ROLE,
+  GET_WORKSPACE_SUBSCRIPTION,
+} from "ui/graphql/workspaces";
+import { PendingWorkspaceInvitation, Subscription, Workspace, WorkspaceUserRole } from "ui/types";
 
 const NO_WORKSPACES: Workspace[] = [];
 
@@ -162,4 +170,64 @@ export function useDeleteWorkspace() {
   );
 
   return deleteWorkspace;
+}
+
+export function useGetWorkspaceApiKeys(workspaceId: string) {
+  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "apiKeys"> }>(
+    GET_WORKSPACE_API_KEYS,
+    {
+      variables: { workspaceId },
+    }
+  );
+
+  return { data, loading, error };
+}
+
+export function useAddWorkspaceApiKey() {
+  const [addWorkspaceApiKey, { loading, error }] = useMutation(ADD_WORKSPACE_API_KEY, {
+    refetchQueries: ["GetWorkspaceApiKeys"],
+  });
+
+  return { addWorkspaceApiKey, loading, error };
+}
+
+export function useDeleteWorkspaceApiKey() {
+  const [deleteWorkspaceApiKey, { loading, error }] = useMutation(DELETE_WORKSPACE_API_KEY, {
+    refetchQueries: ["GetWorkspaceApiKeys"],
+  });
+
+  return { deleteWorkspaceApiKey, loading, error };
+}
+
+export function useUpdateWorkspaceMemberRole() {
+  const [updateWorkspaceMemberRole, { loading, error }] = useMutation<
+    any,
+    { id: string; roles: WorkspaceUserRole[] }
+  >(UPDATE_WORKSPACE_MEMBER_ROLE, {
+    refetchQueries: ["GetWorkspaceMembers"],
+  });
+
+  return { updateWorkspaceMemberRole, loading, error };
+}
+
+export function useGetWorkspaceSubscription(workspaceId: string) {
+  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "subscription"> }>(
+    GET_WORKSPACE_SUBSCRIPTION,
+    {
+      variables: { workspaceId },
+    }
+  );
+
+  return { data, loading, error };
+}
+
+export function useCancelWorkspaceSubscription() {
+  const [cancelWorkspaceSubscription, { loading, error }] = useMutation<
+    Subscription,
+    { workspaceId: string }
+  >(CANCEL_WORKSPACE_SUBSCRIPTION, {
+    refetchQueries: ["GetWorkspaceSubscription"],
+  });
+
+  return { cancelWorkspaceSubscription, loading, error };
 }

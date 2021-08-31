@@ -4,16 +4,7 @@ import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { UserSettings, Workspace, WorkspaceUserRole } from "../types";
-import {
-  ADD_USER_API_KEY,
-  ADD_WORKSPACE_API_KEY,
-  DELETE_USER_API_KEY,
-  DELETE_WORKSPACE_API_KEY,
-  GET_USER_SETTINGS,
-  GET_WORKSPACE_API_KEYS,
-  UPDATE_WORKSPACE_MEMBER_ROLE,
-  GET_WORKSPACE_SUBSCRIPTION,
-} from "ui/graphql/settings";
+import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
@@ -137,53 +128,4 @@ export function useDeleteUserApiKey() {
   });
 
   return { deleteUserApiKey, loading, error };
-}
-
-export function useGetWorkspaceApiKeys(workspaceId: string) {
-  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "apiKeys"> }>(
-    GET_WORKSPACE_API_KEYS,
-    {
-      variables: { workspaceId },
-    }
-  );
-
-  return { data, loading, error };
-}
-
-export function useAddWorkspaceApiKey() {
-  const [addWorkspaceApiKey, { loading, error }] = useMutation(ADD_WORKSPACE_API_KEY, {
-    refetchQueries: ["GetWorkspaceApiKeys"],
-  });
-
-  return { addWorkspaceApiKey, loading, error };
-}
-
-export function useDeleteWorkspaceApiKey() {
-  const [deleteWorkspaceApiKey, { loading, error }] = useMutation(DELETE_WORKSPACE_API_KEY, {
-    refetchQueries: ["GetWorkspaceApiKeys"],
-  });
-
-  return { deleteWorkspaceApiKey, loading, error };
-}
-
-export function useUpdateWorkspaceMemberRole() {
-  const [updateWorkspaceMemberRole, { loading, error }] = useMutation<
-    any,
-    { id: string; roles: WorkspaceUserRole[] }
-  >(UPDATE_WORKSPACE_MEMBER_ROLE, {
-    refetchQueries: ["GetWorkspaceMembers"],
-  });
-
-  return { updateWorkspaceMemberRole, loading, error };
-}
-
-export function useGetWorkspaceSubscription(workspaceId: string) {
-  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "subscription"> }>(
-    GET_WORKSPACE_SUBSCRIPTION,
-    {
-      variables: { workspaceId },
-    }
-  );
-
-  return { data, loading, error };
 }
