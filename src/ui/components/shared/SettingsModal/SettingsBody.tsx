@@ -17,15 +17,15 @@ interface SettingsBodyProps<
 }
 
 function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)[] }) {
-  return <main className="text-lg">{children}</main>;
+  return <main className="text-sm">{children}</main>;
 }
 
 export function SettingsHeader({ children }: { children: React.ReactChild }) {
-  return <h1 className="text-3xl">{children}</h1>;
+  return <h1 className="text-2xl">{children}</h1>;
 }
 
 export function SettingsBodyHeader({ children }: { children: React.ReactChild }) {
-  return <h2 className="text-2xl">{children}</h2>;
+  return <h2 className="text-lg">{children}</h2>;
 }
 
 export default function SettingsBody<

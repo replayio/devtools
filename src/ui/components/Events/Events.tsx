@@ -59,11 +59,11 @@ function Event({
       onClick={() => onSeek(event.point, event.time)}
       title={title}
       className={classNames(
-        "flex flex-row items-center justify-between p-4 rounded-lg hover:bg-gray-100 focus:outline-none",
+        "flex flex-row items-center justify-between p-3 rounded-lg hover:bg-gray-100 focus:outline-none",
         isPaused ? "text-primaryAccent" : ""
       )}
     >
-      <div className="flex flex-row space-x-2 items-center overflow-hidden">
+      <div className="flex flex-row space-x-1.5 items-center overflow-hidden">
         <MaterialIcon highlighted={isPaused}>{icon}</MaterialIcon>
         <div
           className={classNames(
@@ -89,7 +89,7 @@ function EventsLoaderItem({ category, isLoading }: { category: string; isLoading
           className="flex flex-col items-center justify-center"
           style={{ minHeight: "22px", minWidth: "22px" }}
         >
-          <Spinner className="animate-spin h-6 w-6" />
+          <Spinner className="animate-spin h-5 w-5" />
         </div>
       ) : (
         <MaterialIcon>done</MaterialIcon>
@@ -105,7 +105,7 @@ function EventsLoader({
   eventCategoriesLoading: { [key: string]: boolean };
 }) {
   return (
-    <div className="space-y-4 flex flex-col w-full p-4 bg-gray-100 rounded-lg">
+    <div className="space-y-3 flex flex-col w-full p-3 bg-gray-100 rounded-md">
       <strong>Loading events:</strong>
       <div className="flex flex-col w-full space-y-1">
         {Object.keys(eventCategoriesLoading).map(category => {
@@ -140,7 +140,7 @@ function Events({
         <div className="right-sidebar-toolbar-item">Events</div>
       </div>
       <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white h-full">
-        <div className="flex flex-col p-2 self-stretch space-y-2 w-full">
+        <div className="flex flex-col p-1.5 self-stretch space-y-1.5 w-full text-xs">
           {progressPercentage < 100 ? <EventsLoader {...{ eventCategoriesLoading }} /> : null}
           {events.map((e, i) => (
             <Event key={i} onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />

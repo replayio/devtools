@@ -19,13 +19,13 @@ function NewWorkspaceButton({ setModal }: NewWorkspaceButtonProps) {
         <a
           href="#"
           className={classnames(
-            "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 items-center",
+            "flex flex-row px-3 py-1.5 text-md cursor-pointer space-x-2.5 items-center",
             active ? "bg-gray-100 " : ""
           )}
           onClick={onClick}
         >
-          <PlusIcon className="w-6 h-6" />
-          <div className="text-lg">Create a new team</div>
+          <PlusIcon className="w-5 h-5" />
+          <div>Create a new team</div>
         </a>
       )}
     </Menu.Item>

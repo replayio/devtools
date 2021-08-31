@@ -50,8 +50,8 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
   };
 
   return (
-    <div className="comment-input-container p-2" onClick={e => e.stopPropagation()}>
-      <div className="comment-input text-lg">
+    <div className="comment-input-container text-sm p-1.5" onClick={e => e.stopPropagation()}>
+      <div className="comment-input text-xs">
         <DraftJSEditor
           handleCancel={handleCancel}
           handleSubmit={handleSubmit}
@@ -65,9 +65,7 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
       <div className="flex justify-end space-x-2">
         <button
           onClick={clearPendingComment}
-          className={classNames(
-            "justify-center py-2 px-4 text-lg font-medium text-black underline"
-          )}
+          className={classNames("justify-center py-1.5 px-3 font-medium text-black underline")}
         >
           Cancel
         </button>
@@ -75,7 +73,7 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
           onClick={onSubmit}
           disabled={!submitEnabled}
           className={classNames(
-            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium",
+            "justify-center py-1.5 px-3 rounded-md shadow-sm font-medium",
             submitEnabled
               ? "bg-primaryAccent text-white hover:bg-primaryAccentHover"
               : "text-white bg-gray-300"

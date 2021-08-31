@@ -116,6 +116,7 @@ strong {
 }
 
 .tooltip-container {
+  font-size: var(--devtools-base-font-size);
   display: none;
   position: fixed;
   z-index: 9999;
@@ -398,6 +399,7 @@ strong {
 }
 
 .tooltip-container[type="doorhanger"] .menuitem > .command {
+  font-size: var(--devtools-base-font-size);
   display: flex;
   align-items: baseline;
   margin: 0;
@@ -458,8 +460,7 @@ strong {
   flex: 1;
   font: menu;
   white-space: nowrap;
-  font-size: 1.2rem;
-  line-height: 1.6rem;
+  font-size: 0.825rem;
 }
 
 .tooltip-container[type="doorhanger"] .checkbox-container .menuitem > .command > .label {

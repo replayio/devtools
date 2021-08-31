@@ -47,7 +47,6 @@
 
 .recording-list thead.dashboard-viewer-content-header {
   display: contents;
-  font-size: 1rem;
   font-weight: 700;
   color: var(--theme-text-color-inactive);
 }

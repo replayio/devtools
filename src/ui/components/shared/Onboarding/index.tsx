@@ -13,7 +13,7 @@ export function OnboardingContent({
 }) {
   return (
     <div
-      className="p-12 text-4xl space-y-16 relative flex flex-col items-center"
+      className="p-9 text-2xl space-y-12 relative flex flex-col items-center"
       style={{ width: "800px" }}
     >
       <ReplayLogo />
@@ -23,7 +23,7 @@ export function OnboardingContent({
 }
 
 export function OnboardingHeader({ children }: { children: string }) {
-  return <div className="text-7xl font-semibold">{children}</div>;
+  return <div className="text-5xl font-semibold">{children}</div>;
 }
 
 export function OnboardingBody({
@@ -39,7 +39,7 @@ export function OnboardingActions({
 }: {
   children: string | React.ReactChild | React.ReactChild[];
 }) {
-  return <div className="space-x-4 pt-16">{children}</div>;
+  return <div className="space-x-3 pt-12">{children}</div>;
 }
 
 export function NextButton({
@@ -102,7 +102,7 @@ export function OnboardingButton({
       disabled={disabled}
       className={classNames(
         className,
-        "max-w-max items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+        "max-w-max items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {children}
@@ -127,4 +127,4 @@ export function OnboardingModalContainer({
   );
 }
 
-export const ReplayLogo = () => <img className="w-24 h-24" src="/images/logo.svg" />;
+export const ReplayLogo = () => <img className="w-16 h-16" src="/images/logo.svg" />;

@@ -45,7 +45,7 @@ function PanelButtons({
   };
 
   return (
-    <div className="flex flex-row items-center overflow-hidden">
+    <div className="flex flex-row items-center overflow-hidden text-sm">
       {showElements && !isNode && <NodePicker />}
       <button
         className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
@@ -127,7 +127,7 @@ function SecondaryToolbox({
           </button>
         </header>
       )}
-      <div className="secondary-toolbox-content">
+      <div className="secondary-toolbox-content text-xs">
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {showReact && selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}

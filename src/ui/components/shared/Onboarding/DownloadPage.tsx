@@ -10,7 +10,7 @@ function DownloadButtonContent({ text, imgUrl }: { text: string; imgUrl: string 
       style={{ minWidth: "120px" }}
     >
       <span>{text}</span>
-      <img className="w-8 h-8" src={imgUrl} />
+      <img className="w-6 h-6" src={imgUrl} />
     </div>
   );
 }
@@ -33,7 +33,7 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
   };
 
   return (
-    <div className="py-4 flex flex-row w-full space-x-4 justify-center">
+    <div className="py-3 flex flex-row w-full space-x-3 justify-center">
       <PrimaryLgButton color="blue" onClick={handleMac}>
         <DownloadButtonContent text="Mac" imgUrl="/images/icon-apple.svg" />
       </PrimaryLgButton>

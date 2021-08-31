@@ -13,14 +13,14 @@ function PlanDetails({
 }) {
   return (
     <section className="rounded-lg border border-blue-600 overflow-hidden">
-      <header className="bg-blue-200 p-4 border-b border-blue-600 flex flex-row">
-        <MaterialIcon className="mr-4 text-2xl">group</MaterialIcon>
-        <h3 className="text-2xl font-semibold">{title}</h3>
+      <header className="bg-blue-200 p-3 border-b border-blue-600 flex flex-row">
+        <MaterialIcon className="mr-3 text-2xl">group</MaterialIcon>
+        <h3 className="text-xl font-semibold">{title}</h3>
       </header>
-      <div className="p-4">
+      <div className="p-3">
         {description ? <p>{description}</p> : null}
         {features && features.length > 0 ? (
-          <ul className="list-disc pl-8">
+          <ul className="list-disc pl-6">
             {features.map((f, i) => (
               <li key={i}>{f}</li>
             ))}
@@ -67,8 +67,8 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       {data?.node.subscription ? (
         <>
           {data.node.subscription.status === "trialing" ? (
-            <div className="p-4 bg-yellow-100 rounded-lg border border-yellow-600 flex flex-row items-center">
-              <MaterialIcon className="mr-4">access_time</MaterialIcon>
+            <div className="p-3 bg-yellow-100 rounded-lg border border-yellow-600 flex flex-row items-center">
+              <MaterialIcon className="mr-3">access_time</MaterialIcon>
               Trial ends&nbsp;
               <strong>
                 {new Intl.DateTimeFormat("en", {

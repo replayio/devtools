@@ -15,7 +15,7 @@ function Option({ name, id }: { name: string; id: string | null }) {
       className={({ active }) =>
         classnames(
           active ? "text-white bg-primaryAccent" : "",
-          "cursor-default select-none relative py-2 pl-3 pr-9"
+          "cursor-default select-none relative py-1.5 pl-2.5 pr-7"
         )
       }
       value={id}
@@ -31,10 +31,10 @@ function Option({ name, id }: { name: string; id: string | null }) {
             <span
               className={classnames(
                 active ? "text-white" : "text-primaryAccent",
-                "absolute inset-y-0 right-0 flex items-center pr-4"
+                "absolute inset-y-0 right-0 flex items-center pr-3"
               )}
             >
-              <CheckIcon className="h-5 w-5" aria-hidden="true" />
+              <CheckIcon className="h-4 w-4" aria-hidden="true" />
             </span>
           ) : null}
         </>
@@ -59,20 +59,16 @@ export default function SelectMenu({
   const selectedName = options.find(option => option.id === selected)!.name;
 
   return (
-    <div>
+    <div className="text-sm">
       <Listbox value={selected} onChange={setSelected}>
         {({ open }) => (
           <>
-            {label ? (
-              <Listbox.Label className="block text-md font-medium ">
-                label
-              </Listbox.Label>
-            ) : null}
-            <div className={`mt-1 relative z-10 ${className}`}>
-              <Listbox.Button className="bg-white relative w-full border border-textFieldBorder rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover text-lg">
+            {label ? <Listbox.Label className="block font-medium ">label</Listbox.Label> : null}
+            <div className={`relative z-10 ${className}`}>
+              <Listbox.Button className="bg-white relative w-full border border-textFieldBorder rounded-md shadow-sm pl-2.5 pr-8 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover">
                 <span className="block truncate">{selectedName}</span>
-                <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <SelectorIcon className="h-5 w-5 text-textFieldBorder" aria-hidden="true" />
+                <span className="absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none">
+                  <SelectorIcon className="h-4 w-4 text-textFieldBorder" aria-hidden="true" />
                 </span>
               </Listbox.Button>
               <Transition
@@ -84,7 +80,7 @@ export default function SelectMenu({
               >
                 <Listbox.Options
                   static
-                  className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none text-lg"
+                  className="absolute mt-1 w-full bg-white shadow-lg max-h-48 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none"
                 >
                   {options.map(({ name, id }) => (
                     <Option name={name} id={id} key={id} />

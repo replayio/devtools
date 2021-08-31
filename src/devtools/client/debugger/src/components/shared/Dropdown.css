@@ -104,8 +104,6 @@
 .dropdown-panel .menu-item {
   padding: 4px 8px;
   color: var(--theme-body-color);
-  line-height: 1.75rem;
-  font-size: 1.1rem;
 }
 
 .dropdown-panel .menu-item:hover {

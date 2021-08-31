@@ -39,14 +39,14 @@ function Header({
 
   return (
     <div id="header">
-      <div className="header-left space-x-0">
+      <div className="header-left">
         {currentWorkspaceId == null ? null : (
           <a
             href="#"
             onClick={onSettingsClick}
-            className="flex flex-row ml-4 items-center text-gray-400 hover:text-gray-800"
+            className="flex flex-row ml-3 items-center text-gray-400 hover:text-gray-800"
           >
-            <CogIcon className="h-8 w-8" />
+            <CogIcon className="h-6 w-6" />
           </a>
         )}
 

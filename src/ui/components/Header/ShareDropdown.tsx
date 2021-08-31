@@ -76,7 +76,7 @@ function PrivacyNote({ isPrivate, isOwner }: { isPrivate: boolean; isOwner: bool
 
   return (
     <div className={`row privacy-note ${isPrivate ? "is-private" : "is-public"}`}>
-      <div style={{ width: "67px" }} />
+      <div style={{ width: "52px" }} />
       <div className="label">
         <div className="label-title">Note</div>
         <div className="label-description">

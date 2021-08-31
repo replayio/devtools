@@ -28,7 +28,6 @@
 }
 
 .secondary-toolbox-header button {
-  font-size: 15px;
   padding: 8px 12px;
   cursor: pointer;
   transition: color 200ms;

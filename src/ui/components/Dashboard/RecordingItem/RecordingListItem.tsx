@@ -214,7 +214,7 @@ export default function RecordingListItem({
       <td>
         {data.comments.length ? (
           <div className="flex flex-row space-x-1 items-center">
-            <ChatAltIcon className="w-6 h-6 text-gray-500" />
+            <ChatAltIcon className="w-5 h-5 text-gray-500" />
             <span>{data.comments.length}</span>
           </div>
         ) : null}

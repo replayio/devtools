@@ -64,7 +64,7 @@ const DropdownPanel = ({
   };
 
   return (
-    <div className="dropdown-panel">
+    <div className="dropdown-panel text-sm">
       {!editingTitle ? (
         <div className="menu-item" onClick={() => setEditingTitle(true)}>
           Edit title

@@ -45,7 +45,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
       <div className="right-sidebar-toolbar">
         <div className="right-sidebar-toolbar-item comments">Comments</div>
       </div>
-      <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full">
+      <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-sm">
         {displayedComments.length > 0 ? (
           <div className="p-3 overflow-auto w-full flex-grow space-y-3">
             {sortBy(displayedComments, ["time"]).map(comment => {
@@ -53,7 +53,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
             })}
           </div>
         ) : (
-          <div className="transcript-list p-4 self-stretch space-y-4 text-lg text-gray-500 onboarding-text">
+          <div className="transcript-list p-3 self-stretch space-y-3 text-base text-gray-500 onboarding-text">
             <MaterialIcon className="forum large-icon">forum</MaterialIcon>
             <h2>{isAuthenticated ? "Start a conversation" : "Sign in to get started"}</h2>
 

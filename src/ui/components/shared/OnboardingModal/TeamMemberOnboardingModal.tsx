@@ -19,8 +19,8 @@ function TeamMemberOnboardingModalLoader({ hideModal, setWorkspaceId }: PropsFro
   if (loading || !pendingWorkspaces) {
     return (
       <Modal options={{ maskTransparency: "translucent" }}>
-        <div className="p-12 bg-white rounded-lg shadow-xl text-xl relative flex">
-          <Spinner className="animate-spin h-6 w-6 text-gray-500" />
+        <div className="p-9 bg-white rounded-lg shadow-xl text-lg relative flex">
+          <Spinner className="animate-spin h-4 w-4 text-gray-500" />
         </div>
       </Modal>
     );
@@ -68,12 +68,12 @@ function TeamMemberInvitation({
     callToAction = <div className="select-none">Declined</div>;
   } else if (status == "pending") {
     callToAction = (
-      <div className="space-y-2 flex flex-col items-center">
-        <div className="space-x-4 flex flex-row">
+      <div className="space-y-1.5 flex flex-col items-center">
+        <div className="space-x-3 flex flex-row">
           <button
             onClick={onAccept}
             type="button"
-            className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+            className="inline-flex items-center px-3 py-1.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
           >
             Accept
           </button>
@@ -81,7 +81,7 @@ function TeamMemberInvitation({
             <button
               onClick={onDecline}
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md bg-gray-200 hover:bg-gray-300"
+              className="inline-flex items-center px-3 py-1.5 border border-transparent font-medium rounded-md bg-gray-200 hover:bg-gray-300"
             >
               Decline
             </button>
@@ -91,23 +91,23 @@ function TeamMemberInvitation({
     );
   } else if (status == "loading") {
     callToAction = (
-      <div className="space-y-2 flex flex-col items-center">
+      <div className="space-y-1.5 flex flex-col items-center">
         <button
           disabled
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          className="inline-flex items-center px-3 py-1.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
-          <Spinner className="animate-spin h-6 w-6 text-white" />
+          <Spinner className="animate-spin h-4 w-4 text-white" />
         </button>
       </div>
     );
   } else {
     callToAction = (
-      <div className="space-y-2 flex flex-col items-center">
+      <div className="space-y-1.5 flex flex-col items-center">
         <button
           onClick={() => onGo(workspaceTarget.id)}
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          className="inline-flex items-center px-3 py-1.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
           {`Open`}
         </button>
@@ -116,9 +116,9 @@ function TeamMemberInvitation({
   }
 
   return (
-    <div className="flex flex-row items-center justify-between space-x-8">
+    <div className="flex flex-row items-center justify-between space-x-6">
       <div className="flex flex-col text-gray-500 overflow-hidden">
-        <h2 className="text-2xl font-semibold  whitespace-pre overflow-ellipsis overflow-hidden">{`${workspaceTarget.name} team`}</h2>
+        <h2 className="text-xl font-semibold  whitespace-pre overflow-ellipsis overflow-hidden">{`${workspaceTarget.name} team`}</h2>
         <div className="overflow-hidden whitespace-pre overflow-ellipsis">{`${workspaceTarget.recordingCount} replays`}</div>
         <div className="overflow-hidden whitespace-pre overflow-ellipsis">
           {workspaceTarget.inviterEmail
@@ -201,8 +201,8 @@ function TeamMemberOnboardingModal({
         options={{ maskTransparency: isTeamMemberInvite() ? "transparent" : "translucent" }}
       >
         <ModalContent>
-          <div className="space-y-8 flex flex-col">
-            <h2 className="font-bold text-3xl ">{headerText}</h2>
+          <div className="space-y-6 flex flex-col">
+            <h2 className="font-bold text-2xl ">{headerText}</h2>
             {displayedWorkspaces.map(workspace => (
               <TeamMemberInvitation
                 {...{ hideModal, onGo, workspace, onAction }}
@@ -212,7 +212,7 @@ function TeamMemberOnboardingModal({
             {isFinished && !actions.includes("accept") ? (
               <button
                 className={classNames(
-                  "py-2 font-medium rounded-md bg-primaryAccent hover:bg-primaryAccentHover text-white"
+                  "py-1.5 font-medium rounded-md bg-primaryAccent hover:bg-primaryAccentHover text-white"
                 )}
                 onClick={onSkip}
               >

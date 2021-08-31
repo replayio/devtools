@@ -13,6 +13,8 @@
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
 
   /* Text sizes */
+  --root-font-size: 16px;
+  --devtools-base-font-size: 12px;
   --theme-body-font-size: 11px;
   --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);

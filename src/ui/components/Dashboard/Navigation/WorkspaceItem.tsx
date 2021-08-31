@@ -28,9 +28,9 @@ function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: Worksp
   let icon: ReactElement;
 
   if (workspace.id == null) {
-    icon = <UserIcon className="w-6 h-6 flex-shrink-0" />;
+    icon = <UserIcon className="w-5 h-5 flex-shrink-0" />;
   } else {
-    icon = <UserGroupIcon className="w-6 h-6 flex-shrink-0" />;
+    icon = <UserGroupIcon className="w-5 h-5 flex-shrink-0" />;
   }
 
   return (
@@ -39,7 +39,7 @@ function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: Worksp
         <a
           href="#"
           className={classnames(
-            "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 text-lg items-center",
+            "flex flex-row px-3 py-1.5 text-md cursor-pointer space-x-2.5 text-sm items-center",
             active ? "bg-gray-100 " : "",
             currentWorkspaceId == workspace.id ? "font-semibold" : ""
           )}

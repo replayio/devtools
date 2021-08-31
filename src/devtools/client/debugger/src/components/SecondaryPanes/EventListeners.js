@@ -182,7 +182,7 @@ class EventListeners extends Component {
     );
 
     return (
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-1.5">
         {commonCategories.length
           ? this.renderCategoriesSection("Common Events", commonCategories)
           : null}
@@ -209,7 +209,7 @@ class EventListeners extends Component {
 
     return (
       <div className="flex flex-col space-y-1">
-        <div className="text-lg font-medium">{label}</div>
+        <div className="text-sm font-medium">{label}</div>
         <ul className="event-listeners-list">{content}</ul>
       </div>
     );

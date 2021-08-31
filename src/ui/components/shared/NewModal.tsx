@@ -41,7 +41,7 @@ export default function Modal({
 export function ModalContent({ children }: { children: React.ReactChild | React.ReactChild[] }) {
   return (
     <div
-      className="p-12 bg-white rounded-lg shadow-xl text-xl relative justify-between"
+      className="p-9 bg-white rounded-lg shadow-xl text-lg relative justify-between"
       style={{ width: "520px" }}
     >
       {children}

@@ -42,7 +42,7 @@ function IndexingLoader({
   }
 
   return (
-    <div className="w-8 h-8" title={`Indexing (${progressPercentage.toFixed()}%)`}>
+    <div className="w-6 h-6" title={`Indexing (${progressPercentage.toFixed()}%)`}>
       <CircularProgressbar
         value={progressPercentage}
         strokeWidth={10}
@@ -76,7 +76,7 @@ function Toolbar({
   }
 
   return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-8">
+    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-1.5 pb-6">
       <div id="toolbox-toolbar">
         <div
           className={classnames("toolbar-panel-button comments", {

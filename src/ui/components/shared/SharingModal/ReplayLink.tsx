@@ -27,7 +27,7 @@ export function UrlCopy({ url }: { url: string }) {
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="absolute bottom-full p-2 bg-black bg-opacity-900 text-white shadow-2xl rounded-lg mb-2">
+        <div className="absolute bottom-full p-1.5 bg-black bg-opacity-900 text-white shadow-2xl rounded-lg mb-1.5">
           Copied to Clipboard
         </div>
       ) : null}

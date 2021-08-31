@@ -107,7 +107,7 @@ function TeamNamePage({
       <OnboardingBody>
         We recommend keeping it simple and using your company or project name
       </OnboardingBody>
-      <div className="py-4 flex flex-col w-full">
+      <div className="py-3 flex flex-col w-full">
         <TextInput
           placeholder="Team name"
           value={inputValue}
@@ -183,10 +183,10 @@ function TeamMemberInvitationPage({
         Replay is for your whole team. Invite anyone who you would like to be able to record and
         discuss replays with
       </OnboardingBody>
-      <div className="text-2xl w-full space-y-4">
-        <form className="flex flex-col w-full space-y-4 text-2xl" onSubmit={handleAddMember}>
+      <div className="text-xl w-full space-y-3">
+        <form className="flex flex-col w-full space-y-3 text-xl" onSubmit={handleAddMember}>
           <div className="text-sm uppercase font-bold">{`Invite via email`}</div>
-          <div className="flex-grow flex flex-row space-x-4">
+          <div className="flex-grow flex flex-row space-x-3">
             <TextInput
               placeholder="Email address"
               value={inputValue}
@@ -200,7 +200,7 @@ function TeamMemberInvitationPage({
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         {!loading && sortedMembers ? (
-          <div className="overflow-auto w-full text-2xl " style={{ maxHeight: "180px" }}>
+          <div className="overflow-auto w-full text-xl " style={{ maxHeight: "180px" }}>
             <WorkspaceMembers members={sortedMembers} isAdmin />
           </div>
         ) : null}

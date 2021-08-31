@@ -22,7 +22,7 @@ export default function IconWithTooltip({ icon, content, handleClick }: IconWith
   };
 
   return (
-    <div className="icon-with-tooltip">
+    <div className="icon-with-tooltip text-sm">
       <button onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleClick}>
         {icon}
       </button>

@@ -60,17 +60,17 @@ function SharingModal({
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="sharing-modal p-12 space-y-8 relative flex flex-col bg-white text-lg rounded-lg"
+        className="sharing-modal p-12 space-y-8 relative flex flex-col bg-white rounded-lg text-sm"
         style={{ width: "600px" }}
       >
-        <h1 className="text-3xl">Sharing</h1>
+        <h1 className="text-2xl">Sharing</h1>
         <section className="space-y-8">
           <SharedWith
             defaultWorkspaceId={userSettings?.defaultWorkspaceId || null}
             {...{ workspaces, recordingId, collaborators }}
           />
           <div className="space-y-4">
-            <h2 className="text-2xl">Get Link</h2>
+            <h2 className="text-xl">Get Link</h2>
             <ReplayLink recordingId={recordingId} />
             <div className="flex flex-row items-center">
               {isPrivate ? (

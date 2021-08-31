@@ -1,7 +1,4 @@
 /* NOTE: this is added to protect against React DevTools */
-html {
-  font-size: 12px !important;
-}
 
 html,
 body {

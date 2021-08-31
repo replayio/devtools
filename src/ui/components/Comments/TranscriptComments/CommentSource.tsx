@@ -23,11 +23,11 @@ function CommentSource({ comment, createLabels }: CommentSourceProps) {
   }, []);
 
   return (
-    <div className="space-y-6 p-4 rounded-xl rounded-b-none border-b border-gray-200">
-      <div className="text-lg font-medium flex flex-col">
+    <div className="space-y-5 p-3 rounded-xl rounded-b-none border-b border-gray-200">
+      <div className="font-medium flex flex-col">
         <div className="font-semibold">{labels.primary}</div>
         <div
-          className="cm-s-mozilla font-mono overflow-hidden whitespace-pre text-base"
+          className="cm-s-mozilla font-mono overflow-hidden whitespace-pre text-xs"
           dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
         />
       </div>

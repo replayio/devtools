@@ -24,7 +24,7 @@ function Checkbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
   };
 
   if (item.comingSoon) {
-    return <span className="italic  text-gray-500">Coming Soon...</span>;
+    return <span className="italic text-gray-500">Coming Soon...</span>;
   }
 
   return <input type="checkbox" id={String(key)} checked={value} onChange={toggleSetting} />;
@@ -34,7 +34,7 @@ function Dropdown<K>({ value }: InputProps<K>) {
   const onChange = () => {};
 
   return (
-    <div className="w-64">
+    <div className="w-48">
       <SelectMenu selected={value} setSelected={onChange} options={[]} />
     </div>
   );
@@ -53,7 +53,7 @@ export default function SettingsBodyItem<K>({ item, values, onChange }: Settings
 
   return (
     <li className="flex flex-row items-center">
-      <label className="space-y-2 pr-48 flex-grow cursor-pointer" htmlFor={String(key)}>
+      <label className="space-y-1.5 pr-36 flex-grow cursor-pointer" htmlFor={String(key)}>
         <SettingsBodyHeader>{label}</SettingsBodyHeader>
         {description && <div>{description}</div>}
       </label>

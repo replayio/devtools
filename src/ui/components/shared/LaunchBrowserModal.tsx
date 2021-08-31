@@ -16,19 +16,19 @@ function LaunchBrowser({
   }, [path]);
 
   return (
-    <section className="max-w-2xl w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden relative">
-      <div className="p-16 h-84 space-y-12 items-center flex flex-col">
-        <div className="space-y-4 place-content-center">
-          <img className="w-16 h-16 mx-auto" src="/images/logo.svg" />
+    <section className="max-w-xl w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden relative text-sm">
+      <div className="p-12 space-y-9 items-center flex flex-col">
+        <div className="space-y-3 place-content-center">
+          <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
         </div>
-        <div className="text-center space-y-4">
-          <div className="font-bold text-2xl">Launching Replay ...</div>
-          <div className="text-xl text-gray-500 space-y-8">
+        <div className="text-center space-y-3">
+          <div className="font-bold text-lg">Launching Replay ...</div>
+          <div className="text-gray-500 space-y-6">
             <p>
               Click <strong>Open Replay</strong> in the dialog shown by your browser
             </p>
             {children}
-            <p className="text-sm">
+            <p className="text-xs">
               Don&apos;t have Replay installed? <a href="https://replay.io/welcome">Download Now</a>
             </p>
           </div>
