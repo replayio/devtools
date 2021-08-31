@@ -2,12 +2,15 @@ import React from "react";
 import { User } from "ui/types";
 import useAuth0 from "ui/utils/useAuth0";
 import { getAvatarColor } from "ui/utils/user";
+import { Redacted } from "ui/components/Redacted";
 
 export const AuthAvatar = ({ user }: { user: User }) => {
   return (
-    <div className={`avatar authenticated first-player`}>
-      <img src={user.picture} alt={user.name} />
-    </div>
+    <Redacted>
+      <div className={`avatar authenticated first-player`}>
+        <img src={user.picture} alt={user.name} />
+      </div>
+    </Redacted>
   );
 };
 
