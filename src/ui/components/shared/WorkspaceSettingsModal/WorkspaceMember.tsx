@@ -59,7 +59,7 @@ function WorkspaceMemberRoleOption({
   );
 }
 
-function WorkspaceMemberRoles({ member }: { member: WorkspaceUser }) {
+function WorkspaceMemberRoles({ isAdmin, member }: { isAdmin: boolean; member: WorkspaceUser }) {
   const role: WorkspaceUserRole = getMemberRole(member);
   const { updateWorkspaceMemberRole } = hooks.useUpdateWorkspaceMemberRole();
   const [selectedRole, setSelectedRole] = useState<WorkspaceUserRole>(role);
@@ -91,7 +91,9 @@ function WorkspaceMemberRoles({ member }: { member: WorkspaceUser }) {
     <div>
       <WorkspaceMemberRoleOption value="viewer" onSelect={selectRole} selected={selectedRole} />
       <WorkspaceMemberRoleOption value="debugger" onSelect={selectRole} selected={selectedRole} />
-      <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={selectedRole} />
+      {isAdmin ? (
+        <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={selectedRole} />
+      ) : null}
     </div>
   );
 }
@@ -150,23 +152,19 @@ export function NonRegisteredWorkspaceMember({
         <MaterialIcon className="text-3xl">mail_outline</MaterialIcon>
       </div>
       <div className="flex-grow">{member.email}</div>
-      {isAdmin ? (
-        <PortalDropdown
-          buttonContent={<Status member={member} />}
-          setExpanded={setExpanded}
-          expanded={expanded}
-          buttonStyle=""
-          position="bottom-right"
-        >
-          <WorkspaceMemberRoles member={member} />
-          <hr />
-          <div className="permissions-dropdown-item" onClick={handleDelete}>
-            Remove
-          </div>
-        </PortalDropdown>
-      ) : (
-        <Status member={member} hideArrow />
-      )}
+      <PortalDropdown
+        buttonContent={<Status member={member} />}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        buttonStyle=""
+        position="bottom-right"
+      >
+        <WorkspaceMemberRoles member={member} isAdmin={isAdmin} />
+        <hr />
+        <div className="permissions-dropdown-item" onClick={handleDelete}>
+          Remove
+        </div>
+      </PortalDropdown>
     </li>
   );
 }
@@ -221,10 +219,6 @@ function Role({
     );
   }
 
-  if (!isAdmin && localUserId !== userId) {
-    return <Status member={member} hideArrow />;
-  }
-
   return (
     <PortalDropdown
       buttonContent={<Status member={member} />}
@@ -233,7 +227,7 @@ function Role({
       buttonStyle=""
       position="bottom-right"
     >
-      {isAdmin && localUserId !== userId ? <WorkspaceMemberRoles member={member} /> : null}
+      {localUserId !== userId ? <WorkspaceMemberRoles member={member} isAdmin={isAdmin} /> : null}
       <hr />
       <div className="permissions-dropdown-item" onClick={handleDelete}>
         {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
