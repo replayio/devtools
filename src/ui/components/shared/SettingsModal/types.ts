@@ -37,6 +37,10 @@ export interface SettingItem<V> {
   key: keyof V;
   description: string | null;
   disabled: boolean;
+
+  // Used to indicate that a feature is coming soon, but not
+  // yet ready to experiment with
+  comingSoon?: boolean;
 }
 
 export type SettingItemKey = keyof UserSettings;

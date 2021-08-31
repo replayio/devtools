@@ -23,6 +23,10 @@ function Checkbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
     }
   };
 
+  if (item.comingSoon) {
+    return <span className="italic  text-gray-500">Coming Soon...</span>;
+  }
+
   return <input type="checkbox" id={String(key)} checked={value} onChange={toggleSetting} />;
 }
 
