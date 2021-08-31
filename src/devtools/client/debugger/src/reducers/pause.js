@@ -272,6 +272,10 @@ export function getIsPaused(state) {
   return !!state.pause.frames;
 }
 
+export function hasFrames(state) {
+  return !!getTopFrame(state);
+}
+
 export function getPreviousPauseFrameLocation(state) {
   return state.pause.previousLocation;
 }
