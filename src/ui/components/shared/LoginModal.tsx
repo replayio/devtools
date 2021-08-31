@@ -9,7 +9,6 @@ function LoginModal() {
 
   const onClick: React.MouseEventHandler = e => {
     loginWithRedirect({
-      redirectUri: window.location.origin,
       appState: { returnTo: window.location.href },
     });
   };

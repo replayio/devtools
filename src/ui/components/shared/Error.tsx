@@ -49,7 +49,6 @@ function SignInButton() {
 
   const onClick = () => {
     loginWithRedirect({
-      redirectUri: window.location.origin,
       appState: { returnTo: window.location.href },
     });
   };

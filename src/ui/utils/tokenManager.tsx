@@ -17,10 +17,6 @@ const clientId: string = isTesting
   ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm"
   : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 
-const {
-  location: { origin, pathname },
-} = window;
-
 export interface TokenState {
   loading?: boolean;
   token?: string;
@@ -67,7 +63,7 @@ class TokenManager {
         domain={domain}
         clientId={clientId}
         audience={audience}
-        redirectUri={origin + pathname}
+        redirectUri={window.location.origin}
         onRedirectCallback={onRedirectCallback}
         cacheLocation="localstorage"
         prompt="select_account"

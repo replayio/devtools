@@ -23,7 +23,6 @@ function WelcomePage() {
   const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
   const onLogin = () =>
     loginWithRedirect({
-      redirectUri: window.location.origin,
       appState: { returnTo: window.location.href },
     });
 
