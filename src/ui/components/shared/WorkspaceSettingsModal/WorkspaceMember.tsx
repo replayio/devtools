@@ -1,14 +1,14 @@
 import classnames from "classnames";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import hooks from "ui/hooks";
 import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
+import { Redacted } from "ui/components/Redacted";
+import MaterialIcon from "../MaterialIcon";
 
 import "./WorkspaceMember.css";
-import MaterialIcon from "../MaterialIcon";
-import { useEffect } from "react";
 
 type WorkspaceMemberProps = { member: WorkspaceUser; isAdmin: boolean } & PropsFromRedux;
 
@@ -134,7 +134,9 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon className="text-3xl">mail_outline</MaterialIcon>
       </div>
-      <div className="flex-grow">{member.email}</div>
+      <Redacted>
+        <div className="flex-grow">{member.email}</div>
+      </Redacted>
       {isAdmin ? (
         <PortalDropdown
           buttonContent={<Status member={member} />}
@@ -223,7 +225,9 @@ function WorkspaceMember({ member, setWorkspaceId, hideModal, isAdmin }: Workspa
         className="rounded-full"
         style={{ width: "28px", height: "28px" }}
       />
-      <div className="flex-grow">{member.user!.name}</div>
+      <div className="flex-grow" data-private>
+        {member.user!.name}
+      </div>
       <Role
         member={member}
         setWorkspaceId={setWorkspaceId}
