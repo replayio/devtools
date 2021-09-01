@@ -932,7 +932,7 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.paused:not(.paused-before) {
   /* always show the border, even for the last child */
-  border-top: 2px solid #5b41ff;
+  border-top: 2px solid var(--paused-background-color);
 }
 
 .webconsole-app .message.paused.paused-before .message-body-wrapper,
@@ -978,7 +978,7 @@ a.learn-more-link.webconsole-learn-more-link {
   --rewind-left-padding: 5px;
   --rewind-info-button-width: 64px;
   --fast-forward-info-button-width: 92px;
-  --debug-info-button-width: 60px;
+  --debug-info-button-width: 100px;
 }
 
 .webconsole-output .overlay-container .button {
@@ -991,7 +991,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-output .overlay-container.debug .button {
-  cursor: auto;
+  cursor: pointer;
   margin-left: calc(0px - var(--message-left-padding));
   background: linear-gradient(
     0deg,
@@ -1004,6 +1004,12 @@ a.learn-more-link.webconsole-learn-more-link {
   background-color: #2d7eff;
   /* for debugging the final position when hovered */
   /* margin-left: calc(var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius)) !important; */
+}
+
+.webconsole-output .overlay-container.debug .info {
+  background-color: var(--paused-background-color);
+  width: var(--debug-info-button-width);
+  margin-left: calc(0px - var(--message-left-padding) - var(--debug-info-button-width));
 }
 
 .webconsole-output .overlay-container.rewind .info {
@@ -1057,6 +1063,11 @@ a.learn-more-link.webconsole-learn-more-link {
   opacity: 100%;
 }
 
+.webconsole-output .overlay-container.debug:hover .button {
+  background: linear-gradient(152.2deg, #AE95F9 6.75%, var(--paused-background-color) 93.14%);
+  box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
+}
+
 .webconsole-output .overlay-container:not(.debug):hover .button {
   background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
   box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
@@ -1071,4 +1082,9 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-output .overlay-container:hover .info .label {
   opacity: 100%;
+}
+
+.webconsole-output .overlay-container .add-comment-icon {
+  font-size: 1rem;
+  color: white;
 }

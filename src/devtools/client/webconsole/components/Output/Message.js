@@ -168,7 +168,7 @@ class Message extends Component {
       return undefined;
     }
 
-    let overlayType, label, onClick;
+    let overlayType, label;
     let onRewindClick = () => {
       trackEvent("console seek");
       dispatch(
@@ -177,15 +177,16 @@ class Message extends Component {
 
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
+    let handleAddComment = () => {
+      dispatch(actions.createComment(executionPointTime, executionPoint, null, true, frame));
+    };
 
     if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
       overlayType = "fast-forward";
       label = "Fast Forward";
-      onClick = onRewindClick;
     } else if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
       overlayType = "rewind";
       label = "Rewind";
-      onClick = onRewindClick;
     } else if (!isFirstMessageForPoint) {
       // Handle cases where executionPoint is the same as pauseExecutionPoint.
       return;
@@ -194,13 +195,17 @@ class Message extends Component {
       label = "Debug";
 
       return dom.div(
-        { className: `overlay-container debug` },
-        dom.div({ className: "button" }, dom.div({ className: "img" }))
+        { className: `overlay-container debug`, title: "Add Comment", onClick: handleAddComment },
+        dom.div({ className: "info" }, dom.div({ className: "label" }, "Add Comment")),
+        dom.div(
+          { className: "button" },
+          dom.div({ className: "add-comment-icon material-icons rounded-md" }, "add_comment")
+        )
       );
     }
 
     return dom.div(
-      { className: `overlay-container ${overlayType}`, onClick },
+      { className: `overlay-container ${overlayType}`, onClick: onRewindClick },
       dom.div({ className: "info" }, dom.div({ className: "label" }, label)),
       dom.div({ className: "button" }, dom.div({ className: "img" }))
     );
