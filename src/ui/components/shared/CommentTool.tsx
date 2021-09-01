@@ -150,7 +150,7 @@ function CommentTool({
     <div style={parentStyle} className="absolute">
       <div
         className={classNames(
-          "px-2.5 py-1 absolute text-base text-white rounded-2xl w-max space-x-1.5 flex items-center bg-black bg-opacity-70",
+          "px-2.5 py-1 absolute text-xs text-white rounded-2xl w-max space-x-1.5 flex items-center bg-black bg-opacity-70",
           !captionNode.current ? "invisible" : ""
         )}
         style={childStyle}
