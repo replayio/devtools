@@ -11,6 +11,8 @@
     * Workaround: specify font-size on root, on form inputs, and whenever
     * we're using the `font` shorthand. */
   font: message-box;
+  /* This specifies a root font size of 16px. Without this, the Replay UI
+  in Firefox/Replay browsers appear too small. */
   font-size: var(--root-font-size);
 
   --tab-line-hover-color: rgba(0, 0, 0, 0.2);
