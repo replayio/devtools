@@ -147,10 +147,9 @@
   display: flex;
   width: 100%;
   background-color: white;
-  line-height: 16px;
   border-radius: 4px;
   font-family: var(--monospace-font-family);
-  font-size: 1rem;
+  font-size: 0.75rem;
   border: 1px solid var(--theme-splitter-color);
   color: var(--theme-toolbar-color);
 }
