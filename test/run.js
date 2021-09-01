@@ -86,7 +86,7 @@ function processArgs() {
   }
 }
 
-const DefaultDispatchServer = "wss://dispatch.replay.io";
+const DefaultDispatchServer = "wss://dev.dispatch.replay.io";
 
 function processEnvironmentVariables() {
   // The INPUT_STRIPE environment variable is set when running as a Github action.
