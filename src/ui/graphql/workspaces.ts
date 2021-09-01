@@ -54,11 +54,39 @@ export const GET_WORKSPACE_SUBSCRIPTION = gql`
           effectiveUntil
           status
           trialEnds
+          paymentMethods {
+            id
+            type
+            default
+            card {
+              brand
+              last4
+            }
+          }
           plan {
             key
           }
         }
       }
+    }
+  }
+`;
+
+export const PREPARE_WORKSPACE_PAYMENT_METHOD = gql`
+  mutation PrepareWorkspacePaymentMethod($workspaceId: ID!) {
+    prepareWorkspacePaymentMethod(input: { workspaceId: $workspaceId }) {
+      success
+      paymentSecret
+    }
+  }
+`;
+
+export const SET_WORKSPACE_DEFAULT_PAYMENT_METHOD = gql`
+  mutation SetWorkspaceDefaultPaymentMethod($workspaceId: ID!, $paymentMethodId: ID!) {
+    setWorkspaceDefaultPaymentMethod(
+      input: { workspaceId: $workspaceId, paymentMethodId: $paymentMethodId }
+    ) {
+      success
     }
   }
 `;
