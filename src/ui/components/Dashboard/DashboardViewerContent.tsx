@@ -5,7 +5,7 @@ import sortBy from "lodash/sortBy";
 import { isReplayBrowser } from "ui/utils/environment";
 import { Recording } from "ui/types";
 import { RecordingId } from "@recordreplay/protocol";
-import { AssociationFilter, TimeFilter } from "./DashboardViewer";
+import classNames from "classnames";
 
 function getErrorText() {
   if (isReplayBrowser()) {
@@ -59,8 +59,6 @@ interface DashboardViewerContentProps {
   selectedIds: RecordingId[];
   setSelectedIds(ids: RecordingId[]): void;
   editing: boolean;
-  timeFilter: TimeFilter;
-  associationFilter: AssociationFilter;
   searchString: string;
 }
 
@@ -69,8 +67,6 @@ export default function DashboardViewerContent({
   selectedIds,
   setSelectedIds,
   editing,
-  timeFilter,
-  associationFilter,
   searchString,
 }: DashboardViewerContentProps) {
   const [ascOrder, setAscOrder] = useState(false);
@@ -81,7 +77,7 @@ export default function DashboardViewerContent({
 
   if (!recordings.length) {
     let errorText;
-    if (timeFilter != "all" || associationFilter != "all" || searchString) {
+    if (searchString) {
       errorText = "No replays found, please expand your search";
     } else {
       errorText = getErrorText();
@@ -132,7 +128,7 @@ function RecordingsList({
     setSelectedIds(selectedIds.filter(id => id !== recordingId));
 
   return (
-    <table className="dashboard-viewer-content-table">
+    <table className="dashboard-viewer-content-table rounded-md shadow-lg">
       <thead className="dashboard-viewer-content-header">
         <DashboardViewerContentHeader
           recordings={recordings}
@@ -180,25 +176,50 @@ function DashboardViewerContentHeader({
   };
 
   return (
-    <tr className="text-xs">
-      <th>
+    <tr className="bg-gray-50 font-normal text-xs uppercase text-gray-500 ">
+      <Th>
         <input
           type="checkbox"
           onChange={handleHeaderCheckboxClick}
           checked={!!selectedIds.length}
         />
-      </th>
-      <th>PREVIEW</th>
-      <th>TITLE</th>
-      <th className="length">LENGTH</th>
-      <th className="sorter created" onClick={() => setAscOrder(!ascOrder)}>
+      </Th>
+      <Th>TITLE</Th>
+      <Th className="length">LENGTH</Th>
+      <Th className="sorter created" onClick={() => setAscOrder(!ascOrder)}>
         <span className="label">CREATED</span>
         {ascOrder ? <div className="img arrow-up-2" /> : <div className="img arrow-down-2" />}
-      </th>
-      <th className="privacy">PRIVACY</th>
-      <th className="owner">OWNER</th>
-      <th>ACTIVITY</th>
-      <th></th>
+      </Th>
+      <Th className="privacy">PRIVACY</Th>
+      <Th className="owner">OWNER</Th>
+      <Th>ACTIVITY</Th>
+      <Th></Th>
     </tr>
   );
 }
+
+function Th({
+  children,
+  className,
+  onClick,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <th
+      onClick={onClick}
+      className={classNames(className, "flex align-items center py-1 pt-1 bg-gray-50")}
+    >
+      {children}
+    </th>
+  );
+}
+
+// display: flex;
+// align-items: center;
+// padding: 4px 4px 4px 0;
+// border-bottom: 1px solid var(--theme-splitter-color);
+// position: sticky;
+// top: 0px;

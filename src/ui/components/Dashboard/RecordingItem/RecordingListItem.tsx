@@ -12,6 +12,7 @@ import "./RecordingListItem.css";
 import { RecordingItemProps } from "./RecordingItem";
 import { RecordingId } from "@recordreplay/protocol";
 import { Redacted } from "ui/components/Redacted";
+import classNames from "classnames";
 
 function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -180,46 +181,48 @@ export default function RecordingListItem({
   };
 
   return (
-    <tr className={classnames("recording-item", { selected })} onClick={handleClick}>
-      <td>
+    <tr className={classnames("recording-item bg-white", { selected })} onClick={handleClick}>
+      <Td>
         <ItemCheckbox toggleChecked={toggleChecked} selected={selected} />{" "}
-      </td>
-      <td>
+      </Td>
+      <Td className="flex flex-row space-x-2">
         <LazyLoad height={80} scrollContainer=".recording-list" once>
           <ItemScreenshot recordingId={recordingId} />
         </LazyLoad>
-      </td>
-      <td>
         <ItemTitle
           data={data}
           editing={editing}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
         />
-      </td>
-      <td>
+      </Td>
+      <Td>
         <ItemDuration duration={data.duration} />
-      </td>
-      <td>
+      </Td>
+      <Td>
         <ItemCreatedDate date={data.date} />
-      </td>
-      <td>
+      </Td>
+      <Td>
         <ItemPrivacy isPrivate={data.private} toggleIsPrivate={toggleIsPrivate} />
-      </td>
-      <td>
+      </Td>
+      <Td>
         <Redacted>
           <div className="owner">{data.user && <AuthAvatar user={data.user} />}</div>
         </Redacted>
-      </td>
-      <td>
+      </Td>
+      <Td>
         {data.comments.length ? (
           <div className="flex flex-row space-x-1 items-center">
-            <ChatAltIcon className="w-5 h-5 text-gray-500" />
+            <ChatAltIcon className="w-6 h-6 text-gray-500" />
             <span>{data.comments.length}</span>
           </div>
         ) : null}
-      </td>
-      <td>{isOwner && <ItemOptions Panel={Panel} />}</td>
+      </Td>
+      <Td>{isOwner && <ItemOptions Panel={Panel} />}</Td>
     </tr>
   );
+}
+
+function Td({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <td className={classNames(className, "bg-white")}>{children}</td>;
 }

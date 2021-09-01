@@ -1,6 +1,4 @@
 import React from "react";
-import NewWorkspaceButton from "./NewWorkspaceButton";
-import WorkspaceItem from "./WorkspaceItem";
 import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
 import { Workspace } from "ui/types";
 import { Fragment } from "react";
@@ -33,16 +31,7 @@ export default function WorkspaceDropdown({
             <Menu.Items
               static
               className="origin-top-right absolute left-0 z-10 mt-1.5 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none select-none text-sm overflow-hidden"
-            >
-              <div className="py-1">
-                {workspaces.map((workspace, i) => (
-                  <WorkspaceItem workspace={workspace} key={i} />
-                ))}
-              </div>
-              <div className="py-1">
-                <NewWorkspaceButton />
-              </div>
-            </Menu.Items>
+            ></Menu.Items>
           </Transition>
         </>
       )}

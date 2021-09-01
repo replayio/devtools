@@ -5,7 +5,7 @@
 
 .recording-list table.dashboard-viewer-content-table {
   display: grid;
-  grid-template-columns: 30px 112px auto 100px 150px 100px 60px 60px 50px;
+  grid-template-columns: 30px auto 100px 150px 100px 60px 60px 50px;
 }
 
 .dashboard-viewer-header-title {
@@ -60,7 +60,6 @@
   align-items: center;
   padding: 4px 4px 4px 0;
   border-bottom: 1px solid var(--theme-splitter-color);
-  background-color: white;
   position: sticky;
   top: 0px;
 }
