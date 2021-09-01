@@ -32,11 +32,11 @@ function DeletedScreen({ url }: { url: string }) {
     >
       <Modal>
         <div
-          className="p-12 bg-white rounded-lg shadow-xl text-lg space-y-12 relative flex flex-col justify-between"
-          style={{ width: "400px" }}
+          className="p-9 bg-white rounded-md shadow-xl text-base space-y-9 relative flex flex-col justify-between"
+          style={{ width: "300px" }}
         >
-          <h2 className="font-bold text-3xl ">{`Redirecting...`}</h2>
-          <div className="text-gray-500 space-y-6 text-xl">
+          <h2 className="font-bold text-2xl ">{`Redirecting...`}</h2>
+          <div className="text-gray-500 space-y-5 text-lg">
             <div>{`Sit tight! We'll take you back to the library in a few seconds.`}</div>
           </div>
           <div className="space-y-1">
@@ -44,7 +44,7 @@ function DeletedScreen({ url }: { url: string }) {
               type="button"
               onClick={navigateToUrl}
               className={classNames(
-                "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccentHover justify-center",
+                "inline-flex items-center px-3 py-1.5 border border-transparent text-base font-medium rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccentHover justify-center",
                 "text-white bg-primaryAccent hover:bg-primaryAccentHover"
               )}
             >
@@ -76,13 +76,13 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
   const isDeleting = status === "deleting";
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4 text-sm">
       <button
         type="button"
         onClick={onDiscard}
         disabled={isSaving || isDeleting}
         className={classNames(
-          "inline-flex items-center px-4 py-2 border border-textFieldBorder text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center",
+          "inline-flex items-center px-4 py-2 border border-textFieldBorder font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent justify-center",
           "text-gray-500 hover:bg-gray-100 hover:"
         )}
       >
@@ -93,7 +93,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         disabled={isSaving || isDeleting}
         value={isSaving ? `Uploading…` : `Save & Upload`}
         className={classNames(
-          "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccentHover justify-center cursor-pointer",
+          "inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccentHover justify-center cursor-pointer",
           "text-white bg-primaryAccent hover:bg-primaryAccentHover"
         )}
       ></input>
@@ -104,19 +104,19 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 function ReplayPreview({ recording, screenData }: { recording: Recording; screenData: string }) {
   return (
     <div className="space-y-1">
-      <div className="block text-sm uppercase font-semibold ">Preview</div>
+      <div className="block text-xs uppercase font-semibold ">Preview</div>
       <div
-        className="relative bg-gray-100 border border-gray-200 rounded-lg"
+        className="relative bg-gray-100 border border-gray-200 rounded-lg text-xs"
         style={{ height: "200px" }}
       >
         <img src={screenData} className="h-full m-auto" />
         <div
           style={{ maxWidth: "50%" }}
-          className="bg-gray-700 text-white bottom-4 left-4 rounded-lg px-3 py-0.5 absolute text-base select-none"
+          className="bg-gray-700 text-white bottom-4 left-4 rounded-lg px-3 py-0.5 absolute select-none"
         >
           <div className="whitespace-pre overflow-hidden overflow-ellipsis">{recording.url}</div>
         </div>
-        <div className="bg-gray-700 text-white bottom-4 right-4 rounded-lg px-3 py-0.5 absolute text-base select-none">
+        <div className="bg-gray-700 text-white bottom-4 right-4 rounded-lg px-3 py-0.5 absolute select-none">
           {getFormattedTime(recording!.duration)}
         </div>
       </div>
@@ -158,13 +158,13 @@ export function SharingSettings({
   return (
     <>
       <div className="">
-        <label className="block text-sm uppercase font-semibold ">Team</label>
+        <label className="block text-sm uppercase font-semibold">Team</label>
         {workspaces.length ? (
           <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
         ) : null}
       </div>
-      <div className="text-lg space-y-2">
-        <label className="block text-sm uppercase font-semibold ">Privacy</label>
+      <div className="space-y-2 text-sm">
+        <label className="block text-xs uppercase font-semibold">Privacy</label>
         <div className="space-y-1">
           <div className="space-x-2 items-center">
             <input
@@ -231,7 +231,7 @@ function SharingPreview({
   }
 
   return (
-    <div className="flex flex-row items-center space-x-4">
+    <div className="flex flex-row items-center space-x-4 text-sm">
       <span className="material-icons">{icon}</span>
       <div className="flex flex-col flex-grow overflow-hidden">
         <div className="overflow-hidden overflow-ellipsis whitespace-pre">{text}</div>
@@ -317,7 +317,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
           className="p-12 bg-white rounded-lg shadow-xl text-lg space-y-12 relative flex flex-col justify-between"
           style={{ width: "520px" }}
         >
-          <h2 className="font-bold text-3xl ">Save and Upload</h2>
+          <h2 className="font-bold text-2xl ">Save and Upload</h2>
           <form className="space-y-6" onSubmit={e => onSubmit(e)}>
             <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
             <ReplayPreview recording={recording} screenData={screenData!} />

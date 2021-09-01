@@ -233,7 +233,7 @@ class FilterBar extends Component {
 
     return dom.div(
       {
-        className: `webconsole-filteringbar-wrapper ${displayMode}`,
+        className: `webconsole-filteringbar-wrapper text-xs ${displayMode}`,
         "aria-live": "off",
         ref: node => {
           this.wrapperNode = node;

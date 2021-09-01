@@ -36,27 +36,27 @@ function CommentItem({
 
   return (
     <div>
-      <div className="space-y-6 px-4 pt-4">
-        <div className="flex space-x-3 items-center">
+      <div className="space-y-4 px-3 pt-3">
+        <div className="flex space-x-2.5 items-center">
           <img
-            className="h-10 w-10 rounded-full"
+            className="h-8 w-8 rounded-full"
             src={comment.user.picture}
             alt={comment.user.name}
           />
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden text-xs">
             <div className="flex items-center justify-between">
-              <h3 className="text-md font-medium overflow-hidden overflow-ellipsis whitespace-pre">
+              <h3 className="font-medium overflow-hidden overflow-ellipsis whitespace-pre">
                 {comment.user.name}
               </h3>
               <CommentActions comment={comment} isRoot={"replies" in comment} />
             </div>
-            <p className="text-md text-gray-500 overflow-hidden overflow-ellipsis whitespace-pre">
+            <p className="text-gray-500 overflow-hidden overflow-ellipsis whitespace-pre">
               {relativeDate}
             </p>
           </div>
         </div>
       </div>
-      <div className="space-y-6 px-4 pt-4 pb-4 text-md">{comment.content}</div>
+      <div className="space-y-4 px-3 pt-3 pb-3 text-xs">{comment.content}</div>
     </div>
   );
 }

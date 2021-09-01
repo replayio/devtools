@@ -20,7 +20,7 @@ function DownloadLinks() {
 
   if (clicked) {
     return (
-      <div className="flex flex-col space-y-8" style={{ maxWidth: "32rem" }}>
+      <div className="flex flex-col space-y-6" style={{ maxWidth: "24rem" }}>
         <div>Download started.</div>
         <div>{`Once the download is finished, open the Replay Browser installer to install Replay`}</div>
       </div>
@@ -28,13 +28,13 @@ function DownloadLinks() {
   }
 
   return (
-    <div className="flex flex-col space-y-8" style={{ maxWidth: "32rem" }}>
+    <div className="flex flex-col space-y-6 text-sm" style={{ maxWidth: "24rem" }}>
       <div>{`There's nothing here yet. To create your first replay, you first need to download the Replay Browser`}</div>
-      <div className="grid gap-4 grid-cols-2">
+      <div className="grid gap-3 grid-cols-2">
         <a
           href="https://replay.io/downloads/replay.dmg"
           className={
-            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+            "w-full text-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
           }
           onClick={() => setClicked(true)}
         >
@@ -43,7 +43,7 @@ function DownloadLinks() {
         <a
           href="https://replay.io/downloads/linux-replay.tar.bz2"
           className={
-            "w-full text-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+            "w-full text-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
           }
           onClick={() => setClicked(true)}
         >
@@ -88,8 +88,8 @@ export default function DashboardViewerContent({
     }
 
     return (
-      <section className="dashboard-viewer-content grid items-center justify-center">
-        <span className="text-xl text-gray-500">{errorText}</span>
+      <section className="dashboard-viewer-content grid items-center justify-center text-sm">
+        <span className="text-gray-500">{errorText}</span>
       </section>
     );
   }
@@ -180,7 +180,7 @@ function DashboardViewerContentHeader({
   };
 
   return (
-    <tr>
+    <tr className="text-xs">
       <th>
         <input
           type="checkbox"

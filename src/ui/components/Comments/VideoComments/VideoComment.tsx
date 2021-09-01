@@ -53,7 +53,7 @@ function VideoComment({
           onMouseLeave={() => setHoveredComment(null)}
           style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
         />
-        <ChatAltIcon className="w-5 h-5 absolute text-white pointer-events-none	" />
+        <ChatAltIcon className="w-3.5 h-3.5 absolute text-white pointer-events-none	" />
       </div>
     </div>
   );

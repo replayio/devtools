@@ -11,7 +11,7 @@ function ShareButton({ setModal }: PropsFromRedux) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center px-6 py-2 border-2 border-bg-blue-100 text-xl rounded-xl text-black-700 bg-white hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent h-11 mr-0 sharebutton"
+      className="inline-flex items-center px-4 py-1.5 border-2 border-bg-blue-100 rounded-lg text-black-700 bg-white hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent h-8 mr-0 sharebutton"
     >
       Share
     </button>

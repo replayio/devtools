@@ -17,7 +17,7 @@ export function Events() {
   );
 
   return (
-    <div className="event-breakpoints">
+    <div className="event-breakpoints text-xs">
       <Dropdown
         buttonContent={buttonContent}
         setExpanded={setExpanded}

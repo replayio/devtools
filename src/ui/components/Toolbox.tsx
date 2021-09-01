@@ -7,7 +7,7 @@ export default function Toolbox() {
   return (
     <div id="toolbox">
       <div className="toolbox-top-panels">
-        <div className="toolbox-panel" id="toolbox-content-debugger">
+        <div className="toolbox-panel text-xs" id="toolbox-content-debugger">
           <DebuggerApp />
         </div>
       </div>

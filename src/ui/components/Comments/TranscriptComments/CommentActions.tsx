@@ -50,21 +50,23 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   return (
     <div className="comment-actions" onClick={e => e.stopPropagation()}>
       <PortalDropdown
-        buttonContent={<DotsHorizontalIcon className="w-5 h-5 opacity-0 group-hover:opacity-100" />}
+        buttonContent={
+          <DotsHorizontalIcon className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100" />
+        }
         setExpanded={setExpanded}
         expanded={expanded}
         buttonStyle=""
         position="bottom-right"
       >
         <div
-          className="comments-dropdown-item edit-comment text-lg"
+          className="comments-dropdown-item edit-comment text-xs"
           title="Edit Comment"
           onClick={editComment}
         >
           Edit comment
         </div>
         <div
-          className="comments-dropdown-item delete-comment text-lg"
+          className="comments-dropdown-item delete-comment text-xs"
           title="Delete Comment"
           onClick={handleDelete}
         >

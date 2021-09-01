@@ -32,7 +32,7 @@ export default function WorkspaceDropdown({
           >
             <Menu.Items
               static
-              className="origin-top-right absolute left-0 z-10 mt-2 w-72 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none select-none"
+              className="origin-top-right absolute left-0 z-10 mt-1.5 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none select-none text-sm overflow-hidden"
             >
               <div className="py-1">
                 {workspaces.map((workspace, i) => (

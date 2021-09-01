@@ -11,8 +11,10 @@ export default function ReplayInvitations() {
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { invitations, loading: inviteLoading } = hooks.useGetInvitations();
-  let { availableInvitations, loading: availableInvitationsLoading } =
-    hooks.useGetAvailableInvitations();
+  let {
+    availableInvitations,
+    loading: availableInvitationsLoading,
+  } = hooks.useGetAvailableInvitations();
   const addInvitation = hooks.useAddInvitation();
 
   const onSubmit = (e: React.FormEvent) => {
@@ -74,7 +76,7 @@ export default function ReplayInvitations() {
         </label>
         {(!USE_AVAILABLE_INVITATIONS || availableInvitations > 0) && (
           <div className="flex flex-col w-full">
-            <form onSubmit={onSubmit} className="space-x-2 flex flex-row">
+            <form onSubmit={onSubmit} className="space-x-1.5 flex flex-row">
               <TextInput
                 placeholder="Email Address"
                 value={inputValue}
@@ -83,12 +85,12 @@ export default function ReplayInvitations() {
               <button
                 type="submit"
                 value="Invite"
-                className="inline-flex items-center px-3 py-2 border border-transparent text-lg leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
+                className="inline-flex items-center px-2.5 py-1.5 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
               >
                 Invite
               </button>
             </form>
-            {errorMessage ? <div className="text-red-500 text-sm">{errorMessage}</div> : null}
+            {errorMessage ? <div className="text-red-500 text-xs">{errorMessage}</div> : null}
           </div>
         )}
         <div className="invitations-list">

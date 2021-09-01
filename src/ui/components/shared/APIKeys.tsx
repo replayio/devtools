@@ -20,9 +20,9 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
 
   return (
     <>
-      <div className="flex items-center justify-between space-x-4">
+      <div className="flex items-center justify-between space-x-3">
         <div className="flex-auto w-0">
-          <div className="flex items-center px-3 h-12 w-full border border-textFieldBorder rounded-md bg-blue-100">
+          <div className="flex items-center px-2.5 h-9 w-full border border-textFieldBorder rounded-md bg-blue-100">
             <input
               readOnly
               value={keyValue}
@@ -33,7 +33,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
               <div className="mx-3 text-primaryAccent">Copied!</div>
             ) : (
               <MaterialIcon
-                className="material-icons mx-3 w-7 h-7 text-primaryAccent"
+                className="material-icons mx-2.5 w-5 h-5 text-primaryAccent"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
                 assignment_outline
@@ -42,13 +42,13 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
           </div>
         </div>
         <button
-          className="inline-flex items-center px-3 py-2 h-12 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
+          className="inline-flex items-center px-2.5 py-1.5 h-9 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
           onClick={onDone}
         >
           Done
         </button>
       </div>
-      <div className="flex items-center p-3 border border-textFieldBorder rounded-md bg-red-100">
+      <div className="flex items-center p-2.5 border border-textFieldBorder rounded-md bg-red-100">
         Make sure to copy your API key now. You won{"'"}t be able to see it again!
       </div>
     </>
@@ -63,10 +63,10 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
       <h3 className="text-base uppercase font-semibold">API Keys</h3>
       <div className="flex-auto overflow-auto h-0">
         {apiKeys.map(apiKey => (
-          <div className="flex flex-row items-center py-2" key={apiKey.id}>
+          <div className="flex flex-row items-center py-1.5" key={apiKey.id}>
             <span className="flex-auto">{apiKey.label}</span>
             <button
-              className="inline-flex items-center p-3 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
+              className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
               onClick={() => {
                 const message =
                   "This action will permanently delete this API key. \n\nAre you sure you want to proceed?";
@@ -133,10 +133,10 @@ export default function APIKeys({
         <NewApiKey keyValue={keyValue} onDone={() => setKeyValue(undefined)} />
       ) : (
         <>
-          <section className="space-y-3">
-            <h3 className="text-base uppercase font-semibold">Create new API Key</h3>
+          <section className="space-y-2.5 text-sm">
+            <h3 className="uppercase font-semibold text-xs">Create new API Key</h3>
             <form
-              className="space-y-4"
+              className="space-y-3"
               onSubmit={ev => {
                 canSubmit &&
                   addKey(label, selectedScopes).then(resp => {
@@ -148,7 +148,7 @@ export default function APIKeys({
                 ev.preventDefault();
               }}
             >
-              <fieldset className="w-full space-x-2 flex flex-row">
+              <fieldset className="w-full space-x-1.5 flex flex-row">
                 <TextInput
                   disabled={loading}
                   placeholder="API Key Label"
@@ -159,7 +159,7 @@ export default function APIKeys({
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className={`inline-flex items-center px-3 py-2 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent focus:outline-none ${
+                  className={`inline-flex items-center px-2.5 py-1.5 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent focus:outline-none ${
                     canSubmit
                       ? "hover:bg-primaryAccentHover focus:bg-primaryAccentHover"
                       : "opacity-60"
@@ -172,7 +172,7 @@ export default function APIKeys({
                 <fieldset className="w-full">
                   <h4 className="text-sm uppercase font-semibold">Permissions</h4>
                   {scopes.map(scope => (
-                    <label key={scope} className="inline-block space-x-2 mx-2">
+                    <label key={scope} className="inline-block space-x-1.5 mx-1.5">
                       <input
                         type="checkbox"
                         onChange={e =>
@@ -190,7 +190,7 @@ export default function APIKeys({
                     </label>
                   ))}
                   {selectedScopes.length === 0 ? (
-                    <div className="mt-3 flex items-center p-3 border border-textFieldBorder rounded-md bg-red-100">
+                    <div className="mt-2.5 flex items-center p-2.5 border border-textFieldBorder rounded-md bg-red-100">
                       At least one permission must be selected.
                     </div>
                   ) : null}

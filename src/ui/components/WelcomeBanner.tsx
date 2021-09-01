@@ -15,7 +15,7 @@ export default function WelcomeBanner({
     <div className="w-full h-full flex justify-center items-center">
       <div className="relative overflow-hidden text-center">
         {title || em ? (
-          <h1 className="text-6xl font-bold text-gray-800">
+          <h1 className="text-5xl font-bold text-gray-800">
             {title}{" "}
             <div className="inline-block relative">
               {em}
@@ -55,7 +55,7 @@ export default function WelcomeBanner({
           </h1>
         ) : null}
         {subtitle ? (
-          <h2 style={{ width: "660px" }} className="text-2xl mt-8 text-gray-600">
+          <h2 style={{ width: "660px" }} className="text-xl mt-6 text-gray-600">
             {subtitle}
           </h2>
         ) : null}

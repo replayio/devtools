@@ -19,30 +19,30 @@ function AutocompleteAction({
   if (status === "loading") {
     return (
       <button
-        className="inline-flex items-center px-3 py-2 space-x-2 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent"
+        className="inline-flex items-center px-2.5 py-1.5 space-x-1.5 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent"
         disabled
       >
-        <Spinner className="animate-spin h-6 w-6 text-white" />
+        <Spinner className="animate-spin h-4 w-4 text-white" />
         <span>Inviting</span>
       </button>
     );
   } else if (status === "completed") {
     return (
       <button
-        className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-green-600"
+        className="inline-flex items-center px-2.5 py-1.5 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-green-600"
         disabled
       >
-        <CheckCircleIcon className="h-6 w-6 text-white" />
+        <CheckCircleIcon className="h-4 w-4 text-white" />
         <span>Invited</span>
       </button>
     );
   } else if (status === "error") {
     return (
       <button
-        className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-red-600"
+        className="inline-flex items-center px-2.5 py-1.5 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-red-600"
         disabled
       >
-        <ExclamationCircleIcon className="h-6 w-6 text-white" />
+        <ExclamationCircleIcon className="h-4 w-4 text-white" />
         <span>Unknown User</span>
       </button>
     );
@@ -50,10 +50,10 @@ function AutocompleteAction({
 
   return (
     <button
-      className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent hover:bg-primaryAccentHover"
+      className="inline-flex items-center px-2.5 py-1.5 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-primaryAccent hover:bg-primaryAccentHover"
       onClick={handleSubmit}
     >
-      <PaperAirplaneIcon className="h-6 w-6 text-white transform rotate-90" />
+      <PaperAirplaneIcon className="h-4 w-4 text-white transform rotate-90" />
       <span>Add</span>
     </button>
   );

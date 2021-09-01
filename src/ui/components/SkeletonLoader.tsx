@@ -16,7 +16,6 @@ type SkeletonProps = PropsFromRedux & {
 function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode }: SkeletonProps) {
   const [displayedProgress, setDisplayedProgress] = useState(0);
   const key = useRef<any>(null);
-  const backgroundColor = `hsl(0, 0%, 98%)`;
 
   useEffect(() => {
     return () => clearTimeout(key.current);

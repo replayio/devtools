@@ -9,7 +9,6 @@ main.dashboard {
 
 .dashboard-viewer {
   width: 100%;
-  font-size: 14px;
   display: flex;
   flex-direction: column;
   overflow: auto;

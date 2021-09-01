@@ -19,12 +19,12 @@ function InvitationCard({
     <div
       className={classNames(
         borderStyles,
-        "relative rounded-lg border bg-white px-6 py-2 shadow-sm flex space-x-3 focus-within:ring-2 focus-within:ring-offset-2"
+        "relative rounded-lg border bg-white px-4 py-1.5 shadow-sm flex space-x-2.5 focus-within:ring-2 focus-within:ring-offset-2"
       )}
     >
       <div className="flex-1 min-w-0 select-none">
-        <p className="text-lg font-medium ">{teamName}</p>
-        <div className="text-lg truncate space-x-2">{actions}</div>
+        <p className="text-base font-medium ">{teamName}</p>
+        <div className="text-base truncate space-x-1.5">{actions}</div>
       </div>
     </div>
   );
@@ -145,9 +145,9 @@ function Invitations({ setWorkspaceId }: PropsFromRedux) {
   };
 
   return (
-    <div className="workspace-invites flex flex-col space-y-4 p-8 items-start">
+    <div className="workspace-invites flex flex-col space-y-3 p-6 items-start">
       <h2 className="font-medium uppercase tracking-wide">{`PENDING INVITATIONS`}</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         {displayedWorkspaces.map(workspace =>
           acceptedInvitations.includes(workspace) ? (
             <AcceptedInvitation

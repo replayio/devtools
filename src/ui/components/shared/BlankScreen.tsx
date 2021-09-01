@@ -52,12 +52,12 @@ export function BlankLoadingScreen({
     <BlankScreen background={background}>
       <div className="m-auto">
         <div
-          className={classNames("flex flex-col items-center space-y-4  opacity-90 rounded-md p-8", {
+          className={classNames("flex flex-col items-center space-y-3 opacity-90 rounded-md p-6", {
             "bg-white": background == "white",
           })}
         >
           <div
-            className={classNames("text-xl", {
+            className={classNames("text-lg", {
               invisible: !statusMessage,
               "text-white": background === "blue-gradient",
             })}
@@ -65,7 +65,7 @@ export function BlankLoadingScreen({
             {statusMessage || defaultStatusMessage}
           </div>
           <Spinner
-            className={classNames("animate-spin -ml-1 mr-3 h-8 w-8", {
+            className={classNames("animate-spin -ml-1 mr-2.5 h-6 w-6", {
               "text-white": background === "blue-gradient",
             })}
           />
@@ -80,8 +80,8 @@ export function BlankProgressScreen({ progress }: { progress: number }) {
   return (
     <BlankScreen background="white">
       <div className="m-auto">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="text-xl">Preparing replay</div>
+        <div className="flex flex-col items-center space-y-3">
+          <div className="text-lg">Preparing replay</div>
           <div className="w-40 relative h-1 bg-gray-200 rounded-lg overflow-hidden">
             <div
               className="absolute t-0 h-full bg-primaryAccent"

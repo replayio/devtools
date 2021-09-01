@@ -46,7 +46,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
 
   if (style === "primary") {
     textStyle = getTextClass("white");
-    bgStyle = `bg-primaryAccent hover:bg-${getColorCode(color, 700)}`;
+    bgStyle = `bg-${getColorCode(color, 600)} hover:bg-${getColorCode(color, 700)}`;
   } else if (style === "secondary") {
     textStyle = getTextClass(color);
     bgStyle = `bg-white border-${getColorCode(color, 600)} hover:border-${getColorCode(
@@ -61,7 +61,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
   return `${textStyle} ${bgStyle}`;
 }
 
-function Button({
+export function Button({
   size,
   children,
   style,
@@ -95,21 +95,21 @@ interface ButtonProps {
 }
 
 export const PrimaryLgButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="3xl" style="primary" />
+  <Button {...props} size="2xl" style="primary" />
 );
 export const SecondaryLgButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="3xl" style="secondary" />
+  <Button {...props} size="2xl" style="secondary" />
 );
 export const DisabledLgButton = (props: ButtonProps) => (
-  <Button {...props} size="3xl" style="disabled" className="cursor-default" color="gray" />
+  <Button {...props} size="2xl" style="disabled" className="cursor-default" color="gray" />
 );
 
 export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="2xl" style="primary" />
+  <Button {...props} size="md" style="primary" />
 );
 export const SecondaryButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="2xl" style="secondary" />
+  <Button {...props} size="md" style="secondary" />
 );
 export const DisabledButton = (props: ButtonProps) => (
-  <Button {...props} size="2xl" style="disabled" className="cursor-default" color="gray" />
+  <Button {...props} size="md" style="disabled" className="cursor-default" color="gray" />
 );

@@ -23,9 +23,9 @@ export function SharedWith(props: SharedWithProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="w-full flex flex-row justify-between items-center">
-        <h2 className="text-2xl">Shared with</h2>
+        <h2 className="text-xl">Shared with</h2>
         {isEditing ? (
           <PrimaryButton color="blue" onClick={() => setIsEditing(false)}>
             Done
@@ -66,14 +66,14 @@ function SharedWithForm({
   };
 
   return (
-    <div className="w-full justify-between flex flex-col space-y-4">
+    <div className="w-full justify-between flex flex-col space-y-3">
       {workspaces.length ? (
-        <div className="w-full space-y-2">
+        <div className="w-full space-y-1.5">
           <div className="text-sm uppercase font-bold">{`Team`}</div>
           <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
         </div>
       ) : null}
-      <div className="w-full space-y-2">
+      <div className="w-full space-y-1.5">
         <div className="text-sm uppercase font-bold">{`People`}</div>
         <Collaborators {...{ recordingId }} />
       </div>
@@ -97,8 +97,8 @@ function getCollaboratorsSummary(workspace: Workspace, collaboratorCount: number
   }
 
   if (sharees.length === 0) {
-    return <div className="pr-8">This is not currently shared with anybody</div>;
+    return <div className="pr-6">This is not currently shared with anybody</div>;
   }
 
-  return <div className="pr-8">Shared with {commaListOfThings(sharees)}</div>;
+  return <div className="pr-6">Shared with {commaListOfThings(sharees)}</div>;
 }

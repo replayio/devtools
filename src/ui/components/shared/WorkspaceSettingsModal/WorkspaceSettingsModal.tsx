@@ -17,6 +17,7 @@ import { Settings } from "../SettingsModal/types";
 import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
+import { Button } from "../Button";
 
 function ModalButton({
   children,
@@ -36,7 +37,7 @@ function ModalButton({
       disabled={disabled}
       className={classNames(
         className,
-        "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+        "max-w-max items-center px-3 py-1.5 border border-transparent text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {children}
@@ -59,7 +60,7 @@ export function WorkspaceMembers({
   const canAdminLeave = canLeave && members.filter(a => a.roles?.includes("admin")).length > 1;
 
   return (
-    <ul className="flex flex-col space-y-3">
+    <ul className="flex flex-col space-y-2.5">
       {sortedMembers.map(member =>
         member.email ? (
           <NonRegisteredWorkspaceMember
@@ -117,13 +118,13 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
-      <div className="flex-grow flex flex-row space-x-4">
+      <div className="flex-grow flex flex-row space-x-3">
         <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
         <ModalButton onClick={handleAddMember} disabled={isLoading}>
           {isLoading ? "Loading" : "Invite"}
         </ModalButton>
       </div>
-      {errorMessage ? <div className="text-red-500 text-sm">{errorMessage}</div> : null}
+      {errorMessage ? <div className="text-red-500 text-xs">{errorMessage}</div> : null}
     </form>
   );
 }
@@ -148,13 +149,13 @@ const settings: Settings<
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
-        <div className="flex flex-col flex-grow space-y-4 overflow-hidden">
-          <div className="text-xl">{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
+        <div className="flex flex-col flex-grow space-y-3 overflow-hidden">
+          <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
           <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
-          <div className=" text-sm uppercase font-semibold">{`Members`}</div>
+          <div className="text-xs uppercase font-semibold">{`Members`}</div>
           <div className="overflow-auto flex-grow">
-            <div className="workspace-members-container flex flex-col space-y-2">
-              <div className="flex flex-col space-y-2">
+            <div className="workspace-members-container flex flex-col space-y-1.5">
+              <div className="flex flex-col space-y-1.5">
                 {members ? <WorkspaceMembers members={members} isAdmin={isAdmin} /> : null}
               </div>
             </div>
@@ -198,19 +199,16 @@ const settings: Settings<
       };
 
       return (
-        <div className="flex flex-col space-y-4">
-          <div className=" text-sm uppercase font-semibold">{`Danger Zone`}</div>
-          <div className="border border-red-300 flex flex-row justify-between rounded-lg p-2">
+        <div className="flex flex-col space-y-3">
+          <div className=" text-xs uppercase font-semibold">{`Danger Zone`}</div>
+          <div className="border border-red-300 flex flex-row justify-between rounded-lg p-1.5">
             <div className="flex flex-col">
               <div className="font-semibold">Delete this team</div>
               <div className="">{`This cannot be reversed.`}</div>
             </div>
-            <button
-              onClick={handleDeleteTeam}
-              className="max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700"
-            >
+            <Button color="red" onClick={handleDeleteTeam} size="md" style="primary">
               Delete this team
-            </button>
+            </Button>
           </div>
         </div>
       );

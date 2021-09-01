@@ -147,9 +147,9 @@ export function NonRegisteredWorkspaceMember({
   };
 
   return (
-    <li className="flex flex-row items-center space-x-2">
+    <li className="flex flex-row items-center space-x-1.5">
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
-        <MaterialIcon className="text-3xl">mail_outline</MaterialIcon>
+        <MaterialIcon>mail_outline</MaterialIcon>
       </div>
       <Redacted className="flex-grow">{member.email}</Redacted>
       <PortalDropdown
@@ -244,7 +244,7 @@ function WorkspaceMember({
   canLeave = false,
 }: WorkspaceMemberProps) {
   return (
-    <li className="flex flex-row items-center space-x-2">
+    <li className="flex flex-row items-center space-x-1.5">
       <img
         src={member.user!.picture}
         className="rounded-full"

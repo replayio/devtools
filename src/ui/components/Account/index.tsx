@@ -58,15 +58,15 @@ function WelcomePage() {
       className="w-full h-full grid"
       style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
     >
-      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="p-16 h-84 space-y-12">
-          <div className="space-y-4 place-content-center">
-            <img className="w-16 h-16 mx-auto" src="/images/logo.svg" />
+      <section className="max-w-sm w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="p-12 space-y-9">
+          <div className="space-y-3 place-content-center">
+            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
           </div>
           {isTeamMemberInvite() ? (
-            <div className="text-center space-y-2">
-              <div className="font-bold text-2xl">Almost there!</div>
-              <div className="font-medium text-xl">
+            <div className="text-center space-y-1.5">
+              <div className="font-bold text-xl">Almost there!</div>
+              <div className="font-medium text-lg">
                 In order to join your team, we first need you to sign in.
               </div>
             </div>
@@ -74,7 +74,7 @@ function WelcomePage() {
           <a
             href="#"
             onClick={onLogin}
-            className="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
+            className="w-full inline-flex items-center justify-center px-3.5 py-2 border border-transparent text-lg font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
           >
             Sign in to Replay
           </a>

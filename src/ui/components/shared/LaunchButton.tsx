@@ -14,7 +14,7 @@ function ShareButton({ setModal }: PropsFromRedux) {
       onClick={onClick}
       // This height matches the height of the icon button + border
       style={{ height: 26 }}
-      className="inline-flex items-center px-6 rounded-lg text-white bg-primaryAccent hover:bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white box-content mr-2"
+      className="inline-flex items-center px-4 text-xs rounded-lg text-white bg-primaryAccent hover:bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white box-content mr-2"
     >
       Launch Replay
     </button>

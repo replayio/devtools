@@ -16,9 +16,9 @@ export default React.forwardRef<
       ref={ref}
       type="text"
       className={classNames(
-        textSize === "xl" ? "text-4xl" : textSize === "lg" ? "text-2xl" : "text-lg",
+        textSize === "xl" ? "text-2xl" : textSize === "lg" ? "text-base" : "text-sm",
         center ? "text-center" : "",
-        "focus:ring-primaryAccent focus:primaryAccentHover block w-full border px-3 py-2 border-textFieldBorder rounded-md"
+        "focus:ring-primaryAccent focus:primaryAccentHover block w-full border px-2.5 py-1.5 border-textFieldBorder rounded-md"
       )}
     />
   );

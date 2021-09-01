@@ -22,7 +22,7 @@ function ModalLoader() {
   return (
     <OnboardingModalContainer>
       <OnboardingContent>
-        <Spinner className="animate-spin h-6 w-6 text-gray-500" />
+        <Spinner className="animate-spin h-4 w-4 text-gray-500" />
       </OnboardingContent>
     </OnboardingModalContainer>
   );

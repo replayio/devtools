@@ -16,7 +16,7 @@ export default function Collaborators({ recordingId }: CollaboratorsProps) {
   }
 
   return (
-    <section className="flex flex-col w-full space-y-2">
+    <section className="flex flex-col w-full space-y-1.5">
       <EmailForm recordingId={recordingId} />
       <CollaboratorsList {...{ recording, collaborators }} />
     </section>

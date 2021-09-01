@@ -16,11 +16,11 @@ export default function TOSScreen() {
       <BlankScreen background="white" />
       <Modal options={{ maskTransparency: "transparent" }}>
         <div
-          className="p-12 bg-white rounded-lg shadow-2xl text-xl space-y-8 relative flex flex-col items-center"
+          className="p-9 bg-white rounded-lg shadow-xl text-xl space-y-6 relative flex flex-col items-center"
           style={{ width: "520px" }}
         >
           <div className="space-y-4 place-content-center">
-            <img className="w-16 h-16 mx-auto" src="/images/logo.svg" />
+            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
           </div>
           <div className="font-bold text-2xl">Terms of Use</div>
           <div>
@@ -36,7 +36,7 @@ export default function TOSScreen() {
             help define Replay’s relationship with you as you interact with our services. This
             includes:
           </div>
-          <ul className="list-disc pl-8 space-y-2">
+          <ul className="list-disc pl-6 space-y-1.5">
             <li>
               <span className="font-medium">What you can expect from us</span>, which describes how
               we provide and develop our services

@@ -10,10 +10,10 @@ const slides = [
     header: "Welcome to Replay! 👋",
     content: (
       <>
-        <div className="text-xl pb-8">{`We're glad you're here! This is how to get started:`}</div>
-        <li className="text-xl pb-2">{`In the Replay browser, open a website in a new tab`}</li>
-        <li className="text-xl pb-2">{`Press the blue record button to record, press again to stop`}</li>
-        <li className="text-xl pb-2">{`And with that, you'll have recorded your first replay :)`}</li>
+        <div className="text-lg pb-6">{`We're glad you're here! This is how to get started:`}</div>
+        <li className="text-lg pb-1.5">{`In the Replay browser, open a website in a new tab`}</li>
+        <li className="text-lg pb-1.5">{`Press the blue record button to record, press again to stop`}</li>
+        <li className="text-lg pb-1.5">{`And with that, you'll have recorded your first replay :)`}</li>
       </>
     ),
   },
@@ -27,8 +27,8 @@ function SlideContent({
   children: React.ReactElement | React.ReactElement[];
 }) {
   return (
-    <div className="space-y-12">
-      <h2 className="font-bold text-3xl ">{headerText}</h2>
+    <div className="space-y-9">
+      <h2 className="font-bold text-2xl ">{headerText}</h2>
       <div className="text-gray-500">{children}</div>
     </div>
   );
@@ -57,7 +57,7 @@ function Navigation({
   };
 
   return (
-    <div className="text-lg items-right">
+    <div className="text-base items-right">
       {/* <div className="flex flex-row items-center space-x-2">
         <input
           type="checkbox"
@@ -73,7 +73,7 @@ function Navigation({
         <button
           onClick={onSkipOrDone}
           type="button"
-          className="float-right inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          className="float-right inline-flex items-center px-3 py-1.5 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
         >
           {current == total ? "Got it!" : "Skip"}
         </button>
@@ -90,7 +90,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
       <div
-        className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
+        className="p-9 bg-white rounded-lg shadow-xl text-lg space-y-6 relative flex flex-col justify-between"
         style={{ width: "520px" }}
       >
         <SlideContent headerText={header}>{content}</SlideContent>
@@ -101,7 +101,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
           hideModal={hideModal}
         />
         <div
-          className="h-2 bg-white absolute bottom-0 left-0 rounded-md"
+          className="h-1.5 bg-white absolute bottom-0 left-0 rounded-md"
           style={{ width: `${(current / slides.length) * 100}%` }}
         />
       </div>

@@ -90,7 +90,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
   );
 
   return (
-    <div className={classnames("dashboard-viewer flex-grow", { editing })}>
+    <div className={classnames("dashboard-viewer text-sm flex-grow", { editing })}>
       <DashboardViewerHeader
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
@@ -107,7 +107,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
                 { id: "collaborator", name: "Replays shared with me" },
                 { id: "author", name: "Replays I've authored" },
               ]}
-              className="w-72"
+              className="w-56"
             />
             <SelectMenu
               selected={timeFilter}
@@ -118,7 +118,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
                 { id: "week", name: "This week" },
                 { id: "day", name: "Today" },
               ]}
-              className="w-48"
+              className="w-36"
             />
             <TextInput
               placeholder="Search..."

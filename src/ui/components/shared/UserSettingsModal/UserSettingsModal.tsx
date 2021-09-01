@@ -23,7 +23,7 @@ function Support() {
   return (
     <ul>
       <li className="flex flex-row items-center">
-        <label className="space-y-2 pr-48 flex-grow">
+        <label className="space-y-1.5 pr-36 flex-grow">
           <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
           <div className="description">
             Come chat with us on our{" "}
@@ -34,7 +34,7 @@ function Support() {
         </label>
       </li>
       <li className="flex flex-row items-center">
-        <label className="space-y-2 pr-48 flex-grow">
+        <label className="space-y-1.5 pr-36 flex-grow">
           <SettingsBodyHeader>Send us an email</SettingsBodyHeader>
           <div className="description">
             You can also send an email at <a href="mailto:support@replay.io">support@replay.io</a>.
@@ -52,18 +52,18 @@ function Personal() {
   const { name, picture, email } = user!;
 
   return (
-    <div className="space-y-16">
-      <div className="flex flex-row space-x-4 items-center">
-        <img src={picture} className="rounded-full w-16" />
+    <div className="space-y-12">
+      <div className="flex flex-row space-x-3 items-center">
+        <img src={picture} className="rounded-full w-12" />
         <div>
-          <div className="text-xl">{name}</div>
+          <div className="text-base">{name}</div>
           <div className="text-gray-500">{email}</div>
         </div>
       </div>
       <div>
         <button
           onClick={() => handleIntercomLogout(logout)}
-          className="max-w-max items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+          className="max-w-max items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
         >
           Log Out
         </button>
@@ -74,9 +74,9 @@ function Personal() {
 
 function Legal() {
   return (
-    <div className="space-y-16 pr-48">
-      <div className="space-y-4">
-        <div className="space-y-2">
+    <div className="space-y-12 pr-36">
+      <div className="space-y-3">
+        <div className="space-y-1.5">
           <SettingsBodyHeader>
             <a
               className="underline"
@@ -89,7 +89,7 @@ function Legal() {
           </SettingsBodyHeader>
           <div>{`The Terms of Use help define Replay's relationship with you as you interact with our services.`}</div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <SettingsBodyHeader>
             <a
               className="underline"

@@ -23,7 +23,7 @@ const LoginButton = () => {
         })
       }
       type="button"
-      className="inline-flex items-center px-6 py-2 text-xl rounded-lg bg-primaryAccent hover:bg-primaryAccentHover text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent mr-0 sharebutton"
+      className="inline-flex items-center px-4 py-1.5 text-xl rounded-lg bg-primaryAccent hover:bg-primaryAccentHover text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent mr-0 sharebutton"
     >
       Sign In
     </button>
