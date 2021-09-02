@@ -132,9 +132,13 @@ function PanelSummary({
         <button
           type="button"
           onClick={pausedOnHit ? addHitComment : addFloatingCodeComment}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          title="Add Comment"
+          className={classNames(
+            pausedOnHit ? "paused-add-comment" : "bg-primaryAccent hover:bg-primaryAccentHover",
+            "inline-flex items-center px-1 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          )}
         >
-          Add a comment
+          <div className="material-icons text-base text-white add-comment-icon">add_comment</div>
         </button>
       ) : null}
       {reactTooltip}

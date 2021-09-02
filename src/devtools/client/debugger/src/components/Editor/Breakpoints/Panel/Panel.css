@@ -25,8 +25,15 @@
 .breakpoint-panel button {
   height: 100%;
   border-radius: 4px;
-  padding: 4px 8px;
   line-height: 16px;
+}
+
+.breakpoint-panel .paused-add-comment {
+  background-color: #5b41ff;
+}
+
+.breakpoint-panel .edit-actions button {
+  padding: 4px 8px;
 }
 
 .breakpoint-panel .action {
@@ -42,10 +49,6 @@
   padding: 8px;
   color: var(--grey-50);
   border-bottom: 1px solid var(--theme-splitter-color);
-}
-
-.breakpoint-panel .summary .material-icons {
-  color: var(--grey-50);
 }
 
 .breakpoint-panel .summary .options {
@@ -232,4 +235,8 @@
 
 .breakpoint-panel .breakpoint-navigation-commands button:not(.disabled):hover {
   background-color: var(--theme-toolbar-background-hover);
+}
+
+.breakpoint-panel .add-comment-icon {
+  font-size: 1rem;
 }
