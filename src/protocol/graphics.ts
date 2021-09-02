@@ -324,6 +324,7 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
+  await paintPointsWaiter;
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.
