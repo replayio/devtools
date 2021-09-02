@@ -49,7 +49,7 @@ function PanelSummary({
   const addHitComment = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    createFrameComment(currentTime, executionPoint, null);
+    createFrameComment(currentTime, executionPoint, null, breakpoint);
   };
   const addFloatingCodeComment = (e: React.MouseEvent) => {
     e.stopPropagation();
