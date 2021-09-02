@@ -183,7 +183,7 @@ class Message extends Component {
 
     if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
       overlayType = "fast-forward";
-      label = "Fast Forward";
+      label = "Fast-forward";
     } else if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
       overlayType = "rewind";
       label = "Rewind";
@@ -196,11 +196,8 @@ class Message extends Component {
 
       return dom.div(
         { className: `overlay-container debug`, title: "Add Comment", onClick: handleAddComment },
-        dom.div({ className: "info" }, dom.div({ className: "label" }, "Add Comment")),
-        dom.div(
-          { className: "button" },
-          dom.div({ className: "add-comment-icon material-icons rounded-md" }, "add_comment")
-        )
+        dom.div({ className: "info" }, dom.div({ className: "label" }, "Comment")),
+        dom.div({ className: "button" }, dom.div({ className: "img" }))
       );
     }
 
