@@ -33,3 +33,7 @@ body {
   --dark-blue: #2d7eff;
   --faint-red: rgba(255, 0, 0, 0.5);
 }
+
+.inter {
+  font-family: "Inter", sans-serif;
+}
