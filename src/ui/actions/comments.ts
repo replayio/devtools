@@ -6,6 +6,7 @@ import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import { setSelectedPrimaryPanel } from "./app";
 import escapeHtml from "escape-html";
+import { waitForTime } from "protocol/utils";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -75,12 +76,18 @@ export function createComment(
 export function createFrameComment(
   time: number,
   point: string,
-  position: { x: number; y: number } | null
+  position: { x: number; y: number } | null,
+  breakpoint?: any
 ): UIThunkAction {
   return async ({ dispatch }) => {
-    const sourceLocation = await ThreadFront.getCurrentPauseSourceLocation();
+    const sourceLocation =
+      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
     dispatch(createComment(time, point, position, true /* hasFrames */, sourceLocation || null));
   };
+}
+
+function getCurrentPauseSourceLocationWithTimeout() {
+  return Promise.race([ThreadFront.getCurrentPauseSourceLocation(), waitForTime(1000)]);
 }
 
 export function createFloatingCodeComment(
@@ -97,10 +104,12 @@ export function createFloatingCodeComment(
 export function createNoFrameComment(
   time: number,
   point: string,
-  position: { x: number; y: number } | null
+  position: { x: number; y: number } | null,
+  breakpoint?: any
 ): UIThunkAction {
   return async ({ dispatch }) => {
-    const sourceLocation = await ThreadFront.getCurrentPauseSourceLocation();
+    const sourceLocation =
+      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
     dispatch(createComment(time, point, position, false /* hasFrames */, sourceLocation || null));
   };
 }
