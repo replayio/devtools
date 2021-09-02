@@ -65,6 +65,11 @@ export async function setupTimeline(store: UIStore) {
         store.dispatch(goToNextPaint());
       }
     },
+    Space: ev => {
+      if (!ev.target || !isEditableElement(ev.target)) {
+        store.dispatch(togglePlayback());
+      }
+    },
   });
   shortcuts.attach(window.document);
 }
