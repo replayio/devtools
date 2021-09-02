@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import { connect } from "../utils/connect";
 import { features } from "../utils/prefs";
 import actions from "../actions";
+import { setUnexpectedError } from "ui/actions/session";
 import A11yIntention from "./A11yIntention";
 import { ShortcutsModal } from "./ShortcutsModal";
 
@@ -46,6 +47,7 @@ import QuickOpenModal from "./QuickOpenModal";
 import SidePanel from "ui/components/SidePanel";
 import { waitForEditor } from "../utils/editor/create-editor";
 import { isDemo } from "ui/utils/environment";
+import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 
 class Debugger extends Component {
   onLayoutChange;
@@ -256,8 +258,12 @@ function DebuggerLoader(props) {
 
   useEffect(() => {
     (async () => {
-      await waitForEditor();
-      setLoading(false);
+      try {
+        await waitForEditor();
+        setLoading(false);
+      } catch {
+        props.setUnexpectedError(ReplayUpdatedError);
+      }
     })();
   }, []);
 
@@ -280,4 +286,5 @@ export default connect(mapStateToProps, {
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
   refreshCodeMirror: actions.refreshCodeMirror,
+  setUnexpectedError,
 })(DebuggerLoader);
