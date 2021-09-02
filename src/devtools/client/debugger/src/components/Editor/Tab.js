@@ -38,6 +38,7 @@ import classnames from "classnames";
 class Tab extends PureComponent {
   onTabContextMenu = (event, tab) => {
     event.preventDefault();
+    event.stopPropagation();
     this.showContextMenu(event, tab);
   };
 
