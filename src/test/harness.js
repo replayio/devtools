@@ -322,7 +322,7 @@ async function waitForScopeValue(name, value) {
 async function toggleBlackboxSelectedSource() {
   const { getSelectedSource } = dbgSelectors;
   const blackboxed = getSelectedSource().isBlackBoxed;
-  await clickElement(".black-box");
+  dbg.actions.toggleBlackBox(getContext(), getSelectedSource());
   await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
   await ThreadFront.waitForInvalidateCommandsToFinish();
 }
