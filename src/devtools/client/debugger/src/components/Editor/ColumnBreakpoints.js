@@ -14,8 +14,6 @@ import { getLocationKey } from "../../utils/breakpoint";
 // eslint-disable-next-line max-len
 
 class ColumnBreakpoints extends Component {
-  props;
-
   render() {
     const { cx, editor, columnBreakpoints, selectedSource } = this.props;
 

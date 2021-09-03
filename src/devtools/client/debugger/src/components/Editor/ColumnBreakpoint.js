@@ -9,10 +9,8 @@ import { connect } from "../../utils/connect";
 import actions from "../../actions";
 
 import { getDocument } from "../../utils/editor";
-// import Panel from "../Breakpoints/Panel/index";
 import Panel from "./Breakpoints/Panel/index";
-
-// eslint-disable-next-line max-len
+import { features } from "ui/utils/prefs";
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -46,6 +44,10 @@ class ColumnBreakpoint extends Component {
 
   addColumnBreakpoint = nextProps => {
     const { columnBreakpoint, source } = nextProps || this.props;
+
+    if (!features.columnBreakpoints) {
+      return null;
+    }
 
     const sourceId = source.id;
     const doc = getDocument(sourceId);
