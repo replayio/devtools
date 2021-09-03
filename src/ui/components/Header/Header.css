@@ -9,7 +9,7 @@
   justify-content: space-between;
 }
 
-#header .logo {
+.logo {
   height: 24px;
   width: 24px;
   background-repeat: no-repeat;
@@ -17,6 +17,11 @@
   background-position: center;
   border: 4px solid transparent;
   box-sizing: content-box;
+}
+
+.big.logo {
+  height: 64px;
+  width: 64px;
 }
 
 #header .header-left {

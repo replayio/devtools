@@ -18,10 +18,6 @@
   overflow: hidden;
 }
 
-.breakpoint-panel.editing {
-  padding: 8px;
-}
-
 .breakpoint-panel button {
   height: 100%;
   border-radius: 4px;
@@ -56,6 +52,7 @@
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  flex-grow: 1;
 }
 
 .breakpoint-panel .summary .action {
@@ -76,12 +73,24 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 4px;
+  padding: 5px;
+  width: 100%;
+  margin-right: 10px;
+  cursor: text;
+}
+
+span.expression {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding-left: 3px;
 }
 
 .breakpoint-panel .panel-editor {
   display: flex;
   flex-direction: column;
+  padding: 8px;
+  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoint-panel .panel-editor > *:not(:last-child) {
@@ -203,9 +212,9 @@
   padding: 6px 8px 6px 6px;
 }
 
-.breakpoint-panel.editing .breakpoint-navigation {
+/* .breakpoint-panel.editing .breakpoint-navigation {
   display: none;
-}
+} */
 
 .breakpoint-panel .breakpoint-navigation-timeline-container {
   margin: 0 4px;

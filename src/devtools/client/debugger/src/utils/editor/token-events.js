@@ -52,7 +52,7 @@ function isValidToken(target) {
     return false;
   }
 
-  const invalidContainers = [".popover", ".breakpont-panel"];
+  const invalidContainers = [".popover", ".breakpont-panel", ".panel-editor"];
   if (invalidContainers.some(selector => target.closest(selector))) {
     return false;
   }

@@ -125,7 +125,7 @@ function PanelSummary({
           disabled={!isEditable}
           onClick={e => handleClick(e, "logValue")}
         >
-          log(<span className="expression">{logValue}</span>)
+          <span className="expression">{logValue}</span>
         </button>
       </div>
       {!isDemo() ? (

@@ -22,9 +22,11 @@
   border-radius: 50%;
   margin-right: 8px;
   flex-shrink: 0;
-  background: var(--dark-grey);
-  background-position: center;
-  background-size: contain;
+}
+
+.sharing-modal .permission .icon img {
+  height: 32px;
+  width: 32px;
 }
 
 .sharing-modal .permission .main {

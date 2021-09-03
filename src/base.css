@@ -37,3 +37,8 @@ body {
 .inter {
   font-family: "Inter", sans-serif;
 }
+
+img.avatar, .avatar img {
+  border-radius: 50%;
+  background-color: var(--light-grey);
+}

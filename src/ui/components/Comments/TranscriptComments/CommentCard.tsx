@@ -12,6 +12,7 @@ import CommentSource from "./CommentSource";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import useAuth0 from "ui/utils/useAuth0";
 import CommentCardFooter from "./CommentCardFooter";
+import { AvatarImage } from "ui/components/Avatar";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 const hoveredStyles = "border-secondaryAccent hover:border-secondaryAccent";
@@ -38,11 +39,7 @@ function CommentItem({
     <div>
       <div className="space-y-4 px-3 pt-3">
         <div className="flex space-x-2.5 items-center">
-          <img
-            className="h-8 w-8 rounded-full"
-            src={comment.user.picture}
-            alt={comment.user.name}
-          />
+          <AvatarImage className="h-8 w-8 rounded-full avatar" src={comment.user.picture} />
           <div className="flex-1 overflow-hidden text-xs">
             <div className="flex items-center justify-between">
               <h3 className="font-medium overflow-hidden overflow-ellipsis whitespace-pre">
