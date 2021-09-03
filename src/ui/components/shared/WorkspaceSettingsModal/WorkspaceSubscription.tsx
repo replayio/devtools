@@ -207,6 +207,9 @@ function BillingDetails({
               + Add
             </Button>
           </h3>
+          {paymentMethods.length === 0 ? (
+            <p className="text-center">No payment methods have been added to this workspace.</p>
+          ) : null}
           {paymentMethods.map(pm => {
             return (
               <div className="flex flex-row items-center space-x-2" key={pm.id}>
