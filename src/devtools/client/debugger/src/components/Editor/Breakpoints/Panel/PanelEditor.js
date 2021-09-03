@@ -61,54 +61,25 @@ class PanelEditor extends PureComponent {
     this.handleCancel();
   };
 
-  renderActions() {
-    const { syntaxErrors } = this.state;
-    const hasError = syntaxErrors.logValue || syntaxErrors.condition;
-
-    return (
-      <div className="edit-actions">
-        <button disabled={hasError} className="save" type="button" onClick={this.handleSave}>
-          Save
-        </button>
-        <button className="cancel" type="button" onClick={this.handleCancel}>
-          Cancel
-        </button>
-      </div>
-    );
-  }
-
   renderForm() {
     const { syntaxErrors, logValue, condition } = this.state;
-    const { inputToFocus } = this.props;
+    const { inputToFocus, breakpoint } = this.props;
 
     return (
-      <form>
-        <div className={classnames("form-row", { invalid: syntaxErrors.logValue })}>
-          <label htmlFor="logpoint">Log</label>
-          <PanelInput
-            id="logpoint"
-            autofocus={inputToFocus == "logValue"}
-            defaultValue={logValue}
-            onChange={cm => this.onChange("logValue", cm.getValue().trim())}
-            onEnter={this.onEnter}
-            onEscape={this.onEscape}
-          />
-        </div>
-        <div className={classnames("form-row", { invalid: syntaxErrors.condition })}>
-          <label htmlFor="condition">Condition</label>
-          <div className="input-container">
+      <div>
+        <form>
+          <div className={classnames("form-row", { invalid: syntaxErrors.logValue })}>
             <PanelInput
-              id="condition"
-              autofocus={inputToFocus == "condition"}
-              defaultValue={condition}
-              onChange={cm => this.onChange("condition", cm.getValue().trim())}
+              id="logpoint"
+              autofocus={inputToFocus == "logValue"}
+              defaultValue={logValue}
+              onChange={cm => this.onChange("logValue", cm.getValue().trim())}
               onEnter={this.onEnter}
               onEscape={this.onEscape}
             />
-            {condition == "" ? <div className="placeholder-text">e.g. x === true</div> : null}
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     );
   }
 
@@ -121,7 +92,6 @@ class PanelEditor extends PureComponent {
         className={classnames("panel-editor", { conditional: hasCondition })}
         ref={node => (this.panelEditorNode = node)}
       >
-        {this.renderActions()}
         {this.renderForm()}
       </div>
     );
