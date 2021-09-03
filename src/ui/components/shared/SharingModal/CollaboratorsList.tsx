@@ -3,6 +3,7 @@ import { Recording, User } from "ui/types";
 import hooks from "ui/hooks";
 import "./CollaboratorsList.css";
 import MaterialIcon from "../MaterialIcon";
+import { AvatarImage } from "ui/components/Avatar";
 
 export interface CollaboratorDbData {
   collaborationId: string;
@@ -38,7 +39,9 @@ function Collaborator({
   } else {
     iconAndName = (
       <>
-        <div className="icon" style={{ backgroundImage: `url(${collaborator.user.picture})` }} />
+        <div className="icon avatar">
+          <AvatarImage src={collaborator.user.picture} />
+        </div>
         <div className="main">
           <div className="name">{collaborator.user.name}</div>
         </div>
@@ -60,7 +63,9 @@ function Collaborator({
 function Author({ picture, name }: { picture: string; name: string }) {
   return (
     <div className="permission">
-      <div className="icon" style={{ backgroundImage: `url(${picture})` }} />
+      <div className="icon avatar">
+        <AvatarImage src={picture} />
+      </div>
       <div className="main">
         <div className="name">{name}</div>
       </div>
