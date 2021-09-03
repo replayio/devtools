@@ -7,6 +7,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { Redacted } from "ui/components/Redacted";
 import MaterialIcon from "../MaterialIcon";
+import { AvatarImage } from "ui/components/Avatar";
 
 import "./WorkspaceMember.css";
 
@@ -245,9 +246,9 @@ function WorkspaceMember({
 }: WorkspaceMemberProps) {
   return (
     <li className="flex flex-row items-center space-x-1.5">
-      <img
+      <AvatarImage
         src={member.user!.picture}
-        className="rounded-full"
+        className="rounded-full avatar"
         style={{ width: "28px", height: "28px" }}
       />
       <div className="flex-grow" data-private>
