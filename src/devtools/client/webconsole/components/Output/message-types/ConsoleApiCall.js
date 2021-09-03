@@ -131,7 +131,7 @@ function ConsoleApiCall(props) {
     collapseTitle = "Show/hide group";
   }
 
-  const collapsible = isGroupType(type) || (type === "error" && Array.isArray(stacktrace));
+  const collapsible = isGroupType(type) || (level === "error" && Array.isArray(stacktrace));
   const topLevelClasses = ["cm-s-mozilla"];
   return Message({
     messageId,

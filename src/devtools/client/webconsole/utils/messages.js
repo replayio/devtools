@@ -138,8 +138,6 @@ function transformConsoleAPICallPacket(message) {
   let type = MESSAGE_TYPE.LOG;
   if (message.trace) {
     type = MESSAGE_TYPE.TRACE;
-  } else if (message.error) {
-    type = "error";
   } else if (message.assert) {
     type = "assert";
   } else if (message.logpointId) {
