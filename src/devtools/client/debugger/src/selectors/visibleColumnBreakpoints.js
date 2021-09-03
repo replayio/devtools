@@ -18,6 +18,7 @@ import {
 import { getVisibleBreakpoints, getVisibleRequestedBreakpoints } from "./visibleBreakpoints";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
+import { features } from "ui/utils/prefs";
 
 function contains(location, range) {
   return (
@@ -65,12 +66,14 @@ function filterByLineCount(positions, selectedSource) {
   return positions.filter(({ line }) => lineCount[line] > 1);
 }
 
+// filter out positions that are not being shown
 function filterVisible(positions, selectedSource, viewport) {
   return positions.filter(location => {
     return viewport && contains(location, viewport);
   });
 }
 
+// filter out positions that are not in the map
 function filterByBreakpoints(positions, selectedSource, breakpointMap) {
   return positions.filter(position => {
     return breakpointMap[position.line];
@@ -99,7 +102,13 @@ function convertToList(breakpointPositions) {
   return [].concat(...Object.values(breakpointPositions));
 }
 
-export function getColumnBreakpoints(breakpoints, requestedBreakpoints, viewport, selectedSource) {
+export function getColumnBreakpoints(
+  breakpoints,
+  requestedBreakpoints,
+  viewport,
+  selectedSource,
+  breakpointPositions
+) {
   if (!selectedSource) {
     return [];
   }
@@ -110,12 +119,20 @@ export function getColumnBreakpoints(breakpoints, requestedBreakpoints, viewport
   // - there is atleast one other breakpoint on that line
   // - there is a breakpoint on that line
   const allBreakpoints = [...breakpoints, ...requestedBreakpoints];
-  // collect all breakpoint positions but make sure that we don't have 2 positions
-  // for the same line in the same source
-  let positions = uniqBy(
-    allBreakpoints.map(bp => bp.location),
-    ({ sourceId, line }) => `${sourceId}:${line}`
-  );
+
+  // NOTE: column breakpoints are disabled by default because
+  // we should first verify if the results make sense
+  let positions;
+  if (features.columnBreakpoints) {
+    positions = breakpointPositions;
+  } else {
+    // collect all breakpoint positions but make sure that we don't have 2 positions
+    // for the same line in the same source
+    positions = uniqBy(
+      allBreakpoints.map(bp => bp.location),
+      ({ sourceId, line }) => `${sourceId}:${line}`
+    );
+  }
   const breakpointMap = groupBreakpoints(allBreakpoints, selectedSource);
   positions = filterVisible(positions, selectedSource, viewport);
   positions = filterInLine(positions, selectedSource, selectedSource.content);
@@ -146,6 +163,7 @@ export const visibleColumnBreakpoints = createSelector(
   getVisibleRequestedBreakpoints,
   getViewport,
   getSelectedSourceWithContent,
+  getVisibleBreakpointPositions,
   getColumnBreakpoints
 );
 
