@@ -5,14 +5,17 @@ import { loadStripe } from "@stripe/stripe-js";
 
 import hooks from "ui/hooks";
 import { PaymentMethod } from "ui/types";
+import { isDevelopment } from "ui/utils/environment";
 import { features } from "ui/utils/prefs";
 
 import MaterialIcon from "../MaterialIcon";
 import { Button } from "../Button";
 
-const stripePromise = process.env.RECORD_REPLAY_STRIPE_KEY
-  ? loadStripe(process.env.RECORD_REPLAY_STRIPE_KEY)
-  : Promise.reject("Stripe key is unavailable");
+const stripePromise = loadStripe(
+  isDevelopment()
+    ? "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
+    : "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
+);
 
 function PlanDetails({
   title,
