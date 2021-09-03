@@ -11,10 +11,13 @@ import { features } from "ui/utils/prefs";
 import MaterialIcon from "../MaterialIcon";
 import { Button } from "../Button";
 
+// By default, we use the test key for local development and the live key
+// otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
+// usage of the live key.
 const stripePromise = loadStripe(
-  isDevelopment()
-    ? "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
-    : "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
+  process.env.RECORD_REPLAY_STRIPE_LIVE || !isDevelopment()
+    ? "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
+    : "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
 );
 
 function PlanDetails({
