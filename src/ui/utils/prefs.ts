@@ -50,6 +50,7 @@ pref("devtools.features.videoPlayback", false);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
 pref("devtools.features.eventCount", true);
+pref("devtools.features.billing", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -86,6 +87,7 @@ export const features = new PrefsHelper("devtools.features", {
   launchBrowser: ["Bool", "launchBrowser"],
   termsOfService: ["Bool", "termsOfService"],
   eventCount: ["Bool", "eventCount"],
+  billing: ["Bool", "billing"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

@@ -5,6 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 
 import hooks from "ui/hooks";
 import { PaymentMethod } from "ui/types";
+import { features } from "ui/utils/prefs";
 
 import MaterialIcon from "../MaterialIcon";
 
@@ -296,10 +297,12 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
           </div>
         </div>
       ) : null}
-      <BillingDetails
-        paymentMethods={data.node.subscription.paymentMethods}
-        workspaceId={workspaceId}
-      />
+      {features.billing ? (
+        <BillingDetails
+          paymentMethods={data.node.subscription.paymentMethods}
+          workspaceId={workspaceId}
+        />
+      ) : null}
     </section>
   );
 }
