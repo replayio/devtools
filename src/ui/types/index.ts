@@ -39,6 +39,16 @@ export enum WorkspaceSubscriptionStatus {
   Canceled = "canceled",
 }
 
+export interface PaymentMethod {
+  id: string;
+  default: boolean;
+  type: "card";
+  card: {
+    brand: string;
+    last4: string;
+  };
+}
+
 export interface Subscription {
   id: string;
   createdAt: string;
@@ -54,6 +64,7 @@ export interface Subscription {
     key: string;
     createdAt: string;
   };
+  paymentMethods: PaymentMethod[];
 }
 
 export interface Recording {

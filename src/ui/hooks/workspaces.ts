@@ -6,6 +6,8 @@ import {
   GET_WORKSPACE_API_KEYS,
   UPDATE_WORKSPACE_MEMBER_ROLE,
   GET_WORKSPACE_SUBSCRIPTION,
+  PREPARE_WORKSPACE_PAYMENT_METHOD,
+  SET_WORKSPACE_DEFAULT_PAYMENT_METHOD,
 } from "ui/graphql/workspaces";
 import { PendingWorkspaceInvitation, Subscription, Workspace, WorkspaceUserRole } from "ui/types";
 
@@ -230,4 +232,26 @@ export function useCancelWorkspaceSubscription() {
   });
 
   return { cancelWorkspaceSubscription, loading, error };
+}
+
+export function usePrepareWorkspacePaymentMethod() {
+  const [prepareWorkspacePaymentMethod, { loading, error }] = useMutation<
+    { prepareWorkspacePaymentMethod: { paymentSecret: string } },
+    { workspaceId: string }
+  >(PREPARE_WORKSPACE_PAYMENT_METHOD, {
+    refetchQueries: ["GetWorkspaceSubscription"],
+  });
+
+  return { prepareWorkspacePaymentMethod, loading, error };
+}
+
+export function useSetWorkspaceDefaultPaymentMethod() {
+  const [setWorkspaceDefaultPaymentMethod, { loading, error }] = useMutation<
+    any,
+    { workspaceId: string; paymentMethodId: string }
+  >(SET_WORKSPACE_DEFAULT_PAYMENT_METHOD, {
+    refetchQueries: ["GetWorkspaceSubscription"],
+  });
+
+  return { setWorkspaceDefaultPaymentMethod, loading, error };
 }
