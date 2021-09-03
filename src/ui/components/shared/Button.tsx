@@ -68,6 +68,7 @@ export function Button({
   color,
   className,
   onClick = () => {},
+  type,
 }: ButtonProps & {
   color: Colors;
   size: ButtonSizes;
@@ -82,6 +83,7 @@ export function Button({
       onClick={onClick}
       disabled={style === "disabled"}
       className={classNames(standardClasses, colorClasses, focusClasses, className)}
+      type={type}
     >
       {children}
     </button>
@@ -92,6 +94,7 @@ interface ButtonProps {
   children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  type?: "button" | "submit";
 }
 
 export const PrimaryLgButton = (props: ButtonProps & { color: Colors }) => (

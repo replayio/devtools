@@ -146,7 +146,7 @@ function createHttpLink(token: string | undefined) {
   }
 
   return new HttpLink({
-    uri: "http://localhost:8090/v1/graphql",
+    uri: "https://api.replay.io/v1/graphql",
     headers,
     fetch,
   });

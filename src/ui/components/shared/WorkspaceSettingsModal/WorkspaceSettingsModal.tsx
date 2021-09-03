@@ -232,7 +232,7 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
     hiddenTabs.push("Billing");
   }
 
-  if (!isDebugger) {
+  if (!isDebugger && !isAdmin) {
     hiddenTabs.push("API Keys");
   }
 

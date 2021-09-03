@@ -8,6 +8,7 @@ import { PaymentMethod } from "ui/types";
 import { features } from "ui/utils/prefs";
 
 import MaterialIcon from "../MaterialIcon";
+import { Button } from "../Button";
 
 const stripePromise = process.env.RECORD_REPLAY_STRIPE_KEY
   ? loadStripe(process.env.RECORD_REPLAY_STRIPE_KEY)
@@ -24,9 +25,9 @@ function PlanDetails({
 }) {
   return (
     <section className="rounded-lg border border-blue-600 overflow-hidden">
-      <header className="bg-blue-200 p-3 border-b border-blue-600 flex flex-row">
+      <header className="bg-blue-200 p-3 border-b border-blue-600 flex flex-row items-center">
         <MaterialIcon className="mr-3 text-2xl">group</MaterialIcon>
-        <h3 className="text-xl font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold">{title}</h3>
       </header>
       <div className="p-3">
         {description ? <p>{description}</p> : null}
@@ -68,11 +69,16 @@ function getPlanDetails(key: string) {
   return null;
 }
 
-function Field({ id, label, required = false }: { id: string; label: string; required?: boolean }) {
+function Field({
+  className,
+  id,
+  label,
+  ...rest
+}: { label: string } & React.HTMLProps<HTMLInputElement>) {
   return (
-    <div className="flex flex-row items-center space-x-4">
+    <div className={classNames(className, "flex flex-row items-center space-x-4")}>
       <label htmlFor={id}>{label}</label>
-      <input required={required} type="text" id={id} name={id} className="flex-grow" />
+      <input type="text" {...rest} id={id} name={id} className="flex-grow px-2 py-1" />
     </div>
   );
 }
@@ -149,19 +155,21 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
   return (
     <form className="space-y-4" onSubmit={ev => handleSubmit(ev)}>
       <h3 className="flex flex-row border-b py-2 items-center space-x-4">
-        <span className="flex-auto text-xl font-bold">New Payment Method</span>
-        <button type="button" onClick={onDone}>
+        <span className="flex-auto text-lg font-bold">New Payment Method</span>
+        <Button size="sm" color="blue" style="secondary" onClick={onDone}>
           Cancel
-        </button>
-        <button type="submit">Save</button>
+        </Button>
+        <Button size="sm" color="blue" style="primary" type="submit">
+          Save
+        </Button>
       </h3>
       <CardElement />
       <Field id="fullName" required label="Cardholder Name" />
       <Field id="line1" required label="Address Line 1" />
       <Field id="line2" label="Address Line 2" />
       <Field id="city" required label="City" />
-      <Field id="state" required label="State" />
-      <Field id="country" required label="Country" />
+      <Field id="state" required label="State" placeholder="Two-character Code" />
+      <Field id="country" required label="Country" placeholder="Two-character Code" />
       <Field id="postalCode" required label="Postal Code" />
       <div className="space-x-4 flex flex-row items-center justify-end"></div>
     </form>
@@ -176,17 +184,22 @@ function BillingDetails({
   workspaceId: string;
 }) {
   const [adding, setAdding] = useState(false);
-  const { setWorkspaceDefaultPaymentMethod } = hooks.useSetWorkspaceDefaultPaymentMethod();
+  const {
+    setWorkspaceDefaultPaymentMethod,
+    loading: setDefaultLoading,
+  } = hooks.useSetWorkspaceDefaultPaymentMethod();
 
   return (
     <Elements stripe={stripePromise}>
       {adding ? (
         <AddPaymentMethod onDone={() => setAdding(false)} workspaceId={workspaceId} />
       ) : (
-        <>
+        <section className="space-y-4">
           <h3 className="flex flex-row border-b py-2 items-center">
-            <span className="flex-auto text-xl font-bold">Payment Methods</span>
-            <button onClick={() => setAdding(true)}>+ Add</button>
+            <span className="flex-auto text-lg font-bold">Payment Methods</span>
+            <Button size="sm" color="blue" style="primary" onClick={() => setAdding(true)}>
+              + Add
+            </Button>
           </h3>
           {paymentMethods.map(pm => {
             return (
@@ -194,9 +207,15 @@ function BillingDetails({
                 <div>{pm.card.brand}</div>
                 <div className="flex-grow">{pm.card.last4}</div>
                 {pm.default ? (
-                  <div className="material-icons text-green-500">check_circle</div>
+                  <div className="text-green-500 flex flex-row items-center">
+                    <span className="material-icons pr-1">check_circle</span>
+                    Default
+                  </div>
                 ) : (
-                  <button
+                  <Button
+                    size="sm"
+                    color="blue"
+                    style={setDefaultLoading ? "disabled" : "secondary"}
                     onClick={() =>
                       setWorkspaceDefaultPaymentMethod({
                         variables: {
@@ -207,12 +226,12 @@ function BillingDetails({
                     }
                   >
                     Make Default
-                  </button>
+                  </Button>
                 )}
               </div>
             );
           })}
-        </>
+        </section>
       )}
     </Elements>
   );
@@ -246,7 +265,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   }
 
   return (
-    <section className="space-y-8 overflow-y-auto">
+    <section className="space-y-8 overflow-y-auto" style={{ marginRight: -12, paddingRight: 12 }}>
       {data.node.subscription.status === "trialing" ? (
         <div className="p-3 bg-yellow-100 rounded-lg border border-yellow-600 flex flex-row items-center">
           <MaterialIcon className="mr-3">access_time</MaterialIcon>
@@ -274,10 +293,16 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         </div>
       ) : null}
       {getPlanDetails(data.node.subscription.plan.key)}
+      {features.billing ? (
+        <BillingDetails
+          paymentMethods={data.node.subscription.paymentMethods}
+          workspaceId={workspaceId}
+        />
+      ) : null}
       {data.node.subscription.status === "active" ||
       data.node.subscription.status === "trialing" ? (
-        <div className="flex flex-col space-y-4">
-          <div className=" text-sm uppercase font-semibold">Danger Zone</div>
+        <section className="space-y-4">
+          <h3 className="border-b py-2 text-lg font-bold">Danger Zone</h3>
           <div className="border border-red-300 flex flex-row items-center justify-between rounded-lg p-4">
             <div className="flex flex-col">
               <div className="font-semibold">Cancel Subscription</div>
@@ -288,20 +313,14 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
             <button
               onClick={handleCancelSubscription}
               className={classNames(
-                "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
+                "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
                 { "opacity-60": cancelLoading }
               )}
             >
               Cancel Subscription
             </button>
           </div>
-        </div>
-      ) : null}
-      {features.billing ? (
-        <BillingDetails
-          paymentMethods={data.node.subscription.paymentMethods}
-          workspaceId={workspaceId}
-        />
+        </section>
       ) : null}
     </section>
   );
