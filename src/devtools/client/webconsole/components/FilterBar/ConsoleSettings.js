@@ -92,26 +92,6 @@ class ConsoleSettings extends Component {
 
     items.push(
       MenuItem({
-        key: "webconsole-console-settings-filter-info",
-        checked: filters[FILTERS.INFO],
-        className: "menu-item",
-        label: this.getLabel("Show Info", FILTERS.INFO),
-        onClick: () => filterToggle(FILTERS.INFO),
-      })
-    );
-
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-filter-debug",
-        checked: filters[FILTERS.DEBUG],
-        className: "menu-item",
-        label: this.getLabel("Show Debug", FILTERS.DEBUG),
-        onClick: () => filterToggle(FILTERS.DEBUG),
-      })
-    );
-
-    items.push(
-      MenuItem({
         key: "separator",
         role: "menuseparator",
       })
