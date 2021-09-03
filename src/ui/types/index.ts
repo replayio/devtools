@@ -42,17 +42,6 @@ export enum WorkspaceSubscriptionStatus {
 export interface PaymentMethod {
   id: string;
   default: boolean;
-  billingDetails?: {
-    name: string | null;
-    address: {
-      city: string | null;
-      country: string | null;
-      line1: string | null;
-      line2: string | null;
-      postalCode: string | null;
-      state: string | null;
-    } | null;
-  };
   type: "card";
   card: {
     brand: string;
