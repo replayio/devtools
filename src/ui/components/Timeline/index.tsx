@@ -118,12 +118,12 @@ class Timeline extends Component<PropsFromRedux> {
     const {
       hoverTime,
       seek,
-      hoveredItem,
+      hoveredComment,
       clearPendingComment,
       setTimelineToTime,
       setTimelineState,
     } = this.props;
-    const hoveringOverMarker = hoveredItem?.target === "timeline";
+    const hoveringOverMarker = !!hoveredComment;
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
@@ -376,6 +376,7 @@ const connector = connect(
     hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
     hoveredItem: selectors.getHoveredItem(state),
+    hoveredComment: selectors.getHoveredComment(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),
     videoUrl: selectors.getVideoUrl(state),
   }),
