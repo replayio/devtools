@@ -28,14 +28,25 @@ export interface ApiKeyResponse {
   keyValue: string;
 }
 
+export enum WorkspaceSubscriptionStatus {
+  // Subscription is active and payment is up to date
+  Active = "active",
+  // Subscription is active but a billing problem must be resolved
+  Incomplete = "incomplete",
+  // Subscription is active under a trial
+  Trial = "trialing",
+  // Subscription has been cancelled either by the user or by system due to unpayment
+  Canceled = "canceled",
+}
+
 export interface Subscription {
   id: string;
   createdAt: string;
   seatCount: number;
   effectiveFrom?: string;
-  effectiveTo?: string;
+  effectiveUntil?: string;
   createdBy: User;
-  status: string;
+  status: WorkspaceSubscriptionStatus;
   trialEnds: string | null;
   plan: {
     id: string;
