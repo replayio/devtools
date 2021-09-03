@@ -136,7 +136,7 @@ button.jump-definition {
 .invoke-confirm .learn-more-link::after {
   background-image: url(~devtools/client/themes/images/help.svg);
 }
-#header .logo {
+.logo {
   background-image: url(./images/logo.svg);
 }
 .comment-close {
