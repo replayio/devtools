@@ -185,13 +185,13 @@ class Timeline extends Component<PropsFromRedux> {
       <div className="commands">
         <button onClick={togglePlayback} disabled={disabled}>
           {playback ? (
-            <MaterialIcon className="pause_play_circle material-icons-round">
-              pause_circle_outline
-            </MaterialIcon>
+            <div className="flex flex-row" style={{ width: "29px", height: "32px" }}>
+              <img className="w-6 h-6 m-auto" src="/images/playback-pause.svg" />
+            </div>
           ) : (
-            <MaterialIcon className="pause_play_circle material-icons-round">
-              play_circle_outline
-            </MaterialIcon>
+            <div className="flex flex-row" style={{ width: "29px", height: "32px" }}>
+              <img className="w-6 h-6 m-auto" src="/images/playback-play.svg" />
+            </div>
           )}
         </button>
       </div>
