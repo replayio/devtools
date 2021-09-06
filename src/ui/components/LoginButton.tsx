@@ -19,7 +19,7 @@ const LoginButton = () => {
     <button
       onClick={() =>
         loginWithRedirect({
-          appState: { returnTo: window.location.href },
+          appState: { returnTo: window.location.pathname + window.location.search },
         })
       }
       type="button"

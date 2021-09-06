@@ -49,7 +49,7 @@ function SignInButton() {
 
   const onClick = () => {
     loginWithRedirect({
-      appState: { returnTo: window.location.href },
+      appState: { returnTo: window.location.pathname + window.location.search },
     });
   };
 
