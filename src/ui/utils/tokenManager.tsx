@@ -48,9 +48,7 @@ class TokenManager {
 
     const onRedirectCallback = (appState: AppState) => {
       if (appState?.returnTo) {
-        window.location.href = appState.returnTo;
-      } else {
-        history.push(window.location.pathname);
+        history.replace(appState.returnTo);
       }
     };
 
