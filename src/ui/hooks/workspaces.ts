@@ -213,14 +213,13 @@ export function useUpdateWorkspaceMemberRole() {
 }
 
 export function useGetWorkspaceSubscription(workspaceId: string) {
-  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "subscription"> }>(
-    GET_WORKSPACE_SUBSCRIPTION,
-    {
-      variables: { workspaceId },
-    }
-  );
+  const { data, loading, error, refetch } = useQuery<{
+    node: Pick<Required<Workspace>, "subscription">;
+  }>(GET_WORKSPACE_SUBSCRIPTION, {
+    variables: { workspaceId },
+  });
 
-  return { data, loading, error };
+  return { data, loading, error, refetch };
 }
 
 export function useCancelWorkspaceSubscription() {
