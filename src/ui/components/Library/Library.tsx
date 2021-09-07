@@ -18,8 +18,8 @@ import { setExpectedError } from "ui/actions/session";
 import { LoadingScreen } from "../shared/BlankScreen";
 import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
-import LaunchReplayButton from "./LaunchReplayButton";
 import { TextInput } from "../shared/Forms";
+import LaunchButton from "../shared/LaunchButton";
 
 function FilterBar({
   searchString,
@@ -161,11 +161,11 @@ function Library({
 
   return (
     <main className="flex flex-row w-full h-full">
-      {<Sidebar nonPendingWorkspaces={workspaces} />}
+      <Sidebar nonPendingWorkspaces={workspaces} />
       <div className="flex flex-col flex-grow overflow-x-hidden">
         <div className="flex flex-row h-16 border-b border-gray-300 items-center p-5 bg-white space-x-3">
           <FilterBar searchString={searchString} setSearchString={setSearchString} />
-          <LaunchReplayButton />
+          <LaunchButton />
         </div>
         <ViewerRouter
           workspaceName={
@@ -175,7 +175,6 @@ function Library({
           }
           searchString={searchString}
         />
-        {/* <Dashboard /> */}
       </div>
     </main>
   );

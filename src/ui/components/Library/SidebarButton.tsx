@@ -15,8 +15,7 @@ export default function SidebarButton({
   return (
     <a
       className={classNames(
-        `group px-4 py-2 hover:bg-gray-900 hover:text-white transition duration-200 text-left flex flex-row justify-between focus:outline-none`,
-        // `overflow-hidden overflow-ellipsis whitespace-pre`,
+        `group px-4 py-2 hover:bg-gray-900 hover:text-white transition duration-200 text-left flex flex-row justify-between focus:outline-none cursor-pointer`,
         { underline },
         shouldHighlight ? "bg-gray-900 cursor-auto" : ""
       )}
