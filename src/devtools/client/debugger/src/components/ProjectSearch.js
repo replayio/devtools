@@ -53,15 +53,14 @@ export class ProjectSearch extends Component {
   }
 
   componentDidMount() {
-    const { shortcuts } = this.context;
-
-    shortcuts.on("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
+    const { globalShortcuts, shortcuts } = this.context;
+    globalShortcuts.on("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
     shortcuts.on("Enter", this.onEnterPress);
   }
 
   componentWillUnmount() {
-    const { shortcuts } = this.context;
-    shortcuts.off("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
+    const { globalShortcuts, shortcuts } = this.context;
+    globalShortcuts.off("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
     shortcuts.off("Enter", this.onEnterPress);
   }
 
@@ -264,6 +263,7 @@ export class ProjectSearch extends Component {
   }
 }
 ProjectSearch.contextTypes = {
+  globalShortcuts: PropTypes.object,
   shortcuts: PropTypes.object,
 };
 

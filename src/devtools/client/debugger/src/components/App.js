@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component, useEffect, useState } from "react";
+import React, { Component, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
 import { connect } from "../utils/connect";
@@ -23,7 +23,8 @@ import { getSelectedPanel } from "ui/reducers/app.ts";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
-const shortcuts = new KeyShortcuts({ window, target: document });
+
+const globalShortcuts = new KeyShortcuts({ window, target: document });
 
 const { appinfo } = Services;
 
@@ -64,30 +65,36 @@ class Debugger extends Component {
   };
 
   getChildContext = () => {
-    return { shortcuts, l10n: L10N };
+    return { globalShortcuts, shortcuts: this.shortcuts, l10n: L10N };
   };
 
-  componentDidMount() {
-    shortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
-    shortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
-    shortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-    shortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
-    shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
+  constructor(props) {
+    super(props);
+    this.shortcuts = new KeyShortcuts({ window, target: props.wrapper });
+  }
 
-    shortcuts.on("Escape", this.onEscape);
-    shortcuts.on("Cmd+/", this.onCommandSlash);
+  componentDidMount() {
+    globalShortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
+    globalShortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
+    globalShortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
+    globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    globalShortcuts.on("Cmd+/", this.onCommandSlash);
+
+    this.shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
+    this.shortcuts.on("Escape", this.onEscape);
 
     this.props.refreshCodeMirror();
   }
 
   componentWillUnmount() {
-    shortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
-    shortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
-    shortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-    shortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
-    shortcuts.off("Ctrl+G", this.toggleLineQuickOpenModal);
+    globalShortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
+    globalShortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
+    globalShortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
+    globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    globalShortcuts.off("Cmd+/", this.onCommandSlash);
 
-    shortcuts.off("Escape", this.onEscape);
+    this.shortcuts.off("Ctrl+G", this.toggleLineQuickOpenModal);
+    this.shortcuts.off("Escape", this.onEscape);
   }
 
   componentDidUpdate(prevProps) {
@@ -232,7 +239,7 @@ class Debugger extends Component {
   render() {
     const { quickOpenEnabled } = this.props;
     return (
-      <div className="debugger">
+      <>
         <A11yIntention>
           {this.renderLayout()}
           {quickOpenEnabled === true && (
@@ -243,18 +250,20 @@ class Debugger extends Component {
           )}
           {this.renderShortcutsModal()}
         </A11yIntention>
-      </div>
+      </>
     );
   }
 }
 
 Debugger.childContextTypes = {
+  globalShortcuts: PropTypes.object,
   shortcuts: PropTypes.object,
   l10n: PropTypes.object,
 };
 
 function DebuggerLoader(props) {
   const [loading, setLoading] = useState(true);
+  const wrapperNode = useRef();
 
   useEffect(() => {
     (async () => {
@@ -267,7 +276,11 @@ function DebuggerLoader(props) {
     })();
   }, []);
 
-  return loading ? null : <Debugger {...props} />;
+  return (
+    <div className="debugger" ref={wrapperNode}>
+      {loading ? null : <Debugger {...props} wrapper={wrapperNode.current} />}
+    </div>
+  );
 }
 
 const mapStateToProps = state => ({
