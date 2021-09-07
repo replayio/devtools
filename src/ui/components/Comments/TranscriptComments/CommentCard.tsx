@@ -1,6 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classNames from "classnames";
+import Markdown from "react-markdown";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -53,7 +54,9 @@ function CommentItem({
           </div>
         </div>
       </div>
-      <div className="space-y-4 px-3 pt-3 pb-3 text-xs">{comment.content}</div>
+      <div className="space-y-4 px-3 pt-3 pb-3 text-xs">
+        <Markdown>{comment.content}</Markdown>
+      </div>
     </div>
   );
 }
