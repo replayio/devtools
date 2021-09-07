@@ -6,9 +6,14 @@ import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
+import Spinner from "../shared/Spinner";
 
 function ViewerLoader() {
-  return <div className="bg-gray-100 w-full h-full" />;
+  return (
+    <div className="bg-gray-100 w-full h-full grid items-center justify-items-center">
+      <Spinner className="animate-spin h-6 w-6 text-black" />
+    </div>
+  );
 }
 
 function MyLibrary({ workspaceName, searchString }: ViewerRouterProps) {
