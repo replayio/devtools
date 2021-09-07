@@ -77,7 +77,12 @@ function App({ theme, modal, children }: AppProps) {
     return <LoadingScreen />;
   }
 
-  if (!isTest() && auth.isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {
+  if (
+    !isTest() &&
+    auth.isAuthenticated &&
+    userInfo.acceptedTOSVersion &&
+    userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION
+  ) {
     return <TOSScreen />;
   }
 
