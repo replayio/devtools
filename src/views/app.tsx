@@ -10,32 +10,41 @@ import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 
+// _ONLY_ set this flag if you want to disable the frontend entirely
+const maintenanceMode = false;
+
 const Recording = React.lazy(() => import("./recording"));
 const Account = React.lazy(() => import("ui/components/Account"));
 
 const store = bootstrapApp();
 
-const AppRouting = () => (
-  <Provider store={store}>
-    <tokenManager.Auth0Provider>
-      <ApolloWrapper>
-        <IntercomProvider appId={"k7f741xx"}>
-          <App>
-            <ErrorBoundary>
-              <React.Suspense fallback={<LoadingScreen />}>
-                <Switch>
-                  <Route path="/recording/:recordingId" component={Recording} />
-                  <Route exact path="/" component={Account} />
-                  <Route exact path="/view" component={ViewRedirect} />
-                </Switch>
-              </React.Suspense>
-            </ErrorBoundary>
-          </App>
-        </IntercomProvider>
-      </ApolloWrapper>
-    </tokenManager.Auth0Provider>
-  </Provider>
-);
+const AppRouting = () => {
+  if (maintenanceMode) {
+    return <h1>Replay is down for maintenance, come back later!</h1>;
+  }
+
+  return (
+    <Provider store={store}>
+      <tokenManager.Auth0Provider>
+        <ApolloWrapper>
+          <IntercomProvider appId={"k7f741xx"}>
+            <App>
+              <ErrorBoundary>
+                <React.Suspense fallback={<LoadingScreen />}>
+                  <Switch>
+                    <Route path="/recording/:recordingId" component={Recording} />
+                    <Route exact path="/" component={Account} />
+                    <Route exact path="/view" component={ViewRedirect} />
+                  </Switch>
+                </React.Suspense>
+              </ErrorBoundary>
+            </App>
+          </IntercomProvider>
+        </ApolloWrapper>
+      </tokenManager.Auth0Provider>
+    </Provider>
+  );
+};
 
 // This component replaces a legacy /view route with its current equivalent
 function ViewRedirect() {
