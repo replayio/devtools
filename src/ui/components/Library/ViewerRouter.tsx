@@ -7,6 +7,7 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import Spinner from "../shared/Spinner";
+import { PendingTeamScreen } from "./PendingTeamScreen";
 
 function ViewerLoader() {
   return (
@@ -16,7 +17,7 @@ function ViewerLoader() {
   );
 }
 
-function MyLibrary({ workspaceName, searchString }: ViewerRouterProps) {
+function MyLibrary({ searchString }: ViewerRouterProps) {
   const { recordings, loading } = hooks.useGetPersonalRecordings();
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -24,22 +25,47 @@ function MyLibrary({ workspaceName, searchString }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName, searchString }} />;
+  return <Viewer {...{ recordings, workspaceName: "My Library", searchString }} />;
 }
 
-function TeamLibrary({ currentWorkspaceId, workspaceName, searchString }: ViewerRouterProps) {
+function TeamLibrary(props: ViewerRouterProps) {
+  const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
+  const { currentWorkspaceId } = props;
+
+  if (loading) {
+    return <ViewerLoader />;
+  }
+
+  // If the user selects a pending team ID, we should handle is separetly to display an
+  // accept/decline prompt instead of the usual library view.
+  if (currentWorkspaceId && pendingWorkspaces?.map(w => w.id).includes(currentWorkspaceId)) {
+    const workspace = pendingWorkspaces.find(w => w.id);
+    return <PendingTeamScreen workspace={workspace!} />;
+  } else {
+    return <NonPendingTeamLibrary {...props} />;
+  }
+}
+
+function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRouterProps) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
-  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
   if (loading || nonPendingLoading || recordings == null) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName, searchString }} />;
+  return (
+    <Viewer
+      {...{
+        recordings,
+        workspaceName: workspaces.find(ws => ws.id === currentWorkspaceId)!.name,
+        searchString,
+      }}
+    />
+  );
 }
 
 type ViewerRouterProps = PropsFromRedux & {
-  workspaceName: string;
   searchString: string;
 };
 

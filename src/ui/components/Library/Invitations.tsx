@@ -5,6 +5,7 @@ import { PendingWorkspaceInvitation, Workspace } from "ui/types";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import classNames from "classnames";
+import TeamButton from "./TeamButton";
 
 function InvitationCard({
   actions,
@@ -114,65 +115,26 @@ function AcceptedInvitation({
   );
 }
 
-function Invitations({ setWorkspaceId }: PropsFromRedux) {
+export default function Invitations({}) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
-  const [acceptedInvitations, setAcceptedInvitations] = useState<Array<PendingWorkspaceInvitation>>(
-    []
-  );
 
   if (loading) {
     return null;
   }
 
-  const displayedAcceptedInvitations = acceptedInvitations.filter(
-    workspace => pendingWorkspaces && !pendingWorkspaces.includes(workspace)
+  const displayedWorkspaces = [...pendingWorkspaces!].sort((a, b) =>
+    a.name > b.name ? 1 : a.name < b.name ? -1 : 0
   );
-  const displayedWorkspaces = [
-    ...pendingWorkspaces!,
-    ...displayedAcceptedInvitations,
-  ].sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0));
 
   if (displayedWorkspaces.length === 0) {
     return null;
   }
 
-  const hideAcceptedInvitation = (team: PendingWorkspaceInvitation) => {
-    const invitationIndex = acceptedInvitations.indexOf(team);
-
-    if (invitationIndex < 0) {
-      console.error("Can't find the index for that accepted invitation");
-      return;
-    }
-
-    const newAcceptedInvitations = [...acceptedInvitations].slice();
-    newAcceptedInvitations.splice(invitationIndex, 1);
-
-    setAcceptedInvitations(newAcceptedInvitations);
-  };
-
   return (
-    <div className="workspace-invites flex flex-col space-y-2 p-4 items-start text-sm bg-gray-900">
-      <h2 className="font-medium uppercase text-xs">{`Team Invitations`}</h2>
-      <div className="flex flex-col">
-        {displayedWorkspaces.map(workspace =>
-          acceptedInvitations.includes(workspace) ? (
-            <AcceptedInvitation
-              {...{ workspace, setWorkspaceId, hideAcceptedInvitation }}
-              key={`${workspace.id}-accepted`}
-            />
-          ) : (
-            <Invitation
-              workspace={workspace}
-              key={workspace.id}
-              onAccept={() => setAcceptedInvitations([...acceptedInvitations, workspace])}
-            />
-          )
-        )}
-      </div>
-    </div>
+    <>
+      {displayedWorkspaces.map(workspace => (
+        <TeamButton id={workspace.id} text={workspace.name} key={workspace.id} isNew />
+      ))}
+    </>
   );
 }
-
-const connector = connect(() => ({}), { setWorkspaceId: actions.setWorkspaceId });
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(Invitations);
