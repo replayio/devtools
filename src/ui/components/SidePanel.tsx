@@ -4,6 +4,7 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
+import { Redacted } from "./Redacted";
 const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPanes").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
@@ -23,7 +24,8 @@ function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
   }
 
   return (
-    <div
+    <Redacted
+      allowOptIn
       style={{
         width: `${SIDEPANEL_WIDTH}px`,
         height: "100%",
@@ -31,7 +33,7 @@ function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
       }}
     >
       {sidepanel}
-    </div>
+    </Redacted>
   );
 }
 

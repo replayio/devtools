@@ -130,7 +130,7 @@ function ViewerContent({
     <>
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row space-x-2 text-2xl font-semibold">
-          <span>{workspaceName}</span>
+          <Redacted>{workspaceName}</Redacted>
           <span>({recordings.length})</span>
         </div>
         <div className="flex flex-row space-x-2">

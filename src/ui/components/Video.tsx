@@ -8,6 +8,7 @@ import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UIState } from "ui/state";
+import { Redacted } from "./Redacted";
 
 function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
@@ -58,7 +59,7 @@ function Video({
   const showCommentTool = isPaused && !isNodeTarget && isAuthenticated && !isNodePickerActive;
 
   return (
-    <div id="video">
+    <Redacted allowOptIn id="video">
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {showCommentTool ? (
@@ -67,7 +68,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       <div id="highlighter-root"></div>
-    </div>
+    </Redacted>
   );
 }
 

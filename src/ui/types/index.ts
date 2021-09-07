@@ -12,6 +12,7 @@ export type UserSettings = {
   enableTeams: boolean;
   enableRepaint: boolean;
   defaultWorkspaceId: null | string;
+  enableLogRocket: boolean;
 };
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";

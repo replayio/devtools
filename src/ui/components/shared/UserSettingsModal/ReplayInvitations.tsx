@@ -4,6 +4,7 @@ import "./ReplayInvitations.css";
 import { TextInput } from "ui/components/shared/Forms";
 import { validateEmail } from "ui/utils/helpers";
 import { Invitation } from "ui/hooks/invitations";
+import { Redacted } from "ui/components/Redacted";
 
 const USE_AVAILABLE_INVITATIONS = false;
 
@@ -78,6 +79,7 @@ export default function ReplayInvitations() {
           <div className="flex flex-col w-full">
             <form onSubmit={onSubmit} className="space-x-1.5 flex flex-row">
               <TextInput
+                data-private
                 placeholder="Email Address"
                 value={inputValue}
                 onChange={e => setInputValue((e.target as HTMLInputElement).value)}
@@ -104,7 +106,7 @@ export default function ReplayInvitations() {
                 <div className={`material-icons ${invite.pending || "finished"}`}>
                   {invite.pending ? "pending" : "check_circle"}
                 </div>
-                <div>{invite.invitedEmail}</div>
+                <Redacted>{invite.invitedEmail}</Redacted>
               </div>
             ))}
         </div>
