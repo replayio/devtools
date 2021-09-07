@@ -4,10 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
-import WorkspaceDropdown from "../Dashboard/Navigation/WorkspaceDropdown";
 import { Workspace } from "ui/types";
-import { CogIcon } from "@heroicons/react/solid";
-import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
@@ -17,9 +14,7 @@ import {
   hasTeamInvitationCode,
   removeUrlParameters,
 } from "ui/utils/environment";
-import LaunchButton from "../shared/LaunchButton";
 import { setExpectedError } from "ui/actions/session";
-import UserOptions from "ui/components/Header/UserOptions";
 import { LoadingScreen } from "../shared/BlankScreen";
 import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
@@ -41,42 +36,6 @@ function FilterBar({
     <div className="flex flex-row flex-grow text-gray-500 text-sm space-x-3 items-center">
       <div className="material-icons">search</div>
       <TextInput value={searchString} onChange={onChange} placeholder="Search" />
-    </div>
-  );
-}
-
-function Header({
-  nonPendingWorkspaces,
-  currentWorkspaceId,
-  setModal,
-}: {
-  nonPendingWorkspaces: Workspace[];
-  currentWorkspaceId: string | null;
-  setModal: (modal: ModalType) => void;
-}) {
-  const onSettingsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setModal("workspace-settings");
-  };
-
-  return (
-    <div id="header">
-      <div className="header-left">
-        {currentWorkspaceId == null ? null : (
-          <a
-            href="#"
-            onClick={onSettingsClick}
-            className="flex flex-row ml-3 items-center text-gray-400 hover:text-gray-800"
-          >
-            <CogIcon className="h-6 w-6" />
-          </a>
-        )}
-
-        <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
-      </div>
-      <div className="flex-grow h-full" />
-      <LaunchButton />
-      <UserOptions noBrowserItem />
     </div>
   );
 }
