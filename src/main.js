@@ -33,7 +33,11 @@ const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
 const BrowserNewTab = React.lazy(() => import("views/browser/new-tab"));
 const BrowserWelcome = React.lazy(() => import("views/browser/welcome"));
 const AppRouter = React.lazy(() => import("views/app"));
+const MaintenanceModeScreen = React.lazy(() => import("ui/components/MaintenanceMode"));
 const { BlankProgressScreen } = require("ui/components/shared/BlankScreen");
+
+// _ONLY_ set this flag if you want to disable the frontend entirely
+const maintenanceMode = false;
 
 ReactDOM.render(
   <React.Suspense
@@ -41,6 +45,7 @@ ReactDOM.render(
   >
     <Router>
       <Switch>
+        <Route path={maintenanceMode ? "/" : "/maintenance"} component={MaintenanceModeScreen} />
         <Route exact path="/browser/error" component={BrowserError} />
         <Route exact path="/browser/import-settings" component={BrowserImport} />
         <Route exact path="/browser/launch" component={BrowserLaunch} />
