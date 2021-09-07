@@ -2,6 +2,7 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { features } from "ui/utils/prefs";
+import { PrimaryButton } from "../shared/Button";
 
 function ShareButton({ setModal }: PropsFromRedux) {
   const onClick = () => setModal("browser-launch");
@@ -9,15 +10,14 @@ function ShareButton({ setModal }: PropsFromRedux) {
   if (window.__IS_RECORD_REPLAY_RUNTIME__ || !features.launchBrowser) return null;
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      // This height matches the height of the icon button + border
-      style={{ height: 26 }}
-      className="inline-flex items-center px-4 text-xs rounded-lg text-white bg-primaryAccent hover:bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white box-content mr-2"
-    >
-      Launch Replay
-    </button>
+    <PrimaryButton color="blue" onClick={onClick}>
+      <div className="space-x-2 flex flex-row items-center">
+        <div className="material-icons" style={{ fontSize: "1rem" }}>
+          open_in_new
+        </div>
+        <div>Launch Replay</div>
+      </div>
+    </PrimaryButton>
   );
 }
 

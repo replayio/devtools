@@ -19,12 +19,14 @@ function InvitationCard({
     <div
       className={classNames(
         borderStyles,
-        "relative rounded-lg border bg-white px-4 py-1.5 shadow-sm flex space-x-2.5 focus-within:ring-2 focus-within:ring-offset-2"
+        "relative bg-gray-900 py-2 shadow-sm flex space-x-2.5 focus-within:ring-2 focus-within:ring-offset-2"
       )}
     >
       <div className="flex-1 min-w-0 select-none">
-        <p className="text-base font-medium ">{teamName}</p>
-        <div className="text-base truncate space-x-1.5">{actions}</div>
+        <div className="font-medium text-white overflow-hidden overflow-ellipsis whitespace-pre">
+          {teamName}
+        </div>
+        <div className="text-xs truncate space-x-1.5">{actions}</div>
       </div>
     </div>
   );
@@ -34,13 +36,13 @@ function Invitation({ workspace, onAccept }: { workspace: Workspace; onAccept: (
   const [isLoading, setIsLoading] = useState(false);
 
   const acceptPendingInvitation = hooks.useAcceptPendingInvitation(onAccept);
-  const rejectPendingInvitation = hooks.useRejectPendingInvitation(onAccept);
+  const rejectPendingInvitation = hooks.useRejectPendingInvitation(() => {});
 
   const handleAccept = () => {
     acceptPendingInvitation({ variables: { workspaceId: workspace.id } });
     setIsLoading(true);
   };
-  const handleRefuse = () => {
+  const handleDecline = () => {
     rejectPendingInvitation({ variables: { workspaceId: workspace.id } });
     setIsLoading(true);
   };
@@ -49,9 +51,13 @@ function Invitation({ workspace, onAccept }: { workspace: Workspace; onAccept: (
     <div>Loading...</div>
   ) : (
     <>
-      <button onClick={handleRefuse}>Refuse</button>
+      <button onClick={handleDecline} className="hover:underline">
+        Decline
+      </button>
       <span>/</span>
-      <button onClick={handleAccept}>Accept</button>
+      <button onClick={handleAccept} className="hover:underline">
+        Accept
+      </button>
     </>
   );
 
@@ -145,14 +151,14 @@ function Invitations({ setWorkspaceId }: PropsFromRedux) {
   };
 
   return (
-    <div className="workspace-invites flex flex-col space-y-3 p-6 items-start">
-      <h2 className="font-medium uppercase tracking-wide">{`PENDING INVITATIONS`}</h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+    <div className="workspace-invites flex flex-col space-y-2 p-4 items-start text-sm bg-gray-900">
+      <h2 className="font-medium uppercase text-xs">{`Team Invitations`}</h2>
+      <div className="flex flex-col">
         {displayedWorkspaces.map(workspace =>
           acceptedInvitations.includes(workspace) ? (
             <AcceptedInvitation
               {...{ workspace, setWorkspaceId, hideAcceptedInvitation }}
-              key={workspace.id}
+              key={`${workspace.id}-accepted`}
             />
           ) : (
             <Invitation

@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from "react";
-import Dashboard from "../Dashboard/index";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
-import WorkspaceDropdown from "../Dashboard/Navigation/WorkspaceDropdown";
 import { Workspace } from "ui/types";
-import { CogIcon } from "@heroicons/react/solid";
-import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
@@ -18,43 +14,28 @@ import {
   hasTeamInvitationCode,
   removeUrlParameters,
 } from "ui/utils/environment";
-import LaunchButton from "../shared/LaunchButton";
 import { setExpectedError } from "ui/actions/session";
-import UserOptions from "ui/components/Header/UserOptions";
 import { LoadingScreen } from "../shared/BlankScreen";
+import Sidebar from "./Sidebar";
+import ViewerRouter from "./ViewerRouter";
+import { TextInput } from "../shared/Forms";
+import LaunchButton from "../shared/LaunchButton";
 
-function Header({
-  nonPendingWorkspaces,
-  currentWorkspaceId,
-  setModal,
+function FilterBar({
+  searchString,
+  setSearchString,
 }: {
-  nonPendingWorkspaces: Workspace[];
-  currentWorkspaceId: string | null;
-  setModal: (modal: ModalType) => void;
+  searchString: string;
+  setSearchString: Dispatch<SetStateAction<string>>;
 }) {
-  const onSettingsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setModal("workspace-settings");
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
   };
 
   return (
-    <div id="header">
-      <div className="header-left">
-        {currentWorkspaceId == null ? null : (
-          <a
-            href="#"
-            onClick={onSettingsClick}
-            className="flex flex-row ml-3 items-center text-gray-400 hover:text-gray-800"
-          >
-            <CogIcon className="h-6 w-6" />
-          </a>
-        )}
-
-        <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
-      </div>
-      <div className="flex-grow h-full" />
-      <LaunchButton />
-      <UserOptions noBrowserItem />
+    <div className="flex flex-row flex-grow text-gray-500 text-sm space-x-3 items-center">
+      <div className="material-icons">search</div>
+      <TextInput value={searchString} onChange={onChange} placeholder="Search" />
     </div>
   );
 }
@@ -62,6 +43,7 @@ function Header({
 function LibraryLoader(props: PropsFromRedux) {
   const [renderLibrary, setRenderLibrary] = useState(false);
   const [showClaimError, setShowClaimError] = useState(false);
+
   const auth = useAuth0();
   const userInfo = hooks.useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
@@ -135,6 +117,7 @@ function Library({
   pendingWorkspaces,
   nags,
 }: LibraryProps) {
+  const [searchString, setSearchString] = useState("");
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   useEffect(function handleDeletedTeam() {
@@ -177,14 +160,23 @@ function Library({
   }
 
   return (
-    <>
-      <Header
-        nonPendingWorkspaces={workspaces}
-        setModal={setModal}
-        currentWorkspaceId={currentWorkspaceId}
-      />
-      <Dashboard />
-    </>
+    <main className="flex flex-row w-full h-full">
+      <Sidebar nonPendingWorkspaces={workspaces} />
+      <div className="flex flex-col flex-grow overflow-x-hidden">
+        <div className="flex flex-row h-16 border-b border-gray-300 items-center p-5 bg-white space-x-3">
+          <FilterBar searchString={searchString} setSearchString={setSearchString} />
+          <LaunchButton />
+        </div>
+        <ViewerRouter
+          workspaceName={
+            currentWorkspaceId
+              ? workspaces.find(ws => ws.id === currentWorkspaceId)!.name
+              : "Your Library"
+          }
+          searchString={searchString}
+        />
+      </div>
+    </main>
   );
 }
 

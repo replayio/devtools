@@ -1,0 +1,13 @@
+/* Works on Chrome, Edge, and Safari */
+.library-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.library-sidebar::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+.library-sidebar::-webkit-scrollbar-thumb {
+  background-color: #6b7280;
+  border-radius: 8px;
+}
