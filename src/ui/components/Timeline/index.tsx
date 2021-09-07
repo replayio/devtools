@@ -39,9 +39,9 @@ import { prefs, features } from "ui/utils/prefs";
 function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
     <button onClick={onClick} disabled={disabled}>
-      <MaterialIcon className="refresh pause_play_circle material-icons-round">
-        refresh
-      </MaterialIcon>
+      <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
+        <img className="w-6 h-6 m-auto" src="/images/playback-refresh.svg" />
+      </div>
     </button>
   );
 }
@@ -185,11 +185,11 @@ class Timeline extends Component<PropsFromRedux> {
       <div className="commands">
         <button onClick={togglePlayback} disabled={disabled}>
           {playback ? (
-            <div className="flex flex-row" style={{ width: "29px", height: "32px" }}>
+            <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
               <img className="w-6 h-6 m-auto" src="/images/playback-pause.svg" />
             </div>
           ) : (
-            <div className="flex flex-row" style={{ width: "29px", height: "32px" }}>
+            <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
               <img className="w-6 h-6 m-auto" src="/images/playback-play.svg" />
             </div>
           )}
