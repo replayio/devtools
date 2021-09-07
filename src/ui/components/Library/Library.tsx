@@ -153,8 +153,6 @@ function Library({
       // because they were invited to a team.
       if (pendingWorkspaces.length === 1 && workspaces.length === 0) {
         setModal("single-invite");
-      } else {
-        setModal("team-member-onboarding");
       }
     }
 

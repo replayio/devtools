@@ -1,6 +1,5 @@
 import React from "react";
 import { PendingWorkspaceInvitation } from "ui/types";
-import Prompt from "../shared/Prompt";
 import PendingTeamPrompt from "./PendingTeamPrompt";
 import { getDurationString, getRelativeDate } from "./RecordingRow";
 import RecordingTable from "./RecordingTable";
@@ -54,7 +53,6 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
 
 export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceInvitation }) {
   const { name } = workspace;
-  console.log({ workspace });
 
   return (
     <div className="flex flex-col flex-grow px-8 py-6 bg-gray-100 space-y-5 -5 overflow-auto">
