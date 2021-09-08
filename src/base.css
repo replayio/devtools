@@ -25,7 +25,7 @@ body {
   align-items: stretch;
   height: 100%;
   width: 100%;
-  font-family: system-ui, Arial, sans-serif;
+  font-family: "Inter", sans-serif;
   color: var(--theme-body-color);
   --light-grey: #969696;
   --dark-grey: #696969;
