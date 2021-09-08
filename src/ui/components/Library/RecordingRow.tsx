@@ -131,11 +131,7 @@ function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
     <Redacted>
-      <div>
-        {screenData && (
-          <img className="h-9 w-full object-contain" src={screenData} alt="recording screenshot" />
-        )}
-      </div>
+      <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} />}</div>
     </Redacted>
   );
 }
