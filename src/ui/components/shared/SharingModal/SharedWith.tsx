@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/types";
+import { Recording, Workspace } from "ui/types";
 import TeamSelect from "ui/components/UploadScreen/TeamSelect";
 import { PrimaryButton } from "../Button";
 import Collaborators from "./Collaborators";
@@ -10,24 +10,29 @@ import { commaListOfThings } from "ui/utils/helpers";
 type SharedWithProps = {
   workspaces: Workspace[];
   collaborators: CollaboratorDbData[];
-  recordingId: string;
-  defaultWorkspaceId: string | null;
+  recording: Recording;
 };
 
 export function SharedWith(props: SharedWithProps) {
-  const { defaultWorkspaceId, workspaces, collaborators } = props;
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
-    defaultWorkspaceId || null
-  );
+  const { recording, workspaces, collaborators } = props;
+  const currentWorkspaceId = recording.workspace?.id || null;
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(currentWorkspaceId);
   const selectedWorkspace = workspaces.find(w => w.id === selectedWorkspaceId);
   const [isEditing, setIsEditing] = useState(false);
+  const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
+  function moveRecording() {
+    if (selectedWorkspaceId !== currentWorkspaceId) {
+      updateRecordingWorkspace(recording.id, currentWorkspaceId, selectedWorkspaceId);
+    }
+    setIsEditing(false);
+  }
 
   return (
     <div>
       <div className="w-full flex flex-row justify-between items-center">
         <h2 className="text-xl">Sharing</h2>
         {isEditing ? (
-          <PrimaryButton color="blue" onClick={() => setIsEditing(false)}>
+          <PrimaryButton color="blue" onClick={moveRecording}>
             Done
           </PrimaryButton>
         ) : null}
@@ -50,7 +55,7 @@ function SharedWithForm({
   workspaces,
   setSelectedWorkspaceId,
   selectedWorkspaceId,
-  recordingId,
+  recording,
 }: SharedWithProps & {
   isEditing: boolean;
   setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
@@ -75,7 +80,7 @@ function SharedWithForm({
       ) : null}
       <div className="w-full space-y-1.5">
         <div className="text-sm uppercase font-bold">{`People`}</div>
-        <Collaborators {...{ recordingId }} />
+        <Collaborators recordingId={recording.id} />
       </div>
     </div>
   );
