@@ -14,7 +14,58 @@ const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { assert } = require("protocol/utils");
 
 const messagesActions = require("devtools/client/webconsole/actions/messages");
-const { ConsoleCommand } = require("devtools/client/webconsole/types");
+const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
+const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
+
+async function getPause(toolbox) {
+  const { asyncIndex } = toolbox.getPanel("debugger").getFrameId();
+  await ThreadFront.ensureAllSources();
+  const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
+  assert(pause);
+
+  return pause;
+}
+
+async function dispatchExpression(dispatch, pause, expression) {
+  // We use the messages action as it's doing additional transformation on the message.
+  let evalId = nextEvalId++;
+  dispatch(
+    messagesActions.messagesAdd([
+      new ConsoleCommand({
+        messageText: expression,
+        timeStamp: Date.now(),
+        evalId,
+        executionPoint: pause.point,
+        executionPointTime: pause.time,
+      }),
+    ])
+  );
+  dispatch({ type: EVALUATE_EXPRESSION, expression });
+
+  return evalId;
+}
+
+function paywallExpression(expression, reason = "team-user") {
+  return async ({ dispatch, toolbox }) => {
+    const pause = await getPause(toolbox);
+    const evalId = await dispatchExpression(dispatch, pause, expression);
+
+    dispatch(
+      messagesActions.messagesAdd([
+        new PaywallMessage({
+          paywall: {
+            reason,
+          },
+          source: MESSAGE_SOURCE.CONSOLE_API,
+          timeStamp: Date.now(),
+          evalId,
+          executionPoint: pause.point,
+          executionPointTime: pause.time,
+        }),
+      ])
+    );
+  };
+}
 
 let nextEvalId = 1;
 function evaluateExpression(expression) {
@@ -29,24 +80,8 @@ function evaluateExpression(expression) {
     }
 
     const { asyncIndex, frameId } = toolbox.getPanel("debugger").getFrameId();
-    await ThreadFront.ensureAllSources();
-    const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
-    assert(pause);
-
-    // We use the messages action as it's doing additional transformation on the message.
-    let evalId = nextEvalId++;
-    dispatch(
-      messagesActions.messagesAdd([
-        new ConsoleCommand({
-          messageText: expression,
-          timeStamp: Date.now(),
-          evalId,
-          executionPoint: pause.point,
-          executionPointTime: pause.time,
-        }),
-      ])
-    );
-    dispatch({ type: EVALUATE_EXPRESSION, expression });
+    const pause = await getPause(toolbox);
+    const evalId = await dispatchExpression(dispatch, pause, expression);
 
     try {
       const response = await evaluateJSAsync(expression, {
@@ -66,7 +101,7 @@ function evaluateExpression(expression) {
       return dispatch(
         onExpressionEvaluated({
           type: "evaluationResult",
-          result: createPrimitiveValueFront(msg, ThreadFront.pauseForAsyncIndex(asyncIndex)),
+          result: createPrimitiveValueFront(msg, pause),
           evalId,
         })
       );
@@ -132,5 +167,6 @@ function setInputValue(value) {
 }
 module.exports = {
   evaluateExpression,
+  paywallExpression,
   setInputValue,
 };

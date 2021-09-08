@@ -9,6 +9,9 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import actions from "devtools/client/webconsole/actions/index";
 
+import { getRecordingId } from "ui/utils/environment";
+import { getRecording } from "ui/hooks/recordings";
+
 async function createEditor({ execute }) {
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
   const editor = new Editor({
@@ -43,18 +46,27 @@ class JSTerm extends React.Component {
     return {
       // Evaluate provided expression.
       evaluateExpression: PropTypes.func.isRequired,
+      paywallExpression: PropTypes.func.isRequired,
     };
   }
 
   constructor(props) {
     super(props);
     window.jsterm = this;
+    this.state = {
+      canEval: true,
+    };
   }
 
   async componentDidMount() {
     this.editorWaiter = createEditor({ execute: this.execute });
     this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
+
+    const recordingId = getRecordingId();
+    const recording = await getRecording(recordingId);
+
+    this.setState({ canEval: recording.userRole !== "team-user" });
   }
 
   focus() {
@@ -70,7 +82,11 @@ class JSTerm extends React.Component {
       return;
     }
 
-    this.props.evaluateExpression(executeString);
+    if (this.state.canEval) {
+      this.props.evaluateExpression(executeString);
+    } else {
+      this.props.paywallExpression(executeString);
+    }
     this.setValue("");
     return null;
   };
@@ -116,7 +132,6 @@ class JSTerm extends React.Component {
   }
 
   render() {
-    // return null;
     return (
       <div
         className="jsterm-input-container devtools-input"
@@ -137,6 +152,7 @@ function mapStateToProps() {
 
 const mapDispatchToProp = {
   evaluateExpression: actions.evaluateExpression,
+  paywallExpression: actions.paywallExpression,
 };
 
 export default connect(mapStateToProps, mapDispatchToProp)(JSTerm);

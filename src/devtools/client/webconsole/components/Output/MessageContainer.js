@@ -12,6 +12,10 @@ const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/con
 
 const componentMap = new Map([
   [
+    "PaywallMessage",
+    require("devtools/client/webconsole/components/Output/message-types/PaywallMessage"),
+  ],
+  [
     "ConsoleApiCall",
     require("devtools/client/webconsole/components/Output/message-types/ConsoleApiCall"),
   ],
@@ -83,7 +87,9 @@ function getMessageComponent(message) {
 
   switch (message.source) {
     case MESSAGE_SOURCE.CONSOLE_API:
-      return componentMap.get("ConsoleApiCall");
+      return message.paywall
+        ? componentMap.get("PaywallMessage")
+        : componentMap.get("ConsoleApiCall");
     case MESSAGE_SOURCE.JAVASCRIPT:
       switch (message.type) {
         case MESSAGE_TYPE.COMMAND:

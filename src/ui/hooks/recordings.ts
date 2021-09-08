@@ -27,6 +27,7 @@ const GET_WORKSPACE_RECORDINGS = gql`
               createdAt
               private
               isInitialized
+              userRole
               comments {
                 user {
                   id
@@ -63,6 +64,7 @@ const GET_MY_RECORDINGS = gql`
             createdAt
             private
             isInitialized
+            userRole
             owner {
               id
               name
@@ -127,7 +129,7 @@ export async function getRecording(recordingId: RecordingId) {
 }
 
 export function useGetRecording(
-  recordingId: RecordingId | null
+  recordingId: RecordingId | null | undefined
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
   const { data, error, loading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
@@ -169,6 +171,7 @@ function convertRecording(rec: any): Recording | undefined {
     comments: rec.comments,
     collaborators,
     ownerNeedsInvite: rec.ownerNeedsInvite,
+    userRole: rec.userRole,
   };
 }
 

@@ -75,8 +75,6 @@
   text-overflow: ellipsis;
   padding: 5px;
   width: 100%;
-  margin-right: 10px;
-  cursor: text;
 }
 
 span.expression {

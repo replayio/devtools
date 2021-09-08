@@ -22,6 +22,7 @@ export const GET_RECORDING = gql`
       private
       isInitialized
       ownerNeedsInvite
+      userRole
       owner {
         id
         name
