@@ -50,7 +50,6 @@ pref("devtools.features.videoPlayback", false);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
 pref("devtools.features.eventCount", true);
-pref("devtools.features.billing", false);
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.enableLogRocket", false);
 
@@ -89,7 +88,6 @@ export const features = new PrefsHelper("devtools.features", {
   launchBrowser: ["Bool", "launchBrowser"],
   termsOfService: ["Bool", "termsOfService"],
   eventCount: ["Bool", "eventCount"],
-  billing: ["Bool", "billing"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   enableLogRocket: ["Bool", "enableLogRocket"],
 });
