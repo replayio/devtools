@@ -11,7 +11,7 @@ export default function RecordingTable({
   return (
     <div
       className={classNames(
-        "rounded-md shadow-md",
+        "recording-list rounded-md shadow-md",
         isMock ? "overflow-hidden pointer-events-none" : "overflow-auto"
       )}
     >
