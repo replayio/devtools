@@ -7,6 +7,7 @@ import { PrimaryButton } from "../shared/Button";
 import RecordingTable from "./RecordingTable";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
+import sortBy from "lodash/sortBy";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -129,6 +130,12 @@ function ViewerContent({
     );
   }
 
+  let sortedRecordings = sortBy(recordings, recording => {
+    const ascOrder = false;
+    const order = ascOrder ? 1 : -1;
+    return order * new Date(recording.date).getTime();
+  });
+
   return (
     <>
       <ViewerHeader>
@@ -149,7 +156,7 @@ function ViewerContent({
         </div>
       </ViewerHeader>
       <RecordingTable>
-        {recordings.map((r, i) => (
+        {sortedRecordings.map((r, i) => (
           <RecordingRow
             key={i}
             recording={r}
