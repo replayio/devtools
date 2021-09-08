@@ -1,23 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import Modal from "ui/components/shared/NewModal";
 import ReplayLink from "./ReplayLink";
 import hooks from "ui/hooks";
-import { useGetUserSettings } from "ui/hooks/settings";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { UserSettings, Workspace } from "ui/types";
+import { Recording, Workspace } from "ui/types";
 import { PrimaryButton } from "../Button";
 import { actions } from "ui/actions";
 import { SharedWith } from "./SharedWith";
 import { CollaboratorDbData } from "./CollaboratorsList";
 
 function SharingModalWrapper(props: PropsFromRedux) {
-  const { userSettings, loading: loading1 } = useGetUserSettings();
+  const { recordingId } = props.modalOptions!;
+  const { recording, loading: loading1 } = hooks.useGetRecording(recordingId);
   const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
-  const { collaborators, loading: loading3 } = hooks.useGetOwnersAndCollaborators(
-    props.modalOptions!.recordingId
-  );
+  const { collaborators, loading: loading3 } = hooks.useGetOwnersAndCollaborators(recordingId);
 
   if (loading1 || loading2 || loading3) {
     // Todo: Use an actual loader here
@@ -25,26 +23,23 @@ function SharingModalWrapper(props: PropsFromRedux) {
   }
 
   return (
-    <SharingModal {...{ ...props, userSettings, workspaces }} collaborators={collaborators!} />
+    <SharingModal
+      {...{ ...props, workspaces }}
+      recording={recording!}
+      collaborators={collaborators!}
+    />
   );
 }
 
 type SharingModalProps = PropsFromRedux & {
-  userSettings: UserSettings;
+  recording: Recording;
   workspaces: Workspace[];
   collaborators: CollaboratorDbData[];
 };
 
-function SharingModal({
-  modalOptions,
-  userSettings,
-  workspaces,
-  collaborators,
-  hideModal,
-}: SharingModalProps) {
-  const { recordingId } = modalOptions!;
-  const { isPrivate } = hooks.useGetIsPrivate(recordingId!);
-  const toggleIsPrivate = hooks.useToggleIsPrivate(recordingId!, isPrivate);
+function SharingModal({ recording, workspaces, collaborators, hideModal }: SharingModalProps) {
+  const isPrivate = recording.private;
+  const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
 
   const setPublic = () => {
     if (isPrivate) {
@@ -64,13 +59,10 @@ function SharingModal({
         style={{ width: "600px" }}
       >
         <section className="space-y-4">
-          <SharedWith
-            defaultWorkspaceId={userSettings?.defaultWorkspaceId || null}
-            {...{ workspaces, recordingId, collaborators }}
-          />
+          <SharedWith {...{ workspaces, recording, collaborators }} />
           <div className="space-y-2">
             <h2 className="text-xl">Link</h2>
-            <ReplayLink recordingId={recordingId} />
+            <ReplayLink recordingId={recording.id} />
             <div className="flex flex-row items-center">
               {isPrivate ? (
                 <div className="w-full justify-between flex flex-row items-center">
