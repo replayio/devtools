@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import { AvatarImage } from "../Avatar";
 
 function SidebarFooter({ setModal }: PropsFromRedux) {
   const { user } = useAuth0();
@@ -13,7 +14,7 @@ function SidebarFooter({ setModal }: PropsFromRedux) {
 
   return (
     <div className="flex flex-row space-x-2 p-4 bg-gray-700">
-      <img src={picture} className="rounded-full w-8 h-8" />
+      <AvatarImage src={picture} className="rounded-full w-8 h-8 avatar" />
       <div className="flex flex-col">
         <div className="text-sm text-white overflow-hidden overflow-ellipsis whitespace-pre text-left">
           {name}
