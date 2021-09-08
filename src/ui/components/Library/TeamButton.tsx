@@ -48,7 +48,7 @@ function TeamButton({
 
   return (
     <SidebarButton shouldHighlight={isSelected} onClick={handleTeamClick}>
-      <Redacted>
+      <Redacted className="overflow-hidden">
         <div
           className={classNames(
             "overflow-hidden overflow-ellipsis whitespace-pre",
