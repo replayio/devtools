@@ -101,7 +101,7 @@ export default function RecordingRow({
             </div>
 
             <div className="flex flex-col overflow-hidden" style={{ maxWidth: "200px" }}>
-              <div className="text-gray-900 font-bold overflow-hidden overflow-ellipsis whitespace-pre">
+              <div className="text-gray-900 overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title}
               </div>
               <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
