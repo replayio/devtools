@@ -3,7 +3,7 @@ import { Recording } from "ui/types";
 import { useHistory } from "react-router-dom";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
-
+import LazyLoad from "react-lazyload";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import hooks from "ui/hooks";
 import { Redacted } from "../Redacted";
@@ -97,7 +97,9 @@ export default function RecordingRow({
         <Redacted>
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
             <div className="bg-gray-100 rounded-sm w-16 h-9">
-              <ItemScreenshot recordingId={recording.id} />
+              <LazyLoad height={36} scrollContainer=".recording-list" once>
+                <ItemScreenshot recordingId={recording.id} />
+              </LazyLoad>
             </div>
 
             <div className="flex flex-col overflow-hidden" style={{ maxWidth: "200px" }}>
