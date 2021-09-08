@@ -21,6 +21,21 @@ import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
 
+function isUnknownWorkspaceId(
+  id: string | null,
+  workspaces: Workspace[],
+  pendingWorkspaces?: Workspace[]
+) {
+  const associatedWorkspaces = [{ id: null }, ...workspaces];
+
+  // Add the pending workspaces, if any.
+  if (pendingWorkspaces) {
+    associatedWorkspaces.push(...pendingWorkspaces);
+  }
+
+  return !associatedWorkspaces.map(ws => ws.id).includes(id);
+}
+
 function FilterBar({
   searchString,
   setSearchString,
@@ -138,8 +153,6 @@ function Library({
       // because they were invited to a team.
       if (pendingWorkspaces.length === 1 && workspaces.length === 0) {
         setModal("single-invite");
-      } else {
-        setModal("team-member-onboarding");
       }
     }
 
@@ -155,7 +168,8 @@ function Library({
   // that the user is no longer a part of. This occurs when the user is removed
   // from a team that is stored as their default library team in prefs. We return
   // null here, and reset the currentWorkspaceId to the user's library in `handleDeletedTeam`.
-  if (![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+  // This also handles cases where the selected ID actually corresponds to a pending team.
+  if (isUnknownWorkspaceId(currentWorkspaceId, workspaces, pendingWorkspaces)) {
     return <LoadingScreen />;
   }
 
@@ -167,14 +181,7 @@ function Library({
           <FilterBar searchString={searchString} setSearchString={setSearchString} />
           <LaunchButton />
         </div>
-        <ViewerRouter
-          workspaceName={
-            currentWorkspaceId
-              ? workspaces.find(ws => ws.id === currentWorkspaceId)!.name
-              : "Your Library"
-          }
-          searchString={searchString}
-        />
+        <ViewerRouter searchString={searchString} />
       </div>
     </main>
   );

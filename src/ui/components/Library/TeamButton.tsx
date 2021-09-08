@@ -24,13 +24,19 @@ function TeamButton({
 }: TeamButtonProps) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const isSelected = currentWorkspaceId == id;
+  const showSettingsButton = id && isSelected && !isNew;
 
   const handleTeamClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setWorkspaceId(id);
-    updateDefaultWorkspace({
-      variables: { workspaceId: id },
-    });
+
+    // We only set the new team as the default team if this is a non-pending team.
+    // Otherwise, it would be possible to set pending teams as a default team.
+    if (!isNew) {
+      updateDefaultWorkspace({
+        variables: { workspaceId: id },
+      });
+    }
   };
   const handleSettingsClick = () => {
     setModal("workspace-settings");
@@ -54,7 +60,7 @@ function TeamButton({
         </div>
       </Redacted>
       {badge}
-      {id && isSelected ? <SettingsButton onClick={handleSettingsClick} /> : null}
+      {showSettingsButton ? <SettingsButton onClick={handleSettingsClick} /> : null}
     </SidebarButton>
   );
 }
