@@ -10,6 +10,7 @@ import { features } from "ui/utils/prefs";
 
 import MaterialIcon from "../MaterialIcon";
 import { Button } from "../Button";
+import { Redacted } from "ui/components/Redacted";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -212,7 +213,7 @@ function BillingDetails({
           ) : null}
           {paymentMethods.map(pm => {
             return (
-              <div className="flex flex-row items-center space-x-2" key={pm.id}>
+              <Redacted className="flex flex-row items-center space-x-2" key={pm.id}>
                 <div>{pm.card.brand}</div>
                 <div className="flex-grow">{pm.card.last4}</div>
                 {pm.default ? (
@@ -237,7 +238,7 @@ function BillingDetails({
                     Make Default
                   </Button>
                 )}
-              </div>
+              </Redacted>
             );
           })}
         </section>

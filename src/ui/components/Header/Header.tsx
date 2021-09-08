@@ -16,6 +16,7 @@ import { Recording } from "ui/types";
 import { UIState } from "ui/state";
 
 import "./Header.css";
+import { Redacted } from "../Redacted";
 
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   const { users, loading, error } = useGetActiveSessions(
@@ -129,7 +130,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div id="header">
-      <div className="header-left overflow-hidden flex-grow">
+      <Redacted className="header-left overflow-hidden flex-grow">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
@@ -142,7 +143,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
         ) : (
           <div className="title">Recordings</div>
         )}
-      </div>
+      </Redacted>
       <Links recordingTarget={recordingTarget} />
     </div>
   );

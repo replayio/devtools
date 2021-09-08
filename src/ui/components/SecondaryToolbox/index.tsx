@@ -13,6 +13,7 @@ import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
+import { Redacted } from "../Redacted";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -111,7 +112,7 @@ function SecondaryToolbox({
   const toggleShowVideoPanel = () => setShowVideoPanel(!showVideoPanel);
 
   return (
-    <div className={classnames(`secondary-toolbox`, { node: isNode })}>
+    <Redacted allowOptIn className={classnames(`secondary-toolbox`, { node: isNode })}>
       {!isDemo() && (
         <header className="secondary-toolbox-header">
           <PanelButtons
@@ -132,7 +133,7 @@ function SecondaryToolbox({
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {showReact && selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
       </div>
-    </div>
+    </Redacted>
   );
 }
 

@@ -7,7 +7,7 @@ import { Redacted } from "ui/components/Redacted";
 // The user image URLs that we get from Google sometimes fail to load, in that case
 // we fall back to a transparent image (instead of showing the browser's icon for broken images)
 export const AvatarImage = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
-  <img {...props} onError={e => (e.currentTarget.src = "/images/clear.png")} />
+  <img data-private {...props} onError={e => (e.currentTarget.src = "/images/clear.png")} />
 );
 
 export const AuthAvatar = ({ user }: { user: User }) => {
