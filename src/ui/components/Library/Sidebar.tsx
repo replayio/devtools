@@ -7,7 +7,7 @@ import TeamButton from "./TeamButton";
 import "./Sidebar.css";
 
 export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces: Workspace[] }) {
-  const workspaces = [{ id: null, name: "Your Library", members: [] }, ...nonPendingWorkspaces];
+  const userLibrary = { id: null, name: "Your Library", members: [] };
 
   // This corresponds with tailwind colors: thumb is gray-500 and track is gray-800
   const scrollbarStyle = { scrollbarColor: "#6B7280 #1F2937" };
@@ -21,8 +21,9 @@ export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces
         className="library-sidebar flex flex-col flex-grow text-sm overflow-auto"
         style={scrollbarStyle}
       >
+        <TeamButton key={userLibrary.id} id={userLibrary.id} text={userLibrary.name} />
         <Invitations />
-        {workspaces.map(w => (
+        {nonPendingWorkspaces.map(w => (
           <TeamButton key={w.id} id={w.id} text={w.name} />
         ))}
         <NewTeamButton />

@@ -94,7 +94,7 @@ function HeaderTitle({
 
   return (
     <span
-      className="input focus:ring-primaryAccent ml-2 focus:border-blue-500 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis inter"
+      className="input focus:ring-primaryAccent ml-2 focus:border-blue-500 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis"
       role="textbox"
       spellCheck="false"
       contentEditable
