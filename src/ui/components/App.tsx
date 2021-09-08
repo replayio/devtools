@@ -18,7 +18,7 @@ import { useGetUserInfo } from "ui/hooks/users";
 
 import "./App.css";
 import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
-import { LoadingScreen } from "./shared/BlankScreen";
+import { BlankLoadingScreen, LoadingScreen } from "./shared/BlankScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
@@ -72,6 +72,8 @@ function App({ theme, modal, children }: AppProps) {
   if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
     return <LoadingScreen />;
   }
+
+  return <BlankLoadingScreen />;
 
   if (
     !isTest() &&

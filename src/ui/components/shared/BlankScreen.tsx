@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
   getAwaitingSourcemaps,
@@ -8,11 +8,24 @@ import {
   getUploading,
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
+import { useRive } from "rive-react";
 
 const BACKGROUNDS = {
   white: "white",
   "blue-gradient": "linear-gradient(to bottom right, #68DCFC, #4689F8)",
 };
+
+function ReplayLogoSpinner() {
+  const params = {
+    src: "images/new_file-2.riv",
+    autoplay: false,
+  };
+  const { RiveComponent, rive } = useRive(params);
+
+  useEffect(() => rive?.play());
+
+  return <RiveComponent />;
+}
 
 export default function BlankScreen({
   children,
@@ -52,7 +65,7 @@ export function BlankLoadingScreen({
             {}
           )}
         >
-          <Logo />
+          <ReplayLogoSpinner />
           <div
             className={classNames("text-lg", {
               invisible: !statusMessage,
