@@ -37,7 +37,7 @@ const MaintenanceModeScreen = React.lazy(() => import("ui/components/Maintenance
 const { BlankProgressScreen } = require("ui/components/shared/BlankScreen");
 
 // _ONLY_ set this flag if you want to disable the frontend entirely
-const maintenanceMode = true;
+const maintenanceMode = false;
 
 ReactDOM.render(
   <React.Suspense
