@@ -98,9 +98,9 @@ export function BlankProgressScreen({ progress }: { progress: null | number }) {
       <div className="m-auto">
         <div className="flex flex-col items-center space-y-10">
           <Logo />
-          <div className="w-80 h-1 ">
+          <div className="w-56 h-1 ">
             {progress && (
-              <div className="bg-gray-200 rounded-lg overflow-hidden w-80 relative h-1">
+              <div className="bg-gray-200 rounded-lg overflow-hidden w-56 relative h-1">
                 <div
                   className="absolute t-0 h-full bg-primaryAccent"
                   style={{ width: `${progress}%`, transitionDuration: "200ms" }}

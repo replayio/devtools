@@ -55,13 +55,11 @@ function WelcomePage() {
 
   return (
     <main
-      className="w-full h-full grid"
-      style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
-    >
-      <section className="max-w-sm w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
+      className="w-full h-full grid">
+      <section className="max-w-sm w-72 m-auto bg-white rounded-md overflow-hidden">
         <div className="p-12 space-y-9">
           <div className="space-y-3 place-content-center">
-            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+            <img className="w-32 h-32 mx-auto" src="/images/logo.svg" />
           </div>
           {isTeamMemberInvite() ? (
             <div className="text-center space-y-1.5">
