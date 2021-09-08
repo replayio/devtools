@@ -184,63 +184,44 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
 }
 
 function BillingDetails({
+  onAddMethod,
   paymentMethods,
   workspaceId,
 }: {
+  onAddMethod: () => void;
   paymentMethods: PaymentMethod[];
   workspaceId: string;
 }) {
   const [adding, setAdding] = useState(false);
-  const {
-    setWorkspaceDefaultPaymentMethod,
-    loading: setDefaultLoading,
-  } = hooks.useSetWorkspaceDefaultPaymentMethod();
+  const handleDone = () => {
+    onAddMethod();
+    setAdding(false);
+  };
 
   return (
     <Elements stripe={stripePromise}>
       {adding ? (
-        <AddPaymentMethod onDone={() => setAdding(false)} workspaceId={workspaceId} />
+        <AddPaymentMethod onDone={handleDone} workspaceId={workspaceId} />
       ) : (
         <section className="space-y-4">
           <h3 className="flex flex-row border-b py-2 items-center">
             <span className="flex-auto text-lg font-bold">Payment Methods</span>
-            <Button size="sm" color="blue" style="primary" onClick={() => setAdding(true)}>
-              + Add
-            </Button>
+            {paymentMethods.length === 0 ? (
+              <Button size="sm" color="blue" style="primary" onClick={() => setAdding(true)}>
+                + Add
+              </Button>
+            ) : null}
           </h3>
           {paymentMethods.length === 0 ? (
-            <p className="text-center">No payment methods have been added to this workspace.</p>
-          ) : null}
-          {paymentMethods.map(pm => {
-            return (
+            <p className="text-center">A payment method has not been added to this workspace.</p>
+          ) : (
+            paymentMethods.map(pm => (
               <Redacted className="flex flex-row items-center space-x-2" key={pm.id}>
                 <div>{pm.card.brand}</div>
                 <div className="flex-grow">{pm.card.last4}</div>
-                {pm.default ? (
-                  <div className="text-green-500 flex flex-row items-center">
-                    <span className="material-icons pr-1">check_circle</span>
-                    Default
-                  </div>
-                ) : (
-                  <Button
-                    size="sm"
-                    color="blue"
-                    style={setDefaultLoading ? "disabled" : "secondary"}
-                    onClick={() =>
-                      setWorkspaceDefaultPaymentMethod({
-                        variables: {
-                          workspaceId,
-                          paymentMethodId: pm.id,
-                        },
-                      })
-                    }
-                  >
-                    Make Default
-                  </Button>
-                )}
               </Redacted>
-            );
-          })}
+            ))
+          )}
         </section>
       )}
     </Elements>
@@ -248,7 +229,7 @@ function BillingDetails({
 }
 
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
-  const { data, loading } = hooks.useGetWorkspaceSubscription(workspaceId);
+  const { data, loading, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
   const {
     cancelWorkspaceSubscription,
     loading: cancelLoading,
@@ -307,6 +288,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         <BillingDetails
           paymentMethods={data.node.subscription.paymentMethods}
           workspaceId={workspaceId}
+          onAddMethod={refetch}
         />
       ) : null}
       {data.node.subscription.status === "active" ||
