@@ -4,7 +4,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
 import { createReplayURL } from "views/app";
-import Library from "./Library";
+import Library from "../Library/index";
 
 import "./Account.css";
 import "../Header/Header.css";

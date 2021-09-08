@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from "react";
-import Dashboard from "../Dashboard/index";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
-import WorkspaceDropdown from "../Dashboard/Navigation/WorkspaceDropdown";
 import { Workspace } from "ui/types";
-import { CogIcon } from "@heroicons/react/solid";
-import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
@@ -18,43 +14,43 @@ import {
   hasTeamInvitationCode,
   removeUrlParameters,
 } from "ui/utils/environment";
-import LaunchButton from "../shared/LaunchButton";
 import { setExpectedError } from "ui/actions/session";
-import UserOptions from "ui/components/Header/UserOptions";
 import { LoadingScreen } from "../shared/BlankScreen";
+import Sidebar from "./Sidebar";
+import ViewerRouter from "./ViewerRouter";
+import { TextInput } from "../shared/Forms";
+import LaunchButton from "../shared/LaunchButton";
 
-function Header({
-  nonPendingWorkspaces,
-  currentWorkspaceId,
-  setModal,
+function isUnknownWorkspaceId(
+  id: string | null,
+  workspaces: Workspace[],
+  pendingWorkspaces?: Workspace[]
+) {
+  const associatedWorkspaces = [{ id: null }, ...workspaces];
+
+  // Add the pending workspaces, if any.
+  if (pendingWorkspaces) {
+    associatedWorkspaces.push(...pendingWorkspaces);
+  }
+
+  return !associatedWorkspaces.map(ws => ws.id).includes(id);
+}
+
+function FilterBar({
+  searchString,
+  setSearchString,
 }: {
-  nonPendingWorkspaces: Workspace[];
-  currentWorkspaceId: string | null;
-  setModal: (modal: ModalType) => void;
+  searchString: string;
+  setSearchString: Dispatch<SetStateAction<string>>;
 }) {
-  const onSettingsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setModal("workspace-settings");
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
   };
 
   return (
-    <div id="header">
-      <div className="header-left">
-        {currentWorkspaceId == null ? null : (
-          <a
-            href="#"
-            onClick={onSettingsClick}
-            className="flex flex-row ml-3 items-center text-gray-400 hover:text-gray-800"
-          >
-            <CogIcon className="h-6 w-6" />
-          </a>
-        )}
-
-        <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
-      </div>
-      <div className="flex-grow h-full" />
-      <LaunchButton />
-      <UserOptions noBrowserItem />
+    <div className="flex flex-row flex-grow text-gray-500 text-sm space-x-3 items-center">
+      <div className="material-icons">search</div>
+      <TextInput value={searchString} onChange={onChange} placeholder="Search" />
     </div>
   );
 }
@@ -62,6 +58,7 @@ function Header({
 function LibraryLoader(props: PropsFromRedux) {
   const [renderLibrary, setRenderLibrary] = useState(false);
   const [showClaimError, setShowClaimError] = useState(false);
+
   const auth = useAuth0();
   const userInfo = hooks.useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
@@ -135,6 +132,7 @@ function Library({
   pendingWorkspaces,
   nags,
 }: LibraryProps) {
+  const [searchString, setSearchString] = useState("");
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   useEffect(function handleDeletedTeam() {
@@ -155,8 +153,6 @@ function Library({
       // because they were invited to a team.
       if (pendingWorkspaces.length === 1 && workspaces.length === 0) {
         setModal("single-invite");
-      } else {
-        setModal("team-member-onboarding");
       }
     }
 
@@ -172,19 +168,22 @@ function Library({
   // that the user is no longer a part of. This occurs when the user is removed
   // from a team that is stored as their default library team in prefs. We return
   // null here, and reset the currentWorkspaceId to the user's library in `handleDeletedTeam`.
-  if (![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+  // This also handles cases where the selected ID actually corresponds to a pending team.
+  if (isUnknownWorkspaceId(currentWorkspaceId, workspaces, pendingWorkspaces)) {
     return <LoadingScreen />;
   }
 
   return (
-    <>
-      <Header
-        nonPendingWorkspaces={workspaces}
-        setModal={setModal}
-        currentWorkspaceId={currentWorkspaceId}
-      />
-      <Dashboard />
-    </>
+    <main className="flex flex-row w-full h-full">
+      <Sidebar nonPendingWorkspaces={workspaces} />
+      <div className="flex flex-col flex-grow overflow-x-hidden">
+        <div className="flex flex-row h-16 border-b border-gray-300 items-center p-5 bg-white space-x-3">
+          <FilterBar searchString={searchString} setSearchString={setSearchString} />
+          <LaunchButton />
+        </div>
+        <ViewerRouter searchString={searchString} />
+      </div>
+    </main>
   );
 }
 

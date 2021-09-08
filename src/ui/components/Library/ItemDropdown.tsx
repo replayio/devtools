@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { useState } from "react";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { connect, ConnectedProps } from "react-redux";
@@ -30,26 +30,21 @@ function Privacy({
 }
 
 type DropdownPanelProps = PropsFromRedux & {
-  editingTitle: boolean;
-  isPrivate: boolean;
   recording: Recording;
-  setEditingTitle: Dispatch<SetStateAction<boolean>>;
-  toggleIsPrivate: () => void;
 };
 
-const DropdownPanel = ({
-  currentWorkspaceId,
-  editingTitle,
-  setEditingTitle,
-  recording,
-  toggleIsPrivate,
-  isPrivate,
-  setModal,
-}: DropdownPanelProps) => {
+const ItemDropdown = ({ currentWorkspaceId, recording, setModal }: DropdownPanelProps) => {
+  const [isPrivate, setIsPrivate] = useState(recording.private);
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
+  const updateIsPrivate = hooks.useUpdateIsPrivate();
   const recordingId = recording.id;
+
+  const toggleIsPrivate = () => {
+    setIsPrivate(!isPrivate);
+    updateIsPrivate({ variables: { recordingId: recording.id, isPrivate: !isPrivate } });
+  };
 
   const onDeleteRecording = (recordingId: RecordingId) => {
     const message =
@@ -64,12 +59,7 @@ const DropdownPanel = ({
   };
 
   return (
-    <div className="dropdown-panel text-sm">
-      {!editingTitle ? (
-        <div className="menu-item" onClick={() => setEditingTitle(true)}>
-          Edit title
-        </div>
-      ) : null}
+    <div className="dropdown-panel text-sm text-left">
       <div className="menu-item" onClick={() => onDeleteRecording(recordingId)}>
         Delete
       </div>
@@ -77,6 +67,7 @@ const DropdownPanel = ({
       <div className="menu-item" onClick={() => setModal("sharing", { recordingId })}>
         Share
       </div>
+      <div className="border-b border-gray-200 w-full my-1" />
       {currentWorkspaceId ? (
         <div className="menu-item" onClick={() => updateRecording(null)}>
           Move to your personal library
@@ -102,4 +93,4 @@ const connector = connect(
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(DropdownPanel);
+export default connector(ItemDropdown);

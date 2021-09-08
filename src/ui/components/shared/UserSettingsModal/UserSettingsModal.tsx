@@ -53,7 +53,7 @@ function Personal() {
 
   return (
     <div className="space-y-12">
-      <div className="flex flex-row space-x-3 items-center">
+      <div className="flex flex-row space-x-3 items-center" data-private>
         <img src={picture} className="rounded-full w-12" />
         <div>
           <div className="text-base">{name}</div>

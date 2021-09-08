@@ -23,9 +23,9 @@ export function SharedWith(props: SharedWithProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="space-y-3">
+    <div>
       <div className="w-full flex flex-row justify-between items-center">
-        <h2 className="text-xl">Shared with</h2>
+        <h2 className="text-xl">Sharing</h2>
         {isEditing ? (
           <PrimaryButton color="blue" onClick={() => setIsEditing(false)}>
             Done

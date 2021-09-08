@@ -7,6 +7,7 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
+import "./BatchActionDropdown.css";
 
 type BatchActionDropdownProps = PropsFromRedux & {
   selectedIds: RecordingId[];
@@ -45,7 +46,7 @@ function BatchActionDropdown({
   };
 
   const panel = (
-    <div className="dropdown-panel">
+    <div className="dropdown-panel text-sm">
       <div className="menu-item" onClick={deleteSelectedIds}>
         {`Delete ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""}`}
       </div>
@@ -66,14 +67,18 @@ function BatchActionDropdown({
     </div>
   );
   const icon = (
-    <div className={classnames("batch-action", { disabled: !selectedIds.length })}>
+    <div
+      className={classnames("flex flex-row space-x-2 items-center", {
+        disabled: !selectedIds.length,
+      })}
+    >
       <div className="img chevron-down" />
-      {`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}
+      <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
     </div>
   );
 
   return (
-    <div className="dashboard-viewer-header-batch-action">
+    <div className="dashboard-viewer-header-batch-action text-base font-normal">
       <Dropdown panel={panel} icon={icon} panelStyles={{ top: "36px" }} />
     </div>
   );

@@ -17,7 +17,6 @@ import { ModalType } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
 
 import "./App.css";
-import TeamMemberOnboardingModal from "./shared/OnboardingModal/TeamMemberOnboardingModal";
 import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
 import { LoadingScreen } from "./shared/BlankScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
@@ -43,9 +42,6 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "onboarding": {
       return <OnboardingModal />;
-    }
-    case "team-member-onboarding": {
-      return <TeamMemberOnboardingModal />;
     }
     case "single-invite": {
       return <SingleInviteModal />;
@@ -77,7 +73,12 @@ function App({ theme, modal, children }: AppProps) {
     return <LoadingScreen />;
   }
 
-  if (!isTest() && auth.isAuthenticated && userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION) {
+  if (
+    !isTest() &&
+    auth.isAuthenticated &&
+    userInfo.acceptedTOSVersion &&
+    userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION
+  ) {
     return <TOSScreen />;
   }
 

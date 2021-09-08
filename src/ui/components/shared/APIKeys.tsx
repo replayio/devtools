@@ -64,7 +64,9 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
       <div className="flex-auto overflow-auto h-0">
         {apiKeys.map(apiKey => (
           <div className="flex flex-row items-center py-1.5" key={apiKey.id}>
-            <span className="flex-auto">{apiKey.label}</span>
+            <span className="flex-auto" data-private>
+              {apiKey.label}
+            </span>
             <button
               className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
               onClick={() => {

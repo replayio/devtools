@@ -52,6 +52,7 @@ pref("devtools.features.termsOfService", false);
 pref("devtools.features.eventCount", true);
 pref("devtools.features.billing", false);
 pref("devtools.features.columnBreakpoints", false);
+pref("devtools.features.enableLogRocket", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -90,6 +91,7 @@ export const features = new PrefsHelper("devtools.features", {
   eventCount: ["Bool", "eventCount"],
   billing: ["Bool", "billing"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
+  enableLogRocket: ["Bool", "enableLogRocket"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
