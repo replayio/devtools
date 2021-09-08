@@ -113,7 +113,7 @@ function Status({
       className={classnames("flex flex-row items-center group", { italic: member.pending })}
       title={title}
     >
-      <span>
+      <span className="whitespace-pre">
         {memberRoleLabels[getMemberRole(member)]}
         {member.pending ? " (pending)" : ""}
       </span>
@@ -152,7 +152,9 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon>mail_outline</MaterialIcon>
       </div>
-      <Redacted className="flex-grow">{member.email}</Redacted>
+      <Redacted className="flex-grow whitespace-pre overflow-hidden overflow-ellipsis">
+        {member.email}
+      </Redacted>
       <PortalDropdown
         buttonContent={<Status member={member} />}
         setExpanded={setExpanded}
@@ -251,7 +253,7 @@ function WorkspaceMember({
         className="rounded-full avatar"
         style={{ width: "28px", height: "28px" }}
       />
-      <div className="flex-grow" data-private>
+      <div className="flex-grow overflow-hidden whitespace-pre overflow-ellipsis" data-private>
         {member.user!.name}
       </div>
       <Role

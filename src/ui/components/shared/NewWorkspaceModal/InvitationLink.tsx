@@ -41,7 +41,7 @@ export function TextInputCopy({
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="absolute bottom-full p-1.5 bg-black bg-opacity-90 text-white shadow-2xl rounded-lg mb-1.5 text-base">
+        <div className="absolute bottom-full p-1.5 text-gray-200 bg-gray-500 bg-opacity-90 shadow-2xl rounded-lg mb-1.5 text-base">
           Copied
         </div>
       ) : null}
@@ -91,10 +91,12 @@ export default function InvitationLink({
   workspaceId,
   showDomainCheck = true,
   isLarge = false,
+  hideHeader = false,
 }: {
   workspaceId: string;
   showDomainCheck?: boolean;
   isLarge?: boolean;
+  hideHeader?: boolean;
 }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
@@ -109,7 +111,7 @@ export default function InvitationLink({
 
   return (
     <div className="flex flex-col space-y-3 w-full">
-      <div className="text-xs uppercase font-bold">{`Invite via link`}</div>
+      {!hideHeader ? <div className="text-xs uppercase font-bold">{`Invite via link`}</div> : null}
       <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
     </div>
