@@ -64,8 +64,9 @@ export function bootstrapApp() {
   });
 
   if (!isTest()) {
-    var font = new FontFaceObserver("Material Icons");
-    font.load().then(() => store.dispatch(setFontLoading(false)));
+    var font1 = new FontFaceObserver("Material Icons");
+    var font2 = new FontFaceObserver("Material Icons Outlined");
+    Promise.all([font1.load(), font2.load()]).then(() => store.dispatch(setFontLoading(false)));
   } else {
     // FontFaceObserver doesn't work in e2e tests.
     store.dispatch(setFontLoading(false));

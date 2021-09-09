@@ -21,7 +21,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { removeUrlParameters } from "ui/utils/environment";
 import { DownloadPage } from "../Onboarding/DownloadPage";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
-import { features } from "ui/utils/prefs";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 

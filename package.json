@@ -18,7 +18,7 @@
     "@draft-js-plugins/editor": "^4.1.0",
     "@draft-js-plugins/emoji": "^4.2.0",
     "@draft-js-plugins/mention": "^4.3.1",
-    "@headlessui/react": "^1.0.0",
+    "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.1",
     "@recordreplay/playwright": "^1.10.3",
     "@recordreplay/protocol": "^0.10.0",
