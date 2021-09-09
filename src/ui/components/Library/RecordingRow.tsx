@@ -9,6 +9,8 @@ import hooks from "ui/hooks";
 import { Redacted } from "../Redacted";
 import { RecordingId } from "@recordreplay/protocol";
 import ItemDropdown from "./ItemDropdown";
+import classNames from "classnames";
+import { Cell } from "./RecordingTable";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -83,7 +85,7 @@ export default function RecordingRow({
       className="group border-b border-gray-200 hover:bg-gray-50 transition duration-200 cursor-pointer overflow-hidden"
       onClick={onClick}
     >
-      <td className="text-center">
+      <Cell>
         {isEditing ? (
           <input
             type="checkbox"
@@ -92,17 +94,18 @@ export default function RecordingRow({
             checked={selected}
           />
         ) : null}
-      </td>
-      <td className="py-3 px-6 text-left overflow-hidden">
+      </Cell>
+      <Cell alignment="left">
         <Redacted>
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
-            <div className="bg-gray-100 rounded-sm w-16 h-9">
+            <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0">
               <LazyLoad height={36} scrollContainer=".recording-list" once>
                 <ItemScreenshot recordingId={recording.id} />
               </LazyLoad>
             </div>
 
-            <div className="flex flex-col overflow-hidden" style={{ maxWidth: "200px" }}>
+            <div className="flex flex-col overflow-hidden">
+              {/* <div className="flex flex-col overflow-hidden" style={{ maxWidth: "200px" }}> */}
               <div className="text-gray-900 overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title}
               </div>
@@ -112,17 +115,15 @@ export default function RecordingRow({
             </div>
           </div>
         </Redacted>
-      </td>
-      <td className="text-center">{getDurationString(recording.duration)}</td>
-      <td className="text-center">{getRelativeDate(recording.date)}</td>
-      <td className="text-center">{recording.private ? "Private" : "Public"}</td>
-      <td className="text-center overflow-hidden overflow-ellipsis whitespace-pre">
-        {recording.user ? recording.user.name : "Unknown"}
-      </td>
-      <td className="text-center">{`${recording.comments.length} 💬`}</td>
-      <td className="text-center opacity-0 group-hover:opacity-100">
-        {isOwner && <ItemOptions recording={recording} />}
-      </td>
+      </Cell>
+      <Cell>{getDurationString(recording.duration)}</Cell>
+      <Cell>{getRelativeDate(recording.date)}</Cell>
+      <Cell>{recording.private ? "Private" : "Public"}</Cell>
+      <Cell>{recording.user ? recording.user.name : "Unknown"}</Cell>
+      <Cell>{`${recording.comments.length} 💬`}</Cell>
+      <Cell className="text-center opacity-0 group-hover:opacity-100">
+        {isOwner ? <ItemOptions recording={recording} /> : null}
+      </Cell>
     </tr>
   );
 }
