@@ -108,8 +108,8 @@ export default function InvitationLink({
     : `https://app.replay.io/?invitationcode=${workspace.invitationCode}`;
 
   return (
-    <div className="flex flex-col space-y-3 w-full">
-      <div className="text-xs uppercase font-bold">{`Invite via link`}</div>
+    <div className="flex flex-col space-y-3 w-full pt-8">
+      <div className="text-xs uppercase font-bold">{`Invite link`}</div>
       <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
     </div>

@@ -50,7 +50,7 @@ function SlideContent({
   children: React.ReactElement | (React.ReactElement | null)[];
 }) {
   return (
-    <div className="space-y-9 flex flex-col flex-grow overflow-hidden">
+    <div className="space-y-3 flex flex-col flex-grow overflow-hidden">
       <h2 className="text-2xl ">{headerText}</h2>
       <div className="text-gray-500 flex flex-col flex-grow space-y-3 overflow-hidden">
         {children}
@@ -176,9 +176,8 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   return (
     <>
       <SlideContent headerText="Team name">
-        <div>{`Please name your team`}</div>
         {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
-        <div className="py-3 flex flex-col">
+        <div className="flex flex-col">
           <TextInput value={inputValue} onChange={onChange} />
           {inputError ? <div className="text-red-500">{inputError}</div> : null}
         </div>
@@ -240,8 +239,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
 
   return (
     <>
-      <SlideContent headerText="Your team members">
-        <div>{`Next, we need to add your team members to your team.`}</div>
+      <SlideContent headerText="Invite team members">
         <form className="flex flex-col" onSubmit={handleAddMember}>
           <div className="flex-grow flex flex-row space-x-3">
             <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
@@ -330,8 +328,8 @@ function OnboardingModal(props: PropsFromRedux) {
     <>
       <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
         <div
-          className="p-9 bg-white rounded-lg shadow-xl text-sm space-y-6 relative flex flex-col justify-between"
-          style={{ width: "520px", height }}
+          className="p-4 bg-white rounded-lg shadow-xl text-sm space-y-6 relative flex flex-col justify-between"
+          style={{ width: "480px" }}
         >
           {slide}
         </div>
