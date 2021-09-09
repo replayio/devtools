@@ -27,7 +27,7 @@ export function TextInputCopy({
   };
 
   return (
-    <div className="relative flex flex-col items-center w-full">
+    <div className="relative flex flex-col items-center w-full p-0.5">
       <input
         className={classNames(
           isLarge ? "text-xl" : "text-sm",
