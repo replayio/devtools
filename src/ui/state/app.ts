@@ -92,6 +92,7 @@ export interface AppState {
   recordingWorkspace: Workspace | null;
   loadedRegions: loadedRegions | null;
   showVideoPanel: boolean;
+  showEditor: boolean;
 }
 
 export interface AnalysisPoints {

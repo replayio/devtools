@@ -10,7 +10,11 @@ const SecondaryPanes = require("devtools/client/debugger/src/components/Secondar
 
 const SIDEPANEL_WIDTH = 240;
 
-function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
+type SidePanelProps = {
+  resizable?: boolean;
+} & PropsFromRedux;
+
+function SidePanel({ selectedPrimaryPanel, resizable }: SidePanelProps) {
   let sidepanel;
 
   if (selectedPrimaryPanel === "explorer") {
@@ -27,7 +31,7 @@ function SidePanel({ selectedPrimaryPanel }: PropsFromRedux) {
     <Redacted
       allowOptIn
       style={{
-        width: `${SIDEPANEL_WIDTH}px`,
+        width: resizable ? "100%" : `${SIDEPANEL_WIDTH}px`,
         height: "100%",
         borderRight: "1px solid var(--theme-splitter-color)",
       }}

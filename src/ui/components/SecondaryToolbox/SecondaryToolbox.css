@@ -16,7 +16,10 @@
   border-bottom: 1px solid var(--theme-splitter-color);
 }
 
-.secondary-toolbox-header:not(.node) {
+/* This makes sure that in cases where the toolbox is the only one
+displayed in a column, we don't add an additional border. Otherwise,
+the border added is duplicated. */
+.secondary-toolbox-header:not(.video-hidden *) {
   border-top: 1px solid var(--theme-splitter-color);
 }
 

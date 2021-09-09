@@ -14,6 +14,7 @@ import { UIState } from "ui/state";
 import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
+import ToolboxOptions from "./ToolboxOptions";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -109,7 +110,6 @@ function SecondaryToolbox({
   const { userSettings } = hooks.useGetUserSettings();
   const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
-  const toggleShowVideoPanel = () => setShowVideoPanel(!showVideoPanel);
 
   return (
     <Redacted allowOptIn className={classnames(`secondary-toolbox`, { node: isNode })}>
@@ -121,11 +121,7 @@ function SecondaryToolbox({
             isNode={isNode}
             hasReactComponents={hasReactComponents}
           />
-          <button className="" onClick={toggleShowVideoPanel}>
-            <MaterialIcon className="hover:text-primaryAccent">
-              {showVideoPanel ? "videocam_off" : "videocam"}
-            </MaterialIcon>
-          </button>
+          <ToolboxOptions />
         </header>
       )}
       <div className="secondary-toolbox-content text-xs">
