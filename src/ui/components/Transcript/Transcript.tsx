@@ -45,7 +45,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
       <div className="right-sidebar-toolbar">
         <div className="right-sidebar-toolbar-item comments">Comments</div>
       </div>
-      <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-sm">
+      <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
           <div className="p-3 overflow-auto w-full flex-grow space-y-3">
             {sortBy(displayedComments, ["time"]).map(comment => {
