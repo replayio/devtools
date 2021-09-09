@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { matchPath, useHistory, useLocation } from "react-router-dom";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
@@ -189,10 +190,23 @@ const settings: Settings<
 ];
 
 function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const match = matchPath<{ workspaceId: string }>(pathname, {
+    path: "/team/:workspaceId/settings/billing",
+  });
+  const [defaultTab, setDefaultTab] = useState<string>("Team Members");
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
 
-  if (!workspaceId) return null;
+  useEffect(() => {
+    if (match) {
+      setDefaultTab("Billing");
+      history.replace("/");
+    }
+  }, []);
+
+  if (match || !workspaceId) return null;
 
   const roles = members?.find(m => m.userId === localUserId)?.roles;
   const isAdmin = roles?.includes("admin") || false;
@@ -211,7 +225,7 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}
-      defaultSelectedTab="Team Members"
+      defaultSelectedTab={defaultTab}
       panelProps={{ isAdmin, workspaceId, ...rest }}
       settings={settings}
       size="lg"

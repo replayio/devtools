@@ -25,8 +25,8 @@ const AppRouting = () => (
               <React.Suspense fallback={<LoadingScreen />}>
                 <Switch>
                   <Route path="/recording/:recordingId" component={Recording} />
-                  <Route exact path="/" component={Account} />
                   <Route exact path="/view" component={ViewRedirect} />
+                  <Route component={Account} />
                 </Switch>
               </React.Suspense>
             </ErrorBoundary>

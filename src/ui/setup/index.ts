@@ -1,10 +1,11 @@
+import { matchPath } from "react-router-dom";
 import { bootstrapStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
-import { getTheme } from "ui/reducers/app";
+import { getTheme, getWorkspaceId } from "ui/reducers/app";
 import { setFontLoading, setModal, setWorkspaceId } from "ui/actions/app";
 import tokenManager from "ui/utils/tokenManager";
 import { bootIntercom } from "ui/utils/intercom";
@@ -41,6 +42,13 @@ export function bootstrapApp() {
   if (url.searchParams.has("settings")) {
     store.dispatch(setModal("settings"));
   }
+  const match = matchPath<{ workspaceId: string }>(url.pathname, {
+    path: "/team/:workspaceId/settings/billing",
+  });
+  if (match?.params.workspaceId) {
+    store.dispatch(setWorkspaceId(match.params.workspaceId));
+    store.dispatch(setModal("workspace-settings"));
+  }
 
   tokenManager.addListener(async tokenState => {
     if (tokenState.loading || tokenState.error) {
@@ -60,8 +68,10 @@ export function bootstrapApp() {
       setTelemetryContext(userInfo);
     }
 
-    const userSettings = await getUserSettings();
-    store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+    if (!getWorkspaceId(store.getState())) {
+      const userSettings = await getUserSettings();
+      store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+    }
 
     initLaunchDarkly();
   });
