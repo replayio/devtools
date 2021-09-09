@@ -197,7 +197,16 @@ class Message extends Component {
       return dom.div(
         { className: `overlay-container debug`, title: "Add Comment", onClick: handleAddComment },
         dom.div({ className: "info" }, dom.div({ className: "label" }, "Comment")),
-        dom.div({ className: "button" }, dom.div({ className: "img" }))
+        dom.div(
+          { className: "button" },
+          dom.div(
+            {
+              className: "material-icons text-base text-white add-comment-icon",
+              style: { fontSize: "16px" },
+            },
+            "add_comment"
+          )
+        )
       );
     }
 

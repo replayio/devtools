@@ -492,9 +492,6 @@ button.open-inspector {
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
-.overlay-container.debug .img {
-  -webkit-mask-image: url(~devtools/client/debugger/images/add-comment.svg);
-}
 .overlay-container.fast-forward .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
