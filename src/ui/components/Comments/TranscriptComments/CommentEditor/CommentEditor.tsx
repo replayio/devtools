@@ -15,7 +15,7 @@ import {
 import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import { User } from "ui/types";
-import classNames from "classnames";
+import { DisabledSmButton, PrimarySmButton, SecondarySmButton } from "ui/components/shared/Button";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
@@ -63,24 +63,16 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
         />
       </div>
       <div className="flex justify-end space-x-2">
-        <button
-          onClick={clearPendingComment}
-          className={classNames("justify-center py-1.5 px-3 font-medium text-black underline")}
-        >
+        <SecondarySmButton color="gray" onClick={handleCancel}>
           Cancel
-        </button>
-        <button
-          onClick={onSubmit}
-          disabled={!submitEnabled}
-          className={classNames(
-            "justify-center py-1.5 px-3 rounded-md shadow-sm font-medium",
-            submitEnabled
-              ? "bg-primaryAccent text-white hover:bg-primaryAccentHover"
-              : "text-white bg-gray-300"
-          )}
-        >
-          Post
-        </button>
+        </SecondarySmButton>
+        {submitEnabled ? (
+          <PrimarySmButton color="blue" onClick={onSubmit}>
+            Post
+          </PrimarySmButton>
+        ) : (
+          <DisabledSmButton>Post</DisabledSmButton>
+        )}
       </div>
     </div>
   );

@@ -104,6 +104,16 @@ export const DisabledLgButton = (props: ButtonProps) => (
   <Button {...props} size="2xl" style="disabled" className="cursor-default" color="gray" />
 );
 
+export const PrimarySmButton = (props: ButtonProps & { color: Colors }) => (
+  <Button {...props} size="sm" style="primary" />
+);
+export const SecondarySmButton = (props: ButtonProps & { color: Colors }) => (
+  <Button {...props} size="sm" style="secondary" />
+);
+export const DisabledSmButton = (props: ButtonProps) => (
+  <Button {...props} size="sm" style="disabled" className="cursor-default" color="gray" />
+);
+
 export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="md" style="primary" />
 );
