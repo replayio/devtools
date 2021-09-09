@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { SetStateAction } from "react";
 
 export default React.forwardRef<
   HTMLInputElement,

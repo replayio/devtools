@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
@@ -64,7 +64,7 @@ function TeamNamePage({
   const [inputValue, setInputValue] = useState<string>("");
   const [allowNext, setAllowNext] = useState<boolean>(false);
   const [inputError, setInputError] = useState<string | null>(null);
-  const { id: userId } = hooks.useGetUserInfo();
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
@@ -99,17 +99,21 @@ function TeamNamePage({
     trackEvent("created-team");
   };
 
+  useEffect(() => {
+    textInputRef.current?.focus();
+  }, [textInputRef.current]);
+
   return (
     <>
       <OnboardingHeader>What should we call you?</OnboardingHeader>
       <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
       <div className="py-3 flex flex-col w-full">
         <TextInput
-          placeholder="Team name"
           value={inputValue}
           onChange={onChange}
           textSize={"xl"}
           center={true}
+          ref={textInputRef}
         />
         {inputError ? <div className="text-red-500">{inputError}</div> : null}
       </div>
