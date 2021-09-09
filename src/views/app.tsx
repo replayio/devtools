@@ -8,6 +8,7 @@ import { LoadingScreen } from "ui/components/shared/BlankScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
+import { createRouteFromLegacyParams } from "ui/utils/routes";
 import "image/image.css";
 
 const Recording = React.lazy(() => import("./recording"));
@@ -25,6 +26,7 @@ const AppRouting = () => (
               <React.Suspense fallback={<LoadingScreen />}>
                 <Switch>
                   <Route path="/recording/:recordingId" component={Recording} />
+                  <Route path="/team/:workspaceId" component={Account} />
                   <Route exact path="/" component={Account} />
                   <Route exact path="/view" component={ViewRedirect} />
                 </Switch>
@@ -42,25 +44,9 @@ function ViewRedirect() {
   const history = useHistory();
   const currentParams = new URLSearchParams(window.location.search);
   useEffect(() => {
-    history.replace(createReplayURL(currentParams));
+    history.replace(createRouteFromLegacyParams(currentParams));
   });
   return null;
-}
-
-/**
- * Create a (host relative) URL with the given parameters. Used for replacing
- * legacy routes with their current equivalents.
- */
-export function createReplayURL(currentParams: URLSearchParams) {
-  const recordingId = currentParams.get("id");
-  const path = recordingId ? `/recording/${recordingId}` : "/";
-  const newParams = new URLSearchParams();
-  currentParams.forEach((value, key) => {
-    if (key !== "id") {
-      newParams.set(key, value);
-    }
-  });
-  return `${path}?${newParams.toString()}`;
 }
 
 export default AppRouting;

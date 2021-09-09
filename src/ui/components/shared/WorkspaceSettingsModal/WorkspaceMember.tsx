@@ -1,5 +1,7 @@
 import classnames from "classnames";
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { getWorkspaceRoute } from "ui/utils/routes";
 import hooks from "ui/hooks";
 import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
@@ -173,16 +175,15 @@ export function NonRegisteredWorkspaceMember({
 function Role({
   canLeave,
   member,
-  setWorkspaceId,
   hideModal,
   isAdmin,
 }: {
   member: WorkspaceUser;
-  setWorkspaceId: any;
   hideModal: any;
   isAdmin: boolean;
   canLeave: boolean;
 }) {
+  const history = useHistory();
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
@@ -204,7 +205,7 @@ function Role({
       // to the personal workspace.
       if (isPersonal) {
         hideModal();
-        setWorkspaceId(null);
+        history.push(getWorkspaceRoute(null));
         updateDefaultWorkspace({ variables: { workspaceId: null } });
       }
     }
@@ -237,13 +238,7 @@ function Role({
   );
 }
 
-function WorkspaceMember({
-  member,
-  setWorkspaceId,
-  hideModal,
-  isAdmin,
-  canLeave = false,
-}: WorkspaceMemberProps) {
+function WorkspaceMember({ member, hideModal, isAdmin, canLeave = false }: WorkspaceMemberProps) {
   return (
     <li className="flex flex-row items-center space-x-1.5">
       <AvatarImage
@@ -254,19 +249,12 @@ function WorkspaceMember({
       <div className="flex-grow" data-private>
         {member.user!.name}
       </div>
-      <Role
-        member={member}
-        setWorkspaceId={setWorkspaceId}
-        hideModal={hideModal}
-        isAdmin={isAdmin}
-        canLeave={canLeave}
-      />
+      <Role member={member} hideModal={hideModal} isAdmin={isAdmin} canLeave={canLeave} />
     </li>
   );
 }
 
 const connector = connect(() => ({}), {
-  setWorkspaceId: actions.setWorkspaceId,
   hideModal: actions.hideModal,
 });
 export type PropsFromRedux = ConnectedProps<typeof connector>;

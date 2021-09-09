@@ -3,10 +3,11 @@ import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
-import * as actions from "ui/actions/app";
-import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
+import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
+import { Workspace } from "ui/types";
+import { useGetSettingsTab, useGetWorkspaceId } from "ui/utils/routes";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 import {
   isTeamLeaderInvite,
@@ -20,6 +21,8 @@ import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
+import { useHistory } from "react-router-dom";
+import { getWorkspaceRoute } from "ui/utils/routes";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -124,23 +127,19 @@ type LibraryProps = PropsFromRedux & {
   nags: Nag[];
 };
 
-function Library({
-  setWorkspaceId,
-  setModal,
-  currentWorkspaceId,
-  workspaces,
-  pendingWorkspaces,
-  nags,
-}: LibraryProps) {
+function Library({ modal, setModal, workspaces, pendingWorkspaces, nags }: LibraryProps) {
+  const currentWorkspaceId = useGetWorkspaceId();
+  const history = useHistory();
+  const settingsTab = useGetSettingsTab();
   const [searchString, setSearchString] = useState("");
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+  // const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   useEffect(function handleDeletedTeam() {
     // After rendering null, update the workspaceId to display the user's library
     // instead of the non-existent team.
     if (![{ id: null }, ...workspaces].some(ws => ws.id === currentWorkspaceId)) {
-      setWorkspaceId(null);
-      updateDefaultWorkspace({ variables: { workspaceId: null } });
+      history.push(getWorkspaceRoute(null));
+      // updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
   }, []);
   useEffect(function handleOnboardingModals() {
@@ -163,6 +162,14 @@ function Library({
       setModal("first-replay");
     }
   }, []);
+  useEffect(
+    function handleSettingsRoute() {
+      if (settingsTab && modal !== "workspace-settings") {
+        setModal("workspace-settings");
+      }
+    },
+    [settingsTab, modal]
+  );
 
   // Handle cases where the default workspace ID in prefs is for a team
   // that the user is no longer a part of. This occurs when the user is removed
@@ -189,10 +196,9 @@ function Library({
 
 const connector = connect(
   (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
+    modal: selectors.getModal(state),
   }),
   {
-    setWorkspaceId: actions.setWorkspaceId,
     setModal: actions.setModal,
     setExpectedError,
   }

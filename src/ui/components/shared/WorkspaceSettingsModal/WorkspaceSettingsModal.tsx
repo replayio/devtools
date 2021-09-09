@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import React, { ChangeEvent, MouseEventHandler, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { useGetWorkspaceId, getWorkspaceRoute } from "ui/utils/routes";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
@@ -82,7 +82,8 @@ type WorkspaceFormProps = PropsFromRedux & {
   members?: WorkspaceUser[];
 };
 
-function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
+function WorkspaceForm({ members }: WorkspaceFormProps) {
+  const workspaceId = useGetWorkspaceId();
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -136,19 +137,19 @@ const settings: Settings<
     isAdmin: boolean;
     workspaceId: string;
     hideModal: PropsFromRedux["hideModal"];
-    setWorkspaceId: PropsFromRedux["setWorkspaceId"];
   }
 > = [
   {
     title: "Team Members",
     icon: "group",
-    component: function TeamMebers({ isAdmin, workspaceId, settings, ...rest }) {
+    component: function TeamMebers({ isAdmin, settings, ...rest }) {
+      const workspaceId = useGetWorkspaceId()!;
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
         <div className="flex flex-col flex-grow space-y-3 overflow-hidden">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-          <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
+          <WorkspaceForm {...rest} members={members} />
           <div className="text-xs uppercase font-semibold">{`Members`}</div>
           <div className="overflow-auto flex-grow">
             <div className="workspace-members-container flex flex-col space-y-1.5">
@@ -175,8 +176,10 @@ const settings: Settings<
   {
     title: "Delete Team",
     icon: "cancel",
-    component: function DeleteTeam({ hideModal, setWorkspaceId, workspaceId }) {
-      const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+    component: function DeleteTeam({ hideModal }) {
+      const history = useHistory();
+      const workspaceId = useGetWorkspaceId();
+      // const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
 
       const handleDeleteTeam = () => {
@@ -190,8 +193,8 @@ const settings: Settings<
             variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
           });
           hideModal();
-          setWorkspaceId(null);
-          updateDefaultWorkspace({ variables: { workspaceId: null } });
+          history.replace(getWorkspaceRoute(null));
+          // updateDefaultWorkspace({ variables: { workspaceId: null } });
         }
       };
 
@@ -213,7 +216,8 @@ const settings: Settings<
   },
 ];
 
-function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
+function WorkspaceSettingsModal(props: PropsFromRedux) {
+  const workspaceId = useGetWorkspaceId();
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
 
@@ -237,7 +241,7 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
     <SettingsModal
       hiddenTabs={hiddenTabs}
       defaultSelectedTab="Team Members"
-      panelProps={{ isAdmin, workspaceId, ...rest }}
+      panelProps={{ isAdmin, workspaceId, ...props }}
       settings={settings}
       size="lg"
       title="Team Settings"
@@ -245,9 +249,8 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
   );
 }
 
-const connector = connect((state: UIState) => ({ workspaceId: selectors.getWorkspaceId(state) }), {
+const connector = connect(null, {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 export type PropsFromRedux = ConnectedProps<typeof connector>;
 

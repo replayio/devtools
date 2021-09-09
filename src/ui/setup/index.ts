@@ -5,7 +5,7 @@ import { setupDOMHelpers } from "./dom";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
 import { getTheme } from "ui/reducers/app";
-import { setFontLoading, setModal, setWorkspaceId } from "ui/actions/app";
+import { setFontLoading, setModal } from "ui/actions/app";
 import tokenManager from "ui/utils/tokenManager";
 import { bootIntercom } from "ui/utils/intercom";
 import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
@@ -60,7 +60,7 @@ export function bootstrapApp() {
     }
 
     const userSettings = await getUserSettings();
-    store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+    // store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
   });
 
   if (!isTest()) {

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import * as actions from "ui/actions/app";
-import * as selectors from "ui/reducers/app";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { RecordingId } from "@recordreplay/protocol";
 import { Recording } from "ui/types";
 import { WorkspaceId } from "ui/state/app";
-import { UIState } from "ui/state";
+import { useGetWorkspaceId } from "ui/utils/routes";
 
 function Privacy({
   isPrivate,
@@ -33,7 +32,8 @@ type DropdownPanelProps = PropsFromRedux & {
   recording: Recording;
 };
 
-const ItemDropdown = ({ currentWorkspaceId, recording, setModal }: DropdownPanelProps) => {
+const ItemDropdown = ({ recording, setModal }: DropdownPanelProps) => {
+  const currentWorkspaceId = useGetWorkspaceId();
   const [isPrivate, setIsPrivate] = useState(recording.private);
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
@@ -86,11 +86,8 @@ const ItemDropdown = ({ currentWorkspaceId, recording, setModal }: DropdownPanel
   );
 };
 
-const connector = connect(
-  (state: UIState) => ({ currentWorkspaceId: selectors.getWorkspaceId(state) }),
-  {
-    setModal: actions.setModal,
-  }
-);
+const connector = connect(null, {
+  setModal: actions.setModal,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ItemDropdown);

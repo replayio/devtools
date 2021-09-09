@@ -1,18 +1,18 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
+import { getWorkspaceRoute } from "ui/utils/routes";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
 
-import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import * as actions from "ui/actions/app";
-import { UIState } from "ui/state";
+interface PendingTeamPromptProps {
+  workspace: PendingWorkspaceInvitation;
+}
 
-type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
-
-function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps) {
+export default function PendingTeamPrompt({ workspace }: PendingTeamPromptProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const { id, name, inviterEmail } = workspace;
+  const history = useHistory();
 
   const acceptPendingInvitation = hooks.useAcceptPendingInvitation(onAcceptCompleted);
   const declinePendingInvitation = hooks.useRejectPendingInvitation(onDeclineCompleted);
@@ -30,7 +30,7 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
     }
   };
   function onDeclineCompleted() {
-    setWorkspaceId(null);
+    history.push(getWorkspaceRoute(null));
   }
   function onAcceptCompleted() {
     updateDefaultWorkspace({
@@ -67,12 +67,3 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
-  }),
-  { setWorkspaceId: actions.setWorkspaceId }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(PendingTeamPrompt);

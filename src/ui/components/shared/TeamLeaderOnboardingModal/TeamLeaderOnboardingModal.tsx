@@ -1,5 +1,7 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { getWorkspaceRoute } from "ui/utils/routes";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
@@ -21,7 +23,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { removeUrlParameters } from "ui/utils/environment";
 import { DownloadPage } from "../Onboarding/DownloadPage";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
-import { features } from "ui/utils/prefs";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -127,11 +128,8 @@ function TeamNamePage({
   );
 }
 
-function TeamMemberInvitationPage({
-  newWorkspace,
-  setWorkspaceId,
-  onSkipToDownload,
-}: SlideBodyProps) {
+function TeamMemberInvitationPage({ newWorkspace, onSkipToDownload }: SlideBodyProps) {
+  const history = useHistory();
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -142,7 +140,7 @@ function TeamMemberInvitationPage({
   });
 
   useEffect(() => {
-    setWorkspaceId(newWorkspace!.id);
+    history.push(getWorkspaceRoute(newWorkspace!.id));
   });
 
   // This is hacky. A member entry will only have an e-mail if it was pending. If
@@ -283,7 +281,6 @@ function OnboardingModal(props: PropsFromRedux) {
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(OnboardingModal);

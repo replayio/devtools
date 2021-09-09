@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
-import { createReplayURL } from "views/app";
+import { createRouteFromLegacyParams } from "ui/utils/routes";
 import Library from "../Library/index";
 
 import "./Account.css";
@@ -54,8 +54,7 @@ function WelcomePage() {
   }
 
   return (
-    <main
-      className="w-full h-full grid">
+    <main className="w-full h-full grid">
       <section className="max-w-sm w-72 m-auto bg-white rounded-md overflow-hidden">
         <div className="p-12 space-y-9">
           <div className="space-y-3 place-content-center">
@@ -89,7 +88,7 @@ export default function Account() {
 
   useEffect(() => {
     if (searchParams.get("id")) {
-      history.replace(createReplayURL(searchParams));
+      history.replace(createRouteFromLegacyParams(searchParams));
     }
   }, []);
 

@@ -344,10 +344,6 @@ export function setCanvas(canvas: Canvas): SetCanvas {
   return { type: "set_canvas", canvas };
 }
 
-export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId {
-  return { type: "set_workspace_id", workspaceId };
-}
-
 export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSettingsTab {
   return { type: "set_default_settings_tab", tabTitle };
 }

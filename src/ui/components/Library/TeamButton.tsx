@@ -1,45 +1,38 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import * as actions from "ui/actions/app";
-import { UIState } from "ui/state";
-import hooks from "ui/hooks";
-import SidebarButton from "./SidebarButton";
+import { useHistory } from "react-router-dom";
 import classNames from "classnames";
+import { getWorkspaceRoute, getWorkspaceSettingsRoute, useGetWorkspaceId } from "ui/utils/routes";
+import SidebarButton from "./SidebarButton";
 import { Redacted } from "../Redacted";
 
-type TeamButtonProps = PropsFromRedux & {
+interface TeamButtonProps {
   text: string;
   isNew?: boolean;
   id: string | null;
-};
+}
 
-function TeamButton({
-  text,
-  isNew,
-  id,
-  currentWorkspaceId,
-  setWorkspaceId,
-  setModal,
-}: TeamButtonProps) {
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+export default function TeamButton({ text, isNew, id }: TeamButtonProps) {
+  const history = useHistory();
+  const currentWorkspaceId = useGetWorkspaceId()!;
+  // const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const isSelected = currentWorkspaceId == id;
   const showSettingsButton = id && isSelected && !isNew;
 
   const handleTeamClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setWorkspaceId(id);
+    history.push(getWorkspaceRoute(id));
 
     // We only set the new team as the default team if this is a non-pending team.
     // Otherwise, it would be possible to set pending teams as a default team.
     if (!isNew) {
-      updateDefaultWorkspace({
-        variables: { workspaceId: id },
-      });
+      // updateDefaultWorkspace({
+      //   variables: { workspaceId: id },
+      // });
     }
   };
-  const handleSettingsClick = () => {
-    setModal("workspace-settings");
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    history.push(getWorkspaceSettingsRoute(currentWorkspaceId));
   };
 
   const badge = isNew && (
@@ -65,7 +58,7 @@ function TeamButton({
   );
 }
 
-function SettingsButton({ onClick }: { onClick: () => void }) {
+function SettingsButton({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
   return (
     <button
       onClick={onClick}
@@ -75,12 +68,3 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
     </button>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
-  }),
-  { setWorkspaceId: actions.setWorkspaceId, setModal: actions.setModal }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(TeamButton);

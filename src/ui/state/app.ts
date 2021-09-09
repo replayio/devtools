@@ -85,7 +85,6 @@ export interface AppState {
   canvas: Canvas | null;
   videoUrl: string | null;
   videoNode: HTMLVideoElement | null;
-  workspaceId: WorkspaceId | null;
   defaultSettingsTab: SettingsTabTitle;
   recordingTarget: RecordingTarget | null;
   fontLoading: boolean;

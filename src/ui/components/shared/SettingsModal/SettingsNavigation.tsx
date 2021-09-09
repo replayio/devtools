@@ -1,9 +1,12 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import classnames from "classnames";
+import { getWorkspaceSettingsRoute, useGetSettingsTab, useGetWorkspaceId } from "ui/utils/routes";
 import { Setting, Settings } from "./types";
-import "./SettingsNavigation.css";
 import MaterialIcon from "../MaterialIcon";
 import { SettingsHeader } from "./SettingsBody";
+
+import "./SettingsNavigation.css";
 
 interface SettingNavigationItemProps<
   T extends string,
@@ -11,8 +14,6 @@ interface SettingNavigationItemProps<
   P extends Record<string, unknown>
 > {
   setting: Setting<T, V, P>;
-  selectedTab?: T;
-  setSelectedTab: (title: T) => void;
 }
 
 interface SettingNavigationProps<
@@ -21,8 +22,6 @@ interface SettingNavigationProps<
   P extends Record<string, unknown>
 > {
   settings: Settings<T, V, P>;
-  selectedTab?: T;
-  setSelectedTab: (title: T) => void;
   title?: string;
   hiddenTabs?: T[];
 }
@@ -31,10 +30,13 @@ function SettingNavigationItem<
   T extends string,
   V extends Record<string, unknown>,
   P extends Record<string, unknown>
->({ setting, selectedTab, setSelectedTab }: SettingNavigationItemProps<T, V, P>) {
+>({ setting }: SettingNavigationItemProps<T, V, P>) {
   const { title, icon } = setting;
+  const history = useHistory();
+  const workspaceId = useGetWorkspaceId()!;
+  const selectedTab = useGetSettingsTab()!;
   const onClick = () => {
-    setSelectedTab(title);
+    history.push(getWorkspaceSettingsRoute(workspaceId, title));
   };
 
   return (
@@ -49,13 +51,7 @@ export default function SettingNavigation<
   T extends string,
   V extends Record<string, unknown>,
   P extends Record<string, unknown>
->({
-  hiddenTabs,
-  settings,
-  selectedTab,
-  setSelectedTab,
-  title = "Settings",
-}: SettingNavigationProps<T, V, P>) {
+>({ hiddenTabs, settings, title = "Settings" }: SettingNavigationProps<T, V, P>) {
   return (
     <nav>
       <SettingsHeader>{title}</SettingsHeader>
@@ -63,7 +59,7 @@ export default function SettingNavigation<
         {settings
           .filter(setting => !hiddenTabs || !hiddenTabs.includes(setting.title))
           .map((setting, index) => (
-            <SettingNavigationItem {...{ setting, selectedTab, setSelectedTab }} key={index} />
+            <SettingNavigationItem {...{ setting }} key={index} />
           ))}
       </ul>
     </nav>

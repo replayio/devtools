@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
+import classnames from "classnames";
+import { useGetSettingsTab } from "ui/utils/routes";
 import Modal from "ui/components/shared/Modal";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsBody from "./SettingsBody";
-
 import { Settings } from "./types";
 
 import "./SettingsModal.css";
-import classnames from "classnames";
 
 export default function SettingsModal<
   T extends string,
@@ -33,7 +33,7 @@ export default function SettingsModal<
   size?: "sm" | "lg";
   title?: string;
 }) {
-  const [selectedTab, setSelectedTab] = useState<T | undefined>(defaultSelectedTab);
+  const selectedTab = useGetSettingsTab();
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
 
   if (loading) {
@@ -47,7 +47,7 @@ export default function SettingsModal<
   return (
     <div className={classnames("settings-modal", { "settings-modal-large": size === "lg" })}>
       <Modal>
-        <SettingsNavigation {...{ hiddenTabs, settings, selectedTab, setSelectedTab, title }} />
+        <SettingsNavigation {...{ hiddenTabs, settings, selectedTab, title }} />
         <SettingsBody
           values={values}
           selectedSetting={selectedSetting}

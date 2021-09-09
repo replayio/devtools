@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { useHistory } from "react-router-dom";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
+import { getWorkspaceRoute } from "ui/utils/routes";
 import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
@@ -50,13 +52,14 @@ function SingleInviteModalLoader(props: PropsFromRedux) {
 
 // Once we have the workspace, this component should handle auto-accepting that invitation.
 function AutoAccept(props: SingleInviteModalProps) {
-  const { setWorkspaceId, workspace } = props;
+  const { workspace } = props;
+  const history = useHistory();
   const [accepted, setAccepted] = useState(false);
 
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const acceptPendingInvitation = hooks.useAcceptPendingInvitation(() => {
     updateDefaultWorkspace({ variables: { workspaceId: workspace.id } });
-    setWorkspaceId(workspace.id);
+    history.push(getWorkspaceRoute(workspace.id));
     setAccepted(true);
   });
 
@@ -160,7 +163,6 @@ function SingleInviteModal({ hideModal, workspace }: SingleInviteModalProps) {
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(SingleInviteModalLoader);

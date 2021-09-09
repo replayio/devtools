@@ -2,23 +2,22 @@ import React from "react";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import classnames from "classnames";
 import hooks from "ui/hooks";
-import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
+import { useGetWorkspaceId } from "ui/utils/routes";
+
 import "./BatchActionDropdown.css";
 
-type BatchActionDropdownProps = PropsFromRedux & {
+interface BatchActionDropdownProps {
   selectedIds: RecordingId[];
   setSelectedIds: any;
-};
+}
 
-function BatchActionDropdown({
+export default function BatchActionDropdown({
   selectedIds,
   setSelectedIds,
-  currentWorkspaceId,
 }: BatchActionDropdownProps) {
+  const currentWorkspaceId = useGetWorkspaceId();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
@@ -83,9 +82,3 @@ function BatchActionDropdown({
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  currentWorkspaceId: selectors.getWorkspaceId(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(BatchActionDropdown);

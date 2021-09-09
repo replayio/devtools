@@ -1,10 +1,7 @@
 import React from "react";
-import Loader from "../shared/Loader";
+import { Route, Switch } from "react-router-dom";
+import { useGetWorkspaceId } from "ui/utils/routes";
 import Viewer from "./Viewer";
-
-import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import Spinner from "../shared/Spinner";
 import { PendingTeamScreen } from "./PendingTeamScreen";
@@ -29,8 +26,8 @@ function MyLibrary({ searchString }: ViewerRouterProps) {
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
+  const currentWorkspaceId = useGetWorkspaceId();
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
-  const { currentWorkspaceId } = props;
 
   if (loading) {
     return <ViewerLoader />;
@@ -46,7 +43,8 @@ function TeamLibrary(props: ViewerRouterProps) {
   }
 }
 
-function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRouterProps) {
+function NonPendingTeamLibrary({ searchString }: ViewerRouterProps) {
+  const currentWorkspaceId = useGetWorkspaceId();
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -65,22 +63,19 @@ function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRoute
   );
 }
 
-type ViewerRouterProps = PropsFromRedux & {
+interface ViewerRouterProps {
   searchString: string;
-};
-
-function ViewerRouter(props: ViewerRouterProps) {
-  const { currentWorkspaceId } = props;
-
-  if (currentWorkspaceId === null) {
-    return <MyLibrary {...props} />;
-  } else {
-    return <TeamLibrary {...props} />;
-  }
 }
 
-const connector = connect((state: UIState) => ({
-  currentWorkspaceId: selectors.getWorkspaceId(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(ViewerRouter);
+export default function ViewerRouter(props: ViewerRouterProps) {
+  return (
+    <Switch>
+      <Route path="/team/:workspaceId">
+        <TeamLibrary {...props} />
+      </Route>
+      <Route>
+        <MyLibrary {...props} />
+      </Route>
+    </Switch>
+  );
+}

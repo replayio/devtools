@@ -8,11 +8,12 @@ import React, {
   useState,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { useHistory } from "react-router-dom";
 import * as actions from "ui/actions/app";
+import { getWorkspaceRoute } from "ui/utils/routes";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
-import { features } from "ui/utils/prefs";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
@@ -271,13 +272,14 @@ type SlideBody3Props = PropsFromRedux & {
   current: number;
 };
 
-function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props) {
+function SlideBody3({ hideModal, newWorkspace }: SlideBody3Props) {
+  const history = useHistory();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const onClick = () => {
     removeUrlParameters();
 
-    setWorkspaceId(newWorkspace.id);
+    history.push(getWorkspaceRoute(newWorkspace.id));
     updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });
     hideModal();
   };
@@ -342,7 +344,6 @@ function OnboardingModal(props: PropsFromRedux) {
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(OnboardingModal);
