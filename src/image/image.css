@@ -495,9 +495,6 @@ button.open-inspector {
 .overlay-container.fast-forward .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
-.message > .icon.logpoint {
-  -webkit-mask-image: url(~devtools/client/debugger/images/webconsole-logpoint.svg);
-}
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before {
   content: url(~devtools/client/themes/images/webconsole/run.svg);
 }
