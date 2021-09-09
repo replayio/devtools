@@ -33,7 +33,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
               <div className="mx-3 text-primaryAccent">Copied!</div>
             ) : (
               <MaterialIcon
-                className="material-icons mx-2.5 w-5 h-5 text-primaryAccent"
+                className="material-icons mx-2.5 w-5 text-primaryAccent"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
                 assignment_outline
