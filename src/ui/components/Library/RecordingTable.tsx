@@ -16,9 +16,9 @@ export default function RecordingTable({
       )}
     >
       <table className={classNames("w-full relative table-fixed", isMock && "filter blur-sm")}>
-        <thead className="bg-gray-50 font-normal text-xs uppercase text-gray-500 sticky top-0 w-full">
+        <thead className="bg-gray-50 font-normal text-xs uppercase text-gray-500 sticky top-0 w-full z-10">
           <tr className="border-b border-gray-200">
-            <Cell isHeader className="w-12"></Cell>
+            <Cell isHeader className="w-12" />
             <Cell isHeader className="w-auto" alignment="left">
               Title
             </Cell>
@@ -37,7 +37,7 @@ export default function RecordingTable({
             <Cell isHeader className="w-32">
               Activity
             </Cell>
-            <Cell isHeader className="w-20"></Cell>
+            <Cell isHeader className="w-20" />
           </tr>
         </thead>
         <tbody className="bg-white text-sm text-gray-500 overflow-hidden">{children}</tbody>
