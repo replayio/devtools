@@ -1,9 +1,7 @@
 import classNames from "classnames";
 import React, { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState } from "react";
 import { actions } from "ui/actions";
-import BlankScreen from "../BlankScreen";
 import { PrimaryLgButton } from "../Button";
-const Circles = require("ui/components/shared/Circles.js").default;
 import Modal from "../NewModal";
 
 export function OnboardingContent({
@@ -23,7 +21,7 @@ export function OnboardingContent({
 }
 
 export function OnboardingHeader({ children }: { children: string }) {
-  return <div className="text-5xl font-semibold">{children}</div>;
+  return <div className="text-5xl font-extrabold">{children}</div>;
 }
 
 export function OnboardingBody({
@@ -112,14 +110,14 @@ export function OnboardingButton({
 
 export function OnboardingModalContainer({
   children,
-  randomNumber = 0,
 }: {
   children: React.ReactElement;
+  // For randomizing some background elements as controlled by progress
+  // on the parent component, e.g. circles/bubbles that change on click
   randomNumber?: number;
 }) {
   return (
-    <div className="w-full h-full grid fixed bg-white">
-      <Circles randomNumber={randomNumber} />
+    <div className="w-full h-full grid fixed bg-black text-white">
       <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
         {children}
       </Modal>

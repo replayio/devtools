@@ -12,7 +12,6 @@ import {
   OnboardingModalContainer,
   OnboardingContent,
 } from "../Onboarding/index";
-import { UrlCopy } from "../SharingModal/ReplayLink";
 
 const FIRST_REPLAY_TARGET = "https://replay.io/demo";
 

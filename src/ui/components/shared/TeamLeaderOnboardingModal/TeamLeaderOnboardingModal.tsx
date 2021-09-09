@@ -4,7 +4,7 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
-import { PrimaryLgButton, SecondaryLgButton } from "../Button";
+import { PrimaryLgButton } from "../Button";
 import { TextInput } from "../Forms";
 import {
   OnboardingActions,
@@ -38,18 +38,17 @@ type SlideBodyProps = PropsFromRedux & {
 function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
   return (
     <>
-      <OnboardingHeader>Set up your team</OnboardingHeader>
+      <OnboardingHeader>{`Hello there!`}</OnboardingHeader>
       <OnboardingBody>
-        Replay teams are the easiest way to collaborate on bug reports, pull requests, and technical
-        questions
+        {`Welcome to Replay, the new way to record, replay, and debug web applications`}
       </OnboardingBody>
       <OnboardingActions>
         <PrimaryLgButton color="blue" onClick={onNext}>
           Create a team
         </PrimaryLgButton>
-        <SecondaryLgButton color="blue" onClick={() => onSkipToDownload("intro-page")}>
+        <PrimaryLgButton color="gray" onClick={() => onSkipToDownload("intro-page")}>
           Skip for now
-        </SecondaryLgButton>
+        </PrimaryLgButton>
       </OnboardingActions>
     </>
   );
@@ -102,10 +101,8 @@ function TeamNamePage({
 
   return (
     <>
-      <OnboardingHeader>Your team name</OnboardingHeader>
-      <OnboardingBody>
-        We recommend keeping it simple and using your company or project name
-      </OnboardingBody>
+      <OnboardingHeader>What should we call you?</OnboardingHeader>
+      <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
       <div className="py-3 flex flex-col w-full">
         <TextInput
           placeholder="Team name"
@@ -118,9 +115,9 @@ function TeamNamePage({
       </div>
       <OnboardingActions>
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
-        <SecondaryLgButton color="blue" onClick={() => onSkipToDownload("team-name-page")}>
+        <PrimaryLgButton color="gray" onClick={() => onSkipToDownload("team-name-page")}>
           Skip for now
-        </SecondaryLgButton>
+        </PrimaryLgButton>
       </OnboardingActions>
     </>
   );
@@ -177,15 +174,11 @@ function TeamMemberInvitationPage({
 
   return (
     <>
-      <OnboardingHeader>Invite your team members</OnboardingHeader>
-      <OnboardingBody>
-        Replay is for your whole team. Invite anyone who you would like to be able to record and
-        discuss replays with
-      </OnboardingBody>
-      <div className="text-xl w-full space-y-3">
+      <OnboardingHeader>Smells like team spirit</OnboardingHeader>
+      <OnboardingBody>{`Replay is for your whole team. Invite anyone you’d like to record and discuss replays with`}</OnboardingBody>
+      <div className="text-xl space-y-3 w-9/12">
         <form className="flex flex-col w-full space-y-3 text-xl" onSubmit={handleAddMember}>
-          <div className="text-sm uppercase font-bold">{`Invite via email`}</div>
-          <div className="flex-grow flex flex-row space-x-3">
+          <div className="flex-grow flex flex-row space-x-3 text-black">
             <TextInput
               placeholder="Email address"
               value={inputValue}
@@ -203,7 +196,14 @@ function TeamMemberInvitationPage({
             <WorkspaceMembers members={sortedMembers} isAdmin />
           </div>
         ) : null}
-        <InvitationLink workspaceId={newWorkspace!.id} showDomainCheck={false} isLarge={true} />
+        <div className="text-black">
+          <InvitationLink
+            workspaceId={newWorkspace!.id}
+            showDomainCheck={false}
+            isLarge={true}
+            hideHeader
+          />
+        </div>
       </div>
       <OnboardingActions>
         <PrimaryLgButton color="blue" onClick={() => onSkipToDownload()}>

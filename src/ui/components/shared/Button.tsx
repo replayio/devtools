@@ -49,10 +49,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
     bgStyle = `bg-${getColorCode(color, 600)} hover:bg-${getColorCode(color, 700)}`;
   } else if (style === "secondary") {
     textStyle = getTextClass(color);
-    bgStyle = `bg-white border-${getColorCode(color, 600)} hover:border-${getColorCode(
-      color,
-      700
-    )}`;
+    bgStyle = `border-${getColorCode(color, 600)} hover:border-${getColorCode(color, 700)}`;
   } else {
     textStyle = getTextClass("gray");
     bgStyle = `bg-gray-300`;
