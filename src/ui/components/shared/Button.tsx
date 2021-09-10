@@ -58,6 +58,14 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
   return `${textStyle} ${bgStyle}`;
 }
 
+export function getButtonClasses(color: Colors, style: ButtonStyles, size: ButtonSizes) {
+  const standardClasses = STANDARD_CLASSES[size];
+  const colorClasses = getColorClasses(color, style);
+  const focusClasses = "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500";
+
+  return classNames(standardClasses, colorClasses, focusClasses);
+}
+
 export function Button({
   size,
   children,
@@ -71,15 +79,13 @@ export function Button({
   size: ButtonSizes;
   style: ButtonStyles;
 }) {
-  const standardClasses = STANDARD_CLASSES[size];
-  const colorClasses = getColorClasses(color, style);
-  const focusClasses = "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500";
+  const buttonClasses = getButtonClasses(color, style, size);
 
   return (
     <button
       onClick={onClick}
       disabled={style === "disabled"}
-      className={classNames(standardClasses, colorClasses, focusClasses, className)}
+      className={classNames(buttonClasses, className)}
       type={type}
     >
       {children}
