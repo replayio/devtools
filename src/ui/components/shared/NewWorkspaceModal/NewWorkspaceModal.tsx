@@ -5,6 +5,7 @@ import React, {
   MouseEventHandler,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -138,7 +139,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   const [inputValue, setInputValue] = useState<string>("");
   const [inputError, setInputError] = useState<string | null>(null);
   const [allowNext, setAllowNext] = useState<boolean>(false);
-  const { id: userId } = hooks.useGetUserInfo();
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
@@ -173,12 +174,16 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     });
   };
 
+  useEffect(() => {
+    textInputRef.current?.focus();
+  }, [textInputRef.current]);
+
   return (
     <>
       <SlideContent headerText="Team name">
         {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
-        <div className="flex flex-col">
-          <TextInput value={inputValue} onChange={onChange} />
+        <div className="py-3 flex flex-col px-0.5">
+          <TextInput value={inputValue} onChange={onChange} ref={textInputRef} />
           {inputError ? <div className="text-red-500">{inputError}</div> : null}
         </div>
         {/* </form> */}
@@ -206,6 +211,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     setInputValue("");
     setIsLoading(false);
   });
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   // This is hacky. A member entry will only have an e-mail if it was pending. If
   // they had already accepted, we don't expose that member's e-mail. This is not
@@ -237,12 +243,21 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
 
+  useEffect(() => {
+    textInputRef.current?.focus();
+  }, [textInputRef.current]);
+
   return (
     <>
       <SlideContent headerText="Invite team members">
         <form className="flex flex-col" onSubmit={handleAddMember}>
-          <div className="flex-grow flex flex-row space-x-3">
-            <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
+          <div className="flex-grow flex flex-row space-x-3 px-0.5">
+            <TextInput
+              placeholder="Email address"
+              value={inputValue}
+              onChange={onChange}
+              ref={textInputRef}
+            />
             <ModalButton onClick={handleAddMember} disabled={isLoading}>
               {isLoading ? "Loading" : "Invite"}
             </ModalButton>

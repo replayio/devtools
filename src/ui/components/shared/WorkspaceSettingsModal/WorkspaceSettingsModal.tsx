@@ -1,5 +1,4 @@
-import classNames from "classnames";
-import React, { ChangeEvent, MouseEventHandler, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
@@ -14,33 +13,7 @@ import { Settings } from "../SettingsModal/types";
 import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
-import { Button } from "../Button";
-
-function ModalButton({
-  children,
-  onClick = () => {},
-  className,
-  disabled = false,
-}: {
-  children: React.ReactElement | string;
-  className?: string;
-  onClick?: MouseEventHandler;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={classNames(
-        className,
-        "max-w-max items-center px-3 py-1.5 border border-transparent text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
-    >
-      {children}
-    </button>
-  );
-}
+import { Button, DisabledButton, PrimaryButton } from "../Button";
 
 export function WorkspaceMembers({
   members,
@@ -115,11 +88,13 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
-      <div className="flex-grow flex flex-row space-x-3">
+      <div className="flex-grow flex flex-row space-x-3 px-0.5">
         <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
-        <ModalButton onClick={handleAddMember} disabled={isLoading}>
-          {isLoading ? "Loading" : "Invite"}
-        </ModalButton>
+        {!isLoading ? (
+          <PrimaryButton color="blue">Invite</PrimaryButton>
+        ) : (
+          <DisabledButton>Loading</DisabledButton>
+        )}
       </div>
       {errorMessage ? <div className="text-red-500 text-xs">{errorMessage}</div> : null}
     </form>

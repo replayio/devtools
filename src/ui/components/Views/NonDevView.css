@@ -17,12 +17,9 @@
   background-color: var(--theme-accordion-header-background);
 }
 
-.comments {
-  margin-bottom: 1px;
-}
-
 .right-sidebar-toolbar-item {
   font-size: 15px;
+  line-height: 19px;
   font-weight: 400;
   color: var(--theme-body-color);
   overflow: hidden;

@@ -15,21 +15,58 @@ export default function RecordingTable({
         isMock ? "overflow-hidden pointer-events-none" : "overflow-auto"
       )}
     >
-      <table className={classNames("w-full relative", isMock && "filter blur-sm")}>
-        <thead className="bg-gray-50 font-normal text-xs uppercase text-gray-500 sticky top-0 w-full">
+      <table className={classNames("w-full relative table-fixed", isMock && "filter blur-sm")}>
+        <thead className="bg-gray-50 font-normal text-xs uppercase text-gray-500 sticky top-0 w-full z-10">
           <tr className="border-b border-gray-200">
-            <th className="py-3 px-4"></th>
-            <th className="py-3 px-6 text-left">Title</th>
-            <th className="py-3 px-6">Length</th>
-            <th className="py-3 px-6">Created</th>
-            <th className="py-3 px-6">Privacy</th>
-            <th className="py-3 px-6">Owner</th>
-            <th className="py-3 px-6">Activity</th>
-            <th className="py-3 px-4"></th>
+            <Cell isHeader className="w-12" />
+            <Cell isHeader className="w-auto" alignment="left">
+              Title
+            </Cell>
+            <Cell isHeader className="w-32">
+              Length
+            </Cell>
+            <Cell isHeader className="w-32">
+              Created
+            </Cell>
+            <Cell isHeader className="w-32">
+              Privacy
+            </Cell>
+            <Cell isHeader className="w-40">
+              Owner
+            </Cell>
+            <Cell isHeader className="w-32">
+              Activity
+            </Cell>
+            <Cell isHeader className="w-20" />
           </tr>
         </thead>
         <tbody className="bg-white text-sm text-gray-500 overflow-hidden">{children}</tbody>
       </table>
     </div>
   );
+}
+
+export function Cell({
+  className,
+  children,
+  alignment = "center",
+  isHeader,
+}: {
+  children?: string | React.ReactChild | null;
+  className?: string;
+  alignment?: "left" | "center";
+  isHeader?: boolean;
+}) {
+  const classes = classNames(
+    className,
+    "py-3 px-4",
+    "overflow-hidden whitespace-pre overflow-ellipsis",
+    alignment === "left" ? "text-left" : "text-center"
+  );
+
+  if (isHeader) {
+    return <th className={classes}>{children}</th>;
+  } else {
+    return <td className={classes}>{children}</td>;
+  }
 }

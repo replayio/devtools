@@ -41,7 +41,7 @@ function CommentItem({
       <div className="space-y-4 px-3 pt-3">
         <div className="flex space-x-2.5 items-center">
           <AvatarImage className="h-8 w-8 rounded-full avatar" src={comment.user.picture} />
-          <div className="flex-1 overflow-hidden text-xs">
+          <div className="flex-1 overflow-hidden">
             <div className="flex items-center justify-between">
               <h3 className="font-medium overflow-hidden overflow-ellipsis whitespace-pre">
                 {comment.user.name}

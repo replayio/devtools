@@ -26,14 +26,11 @@ function DeletedScreen({ url }: { url: string }) {
   });
 
   return (
-    <div
-      className="w-full h-full"
-      style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
-    >
+    <div className="w-full h-full" style={{ background: "white" }}>
       <Modal>
         <div
-          className="p-9 bg-white rounded-md shadow-xl text-base space-y-9 relative flex flex-col justify-between"
-          style={{ width: "300px" }}
+          className="p-9 bg-white rounded-md shadow-xl text-base space-y-9 relative flex flex-col justify-between overflow-y-auto"
+          style={{ width: "300px", maxHeight: "90vh" }}
         >
           <h2 className="font-bold text-2xl ">{`Redirecting...`}</h2>
           <div className="text-gray-500 space-y-5 text-lg">
@@ -308,14 +305,11 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
   const showLimitWarning = recording.duration > 120 * 1000;
 
   return (
-    <div
-      className="w-full h-full"
-      style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
-    >
+    <div className="w-full h-full" style={{ background: "" }}>
       <Modal>
         <div
-          className="p-12 bg-white rounded-lg shadow-xl text-lg space-y-12 relative flex flex-col justify-between"
-          style={{ width: "520px" }}
+          className="p-12 bg-white rounded-lg shadow-xl text-lg space-y-12 relative flex flex-col justify-between overflow-y-auto"
+          style={{ width: "520px", maxHeight: "90vh" }}
         >
           <h2 className="font-bold text-2xl ">Save and Upload</h2>
           <form className="space-y-6" onSubmit={e => onSubmit(e)}>

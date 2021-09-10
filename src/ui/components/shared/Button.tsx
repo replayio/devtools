@@ -49,10 +49,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
     bgStyle = `bg-${getColorCode(color, 600)} hover:bg-${getColorCode(color, 700)}`;
   } else if (style === "secondary") {
     textStyle = getTextClass(color);
-    bgStyle = `bg-white border-${getColorCode(color, 600)} hover:border-${getColorCode(
-      color,
-      700
-    )}`;
+    bgStyle = `border-${getColorCode(color, 600)} hover:border-${getColorCode(color, 700)}`;
   } else {
     textStyle = getTextClass("gray");
     bgStyle = `bg-gray-300`;
@@ -105,6 +102,16 @@ export const SecondaryLgButton = (props: ButtonProps & { color: Colors }) => (
 );
 export const DisabledLgButton = (props: ButtonProps) => (
   <Button {...props} size="2xl" style="disabled" className="cursor-default" color="gray" />
+);
+
+export const PrimarySmButton = (props: ButtonProps & { color: Colors }) => (
+  <Button {...props} size="sm" style="primary" />
+);
+export const SecondarySmButton = (props: ButtonProps & { color: Colors }) => (
+  <Button {...props} size="sm" style="secondary" />
+);
+export const DisabledSmButton = (props: ButtonProps) => (
+  <Button {...props} size="sm" style="disabled" className="cursor-default" color="gray" />
 );
 
 export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (

@@ -95,6 +95,9 @@ export type SetLoadedRegions = Action<"set_loaded_regions"> & {
 export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
   showVideoPanel: boolean;
 };
+export type SetShowEditorAction = Action<"set_show_editor"> & {
+  showEditor: boolean;
+};
 
 export type AppActions =
   | SetRecordingDurationAction
@@ -126,6 +129,7 @@ export type AppActions =
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
   | SetShowVideoPanelAction
+  | SetShowEditorAction
   | SetAwaitingSourcemapsAction;
 
 export function setupApp(store: UIStore) {
@@ -366,4 +370,8 @@ export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspa
 
 export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
   return { type: "set_show_video_panel", showVideoPanel };
+}
+
+export function setShowEditor(showEditor: boolean): SetShowEditorAction {
+  return { type: "set_show_editor", showEditor };
 }

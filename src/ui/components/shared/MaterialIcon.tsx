@@ -9,6 +9,7 @@ type MaterialIconProps = PropsFromRedux &
   React.HTMLProps<HTMLDivElement> & {
     children: string;
     highlighted?: boolean;
+    outlined?: boolean;
   };
 
 function MaterialIcon({
@@ -16,6 +17,7 @@ function MaterialIcon({
   fontLoading,
   highlighted,
   className,
+  outlined,
   dispatch, // unused
   ...rest
 }: MaterialIconProps) {
@@ -23,7 +25,7 @@ function MaterialIcon({
     <div
       {...rest}
       className={classnames(
-        "material-icons",
+        outlined ? "material-icons-outlined" : "material-icons",
         className,
         highlighted ? "text-primaryAccent" : "text-gray-800",
         { invisible: fontLoading }
