@@ -128,6 +128,12 @@ function UserAPIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
   );
 }
 
+function ApiKeysWrapper({ settings }: { settings?: UserSettings }) {
+  if (!settings) return null;
+
+  return <UserAPIKeys apiKeys={settings.apiKeys} />;
+}
+
 const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings, {}> => [
   {
     title: "Personal",
@@ -142,11 +148,7 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
   {
     title: "API Keys",
     icon: "vpn_key",
-    component: function ApiKeysWrapper({ settings }) {
-      if (!settings) return null;
-
-      return <UserAPIKeys apiKeys={settings.apiKeys} />;
-    },
+    component: ApiKeysWrapper,
   },
   {
     title: "Experimental",
