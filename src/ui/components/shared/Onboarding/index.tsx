@@ -7,7 +7,7 @@ import Modal from "../NewModal";
 export function OnboardingContent({
   children,
 }: {
-  children: React.ReactChild | React.ReactChild[];
+  children: React.ReactChild | (React.ReactChild | null)[];
 }) {
   return (
     <div
@@ -37,7 +37,7 @@ export function OnboardingActions({
 }: {
   children: string | React.ReactChild | React.ReactChild[];
 }) {
-  return <div className="space-x-3 pt-12">{children}</div>;
+  return <div className="space-x-6">{children}</div>;
 }
 
 export function NextButton({
@@ -110,14 +110,21 @@ export function OnboardingButton({
 
 export function OnboardingModalContainer({
   children,
+  theme = "dark",
 }: {
   children: React.ReactElement;
   // For randomizing some background elements as controlled by progress
   // on the parent component, e.g. circles/bubbles that change on click
   randomNumber?: number;
+  theme?: "dark" | "light";
 }) {
   return (
-    <div className="w-full h-full grid fixed bg-black text-white">
+    <div
+      className={classNames(
+        "w-full h-full grid fixed",
+        theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+      )}
+    >
       <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
         {children}
       </Modal>
@@ -125,4 +132,4 @@ export function OnboardingModalContainer({
   );
 }
 
-export const ReplayLogo = () => <img className="w-16 h-16" src="/images/logo.svg" />;
+export const ReplayLogo = () => <img className="w-32 h-32" src="/images/logo.svg" />;

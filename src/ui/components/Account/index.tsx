@@ -54,31 +54,23 @@ function WelcomePage() {
   }
 
   return (
-    <main
-      className="w-full h-full grid">
-      <section className="max-w-sm w-72 m-auto bg-white rounded-md overflow-hidden">
-        <div className="p-12 space-y-9">
-          <div className="space-y-3 place-content-center">
-            <img className="w-32 h-32 mx-auto" src="/images/logo.svg" />
-          </div>
-          {isTeamMemberInvite() ? (
-            <div className="text-center space-y-1.5">
-              <div className="font-bold text-xl">Almost there!</div>
-              <div className="font-medium text-lg">
-                In order to join your team, we first need you to sign in.
-              </div>
-            </div>
-          ) : null}
-          <a
-            href="#"
-            onClick={onLogin}
-            className="w-full inline-flex items-center justify-center px-3.5 py-2 border border-transparent text-lg font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-          >
-            Sign in to Replay
-          </a>
-        </div>
-      </section>
-    </main>
+    <OnboardingModalContainer theme="light">
+      <OnboardingContent>
+        {isTeamMemberInvite() ? (
+          <>
+            <OnboardingHeader>Almost there!</OnboardingHeader>
+            <OnboardingBody>
+              In order to join your team, we first need you to sign in.
+            </OnboardingBody>
+          </>
+        ) : null}
+        <OnboardingActions>
+          <PrimaryLgButton color="blue" onClick={onLogin}>
+            Sign in with Google
+          </PrimaryLgButton>
+        </OnboardingActions>
+      </OnboardingContent>
+    </OnboardingModalContainer>
   );
 }
 
