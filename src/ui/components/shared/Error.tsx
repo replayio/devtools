@@ -103,7 +103,7 @@ function Error({ error }: { error: ExpectedError | UnexpectedError }) {
 
   return (
     <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
-      <div className="p-12 h-64 space-y-12 items-center flex flex-col">
+      <div className="p-12 space-y-12 items-center flex flex-col">
         <div className="space-y-4 place-content-center">
           <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
         </div>
