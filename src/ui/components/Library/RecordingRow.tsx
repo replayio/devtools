@@ -86,7 +86,7 @@ export default function RecordingRow({
       onClick={onClick}
     >
       <Cell>
-        {isEditing ? (
+        {isEditing && isOwner ? (
           <input
             type="checkbox"
             onClick={e => e.stopPropagation()}
