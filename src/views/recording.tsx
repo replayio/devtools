@@ -8,6 +8,10 @@ import { LoadingScreen } from "ui/components/shared/BlankScreen";
 import Upload from "views/upload";
 import DevTools from "ui/components/DevTools";
 
+import("ui/components/Views/DevView");
+import("devtools/client/debugger/src/utils/editor/source-editor");
+import("ui/components/Comments/TranscriptComments/CommentEditor/draftjs");
+
 function Recording({ getAccessibleRecording }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const [recording, setRecording] = useState<RecordingInfo | null>();
