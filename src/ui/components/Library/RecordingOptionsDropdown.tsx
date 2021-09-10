@@ -61,19 +61,18 @@ function RecordingOptionsDropdown({
         isPrivate ? "public" : "private"
       }`}</DropdownItem>
       <DropdownItem onClick={() => setModal("sharing", { recordingId })}>Share</DropdownItem>
+      <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
       <DropdownDivider />
       <div className="overflow-y-auto max-h-48">
         {currentWorkspaceId !== null ? (
-          <DropdownItem onClick={() => updateRecording(null)}>
-            Move to your personal library
-          </DropdownItem>
+          <DropdownItem onClick={() => updateRecording(null)}>Your library</DropdownItem>
         ) : null}
         {!loading
           ? workspaces
               .filter(w => w.id !== currentWorkspaceId)
               .map(({ id, name }) => (
                 <DropdownItem onClick={() => updateRecording(id)} key={id}>
-                  {`Move to ${name}`}
+                  {name}
                 </DropdownItem>
               ))
           : null}
