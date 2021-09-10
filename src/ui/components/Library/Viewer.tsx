@@ -43,7 +43,7 @@ function DownloadLinks() {
       <div>{`There's nothing here yet. To create your first replay, you first need to download the Replay Browser`}</div>
       <div className="grid gap-3 grid-cols-2">
         <a
-          href="https://replay.io/downloads/replay.dmg"
+          href="https://static.replay.io/downloads/replay.dmg"
           className={
             "w-full text-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
           }
@@ -52,7 +52,7 @@ function DownloadLinks() {
           Download for Mac
         </a>
         <a
-          href="https://replay.io/downloads/linux-replay.tar.bz2"
+          href="https://static.replay.io/downloads/linux-replay.tar.bz2"
           className={
             "w-full text-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
           }

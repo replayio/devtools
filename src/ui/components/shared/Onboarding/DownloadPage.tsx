@@ -22,11 +22,11 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
   };
   const handleMac = () => {
     trackEvent("downloaded-mac");
-    startDownload("https://replay.io/downloads/replay.dmg");
+    startDownload("https://static.replay.io/downloads/replay.dmg");
   };
   const handleLinux = () => {
     trackEvent("downloaded-linux");
-    startDownload("https://replay.io/downloads/linux-replay.tar.bz2");
+    startDownload("https://static.replay.io/downloads/linux-replay.tar.bz2");
   };
   const handleWindows = () => {
     trackEvent("downloaded-windows");

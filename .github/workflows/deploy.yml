@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Download
-        run: wget https://replay.io/downloads/replay.dmg
+        run: wget https://static.replay.io/downloads/replay.dmg
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Download
-        run: wget https://replay.io/downloads/macOS-replay-node
+        run: wget https://static.replay.io/downloads/macOS-replay-node
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
@@ -55,7 +55,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Download
-        run: wget https://replay.io/downloads/macOS-recordreplay.so
+        run: wget https://static.replay.io/downloads/macOS-recordreplay.so
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
