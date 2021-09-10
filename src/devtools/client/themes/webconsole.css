@@ -1088,3 +1088,13 @@ a.learn-more-link.webconsole-learn-more-link {
   font-size: 1rem;
   color: white;
 }
+
+.webconsole-app .message.paywall > .icon::before {
+  content: "lock";
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* tailwind text-gray-500 */
+  color: rgba(107, 114, 128);
+}

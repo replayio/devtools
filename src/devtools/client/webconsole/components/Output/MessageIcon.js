@@ -29,6 +29,8 @@ function getIconElement(level, onRewindClick, type) {
 
   if (type === "logPoint") {
     classnames.push("logpoint");
+  } else if (type === "paywall") {
+    classnames.push("material-icons");
   }
 
   {

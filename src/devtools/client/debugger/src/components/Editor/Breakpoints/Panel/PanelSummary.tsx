@@ -6,7 +6,8 @@ import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { isDemo } from "ui/utils/environment";
+import { getRecordingId, isDemo } from "ui/utils/environment";
+import hooks from "ui/hooks";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
 
@@ -28,14 +29,18 @@ function PanelSummary({
   currentTime,
   analysisPoints,
 }: PanelSummaryProps) {
+  const recordingId = getRecordingId();
+  const { recording } = hooks.useGetRecording(recordingId);
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
   const reactTooltip = (
-    <ReactTooltip delayHide={200} delayShow={200} place={"right"} multiline={true} />
+    <ReactTooltip delayHide={200} delayShow={200} place={"right"} multiline={true} bodyMode />
   );
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
-  const isEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
+  const didExceedMaxHitsEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
+  const isTeamDeveloper = recording ? recording.userRole !== "team-user" : false;
+  const isEditable = didExceedMaxHitsEditable && isTeamDeveloper;
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -96,20 +101,22 @@ function PanelSummary({
 
   let tooltipContent: any = {};
 
-  if (!isEditable) {
+  if (!didExceedMaxHitsEditable) {
     tooltipContent[
       "data-tip"
     ] = `This log is not editable because <br /> it was hit ${prefs.maxHitsEditable}+ times`;
   }
 
   return (
-    <div className="summary" onClick={e => handleClick(e, "logValue")}>
-      <div className="options" {...tooltipContent}>
+    <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
+      <div className="options items-center" {...tooltipContent}>
         {conditionValue ? (
           <button
             className={classNames(
-              "condition",
-              isEditable ? "hover:bg-gray-200 hover:text-primaryAccent" : "cursor-auto"
+              "condition border rounded border-gray-400",
+              isEditable
+                ? "hover:bg-white hover:text-primaryAccent cursor-text"
+                : "hover:bg-gray-200 cursor-auto"
             )}
             disabled={!isEditable}
             onClick={e => handleClick(e, "condition")}
@@ -119,15 +126,34 @@ function PanelSummary({
         ) : null}
         <button
           className={classNames(
-            "log",
-            isEditable ? "hover:bg-gray-200 hover:text-primaryAccent" : "cursor-auto"
+            "log border rounded",
+            isEditable
+              ? "border-gray-400 hover:bg-white hover:text-primaryAccent cursor-text"
+              : "bg-gray-200 cursor-auto"
           )}
           disabled={!isEditable}
           onClick={e => handleClick(e, "logValue")}
         >
-          <span className="expression">{logValue}</span>
+          <span
+            className="expression"
+            data-tip={
+              isEditable
+                ? undefined
+                : "Editing logpoints is available for Developers in the Team plan"
+            }
+          >
+            {logValue}
+          </span>
         </button>
       </div>
+      {!isTeamDeveloper ? (
+        <span
+          className="material-icons cursor-default text-gray-400"
+          data-tip="Editing logpoints is available for Developers in the Team plan"
+        >
+          lock
+        </span>
+      ) : null}
       {!isDemo() ? (
         <button
           type="button"

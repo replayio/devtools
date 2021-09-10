@@ -57,3 +57,34 @@ exports.ConsoleMessage = function (props) {
     props
   );
 };
+
+exports.PaywallMessage = function (props) {
+  return Object.assign(
+    {
+      id: null,
+      innerWindowID: null,
+      allowRepeating: true,
+      source: null,
+      timeStamp: null,
+      type: MESSAGE_TYPE.RESULT,
+      level: MESSAGE_LEVEL.LOG,
+      category: null,
+      messageText: null,
+      parameters: null,
+      repeatId: null,
+      stacktrace: null,
+      frame: null,
+      groupId: null,
+      errorMessageName: null,
+      exceptionDocURL: null,
+      executionPoint: undefined,
+      userProvidedStyles: null,
+      notes: null,
+      indent: 0,
+      prefix: "",
+      private: false,
+      logpointId: undefined,
+    },
+    props
+  );
+};

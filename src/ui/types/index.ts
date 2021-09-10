@@ -69,6 +69,21 @@ export interface Subscription {
   paymentMethods: PaymentMethod[];
 }
 
+export enum RecordingRole {
+  // A user accessing a public recording may have no role (even if authenticated)
+  None = "none",
+  // The creator of the recording that exists in their library
+  Owner = "owner",
+  // A user invited to collaborate on recording
+  Collaborator = "collaborator",
+  // A user with access to the recording via their team with the "user" role on that team
+  TeamUser = "team-user",
+  // A user with access to the recording via their team with the "developer" role on that team
+  TeamDeveloper = "team-developer",
+  // A user with access to the recording via their team with the "admin" role on that team
+  TeamAdmin = "team-admin",
+}
+
 export interface Recording {
   id: string;
   url: string;
@@ -83,6 +98,7 @@ export interface Recording {
   workspace?: Workspace;
   collaborators?: string[];
   comments?: any;
+  userRole?: RecordingRole;
 }
 
 export interface PendingWorkspaceInvitation extends Workspace {
