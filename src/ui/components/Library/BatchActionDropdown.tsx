@@ -6,7 +6,6 @@ import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
 import { Dropdown, DropdownButton, DropdownDivider, DropdownItem } from "./LibraryDropdown";
-import "./BatchActionDropdown.css";
 import { getButtonClasses } from "../shared/Button";
 import MaterialIcon from "../shared/MaterialIcon";
 import classNames from "classnames";
@@ -77,20 +76,17 @@ function BatchActionDropdown({
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>
+        <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
         <DropdownDivider />
         <div className="overflow-y-auto max-h-48">
           {currentWorkspaceId ? (
-            <DropdownItem onClick={() => updateRecordings(null)}>
-              {`Move ${selectedIds.length} item${
-                selectedIds.length > 1 ? "s" : ""
-              } to your personal workspace`}
-            </DropdownItem>
+            <DropdownItem onClick={() => updateRecordings(null)}>Your library</DropdownItem>
           ) : null}
           {workspaces
             .filter(w => w.id !== currentWorkspaceId)
             .map(({ id, name }) => (
               <DropdownItem onClick={() => updateRecordings(id)} key={id}>
-                {`Move ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} to ${name}`}
+                {name}
               </DropdownItem>
             ))}
         </div>
