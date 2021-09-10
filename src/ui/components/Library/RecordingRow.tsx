@@ -8,7 +8,6 @@ import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import hooks from "ui/hooks";
 import { Redacted } from "../Redacted";
 import { RecordingId } from "@recordreplay/protocol";
-import ItemDropdown from "./ItemDropdown";
 import { Cell } from "./RecordingTable";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 
@@ -134,19 +133,5 @@ function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
     <Redacted>
       <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} />}</div>
     </Redacted>
-  );
-}
-
-function ItemOptions({ recording }: { recording: Recording }) {
-  const Panel = <ItemDropdown recording={recording} />;
-
-  return (
-    <div className="more" onClick={e => e.stopPropagation()}>
-      <Dropdown
-        panel={Panel}
-        icon={<div className="img dots-horizontal" />}
-        panelStyles={{ top: "28px", right: "0px" }}
-      />
-    </div>
   );
 }
