@@ -10,6 +10,7 @@ import { Redacted } from "../Redacted";
 import { RecordingId } from "@recordreplay/protocol";
 import { Cell } from "./RecordingTable";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
+import MaterialIcon from "../shared/MaterialIcon";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -119,7 +120,18 @@ export default function RecordingRow({
       <Cell>{getRelativeDate(recording.date)}</Cell>
       <Cell>{recording.private ? "Private" : "Public"}</Cell>
       <Cell>{recording.user ? recording.user.name : "Unknown"}</Cell>
-      <Cell>{`${recording.comments.length} 💬`}</Cell>
+      <Cell>
+        {recording.comments.length ? (
+          <div className="inline-block">
+            <div className="flex flex-row space-x-1">
+              <span>{recording.comments.length}</span>
+              <MaterialIcon className="text-lg leading-5">message</MaterialIcon>
+            </div>
+          </div>
+        ) : (
+          <div>-</div>
+        )}
+      </Cell>
       <td className="text-center py-3 px-4" onClick={e => e.stopPropagation()}>
         {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
       </td>
