@@ -121,7 +121,7 @@ export function OnboardingModalContainer({
   return (
     <div
       className={classNames(
-        "w-full h-full grid fixed",
+        "w-full h-full grid fixed z-50",
         theme === "dark" ? "bg-black text-white" : "bg-white text-black"
       )}
     >
