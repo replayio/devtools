@@ -8,7 +8,6 @@ import "./MaterialIcon.css";
 type MaterialIconProps = PropsFromRedux &
   React.HTMLProps<HTMLDivElement> & {
     children: string;
-    highlighted?: boolean;
     outlined?: boolean;
     // tailwind text color style, e.g. text-white, text-blue-200
     color?: string;
@@ -17,7 +16,6 @@ type MaterialIconProps = PropsFromRedux &
 function MaterialIcon({
   children,
   fontLoading,
-  highlighted,
   className,
   outlined,
   color,
@@ -27,12 +25,9 @@ function MaterialIcon({
   return (
     <div
       {...rest}
-      className={classnames(
-        outlined ? "material-icons-outlined" : "material-icons",
-        className,
-        highlighted ? "text-primaryAccent" : color ? color : "text-gray-800",
-        { invisible: fontLoading }
-      )}
+      className={classnames(outlined ? "material-icons-outlined" : "material-icons", className, {
+        invisible: fontLoading,
+      })}
     >
       {children}
     </div>
