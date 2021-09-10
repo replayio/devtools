@@ -17,6 +17,7 @@ import { UIState } from "ui/state";
 
 import "./Header.css";
 import { Redacted } from "../Redacted";
+import classNames from "classnames";
 
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   const { users, loading, error } = useGetActiveSessions(
@@ -71,13 +72,8 @@ function HeaderTitle({
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const isAuthor = userId && userId == recording.userId;
 
-  if (isAuthor && !recording.isInitialized && !isTest()) {
-    return (
-      <div className="title-container">
-        <div className="title">New Recording</div>
-      </div>
-    );
-  }
+  const className =
+    "ml-2 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis";
 
   const onKeyPress: React.KeyboardEventHandler = (e: any) => {
     if (e.code == "Enter" || e.code == "Escape") {
@@ -92,9 +88,13 @@ function HeaderTitle({
     setInputValue(currentValue);
   };
 
+  if (!isAuthor) {
+    return <span className={className}>{inputValue}</span>;
+  }
+
   return (
     <span
-      className="input focus:ring-primaryAccent ml-2 focus:border-blue-500 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis"
+      className={classNames(className, "input focus:ring-primaryAccent focus:border-blue-500")}
       role="textbox"
       spellCheck="false"
       contentEditable
