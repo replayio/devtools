@@ -1,13 +1,15 @@
 import React from "react";
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
-import classnames from "classnames";
 import hooks from "ui/hooks";
 import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
+import { Dropdown, DropdownButton, DropdownDivider, DropdownItem } from "./LibraryDropdown";
 import "./BatchActionDropdown.css";
+import { getButtonClasses } from "../shared/Button";
+import MaterialIcon from "../shared/MaterialIcon";
+import classNames from "classnames";
 
 type BatchActionDropdownProps = PropsFromRedux & {
   selectedIds: RecordingId[];
@@ -45,41 +47,41 @@ function BatchActionDropdown({
     setSelectedIds([]);
   };
 
-  const panel = (
-    <div className="dropdown-panel text-sm">
-      <div className="menu-item" onClick={deleteSelectedIds}>
-        {`Delete ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""}`}
-      </div>
-      {currentWorkspaceId ? (
-        <div className="menu-item" onClick={() => updateRecordings(null)}>
-          {`Move ${selectedIds.length} item${
-            selectedIds.length > 1 ? "s" : ""
-          } to your personal workspace`}
-        </div>
-      ) : null}
-      {workspaces
-        .filter(w => w.id !== currentWorkspaceId)
-        .map(({ id, name }) => (
-          <div className="menu-item" onClick={() => updateRecordings(id)} key={id}>
-            {`Move ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} to ${name}`}
-          </div>
-        ))}
-    </div>
-  );
-  const icon = (
-    <div
-      className={classnames("flex flex-row space-x-2 items-center", {
-        disabled: !selectedIds.length,
-      })}
-    >
-      <div className="img chevron-down" />
-      <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
-    </div>
+  const button = (
+    <DropdownButton className={getButtonClasses("blue", "secondary", "md")}>
+      <span className={classNames("space-x-1 flex flex-row items-center leading-4")}>
+        <MaterialIcon outlined className="text-sm leading-4 font-bold" color="text-primaryAccent">
+          expand_more
+        </MaterialIcon>
+        <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
+      </span>
+    </DropdownButton>
   );
 
   return (
-    <div className="dashboard-viewer-header-batch-action text-base font-normal">
-      <Dropdown panel={panel} icon={icon} panelStyles={{ top: "36px" }} />
+    <div className="relative">
+      <Dropdown button={button} menuItemsClassName="z-50">
+        <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
+          selectedIds.length > 1 ? "s" : ""
+        }`}</DropdownItem>
+        <DropdownDivider />
+        <div className="overflow-y-auto max-h-48">
+          {currentWorkspaceId ? (
+            <DropdownItem onClick={() => updateRecordings(null)}>
+              {`Move ${selectedIds.length} item${
+                selectedIds.length > 1 ? "s" : ""
+              } to your personal workspace`}
+            </DropdownItem>
+          ) : null}
+          {workspaces
+            .filter(w => w.id !== currentWorkspaceId)
+            .map(({ id, name }) => (
+              <DropdownItem onClick={() => updateRecordings(id)} key={id}>
+                {`Move ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} to ${name}`}
+              </DropdownItem>
+            ))}
+        </div>
+      </Dropdown>
     </div>
   );
 }

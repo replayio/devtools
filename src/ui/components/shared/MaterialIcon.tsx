@@ -10,6 +10,8 @@ type MaterialIconProps = PropsFromRedux &
     children: string;
     highlighted?: boolean;
     outlined?: boolean;
+    // tailwind text color style, e.g. text-white, text-blue-200
+    color?: string;
   };
 
 function MaterialIcon({
@@ -18,6 +20,7 @@ function MaterialIcon({
   highlighted,
   className,
   outlined,
+  color,
   dispatch, // unused
   ...rest
 }: MaterialIconProps) {
@@ -27,7 +30,7 @@ function MaterialIcon({
       className={classnames(
         outlined ? "material-icons-outlined" : "material-icons",
         className,
-        highlighted ? "text-primaryAccent" : "text-gray-800",
+        highlighted ? "text-primaryAccent" : color ? color : "text-gray-800",
         { invisible: fontLoading }
       )}
     >

@@ -141,7 +141,7 @@ function ViewerContent({
     <>
       <ViewerHeader>
         {HeaderLeft}
-        <div className="flex flex-row space-x-2">
+        <div className="flex flex-row space-x-3">
           {isEditing ? (
             <>
               <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
