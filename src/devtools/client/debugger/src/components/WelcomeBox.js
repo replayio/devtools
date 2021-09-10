@@ -6,10 +6,16 @@ import React, { Component } from "react";
 import { connect } from "../utils/connect";
 import actions from "../actions";
 import { formatKeyShortcut } from "../utils/text";
+import { useGetUserSettings } from "ui/hooks/settings";
 
 import "./WelcomeBox.css";
 
 function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
+  const { userSettings, loading } = useGetUserSettings();
+  if (loading) {
+    return null;
+  }
+
   return (
     <div className="welcomebox">
       <div className="alignlabel">
@@ -24,15 +30,17 @@ function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
             <span className="shortcutLabel">{"%S Go to file".substring(2)}</span>
           </p>
 
-          <p
-            className="welcomebox__searchSources"
-            role="button"
-            tabIndex="0"
-            onClick={() => openQuickOpen("@", true)}
-          >
-            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+o")}</span>
-            <span className="shortcutLabel">{"%S Search functions".substring(2)}</span>
-          </p>
+          {userSettings.enableGlobalSearch && (
+            <p
+              className="welcomebox__searchSources"
+              role="button"
+              tabIndex="0"
+              onClick={() => openQuickOpen("@", true)}
+            >
+              <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+o")}</span>
+              <span className="shortcutLabel">{"%S Search functions".substring(2)}</span>
+            </p>
+          )}
           <p
             className="welcomebox__searchProject"
             role="button"

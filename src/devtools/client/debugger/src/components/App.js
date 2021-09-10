@@ -20,6 +20,7 @@ import {
   getOrientation,
 } from "../selectors";
 import { getSelectedPanel } from "ui/reducers/app.ts";
+import { useGetUserSettings } from "ui/hooks/settings";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
@@ -77,7 +78,9 @@ class Debugger extends Component {
     globalShortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-    globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    if (this.props.enableGlobalSearch) {
+      globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    }
     globalShortcuts.on("Cmd+/", this.onCommandSlash);
 
     this.shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
@@ -90,7 +93,9 @@ class Debugger extends Component {
     globalShortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-    globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    if (this.props.enableGlobalSearch) {
+      globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    }
     globalShortcuts.off("Cmd+/", this.onCommandSlash);
 
     this.shortcuts.off("Ctrl+G", this.toggleLineQuickOpenModal);
@@ -232,6 +237,7 @@ class Debugger extends Component {
         additionalClass={additionalClass}
         enabled={this.state.shortcutsModalEnabled}
         handleClose={() => this.toggleShortcutsModal()}
+        enableGlobalSearch={this.props.enableGlobalSearch}
       />
     );
   }
@@ -262,14 +268,15 @@ Debugger.childContextTypes = {
 };
 
 function DebuggerLoader(props) {
-  const [loading, setLoading] = useState(true);
+  const [loadingEditor, setLoadingEditor] = useState(true);
   const wrapperNode = useRef();
+  const { userSettings, loading: loadingSettings } = useGetUserSettings();
 
   useEffect(() => {
     (async () => {
       try {
         await waitForEditor();
-        setLoading(false);
+        setLoadingEditor(false);
       } catch {
         props.setUnexpectedError(ReplayUpdatedError);
       }
@@ -278,7 +285,13 @@ function DebuggerLoader(props) {
 
   return (
     <div className="debugger" ref={wrapperNode}>
-      {loading ? null : <Debugger {...props} wrapper={wrapperNode.current} />}
+      {loadingEditor || loadingSettings ? null : (
+        <Debugger
+          {...props}
+          wrapper={wrapperNode.current}
+          enableGlobalSearch={userSettings.enableGlobalSearch}
+        />
+      )}
     </div>
   );
 }

@@ -177,6 +177,14 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
         disabled: false,
         comingSoon: !internal,
       },
+      {
+        label: "Enable global symbol search",
+        type: "checkbox",
+        key: "enableGlobalSearch",
+        description: "Search for symbols in all source files",
+        disabled: false,
+        comingSoon: !internal,
+      },
     ],
   },
   {
@@ -199,6 +207,7 @@ export function UserSettingsModal(props: PropsFromRedux) {
   const updateRepaint = hooks.useUpdateUserSetting("enableRepaint", "Boolean");
   const updateReact = hooks.useUpdateUserSetting("showReact", "Boolean");
   const updateElements = hooks.useUpdateUserSetting("showElements", "Boolean");
+  const updateGlobalSearch = hooks.useUpdateUserSetting("enableGlobalSearch", "Boolean");
 
   const onChange = (key: keyof UserSettings, value: any) => {
     if (key === "enableRepaint") {
@@ -208,6 +217,8 @@ export function UserSettingsModal(props: PropsFromRedux) {
       updateReact({ variables: { newValue: value } });
     } else if (key === "showElements") {
       updateElements({ variables: { newValue: value } });
+    } else if (key === "enableGlobalSearch") {
+      updateGlobalSearch({ variables: { newValue: value } });
     }
   };
 

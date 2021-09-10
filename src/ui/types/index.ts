@@ -11,6 +11,7 @@ export type UserSettings = {
   showReact: boolean;
   enableTeams: boolean;
   enableRepaint: boolean;
+  enableGlobalSearch: boolean;
   defaultWorkspaceId: null | string;
   enableLogRocket: boolean;
 };

@@ -15,6 +15,7 @@ export function createUserSettingsMock(): MockedResponse[] {
             showReact: false,
             enableTeams: true,
             enableRepaint: false,
+            enableGlobalSearch: false,
           },
           defaultWorkspace: null,
         },

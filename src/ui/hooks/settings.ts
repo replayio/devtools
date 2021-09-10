@@ -13,6 +13,7 @@ const emptySettings: UserSettings = {
   showReact: false,
   enableTeams: true,
   enableRepaint: false,
+  enableGlobalSearch: false,
   defaultWorkspaceId: null,
   enableLogRocket: false,
 };
@@ -23,6 +24,7 @@ const testSettings: UserSettings = {
   showReact: true,
   enableTeams: true,
   enableRepaint: false,
+  enableGlobalSearch: false,
   defaultWorkspaceId: null,
   enableLogRocket: false,
 };
@@ -73,6 +75,7 @@ function convertUserSettings(data: any): UserSettings {
     showReact: settings.showReact,
     enableTeams: settings.enableTeams,
     enableRepaint: settings.enableRepaint,
+    enableGlobalSearch: settings.enableGlobalSearch,
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     enableLogRocket:
       "enableLogRocket" in settings ? settings.enableLogRocket : features.enableLogRocket,
