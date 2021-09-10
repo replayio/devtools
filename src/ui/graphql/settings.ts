@@ -14,6 +14,7 @@ export const GET_USER_SETTINGS = gql`
         showReact
         enableTeams
         enableRepaint
+        enableGlobalSearch
       }
       defaultWorkspace {
         id
