@@ -127,7 +127,8 @@ export function createSession(recordingId: string): UIThunkAction {
         userInfo,
         auth0User: tokenManager.auth0Client?.user,
       });
-      registerRecording(recordingId);
+
+      registerRecording({ recording, userInfo });
 
       ThreadFront.setTest(getTest() || undefined);
       ThreadFront.recordingId = recordingId;
