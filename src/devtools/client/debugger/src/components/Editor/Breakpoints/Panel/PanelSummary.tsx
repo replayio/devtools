@@ -113,7 +113,7 @@ function PanelSummary({
         {conditionValue ? (
           <button
             className={classNames(
-              "condition border rounded border-gray-400",
+              "condition border rounded ",
               isEditable
                 ? "hover:bg-white hover:text-primaryAccent cursor-text"
                 : "hover:bg-gray-200 cursor-auto"
@@ -128,7 +128,7 @@ function PanelSummary({
           className={classNames(
             "log border rounded",
             isEditable
-              ? "border-gray-400 hover:bg-white hover:text-primaryAccent cursor-text"
+              ? "hover:bg-white hover:text-primaryAccent cursor-text"
               : "bg-gray-200 cursor-auto"
           )}
           disabled={!isEditable}
