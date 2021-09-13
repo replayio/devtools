@@ -2,16 +2,18 @@ import mixpanel from "mixpanel-browser";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { isDevelopment, skipTelemetry } from "./environment";
-import { Workspace } from "ui/types";
+import { Recording, Workspace } from "ui/types";
 import { isTest } from "./environment";
 import { prefs } from "./prefs";
+import { UserInfo } from "ui/hooks/users";
+
+let mixpanelDisabled = false;
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
 
   if (skipTelemetry()) {
-    mixpanel.disable();
     return;
   }
 
@@ -33,9 +35,24 @@ export function setupTelemetry() {
   });
 }
 
-export function registerRecording(recordingId: string) {
-  mixpanel.register({ recordingId });
-  Sentry.setContext("recording", { recordingId, url: window.location.href });
+export function registerRecording({
+  recording,
+  userInfo,
+}: {
+  recording?: Recording;
+  userInfo?: Omit<UserInfo, "loading">;
+}) {
+  if (!recording) {
+    return;
+  }
+
+  Sentry.setContext("recording", { recordingId: recording.id, url: window.location.href });
+
+  if (recording.user?.internal || userInfo?.internal || skipTelemetry()) {
+    mixpanelDisabled = true;
+  } else {
+    mixpanel.register({ recordingId: recording.id });
+  }
 }
 
 type TelemetryUser = {
@@ -62,20 +79,21 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
     Sentry.setTag("anonymous", true);
   }
 
-  if (id) {
+  if (!mixpanelDisabled && id) {
     mixpanel.identify(id);
   }
 
-  if (email) {
+  if (!mixpanelDisabled && email) {
     mixpanel.people.set({ $email: email });
   }
 }
 
 export async function sendTelemetryEvent(event: string, tags: any = {}) {
+  if (skipTelemetry()) {
+    return;
+  }
+
   try {
-    if (skipTelemetry()) {
-      return;
-    }
     const response = await fetch("https://telemetry.replay.io/", {
       method: "POST",
       headers: {
@@ -93,7 +111,7 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
 
 export async function trackEvent(event: string, additionalContext?: Object) {
   // we should be able to opt-in to logging telemetry events in development
-  if (!prefs.logTelemetryEvent && (isTest() || isDevelopment())) {
+  if (mixpanelDisabled || (!prefs.logTelemetryEvent && (isTest() || isDevelopment()))) {
     return;
   }
 
