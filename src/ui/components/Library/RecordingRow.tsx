@@ -74,7 +74,9 @@ export default function RecordingRow({
   };
   const onClick = (e: React.MouseEvent) => {
     if (isEditing) {
-      toggleChecked();
+      if (isOwner) {
+        toggleChecked();
+      }
     } else {
       onNavigate(e);
     }
