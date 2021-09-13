@@ -59,12 +59,13 @@ function Event({
       onClick={() => onSeek(event.point, event.time)}
       title={title}
       className={classNames(
-        "flex flex-row items-center justify-between p-3 rounded-lg hover:bg-gray-100 focus:outline-none",
+        "group",
+        "flex flex-row items-center justify-between p-3 rounded-lg hover:bg-gray-100 focus:outline-none space-x-2",
         isPaused ? "text-primaryAccent" : ""
       )}
     >
-      <div className="flex flex-row space-x-1.5 items-center overflow-hidden">
-        <MaterialIcon highlighted={isPaused}>{icon}</MaterialIcon>
+      <div className="flex flex-row space-x-2 items-center overflow-hidden">
+        <MaterialIcon className="group-hover:text-primaryAccent">{icon}</MaterialIcon>
         <div
           className={classNames(
             isPaused ? "font-semibold" : "",

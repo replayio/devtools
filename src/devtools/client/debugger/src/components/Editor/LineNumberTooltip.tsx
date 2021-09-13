@@ -87,7 +87,7 @@ function LineNumberTooltip({
   return (
     <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
       <>
-        {isHot && <MaterialIcon>warning_amber</MaterialIcon>}
+        <MaterialIcon className="mr-1">warning_amber</MaterialIcon>
         <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
       </>
     </StaticTooltip>

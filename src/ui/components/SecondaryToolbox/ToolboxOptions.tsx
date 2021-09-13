@@ -21,7 +21,7 @@ function ToolboxOptions({
         <Menu.Button className="flex items-center text-gray-400 hover:text-gray-600">
           <MaterialIcon
             outlined
-            className="h-4 w-4 hover:text-primaryAccentHover"
+            className="h-4 w-4 hover:text-primaryAccentHover text-gray-800"
             style={{ fontSize: "16px" }}
           >
             view_compact
