@@ -3,6 +3,7 @@ import React, { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState
 import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
+import BubbleBackground from "./BubbleBackground";
 
 export function OnboardingContentWrapper({
   children,
@@ -133,9 +134,12 @@ export function OnboardingModalContainer({
         theme === "dark" ? "bg-black text-white" : "bg-white text-black"
       )}
     >
-      <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
-        {children}
-      </Modal>
+      <>
+        <BubbleBackground />
+        <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
+          {children}
+        </Modal>
+      </>
     </div>
   );
 }
