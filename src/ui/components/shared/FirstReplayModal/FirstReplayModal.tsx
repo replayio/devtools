@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { launchAndRecordUrl } from "ui/utils/environment";
 import { PrimaryLgButton } from "../Button";
 import { TextInputCopy } from "../NewWorkspaceModal/InvitationLink";
 import {
@@ -16,10 +17,6 @@ import {
 
 const FIRST_REPLAY_TARGET = "https://replay.io/demo";
 
-const RecordIcon = () => (
-  <span className="bg-primaryAccent text-white rounded-lg px-2 py-1 uppercase text-lg">⦿ REC</span>
-);
-
 function FirstReplayModal({ hideModal }: PropsFromRedux) {
   const userInfo = hooks.useGetUserInfo();
   const updateUserNags = hooks.useUpdateUserNags();
@@ -30,24 +27,21 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
       variables: { newNags },
     });
     hideModal();
-    window.open(FIRST_REPLAY_TARGET);
+    launchAndRecordUrl(FIRST_REPLAY_TARGET);
   };
 
   return (
     <OnboardingModalContainer>
       <OnboardingContentWrapper>
         <OnboardingContent>
-          <OnboardingHeader>Create your first Replay</OnboardingHeader>
+          <OnboardingHeader>{`Let's time travel`}</OnboardingHeader>
           <OnboardingBody>
-            {`We've put together a demo to show you how Replay works. Once it's opened in a new tab, press the record `}
-            <RecordIcon />
-            {` button to start recording.`}
+            {`We've made a Back to the Future themed demo for you to kick the tires. Ready?`}
           </OnboardingBody>
         </OnboardingContent>
-        <TextInputCopy text={FIRST_REPLAY_TARGET} isLarge={true} isCenter={true} />
         <OnboardingActions>
           <PrimaryLgButton color="blue" onClick={handleOpen}>
-            {`Open this website in a new tab`}
+            {`Ready as I'll ever be, Doc`}
           </PrimaryLgButton>
         </OnboardingActions>
       </OnboardingContentWrapper>
