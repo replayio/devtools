@@ -14,6 +14,7 @@ import {
   OnboardingActions,
   OnboardingBody,
   OnboardingContent,
+  OnboardingContentWrapper,
   OnboardingHeader,
   OnboardingModalContainer,
 } from "../shared/Onboarding/index";
@@ -38,38 +39,40 @@ function WelcomePage() {
   if (isTeamLeaderInvite()) {
     return (
       <OnboardingModalContainer>
-        <OnboardingContent>
-          <OnboardingHeader>👋 Welcome</OnboardingHeader>
-          <OnboardingBody>
-            {"Welcome to Replay - the new way to record, replay, and debug web applications!"}
-          </OnboardingBody>
+        <OnboardingContentWrapper>
+          <OnboardingContent>
+            <OnboardingHeader>👋 Welcome</OnboardingHeader>
+            <OnboardingBody>
+              {"Welcome to Replay - the new way to record, replay, and debug web applications!"}
+            </OnboardingBody>
+          </OnboardingContent>
           <OnboardingActions>
             <PrimaryLgButton color="blue" onClick={onLogin}>
               Sign in with Google
             </PrimaryLgButton>
           </OnboardingActions>
-        </OnboardingContent>
+        </OnboardingContentWrapper>
       </OnboardingModalContainer>
     );
   }
 
   return (
     <OnboardingModalContainer theme="light">
-      <OnboardingContent>
+      <OnboardingContentWrapper>
         {isTeamMemberInvite() ? (
-          <>
+          <OnboardingContent>
             <OnboardingHeader>Almost there!</OnboardingHeader>
             <OnboardingBody>
               In order to join your team, we first need you to sign in.
             </OnboardingBody>
-          </>
+          </OnboardingContent>
         ) : null}
         <OnboardingActions>
           <PrimaryLgButton color="blue" onClick={onLogin}>
             {isTeamMemberInvite() ? "Sign in with Google" : "Log into Replay"}
           </PrimaryLgButton>
         </OnboardingActions>
-      </OnboardingContent>
+      </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
 }
