@@ -11,6 +11,7 @@ import {
   OnboardingBody,
   OnboardingButton,
   OnboardingContent,
+  OnboardingContentWrapper,
   OnboardingHeader,
   NextButton,
   OnboardingModalContainer,
@@ -38,10 +39,12 @@ type SlideBodyProps = PropsFromRedux & {
 function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
   return (
     <>
-      <OnboardingHeader>{`Hello there!`}</OnboardingHeader>
-      <OnboardingBody>
-        {`Welcome to Replay, the new way to record, replay, and debug web applications`}
-      </OnboardingBody>
+      <OnboardingContent>
+        <OnboardingHeader>{`Hello there!`}</OnboardingHeader>
+        <OnboardingBody>
+          {`Welcome to Replay, the new way to record, replay, and debug web applications`}
+        </OnboardingBody>
+      </OnboardingContent>
       <OnboardingActions>
         <PrimaryLgButton color="blue" onClick={onNext}>
           Create a team
@@ -105,8 +108,10 @@ function TeamNamePage({
 
   return (
     <>
-      <OnboardingHeader>What should we call you?</OnboardingHeader>
-      <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
+      <OnboardingContent>
+        <OnboardingHeader>What should we call you?</OnboardingHeader>
+        <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
+      </OnboardingContent>
       <div className="py-3 flex flex-col w-full">
         <TextInput
           value={inputValue}
@@ -178,8 +183,10 @@ function TeamMemberInvitationPage({
 
   return (
     <>
-      <OnboardingHeader>Smells like team spirit</OnboardingHeader>
-      <OnboardingBody>{`Replay is for your whole team. Invite anyone you’d like to record and discuss replays with`}</OnboardingBody>
+      <OnboardingContent>
+        <OnboardingHeader>Smells like team spirit</OnboardingHeader>
+        <OnboardingBody>{`Replay is for your whole team. Invite anyone you’d like to record and discuss replays with`}</OnboardingBody>
+      </OnboardingContent>
       <div className="text-xl space-y-3 w-9/12">
         <form className="flex flex-col w-full space-y-3 text-xl" onSubmit={handleAddMember}>
           <div className="flex-grow flex flex-row space-x-3 text-black">
@@ -279,7 +286,7 @@ function OnboardingModal(props: PropsFromRedux) {
 
   return (
     <OnboardingModalContainer {...{ randomNumber }}>
-      <OnboardingContent>{slide}</OnboardingContent>
+      <OnboardingContentWrapper>{slide}</OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
 }

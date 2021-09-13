@@ -4,7 +4,7 @@ import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 
-export function OnboardingContent({
+export function OnboardingContentWrapper({
   children,
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
@@ -18,6 +18,14 @@ export function OnboardingContent({
       {children}
     </div>
   );
+}
+
+export function OnboardingContent({
+  children,
+}: {
+  children: React.ReactChild | (React.ReactChild | null)[];
+}) {
+  return <div className="space-y-4 relative flex flex-col items-center">{children}</div>;
 }
 
 export function OnboardingHeader({ children }: { children: string }) {

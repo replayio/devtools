@@ -11,6 +11,7 @@ import {
   OnboardingHeader,
   OnboardingModalContainer,
   OnboardingContent,
+  OnboardingContentWrapper,
 } from "../Onboarding/index";
 
 const FIRST_REPLAY_TARGET = "https://replay.io/demo";
@@ -34,20 +35,22 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
 
   return (
     <OnboardingModalContainer>
-      <OnboardingContent>
-        <OnboardingHeader>Create your first Replay</OnboardingHeader>
-        <OnboardingBody>
-          {`We've put together a demo to show you how Replay works. Once it's opened in a new tab, press the record `}
-          <RecordIcon />
-          {` button to start recording.`}
-        </OnboardingBody>
+      <OnboardingContentWrapper>
+        <OnboardingContent>
+          <OnboardingHeader>Create your first Replay</OnboardingHeader>
+          <OnboardingBody>
+            {`We've put together a demo to show you how Replay works. Once it's opened in a new tab, press the record `}
+            <RecordIcon />
+            {` button to start recording.`}
+          </OnboardingBody>
+        </OnboardingContent>
         <TextInputCopy text={FIRST_REPLAY_TARGET} isLarge={true} isCenter={true} />
         <OnboardingActions>
           <PrimaryLgButton color="blue" onClick={handleOpen}>
             {`Open this website in a new tab`}
           </PrimaryLgButton>
         </OnboardingActions>
-      </OnboardingContent>
+      </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
 }
