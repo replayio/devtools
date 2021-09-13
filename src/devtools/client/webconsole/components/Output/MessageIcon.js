@@ -27,9 +27,7 @@ function getIconElement(level, onRewindClick, type) {
   let title = l10n.getStr(l10nLevels[level] || level);
   const classnames = ["icon"];
 
-  if (type === "logPoint") {
-    classnames.push("logpoint");
-  } else if (type === "paywall") {
+  if (type === "paywall") {
     classnames.push("material-icons");
   }
 
