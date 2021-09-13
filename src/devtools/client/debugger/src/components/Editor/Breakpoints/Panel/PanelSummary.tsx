@@ -8,8 +8,10 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { getRecordingId, isDemo } from "ui/utils/environment";
 import hooks from "ui/hooks";
+import escapeHtml from "escape-html";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
+const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 
 type Input = "condition" | "logValue";
 
@@ -18,6 +20,17 @@ type PanelSummaryProps = PropsFromRedux & {
   toggleEditingOn: () => void;
   setInputToFocus: Dispatch<SetStateAction<Input>>;
 };
+
+function getSyntaxHighlightedMarkup(string: string) {
+  let markup = "";
+
+  getCodeMirror().runMode(string, "javascript", (text: string, className: string | null) => {
+    const openingTag = className ? `<span class="cm-${className}">` : "<span>";
+    markup += `${openingTag}${escapeHtml(text)}</span>`;
+  });
+
+  return markup;
+}
 
 function PanelSummary({
   breakpoint,
@@ -108,7 +121,7 @@ function PanelSummary({
   }
 
   return (
-    <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
+    <div className="summary space-x-2 group" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center" {...tooltipContent}>
         {conditionValue ? (
           <button
@@ -126,10 +139,8 @@ function PanelSummary({
         ) : null}
         <button
           className={classNames(
-            "log border rounded",
-            isEditable
-              ? "hover:bg-white hover:text-primaryAccent cursor-text"
-              : "bg-gray-200 cursor-auto"
+            "flex flex-row items-top space-x-1",
+            !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
           )}
           disabled={!isEditable}
           onClick={e => handleClick(e, "logValue")}
@@ -142,8 +153,27 @@ function PanelSummary({
                 : "Editing logpoints is available for Developers in the Team plan"
             }
           >
-            {logValue}
+            <span
+              className={
+                isEditable
+                  ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
+                  : ""
+              }
+            >
+              <div
+                className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
+                dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(logValue) || "" }}
+              />
+            </span>
           </span>
+          {isEditable ? (
+            <MaterialIcon
+              className="opacity-0 group-hover:opacity-100 "
+              style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
+            >
+              edit
+            </MaterialIcon>
+          ) : null}
         </button>
       </div>
       {!isTeamDeveloper ? (
