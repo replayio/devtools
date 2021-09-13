@@ -154,12 +154,12 @@ export function SharingSettings({
 
   return (
     <>
-      <div className="">
-        <label className="block text-sm uppercase font-semibold">Team</label>
-        {workspaces.length ? (
+      {workspaces.length ? (
+        <div className="">
+          <label className="block text-xs uppercase font-semibold">Team</label>
           <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
-        ) : null}
-      </div>
+        </div>
+      ) : null}
       <div className="space-y-2 text-sm">
         <label className="block text-xs uppercase font-semibold">Privacy</label>
         <div className="space-y-1">
