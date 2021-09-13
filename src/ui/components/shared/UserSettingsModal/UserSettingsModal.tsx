@@ -18,6 +18,7 @@ import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 
 import ReplayInvitations from "./ReplayInvitations";
 import { UserInfo } from "ui/hooks/users";
+import { getFeatureFlag } from "ui/utils/launchdarkly";
 
 function Support() {
   return (
@@ -222,9 +223,12 @@ export function UserSettingsModal(props: PropsFromRedux) {
     }
   };
 
+  const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
+
   const settings = getSettings(internal);
   return (
     <SettingsModal
+      hiddenTabs={hiddenTabs}
       defaultSelectedTab={props.defaultSettingsTab}
       loading={loading || userInfoLoading}
       onChange={onChange}

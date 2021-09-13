@@ -12,6 +12,7 @@ import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/br
 import { getUserInfo } from "ui/hooks/users";
 import { getUserSettings } from "ui/hooks/settings";
 import { isTest } from "ui/utils/environment";
+import { initLaunchDarkly } from "ui/utils/launchdarkly";
 const FontFaceObserver = require("fontfaceobserver");
 
 declare global {
@@ -61,6 +62,8 @@ export function bootstrapApp() {
 
     const userSettings = await getUserSettings();
     store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+
+    initLaunchDarkly();
   });
 
   if (!isTest()) {
