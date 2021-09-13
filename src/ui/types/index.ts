@@ -23,6 +23,8 @@ export interface ApiKey {
   createdAt: string;
   label: string;
   scopes: ApiKeyScope[];
+  recordingCount: number;
+  maxRecordings: number | null;
 }
 
 export interface ApiKeyResponse {

@@ -62,26 +62,33 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
     <section className="flex-auto flex flex-col">
       <h3 className="text-base uppercase font-semibold">API Keys</h3>
       <div className="flex-auto overflow-auto h-0">
-        {apiKeys.map(apiKey => (
-          <div className="flex flex-row items-center py-1.5" key={apiKey.id}>
-            <span className="flex-auto" data-private>
-              {apiKey.label}
-            </span>
-            <button
-              className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
-              onClick={() => {
-                const message =
-                  "This action will permanently delete this API key. \n\nAre you sure you want to proceed?";
+        {apiKeys.map(apiKey => {
+          const usage =
+            typeof apiKey.maxRecordings === "number"
+              ? `(${apiKey.recordingCount} / ${apiKey.maxRecordings} recordings)`
+              : `(${apiKey.recordingCount} recordings)`;
+          return (
+            <div className="flex flex-row items-center py-1.5" key={apiKey.id}>
+              <span className="flex-auto" data-private>
+                {apiKey.label}
+                <span className="text-gray-500 ml-2">{usage}</span>
+              </span>
+              <button
+                className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
+                onClick={() => {
+                  const message =
+                    "This action will permanently delete this API key. \n\nAre you sure you want to proceed?";
 
-                if (window.confirm(message)) {
-                  onDelete(apiKey.id);
-                }
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+                  if (window.confirm(message)) {
+                    onDelete(apiKey.id);
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

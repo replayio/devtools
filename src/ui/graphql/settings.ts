@@ -8,6 +8,8 @@ export const GET_USER_SETTINGS = gql`
         createdAt
         label
         scopes
+        recordingCount
+        maxRecordings
       }
       settings {
         showElements
