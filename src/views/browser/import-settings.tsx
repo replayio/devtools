@@ -1,7 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-import WelcomeBanner from "ui/components/WelcomeBanner";
+import { getButtonClasses } from "ui/components/shared/Button";
+import {
+  OnboardingActions,
+  OnboardingBody,
+  OnboardingContent,
+  OnboardingContentWrapper,
+  OnboardingHeader,
+  OnboardingModalContainer,
+} from "ui/components/shared/Onboarding";
 
 function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
@@ -14,26 +21,27 @@ function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
 
 export default function ImportSettings() {
   return (
-    <WelcomeBanner
-      title="Import Settings to"
-      subtitle="Import your cookies, passwords, and bookmarks from another browser to quickly get started with Replay."
-    >
-      <Link
-        type="button"
-        to="/"
-        className="inline-block appearance-none w-42 mt-8 mx-4 px-8 py-4 border border-transparent text-xl font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        onClick={launchMigrationWizard}
-      >
-        Import
-      </Link>
-      <Link
-        type="button"
-        to="/"
-        className="inline-block appearance-none w-42 mt-8 mx-4 px-8 py-4 border border-indigo-600 text-xl font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-700 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        Skip
-      </Link>
-      <iframe id="migrationFrame" className="h-0 w-0" />
-    </WelcomeBanner>
+    <OnboardingModalContainer>
+      <OnboardingContentWrapper>
+        <OnboardingContent>
+          <OnboardingHeader>{`Got settings?`}</OnboardingHeader>
+          <OnboardingBody>{`If you'd like, I can carry you settings over from your main browser so you can get running quickly.`}</OnboardingBody>
+        </OnboardingContent>
+        <OnboardingActions>
+          <Link
+            type="button"
+            to="/"
+            className={getButtonClasses("blue", "primary", "2xl")}
+            onClick={launchMigrationWizard}
+          >
+            {`Sounds helpful, let's do it`}
+          </Link>
+          <Link type="button" to="/" className={getButtonClasses("gray", "primary", "2xl")}>
+            Skip
+          </Link>
+        </OnboardingActions>
+        <iframe id="migrationFrame" className="h-0 w-0" />
+      </OnboardingContentWrapper>
+    </OnboardingModalContainer>
   );
 }

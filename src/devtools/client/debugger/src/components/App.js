@@ -31,7 +31,6 @@ const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";
 
-import "./variables.css";
 import "./App.css";
 
 import "devtools/client/themes/variables.css";
