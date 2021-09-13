@@ -120,3 +120,9 @@ export function getPausePointParams() {
 export function removeUrlParameters() {
   window.history.pushState({}, document.title, window.location.pathname);
 }
+
+export function launchAndRecordUrl(url: string) {
+  const autoRecordUrl = `replay:record?url=${url}`;
+
+  window.open(autoRecordUrl);
+}
