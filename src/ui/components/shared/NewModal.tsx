@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React from "react";
+import MaterialIcon from "./MaterialIcon";
 
 export default function Modal({
   actions,
@@ -46,5 +47,13 @@ export function ModalContent({ children }: { children: React.ReactChild | React.
     >
       {children}
     </div>
+  );
+}
+
+export function ModalCloseButton({ onClose }: { onClose?: () => void }) {
+  return (
+    <button onClick={onClose}>
+      <MaterialIcon className="align-top">close</MaterialIcon>
+    </button>
   );
 }
