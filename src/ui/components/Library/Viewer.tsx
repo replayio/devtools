@@ -4,7 +4,6 @@ import { RecordingId } from "@recordreplay/protocol";
 import BatchActionDropdown from "./BatchActionDropdown";
 import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton } from "../shared/Button";
-import RecordingTable from "./RecordingTable";
 import { Redacted } from "../Redacted";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
@@ -156,7 +155,7 @@ function ViewerContent({
           )}
         </div>
       </ViewerHeader>
-      <RecordingTable>
+      <div className="flex flex-col rounded-md shadow-md bg-white text-sm overflow-y-auto recording-list">
         {sortedRecordings.map((r, i) => (
           <RecordingRow
             key={i}
@@ -165,7 +164,7 @@ function ViewerContent({
             {...{ addSelectedId, removeSelectedId, isEditing }}
           />
         ))}
-      </RecordingTable>
+      </div>
     </>
   );
 }
