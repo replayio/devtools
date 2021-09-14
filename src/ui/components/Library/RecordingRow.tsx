@@ -28,6 +28,8 @@ export function getRelativeDate(date: string) {
 }
 
 export function getDisplayedUrl(url: string) {
+  if (!url) return "";
+
   const urlObj = new URL(url);
   const { hostname, pathname } = urlObj;
   return `${hostname}${pathname}`;
