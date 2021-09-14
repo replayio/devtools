@@ -4,13 +4,10 @@ import { useHistory } from "react-router-dom";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import LazyLoad from "react-lazyload";
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import hooks from "ui/hooks";
 import { Redacted } from "../Redacted";
 import { RecordingId } from "@recordreplay/protocol";
-import { Cell } from "./RecordingTable";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
-import MaterialIcon from "../shared/MaterialIcon";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -28,6 +25,12 @@ export function getRelativeDate(date: string) {
   }
 
   return content;
+}
+
+export function getDisplayedUrl(url: string) {
+  const urlObj = new URL(url);
+  const { hostname, pathname } = urlObj;
+  return `${hostname}${pathname}`;
 }
 
 export default function RecordingRow({
@@ -83,11 +86,11 @@ export default function RecordingRow({
   };
 
   return (
-    <tr
-      className="group border-b border-gray-200 hover:bg-gray-50 transition duration-200 cursor-pointer overflow-hidden"
+    <div
+      className="group border-b border-gray-200 hover:bg-gray-50 transition duration-200 cursor-pointer flex flex-row"
       onClick={onClick}
     >
-      <Cell>
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0">
         {isEditing && isOwner ? (
           <input
             type="checkbox"
@@ -97,8 +100,8 @@ export default function RecordingRow({
             className="focus:primaryAccentHover h-4 w-4 text-primaryAccent border-gray-300 rounded"
           />
         ) : null}
-      </Cell>
-      <Cell alignment="left">
+      </div>
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
         <Redacted>
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
             <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0">
@@ -107,37 +110,59 @@ export default function RecordingRow({
               </LazyLoad>
             </div>
 
-            <div className="flex flex-col overflow-hidden">
+            <div className="flex flex-col overflow-hidden space-y-0.5">
               <div className="text-gray-900 overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title}
               </div>
-              <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
-                {recording.url}
+              <div className="flex flex-row space-x-4 text-gray-500">
+                <div
+                  className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
+                  style={{ minWidth: "5rem" }}
+                >
+                  <img src="/images/timer.svg" className="w-3" />
+                  <span>{getDurationString(recording.duration)}</span>
+                </div>
+                <div
+                  className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
+                  style={{ minWidth: "6rem" }}
+                >
+                  <img src="/images/today.svg" className="w-3" />
+                  <span>{getRelativeDate(recording.date)}</span>
+                </div>
+                <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
+                  {getDisplayedUrl(recording.url)}
+                </div>
               </div>
             </div>
           </div>
         </Redacted>
-      </Cell>
-      <Cell>{getDurationString(recording.duration)}</Cell>
-      <Cell>{getRelativeDate(recording.date)}</Cell>
-      <Cell>{recording.private ? "Private" : "Public"}</Cell>
-      <Cell>{recording.user ? recording.user.name : "Unknown"}</Cell>
-      <Cell>
+      </div>
+
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 my-auto">
+        {recording.private ? "Private" : "Public"}
+      </div>
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-40 flex-shrink-0 my-auto">
+        {recording.user ? recording.user.name : "Unknown"}
+      </div>
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 flex flex-row items-center">
         {recording.comments.length ? (
           <div className="inline-block">
             <div className="flex flex-row space-x-1">
               <span>{recording.comments.length}</span>
-              <MaterialIcon className="text-lg leading-5">message</MaterialIcon>
+              <img src="/images/comment-outline.svg" className="w-3" />
             </div>
           </div>
         ) : (
           <div>-</div>
         )}
-      </Cell>
-      <td className="text-center py-3 px-4" onClick={e => e.stopPropagation()}>
+      </div>
+      <div
+        className="py-3 px-4 w-20 flex-shrink-0 flex flex-row items-center justify-center"
+        onClick={e => e.stopPropagation()}
+      >
         {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 }
 
