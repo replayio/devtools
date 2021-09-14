@@ -130,7 +130,7 @@ export default function RecordingRow({
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
                 <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
-                  {getDisplayedUrl(recording.url)}
+                  {recording.url ? getDisplayedUrl(recording.url) : ""}
                 </div>
               </div>
             </div>
