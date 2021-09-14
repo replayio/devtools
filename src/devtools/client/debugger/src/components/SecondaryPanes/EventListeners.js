@@ -306,23 +306,27 @@ class EventListeners extends Component {
     }
 
     return (
-      <li className="event-listener-event" key={event.id}>
-        <div className="flex flex-row justify-between">
-          <label className="event-listener-label">
+      <li
+        className="px-2 pl-5 mr-1 rounded-sm flex flex-row items-center hover:bg-gray-200"
+        key={event.id}
+      >
+        <div className="flex flex-row justify-between w-full">
+          <label className="w-full flex flex-row items-center">
             <input
               type="checkbox"
               value={event.id}
               onChange={e => this.onEventTypeClick(event.id, e.target.checked)}
               checked={activeEventListeners.includes(event.id)}
+              className="focus:primaryAccentHover h-4 w-4 text-primaryAccent border-gray-300 rounded flex-shrink-0"
             />
-            <span className="event-listener-name">
+            <span className="event-listener-name flex-grow">
               {searchText ? this.renderCategory(category) : null}
               {event.name}
             </span>
+            {features.eventCount ? (
+              <span className="event-listener-count flex-shrink-0">{points.length}</span>
+            ) : null}
           </label>
-          {features.eventCount ? (
-            <span className="event-listener-count">{points.length}</span>
-          ) : null}
         </div>
       </li>
     );
