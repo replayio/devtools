@@ -47,7 +47,14 @@ function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
   const reactTooltip = (
-    <ReactTooltip delayHide={200} delayShow={200} place={"right"} multiline={true} bodyMode />
+    <ReactTooltip
+      id="breakpoint-panel-tooltip"
+      delayHide={200}
+      delayShow={200}
+      place={"right"}
+      multiline={true}
+      bodyMode
+    />
   );
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
@@ -99,6 +106,7 @@ function PanelSummary({
         <div
           className="flex items-center overflow-hidden space-x-2"
           data-tip={`This log is hidden from the console because <br /> it was hit ${prefs.maxHitsDisplayed}+ times`}
+          data-for="breakpoint-panel-tooltip"
         >
           <MaterialIcon className="text-xl">warning</MaterialIcon>
           <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
@@ -118,6 +126,7 @@ function PanelSummary({
     tooltipContent[
       "data-tip"
     ] = `This log is not editable because <br /> it was hit ${prefs.maxHitsEditable}+ times`;
+    tooltipContent["data-for"] = "breakpoint-panel-tooltip";
   }
 
   return (
@@ -152,6 +161,7 @@ function PanelSummary({
                 ? undefined
                 : "Editing logpoints is available for Developers in the Team plan"
             }
+            data-for="breakpoint-panel-tooltip"
           >
             <span
               className={
@@ -180,6 +190,7 @@ function PanelSummary({
         <span
           className="material-icons cursor-default text-gray-400"
           data-tip="Editing logpoints is available for Developers in the Team plan"
+          data-for="breakpoint-panel-tooltip"
         >
           lock
         </span>

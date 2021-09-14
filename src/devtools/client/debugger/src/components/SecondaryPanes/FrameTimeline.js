@@ -156,6 +156,7 @@ class FrameTimeline extends Component {
     return (
       <div
         data-tip="Frame Progress"
+        data-for="frame-timeline-tooltip"
         className={classnames("frame-timeline-container", { scrubbing })}
       >
         <div
@@ -168,7 +169,7 @@ class FrameTimeline extends Component {
             style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
           />
         </div>
-        <ReactTooltip delayHide={200} delayShow={200} place={"top"} />
+        <ReactTooltip id="frame-timeline-tooltip" delayHide={200} delayShow={200} place={"top"} />
       </div>
     );
   }
