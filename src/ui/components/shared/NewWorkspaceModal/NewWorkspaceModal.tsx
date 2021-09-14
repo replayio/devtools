@@ -5,6 +5,7 @@ import React, {
   MouseEventHandler,
   SetStateAction,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -15,6 +16,8 @@ import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
 import { features } from "ui/utils/prefs";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
+import { getFeatureFlag } from "ui/utils/launchdarkly";
+import { trackEvent } from "ui/utils/telemetry";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
@@ -177,6 +180,38 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   useEffect(() => {
     textInputRef.current?.focus();
   }, [textInputRef.current]);
+
+  const canCreateWorkspace = !getFeatureFlag("create-workspace-enabled", true);
+
+  // memoize the tracking event so it's only called once even if the view is
+  // rerendered for some reason
+  useMemo(() => {
+    if (!canCreateWorkspace) {
+      trackEvent("create-team-disabled", {
+        source: "library",
+      });
+    }
+  }, [canCreateWorkspace]);
+
+  if (canCreateWorkspace) {
+    return (
+      <SlideContent headerText="Apologies">
+        <p>
+          Gosh, so many people are using Replay that we’ve decided to turn off new teams for now.
+          We’ll turn teams back on as soon as possible, thanks for your patience!
+        </p>
+        <div className="grid">
+          <button
+            onClick={hideModal}
+            type="button"
+            className="items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
+          >
+            Okay, sounds good!
+          </button>
+        </div>
+      </SlideContent>
+    );
+  }
 
   return (
     <>

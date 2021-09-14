@@ -1,4 +1,12 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
@@ -22,6 +30,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { removeUrlParameters } from "ui/utils/environment";
 import { DownloadPage } from "../Onboarding/DownloadPage";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
+import { getFeatureFlag } from "ui/utils/launchdarkly";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -105,6 +114,37 @@ function TeamNamePage({
   useEffect(() => {
     textInputRef.current?.focus();
   }, [textInputRef.current]);
+
+  const canCreateWorkspace = !getFeatureFlag("create-workspace-enabled", true);
+
+  // memoize the tracking event so it's only called once even if the view is
+  // rerendered for some reason
+  useMemo(() => {
+    if (!canCreateWorkspace) {
+      trackEvent("create-team-disabled", {
+        source: "onboarding",
+      });
+    }
+  }, [canCreateWorkspace]);
+
+  if (canCreateWorkspace) {
+    return (
+      <>
+        <OnboardingContent>
+          <OnboardingHeader>Apologies!</OnboardingHeader>
+          <OnboardingBody>
+            Gosh, so many people are using Replay that we’ve decided to turn off new teams for now.
+            We’ll turn teams back on as soon as possible, thanks for your patience!
+          </OnboardingBody>
+        </OnboardingContent>
+        <OnboardingActions>
+          <PrimaryLgButton color="blue" onClick={() => onSkipToDownload("team-name-page")}>
+            Okay, sounds good!
+          </PrimaryLgButton>
+        </OnboardingActions>
+      </>
+    );
+  }
 
   return (
     <>
