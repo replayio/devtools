@@ -5,6 +5,7 @@ import { getContext } from "devtools/client/debugger/src/selectors";
 import { PanelInput } from "./PanelInput";
 import actions from "devtools/client/debugger/src/actions";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import classNames from "classnames";
 
 class PanelEditor extends PureComponent {
   panelEditorNode;
@@ -66,7 +67,7 @@ class PanelEditor extends PureComponent {
     const { inputToFocus, breakpoint } = this.props;
 
     return (
-      <div>
+      <div className="flex-grow overflow-hidden">
         <form>
           <div className={classnames("form-row", { invalid: syntaxErrors.logValue })}>
             <PanelInput
@@ -83,16 +84,32 @@ class PanelEditor extends PureComponent {
     );
   }
 
+  renderSubmitButton() {
+    return (
+      <button
+        type="button"
+        onClick={this.onEnter}
+        title="Save log expression"
+        className="bg-primaryAccent hover:bg-primaryAccentHover inline-flex items-center p-1 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent flex-shrink-0"
+      >
+        Save
+      </button>
+    );
+  }
+
   render() {
     const { condition } = this.state;
     const hasCondition = condition !== null;
 
     return (
       <div
-        className={classnames("panel-editor", { conditional: hasCondition })}
+        className={classnames("panel-editor flex flex-row bg-white space-x-2", {
+          conditional: hasCondition,
+        })}
         ref={node => (this.panelEditorNode = node)}
       >
         {this.renderForm()}
+        {this.renderSubmitButton()}
       </div>
     );
   }

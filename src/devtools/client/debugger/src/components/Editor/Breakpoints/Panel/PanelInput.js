@@ -98,5 +98,5 @@ export function PanelInput({
     }
   }, [codeMirrorNode, autofocus]);
 
-  return <textarea ref={textAreaNode} className={`editor-mount`} />;
+  return <textarea ref={textAreaNode} className={`editor-mount invisible`} />;
 }

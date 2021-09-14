@@ -14,6 +14,7 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import PanelSummary from "./PanelSummary";
+import FirstEditNag from "./FirstEditNag";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -60,26 +61,29 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
       <div
+        className="breakpoint-panel-wrapper mx-3 my-2"
         style={{ width: `${width}px` }}
-        className={classnames("breakpoint-panel", { editing })}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        {editing ? (
-          <PanelEditor
-            breakpoint={breakpoint}
-            toggleEditingOff={toggleEditingOff}
-            inputToFocus={inputToFocus}
-            setInputToFocus={setInputToFocus}
-          />
-        ) : (
-          <PanelSummary
-            breakpoint={breakpoint}
-            toggleEditingOn={toggleEditingOn}
-            setInputToFocus={setInputToFocus}
-          />
-        )}
-        <BreakpointNavigation breakpoint={breakpoint} />
+        <div className={classnames("breakpoint-panel", { editing })}>
+          {<FirstEditNag {...{ editing }} />}
+          {editing ? (
+            <PanelEditor
+              breakpoint={breakpoint}
+              toggleEditingOff={toggleEditingOff}
+              inputToFocus={inputToFocus}
+              setInputToFocus={setInputToFocus}
+            />
+          ) : (
+            <PanelSummary
+              breakpoint={breakpoint}
+              toggleEditingOn={toggleEditingOn}
+              setInputToFocus={setInputToFocus}
+            />
+          )}
+          <BreakpointNavigation breakpoint={breakpoint} />
+        </div>
       </div>
     </Widget>
   );
