@@ -20,6 +20,7 @@ import { getRecording } from "ui/hooks/recordings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { jumpToInitialPausePoint } from "./timeline";
 import { Recording } from "ui/types";
+import { getFeatureFlag } from "ui/utils/launchdarkly";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -71,7 +72,7 @@ function getRecordingNotAccessibleError(
   const isAuthorized = !!(isTest() || recording);
   const isAuthenticated = !!(isTest() || isMock() || tokenManager.auth0Client?.isAuthenticated);
 
-  if (recording?.ownerNeedsInvite) {
+  if (recording?.ownerNeedsInvite && getFeatureFlag("new-user-invitations", true)) {
     const isAuthor = userId && userId == recording.userId;
 
     if (isAuthor) {

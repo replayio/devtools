@@ -42,6 +42,7 @@
     "fontfaceobserver": "^2.1.0",
     "graphql": "^15.3.0",
     "jwt-decode": "^3.1.2",
+    "launchdarkly-js-client-sdk": "^2.19.2",
     "lodash": "^4.17.20",
     "logrocket": "^1.0.13",
     "logrocket-react": "^3.0.1",
