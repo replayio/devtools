@@ -9,25 +9,13 @@ import { ChatAltIcon } from "@heroicons/react/solid";
 const MARKER_DIAMETER = 28;
 const MARKER_RADIUS = 14;
 
-function VideoComment({
-  comment,
-  canvas,
-  setHoveredComment,
-  hoveredComment,
-  currentTime,
-  hoverTime,
-}: PropsFromRedux) {
+function VideoComment({ comment, canvas, setHoveredComment, hoveredComment }: PropsFromRedux) {
   if (!canvas || !comment) {
     return null;
   }
 
   const { scale } = canvas;
   const position = comment.position;
-
-  // Hide pins while the user is hovering in the timeline
-  if (!hoveredComment && hoverTime && hoverTime != currentTime) {
-    return null;
-  }
 
   const isHighlighted = hoveredComment === comment.id;
 
@@ -61,8 +49,6 @@ function VideoComment({
 
 const connector = connect(
   (state: UIState) => ({
-    currentTime: selectors.getCurrentTime(state),
-    hoverTime: selectors.getHoverTime(state),
     pendingComment: selectors.getPendingComment(state),
     canvas: selectors.getCanvas(state),
     hoveredComment: selectors.getHoveredComment(state),
