@@ -27,6 +27,7 @@ const React = require("react");
 const ReactDOM = require("react-dom");
 const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
 import "devtools/client/debugger/src/components/variables.css";
+import "devtools/client/themes/variables.css";
 
 const BrowserError = React.lazy(() => import("views/browser/error"));
 const BrowserImport = React.lazy(() => import("views/browser/import-settings"));
