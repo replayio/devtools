@@ -68,7 +68,7 @@ class ReplayWall implements Wall {
     );
     if (response.returned) {
       const result: any = await response.returned.getJSON();
-      this._listener!({ event: result.event, payload: result.data });
+      this._listener?.({ event: result.event, payload: result.data });
     }
   }
 }
