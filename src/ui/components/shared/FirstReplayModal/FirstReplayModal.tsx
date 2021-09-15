@@ -15,7 +15,7 @@ import {
   OnboardingContentWrapper,
 } from "../Onboarding/index";
 
-const FIRST_REPLAY_TARGET = "https://replay.io/demo";
+const FIRST_REPLAY_TARGET = "https://static.replay.io/demo";
 
 function FirstReplayModal({ hideModal }: PropsFromRedux) {
   const userInfo = hooks.useGetUserInfo();
