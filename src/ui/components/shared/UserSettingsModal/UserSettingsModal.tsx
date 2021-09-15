@@ -19,6 +19,7 @@ import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 import ReplayInvitations from "./ReplayInvitations";
 import { UserInfo } from "ui/hooks/users";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
+import { AvatarImage } from "ui/components/Avatar";
 
 function Support() {
   return (
@@ -55,7 +56,7 @@ function Personal() {
   return (
     <div className="space-y-12">
       <div className="flex flex-row space-x-3 items-center" data-private>
-        <img src={picture} className="rounded-full w-12" />
+        <AvatarImage src={picture} className="rounded-full w-12 avatar" />
         <div>
           <div className="text-base">{name}</div>
           <div className="text-gray-500">{email}</div>
