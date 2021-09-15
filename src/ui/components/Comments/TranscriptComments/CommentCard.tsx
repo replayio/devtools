@@ -54,7 +54,7 @@ function CommentItem({
           </div>
         </div>
       </div>
-      <div className="space-y-4 px-3 pt-3 pb-3 text-xs">
+      <div className="space-y-4 px-3 pt-3 pb-3 text-xs break-words">
         <Markdown>{comment.content}</Markdown>
       </div>
     </div>
