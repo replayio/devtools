@@ -28,7 +28,7 @@ export function SharedWith(props: SharedWithProps) {
   }
 
   return (
-    <div>
+    <div className="space-y-2">
       <div className="w-full flex flex-row justify-between items-center">
         <h2 className="text-xl">Sharing</h2>
         {isEditing ? (
@@ -74,12 +74,12 @@ function SharedWithForm({
     <div className="w-full justify-between flex flex-col space-y-3">
       {workspaces.length ? (
         <div className="w-full space-y-1.5">
-          <div className="text-sm uppercase font-bold">{`Team`}</div>
+          <div className="text-xs uppercase font-bold">{`Team`}</div>
           <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
         </div>
       ) : null}
       <div className="w-full space-y-1.5">
-        <div className="text-sm uppercase font-bold">{`People`}</div>
+        <div className="text-xs uppercase font-bold">{`People`}</div>
         <Collaborators recordingId={recording.id} />
       </div>
     </div>
