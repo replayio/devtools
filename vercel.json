@@ -1,6 +1,7 @@
 {
-	"routes": [
-	  { "handle": "filesystem" },
-	  { "src": "/(.*)", "dest": "/index.html" }
-	]
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*\\.js", "dest": "/notfound.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
