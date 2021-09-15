@@ -72,23 +72,6 @@ function getRecordingNotAccessibleError(
   const isAuthorized = !!(isTest() || recording);
   const isAuthenticated = !!(isTest() || isMock() || tokenManager.auth0Client?.isAuthenticated);
 
-  if (recording?.ownerNeedsInvite && getFeatureFlag("new-user-invitations", true)) {
-    const isAuthor = userId && userId == recording.userId;
-
-    if (isAuthor) {
-      return {
-        message: "Your replay can not be viewed",
-        content:
-          "Your Replay account is currently unactivated because you have not been invited to Replay by an existing user. Until you are invited, your authored Replays will be unviewable.",
-      };
-    } else {
-      return {
-        message: "This replay can not be viewed",
-        content: "The author for this replay is currently using an unactivated account.",
-      };
-    }
-  }
-
   if (isAuthorized) {
     return undefined;
   }
