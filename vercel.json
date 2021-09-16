@@ -3,5 +3,11 @@
     { "handle": "filesystem" },
     { "src": "/.*\\.js", "dest": "/notfound.js" },
     { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "headers": [
+    { 
+      "source": "/.*\\.[0-9a-f]+\\.js(.map)?",
+      "headers": [{ "key": "cache-control", "value": "immutable" }]
+    }
   ]
 }
