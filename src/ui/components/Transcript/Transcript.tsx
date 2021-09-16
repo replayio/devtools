@@ -59,7 +59,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
 
             <p>
               {isAuthenticated
-                ? "Add a comment to the video, a line of code, or (soon!) a console message."
+                ? "Add a comment to the video, a line of code, or a console message."
                 : "Once signed in, you can add comments and make your voice heard!"}
             </p>
             <img src="/images/comment-onboarding-arrow.svg" className="arrow" />
