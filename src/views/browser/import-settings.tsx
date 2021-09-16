@@ -25,7 +25,7 @@ export default function ImportSettings() {
       <OnboardingContentWrapper>
         <OnboardingContent>
           <OnboardingHeader>{`Got settings?`}</OnboardingHeader>
-          <OnboardingBody>{`If you'd like, I can carry your settings over from your main browser so you can get running quickly.`}</OnboardingBody>
+          <OnboardingBody>{`If you'd like, I can carry your settings over from your main browser so you can get up and running quickly.`}</OnboardingBody>
         </OnboardingContent>
         <OnboardingActions>
           <Link
