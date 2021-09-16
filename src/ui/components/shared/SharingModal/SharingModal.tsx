@@ -17,7 +17,7 @@ function SharingModalWrapper(props: PropsFromRedux) {
   const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
   const { collaborators, loading: loading3 } = hooks.useGetOwnersAndCollaborators(recordingId);
 
-  if (loading1 || loading2 || loading3) {
+  if (loading1 || loading2 || loading3 || !recording) {
     // Todo: Use an actual loader here
     return null;
   }
@@ -25,7 +25,7 @@ function SharingModalWrapper(props: PropsFromRedux) {
   return (
     <SharingModal
       {...{ ...props, workspaces }}
-      recording={recording!}
+      recording={recording}
       collaborators={collaborators!}
     />
   );
