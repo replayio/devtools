@@ -30,10 +30,10 @@ const MOCK_DATA = [
 function MockRecordingRow({ date, name }: { date: string; name: string }) {
   return (
     <div className="group border-b border-gray-200 hover:bg-gray-50 transition duration-200 cursor-pointer flex flex-row">
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0"></div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
+      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-8 flex-shrink-0" />
+      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
         <div className="flex flex-row items-center space-x-4 overflow-hidden">
-          <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0"></div>
+          <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0 overflow-hidden" />
           <div className="flex flex-col overflow-hidden space-y-0.5">
             <div className="text-gray-900 overflow-hidden overflow-ellipsis whitespace-pre">
               jQuery - TodoMVC
@@ -61,13 +61,13 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
         </div>
       </div>
 
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 my-auto">
+      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-16 flex-shrink-0 my-auto">
         {Math.random() > 0.5 ? "Private" : "Public"}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-40 flex-shrink-0 my-auto">
+      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-36 flex-shrink-0 my-auto">
         {name}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 flex flex-row items-center">
+      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-16 flex-shrink-0 flex flex-row items-center">
         <div className="inline-block">
           <div className="flex flex-row space-x-1">
             <span>{Math.floor(Math.random() * 20)}</span>
@@ -75,7 +75,7 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
           </div>
         </div>
       </div>
-      <div className="py-3 px-4 w-20 flex-shrink-0 flex flex-row items-center justify-center"></div>
+      <div className="py-3 px-1 w-8 flex-shrink-0 flex flex-row items-center justify-center" />
     </div>
   );
 }
