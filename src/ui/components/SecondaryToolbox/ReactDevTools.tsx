@@ -29,7 +29,7 @@ class ReplayWall implements Wall {
 
   // send an annotation from the backend in the recording to the frontend
   sendAnnotation(annotation: Annotation) {
-    this._listener!(annotation);
+    this._listener?.(annotation);
   }
 
   // called by the frontend to send a request to the backend
@@ -39,7 +39,7 @@ class ReplayWall implements Wall {
         // this element has been inspected before, the frontend asks to inspect it again
         // to see if there are any changes - in Replay there won't be any so we can send
         // the response immediately without asking the backend
-        this._listener!({
+        this._listener?.({
           event: "inspectedElement",
           payload: {
             responseID: payload.requestID,
