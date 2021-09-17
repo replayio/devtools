@@ -9,8 +9,6 @@ import remove from "lodash/remove";
 
 const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 import { getActiveEventListeners, getEventListenerExpanded } from "../selectors";
-import { ThreadFront } from "protocol/thread";
-import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
 
 import { features } from "ui/utils/prefs";
 
@@ -19,36 +17,6 @@ export async function setupEventListeners(store) {
 
   const eventListeners = getActiveEventListeners(store.getState());
   await store.dispatch(setEventListeners(eventListeners));
-}
-
-async function fetchEventTypePoints(categories) {
-  const eventTypes = categories
-    .map(cat => cat.events)
-    .flat()
-    .map(e => e.id);
-
-  const sessionId = await ThreadFront.waitForSession();
-
-  const eventTypePoints = await Promise.all(
-    eventTypes.map(
-      eventType =>
-        new Promise(async resolve => {
-          analysisManager.runAnalysis(
-            {
-              sessionId,
-              mapper: `return [{ key: input.point, value: input }];`,
-              effectful: false,
-              eventHandlerEntryPoints: [{ eventType }],
-            },
-            {
-              onAnalysisPoints: points => resolve([eventType, points]),
-            }
-          );
-        })
-    )
-  );
-
-  return Object.fromEntries(eventTypePoints);
 }
 
 function updateEventListeners(newEvents) {
@@ -114,12 +82,12 @@ export function removeEventListenerExpanded(category) {
 }
 
 export function getEventListenerBreakpointTypes() {
-  return async ({ dispatch }) => {
+  return async ({ dispatch, client }) => {
     const categories = await getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
     if (features.eventCount) {
-      const eventTypePoints = await fetchEventTypePoints(categories);
+      const eventTypePoints = await client.fetchEventTypePoints(categories);
       dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
     }
   };
