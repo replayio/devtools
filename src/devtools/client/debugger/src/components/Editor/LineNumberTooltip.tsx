@@ -2,6 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { ReplayLogo } from "ui/components/shared/Onboarding";
+import hooks from "ui/hooks";
+import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 const { prefs } = require("ui/utils/prefs");
@@ -23,6 +26,7 @@ function LineNumberTooltip({
   setHoveredLineNumberLocation,
   updateHoveredLineNumber,
 }: LineNumberTooltipProps) {
+  const { nags } = hooks.useGetUserInfo();
   const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
 
@@ -84,12 +88,41 @@ function LineNumberTooltip({
   const points = analysisPoints.length;
   const isHot = points > prefs.maxHitsDisplayed;
 
-  return (
-    <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
+  let tooltipContent;
+
+  if (nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
+    tooltipContent = (
       <>
         {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
         <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
       </>
+    );
+  } else {
+    tooltipContent = (
+      <div className="flex flex-row space-x-2 items-center">
+        <div className="flex flex-shrink-0">
+          <ReplayLogo className="w-4 h-4" color="white" />
+        </div>
+        <div className="flex flex-col">
+          <div>
+            <strong>Click to add a print statement</strong>
+          </div>
+          <div className="flex flex-row space-x-1 items-center">
+            {isHot ? (
+              <MaterialIcon style={{ fontSize: "1rem", lineHeight: "1rem" }}>
+                warning_amber
+              </MaterialIcon>
+            ) : null}
+            <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
+      {tooltipContent}
     </StaticTooltip>
   );
 }
