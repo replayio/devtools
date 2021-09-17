@@ -7,8 +7,6 @@ declare global {
 }
 
 export function setupDOMHelpers() {
-  document.body.addEventListener("contextmenu", e => e.preventDefault());
-
   // Set the current mouse position on the window. This is used in places where
   // testing element.matches(":hover") does not work right for some reason.
   document.body.addEventListener("mousemove", e => {
