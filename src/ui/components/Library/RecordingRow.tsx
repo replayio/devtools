@@ -92,7 +92,7 @@ export default function RecordingRow({
       className="group border-b border-gray-200 hover:bg-gray-50 transition duration-200 cursor-pointer flex flex-row"
       onClick={onClick}
     >
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0">
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-4 flex-shrink-0">
         {isEditing && isOwner ? (
           <input
             type="checkbox"
@@ -106,14 +106,14 @@ export default function RecordingRow({
       <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
         <Redacted>
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
-            <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0">
+            <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0 rounded-sm">
               <LazyLoad height={36} scrollContainer=".recording-list" once>
                 <ItemScreenshot recordingId={recording.id} />
               </LazyLoad>
             </div>
 
             <div className="flex flex-col overflow-hidden space-y-0.5">
-              <div className="text-gray-900 overflow-hidden overflow-ellipsis whitespace-pre">
+              <div className="text-gray-900 font-semibold overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title}
               </div>
               <div className="flex flex-row space-x-4 text-gray-500">
@@ -143,10 +143,10 @@ export default function RecordingRow({
       <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 my-auto">
         {recording.private ? "Private" : "Public"}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-40 flex-shrink-0 my-auto">
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis flex-shrink-0 my-auto">
         {recording.user ? recording.user.name : "Unknown"}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 flex flex-row items-center">
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0 flex flex-row items-center">
         {recording.comments.length ? (
           <div className="inline-block">
             <div className="flex flex-row space-x-1">
@@ -159,7 +159,7 @@ export default function RecordingRow({
         )}
       </div>
       <div
-        className="py-3 px-4 w-20 flex-shrink-0 flex flex-row items-center justify-center"
+        className="py-3 px-4 flex-shrink-0 flex flex-row items-center justify-center w-12"
         onClick={e => e.stopPropagation()}
       >
         {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
@@ -172,7 +172,9 @@ function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
     <Redacted>
-      <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} />}</div>
+      <div>
+        {screenData && <img className="h-9 w-full rounded-sm object-contain" src={screenData} />}
+      </div>
     </Redacted>
   );
 }
