@@ -73,9 +73,11 @@ export default function Viewer({
   workspaceName: string;
   searchString: string;
 }) {
-  const filteredRecordings = recordings.filter(
-    r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
-  );
+  const filteredRecordings = searchString
+    ? recordings.filter(
+        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
+      )
+    : recordings;
 
   return (
     <div className="flex flex-col flex-grow px-8 py-6 bg-gray-100 space-y-5 overflow-hidden">

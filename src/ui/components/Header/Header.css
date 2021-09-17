@@ -90,6 +90,10 @@
   font-weight: 600;
 }
 
+#header .input {
+  min-width: 200px;
+}
+
 #header input.title:focus {
   border: none;
   outline: none;

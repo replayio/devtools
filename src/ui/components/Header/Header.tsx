@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
@@ -56,6 +56,12 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   );
 }
 
+enum EditState {
+  Inactive,
+  Active,
+  Saving,
+}
+
 // This is a workaround for getting an automatically-resizing horizontal text input
 // so that switching between the editing and non-editing states is smooth.
 // https://stackoverflow.com/questions/45306325/react-contenteditable-and-cursor-position
@@ -66,7 +72,7 @@ function HeaderTitle({
   recording: Recording;
   recordingId: RecordingId;
 }) {
-  const [inputValue, setInputValue] = useState(recording.title);
+  const [editing, setEditing] = useState(EditState.Inactive);
   const inputNode = useRef<HTMLSpanElement>(null);
   const { userId } = hooks.useGetUserId();
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
@@ -81,27 +87,48 @@ function HeaderTitle({
       inputNode.current!.blur();
     }
   };
+  const onFocus = () => editing === EditState.Inactive && setEditing(EditState.Active);
   const onBlur = () => {
-    const currentValue = inputNode.current!.innerHTML;
+    if (editing !== EditState.Active) return;
+    const currentValue = inputNode.current!.textContent;
 
-    updateRecordingTitle({ variables: { recordingId, title: currentValue } });
-    setInputValue(currentValue);
+    setEditing(EditState.Saving);
+    updateRecordingTitle({ variables: { recordingId, title: currentValue } }).then(() => {
+      setEditing(EditState.Inactive);
+    });
   };
 
+  const hasTitle = recording.title && recording.title.length > 0;
+  const displayTitle = hasTitle ? recording.title : "Untitled";
+
+  useLayoutEffect(() => {
+    if (!inputNode.current) return;
+
+    if (!editing) {
+      inputNode.current.innerText = hasTitle ? recording.title : "Untitled";
+    } else if (editing === EditState.Active && !hasTitle) {
+      inputNode.current.innerText = "";
+    } else if (editing === EditState.Saving && !inputNode.current.innerText) {
+      inputNode.current.innerText = "Untitled";
+    }
+  }, [editing, hasTitle, recording.title]);
+
   if (!isAuthor) {
-    return <span className={className}>{inputValue}</span>;
+    return <span className={className}>{displayTitle}</span>;
   }
 
   return (
     <span
-      className={classNames(className, "input focus:ring-primaryAccent focus:border-blue-500")}
+      className={classNames(className, "input focus:ring-primaryAccent focus:border-blue-500", {
+        italic: !hasTitle && !editing,
+      })}
       role="textbox"
       spellCheck="false"
       contentEditable
       onBlur={onBlur}
       onKeyPress={onKeyPress}
       onKeyDown={onKeyPress}
-      dangerouslySetInnerHTML={{ __html: inputValue }}
+      onFocus={onFocus}
       ref={inputNode}
     />
   );
