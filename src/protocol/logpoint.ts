@@ -15,6 +15,7 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisMana
 import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
+import { EventTypeCategory } from "devtools/server/actors/utils/event-breakpoints";
 const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.
@@ -350,6 +351,39 @@ export function setLogpointByURL(
   setMultiSourceLogpoint(logGroupId, locations, text, condition, showInConsole);
 }
 
+const eventTypePoints: Record<string, PointDescription[]> = {};
+const eventTypeLogGroupId: Record<string, string> = {};
+
+export async function fetchEventTypePoints(categories: EventTypeCategory[]) {
+  const eventTypes = categories
+    .map(cat => cat.events)
+    .flat()
+    .map(e => e.id);
+
+  const sessionId = await ThreadFront.waitForSession();
+
+  await Promise.all(
+    eventTypes.map(async eventType => {
+      const collectedPoints: PointDescription[] = [];
+      await analysisManager.runAnalysis(
+        {
+          sessionId,
+          mapper: `return [{ key: input.point, value: input }];`,
+          effectful: false,
+          eventHandlerEntryPoints: [{ eventType }],
+        },
+        {
+          onAnalysisPoints: points => collectedPoints.push(...points),
+        }
+      );
+      eventTypePoints[eventType] = collectedPoints;
+      return collectedPoints;
+    })
+  );
+
+  return eventTypePoints;
+}
+
 // Event listener logpoints use a multistage analysis. First, the normal
 // logpoint analysis runs to generate points for the points where regular
 // DOM event listeners are called by the browser. During this first analysis,
@@ -389,7 +423,31 @@ function eventLogpointMapper(getFrameworkListeners: boolean) {
   `;
 }
 
-export async function setEventLogpoint(logGroupId: string, eventTypes: string[]) {
+export function newLogGroupId() {
+  return `logGroup-${Math.random()}`;
+}
+
+export async function setEventLogpoints(eventTypes: string[]) {
+  for (const eventType in eventTypeLogGroupId) {
+    if (eventTypes.indexOf(eventType) < 0) {
+      removeLogpoint(eventTypeLogGroupId[eventType]);
+      delete eventTypeLogGroupId[eventType];
+    }
+  }
+  for (const eventType of eventTypes) {
+    if (!eventTypeLogGroupId[eventType]) {
+      const logGroupId = newLogGroupId();
+      eventTypeLogGroupId[eventType] = logGroupId;
+      setEventLogpoint(logGroupId, [eventType], eventTypePoints[eventType]);
+    }
+  }
+}
+
+export async function setEventLogpoint(
+  logGroupId: string,
+  eventTypes: string[],
+  points?: PointDescription[]
+) {
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
@@ -399,9 +457,13 @@ export async function setEventLogpoint(logGroupId: string, eventTypes: string[])
     eventHandlerEntryPoints: eventTypes.map(eventType => ({ eventType })),
   };
   const handler: AnalysisHandler<void> = {
-    onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),
     onAnalysisResult: result => showLogpointsResult(logGroupId, result),
   };
+  if (points) {
+    showLogpointsLoading(logGroupId, points);
+  } else {
+    handler.onAnalysisPoints = points => showLogpointsLoading(logGroupId, points);
+  }
 
   await analysisManager.runAnalysis(params, handler);
 }

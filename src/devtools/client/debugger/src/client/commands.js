@@ -10,10 +10,12 @@ import { clientEvents } from "./events";
 import Reps from "devtools-reps";
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
+const { fetchEventTypePoints } = require("protocol/logpoint");
 const {
   setLogpoint,
   setLogpointByURL,
-  setEventLogpoint,
+  newLogGroupId,
+  setEventLogpoints,
   setExceptionLogpoint,
   removeLogpoint,
 } = require("protocol/logpoint");
@@ -92,10 +94,6 @@ function locationKey(location) {
   const sourceId = location.sourceId || "";
   // $FlowIgnore
   return `${sourceUrl}:${sourceId}:${line}:${column}`;
-}
-
-function newLogGroupId() {
-  return `logGroup-${Math.random()}`;
 }
 
 function maybeGenerateLogGroupId(options) {
@@ -266,18 +264,8 @@ function interrupt(thread) {
   return ThreadFront.interrupt();
 }
 
-let gEventLogpointGroupId;
-
 function setEventListenerBreakpoints(ids) {
-  if (gEventLogpointGroupId) {
-    removeLogpoint(gEventLogpointGroupId);
-  }
-  if (ids.length) {
-    gEventLogpointGroupId = newLogGroupId();
-    setEventLogpoint(gEventLogpointGroupId, ids);
-  } else {
-    gEventLogpointGroupId = null;
-  }
+  setEventLogpoints(ids);
 }
 
 let gExceptionLogpointGroupId;
@@ -399,6 +387,7 @@ const clientCommands = {
   registerSourceActor,
   getMainThread,
   setSkipPausing,
+  fetchEventTypePoints,
   setEventListenerBreakpoints,
   getFrontByID,
   fetchAncestorFramePositions,
