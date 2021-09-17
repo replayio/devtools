@@ -115,8 +115,8 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
     store.dispatch(
       actions.setUnexpectedError({
         ...error,
-        message: "Unexpected session error",
-        content: "The session has closed due to an error. Please refresh the page.",
+        message: "Our apologies!",
+        content: "Something went wrong, so we've contacted our engineers and they'll look into it as soon as possible.",
         action: "refresh",
       })
     )
