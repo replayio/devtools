@@ -140,13 +140,13 @@ export default function RecordingRow({
         </Redacted>
       </div>
 
-      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-16 flex-shrink-0 my-auto">
+      <div className="py-3 px-3 text-right overflow-hidden whitespace-nowrap overflow-ellipsis min-w-min w-20 flex-shrink my-auto">
         {recording.private ? "Private" : "Public"}
       </div>
-      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-36 flex-shrink-0 my-auto">
+      <div className="py-3 px-3 overflow-hidden whitespace-nowrap min-w-0 w-36 overflow-ellipsis flex-shrink my-auto">
         {recording.user ? recording.user.name : "Unknown"}
       </div>
-      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-16 flex-shrink-0 flex flex-row items-center">
+      <div className="py-3 px-3 overflow-hidden whitespace-pre w-12 flex-shrink flex flex-row items-center">
         {recording.comments.length ? (
           <div className="inline-block">
             <div className="flex flex-row space-x-1">
@@ -155,11 +155,11 @@ export default function RecordingRow({
             </div>
           </div>
         ) : (
-          <div>-</div>
+          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink flex flex-row items-center"> </div>
         )}
       </div>
       <div
-        className="py-3 px-4 flex-shrink-0 flex flex-row items-center justify-center w-12 relative"
+        className="py-3 pr-4 flex-shrink-0 flex flex-row items-center justify-center w-6 relative"
         onClick={e => e.stopPropagation()}
       >
         {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
