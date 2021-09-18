@@ -103,17 +103,17 @@ function LineNumberTooltip({
         <div className="flex flex-shrink-0">
           <ReplayLogo className="w-4 h-4" color="white" />
         </div>
-        <div className="flex flex-col">
-          <div>
-            <strong>Click to add a print statement</strong>
-          </div>
+        <div className="flex flex-col space-x-0.5">
           <div className="flex flex-row space-x-1 items-center">
             {isHot ? (
               <MaterialIcon style={{ fontSize: "1rem", lineHeight: "1rem" }}>
                 warning_amber
               </MaterialIcon>
             ) : null}
-            <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
+            <span>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</span>
+          </div>
+          <div>
+            <strong>Click to add a print statement</strong>
           </div>
         </div>
       </div>
