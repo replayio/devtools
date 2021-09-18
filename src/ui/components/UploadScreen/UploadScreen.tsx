@@ -233,7 +233,11 @@ function SharingPreview({
       <div className="flex flex-col flex-grow overflow-hidden">
         <div className="overflow-hidden overflow-ellipsis whitespace-pre">{text}</div>
       </div>
-      <button className="text-blue-700 underline p-2" onClick={toggleShowSharingSettings}>
+      <button
+        type="button"
+        className="text-blue-700 underline p-2"
+        onClick={toggleShowSharingSettings}
+      >
         Edit
       </button>
     </div>
