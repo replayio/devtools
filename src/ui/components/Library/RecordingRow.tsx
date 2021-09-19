@@ -113,10 +113,10 @@ export default function RecordingRow({
             </div>
 
             <div className="flex flex-col overflow-hidden space-y-0.5">
-              <div className="text-gray-900 font-semibold overflow-hidden overflow-ellipsis whitespace-pre">
+              <div className="overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title}
               </div>
-              <div className="flex flex-row space-x-4 text-gray-500">
+              <div className="flex flex-row space-x-4 text-gray-400 font-light">
                 <div
                   className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
                   style={{ minWidth: "5rem" }}
@@ -131,7 +131,7 @@ export default function RecordingRow({
                   <img src="/images/today.svg" className="w-3" />
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
-                <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
+                <div className="text-gray-400 font-light overflow-hidden overflow-ellipsis whitespace-pre">
                   {getDisplayedUrl(recording.url)}
                 </div>
               </div>
