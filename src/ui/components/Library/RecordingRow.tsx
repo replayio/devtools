@@ -113,10 +113,10 @@ export default function RecordingRow({
             </div>
 
             <div className="flex flex-col overflow-hidden space-y-0.5">
-              <div className="text-gray-900 font-semibold overflow-hidden overflow-ellipsis whitespace-pre">
+              <div className="overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title}
               </div>
-              <div className="flex flex-row space-x-4 text-gray-500">
+              <div className="flex flex-row space-x-4 text-gray-400 font-light">
                 <div
                   className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
                   style={{ minWidth: "5rem" }}
@@ -131,7 +131,7 @@ export default function RecordingRow({
                   <img src="/images/today.svg" className="w-3" />
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
-                <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
+                <div className="text-gray-400 font-light overflow-hidden overflow-ellipsis whitespace-pre">
                   {getDisplayedUrl(recording.url)}
                 </div>
               </div>
@@ -140,13 +140,13 @@ export default function RecordingRow({
         </Redacted>
       </div>
 
-      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-16 flex-shrink-0 my-auto">
+      <div className="py-3 px-3 text-right overflow-hidden whitespace-nowrap overflow-ellipsis min-w-min w-20 flex-shrink my-auto">
         {recording.private ? "Private" : "Public"}
       </div>
-      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-36 flex-shrink-0 my-auto">
+      <div className="py-3 px-3 overflow-hidden whitespace-nowrap min-w-0 w-36 overflow-ellipsis flex-shrink my-auto">
         {recording.user ? recording.user.name : "Unknown"}
       </div>
-      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis w-16 flex-shrink-0 flex flex-row items-center">
+      <div className="py-3 px-3 overflow-hidden whitespace-pre w-12 flex-shrink flex flex-row items-center">
         {recording.comments.length ? (
           <div className="inline-block">
             <div className="flex flex-row space-x-1">
@@ -155,11 +155,11 @@ export default function RecordingRow({
             </div>
           </div>
         ) : (
-          <div>-</div>
+          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink flex flex-row items-center"> </div>
         )}
       </div>
       <div
-        className="py-3 px-4 flex-shrink-0 flex flex-row items-center justify-center w-12 relative"
+        className="py-3 pr-4 flex-shrink-0 flex flex-row items-center justify-center w-6 relative"
         onClick={e => e.stopPropagation()}
       >
         {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
