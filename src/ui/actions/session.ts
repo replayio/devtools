@@ -138,22 +138,17 @@ export function createSession(recordingId: string): UIThunkAction {
 
       dispatch(jumpToInitialPausePoint());
     } catch (e) {
-      if (e.code == 31) {
-        const currentError = selectors.getUnexpectedError(getState());
+      const currentError = selectors.getUnexpectedError(getState());
 
-        // Don't overwrite an existing error.
-        if (!currentError) {
-          dispatch(
-            setUnexpectedError({
-              message: "Unexpected session error",
-              content: "The session has closed due to an error. Please refresh the page.",
-              action: "refresh",
-              ...e,
-            })
-          );
-        }
-      } else {
-        throw e;
+      // Don't overwrite an existing error.
+      if (!currentError) {
+        dispatch(
+          setUnexpectedError({
+            message: "Unexpected session error",
+            content: e.message || "The session has closed due to an error.",
+            action: "library",
+          })
+        );
       }
     }
   };
