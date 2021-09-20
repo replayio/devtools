@@ -24,23 +24,38 @@ function PlanDetails({
   title,
   description,
   features,
+  seatCount,
 }: {
   title: string;
   description?: string;
   features?: string[];
+  seatCount?: number;
 }) {
   return (
     <section className="rounded-lg border border-blue-600 overflow-hidden">
-      <header className="bg-blue-200 p-3 border-b border-blue-600 flex flex-row items-center">
-        <MaterialIcon className="mr-3 text-2xl">group</MaterialIcon>
-        <h3 className="text-lg font-semibold">{title}</h3>
+      <header className="bg-blue-200 p-3 border-b border-blue-600 flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center">
+          <MaterialIcon className="mr-3 text-2xl">group</MaterialIcon>
+          <div className="flex flex-col">
+            <h3 className="text-lg font-semibold">{title}</h3>
+            {seatCount ? <div className="text-xs leading-none">{seatCount} paid seats</div> : null}
+          </div>
+        </div>
+        {seatCount ? (
+          <div className="flex flex-col items-end" title={`${seatCount} users * $20/month`}>
+            <div className="font-semibold">${seatCount * 20}</div>
+            <div className="text-xs leading-none">/ month</div>
+          </div>
+        ) : null}
       </header>
       <div className="p-3">
         {description ? <p>{description}</p> : null}
         {features && features.length > 0 ? (
-          <ul className="list-disc pl-6">
+          <ul className="pl-6">
             {features.map((f, i) => (
-              <li key={i}>{f}</li>
+              <li key={i} className="list-disc">
+                {f}
+              </li>
             ))}
           </ul>
         ) : null}
@@ -49,7 +64,7 @@ function PlanDetails({
   );
 }
 
-function getPlanDetails(key: string) {
+function getPlanDetails(key: string, seatCount: number) {
   if (key === "test-beta-v1" || key === "beta-v1") {
     return (
       <PlanDetails
@@ -68,6 +83,7 @@ function getPlanDetails(key: string) {
           "Team Library to easily share recordings",
           "Programmatic recording upload with personal and team API keys",
         ]}
+        seatCount={seatCount}
       />
     );
   }
@@ -640,7 +656,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
           </strong>
         </div>
       ) : null}
-      {getPlanDetails(data.node.subscription.plan.key)}
+      {getPlanDetails(data.node.subscription.plan.key, data.node.subscription.seatCount)}
       <BillingDetails
         paymentMethods={data.node.subscription.paymentMethods}
         workspaceId={workspaceId}

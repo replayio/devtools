@@ -82,7 +82,7 @@ function Legal() {
           <SettingsBodyHeader>
             <a
               className="underline"
-              href="https://replay.io/tos.html"
+              href="https://www.replay.io/terms-of-use"
               target="_blank"
               rel="noreferrer"
             >
@@ -95,7 +95,7 @@ function Legal() {
           <SettingsBodyHeader>
             <a
               className="underline"
-              href="https://replay.io/privacy.html"
+              href="https://www.replay.io/privacy-policy"
               target="_blank"
               rel="noreferrer"
             >

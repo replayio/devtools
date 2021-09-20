@@ -17,7 +17,7 @@ export function DropdownButton({
 }) {
   return (
     <Menu.Button
-      className={classNames(className, "flex px-3 py-2 items-center text-sm")}
+      className={classNames(className, "flex px-1 py-2 items-center text-sm")}
       disabled={disabled}
     >
       {children}

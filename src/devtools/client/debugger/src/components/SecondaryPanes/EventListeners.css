@@ -34,6 +34,7 @@
 .event-listener-header {
   display: flex;
   align-items: center;
+  font-size: 12px;
 }
 
 .event-listeners button.event-listener-expand {
@@ -94,8 +95,9 @@
 }
 
 .event-listener-name {
-  line-height: 14px;
+  line-height: 13px;
   padding: 3px 0;
+  font-size: 12px;
 }
 
 .event-listener-event input {

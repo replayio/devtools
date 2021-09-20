@@ -54,6 +54,7 @@ export const GET_WORKSPACE_SUBSCRIPTION = gql`
           effectiveUntil
           status
           trialEnds
+          seatCount
           paymentMethods {
             id
             type

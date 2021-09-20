@@ -39,27 +39,7 @@ function DownloadLinks() {
 
   return (
     <div className="flex flex-col space-y-6 text-sm" style={{ maxWidth: "24rem" }}>
-      <div>{`There's nothing here yet. To create your first replay, you first need to download the Replay Browser`}</div>
-      <div className="grid gap-3 grid-cols-2">
-        <a
-          href="https://static.replay.io/downloads/replay.dmg"
-          className={
-            "w-full text-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
-          }
-          onClick={() => setClicked(true)}
-        >
-          Download for Mac
-        </a>
-        <a
-          href="https://static.replay.io/downloads/linux-replay.tar.bz2"
-          className={
-            "w-full text-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
-          }
-          onClick={() => setClicked(true)}
-        >
-          Download for Linux
-        </a>
-      </div>
+      <div className="text-lg">{`👋 This is where your replays will go!`}</div>      
     </div>
   );
 }
@@ -108,7 +88,19 @@ function ViewerContent({
     <ViewerHeaderLeft>
       <>
         <Redacted>{workspaceName}</Redacted>
-        <span>({recordings.length})</span>
+        <span>
+          
+          {recordings.length != 0 ? (
+            <>              
+                ({recordings.length})            
+            </>
+          ) : (
+            <>
+              
+            </>
+          )}
+          
+        </span>
       </>
     </ViewerHeaderLeft>
   );

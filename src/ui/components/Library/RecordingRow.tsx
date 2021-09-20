@@ -103,20 +103,20 @@ export default function RecordingRow({
           />
         ) : null}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
+      <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
         <Redacted>
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
-            <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0">
+            <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0 overflow-hidden">
               <LazyLoad height={36} scrollContainer=".recording-list" once>
                 <ItemScreenshot recordingId={recording.id} />
               </LazyLoad>
             </div>
 
             <div className="flex flex-col overflow-hidden space-y-0.5">
-              <div className="text-gray-900 overflow-hidden overflow-ellipsis whitespace-pre">
+              <div className="overflow-hidden overflow-ellipsis whitespace-pre">
                 {recording.title || <span className="italic">Untitled</span>}
               </div>
-              <div className="flex flex-row space-x-4 text-gray-500">
+              <div className="flex flex-row space-x-4 text-gray-400 font-light">
                 <div
                   className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
                   style={{ minWidth: "5rem" }}
@@ -131,7 +131,7 @@ export default function RecordingRow({
                   <img src="/images/today.svg" className="w-3" />
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
-                <div className="text-gray-400 overflow-hidden overflow-ellipsis whitespace-pre">
+                <div className="text-gray-400 font-light overflow-hidden overflow-ellipsis whitespace-pre">
                   {getDisplayedUrl(recording.url)}
                 </div>
               </div>
@@ -140,13 +140,13 @@ export default function RecordingRow({
         </Redacted>
       </div>
 
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 my-auto">
+      <div className="py-3 px-3 text-right overflow-hidden whitespace-nowrap overflow-ellipsis min-w-min w-20 flex-shrink my-auto">
         {recording.private ? "Private" : "Public"}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-40 flex-shrink-0 my-auto">
+      <div className="py-3 px-3 overflow-hidden whitespace-nowrap min-w-0 w-36 overflow-ellipsis flex-shrink my-auto">
         {recording.user ? recording.user.name : "Unknown"}
       </div>
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-24 flex-shrink-0 flex flex-row items-center">
+      <div className="py-3 px-3 overflow-hidden whitespace-pre w-12 flex-shrink flex flex-row items-center">
         {recording.comments.length ? (
           <div className="inline-block">
             <div className="flex flex-row space-x-1">
@@ -155,11 +155,11 @@ export default function RecordingRow({
             </div>
           </div>
         ) : (
-          <div>-</div>
+          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink flex flex-row items-center"> </div>
         )}
       </div>
       <div
-        className="py-3 px-4 w-20 flex-shrink-0 flex flex-row items-center justify-center"
+        className="py-3 pr-4 flex-shrink-0 flex flex-row items-center justify-center w-6 relative"
         onClick={e => e.stopPropagation()}
       >
         {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
