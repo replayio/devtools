@@ -15,6 +15,8 @@ import { actions } from "ui/actions";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
+import hooks from "ui/hooks";
+import { Nag } from "ui/hooks/users";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -28,6 +30,18 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
+  const { nags } = hooks.useGetUserInfo();
+  const updateUserNags = hooks.useUpdateUserNags();
+
+  useEffect(() => {
+    // Make sure to toggle off the first_breakpoint_add nag once the widget is opened.
+    if (nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
+      const newNags = [...nags, Nag.FIRST_BREAKPOINT_ADD];
+      updateUserNags({
+        variables: { newNags },
+      });
+    }
+  }, []);
 
   useEffect(() => {
     // Force CodeMirror to refresh when changing the size of the breakpoint

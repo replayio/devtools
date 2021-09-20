@@ -15,7 +15,7 @@ export function OnboardingContentWrapper({
       className="p-9 text-2xl space-y-12 relative flex flex-col items-center"
       style={{ width: "800px" }}
     >
-      <ReplayLogo />
+      <ReplayLogo className="w-32 h-32" />
       {children}
     </div>
   );
@@ -144,4 +144,8 @@ export function OnboardingModalContainer({
   );
 }
 
-export const ReplayLogo = () => <img className="w-32 h-32" src="/images/logo.svg" />;
+export const ReplayLogo = ({ className, color }: { className?: string; color?: "white" }) => {
+  const src = color === "white" ? "/images/logo-white.svg" : "/images/logo.svg";
+
+  return <img className={className} src={src} />;
+};
