@@ -51,10 +51,6 @@
   transition-duration: 200ms;
 }
 
-.toolbar-panel-button:not(:last-child) {
-  margin-bottom: 4px;
-}
-
 .toolbar-panel-button:hover {
   background-color: var(--toolbarbutton-focus-background);
 }

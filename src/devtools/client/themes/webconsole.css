@@ -419,6 +419,7 @@ html #webconsole-notificationbox {
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
+  height: var(--editor-footer-height)
 }
 
 /* CodeMirror-powered JsTerm */
