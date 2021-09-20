@@ -140,13 +140,13 @@ export default function RecordingRow({
         </Redacted>
       </div>
 
-      <div className="py-3 px-3 text-right overflow-hidden whitespace-nowrap overflow-ellipsis min-w-min w-20 flex-shrink my-auto">
+      <div className="py-3 px-3 text-right overflow-hidden whitespace-nowrap overflow-ellipsis min-w-min w-20 flex-shrink-0 my-auto">
         {recording.private ? "Private" : "Public"}
       </div>
-      <div className="py-3 px-3 overflow-hidden whitespace-nowrap min-w-0 w-36 overflow-ellipsis flex-shrink my-auto">
+      <div className="py-3 px-3 overflow-hidden whitespace-nowrap min-w-0 w-36 overflow-ellipsis flex-shrink-0 my-auto">
         {recording.user ? recording.user.name : "Unknown"}
       </div>
-      <div className="py-3 px-3 overflow-hidden whitespace-pre w-12 flex-shrink flex flex-row items-center">
+      <div className="py-3 px-3 overflow-hidden whitespace-pre w-12 flex-shrink-0 flex flex-row items-center">
         {recording.comments.length ? (
           <div className="inline-block">
             <div className="flex flex-row space-x-1">
@@ -155,7 +155,7 @@ export default function RecordingRow({
             </div>
           </div>
         ) : (
-          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink flex flex-row items-center" />
+          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink-0 flex flex-row items-center" />
         )}
       </div>
       <div
