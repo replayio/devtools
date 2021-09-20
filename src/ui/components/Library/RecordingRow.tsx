@@ -155,7 +155,7 @@ export default function RecordingRow({
             </div>
           </div>
         ) : (
-          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink flex flex-row items-center"> </div>
+          <div className="py-3 px-3 overflow-hidden whitespace-nowrap overflow-ellipsis w-12 flex-shrink flex flex-row items-center" />
         )}
       </div>
       <div
