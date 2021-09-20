@@ -227,11 +227,6 @@ class SearchBox extends PureComponent {
             summary
           )
         : null,
-      dom.button({
-        className: "devtools-searchinput-clear",
-        hidden: value === "",
-        onClick: this.onClearButtonClick,
-      }),
       showAutocomplete &&
         SearchBoxAutocompletePopup({
           autocompleteProvider,
