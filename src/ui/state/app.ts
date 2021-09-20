@@ -51,7 +51,7 @@ export interface ExpectedError {
 export type UnexpectedError = {
   message: string;
   content: string;
-  action?: "refresh";
+  action?: "refresh" | "library";
 };
 
 export interface UploadInfo {
