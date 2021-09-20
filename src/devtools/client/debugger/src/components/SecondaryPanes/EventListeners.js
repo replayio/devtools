@@ -257,9 +257,12 @@ class EventListeners extends Component {
     const { expandedCategories } = this.props;
 
     const expanded = expandedCategories.includes(category.name);
-    
+
     return (
-      <div className="event-listener-header flex flex-row justify-between w-full px-0 mb-1 pr-3" onClick={() => this.onCategoryToggle(category.name)}>
+      <div
+        className="event-listener-header flex flex-row justify-between w-full px-0 mb-1 pr-3"
+        onClick={() => this.onCategoryToggle(category.name)}
+      >
         <div className="event-listener-header-label">
           <button className="event-listener-expand">
             <AccessibleImage className={classnames("arrow", { expanded })} />
@@ -268,7 +271,9 @@ class EventListeners extends Component {
             <span className="event-listener-category">{category.name}</span>
           </label>
         </div>
-        <div className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">{count}</div>
+        <div className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">
+          {count}
+        </div>
       </div>
     );
   }
@@ -324,14 +329,16 @@ class EventListeners extends Component {
               {event.name}
             </span>
             {features.eventCount ? (
-              <span className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">{points.length}</span>
+              <span className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">
+                {points.length}
+              </span>
             ) : null}
           </label>
         </div>
       </li>
     );
   }
-  
+
   renderAdvanced() {
     const { searchText } = this.state;
 
