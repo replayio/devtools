@@ -90,7 +90,7 @@ function LineNumberTooltip({
 
   let tooltipContent;
 
-  if (nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
+  if (!nags || nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
     tooltipContent = (
       <>
         {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
