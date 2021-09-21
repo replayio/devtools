@@ -24,7 +24,7 @@ export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces
         <TeamButton key={userLibrary.id} id={userLibrary.id} text={userLibrary.name} />
         <Invitations />
         {nonPendingWorkspaces.map(w => (
-          <TeamButton key={w.id} id={w.id} text={w.name} />
+          <TeamButton key={w.id} id={w.id} text={w.name} workspace={w} />
         ))}
         <NewTeamButton />
       </div>

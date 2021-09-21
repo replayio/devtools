@@ -97,6 +97,9 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 invitationCode
                 domain
                 isDomainLimitedCode
+                subscription {
+                  status
+                }
                 members {
                   edges {
                     node {

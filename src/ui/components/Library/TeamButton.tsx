@@ -7,11 +7,13 @@ import hooks from "ui/hooks";
 import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
 import { Redacted } from "../Redacted";
+import { Workspace } from "ui/types";
 
 type TeamButtonProps = PropsFromRedux & {
   text: string;
   isNew?: boolean;
   id: string | null;
+  workspace?: Workspace;
 };
 
 function TeamButton({
@@ -19,6 +21,7 @@ function TeamButton({
   isNew,
   id,
   currentWorkspaceId,
+  workspace,
   setWorkspaceId,
   setModal,
 }: TeamButtonProps) {
@@ -42,10 +45,6 @@ function TeamButton({
     setModal("workspace-settings");
   };
 
-  const badge = isNew && (
-    <div className="text-xs bg-blue-500 text-white rounded-lg px-3 py-0.5">New</div>
-  );
-
   return (
     <SidebarButton shouldHighlight={isSelected} onClick={handleTeamClick}>
       <Redacted className="overflow-hidden">
@@ -56,11 +55,15 @@ function TeamButton({
           )}
           title={text}
         >
-          {text}
+          {`${text}${workspace?.subscription?.status === "trialing" ? " (Trial)" : ""}`}
         </div>
       </Redacted>
-      {badge}
-      {showSettingsButton ? <SettingsButton onClick={handleSettingsClick} /> : null}
+      <div className="flex flex-row space-x-1">
+        {isNew ? (
+          <div className={"text-xs rounded-lg px-3 py-0.5 bg-blue-500 text-white"}>New</div>
+        ) : null}
+        {showSettingsButton ? <SettingsButton onClick={handleSettingsClick} /> : null}
+      </div>
     </SidebarButton>
   );
 }
@@ -69,7 +72,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="material-icons ml-2 w-5 text-gray-200 transition duration-200 text-sm"
+      className="material-icons w-5 text-gray-200 transition duration-200 text-sm"
     >
       settings
     </button>
