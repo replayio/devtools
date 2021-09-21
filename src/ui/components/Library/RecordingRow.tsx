@@ -114,7 +114,7 @@ export default function RecordingRow({
 
             <div className="flex flex-col overflow-hidden space-y-0.5">
               <div className="overflow-hidden overflow-ellipsis whitespace-pre">
-                {recording.title}
+                {recording.title || <span className="italic">Untitled</span>}
               </div>
               <div className="flex flex-row space-x-4 text-gray-400 font-light">
                 <div
