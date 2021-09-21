@@ -509,10 +509,10 @@ export function refreshGraphics() {
     const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
     if (highlighterContainer && gDevicePixelRatio) {
       highlighterContainer.style.transform = `scale(${bounds.scale * gDevicePixelRatio})`;
-      highlighterContainer.style.left = String(bounds.left);
-      highlighterContainer.style.top = String(bounds.top);
-      highlighterContainer.style.width = String(bounds.width);
-      highlighterContainer.style.height = String(bounds.height);
+      highlighterContainer.style.left = `${bounds.left}px`;
+      highlighterContainer.style.top = `${bounds.top}px`;
+      highlighterContainer.style.width = `${bounds.width}px`;
+      highlighterContainer.style.height = `${bounds.height}px`;
     }
   } else {
     cx.clearRect(0, 0, canvas.width, canvas.height);
