@@ -232,8 +232,10 @@ function CanvasFrameAnonymousContentHelper(highlighterEnv, nodeBuilder) {
 CanvasFrameAnonymousContentHelper.prototype = {
   destroy() {
     this._remove();
-    this.highlighterEnv.off("window-ready", this._onWindowReady);
-    this.highlighterEnv = this.nodeBuilder = this._content = null;
+    if (this.highlighterEnv) {
+      this.highlighterEnv.off("window-ready", this._onWindowReady);
+      this.highlighterEnv = this.nodeBuilder = this._content = null;
+    }
     this.anonymousContentDocument = null;
     this.anonymousContentGlobal = null;
 

@@ -15,6 +15,10 @@ const Highlighter = {
     if (!node) {
       return;
     }
+    if (gBoxModelHighlighter && !document.getElementById("box-model-root")) {
+      gBoxModelHighlighter.destroy();
+      gBoxModelHighlighter = undefined;
+    }
     if (!gBoxModelHighlighter) {
       gBoxModelHighlighter = new BoxModelHighlighter();
     }
