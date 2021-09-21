@@ -289,11 +289,13 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * Destroy the nodes. Remove listeners.
    */
   destroy() {
-    this.highlighterEnv.off("will-navigate", this.onWillNavigate);
+    if (this.highlighterEnv) {
+      this.highlighterEnv?.off("will-navigate", this.onWillNavigate);
 
-    const { pageListenerTarget } = this.highlighterEnv;
-    if (pageListenerTarget) {
-      pageListenerTarget.removeEventListener("pagehide", this.onPageHide);
+      const { pageListenerTarget } = this.highlighterEnv;
+      if (pageListenerTarget) {
+        pageListenerTarget.removeEventListener("pagehide", this.onPageHide);
+      }
     }
 
     this.markup.destroy();
