@@ -32,7 +32,6 @@
   line-height: 16px;
   position: absolute;
   display: inline-block;
-  top: var(--icon-margin);
   margin-left: 8px;
   animation: tooltip-pop-up 200ms ease;
   z-index: var(--z-index-1--icon-tooltip);

@@ -19,7 +19,7 @@ const AppRouting = () => (
   <Provider store={store}>
     <tokenManager.Auth0Provider>
       <ApolloWrapper>
-        <IntercomProvider appId={"k7f741xx"}>
+        <IntercomProvider appId={"k7f741xx"} autoBoot>
           <App>
             <ErrorBoundary>
               <React.Suspense fallback={<LoadingScreen />}>
