@@ -13,6 +13,8 @@ import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import "./Toolbox.css";
+import { useIntercom } from "react-use-intercom";
+import useAuth0 from "ui/utils/useAuth0";
 
 function IndexingLoader({
   progressPercentage,
@@ -42,7 +44,7 @@ function IndexingLoader({
   }
 
   return (
-    <div className="w-6 h-6" title={`Indexing (${progressPercentage.toFixed()}%)`}>
+    <div className="w-8 h-8 p-1" title={`Indexing (${progressPercentage.toFixed()}%)`}>
       <CircularProgressbar
         value={progressPercentage}
         strokeWidth={10}
@@ -76,7 +78,7 @@ function Toolbar({
   }
 
   return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-1.5 pb-6">
+    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-1.5 pb-4">
       <div id="toolbox-toolbar">
         <div
           className={classnames("toolbar-panel-button comments", {
@@ -137,7 +139,29 @@ function Toolbar({
           </>
         ) : null}
       </div>
-      <IndexingLoader {...{ progressPercentage, viewMode }} />
+      <div className="flex flex-col space-y-1 items-center">
+        <LaunchIntercomMessengerButton />
+        <IndexingLoader {...{ progressPercentage, viewMode }} />
+      </div>
+    </div>
+  );
+}
+
+function LaunchIntercomMessengerButton() {
+  const { show } = useIntercom();
+  const { isAuthenticated } = useAuth0();
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div className="toolbar-panel-button">
+      <IconWithTooltip
+        icon={<MaterialIcon className="toolbar-panel-icon">contact_support</MaterialIcon>}
+        content={"Chat with us"}
+        handleClick={show}
+      />
     </div>
   );
 }
