@@ -489,6 +489,7 @@ button.open-inspector {
 .img.lightning {
   -webkit-mask-image: url(./images/lightning.svg);
 }
+
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
