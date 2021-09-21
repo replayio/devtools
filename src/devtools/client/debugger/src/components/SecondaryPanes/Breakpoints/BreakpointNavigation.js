@@ -68,7 +68,7 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
           navigateToPoint(prev);
         }}
       >
-        <div className="img play-circle" style={{ transform: "rotate(180deg)" }} />
+        <div className="img rewind" />
       </button>{" "}
       <button
         className={`breakpoint-navigation-command-next ${!next ? " disabled" : ""}`}
@@ -77,7 +77,7 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
           navigateToPoint(next);
         }}
       >
-        <div className="img play-circle" />
+        <div className="img rewind" style={{ transform: "rotate(180deg)" }} />
       </button>
     </div>
   );
