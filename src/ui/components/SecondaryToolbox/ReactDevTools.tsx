@@ -7,11 +7,18 @@ import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
 import { getAnnotations, getCurrentPoint } from "ui/reducers/reactDevTools";
+import Highlighter from "highlighter/highlighter.js";
+
+interface ReactElementID {
+  rendererID: number;
+  id: number;
+}
 
 // used by the frontend to communicate with the backend
 class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
   private inspectedElements = new Set();
+  private highlightedElementId?: ReactElementID;
 
   // called by the frontend to register a listener for receiving backend messages
   listen(listener: (msg: any) => void) {
@@ -34,28 +41,66 @@ class ReplayWall implements Wall {
 
   // called by the frontend to send a request to the backend
   async send(event: string, payload: any) {
-    if (event == "inspectElement") {
-      if (this.inspectedElements.has(payload.id) && !payload.path) {
-        // this element has been inspected before, the frontend asks to inspect it again
-        // to see if there are any changes - in Replay there won't be any so we can send
-        // the response immediately without asking the backend
-        this._listener?.({
-          event: "inspectedElement",
-          payload: {
-            responseID: payload.requestID,
-            id: payload.id,
-            type: "no-change",
-          },
-        });
-      } else {
-        if (!payload.path) {
-          this.inspectedElements.add(payload.id);
+    switch (event) {
+      case "inspectElement": {
+        if (this.inspectedElements.has(payload.id) && !payload.path) {
+          // this element has been inspected before, the frontend asks to inspect it again
+          // to see if there are any changes - in Replay there won't be any so we can send
+          // the response immediately without asking the backend
+          this._listener?.({
+            event: "inspectedElement",
+            payload: {
+              responseID: payload.requestID,
+              id: payload.id,
+              type: "no-change",
+            },
+          });
+        } else {
+          if (!payload.path) {
+            this.inspectedElements.add(payload.id);
+          }
+          this.sendRequest(event, payload);
         }
-        this.sendRequest(event, payload);
+        break;
       }
-    }
-    if (event == "getBridgeProtocol") {
-      this.sendRequest(event, payload);
+
+      case "getBridgeProtocol": {
+        this.sendRequest(event, payload);
+        break;
+      }
+
+      case "highlightNativeElement": {
+        const { rendererID, id } = payload;
+
+        if (this.highlightedElementId) {
+          Highlighter.unhighlight();
+        }
+        this.highlightedElementId = { rendererID, id };
+
+        const response = await ThreadFront.evaluate(
+          0,
+          undefined,
+          `__REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(${rendererID}).findNativeNodesForFiberID(${id})[0]`
+        );
+        if (!response.returned || !this.isHighlightedElementID(rendererID, id)) {
+          return;
+        }
+
+        const nodeFront = response.returned.getNodeFront();
+        await nodeFront?.ensureLoaded();
+        if (!nodeFront || !this.isHighlightedElementID(rendererID, id)) {
+          return;
+        }
+
+        Highlighter.highlight(nodeFront);
+        break;
+      }
+
+      case "clearNativeElementHighlight": {
+        Highlighter.unhighlight();
+        this.highlightedElementId = undefined;
+        break;
+      }
     }
   }
 
@@ -70,6 +115,12 @@ class ReplayWall implements Wall {
       const result: any = await response.returned.getJSON();
       this._listener?.({ event: result.event, payload: result.data });
     }
+  }
+
+  private isHighlightedElementID(rendererID: number, id: number) {
+    return (
+      this.highlightedElementId?.rendererID === rendererID && this.highlightedElementId?.id === id
+    );
   }
 }
 
