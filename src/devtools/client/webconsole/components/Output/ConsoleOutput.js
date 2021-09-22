@@ -37,7 +37,10 @@ class ConsoleOutput extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.closestMessage != prevProps.closestMessage) {
+    if (
+      this.props.pausedExecutionPoint != prevProps.pausedExecutionPoint &&
+      this.props.closestMessage != prevProps.closestMessage
+    ) {
       return this.scrollToClosestMessage();
     }
 
