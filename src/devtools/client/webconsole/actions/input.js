@@ -82,6 +82,15 @@ function evaluateExpression(expression) {
     const { asyncIndex, frameId } = toolbox.getPanel("debugger").getFrameId();
     const pause = await getPause(toolbox);
     const evalId = await dispatchExpression(dispatch, pause, expression);
+    dispatch(
+      messagesActions.messagesAdd([
+        {
+          type: "evaluationResult",
+          result: createPrimitiveValueFront("Loading...", pause),
+          evalId,
+        },
+      ])
+    );
 
     try {
       const response = await evaluateJSAsync(expression, {

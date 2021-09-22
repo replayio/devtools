@@ -125,8 +125,8 @@ function addMessage(newMessage, state, filtersState) {
   // logpoint ID. In this case the first message is provisional and should be
   // removed.
   const removedIds = [];
-  if (newMessage.logpointId) {
-    const key = `${newMessage.logpointId}:${newMessage.executionPoint}`;
+  if (newMessage.logpointId || (newMessage.evalId && newMessage.type === MESSAGE_TYPE.RESULT)) {
+    const key = `${newMessage.logpointId || newMessage.evalId}:${newMessage.executionPoint}`;
     const existingMessage = state.logpointMessages.get(key);
     if (existingMessage) {
       log(`LogpointFinish ${newMessage.executionPoint}`);
