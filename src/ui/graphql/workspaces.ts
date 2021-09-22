@@ -9,6 +9,8 @@ export const GET_WORKSPACE_API_KEYS = gql`
           createdAt
           label
           scopes
+          recordingCount
+          maxRecordings
         }
       }
     }
