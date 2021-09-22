@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -14,16 +14,11 @@ import { Button } from "../Button";
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
 // usage of the live key.
-let stripeLoadFailed = false;
 const stripePromise = loadStripe(
   process.env.RECORD_REPLAY_STRIPE_LIVE || !isDevelopment()
     ? "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
     : "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
-).catch(e => {
-  stripeLoadFailed = true;
-  console.error("Failed to load stripe");
-  return null;
-});
+);
 
 function PlanDetails({
   title,
@@ -192,12 +187,14 @@ const getValue = (form: HTMLFormElement, field: string) => {
 
 function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspaceId: string }) {
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | undefined>(
-    stripeLoadFailed ? "Unable to add a payment method at this time." : undefined
-  );
+  const [error, setError] = useState<string>();
   const stripe = useStripe();
   const elements = useElements();
   const { prepareWorkspacePaymentMethod, loading } = hooks.usePrepareWorkspacePaymentMethod();
+
+  useEffect(() => {
+    stripePromise.catch(() => setError("Unable to add a payment method at this time."));
+  }, [stripePromise]);
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
