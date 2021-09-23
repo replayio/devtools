@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -191,6 +191,10 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
   const stripe = useStripe();
   const elements = useElements();
   const { prepareWorkspacePaymentMethod, loading } = hooks.usePrepareWorkspacePaymentMethod();
+
+  useEffect(() => {
+    stripePromise.catch(() => setError("Unable to add a payment method at this time."));
+  }, [stripePromise]);
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
