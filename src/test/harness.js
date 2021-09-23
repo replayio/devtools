@@ -695,6 +695,9 @@ async function checkHighlighterShape(svgPath) {
   await waitUntil(() => {
     const highlighterNode = document.getElementById("box-model-content");
     const highlighterPath = highlighterNode?.attributes["d"].textContent;
+    if (!highlighterPath) {
+      return false;
+    }
     const highlighterCoords = highlighterPath.substring(1).split(/ L|,/);
     for (let i = 0; i < 8; i++) {
       if (Math.abs(highlighterCoords[i] - expectedCoords[i]) >= 1) {
