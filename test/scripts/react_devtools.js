@@ -23,6 +23,11 @@ Test.describe(`Test React DevTools.`, async () => {
   await Test.waitUntil(() => getComponents().length === 3);
 
   const rootComponent = getComponents()[0];
+
+  rootComponent.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+  await Test.checkHighlighterVisible(true);
+  await Test.checkHighlighterShape("M40,16 L1280,16 L1280,35 L40,35");
+
   rootComponent.parentElement.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
   await Test.waitUntil(() => getInspectedItem("State"));
 
