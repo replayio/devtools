@@ -28,6 +28,7 @@ function getPanelWidth({ editor }) {
 
 function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem }) {
   const [editing, setEditing] = useState(false);
+  const [showCondition, setShowCondition] = useState(!!breakpoint.options.condition);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const { nags } = hooks.useGetUserInfo();
@@ -88,6 +89,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
               toggleEditingOff={toggleEditingOff}
               inputToFocus={inputToFocus}
               setInputToFocus={setInputToFocus}
+              showCondition={showCondition}
             />
           ) : (
             <PanelSummary
@@ -96,7 +98,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
               setInputToFocus={setInputToFocus}
             />
           )}
-          <BreakpointNavigation breakpoint={breakpoint} />
+          <BreakpointNavigation {...{ breakpoint, editing, showCondition, setShowCondition }} />
         </div>
       </div>
     </Widget>

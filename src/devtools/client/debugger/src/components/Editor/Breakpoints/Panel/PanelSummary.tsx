@@ -130,61 +130,96 @@ function PanelSummary({
   }
 
   return (
-    <div className="summary space-x-2 group" onClick={e => handleClick(e, "logValue")}>
-      <div className="options items-center" {...tooltipContent}>
+    <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
+      <div className="options items-center flex-col flex-grow" {...tooltipContent}>
         {conditionValue ? (
+          <div className="flex flex-row space-x-1 items-center">
+            <div className="w-6 flex-shrink-0">if</div>
+            <button
+              className={classNames(
+                "group flex flex-row items-top space-x-1 p-0.5",
+                !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
+              )}
+              disabled={!isEditable}
+              onClick={e => handleClick(e, "condition")}
+            >
+              <span
+                className="expression"
+                data-tip={
+                  isEditable
+                    ? undefined
+                    : "Editing logpoints is available for Developers in the Team plan"
+                }
+                data-for="breakpoint-panel-tooltip"
+              >
+                <span
+                  className={
+                    isEditable
+                      ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
+                      : ""
+                  }
+                >
+                  <div
+                    className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
+                    dangerouslySetInnerHTML={{
+                      __html: getSyntaxHighlightedMarkup(conditionValue) || "",
+                    }}
+                  />
+                </span>
+              </span>
+              {isEditable ? (
+                <MaterialIcon
+                  className="opacity-0 group-hover:opacity-100 "
+                  style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
+                >
+                  edit
+                </MaterialIcon>
+              ) : null}
+            </button>
+          </div>
+        ) : null}
+        <div className="flex flex-row space-x-1 items-center">
+          {conditionValue ? <div className="w-6 flex-shrink-0">log</div> : null}
           <button
             className={classNames(
-              "condition border rounded ",
-              isEditable
-                ? "hover:bg-white hover:text-primaryAccent cursor-text"
-                : "hover:bg-gray-200 cursor-auto"
+              "group flex flex-row items-top space-x-1 p-0.5",
+              !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
             )}
             disabled={!isEditable}
-            onClick={e => handleClick(e, "condition")}
-          >
-            if (<span className="expression">{conditionValue}</span>)
-          </button>
-        ) : null}
-        <button
-          className={classNames(
-            "flex flex-row items-top space-x-1",
-            !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
-          )}
-          disabled={!isEditable}
-          onClick={e => handleClick(e, "logValue")}
-        >
-          <span
-            className="expression"
-            data-tip={
-              isEditable
-                ? undefined
-                : "Editing logpoints is available for Developers in the Team plan"
-            }
-            data-for="breakpoint-panel-tooltip"
+            onClick={e => handleClick(e, "logValue")}
           >
             <span
-              className={
+              className="expression"
+              data-tip={
                 isEditable
-                  ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
-                  : ""
+                  ? undefined
+                  : "Editing logpoints is available for Developers in the Team plan"
               }
+              data-for="breakpoint-panel-tooltip"
             >
-              <div
-                className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
-                dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(logValue) || "" }}
-              />
+              <span
+                className={
+                  isEditable
+                    ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
+                    : ""
+                }
+              >
+                <div
+                  className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
+                  dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(logValue) || "" }}
+                />
+              </span>
             </span>
-          </span>
-          {isEditable ? (
-            <MaterialIcon
-              className="opacity-0 group-hover:opacity-100 "
-              style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
-            >
-              edit
-            </MaterialIcon>
-          ) : null}
-        </button>
+            {isEditable ? (
+              <MaterialIcon
+                className="opacity-0 group-hover:opacity-100 "
+                style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
+              >
+                edit
+              </MaterialIcon>
+            ) : null}
+          </button>
+        </div>
       </div>
       {!isTeamDeveloper ? (
         <span

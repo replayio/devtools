@@ -6,6 +6,7 @@ import { compareNumericStrings } from "protocol/utils";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import "./BreakpointNavigation.css";
@@ -16,6 +17,9 @@ function BreakpointNavigation({
   breakpoint,
   seek,
   analysisPoints,
+  editing,
+  setShowCondition,
+  showCondition,
   setZoomedBreakpoint = () => {},
 }) {
   const [lastExecutionPoint, setLastExecutionPoint] = useState(null);
@@ -46,8 +50,27 @@ function BreakpointNavigation({
       ) : null}
       {analysisPoints !== "error" && analysisPoints?.length ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
-      ) : null}
-      {executionPoint ? (
+      ) : (
+        <div className="flex-grow" />
+      )}
+      {editing ? (
+        <div className="flex flex-col items-end">
+          <button
+            className={classnames(
+              "rounded-full h-5 w-5 p-px pt-0.5 border",
+              showCondition
+                ? "border-primaryAccent text-primaryAccent"
+                : "border-gray-500 text-gray-500"
+            )}
+            style={{ height: "1.25rem", borderRadius: "100%" }}
+            onClick={() => setShowCondition(!showCondition)}
+          >
+            <MaterialIcon className="leading-none" style={{ fontSize: "1rem" }}>
+              filter_list
+            </MaterialIcon>
+          </button>
+        </div>
+      ) : executionPoint ? (
         <BreakpointNavigationStatus
           indexed={indexed}
           executionPoint={lastExecutionPoint}
