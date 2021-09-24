@@ -1,21 +1,42 @@
 import classNames from "classnames";
-import React, { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  MouseEventHandler,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import BubbleBackground from "./BubbleBackground";
 
+const OnboardingContext = React.createContext({ theme: "dark" });
+
 export function OnboardingContentWrapper({
   children,
+  overlay,
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
+  overlay?: boolean;
 }) {
+  const ctx = useContext(OnboardingContext);
+
   return (
     <div
-      className="p-9 text-2xl space-y-12 relative flex flex-col items-center"
-      style={{ width: "800px" }}
+      className={classNames(
+        "p-9 text-2xl relative flex flex-col items-center",
+        overlay ? "space-y-8" : "space-y-12",
+        {
+          "rounded-lg bg-opacity-80": overlay,
+          "bg-white": overlay && ctx.theme === "light",
+          "bg-black": overlay && ctx.theme === "dark",
+        }
+      )}
+      style={{ width: overlay ? 512 : 800 }}
     >
-      <ReplayLogo className="w-32 h-32" />
+      <ReplayLogo size={overlay ? "md" : "lg"} wide={overlay} />
       {children}
     </div>
   );
@@ -128,24 +149,44 @@ export function OnboardingModalContainer({
   theme?: "dark" | "light";
 }) {
   return (
-    <div
-      className={classNames(
-        "w-full h-full grid fixed z-50",
-        theme === "dark" ? "bg-black text-white" : "bg-white text-black"
-      )}
-    >
-      <>
-        <BubbleBackground />
-        <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
-          {children}
-        </Modal>
-      </>
-    </div>
+    <OnboardingContext.Provider value={{ theme }}>
+      <div
+        className={classNames(
+          "w-full h-full grid fixed z-50",
+          theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+        )}
+      >
+        <>
+          <BubbleBackground />
+          <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
+            {children}
+          </Modal>
+        </>
+      </div>
+    </OnboardingContext.Provider>
   );
 }
 
-export const ReplayLogo = ({ className, color }: { className?: string; color?: "white" }) => {
-  const src = color === "white" ? "/images/logo-white.svg" : "/images/logo.svg";
+const logoSizes = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 32,
+};
 
-  return <img className={className} src={src} />;
+export const ReplayLogo = ({
+  color,
+  wide,
+  size = "lg",
+}: {
+  color?: "white";
+  wide?: boolean;
+  size?: keyof typeof logoSizes;
+}) => {
+  let src = wide ? "/images/logo-wide.svg" : "/images/logo.svg";
+  if (color === "white") {
+    src = "/images/logo-white.svg";
+  }
+
+  return <img className={`h-${logoSizes[size]} w-auto`} src={src} />;
 };

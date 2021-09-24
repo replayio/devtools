@@ -58,20 +58,29 @@ function WelcomePage() {
 
   return (
     <OnboardingModalContainer theme="light">
-      <OnboardingContentWrapper>
-        {isTeamMemberInvite() ? (
-          <OnboardingContent>
-            <OnboardingHeader>Almost there!</OnboardingHeader>
-            <OnboardingBody>
-              In order to join your team, we first need you to sign in.
-            </OnboardingBody>
-          </OnboardingContent>
-        ) : null}
-        <OnboardingActions>
-          <PrimaryLgButton color="blue" onClick={onLogin}>
-            {isTeamMemberInvite() ? "Sign in with Google" : "Log into Replay"}
-          </PrimaryLgButton>
-        </OnboardingActions>
+      <OnboardingContentWrapper overlay>
+        {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
+        <div className="text-base space-y-4 self-start">
+          {isTeamMemberInvite() ? (
+            <p>In order to join your team, we first need you to sign in.</p>
+          ) : (
+            <>
+              <p>
+                Replay captures everything you need for the perfect bug report, all in one link.
+                Spend less time reproducing issues and more time getting real work done.
+              </p>
+              <p>
+                Learn more at{" "}
+                <a href="https://replay.io" className="underline pointer-hand">
+                  Replay.io
+                </a>
+              </p>
+            </>
+          )}
+        </div>
+        <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
+          {isTeamMemberInvite() ? "Sign in with Google" : "Log into Replay"}
+        </PrimaryLgButton>
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );

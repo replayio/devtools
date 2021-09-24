@@ -101,7 +101,7 @@ function LineNumberTooltip({
     tooltipContent = (
       <div className="flex flex-row space-x-2 items-center">
         <div className="flex flex-shrink-0">
-          <ReplayLogo className="w-4 h-4" color="white" />
+          <ReplayLogo size="xs" color="white" />
         </div>
         <div className="flex flex-col space-x-0.5">
           <div className="flex flex-row space-x-1 items-center">
