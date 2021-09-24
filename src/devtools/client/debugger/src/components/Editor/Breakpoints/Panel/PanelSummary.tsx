@@ -32,6 +32,105 @@ function getSyntaxHighlightedMarkup(string: string) {
   return markup;
 }
 
+function SummaryRow({
+  isEditable,
+  handleClick,
+  label,
+  value,
+}: {
+  isEditable: boolean;
+  handleClick: (event: React.MouseEvent) => void;
+  label: string | null;
+  value: string;
+}) {
+  return (
+    <div className="flex flex-row space-x-1 items-center">
+      {label ? <div className="w-6 flex-shrink-0">{label}</div> : null}
+      <button
+        className={classNames(
+          "group flex flex-row items-top space-x-1 p-0.5",
+          !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
+        )}
+        disabled={!isEditable}
+        onClick={handleClick}
+      >
+        <span
+          className="expression"
+          data-tip={
+            isEditable
+              ? undefined
+              : "Editing logpoints is available for Developers in the Team plan"
+          }
+          data-for="breakpoint-panel-tooltip"
+        >
+          <span
+            className={
+              isEditable
+                ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
+                : ""
+            }
+          >
+            <div
+              className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
+              dangerouslySetInnerHTML={{
+                __html: getSyntaxHighlightedMarkup(value) || "",
+              }}
+            />
+          </span>
+        </span>
+        {isEditable ? (
+          <MaterialIcon
+            className="opacity-0 group-hover:opacity-100 "
+            style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
+          >
+            edit
+          </MaterialIcon>
+        ) : null}
+      </button>
+    </div>
+  );
+}
+
+function Condition({
+  isEditable,
+  handleClick,
+  conditionValue,
+}: {
+  isEditable: boolean;
+  handleClick: (event: React.MouseEvent, input: Input) => void;
+  conditionValue: string;
+}) {
+  return (
+    <SummaryRow
+      label="if"
+      value={conditionValue}
+      handleClick={e => handleClick(e, "condition")}
+      {...{ isEditable }}
+    />
+  );
+}
+
+function Log({
+  hasCondition,
+  isEditable,
+  handleClick,
+  logValue,
+}: {
+  isEditable: boolean;
+  handleClick: (event: React.MouseEvent, input: Input) => void;
+  hasCondition: boolean;
+  logValue: string;
+}) {
+  return (
+    <SummaryRow
+      label={hasCondition ? "log" : null}
+      value={logValue}
+      handleClick={e => handleClick(e, "logValue")}
+      {...{ isEditable }}
+    />
+  );
+}
+
 function PanelSummary({
   breakpoint,
   toggleEditingOn,
@@ -60,7 +159,7 @@ function PanelSummary({
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
   const didExceedMaxHitsEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
   const isTeamDeveloper = recording ? recording.userRole !== "team-user" : false;
-  const isEditable = didExceedMaxHitsEditable && isTeamDeveloper;
+  const isEditable = !!didExceedMaxHitsEditable && !!isTeamDeveloper;
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -132,94 +231,8 @@ function PanelSummary({
   return (
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center flex-col flex-grow" {...tooltipContent}>
-        {conditionValue ? (
-          <div className="flex flex-row space-x-1 items-center">
-            <div className="w-6 flex-shrink-0">if</div>
-            <button
-              className={classNames(
-                "group flex flex-row items-top space-x-1 p-0.5",
-                !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
-              )}
-              disabled={!isEditable}
-              onClick={e => handleClick(e, "condition")}
-            >
-              <span
-                className="expression"
-                data-tip={
-                  isEditable
-                    ? undefined
-                    : "Editing logpoints is available for Developers in the Team plan"
-                }
-                data-for="breakpoint-panel-tooltip"
-              >
-                <span
-                  className={
-                    isEditable
-                      ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
-                      : ""
-                  }
-                >
-                  <div
-                    className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
-                    dangerouslySetInnerHTML={{
-                      __html: getSyntaxHighlightedMarkup(conditionValue) || "",
-                    }}
-                  />
-                </span>
-              </span>
-              {isEditable ? (
-                <MaterialIcon
-                  className="opacity-0 group-hover:opacity-100 "
-                  style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
-                >
-                  edit
-                </MaterialIcon>
-              ) : null}
-            </button>
-          </div>
-        ) : null}
-        <div className="flex flex-row space-x-1 items-center">
-          {conditionValue ? <div className="w-6 flex-shrink-0">log</div> : null}
-          <button
-            className={classNames(
-              "group flex flex-row items-top space-x-1 p-0.5",
-              !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
-            )}
-            disabled={!isEditable}
-            onClick={e => handleClick(e, "logValue")}
-          >
-            <span
-              className="expression"
-              data-tip={
-                isEditable
-                  ? undefined
-                  : "Editing logpoints is available for Developers in the Team plan"
-              }
-              data-for="breakpoint-panel-tooltip"
-            >
-              <span
-                className={
-                  isEditable
-                    ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
-                    : ""
-                }
-              >
-                <div
-                  className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
-                  dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(logValue) || "" }}
-                />
-              </span>
-            </span>
-            {isEditable ? (
-              <MaterialIcon
-                className="opacity-0 group-hover:opacity-100 "
-                style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
-              >
-                edit
-              </MaterialIcon>
-            ) : null}
-          </button>
-        </div>
+        {conditionValue ? <Condition {...{ isEditable, handleClick, conditionValue }} /> : null}
+        <Log {...{ isEditable, handleClick, logValue }} hasCondition={!!conditionValue} />
       </div>
       {!isTeamDeveloper ? (
         <span

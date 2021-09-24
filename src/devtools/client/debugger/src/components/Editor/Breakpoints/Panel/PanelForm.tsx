@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-const PanelInput = require("./PanelInput");
+const { PanelInput } = require("./PanelInput");
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 
 export function SubmitButton({
@@ -17,10 +17,10 @@ export function SubmitButton({
       type="button"
       disabled={disabled}
       onClick={handleSetBreakpoint}
-      title="Save log expression"
+      title={disabled ? "Invalid expression(s)" : "Save expression(s)"}
       className={classnames(
-        "hover:bg-primaryAccentHover inline-flex items-center p-1 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent flex-shrink-0 font-sans",
-        disabled ? "text-gray-700 bg-gray-300" : "bg-primaryAccent text-white"
+        "inline-flex items-center p-1 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent flex-shrink-0 font-sans text-white",
+        disabled ? "bg-gray-400 cursor-default" : "bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       Save
@@ -30,11 +30,11 @@ export function SubmitButton({
 
 interface PanelFormProps {
   logValue: string;
-  logSyntaxError: string;
+  logSyntaxError: string | null;
   setLogValue: (value: string) => void;
   setLogSyntaxError: (value: string | null) => void;
   condition: string;
-  conditionSyntaxError: string;
+  conditionSyntaxError: string | null;
   setCondition: (value: string) => void;
   setConditionSyntaxError: (value: string | null) => void;
   handleSetBreakpoint: () => void;
@@ -75,8 +75,8 @@ export default function PanelForm({
     <div className="flex-grow overflow-hidden">
       <form className="flex flex-col space-y-1">
         {showCondition ? (
-          <div className={classnames("form-row space-x-1", { invalid: conditionSyntaxError })}>
-            <div className="w-6 flex-shrink-0">if</div>
+          <div className={classnames("form-row", { invalid: conditionSyntaxError })}>
+            <div className="w-6 flex-shrink-0 mr-1">if</div>
             <PanelInput
               id="condition"
               autofocus={inputToFocus == "condition"}
@@ -87,8 +87,8 @@ export default function PanelForm({
             />
           </div>
         ) : null}
-        <div className={classnames("form-row space-x-1", { invalid: logSyntaxError })}>
-          {showCondition ? <div className="w-6 flex-shrink-0">log</div> : null}
+        <div className={classnames("form-row", { invalid: logSyntaxError })}>
+          {showCondition ? <div className="w-6 flex-shrink-0 mr-1">log</div> : null}
           <PanelInput
             id="logpoint"
             autofocus={inputToFocus == "logValue"}

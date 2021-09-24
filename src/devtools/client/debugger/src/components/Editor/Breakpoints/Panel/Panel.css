@@ -137,7 +137,7 @@ span.expression {
   width: 100%;
   border-radius: 4px;
   font-family: var(--monospace-font-family);
-  font-size: 0.75rem;
+  font-size: var(--theme-code-font-size);
   color: var(--theme-toolbar-color);
 }
 
@@ -145,7 +145,7 @@ span.expression {
   border: 1px solid #E5E7EB;
 }
 
-.breakpoint-panel .form-row.invalid .CodeMirror {
+.breakpoint-panel .panel-editor form .form-row.invalid .CodeMirror {
   border-color: var(--red-50);
 }
 
@@ -159,6 +159,12 @@ span.expression {
 .breakpoint-panel .CodeMirror-scroll {
   display: flex;
   flex-grow: 1;
+}
+
+/* This removes padding so we can match the positions of both editing and
+non-editing markup */
+.breakpoint-panel .CodeMirror .CodeMirror-line  {
+  padding: 0px;
 }
 
 .breakpoint-panel .edit-actions {

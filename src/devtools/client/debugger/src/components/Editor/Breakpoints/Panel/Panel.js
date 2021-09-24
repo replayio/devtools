@@ -90,6 +90,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
               inputToFocus={inputToFocus}
               setInputToFocus={setInputToFocus}
               showCondition={showCondition}
+              setShowCondition={setShowCondition}
             />
           ) : (
             <PanelSummary
