@@ -10,6 +10,7 @@ module.exports = {
         primaryAccentHover: "var(--primary-accent-hover)",
         secondaryAccent: "var(--secondary-accent)",
         textFieldBorder: "var(--text-field-border)",
+        toolbarBackground: "var(--theme-toolbar-background)",
       },
     },
   },
