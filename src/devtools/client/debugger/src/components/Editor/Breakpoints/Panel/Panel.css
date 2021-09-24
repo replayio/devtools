@@ -51,10 +51,7 @@
 
 .breakpoint-panel .summary .options {
   font-family: var(--monospace-font-family);
-  display: flex;
-  flex-direction: row;
   overflow: hidden;
-  flex-grow: 1;
 }
 
 .breakpoint-panel .summary .action {
@@ -82,7 +79,6 @@
 span.expression {
   display: block;
   text-align: left;
-  padding-left: 3px;
 }
 
 .breakpoint-panel .panel-editor {
@@ -102,15 +98,6 @@ span.expression {
   margin-right: 8px;
 }
 
-.breakpoint-panel form {
-  display: flex;
-  flex-direction: column;
-}
-
-.breakpoint-panel form > *:not(:last-child) {
-  margin-bottom: 4px;
-}
-
 .breakpoint-panel form label {
   color: var(--theme-comment);
   min-width: 48px;
@@ -126,10 +113,6 @@ span.expression {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-.breakpoint-panel .form-row.invalid .CodeMirror-line * {
-  color: var(--red-50);
 }
 
 .breakpoint-panel form .input-container {
@@ -148,13 +131,22 @@ span.expression {
   pointer-events: none;
 }
 
-.breakpoint-panel form .CodeMirror {
+.breakpoint-panel .panel-editor form .CodeMirror {
+  border: 1px solid transparent;
   display: flex;
   width: 100%;
   border-radius: 4px;
   font-family: var(--monospace-font-family);
-  font-size: 0.75rem;
+  font-size: var(--theme-code-font-size);
   color: var(--theme-toolbar-color);
+}
+
+.breakpoint-panel .panel-editor.conditional form .CodeMirror {
+  border: 1px solid #E5E7EB;
+}
+
+.breakpoint-panel .panel-editor form .form-row.invalid .CodeMirror {
+  border-color: var(--red-50);
 }
 
 .breakpoint-panel form textarea {
@@ -167,6 +159,12 @@ span.expression {
 .breakpoint-panel .CodeMirror-scroll {
   display: flex;
   flex-grow: 1;
+}
+
+/* This removes padding so we can match the positions of both editing and
+non-editing markup */
+.breakpoint-panel .CodeMirror .CodeMirror-line  {
+  padding: 0px;
 }
 
 .breakpoint-panel .edit-actions {
