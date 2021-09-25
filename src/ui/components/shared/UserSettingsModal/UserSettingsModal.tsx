@@ -164,6 +164,13 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
         disabled: false,
       },
       {
+        label: "Enable global function search",
+        type: "checkbox",
+        key: "enableGlobalSearch",
+        description: "Search for functions in all source files",
+        disabled: false,
+      },
+      {
         label: "Enable the Elements pane",
         type: "checkbox",
         key: "showElements",
@@ -176,14 +183,6 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
         type: "checkbox",
         key: "enableRepaint",
         description: "Repaint the DOM on demand",
-        disabled: false,
-        comingSoon: !internal,
-      },
-      {
-        label: "Enable global symbol search",
-        type: "checkbox",
-        key: "enableGlobalSearch",
-        description: "Search for symbols in all source files",
         disabled: false,
         comingSoon: !internal,
       },
