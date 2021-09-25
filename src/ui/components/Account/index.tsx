@@ -65,21 +65,18 @@ function WelcomePage() {
             <p>In order to join your team, we first need you to sign in.</p>
           ) : (
             <>
-              <p>
-                Replay captures everything you need for the perfect bug report, all in one link.
-                Spend less time reproducing issues and more time getting real work done.
-              </p>
-              <p>
-                Learn more at{" "}
+              <p className="text-center">
+                Replay captures everything you need for the perfect bug report, all in one link.{" "}
                 <a href="https://replay.io" className="underline pointer-hand">
-                  Replay.io
+                  Learn more
                 </a>
               </p>
+              <p></p>
             </>
           )}
         </div>
         <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
-          {isTeamMemberInvite() ? "Sign in with Google" : "Log into Replay"}
+          {isTeamMemberInvite() ? "Sign in with Google" : "Login"}
         </PrimaryLgButton>
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
