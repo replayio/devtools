@@ -10,6 +10,7 @@ import { PrimaryButton } from "../Button";
 import { actions } from "ui/actions";
 import { SharedWith } from "./SharedWith";
 import { CollaboratorDbData } from "./CollaboratorsList";
+import useAuth0 from "ui/utils/useAuth0";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const { recordingId } = props.modalOptions!;
@@ -41,6 +42,13 @@ function SharingModal({ recording, workspaces, collaborators, hideModal }: Shari
   const isPrivate = recording.private;
   const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
 
+  const { isAuthenticated } = useAuth0();
+  const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
+  const isCollaborator =
+    isAuthenticated &&
+    hooks.useIsCollaborator(recording.id || "00000000-0000-0000-0000-000000000000");
+  const showShare = (isOwner || isCollaborator) && false;
+
   const setPublic = () => {
     if (isPrivate) {
       toggleIsPrivate();
@@ -59,31 +67,33 @@ function SharingModal({ recording, workspaces, collaborators, hideModal }: Shari
         style={{ width: "600px" }}
       >
         <section className="space-y-4">
-          <SharedWith {...{ workspaces, recording, collaborators }} />
+          {showShare ? <SharedWith {...{ workspaces, recording, collaborators }} /> : null}
           <div className="space-y-2">
             <h2 className="text-xl">Link</h2>
             <ReplayLink recordingId={recording.id} />
-            <div className="flex flex-row items-center">
-              {isPrivate ? (
-                <div className="w-full justify-between flex flex-row items-center">
-                  <div>
-                    <strong>Restricted</strong> Only people added can open this link
+            {showShare ? (
+              <div className="flex flex-row items-center">
+                {isPrivate ? (
+                  <div className="w-full justify-between flex flex-row items-center">
+                    <div>
+                      <strong>Restricted</strong> Only people added can open this link
+                    </div>
+                    <PrimaryButton color="blue" onClick={setPublic}>
+                      Change to anyone
+                    </PrimaryButton>
                   </div>
-                  <PrimaryButton color="blue" onClick={setPublic}>
-                    Change to anyone
-                  </PrimaryButton>
-                </div>
-              ) : (
-                <div className="w-full flex flex-row justify-between items-center">
-                  <div>
-                    <strong>Anyone</strong> on the internet with this link can view
+                ) : (
+                  <div className="w-full flex flex-row justify-between items-center">
+                    <div>
+                      <strong>Anyone</strong> on the internet with this link can view
+                    </div>
+                    <PrimaryButton color="blue" onClick={setPrivate}>
+                      Change to restricted
+                    </PrimaryButton>
                   </div>
-                  <PrimaryButton color="blue" onClick={setPrivate}>
-                    Change to restricted
-                  </PrimaryButton>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            ) : null}
           </div>
         </section>
       </div>
