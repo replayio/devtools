@@ -102,6 +102,10 @@ export class ValueFront {
     return !!this._object;
   }
 
+  objectId() {
+    return this._object?.objectId;
+  }
+
   hasPreview() {
     return this._object && this._object.preview;
   }

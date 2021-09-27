@@ -1,24 +1,29 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { createBridge, createStore, initialize, Wall } from "react-devtools-inline/frontend";
-import { ExecutionPoint } from "@recordreplay/protocol";
+import { createBridge, createStore, initialize, Store, Wall } from "react-devtools-inline/frontend";
+import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
 import { getAnnotations, getCurrentPoint } from "ui/reducers/reactDevTools";
+import { setIsNodePickerActive } from "ui/actions/app";
 import Highlighter from "highlighter/highlighter.js";
+import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 
-interface ReactElementID {
-  rendererID: number;
-  id: number;
-}
+const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
 // used by the frontend to communicate with the backend
 class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
   private inspectedElements = new Set();
-  private highlightedElementId?: ReactElementID;
+  private highlightedElementId?: number;
+  store?: Store;
+
+  constructor(
+    private enablePicker: (opts: NodePickerOpts) => void,
+    private disablePicker: () => void
+  ) {}
 
   // called by the frontend to register a listener for receiving backend messages
   listen(listener: (msg: any) => void) {
@@ -75,20 +80,20 @@ class ReplayWall implements Wall {
         if (this.highlightedElementId) {
           Highlighter.unhighlight();
         }
-        this.highlightedElementId = { rendererID, id };
+        this.highlightedElementId = id;
 
         const response = await ThreadFront.evaluate(
           0,
           undefined,
-          `__REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(${rendererID}).findNativeNodesForFiberID(${id})[0]`
+          `${getDOMNodes}(${rendererID}, ${id})[0]`
         );
-        if (!response.returned || !this.isHighlightedElementID(rendererID, id)) {
+        if (!response.returned || this.highlightedElementId !== id) {
           return;
         }
 
         const nodeFront = response.returned.getNodeFront();
         await nodeFront?.ensureLoaded();
-        if (!nodeFront || !this.isHighlightedElementID(rendererID, id)) {
+        if (!nodeFront || this.highlightedElementId !== id) {
           return;
         }
 
@@ -99,6 +104,31 @@ class ReplayWall implements Wall {
       case "clearNativeElementHighlight": {
         Highlighter.unhighlight();
         this.highlightedElementId = undefined;
+        break;
+      }
+
+      case "startInspectingNative": {
+        ThreadFront.ensureCurrentPause();
+        await ThreadFront.currentPause!.createWaiter;
+        await ThreadFront.currentPause!.loadMouseTargets();
+
+        const nodeToElementId = await this.mapNodesToElements();
+
+        this.enablePicker({
+          onHovering: nodeId => {
+            const elementId = nodeId && nodeToElementId.get(nodeId);
+            elementId && this._listener?.({ event: "selectFiber", payload: elementId });
+          },
+          onPicked: _ => {
+            this._listener?.({ event: "stopInspectingNative", payload: true });
+          },
+          enabledNodeIds: [...nodeToElementId.keys()],
+        });
+        break;
+      }
+
+      case "stopInspectingNative": {
+        this.disablePicker();
         break;
       }
     }
@@ -117,18 +147,50 @@ class ReplayWall implements Wall {
     }
   }
 
-  private isHighlightedElementID(rendererID: number, id: number) {
-    return (
-      this.highlightedElementId?.rendererID === rendererID && this.highlightedElementId?.id === id
-    );
+  private async mapNodesToElements() {
+    const nodeToElementId = new Map<ObjectId, number>();
+    for (const rootID of this.store!._roots) {
+      const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
+      const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
+      const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id)) { map.set(node, id); } return map; }, new Map())`;
+      const response = await ThreadFront.evaluate(0, undefined, expr);
+      if (response.returned) {
+        const entries = response.returned.previewContainerEntries();
+        for (const { key, value } of entries) {
+          if (!key?.isObject() || !value.isPrimitive() || typeof value.primitive() !== "number") {
+            continue;
+          }
+          nodeToElementId.set(key.objectId()!, value.primitive() as number);
+        }
+      }
+    }
+    return nodeToElementId;
+  }
+
+  private collectElementIDs(elementID: number, elementIDs?: number[]) {
+    if (!elementIDs) {
+      elementIDs = [];
+    }
+    elementIDs.push(elementID);
+    const element = this.store!._idToElement.get(elementID);
+    for (const childID of element!.children) {
+      this.collectElementIDs(childID, elementIDs);
+    }
+    return elementIDs;
   }
 }
 
-function createReactDevTools(annotations: Annotation[], currentPoint: ExecutionPoint) {
+function createReactDevTools(
+  annotations: Annotation[],
+  currentPoint: ExecutionPoint,
+  enablePicker: (opts: NodePickerOpts) => void,
+  disablePicker: () => void
+) {
   const target = { postMessage() {} };
-  const wall = new ReplayWall();
+  const wall = new ReplayWall(enablePicker, disablePicker);
   const bridge = createBridge(target, wall);
-  const store = createStore(bridge, { supportsNativeInspection: false });
+  const store = createStore(bridge, { supportsNativeInspection: true });
+  wall.store = store;
   const ReactDevTools = initialize(target, { bridge, store });
 
   for (const { message, point } of annotations) {
@@ -140,12 +202,21 @@ function createReactDevTools(annotations: Annotation[], currentPoint: ExecutionP
   return ReactDevTools;
 }
 
-function ReactDevtoolsPanel({ annotations, currentPoint }: PropsFromRedux) {
+function ReactDevtoolsPanel({ annotations, currentPoint, setIsNodePickerActive }: PropsFromRedux) {
   if (currentPoint === null) {
     return null;
   }
 
-  const ReactDevTools = createReactDevTools(annotations, currentPoint);
+  function enablePicker(opts: NodePickerOpts) {
+    setIsNodePickerActive(true);
+    NodePicker.enable(opts);
+  }
+  function disablePicker() {
+    NodePicker.disable();
+    setIsNodePickerActive(false);
+  }
+
+  const ReactDevTools = createReactDevTools(annotations, currentPoint, enablePicker, disablePicker);
 
   return (
     <ReactDevTools
@@ -163,9 +234,12 @@ function ReactDevtoolsPanel({ annotations, currentPoint }: PropsFromRedux) {
   );
 }
 
-const connector = connect((state: UIState) => ({
-  annotations: getAnnotations(state),
-  currentPoint: getCurrentPoint(state),
-}));
+const connector = connect(
+  (state: UIState) => ({
+    annotations: getAnnotations(state),
+    currentPoint: getCurrentPoint(state),
+  }),
+  { setIsNodePickerActive }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ReactDevtoolsPanel);
