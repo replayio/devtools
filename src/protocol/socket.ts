@@ -13,6 +13,7 @@ import { setUnexpectedError } from "ui/actions/session";
 import { UIStore } from "ui/actions";
 import { Action, Dispatch } from "redux";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
+import { UnexpectedError } from "ui/state/app";
 
 interface Message {
   id: number;
@@ -40,6 +41,7 @@ const gMessageWaiters = new Map<number, MessageWaiter>();
 const gStartTime = Date.now();
 let gSentBytes = 0;
 let gReceivedBytes = 0;
+let lastReceivedMessageTime = Date.now();
 
 let willClose = false;
 window.addEventListener("beforeunload", () => {
@@ -126,6 +128,7 @@ export const client = new ProtocolClient({
 });
 
 function onSocketMessage(evt: MessageEvent<any>) {
+  lastReceivedMessageTime = Date.now();
   gReceivedBytes += evt.data.length;
   const msg = JSON.parse(evt.data);
 
@@ -149,19 +152,19 @@ function onSocketMessage(evt: MessageEvent<any>) {
   }
 }
 
+const disconnectedError: UnexpectedError = {
+  message: "Are you still there?",
+  content: "Replays disconnect after 5 minutes to reduce server load. Ready when you are!",
+  action: "refresh",
+};
+
 function onSocketClose() {
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
     log("Socket Closed");
     gSocketOpen = false;
 
     if (!willClose) {
-      dispatch(
-        setUnexpectedError({
-          message: "Are you still there?",
-          content: "Replays disconnect after 5 minutes to reduce server load. Ready when you are!",
-          action: "refresh",
-        })
-      );
+      dispatch(setUnexpectedError(disconnectedError));
     }
   };
 }
@@ -173,14 +176,18 @@ function onSocketError(evt: Event) {
   willClose = true;
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
     log("Socket Error");
-    dispatch(
-      setUnexpectedError({
-        message: "Unexpected socket error",
-        content: "The socket has closed due to an error. Please refresh the page.",
-        action: "refresh",
-        ...evt,
-      })
-    );
+    if (Date.now() - lastReceivedMessageTime < 300000) {
+      dispatch(
+        setUnexpectedError({
+          message: "Unexpected socket error",
+          content: "The socket has closed due to an error. Please refresh the page.",
+          action: "refresh",
+          ...evt,
+        })
+      );
+    } else {
+      dispatch(setUnexpectedError(disconnectedError));
+    }
   };
 }
 
