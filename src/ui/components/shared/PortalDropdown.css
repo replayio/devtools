@@ -30,17 +30,21 @@
 }
 
 .portal-dropdown-container .content {
-  background: white;
   width: max-content;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
   position: absolute;
+  color: var(--theme-toolbar-color);
+  z-index: 1001;
+}
+
+/* These are old styles. These should be winded down as we use the tailwind dropdown
+in more places. */
+.portal-dropdown-container .content .old-portal {
   box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
     rgba(15, 15, 15, 0.2) 0px 9px 24px;
   background: var(--theme-toolbar-background);
-  color: var(--theme-toolbar-color);
-  z-index: 1001;
 }
 
 button.expand-dropdown:focus {

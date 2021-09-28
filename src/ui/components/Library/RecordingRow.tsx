@@ -92,7 +92,7 @@ export default function RecordingRow({
       className="group border-b border-gray-200 hover:bg-gray-50 transition duration-200 cursor-pointer flex flex-row"
       onClick={onClick}
     >
-      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0">
+      <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0 flex flex-row items-center">
         {isEditing && isOwner ? (
           <input
             type="checkbox"

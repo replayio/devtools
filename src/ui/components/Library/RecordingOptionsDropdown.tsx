@@ -8,7 +8,9 @@ import MaterialIcon from "../shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
-import { Dropdown, DropdownButton, DropdownDivider, DropdownItem } from "./LibraryDropdown";
+import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
+import PortalDropdown from "../shared/PortalDropdown";
+import classNames from "classnames";
 
 type RecordingOptionsDropdownProps = PropsFromRedux & {
   recording: Recording;
@@ -20,6 +22,7 @@ function RecordingOptionsDropdown({
   setModal,
 }: RecordingOptionsDropdownProps) {
   const [isPrivate, setIsPrivate] = useState(recording.private);
+  const [expanded, setExpanded] = useState(false);
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
@@ -44,40 +47,49 @@ function RecordingOptionsDropdown({
   };
 
   const button = (
-    <DropdownButton className="opacity-0 group-hover:opacity-100">
-      <MaterialIcon
-        outlined
-        className="h-4 w-4 text-gray-400 hover:text-primaryAccentHover text-base leading-4"
-      >
-        more_vert
-      </MaterialIcon>
-    </DropdownButton>
+    <MaterialIcon
+      outlined
+      className={classNames(
+        expanded ? "opacity-100" : "",
+        "h-4 w-4 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-primaryAccentHover text-base leading-4"
+      )}
+    >
+      more_vert
+    </MaterialIcon>
   );
 
   return (
-    <Dropdown button={button} menuItemsClassName={"mr-8"}>
-      <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
-      <DropdownItem onClick={toggleIsPrivate}>{`Make ${
-        isPrivate ? "public" : "private"
-      }`}</DropdownItem>
-      <DropdownItem onClick={() => setModal("sharing", { recordingId })}>Share</DropdownItem>
-      <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
-      <DropdownDivider />
-      <div className="overflow-y-auto max-h-48">
-        {currentWorkspaceId !== null ? (
-          <DropdownItem onClick={() => updateRecording(null)}>Your library</DropdownItem>
-        ) : null}
-        {!loading
-          ? workspaces
-              .filter(w => w.id !== currentWorkspaceId)
-              .map(({ id, name }) => (
-                <DropdownItem onClick={() => updateRecording(id)} key={id}>
-                  {name}
-                </DropdownItem>
-              ))
-          : null}
-      </div>
-    </Dropdown>
+    <PortalDropdown
+      buttonContent={button}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle=""
+      distance={0}
+    >
+      <Dropdown>
+        <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
+        <DropdownItem onClick={toggleIsPrivate}>{`Make ${
+          isPrivate ? "public" : "private"
+        }`}</DropdownItem>
+        <DropdownItem onClick={() => setModal("sharing", { recordingId })}>Share</DropdownItem>
+        <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
+        <DropdownDivider />
+        <div className="overflow-y-auto max-h-48">
+          {currentWorkspaceId !== null ? (
+            <DropdownItem onClick={() => updateRecording(null)}>Your library</DropdownItem>
+          ) : null}
+          {!loading
+            ? workspaces
+                .filter(w => w.id !== currentWorkspaceId)
+                .map(({ id, name }) => (
+                  <DropdownItem onClick={() => updateRecording(id)} key={id}>
+                    {name}
+                  </DropdownItem>
+                ))
+            : null}
+        </div>
+      </Dropdown>
+    </PortalDropdown>
   );
 }
 

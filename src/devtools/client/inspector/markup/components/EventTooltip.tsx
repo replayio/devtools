@@ -73,7 +73,9 @@ class EventTooltip extends PureComponent<EventTooltipProps & PropsFromRedux> {
         expanded={!!events}
         setExpanded={this.setExpanded}
       >
-        <div className="devtools-tooltip-events-container">{this.renderEvents(events)}</div>
+        <div className="devtools-tooltip-events-container old-portal">
+          {this.renderEvents(events)}
+        </div>
       </PortalDropdown>
     );
   }
