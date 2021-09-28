@@ -42,9 +42,12 @@ function CommentSource({
       onClick={onSelectSource}
       className="group space-y-5 p-3 rounded-xl rounded-b-none border-b border-gray-200  hover:bg-toolbarBackground cursor-pointer"
     >
-      <div className="font-medium flex flex-col">
+      <div className="font-medium flex flex-col mono">
         <div className="w-full flex flex-row justify-between space-x-1">
-          <div className="font-semibold whitespace-pre overflow-hidden overflow-ellipsis">
+          <div
+            className="font-mono font-semibold whitespace-pre overflow-hidden overflow-ellipsis"
+            style={{ fontSize: "11px" }}
+          >
             {labels.primary}
           </div>
           <div
@@ -56,6 +59,7 @@ function CommentSource({
         </div>
         <div
           className="cm-s-mozilla font-mono overflow-hidden whitespace-pre text-xs"
+          style={{ fontSize: "11px" }}
           dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
         />
       </div>
