@@ -53,30 +53,34 @@ function BreakpointNavigation({
       ) : (
         <div className="flex-grow" />
       )}
-      {editing ? (
-        <div className="flex flex-col items-end">
-          <button
-            className={classnames(
-              "rounded-full h-5 w-5 p-px pt-0.5 border",
-              showCondition
-                ? "border-primaryAccent text-primaryAccent"
-                : "border-gray-500 text-gray-500"
-            )}
-            style={{ height: "1.25rem", borderRadius: "100%" }}
-            onClick={() => setShowCondition(!showCondition)}
-          >
-            <MaterialIcon className="leading-none" style={{ fontSize: "1rem" }}>
-              filter_list
-            </MaterialIcon>
-          </button>
-        </div>
-      ) : executionPoint ? (
-        <BreakpointNavigationStatus
-          indexed={indexed}
-          executionPoint={lastExecutionPoint}
-          analysisPoints={analysisPoints}
-        />
-      ) : null}
+      <div className="relative">
+        {editing ? (
+          <div className="absolute right-0">
+            <button
+              className={classnames(
+                "rounded-full h-5 w-5 p-px pt-0.5 border",
+                showCondition
+                  ? "border-primaryAccent text-primaryAccent"
+                  : "border-gray-500 text-gray-500"
+              )}
+              style={{ height: "1.25rem", borderRadius: "100%" }}
+              onClick={() => setShowCondition(!showCondition)}
+            >
+              <MaterialIcon className="leading-none" style={{ fontSize: "1rem" }}>
+                filter_list
+              </MaterialIcon>
+            </button>
+          </div>
+        ) : null}
+        {executionPoint ? (
+          <BreakpointNavigationStatus
+            indexed={indexed}
+            executionPoint={lastExecutionPoint}
+            analysisPoints={analysisPoints}
+            isHidden={editing}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -106,7 +110,7 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
   );
 }
 
-function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed }) {
+function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed, isHidden }) {
   let status = "";
   if (!indexed) {
     status = "Indexing";
@@ -125,7 +129,9 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
   }
 
   return (
-    <div className="breakpoint-navigation-status-container">
+    <div
+      className={classnames("breakpoint-navigation-status-container", isHidden ? "invisible" : "")}
+    >
       <div className="px-3 py-0.5 rounded-2xl text-gray-500 bg-gray-200">{status}</div>
     </div>
   );
