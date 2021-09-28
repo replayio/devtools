@@ -10,6 +10,8 @@ import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
 import { ViewMode } from "ui/state/app";
 
+const TOGGLE_DELAY = 300;
+
 interface HandleProps {
   text: string;
   mode: ViewMode;
@@ -60,6 +62,14 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
     import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
     preloadPromise.current = import("../Views/DevView");
   }, []);
+  useEffect(() => {
+    // It's possible for the view to be toggled by something else apart from this component.
+    // When that happens, we need to update the localViewMode so that it displays
+    // the right state.
+    if (viewMode !== localViewMode) {
+      setLocalViewMode(viewMode);
+    }
+  }, [viewMode]);
 
   // Don't show anything while waiting for framer-motion to be imported.
   if (!framerMotion) {
@@ -75,7 +85,7 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
     // before re-rendering all of devtools in the new viewMode.
     clearTimeout(toggleTimeoutKey.current!);
     const delayPromise = new Promise<void>(resolve => {
-      toggleTimeoutKey.current = setTimeout(() => resolve(), 300);
+      toggleTimeoutKey.current = setTimeout(() => resolve(), TOGGLE_DELAY);
     });
     await Promise.all([preloadPromise, delayPromise]);
 
