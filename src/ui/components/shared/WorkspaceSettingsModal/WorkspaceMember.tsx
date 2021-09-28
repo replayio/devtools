@@ -162,10 +162,12 @@ export function NonRegisteredWorkspaceMember({
         buttonStyle=""
         position="bottom-right"
       >
-        <WorkspaceMemberRoles member={member} isAdmin={isAdmin} />
-        <hr />
-        <div className="permissions-dropdown-item" onClick={handleDelete}>
-          Remove
+        <div className="old-portal">
+          <WorkspaceMemberRoles member={member} isAdmin={isAdmin} />
+          <hr />
+          <div className="permissions-dropdown-item" onClick={handleDelete}>
+            Remove
+          </div>
         </div>
       </PortalDropdown>
     </li>

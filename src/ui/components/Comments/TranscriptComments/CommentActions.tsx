@@ -58,19 +58,21 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
         buttonStyle=""
         position="bottom-right"
       >
-        <div
-          className="comments-dropdown-item edit-comment text-xs"
-          title="Edit Comment"
-          onClick={editComment}
-        >
-          Edit comment
-        </div>
-        <div
-          className="comments-dropdown-item delete-comment text-xs"
-          title="Delete Comment"
-          onClick={handleDelete}
-        >
-          {isRoot ? "Delete comment and replies" : "Delete comment"}
+        <div className="old-portal">
+          <div
+            className="comments-dropdown-item edit-comment text-xs"
+            title="Edit Comment"
+            onClick={editComment}
+          >
+            Edit comment
+          </div>
+          <div
+            className="comments-dropdown-item delete-comment text-xs"
+            title="Delete Comment"
+            onClick={handleDelete}
+          >
+            {isRoot ? "Delete comment and replies" : "Delete comment"}
+          </div>
         </div>
       </PortalDropdown>
     </div>
