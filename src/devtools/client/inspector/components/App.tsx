@@ -196,8 +196,8 @@ class InspectorApp extends Component<PropsFromRedux> {
           <SplitBox
             ref={this.splitBoxRef}
             className="inspector-sidebar-splitter"
-            initialSize={`${is3PaneModeEnabled ? prefs.sidebarSize : prefs.splitSidebarSize}`}
-            minSize="10%"
+            initialSize={`${is3PaneModeEnabled ? prefs.sidebarSize : prefs.splitSidebarSize}px`}
+            minSize="20%"
             maxSize="80%"
             onMove={this.onSplitboxResize}
             splitterSize={1}
@@ -206,7 +206,7 @@ class InspectorApp extends Component<PropsFromRedux> {
             endPanel={
               <SplitBox
                 ref={this.sidebarSplitboxRef}
-                initialSize={`${is3PaneModeEnabled ? prefs.splitSidebarSize : 0}`}
+                initialSize={`${is3PaneModeEnabled ? prefs.splitSidebarSize : 0}px`}
                 minSize={is3PaneModeEnabled ? "20%" : "0"}
                 maxSize="80%"
                 onMove={this.onSidebarSplitboxResize}

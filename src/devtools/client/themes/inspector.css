@@ -169,6 +169,14 @@ window {
   right: 0;
 }
 
+#inspector-sidebar .tab-panel-box {
+  height: 100%;
+}
+
+#ruleview-container .accordion {
+  height: auto;
+}
+
 /* Override `-moz-user-focus:ignore;` from toolkit/content/minimal-xul.css */
 .inspector-tabpanel > * {
   -moz-user-focus: normal;
