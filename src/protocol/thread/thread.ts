@@ -839,14 +839,14 @@ class _ThreadFront {
     return pause == this.currentPause;
   }
 
-  async getMouseTarget(x: number, y: number) {
+  async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
     if (!this.sessionId) {
       return null;
     }
     const pause = this.currentPause;
     await this.ensureAllSources();
     this.ensureCurrentPause();
-    const nodeBounds = await this.currentPause!.getMouseTarget(x, y);
+    const nodeBounds = await this.currentPause!.getMouseTarget(x, y, nodeIds);
     return pause == this.currentPause ? nodeBounds : null;
   }
 

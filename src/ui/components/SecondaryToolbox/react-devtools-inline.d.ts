@@ -23,7 +23,14 @@ declare module "react-devtools-inline/frontend" {
     send(event: string, payload: any): void;
   }
   export interface Bridge {}
-  export interface Store {}
+  export interface Store {
+    _roots: number[];
+    _rootIDToRendererID: Map<number, number>;
+    _idToElement: Map<number, Element>;
+  }
+  export interface Element {
+    children: number[];
+  }
 
   export function createBridge(target: Target, wall: Wall): Bridge;
   export function createStore(

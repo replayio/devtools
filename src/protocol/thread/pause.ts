@@ -456,11 +456,17 @@ export class Pause {
     this.loadMouseTargetsWaiter.resolve();
   }
 
-  async getMouseTarget(x: number, y: number) {
+  async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
     await this.loadMouseTargets();
     for (const { node, rect } of this.mouseTargets!) {
       const [left, top, right, bottom] = rect;
-      if (x >= left && x <= right && y >= top && y <= bottom) {
+      if (
+        (!nodeIds || nodeIds.includes(node)) &&
+        x >= left &&
+        x <= right &&
+        y >= top &&
+        y <= bottom
+      ) {
         return new NodeBoundsFront(this, node, rect);
       }
     }
