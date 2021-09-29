@@ -36,6 +36,7 @@ function PageError(props) {
     isPaused,
     maybeScrollToBottom,
     pausedExecutionPoint,
+    isFirstMessageForPoint,
   } = props;
   const {
     id: messageId,
@@ -86,6 +87,7 @@ function PageError(props) {
     maybeScrollToBottom,
     message,
     pausedExecutionPoint,
+    isFirstMessageForPoint,
   });
 }
 
