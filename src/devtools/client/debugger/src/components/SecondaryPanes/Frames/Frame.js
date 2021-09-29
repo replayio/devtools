@@ -13,7 +13,6 @@ import { formatDisplayName } from "../../../utils/pause/frames";
 import { getFilename, getFileURL } from "../../../utils/source";
 import FrameMenu from "./FrameMenu";
 import FrameIndent from "./FrameIndent";
-import actions from "../../../actions";
 
 function FrameTitle({ frame, options = {}, l10n }) {
   const displayName = formatDisplayName(frame, options, l10n);
@@ -38,8 +37,9 @@ function FrameLocation({ frame, displayFullUrl = false }) {
   const filename = displayFullUrl ? getFileURL(source, false) : getFilename(source);
 
   return (
-    <span className="location" title={source.url}>
-      <span className="filename">{filename}</span>:<span className="line">{location.line}</span>
+    <span className="location frame-link-source" title={source.url}>
+      <span className="filename">{filename}</span>:
+      <span className="line frame-link-line">{location.line}</span>
     </span>
   );
 }
@@ -104,6 +104,7 @@ export default class FrameComponent extends Component {
       displayFullUrl,
       getFrameTitle,
       disableContextMenu,
+      panel,
     } = this.props;
     const { l10n } = this.context;
 
@@ -142,7 +143,9 @@ export default class FrameComponent extends Component {
           </span>
         )}
         {this.isSelectable && <FrameIndent />}
-        <div className="frame-description">
+        <div
+          className={classNames("frame-description", panel === "webconsole" ? "frame-link" : "")}
+        >
           <FrameTitle frame={frame} options={{ shouldMapDisplayName }} l10n={l10n} />
           {!hideLocation && <span className="clipboard-only"> </span>}
           {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
