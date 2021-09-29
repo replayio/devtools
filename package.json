@@ -64,6 +64,7 @@
     "react-tooltip": "^4.2.21",
     "react-transition-group": "^2.0.1",
     "react-use-intercom": "^1.2.0",
+    "reactjs-popup": "^2.0.5",
     "redux": "^4.0.5",
     "remark-emoji": "^2.1.0",
     "reselect": "^4.0.0",
