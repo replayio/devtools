@@ -1,0 +1,14 @@
+#popup-root .popup-content {
+  background: var(--theme-popup-color);
+  color: var(--theme-popup-background);
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  width: auto;
+  padding: 8px 12px;
+  border: none;
+}
+
+#popup-root .popup-arrow {
+  color: var(--theme-popup-color);
+  filter: none;
+}

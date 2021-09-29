@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import React, { Dispatch, SetStateAction } from "react";
-import ReactTooltip from "react-tooltip";
+import Popup from "reactjs-popup";
+import { PopupProps } from "reactjs-popup/dist/types";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -12,6 +13,16 @@ import escapeHtml from "escape-html";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
 const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
+
+import "reactjs-popup/dist/index.css";
+import "ui/components/reactjs-popup.css";
+
+const popupProps: Omit<PopupProps, "children"> = {
+  on: "hover",
+  position: "right center",
+  mouseEnterDelay: 200,
+  mouseLeaveDelay: 200,
+};
 
 type Input = "condition" | "logValue";
 
@@ -54,15 +65,7 @@ function SummaryRow({
         disabled={!isEditable}
         onClick={handleClick}
       >
-        <span
-          className="expression"
-          data-tip={
-            isEditable
-              ? undefined
-              : "Editing logpoints is available for Developers in the Team plan"
-          }
-          data-for="breakpoint-panel-tooltip"
-        >
+        <span className="expression">
           <span
             className={
               isEditable
@@ -145,16 +148,6 @@ function PanelSummary({
   const { recording } = hooks.useGetRecording(recordingId);
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
-  const reactTooltip = (
-    <ReactTooltip
-      id="breakpoint-panel-tooltip"
-      delayHide={200}
-      delayShow={200}
-      place={"right"}
-      multiline={true}
-      bodyMode
-    />
-  );
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
   const didExceedMaxHitsEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
@@ -202,15 +195,18 @@ function PanelSummary({
   if (isHot) {
     return (
       <div className="summary">
-        <div
-          className="flex items-center overflow-hidden space-x-2"
-          data-tip={`This log is hidden from the console because <br /> it was hit ${prefs.maxHitsDisplayed}+ times`}
-          data-for="breakpoint-panel-tooltip"
+        <Popup
+          trigger={
+            <div className="flex items-center overflow-hidden space-x-2">
+              <MaterialIcon className="text-xl">warning</MaterialIcon>
+              <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
+            </div>
+          }
+          {...popupProps}
         >
-          <MaterialIcon className="text-xl">warning</MaterialIcon>
-          <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
-        </div>
-        {reactTooltip}
+          This log is hidden from the console <br />
+          because it was hit {prefs.maxHitsDisplayed}+ times
+        </Popup>
       </div>
     );
   }
@@ -221,27 +217,30 @@ function PanelSummary({
 
   let tooltipContent: any = {};
 
-  if (!didExceedMaxHitsEditable) {
-    tooltipContent[
-      "data-tip"
-    ] = `This log is not editable because <br /> it was hit ${prefs.maxHitsEditable}+ times`;
-    tooltipContent["data-for"] = "breakpoint-panel-tooltip";
-  }
+  const content = (
+    <div className="options items-center flex-col flex-grow" {...tooltipContent}>
+      {conditionValue ? <Condition {...{ isEditable, handleClick, conditionValue }} /> : null}
+      <Log {...{ isEditable, handleClick, logValue }} hasCondition={!!conditionValue} />
+    </div>
+  );
 
   return (
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
-      <div className="options items-center flex-col flex-grow" {...tooltipContent}>
-        {conditionValue ? <Condition {...{ isEditable, handleClick, conditionValue }} /> : null}
-        <Log {...{ isEditable, handleClick, logValue }} hasCondition={!!conditionValue} />
-      </div>
+      {!didExceedMaxHitsEditable ? (
+        <Popup trigger={content} {...popupProps}>
+          This log is not editable because <br />
+          it was hit {prefs.maxHitsEditable}+ times
+        </Popup>
+      ) : (
+        content
+      )}
       {!isTeamDeveloper ? (
-        <span
-          className="material-icons cursor-default text-gray-400"
-          data-tip="Editing logpoints is available for Developers in the Team plan"
-          data-for="breakpoint-panel-tooltip"
+        <Popup
+          trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}
+          {...popupProps}
         >
-          lock
-        </span>
+          Editing logpoints is available for Developers in the Team plan
+        </Popup>
       ) : null}
       {!isDemo() ? (
         <button
@@ -256,7 +255,6 @@ function PanelSummary({
           <div className="material-icons text-base text-white add-comment-icon">add_comment</div>
         </button>
       ) : null}
-      {reactTooltip}
     </div>
   );
 }
