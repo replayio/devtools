@@ -205,16 +205,18 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
   };
 }
 
-export function setUnexpectedError(error: UnexpectedError): UIThunkAction {
+export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
   return ({ getState, dispatch }) => {
     const state = getState();
 
-    sendTelemetryEvent("DevtoolsUnexpectedError", {
-      ...error,
-      recordingId: getRecordingId(),
-      sessionId: selectors.getSessionId(state),
-      environment: isDevelopment() ? "dev" : "prod",
-    });
+    if (!skipTelemetry) {
+      sendTelemetryEvent("DevtoolsUnexpectedError", {
+        ...error,
+        recordingId: getRecordingId(),
+        sessionId: selectors.getSessionId(state),
+        environment: isDevelopment() ? "dev" : "prod",
+      });
+    }
 
     dispatch({ type: "set_unexpected_error", error });
   };
