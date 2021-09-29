@@ -18,7 +18,7 @@
   margin: 0;
   max-width: 100%;
   flex-wrap: wrap;
-  line-height: 2rem;
+  line-height: 1.5rem;
 }
 
 .frames [role="list"] [role="listitem"] * {
@@ -47,9 +47,9 @@
   color: var(--theme-comment);
 }
 
-.theme-light .frames .location {
+.theme-light .call-stack-pane .frames .location {
   color: var(--theme-comment);
-  padding-right: 20px;
+  padding-right: 10px;
 }
 
 :root.theme-dark .frames .location {
@@ -63,13 +63,13 @@
   padding-left: 10px;
 }
 
-.frames [role="list"] [role="listitem"]:hover,
-.frames [role="list"] [role="listitem"]:focus {
+.call-stack-pane .frames [role="list"] [role="listitem"]:hover,
+.call-stack-pane .frames [role="list"] [role="listitem"]:focus {
   background-color: var(--theme-toolbar-background-alt);
 }
 
-.frames [role="list"] [role="listitem"]:hover .location-async-cause,
-.frames [role="list"] [role="listitem"]:focus .location-async-cause {
+.call-stack-pane .frames [role="list"] [role="listitem"]:hover .location-async-cause,
+.call-stack-pane .frames [role="list"] [role="listitem"]:focus .location-async-cause {
   background-color: var(--theme-body-background);
 }
 
