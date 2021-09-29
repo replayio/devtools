@@ -16,7 +16,7 @@ class ErrorBoundary extends Component<PropsFromRedux & { children: ReactNode }> 
   componentDidCatch(error: any, errorInfo: any) {
     const { setUnexpectedError } = this.props;
     if (error.name === "ChunkLoadError") {
-      setUnexpectedError(ReplayUpdatedError);
+      setUnexpectedError(ReplayUpdatedError, true);
     } else {
       setUnexpectedError({
         message: "Unexpected error",

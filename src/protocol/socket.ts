@@ -164,7 +164,7 @@ function onSocketClose() {
     gSocketOpen = false;
 
     if (!willClose) {
-      dispatch(setUnexpectedError(disconnectedError));
+      dispatch(setUnexpectedError(disconnectedError, true));
     }
   };
 }
@@ -186,7 +186,7 @@ function onSocketError(evt: Event) {
         })
       );
     } else {
-      dispatch(setUnexpectedError(disconnectedError));
+      dispatch(setUnexpectedError(disconnectedError, true));
     }
   };
 }

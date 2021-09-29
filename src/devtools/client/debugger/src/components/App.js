@@ -277,7 +277,7 @@ function DebuggerLoader(props) {
         await waitForEditor();
         setLoadingEditor(false);
       } catch {
-        props.setUnexpectedError(ReplayUpdatedError);
+        props.setUnexpectedError(ReplayUpdatedError, true);
       }
     })();
   }, []);
