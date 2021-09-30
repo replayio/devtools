@@ -783,10 +783,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   return (
     <>
       <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
-      <section
-        className="space-y-6 overflow-y-scroll"
-        style={{ marginRight: -16, paddingRight: 16 }}
-      >
+      <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
         {view === "details" ? (
           <>
             <BillingBanners subscription={data.node.subscription} />
