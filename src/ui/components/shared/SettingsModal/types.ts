@@ -23,6 +23,7 @@ export interface SettingWithComponent<
   title: T;
   component: React.ComponentType<{ settings?: V } & P>;
   icon?: string;
+  noTitle?: boolean;
 }
 
 export type Setting<
