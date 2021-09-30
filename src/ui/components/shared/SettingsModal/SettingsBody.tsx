@@ -38,7 +38,7 @@ export default function SettingsBody<
   if ("component" in selectedSetting) {
     return (
       <SettingsBodyWrapper>
-        <SettingsHeader>{title}</SettingsHeader>
+        {selectedSetting.noTitle ? null : <SettingsHeader>{title}</SettingsHeader>}
         <selectedSetting.component settings={values} {...panelProps} />
       </SettingsBodyWrapper>
     );

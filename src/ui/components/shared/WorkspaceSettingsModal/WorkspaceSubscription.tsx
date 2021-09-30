@@ -5,90 +5,96 @@ import { loadStripe } from "@stripe/stripe-js";
 
 import { Redacted } from "ui/components/Redacted";
 import hooks from "ui/hooks";
-import { PaymentMethod } from "ui/types";
+import { PaymentMethod, Subscription } from "ui/types";
 import { isDevelopment } from "ui/utils/environment";
+import { getFeatureFlag } from "ui/utils/launchdarkly";
 
 import MaterialIcon from "../MaterialIcon";
 import { Button } from "../Button";
+import { SettingsHeader } from "../SettingsModal/SettingsBody";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
 // usage of the live key.
 const stripePromise = loadStripe(
-  process.env.RECORD_REPLAY_STRIPE_LIVE || !isDevelopment()
+  true || !isDevelopment()
     ? "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
     : "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
 );
 
-function PlanDetails({
-  title,
-  description,
-  features,
-  seatCount,
-}: {
-  title: string;
-  description?: string;
-  features?: string[];
-  seatCount?: number;
-}) {
+type Views = "details" | "add-payment-method" | "enter-payment-method" | "confirm-payment-method";
+
+function isSubscriptionCancelled(subscription: Subscription) {
+  return subscription.status === "canceled" && subscription.effectiveUntil;
+}
+
+function getViewTitle(view: Views) {
+  switch (view) {
+    case "details":
+      return "Billing";
+    case "add-payment-method":
+    case "enter-payment-method":
+      return "Add Payment Method";
+    case "confirm-payment-method":
+      return "Payment Method Added!";
+  }
+}
+
+function getPlanDisplayText(subscription: Subscription) {
+  const trial = subscription.status === "trialing";
+  let text = "Team Plan";
+
+  switch (subscription.plan.key) {
+    case "beta-v1":
+    case "test-beta-v1":
+      text = "Beta Tester Appreciation Plan";
+      break;
+    case "team-v1":
+    case "test-team-v1":
+      text = "Team Plan";
+      break;
+  }
+
+  return `${text} ${trial ? "(Trial)" : ""}`;
+}
+
+function ExpirationRow({ subscription, label }: { label: string; subscription: Subscription }) {
+  const showTrialExpiration = getFeatureFlag("ui-trial-expiration", false);
+
+  if (subscription.plan.key.includes("beta") || !showTrialExpiration || !subscription.trialEnds) {
+    return null;
+  }
+
   return (
-    <section className="rounded-lg border border-blue-600 overflow-hidden">
-      <header className="bg-blue-200 p-3 border-b border-blue-600 flex flex-row items-center justify-between">
-        <div className="flex flex-row items-center">
-          <MaterialIcon className="mr-3 text-2xl">group</MaterialIcon>
-          <div className="flex flex-col">
-            <h3 className="text-lg font-semibold">{title}</h3>
-            {seatCount ? <div className="text-xs leading-none">{seatCount} paid seats</div> : null}
-          </div>
-        </div>
-        {seatCount ? (
-          <div className="flex flex-col items-end" title={`${seatCount} users * $20/month`}>
-            <div className="font-semibold">${seatCount * 20}</div>
-            <div className="text-xs leading-none">/ month</div>
-          </div>
-        ) : null}
-      </header>
-      <div className="p-3">
-        {description ? <p>{description}</p> : null}
-        {features && features.length > 0 ? (
-          <ul className="pl-6">
-            {features.map((f, i) => (
-              <li key={i} className="list-disc">
-                {f}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-    </section>
+    <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+      <span>{label}</span>
+      <span>{formatDate(subscription.trialEnds, "long")}</span>
+    </div>
   );
 }
 
-function getPlanDetails(key: string, seatCount: number) {
-  if (key === "test-beta-v1" || key === "beta-v1") {
-    return (
-      <PlanDetails
-        title="Beta Plan"
-        description="As a thank you for being a beta user, you have full access for a limited time to Replay including recording, debugging, and collaborating with your team."
-      />
-    );
-  }
-
-  if (key === "test-team-v1" || key === "team-v1") {
-    return (
-      <PlanDetails
-        title="Team Plan"
-        features={[
-          "Unlimited recordings",
-          "Team Library to easily share recordings",
-          "Programmatic recording upload with personal and team API keys",
-        ]}
-        seatCount={seatCount}
-      />
-    );
-  }
-
-  return null;
+function PlanDetails({ subscription }: { subscription: Subscription }) {
+  return (
+    <>
+      <ExpirationRow subscription={subscription} label="Your team's start date" />
+      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <span>Renewal Schedule</span>
+        <span>Monthly</span>
+      </div>
+      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <span>Number of seats</span>
+        <span>{subscription.seatCount}</span>
+      </div>
+      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <span>Cost per seat</span>
+        <span>$20</span>
+      </div>
+      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <span>Monthly charge</span>
+        <span>${20 * subscription.seatCount} per month</span>
+      </div>
+    </>
+  );
 }
 
 function FieldRow({ children, className, ...rest }: React.HTMLProps<HTMLDivElement>) {
@@ -185,7 +191,15 @@ const getValue = (form: HTMLFormElement, field: string) => {
   }
 };
 
-function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspaceId: string }) {
+function AddPaymentMethod({
+  onCancel,
+  onSave,
+  workspaceId,
+}: {
+  onCancel: () => void;
+  onSave: () => void;
+  workspaceId: string;
+}) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
   const stripe = useStripe();
@@ -250,7 +264,7 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
         throw confirm.error;
       }
 
-      onDone();
+      onSave();
     } catch (e) {
       console.error(e);
       setError("Failed to create payment method. Please try again later.");
@@ -272,9 +286,6 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
 
   return (
     <form className="space-y-4" onSubmit={ev => handleSubmit(ev)}>
-      <h3 className="flex flex-row items-center space-x-4">
-        <span className="flex-auto text-lg font-bold">New Payment Method</span>
-      </h3>
       <FieldRow>
         <CardElement className="col-span-3" options={{ hidePostalCode: true }} />
       </FieldRow>
@@ -540,7 +551,7 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
           size="sm"
           color="blue"
           style="secondary"
-          onClick={onDone}
+          onClick={onCancel}
           className={saving ? "opacity-60" : undefined}
         >
           Cancel
@@ -559,54 +570,159 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
   );
 }
 
-function BillingDetails({
-  onAddMethod,
-  paymentMethods,
-  workspaceId,
-}: {
-  onAddMethod: () => void;
-  paymentMethods: PaymentMethod[];
-  workspaceId: string;
-}) {
-  const [adding, setAdding] = useState(false);
-  const handleDone = () => {
-    onAddMethod();
-    setAdding(false);
-  };
+function formatDate(date: string, format: "relative" | "long" = "relative") {
+  if ("RelativeTimeFormat" in Intl && format === "relative") {
+    /* @ts-ignore */
+    const rtf = new Intl.RelativeTimeFormat("en", {
+      localeMatcher: "best fit",
+      numeric: "auto",
+      style: "long",
+    });
 
+    const ends = Math.ceil((new Date(date).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+    return rtf.format(ends, "day");
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(new Date(new Date(date)));
+}
+
+function Banner({
+  children,
+  icon,
+  type,
+}: {
+  children: React.ReactNode;
+  icon: React.ReactNode;
+  type: "warning" | "primary";
+}) {
   return (
-    <Elements stripe={stripePromise}>
-      {adding ? (
-        <AddPaymentMethod onDone={handleDone} workspaceId={workspaceId} />
-      ) : (
-        <section className="space-y-4">
-          <h3 className="flex flex-row border-b py-2 items-center">
-            <span className="flex-auto text-lg font-bold">Payment Method</span>
-            {paymentMethods.length === 0 ? (
-              <Button size="sm" color="blue" style="primary" onClick={() => setAdding(true)}>
-                + Add
-              </Button>
-            ) : null}
-          </h3>
-          {paymentMethods.length === 0 ? (
-            <p>A payment method has not been added to this workspace.</p>
-          ) : (
-            paymentMethods.map(pm => (
-              <Redacted className="flex flex-row items-center" key={pm.id}>
-                <div>
-                  {cardToDisplayType(pm.card.brand)} ending with {pm.card.last4}
-                </div>
-              </Redacted>
-            ))
-          )}
-        </section>
-      )}
-    </Elements>
+    <div
+      className={classNames("rounded-md flex flex-row items-center p-3 space-x-3", {
+        "bg-primaryAccent text-white": type === "primary",
+        "bg-yellow-300 text-black": type === "warning",
+      })}
+    >
+      {icon}
+      <span className="flex-grow">{children}</span>
+    </div>
   );
 }
 
-export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
-  const { data, loading, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
+function BillingBanners({ subscription }: { subscription: Subscription }) {
+  if (subscription.plan.key === "beta-v1") {
+    return (
+      <Banner icon={<span className="text-3xl">😍</span>} type="primary">
+        We’ve gifted you a team plan for being a beta tester. Thank you!
+      </Banner>
+    );
+  }
+
+  if (isSubscriptionCancelled(subscription)) {
+    return (
+      <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
+        Subscription ends {formatDate(subscription.effectiveUntil!)}
+      </Banner>
+    );
+  }
+
+  const showTrialExpiration = getFeatureFlag("ui-trial-expiration", false);
+  if (subscription.status === "trialing" && showTrialExpiration) {
+    return (
+      <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
+        Trial ends {formatDate(subscription.trialEnds!)}
+      </Banner>
+    );
+  }
+
+  return null;
+}
+
+function SubscriptionDetails({
+  subscription,
+  onAddPaymentMethod,
+}: {
+  subscription: Subscription;
+  onAddPaymentMethod: () => void;
+}) {
+  return (
+    <section>
+      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <span>Current Plan</span>
+        <span>{getPlanDisplayText(subscription)}</span>
+      </div>
+      <ExpirationRow subscription={subscription} label="Expiration" />
+      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <span>Number of seats</span>
+        <span>{subscription.seatCount}</span>
+      </div>
+      {isSubscriptionCancelled(subscription) ? null : (
+        <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+          <span>Payment Method</span>
+          <span>
+            {subscription.paymentMethods.length > 0 ? (
+              `${cardToDisplayType(subscription.paymentMethods[0].card.brand)} ending with ${
+                subscription.paymentMethods[0].card.last4
+              }`
+            ) : (
+              <button className="text-primaryAccent hover:underline" onClick={onAddPaymentMethod}>
+                Add Payment Method
+              </button>
+            )}
+          </span>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ConsentForm({
+  subscription,
+  onEnterCard,
+}: {
+  subscription: Subscription;
+  onEnterCard: () => void;
+}) {
+  return (
+    <section>
+      <PlanDetails subscription={subscription} />
+      <button
+        className="bg-primaryAccent text-white w-full px-6 py-3 my-6 rounded-md"
+        onClick={onEnterCard}
+      >
+        Add Credit Card
+      </button>
+      <a
+        href="https://www.replay.io/terms-of-use"
+        target="_blank"
+        rel="noreferrer"
+        className="underline"
+      >
+        Terms of service and cancellation policy
+      </a>
+    </section>
+  );
+}
+
+function Confirmation({ subscription }: { subscription: Subscription }) {
+  return (
+    <section>
+      {/* <div className="h-36 mb-6 rounded-lg bg-blue-100" /> */}
+      <PlanDetails subscription={subscription} />
+    </section>
+  );
+}
+
+function CancelSubscription({
+  subscription,
+  workspaceId,
+}: {
+  subscription: Subscription;
+  workspaceId: string;
+}) {
   const {
     cancelWorkspaceSubscription,
     loading: cancelLoading,
@@ -622,6 +738,38 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     });
   };
 
+  if (subscription.status !== "active" && subscription.status !== "trialing") {
+    return null;
+  }
+
+  return (
+    <section className="space-y-4">
+      <h3 className="border-b py-2 text-lg font-bold">Danger Zone</h3>
+      <div className="border border-red-300 flex flex-row items-center justify-between rounded-lg p-3 space-x-3">
+        <div className="flex flex-col">
+          <div className="font-semibold">Cancel Subscription</div>
+          <div className="">
+            Cancellation will take effect at the end of the current billing period.
+          </div>
+        </div>
+        <button
+          onClick={handleCancelSubscription}
+          className={classNames(
+            "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
+            { "opacity-60": cancelLoading }
+          )}
+        >
+          Cancel Subscription
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
+  const [view, setView] = useState<Views>("details");
+  const { data, loading } = hooks.useGetWorkspaceSubscription(workspaceId);
+
   if (loading) return null;
 
   if (!data?.node.subscription) {
@@ -633,62 +781,38 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   }
 
   return (
-    <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
-      {data.node.subscription.status === "trialing" ? (
-        <div className="p-3 bg-yellow-100 rounded-lg border border-yellow-600 flex flex-row items-center">
-          <MaterialIcon className="mr-3">access_time</MaterialIcon>
-          Trial ends&nbsp;
-          <strong>
-            {new Intl.DateTimeFormat("en", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-            }).format(new Date(data.node.subscription.trialEnds!))}
-          </strong>
-        </div>
-      ) : null}
-      {data.node.subscription.status === "canceled" && data.node.subscription.effectiveUntil ? (
-        <div className="p-4 bg-yellow-100 rounded-lg border border-yellow-600 flex flex-row items-center">
-          <MaterialIcon className="mr-4">access_time</MaterialIcon>
-          Subscription ends&nbsp;
-          <strong>
-            {new Intl.DateTimeFormat("en", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-            }).format(new Date(data.node.subscription.effectiveUntil))}
-          </strong>
-        </div>
-      ) : null}
-      {getPlanDetails(data.node.subscription.plan.key, data.node.subscription.seatCount)}
-      <BillingDetails
-        paymentMethods={data.node.subscription.paymentMethods}
-        workspaceId={workspaceId}
-        onAddMethod={refetch}
-      />
-      {data.node.subscription.status === "active" ||
-      data.node.subscription.status === "trialing" ? (
-        <section className="space-y-4">
-          <h3 className="border-b py-2 text-lg font-bold">Danger Zone</h3>
-          <div className="border border-red-300 flex flex-row items-center justify-between rounded-lg p-3 space-x-3">
-            <div className="flex flex-col">
-              <div className="font-semibold">Cancel Subscription</div>
-              <div className="">
-                Cancellation will take effect at the end of the current billing period.
-              </div>
-            </div>
-            <button
-              onClick={handleCancelSubscription}
-              className={classNames(
-                "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
-                { "opacity-60": cancelLoading }
-              )}
-            >
-              Cancel Subscription
-            </button>
-          </div>
-        </section>
-      ) : null}
-    </section>
+    <>
+      <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
+      <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
+        {view === "details" ? (
+          <>
+            <BillingBanners subscription={data.node.subscription} />
+            <SubscriptionDetails
+              subscription={data.node.subscription}
+              onAddPaymentMethod={() => setView("add-payment-method")}
+            />
+            <CancelSubscription subscription={data.node.subscription} workspaceId={workspaceId} />
+          </>
+        ) : null}
+        {view === "add-payment-method" ? (
+          <ConsentForm
+            subscription={data.node.subscription}
+            onEnterCard={() => setView("enter-payment-method")}
+          />
+        ) : null}
+        {view === "enter-payment-method" ? (
+          <Elements stripe={stripePromise}>
+            <AddPaymentMethod
+              onCancel={() => setView("details")}
+              onSave={() => setView("confirm-payment-method")}
+              workspaceId={workspaceId}
+            />
+          </Elements>
+        ) : null}
+        {view === "confirm-payment-method" ? (
+          <Confirmation subscription={data.node.subscription} />
+        ) : null}
+      </section>
+    </>
   );
 }

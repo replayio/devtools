@@ -142,6 +142,7 @@ const settings: Settings<
     title: "Billing",
     icon: "payment",
     component: WorkspaceSubscription,
+    noTitle: true,
   },
   {
     title: "API Keys",
