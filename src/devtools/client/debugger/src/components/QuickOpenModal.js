@@ -9,6 +9,7 @@ import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
 import throttle from "lodash/throttle";
 import { createSelector } from "reselect";
+import { ThreadFront } from "protocol/thread";
 import actions from "../actions";
 import {
   getSourceList,
@@ -107,6 +108,10 @@ export class QuickOpenModal extends Component {
     return index !== -1 ? query.slice(0, index) : query;
   };
 
+  selectPreferredSources = memoizeLast(sourceList =>
+    sourceList.filter(source => ThreadFront.isPreferredSource(source.id))
+  );
+
   formatSources = memoizeLast((sourceList, tabs) => {
     const tabUrls = new Set(tabs.map(tab => tab.url));
     return formatSources(sourceList, tabUrls);
@@ -115,7 +120,7 @@ export class QuickOpenModal extends Component {
   searchSources = query => {
     const { sourceList, tabs } = this.props;
 
-    const sources = this.formatSources(sourceList, tabs);
+    const sources = this.formatSources(this.selectPreferredSources(sourceList), tabs);
     const results = query == "" ? sources : filter(sources, this.dropGoto(query));
     return this.setResults(results);
   };
