@@ -341,9 +341,6 @@ class Timeline extends Component<PropsFromRedux> {
             {this.isHovering() && percent >= 0 && percent <= 100 ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
-            {viewMode == "dev" && selectedPanel == "console"
-              ? this.renderMessages()
-              : this.renderEvents()}
             {this.renderPreviewMarkers()}
             <Comments />
           </div>
