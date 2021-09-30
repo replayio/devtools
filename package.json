@@ -29,6 +29,7 @@
     "@stripe/stripe-js": "^1.17.1",
     "@tailwindcss/forms": "^0.3.2",
     "apollo-link-http": "^1.5.17",
+    "babel-plugin-add-react-displayname": "0.0.5",
     "base64-arraybuffer": "^0.2.0",
     "bufferutil": "^4.0.3",
     "classnames": "^2.2.6",
