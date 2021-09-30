@@ -191,7 +191,15 @@ const getValue = (form: HTMLFormElement, field: string) => {
   }
 };
 
-function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspaceId: string }) {
+function AddPaymentMethod({
+  onCancel,
+  onSave,
+  workspaceId,
+}: {
+  onCancel: () => void;
+  onSave: () => void;
+  workspaceId: string;
+}) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
   const stripe = useStripe();
@@ -256,7 +264,7 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
         throw confirm.error;
       }
 
-      onDone();
+      onSave();
     } catch (e) {
       console.error(e);
       setError("Failed to create payment method. Please try again later.");
@@ -543,7 +551,7 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
           size="sm"
           color="blue"
           style="secondary"
-          onClick={onDone}
+          onClick={onCancel}
           className={saving ? "opacity-60" : undefined}
         >
           Cancel
@@ -559,28 +567,6 @@ function AddPaymentMethod({ onDone, workspaceId }: { onDone: () => void; workspa
         </Button>
       </div>
     </form>
-  );
-}
-
-function BillingDetails({
-  onAddMethod,
-  paymentMethods,
-  workspaceId,
-}: {
-  onAddMethod: () => void;
-  paymentMethods: PaymentMethod[];
-  workspaceId: string;
-}) {
-  const [adding, setAdding] = useState(false);
-  const handleDone = () => {
-    onAddMethod();
-    setAdding(false);
-  };
-
-  return (
-    <Elements stripe={stripePromise}>
-      <AddPaymentMethod onDone={handleDone} workspaceId={workspaceId} />
-    </Elements>
   );
 }
 
@@ -638,7 +624,7 @@ function BillingBanners({ subscription }: { subscription: Subscription }) {
   if (isSubscriptionCancelled(subscription)) {
     return (
       <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
-        Subscription ends {formatDate(subscription.effectiveUntil)}
+        Subscription ends {formatDate(subscription.effectiveUntil!)}
       </Banner>
     );
   }
@@ -820,7 +806,8 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         {view === "enter-payment-method" ? (
           <Elements stripe={stripePromise}>
             <AddPaymentMethod
-              onDone={() => setView("confirm-payment-method")}
+              onCancel={() => setView("details")}
+              onSave={() => setView("confirm-payment-method")}
               workspaceId={workspaceId}
             />
           </Elements>
