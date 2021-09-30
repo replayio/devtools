@@ -24,6 +24,10 @@ const stripePromise = loadStripe(
 
 type Views = "details" | "add-payment-method" | "enter-payment-method" | "confirm-payment-method";
 
+function isSubscriptionCancelled(subscription: Subscription) {
+  return subscription.status === "canceled" && subscription.effectiveUntil;
+}
+
 function getViewTitle(view: Views) {
   switch (view) {
     case "details":
@@ -631,7 +635,7 @@ function BillingBanners({ subscription }: { subscription: Subscription }) {
     );
   }
 
-  if (subscription.status === "canceled" && subscription.effectiveUntil) {
+  if (isSubscriptionCancelled(subscription)) {
     return (
       <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
         Subscription ends {formatDate(subscription.effectiveUntil)}
@@ -669,20 +673,22 @@ function SubscriptionDetails({
         <span>Number of seats</span>
         <span>{subscription.seatCount}</span>
       </div>
-      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
-        <span>Payment Method</span>
-        <span>
-          {subscription.paymentMethods.length > 0 ? (
-            `${cardToDisplayType(subscription.paymentMethods[0].card.brand)} ending with ${
-              subscription.paymentMethods[0].card.last4
-            }`
-          ) : (
-            <button className="text-primaryAccent hover:underline" onClick={onAddPaymentMethod}>
-              Add Payment Method
-            </button>
-          )}
-        </span>
-      </div>
+      {isSubscriptionCancelled(subscription) ? null : (
+        <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+          <span>Payment Method</span>
+          <span>
+            {subscription.paymentMethods.length > 0 ? (
+              `${cardToDisplayType(subscription.paymentMethods[0].card.brand)} ending with ${
+                subscription.paymentMethods[0].card.last4
+              }`
+            ) : (
+              <button className="text-primaryAccent hover:underline" onClick={onAddPaymentMethod}>
+                Add Payment Method
+              </button>
+            )}
+          </span>
+        </div>
+      )}
     </section>
   );
 }
