@@ -63,7 +63,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
     const pausedAtComment = currentTime == time;
 
     return (
-      <button
+      <div
         className={classnames("img comment-marker", {
           paused: pausedAtComment,
           "primary-highlight": isPrimaryHighlighted,
