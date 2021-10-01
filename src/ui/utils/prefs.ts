@@ -94,4 +94,5 @@ export const features = new PrefsHelper("devtools.features", {
 
 export const asyncStore = asyncStoreHelper("devtools", {
   eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
+  replaySessions: ["replay-sessions", {}],
 });
