@@ -25,6 +25,7 @@ import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { isRepaintEnabled } from "protocol/enable-repaint";
+import { clearPendingComment } from "./comments";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -314,6 +315,8 @@ export function startPlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
     log(`StartPlayback`);
 
+    dispatch(clearPendingComment());
+
     const state = getState();
     const currentTime = getCurrentTime(state);
     const { endTime } = getZoomRegion(state);
@@ -335,6 +338,8 @@ export function startPlayback(): UIThunkAction {
 export function stopPlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
     log(`StopPlayback`);
+
+    dispatch(clearPendingComment());
 
     const playback = getPlayback(getState());
 

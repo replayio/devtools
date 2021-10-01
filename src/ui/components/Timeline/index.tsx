@@ -152,20 +152,17 @@ class Timeline extends Component<PropsFromRedux> {
       startPlayback,
       stopPlayback,
       replayPlayback,
-      clearPendingComment,
       videoUrl,
     } = this.props;
     const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
       if (disabled) return;
 
-      clearPendingComment();
       replayPlayback();
     };
     const togglePlayback = () => {
       if (disabled) return;
 
-      clearPendingComment();
       if (playback) {
         stopPlayback();
       } else {
