@@ -45,14 +45,15 @@
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
 
-  --primary-accent: #007aff;
+  --primary-accent-text: #007aff;
+  --primary-accent: #01acfd;
   --primary-accent-hover: #0067d7;
   --primary-accent-light: #85bfff;
 
   --secondary-accent: #8330f4;
   --secondary-accent-stroke: #f9f5ff;
 
-  --that-dark-color: #1F2937;
+  --that-dark-color: #1f2937;
 
   --text-field-border: var(--cool-gray-300);
 
@@ -187,7 +188,7 @@
 
   /* Text color */
   --theme-comment: var(--grey-50);
-  --theme-body-color: var(--grey-70);
+  --theme-body-color: #38383d;
   --theme-text-color-alt: var(--grey-50);
   --theme-text-color-inactive: var(--grey-40);
   --theme-text-color-strong: var(--grey-90);
