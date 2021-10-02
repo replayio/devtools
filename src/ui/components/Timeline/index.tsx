@@ -39,7 +39,7 @@ import { prefs, features } from "ui/utils/prefs";
 function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
     <button onClick={onClick} disabled={disabled}>
-      <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
+      <div className="flex flex-row" style={{ width: "32px", height: "32px", color: "red" }}>
         <img className="w-6 h-6 m-auto" src="/images/playback-refresh.svg" />
       </div>
     </button>

@@ -419,7 +419,7 @@ html #webconsole-notificationbox {
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
-  height: var(--editor-footer-height)
+  height: var(--editor-footer-height);
 }
 
 /* CodeMirror-powered JsTerm */
@@ -1056,12 +1056,12 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-output .overlay-container.debug:hover .button,
 .webconsole-output .overlay-container.debug:hover .info {
-  background: linear-gradient(180deg, #7F6BFF 0%, var(--paused-background-color) 100%);
+  background: linear-gradient(180deg, #7f6bff 0%, var(--paused-background-color) 100%);
 }
 
 .webconsole-output .overlay-container:not(.debug):hover .button,
 .webconsole-output .overlay-container:not(.debug):hover .info {
-  background: linear-gradient(180deg, #3E7AF0 0%, #1F62E4 100%);
+  background: linear-gradient(180deg, #3e7af0 0%, #1f62e4 100%);
 }
 
 .webconsole-output .overlay-container:hover .info {

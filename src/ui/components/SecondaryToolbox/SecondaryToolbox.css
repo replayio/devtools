@@ -67,7 +67,6 @@ the border added is duplicated. */
 .secondary-toolbox-header button:hover,
 .secondary-toolbox-header button.expanded {
   background: inherit;
-  color: green;
 }
 
 .secondary-toolbox-header .action-buttons button {
