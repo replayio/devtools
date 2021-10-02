@@ -7,14 +7,11 @@
 }
 
 .dropdown-wrapper button.secondary {
-  color: var(--primary-accent);
-  border: 1px solid var(--primary-accent);
   padding: 5px 10px 5px 5px;
   background: none;
 }
 
 .dropdown-wrapper button.secondary .img {
-  background: var(--primary-accent);
 }
 
 .dropdown-wrapper button .img:not(:last-child) {

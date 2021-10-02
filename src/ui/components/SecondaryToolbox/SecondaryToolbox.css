@@ -56,10 +56,19 @@ the border added is duplicated. */
   background-color: inherit;
 }
 
+.secondary-toolbox-header .label {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.secondary-toolbox-header .expanded .label {
+  color: var(--theme-body-color);
+  font-weight: bold;
+}
+
 .secondary-toolbox-header button:hover,
 .secondary-toolbox-header button.expanded {
   background: inherit;
-  color: var(--theme-toolbar-selected-color);
+  color: var(--theme-body-color);
 }
 
 .secondary-toolbox-header .action-buttons button {
