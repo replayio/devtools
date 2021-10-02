@@ -144,10 +144,14 @@
   --theme-body-background: white;
   --theme-sidebar-background: white;
 
+  /* Jon's new tab work */
+  --tab-selected-color: var(--theme-body-color);
+  --tab-standard-color: #9c9c9e;
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
   --theme-toolbar-background: var(--grey-10);
-  --theme-toolbar-selected-color: var(--primary-accent);
+  --theme-toolbar-selected-color: var(--tab-selected-color);
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
   --theme-toolbar-background-alt: #f5f5f5;

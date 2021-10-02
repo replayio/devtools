@@ -57,18 +57,17 @@ the border added is duplicated. */
 }
 
 .secondary-toolbox-header .label {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--tab-standard-color);
 }
 
 .secondary-toolbox-header .expanded .label {
-  color: var(--theme-body-color);
-  font-weight: bold;
+  color: var(--tab-selected-color);
 }
 
 .secondary-toolbox-header button:hover,
 .secondary-toolbox-header button.expanded {
   background: inherit;
-  color: var(--theme-body-color);
+  color: green;
 }
 
 .secondary-toolbox-header .action-buttons button {

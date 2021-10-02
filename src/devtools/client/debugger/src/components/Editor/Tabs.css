@@ -61,9 +61,21 @@
   transform: scaleX(0);
 }
 
+.source-tab .filename {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-inline-end: 4px;
+}
+
+.source-tab {
+  color: var(--tab-standard-color);
+}
+
 .source-tab.active {
-  --tab-line-color: var(--theme-body-color);
-  color: var(--primary-accent);
+  --tab-line-color: var(--tab-selected-color);
+  color: var(--tab-selected-color);
   border-bottom-color: transparent;
   background-color: white;
 }
@@ -83,15 +95,6 @@
 .source-tab .img.blackBox {
   mask-size: 14px;
   background-color: currentColor;
-}
-
-.source-tab .filename {
-  display: block;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding-inline-end: 4px;
-  color: var(--theme-body-color);
 }
 
 .source-tab .filename span {
@@ -120,5 +123,5 @@
 .source-tab .close-btn:hover,
 .source-tab .close-btn:focus {
   color: var(--theme-selection-color);
-  background-color: var(--primary-accent);
+  background-color: var(--tab-standard-color);
 }
