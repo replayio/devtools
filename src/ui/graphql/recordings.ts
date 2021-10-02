@@ -32,6 +32,10 @@ export const GET_RECORDING = gql`
       workspace {
         id
         name
+        subscription {
+          status
+          trialEnds
+        }
       }
       collaborators {
         edges {

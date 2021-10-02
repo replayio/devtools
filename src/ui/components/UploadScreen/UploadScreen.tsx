@@ -10,6 +10,7 @@ import { LoadingScreen } from "../shared/BlankScreen";
 import MaterialIcon from "../shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
+import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
@@ -335,6 +336,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
             {showLimitWarning ? <SoftLimitWarning /> : null}
             <Actions onDiscard={onDiscard} status={status} />
           </form>
+          <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         </div>
       </Modal>
     </div>
