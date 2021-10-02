@@ -66,19 +66,21 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
   const { addNewCollaborator } = hooks.useAddNewCollaborator(
     function onCompleted() {
       setStatus("completed");
-      setTimeout(() => {
-        setStatus("pending");
-        setShowAutocomplete(false);
-      }, 2000);
+      delayedReset();
     },
     function onError() {
       setStatus("error");
-      setTimeout(() => {
-        setStatus("pending");
-        setShowAutocomplete(false);
-      }, 2000);
+      delayedReset();
     }
   );
+
+  const delayedReset = () => {
+    setTimeout(() => {
+      setStatus("pending");
+      setShowAutocomplete(false);
+      setInputValue("");
+    }, 2000);
+  };
 
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
