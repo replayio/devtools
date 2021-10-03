@@ -123,7 +123,10 @@ function _LoadingScreen({ uploading, awaitingSourcemaps, progress, finished }: P
   if (awaitingSourcemaps) {
     return <BlankLoadingScreen statusMessage={"Uploading sourcemaps"} />;
   } else if (uploading) {
-    return <BlankLoadingScreen statusMessage={"Uploading replay"} />;
+    const statusMessage = uploading?.amount
+      ? `Uploading ${uploading?.amount} of ${uploading?.total}`
+      : `Uploading ${uploading?.total || ""}`;
+    return <BlankLoadingScreen statusMessage={statusMessage} />;
   }
 
   return <BlankProgressScreen progress={progress} />;
