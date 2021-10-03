@@ -28,51 +28,13 @@ import "./Frames.css";
 const NUM_FRAMES_SHOWN = 7;
 
 class Frames extends Component {
-  renderFrames;
-  toggleFramesDisplay;
-  truncateFrames;
-  copyStackTrace;
-  toggleFrameworkGrouping;
-  renderToggleButton;
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showAllFrames: !!props.disableFrameTruncate,
-    };
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     const { frames, selectedFrame, frameworkGroupingOn } = this.props;
-    const { showAllFrames } = this.state;
     return (
       frames !== nextProps.frames ||
       selectedFrame !== nextProps.selectedFrame ||
-      showAllFrames !== nextState.showAllFrames ||
       frameworkGroupingOn !== nextProps.frameworkGroupingOn
     );
-  }
-
-  toggleFramesDisplay = () => {
-    this.setState(prevState => ({
-      showAllFrames: !prevState.showAllFrames,
-    }));
-  };
-
-  collapseFrames(frames) {
-    const { frameworkGroupingOn } = this.props;
-    if (!frameworkGroupingOn) {
-      return frames;
-    }
-
-    return collapseFrames(frames);
-  }
-
-  truncateFrames(frames) {
-    const numFramesToShow = this.state.showAllFrames ? frames.length : NUM_FRAMES_SHOWN;
-
-    return frames.slice(0, numFramesToShow);
   }
 
   copyStackTrace = () => {
@@ -86,6 +48,15 @@ class Frames extends Component {
     const { toggleFrameworkGrouping, frameworkGroupingOn } = this.props;
     toggleFrameworkGrouping(!frameworkGroupingOn);
   };
+
+  collapseFrames(frames) {
+    const { frameworkGroupingOn } = this.props;
+    if (!frameworkGroupingOn) {
+      return frames;
+    }
+
+    return collapseFrames(frames);
+  }
 
   renderFrames(frames) {
     const {
@@ -101,7 +72,7 @@ class Frames extends Component {
       panel,
     } = this.props;
 
-    const framesOrGroups = this.truncateFrames(this.collapseFrames(frames));
+    const framesOrGroups = this.collapseFrames(frames);
 
     // We're not using a <ul> because it adds new lines before and after when
     // the user copies the trace. Needed for the console which has several
@@ -149,26 +120,8 @@ class Frames extends Component {
     );
   }
 
-  renderToggleButton(frames) {
-    const { l10n } = this.context;
-    const buttonMessage = this.state.showAllFrames ? "Collapse rows" : "Expand rows";
-
-    frames = this.collapseFrames(frames);
-    if (frames.length <= NUM_FRAMES_SHOWN) {
-      return null;
-    }
-
-    return (
-      <div className="show-more-container">
-        <button className="show-more" onClick={this.toggleFramesDisplay}>
-          {buttonMessage}
-        </button>
-      </div>
-    );
-  }
-
   render() {
-    const { frames, framesLoading, disableFrameTruncate } = this.props;
+    const { frames, framesLoading } = this.props;
 
     if (!frames) {
       return (
@@ -180,12 +133,7 @@ class Frames extends Component {
       );
     }
 
-    return (
-      <div className="pane frames">
-        {this.renderFrames(frames || [])}
-        {disableFrameTruncate ? null : this.renderToggleButton(frames || [])}
-      </div>
-    );
+    return <div className="pane frames">{this.renderFrames(frames || [])}</div>;
   }
 }
 
