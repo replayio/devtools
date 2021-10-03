@@ -4,7 +4,6 @@ import "./ReplayInvitations.css";
 import { TextInput } from "ui/components/shared/Forms";
 import { validateEmail } from "ui/utils/helpers";
 import { Invitation } from "ui/hooks/invitations";
-import { Redacted } from "ui/components/Redacted";
 
 const USE_AVAILABLE_INVITATIONS = false;
 
@@ -106,7 +105,7 @@ export default function ReplayInvitations() {
                 <div className={`material-icons ${invite.pending || "finished"}`}>
                   {invite.pending ? "pending" : "check_circle"}
                 </div>
-                <Redacted>{invite.invitedEmail}</Redacted>
+                <div>{invite.invitedEmail}</div>
               </div>
             ))}
         </div>

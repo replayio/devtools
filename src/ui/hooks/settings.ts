@@ -5,7 +5,7 @@ import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { UserSettings, Workspace, WorkspaceUserRole } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
-import { features } from "ui/utils/prefs";
+import { prefs } from "ui/utils/prefs";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
@@ -15,7 +15,7 @@ const emptySettings: UserSettings = {
   enableRepaint: false,
   enableGlobalSearch: false,
   defaultWorkspaceId: null,
-  enableLogRocket: false,
+  disableLogRocket: false,
 };
 
 const testSettings: UserSettings = {
@@ -26,7 +26,7 @@ const testSettings: UserSettings = {
   enableRepaint: false,
   enableGlobalSearch: false,
   defaultWorkspaceId: null,
-  enableLogRocket: false,
+  disableLogRocket: false,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
@@ -77,8 +77,7 @@ function convertUserSettings(data: any): UserSettings {
     enableRepaint: settings.enableRepaint,
     enableGlobalSearch: settings.enableGlobalSearch,
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
-    enableLogRocket:
-      "enableLogRocket" in settings ? settings.enableLogRocket : features.enableLogRocket,
+    disableLogRocket: !!prefs.disableLogRocket,
   };
 }
 

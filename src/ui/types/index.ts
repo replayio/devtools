@@ -13,7 +13,7 @@ export type UserSettings = {
   enableRepaint: boolean;
   enableGlobalSearch: boolean;
   defaultWorkspaceId: null | string;
-  enableLogRocket: boolean;
+  disableLogRocket: boolean;
 };
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";

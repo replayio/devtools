@@ -104,40 +104,38 @@ export default function RecordingRow({
         ) : null}
       </div>
       <div className="py-3 px-1 overflow-hidden whitespace-pre overflow-ellipsis flex-grow">
-        <Redacted>
-          <div className="flex flex-row items-center space-x-4 overflow-hidden">
-            <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0 overflow-hidden">
-              <LazyLoad height={36} scrollContainer=".recording-list" once>
-                <ItemScreenshot recordingId={recording.id} />
-              </LazyLoad>
-            </div>
+        <div className="flex flex-row items-center space-x-4 overflow-hidden">
+          <div className="bg-gray-100 rounded-sm w-16 h-9 flex-shrink-0 overflow-hidden">
+            <LazyLoad height={36} scrollContainer=".recording-list" once>
+              <ItemScreenshot recordingId={recording.id} />
+            </LazyLoad>
+          </div>
 
-            <div className="flex flex-col overflow-hidden space-y-0.5">
-              <div className="overflow-hidden overflow-ellipsis whitespace-pre">
-                {recording.title || <span className="italic">Untitled</span>}
+          <div className="flex flex-col overflow-hidden space-y-0.5">
+            <div className="overflow-hidden overflow-ellipsis whitespace-pre">
+              {recording.title || <span className="italic">Untitled</span>}
+            </div>
+            <div className="flex flex-row space-x-4 text-gray-400 font-light">
+              <div
+                className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
+                style={{ minWidth: "5rem" }}
+              >
+                <img src="/images/timer.svg" className="w-3" />
+                <span>{getDurationString(recording.duration)}</span>
               </div>
-              <div className="flex flex-row space-x-4 text-gray-400 font-light">
-                <div
-                  className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
-                  style={{ minWidth: "5rem" }}
-                >
-                  <img src="/images/timer.svg" className="w-3" />
-                  <span>{getDurationString(recording.duration)}</span>
-                </div>
-                <div
-                  className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
-                  style={{ minWidth: "6rem" }}
-                >
-                  <img src="/images/today.svg" className="w-3" />
-                  <span>{getRelativeDate(recording.date)}</span>
-                </div>
-                <div className="text-gray-400 font-light overflow-hidden overflow-ellipsis whitespace-pre">
-                  {getDisplayedUrl(recording.url)}
-                </div>
+              <div
+                className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"
+                style={{ minWidth: "6rem" }}
+              >
+                <img src="/images/today.svg" className="w-3" />
+                <span>{getRelativeDate(recording.date)}</span>
+              </div>
+              <div className="text-gray-400 font-light overflow-hidden overflow-ellipsis whitespace-pre">
+                {getDisplayedUrl(recording.url)}
               </div>
             </div>
           </div>
-        </Redacted>
+        </div>
       </div>
 
       <div className="py-3 px-3 text-right overflow-hidden whitespace-nowrap overflow-ellipsis min-w-min w-20 flex-shrink-0 my-auto">

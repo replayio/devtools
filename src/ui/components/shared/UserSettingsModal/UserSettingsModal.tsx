@@ -17,9 +17,9 @@ import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 
 import ReplayInvitations from "./ReplayInvitations";
-import { UserInfo } from "ui/hooks/users";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
+import { prefs } from "ui/utils/prefs";
 
 function Support() {
   return (
@@ -51,7 +51,13 @@ function Support() {
 
 function Personal() {
   const { logout, user } = useAuth0();
+  const [disableLogRocket, setDisableLogRocket] = useState(prefs.disableLogRocket);
   const { name, picture, email } = user!;
+
+  const toggleDisableLogRocket = () => {
+    prefs.disableLogRocket = !prefs.disableLogRocket;
+    setDisableLogRocket(prefs.disableLogRocket);
+  };
 
   return (
     <div className="space-y-12">
@@ -61,6 +67,19 @@ function Personal() {
           <div className="text-base">{name}</div>
           <div className="text-gray-500">{email}</div>
         </div>
+      </div>
+      <div className="flex flex-row space-x-3 items-center" data-private>
+        <li className="flex flex-row items-center">
+          <label className="space-y-1.5 pr-36 flex-grow cursor-pointer" htmlFor="disableLogRocket">
+            <div>Disable LogRocket Session Replay</div>
+          </label>
+          <input
+            type="checkbox"
+            id="disableLogRocket"
+            checked={!!disableLogRocket}
+            onChange={toggleDisableLogRocket}
+          />
+        </li>
       </div>
       <div>
         <button

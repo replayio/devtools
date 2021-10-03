@@ -103,8 +103,6 @@ function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
   recordingTarget,
-  showVideoPanel,
-  setShowVideoPanel,
   hasReactComponents,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
@@ -112,7 +110,7 @@ function SecondaryToolbox({
   const isNode = recordingTarget === "node";
 
   return (
-    <Redacted allowOptIn className={classnames(`secondary-toolbox`, { node: isNode })}>
+    <div className={classnames(`secondary-toolbox`, { node: isNode })}>
       {!isDemo() && (
         <header className="secondary-toolbox-header">
           <PanelButtons
@@ -124,12 +122,12 @@ function SecondaryToolbox({
           <ToolboxOptions />
         </header>
       )}
-      <div className="secondary-toolbox-content text-xs">
+      <Redacted className="secondary-toolbox-content text-xs">
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {showReact && selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
-      </div>
-    </Redacted>
+      </Redacted>
+    </div>
   );
 }
 

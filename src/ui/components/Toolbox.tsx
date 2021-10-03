@@ -6,7 +6,7 @@ import { Redacted } from "./Redacted";
 
 export default function Toolbox() {
   return (
-    <Redacted allowOptIn id="toolbox">
+    <Redacted id="toolbox">
       <div className="toolbox-top-panels">
         <div className="toolbox-panel text-xs" id="toolbox-content-debugger">
           <DebuggerApp />

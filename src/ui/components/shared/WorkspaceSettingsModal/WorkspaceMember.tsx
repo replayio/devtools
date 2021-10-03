@@ -5,7 +5,6 @@ import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import { Redacted } from "ui/components/Redacted";
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
 
@@ -152,9 +151,9 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon>mail_outline</MaterialIcon>
       </div>
-      <Redacted className="flex-grow whitespace-pre overflow-hidden overflow-ellipsis">
+      <div className="flex-grow whitespace-pre overflow-hidden overflow-ellipsis">
         {member.email}
-      </Redacted>
+      </div>
       <PortalDropdown
         buttonContent={<Status member={member} />}
         setExpanded={setExpanded}

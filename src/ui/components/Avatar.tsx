@@ -2,7 +2,6 @@ import React from "react";
 import { User } from "ui/types";
 import useAuth0 from "ui/utils/useAuth0";
 import { getAvatarColor } from "ui/utils/user";
-import { Redacted } from "ui/components/Redacted";
 
 // The user image URLs that we get from Google sometimes fail to load, in that case
 // we fall back to a transparent image (instead of showing the browser's icon for broken images)
@@ -12,11 +11,9 @@ export const AvatarImage = (props: React.ImgHTMLAttributes<HTMLImageElement>) =>
 
 export const AuthAvatar = ({ user }: { user: User }) => {
   return (
-    <Redacted>
-      <div className={`avatar authenticated first-player`}>
-        <AvatarImage src={user.picture} />
-      </div>
-    </Redacted>
+    <div className={`avatar authenticated first-player`}>
+      <AvatarImage src={user.picture} />
+    </div>
   );
 };
 

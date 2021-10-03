@@ -6,7 +6,6 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
-import { Redacted } from "../Redacted";
 import { Workspace } from "ui/types";
 
 type TeamButtonProps = PropsFromRedux & {
@@ -47,17 +46,15 @@ function TeamButton({
 
   return (
     <SidebarButton shouldHighlight={isSelected} onClick={handleTeamClick}>
-      <Redacted className="overflow-hidden">
-        <div
-          className={classNames(
-            "overflow-hidden overflow-ellipsis whitespace-pre",
-            currentWorkspaceId == id ? "font-bold" : ""
-          )}
-          title={text}
-        >
-          {`${text}${workspace?.subscription?.status === "trialing" ? " (Trial)" : ""}`}
-        </div>
-      </Redacted>
+      <div
+        className={classNames(
+          "overflow-hidden overflow-ellipsis whitespace-pre",
+          currentWorkspaceId == id ? "font-bold" : ""
+        )}
+        title={text}
+      >
+        {`${text}${workspace?.subscription?.status === "trialing" ? " (Trial)" : ""}`}
+      </div>
       <div className="flex flex-row space-x-1">
         {isNew ? (
           <div className={"text-xs rounded-lg px-3 py-0.5 text-white newbadge"}>New</div>

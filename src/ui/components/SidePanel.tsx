@@ -22,14 +22,13 @@ function SidePanel({ selectedPrimaryPanel, resizable }: SidePanelProps) {
   } else if (selectedPrimaryPanel === "debug") {
     sidepanel = <SecondaryPanes />;
   } else if (selectedPrimaryPanel === "comments") {
-    sidepanel = <Transcript />;
+    return <Transcript />;
   } else if (selectedPrimaryPanel === "events") {
-    sidepanel = <Events />;
+    return <Events />;
   }
 
   return (
     <Redacted
-      allowOptIn
       style={{
         width: resizable ? "100%" : `${SIDEPANEL_WIDTH}px`,
         height: "100%",
