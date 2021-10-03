@@ -116,8 +116,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
       actions.setUnexpectedError({
         ...error,
         message: "Our apologies!",
-        content:
-          "Something went wrong, so we've contacted our engineers and they'll look into it as soon as possible.",
+        content: "Something went wrong while replaying, we'll look into it as soon as possible.",
         action: "refresh",
       })
     )
