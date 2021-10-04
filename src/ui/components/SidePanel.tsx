@@ -10,11 +10,9 @@ const SecondaryPanes = require("devtools/client/debugger/src/components/Secondar
 
 const SIDEPANEL_WIDTH = 240;
 
-type SidePanelProps = {
-  resizable?: boolean;
-} & PropsFromRedux;
+type SidePanelProps = PropsFromRedux;
 
-function SidePanel({ selectedPrimaryPanel, resizable }: SidePanelProps) {
+function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
   let sidepanel;
 
   if (selectedPrimaryPanel === "explorer") {
@@ -38,7 +36,7 @@ function SidePanel({ selectedPrimaryPanel, resizable }: SidePanelProps) {
   return (
     <div
       style={{
-        width: resizable ? "100%" : `${SIDEPANEL_WIDTH}px`,
+        width: "100%",
         height: "100%",
         borderRight: "1px solid var(--theme-splitter-color)",
       }}

@@ -24,9 +24,9 @@ pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.toolbox-height", "50%");
-pref("devtools.non-dev-side-panel-width", "25%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
+pref("devtools.sidePanelSize", "240px");
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.libraryFilterTime", "all");
@@ -60,7 +60,6 @@ export const prefs = new PrefsHelper("devtools", {
   recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
   toolboxHeight: ["String", "toolbox-height"],
-  nonDevSidePanelWidth: ["String", "non-dev-side-panel-width"],
   viewMode: ["String", "view-mode"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
@@ -70,6 +69,7 @@ export const prefs = new PrefsHelper("devtools", {
   logTelemetryEvent: ["Bool", "logTelemetryEvent"],
   showRedactions: ["Bool", "showRedactions"],
   disableLogRocket: ["Bool", "disableLogRocket"],
+  sidePanelSize: ["String", "sidePanelSize"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

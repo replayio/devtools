@@ -82,7 +82,7 @@ interface MainProps {
 function NonDevMain({ displayedProgress }: MainProps) {
   return (
     <main>
-      <div className="comments" style={{ width: prefs.nonDevSidePanelWidth as string }}></div>
+      <div className="comments" style={{ width: prefs.sidePanelSize as string }}></div>
       <section>
         <div className="video"></div>
         <div className="timeline">

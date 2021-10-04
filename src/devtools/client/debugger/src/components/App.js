@@ -7,19 +7,21 @@ import PropTypes from "prop-types";
 
 import { connect } from "../utils/connect";
 import { features } from "../utils/prefs";
+import { prefs } from "../../../../../ui/utils/prefs";
 import actions from "../actions";
 import { setUnexpectedError } from "ui/actions/session";
 import A11yIntention from "./A11yIntention";
 import { ShortcutsModal } from "./ShortcutsModal";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 import {
-  getSelectedSource,
-  getPaneCollapse,
   getActiveSearch,
-  getQuickOpenEnabled,
   getOrientation,
+  getPaneCollapse,
+  getQuickOpenEnabled,
+  getSelectedSource,
 } from "../selectors";
-import { getSelectedPanel } from "ui/reducers/app.ts";
+import { getSelectedPanel, getShowEditor } from "ui/reducers/app.ts";
 import { useGetUserSettings } from "ui/hooks/settings";
 
 import { KeyShortcuts } from "devtools-modules";
@@ -61,7 +63,6 @@ class Debugger extends Component {
 
   state = {
     shortcutsModalEnabled: false,
-    startPanelSize: 0,
   };
 
   getChildContext = () => {
@@ -173,14 +174,13 @@ class Debugger extends Component {
   };
 
   renderEditorPane = () => {
-    const { startPanelSize } = this.state;
     const horizontal = this.isHorizontal();
 
     return (
       <div className="editor-pane">
         <div className="editor-container">
           {!isDemo() && <EditorTabs horizontal={horizontal} />}
-          <Editor startPanelSize={startPanelSize} />
+          <Editor />
           {!this.props.selectedSource ? (
             <WelcomeBox
               horizontal={horizontal}
@@ -216,10 +216,23 @@ class Debugger extends Component {
       return this.renderEditorPane();
     }
 
+    const onResize = num => {
+      prefs.sidePanelSize = `${num}px`;
+    };
+
     return (
       <div className="horizontal-panels">
-        {!startPanelCollapsed ? <SidePanel /> : null}
-        {this.renderEditorPane()}
+        <SplitBox
+          startPanel={!startPanelCollapsed && <SidePanel />}
+          endPanel={this.props.showEditor && this.renderEditorPane()}
+          initialSize={prefs.sidePanelSize}
+          maxSize={this.props.showEditor ? "80%" : "100%"}
+          minSize={this.props.showEditor ? "100px" : "100%"}
+          onControlledPanelResized={onResize}
+          splitterSize={1}
+          style={{ width: "100%", overflow: "hidden" }}
+          vert={true}
+        />
       </div>
     );
   };
@@ -296,12 +309,13 @@ function DebuggerLoader(props) {
 }
 
 const mapStateToProps = state => ({
-  selectedSource: getSelectedSource(state),
-  startPanelCollapsed: getPaneCollapse(state),
   activeSearch: getActiveSearch(state),
-  quickOpenEnabled: getQuickOpenEnabled(state),
   orientation: getOrientation(state),
+  quickOpenEnabled: getQuickOpenEnabled(state),
   selectedPanel: getSelectedPanel(state),
+  selectedSource: getSelectedSource(state),
+  showEditor: getShowEditor(state),
+  startPanelCollapsed: getPaneCollapse(state),
 });
 
 export default connect(mapStateToProps, {

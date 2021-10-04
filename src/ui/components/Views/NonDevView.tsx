@@ -44,18 +44,25 @@ function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
     </div>
   );
 
-  const handleMove = (num: number) => {
+  const handleMove = (size: number) => {
     updateTimelineDimensions();
-    prefs.nonDevSidePanelWidth = `${num}px`;
+    prefs.sidePanelSize = `${size}px`;
   };
 
   return (
-    <div className="horizontal-panels">
-      <div className="flex flex-row h-full">
-        <Toolbar />
-        <SidePanel />
-      </div>
-      {viewer}
+    <div className="flex flex-row h-full">
+      <Toolbar />
+      <SplitBox
+        startPanel={<SidePanel />}
+        endPanel={viewer}
+        initialSize={prefs.sidePanelSize as string}
+        maxSize={"80%"}
+        minSize={"100px"}
+        onControlledPanelResized={handleMove}
+        splitterSize={1}
+        style={{ width: "100%", overflow: "hidden" }}
+        vert={true}
+      />
     </div>
   );
 }

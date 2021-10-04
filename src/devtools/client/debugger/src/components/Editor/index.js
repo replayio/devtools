@@ -94,7 +94,6 @@ class Editor extends PureComponent {
 
     startOperation();
     this.setText(props, editor);
-    this.setSize(props, editor);
     this.scrollToLocation(props, editor);
     endOperation();
 
@@ -330,16 +329,6 @@ class Editor extends PureComponent {
       }
 
       scrollToColumn(editor.codeMirror, line, column);
-    }
-  }
-
-  setSize(nextProps, editor) {
-    if (!editor) {
-      return;
-    }
-
-    if (nextProps.startPanelSize !== this.props.startPanelSize) {
-      editor.codeMirror.setSize();
     }
   }
 
