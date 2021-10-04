@@ -62,7 +62,6 @@ the border added is duplicated. */
 
 .secondary-toolbox-header .expanded .label {
   color: var(--tab-selected-color);
-  color: rgba(0, 0, 0, 0.5);
 }
 
 .secondary-toolbox-header button:hover,
