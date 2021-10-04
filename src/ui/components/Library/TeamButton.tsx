@@ -60,7 +60,7 @@ function TeamButton({
       </Redacted>
       <div className="flex flex-row space-x-1">
         {isNew ? (
-          <div className={"text-xs rounded-lg px-3 py-0.5 bg-blue-500 text-white"}>New</div>
+          <div className={"text-xs rounded-lg px-3 py-0.5 text-white newbadge"}>New</div>
         ) : null}
         {showSettingsButton ? <SettingsButton onClick={handleSettingsClick} /> : null}
       </div>

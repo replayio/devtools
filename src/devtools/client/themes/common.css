@@ -16,7 +16,7 @@
   font-size: var(--root-font-size);
 
   --tab-line-hover-color: rgba(0, 0, 0, 0.2);
-  --tab-line-selected-color: var(--blue-50);
+  --tab-line-selected-color: var(--tab-selected-color);
   --toggle-thumb-color: white;
   --toggle-track-color: var(--grey-30);
 

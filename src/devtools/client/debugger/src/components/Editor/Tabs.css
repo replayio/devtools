@@ -61,10 +61,23 @@
   transform: scaleX(0);
 }
 
+.source-tab .filename {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-inline-end: 4px;
+}
+
+.source-tab {
+  color: var(--tab-standard-color);
+}
+
 .source-tab.active {
-  --tab-line-color: var(--primary-accent);
+  --tab-line-color: var(--theme-body-color);
   color: var(--primary-accent);
   border-bottom-color: transparent;
+  background-color: white;
 }
 
 .source-tab:not(.active):hover {
@@ -90,6 +103,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   padding-inline-end: 4px;
+  color: var(--theme-body-color);
 }
 
 .source-tab .filename span {
@@ -103,7 +117,7 @@
 }
 
 .source-tab.active .close-btn {
-  color: inherit;
+  color: var(--theme-body-color);
 }
 
 .source-tab.active .close-btn,
@@ -118,5 +132,6 @@
 .source-tab .close-btn:hover,
 .source-tab .close-btn:focus {
   color: var(--theme-selection-color);
-  background-color: var(--theme-selection-background);
+  background-color: var(--tab-standard-color);
+  background-color: var(--primary-accent);
 }
