@@ -47,8 +47,11 @@
 
   --primary-accent-text: #007aff;
   --primary-accent: #01acfd;
-  --primary-accent-hover: #0067d7;
+  --primary-accent-hover: #019be4;
   --primary-accent-light: #85bfff;
+
+  --primary-accent-legacy: #007aff;
+  --primary-accent-legacy-hover: #0067d7;
 
   --secondary-accent: #f02d5e;
   --secondary-accent-stroke: #f02d5e;

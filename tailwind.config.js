@@ -8,6 +8,8 @@ module.exports = {
       colors: {
         primaryAccent: "var(--primary-accent)",
         primaryAccentHover: "var(--primary-accent-hover)",
+        primaryAccentLegacy: "var(--primary-accent-legacy)",
+        primaryAccentHoverLegacy: "var(--primary-accent-hover-legacy)",
         secondaryAccent: "var(--secondary-accent)",
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",

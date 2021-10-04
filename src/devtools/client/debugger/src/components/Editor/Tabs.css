@@ -97,8 +97,6 @@
   background-color: currentColor;
 }
 
-<<<<<<< HEAD
-=======
 .source-tab .filename {
   display: block;
   white-space: nowrap;
@@ -108,7 +106,6 @@
   color: var(--theme-body-color);
 }
 
->>>>>>> ca356e51656a5216497b207f8183acc34a605483
 .source-tab .filename span {
   opacity: 0.7;
   padding-inline-start: 4px;
@@ -135,9 +132,6 @@
 .source-tab .close-btn:hover,
 .source-tab .close-btn:focus {
   color: var(--theme-selection-color);
-<<<<<<< HEAD
   background-color: var(--tab-standard-color);
-=======
   background-color: var(--primary-accent);
->>>>>>> ca356e51656a5216497b207f8183acc34a605483
 }
