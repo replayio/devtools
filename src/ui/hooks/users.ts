@@ -1,6 +1,7 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { GET_USER_INFO, GET_USER_ID } from "ui/graphql/users";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 export async function getUserId() {
   const result = await query({
@@ -38,6 +39,10 @@ export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefin
   });
   const viewer = result?.data?.viewer;
   if (!viewer) {
+    return undefined;
+  }
+  if (!viewer.user) {
+    sendTelemetryEvent("UnexpectedGraphQLResult", { result });
     return undefined;
   }
   return {
