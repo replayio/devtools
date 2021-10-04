@@ -27,7 +27,7 @@
 }
 
 .breakpoint-panel .paused-add-comment {
-  background-color: #5b41ff;
+  background-color: var(--secondary-accent);
 }
 
 .breakpoint-panel .edit-actions button {
@@ -142,7 +142,7 @@ span.expression {
 }
 
 .breakpoint-panel .panel-editor.conditional form .CodeMirror {
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
 }
 
 .breakpoint-panel .panel-editor form .form-row.invalid .CodeMirror {
@@ -163,7 +163,7 @@ span.expression {
 
 /* This removes padding so we can match the positions of both editing and
 non-editing markup */
-.breakpoint-panel .CodeMirror .CodeMirror-line  {
+.breakpoint-panel .CodeMirror .CodeMirror-line {
   padding: 0px;
 }
 
