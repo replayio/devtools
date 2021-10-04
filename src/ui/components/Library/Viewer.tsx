@@ -8,6 +8,7 @@ import { Redacted } from "../Redacted";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
+import TeamTrialEnd from "./TeamTrialEnd";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -39,7 +40,7 @@ function DownloadLinks() {
 
   return (
     <div className="flex flex-col space-y-6 text-sm" style={{ maxWidth: "24rem" }}>
-      <div className="text-lg">{`👋 This is where your replays will go!`}</div>      
+      <div className="text-lg">{`👋 This is where your replays will go!`}</div>
     </div>
   );
 }
@@ -88,19 +89,7 @@ function ViewerContent({
     <ViewerHeaderLeft>
       <>
         <Redacted>{workspaceName}</Redacted>
-        <span>
-          
-          {recordings.length != 0 ? (
-            <>              
-                ({recordings.length})            
-            </>
-          ) : (
-            <>
-              
-            </>
-          )}
-          
-        </span>
+        <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
       </>
     </ViewerHeaderLeft>
   );
@@ -134,7 +123,8 @@ function ViewerContent({
     <>
       <ViewerHeader>
         {HeaderLeft}
-        <div className="flex flex-row space-x-3">
+        <div className="flex flex-row space-x-3 items-center">
+          <TeamTrialEnd />
           {isEditing ? (
             <>
               <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />

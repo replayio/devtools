@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
@@ -7,7 +7,7 @@ import { useGetActiveSessions } from "ui/hooks/sessions";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import hooks from "ui/hooks";
-import { isDemo, isTest } from "ui/utils/environment";
+import { isDemo } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
@@ -18,6 +18,7 @@ import { UIState } from "ui/state";
 import "./Header.css";
 import { Redacted } from "../Redacted";
 import classNames from "classnames";
+import { RecordingTrialEnd } from "./RecordingTrialEnd";
 
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   const { users, loading, error } = useGetActiveSessions(
@@ -48,6 +49,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
 
   return (
     <div className="links">
+      <RecordingTrialEnd />
       {showShare ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
       {recordingTarget != "node" && <ViewToggle />}

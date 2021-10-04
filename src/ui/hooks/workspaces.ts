@@ -99,6 +99,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 isDomainLimitedCode
                 subscription {
                   status
+                  trialEnds
                 }
                 members {
                   edges {
