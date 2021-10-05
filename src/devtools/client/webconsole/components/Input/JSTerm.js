@@ -11,8 +11,12 @@ import actions from "devtools/client/webconsole/actions/index";
 
 import { getRecordingId } from "ui/utils/environment";
 import { getRecording } from "ui/hooks/recordings";
+import { getCommandMessages } from "../../selectors/messages";
 
-async function createEditor({ execute }) {
+import uniq from "lodash/uniq";
+import clamp from "lodash/clamp";
+
+async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
   const editor = new Editor({
     autofocus: true,
@@ -36,6 +40,8 @@ async function createEditor({ execute }) {
       Esc: false,
       "Cmd-F": false,
       "Ctrl-F": false,
+      Up: historyCursorUp,
+      Down: historyCursorDown,
     },
   });
   return editor;
@@ -55,11 +61,16 @@ class JSTerm extends React.Component {
     window.jsterm = this;
     this.state = {
       canEval: true,
+      historyIndex: 0,
     };
   }
 
   async componentDidMount() {
-    this.editorWaiter = createEditor({ execute: this.execute });
+    this.editorWaiter = createEditor({
+      execute: this.execute,
+      historyCursorUp: this.historyCursorUp,
+      historyCursorDown: this.historyCursorDown,
+    });
     this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
 
@@ -71,6 +82,20 @@ class JSTerm extends React.Component {
 
   focus() {
     this.editor?.focus();
+  }
+
+  historyCursorUp = () => this.moveHistoryCursor(1);
+  historyCursorDown = () => this.moveHistoryCursor(-1);
+
+  moveHistoryCursor(difference) {
+    const messages = uniq(this.props.commandHistory.map(m => m.messageText).reverse());
+
+    if (messages.length === 0) {
+      return;
+    }
+    const newIndex = clamp(this.state.historyIndex + difference, 0, messages.length);
+    this.setValue(["", ...messages][newIndex]);
+    this.setState({ historyIndex: newIndex });
   }
 
   /**
@@ -88,6 +113,7 @@ class JSTerm extends React.Component {
       this.props.paywallExpression(executeString);
     }
     this.setValue("");
+    this.setState({ historyIndex: 0 });
     return null;
   };
 
@@ -98,7 +124,7 @@ class JSTerm extends React.Component {
    *        The new value to set.
    * @returns void
    */
-  setValue(newValue = "") {
+  setValue = (newValue = "") => {
     // In order to get the autocomplete popup to work properly, we need to set the
     // editor text and the cursor in the same operation. If we don't, the text change
     // is done before the cursor is moved, and the autocompletion call to the server
@@ -113,7 +139,7 @@ class JSTerm extends React.Component {
         ch: lines[lines.length - 1].length,
       });
     });
-  }
+  };
 
   /**
    * Gets the value from the input field
@@ -146,8 +172,10 @@ class JSTerm extends React.Component {
   }
 }
 
-function mapStateToProps() {
-  return {};
+function mapStateToProps(state) {
+  return {
+    commandHistory: getCommandMessages(state),
+  };
 }
 
 const mapDispatchToProp = {

@@ -48,6 +48,10 @@ export const getMessages = createSelector(
   (messagesById, visibleMessages) => visibleMessages.map(id => messagesById.get(id))
 );
 
+export const getCommandMessages = createSelector(getMessages, messages =>
+  messages.filter(message => message.type === "command")
+);
+
 export const getMessagesForTimeline = createSelector(getMessages, messages =>
   messages.filter(message => message.source == "console-api" || isError(message))
 );
