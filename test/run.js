@@ -201,7 +201,7 @@ async function runTest(test, example, target) {
     // Don't start processing recordings when they are created while we are
     // running tests. This reduces server load if we are recording the viewer
     // itself.
-    RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
+    RECORD_REPLAY_DONT_PROCESS_RECORDINGS: "1",
     RECORD_REPLAY_TEST_URL: exampleRecordingId
       ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
       : `http://localhost:8080/test/examples/${example}`,

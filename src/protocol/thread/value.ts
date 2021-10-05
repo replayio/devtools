@@ -20,6 +20,7 @@ export class ValueFront {
   private _hasPrimitive: boolean;
   private _primitive: string | number | null | undefined;
   private _isBigInt: boolean;
+  private _isSymbol: boolean;
   private _object: WiredObject | null;
   private _uninitialized: boolean;
   private _unavailable: boolean;
@@ -33,6 +34,7 @@ export class ValueFront {
     this._hasPrimitive = false;
     this._primitive = undefined;
     this._isBigInt = false;
+    this._isSymbol = false;
 
     // For objects.
     this._object = null;
@@ -61,6 +63,10 @@ export class ValueFront {
       this._hasPrimitive = true;
       this._isBigInt = true;
       this._primitive = protocolValue.bigint;
+    } else if ("symbol" in protocolValue) {
+      this._hasPrimitive = true;
+      this._isSymbol = true;
+      this._primitive = protocolValue.symbol;
     } else if ("uninitialized" in protocolValue) {
       this._uninitialized = true;
     } else if ("unavailable" in protocolValue) {

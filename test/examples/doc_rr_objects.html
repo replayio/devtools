@@ -38,6 +38,9 @@ var n = new Proxy({ a: 0 }, {
     dump("Hello\n");
   }
 });
+var o = Symbol();
+var p = Symbol("symbol");
+var q = { [o]: 42, [p]: o };
 console.log(a);
 console.log(b);
 console.log(c);
@@ -52,6 +55,9 @@ console.log(k);
 console.log(l);
 console.log(m);
 console.log(n);
+console.log(o);
+console.log(p);
+console.log(q);
 console.log("Done");
 window.setTimeout(recordingFinished);
 }

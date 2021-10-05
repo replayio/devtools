@@ -17,4 +17,8 @@ Test.describe(`showing console objects in node.`, async () => {
   Test.checkJumpIcon(msg);
 
   await Test.waitForMessage('Array(6) [ undefined, true, 3, null, "z", 40n ]');
+  await Test.waitForMessage('Proxy {  }');
+  await Test.waitForMessage("Symbol()");
+  await Test.waitForMessage("Symbol(symbol)");
+  await Test.waitForMessage(`Object { "Symbol()": 42, "Symbol(symbol)": "Symbol()" }`);
 });
