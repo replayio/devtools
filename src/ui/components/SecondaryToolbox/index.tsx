@@ -125,7 +125,9 @@ function SecondaryToolbox({
       <Redacted className="secondary-toolbox-content text-xs">
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
-        {showReact && selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
+        {showReact && hasReactComponents && selectedPanel === "react-components" ? (
+          <ReactDevtoolsPanel />
+        ) : null}
       </Redacted>
     </div>
   );
