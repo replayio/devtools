@@ -26,7 +26,7 @@ pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.toolbox-height", "50%");
 pref("devtools.non-dev-side-panel-width", "25%");
 pref("devtools.view-mode", "non-dev");
-pref("devtools.dev-secondary-panel-height", "50%");
+pref("devtools.dev-secondary-panel-height", 375);
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.libraryFilterTime", "all");
@@ -62,7 +62,7 @@ export const prefs = new PrefsHelper("devtools", {
   toolboxHeight: ["String", "toolbox-height"],
   nonDevSidePanelWidth: ["String", "non-dev-side-panel-width"],
   viewMode: ["String", "view-mode"],
-  secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
+  secondaryPanelHeight: ["Int", "dev-secondary-panel-height"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
   libraryFilterTime: ["String", "libraryFilterTime"],

@@ -21,7 +21,7 @@ class SplitBox extends Component {
       // Custom class name. You can use more names separated by a space.
       className: PropTypes.string,
       // Initial size of controlled panel.
-      initialSize: PropTypes.any,
+      initialSize: PropTypes.number,
       // Optional initial width of controlled panel.
       initialWidth: PropTypes.number,
       // Optional initial height of controlled panel.
@@ -53,11 +53,11 @@ class SplitBox extends Component {
 
   static get defaultProps() {
     return {
-      splitterSize: 5,
-      vert: true,
-      endPanelControl: false,
       endPanelCollapsed: false,
+      endPanelControl: false,
+      splitterSize: 5,
       startPanelCollapsed: false,
+      vert: true,
     };
   }
 
@@ -65,10 +65,9 @@ class SplitBox extends Component {
     super(props);
 
     this.state = {
+      height: props.initialHeight || props.initialSize,
+      width: props.initialWidth || props.initialSize,
       vert: props.vert,
-      // We use integers for these properties
-      width: parseInt(props.initialWidth || props.initialSize, 10),
-      height: parseInt(props.initialHeight || props.initialSize, 10),
     };
 
     this.onStartMove = this.onStartMove.bind(this);
