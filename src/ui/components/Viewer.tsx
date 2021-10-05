@@ -11,7 +11,7 @@ export default function Viewer() {
       splitterSize={1}
       initialSize={prefs.secondaryPanelHeight}
       onResizeEnd={(num: number) => {
-        prefs.secondaryPanelHeight = num;
+        prefs.secondaryPanelHeight = `${num}px`;
       }}
       minSize="20%"
       maxSize="80%"
