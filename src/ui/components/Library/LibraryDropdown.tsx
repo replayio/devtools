@@ -1,6 +1,7 @@
 import React from "react";
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
+import MaterialIcon from "../shared/MaterialIcon";
 
 // This should be the standard dropdown component for the Library
 // but then we should slowly make it even more general purpose
@@ -28,9 +29,11 @@ export function DropdownButton({
 export function Dropdown({
   children,
   menuItemsClassName,
+  widthClass = "w-56",
 }: {
   children: (React.ReactElement | null)[];
   menuItemsClassName?: string;
+  widthClass?: "w-56" | "w-80";
 }) {
   return (
     <Menu as="div" className="inline-block text-left recording-options">
@@ -39,7 +42,8 @@ export function Dropdown({
           static
           className={classNames(
             menuItemsClassName,
-            "origin-top-right text-sm right-0 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+            widthClass,
+            "origin-top-right text-sm right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
           )}
         >
           <div className="py-1">{children}</div>
@@ -53,7 +57,7 @@ export function DropdownItem({
   children,
   onClick,
 }: {
-  children: string;
+  children: string | React.ReactElement;
   onClick: (e: React.MouseEvent) => void;
 }) {
   return (
@@ -71,6 +75,30 @@ export function DropdownItem({
         </a>
       )}
     </Menu.Item>
+  );
+}
+
+export function DropdownItemContent({
+  children,
+  icon,
+  selected,
+}: {
+  children: string | React.ReactElement;
+  icon: string;
+  selected: boolean;
+}) {
+  return (
+    <div className="flex flex-row space-x-4">
+      <div
+        className={classNames(
+          "w-4 flex flex-row items-center",
+          selected ? "text-primaryAccent" : ""
+        )}
+      >
+        <MaterialIcon style={{ fontSize: "20px" }}>{icon}</MaterialIcon>
+      </div>
+      <span className="whitespace-pre overflow-hidden overflow-ellipsis">{children}</span>
+    </div>
   );
 }
 
