@@ -33,6 +33,7 @@ pref("devtools.libraryFilterTime", "all");
 pref("devtools.libraryFilterAssociation", "all");
 pref("devtools.logTelemetryEvent", false);
 pref("devtools.showRedactions", false);
+pref("devtools.disableLogRocket", false);
 
 // app features
 pref("devtools.features.comments", true);
@@ -51,7 +52,6 @@ pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
 pref("devtools.features.eventCount", true);
 pref("devtools.features.columnBreakpoints", false);
-pref("devtools.features.enableLogRocket", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -69,6 +69,7 @@ export const prefs = new PrefsHelper("devtools", {
   libraryFilterAssociation: ["String", "libraryFilterAssociation"],
   logTelemetryEvent: ["Bool", "logTelemetryEvent"],
   showRedactions: ["Bool", "showRedactions"],
+  disableLogRocket: ["Bool", "disableLogRocket"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
@@ -89,7 +90,6 @@ export const features = new PrefsHelper("devtools.features", {
   termsOfService: ["Bool", "termsOfService"],
   eventCount: ["Bool", "eventCount"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
-  enableLogRocket: ["Bool", "enableLogRocket"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

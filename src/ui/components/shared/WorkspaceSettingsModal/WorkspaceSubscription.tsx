@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
-import { Redacted } from "ui/components/Redacted";
 import hooks from "ui/hooks";
-import { PaymentMethod, Subscription } from "ui/types";
+import { Subscription } from "ui/types";
 import { isDevelopment } from "ui/utils/environment";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 

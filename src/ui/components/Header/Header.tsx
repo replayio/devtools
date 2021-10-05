@@ -16,7 +16,6 @@ import { Recording } from "ui/types";
 import { UIState } from "ui/state";
 
 import "./Header.css";
-import { Redacted } from "../Redacted";
 import classNames from "classnames";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 
@@ -159,7 +158,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div id="header">
-      <Redacted className="header-left overflow-hidden flex-grow">
+      <div className="header-left overflow-hidden flex-grow">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
@@ -172,7 +171,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
         ) : (
           <div className="title">Recordings</div>
         )}
-      </Redacted>
+      </div>
       <Links recordingTarget={recordingTarget} />
     </div>
   );

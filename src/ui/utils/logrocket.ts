@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/react";
 import { skipTelemetry } from "./environment";
 import { Recording } from "ui/types";
 import { UserInfo } from "ui/hooks/users";
+import { prefs } from "./prefs";
 
 let setup = false;
 
@@ -18,7 +19,12 @@ export default {
     auth0User: any;
   }) => {
     // Skip if the recording was either created or viewed by an internal user
-    if (recording?.user?.internal || userInfo?.internal || skipTelemetry()) {
+    if (
+      prefs.disableLogRocket ||
+      recording?.user?.internal ||
+      userInfo?.internal ||
+      skipTelemetry()
+    ) {
       return;
     }
 

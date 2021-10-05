@@ -4,7 +4,6 @@ import { RecordingId } from "@recordreplay/protocol";
 import BatchActionDropdown from "./BatchActionDropdown";
 import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton } from "../shared/Button";
-import { Redacted } from "../Redacted";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
@@ -88,7 +87,7 @@ function ViewerContent({
   const HeaderLeft = (
     <ViewerHeaderLeft>
       <>
-        <Redacted>{workspaceName}</Redacted>
+        {workspaceName}
         <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
       </>
     </ViewerHeaderLeft>

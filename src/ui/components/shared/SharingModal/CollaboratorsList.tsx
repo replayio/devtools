@@ -4,7 +4,6 @@ import hooks from "ui/hooks";
 import "./CollaboratorsList.css";
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
-import { Redacted } from "ui/components/Redacted";
 
 export interface CollaboratorDbData {
   collaborationId: string;
@@ -51,19 +50,19 @@ function Collaborator({
   }
 
   return (
-    <Redacted className="permission">
+    <div className="permission">
       {iconAndName}
       <div className="role">Collaborator</div>
       <button className="delete" onClick={handleDeleteClick}>
         <div className="img close" />
       </button>
-    </Redacted>
+    </div>
   );
 }
 
 function Author({ picture, name }: { picture: string; name: string }) {
   return (
-    <Redacted className="permission">
+    <div className="permission">
       <div className="icon avatar">
         <AvatarImage src={picture} />
       </div>
@@ -71,7 +70,7 @@ function Author({ picture, name }: { picture: string; name: string }) {
         <div className="name">{name}</div>
       </div>
       <div className="role">Author</div>
-    </Redacted>
+    </div>
   );
 }
 
