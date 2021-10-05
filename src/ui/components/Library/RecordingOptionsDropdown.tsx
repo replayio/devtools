@@ -32,8 +32,8 @@ function RecordingOptionsDropdown({
   const toggleIsPrivate = () => {
     setIsPrivate(!isPrivate);
     updateIsPrivate({ variables: { recordingId: recording.id, isPrivate: !isPrivate } });
+    setExpanded(false);
   };
-
   const onDeleteRecording = (recordingId: RecordingId) => {
     const message =
       "This action will permanently delete this replay. \n\nAre you sure you want to proceed?";
@@ -41,9 +41,15 @@ function RecordingOptionsDropdown({
     if (window.confirm(message)) {
       deleteRecording(recordingId, currentWorkspaceId);
     }
+    setExpanded(false);
   };
   const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
     updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId);
+    setExpanded(false);
+  };
+  const handleShareClick = () => {
+    setModal("sharing", { recordingId });
+    setExpanded(false);
   };
 
   const button = (
@@ -71,7 +77,7 @@ function RecordingOptionsDropdown({
         <DropdownItem onClick={toggleIsPrivate}>{`Make ${
           isPrivate ? "public" : "private"
         }`}</DropdownItem>
-        <DropdownItem onClick={() => setModal("sharing", { recordingId })}>Share</DropdownItem>
+        <DropdownItem onClick={handleShareClick}>Share</DropdownItem>
         <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
         <DropdownDivider />
         <div className="overflow-y-auto max-h-48">
