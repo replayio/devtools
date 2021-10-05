@@ -426,7 +426,7 @@ export function useGetWorkspaceRecordings(
   return { recordings, loading };
 }
 
-export function useUpdateRecordingWorkspace() {
+export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
   const [updateRecordingWorkspace] = useMutation(
     gql`
       mutation UpdateRecordingWorkspace($recordingId: ID!, $workspaceId: ID) {
@@ -442,6 +442,14 @@ export function useUpdateRecordingWorkspace() {
       }
     `
   );
+
+  if (!isOptimistic) {
+    return (
+      recordingId: RecordingId,
+      currentWorkspaceId: WorkspaceId | null,
+      targetWorkspaceId: WorkspaceId | null
+    ) => updateRecordingWorkspace({ variables: { recordingId, workspaceId: targetWorkspaceId } });
+  }
 
   return (
     recordingId: RecordingId,

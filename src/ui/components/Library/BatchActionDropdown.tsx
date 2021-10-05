@@ -80,7 +80,6 @@ function BatchActionDropdown({
       expanded={expanded}
       distance={0}
     >
-      {/* <div className="relative"> */}
       <Dropdown menuItemsClassName="z-50">
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""

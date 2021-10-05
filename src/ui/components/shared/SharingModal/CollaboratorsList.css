@@ -1,3 +1,7 @@
+.sharing-modal .permissions-list {
+  max-height: 240px;
+}
+
 .sharing-modal .permission {
   display: flex;
   align-items: center;
@@ -35,7 +39,6 @@
 
 .sharing-modal .permission .role {
   flex-shrink: 0;
-  padding: 0px 8px;
   color: var(--theme-comment);
 }
 
@@ -57,7 +60,7 @@
 }
 
 .sharing-modal .permission:hover button.delete {
-  display: block;
+  display: inherit;
 }
 
 .sharing-modal .permission button.delete:hover {

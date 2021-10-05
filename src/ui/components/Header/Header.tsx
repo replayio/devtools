@@ -41,16 +41,11 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
 function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   const recordingId = hooks.useGetRecordingId();
   const { isAuthenticated } = useAuth0();
-  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
-  const isCollaborator =
-    isAuthenticated &&
-    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000");
-  const showShare = isOwner || isCollaborator;
 
   return (
     <div className="links">
       <RecordingTrialEnd />
-      {showShare ? <ShareButton /> : null}
+      {isAuthenticated ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
       {recordingTarget != "node" && <ViewToggle />}
       <UserOptions />

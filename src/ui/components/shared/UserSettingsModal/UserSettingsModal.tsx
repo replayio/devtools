@@ -17,7 +17,6 @@ import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 
 import ReplayInvitations from "./ReplayInvitations";
-import { UserInfo } from "ui/hooks/users";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 

@@ -29,7 +29,7 @@ function Collaborator({
   if (collaborator.email) {
     iconAndName = (
       <>
-        <div className="bg-gray-200 rounded-full" style={{ padding: "5px", marginRight: "8px" }}>
+        <div className="bg-gray-300 rounded-full" style={{ padding: "5px", marginRight: "8px" }}>
           <MaterialIcon className="text-white align-middle">mail_outline</MaterialIcon>
         </div>
         <div className="main">
@@ -101,7 +101,7 @@ export default function CollaboratorsList({
   collaborators: CollaboratorDbData[] | null;
 }) {
   return (
-    <div className="permissions-list">
+    <div className="permissions-list overflow-auto">
       <Author picture={recording.user!.picture} name={recording.user!.name} />
       {collaborators ? <Collaborators {...{ collaborators }} /> : null}
     </div>
