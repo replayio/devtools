@@ -11,6 +11,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   const isPrivate = recording.private;
   const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace(false);
+  const { workspaces } = hooks.useGetNonPendingWorkspaces();
   const workspaceId = recording.workspace?.id || null;
   const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
 
@@ -75,7 +76,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
       distance={0}
       position="bottom-right"
     >
-      <Dropdown menuItemsClassName="z-50" widthClass="w-80">
+      <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
         <DropdownItem onClick={setPublic}>
           <DropdownItemContent icon="link" selected={!isPrivate}>
             Anyone with the link
@@ -86,6 +87,17 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
             Only people with access
           </DropdownItemContent>
         </DropdownItem>
+        <div>
+          {workspaces.map(({ id, name }) => (
+            <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
+              <DropdownItemContent icon="group" selected={isPrivate && id === workspaceId}>
+                <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+                  Members of {name}
+                </span>
+              </DropdownItemContent>
+            </DropdownItem>
+          ))}
+        </div>
       </Dropdown>
     </PortalDropdown>
   );
