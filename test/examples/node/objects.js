@@ -26,6 +26,14 @@ function foo() {
   var j = RangeError("foo");
   var l = bar;
   var m = [undefined, true, 3, null, "z", 40n];
+  var n = new Proxy({ a: 0 }, {
+    get(target, prop, receiver) {
+      dump("Hello\n");
+    }
+  });
+  var o = Symbol();
+  var p = Symbol("symbol");
+  var q = { [o]: 42, [p]: o };
   console.log(a);
   console.log(b);
   console.log(c);
@@ -38,6 +46,10 @@ function foo() {
   console.log(j);
   console.log(l);
   console.log(m);
+  console.log(n);
+  console.log(o);
+  console.log(p);
+  console.log(q);
 }
 foo();
 
