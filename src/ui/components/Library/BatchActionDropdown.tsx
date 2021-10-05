@@ -40,12 +40,15 @@ function BatchActionDropdown({
       selectedIds.forEach(recordingId => deleteRecording(recordingId, currentWorkspaceId));
       setSelectedIds([]);
     }
+
+    setExpanded(false);
   };
   const updateRecordings = (targetWorkspaceId: WorkspaceId | null) => {
     selectedIds.forEach(recordingId =>
       updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId)
     );
     setSelectedIds([]);
+    setExpanded(false);
   };
 
   let button, buttonClasses;
@@ -80,7 +83,6 @@ function BatchActionDropdown({
       expanded={expanded}
       distance={0}
     >
-      {/* <div className="relative"> */}
       <Dropdown menuItemsClassName="z-50">
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
