@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { updateEnableRepaint } from "protocol/enable-repaint";
@@ -16,7 +16,6 @@ import SettingsModal from "../SettingsModal";
 import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 
-import ReplayInvitations from "./ReplayInvitations";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 import { prefs } from "ui/utils/prefs";
@@ -160,11 +159,6 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
     title: "Personal",
     icon: "person",
     component: Personal,
-  },
-  {
-    title: "Invitations",
-    icon: "stars",
-    component: ReplayInvitations,
   },
   {
     title: "API Keys",
