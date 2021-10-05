@@ -26,7 +26,9 @@ export function TrialEnd({
   return (
     <div className="py-1 p-4 rounded-lg flex flex-row space-x-2 items-center" style={style}>
       <MaterialIcon style={{ fontSize: "1.25rem" }}>timer</MaterialIcon>
-      <span>Trial expires in {getDaysLeft(trialEnds)} days</span>
+      <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+        Trial expires in {getDaysLeft(trialEnds)} days
+      </span>
     </div>
   );
 }
