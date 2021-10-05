@@ -18,17 +18,25 @@ function SidePanel({ selectedPrimaryPanel, resizable }: SidePanelProps) {
   let sidepanel;
 
   if (selectedPrimaryPanel === "explorer") {
-    sidepanel = <PrimaryPanes />;
+    sidepanel = (
+      <Redacted>
+        <PrimaryPanes />
+      </Redacted>
+    );
   } else if (selectedPrimaryPanel === "debug") {
-    sidepanel = <SecondaryPanes />;
+    sidepanel = (
+      <Redacted>
+        <SecondaryPanes />
+      </Redacted>
+    );
   } else if (selectedPrimaryPanel === "comments") {
-    return <Transcript />;
+    sidepanel = <Transcript />;
   } else if (selectedPrimaryPanel === "events") {
-    return <Events />;
+    sidepanel = <Events />;
   }
 
   return (
-    <Redacted
+    <div
       style={{
         width: resizable ? "100%" : `${SIDEPANEL_WIDTH}px`,
         height: "100%",
@@ -36,7 +44,7 @@ function SidePanel({ selectedPrimaryPanel, resizable }: SidePanelProps) {
       }}
     >
       {sidepanel}
-    </Redacted>
+    </div>
   );
 }
 
