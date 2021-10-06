@@ -40,16 +40,15 @@ function CommentSource({
   return (
     <div
       onClick={onSelectSource}
-      className="group space-y-5 p-3 rounded-xl rounded-b-none border-b border-gray-200  hover:bg-toolbarBackground cursor-pointer"
+      className="group p-1.5 border-gray-200 hover:bg-toolbarBackground cursor-pointer"
     >
       <div className="font-medium flex flex-col mono">
         <div className="w-full flex flex-row justify-between space-x-1">
           <div
-            className="font-mono font-semibold whitespace-pre overflow-hidden overflow-ellipsis"
+            className="cm-s-mozilla font-mono overflow-hidden whitespace-pre text-xs"
             style={{ fontSize: "11px" }}
-          >
-            {labels.primary}
-          </div>
+            dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
+          />
           <div
             className="flex-shrink-0 bg-gray-300 rounded-full p-px w-4 h-4 opacity-0 group-hover:opacity-100"
             title="Show in the Editor"
@@ -57,11 +56,6 @@ function CommentSource({
             <MaterialIcon style={{ fontSize: "14px" }}>code</MaterialIcon>
           </div>
         </div>
-        <div
-          className="cm-s-mozilla font-mono overflow-hidden whitespace-pre text-xs"
-          style={{ fontSize: "11px" }}
-          dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
-        />
       </div>
     </div>
   );

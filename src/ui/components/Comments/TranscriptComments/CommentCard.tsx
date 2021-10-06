@@ -37,24 +37,22 @@ function CommentItem({
   let relativeDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
 
   return (
-    <div>
-      <div className="space-y-4 px-3 pt-3">
-        <div className="flex space-x-2.5 items-center">
-          <AvatarImage className="h-8 w-8 rounded-full avatar" src={comment.user.picture} />
-          <div className="flex-1 overflow-hidden">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium overflow-hidden overflow-ellipsis whitespace-pre">
-                {comment.user.name}
-              </h3>
-              <CommentActions comment={comment} isRoot={"replies" in comment} />
-            </div>
-            <p className="text-gray-500 overflow-hidden overflow-ellipsis whitespace-pre">
-              {relativeDate}
-            </p>
+    <div className="p-1.5 space-y-2">
+      <div className="space-y-4">
+        <div className="flex flex-row space-x-1 items-center">
+          <AvatarImage className="h-5 w-5 rounded-full avatar" src={comment.user.picture} />
+          <div className="overflow-hidden flex flex-row flex-grow space-x-1">
+            <span className="font-bold overflow-hidden overflow-ellipsis whitespace-pre">
+              {comment.user.name}
+            </span>
+            <span className="text-gray-300 overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0">
+              2w
+            </span>
           </div>
+          <CommentActions comment={comment} isRoot={"replies" in comment} />
         </div>
       </div>
-      <div className="space-y-4 px-3 pt-3 pb-3 text-xs break-words">
+      <div className="space-y-4 text-xs break-words">
         <Markdown>{comment.content}</Markdown>
       </div>
     </div>
@@ -121,20 +119,17 @@ function CommentCard({
 
   return (
     <div
-      className={`mx-auto w-full group`}
+      className={`mx-auto w-full group border-b border-gray-200`}
       onClick={() => seekToComment(comment)}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
       <div
-        className={classNames(
-          "bg-white rounded-lg border border-gray-200 hover:border-primaryAccent",
-          {
-            "border-primaryAccent shadow-sm": isPaused,
-            "cursor-pointer": !isPaused,
-            [hoveredStyles]: hoveredComment == comment.id && isPaused,
-          }
-        )}
+        className={classNames("bg-white border-l-2 border-transparent hover:border-primaryAccent", {
+          "border-primaryAccent": isPaused,
+          "cursor-pointer": !isPaused,
+          [hoveredStyles]: hoveredComment == comment.id && isPaused,
+        })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
         <CommentItem comment={comment} pendingComment={pendingComment} />
