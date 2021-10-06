@@ -8,14 +8,6 @@ Replay is a new debugger for recording and replaying software. Debugging with Re
 
 Feel free to file any issues you see while recording or replaying.
 
-### Feature Requests
-
-We track feature requests in [Canny](https://replay.canny.io/). We use Canny for 3 reasons:
-
-- To discuss the future of Replay with the community
-- To plan in the open. Our roadmap is transparent :)
-- To keep the issue backlog actionable.
-
 ### Setup instructions:
 
 Replay's DevTools is a React app built on top of the Replay [protocol](https://www.notion.so/replayio/Protocol-d8e7b5f428594589ab60c42afad782c1). Getting started is as simple as:
