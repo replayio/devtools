@@ -40,7 +40,7 @@ function CommentSource({
   return (
     <div
       onClick={onSelectSource}
-      className="group p-1.5 border-gray-200 hover:bg-toolbarBackground cursor-pointer"
+      className="group px-2 py-0.5 bg-gray-100 hover:bg-gray-200 rounded-md border-gray-200 cursor-pointer"
     >
       <div className="font-medium flex flex-col mono">
         <div className="w-full flex flex-row justify-between space-x-1">
@@ -50,10 +50,11 @@ function CommentSource({
             dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
           />
           <div
-            className="flex-shrink-0 bg-gray-300 rounded-full p-px w-4 h-4 opacity-0 group-hover:opacity-100"
+            className="flex flex-shrink-0 opacity-0 group-hover:opacity-100"
+            // className="flex-shrink-0 p-px w-4 h-4 opacity-0 group-hover:opacity-100"
             title="Show in the Editor"
           >
-            <MaterialIcon style={{ fontSize: "14px" }}>code</MaterialIcon>
+            <MaterialIcon style={{ fontSize: "14px" }}>keyboard_arrow_right</MaterialIcon>
           </div>
         </div>
       </div>

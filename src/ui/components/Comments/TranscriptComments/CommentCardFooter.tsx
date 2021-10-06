@@ -56,7 +56,10 @@ function NewReply({
 
 function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFooterProps) {
   const replyPrompt = (
-    <div className="border-t border-gray-200 p-1.5 text-gray-400" onClick={onReply}>
+    <div
+      className="border border-primaryAccent rounded-md bg-gray-100 hover:bg-gray-200 py-1 px-2 opacity-75 hover:opacity-100"
+      onClick={onReply}
+    >
       Write a reply...
     </div>
   );

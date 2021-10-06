@@ -16,7 +16,8 @@ import CommentCardFooter from "./CommentCardFooter";
 import { AvatarImage } from "ui/components/Avatar";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
-const hoveredStyles = "border-secondaryAccent hover:border-secondaryAccent";
+// const hoveredStyles = "border-secondaryAccent hover:border-secondaryAccent";
+const hoveredStyles = "hover:bg-gray-100";
 
 function CommentItem({
   pendingComment,
@@ -37,22 +38,23 @@ function CommentItem({
   let relativeDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
 
   return (
-    <div className="p-1.5 space-y-2">
-      <div className="space-y-4">
-        <div className="flex flex-row space-x-1 items-center">
-          <AvatarImage className="h-5 w-5 rounded-full avatar" src={comment.user.picture} />
-          <div className="overflow-hidden flex flex-row flex-grow space-x-1">
-            <span className="font-bold overflow-hidden overflow-ellipsis whitespace-pre">
-              {comment.user.name}
-            </span>
-            <span className="text-gray-300 overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0">
-              2w
-            </span>
-          </div>
-          <CommentActions comment={comment} isRoot={"replies" in comment} />
+    <div className="space-y-1.5">
+      <div className="flex flex-row space-x-1.5 items-center">
+        <AvatarImage className="h-5 w-5 rounded-full avatar" src={comment.user.picture} />
+        <div className="overflow-hidden flex flex-row flex-grow space-x-2">
+          <span className="font-medium overflow-hidden overflow-ellipsis whitespace-pre">
+            {comment.user.name}
+          </span>
+          <span
+            className="overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0 opacity-50"
+            title={relativeDate}
+          >
+            2w
+          </span>
         </div>
+        <CommentActions comment={comment} isRoot={"replies" in comment} />
       </div>
-      <div className="space-y-4 text-xs break-words">
+      <div className="space-y-4 text-xs break-words" style={{ lineHeight: "1.125rem" }}>
         <Markdown>{comment.content}</Markdown>
       </div>
     </div>
@@ -119,16 +121,18 @@ function CommentCard({
 
   return (
     <div
-      className={`mx-auto w-full group border-b border-gray-200`}
+      className={classNames(
+        `mx-auto w-full group py-2.5 border-b border-gray-200 cursor-pointer transition`,
+        hoveredComment === comment.id ? "bg-gray-50" : "bg-white"
+      )}
       onClick={() => seekToComment(comment)}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
       <div
-        className={classNames("bg-white border-l-2 border-transparent hover:border-primaryAccent", {
+        className={classNames("border-l-2 border-transparent px-2.5 pl-2 space-y-2", {
           "border-primaryAccent": isPaused,
-          "cursor-pointer": !isPaused,
-          [hoveredStyles]: hoveredComment == comment.id && isPaused,
+          // [hoveredStyles]: hoveredComment == comment.id && isPaused,
         })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
