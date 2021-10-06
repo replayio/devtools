@@ -193,7 +193,7 @@ export default function DraftJSEditor({
 
   return (
     <div
-      className="draft-editor-container"
+      className="draft-editor-container px-2 py-1 rounded-md"
       ref={wrapperNode}
       onClick={() => editorNode.current!.focus()}
     >

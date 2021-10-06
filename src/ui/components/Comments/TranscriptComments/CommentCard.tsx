@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classNames from "classnames";
 import Markdown from "react-markdown";
@@ -138,11 +138,15 @@ function CommentCard({
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
         <CommentItem comment={comment} pendingComment={pendingComment} />
         {comment.replies?.map((reply: Reply, i: number) => (
-          <div className="border-t border-gray-200" key={"id" in reply ? reply.id : 0}>
+          <div key={"id" in reply ? reply.id : 0}>
             <CommentItem comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isPaused && !isEditing ? <CommentCardFooter comment={comment} onReply={onReply} /> : null}
+        <div style={{ lineHeight: "1.125rem" }}>
+          {isPaused && !isEditing ? (
+            <CommentCardFooter comment={comment} onReply={onReply} />
+          ) : null}
+        </div>
       </div>
     </div>
   );

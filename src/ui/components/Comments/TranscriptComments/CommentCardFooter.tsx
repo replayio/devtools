@@ -26,7 +26,7 @@ function NewComment({
   }
 
   return (
-    <div className="border-t border-gray-200">
+    <div>
       <NewCommentEditor comment={pendingComment} type={"new_comment"} />
     </div>
   );
@@ -48,7 +48,7 @@ function NewReply({
   }
 
   return (
-    <div className="border-t border-gray-200">
+    <div>
       <NewCommentEditor comment={pendingComment} type={"new_reply"} />
     </div>
   );
