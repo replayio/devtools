@@ -54,7 +54,6 @@
 .transcript-list .draft-editor-container {
   /* Create a positioning context for the emoji picker */
   position: relative;
-  border: 1px solid var(--cool-gray-200);
   flex-grow: 1;
 }
 

@@ -54,8 +54,8 @@ function NewReply({
   );
 }
 
-function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFooterProps) {
-  const replyPrompt = (
+export function ReplyPrompt({ onReply }: { onReply?: (e: React.MouseEvent) => void }) {
+  return (
     <div
       className="border border-primaryAccent rounded-md bg-gray-100 hover:bg-gray-200 py-1 px-2 opacity-75 hover:opacity-100"
       onClick={onReply}
@@ -63,6 +63,10 @@ function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFoot
       Write a reply...
     </div>
   );
+}
+
+function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFooterProps) {
+  const replyPrompt = <ReplyPrompt {...{ onReply }} />;
 
   // Case 1 and 2: Editing a comment/reply.
   if (
