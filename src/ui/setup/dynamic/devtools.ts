@@ -36,6 +36,7 @@ const {
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
 import { getUserSettings } from "ui/hooks/settings";
+import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 
@@ -73,7 +74,11 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
 
+  const commandHistory = await asyncStore.commandHistory;
+  const messages = initialMessageState({ commandHistory });
+
   const initialState = {
+    messages,
     ...initialDebuggerState,
     ...initialConsoleState,
   };

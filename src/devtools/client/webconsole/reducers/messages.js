@@ -13,6 +13,7 @@ const { getSourceNames } = require("devtools/client/shared/source-utils");
 
 const { log } = require("protocol/socket");
 const { assert, compareNumericStrings } = require("protocol/utils");
+const { appendToHistory } = require("ui/utils/commandHistory");
 
 const MessageState = overrides =>
   Object.freeze(
@@ -29,6 +30,8 @@ const MessageState = overrides =>
         filteredMessagesCount: getDefaultFiltersCounter(),
         // List of the message ids which are opened.
         messagesUiById: [],
+
+        commandHistory: [],
 
         // Map logpointId:pointString to messages.
         logpointMessages: new Map(),
@@ -48,6 +51,7 @@ const MessageState = overrides =>
 
 function cloneState(state) {
   return {
+    commandHistory: [...state.commandHistory],
     messagesById: new Map(state.messagesById),
     visibleMessages: [...state.visibleMessages],
     filteredMessagesCount: { ...state.filteredMessagesCount },
@@ -161,6 +165,9 @@ function messages(state = MessageState(), action) {
       let newState = cloneState(state);
       action.messages.forEach(message => {
         newState = addMessage(message, newState, filtersState);
+        if (message.type === "command") {
+          newState.commandHistory = appendToHistory(message.messageText, state.commandHistory);
+        }
       });
       return newState;
 
@@ -744,3 +751,5 @@ exports.messages = messages;
 
 // Export for testing purpose.
 exports.ensureExecutionPoint = ensureExecutionPoint;
+
+exports.initialMessageState = MessageState;

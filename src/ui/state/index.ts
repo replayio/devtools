@@ -9,6 +9,7 @@ import { ClassListState } from "devtools/client/inspector/rules/state/class-list
 import { PseudoClassesState } from "devtools/client/inspector/rules/state/pseudo-classes";
 import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
+import { MessageState } from "devtools/client/webconsole/reducers/messages";
 
 export interface UIState {
   timeline: TimelineState;
@@ -17,6 +18,7 @@ export interface UIState {
   reactDevTools: ReactDevToolsState;
   inspector: InspectorState;
   markup: MarkupState;
+  messages: MessageState;
   eventTooltip: EventTooltipState;
   classList: ClassListState;
   pseudoClasses: PseudoClassesState;

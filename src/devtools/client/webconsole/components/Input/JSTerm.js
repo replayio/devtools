@@ -11,9 +11,8 @@ import actions from "devtools/client/webconsole/actions/index";
 
 import { getRecordingId } from "ui/utils/environment";
 import { getRecording } from "ui/hooks/recordings";
-import { getCommandMessages } from "../../selectors/messages";
+import { getCommandHistory } from "../../selectors/messages";
 
-import uniq from "lodash/uniq";
 import clamp from "lodash/clamp";
 
 async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
@@ -88,14 +87,13 @@ class JSTerm extends React.Component {
   historyCursorDown = () => this.moveHistoryCursor(-1);
 
   moveHistoryCursor(difference) {
-    const messages = uniq(this.props.commandHistory.map(m => m.messageText).reverse());
+    const { commandHistory } = this.props;
+    if (commandHistory.length > 0) {
+      const newIndex = clamp(this.state.historyIndex + difference, 0, commandHistory.length);
 
-    if (messages.length === 0) {
-      return;
+      this.setValue(["", ...commandHistory][newIndex]);
+      this.setState({ historyIndex: newIndex });
     }
-    const newIndex = clamp(this.state.historyIndex + difference, 0, messages.length);
-    this.setValue(["", ...messages][newIndex]);
-    this.setState({ historyIndex: newIndex });
   }
 
   /**
@@ -174,7 +172,7 @@ class JSTerm extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    commandHistory: getCommandMessages(state),
+    commandHistory: getCommandHistory(state),
   };
 }
 

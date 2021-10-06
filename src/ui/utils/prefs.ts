@@ -1,11 +1,7 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
-import Services from "devtools-services";
-
-// Schema version to bump when the async store format has changed incompatibly
-// and old stores should be cleared.
-const { pref } = Services;
+import { pref } from "devtools-services";
 
 // Get prefs from the URL with the format
 // &prefs=<key>:<value>,<key>:<value> e.g. &prefs=video:true
@@ -95,4 +91,5 @@ export const features = new PrefsHelper("devtools.features", {
 export const asyncStore = asyncStoreHelper("devtools", {
   eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
   replaySessions: ["replay-sessions", {}],
+  commandHistory: ["command-history", []],
 });

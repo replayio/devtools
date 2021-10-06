@@ -4,12 +4,7 @@
 
 "use strict";
 
-const {
-  EVALUATE_EXPRESSION,
-  SET_TERMINAL_INPUT,
-  SET_TERMINAL_EAGER_RESULT,
-} = require("devtools/client/webconsole/constants");
-const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
+const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { assert } = require("protocol/utils");
 

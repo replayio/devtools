@@ -11,13 +11,11 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 
 import { createSelector } from "reselect";
 
-export const getAllMessagesUiById = state => state.messages.messagesUiById;
 export const getAllMessagesPayloadById = state => state.messages.messagesPayloadById;
-export const getAllGroupsById = state => state.messages.groupsById;
-export const getCurrentGroup = state => state.messages.currentGroup;
-export const getFilteredMessagesCount = state => state.messages.filteredMessagesCount;
+export const getAllMessagesUiById = state => state.messages.messagesUiById;
 export const getAllRepeatById = state => state.messages.repeatById;
-export const getGroupsById = state => state.messages.groupsById;
+export const getCommandHistory = state => state.messages.commandHistory;
+export const getFilteredMessagesCount = state => state.messages.filteredMessagesCount;
 
 function messageTime(msg) {
   const { executionPointTime, lastExecutionPoint } = msg;
@@ -46,10 +44,6 @@ export const getMessages = createSelector(
   getAllMessagesById,
   getVisibleMessages,
   (messagesById, visibleMessages) => visibleMessages.map(id => messagesById.get(id))
-);
-
-export const getCommandMessages = createSelector(getMessages, messages =>
-  messages.filter(message => message.type === "command")
 );
 
 export const getMessagesForTimeline = createSelector(getMessages, messages =>

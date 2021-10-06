@@ -49,6 +49,7 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   updatePref("splitConsole", isSplitConsoleOpen);
   updatePref("selectedPanel", getSelectedPanel);
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
+  updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);
 
   updateReplaySessions(state);
 }
