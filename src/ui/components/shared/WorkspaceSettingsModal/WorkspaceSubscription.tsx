@@ -4,7 +4,7 @@ import { Elements, CardElement, useStripe, useElements } from "@stripe/react-str
 import { loadStripe } from "@stripe/stripe-js";
 
 import hooks from "ui/hooks";
-import { Subscription } from "ui/types";
+import { PaymentMethod, Subscription } from "ui/types";
 import { isDevelopment } from "ui/utils/environment";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 
@@ -16,15 +16,24 @@ import { SettingsHeader } from "../SettingsModal/SettingsBody";
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
 // usage of the live key.
 const stripePromise = loadStripe(
-  true || !isDevelopment()
+  !isDevelopment()
     ? "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
     : "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
 );
 
-type Views = "details" | "add-payment-method" | "enter-payment-method" | "confirm-payment-method";
+type Views =
+  | "details"
+  | "add-payment-method"
+  | "enter-payment-method"
+  | "confirm-payment-method"
+  | "delete-payment-method";
 
 function isSubscriptionCancelled(subscription: Subscription) {
   return subscription.status === "canceled" && subscription.effectiveUntil;
+}
+
+function formatPaymentMethod(paymentMethod: PaymentMethod) {
+  return `${cardToDisplayType(paymentMethod.card.brand)} ending with ${paymentMethod.card.last4}`;
 }
 
 function getViewTitle(view: Views) {
@@ -36,6 +45,8 @@ function getViewTitle(view: Views) {
       return "Add Payment Method";
     case "confirm-payment-method":
       return "Payment Method Added!";
+    case "delete-payment-method":
+      return "Remove Payment Method";
   }
 }
 
@@ -643,9 +654,11 @@ function BillingBanners({ subscription }: { subscription: Subscription }) {
 function SubscriptionDetails({
   subscription,
   onAddPaymentMethod,
+  onDeletePaymentMethod,
 }: {
   subscription: Subscription;
   onAddPaymentMethod: () => void;
+  onDeletePaymentMethod: () => void;
 }) {
   return (
     <section>
@@ -661,11 +674,14 @@ function SubscriptionDetails({
       {isSubscriptionCancelled(subscription) ? null : (
         <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
           <span>Payment Method</span>
-          <span>
+          <span className="flex flex-col items-end">
             {subscription.paymentMethods.length > 0 ? (
-              `${cardToDisplayType(subscription.paymentMethods[0].card.brand)} ending with ${
-                subscription.paymentMethods[0].card.last4
-              }`
+              <>
+                {formatPaymentMethod(subscription.paymentMethods[0])}
+                <button className="text-primaryAccent underline" onClick={onDeletePaymentMethod}>
+                  Remove
+                </button>
+              </>
             ) : (
               <button className="text-primaryAccent hover:underline" onClick={onAddPaymentMethod}>
                 Add Payment Method
@@ -711,6 +727,62 @@ function Confirmation({ subscription }: { subscription: Subscription }) {
     <section>
       {/* <div className="h-36 mb-6 rounded-lg bg-blue-100" /> */}
       <PlanDetails subscription={subscription} />
+    </section>
+  );
+}
+
+function DeleteConfirmation({
+  workspaceId,
+  subscription,
+  onDone,
+}: {
+  workspaceId: string;
+  subscription: Subscription;
+  onDone: () => void;
+}) {
+  const { deleteWorkspacePaymentMethod, loading, error } = hooks.useDeleteWorkspacePaymentMethod();
+
+  const handleDeletePaymentMethod = () =>
+    deleteWorkspacePaymentMethod({
+      variables: {
+        workspaceId,
+        paymentMethodId: subscription.paymentMethods[0].id,
+      },
+    }).then(onDone);
+
+  if (error) {
+    return <section className="text-red">Unable to remove a payment method at this time.</section>;
+  }
+
+  return (
+    <section className="space-y-6">
+      <p>
+        Removing a payment method will prevent any future charges for this subscription. Add a new
+        payment method to continue your subscription beyond the current billing cycle.
+      </p>
+      <p>Are you sure you want to remove {formatPaymentMethod(subscription.paymentMethods[0])}?</p>
+      <div className="flex flex-row space-x-6 justify-center">
+        <button
+          className={classNames(
+            "border border-primaryAccent text-primaryAccent px-6 py-3 rounded-md",
+            {
+              "opacity-60": loading,
+            }
+          )}
+          onClick={loading ? undefined : onDone}
+        >
+          Cancel
+        </button>
+        <button
+          disabled={loading}
+          className={classNames("bg-red-500 text-white px-6 py-3 rounded-md", {
+            "opacity-60": loading,
+          })}
+          onClick={loading ? undefined : handleDeletePaymentMethod}
+        >
+          Remove Payment Method
+        </button>
+      </div>
     </section>
   );
 }
@@ -789,6 +861,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
             <SubscriptionDetails
               subscription={data.node.subscription}
               onAddPaymentMethod={() => setView("add-payment-method")}
+              onDeletePaymentMethod={() => setView("delete-payment-method")}
             />
             <CancelSubscription subscription={data.node.subscription} workspaceId={workspaceId} />
           </>
@@ -810,6 +883,13 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         ) : null}
         {view === "confirm-payment-method" ? (
           <Confirmation subscription={data.node.subscription} />
+        ) : null}
+        {view === "delete-payment-method" ? (
+          <DeleteConfirmation
+            subscription={data.node.subscription}
+            workspaceId={workspaceId}
+            onDone={() => setView("details")}
+          />
         ) : null}
       </section>
     </>

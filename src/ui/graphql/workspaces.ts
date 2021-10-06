@@ -94,6 +94,16 @@ export const SET_WORKSPACE_DEFAULT_PAYMENT_METHOD = gql`
   }
 `;
 
+export const DELETE_WORKSPACE_PAYMENT_METHOD = gql`
+  mutation DeleteWorkspacePaymentMethod($workspaceId: ID!, $paymentMethodId: ID!) {
+    deleteWorkspacePaymentMethod(
+      input: { workspaceId: $workspaceId, paymentMethodId: $paymentMethodId }
+    ) {
+      success
+    }
+  }
+`;
+
 export const CANCEL_WORKSPACE_SUBSCRIPTION = gql`
   mutation CancelWorkspaceSubscription($workspaceId: ID!) {
     cancelWorkspaceSubscription(input: { workspaceId: $workspaceId }) {
