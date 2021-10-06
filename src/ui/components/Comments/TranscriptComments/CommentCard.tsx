@@ -122,30 +122,36 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto w-full group py-2.5 border-b border-gray-200 cursor-pointer transition`,
-        hoveredComment === comment.id ? "bg-gray-50" : "bg-white"
+        `mx-auto w-full group border-b border-gray-200 cursor-pointer transition`,
+        isPaused || hoveredComment === comment.id ? "bg-gray-50" : "bg-white"
       )}
       onClick={() => seekToComment(comment)}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
       <div
-        className={classNames("border-l-2 border-transparent px-2.5 pl-2 space-y-2", {
+        className={classNames("py-2.5 w-full border-l-2 border-transparent", {
           "border-primaryAccent": isPaused,
-          // [hoveredStyles]: hoveredComment == comment.id && isPaused,
         })}
       >
-        {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
-        <CommentItem comment={comment} pendingComment={pendingComment} />
-        {comment.replies?.map((reply: Reply, i: number) => (
-          <div key={"id" in reply ? reply.id : 0}>
-            <CommentItem comment={reply} pendingComment={pendingComment} />
+        <div
+          className={classNames("px-2.5 pl-2 space-y-2", {
+            // "border-primaryAccent": isPaused,
+            // [hoveredStyles]: hoveredComment == comment.id && isPaused,
+          })}
+        >
+          {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
+          <CommentItem comment={comment} pendingComment={pendingComment} />
+          {comment.replies?.map((reply: Reply, i: number) => (
+            <div key={"id" in reply ? reply.id : 0}>
+              <CommentItem comment={reply} pendingComment={pendingComment} />
+            </div>
+          ))}
+          <div style={{ lineHeight: "1.125rem" }}>
+            {isPaused && !isEditing ? (
+              <CommentCardFooter comment={comment} onReply={onReply} />
+            ) : null}
           </div>
-        ))}
-        <div style={{ lineHeight: "1.125rem" }}>
-          {isPaused && !isEditing ? (
-            <CommentCardFooter comment={comment} onReply={onReply} />
-          ) : null}
         </div>
       </div>
     </div>
