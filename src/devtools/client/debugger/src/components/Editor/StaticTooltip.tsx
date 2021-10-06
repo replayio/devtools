@@ -30,10 +30,10 @@ function StaticTooltip({
   }
 
   return ReactDOM.createPortal(
-    <div className={`static-tooltip text-sm ${className}`} style={style}>
+    <div className={`static-tooltip text-sm z-10 ${className}`} style={style}>
       {children}
     </div>,
-    targetNode
+    document.body
   );
 }
 
