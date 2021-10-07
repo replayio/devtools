@@ -43,6 +43,7 @@ function initialAppState(): AppState {
     loadedRegions: null,
     showVideoPanel: true,
     showEditor: true,
+    isRepainting: false,
   };
 }
 
@@ -224,6 +225,11 @@ export default function update(
       return { ...state, showEditor: action.showEditor };
     }
 
+    case "set_is_repainting": {
+      console.log(">>", action.isRepainting);
+      return { ...state, isRepainting: action.isRepainting };
+    }
+
     default: {
       return state;
     }
@@ -317,6 +323,7 @@ export const getFontLoading = (state: UIState) => state.app.fontLoading;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const getShowVideoPanel = (state: UIState) => state.app.showVideoPanel;
 export const getShowEditor = (state: UIState) => state.app.showEditor;
+export const getIsRepainting = (state: UIState) => state.app.isRepainting;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
   typeof time !== "number" ||
   !!getLoadedRegions(state)?.loaded.some(

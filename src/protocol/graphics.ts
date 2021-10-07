@@ -17,7 +17,7 @@ import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
 import { UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
-import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
+import { setCanvas, setEventsForType, setIsRepainting, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { isRepaintEnabled } from "./enable-repaint";
@@ -238,8 +238,10 @@ export function setupGraphics(store: UIStore) {
     const pause = ThreadFront.currentPause;
     assert(pause);
 
+    store.dispatch(setIsRepainting(true));
     const rv = await pause.repaintGraphics();
     if (pause === ThreadFront.currentPause && rv) {
+      store.dispatch(setIsRepainting(false));
       const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
       let { description, screenShot } = rv;
       if (screenShot) {

@@ -1,0 +1,13 @@
+.repainting-spinner {
+  animation: repainting-spinner-fade 500ms ease 1000ms forwards;
+  opacity: 0;
+}
+
+@keyframes repainting-spinner-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

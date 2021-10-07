@@ -7,6 +7,8 @@ import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import { UIState } from "ui/state";
 import CanvasOverlay from "./Comments/VideoComments/CanvasOverlay";
 import ReplayLogo from "./shared/ReplayLogo";
+import Spinner from "./shared/Spinner";
+import "./Video.css";
 
 function StalledOverlay({ isPlaybackStalled }: { isPlaybackStalled: boolean }) {
   return (
@@ -18,6 +20,16 @@ function StalledOverlay({ isPlaybackStalled }: { isPlaybackStalled: boolean }) {
   );
 }
 
+function RepaintingOverlay() {
+  return (
+    <div className="w-full h-full z-10 pointer-events-none grid">
+      <div className="w-4 h-4 m-auto repainting-spinner">
+        <Spinner className="animate-spin h-4 w-4 text-gray-black" />
+      </div>
+    </div>
+  );
+}
+
 function Video({
   currentTime,
   playback,
@@ -25,6 +37,7 @@ function Video({
   pendingComment,
   setVideoNode,
   canvas,
+  isRepainting,
   isPlaybackStalled,
   videoUrl,
 }: PropsFromRedux) {
@@ -59,6 +72,7 @@ function Video({
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {canvas ? (
         <>
+          {isRepainting ? <RepaintingOverlay /> : null}
           <StalledOverlay isPlaybackStalled={isPlaybackStalled} />
           <CommentsOverlay />
         </>
@@ -78,6 +92,7 @@ const connector = connect(
     videoUrl: selectors.getVideoUrl(state),
     isPlaybackStalled: selectors.isPlaybackStalled(state),
     canvas: selectors.getCanvas(state),
+    isRepainting: selectors.getIsRepainting(state),
   }),
   {
     setVideoNode: actions.setVideoNode,

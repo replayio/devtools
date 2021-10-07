@@ -93,6 +93,7 @@ export interface AppState {
   loadedRegions: loadedRegions | null;
   showVideoPanel: boolean;
   showEditor: boolean;
+  isRepainting: boolean;
 }
 
 export interface AnalysisPoints {
