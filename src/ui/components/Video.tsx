@@ -55,7 +55,7 @@ function Video({
     }
   };
 
-  const showCommentTool = isPaused && !isNodeTarget && isAuthenticated && !isNodePickerActive;
+  const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
 
   return (
     <div id="video">
