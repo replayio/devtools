@@ -6,6 +6,7 @@ import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import { UIState } from "ui/state";
 import CanvasOverlay from "./Comments/VideoComments/CanvasOverlay";
+import ReplayLogo from "./shared/ReplayLogo";
 
 function StalledOverlay({ isPlaybackStalled }: { isPlaybackStalled: boolean }) {
   return (
@@ -50,7 +51,10 @@ function Video({
   };
 
   return (
-    <div id="video">
+    <div id="video" className="" style={{ background: "var(--theme-toolbar-background)" }}>
+      <div className="absolute w-full h-full flex items-center justify-center">
+        <ReplayLogo size="sm" color="gray" />
+      </div>
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {canvas ? (

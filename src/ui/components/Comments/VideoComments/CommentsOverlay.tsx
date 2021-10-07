@@ -66,7 +66,8 @@ function CommentsOverlay({
   const showComments = isPaused && !isNodeTarget && isAuthenticated && !isNodePickerActive;
 
   if (!showComments) {
-    return <CanvasOverlay />;
+    // return <CanvasOverlay />;
+    return null;
   }
 
   return (
