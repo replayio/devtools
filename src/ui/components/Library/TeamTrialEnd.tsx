@@ -1,12 +1,15 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { useHistory } from "react-router";
+import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { TrialEnd } from "../shared/TrialEnd";
 
-function TeamTrialEnd({ currentWorkspaceId }: PropsFromRedux) {
+function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const history = useHistory();
 
   // There's no workspace ID if they are in their personal library.
   if (loading || !currentWorkspaceId) {
@@ -19,11 +22,26 @@ function TeamTrialEnd({ currentWorkspaceId }: PropsFromRedux) {
     return null;
   }
 
-  return <TrialEnd trialEnds={workspace.subscription.trialEnds} color="yellow" />;
+  const onClick = () => {
+    history.push(`/team/${currentWorkspaceId}/settings/billing`);
+    setModal("workspace-settings");
+  };
+
+  return (
+    <TrialEnd
+      trialEnds={workspace.subscription.trialEnds}
+      color="yellow"
+      className="py-2 cursor-pointer"
+      onClick={onClick}
+    />
+  );
 }
 
-const connector = connect((state: UIState) => ({
-  currentWorkspaceId: selectors.getWorkspaceId(state),
-}));
+const connector = connect(
+  (state: UIState) => ({
+    currentWorkspaceId: selectors.getWorkspaceId(state),
+  }),
+  { setModal: actions.setModal }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(TeamTrialEnd);

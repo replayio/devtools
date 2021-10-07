@@ -24,7 +24,7 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
     recordingId || "00000000-0000-0000-0000-000000000000"
   );
 
-  if (loading || error) {
+  if (loading || error || !users?.length) {
     return null;
   }
 
