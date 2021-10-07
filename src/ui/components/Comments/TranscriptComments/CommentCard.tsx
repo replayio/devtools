@@ -36,7 +36,7 @@ function CommentItemHeader({
           className="overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0 opacity-50"
           title={relativeDate}
         >
-          2w
+          {relativeDate}
         </span>
       </div>
       {showOptions ? <CommentActions comment={comment} isRoot={"replies" in comment} /> : null}
