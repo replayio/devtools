@@ -27,7 +27,7 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
       variables: { newNags },
     });
     hideModal();
-    launchAndRecordUrl(FIRST_REPLAY_TARGET);
+    launchAndRecordUrl("https://static.replay.io/demo");
   };
 
   return (
