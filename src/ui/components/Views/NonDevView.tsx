@@ -50,7 +50,7 @@ function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex flex-row h-full">
+    <div className="flex flex-row h-full overflow-hidden">
       <Toolbar />
       <SplitBox
         startPanel={<SidePanel />}
