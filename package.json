@@ -70,7 +70,7 @@
     "remark-emoji": "^2.1.0",
     "reselect": "^4.0.0",
     "resize-observer-polyfill": "^1.5.1",
-    "sharp": "^0.27.0",
+    "sharp": "^0.27.2",
     "utf-8-validate": "^5.0.4",
     "whatwg-url": "^9.0.0"
   },
