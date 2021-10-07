@@ -191,7 +191,7 @@ export default function DraftJSEditor({
 
   return (
     <div
-      className="draft-editor-container px-2 py-1 rounded-md border border-primaryAccent bg-white"
+      className="draft-editor-container px-2 py-1 rounded-md border border-gray-400 bg-white"
       ref={wrapperNode}
       onClick={() => editorNode.current!.focus()}
     >
