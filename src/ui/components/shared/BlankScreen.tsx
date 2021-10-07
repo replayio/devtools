@@ -125,18 +125,7 @@ function _LoadingScreen({ uploading, awaitingSourcemaps, progress, finished }: P
   } else if (uploading) {
 
     const amount = `${Math.round(+uploading.amount)}Mb`;
-    const total = `${Math.round(+(uploading.total || 0))}Mb`;
-    
-    let statusMessage;
-    if (amount && total) {
-      statusMessage = `Uploading ${amount} of ${total}`;
-    } else if (amount) {
-      statusMessage = `Uploading ${amount}`
-    } else if (total) {
-      statusMessage = `Uploading ${total}`
-    } else {
-      statusMessage = `Uploading`;
-    }
+    const statusMessage = amount ? "Uploading" : `Uploading ${amount}`;
 
     return <BlankLoadingScreen statusMessage={statusMessage} />;
   }
