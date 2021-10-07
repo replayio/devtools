@@ -8,8 +8,6 @@ import { Redacted } from "./Redacted";
 const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPanes").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
-const SIDEPANEL_WIDTH = 240;
-
 type SidePanelProps = PropsFromRedux;
 
 function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
@@ -17,13 +15,13 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
 
   if (selectedPrimaryPanel === "explorer") {
     sidepanel = (
-      <Redacted>
+      <Redacted className="h-full">
         <PrimaryPanes />
       </Redacted>
     );
   } else if (selectedPrimaryPanel === "debug") {
     sidepanel = (
-      <Redacted>
+      <Redacted className="h-full">
         <SecondaryPanes />
       </Redacted>
     );
