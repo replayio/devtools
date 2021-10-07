@@ -138,14 +138,10 @@ export default function DraftJSEditor({
   }, [decorator]);
 
   const keyBindingFn = (e: React.KeyboardEvent) => {
-    if (
-      e.keyCode == 13 &&
-      e.metaKey &&
-      config?.modules.DraftJS.KeyBindingUtil.hasCommandModifier(e)
-    ) {
+    // Only save if the user is pressing Enter without holding Shift
+    if (e.keyCode == 13 && !e.shiftKey) {
       return "save";
-    }
-    if (e.keyCode == 27) {
+    } else if (e.keyCode == 27) {
       return "cancel";
     }
 
@@ -195,7 +191,7 @@ export default function DraftJSEditor({
 
   return (
     <div
-      className="draft-editor-container px-2 py-1 rounded-md border border-primaryAccent"
+      className="draft-editor-container px-2 py-1 rounded-md border border-primaryAccent bg-white"
       ref={wrapperNode}
       onClick={() => editorNode.current!.focus()}
     >

@@ -50,7 +50,7 @@ function CommentSource({
             dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
           />
           <div
-            className="flex flex-shrink-0 opacity-0 group-hover:opacity-100"
+            className="flex flex-shrink-0 opacity-0 group-hover:opacity-100 transition"
             // className="flex-shrink-0 p-px w-4 h-4 opacity-0 group-hover:opacity-100"
             title="Show in the Editor"
           >

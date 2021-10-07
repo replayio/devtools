@@ -103,17 +103,15 @@ function CommentCard({
   if (!("id" in comment)) {
     return (
       <div
-        className={`mx-auto w-full group`}
+        className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
         onMouseEnter={() => setHoveredComment("pendingCommentId")}
         onMouseLeave={() => setHoveredComment(null)}
       >
-        <div
-          className={classNames("bg-white rounded-lg border border-primaryAccent shadow-sm", {
-            [hoveredStyles]: hoveredComment == "pendingCommentId" && isPaused,
-          })}
-        >
-          {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
-          <NewCommentEditor comment={comment} type={"new_comment"} />
+        <div className={classNames("py-2.5 w-full border-l-2 border-primaryAccent")}>
+          <div className={classNames("px-2.5 pl-2 space-y-2")}>
+            {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
+            <NewCommentEditor comment={comment} type={"new_comment"} />
+          </div>
         </div>
       </div>
     );
@@ -122,7 +120,7 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto w-full group border-b border-gray-200 cursor-pointer transition`,
+        `mx-auto w-full group border-b border-gray-300 cursor-pointer transition`,
         isPaused || hoveredComment === comment.id ? "bg-gray-50" : "bg-white"
       )}
       onClick={() => seekToComment(comment)}
@@ -134,12 +132,7 @@ function CommentCard({
           "border-primaryAccent": isPaused,
         })}
       >
-        <div
-          className={classNames("px-2.5 pl-2 space-y-2", {
-            // "border-primaryAccent": isPaused,
-            // [hoveredStyles]: hoveredComment == comment.id && isPaused,
-          })}
-        >
+        <div className={classNames("px-2.5 pl-2 space-y-2")}>
           {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
           <CommentItem comment={comment} pendingComment={pendingComment} />
           {comment.replies?.map((reply: Reply, i: number) => (
@@ -147,11 +140,11 @@ function CommentCard({
               <CommentItem comment={reply} pendingComment={pendingComment} />
             </div>
           ))}
-          <div style={{ lineHeight: "1.125rem" }}>
-            {isPaused && !isEditing ? (
+          {isPaused && !isEditing ? (
+            <div style={{ lineHeight: "1.125rem" }}>
               <CommentCardFooter comment={comment} onReply={onReply} />
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
