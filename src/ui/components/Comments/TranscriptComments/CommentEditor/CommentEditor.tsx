@@ -50,29 +50,23 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
   };
 
   return (
-    <div className="comment-input-container text-sm p-1.5" onClick={e => e.stopPropagation()}>
-      <div className="comment-input text-xs">
+    <div className="comment-input-container" onClick={e => e.stopPropagation()}>
+      <div className="comment-input">
         <DraftJSEditor
           handleCancel={handleCancel}
           handleSubmit={handleSubmit}
           initialContent={comment.content}
-          placeholder={comment.content == "" ? "Type a comment" : ""}
+          placeholder={
+            comment.content == ""
+              ? "parentId" in comment
+                ? "Write a reply..."
+                : "Type a comment"
+              : ""
+          }
           api={setApi}
           onChangeCallback={onChangeCallback}
           users={users}
         />
-      </div>
-      <div className="flex justify-end space-x-2">
-        <SecondarySmButton color="gray" onClick={handleCancel}>
-          Cancel
-        </SecondarySmButton>
-        {submitEnabled ? (
-          <PrimarySmButton color="blue" onClick={onSubmit}>
-            Post
-          </PrimarySmButton>
-        ) : (
-          <DisabledSmButton>Post</DisabledSmButton>
-        )}
       </div>
     </div>
   );

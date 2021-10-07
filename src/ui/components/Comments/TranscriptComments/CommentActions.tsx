@@ -51,7 +51,9 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     <div className="comment-actions" onClick={e => e.stopPropagation()}>
       <PortalDropdown
         buttonContent={
-          <DotsHorizontalIcon className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100" />
+          <div className="text-gray-400">
+            <DotsHorizontalIcon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition" />
+          </div>
         }
         setExpanded={setExpanded}
         expanded={expanded}

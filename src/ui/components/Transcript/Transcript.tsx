@@ -47,7 +47,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
       </div>
       <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
-          <div className="p-3 overflow-auto w-full flex-grow space-y-3">
+          <div className="overflow-auto w-full flex-grow">
             {sortBy(displayedComments, ["time"]).map(comment => {
               return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
             })}
@@ -56,7 +56,6 @@ function Transcript({ pendingComment }: PropsFromRedux) {
           <div className="transcript-list p-3 self-stretch space-y-3 text-base text-gray-500 onboarding-text">
             <MaterialIcon className="forum large-icon">forum</MaterialIcon>
             <h2>{isAuthenticated ? "Start a conversation" : "Sign in to get started"}</h2>
-
             <p>
               {isAuthenticated
                 ? "Add a comment to the video, a line of code, or a console message."

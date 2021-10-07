@@ -26,7 +26,7 @@ function NewComment({
   }
 
   return (
-    <div className="border-t border-gray-200">
+    <div>
       <NewCommentEditor comment={pendingComment} type={"new_comment"} />
     </div>
   );
@@ -48,18 +48,25 @@ function NewReply({
   }
 
   return (
-    <div className="border-t border-gray-200">
+    <div>
       <NewCommentEditor comment={pendingComment} type={"new_reply"} />
     </div>
   );
 }
 
-function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFooterProps) {
-  const replyPrompt = (
-    <div className="border-t border-gray-200 px-3 py-3 text-gray-400" onClick={onReply}>
+export function ReplyPrompt({ onReply }: { onReply?: (e: React.MouseEvent) => void }) {
+  return (
+    <div
+      className="border border-gray-400 rounded-md bg-gray-100 hover:bg-gray-200 py-1 px-2 opacity-75 hover:opacity-100 transition"
+      onClick={onReply}
+    >
       Write a reply...
     </div>
   );
+}
+
+function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFooterProps) {
+  let footer;
 
   // Case 1 and 2: Editing a comment/reply.
   if (
@@ -67,28 +74,28 @@ function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFoot
     pendingComment.type === "edit_comment" ||
     pendingComment.type === "edit_reply"
   ) {
-    return replyPrompt;
-  }
-
-  // Case 3: Adding a comment.
-  if (pendingComment.type === "new_comment") {
-    return (
+    footer = <ReplyPrompt {...{ onReply }} />;
+  } else if (pendingComment.type === "new_comment") {
+    // Case 3: Adding a comment.
+    footer = (
       <NewComment
         pendingComment={pendingComment.comment}
         comment={comment}
-        replyPrompt={replyPrompt}
+        replyPrompt={<ReplyPrompt {...{ onReply }} />}
+      />
+    );
+  } else {
+    // Case 4: Adding a reply.
+    footer = (
+      <NewReply
+        pendingComment={pendingComment.comment}
+        comment={comment as Comment}
+        replyPrompt={<ReplyPrompt {...{ onReply }} />}
       />
     );
   }
 
-  // Case 4: Adding a reply.
-  return (
-    <NewReply
-      pendingComment={pendingComment.comment}
-      comment={comment as Comment}
-      replyPrompt={replyPrompt}
-    />
-  );
+  return <div style={{ lineHeight: "1.125rem" }}>{footer}</div>;
 }
 
 const connector = connect((state: UIState) => ({

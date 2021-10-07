@@ -8,6 +8,7 @@ import { addMentions, convertToMarkdown } from "./mention";
 import { features } from "ui/utils/prefs";
 
 import "./DraftJSEditor.css";
+import { ReplyPrompt } from "../CommentCardFooter";
 
 const moveSelectionToEnd = (editorState: Draft.EditorState, DraftJS: DraftJSModule) => {
   const { EditorState, SelectionState } = DraftJS;
@@ -137,14 +138,10 @@ export default function DraftJSEditor({
   }, [decorator]);
 
   const keyBindingFn = (e: React.KeyboardEvent) => {
-    if (
-      e.keyCode == 13 &&
-      e.metaKey &&
-      config?.modules.DraftJS.KeyBindingUtil.hasCommandModifier(e)
-    ) {
+    // Only save if the user is pressing Enter without holding Shift
+    if (e.keyCode == 13 && !e.shiftKey) {
       return "save";
-    }
-    if (e.keyCode == 27) {
+    } else if (e.keyCode == 27) {
       return "cancel";
     }
 
@@ -172,7 +169,8 @@ export default function DraftJSEditor({
     [mentionSearchText, users]
   );
 
-  if (!config) return null;
+  // This keeps the comment from collapsing when the user clicks the reply button.
+  if (!config) return <ReplyPrompt />;
 
   const {
     emojiPlugin,
@@ -193,7 +191,7 @@ export default function DraftJSEditor({
 
   return (
     <div
-      className="draft-editor-container"
+      className="draft-editor-container px-2 py-1 rounded-md border border-gray-400 bg-white"
       ref={wrapperNode}
       onClick={() => editorNode.current!.focus()}
     >
