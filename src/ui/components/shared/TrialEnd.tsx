@@ -23,11 +23,16 @@ export function TrialEnd({
     style = { backgroundColor: "#E9E9EB" };
   }
 
+  const daysLeft = getDaysLeft(trialEnds);
+  if (daysLeft >= 21) {
+    return null
+  }
+
   return (
     <div className="py-1 p-4 rounded-lg flex flex-row space-x-2 items-center" style={style}>
       <MaterialIcon style={{ fontSize: "1.25rem" }}>timer</MaterialIcon>
       <span className="overflow-hidden whitespace-pre overflow-ellipsis">
-        Trial expires in {getDaysLeft(trialEnds)} days
+        Trial expires in {daysLeft} days
       </span>
     </div>
   );
