@@ -4,19 +4,17 @@ import { actions } from "ui/actions";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
-import CommentTool from "ui/components/shared/CommentTool";
-import hooks from "ui/hooks";
-import { useAuth0 } from "@auth0/auth0-react";
 import { UIState } from "ui/state";
+import CanvasOverlay from "./Comments/VideoComments/CanvasOverlay";
 
-function CommentLoader({ recordingId }: { recordingId: string }) {
-  const { comments, loading } = hooks.useGetComments(recordingId);
-
-  if (loading) {
-    return null;
-  }
-
-  return <CommentTool comments={comments} />;
+function StalledOverlay({ isPlaybackStalled }: { isPlaybackStalled: boolean }) {
+  return (
+    <CanvasOverlay>
+      {isPlaybackStalled ? (
+        <div className="w-full h-full pointer-events-none bg-black opacity-50 absolute z-10" />
+      ) : null}
+    </CanvasOverlay>
+  );
 }
 
 function Video({
@@ -24,15 +22,11 @@ function Video({
   playback,
   isNodePickerActive,
   pendingComment,
-  recordingTarget,
   setVideoNode,
+  canvas,
+  isPlaybackStalled,
   videoUrl,
 }: PropsFromRedux) {
-  const { isAuthenticated } = useAuth0();
-  const recordingId = hooks.useGetRecordingId();
-  const isPaused = !playback;
-  const isNodeTarget = recordingTarget == "node";
-
   useEffect(() => {
     installObserver();
   }, []);
@@ -61,10 +55,11 @@ function Video({
     <div id="video">
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
-      {showCommentTool ? (
-        <CommentsOverlay>
-          <CommentLoader recordingId={recordingId} />
-        </CommentsOverlay>
+      {canvas ? (
+        <>
+          <StalledOverlay isPlaybackStalled={isPlaybackStalled} />
+          <CommentsOverlay />
+        </>
       ) : null}
       <div id="highlighter-root"></div>
     </div>
@@ -79,6 +74,8 @@ const connector = connect(
     playback: selectors.getPlayback(state),
     recordingTarget: selectors.getRecordingTarget(state),
     videoUrl: selectors.getVideoUrl(state),
+    isPlaybackStalled: selectors.isPlaybackStalled(state),
+    canvas: selectors.getCanvas(state),
   }),
   {
     setVideoNode: actions.setVideoNode,
