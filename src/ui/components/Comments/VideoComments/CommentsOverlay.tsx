@@ -6,6 +6,9 @@ import VideoComment from "./VideoComment";
 import "./CommentsOverlay.css";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
+import CommentTool from "ui/components/shared/CommentTool";
+import CanvasOverlay from "./CanvasOverlay";
+import useAuth0 from "ui/utils/useAuth0";
 
 function findComment({
   hasuraComments,
@@ -35,46 +38,55 @@ function findComment({
   );
 }
 
-function CommentsOverlay({
-  pendingComment,
-  canvas,
-  currentTime,
-  children,
-}: PropsFromRedux & { children: React.ReactNode }) {
-  const recordingId = hooks.useGetRecordingId();
-  const { comments: hasuraComments } = hooks.useGetComments(recordingId);
+function CommentLoader({ recordingId }: { recordingId: string }) {
+  const { comments, loading } = hooks.useGetComments(recordingId);
 
-  if (!canvas) {
+  if (loading) {
     return null;
   }
 
-  const { top, left, width, height, scale } = canvas;
+  return <CommentTool comments={comments} />;
+}
+
+function CommentsOverlay({
+  pendingComment,
+  currentTime,
+  playback,
+  recordingTarget,
+  isNodePickerActive,
+}: PropsFromRedux) {
+  const { isAuthenticated } = useAuth0();
+  const isPaused = !playback;
+  const recordingId = hooks.useGetRecordingId();
+  const { comments: hasuraComments } = hooks.useGetComments(recordingId);
+
   const comments = findComment({ hasuraComments, pendingComment, currentTime });
+  const isNodeTarget = recordingTarget == "node";
+
+  const showComments = isPaused && !isNodeTarget && isAuthenticated && !isNodePickerActive;
+
+  if (!showComments) {
+    return <CanvasOverlay />;
+  }
 
   return (
-    <div
-      className="canvas-overlay"
-      style={{
-        top: top,
-        left: left,
-        width: width * scale,
-        height: height * scale,
-      }}
-    >
+    <CanvasOverlay>
       <div className="canvas-comments">
         {comments.map(comment => (
           <VideoComment comment={comment} key={"id" in comment ? comment.id : "pendingCommentId"} />
         ))}
       </div>
-      {children}
-    </div>
+      <CommentLoader recordingId={recordingId} />
+    </CanvasOverlay>
   );
 }
 
 const connector = connect((state: UIState) => ({
   currentTime: selectors.getCurrentTime(state),
   pendingComment: selectors.getPendingComment(state),
-  canvas: selectors.getCanvas(state),
+  playback: selectors.getPlayback(state),
+  recordingTarget: selectors.getRecordingTarget(state),
+  isNodePickerActive: selectors.getIsNodePickerActive(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

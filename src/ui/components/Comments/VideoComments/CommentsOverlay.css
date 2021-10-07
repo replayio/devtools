@@ -1,20 +1,14 @@
-.canvas-overlay {
-  z-index: 10;
-  position: absolute;
-  pointer-events: none;
-}
-
-.canvas-overlay .canvas-comments {
+.canvas-comments {
   position: relative;
   pointer-events: all;
 }
 
-.canvas-overlay .canvas-comment {
+.canvas-comments .canvas-comment {
   position: absolute;
   display: flex;
 }
 
-.canvas-overlay .canvas-comment-marker {
+.canvas-comments .canvas-comment-marker {
   padding: 4px;
   background: var(--theme-icon-color);
   border-radius: 100%;
@@ -23,13 +17,13 @@
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
-.canvas-overlay .canvas-comment-marker.selected,
-.canvas-overlay .canvas-comment-marker.highlighted {
+.canvas-comments .canvas-comment-marker.selected,
+.canvas-comments .canvas-comment-marker.highlighted {
   background: var(--primary-accent);
   transition: background 200ms;
 }
 
-.canvas-overlay .canvas-comment .img.location-marker {
+.canvas-comments .canvas-comment .img.location-marker {
   background: white;
   width: 32px;
   height: 32px;
