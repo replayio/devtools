@@ -96,6 +96,7 @@ export interface AppState {
   showVideoPanel: boolean;
   showEditor: boolean;
   trialExpired: boolean;
+  isRepainting: boolean;
 }
 
 export interface AnalysisPoints {
