@@ -73,7 +73,7 @@ function CommentItem({
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5 group">
       <CommentItemHeader {...{ comment, showOptions }} />
       {content}
     </div>
@@ -139,7 +139,7 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto w-full group border-b border-gray-300 cursor-pointer transition`,
+        `mx-auto w-full border-b border-gray-300 cursor-pointer transition`,
         isPaused || hoveredComment === comment.id ? "bg-gray-50" : "bg-white"
       )}
       onClick={() => seekToComment(comment)}
@@ -158,11 +158,7 @@ function CommentCard({
             <CommentItem comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isPaused && !isEditing ? (
-          <div style={{ lineHeight: "1.125rem" }}>
-            <CommentCardFooter comment={comment} onReply={onReply} />
-          </div>
-        ) : null}
+        {isPaused && !isEditing ? <CommentCardFooter comment={comment} onReply={onReply} /> : null}
       </div>
     </div>
   );

@@ -66,7 +66,7 @@ export function ReplyPrompt({ onReply }: { onReply?: (e: React.MouseEvent) => vo
 }
 
 function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFooterProps) {
-  const replyPrompt = <ReplyPrompt {...{ onReply }} />;
+  let footer;
 
   // Case 1 and 2: Editing a comment/reply.
   if (
@@ -74,28 +74,28 @@ function CommentCardFooter({ comment, pendingComment, onReply }: CommentCardFoot
     pendingComment.type === "edit_comment" ||
     pendingComment.type === "edit_reply"
   ) {
-    return replyPrompt;
-  }
-
-  // Case 3: Adding a comment.
-  if (pendingComment.type === "new_comment") {
-    return (
+    footer = <ReplyPrompt {...{ onReply }} />;
+  } else if (pendingComment.type === "new_comment") {
+    // Case 3: Adding a comment.
+    footer = (
       <NewComment
         pendingComment={pendingComment.comment}
         comment={comment}
-        replyPrompt={replyPrompt}
+        replyPrompt={<ReplyPrompt {...{ onReply }} />}
+      />
+    );
+  } else {
+    // Case 4: Adding a reply.
+    footer = (
+      <NewReply
+        pendingComment={pendingComment.comment}
+        comment={comment as Comment}
+        replyPrompt={<ReplyPrompt {...{ onReply }} />}
       />
     );
   }
 
-  // Case 4: Adding a reply.
-  return (
-    <NewReply
-      pendingComment={pendingComment.comment}
-      comment={comment as Comment}
-      replyPrompt={replyPrompt}
-    />
-  );
+  return <div style={{ lineHeight: "1.125rem" }}>{footer}</div>;
 }
 
 const connector = connect((state: UIState) => ({

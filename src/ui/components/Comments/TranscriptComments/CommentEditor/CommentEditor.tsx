@@ -49,8 +49,6 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
     }
   };
 
-  console.log({ comment });
-
   return (
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
@@ -70,18 +68,6 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
           users={users}
         />
       </div>
-      {/* <div className="flex justify-end space-x-2">
-        <SecondarySmButton color="gray" onClick={handleCancel}>
-          Cancel
-        </SecondarySmButton>
-        {submitEnabled ? (
-          <PrimarySmButton color="blue" onClick={onSubmit}>
-            Post
-          </PrimarySmButton>
-        ) : (
-          <DisabledSmButton>Post</DisabledSmButton>
-        )}
-      </div> */}
     </div>
   );
 }
