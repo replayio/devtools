@@ -7,6 +7,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+const { prefs } = require("ui/utils/prefs");
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import "./BreakpointNavigation.css";
@@ -30,6 +31,8 @@ function BreakpointNavigation({
     }
   };
   const isEmpty = analysisPoints && (analysisPoints === "error" || analysisPoints?.length == 0);
+  const isHot =
+    analysisPoints && analysisPoints !== "error" && analysisPoints.length > prefs.maxHitsDisplayed;
 
   let prev, next;
 
@@ -46,9 +49,14 @@ function BreakpointNavigation({
   return (
     <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
       {!isEmpty ? (
-        <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
+        <BreakpointNavigationCommands
+          disabled={isHot}
+          prev={prev}
+          next={next}
+          navigateToPoint={navigateToPoint}
+        />
       ) : null}
-      {analysisPoints !== "error" && analysisPoints?.length ? (
+      {analysisPoints !== "error" ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : (
         <div className="flex-grow" />
@@ -85,24 +93,22 @@ function BreakpointNavigation({
   );
 }
 
-function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
+function BreakpointNavigationCommands({ disabled, prev, next, navigateToPoint }) {
+  const prevDisabled = disabled || !prev;
+  const nextDisabled = disabled || !next;
   return (
     <div className="breakpoint-navigation-commands">
       <button
-        className={`breakpoint-navigation-command-prev ${!prev ? " disabled" : ""}`}
-        disabled={!prev}
-        onClick={() => {
-          navigateToPoint(prev);
-        }}
+        className={`breakpoint-navigation-command-prev ${prevDisabled ? " disabled" : ""}`}
+        disabled={prevDisabled}
+        onClick={() => navigateToPoint(prev)}
       >
         <div className="img rewind" />
       </button>{" "}
       <button
-        className={`breakpoint-navigation-command-next ${!next ? " disabled" : ""}`}
-        disabled={!next}
-        onClick={() => {
-          navigateToPoint(next);
-        }}
+        className={`breakpoint-navigation-command-next ${nextDisabled || !next ? " disabled" : ""}`}
+        disabled={nextDisabled}
+        onClick={() => navigateToPoint(next)}
       >
         <div className="img rewind" style={{ transform: "rotate(180deg)" }} />
       </button>

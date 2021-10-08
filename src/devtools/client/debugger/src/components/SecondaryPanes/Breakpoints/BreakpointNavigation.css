@@ -19,8 +19,11 @@
 }
 
 .breakpoint-navigation-commands > * {
-  cursor: pointer;
   padding: 4px;
+}
+
+.breakpoint-navigation-commands > *:hover:not(.disabled) {
+  cursor: pointer;
 }
 
 .breakpoint-navigation-commands .img {

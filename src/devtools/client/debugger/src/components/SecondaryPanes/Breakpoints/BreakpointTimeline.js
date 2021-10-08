@@ -88,7 +88,7 @@ function BreakpointTimeline({
       >
         <div className="progress-line full" />
         <div className="progress-line" style={{ width: `${percent}%` }} />
-        {analysisPoints !== "error" && analysisPoints.length < prefs.maxHitsDisplayed
+        {analysisPoints !== "error" && analysisPoints?.length < prefs.maxHitsDisplayed
           ? analysisPoints.map((p, i) => (
               <BreakpointTimelinePoint
                 breakpoint={breakpoint}
