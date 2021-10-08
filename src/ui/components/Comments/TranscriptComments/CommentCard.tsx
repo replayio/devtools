@@ -140,7 +140,7 @@ function CommentCard({
     <div
       className={classNames(
         `mx-auto w-full border-b border-gray-300 cursor-pointer transition`,
-        isPaused || hoveredComment === comment.id ? "bg-gray-50" : "bg-white"
+        hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onClick={() => seekToComment(comment)}
       onMouseEnter={() => setHoveredComment(comment.id)}

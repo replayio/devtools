@@ -57,7 +57,7 @@ function NewReply({
 export function ReplyPrompt({ onReply }: { onReply?: (e: React.MouseEvent) => void }) {
   return (
     <div
-      className="border border-gray-400 rounded-md bg-gray-100 hover:bg-gray-200 py-1 px-2 opacity-75 hover:opacity-100 transition"
+      className="border border-gray-400 rounded-md hover:bg-gray-100 py-1 px-2 transition"
       onClick={onReply}
     >
       Write a reply...
