@@ -55,6 +55,27 @@ function formatRelativeTime(date: Date) {
   return `${minutes}m`;
 }
 
+function BorderBridge({
+  comments,
+  comment,
+  isPaused,
+}: {
+  comments: (Comment | PendingNewComment)[];
+  comment: Comment | PendingNewComment;
+  isPaused: boolean;
+}) {
+  const currentIndex = comments.findIndex(c => c === comment);
+  const nextComment = comments[currentIndex + 1];
+  const hasNextCommentSibling =
+    nextComment && comment.time === nextComment.time && comment.point === nextComment.point;
+
+  if (!isPaused || !hasNextCommentSibling) {
+    return null;
+  }
+
+  return <div className="absolute -bottom-px h-px w-0.5 bg-secondaryAccent mix-blend-multiply" />;
+}
+
 function CommentItemHeader({
   comment,
   showOptions,
@@ -125,11 +146,13 @@ function CommentItem({
 
 type PropsFromParent = {
   comment: Comment | PendingNewComment;
+  comments: (Comment | PendingNewComment)[];
 };
 type CommentCardProps = PropsFromRedux & PropsFromParent;
 
 function CommentCard({
   comment,
+  comments,
   currentTime,
   executionPoint,
   seekToComment,
@@ -182,13 +205,14 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto w-full border-b border-gray-300 cursor-pointer transition`,
+        `mx-auto relative w-full border-b border-gray-300 cursor-pointer transition`,
         hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onClick={() => seekToComment(comment)}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
+      <BorderBridge {...{ comments, comment, isPaused }} />
       <div
         className={classNames("py-2.5 w-full border-l-2 border-transparent px-2.5 pl-2 space-y-2", {
           "border-secondaryAccent": isPaused,
