@@ -983,7 +983,6 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-output .overlay-container.debug .button {
   cursor: pointer;
-  margin-left: calc(0px - var(--message-left-padding));
   background: linear-gradient(
     0deg,
     var(--paused-background-color) 0%,
