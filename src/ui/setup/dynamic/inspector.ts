@@ -1,5 +1,3 @@
-import { extendStore } from "../store";
-import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { prefs, features } from "devtools/client/inspector/prefs";
 
 declare global {
@@ -10,7 +8,5 @@ declare global {
     };
   }
 }
-
-extendStore({}, inspectorReducers, {});
 
 window.app.inspector = { prefs, features };
