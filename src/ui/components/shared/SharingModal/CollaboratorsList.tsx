@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Recording, User } from "ui/types";
 import hooks from "ui/hooks";
 import "./CollaboratorsList.css";
@@ -60,7 +60,12 @@ function Collaborator({
   );
 }
 
-function Author({ picture, name }: { picture: string; name: string }) {
+function Author({ user }: {user: User | void}) {
+  if (!user) {
+    return null
+  }
+
+  const { picture, name } = user;
   return (
     <div className="permission">
       <div className="icon avatar">
@@ -101,7 +106,7 @@ export default function CollaboratorsList({
 }) {
   return (
     <div className="permissions-list overflow-auto">
-      <Author picture={recording.user!.picture} name={recording.user!.name} />
+      <Author user={recording.user} />
       {collaborators ? <Collaborators {...{ collaborators }} /> : null}
     </div>
   );
