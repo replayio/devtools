@@ -8,8 +8,10 @@ import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
 import { getAnnotations, getCurrentPoint } from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive } from "ui/actions/app";
+import { setHasReactComponents } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter.js";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -22,7 +24,8 @@ class ReplayWall implements Wall {
 
   constructor(
     private enablePicker: (opts: NodePickerOpts) => void,
-    private disablePicker: () => void
+    private disablePicker: () => void,
+    private onShutdown: () => void
   ) {}
 
   // called by the frontend to register a listener for receiving backend messages
@@ -70,7 +73,10 @@ class ReplayWall implements Wall {
       }
 
       case "getBridgeProtocol": {
-        this.sendRequest(event, payload);
+        const response = await this.sendRequest(event, payload);
+        if (response === undefined) {
+          this.onShutdown();
+        }
         break;
       }
 
@@ -144,7 +150,10 @@ class ReplayWall implements Wall {
     if (response.returned) {
       const result: any = await response.returned.getJSON();
       this._listener?.({ event: result.event, payload: result.data });
+      return result;
     }
+
+    return response.returned;
   }
 
   private async mapNodesToElements() {
@@ -184,10 +193,11 @@ function createReactDevTools(
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodePickerOpts) => void,
-  disablePicker: () => void
+  disablePicker: () => void,
+  onShutdown: () => void
 ) {
   const target = { postMessage() {} };
-  const wall = new ReplayWall(enablePicker, disablePicker);
+  const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
   const bridge = createBridge(target, wall);
   const store = createStore(bridge, { supportsNativeInspection: true });
   wall.store = store;
@@ -202,7 +212,12 @@ function createReactDevTools(
   return ReactDevTools;
 }
 
-function ReactDevtoolsPanel({ annotations, currentPoint, setIsNodePickerActive }: PropsFromRedux) {
+function ReactDevtoolsPanel({
+  annotations,
+  currentPoint,
+  setIsNodePickerActive,
+  setHasReactComponents,
+}: PropsFromRedux) {
   if (currentPoint === null) {
     return null;
   }
@@ -216,7 +231,18 @@ function ReactDevtoolsPanel({ annotations, currentPoint, setIsNodePickerActive }
     setIsNodePickerActive(false);
   }
 
-  const ReactDevTools = createReactDevTools(annotations, currentPoint, enablePicker, disablePicker);
+  function onShutdown() {
+    sendTelemetryEvent("react-devtools-shutdown");
+    setHasReactComponents(false);
+  }
+
+  const ReactDevTools = createReactDevTools(
+    annotations,
+    currentPoint,
+    enablePicker,
+    disablePicker,
+    onShutdown
+  );
 
   return (
     <ReactDevTools
@@ -239,7 +265,7 @@ const connector = connect(
     annotations: getAnnotations(state),
     currentPoint: getCurrentPoint(state),
   }),
-  { setIsNodePickerActive }
+  { setIsNodePickerActive, setHasReactComponents }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ReactDevtoolsPanel);

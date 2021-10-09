@@ -5,11 +5,17 @@ import { Annotation } from "ui/state/reactDevTools";
 import { UIStore } from ".";
 
 export type AddAnnotationsAction = Action<"add_annotations"> & { annotations: Annotation[] };
+export type SetHasReactComponentsAction = Action<"set_has_react_components"> & {
+  hasReactComponents: boolean;
+};
 export type SetCurrentPointAction = Action<"set_current_point"> & {
   currentPoint: ExecutionPoint | null;
 };
 
-export type ReactDevToolsAction = AddAnnotationsAction | SetCurrentPointAction;
+export type ReactDevToolsAction =
+  | AddAnnotationsAction
+  | SetCurrentPointAction
+  | SetHasReactComponentsAction;
 
 export function setupReactDevTools(store: UIStore) {
   store.dispatch(setCurrentPoint(ThreadFront.currentPoint));
@@ -26,6 +32,10 @@ export function setupReactDevTools(store: UIStore) {
       )
     );
   });
+}
+
+export function setHasReactComponents(hasReactComponents: boolean): SetHasReactComponentsAction {
+  return { type: "set_has_react_components", hasReactComponents };
 }
 
 export function addAnnotations(annotations: Annotation[]): AddAnnotationsAction {
