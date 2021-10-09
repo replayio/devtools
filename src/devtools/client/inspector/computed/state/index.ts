@@ -20,3 +20,6 @@ export interface ComputedState {
   search: string;
   showBrowserStyles: boolean;
 }
+export interface InspectorState {
+  computed: ComputedState;
+}

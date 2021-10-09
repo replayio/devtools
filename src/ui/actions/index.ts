@@ -5,7 +5,7 @@ import * as timelineActions from "./timeline";
 import * as sessionActions from "./session";
 import * as commentsActions from "./comments";
 import * as reactDevToolsActions from "./reactDevTools";
-import { ThunkAction } from "ui/utils/thunk";
+import { ThunkAction, ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
 import type { AppActions } from "./app";
 import type { TimelineActions } from "./timeline";
@@ -30,15 +30,6 @@ export type UIAction =
   | EventTooltipAction
   | SessionActions
   | DebuggerAction;
-
-interface ThunkExtraArgs {
-  client: any;
-  panels: any;
-  prefsService: any;
-  toolbox: any;
-  parser: any;
-  search: any;
-}
 
 export type UIThunkAction<TReturn = void> = ThunkAction<TReturn, UIState, ThunkExtraArgs, UIAction>;
 

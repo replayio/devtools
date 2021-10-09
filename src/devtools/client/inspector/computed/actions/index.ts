@@ -2,6 +2,8 @@ import { Action } from "redux";
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
 import CSSProperties from "../../css-properties";
+import { ThunkAction, ThunkExtraArgs } from "ui/utils/thunk";
+import { InspectorState } from "../state";
 const { OutputParser } = require("devtools/client/shared/output-parser");
 
 type SetComputedPropertiesAction = Action<"set_computed_properties"> & {
@@ -19,8 +21,18 @@ export type ComputedAction =
   | SetShowBrowserStylesAction
   | SetComputedPropertyExpandedAction;
 
-export function setComputedProperties(elementStyle: ElementStyle): SetComputedPropertiesAction {
-  return { type: "set_computed_properties", properties: createComputedProperties(elementStyle) };
+export type InspectorThunkAction<TReturn = void> = ThunkAction<
+  TReturn,
+  InspectorState,
+  ThunkExtraArgs,
+  ComputedAction
+>;
+
+export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
+  return async ({ dispatch }) => {
+    const properties = await createComputedProperties(elementStyle);
+    return dispatch({ type: "set_computed_properties", properties });
+  };
 }
 
 export function setComputedPropertySearch(search: string): SetComputedPropertySearchAction {
@@ -40,8 +52,10 @@ export function setComputedPropertyExpanded(
 
 const outputParser = new OutputParser(document, CSSProperties);
 
-function createComputedProperties(elementStyle: ElementStyle): ComputedPropertyState[] {
-  const computed = elementStyle.element.getComputedStyle();
+async function createComputedProperties(
+  elementStyle: ElementStyle
+): Promise<ComputedPropertyState[]> {
+  const computed = await elementStyle.element.getComputedStyle();
   if (!computed) return [];
 
   const properties: ComputedPropertyState[] = [];

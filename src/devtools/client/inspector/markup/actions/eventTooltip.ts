@@ -23,7 +23,7 @@ export function showEventTooltip(nodeId: string): UIThunkAction {
   return async ({ dispatch }) => {
     assert(ThreadFront.currentPause);
     const nodeFront = ThreadFront.currentPause.getNodeFront(nodeId);
-    const listenerRaw = nodeFront.getEventListeners() || [];
+    const listenerRaw = (await nodeFront.getEventListeners()) || [];
     const frameworkListeners = await nodeFront.getFrameworkEventListeners();
 
     const listenerInfo = [...listenerRaw, ...frameworkListeners].map(listener => {
