@@ -37,11 +37,12 @@ function VideoComment({
         className="flex items-center justify-center"
         style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
       >
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primaryAccent opacity-75 pointer-events-none" />
+        {isHighlighted ? (
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondaryAccent opacity-75 pointer-events-none" />
+        ) : null}
         <span
           className={classnames(
-            "rounded-full relative inline-flex transition duration-300 ease-in-out bg-primaryAccent cursor-pointer",
-            isHighlighted ? "bg-secondaryAccent" : ""
+            "rounded-full relative inline-flex transition duration-300 ease-in-out bg-secondaryAccent cursor-pointer"
           )}
           onMouseEnter={() => setHoveredComment(comment.id)}
           onMouseLeave={() => setHoveredComment(null)}
