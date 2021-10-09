@@ -13,6 +13,7 @@ import {
   NodeBounds,
   PauseData,
   repaintGraphicsResult,
+  getAllBoundingClientRectsResult,
 } from "@recordreplay/protocol";
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
@@ -97,7 +98,7 @@ export class Pause {
   documentNode: NodeFront | undefined;
   domFronts: Map<string, DOMFront>;
   stack: WiredFrame[] | undefined;
-  loadMouseTargetsWaiter: Deferred<void> | undefined;
+  loadMouseTargetsWaiter: Deferred<getAllBoundingClientRectsResult | null> | undefined;
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
@@ -450,10 +451,19 @@ export class Pause {
     if (this.loadMouseTargetsWaiter) {
       return this.loadMouseTargetsWaiter.promise;
     }
+
     this.loadMouseTargetsWaiter = defer();
-    const { elements } = await this.sendMessage(client.DOM.getAllBoundingClientRects, {});
-    this.mouseTargets = elements;
-    this.loadMouseTargetsWaiter.resolve();
+    let rv = null;
+    try {
+      rv = await this.sendMessage(client.DOM.getAllBoundingClientRects, {});
+      this.mouseTargets = rv.elements;
+    } catch (e) {
+      this.mouseTargets = [];
+      console.error("DOM.getAllBoundingClientRects failed", e);
+    }
+
+    this.loadMouseTargetsWaiter.resolve(rv);
+    return !!rv;
   }
 
   async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
