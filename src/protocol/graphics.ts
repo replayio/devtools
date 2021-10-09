@@ -239,19 +239,26 @@ export function setupGraphics(store: UIStore) {
     assert(pause);
 
     const rv = await pause.repaintGraphics();
-    if (pause === ThreadFront.currentPause && rv) {
-      const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-      let { description, screenShot } = rv;
-      if (screenShot) {
-        repaintedScreenshots.set(description.hash, screenShot);
-      } else {
-        screenShot = repaintedScreenshots.get(description.hash);
-        if (!screenShot) {
-          console.error("Missing repainted screenshot", description);
-          return;
+    if (pause === ThreadFront.currentPause) {
+      // First try to use the new graphics,
+      // then fallback to the most recent graphics.
+      if (rv) {
+        const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+        let { description, screenShot } = rv;
+        if (screenShot) {
+          repaintedScreenshots.set(description.hash, screenShot);
+        } else {
+          screenShot = repaintedScreenshots.get(description.hash);
+          if (!screenShot) {
+            console.error("Missing repainted screenshot", description);
+            return;
+          }
         }
+        paintGraphics(screenShot, mouse);
+      } else {
+        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+        paintGraphics(screen, mouse);
       }
-      paintGraphics(screenShot, mouse);
     }
   });
 }
