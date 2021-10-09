@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classNames from "classnames";
 import Markdown from "react-markdown";
@@ -10,11 +10,50 @@ import { Comment, PendingComment, PendingNewComment, Reply } from "ui/state/comm
 import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
-import formatDistanceToNow from "date-fns/formatDistanceToNow";
+
+import differenceInMinutes from "date-fns/differenceInMinutes";
+import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
+import differenceInWeeks from "date-fns/differenceInWeeks";
+import differenceInMonths from "date-fns/differenceInMonths";
+import differenceInYears from "date-fns/differenceInYears";
+
 import useAuth0 from "ui/utils/useAuth0";
 import CommentCardFooter from "./CommentCardFooter";
 import { AvatarImage } from "ui/components/Avatar";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
+
+function formatRelativeTime(date: Date) {
+  const minutes = differenceInMinutes(Date.now(), date);
+  const days = differenceInCalendarDays(Date.now(), date);
+  const weeks = differenceInWeeks(Date.now(), date);
+  const months = differenceInMonths(Date.now(), date);
+  const years = differenceInYears(Date.now(), date);
+
+  if (years > 0) {
+    return `${years}y`;
+  }
+  if (months > 0) {
+    return `${months}m`;
+  }
+
+  if (weeks > 0) {
+    return `${weeks}w`;
+  }
+
+  if (days > 0) {
+    return `${days}d`;
+  }
+
+  if (minutes >= 60) {
+    return `${Math.floor(minutes / 60)}h`;
+  }
+
+  if (minutes == 0) {
+    return "Now";
+  }
+
+  return `${minutes}m`;
+}
 
 function CommentItemHeader({
   comment,
@@ -23,7 +62,11 @@ function CommentItemHeader({
   comment: Comment | Reply;
   showOptions: boolean;
 }) {
-  let relativeDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+  const [relativeDate, setRelativeDate] = useState("");
+
+  useEffect(() => {
+    setRelativeDate(formatRelativeTime(new Date(comment.createdAt)));
+  }, []);
 
   return (
     <div className="flex flex-row space-x-1.5 items-center">
