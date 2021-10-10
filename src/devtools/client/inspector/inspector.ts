@@ -10,6 +10,8 @@ const EventEmitter = require("devtools/shared/event-emitter");
 // const { log } = require("protocol/socket");
 import { NodeFront } from "protocol/thread/node";
 import { UIStore } from "ui/actions";
+import { extendStore } from "ui/setup/store";
+import * as inspectorReducers from "devtools/client/inspector/reducers";
 
 require("devtools/client/themes/breadcrumbs.css");
 require("devtools/client/themes/inspector.css");
@@ -39,6 +41,7 @@ import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
 
 const Highlighter = require("highlighter/highlighter");
+extendStore({}, inspectorReducers, {});
 
 /**
  * Represents an open instance of the Inspector for a tab.
