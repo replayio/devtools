@@ -11,7 +11,7 @@ export default function TeamSelect({
   selectedWorkspaceId: string | null;
   handleWorkspaceSelect: (id: string | null) => void;
 }) {
-  const displayedWorkspaces = [{ id: null, name: "My Library" }, ...workspaces].sort();
+  const displayedWorkspaces = [{ id: null, name: "Your Library" }, ...workspaces].sort();
 
   return (
     <SelectMenu

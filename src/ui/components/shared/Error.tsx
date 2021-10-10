@@ -79,7 +79,7 @@ function LibraryButton() {
         "w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
-      Back to Library
+      Back to Your Library
     </button>
   );
 }

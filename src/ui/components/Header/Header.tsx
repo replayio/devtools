@@ -157,7 +157,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
-            content={"Back to Library"}
+            content={"Back to Your Library"}
             handleClick={e => onNavigateBack(e)}
           />
         )}

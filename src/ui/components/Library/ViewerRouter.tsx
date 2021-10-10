@@ -25,7 +25,7 @@ function MyLibrary({ searchString }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName: "My Library", searchString }} />;
+  return <Viewer {...{ recordings, workspaceName: "Your Library", searchString }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
