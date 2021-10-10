@@ -116,7 +116,12 @@ class ReplayWall implements Wall {
       case "startInspectingNative": {
         ThreadFront.ensureCurrentPause();
         await ThreadFront.currentPause!.createWaiter;
-        await ThreadFront.currentPause!.loadMouseTargets();
+        const rv = await ThreadFront.currentPause!.loadMouseTargets();
+
+        if (!rv) {
+          this._listener?.({ event: "stopInspectingNative", payload: true });
+          break;
+        }
 
         const nodeToElementId = await this.mapNodesToElements();
 
@@ -130,6 +135,7 @@ class ReplayWall implements Wall {
           },
           enabledNodeIds: [...nodeToElementId.keys()],
         });
+
         break;
       }
 
