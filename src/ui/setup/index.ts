@@ -6,7 +6,14 @@ import { setupDOMHelpers } from "./dom";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
 import { getTheme, getWorkspaceId } from "ui/reducers/app";
-import { setFontLoading, setModal, setViewMode, setWorkspaceId } from "ui/actions/app";
+import {
+  setFontLoading,
+  setModal,
+  setShowEditor,
+  setShowVideoPanel,
+  setViewMode,
+  setWorkspaceId,
+} from "ui/actions/app";
 import tokenManager from "ui/utils/tokenManager";
 import { bootIntercom } from "ui/utils/intercom";
 import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
@@ -15,7 +22,6 @@ import { getUserSettings } from "ui/hooks/settings";
 import { getRecordingId, isTest } from "ui/utils/environment";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 const FontFaceObserver = require("fontfaceobserver");
-import { ViewMode } from "ui/state/app";
 import { asyncStore } from "ui/utils/prefs";
 
 declare global {
@@ -34,9 +40,24 @@ export function bootstrapApp() {
   const store = bootstrapStore();
   window.store = store;
 
-  registerStoreObserver(store, updatePrefs);
+  // Check if we have any preferences saved for this replay and apply
+  // them to the store. Todo: Do this step before we create the store.
+  asyncStore.replaySessions
+    .then((sessions: ReplaySessions) => {
+      const session = sessions[getRecordingId()!];
 
-  setupAppHelper(store);
+      if (!session) {
+        return;
+      }
+
+      store.dispatch(setViewMode(session.viewMode));
+      store.dispatch(setShowVideoPanel(session.showVideoPanel));
+      store.dispatch(setShowEditor(session.showEditor));
+    })
+    .then(() => {
+      registerStoreObserver(store, updatePrefs);
+      setupAppHelper(store);
+    });
 
   const theme = getTheme(store.getState());
   document.body.parentElement!.className = theme || "";
@@ -51,18 +72,6 @@ export function bootstrapApp() {
     store.dispatch(setWorkspaceId(match.params.workspaceId));
     store.dispatch(setModal("workspace-settings"));
   }
-
-  // Check if we have any preferences saved for this replay and apply
-  // them to the store. Todo: Do this step before we create the store.
-  asyncStore.replaySessions.then((sessions: ReplaySessions) => {
-    const session = sessions[getRecordingId()!];
-
-    if (!session) {
-      return;
-    }
-
-    store.dispatch(setViewMode(session.viewMode));
-  });
 
   tokenManager.addListener(async tokenState => {
     if (tokenState.loading || tokenState.error) {

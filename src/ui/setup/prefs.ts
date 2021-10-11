@@ -1,7 +1,13 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
-import { getSelectedPanel, getViewMode, isSplitConsoleOpen } from "ui/reducers/app";
+import {
+  getSelectedPanel,
+  getShowEditor,
+  getShowVideoPanel,
+  getViewMode,
+  isSplitConsoleOpen,
+} from "ui/reducers/app";
 import { getRecordingId } from "ui/utils/environment";
 import { ViewMode } from "ui/state/app";
 
@@ -10,6 +16,8 @@ export interface ReplaySessions {
 }
 export interface ReplaySession {
   viewMode: ViewMode;
+  showVideoPanel: boolean;
+  showEditor: boolean;
 }
 
 export function registerStoreObserver(
@@ -24,9 +32,7 @@ export function registerStoreObserver(
   });
 }
 
-let currentReplaySessions: ReplaySessions;
-
-export function updatePrefs(state: UIState, oldState: UIState) {
+export async function updatePrefs(state: UIState, oldState: UIState) {
   function updatePref(field: keyof typeof prefs, selector: Function) {
     if (selector(state) != selector(oldState)) {
       prefs[field] = selector(state);
@@ -43,20 +49,17 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   updatePref("selectedPanel", getSelectedPanel);
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
 
-  const previousReplaySessions = currentReplaySessions;
-  currentReplaySessions = updateReplaySessions(state, currentReplaySessions);
-
-  if (previousReplaySessions && previousReplaySessions !== currentReplaySessions) {
-    asyncStore.replaySessions = currentReplaySessions;
-  }
+  await updateReplaySessions(state);
 }
 
-function updateReplaySessions(
-  state: UIState,
-  currentReplaySessions: ReplaySessions
-): ReplaySessions {
+async function updateReplaySessions(state: UIState) {
   const recordingId = getRecordingId();
-  const currentReplaySession = { viewMode: getViewMode(state) };
+  const previousReplaySessions = await asyncStore.replaySessions;
+  const currentReplaySession = {
+    viewMode: getViewMode(state),
+    showEditor: getShowEditor(state),
+    showVideoPanel: getShowVideoPanel(state),
+  };
 
-  return { ...currentReplaySessions, [recordingId!]: currentReplaySession };
+  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId!]: currentReplaySession };
 }
