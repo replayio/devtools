@@ -10,11 +10,9 @@ import { AddPaymentMethod } from "./AddPaymentMethod";
 import { ConsentForm } from "./ConsentForm";
 import { getViewTitle, Views } from "./utils";
 
-import { CancelSubscription } from "./CancelSubscription";
 import { DeleteConfirmation } from "./DeleteConfirmation";
-import { BillingBanners } from "./BillingBanners";
 import { Confirmation } from "./Confirmation";
-import { SubscriptionDetails } from "./SubscriptionDetails";
+import { SubscriptionDetailsView } from "./SubscriptionDetailsView";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -44,15 +42,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
       <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
         {view === "details" ? (
-          <>
-            <BillingBanners subscription={data.node.subscription} />
-            <SubscriptionDetails
-              subscription={data.node.subscription}
-              onAddPaymentMethod={() => setView("add-payment-method")}
-              onDeletePaymentMethod={() => setView("delete-payment-method")}
-            />
-            <CancelSubscription subscription={data.node.subscription} workspaceId={workspaceId} />
-          </>
+          <SubscriptionDetailsView subscription={data.node.subscription} />
         ) : null}
         {view === "add-payment-method" ? (
           <ConsentForm
