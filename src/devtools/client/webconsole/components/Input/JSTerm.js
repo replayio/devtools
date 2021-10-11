@@ -17,7 +17,9 @@ import uniq from "lodash/uniq";
 import clamp from "lodash/clamp";
 
 async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
+  await gToolbox.startPanel("debugger");
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
+
   const editor = new Editor({
     autofocus: true,
     enableCodeFolding: false,
