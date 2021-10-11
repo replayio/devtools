@@ -6,25 +6,11 @@ import { Subscription } from "ui/types";
 export function CancelSubscription({
   subscription,
   workspaceId,
+  actions,
 }: {
   subscription: Subscription;
   workspaceId: string;
 }) {
-  const {
-    cancelWorkspaceSubscription,
-    loading: cancelLoading,
-  } = hooks.useCancelWorkspaceSubscription();
-
-  const handleCancelSubscription = () => {
-    if (cancelLoading) return;
-
-    cancelWorkspaceSubscription({
-      variables: {
-        workspaceId,
-      },
-    });
-  };
-
   if (subscription.status !== "active" && subscription.status !== "trialing") {
     return null;
   }
@@ -40,10 +26,10 @@ export function CancelSubscription({
           </div>
         </div>
         <button
-          onClick={handleCancelSubscription}
+          onClick={actions.handleCancelSubscription}
           className={classNames(
             "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
-            { "opacity-60": cancelLoading }
+            { "opacity-60": actions.cancelLoading }
           )}
         >
           Cancel Subscription

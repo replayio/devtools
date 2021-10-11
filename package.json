@@ -10,7 +10,9 @@
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "build-cra-e2e-test": "node test/examples/cra/build"
+    "build-cra-e2e-test": "node test/examples/cra/build",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@apollo/client": "^3.1.5",
@@ -25,6 +27,7 @@
     "@recordreplay/recordings-cli": "^0.3.1",
     "@sentry/react": "^6.8.0",
     "@sentry/tracing": "^6.8.0",
+    "@storybook/addon-postcss": "^2.0.0",
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.17.1",
     "@tailwindcss/forms": "^0.3.2",
@@ -88,6 +91,12 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.14.5",
     "@babel/types": "^7.14.8",
+    "@storybook/addon-actions": "^6.3.10",
+    "@storybook/addon-essentials": "^6.3.10",
+    "@storybook/addon-links": "^6.3.10",
+    "@storybook/builder-webpack5": "^6.3.10",
+    "@storybook/manager-webpack5": "^6.3.10",
+    "@storybook/react": "^6.3.10",
     "@types/classnames": "^2.2.11",
     "@types/draft-js": "^0.10.44",
     "@types/escape-html": "^1.0.1",
