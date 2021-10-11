@@ -1,6 +1,7 @@
-import { CommentsState } from "ui/state/comments";
+import { CommentsState, PendingComment } from "ui/state/comments";
 import { CommentsAction } from "ui/actions/comments";
 import { UIState } from "ui/state";
+import cloneDeep from "lodash/cloneDeep";
 
 function initialCommentsState(): CommentsState {
   return {
@@ -33,6 +34,22 @@ export default function update(
       return {
         ...state,
         shouldShowLoneEvents: action.value,
+      };
+    }
+
+    case "update_pending_comment_content": {
+      if (!state.pendingComment) {
+        return state;
+      }
+
+      // Using cloneDeep instead of copying with destructure syntax
+      // to keep TS happy.
+      const newPendingComment = cloneDeep(state.pendingComment);
+      newPendingComment.comment.content = action.content;
+
+      return {
+        ...state,
+        pendingComment: newPendingComment,
       };
     }
 

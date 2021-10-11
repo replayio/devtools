@@ -20,9 +20,14 @@ const {
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
+type UpdatePendingCommentContent = Action<"update_pending_comment_content"> & { content: string };
 type SetShouldShowLoneEvents = Action<"set_should_show_lone_events"> & { value: boolean };
 
-export type CommentsAction = SetPendingComment | SetHoveredComment | SetShouldShowLoneEvents;
+export type CommentsAction =
+  | SetPendingComment
+  | SetHoveredComment
+  | SetShouldShowLoneEvents
+  | UpdatePendingCommentContent;
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
   return { type: "set_pending_comment", comment };
@@ -36,19 +41,8 @@ export function clearPendingComment(): SetPendingComment {
   return { type: "set_pending_comment", comment: null };
 }
 
-export function updatePendingCommentContent(content: string): UIThunkAction {
-  return async ({ getState, dispatch }) => {
-    const pendingComment = getPendingComment(getState());
-
-    if (!pendingComment) {
-      return;
-    }
-
-    const newPendingComment = { ...pendingComment };
-    newPendingComment.comment.content = content;
-
-    dispatch(setPendingComment(newPendingComment));
-  };
+export function updatePendingCommentContent(content: string): UpdatePendingCommentContent {
+  return { type: "update_pending_comment_content", content };
 }
 
 export function toggleShowLoneEvents(): UIThunkAction {
