@@ -54,11 +54,13 @@ export async function getInitialAppState(): Promise<AppState> {
     return syncInitialAppState;
   }
 
+  const { viewMode, showVideoPanel, showEditor } = syncInitialAppState;
+
   return {
     ...syncInitialAppState,
-    viewMode: session.viewMode,
-    showVideoPanel: session.showVideoPanel,
-    showEditor: session.showEditor,
+    viewMode: session.viewMode || viewMode,
+    showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
+    showEditor: "showEditor" in session ? session.showEditor : showEditor,
   };
 }
 
