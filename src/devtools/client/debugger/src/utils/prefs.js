@@ -1,10 +1,9 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+// /* This Source Code Form is subject to the terms of the Mozilla Public
+//  * License, v. 2.0. If a copy of the MPL was not distributed with this
+//  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import { PrefsHelper, asyncStoreHelper } from "devtools-modules";
+import { asyncStoreHelper } from "devtools/shared/async-store-helper";
+import { PrefsHelper } from "devtools/client/shared/prefs";
 
 import Services from "devtools-services";
 

@@ -1,18 +1,12 @@
 import React, { useState } from "react";
-import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
 import hooks from "ui/hooks";
 import { isDevelopment } from "ui/utils/environment";
 
-import { SettingsHeader } from "../SettingsModal/SettingsBody";
-import { AddPaymentMethod } from "./AddPaymentMethod";
-import { ConsentForm } from "./ConsentForm";
-import { getViewTitle, Views } from "./utils";
+import { Views } from "./utils";
 
-import { DeleteConfirmation } from "./DeleteConfirmation";
-import { Confirmation } from "./Confirmation";
-import { SubscriptionDetailsView } from "./SubscriptionDetailsView";
+import { WorkspaceSubscriptionContainer } from "./WorkspaceSubscriptionContainer";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -26,6 +20,25 @@ export const stripePromise = loadStripe(
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
   const [view, setView] = useState<Views>("details");
   const { data, loading } = hooks.useGetWorkspaceSubscription(workspaceId);
+  const {
+    cancelWorkspaceSubscription,
+    loading: cancelLoading,
+  } = hooks.useCancelWorkspaceSubscription();
+
+  const handleCancelSubscription = () => {
+    if (cancelLoading) return;
+
+    cancelWorkspaceSubscription({
+      variables: {
+        workspaceId,
+      },
+    });
+  };
+
+  const actions = {
+    handleCancelSubscription,
+    cancelLoading,
+  };
 
   if (loading) return null;
 
@@ -38,40 +51,13 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   }
 
   return (
-    <>
-      <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
-      <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
-        {view === "details" ? (
-          <SubscriptionDetailsView subscription={data.node.subscription} />
-        ) : null}
-        {view === "add-payment-method" ? (
-          <ConsentForm
-            subscription={data.node.subscription}
-            onEnterCard={() => setView("enter-payment-method")}
-          />
-        ) : null}
-        {view === "enter-payment-method" ? (
-          <Elements stripe={stripePromise}>
-            <AddPaymentMethod
-              onCancel={() => setView("details")}
-              onSave={() => setView("confirm-payment-method")}
-              workspaceId={workspaceId}
-              // TODO: handle the error at this level...
-              stripePromise={stripePromise}
-            />
-          </Elements>
-        ) : null}
-        {view === "confirm-payment-method" ? (
-          <Confirmation subscription={data.node.subscription} />
-        ) : null}
-        {view === "delete-payment-method" ? (
-          <DeleteConfirmation
-            subscription={data.node.subscription}
-            workspaceId={workspaceId}
-            onDone={() => setView("details")}
-          />
-        ) : null}
-      </section>
-    </>
+    <WorkspaceSubscriptionContainer
+      subscription={data.node.subscription}
+      workspaceId={workspaceId}
+      view={view}
+      actions={actions}
+      setView={setView}
+      stripePromise={stripePromise}
+    ></WorkspaceSubscriptionContainer>
   );
 }

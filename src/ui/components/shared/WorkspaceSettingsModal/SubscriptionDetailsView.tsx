@@ -1,4 +1,5 @@
 import React from "react";
+
 import { CancelSubscription } from "./CancelSubscription";
 import { BillingBanners } from "./BillingBanners";
 import { SubscriptionDetails } from "./SubscriptionDetails";
@@ -9,6 +10,7 @@ export function SubscriptionDetailsView({
   subscription,
   setView,
   workspaceId,
+  actions,
 }: {
   subscription: Subscription;
   setView: (view: Views) => void;
@@ -16,13 +18,14 @@ export function SubscriptionDetailsView({
 }) {
   return (
     <>
+      {/* <h3>Hi</h3> */}
       <BillingBanners subscription={subscription} />
       <SubscriptionDetails
         subscription={subscription}
         onAddPaymentMethod={() => setView("add-payment-method")}
         onDeletePaymentMethod={() => setView("delete-payment-method")}
       />
-      <CancelSubscription subscription={subscription} workspaceId={workspaceId} />
+      <CancelSubscription actions={actions} subscription={subscription} workspaceId={workspaceId} />
     </>
   );
 }

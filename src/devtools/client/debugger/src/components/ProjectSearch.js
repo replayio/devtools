@@ -27,7 +27,7 @@ import ManagedTree from "./shared/ManagedTree";
 import SearchInput from "./shared/SearchInput";
 import AccessibleImage from "./shared/AccessibleImage";
 
-import { PluralForm } from "devtools-modules";
+import { PluralForm } from "devtools/shared/plural-form";
 
 import "./ProjectSearch.css";
 

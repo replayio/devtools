@@ -19,7 +19,7 @@ import { isFulfilled, fulfilled } from "../../utils/async-value";
 import { isPretty } from "../../utils/source";
 import { memoizeableAction } from "../../utils/memoizableAction";
 
-import { Telemetry } from "devtools-modules";
+import Telemetry from "devtools/shared/Telemetry";
 
 // Measures the time it takes for a source to load
 const loadSourceHistogram = "DEVTOOLS_DEBUGGER_LOAD_SOURCE_MS";

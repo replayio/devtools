@@ -4,6 +4,7 @@
 
 //
 import memoize from "lodash/memoize";
+import "ui/utils/whatwg-url-fix.js";
 import { URL } from "whatwg-url";
 
 const defaultUrl = {

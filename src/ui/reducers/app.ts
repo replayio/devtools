@@ -3,6 +3,7 @@ import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
 import { prefs } from "../utils/prefs";
+
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isSameTimeStampedPointRange } from "ui/utils/timeline";

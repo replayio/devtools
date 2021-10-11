@@ -212,9 +212,4 @@ function key(n) {
   });
 }
 
-exports.getItem = getItem;
-exports.setItem = setItem;
-exports.removeItem = removeItem;
-exports.clear = clear;
-exports.length = length;
-exports.key = key;
+module.exports = {getItem, setItem, removeItem, clear, length, key}
