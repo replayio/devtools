@@ -6,11 +6,12 @@ import LogRocket from "ui/utils/logrocket";
 import { sanityCheckMiddleware } from "ui/utils/sanitize";
 const configureStore = require("devtools/client/debugger/src/actions/utils/create-store").default;
 import reducer from "ui/reducers/app";
+import { AppState } from "ui/state/app";
 
 let reducers: Record<string, any> = { app: reducer };
 let thunkArgs: Record<string, any> = {};
 
-export function bootstrapStore() {
+export function bootstrapStore(initialState: { app: AppState }) {
   // TODO; manage panels outside of the Toolbox componenet
   const panels = {};
 
@@ -31,7 +32,7 @@ export function bootstrapStore() {
       : undefined
     : applyMiddleware(LogRocket.reduxMiddleware());
 
-  return createStore(combineReducers(reducers), {}, middleware);
+  return createStore(combineReducers(reducers), initialState, middleware);
 }
 
 export function extendStore(
