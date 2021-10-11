@@ -7,6 +7,7 @@ import { ThreadFront } from "protocol/thread";
 import { setSelectedPrimaryPanel } from "./app";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
+import { getPendingComment } from "ui/reducers/comments";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -33,6 +34,21 @@ export function setHoveredComment(comment: any): SetHoveredComment {
 
 export function clearPendingComment(): SetPendingComment {
   return { type: "set_pending_comment", comment: null };
+}
+
+export function updatePendingCommentContent(content: string): UIThunkAction {
+  return async ({ getState, dispatch }) => {
+    const pendingComment = getPendingComment(getState());
+
+    if (!pendingComment) {
+      return;
+    }
+
+    const newPendingComment = { ...pendingComment };
+    newPendingComment.comment.content = content;
+
+    dispatch(setPendingComment(newPendingComment));
+  };
 }
 
 export function toggleShowLoneEvents(): UIThunkAction {
