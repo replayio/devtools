@@ -40,6 +40,8 @@ function Transcript({ pendingComment }: PropsFromRedux) {
 
   const { isAuthenticated } = useAuth0();
 
+  const sortedComments = sortBy(displayedComments, ["time"]);
+
   return (
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
@@ -48,8 +50,14 @@ function Transcript({ pendingComment }: PropsFromRedux) {
       <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
           <div className="overflow-auto w-full flex-grow">
-            {sortBy(displayedComments, ["time"]).map(comment => {
-              return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
+            {sortedComments.map(comment => {
+              return (
+                <CommentCard
+                  comments={sortedComments}
+                  comment={comment}
+                  key={"id" in comment ? comment.id : 0}
+                />
+              );
             })}
           </div>
         ) : (
