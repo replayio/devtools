@@ -4,8 +4,6 @@
 
 //
 
-import { DevToolsUtils } from "devtools-modules";
-
 /**
  * Utils for utils, by utils
  * @module utils/utils
@@ -57,5 +55,5 @@ export function downloadFile(content, fileName) {
   }
 
   const data = new TextEncoder().encode(content.value);
-  DevToolsUtils.saveAs(window, data, fileName);
+  console.error("saveAs is not implemented");
 }
