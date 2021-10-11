@@ -9,21 +9,13 @@ import {
   getSource,
   getSourceFromId,
   getSourceWithContent,
-  getSourceContent,
   getSourcesEpoch,
   getSourceActorsForSource,
 } from "../../selectors";
 
-import { isFulfilled, fulfilled } from "../../utils/async-value";
+import { fulfilled } from "../../utils/async-value";
 
-import { isPretty } from "../../utils/source";
 import { memoizeableAction } from "../../utils/memoizableAction";
-
-import { Telemetry } from "devtools-modules";
-
-// Measures the time it takes for a source to load
-const loadSourceHistogram = "DEVTOOLS_DEBUGGER_LOAD_SOURCE_MS";
-const telemetry = new Telemetry();
 
 export async function loadSource(state, source, { parser, client }) {
   // We only need the source text from one actor, but messages sent to retrieve
@@ -40,9 +32,7 @@ export async function loadSource(state, source, { parser, client }) {
     handledActors.add(actor.actor);
 
     try {
-      telemetry.start(loadSourceHistogram, source);
       response = await client.sourceContents(actor);
-      telemetry.finish(loadSourceHistogram, source);
       break;
     } catch (e) {
       console.warn(`sourceContents failed: ${e}`);

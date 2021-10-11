@@ -11,7 +11,7 @@ const test = url.searchParams.get("test");
 // local storage in that case.
 if (test && !url.searchParams.get("navigated")) {
   localStorage.clear();
-  require("devtools-modules").asyncStorage.clear();
+  require("devtools/shared/async-storage").clear();
 }
 
 // *** WARNING ***

@@ -24,7 +24,7 @@ import {
 import { getSelectedPanel, getShowEditor } from "ui/reducers/app.ts";
 import { useGetUserSettings } from "ui/hooks/settings";
 
-import { KeyShortcuts } from "devtools-modules";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools-services";
 
 const globalShortcuts = new KeyShortcuts({ window, target: document });

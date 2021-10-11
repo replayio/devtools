@@ -74,7 +74,7 @@ const ElectronKeysMapping = {
  *        Optional DOM Element on which we should listen events from.
  *        If omitted, we listen for all events fired on `window`.
  */
-function KeyShortcuts({ window, target }) {
+export default function KeyShortcuts({ window, target }) {
   this.window = window;
   this.target = target || window;
   this.keys = new Map();
@@ -301,5 +301,3 @@ KeyShortcuts.prototype = {
     this.eventEmitter.off(key, listener);
   },
 };
-
-module.exports = KeyShortcuts;
