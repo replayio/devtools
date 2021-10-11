@@ -6,7 +6,7 @@
 
 "use strict";
 
-const { createFactory, createRef, PureComponent } = require("react");
+const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 
@@ -21,7 +21,7 @@ loader.lazyGetter(this, "MDNLink", function() {
 });
 */
 
-const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 
 class SearchBox extends PureComponent {
   static get propTypes() {

@@ -1,7 +1,7 @@
 import { Inspector } from "../inspector";
 
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
-const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 

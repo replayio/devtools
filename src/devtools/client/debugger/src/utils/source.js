@@ -9,7 +9,7 @@
  * @module utils/source
  */
 
-import { getUnicodeUrl } from "devtools-modules";
+import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
 import { endTruncateStr } from "./utils";
 import { truncateMiddleText } from "../utils/text";

@@ -29,7 +29,7 @@ loader.lazyRequireGetter(
   "devtools/client/inspector/shared/style-inspector-menu"
 );
 
-const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 
 loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
 

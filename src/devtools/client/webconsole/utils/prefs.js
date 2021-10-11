@@ -5,7 +5,7 @@
 "use strict";
 
 import Services from "devtools-services";
-import { PrefsHelper } from "devtools-modules";
+import { PrefsHelper } from "devtools/client/shared/prefs";
 
 const { pref } = Services;
 

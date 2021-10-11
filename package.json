@@ -45,6 +45,7 @@
     "jwt-decode": "^3.1.2",
     "launchdarkly-js-client-sdk": "^2.19.2",
     "lodash": "^4.17.20",
+    "lodash-move": "^1.1.1",
     "logrocket": "^1.0.13",
     "logrocket-react": "^3.0.1",
     "md5": "^2.3.0",
