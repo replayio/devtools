@@ -72,7 +72,6 @@ class JSTerm extends React.Component {
       historyCursorDown: this.historyCursorDown,
     });
     this.editor = await this.editorWaiter;
-    await gToolbox.startPanel("debugger");
     this.editor.appendToLocalElement(this.node);
 
     const recordingId = getRecordingId();
