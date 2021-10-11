@@ -2,52 +2,68 @@ import { AppState, EventCategory, EventKind, PanelName, ReplayEvent, ViewMode } 
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-import { prefs } from "../utils/prefs";
+import { asyncStore, prefs } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
+import { getRecordingId } from "ui/utils/environment";
 
-function initialAppState(): AppState {
+const syncInitialAppState: AppState = {
+  expectedError: null,
+  unexpectedError: null,
+  theme: "theme-light",
+  splitConsoleOpen: prefs.splitConsole as boolean,
+  selectedPanel: prefs.selectedPanel as PanelName,
+  selectedPrimaryPanel: "comments",
+  initializedPanels: [],
+  recordingDuration: 0,
+  indexing: 0,
+  loading: 4,
+  displayedLoadingProgress: null,
+  loadingFinished: false,
+  uploading: null,
+  awaitingSourcemaps: false,
+  sessionId: null,
+  modal: null,
+  modalOptions: null,
+  analysisPoints: {},
+  events: {},
+  viewMode: "non-dev",
+  hoveredLineNumberLocation: null,
+  isNodePickerActive: false,
+  canvas: null,
+  videoUrl: null,
+  videoNode: null,
+  workspaceId: null,
+  defaultSettingsTab: "Personal",
+  recordingTarget: null,
+  fontLoading: true,
+  recordingWorkspace: null,
+  loadedRegions: null,
+  showVideoPanel: true,
+  showEditor: true,
+};
+
+export async function getInitialAppState(): Promise<AppState> {
+  const recordingId = getRecordingId();
+  const replaySessions = await asyncStore.replaySessions;
+  const session = replaySessions[recordingId!];
+
+  if (!session) {
+    return syncInitialAppState;
+  }
+
   return {
-    expectedError: null,
-    unexpectedError: null,
-    theme: "theme-light",
-    splitConsoleOpen: prefs.splitConsole as boolean,
-    selectedPanel: prefs.selectedPanel as PanelName,
-    selectedPrimaryPanel: "comments",
-    initializedPanels: [],
-    recordingDuration: 0,
-    indexing: 0,
-    loading: 4,
-    displayedLoadingProgress: null,
-    loadingFinished: false,
-    uploading: null,
-    awaitingSourcemaps: false,
-    sessionId: null,
-    modal: null,
-    modalOptions: null,
-    analysisPoints: {},
-    events: {},
-    viewMode: "non-dev" as ViewMode,
-    hoveredLineNumberLocation: null,
-    isNodePickerActive: false,
-    canvas: null,
-    videoUrl: null,
-    videoNode: null,
-    workspaceId: null,
-    defaultSettingsTab: "Personal",
-    recordingTarget: null,
-    fontLoading: true,
-    recordingWorkspace: null,
-    loadedRegions: null,
-    showVideoPanel: true,
-    showEditor: true,
+    ...syncInitialAppState,
+    viewMode: session.viewMode,
+    showVideoPanel: session.showVideoPanel,
+    showEditor: session.showEditor,
   };
 }
 
 export default function update(
-  state = initialAppState(),
+  state: AppState = syncInitialAppState,
   action: AppActions | SessionActions
 ): AppState {
   switch (action.type) {

@@ -32,7 +32,7 @@ export function registerStoreObserver(
   });
 }
 
-export async function updatePrefs(state: UIState, oldState: UIState) {
+export function updatePrefs(state: UIState, oldState: UIState) {
   function updatePref(field: keyof typeof prefs, selector: Function) {
     if (selector(state) != selector(oldState)) {
       prefs[field] = selector(state);
@@ -49,7 +49,7 @@ export async function updatePrefs(state: UIState, oldState: UIState) {
   updatePref("selectedPanel", getSelectedPanel);
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
 
-  await updateReplaySessions(state);
+  updateReplaySessions(state);
 }
 
 async function updateReplaySessions(state: UIState) {
