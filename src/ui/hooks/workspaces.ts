@@ -85,6 +85,16 @@ export function useGetPendingWorkspaces() {
   return { pendingWorkspaces, loading };
 }
 
+export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; loading: boolean } {
+  // TODO: We need a better way to do this but this'll do for now
+  const { workspaces, loading } = useGetNonPendingWorkspaces();
+
+  return {
+    workspace: workspaces.find(ws => ws.id === workspaceId),
+    loading,
+  };
+}
+
 export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading: boolean } {
   const { data, loading, error } = useQuery(
     gql`

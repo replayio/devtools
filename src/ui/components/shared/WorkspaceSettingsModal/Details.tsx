@@ -24,7 +24,6 @@ export function Details({
         onAddPaymentMethod={() => setView("add-payment-method")}
         onDeletePaymentMethod={() => setView("delete-payment-method")}
       />
-      <CancelSubscription subscription={subscription} workspaceId={workspaceId} />
     </>
   );
 }

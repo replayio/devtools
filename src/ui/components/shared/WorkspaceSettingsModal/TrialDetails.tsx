@@ -2,16 +2,19 @@ import React from "react";
 import { Button } from "../Button";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import { Subscription } from "ui/types";
+import hooks from "ui/hooks";
 
 export default function TrialDetails({
   subscription,
+  workspaceId,
   onSelectPricing,
 }: {
   subscription: Subscription;
   workspaceId: string;
   onSelectPricing: () => void;
 }) {
-  if (subscription.status !== "trialing" || !subscription.trialEnds) {
+  const { workspace } = hooks.useGetWorkspace(workspaceId);
+  if (subscription.status !== "trialing" || !subscription.trialEnds || !workspace) {
     return null;
   }
 
@@ -20,11 +23,18 @@ export default function TrialDetails({
     <div className="p-4 ">
       <div
         style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)" }}
-        className="bg-white pt-8 pb-4 px-6 text-center text-lg rounded"
+        className="space-y-6 bg-white pt-8 pb-4 px-6 text-lg rounded"
       >
-        We hope you’ve been enjoying Replay! Your access will run out in{" "}
-        <span className="font-bold">{days} days</span>.
-        <div className="flex justify-center mt-6">
+        <p>
+          {workspace.name} Free Trial will be expiring in{" "}
+          <span className="font-bold whitespace-nowrap">{days} days</span>.
+        </p>
+        <p>
+          When the trial expires, existing replays will continue to be debuggable, but new replays
+          will require an active subscription. Feel free to email us at{" "}
+          <a href="mailto:support@replay.io">support@replay.io</a> if you have any questions.
+        </p>
+        <div className="flex justify-center">
           <Button
             size="xl"
             color="blue"

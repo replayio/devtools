@@ -29,10 +29,19 @@ export function BillingBanners({
     );
   }
 
-  if (isSubscriptionCancelled(subscription)) {
+  if (subscription.status === "trialing") {
     return (
       <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
-        Subscription ends {formatDate(subscription.effectiveUntil!)}
+        Trial ends {formatDate(subscription.trialEnds!)}
+      </Banner>
+    );
+  }
+
+  if (isSubscriptionCancelled(subscription)) {
+    const past = Date.now() - new Date(subscription.effectiveUntil!).getTime() > 0;
+    return (
+      <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
+        Subscription {past ? "ended" : "ends"} {formatDate(subscription.effectiveUntil!)}.
       </Banner>
     );
   }

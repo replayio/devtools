@@ -4,15 +4,16 @@ import { loadStripe } from "@stripe/stripe-js";
 
 import hooks from "ui/hooks";
 import { isDevelopment } from "ui/utils/environment";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
-import { EnterPaymentMethod } from "./AddPaymentMethod";
-import { TeamPricingPage } from "./TeamPricingPage";
-import { getViewTitle, Views } from "./utils";
 
+import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
+import { TeamPricingPage } from "./TeamPricingPage";
 import TrialDetails from "./TrialDetails";
+import { getViewTitle, Views } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -41,12 +42,27 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     }
   }, [confirmed, view]);
 
+  useEffect(() => {
+    if (error) {
+      sendTelemetryEvent("DevtoolsGraphQLError", {
+        source: "useGetWorkspaceSubscription",
+        workspaceId,
+        message: error,
+        environment: isDevelopment() ? "dev" : "prod",
+      });
+    }
+  });
+
   if (loading) return null;
 
   if (error) {
     return (
       <section className="space-y-8">
-        <p>Unable to load the subscription at this time</p>
+        <p>
+          Unable to load the subscription at this time. We are looking into it on our end and feel
+          free to email us at <a href="mailto:support@replay.io">support@replay.io</a> if this
+          problem persists.
+        </p>
       </section>
     );
   }
@@ -61,7 +77,9 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
 
   return (
     <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
-      <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
+      <SettingsHeader>
+        {getViewTitle(view === "details" && showTrialDetails ? "trial-details" : view)}
+      </SettingsHeader>
       {view === "details" &&
         (showTrialDetails ? (
           <TrialDetails
