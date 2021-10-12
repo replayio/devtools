@@ -14,6 +14,9 @@ module.exports = {
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
       },
+      lineHeight: {
+        "comment-text": "1.125rem",
+      },
     },
   },
   variants: {},

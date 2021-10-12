@@ -129,7 +129,7 @@ function CommentItem({
     showOptions = false;
   } else {
     content = (
-      <div className="space-y-4 text-xs break-words" style={{ lineHeight: "1.125rem" }}>
+      <div className="space-y-4 text-xs break-words whitespace-pre-wrap leading-comment-text">
         <Markdown>{comment.content}</Markdown>
       </div>
     );
