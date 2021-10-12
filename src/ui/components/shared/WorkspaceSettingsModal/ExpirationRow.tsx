@@ -3,17 +3,17 @@ import { Subscription } from "ui/types";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { formatDate } from "./formatDate";
 
-export function ExpirationRow({
-  subscription,
-  label,
-}: {
-  label: string;
-  subscription: Subscription;
-}) {
-  const showTrialExpiration = getFeatureFlag("ui-trial-expiration", false);
-
-  if (subscription.plan.key.includes("beta") || !showTrialExpiration || !subscription.trialEnds) {
+export function ExpirationRow({ subscription }: { subscription: Subscription }) {
+  if (subscription.plan.key.includes("beta") || !subscription.trialEnds) {
     return null;
+  }
+
+  let label = "Renewal date";
+
+  if (subscription.status === "trialing" && subscription.paymentMethods.length === 0) {
+    label = "Your team’s start date";
+  } else if (subscription.status === "canceled") {
+    label = "Subscription end date";
   }
 
   return (

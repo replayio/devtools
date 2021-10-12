@@ -6,7 +6,21 @@ import { Banner } from "./Banner";
 import { isSubscriptionCancelled } from "./utils";
 import { formatDate } from "./formatDate";
 
-export function BillingBanners({ subscription }: { subscription: Subscription }) {
+export function BillingBanners({
+  confirmed,
+  subscription,
+}: {
+  confirmed?: boolean;
+  subscription: Subscription;
+}) {
+  if (confirmed) {
+    return (
+      <Banner icon={<MaterialIcon>check_circle_outline</MaterialIcon>} type="primary">
+        Payment method added successfully, thank you!
+      </Banner>
+    );
+  }
+
   if (subscription.plan.key === "beta-v1") {
     return (
       <Banner icon={<span className="text-3xl">😍</span>} type="primary">
@@ -15,19 +29,19 @@ export function BillingBanners({ subscription }: { subscription: Subscription })
     );
   }
 
-  if (isSubscriptionCancelled(subscription)) {
+  if (subscription.status === "trialing") {
     return (
       <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
-        Subscription ends {formatDate(subscription.effectiveUntil!)}
+        Trial ends {formatDate(subscription.trialEnds!)}
       </Banner>
     );
   }
 
-  const showTrialExpiration = getFeatureFlag("ui-trial-expiration", false);
-  if (subscription.status === "trialing" && showTrialExpiration) {
+  if (isSubscriptionCancelled(subscription)) {
+    const past = Date.now() - new Date(subscription.effectiveUntil!).getTime() > 0;
     return (
       <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
-        Trial ends {formatDate(subscription.trialEnds!)}
+        Subscription {past ? "ended" : "ends"} {formatDate(subscription.effectiveUntil!)}.
       </Banner>
     );
   }

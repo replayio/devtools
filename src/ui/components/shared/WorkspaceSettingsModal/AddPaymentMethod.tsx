@@ -13,7 +13,7 @@ export const getValue = (form: HTMLFormElement, field: string) => {
   }
 };
 
-export function AddPaymentMethod({
+export function EnterPaymentMethod({
   onCancel,
   onSave,
   workspaceId,
@@ -98,14 +98,7 @@ export function AddPaymentMethod({
   };
 
   if (error) {
-    return (
-      <div className="space-y-4">
-        <h3 className="flex flex-row items-center space-x-4">
-          <span className="flex-auto text-lg font-bold">New Payment Method</span>
-        </h3>
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+    return <p className="text-red-500">{error}</p>;
   }
 
   return (
@@ -120,13 +113,14 @@ export function AddPaymentMethod({
       <InputField id="state" required label="State / Province" autoComplete="address-level1" />
       <InputField id="postalCode" required label="Postal Code" autoComplete="postal-code" />
       <CountrySelect />
-      <div className="space-x-4 flex flex-row items-center justify-end pt-5 border-t border-gray-200 ">
+      <div className="space-x-4 flex flex-row items-center justify-end pt-5 border-t border-gray-200 pb-2">
         <Button
           size="sm"
           color="blue"
           style="secondary"
           onClick={onCancel}
           className={saving ? "opacity-60" : undefined}
+          type="button"
         >
           Cancel
         </Button>

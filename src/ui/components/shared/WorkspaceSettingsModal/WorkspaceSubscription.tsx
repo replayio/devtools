@@ -1,20 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
 import hooks from "ui/hooks";
 import { isDevelopment } from "ui/utils/environment";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
-import { AddPaymentMethod } from "./AddPaymentMethod";
-import { ConsentForm } from "./ConsentForm";
-import { getViewTitle, Views } from "./utils";
 
-import { CancelSubscription } from "./CancelSubscription";
+import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
-import { BillingBanners } from "./BillingBanners";
-import { Confirmation } from "./Confirmation";
-import { SubscriptionDetails } from "./SubscriptionDetails";
+import { Details } from "./Details";
+import { TeamPricingPage } from "./TeamPricingPage";
+import TrialDetails from "./TrialDetails";
+import { getViewTitle, Views } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -27,11 +26,48 @@ export const stripePromise = loadStripe(
 
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
   const [view, setView] = useState<Views>("details");
-  const { data, loading } = hooks.useGetWorkspaceSubscription(workspaceId);
+  const [confirmed, setConfirmed] = useState(false);
+  const { data, loading, error, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
+
+  const subscription = data?.node.subscription;
+  const showTrialDetails =
+    subscription &&
+    subscription?.paymentMethods?.length === 0 &&
+    subscription.status === "trialing";
+
+  // clear the confirmed state if changing views
+  useEffect(() => {
+    if (confirmed && view !== "details") {
+      setConfirmed(false);
+    }
+  }, [confirmed, view]);
+
+  useEffect(() => {
+    if (error) {
+      sendTelemetryEvent("DevtoolsGraphQLError", {
+        source: "useGetWorkspaceSubscription",
+        workspaceId,
+        message: error,
+        environment: isDevelopment() ? "dev" : "prod",
+      });
+    }
+  });
 
   if (loading) return null;
 
-  if (!data?.node.subscription) {
+  if (error) {
+    return (
+      <section className="space-y-8">
+        <p>
+          Unable to load the subscription at this time. We are looking into it on our end and feel
+          free to email us at <a href="mailto:support@replay.io">support@replay.io</a> if this
+          problem persists.
+        </p>
+      </section>
+    );
+  }
+
+  if (!subscription) {
     return (
       <section className="space-y-8">
         <p>This team does not have an active subscription</p>
@@ -40,48 +76,54 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   }
 
   return (
-    <>
-      <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
-      <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
-        {view === "details" ? (
-          <>
-            <BillingBanners subscription={data.node.subscription} />
-            <SubscriptionDetails
-              subscription={data.node.subscription}
-              onAddPaymentMethod={() => setView("add-payment-method")}
-              onDeletePaymentMethod={() => setView("delete-payment-method")}
-            />
-            <CancelSubscription subscription={data.node.subscription} workspaceId={workspaceId} />
-          </>
-        ) : null}
-        {view === "add-payment-method" ? (
-          <ConsentForm
-            subscription={data.node.subscription}
-            onEnterCard={() => setView("enter-payment-method")}
-          />
-        ) : null}
-        {view === "enter-payment-method" ? (
-          <Elements stripe={stripePromise}>
-            <AddPaymentMethod
-              onCancel={() => setView("details")}
-              onSave={() => setView("confirm-payment-method")}
-              workspaceId={workspaceId}
-              // TODO: handle the error at this level...
-              stripePromise={stripePromise}
-            />
-          </Elements>
-        ) : null}
-        {view === "confirm-payment-method" ? (
-          <Confirmation subscription={data.node.subscription} />
-        ) : null}
-        {view === "delete-payment-method" ? (
-          <DeleteConfirmation
-            subscription={data.node.subscription}
+    <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
+      <SettingsHeader>
+        {getViewTitle(view === "details" && showTrialDetails ? "trial-details" : view)}
+      </SettingsHeader>
+      {view === "details" &&
+        (showTrialDetails ? (
+          <TrialDetails
             workspaceId={workspaceId}
-            onDone={() => setView("details")}
+            subscription={subscription}
+            onSelectPricing={() => setView("add-payment-method")}
           />
-        ) : null}
-      </section>
-    </>
+        ) : (
+          <Details
+            workspaceId={workspaceId}
+            subscription={subscription}
+            setView={setView}
+            confirmed={confirmed}
+          />
+        ))}
+      {view === "add-payment-method" && (
+        <TeamPricingPage
+          subscription={subscription}
+          onEnterCard={() => setView("enter-payment-method")}
+        />
+      )}
+      {view === "enter-payment-method" && (
+        <Elements stripe={stripePromise}>
+          <EnterPaymentMethod
+            onCancel={() => setView("details")}
+            onSave={() => {
+              refetch().then(() => {
+                setView("details");
+                setConfirmed(true);
+              });
+            }}
+            workspaceId={workspaceId}
+            // TODO: handle the error at this level...
+            stripePromise={stripePromise}
+          />
+        </Elements>
+      )}
+      {view === "delete-payment-method" && (
+        <DeleteConfirmation
+          subscription={subscription}
+          workspaceId={workspaceId}
+          onDone={() => setView("details")}
+        />
+      )}
+    </section>
   );
 }

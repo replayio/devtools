@@ -2,6 +2,7 @@ import { PaymentMethod, Subscription } from "ui/types";
 
 export type Views =
   | "details"
+  | "trial-details"
   | "add-payment-method"
   | "enter-payment-method"
   | "confirm-payment-method"
@@ -37,16 +38,19 @@ export function getViewTitle(view: Views) {
     case "details":
       return "Billing";
     case "add-payment-method":
+      return "Team Plan Pricing";
     case "enter-payment-method":
       return "Add Payment Method";
     case "confirm-payment-method":
       return "Payment Method Added!";
     case "delete-payment-method":
       return "Remove Payment Method";
+    case "trial-details":
+      return "Trial Expiring Soon";
   }
 }
 export function getPlanDisplayText(subscription: Subscription) {
-  const trial = subscription.status === "trialing";
+  const trial = subscription.status === "trialing" && subscription.paymentMethods.length === 0;
   let text = "Team Plan";
 
   switch (subscription.plan.key) {
