@@ -39,7 +39,7 @@ function DevView({
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
           initialSize={prefs.toolboxHeight as string}
-          minSize={showEditor || !sidePanelCollapsed ? "20%" : "0%"}
+          minSize={showEditor || !sidePanelCollapsed ? "240px" : "0%"}
           maxSize={showEditor || !sidePanelCollapsed ? "80%" : "0%"}
           vert={true}
           onMove={handleMove}
