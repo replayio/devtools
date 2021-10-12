@@ -89,7 +89,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
-      <div className="flex-grow flex flex-row space-x-3 px-0.5">
+      <div className="flex-grow flex flex-row space-x-3 p-0.5">
         <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
         {!isLoading ? (
           <PrimaryButton color="blue">Invite</PrimaryButton>
