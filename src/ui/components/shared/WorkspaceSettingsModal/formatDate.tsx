@@ -13,7 +13,7 @@ export function formatDate(date: string, format: "relative" | "long" = "relative
 
   return new Intl.DateTimeFormat("en", {
     year: "numeric",
-    month: "numeric",
+    month: "long",
     day: "numeric",
   }).format(new Date(new Date(date)));
 }

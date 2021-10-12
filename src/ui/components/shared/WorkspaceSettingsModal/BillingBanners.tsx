@@ -6,7 +6,21 @@ import { Banner } from "./Banner";
 import { isSubscriptionCancelled } from "./utils";
 import { formatDate } from "./formatDate";
 
-export function BillingBanners({ subscription }: { subscription: Subscription }) {
+export function BillingBanners({
+  confirmed,
+  subscription,
+}: {
+  confirmed?: boolean;
+  subscription: Subscription;
+}) {
+  if (confirmed) {
+    return (
+      <Banner icon={<MaterialIcon>check_circle_outline</MaterialIcon>} type="primary">
+        Payment method added successfully, thank you!
+      </Banner>
+    );
+  }
+
   if (subscription.plan.key === "beta-v1") {
     return (
       <Banner icon={<span className="text-3xl">😍</span>} type="primary">

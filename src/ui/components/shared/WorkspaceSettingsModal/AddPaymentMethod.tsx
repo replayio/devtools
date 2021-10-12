@@ -13,7 +13,7 @@ export const getValue = (form: HTMLFormElement, field: string) => {
   }
 };
 
-export function AddPaymentMethod({
+export function EnterPaymentMethod({
   onCancel,
   onSave,
   workspaceId,
@@ -98,14 +98,7 @@ export function AddPaymentMethod({
   };
 
   if (error) {
-    return (
-      <div className="space-y-4">
-        <h3 className="flex flex-row items-center space-x-4">
-          <span className="flex-auto text-lg font-bold">New Payment Method</span>
-        </h3>
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+    return <p className="text-red-500">{error}</p>;
   }
 
   return (

@@ -18,7 +18,7 @@ export function SubscriptionDetails({
         <span>Current Plan</span>
         <span>{getPlanDisplayText(subscription)}</span>
       </div>
-      <ExpirationRow subscription={subscription} label="Expiration" />
+      <ExpirationRow subscription={subscription} />
       <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
         <span>Number of seats</span>
         <span>{subscription.seatCount}</span>
@@ -28,12 +28,12 @@ export function SubscriptionDetails({
           <span>Payment Method</span>
           <span className="flex flex-col items-end">
             {subscription.paymentMethods.length > 0 ? (
-              <>
+              <button
+                className="text-primaryAccent hover:underline"
+                onClick={onDeletePaymentMethod}
+              >
                 {formatPaymentMethod(subscription.paymentMethods[0])}
-                <button className="text-primaryAccent underline" onClick={onDeletePaymentMethod}>
-                  Remove
-                </button>
-              </>
+              </button>
             ) : (
               <button className="text-primaryAccent hover:underline" onClick={onAddPaymentMethod}>
                 Add Payment Method

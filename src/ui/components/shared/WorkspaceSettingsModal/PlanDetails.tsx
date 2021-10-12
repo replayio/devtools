@@ -5,7 +5,7 @@ import { ExpirationRow } from "./ExpirationRow";
 export function PlanDetails({ subscription }: { subscription: Subscription }) {
   return (
     <>
-      <ExpirationRow subscription={subscription} label="Your team's start date" />
+      <ExpirationRow subscription={subscription} />
       <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
         <span>Renewal Schedule</span>
         <span>Monthly</span>
