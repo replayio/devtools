@@ -3,6 +3,7 @@ import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
 import {
   getSelectedPanel,
+  getSelectedPrimaryPanel,
   getShowEditor,
   getShowVideoPanel,
   getViewMode,
@@ -59,6 +60,7 @@ async function updateReplaySessions(state: UIState) {
     viewMode: getViewMode(state),
     showEditor: getShowEditor(state),
     showVideoPanel: getShowVideoPanel(state),
+    selectedPrimaryPanel: getSelectedPrimaryPanel(state),
   };
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId!]: currentReplaySession };
