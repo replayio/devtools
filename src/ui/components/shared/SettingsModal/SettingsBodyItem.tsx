@@ -1,7 +1,8 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { SettingItem } from "./types";
 import { SelectMenu } from "ui/components/shared/Forms";
 import { SettingsBodyHeader } from "./SettingsBody";
+import Checkbox from "../Forms/Checkbox";
 
 interface SettingsBodyItemProps<V> {
   item: SettingItem<V>;
@@ -13,7 +14,7 @@ type InputProps<V, Value = any> = {
   value: Value;
 } & Pick<SettingsBodyItemProps<V>, "item" | "onChange">;
 
-function Checkbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
+function SettingCheckbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
   const { key } = item;
 
   const toggleSetting = () => {
@@ -27,7 +28,7 @@ function Checkbox<K>({ item, value, onChange }: InputProps<K, boolean>) {
     return <span className="italic text-gray-500">Coming Soon...</span>;
   }
 
-  return <input type="checkbox" id={String(key)} checked={value} onChange={toggleSetting} />;
+  return <Checkbox id={String(key)} checked={value} onChange={toggleSetting} />;
 }
 
 function Dropdown<K>({ value }: InputProps<K>) {
@@ -42,7 +43,7 @@ function Dropdown<K>({ value }: InputProps<K>) {
 
 function Input<K>({ item, value, ...rest }: InputProps<K>) {
   if (item.type == "checkbox" && typeof value === "boolean") {
-    return <Checkbox {...rest} item={item} value={value} />;
+    return <SettingCheckbox {...rest} item={item} value={value} />;
   }
 
   return <Dropdown {...rest} item={item} value={value} />;
