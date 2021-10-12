@@ -4,9 +4,7 @@ import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { formatDate } from "./formatDate";
 
 export function ExpirationRow({ subscription }: { subscription: Subscription }) {
-  const showTrialExpiration = getFeatureFlag("ui-trial-expiration", false);
-
-  if (subscription.plan.key.includes("beta") || !showTrialExpiration || !subscription.trialEnds) {
+  if (subscription.plan.key.includes("beta") || !subscription.trialEnds) {
     return null;
   }
 

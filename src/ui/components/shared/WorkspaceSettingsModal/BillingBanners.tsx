@@ -37,14 +37,5 @@ export function BillingBanners({
     );
   }
 
-  const showTrialExpiration = getFeatureFlag("ui-trial-expiration", false);
-  if (subscription.status === "trialing" && showTrialExpiration) {
-    return (
-      <Banner icon={<MaterialIcon>access_time</MaterialIcon>} type="warning">
-        Trial ends {formatDate(subscription.trialEnds!)}
-      </Banner>
-    );
-  }
-
   return null;
 }
