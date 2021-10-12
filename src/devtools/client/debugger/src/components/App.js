@@ -112,7 +112,7 @@ class Debugger extends Component {
     }
   }
 
-  onEscape = (_, e) => {
+  onEscape = e => {
     const { activeSearch, closeActiveSearch, closeQuickOpen, quickOpenEnabled } = this.props;
     const { shortcutsModalEnabled } = this.state;
     const anyTrue = activeSearch || quickOpenEnabled || shortcutsModalEnabled;
@@ -143,23 +143,23 @@ class Debugger extends Component {
     return this.props.orientation === "horizontal";
   }
 
-  toggleFunctionQuickOpenModal = (_, e) => {
-    this.toggleQuickOpenModal(_, e, "@");
+  toggleFunctionQuickOpenModal = e => {
+    this.toggleQuickOpenModal(e, "@");
   };
 
-  toggleProjectFunctionQuickOpenModal = (_, e) => {
-    this.toggleQuickOpenModal(_, e, "@", true);
+  toggleProjectFunctionQuickOpenModal = e => {
+    this.toggleQuickOpenModal(e, "@", true);
   };
 
-  toggleLineQuickOpenModal = (_, e) => {
-    this.toggleQuickOpenModal(_, e, ":");
+  toggleLineQuickOpenModal = e => {
+    this.toggleQuickOpenModal(e, ":");
   };
 
-  toggleSourceQuickOpenModal = (_, e) => {
-    this.toggleQuickOpenModal(_, e, "");
+  toggleSourceQuickOpenModal = e => {
+    this.toggleQuickOpenModal(e, "");
   };
 
-  toggleQuickOpenModal = (_, e, query, project = false) => {
+  toggleQuickOpenModal = (e, query, project = false) => {
     const { quickOpenEnabled, openQuickOpen, closeQuickOpen } = this.props;
 
     e.preventDefault();
