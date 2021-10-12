@@ -7,6 +7,7 @@ import { UIState } from "ui/state";
 import BlankScreen from "./BlankScreen";
 import classNames from "classnames";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
+import { isDevelopment } from "ui/utils/environment";
 
 export function PopupBlockedError() {
   const error = { message: "OAuth consent popup blocked" };
@@ -98,8 +99,37 @@ function ActionButton({ action }: { action: string }) {
   return <div>{button}</div>;
 }
 
-function Error({ error }: { error: ExpectedError | UnexpectedError }) {
+interface ErrorProps {
+  error: ExpectedError | UnexpectedError;
+}
+
+function DevelopmentError({ error }: ErrorProps) {
+  const { message, content } = error;
+  return (
+    <section className="w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
+      <div className="p-12 space-y-12 items-center flex flex-col">
+        <div className="space-y-4 place-content-center">
+          <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+        </div>
+        <div className="text-center space-y-3">
+          {message ? <div className="font-bold text-lg">{message}</div> : null}
+          {content ? (
+            <div className="text-gray-500 text-left">
+              <pre>{content}</pre>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Error({ error }: ErrorProps) {
   const { action, message, content } = error;
+
+  if (isDevelopment()) {
+    return <DevelopmentError error={error} />;
+  }
 
   return (
     <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
