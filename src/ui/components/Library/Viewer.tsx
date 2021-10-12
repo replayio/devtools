@@ -87,7 +87,7 @@ function ViewerContent({
   const HeaderLeft = (
     <ViewerHeaderLeft>
       <>
-        {workspaceName}
+        <span>{workspaceName}</span>
         <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
       </>
     </ViewerHeaderLeft>
