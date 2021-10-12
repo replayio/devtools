@@ -84,14 +84,14 @@ export type PendingComment =
     };
 
 export interface PendingNewComment extends PendingBlankComment {
-  content: "";
+  content: string;
   primaryLabel: string | null;
   secondaryLabel: string | null;
   position: CommentPosition | null;
 }
 
 export interface PendingNewReply extends PendingBlankComment {
-  content: "";
+  content: string;
   parentId: string;
 }
 

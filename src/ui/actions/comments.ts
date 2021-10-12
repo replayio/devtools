@@ -7,6 +7,7 @@ import { ThreadFront } from "protocol/thread";
 import { setSelectedPrimaryPanel } from "./app";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
+import { getPendingComment } from "ui/reducers/comments";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -19,9 +20,14 @@ const {
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
+type UpdatePendingCommentContent = Action<"update_pending_comment_content"> & { content: string };
 type SetShouldShowLoneEvents = Action<"set_should_show_lone_events"> & { value: boolean };
 
-export type CommentsAction = SetPendingComment | SetHoveredComment | SetShouldShowLoneEvents;
+export type CommentsAction =
+  | SetPendingComment
+  | SetHoveredComment
+  | SetShouldShowLoneEvents
+  | UpdatePendingCommentContent;
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
   return { type: "set_pending_comment", comment };
@@ -33,6 +39,10 @@ export function setHoveredComment(comment: any): SetHoveredComment {
 
 export function clearPendingComment(): SetPendingComment {
   return { type: "set_pending_comment", comment: null };
+}
+
+export function updatePendingCommentContent(content: string): UpdatePendingCommentContent {
+  return { type: "update_pending_comment_content", content };
 }
 
 export function toggleShowLoneEvents(): UIThunkAction {

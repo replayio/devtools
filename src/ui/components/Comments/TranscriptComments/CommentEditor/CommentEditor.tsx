@@ -22,7 +22,12 @@ type CommentEditorProps = PropsFromRedux & {
   handleSubmit: (inputValue: string) => void;
 };
 
-function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEditorProps) {
+function CommentEditor({
+  comment,
+  handleSubmit,
+  updatePendingCommentContent,
+  clearPendingComment,
+}: CommentEditorProps) {
   const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
   const [api, setApi] = useState<DraftJSAPI>();
@@ -41,12 +46,7 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
   };
   const onChangeCallback = () => {
     setSubmitEnabled(!!api?.getText().length);
-  };
-
-  const onSubmit = () => {
-    if (api) {
-      handleSubmit(api.getText());
-    }
+    updatePendingCommentContent(api ? api.getText() : "");
   };
 
   return (
@@ -78,6 +78,7 @@ const connector = connect(
   }),
   {
     clearPendingComment: actions.clearPendingComment,
+    updatePendingCommentContent: actions.updatePendingCommentContent,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
