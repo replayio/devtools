@@ -50,6 +50,15 @@ export type ThunkAction<TReturnType, TState, TExtraThunkArg, TBasicAction extend
   } & TExtraThunkArg
 ) => TReturnType;
 
+export interface ThunkExtraArgs {
+  client: any;
+  panels: any;
+  prefsService: any;
+  toolbox: any;
+  parser: any;
+  search: any;
+}
+
 /**
  * Redux behaviour changed by middleware, so overloads here
  */

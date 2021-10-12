@@ -35,6 +35,14 @@ export class NodeFront {
   private _quads: BoxModel | null;
   private _bounds: Rect | null;
 
+  private _waiters: {
+    computedStyle: Deferred<any> | null;
+    rules: Deferred<any> | null;
+    listeners: Deferred<any> | null;
+    quads: Deferred<any> | null;
+    bounds: Deferred<any> | null;
+  };
+
   constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
@@ -45,11 +53,19 @@ export class NodeFront {
 
     // Additional data that can be loaded for the node.
     this._loadWaiter = null;
+    this._frameworkListenersWaiter = null;
+    this._waiters = {
+      computedStyle: null,
+      rules: null,
+      listeners: null,
+      quads: null,
+      bounds: null,
+    };
+
     this._loaded = false;
     this._computedStyle = null;
     this._rules = null;
     this._listeners = null;
-    this._frameworkListenersWaiter = null;
     this._quads = null;
     this._bounds = null;
   }
@@ -198,67 +214,36 @@ export class NodeFront {
   }
 
   // Load all data for this node that is needed to select it in the inspector.
+  async getComputedStyle() {
+    if (!this._waiters.computedStyle) {
+      this._waiters.computedStyle = defer();
+      try {
+        const { computedStyle } = await this._pause.sendMessage(client.CSS.getComputedStyle, {
+          node: this._object.objectId,
+        });
+        this._computedStyle = new Map();
+        for (const { name, value } of computedStyle) {
+          this._computedStyle.set(name, value);
+        }
+      } catch (e) {
+        this._computedStyle = null;
+      } finally {
+        this._waiters.computedStyle.resolve(this._computedStyle);
+      }
+    }
+
+    if (this._computedStyle) {
+      return this._computedStyle;
+    }
+  }
+
+  // TODO: Node properties should be fetched lazily #3983
   async ensureLoaded() {
     if (this._loadWaiter) {
       return this._loadWaiter.promise;
     }
     this._loadWaiter = defer();
-
-    await Promise.all([
-      this._pause.sendMessage(client.CSS.getComputedStyle, { node: this._object.objectId }).then(
-        ({ computedStyle }) => {
-          this._computedStyle = new Map();
-          for (const { name, value } of computedStyle) {
-            this._computedStyle.set(name, value);
-          }
-        },
-        () => {
-          this._computedStyle = null;
-        }
-      ),
-      this._pause.sendMessage(client.CSS.getAppliedRules, { node: this._object.objectId }).then(
-        ({ rules, data }) => {
-          this._rules = uniqBy(rules, (rule: AppliedRule) => `${rule.rule}|${rule.pseudoElement}`);
-          this._pause.addData(data);
-        },
-        () => {
-          this._rules = null;
-        }
-      ),
-      this._pause.sendMessage(client.DOM.getEventListeners, { node: this._object.objectId }).then(
-        ({ listeners, data }) => {
-          this._pause.addData(data);
-          this._listeners = listeners.map(listener => ({
-            ...listener,
-            handler: new ValueFront(this._pause, { object: listener.handler }),
-            node: this._pause.getNodeFront(listener.node),
-          }));
-        },
-        () => {
-          this._listeners = null;
-        }
-      ),
-      this._pause.sendMessage(client.DOM.getBoxModel, { node: this._object.objectId }).then(
-        ({ model }) => {
-          this._quads = model;
-        },
-        () => {
-          this._quads = null;
-        }
-      ),
-      this._pause
-        .sendMessage(client.DOM.getBoundingClientRect, {
-          node: this._object.objectId,
-        })
-        .then(
-          ({ rect }) => {
-            this._bounds = rect;
-          },
-          () => {
-            this._bounds = null;
-          }
-        ),
-    ]);
+    await this.getComputedStyle();
     this._loaded = true;
     this._loadWaiter!.resolve();
   }
@@ -285,19 +270,34 @@ export class NodeFront {
     return this._computedStyle?.get("display");
   }
 
-  getComputedStyle() {
-    assert(this._loaded);
-    return this._computedStyle;
-  }
-
   // Whether or not the node has event listeners.
   get hasEventListeners() {
-    assert(this._loaded);
+    // TODO: The preview should return hasEventListeners
+    return false;
     return this._listeners!.length != 0;
   }
 
-  getEventListeners() {
-    assert(this._loaded);
+  async getEventListeners() {
+    if (!this._waiters.listeners) {
+      try {
+        this._waiters.listeners = defer();
+        const { listeners, data } = await this._pause.sendMessage(client.DOM.getEventListeners, {
+          node: this._object.objectId,
+        });
+        this._pause.addData(data);
+        this._listeners = listeners.map(listener => ({
+          ...listener,
+          handler: new ValueFront(this._pause, { object: listener.handler }),
+          node: this._pause.getNodeFront(listener.node),
+        }));
+      } catch (e) {
+        this._listeners = null;
+      } finally {
+        this._waiters.listeners!.resolve(this._listeners);
+      }
+    }
+
+    await this._waiters.listeners;
     return this._listeners;
   }
 
@@ -311,11 +311,26 @@ export class NodeFront {
     return listeners;
   }
 
-  getAppliedRules() {
-    assert(this._loaded);
+  async getAppliedRules() {
+    if (!this._waiters.rules) {
+      try {
+        this._waiters.rules = defer();
+        const { rules, data } = await this._pause.sendMessage(client.CSS.getAppliedRules, {
+          node: this._object.objectId,
+        });
+        this._rules = uniqBy(rules, (rule: AppliedRule) => `${rule.rule}|${rule.pseudoElement}`);
+        this._pause.addData(data);
+      } catch (e) {
+        this._rules = null;
+      } finally {
+        this._waiters.rules?.resolve(this._rules);
+      }
+    }
+
     if (this._rules === null) {
       return null;
     }
+
     return this._rules.map(({ rule, pseudoElement }) => {
       return { rule: this._pause.getRuleFront(rule), pseudoElement };
     });
@@ -328,16 +343,50 @@ export class NodeFront {
     return null;
   }
 
-  getBoxQuads(box: "content" | "padding" | "border" | "margin") {
-    assert(this._loaded);
-    return this._quads ? buildBoxQuads(this._quads[box]) : null;
+  async getBoxModel() {
+    if (!this._waiters.quads) {
+      try {
+        this._waiters.quads = defer();
+        const { model } = await this._pause.sendMessage(client.DOM.getBoxModel, {
+          node: this._object.objectId,
+        });
+        this._quads = model;
+      } catch (e) {
+        this._quads = null;
+      }
+      this._waiters.quads?.resolve(this._quads);
+    }
+
+    return this._quads;
   }
 
-  getBoundingClientRect() {
-    assert(this._loaded);
+  getBoxQuads(box: "content" | "padding" | "border" | "margin") {
+    if (!this._quads) {
+      return null;
+    }
+
+    return buildBoxQuads(this._quads[box]);
+  }
+
+  async getBoundingClientRect() {
+    if (!this._waiters.bounds) {
+      try {
+        this._waiters.bounds = defer();
+        const { rect } = await this._pause.sendMessage(client.DOM.getBoundingClientRect, {
+          node: this._object.objectId,
+        });
+        this._bounds = rect;
+      } catch (e) {
+        this._bounds = null;
+      } finally {
+        this._waiters.bounds?.resolve(this._bounds);
+      }
+    }
+
     if (!this._bounds) {
       return null;
     }
+
     const [left, top, right, bottom] = this._bounds;
     return new DOMRect(left, top, right - left, bottom - top);
   }

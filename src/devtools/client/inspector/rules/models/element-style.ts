@@ -165,10 +165,10 @@ export default class ElementStyle {
    * Returns a promise that will be resolved when the elementStyle is
    * ready.
    */
-  populate() {
+  async populate() {
     this.rules = [];
 
-    const applied = this.element.getAppliedRules();
+    const applied = await this.element.getAppliedRules();
     if (applied === null) {
       this.rules = null;
       return;
@@ -201,7 +201,7 @@ export default class ElementStyle {
         if (parentInline && parentInline.properties.length > 0) {
           this._maybeAddRule(parentInline, elem);
         }
-        const parentApplied = elem.getAppliedRules();
+        const parentApplied = await elem.getAppliedRules();
         if (parentApplied === null) {
           this.rules = null;
           return;

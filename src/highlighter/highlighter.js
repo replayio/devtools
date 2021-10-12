@@ -11,10 +11,14 @@ let gBoxModelHighlighter;
 const Highlighter = {
   currentNode: null,
 
-  highlight(node) {
+  async highlight(node) {
     if (!node) {
       return;
     }
+    if (node.getBoxModel) {
+      await node.getBoxModel();
+    }
+
     if (gBoxModelHighlighter && !document.getElementById("box-model-root")) {
       gBoxModelHighlighter.destroy();
       gBoxModelHighlighter = undefined;
