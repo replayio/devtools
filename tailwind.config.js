@@ -6,10 +6,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        lightGrey: "var(--light-grey)",
         primaryAccent: "var(--primary-accent)",
         primaryAccentHover: "var(--primary-accent-hover)",
-        primaryAccentLegacy: "var(--primary-accent-legacy)",
         primaryAccentHoverLegacy: "var(--primary-accent-hover-legacy)",
+        primaryAccentLegacy: "var(--primary-accent-legacy)",
         secondaryAccent: "var(--secondary-accent)",
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
