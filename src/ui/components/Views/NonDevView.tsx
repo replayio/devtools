@@ -57,7 +57,7 @@ function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
         endPanel={viewer}
         initialSize={prefs.sidePanelSize as string}
         maxSize={"80%"}
-        minSize={"100px"}
+        minSize={"240px"}
         onControlledPanelResized={handleMove}
         splitterSize={1}
         style={{ width: "100%", overflow: "hidden" }}
