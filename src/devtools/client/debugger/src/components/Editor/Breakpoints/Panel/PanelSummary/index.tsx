@@ -62,8 +62,10 @@ function PanelSummary({
     e.stopPropagation();
 
     if (pausedOnHit) {
+      console.log("createFrameComment", currentTime, executionPoint, breakpoint);
       createFrameComment(currentTime, executionPoint, null, breakpoint);
     } else {
+      console.log("createFloatingCodeComment", currentTime, executionPoint, breakpoint);
       createFloatingCodeComment(currentTime, executionPoint, breakpoint);
     }
   };

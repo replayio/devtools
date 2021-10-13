@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classNames from "classnames";
-import Markdown from "react-markdown";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -17,9 +16,8 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
 
-import useAuth0 from "ui/utils/useAuth0";
-import CommentCardFooter from "./CommentCardFooter";
 import { AvatarImage } from "ui/components/Avatar";
+import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function formatRelativeTime(date: Date) {
@@ -35,24 +33,19 @@ function formatRelativeTime(date: Date) {
   if (months > 0) {
     return `${months}m`;
   }
-
   if (weeks > 0) {
     return `${weeks}w`;
   }
-
   if (days > 0) {
     return `${days}d`;
   }
-
   if (minutes >= 60) {
     return `${Math.floor(minutes / 60)}h`;
   }
-
-  if (minutes == 0) {
-    return "Now";
+  if (minutes > 0) {
+    return `${minutes}m`;
   }
-
-  return `${minutes}m`;
+  return "Now";
 }
 
 function BorderBridge({
@@ -89,6 +82,10 @@ function CommentItemHeader({
     setRelativeDate(formatRelativeTime(new Date(comment.createdAt)));
   }, []);
 
+  if (!comment.user) {
+    return null;
+  }
+
   return (
     <div className="flex flex-row space-x-1.5 items-center">
       <AvatarImage className="h-5 w-5 rounded-full avatar" src={comment.user.picture} />
@@ -115,38 +112,20 @@ function CommentItem({
   pendingComment: PendingComment | null;
   comment: Comment | Reply;
 }) {
-  let content, showOptions;
-
-  if (
-    pendingComment &&
-    (pendingComment.type == "edit_reply" || pendingComment.type == "edit_comment") &&
-    "id" in comment &&
-    pendingComment.comment.id == comment.id
-  ) {
-    const { comment, type } = pendingComment;
-
-    content = <ExistingCommentEditor comment={comment} type={type} />;
-    showOptions = false;
-  } else {
-    content = (
-      <div className="space-y-4 text-xs break-words whitespace-pre-wrap leading-comment-text">
-        <Markdown>{comment.content}</Markdown>
-      </div>
-    );
-    showOptions = true;
-  }
+  const isEditing = Boolean(pendingComment?.comment?.id == comment.id);
+  const showOptions = !isEditing;
 
   return (
     <div className="space-y-1.5 group">
       <CommentItemHeader {...{ comment, showOptions }} />
-      {content}
+      <ExistingCommentEditor comment={comment} pendingComment={pendingComment} />
     </div>
   );
 }
 
 type PropsFromParent = {
-  comment: Comment | PendingNewComment;
-  comments: (Comment | PendingNewComment)[];
+  comment: PendingNewComment;
+  comments: PendingNewComment[];
 };
 type CommentCardProps = PropsFromRedux & PropsFromParent;
 
@@ -156,36 +135,13 @@ function CommentCard({
   currentTime,
   executionPoint,
   seekToComment,
-  setModal,
-  replyToComment,
   hoveredComment,
   setHoveredComment,
   pendingComment,
 }: CommentCardProps) {
-  const { isAuthenticated } = useAuth0();
-  const isPaused = comment.time === currentTime && executionPoint === comment.point;
-  const isEditing =
-    pendingComment &&
-    ["edit_comment", "edit_reply"].includes(pendingComment.type) &&
-    pendingComment?.comment.time === currentTime &&
-    pendingComment?.comment.point === executionPoint;
+  const isPaused = currentTime === comment.time && executionPoint === comment.point;
 
-  const onReply = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!isAuthenticated) {
-      setModal("login");
-      return;
-    }
-
-    if ("id" in comment) {
-      replyToComment(comment);
-    }
-  };
-
-  // If the comment for this card doesn't have an ID, it's because it's the corresponding
-  // comment for a pending new comment.
-  if (!("id" in comment)) {
+  if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
         className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
@@ -219,13 +175,19 @@ function CommentCard({
         })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
-        <CommentItem comment={comment} pendingComment={pendingComment} />
-        {comment.replies?.map((reply: Reply, i: number) => (
-          <div key={"id" in reply ? reply.id : 0}>
+        <CommentItem comment={comment as Comment} pendingComment={pendingComment} />
+        {comment.replies?.map((reply: Reply) => (
+          <div key={reply.id}>
             <CommentItem comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isPaused && !isEditing ? <CommentCardFooter comment={comment} onReply={onReply} /> : null}
+        {isPaused && !pendingComment ? (
+          <NewCommentEditor
+            key={`${comment.id}-${(comment.replies || []).length}`}
+            comment={{ ...comment, content: "", parentId: comment.id }}
+            type={"new_reply"}
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -233,16 +195,14 @@ function CommentCard({
 
 const connector = connect(
   (state: UIState) => ({
-    pendingComment: selectors.getPendingComment(state),
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
     hoveredComment: selectors.getHoveredComment(state),
+    pendingComment: selectors.getPendingComment(state),
   }),
   {
-    replyToComment: actions.replyToComment,
-    setModal: actions.setModal,
-    seekToComment: actions.seekToComment,
     editItem: actions.editItem,
+    seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
   }
 );

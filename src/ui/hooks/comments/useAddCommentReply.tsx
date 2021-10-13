@@ -3,11 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import useAuth0 from "ui/utils/useAuth0";
 import { GET_USER_ID } from "ui/graphql/users";
 import { GET_COMMENTS } from "ui/graphql/comments";
-
-interface NewReplyVariable {
-  content: string;
-  commentId: string;
-}
+import { PendingNewReply } from "ui/state/comments";
 
 export default function useAddCommentReply() {
   const { user } = useAuth0();
@@ -29,10 +25,15 @@ export default function useAddCommentReply() {
     console.error("Apollo error while adding a comment:", error);
   }
 
-  return (reply: NewReplyVariable, recordingId: RecordingId) => {
+  return (reply: PendingNewReply, recordingId: RecordingId) => {
     const temporaryId = new Date().toISOString();
     addCommentReply({
-      variables: { input: reply },
+      variables: {
+        input: {
+          commentId: reply.parentId,
+          content: reply.content,
+        },
+      },
       optimisticResponse: {
         addCommentReply: {
           success: true,
@@ -61,7 +62,7 @@ export default function useAddCommentReply() {
           query: GET_USER_ID,
         });
 
-        const parentComment = data.recording.comments.find((r: any) => r.id === reply.commentId);
+        const parentComment = data.recording.comments.find((r: any) => r.id === reply.parentId);
         const newReply = {
           id: commentReply.id,
           content: reply.content,
@@ -90,7 +91,7 @@ export default function useAddCommentReply() {
           recording: {
             ...data.recording,
             comments: [
-              ...data.recording.comments.filter((r: any) => r.id !== reply.commentId),
+              ...data.recording.comments.filter((r: any) => r.id !== reply.parentId),
               newParentComment,
             ],
           },

@@ -2,36 +2,44 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
-import { PendingEditComment, PendingEditReply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
+import {
+  Comment,
+  PendingComment,
+  PendingNewComment,
+  PendingNewReply,
+  Reply,
+} from "ui/state/comments";
 
 type ExistingCommentEditorProps = PropsFromRedux & {
-  comment: PendingEditComment | PendingEditReply;
-  type: "edit_comment" | "edit_reply";
+  comment: Comment | Reply | PendingNewComment | PendingNewReply;
+  pendingComment: PendingComment | null;
 };
 
-function ExistingCommentEditor({ comment, type, clearPendingComment }: ExistingCommentEditorProps) {
+function ExistingCommentEditor({
+  comment,
+  pendingComment,
+  clearPendingComment,
+}: ExistingCommentEditorProps) {
   const updateComment = hooks.useUpdateComment();
   const updateCommentReply = hooks.useUpdateCommentReply();
 
   const handleSubmit = (inputValue: string) => {
-    handleExistingSave(comment, inputValue);
+    if (pendingComment?.type === "edit_comment") {
+      updateComment(pendingComment.comment.id, inputValue, pendingComment.comment.position);
+    } else if (pendingComment?.type === "edit_reply") {
+      updateCommentReply(pendingComment.comment.id, inputValue);
+    }
     clearPendingComment();
   };
-  const handleExistingSave = (
-    pendingComment: PendingEditComment | PendingEditReply,
-    inputValue: string
-  ) => {
-    const { id } = pendingComment;
 
-    if (type === "edit_comment") {
-      updateComment(id, inputValue, pendingComment.position);
-    } else {
-      updateCommentReply(id, inputValue);
-    }
-  };
-
-  return <CommentEditor {...{ comment, handleSubmit }} />;
+  return (
+    <CommentEditor
+      editable={pendingComment?.comment?.id === comment.id}
+      comment={comment}
+      handleSubmit={handleSubmit}
+    />
+  );
 }
 
 const connector = connect(null, { clearPendingComment: actions.clearPendingComment });

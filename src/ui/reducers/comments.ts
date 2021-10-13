@@ -3,6 +3,8 @@ import { CommentsAction } from "ui/actions/comments";
 import { UIState } from "ui/state";
 import cloneDeep from "lodash/cloneDeep";
 
+export const PENDING_COMMENT_ID = "PENDING";
+
 function initialCommentsState(): CommentsState {
   return {
     hoveredComment: null,

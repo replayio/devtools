@@ -80,3 +80,11 @@
 .transcript-list .img.paper-airplane:hover {
   background: var(--primary-accent);
 }
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9197a3;
+  pointer-events: none;
+  height: 0;
+}

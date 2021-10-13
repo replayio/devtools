@@ -1,37 +1,29 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import {
-  Comment,
-  PendingEditComment,
-  PendingEditReply,
-  PendingNewComment,
-  PendingNewReply,
-} from "ui/state/comments";
+import { Comment, PendingNewComment, PendingNewReply, Reply } from "ui/state/comments";
 
-import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import { User } from "ui/types";
-import { DisabledSmButton, PrimarySmButton, SecondarySmButton } from "ui/components/shared/Button";
+import TipTapEditor from "./TipTapEditor";
 
 type CommentEditorProps = PropsFromRedux & {
-  comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
+  comment: Comment | Reply | PendingNewComment | PendingNewReply;
+  editable: boolean;
   handleSubmit: (inputValue: string) => void;
 };
 
 function CommentEditor({
-  comment,
-  handleSubmit,
-  updatePendingCommentContent,
   clearPendingComment,
+  comment,
+  editable,
+  handleSubmit,
 }: CommentEditorProps) {
   const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
-  const [api, setApi] = useState<DraftJSAPI>();
-  const [submitEnabled, setSubmitEnabled] = useState<boolean>(false);
 
   const users = useMemo(
     () =>
@@ -41,21 +33,15 @@ function CommentEditor({
     [loading]
   );
 
-  const handleCancel = () => {
-    clearPendingComment();
-  };
-  const onChangeCallback = () => {
-    setSubmitEnabled(!!api?.getText().length);
-    updatePendingCommentContent(api ? api.getText() : "");
-  };
-
   return (
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
-        <DraftJSEditor
-          handleCancel={handleCancel}
+        <TipTapEditor
+          content={comment.content || ""}
+          editable={editable}
+          handleCancel={clearPendingComment}
           handleSubmit={handleSubmit}
-          initialContent={comment.content}
+          possibleMentions={users || []}
           placeholder={
             comment.content == ""
               ? "parentId" in comment
@@ -63,9 +49,6 @@ function CommentEditor({
                 : "Type a comment"
               : ""
           }
-          api={setApi}
-          onChangeCallback={onChangeCallback}
-          users={users}
         />
       </div>
     </div>
@@ -76,10 +59,7 @@ const connector = connect(
   (state: UIState) => ({
     pendingComment: selectors.getPendingComment(state),
   }),
-  {
-    clearPendingComment: actions.clearPendingComment,
-    updatePendingCommentContent: actions.updatePendingCommentContent,
-  }
+  { clearPendingComment: actions.clearPendingComment }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommentEditor);

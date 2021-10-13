@@ -1,4 +1,5 @@
-import { RecordingId, MouseEvent } from "@recordreplay/protocol";
+import { RecordingId } from "@recordreplay/protocol";
+import { User } from "ui/types";
 
 export interface CommentsState {
   pendingComment: PendingComment | null;
@@ -18,101 +19,49 @@ export interface CommentPosition {
   y: number;
 }
 
-interface User {
-  picture: string;
-  name: string;
-  id: string;
-}
-
-export interface Comment {
+export interface Remark {
   content: string;
-  primaryLabel: string;
-  secondaryLabel: string;
   createdAt: string;
   hasFrames: boolean;
-  sourceLocation: SourceLocation | null;
   id: string;
   point: string;
-  recording_id: RecordingId;
+  recordingId: RecordingId;
+  sourceLocation: SourceLocation | null;
   time: number;
   updatedAt: string;
   user: User;
+}
+
+export interface Comment extends Remark {
+  position: CommentPosition | null;
+  primaryLabel?: string;
   replies: Reply[];
-  __typename: string;
-  position: CommentPosition;
-  parentId: null;
+  secondaryLabel?: string;
 }
 
-export interface Reply {
-  content: string;
-  createdAt: string;
-  hasFrames: boolean;
-  sourceLocation: SourceLocation | null;
-  id: string;
-  point: string;
-  recording_id: RecordingId;
-  time: number;
-  updatedAt: string;
-  user: User;
-  __typename: string;
-  position: null;
+export interface Reply extends Remark {
   parentId: string;
 }
-
-export interface Event extends MouseEvent {
-  comment?: Comment;
-}
-
-// Pending Comments
 
 export type PendingComment =
   | {
-      type: "new_comment";
       comment: PendingNewComment;
+      type: "new_comment";
     }
   | {
-      type: "new_reply";
       comment: PendingNewReply;
+      type: "new_reply";
     }
   | {
+      comment: Comment;
       type: "edit_comment";
-      comment: PendingEditComment;
     }
   | {
+      comment: Reply;
       type: "edit_reply";
-      comment: PendingEditReply;
     };
 
-export interface PendingNewComment extends PendingBlankComment {
-  content: string;
-  primaryLabel: string | null;
-  secondaryLabel: string | null;
-  position: CommentPosition | null;
-}
+export type PendingCommentAction = "edit_reply" | "edit_comment" | "new_reply" | "new_comment";
 
-export interface PendingNewReply extends PendingBlankComment {
-  content: string;
-  parentId: string;
-}
-
-export interface PendingEditComment extends PendingBlankComment {
-  primaryLabel: string | null;
-  secondaryLabel: string | null;
-  position: CommentPosition;
-  parentId?: null;
-  id: string;
-}
-
-export interface PendingEditReply extends PendingBlankComment {
-  position: null;
-  parentId: string;
-  id: string;
-}
-
-export interface PendingBlankComment {
-  content: string;
-  time: number;
-  point: string;
-  hasFrames: boolean;
-  sourceLocation: SourceLocation | null;
-}
+export type PendingNewComment = Omit<Comment, "recordingId" | "user">;
+export type PendingNewReply = Omit<Reply, "recordingId" | "user">;

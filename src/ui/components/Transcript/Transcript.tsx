@@ -8,26 +8,13 @@ import { UIState } from "ui/state";
 import { Comment, PendingNewComment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
-import useDraftJS from "ui/components/Comments/TranscriptComments/CommentEditor/use-draftjs";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 function Transcript({ pendingComment }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const { comments } = hooks.useGetComments(recordingId);
-  const { recording, loading } = hooks.useGetRecording(recordingId);
-  const { userId } = hooks.useGetUserId();
-  const load = useDraftJS();
-  const isAuthor = userId && userId == recording?.userId;
-
-  useEffect(() => {
-    let idle: NodeJS.Timeout | undefined = setTimeout(() => {
-      load().then(() => {
-        idle = undefined;
-      });
-    }, 1000);
-
-    return () => idle && clearTimeout(idle);
-  }, []);
+  const { loading } = hooks.useGetRecording(recordingId);
+  const { isAuthenticated } = useAuth0();
 
   if (loading) {
     return null;
@@ -38,9 +25,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
     displayedComments.push(pendingComment.comment);
   }
 
-  const { isAuthenticated } = useAuth0();
-
-  const sortedComments = sortBy(displayedComments, ["time"]);
+  const sortedComments = sortBy(displayedComments, ["time", "createdAt"]);
 
   return (
     <div className="right-sidebar">

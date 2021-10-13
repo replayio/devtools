@@ -1,15 +1,11 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useMutation } from "@apollo/client";
 import useAuth0 from "ui/utils/useAuth0";
-import { CommentPosition, PendingNewComment } from "ui/state/comments";
+import { PendingNewComment, Remark } from "ui/state/comments";
 import { GET_USER_ID } from "ui/graphql/users";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
-
-interface NewCommentVariable extends Omit<PendingNewComment, "content"> {
-  content: string;
-  position: CommentPosition | null;
-}
+import _ from "lodash";
 
 export default function useAddComment() {
   const { user } = useAuth0();
@@ -31,12 +27,18 @@ export default function useAddComment() {
     console.error("Apollo error while adding a comment:", error);
   }
 
-  return (comment: NewCommentVariable, recordingId: RecordingId) => {
+  return (comment: PendingNewComment, recordingId: RecordingId) => {
     const temporaryId = new Date().toISOString();
     trackEvent("create comment");
 
+    const without = (object: any, keys: string[]): any => {
+      return _.fromPairs(_.toPairs(object).filter(pair => !keys.includes(pair[0])));
+    };
+
     addComment({
-      variables: { input: comment },
+      variables: {
+        input: { ...without(comment, ["id", "createdAt", "updatedAt", "replies"]), recordingId },
+      },
       optimisticResponse: {
         addComment: {
           success: true,
@@ -66,15 +68,13 @@ export default function useAddComment() {
         const newComment = {
           ...comment,
           id: commentId,
-          replies: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
           user: {
             id: userId,
             name: user.name,
             picture: user.picture,
             __typename: "User",
           },
+          __typename: "Comment",
         };
         const newData = {
           ...data,
@@ -82,7 +82,7 @@ export default function useAddComment() {
             ...data.recording,
             comments: [
               ...data.recording.comments.filter(
-                (c: any) => c.id !== temporaryId && c.id !== commentId
+                (c: Remark) => c.id !== temporaryId && c.id !== commentId
               ),
               newComment,
             ],

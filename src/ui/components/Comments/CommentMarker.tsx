@@ -55,7 +55,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
       return null;
     }
 
-    if (comment.time > zoomRegion.endTime) {
+    if (!comment.time || comment.time > zoomRegion.endTime) {
       return null;
     }
 

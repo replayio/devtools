@@ -178,7 +178,7 @@ class Message extends Component {
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
     let handleAddComment = () => {
-      dispatch(actions.createComment(executionPointTime, executionPoint, null, true, frame));
+      dispatch(actions.createComment(executionPointTime, executionPoint, undefined, true, frame));
     };
 
     if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {

@@ -1,13 +1,13 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { PendingComment, Event, Comment, Reply, SourceLocation } from "ui/state/comments";
+import { PendingComment, Comment, Reply, SourceLocation } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import { setSelectedPrimaryPanel } from "./app";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
-import { getPendingComment } from "ui/reducers/comments";
+import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -61,20 +61,24 @@ export function createComment(
 ): UIThunkAction {
   return async ({ dispatch }) => {
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
-    const primaryLabel = labels?.primary || null;
-    const secondaryLabel = labels?.secondary || null;
+    const primaryLabel = labels?.primary;
+    const secondaryLabel = labels?.secondary;
 
     const pendingComment: PendingComment = {
       type: "new_comment",
       comment: {
         content: "",
-        time,
+        createdAt: new Date().toISOString(),
+        hasFrames,
+        id: PENDING_COMMENT_ID,
         point,
         position,
         primaryLabel,
+        replies: [],
         secondaryLabel,
-        hasFrames,
         sourceLocation,
+        time,
+        updatedAt: new Date().toISOString(),
       },
     };
 
@@ -92,7 +96,7 @@ export function createFrameComment(
   return async ({ dispatch }) => {
     const sourceLocation =
       breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
-    dispatch(createComment(time, point, position, true /* hasFrames */, sourceLocation || null));
+    dispatch(createComment(time, point, position, true, sourceLocation || null));
   };
 }
 
@@ -107,20 +111,7 @@ export function createFloatingCodeComment(
 ): UIThunkAction {
   return async ({ dispatch }) => {
     const { location: sourceLocation } = breakpoint;
-    dispatch(createComment(time, point, null, false /* hasFrames */, sourceLocation || null));
-  };
-}
-
-export function createNoFrameComment(
-  time: number,
-  point: string,
-  position: { x: number; y: number } | null,
-  breakpoint?: any
-): UIThunkAction {
-  return async ({ dispatch }) => {
-    const sourceLocation =
-      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
-    dispatch(createComment(time, point, position, false /* hasFrames */, sourceLocation || null));
+    dispatch(createComment(time, point, null, false, sourceLocation || null));
   };
 }
 
@@ -160,72 +151,55 @@ export function createLabels(sourceLocation: {
   };
 }
 
-export function editItem(item: Comment | Reply): UIThunkAction {
+export function editItem(item: Reply | Comment): UIThunkAction {
   return async ({ dispatch }) => {
     const { point, time, hasFrames } = item;
 
     dispatch(seekToComment(item));
 
     if (!("replies" in item)) {
-      const { content, sourceLocation, parentId, position, id } = item;
-
-      // Editing a reply.
       const pendingComment: PendingComment = {
+        comment: item,
         type: "edit_reply",
-        comment: { content, time, point, hasFrames, sourceLocation, parentId, position, id },
       };
       dispatch(setPendingComment(pendingComment));
     } else {
-      const { content, primaryLabel, secondaryLabel, sourceLocation, id, position } = item;
-
-      // Editing a comment.
       const pendingComment: PendingComment = {
+        comment: item,
         type: "edit_comment",
-        comment: {
-          content,
-          primaryLabel,
-          secondaryLabel,
-          time,
-          point,
-          hasFrames,
-          sourceLocation,
-          id,
-          position,
-        },
       };
       dispatch(setPendingComment(pendingComment));
     }
   };
 }
 
-export function seekToComment(
-  item: Comment | Reply | Event | PendingComment["comment"]
-): UIThunkAction {
+export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
   return ({ dispatch, getState }) => {
     dispatch(clearPendingComment());
 
     let cx = selectors.getThreadContext(getState());
-    const hasFrames = "hasFrames" in item ? item.hasFrames : false;
-    dispatch(actions.seek(item.point, item.time, hasFrames));
-    if ("sourceLocation" in item && item.sourceLocation) {
+    dispatch(actions.seek(item.point, item.time, item.hasFrames));
+    if (item.sourceLocation) {
       cx = selectors.getThreadContext(getState());
       dispatch(actions.selectLocation(cx, item.sourceLocation));
     }
   };
 }
 
-export function replyToComment(comment: Comment): UIThunkAction {
+export function replyToComment(parentId: string, point: string, time: number): UIThunkAction {
   return ({ dispatch }) => {
-    const { time, point, hasFrames, id } = comment;
     const pendingComment: PendingComment = {
       type: "new_reply",
       comment: {
         content: "",
-        time,
-        point,
-        hasFrames,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        id: PENDING_COMMENT_ID,
+        hasFrames: false,
         sourceLocation: null,
-        parentId: id,
+        parentId,
+        point,
+        time,
       },
     };
 
