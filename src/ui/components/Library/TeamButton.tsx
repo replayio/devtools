@@ -8,7 +8,6 @@ import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
 import { Workspace } from "ui/types";
 import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
-import { sub } from "date-fns";
 
 function TeamButton({
   text,

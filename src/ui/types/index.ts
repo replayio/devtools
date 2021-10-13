@@ -47,7 +47,7 @@ export interface PaymentMethod {
   id: string;
   default: boolean;
   type: "card";
-  card?: {
+  card: {
     brand: string;
     last4: string;
   };

@@ -13,10 +13,6 @@ export function isSubscriptionCancelled(subscription: Subscription) {
 }
 
 export function formatPaymentMethod(paymentMethod: PaymentMethod) {
-  if (!paymentMethod.card) {
-    return "Card";
-  }
-
   return `${cardToDisplayType(paymentMethod.card.brand)} ending with ${paymentMethod.card.last4}`;
 }
 
@@ -38,7 +34,7 @@ export const cardToDisplayType = (type: string) => {
 };
 
 export function getPlanDisplayText(subscription: Subscription) {
-  const trial = subscription.status === "trialing" && subscription.paymentMethods?.length === 0;
+  const trial = subscription.status === "trialing" && subscription.paymentMethods.length === 0;
   let text = "Team Plan";
 
   switch (subscription.plan.key) {
