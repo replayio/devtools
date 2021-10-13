@@ -451,12 +451,18 @@ function isError(message) {
   return message.source === "javascript" && message.level === "error";
 }
 
+// messages with a resource:///modules path are considered internal
+function isBrowserInternalMessage(msg) {
+  return msg.match(/resource:\/\/\/modules\/\S+\.jsm/);
+}
+
 module.exports = {
   getArrayTypeNames,
   getDescriptorValue,
   isContentBlockingMessage,
   isGroupType,
   isError,
+  isBrowserInternalMessage,
   l10n,
   prepareMessage,
 };
