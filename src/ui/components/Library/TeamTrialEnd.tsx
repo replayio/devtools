@@ -30,7 +30,7 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
   };
 
   const expiresIn = subscriptionEndsIn(workspace);
-  debugger;
+
   return (
     <TrialEnd
       expiresIn={expiresIn}

@@ -3,18 +3,29 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 
 export function inUnpaidFreeTrial(workspace: Workspace) {
   const subscription = workspace.subscription;
-  return subscription && subscription.status == "trialing" && !workspace.hasPaymentMethod;
+
+  if (subscription && subscription.status === "trialing") {
+    return !workspace.hasPaymentMethod;
+  }
+
+  return false;
 }
 
 export function subscriptionEndsIn(workspace: Workspace, date?: Date | number) {
+  date = date || Date.now();
   const subscription = workspace.subscription;
 
+  if (!subscription) {
+    return 0;
+  }
+
   if (
-    !subscription ||
     subscription.status === WorkspaceSubscriptionStatus.Canceled ||
     subscription.status === WorkspaceSubscriptionStatus.Incomplete
   ) {
-    return 0;
+    return subscription.effectiveUntil
+      ? differenceInCalendarDays(new Date(subscription.effectiveUntil), date)
+      : 0;
   }
 
   if (subscription.status === WorkspaceSubscriptionStatus.Active) {
@@ -23,7 +34,7 @@ export function subscriptionEndsIn(workspace: Workspace, date?: Date | number) {
     return Infinity;
   }
 
-  return differenceInCalendarDays(new Date(subscription.trialEnds!), date || Date.now());
+  return differenceInCalendarDays(new Date(subscription.trialEnds!), date);
 }
 
 export function subscriptionExpired(workspace: Workspace, date?: Date) {

@@ -15,11 +15,14 @@ export function UploadRecordingTrialEnd({
   // parent's space-y styling
   const style = { marginTop: "0px" };
 
-  if (!workspace || !inUnpaidFreeTrial(workspace)) {
+  if (!workspace) {
     return null;
   }
 
   const expiresIn = subscriptionEndsIn(workspace);
+  if (expiresIn > 0 && !inUnpaidFreeTrial(workspace)) {
+    return null;
+  }
 
   return (
     <div className="absolute top-0 left-1/2 transform -translate-x-1/2" {...{ style }}>

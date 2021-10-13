@@ -35,6 +35,7 @@ export const GET_RECORDING = gql`
         subscription {
           status
           trialEnds
+          effectiveUntil
         }
       }
       collaborators {
