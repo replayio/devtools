@@ -5,7 +5,9 @@ import { Comment, Reply } from "ui/state/comments";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import "./CommentActions.css";
-import { DotsHorizontalIcon } from "@heroicons/react/solid";
+import classNames from "classnames";
+import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
@@ -25,7 +27,8 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     return null;
   }
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setExpanded(false);
 
     const replyCount = ("replies" in comment && comment.replies?.length) || 0;
@@ -41,43 +44,41 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
       }
     }
   };
-  const editComment = () => {
+  const editComment = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setExpanded(false);
 
     editItem(comment);
   };
 
+  const button = (
+    <MaterialIcon
+      outlined
+      className={classNames(
+        expanded ? "opacity-100" : "",
+        "h-4 w-4 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-primaryAccentHover text-base leading-4"
+      )}
+    >
+      more_vert
+    </MaterialIcon>
+  );
+
   return (
-    <div className="comment-actions" onClick={e => e.stopPropagation()}>
-      <PortalDropdown
-        buttonContent={
-          <div className="text-gray-400">
-            <DotsHorizontalIcon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition" />
-          </div>
-        }
-        setExpanded={setExpanded}
-        expanded={expanded}
-        buttonStyle=""
-        position="bottom-right"
-      >
-        <div className="old-portal">
-          <div
-            className="comments-dropdown-item edit-comment text-xs"
-            title="Edit Comment"
-            onClick={editComment}
-          >
-            Edit comment
-          </div>
-          <div
-            className="comments-dropdown-item delete-comment text-xs"
-            title="Delete Comment"
-            onClick={handleDelete}
-          >
-            {isRoot ? "Delete comment and replies" : "Delete comment"}
-          </div>
-        </div>
-      </PortalDropdown>
-    </div>
+    <PortalDropdown
+      buttonContent={button}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle=""
+      distance={0}
+      position="bottom-right"
+    >
+      <Dropdown>
+        <DropdownItem onClick={editComment}>Edit comment</DropdownItem>
+        <DropdownItem onClick={handleDelete}>
+          {isRoot ? "Delete comment and replies" : "Delete comment"}
+        </DropdownItem>
+      </Dropdown>
+    </PortalDropdown>
   );
 }
 
