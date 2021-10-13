@@ -12,6 +12,7 @@ import { getRecordingId } from "ui/utils/environment";
 const syncInitialAppState: AppState = {
   expectedError: null,
   unexpectedError: null,
+  trialExpired: false,
   theme: "theme-light",
   splitConsoleOpen: prefs.splitConsole as boolean,
   selectedPanel: prefs.selectedPanel as PanelName,
@@ -100,6 +101,10 @@ export default function update(
 
     case "set_unexpected_error": {
       return { ...state, unexpectedError: action.error };
+    }
+
+    case "set_trial_expired": {
+      return { ...state, trialExpired: true };
     }
 
     case "update_theme": {
@@ -268,6 +273,7 @@ export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourc
 export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
+export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;

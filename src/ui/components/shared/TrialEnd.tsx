@@ -2,20 +2,13 @@ import classNames from "classnames";
 import React from "react";
 import MaterialIcon from "./MaterialIcon";
 
-function getDaysLeft(trialEndDate: string) {
-  const timeLeft = new Date(trialEndDate).getTime() - new Date().getTime();
-  const daysLeft = timeLeft / (1000 * 60 * 60 * 24);
-
-  return Math.floor(daysLeft);
-}
-
 export function TrialEnd({
-  trialEnds,
+  expiresIn,
   color = "gray",
   className,
   onClick,
 }: {
-  trialEnds: string;
+  expiresIn: number;
   color?: "yellow" | "gray";
   className?: string;
   onClick?: () => void;
@@ -28,8 +21,7 @@ export function TrialEnd({
     style = { backgroundColor: "#E9E9EB" };
   }
 
-  const daysLeft = getDaysLeft(trialEnds);
-  if (daysLeft >= 21) {
+  if (expiresIn >= 21) {
     return null;
   }
 
@@ -41,7 +33,13 @@ export function TrialEnd({
     >
       <MaterialIcon style={{ fontSize: "1.25rem" }}>timer</MaterialIcon>
       <span className="overflow-hidden whitespace-pre overflow-ellipsis">
-        Trial expires in {daysLeft} days
+        {expiresIn > 1 ? (
+          <span>Trial expires in {expiresIn} days</span>
+        ) : expiresIn == 1 ? (
+          <span>Trial expires in 1 day</span>
+        ) : (
+          <span>Trial expired</span>
+        )}
       </span>
     </div>
   );

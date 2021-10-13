@@ -165,9 +165,32 @@ function UnexpectedErrorScreen({ error }: { error: UnexpectedError }) {
   );
 }
 
-function _AppErrors({ expectedError, unexpectedError }: PropsFromRedux) {
+function TrialExpired() {
+  return (
+    <Modal options={{ maskTransparency: "translucent" }}>
+      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
+        <div className="p-12 space-y-12 items-center flex flex-col">
+          <div className="space-y-4 place-content-center">
+            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+          </div>
+          <div className="text-center space-y-3 max-w-lg	">
+            <div className="font-bold text-lg">Free Trial Expired</div>
+            <div className="text-gray-500 text-center ">
+              This replay is unavailable because it was recorded after your team's free trial
+              expired.
+            </div>
+          </div>
+          <ActionButton action={"library"} />
+        </div>
+      </section>
+    </Modal>
+  );
+}
+
+function _AppErrors({ expectedError, unexpectedError, trialExpired }: PropsFromRedux) {
   return (
     <>
+      {trialExpired && <TrialExpired />}
       {expectedError ? <ExpectedErrorScreen error={expectedError} /> : null}
       {unexpectedError ? <UnexpectedErrorScreen error={unexpectedError} /> : null}
     </>
@@ -177,6 +200,7 @@ function _AppErrors({ expectedError, unexpectedError }: PropsFromRedux) {
 const connector = connect((state: UIState) => ({
   expectedError: selectors.getExpectedError(state),
   unexpectedError: selectors.getUnexpectedError(state),
+  trialExpired: selectors.getTrialExpired(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(_AppErrors);
