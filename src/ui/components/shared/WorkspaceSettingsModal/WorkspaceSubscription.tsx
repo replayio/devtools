@@ -12,7 +12,7 @@ import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
 import { TeamPricingPage } from "./TeamPricingPage";
-import { getViewTitle, Views } from "./utils";
+import { Views } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -26,6 +26,7 @@ export const stripePromise = loadStripe(
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
   const [view, setView] = useState<Views>("details");
   const [confirmed, setConfirmed] = useState(false);
+  const { workspace, loading: wsLoading } = hooks.useGetWorkspace(workspaceId);
   const { data, loading, error, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
 
   // clear the confirmed state if changing views
@@ -46,7 +47,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     }
   });
 
-  if (loading || !data) {
+  if (loading || !data || wsLoading || !workspace) {
     return null;
   }
 
@@ -76,7 +77,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
       {view === "details" && (
         <Details
-          workspaceId={workspaceId}
+          workspace={workspace}
           subscription={subscription}
           setView={setView}
           confirmed={confirmed}
@@ -84,7 +85,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       )}
       {view === "add-payment-method" && (
         <>
-          <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
+          <SettingsHeader>Team Plan Pricing</SettingsHeader>
           <TeamPricingPage
             subscription={subscription}
             onEnterCard={() => setView("enter-payment-method")}
@@ -93,7 +94,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       )}
       {view === "enter-payment-method" && (
         <Elements stripe={stripePromise}>
-          <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
+          <SettingsHeader>Add Payment Method</SettingsHeader>
           <EnterPaymentMethod
             onCancel={() => setView("details")}
             onSave={() => {
@@ -110,7 +111,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       )}
       {view === "delete-payment-method" && (
         <>
-          <SettingsHeader>{getViewTitle(view)}</SettingsHeader>
+          <SettingsHeader>Remove Payment Method</SettingsHeader>
           <DeleteConfirmation
             subscription={subscription}
             workspaceId={workspaceId}

@@ -1,73 +1,41 @@
 import React from "react";
 import hooks from "ui/hooks";
-import { Subscription } from "ui/types";
+import { Subscription, Workspace } from "ui/types";
 import { Button } from "../Button";
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
 import { BillingBanners } from "./BillingBanners";
 import { ExpirationRow } from "./ExpirationRow";
 import { isSubscriptionCancelled, getPlanDisplayText, formatPaymentMethod, Views } from "./utils";
-import { inUnpaidFreeTrial, freeTrialExpiresIn } from "ui/utils/workspace";
+import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
 function TrialDetails({
-  workspaceId,
+  workspace,
   onSelectPricing,
   expiresIn,
 }: {
-  workspaceId: string;
+  workspace: Workspace;
   onSelectPricing: () => void;
   expiresIn: number;
 }) {
-  const { workspace } = hooks.useGetWorkspace(workspaceId);
-
-  if (expiresIn > 0) {
-    return (
-      <>
-        <SettingsHeader>Trial Expiring Soon</SettingsHeader>
-        <div className="p-4 ">
-          <div
-            style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)" }}
-            className="space-y-6 bg-white pt-8 pb-4 px-6 text-lg rounded"
-          >
-            <p>
-              {workspace.name} Free Trial will be expiring in{" "}
-              {expiresIn == 1 ? (
-                <span className="font-bold whitespace-nowrap">1 day</span>
-              ) : (
-                <span className="font-bold whitespace-nowrap">{expiresIn} days</span>
-              )}
-              .
-            </p>
-            <p>
-              Existing replays will continue to be debuggable. New replays will require an active
-              subscription. Feel free to <a href="mailto:support@replay.io">email</a> us if you have
-              any questions.
-            </p>
-            <div className="flex justify-center">
-              <Button
-                size="xl"
-                color="blue"
-                style="primary"
-                type="submit"
-                className="w-full justify-center"
-                onClick={onSelectPricing}
-              >
-                Team Plan Pricing
-              </Button>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
+  const expired = expiresIn <= 0;
 
   return (
     <>
-      <SettingsHeader>Trial Expired</SettingsHeader>
-      <div className="p-4 ">
+      <SettingsHeader>{expired ? "Trial Expired" : "Trial Expiring Soon"}</SettingsHeader>
+      <div className="p-4">
         <div
           style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)" }}
           className="space-y-6 bg-white pt-8 pb-4 px-6 text-lg rounded"
         >
+          {!expired && (
+            <p>
+              {workspace?.name} Free Trial will be expiring in{" "}
+              <span className="font-bold whitespace-nowrap">
+                {expiresIn === 1 ? "1 day" : `${expiresIn} days`}
+              </span>
+              .
+            </p>
+          )}
           <p>
             Existing replays will continue to be debuggable. New replays will require an active
             subscription. Feel free to <a href="mailto:support@replay.io">email</a> us if you have
@@ -137,20 +105,20 @@ function SubscriptionDetails({
 export function Details({
   subscription,
   setView,
-  workspaceId,
+  workspace,
   confirmed,
 }: {
   confirmed?: boolean;
   subscription: Subscription;
-  workspaceId: string;
-
+  workspace: Workspace;
   setView: (view: Views) => void;
 }) {
-  const expiresIn = freeTrialExpiresIn(subscription);
-  if (inUnpaidFreeTrial(subscription)) {
+  if (inUnpaidFreeTrial(workspace)) {
+    const expiresIn = subscriptionEndsIn(workspace);
+
     return (
       <TrialDetails
-        workspaceId={workspaceId}
+        workspace={workspace}
         expiresIn={expiresIn}
         onSelectPricing={() => setView("add-payment-method")}
       />

@@ -6,7 +6,7 @@ import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { freeTrialExpiresIn } from "ui/utils/workspace";
+import { subscriptionEndsIn } from "ui/utils/workspace";
 import { TrialEnd } from "../shared/TrialEnd";
 
 function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
@@ -29,7 +29,7 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
     setModal("workspace-settings");
   };
 
-  const expiresIn = freeTrialExpiresIn(workspace?.subscription);
+  const expiresIn = subscriptionEndsIn(workspace);
   debugger;
   return (
     <TrialEnd

@@ -1,22 +1,33 @@
-import { Subscription } from "ui/types";
+import { Workspace, WorkspaceSubscriptionStatus } from "ui/types";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 
-export function inUnpaidFreeTrial(subscription?: Subscription) {
-  return (
-    subscription &&
-    subscription.status == "trialing" &&
-    (!subscription.paymentMethods || subscription.paymentMethods.length === 0)
-  );
+export function inUnpaidFreeTrial(workspace: Workspace) {
+  const subscription = workspace.subscription;
+  return subscription && subscription.status == "trialing" && !workspace.hasPaymentMethod;
 }
 
-export function freeTrialExpiresIn(subscription: Subscription) {
-  return differenceInCalendarDays(new Date(subscription.trialEnds), Date.now());
-}
+export function subscriptionEndsIn(workspace: Workspace, date?: Date | number) {
+  const subscription = workspace.subscription;
 
-export function freeTrialExpired(subscription?: Subscription) {
-  if (!subscription || !inUnpaidFreeTrial(subscription)) {
-    return false;
+  if (
+    !subscription ||
+    subscription.status === WorkspaceSubscriptionStatus.Canceled ||
+    subscription.status === WorkspaceSubscriptionStatus.Incomplete
+  ) {
+    return 0;
   }
-  const expiresIn = freeTrialExpiresIn(subscription);
+
+  if (subscription.status === WorkspaceSubscriptionStatus.Active) {
+    // TODO: Use the following when effective_until is always populated
+    // return !workspace.hasPaymentMethod ? subscription.effectiveUntil : Infinity;
+    return Infinity;
+  }
+
+  return differenceInCalendarDays(new Date(subscription.trialEnds!), date || Date.now());
+}
+
+export function subscriptionExpired(workspace: Workspace, date?: Date) {
+  const expiresIn = subscriptionEndsIn(workspace, date);
+
   return expiresIn <= 0;
 }

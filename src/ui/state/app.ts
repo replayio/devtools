@@ -93,6 +93,7 @@ export interface AppState {
   loadedRegions: loadedRegions | null;
   showVideoPanel: boolean;
   showEditor: boolean;
+  trialExpired: boolean;
 }
 
 export interface AnalysisPoints {

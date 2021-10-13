@@ -7,7 +7,7 @@ import hooks from "ui/hooks";
 import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
 import { Workspace } from "ui/types";
-import { inUnpaidFreeTrial, freeTrialExpired } from "ui/utils/workspace";
+import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
 import { sub } from "date-fns";
 
 function TeamButton({
@@ -44,12 +44,12 @@ function TeamButton({
     setModal("workspace-settings");
   };
 
-  const subscription = workspace?.subscription;
-  const badge = inUnpaidFreeTrial(subscription)
-    ? "(Trial)"
-    : freeTrialExpired(subscription)
-    ? "(Expired)"
-    : "";
+  let badge =
+    workspace && inUnpaidFreeTrial(workspace)
+      ? "(Trial)"
+      : workspace && subscriptionExpired(workspace)
+      ? "(Expired)"
+      : "";
 
   return (
     <SidebarButton shouldHighlight={isSelected} onClick={handleTeamClick}>

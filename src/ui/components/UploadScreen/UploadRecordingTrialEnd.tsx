@@ -1,7 +1,7 @@
 import React from "react";
 import { Workspace } from "ui/types";
 import { TrialEnd } from "../shared/TrialEnd";
-import { freeTrialExpiresIn, inUnpaidFreeTrial } from "ui/utils/workspace";
+import { subscriptionEndsIn, inUnpaidFreeTrial } from "ui/utils/workspace";
 
 export function UploadRecordingTrialEnd({
   workspaces,
@@ -15,13 +15,11 @@ export function UploadRecordingTrialEnd({
   // parent's space-y styling
   const style = { marginTop: "0px" };
 
-  const subscription = workspace?.subscription;
-  if (!subscription || !inUnpaidFreeTrial(subscription)) {
+  if (!workspace || !inUnpaidFreeTrial(workspace)) {
     return null;
   }
 
-  const expiresIn = freeTrialExpiresIn(subscription);
-  console.log({ subscription, expiresIn });
+  const expiresIn = subscriptionEndsIn(workspace);
 
   return (
     <div className="absolute top-0 left-1/2 transform -translate-x-1/2" {...{ style }}>

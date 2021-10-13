@@ -13,6 +13,10 @@ export function isSubscriptionCancelled(subscription: Subscription) {
 }
 
 export function formatPaymentMethod(paymentMethod: PaymentMethod) {
+  if (!paymentMethod.card) {
+    return "Card";
+  }
+
   return `${cardToDisplayType(paymentMethod.card.brand)} ending with ${paymentMethod.card.last4}`;
 }
 
@@ -33,20 +37,8 @@ export const cardToDisplayType = (type: string) => {
   }
 };
 
-export function getViewTitle(view: Views) {
-  switch (view) {
-    case "add-payment-method":
-      return "Team Plan Pricing";
-    case "enter-payment-method":
-      return "Add Payment Method";
-    case "confirm-payment-method":
-      return "Payment Method Added!";
-    case "delete-payment-method":
-      return "Remove Payment Method";
-  }
-}
 export function getPlanDisplayText(subscription: Subscription) {
-  const trial = subscription.status === "trialing" && subscription.paymentMethods.length === 0;
+  const trial = subscription.status === "trialing" && subscription.paymentMethods?.length === 0;
   let text = "Team Plan";
 
   switch (subscription.plan.key) {

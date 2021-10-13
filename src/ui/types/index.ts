@@ -47,7 +47,7 @@ export interface PaymentMethod {
   id: string;
   default: boolean;
   type: "card";
-  card: {
+  card?: {
     brand: string;
     last4: string;
   };
@@ -117,6 +117,7 @@ export interface Workspace {
   members?: User[];
   apiKeys?: ApiKey[];
   subscription?: Subscription;
+  hasPaymentMethod: boolean;
 }
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";

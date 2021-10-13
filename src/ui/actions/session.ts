@@ -20,7 +20,8 @@ import { getRecording } from "ui/hooks/recordings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { jumpToInitialPausePoint } from "./timeline";
 import { Recording } from "ui/types";
-import { freeTrialExpired } from "ui/utils/workspace";
+import { subscriptionExpired } from "ui/utils/workspace";
+import { ApolloError } from "@apollo/client";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -63,7 +64,12 @@ export function getAccessibleRecording(
       }
       return recording!;
     } catch (err) {
-      dispatch(setExpectedError({ message: "Error", content: extractGraphQLError(err)! }));
+      let content = "Unexpected error retrieving recording.";
+      if (err instanceof ApolloError) {
+        content = extractGraphQLError(err)!;
+      }
+
+      dispatch(setExpectedError({ message: "Error", content }));
       return null;
     }
   };
@@ -120,9 +126,7 @@ export function createSession(recordingId: string): UIThunkAction {
 
       if (
         recording.workspace &&
-        recording.workspace?.subscription &&
-        freeTrialExpired(recording.workspace.subscription) &&
-        new Date(recording.date) > new Date(recording.workspace.subscription.trialEnds)
+        subscriptionExpired(recording.workspace, new Date(recording.date))
       ) {
         return dispatch(setTrialExpired());
       }
@@ -150,7 +154,7 @@ export function createSession(recordingId: string): UIThunkAction {
       prefs.recordingId = recordingId;
 
       dispatch(jumpToInitialPausePoint());
-    } catch (e) {
+    } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
