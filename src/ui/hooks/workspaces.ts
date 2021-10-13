@@ -111,6 +111,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 subscription {
                   status
                   trialEnds
+                  effectiveUntil
                 }
                 members {
                   edges {

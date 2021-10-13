@@ -43,6 +43,13 @@ const GET_WORKSPACE_RECORDINGS = gql`
                   id
                 }
               }
+              workspace {
+                subscription {
+                  status
+                  trialEnds
+                  effectiveUntil
+                }
+              }
             }
           }
         }
