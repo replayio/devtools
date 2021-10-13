@@ -19,6 +19,7 @@ import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 import { prefs } from "ui/utils/prefs";
+import Checkbox from "../Forms/Checkbox";
 
 function Support() {
   return (
@@ -67,18 +68,15 @@ function Personal() {
           <div className="text-gray-500">{email}</div>
         </div>
       </div>
-      <div className="flex flex-row space-x-3 items-center" data-private>
-        <li className="flex flex-row items-center">
-          <label className="space-y-1.5 pr-36 flex-grow cursor-pointer" htmlFor="disableLogRocket">
-            <div>Disable LogRocket Session Replay</div>
-          </label>
-          <input
-            type="checkbox"
-            id="disableLogRocket"
-            checked={!!disableLogRocket}
-            onChange={toggleDisableLogRocket}
-          />
-        </li>
+      <div className="flex justify-between items-center" data-private>
+        <label className="cursor-pointer" htmlFor="disableLogRocket">
+          <div>Disable LogRocket Session Replay</div>
+        </label>
+        <Checkbox
+          id="disableLogRocket"
+          checked={!!disableLogRocket}
+          onChange={toggleDisableLogRocket}
+        />
       </div>
       <div>
         <button
