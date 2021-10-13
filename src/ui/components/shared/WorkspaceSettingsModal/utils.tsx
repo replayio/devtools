@@ -33,22 +33,6 @@ export const cardToDisplayType = (type: string) => {
   }
 };
 
-export function getViewTitle(view: Views) {
-  switch (view) {
-    case "details":
-      return "Billing";
-    case "add-payment-method":
-      return "Team Plan Pricing";
-    case "enter-payment-method":
-      return "Add Payment Method";
-    case "confirm-payment-method":
-      return "Payment Method Added!";
-    case "delete-payment-method":
-      return "Remove Payment Method";
-    case "trial-details":
-      return "Trial Expiring Soon";
-  }
-}
 export function getPlanDisplayText(subscription: Subscription) {
   const trial = subscription.status === "trialing" && subscription.paymentMethods.length === 0;
   let text = "Team Plan";

@@ -1,14 +1,18 @@
 import React from "react";
 import hooks from "ui/hooks";
 import { TrialEnd } from "../shared/TrialEnd";
+import { subscriptionEndsIn, inUnpaidFreeTrial } from "ui/utils/workspace";
 
 export function RecordingTrialEnd() {
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
 
-  if (loading || !recording?.workspace?.subscription?.trialEnds) {
+  const workspace = recording?.workspace;
+  if (loading || !workspace || !inUnpaidFreeTrial(workspace)) {
     return null;
   }
 
-  return <TrialEnd trialEnds={recording.workspace.subscription.trialEnds} color="yellow" />;
+  const expiresIn = subscriptionEndsIn(workspace);
+
+  return <TrialEnd expiresIn={expiresIn} color="yellow" />;
 }

@@ -117,6 +117,7 @@ export interface Workspace {
   members?: User[];
   apiKeys?: ApiKey[];
   subscription?: Subscription;
+  hasPaymentMethod: boolean;
 }
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";

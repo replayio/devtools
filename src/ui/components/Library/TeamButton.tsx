@@ -7,13 +7,7 @@ import hooks from "ui/hooks";
 import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
 import { Workspace } from "ui/types";
-
-type TeamButtonProps = PropsFromRedux & {
-  text: string;
-  isNew?: boolean;
-  id: string | null;
-  workspace?: Workspace;
-};
+import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
 
 function TeamButton({
   text,
@@ -23,7 +17,12 @@ function TeamButton({
   workspace,
   setWorkspaceId,
   setModal,
-}: TeamButtonProps) {
+}: PropsFromRedux & {
+  text: string;
+  isNew?: boolean;
+  id: string | null;
+  workspace?: Workspace;
+}) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const isSelected = currentWorkspaceId == id;
   const showSettingsButton = id && isSelected && !isNew;
@@ -44,6 +43,13 @@ function TeamButton({
     setModal("workspace-settings");
   };
 
+  let badge =
+    workspace && inUnpaidFreeTrial(workspace)
+      ? "(Trial)"
+      : workspace && subscriptionExpired(workspace)
+      ? "(Expired)"
+      : "";
+
   return (
     <SidebarButton shouldHighlight={isSelected} onClick={handleTeamClick}>
       <div
@@ -53,7 +59,7 @@ function TeamButton({
         )}
         title={text}
       >
-        {`${text}${workspace?.subscription?.status === "trialing" ? " (Trial)" : ""}`}
+        {`${text} ${badge}`}
       </div>
       <div className="flex flex-row space-x-1">
         {isNew ? (

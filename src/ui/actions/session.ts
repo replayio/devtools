@@ -20,13 +20,18 @@ import { getRecording } from "ui/hooks/recordings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { jumpToInitialPausePoint } from "./timeline";
 import { Recording } from "ui/types";
-import { getFeatureFlag } from "ui/utils/launchdarkly";
+import { subscriptionExpired } from "ui/utils/workspace";
+import { ApolloError } from "@apollo/client";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
 };
+export type SetTrialExpiredAction = Action<"set_trial_expired">;
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
-export type SessionActions = SetExpectedErrorAction | SetUnexpectedErrorAction;
+export type SessionActions =
+  | SetExpectedErrorAction
+  | SetUnexpectedErrorAction
+  | SetTrialExpiredAction;
 
 declare global {
   interface Window {
@@ -59,7 +64,12 @@ export function getAccessibleRecording(
       }
       return recording!;
     } catch (err) {
-      dispatch(setExpectedError({ message: "Error", content: extractGraphQLError(err)! }));
+      let content = "Unexpected error retrieving recording.";
+      if (err instanceof ApolloError) {
+        content = extractGraphQLError(err)!;
+      }
+
+      dispatch(setExpectedError({ message: "Error", content }));
       return null;
     }
   };
@@ -114,6 +124,13 @@ export function createSession(recordingId: string): UIThunkAction {
 
       registerRecording({ recording, userInfo });
 
+      if (
+        recording.workspace &&
+        subscriptionExpired(recording.workspace, new Date(recording.date))
+      ) {
+        return dispatch(setTrialExpired());
+      }
+
       ThreadFront.setTest(getTest() || undefined);
       ThreadFront.recordingId = recordingId;
 
@@ -137,7 +154,7 @@ export function createSession(recordingId: string): UIThunkAction {
       prefs.recordingId = recordingId;
 
       dispatch(jumpToInitialPausePoint());
-    } catch (e) {
+    } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
@@ -205,6 +222,9 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
   };
 }
 
+export function setTrialExpired(): SetTrialExpiredAction {
+  return { type: "set_trial_expired" };
+}
 export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
   return ({ getState, dispatch }) => {
     const state = getState();

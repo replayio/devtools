@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -12,8 +12,7 @@ import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
 import { TeamPricingPage } from "./TeamPricingPage";
-import TrialDetails from "./TrialDetails";
-import { getViewTitle, Views } from "./utils";
+import { Views } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -27,13 +26,8 @@ export const stripePromise = loadStripe(
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
   const [view, setView] = useState<Views>("details");
   const [confirmed, setConfirmed] = useState(false);
+  const { workspace, loading: wsLoading } = hooks.useGetWorkspace(workspaceId);
   const { data, loading, error, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
-
-  const subscription = data?.node.subscription;
-  const showTrialDetails =
-    subscription &&
-    subscription?.paymentMethods?.length === 0 &&
-    subscription.status === "trialing";
 
   // clear the confirmed state if changing views
   useEffect(() => {
@@ -53,7 +47,11 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     }
   });
 
-  if (loading) return null;
+  if (loading || !data || wsLoading || !workspace) {
+    return null;
+  }
+
+  const { subscription } = data.node;
 
   if (error) {
     return (
@@ -77,32 +75,26 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
 
   return (
     <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
-      <SettingsHeader>
-        {getViewTitle(view === "details" && showTrialDetails ? "trial-details" : view)}
-      </SettingsHeader>
-      {view === "details" &&
-        (showTrialDetails ? (
-          <TrialDetails
-            workspaceId={workspaceId}
-            subscription={subscription}
-            onSelectPricing={() => setView("add-payment-method")}
-          />
-        ) : (
-          <Details
-            workspaceId={workspaceId}
-            subscription={subscription}
-            setView={setView}
-            confirmed={confirmed}
-          />
-        ))}
-      {view === "add-payment-method" && (
-        <TeamPricingPage
+      {view === "details" && (
+        <Details
+          workspace={workspace}
           subscription={subscription}
-          onEnterCard={() => setView("enter-payment-method")}
+          setView={setView}
+          confirmed={confirmed}
         />
+      )}
+      {view === "add-payment-method" && (
+        <>
+          <SettingsHeader>Team Plan Pricing</SettingsHeader>
+          <TeamPricingPage
+            subscription={subscription}
+            onEnterCard={() => setView("enter-payment-method")}
+          />
+        </>
       )}
       {view === "enter-payment-method" && (
         <Elements stripe={stripePromise}>
+          <SettingsHeader>Add Payment Method</SettingsHeader>
           <EnterPaymentMethod
             onCancel={() => setView("details")}
             onSave={() => {
@@ -118,11 +110,14 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         </Elements>
       )}
       {view === "delete-payment-method" && (
-        <DeleteConfirmation
-          subscription={subscription}
-          workspaceId={workspaceId}
-          onDone={() => setView("details")}
-        />
+        <>
+          <SettingsHeader>Remove Payment Method</SettingsHeader>
+          <DeleteConfirmation
+            subscription={subscription}
+            workspaceId={workspaceId}
+            onDone={() => setView("details")}
+          />
+        </>
       )}
     </section>
   );
