@@ -14,6 +14,8 @@ function CurrentTimeLine() {
   return <div className="bg-secondaryAccent w-full m-0" style={{ height: "3px" }} />;
 }
 
+const FILTERED_EVENT_TYPES = ["keydown", "keyup"];
+
 function Events({
   currentTime,
   eventCategoriesLoading,
@@ -25,6 +27,8 @@ function Events({
   const onSeek = (point: string, time: number) => {
     seek(point, time, false);
   };
+
+  events = events.filter(e => !FILTERED_EVENT_TYPES.includes(e.kind || ""));
 
   const currentEventIndex = sortedLastIndex(
     events.map(e => e.time),
