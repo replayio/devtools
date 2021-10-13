@@ -40,7 +40,8 @@ export type SettingsTabTitle =
   | "Support"
   | "Personal"
   | "Legal"
-  | "API Keys";
+  | "API Keys"
+  | "Preferences";
 
 export interface ExpectedError {
   message: string;

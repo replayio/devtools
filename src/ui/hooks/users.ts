@@ -32,6 +32,13 @@ export enum Nag {
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
 }
 
+export enum EmailPreference {
+  MARKETING = "marketing",
+  COLLABORATOR_REQUEST = "collaborator_request",
+  REPLAY_COMMENT = "replay_comment",
+  NEW_TEAM_INVITE = "new_team_invite",
+}
+
 export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefined> {
   const result = await query({
     query: GET_USER_INFO,
@@ -67,9 +74,20 @@ export function useGetUserInfo() {
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
+  const emailsOptedOut: EmailPreference[] = data?.viewer?.email_preferences;
   const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
 
-  return { loading, id, email, internal, nags, name, picture, acceptedTOSVersion };
+  return {
+    loading,
+    id,
+    email,
+    internal,
+    nags,
+    name,
+    picture,
+    acceptedTOSVersion,
+    emailsOptedOut,
+  };
 }
 
 export function useUpdateUserNags() {
@@ -89,6 +107,50 @@ export function useUpdateUserNags() {
   }
 
   return updateUserNags;
+}
+
+// The preferences list is a blacklist of preferences that are disabled. This
+// enables the preference by removing the preference from the list, if it exists.
+export function useEnableEmailPreference() {
+  const updateUserEmailPreferences = useUpdateUserEmailPreferences();
+
+  return (preference: EmailPreference, emailsOptedOut: EmailPreference[]) => {
+    const newPrefs = emailsOptedOut.filter(p => p !== preference);
+    updateUserEmailPreferences(newPrefs);
+  };
+}
+
+// The preferences list is a blacklist of preferences that are disabled. This
+// disables the preference by adding the preference to the list, if it's not already there.
+export function useDisableEmailPreference() {
+  const updateUserEmailPreferences = useUpdateUserEmailPreferences();
+
+  return (preference: EmailPreference, emailsOptedOut: EmailPreference[]) => {
+    const newPrefs = emailsOptedOut.includes(preference)
+      ? emailsOptedOut
+      : [...emailsOptedOut, preference];
+    updateUserEmailPreferences(newPrefs);
+  };
+}
+
+export function useUpdateUserEmailPreferences() {
+  const [useUpdateUserEmailPreferences, { error }] = useMutation(
+    gql`
+      mutation useUpdateUserEmailPreferences($newEmailPreferences: [String!]!) {
+        useUpdateUserEmailPreferences(input: { emailPreferences: $newEmailPreferences }) {
+          success
+        }
+      }
+    `,
+    { refetchQueries: ["GetUser"] }
+  );
+
+  if (error) {
+    console.error("Apollo error while updating the user's email preferences:", error);
+  }
+
+  return (newPrefs: EmailPreference[]) =>
+    useUpdateUserEmailPreferences({ variables: { emailPreferences: newPrefs } });
 }
 
 export function useAcceptTOS() {
