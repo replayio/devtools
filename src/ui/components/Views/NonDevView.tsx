@@ -34,7 +34,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
+function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromRedux) {
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -56,8 +56,8 @@ function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
         startPanel={<SidePanel />}
         endPanel={viewer}
         initialSize={prefs.sidePanelSize as string}
-        maxSize={"80%"}
-        minSize={"240px"}
+        maxSize={sidePanelCollapsed ? "0" : "80%"}
+        minSize={sidePanelCollapsed ? "0" : "240px"}
         onControlledPanelResized={handleMove}
         splitterSize={1}
         style={{ width: "100%", overflow: "hidden" }}
@@ -70,6 +70,7 @@ function NonDevView({ updateTimelineDimensions }: PropsFromRedux) {
 const connector = connect(
   (state: UIState) => ({
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
+    sidePanelCollapsed: selectors.getPaneCollapse(state),
   }),
   {
     updateTimelineDimensions,

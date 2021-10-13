@@ -4,7 +4,7 @@ import classnames from "classnames";
 import "./ViewToggle.css";
 import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
-import { getViewMode } from "../../reducers/app";
+import { getSelectedPrimaryPanel, getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
@@ -48,7 +48,12 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps
   );
 }
 
-function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFromRedux) {
+function ViewToggle({
+  viewMode,
+  setViewMode,
+  setSelectedPrimaryPanel,
+  selectedPrimaryPanel,
+}: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
@@ -89,7 +94,13 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
     });
     await Promise.all([preloadPromise, delayPromise]);
 
-    if (mode === "non-dev") {
+    // We switch to viewing comments only if the current view is something that
+    // wouldn't be visible in Viewer Mode normally (like debug or explorer)
+    if (
+      mode === "non-dev" &&
+      selectedPrimaryPanel !== "comments" &&
+      selectedPrimaryPanel !== "events"
+    ) {
       setSelectedPrimaryPanel("comments");
     }
     setViewMode(mode);
@@ -128,6 +139,7 @@ function ViewToggle({ viewMode, setViewMode, setSelectedPrimaryPanel }: PropsFro
 const connector = connect(
   (state: UIState) => ({
     viewMode: getViewMode(state),
+    selectedPrimaryPanel: getSelectedPrimaryPanel(state),
   }),
   {
     setViewMode,
