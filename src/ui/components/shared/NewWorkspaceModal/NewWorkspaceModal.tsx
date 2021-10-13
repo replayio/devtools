@@ -80,21 +80,28 @@ function NextButton({
   total,
   setCurrent,
   onNext,
+  didUserConfirm,
   allowNext,
 }: {
   current: number;
   total: number;
   setCurrent: Dispatch<SetStateAction<number>>;
   hideModal: typeof actions.hideModal;
+  didUserConfirm: () => boolean;
   onNext?: () => void;
   allowNext: boolean;
 }) {
   const [nextClicked, setNextClicked] = useState<boolean>(false);
 
   const onClick = () => {
+    if (!didUserConfirm()) {
+      return;
+    }
+
     if (onNext) {
       onNext();
     }
+
     setNextClicked(true);
   };
 
@@ -192,6 +199,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
         {isValidTeamName(inputValue) ? (
           <NextButton
             onNext={handleSave}
+            didUserConfirm={() => true}
             {...{ current, total, setCurrent, hideModal, allowNext }}
           />
         ) : (
@@ -242,6 +250,12 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     setIsLoading(true);
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
+  const didUserConfirm = () => {
+    const message =
+      "You started tried to invite someone, but didn't press the invite button. Are you sure you want to proceed?";
+
+    return window.confirm(message);
+  };
 
   useEffect(() => {
     textInputRef.current?.focus();
@@ -270,7 +284,10 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
         <InvitationLink workspaceId={newWorkspace!.id} />
       </SlideContent>
       <div className="grid">
-        <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
+        <NextButton
+          allowNext={true}
+          {...{ current, total, setCurrent, hideModal, didUserConfirm }}
+        />
       </div>
     </>
   );
