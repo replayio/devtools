@@ -20,6 +20,7 @@ import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 import { prefs } from "ui/utils/prefs";
 import Checkbox from "../Forms/Checkbox";
+import PreferencesSettings from "./PreferencesSettings";
 
 function Support() {
   return (
@@ -51,13 +52,7 @@ function Support() {
 
 function Personal() {
   const { logout, user } = useAuth0();
-  const [disableLogRocket, setDisableLogRocket] = useState(prefs.disableLogRocket);
   const { name, picture, email } = user!;
-
-  const toggleDisableLogRocket = () => {
-    prefs.disableLogRocket = !prefs.disableLogRocket;
-    setDisableLogRocket(prefs.disableLogRocket);
-  };
 
   return (
     <div className="space-y-12">
@@ -67,16 +62,6 @@ function Personal() {
           <div className="text-base">{name}</div>
           <div className="text-gray-500">{email}</div>
         </div>
-      </div>
-      <div className="flex justify-between items-center" data-private>
-        <label className="cursor-pointer" htmlFor="disableLogRocket">
-          <div>Disable LogRocket Session Replay</div>
-        </label>
-        <Checkbox
-          id="disableLogRocket"
-          checked={!!disableLogRocket}
-          onChange={toggleDisableLogRocket}
-        />
       </div>
       <div>
         <button
@@ -162,6 +147,11 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
     title: "API Keys",
     icon: "vpn_key",
     component: ApiKeysWrapper,
+  },
+  {
+    title: "Preferences",
+    icon: "tune",
+    component: PreferencesSettings,
   },
   {
     title: "Experimental",

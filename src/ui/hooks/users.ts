@@ -32,6 +32,13 @@ export enum Nag {
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
 }
 
+export enum EmailSubscription {
+  MARKETING = "marketing",
+  COLLABORATOR_REQUEST = "collaborator_request",
+  REPLAY_COMMENT = "replay_comment",
+  NEW_TEAM_INVITE = "new_team_invite",
+}
+
 export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefined> {
   const result = await query({
     query: GET_USER_INFO,
@@ -67,9 +74,20 @@ export function useGetUserInfo() {
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
+  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
   const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
 
-  return { loading, id, email, internal, nags, name, picture, acceptedTOSVersion };
+  return {
+    loading,
+    id,
+    email,
+    internal,
+    nags,
+    name,
+    picture,
+    acceptedTOSVersion,
+    unsubscribedEmailTypes,
+  };
 }
 
 export function useUpdateUserNags() {
@@ -89,6 +107,43 @@ export function useUpdateUserNags() {
   }
 
   return updateUserNags;
+}
+
+export function useSubscribeToEmailType() {
+  const [subscribeToEmailType, { error }] = useMutation(
+    gql`
+      mutation subscribeToEmailType($emailType: String!) {
+        subscribeToEmailType(input: { emailType: $emailType }) {
+          success
+        }
+      }
+    `,
+    { refetchQueries: ["GetUser"] }
+  );
+
+  if (error) {
+    console.error("Apollo error while updating the user's email preferences:", error);
+  }
+
+  return (emailType: EmailSubscription) => subscribeToEmailType({ variables: { emailType } });
+}
+export function useUnsubscribeToEmailType() {
+  const [unsubscribeToEmailType, { error }] = useMutation(
+    gql`
+      mutation unsubscribeToEmailType($emailType: String!) {
+        unsubscribeToEmailType(input: { emailType: $emailType }) {
+          success
+        }
+      }
+    `,
+    { refetchQueries: ["GetUser"] }
+  );
+
+  if (error) {
+    console.error("Apollo error while updating the user's email preferences:", error);
+  }
+
+  return (emailType: EmailSubscription) => unsubscribeToEmailType({ variables: { emailType } });
 }
 
 export function useAcceptTOS() {

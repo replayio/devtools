@@ -10,6 +10,7 @@ export const GET_USER_INFO = gql`
       internal
       nags
       acceptedTOSVersion
+      unsubscribedEmailTypes
     }
   }
 `;
