@@ -2,52 +2,55 @@ import React, { useState } from "react";
 import hooks from "ui/hooks";
 import { prefs } from "ui/utils/prefs";
 import Checkbox from "../Forms/Checkbox";
-import { EmailPreference } from "ui/hooks/users";
+import { EmailSubscription } from "ui/hooks/users";
 import Radio from "../Forms/Radio";
 
 const EMAIL_NOTIFICATIONS = {
-  [EmailPreference.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
-  [EmailPreference.REPLAY_COMMENT]: "When somebody comments on your replay",
-  [EmailPreference.NEW_TEAM_INVITE]: "When you're invited to a new team",
+  [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
+  [EmailSubscription.REPLAY_COMMENT]: "When somebody comments on your replay",
+  [EmailSubscription.NEW_TEAM_INVITE]: "When you're invited to a new team",
 };
 
 function Notification({
   content,
-  preference,
-  emailsOptedOut,
+  emailType,
+  unsubscribedEmailTypes,
 }: {
   content: string;
-  preference: EmailPreference;
-  emailsOptedOut: EmailPreference[];
+  emailType: EmailSubscription;
+  unsubscribedEmailTypes: EmailSubscription[];
 }) {
-  const enableEmailPreference = hooks.useEnableEmailPreference();
-  const disableEmailPreference = hooks.useDisableEmailPreference();
-
-  const checked = !emailsOptedOut.includes(preference);
+  const subscribeToEmailType = hooks.useSubscribeToEmailType();
+  const unsubscribeToEmailType = hooks.useUnsubscribeToEmailType();
+  const checked = !unsubscribedEmailTypes.includes(emailType);
 
   const handleChange = () => {
     if (checked) {
-      disableEmailPreference(preference, emailsOptedOut);
+      unsubscribeToEmailType(emailType);
     } else {
-      enableEmailPreference(preference, emailsOptedOut);
+      subscribeToEmailType(emailType);
     }
   };
 
   return (
-    <label className="flex items-center space-x-2 cursor-pointer" data-private htmlFor={preference}>
-      <Checkbox id={preference} checked={checked} onChange={handleChange} />
+    <label className="flex items-center space-x-2 cursor-pointer" data-private htmlFor={emailType}>
+      <Checkbox id={emailType} checked={checked} onChange={handleChange} />
       <div>{content}</div>
     </label>
   );
 }
 
-function MarketingPreferences({ emailsOptedOut }: { emailsOptedOut: EmailPreference[] }) {
-  const enableEmailPreference = hooks.useEnableEmailPreference();
-  const disableEmailPreference = hooks.useDisableEmailPreference();
-  const isEnabled = !emailsOptedOut.includes(EmailPreference.MARKETING);
+function MarketingPreferences({
+  unsubscribedEmailTypes,
+}: {
+  unsubscribedEmailTypes: EmailSubscription[];
+}) {
+  const subscribeToEmailType = hooks.useSubscribeToEmailType();
+  const unsubscribeToEmailType = hooks.useUnsubscribeToEmailType();
+  const isEnabled = !unsubscribedEmailTypes.includes(EmailSubscription.MARKETING);
 
-  const onEnable = () => enableEmailPreference(EmailPreference.MARKETING, emailsOptedOut);
-  const onDisable = () => disableEmailPreference(EmailPreference.MARKETING, emailsOptedOut);
+  const onEnable = () => subscribeToEmailType(EmailSubscription.MARKETING);
+  const onDisable = () => unsubscribeToEmailType(EmailSubscription.MARKETING);
 
   return (
     <div className="space-y-4">
@@ -90,16 +93,20 @@ function MarketingPreferences({ emailsOptedOut }: { emailsOptedOut: EmailPrefere
   );
 }
 
-function NotificationPreferences({ emailsOptedOut }: { emailsOptedOut: EmailPreference[] }) {
+function NotificationPreferences({
+  unsubscribedEmailTypes,
+}: {
+  unsubscribedEmailTypes: EmailSubscription[];
+}) {
   return (
     <div className="space-y-4">
       <div className="text-lg">Notification Preferences</div>
       <div>Choose which email updates you would like to receive:</div>
       <div className="flex flex-col space-y-2 p-1">
-        {Object.entries(EMAIL_NOTIFICATIONS).map(([preference, content]: string[], i) => (
+        {Object.entries(EMAIL_NOTIFICATIONS).map(([emailType, content]: string[], i) => (
           <Notification
-            {...{ content, emailsOptedOut }}
-            preference={preference as EmailPreference}
+            {...{ content, unsubscribedEmailTypes }}
+            emailType={emailType as EmailSubscription}
             key={i}
           />
         ))}
@@ -137,7 +144,7 @@ function PrivacyPreferences() {
 }
 
 export default function PreferencesSettings() {
-  const { loading, emailsOptedOut } = hooks.useGetUserInfo();
+  const { loading, unsubscribedEmailTypes } = hooks.useGetUserInfo();
 
   if (loading) {
     return null;
@@ -146,8 +153,8 @@ export default function PreferencesSettings() {
   return (
     <div className="space-y-6 overflow-auto">
       <PrivacyPreferences />
-      <MarketingPreferences {...{ emailsOptedOut }} />
-      <NotificationPreferences {...{ emailsOptedOut }} />
+      <MarketingPreferences {...{ unsubscribedEmailTypes }} />
+      <NotificationPreferences {...{ unsubscribedEmailTypes }} />
     </div>
   );
 }

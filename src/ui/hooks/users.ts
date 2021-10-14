@@ -32,7 +32,7 @@ export enum Nag {
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
 }
 
-export enum EmailPreference {
+export enum EmailSubscription {
   MARKETING = "marketing",
   COLLABORATOR_REQUEST = "collaborator_request",
   REPLAY_COMMENT = "replay_comment",
@@ -74,7 +74,7 @@ export function useGetUserInfo() {
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
-  const emailsOptedOut: EmailPreference[] = data?.viewer?.email_preferences;
+  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
   const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
 
   return {
@@ -86,7 +86,7 @@ export function useGetUserInfo() {
     name,
     picture,
     acceptedTOSVersion,
-    emailsOptedOut,
+    unsubscribedEmailTypes,
   };
 }
 
@@ -109,35 +109,11 @@ export function useUpdateUserNags() {
   return updateUserNags;
 }
 
-// The preferences list is a blacklist of preferences that are disabled. This
-// enables the preference by removing the preference from the list, if it exists.
-export function useEnableEmailPreference() {
-  const updateUserEmailPreferences = useUpdateUserEmailPreferences();
-
-  return (preference: EmailPreference, emailsOptedOut: EmailPreference[]) => {
-    const newPrefs = emailsOptedOut.filter(p => p !== preference);
-    updateUserEmailPreferences(newPrefs);
-  };
-}
-
-// The preferences list is a blacklist of preferences that are disabled. This
-// disables the preference by adding the preference to the list, if it's not already there.
-export function useDisableEmailPreference() {
-  const updateUserEmailPreferences = useUpdateUserEmailPreferences();
-
-  return (preference: EmailPreference, emailsOptedOut: EmailPreference[]) => {
-    const newPrefs = emailsOptedOut.includes(preference)
-      ? emailsOptedOut
-      : [...emailsOptedOut, preference];
-    updateUserEmailPreferences(newPrefs);
-  };
-}
-
-export function useUpdateUserEmailPreferences() {
-  const [useUpdateUserEmailPreferences, { error }] = useMutation(
+export function useSubscribeToEmailType() {
+  const [subscribeToEmailType, { error }] = useMutation(
     gql`
-      mutation useUpdateUserEmailPreferences($newEmailPreferences: [String!]!) {
-        useUpdateUserEmailPreferences(input: { emailPreferences: $newEmailPreferences }) {
+      mutation subscribeToEmailType($emailType: String!) {
+        subscribeToEmailType(input: { emailType: $emailType }) {
           success
         }
       }
@@ -149,8 +125,25 @@ export function useUpdateUserEmailPreferences() {
     console.error("Apollo error while updating the user's email preferences:", error);
   }
 
-  return (newPrefs: EmailPreference[]) =>
-    useUpdateUserEmailPreferences({ variables: { emailPreferences: newPrefs } });
+  return (emailType: EmailSubscription) => subscribeToEmailType({ variables: { emailType } });
+}
+export function useUnsubscribeToEmailType() {
+  const [unsubscribeToEmailType, { error }] = useMutation(
+    gql`
+      mutation unsubscribeToEmailType($emailType: String!) {
+        unsubscribeToEmailType(input: { emailType: $emailType }) {
+          success
+        }
+      }
+    `,
+    { refetchQueries: ["GetUser"] }
+  );
+
+  if (error) {
+    console.error("Apollo error while updating the user's email preferences:", error);
+  }
+
+  return (emailType: EmailSubscription) => unsubscribeToEmailType({ variables: { emailType } });
 }
 
 export function useAcceptTOS() {
