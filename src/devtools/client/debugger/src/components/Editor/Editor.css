@@ -139,9 +139,25 @@ html[dir="rtl"] .editor-mount {
   background-color: var(--debug-expression-error-background);
 }
 
-.new-debug-line > .CodeMirror-line {
-  background-color: var(--debug-line-background) !important ;
+/* Prevent this from creating a stacking context so we can
+separately stack the pause line visuals and the code. */
+.CodeMirror .new-debug-line > .CodeMirror-line {
+  z-index: auto;
+}
+
+.new-debug-line > .CodeMirror-line::before {
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  position: absolute;
+  content: "";
+  background-color: var(--debug-line-background) !important;
   outline: var(--debug-line-border) solid 1px;
+}
+
+.new-debug-line > .CodeMirror-line [role=presentation] {
+  z-index: 1;
+  position: relative;
 }
 
 /* Don't display the highlight color since the debug line
