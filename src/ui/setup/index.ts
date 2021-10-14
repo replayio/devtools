@@ -22,8 +22,6 @@ declare global {
   }
 }
 
-const url = new URL(window.location.href);
-
 export async function bootstrapApp() {
   setupTelemetry();
 
@@ -42,17 +40,6 @@ export async function bootstrapApp() {
   const theme = getTheme(store.getState());
   document.body.parentElement!.className = theme || "";
 
-  if (url.searchParams.has("settings")) {
-    store.dispatch(setModal("settings"));
-  }
-  const match = matchPath<{ workspaceId: string }>(url.pathname, {
-    path: "/team/:workspaceId/settings/billing",
-  });
-  if (match?.params.workspaceId) {
-    store.dispatch(setWorkspaceId(match.params.workspaceId));
-    store.dispatch(setModal("workspace-settings"));
-  }
-
   tokenManager.addListener(async tokenState => {
     if (tokenState.loading || tokenState.error) {
       return;
@@ -69,11 +56,24 @@ export async function bootstrapApp() {
     const userInfo = await getUserInfo();
     if (userInfo) {
       setTelemetryContext(userInfo);
-    }
 
-    if (!getWorkspaceId(store.getState())) {
-      const userSettings = await getUserSettings();
-      store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+      const url = new URL(window.location.href);
+
+      if (url.searchParams.has("settings")) {
+        store.dispatch(setModal("settings"));
+      }
+
+      const match = matchPath<{ workspaceId: string }>(url.pathname, {
+        path: "/team/:workspaceId/settings/billing",
+      });
+
+      if (match?.params.workspaceId) {
+        store.dispatch(setWorkspaceId(match.params.workspaceId));
+        store.dispatch(setModal("workspace-settings"));
+      } else if (!getWorkspaceId(store.getState())) {
+        const userSettings = await getUserSettings();
+        store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+      }
     }
 
     initLaunchDarkly();
