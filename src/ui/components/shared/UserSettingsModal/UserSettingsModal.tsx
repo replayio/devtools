@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { updateEnableRepaint } from "protocol/enable-repaint";
@@ -21,6 +21,7 @@ import { AvatarImage } from "ui/components/Avatar";
 import { prefs } from "ui/utils/prefs";
 import Checkbox from "../Forms/Checkbox";
 import PreferencesSettings from "./PreferencesSettings";
+import { match, matchPath, useHistory, useLocation } from "react-router";
 
 function Support() {
   return (
@@ -204,6 +205,12 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
 export function UserSettingsModal(props: PropsFromRedux) {
   const { userSettings, loading } = hooks.useGetUserSettings();
   const { internal, loading: userInfoLoading } = hooks.useGetUserInfo();
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const match = matchPath(pathname, {
+    path: "/settings/preferences",
+  });
+  const [defaultTab] = useState<string>(match ? "Preferences" : props.defaultSettingsTab);
 
   // TODO: This is bad and should be updated with a better generalized hook
   const updateRepaint = hooks.useUpdateUserSetting("enableRepaint", "Boolean");
@@ -224,13 +231,19 @@ export function UserSettingsModal(props: PropsFromRedux) {
     }
   };
 
+  useEffect(() => {
+    if (match) {
+      history.replace("/");
+    }
+  }, []);
+
   const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
 
   const settings = getSettings(internal);
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}
-      defaultSelectedTab={props.defaultSettingsTab}
+      defaultSelectedTab={defaultTab}
       loading={loading || userInfoLoading}
       onChange={onChange}
       panelProps={{}}

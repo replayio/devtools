@@ -56,21 +56,9 @@ export async function bootstrapApp() {
     const userInfo = await getUserInfo();
     if (userInfo) {
       setTelemetryContext(userInfo);
+      maybeAutoOpenModal(store);
 
-      const url = new URL(window.location.href);
-
-      if (url.searchParams.has("settings")) {
-        store.dispatch(setModal("settings"));
-      }
-
-      const match = matchPath<{ workspaceId: string }>(url.pathname, {
-        path: "/team/:workspaceId/settings/billing",
-      });
-
-      if (match?.params.workspaceId) {
-        store.dispatch(setWorkspaceId(match.params.workspaceId));
-        store.dispatch(setModal("workspace-settings"));
-      } else if (!getWorkspaceId(store.getState())) {
+      if (!getWorkspaceId(store.getState())) {
         const userSettings = await getUserSettings();
         store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
       }
@@ -89,4 +77,22 @@ export async function bootstrapApp() {
   }
 
   return store;
+}
+
+function maybeAutoOpenModal(store: UIStore) {
+  const url = new URL(window.location.href);
+
+  const billingsMatch = matchPath<{ workspaceId: string }>(url.pathname, {
+    path: "/team/:workspaceId/settings/billing",
+  });
+  const preferencesMatch = matchPath(url.pathname, {
+    path: "/settings",
+  });
+
+  if (billingsMatch?.params.workspaceId) {
+    store.dispatch(setWorkspaceId(billingsMatch.params.workspaceId));
+    store.dispatch(setModal("workspace-settings"));
+  } else if (preferencesMatch) {
+    store.dispatch(setModal("settings"));
+  }
 }
