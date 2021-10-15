@@ -5,7 +5,6 @@ import CommentButton from "./CommentButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Popup from "./Popup";
 import hooks from "ui/hooks";
-import { Condition, Input } from "./Condition";
 import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { getRecordingId } from "ui/utils/environment";
@@ -17,6 +16,9 @@ const { prefs } = require("ui/utils/prefs");
 import "reactjs-popup/dist/index.css";
 import "ui/components/reactjs-popup.css";
 import Log from "./Log";
+import Condition from "./Condition";
+
+export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
   breakpoint: any;
@@ -40,9 +42,11 @@ function PanelSummary({
   const logValue = breakpoint.options.logValue;
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
-  const didExceedMaxHitsEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
+  const didExceedMaxHitsEditable = !!(
+    analysisPoints && analysisPoints.length < prefs.maxHitsEditable
+  );
   const isTeamDeveloper = recording ? recording.userRole !== "team-user" : false;
-  const isEditable = !!didExceedMaxHitsEditable && !!isTeamDeveloper;
+  const isEditable = didExceedMaxHitsEditable && isTeamDeveloper;
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -75,10 +79,9 @@ function PanelSummary({
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
           <Log
-            isEditable={false}
-            handleClick={() => {}}
-            logValue={logValue}
+            value={logValue}
             hasCondition={!!conditionValue}
+            {...{ isTeamDeveloper, didExceedMaxHitsEditable }}
           />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
@@ -108,8 +111,25 @@ function PanelSummary({
   return (
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center flex-col flex-grow">
-        <Condition {...{ isEditable, handleClick, conditionValue }} />
-        <Log {...{ isEditable, handleClick, logValue }} hasCondition={!!conditionValue} />
+        {conditionValue ? (
+          <Condition
+            {...{
+              handleClick,
+              isTeamDeveloper,
+              didExceedMaxHitsEditable,
+            }}
+            value={conditionValue}
+          />
+        ) : null}
+        <Log
+          {...{
+            handleClick,
+            isTeamDeveloper,
+            didExceedMaxHitsEditable,
+          }}
+          hasCondition={true}
+          value={logValue}
+        />
       </div>
       {!isTeamDeveloper ? (
         <Popup trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}>
