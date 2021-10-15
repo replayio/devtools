@@ -22,6 +22,7 @@ import { LoadingScreen } from "./shared/BlankScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
+import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -54,6 +55,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "first-replay": {
       return <FirstReplayModal />;
+    }
+    case "trimming": {
+      return <TrimmingModal />;
     }
     default: {
       return null;

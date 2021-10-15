@@ -2,12 +2,13 @@ import { AppState, EventCategory, EventKind, PanelName, ReplayEvent, ViewMode } 
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-import { asyncStore, prefs } from "../utils/prefs";
+import { asyncStore, prefs, features } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { isSameTimeStampedPointRange } from "ui/utils/timeline";
+import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/environment";
+import { getTrimRegion } from "ui/reducers/timeline";
 
 const syncInitialAppState: AppState = {
   expectedError: null,
@@ -283,13 +284,28 @@ export const getAnalysisPointsForLocation = (
   condition = ""
 ) => {
   if (!location) return;
-  return state.app.analysisPoints[getLocationAndConditionKey(location, condition)];
+  const trimRegion = getTrimRegion(state);
+  const key = getLocationAndConditionKey(location, condition);
+  const points = state.app.analysisPoints[key];
+
+  if (features.trimming && trimRegion && points && points !== "error") {
+    return points.filter(p => isInTrimSpan(p.time, trimRegion));
+  }
+
+  return points;
 };
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
-  return getAnalysisPointsForLocation(state, location);
+  const points = getAnalysisPointsForLocation(state, location);
+  const trimRegion = getTrimRegion(state);
+
+  if (features.trimming && trimRegion && points && points !== "error") {
+    return points.filter(p => isInTrimSpan(p.time, trimRegion));
+  }
+
+  return points;
 };
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>
@@ -365,3 +381,4 @@ export const isFinishedLoadingRegions = (state: UIState) => {
 
   return isSameTimeStampedPointRange(loading, loaded);
 };
+export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";

@@ -13,7 +13,13 @@ import {
   snapTimeForPlayback,
   Video,
 } from "protocol/graphics";
-import { getCurrentTime, getHoverTime, getPlayback, getZoomRegion } from "ui/reducers/timeline";
+import {
+  getCurrentTime,
+  getHoverTime,
+  getPlayback,
+  getTrimRegion,
+  getZoomRegion,
+} from "ui/reducers/timeline";
 import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
@@ -25,6 +31,8 @@ import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { isRepaintEnabled } from "protocol/enable-repaint";
+import { getModal } from "ui/reducers/app";
+import clamp from "lodash/clamp";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -38,6 +46,12 @@ export type SetHoveredItemAction = Action<"set_hovered_item"> & {
 export type SetPlaybackPrecachedTimeAction = Action<"set_playback_precached_time"> & {
   time: number;
 };
+export type SetTrimRegionAction = Action<"set_trim_region"> & {
+  trimRegion: {
+    startTime: number;
+    endTime: number;
+  };
+};
 
 export type TimelineActions =
   | SetTimelineStateAction
@@ -45,7 +59,8 @@ export type TimelineActions =
   | UpdateTooltipAction
   | SetZoomRegionAction
   | SetHoveredItemAction
-  | SetPlaybackPrecachedTimeAction;
+  | SetPlaybackPrecachedTimeAction
+  | SetTrimRegionAction;
 
 export async function setupTimeline(store: UIStore) {
   const { dispatch } = store;
@@ -202,8 +217,9 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
 export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
+    const isTrimming = getModal(getState()) === "trimming";
 
-    if (!updateGraphics || isRepaintEnabled()) {
+    if (!updateGraphics || isRepaintEnabled() || isTrimming) {
       return;
     }
 
@@ -499,4 +515,41 @@ export function clearHoveredItem(): UIThunkAction {
 
 export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTimeAction {
   return { type: "set_playback_precached_time", time };
+}
+
+export function setTrimRegion(trimRegion: {
+  startTime: number;
+  endTime: number;
+}): SetTrimRegionAction {
+  return { type: "set_trim_region", trimRegion };
+}
+
+export function updateTrimRegion(
+  type: "startTime" | "endTime" | "span",
+  midpointDifference: number
+): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const state = getState();
+    const hoverTime = getHoverTime(state);
+    const trimRegion = getTrimRegion(state);
+    const zoomRegion = getZoomRegion(state);
+
+    if (!hoverTime || !trimRegion) return;
+
+    if (type === "span") {
+      const { startTime, endTime } = trimRegion;
+      const oldSpanMidpoint = (endTime + startTime) / 2;
+      const newMidpoint = hoverTime;
+      const midpointShift = newMidpoint - oldSpanMidpoint;
+
+      const newTrimRegion = {
+        startTime: clamp(startTime + midpointShift + midpointDifference, 0, zoomRegion.endTime),
+        endTime: clamp(endTime + midpointShift + midpointDifference, 0, zoomRegion.endTime),
+      };
+
+      dispatch(setTrimRegion(newTrimRegion));
+    } else {
+      dispatch(setTrimRegion({ ...trimRegion, [type]: hoverTime! }));
+    }
+  };
 }

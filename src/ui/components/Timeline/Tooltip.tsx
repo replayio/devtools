@@ -3,10 +3,11 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { getVisiblePosition } from "ui/utils/timeline";
+import { features } from "ui/utils/prefs";
 import "./Tooltip.css";
 
-export function Tooltip({ hoverTime, zoomRegion, timelineWidth }: Props) {
-  if (!hoverTime) {
+export function Tooltip({ hoverTime, zoomRegion, timelineWidth, isTrimming }: Props) {
+  if (!hoverTime || (features.trimming && isTrimming)) {
     return null;
   }
 
@@ -26,6 +27,7 @@ export function Tooltip({ hoverTime, zoomRegion, timelineWidth }: Props) {
 const connector = connect((state: UIState) => ({
   hoverTime: selectors.getHoverTime(state),
   zoomRegion: selectors.getZoomRegion(state),
+  isTrimming: selectors.getIsTrimming(state),
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;

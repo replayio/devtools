@@ -48,6 +48,7 @@ pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
 pref("devtools.features.eventCount", true);
 pref("devtools.features.columnBreakpoints", false);
+pref("devtools.features.trimming", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -86,6 +87,7 @@ export const features = new PrefsHelper("devtools.features", {
   termsOfService: ["Bool", "termsOfService"],
   eventCount: ["Bool", "eventCount"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
+  trimming: ["Bool", "trimming"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
