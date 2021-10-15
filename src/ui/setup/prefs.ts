@@ -51,11 +51,17 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);
 
-  updateReplaySessions(state);
+  maybeUpdateReplaySessions(state);
 }
 
-async function updateReplaySessions(state: UIState) {
+async function maybeUpdateReplaySessions(state: UIState) {
   const recordingId = getRecordingId();
+
+  // Bail if we're not in a recording.
+  if (!recordingId) {
+    return;
+  }
+
   const previousReplaySessions = await asyncStore.replaySessions;
   const currentReplaySession = {
     viewMode: getViewMode(state),

@@ -8,6 +8,8 @@ import hooks from "ui/hooks";
 import { Redacted } from "../Redacted";
 import { RecordingId } from "@recordreplay/protocol";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -35,19 +37,22 @@ export function getDisplayedUrl(url: string) {
   return `${hostname}${pathname}`;
 }
 
-export default function RecordingRow({
-  recording,
-  isEditing,
-  selected,
-  addSelectedId,
-  removeSelectedId,
-}: {
+type RecordingRowProps = PropsFromRedux & {
   recording: Recording;
   isEditing: boolean;
   selected: boolean;
   addSelectedId: (recordingId: RecordingId) => void;
   removeSelectedId: (recordingId: RecordingId) => void;
-}) {
+};
+
+function RecordingRow({
+  recording,
+  isEditing,
+  selected,
+  addSelectedId,
+  removeSelectedId,
+  loadReplayPrefs,
+}: RecordingRowProps) {
   const history = useHistory();
   const { userId, loading } = hooks.useGetUserId();
 
@@ -68,6 +73,8 @@ export default function RecordingRow({
     if (event.metaKey) {
       return window.open(url);
     }
+
+    loadReplayPrefs(recording.id);
     history.push(url);
   };
   const toggleChecked = () => {
@@ -174,3 +181,7 @@ function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
     </Redacted>
   );
 }
+
+const connector = connect(() => ({}), { loadReplayPrefs: actions.loadReplayPrefs });
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(RecordingRow);

@@ -49,6 +49,12 @@ const syncInitialAppState: AppState = {
 
 export async function getInitialAppState(): Promise<AppState> {
   const recordingId = getRecordingId();
+
+  // If we're in the library, there are no preferences to fetch.
+  if (!recordingId) {
+    return syncInitialAppState;
+  }
+
   const replaySessions = await asyncStore.replaySessions;
   const session = replaySessions[recordingId!];
 
