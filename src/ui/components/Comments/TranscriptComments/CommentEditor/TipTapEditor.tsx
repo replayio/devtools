@@ -45,6 +45,10 @@ const TipTapEditor = ({
         name: "submitOnEnter",
         addKeyboardShortcuts() {
           return {
+            "Cmd-Enter": ({ editor }) => {
+              handleSubmit(JSON.stringify(editor.getJSON()));
+              return true;
+            },
             Enter: ({ editor }) => {
               handleSubmit(JSON.stringify(editor.getJSON()));
               return true;
