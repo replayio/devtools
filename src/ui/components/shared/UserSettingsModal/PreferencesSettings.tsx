@@ -40,59 +40,6 @@ function Notification({
   );
 }
 
-function MarketingPreferences({
-  unsubscribedEmailTypes,
-}: {
-  unsubscribedEmailTypes: EmailSubscription[];
-}) {
-  const subscribeToEmailType = hooks.useSubscribeToEmailType();
-  const unsubscribeToEmailType = hooks.useUnsubscribeToEmailType();
-  const isEnabled = !unsubscribedEmailTypes.includes(EmailSubscription.MARKETING);
-
-  const onEnable = () => subscribeToEmailType(EmailSubscription.MARKETING);
-  const onDisable = () => unsubscribeToEmailType(EmailSubscription.MARKETING);
-
-  return (
-    <div className="space-y-4">
-      <div className="text-lg">Email Preferences</div>
-      <div className="flex flex-col space-y-2 p-1">
-        <label className="flex space-x-2 cursor-pointer" htmlFor="enable_marketing" data-private>
-          <Radio
-            id="enable_marketing"
-            name="marketing_email"
-            checked={isEnabled}
-            onChange={onEnable}
-          />
-          <div>
-            <div className="cursor-pointer">
-              {"Receive all emails, except those I unsubscribe from"}
-            </div>
-            <div className="text-xs text-gray-500">
-              {`We’ll occasionally contact you with the latest news and happenings`}
-            </div>
-          </div>
-        </label>
-        <label className="flex space-x-2 cursor-pointer" htmlFor="disable_marketing" data-private>
-          <Radio
-            id="disable_marketing"
-            name="marketing_emails"
-            checked={!isEnabled}
-            onChange={onDisable}
-          />
-          <div>
-            <div className="cursor-pointer">
-              <div>{"Only receive account related emails, and those I subscribe to"}</div>
-            </div>
-            <div className="text-xs text-gray-500">
-              {`We’ll only send you administrative emails, and any emails you’re subscribed to`}
-            </div>
-          </div>
-        </label>
-      </div>
-    </div>
-  );
-}
-
 function NotificationPreferences({
   unsubscribedEmailTypes,
 }: {
@@ -153,7 +100,6 @@ export default function PreferencesSettings() {
   return (
     <div className="space-y-6 overflow-auto">
       <PrivacyPreferences />
-      <MarketingPreferences {...{ unsubscribedEmailTypes }} />
       <NotificationPreferences {...{ unsubscribedEmailTypes }} />
     </div>
   );

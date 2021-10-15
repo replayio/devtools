@@ -33,7 +33,6 @@ export enum Nag {
 }
 
 export enum EmailSubscription {
-  MARKETING = "marketing",
   COLLABORATOR_REQUEST = "collaborator_request",
   REPLAY_COMMENT = "replay_comment",
   NEW_TEAM_INVITE = "new_team_invite",
