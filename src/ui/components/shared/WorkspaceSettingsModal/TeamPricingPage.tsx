@@ -1,5 +1,6 @@
 import React from "react";
 import { Subscription } from "ui/types";
+import { Button } from "../Button";
 import { PlanDetails } from "./PlanDetails";
 
 export function TeamPricingPage({
@@ -25,12 +26,15 @@ export function TeamPricingPage({
         </a>
       </p>
       <PlanDetails subscription={subscription} />
-      <button
-        className="bg-primaryAccent text-white w-full px-6 py-3 my-6 rounded-md"
+      <Button
+        color="blue"
+        size="xl"
+        style="primary"
+        className="justify-center w-full my-6"
         onClick={onEnterCard}
       >
         Add Payment Method
-      </button>
+      </Button>
       <a
         href="https://www.replay.io/terms-of-use"
         target="_blank"
