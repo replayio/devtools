@@ -4,9 +4,9 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
 import { Comment, Reply } from "ui/state/comments";
+import compact from "lodash/compact";
+import range from "lodash/range";
 import sortBy from "lodash/sortBy";
-import indexOf from "lodash/indexOf";
-import { range } from "lodash";
 
 export function formatRelativeTime(date: Date) {
   const minutes = differenceInMinutes(Date.now(), date);
@@ -36,11 +36,25 @@ export function formatRelativeTime(date: Date) {
   return "Now";
 }
 
-export function commentKeys(comments: (Comment | Reply)[]): number[] {
+export function commentKeys(comments: (Comment | Reply)[]): string[] {
+  const createdAt = orderedByApproximatelyCreatedAt(comments);
+  return comments.map((c, i) => commentKey(c, createdAt[i]));
+}
+
+function commentKey(comment: Comment | Reply, createdAtOrder: number): string {
+  return compact([createdAtOrder + 1, commentIdentifiers(comment)]).join("-");
+}
+
+function orderedByApproximatelyCreatedAt(comments: (Comment | Reply)[]): number[] {
   const indices = range(comments.length);
-  const permutation = sortBy(indices, [
-    i => Number(Date.parse(comments[i].createdAt)),
-    i => comments[i].user.id,
-  ]);
+  const permutation = sortBy(indices, [i => Number(Date.parse(comments[i].createdAt))]);
   return indices.map(i => permutation.indexOf(i));
+}
+
+function commentIdentifiers(comment: Comment | Reply): string {
+  return compact([
+    comment.point,
+    comment.sourceLocation?.sourceId,
+    comment.sourceLocation?.line,
+  ]).join("-");
 }

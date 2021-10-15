@@ -143,7 +143,7 @@ function PanelSummary({
 }
 
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: any }) => ({
+  (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
   }),
   {

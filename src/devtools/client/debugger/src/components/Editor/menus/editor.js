@@ -51,13 +51,7 @@ const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
-export function editorMenuItems({
-  cx,
-  editorActions,
-  selectedSource,
-  selectionText,
-  isTextSelected,
-}) {
+export function editorMenuItems({ cx, editorActions, selectedSource }) {
   const items = [];
 
   items.push(

@@ -1,4 +1,4 @@
-import { CommentsState, PendingComment } from "ui/state/comments";
+import { CommentsState } from "ui/state/comments";
 import { CommentsAction } from "ui/actions/comments";
 import { UIState } from "ui/state";
 import cloneDeep from "lodash/cloneDeep";

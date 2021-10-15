@@ -22,6 +22,7 @@ import SearchBar from "./SearchBar";
 import Preview from "./Preview";
 import Breakpoints from "./Breakpoints/Breakpoints";
 import ColumnBreakpoints from "./ColumnBreakpoints";
+import GutterContextMenu from "ui/components/ContextMenu/GutterContextMenu";
 import DebugLine from "./DebugLine";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
@@ -53,6 +54,9 @@ import {
 } from "../../utils/editor";
 
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
+
+import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
+import { getContextMenu } from "ui/reducers/contextMenus";
 
 import "./Editor.css";
 import { selectors } from "ui/reducers";
@@ -246,9 +250,23 @@ class Editor extends PureComponent {
 
   onGutterClick = (cm, line, gutter, ev) => {
     const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
+    const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
 
-    // Bail if the user clicks on a non-breakable line.
+    // Open the context menu then bail if the user clicks on a non-breakable line
     if (ev.target.closest(".empty-line")) {
+      // I am pretty morally opposed to this code, but without it codemirror
+      // breaks in a myriad of ways.
+      setTimeout(() => {
+        this.props.openContextMenu({
+          x: ev.x,
+          y: ev.y,
+          contextMenuItem: {
+            location: sourceLocation,
+            sourceUrl: selectedSource.url,
+          },
+        });
+      }, 100);
+
       return;
     }
 
@@ -265,6 +283,7 @@ class Editor extends PureComponent {
     if (typeof line !== "number") {
       return;
     }
+
     const sourceLine = fromEditorLine(line);
 
     // Don't add a breakpoint if the user clicked on something other than the gutter line number,
@@ -390,7 +409,7 @@ class Editor extends PureComponent {
   }
 
   renderItems() {
-    const { cx, selectedSource } = this.props;
+    const { cx, selectedSource, closeContextMenu, contextMenu: gutterContextMenu } = this.props;
     const { editor, contextMenu } = this.state;
 
     if (!selectedSource || !editor) {
@@ -403,6 +422,9 @@ class Editor extends PureComponent {
 
     return (
       <div>
+        {gutterContextMenu && (
+          <GutterContextMenu contextMenu={gutterContextMenu} close={closeContextMenu} />
+        )}
         <DebugLine />
         <HighlightLine />
         <EmptyLines editor={editor} />
@@ -459,6 +481,7 @@ const mapStateToProps = state => {
 
   return {
     cx: selectors.getThreadContext(state),
+    contextMenu: getContextMenu(state),
     selectedLocation: selectors.getSelectedLocation(state),
     selectedSource,
     searchOn: selectors.getActiveSearch(state) === "file",
@@ -472,14 +495,15 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(
     {
-      toggleBreakpointAtLine: actions.toggleBreakpointAtLine,
       addBreakpointAtLine: actions.addBreakpointAtLine,
-      jumpToMappedLocation: actions.jumpToMappedLocation,
-      traverseResults: actions.traverseResults,
-      updateViewport: actions.updateViewport,
-      updateCursorPosition: actions.updateCursorPosition,
+      closeContextMenu,
       closeTab: actions.closeTab,
+      jumpToMappedLocation: actions.jumpToMappedLocation,
+      openContextMenu,
       toggleBlackBox: actions.toggleBlackBox,
+      traverseResults: actions.traverseResults,
+      updateCursorPosition: actions.updateCursorPosition,
+      updateViewport: actions.updateViewport,
     },
     dispatch
   ),
