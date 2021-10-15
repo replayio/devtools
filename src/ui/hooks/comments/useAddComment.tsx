@@ -68,6 +68,8 @@ export default function useAddComment() {
         const newComment = {
           ...comment,
           id: commentId,
+          primaryLabel: comment.primaryLabel || null,
+          secondaryLabel: comment.secondaryLabel || null,
           user: {
             id: userId,
             name: user.name,
