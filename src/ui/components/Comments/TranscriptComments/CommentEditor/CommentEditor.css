@@ -47,10 +47,6 @@
   background: var(--primary-accent);
 }
 
-.transcript-list .comment-input:hover {
-  cursor: text;
-}
-
 .transcript-list .draft-editor-container {
   /* Create a positioning context for the emoji picker */
   position: relative;

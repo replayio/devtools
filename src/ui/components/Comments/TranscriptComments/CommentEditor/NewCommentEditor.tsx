@@ -11,7 +11,7 @@ interface NewCommentEditorProps extends PropsFromRedux {
   type: "new_reply" | "new_comment";
 }
 
-function NewCommentEditor({ comment, type, clearPendingComment, setModal }: NewCommentEditorProps) {
+function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewCommentEditorProps) {
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const addComment = hooks.useAddComment();

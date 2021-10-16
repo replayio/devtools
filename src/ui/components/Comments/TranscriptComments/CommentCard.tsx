@@ -129,17 +129,25 @@ type PropsFromParent = {
 };
 type CommentCardProps = PropsFromRedux & PropsFromParent;
 
+export const FocusContext = React.createContext({
+  autofocus: false,
+  isFocused: false,
+  blur: () => {},
+});
+
 function CommentCard({
   comment,
   comments,
   currentTime,
   executionPoint,
-  seekToComment,
   hoveredComment,
-  setHoveredComment,
   pendingComment,
+  seekToComment,
+  setHoveredComment,
 }: CommentCardProps) {
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
+
+  const [isFocused, setIsFocused] = useState(false);
 
   if (comment.id === PENDING_COMMENT_ID) {
     return (
@@ -147,11 +155,16 @@ function CommentCard({
         className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
         onMouseEnter={() => setHoveredComment("pendingCommentId")}
         onMouseLeave={() => setHoveredComment(null)}
+        onClick={() => setIsFocused(true)}
       >
         <div className={classNames("py-2.5 w-full border-l-2 border-secondaryAccent")}>
           <div className={classNames("px-2.5 pl-2 space-y-2")}>
             {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
-            <NewCommentEditor comment={comment} type={"new_comment"} />
+            <FocusContext.Provider
+              value={{ autofocus: true, isFocused, blur: () => setIsFocused(false) }}
+            >
+              <NewCommentEditor comment={comment} type={"new_comment"} />
+            </FocusContext.Provider>
           </div>
         </div>
       </div>
@@ -164,7 +177,10 @@ function CommentCard({
         `mx-auto relative w-full border-b border-gray-300 cursor-pointer transition`,
         hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
-      onClick={() => seekToComment(comment)}
+      onClick={() => {
+        seekToComment(comment);
+        setIsFocused(true);
+      }}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
@@ -182,11 +198,15 @@ function CommentCard({
           </div>
         ))}
         {isPaused && !pendingComment ? (
-          <NewCommentEditor
-            key={`${comment.id}-${(comment.replies || []).length}`}
-            comment={{ ...comment, content: "", parentId: comment.id }}
-            type={"new_reply"}
-          />
+          <FocusContext.Provider
+            value={{ autofocus: isFocused, isFocused, blur: () => setIsFocused(false) }}
+          >
+            <NewCommentEditor
+              key={`${comment.id}-${(comment.replies || []).length}`}
+              comment={{ ...comment, content: "", parentId: comment.id }}
+              type={"new_reply"}
+            />
+          </FocusContext.Provider>
         ) : null}
       </div>
     </div>

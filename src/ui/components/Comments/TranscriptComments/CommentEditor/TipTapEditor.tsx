@@ -4,8 +4,11 @@ import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
+import { Plugin, PluginKey } from "prosemirror-state";
 
 interface TipTapEditorProps {
+  autofocus: boolean;
+  blur: () => void;
   content: string;
   editable: boolean;
   handleSubmit: (text: string) => void;
@@ -13,6 +16,7 @@ interface TipTapEditorProps {
   placeholder: string;
   // Not actually implementing this now, but leaving it in the API for later
   possibleMentions: User[];
+  takeFocus: boolean;
 }
 
 const tryToParse = (content: string): any => {
@@ -30,11 +34,14 @@ const tryToParse = (content: string): any => {
 };
 
 const TipTapEditor = ({
+  autofocus,
+  blur,
   content,
   editable,
   handleSubmit,
   handleCancel,
   placeholder,
+  takeFocus,
 }: TipTapEditorProps) => {
   const editor = useEditor({
     extensions: [
@@ -53,7 +60,8 @@ const TipTapEditor = ({
               handleSubmit(JSON.stringify(editor.getJSON()));
               return true;
             },
-            Escape: () => {
+            Escape: ({ editor }) => {
+              editor.commands.blur();
               handleCancel();
               return true;
             },
@@ -68,7 +76,7 @@ const TipTapEditor = ({
     },
     content: tryToParse(content),
     editable,
-    autofocus: true,
+    autofocus,
   });
 
   useEffect(() => {
@@ -78,14 +86,23 @@ const TipTapEditor = ({
     }
   }, [editable]);
 
+  useEffect(() => {
+    if (takeFocus) {
+      console.log("taking focus");
+      editor?.commands.focus("end");
+    }
+  }, [takeFocus]);
+
   return (
     <EditorContent
       className={classNames("outline-none w-full rounded-md py-1 px-2 transition", {
-        "border-gray-400": editable,
         "bg-white": editable,
+        "border-gray-400": editable,
+        "cursor-text": editable,
         border: editable,
       })}
       editor={editor}
+      onBlur={blur}
     />
   );
 };

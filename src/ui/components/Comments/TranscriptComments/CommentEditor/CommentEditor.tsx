@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -9,6 +9,8 @@ import { Comment, PendingNewComment, PendingNewReply, Reply } from "ui/state/com
 import "./CommentEditor.css";
 import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
+import { FocusContext } from "../CommentCard";
+import classNames from "classnames";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply | PendingNewComment | PendingNewReply;
@@ -34,22 +36,31 @@ function CommentEditor({
   );
 
   return (
-    <div className="comment-input-container" onClick={e => e.stopPropagation()}>
-      <div className="comment-input">
-        <TipTapEditor
-          content={comment.content || ""}
-          editable={editable}
-          handleCancel={clearPendingComment}
-          handleSubmit={handleSubmit}
-          possibleMentions={users || []}
-          placeholder={
-            comment.content == ""
-              ? "parentId" in comment
-                ? "Write a reply..."
-                : "Type a comment"
-              : ""
-          }
-        />
+    <div className="comment-input-container">
+      <div className={classNames("comment-input")}>
+        <FocusContext.Consumer>
+          {({ autofocus, blur, isFocused }) => (
+            <TipTapEditor
+              autofocus={autofocus}
+              blur={blur}
+              content={comment.content || ""}
+              editable={editable}
+              handleCancel={() => {
+                clearPendingComment();
+              }}
+              handleSubmit={handleSubmit}
+              possibleMentions={users || []}
+              placeholder={
+                comment.content == ""
+                  ? "parentId" in comment
+                    ? "Write a reply..."
+                    : "Type a comment"
+                  : ""
+              }
+              takeFocus={isFocused}
+            />
+          )}
+        </FocusContext.Consumer>
       </div>
     </div>
   );
