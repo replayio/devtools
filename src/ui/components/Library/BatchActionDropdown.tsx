@@ -10,6 +10,7 @@ import { getButtonClasses } from "../shared/Button";
 import MaterialIcon from "../shared/MaterialIcon";
 import classNames from "classnames";
 import PortalDropdown from "../shared/PortalDropdown";
+import MoveRecordingMenu from "./MoveRecordingMenu";
 
 type BatchActionDropdownProps = PropsFromRedux & {
   selectedIds: RecordingId[];
@@ -87,20 +88,9 @@ function BatchActionDropdown({
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>
-        <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
-        <DropdownDivider />
-        <div className="overflow-y-auto max-h-48">
-          {currentWorkspaceId ? (
-            <DropdownItem onClick={() => updateRecordings(null)}>Your library</DropdownItem>
-          ) : null}
-          {workspaces
-            .filter(w => w.id !== currentWorkspaceId)
-            .map(({ id, name }) => (
-              <DropdownItem onClick={() => updateRecordings(id)} key={id}>
-                {name}
-              </DropdownItem>
-            ))}
-        </div>
+        {!loading ? (
+          <MoveRecordingMenu workspaces={workspaces} onMoveRecording={updateRecordings} />
+        ) : null}
       </Dropdown>
     </PortalDropdown>
   );
