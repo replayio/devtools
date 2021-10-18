@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import Mention from "@tiptap/extension-mention";
 import StarterKit from "@tiptap/starter-kit";
+import suggestion from "./mentionSuggestion";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
-import { Plugin, PluginKey } from "prosemirror-state";
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -41,12 +42,13 @@ const TipTapEditor = ({
   handleSubmit,
   handleCancel,
   placeholder,
+  possibleMentions,
   takeFocus,
 }: TipTapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
+      Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
       Placeholder.configure({ placeholder }),
       Extension.create({
         name: "submitOnEnter",

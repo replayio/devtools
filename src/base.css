@@ -34,11 +34,20 @@ body {
   --faint-red: rgba(255, 0, 0, 0.5);
 }
 
+div[data-tippy-root] {
+  --light-grey: #969696;
+  --dark-grey: #696969;
+  --light-blue: #61cdff;
+  --dark-blue: #2d7eff;
+  --faint-red: rgba(255, 0, 0, 0.5);
+}
+
 .inter {
   font-family: "Inter", sans-serif;
 }
 
-img.avatar, .avatar img {
+img.avatar,
+.avatar img {
   border-radius: 50%;
   background-color: var(--light-grey);
 }
