@@ -52,11 +52,15 @@ const TipTapEditor = ({
         addKeyboardShortcuts() {
           return {
             "Cmd-Enter": ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
+              if (editor.getCharacterCount() > 0) {
+                handleSubmit(JSON.stringify(editor.getJSON()));
+              }
               return true;
             },
             Enter: ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
+              if (editor.getCharacterCount() > 0) {
+                handleSubmit(JSON.stringify(editor.getJSON()));
+              }
               return true;
             },
             Escape: ({ editor }) => {

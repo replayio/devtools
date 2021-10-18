@@ -1,7 +1,12 @@
+import { Editor } from "@tiptap/react";
 import classNames from "classnames";
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 
 export const MentionList = forwardRef((props: { items: any[]; command: any }, ref: any) => {
+  if (!(props as any).editor.isEditable) {
+    return null;
+  }
+
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = (index: number) => {
@@ -38,7 +43,7 @@ export const MentionList = forwardRef((props: { items: any[]; command: any }, re
         return true;
       }
 
-      if (event.key === "Enter") {
+      if (event.key === "Enter" || event.key === "Tab") {
         enterHandler();
         return true;
       }

@@ -30,6 +30,9 @@ export default (users: string[]) => ({
         });
       },
       onUpdate(props: any) {
+        if (!props.editor.isEditable) {
+          return;
+        }
         reactRenderer.updateProps(props);
 
         popup[0].setProps({
