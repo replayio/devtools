@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
-import { KeyboardEvent } from "react";
 
 export const MentionList = forwardRef((props: { items: any[]; command: any }, ref: any) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -28,7 +27,7 @@ export const MentionList = forwardRef((props: { items: any[]; command: any }, re
   useEffect(() => setSelectedIndex(0), [props.items]);
 
   useImperativeHandle(ref, () => ({
-    onKeyDown: (event: KeyboardEvent) => {
+    onKeyDown: ({ event }: { event: KeyboardEvent }) => {
       if (event.key === "ArrowUp") {
         upHandler();
         return true;
@@ -41,7 +40,7 @@ export const MentionList = forwardRef((props: { items: any[]; command: any }, re
 
       if (event.key === "Enter") {
         enterHandler();
-        return false;
+        return true;
       }
 
       return false;

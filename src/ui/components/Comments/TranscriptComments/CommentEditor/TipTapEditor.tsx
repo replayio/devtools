@@ -15,7 +15,6 @@ interface TipTapEditorProps {
   handleSubmit: (text: string) => void;
   handleCancel: () => void;
   placeholder: string;
-  // Not actually implementing this now, but leaving it in the API for later
   possibleMentions: User[];
   takeFocus: boolean;
 }
@@ -48,8 +47,6 @@ const TipTapEditor = ({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
-      Placeholder.configure({ placeholder }),
       Extension.create({
         name: "submitOnEnter",
         addKeyboardShortcuts() {
@@ -70,6 +67,8 @@ const TipTapEditor = ({
           };
         },
       }),
+      Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
+      Placeholder.configure({ placeholder }),
     ],
     editorProps: {
       attributes: {
@@ -90,7 +89,6 @@ const TipTapEditor = ({
 
   useEffect(() => {
     if (takeFocus) {
-      console.log("taking focus");
       editor?.commands.focus("end");
     }
   }, [takeFocus]);

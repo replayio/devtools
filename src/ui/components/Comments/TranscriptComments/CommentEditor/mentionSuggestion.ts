@@ -43,13 +43,7 @@ export default (users: string[]) => ({
           return true;
         }
 
-        if (props.event.key === "Enter") {
-          popup[0].hide();
-
-          return true;
-        }
-
-        return reactRenderer.ref?.onKeyDown(props);
+        return (reactRenderer.ref as any).onKeyDown(props);
       },
       onExit() {
         popup[0].destroy();
