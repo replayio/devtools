@@ -1,4 +1,3 @@
-import { Editor } from "@tiptap/react";
 import classNames from "classnames";
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 
