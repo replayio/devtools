@@ -7,7 +7,6 @@ import Popup from "./Popup";
 import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import { actions } from "ui/actions";
-import { getRecordingId } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
@@ -36,8 +35,7 @@ function PanelSummary({
   currentTime,
   analysisPoints,
 }: PanelSummaryProps) {
-  const recordingId = getRecordingId();
-  const { recording } = hooks.useGetRecording(recordingId);
+  const isTeamDeveloper = hooks.useIsTeamDeveloper();
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
@@ -45,7 +43,6 @@ function PanelSummary({
   const didExceedMaxHitsEditable = !!(
     analysisPoints && analysisPoints.length < prefs.maxHitsEditable
   );
-  const isTeamDeveloper = recording ? recording.userRole !== "team-user" : false;
   const isEditable = didExceedMaxHitsEditable && isTeamDeveloper;
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
@@ -78,11 +75,7 @@ function PanelSummary({
     return (
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
-          <Log
-            value={logValue}
-            hasCondition={!!conditionValue}
-            {...{ isTeamDeveloper, didExceedMaxHitsEditable }}
-          />
+          <Log value={logValue} hasCondition={!!conditionValue} {...{ didExceedMaxHitsEditable }} />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -115,7 +108,6 @@ function PanelSummary({
           <Condition
             {...{
               handleClick,
-              isTeamDeveloper,
               didExceedMaxHitsEditable,
             }}
             value={conditionValue}
@@ -124,7 +116,6 @@ function PanelSummary({
         <Log
           {...{
             handleClick,
-            isTeamDeveloper,
             didExceedMaxHitsEditable,
           }}
           hasCondition={true}

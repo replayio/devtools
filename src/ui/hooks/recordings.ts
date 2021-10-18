@@ -7,6 +7,7 @@ import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
+import { getRecordingId } from "ui/utils/environment";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -153,6 +154,19 @@ export function useGetRecording(
   const isAuthorized = isTest() || recording;
 
   return { recording, isAuthorized: !!isAuthorized, loading };
+}
+
+export function useIsTeamDeveloper() {
+  const recordingId = getRecordingId();
+  const { data, error, loading } = useQuery(GET_RECORDING, {
+    variables: { recordingId },
+  });
+
+  if (error) {
+    console.error("Apollo error while getting the user's role", error);
+  }
+
+  return { isTeamDeveloper: data.recording.userRole !== "team-user", loading };
 }
 
 function convertRecording(rec: any): Recording | undefined {

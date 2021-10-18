@@ -3,13 +3,13 @@ import classNames from "classnames";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import escapeHtml from "escape-html";
 import Popup from "./Popup";
+import hooks from "ui/hooks";
 const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 const { prefs } = require("ui/utils/prefs");
 
 export interface SummaryExpressionProps {
   value: string;
   didExceedMaxHitsEditable: boolean;
-  isTeamDeveloper: boolean;
 }
 
 function getSyntaxHighlightedMarkup(string: string) {
@@ -46,12 +46,12 @@ function Expression({ value, isEditable }: { value: string; isEditable: boolean 
 
 export function SummaryExpression({
   didExceedMaxHitsEditable,
-  isTeamDeveloper,
   handleClick,
   value,
 }: SummaryExpressionProps & {
   handleClick: (event: React.MouseEvent) => void;
 }) {
+  const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const isEditable = didExceedMaxHitsEditable && isTeamDeveloper;
 
   return (
