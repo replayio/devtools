@@ -36,7 +36,7 @@ export default class OutlineFilter extends Component {
   render() {
     const { focused } = this.state;
     return (
-      <div className="outline-filter">
+      <div className="outline-filter sticky top-0">
         <form>
           <input
             className={classnames("outline-filter-input devtools-filterinput", {
