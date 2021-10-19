@@ -102,6 +102,48 @@ const GET_MY_RECORDINGS = gql`
   }
 `;
 
+const GET_OWNERS_AND_COLLABORATORS = gql`
+  query GetOwnerAndCollaborators($recordingId: UUID!) {
+    recording(uuid: $recordingId) {
+      uuid
+      owner {
+        id
+        name
+        picture
+      }
+      collaborators {
+        edges {
+          node {
+            ... on RecordingPendingEmailCollaborator {
+              id
+              email
+              createdAt
+            }
+            ... on RecordingPendingUserCollaborator {
+              id
+              createdAt
+              user {
+                id
+                name
+                picture
+              }
+            }
+            ... on RecordingUserCollaborator {
+              id
+              createdAt
+              user {
+                id
+                name
+                picture
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export function useGetRecordingId() {
   const { recordingId } = useParams<{ recordingId: string }>();
   return recordingId;
@@ -214,6 +256,30 @@ export function useGetRecordingPhoto(
   return { error, loading, screenData };
 }
 
+export async function getOwnersAndCollaborators(recordingId: RecordingId) {
+  const { data, loading, error } = await query({
+    query: GET_OWNERS_AND_COLLABORATORS,
+    variables: { recordingId },
+  });
+
+  let collaborators: CollaboratorDbData[] = [];
+  if (data?.recording?.collaborators) {
+    collaborators = data.recording.collaborators.edges
+      .map(({ node }: any) => ({
+        collaborationId: node.id,
+        user: node.user,
+        email: node.email,
+        createdAt: node.createdAt,
+      }))
+      .sort(
+        (a: CollaboratorDbData, b: CollaboratorDbData) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+  }
+  const recording = convertRecording(data.recording);
+  return { collaborators, recording, loading, error };
+}
+
 export function useGetOwnersAndCollaborators(
   recordingId: RecordingId
 ): {
@@ -222,52 +288,9 @@ export function useGetOwnersAndCollaborators(
   recording: Recording | undefined;
   collaborators: CollaboratorDbData[] | null;
 } {
-  const { data, loading, error } = useQuery(
-    gql`
-      query GetOwnerAndCollaborators($recordingId: UUID!) {
-        recording(uuid: $recordingId) {
-          uuid
-          owner {
-            id
-            name
-            picture
-          }
-          collaborators {
-            edges {
-              node {
-                ... on RecordingPendingEmailCollaborator {
-                  id
-                  email
-                  createdAt
-                }
-                ... on RecordingPendingUserCollaborator {
-                  id
-                  createdAt
-                  user {
-                    id
-                    name
-                    picture
-                  }
-                }
-                ... on RecordingUserCollaborator {
-                  id
-                  createdAt
-                  user {
-                    id
-                    name
-                    picture
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `,
-    {
-      variables: { recordingId },
-    }
-  );
+  const { data, loading, error } = useQuery(GET_OWNERS_AND_COLLABORATORS, {
+    variables: { recordingId },
+  });
 
   if (loading) {
     return { collaborators: null, recording: undefined, loading, error };

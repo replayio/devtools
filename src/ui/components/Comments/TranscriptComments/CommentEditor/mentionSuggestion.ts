@@ -1,12 +1,17 @@
 import { ReactRenderer } from "@tiptap/react";
 import tippy, { Instance, Props } from "tippy.js";
+import { getOwnersAndCollaborators } from "ui/hooks/recordings";
+import { getRecordingId } from "ui/utils/environment";
 import { MentionList } from "./MentionList";
 
-export default (users: string[]) => ({
-  items: (query: string) => {
-    return users
-      .filter((item: string) => item.toLowerCase().startsWith(query.toLowerCase()))
-      .slice(0, 5);
+export default (_users: string[]) => ({
+  items: async (query: string) => {
+    const recordingId = getRecordingId();
+    return getOwnersAndCollaborators(recordingId!).then(({ collaborators, recording }) =>
+      [...collaborators.map(c => c.user.name), recording?.user?.name]
+        .filter((item?: string) => item?.toLowerCase().startsWith(query.toLowerCase()))
+        .slice(0, 5)
+    );
   },
   render: () => {
     let reactRenderer: ReactRenderer;

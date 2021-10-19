@@ -15,7 +15,6 @@ interface TipTapEditorProps {
   handleSubmit: (text: string) => void;
   handleCancel: () => void;
   placeholder: string;
-  possibleMentions: User[];
   takeFocus: boolean;
 }
 
@@ -41,7 +40,6 @@ const TipTapEditor = ({
   handleSubmit,
   handleCancel,
   placeholder,
-  possibleMentions,
   takeFocus,
 }: TipTapEditorProps) => {
   const editor = useEditor({
@@ -71,7 +69,7 @@ const TipTapEditor = ({
           };
         },
       }),
-      Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
+      Mention.configure({ suggestion: suggestion([]) }),
       Placeholder.configure({ placeholder }),
     ],
     editorProps: {
