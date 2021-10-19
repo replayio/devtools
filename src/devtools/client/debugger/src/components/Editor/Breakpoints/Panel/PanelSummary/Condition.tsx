@@ -10,5 +10,5 @@ type ConditionProps = SummaryExpressionProps & {
 export default function Condition({ handleClick, ...rest }: ConditionProps) {
   const expression = <SummaryExpression {...rest} handleClick={e => handleClick(e, "condition")} />;
 
-  return <SummaryRow label={"if"} expression={expression} />;
+  return <SummaryRow label={"if"}>{expression}</SummaryRow>;
 }

@@ -1,16 +1,16 @@
 import React from "react";
 
 export default function SummaryRow({
-  expression,
+  children,
   label,
 }: {
-  expression: React.ReactElement;
+  children: React.ReactElement;
   label: string | null;
 }) {
   return (
     <div className="flex flex-row space-x-1 items-center">
       {label ? <div className="w-6 flex-shrink-0">{label}</div> : null}
-      {expression}
+      {children}
     </div>
   );
 }

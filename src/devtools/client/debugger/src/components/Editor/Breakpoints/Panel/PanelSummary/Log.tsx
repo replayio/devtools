@@ -11,5 +11,5 @@ type LogProps = SummaryExpressionProps & {
 export default function Log({ handleClick = () => {}, hasCondition, ...rest }: LogProps) {
   const expression = <SummaryExpression {...rest} handleClick={e => handleClick(e, "logValue")} />;
 
-  return <SummaryRow label={hasCondition ? "log" : null} expression={expression} />;
+  return <SummaryRow label={hasCondition ? "log" : null}>{expression}</SummaryRow>;
 }

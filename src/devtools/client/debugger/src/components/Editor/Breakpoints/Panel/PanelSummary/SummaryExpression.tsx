@@ -9,7 +9,7 @@ const { prefs } = require("ui/utils/prefs");
 
 export interface SummaryExpressionProps {
   value: string;
-  didExceedMaxHitsEditable: boolean;
+  isUnderMaxHitsEditable: boolean;
 }
 
 function getSyntaxHighlightedMarkup(string: string) {
@@ -45,14 +45,14 @@ function Expression({ value, isEditable }: { value: string; isEditable: boolean 
 }
 
 export function SummaryExpression({
-  didExceedMaxHitsEditable,
+  isUnderMaxHitsEditable,
   handleClick,
   value,
 }: SummaryExpressionProps & {
   handleClick: (event: React.MouseEvent) => void;
 }) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
-  const isEditable = didExceedMaxHitsEditable && isTeamDeveloper;
+  const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
 
   return (
     <button
@@ -65,7 +65,9 @@ export function SummaryExpression({
     >
       {isEditable ? (
         <>
-          <Expression {...{ value, isEditable }} />
+          <span className="expression">
+            <Expression {...{ value, isEditable }} />
+          </span>
           <MaterialIcon
             className="opacity-0 group-hover:opacity-100 "
             style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
@@ -75,7 +77,13 @@ export function SummaryExpression({
         </>
       ) : (
         <>
-          <Popup trigger={<Expression {...{ value, isEditable }} />}>
+          <Popup
+            trigger={
+              <span className="expression">
+                <Expression {...{ value, isEditable }} />
+              </span>
+            }
+          >
             {isTeamDeveloper ? (
               "Editing logpoints is available for Developers in the Team plan"
             ) : (
