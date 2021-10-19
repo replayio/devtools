@@ -253,6 +253,7 @@ export function useGetRecordingPhoto(
   }
 
   const screenData = data.recording?.thumbnail;
+
   return { error, loading, screenData };
 }
 

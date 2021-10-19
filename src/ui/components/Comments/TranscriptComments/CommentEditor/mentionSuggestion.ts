@@ -8,7 +8,13 @@ export default (_users: string[]) => ({
   items: async (query: string) => {
     const recordingId = getRecordingId();
     return getOwnersAndCollaborators(recordingId!).then(({ collaborators, recording }) =>
-      [...collaborators.map(c => c.user.name), recording?.user?.name]
+      [
+        ...collaborators
+          .map(c => c.user)
+          .filter(Boolean)
+          .map(user => user.name),
+        recording?.user?.name,
+      ]
         .filter((item?: string) => item?.toLowerCase().startsWith(query.toLowerCase()))
         .slice(0, 5)
     );
