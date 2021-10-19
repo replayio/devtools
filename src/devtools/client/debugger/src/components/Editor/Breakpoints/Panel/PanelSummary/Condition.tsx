@@ -1,25 +1,14 @@
 import React from "react";
+import { Input } from ".";
+import { SummaryExpression, SummaryExpressionProps } from "./SummaryExpression";
 import SummaryRow from "./SummaryRow";
 
-export type Input = "condition" | "logValue";
-
-interface ConditionProps {
-  isEditable: boolean;
+type ConditionProps = SummaryExpressionProps & {
   handleClick: (event: React.MouseEvent, input: Input) => void;
-  conditionValue: string;
-}
+};
 
-export function Condition({ isEditable, handleClick, conditionValue }: ConditionProps) {
-  if (!conditionValue) {
-    return null;
-  }
+export default function Condition({ handleClick, ...rest }: ConditionProps) {
+  const expression = <SummaryExpression {...rest} handleClick={e => handleClick(e, "condition")} />;
 
-  return (
-    <SummaryRow
-      label="if"
-      value={conditionValue}
-      handleClick={e => handleClick(e, "condition")}
-      {...{ isEditable }}
-    />
-  );
+  return <SummaryRow label={"if"}>{expression}</SummaryRow>;
 }

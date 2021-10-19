@@ -5,10 +5,8 @@ import CommentButton from "./CommentButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Popup from "./Popup";
 import hooks from "ui/hooks";
-import { Condition, Input } from "./Condition";
 import { UIState } from "ui/state";
 import { actions } from "ui/actions";
-import { getRecordingId } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
@@ -17,6 +15,9 @@ const { prefs } = require("ui/utils/prefs");
 import "reactjs-popup/dist/index.css";
 import "ui/components/reactjs-popup.css";
 import Log from "./Log";
+import Condition from "./Condition";
+
+export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
   breakpoint: any;
@@ -34,15 +35,15 @@ function PanelSummary({
   currentTime,
   analysisPoints,
 }: PanelSummaryProps) {
-  const recordingId = getRecordingId();
-  const { recording } = hooks.useGetRecording(recordingId);
+  const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
-  const didExceedMaxHitsEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
-  const isTeamDeveloper = recording ? recording.userRole !== "team-user" : false;
-  const isEditable = !!didExceedMaxHitsEditable && !!isTeamDeveloper;
+  const isUnderMaxHitsEditable = !!(
+    analysisPoints && analysisPoints.length < prefs.maxHitsEditable
+  );
+  const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -74,12 +75,7 @@ function PanelSummary({
     return (
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
-          <Log
-            isEditable={false}
-            handleClick={() => {}}
-            logValue={logValue}
-            hasCondition={!!conditionValue}
-          />
+          <Log value={logValue} hasCondition={!!conditionValue} {...{ isUnderMaxHitsEditable }} />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -108,8 +104,19 @@ function PanelSummary({
   return (
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center flex-col flex-grow">
-        <Condition {...{ isEditable, handleClick, conditionValue }} />
-        <Log {...{ isEditable, handleClick, logValue }} hasCondition={!!conditionValue} />
+        {conditionValue ? (
+          <Condition
+            handleClick={handleClick}
+            isUnderMaxHitsEditable={isUnderMaxHitsEditable}
+            value={conditionValue}
+          />
+        ) : null}
+        <Log
+          handleClick={handleClick}
+          isUnderMaxHitsEditable={isUnderMaxHitsEditable}
+          hasCondition={!!conditionValue}
+          value={logValue}
+        />
       </div>
       {!isTeamDeveloper ? (
         <Popup trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}>
