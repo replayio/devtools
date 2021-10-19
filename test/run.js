@@ -6,7 +6,14 @@ const https = require("https");
 const { spawn, spawnSync } = require("child_process");
 const url = require("url");
 const Manifest = require("./manifest");
-const { findGeckoPath, createTestScript, tmpFile, spawnChecked, defer } = require("./utils");
+const {
+  findGeckoPath,
+  createTestScript,
+  tmpFile,
+  sendTelemetryEvent,
+  spawnChecked,
+  defer,
+} = require("./utils");
 const { listAllRecordings } = require("@recordreplay/recordings-cli");
 
 // This API key allows access to the whole team that holds all these test
@@ -311,6 +318,8 @@ async function runTestViewer(path, local, timeout, env) {
       }
     }
 
+    sendTelemetryEvent("E2EFinished", { success: false, local, why });
+
     failures.push(`Failed test: ${local} ${why}`);
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
 
@@ -338,6 +347,8 @@ async function runTestViewer(path, local, timeout, env) {
         logFailure(`Exited with code ${code}`);
       } else if (!passed) {
         logFailure("Exited without passing test");
+      } else {
+        sendTelemetryEvent("E2EFinished", { success: true, local });
       }
     }
     resolve();

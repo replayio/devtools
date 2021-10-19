@@ -70,6 +70,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 0/8
   test1:
     name: Test stripe 1
@@ -81,6 +82,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 1/8
   test2:
     name: Test stripe 2
@@ -92,6 +94,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 2/8
   test3:
     name: Test stripe 3
@@ -103,6 +106,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 3/8
   test4:
     name: Test stripe 4
@@ -114,6 +118,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 4/8
   test5:
     name: Test stripe 5
@@ -125,6 +130,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 5/8
   test6:
     name: Test stripe 6
@@ -136,6 +142,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 6/8
   test7:
     name: Test stripe 7
@@ -147,6 +154,7 @@ jobs:
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
         with:
+          github_ci: true
           stripe: 7/8
   mock-test:
     name: Mock Tests
