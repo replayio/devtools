@@ -9,6 +9,7 @@ import {
   loadedRegions,
   KeyboardEvent,
   NavigationEvent,
+  RecordingId,
 } from "@recordreplay/protocol";
 import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
@@ -30,6 +31,7 @@ import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
 import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
+import { asyncStore } from "ui/utils/prefs";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -374,4 +376,20 @@ export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAct
 
 export function setShowEditor(showEditor: boolean): SetShowEditorAction {
   return { type: "set_show_editor", showEditor };
+}
+
+export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
+  return async ({ dispatch }) => {
+    const replaySessions = await asyncStore.replaySessions;
+    const session = replaySessions[recordingId];
+
+    if (recordingId) {
+      const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = session;
+
+      dispatch(setViewMode(viewMode));
+      dispatch(setShowEditor(showEditor));
+      dispatch(setShowVideoPanel(showVideoPanel));
+      dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
+    }
+  };
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import Loader from "../shared/Loader";
 import Viewer from "./Viewer";
 
 import { connect, ConnectedProps } from "react-redux";
