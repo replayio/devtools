@@ -50,4 +50,8 @@ interface HoveredLocation extends Location {
   column: number;
 }
 
-export type DragTarget = "startTime" | "endTime" | "span";
+export enum TrimOperation {
+  resizeStart = "resizeStart",
+  resizeEnd = "resizeEnd",
+  moveSpan = "moveSpan",
+}

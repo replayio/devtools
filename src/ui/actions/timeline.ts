@@ -24,7 +24,14 @@ import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { TimelineState, Tooltip, ZoomRegion, HoveredItem, TrimRegion } from "ui/state/timeline";
+import {
+  TimelineState,
+  Tooltip,
+  ZoomRegion,
+  HoveredItem,
+  TrimRegion,
+  TrimOperation,
+} from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
@@ -33,7 +40,6 @@ import { getFirstComment } from "ui/hooks/comments/comments";
 import { isRepaintEnabled } from "protocol/enable-repaint";
 import { getModal } from "ui/reducers/app";
 import clamp from "lodash/clamp";
-import { TrimOperation } from "ui/components/Timeline/Trimmer";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;

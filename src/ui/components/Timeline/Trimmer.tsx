@@ -5,15 +5,11 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
-import { TrimRegion, ZoomRegion } from "ui/state/timeline";
+import { TrimOperation, TrimRegion, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 
-export enum TrimOperation {
-  resizeStart = "resizeStart",
-  resizeEnd = "resizeEnd",
-  moveSpan = "moveSpan",
-}
+
 type TrimmerProps = PropsFromRedux & { width: number };
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
