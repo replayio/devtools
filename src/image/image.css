@@ -1,3 +1,8 @@
+.img.windows {
+  mask: url(~image/images/icon-windows.svg);
+  width: 24px;
+  height: 24px;
+}
 .img.webpack {
   background-image: url(~devtools/client/debugger/images/sources/webpack.svg);
 }

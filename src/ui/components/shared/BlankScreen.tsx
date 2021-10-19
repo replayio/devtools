@@ -90,6 +90,20 @@ function Logo({ scale = 1 }) {
     </svg>
   );
 }
+function WindowsEarlyAccess() {
+  if (true) {
+    return null;
+  }
+  return (
+    <div
+      className="flex absolute items-center text-primaryAccent"
+      style={{ bottom: "50px", left: "calc(50% - 98px)" }}
+    >
+      <div className="img windows w-6 h-6 mr-2" style={{ background: "var(--primary-accent)" }} />
+      Windows Early Access
+    </div>
+  );
+}
 
 // White progress screen used for showing the scanning progress of a replay
 export function BlankProgressScreen({ progress }: { progress: null | number }) {
@@ -110,6 +124,7 @@ export function BlankProgressScreen({ progress }: { progress: null | number }) {
           </div>
         </div>
       </div>
+      <WindowsEarlyAccess />
     </BlankScreen>
   );
 }
@@ -123,7 +138,6 @@ function _LoadingScreen({ uploading, awaitingSourcemaps, progress, finished }: P
   if (awaitingSourcemaps) {
     return <BlankLoadingScreen statusMessage={"Uploading sourcemaps"} />;
   } else if (uploading) {
-
     const amount = `${Math.round(+uploading.amount)}Mb`;
     const statusMessage = amount ? `Uploading ${amount}` : "Uploading";
 
