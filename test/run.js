@@ -266,9 +266,13 @@ async function runTestViewer(path, local, timeout, env) {
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
-    console.log("SENTINEL", data.toString(), env.RECORD_REPLAY_SERVER);
     if (match) {
-      console.log("SENTINEL_MATCH", match);
+      console.log(env);
+      console.log("SENTINEL_MATCH", match.toString(), {
+        foo: match[0],
+        bar: match[1],
+        bax: match[2],
+      });
     }
 
     if (match && match[2].startsWith("http://localhost:8080/recording")) {
