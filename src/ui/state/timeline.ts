@@ -11,6 +11,11 @@ export interface ZoomRegion {
   scale: number;
 }
 
+export interface TrimRegion {
+  endTime: number;
+  startTime: number;
+}
+
 export interface TimelineState {
   currentTime: number;
   playback: {
@@ -30,6 +35,7 @@ export interface TimelineState {
   shouldAnimate: boolean;
   tooltip: Tooltip | null;
   hoveredItem: HoveredItem | null;
+  trimRegion: { startTime: number; endTime: number } | null;
 }
 
 export interface HoveredItem {
@@ -42,4 +48,10 @@ export interface HoveredItem {
 interface HoveredLocation extends Location {
   line: number;
   column: number;
+}
+
+export enum TrimOperation {
+  resizeStart = "resizeStart",
+  resizeEnd = "resizeEnd",
+  moveSpan = "moveSpan",
 }

@@ -32,9 +32,9 @@ import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import "./Timeline.css";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
-import MaterialIcon from "../shared/MaterialIcon";
-
 import { prefs, features } from "ui/utils/prefs";
+import Trimmer from "./Trimmer";
+import TrimButton from "./TrimButton";
 
 function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
@@ -102,14 +102,14 @@ class Timeline extends Component<PropsFromRedux> {
   };
 
   onPlayerMouseMove: MouseEventHandler = e => {
-    const { hoverTime, setTimelineToTime, setTimelineState } = this.props;
+    const { hoverTime, setTimelineToTime, setTimelineState, isTrimming } = this.props;
     const mouseTime = this.getMouseTime(e);
     const isDragging = e.buttons === 1;
 
     if (hoverTime != mouseTime) {
       setTimelineToTime(mouseTime, isDragging);
     }
-    if (isDragging) {
+    if (isDragging && !isTrimming) {
       setTimelineState({ currentTime: mouseTime });
     }
   };
@@ -122,9 +122,14 @@ class Timeline extends Component<PropsFromRedux> {
       clearPendingComment,
       setTimelineToTime,
       setTimelineState,
+      isTrimming,
     } = this.props;
     const hoveringOverMarker = !!hoveredComment;
     const mouseTime = this.getMouseTime(e);
+
+    if (isTrimming) {
+      return;
+    }
 
     if (hoverTime != null && !hoveringOverMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
@@ -298,6 +303,34 @@ class Timeline extends Component<PropsFromRedux> {
     );
   }
 
+  renderTrimmedRegion() {
+    const { trimRegion, zoomRegion } = this.props;
+
+    if (!trimRegion) return null;
+
+    const { startTime, endTime } = trimRegion;
+    const { endTime: duration } = zoomRegion;
+    const start = getVisiblePosition({ time: startTime, zoom: zoomRegion }) * 100;
+    const end = getVisiblePosition({ time: duration - endTime, zoom: zoomRegion }) * 100;
+
+    return (
+      <>
+        <div
+          className="unloaded-regions start"
+          style={{
+            width: `${clamp(start, 0, 100)}%`,
+          }}
+        />
+        <div
+          className="unloaded-regions end"
+          style={{
+            width: `${clamp(end, 0, 100)}%`,
+          }}
+        />
+      </>
+    );
+  }
+
   render() {
     const {
       zoomRegion,
@@ -306,10 +339,8 @@ class Timeline extends Component<PropsFromRedux> {
       precachedTime,
       hoveredLineNumberLocation,
       hoveredItem,
-      viewMode,
-      selectedPanel,
       recordingDuration,
-      loadedRegions,
+      isTrimming,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
@@ -338,11 +369,13 @@ class Timeline extends Component<PropsFromRedux> {
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {this.renderUnloadedRegions()}
+            {features.trimming ? this.renderTrimmedRegion() : null}
             {this.isHovering() && percent >= 0 && percent <= 100 ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
             {this.renderPreviewMarkers()}
             <Comments />
+            {isTrimming ? <Trimmer width={this.overlayWidth} /> : null}
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>
@@ -351,6 +384,7 @@ class Timeline extends Component<PropsFromRedux> {
           <span className="time-divider">/</span>
           <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
         </div>
+        {features.trimming ? <TrimButton /> : null}
       </div>
     );
   }
@@ -376,6 +410,8 @@ const connector = connect(
     hoveredComment: selectors.getHoveredComment(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),
     videoUrl: selectors.getVideoUrl(state),
+    isTrimming: selectors.getIsTrimming(state),
+    trimRegion: selectors.getTrimRegion(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

@@ -17,6 +17,7 @@ function initialTimelineState(): TimelineState {
     mouse: null,
     tooltip: null,
     hoveredItem: null,
+    trimRegion: null,
   };
 }
 
@@ -50,6 +51,10 @@ export default function update(
       return { ...state, playbackPrecachedTime: action.time };
     }
 
+    case "set_trim_region": {
+      return { ...state, trimRegion: action.trimRegion };
+    }
+
     default: {
       return state;
     }
@@ -69,3 +74,4 @@ export const getTimelineDimensions = (state: UIState) => state.timeline.timeline
 export const getTooltip = (state: UIState) => state.timeline.tooltip;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
+export const getTrimRegion = (state: UIState) => state.timeline.trimRegion;

@@ -32,7 +32,8 @@ export type ModalType =
   | "single-invite"
   | "team-leader-onboarding"
   | "browser-launch"
-  | "first-replay";
+  | "first-replay"
+  | "trimming";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"

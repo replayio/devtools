@@ -18,8 +18,13 @@ module.exports = {
       lineHeight: {
         "comment-text": "1.125rem",
       },
+      cursor: {
+        "ew-resize": "ew-resize",
+      },
     },
   },
-  variants: {},
+  variants: {
+    width: ["hover", "group-hover"],
+  },
   plugins: [require("@tailwindcss/forms")],
 };

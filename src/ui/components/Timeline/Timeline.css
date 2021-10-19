@@ -50,11 +50,13 @@
 }
 
 .timeline .progress-bar {
-  position: relative;
-  flex-grow: 1;
-  width: 100%;
-  height: 32px;
+  align-items: center;
   cursor: pointer;
+  display: flex;
+  flex-grow: 1;
+  height: 32px;
+  position: relative;
+  width: 100%;
 }
 
 .timeline .progress {

@@ -5,8 +5,9 @@ import { UIState } from "ui/state";
 import { getVisiblePosition } from "ui/utils/timeline";
 import "./Tooltip.css";
 
-export function Tooltip({ hoverTime, zoomRegion, timelineWidth }: Props) {
-  if (!hoverTime) {
+export function Tooltip({ hoverTime, zoomRegion, timelineWidth, isTrimming }: Props) {
+  const shouldHideTooltip = !hoverTime || isTrimming;
+  if (shouldHideTooltip) {
     return null;
   }
 
@@ -26,6 +27,7 @@ export function Tooltip({ hoverTime, zoomRegion, timelineWidth }: Props) {
 const connector = connect((state: UIState) => ({
   hoverTime: selectors.getHoverTime(state),
   zoomRegion: selectors.getZoomRegion(state),
+  isTrimming: selectors.getIsTrimming(state),
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
