@@ -257,26 +257,30 @@ export function useGetRecordingPhoto(
   return { error, loading, screenData };
 }
 
+function convertCollaborators(recording: any) {
+  if (!recording.collaborators) {
+    return [];
+  }
+  return recording.collaborators.edges
+    .map(({ node }: any) => ({
+      collaborationId: node.id,
+      user: node.user,
+      email: node.email,
+      createdAt: node.createdAt,
+    }))
+    .sort(
+      (a: CollaboratorDbData, b: CollaboratorDbData) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+}
+
 export async function getOwnersAndCollaborators(recordingId: RecordingId) {
   const { data, loading, error } = await query({
     query: GET_OWNERS_AND_COLLABORATORS,
     variables: { recordingId },
   });
 
-  let collaborators: CollaboratorDbData[] = [];
-  if (data?.recording?.collaborators) {
-    collaborators = data.recording.collaborators.edges
-      .map(({ node }: any) => ({
-        collaborationId: node.id,
-        user: node.user,
-        email: node.email,
-        createdAt: node.createdAt,
-      }))
-      .sort(
-        (a: CollaboratorDbData, b: CollaboratorDbData) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }
+  let collaborators: CollaboratorDbData[] = convertCollaborators(data.recording);
   const recording = convertRecording(data.recording);
   return { collaborators, recording, loading, error };
 }
@@ -301,20 +305,7 @@ export function useGetOwnersAndCollaborators(
     console.error("Apollo error while getting owners and collaborators", error);
   }
 
-  let collaborators: CollaboratorDbData[] = [];
-  if (data?.recording?.collaborators) {
-    collaborators = data.recording.collaborators.edges
-      .map(({ node }: any) => ({
-        collaborationId: node.id,
-        user: node.user,
-        email: node.email,
-        createdAt: node.createdAt,
-      }))
-      .sort(
-        (a: CollaboratorDbData, b: CollaboratorDbData) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }
+  let collaborators: CollaboratorDbData[] = convertCollaborators(data.recording);
   const recording = convertRecording(data.recording);
   return { collaborators, recording, loading, error };
 }
