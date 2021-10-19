@@ -4,7 +4,6 @@ import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
-import { Plugin, PluginKey } from "prosemirror-state";
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -53,11 +52,15 @@ const TipTapEditor = ({
         addKeyboardShortcuts() {
           return {
             "Cmd-Enter": ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
+              if (editor.getCharacterCount() > 0) {
+                handleSubmit(JSON.stringify(editor.getJSON()));
+              }
               return true;
             },
             Enter: ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
+              if (editor.getCharacterCount() > 0) {
+                handleSubmit(JSON.stringify(editor.getJSON()));
+              }
               return true;
             },
             Escape: ({ editor }) => {
