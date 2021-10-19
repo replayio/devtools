@@ -24,7 +24,7 @@ import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
+import { TimelineState, Tooltip, ZoomRegion, HoveredItem, TrimRegion } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
@@ -33,6 +33,7 @@ import { getFirstComment } from "ui/hooks/comments/comments";
 import { isRepaintEnabled } from "protocol/enable-repaint";
 import { getModal } from "ui/reducers/app";
 import clamp from "lodash/clamp";
+import { TrimOperation } from "ui/components/Timeline/Trimmer";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -217,22 +218,24 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
 export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
-    const isTrimming = getModal(getState()) === "trimming";
+    const stateBeforeScreenshot = getState();
+    const isTrimming = getModal(stateBeforeScreenshot) === "trimming";
 
     if (!updateGraphics || isRepaintEnabled() || isTrimming) {
       return;
     }
 
     try {
-      const currentTime = getCurrentTime(getState());
+      const currentTime = getCurrentTime(stateBeforeScreenshot);
       const screenshotTime = time || currentTime;
       const { screen, mouse } = await getGraphicsAtTime(screenshotTime);
+      const stateAfterScreenshot = getState();
 
-      if (getHoverTime(getState()) !== time) {
+      if (getHoverTime(stateAfterScreenshot) !== time) {
         return;
       }
 
-      const playing = !!getPlayback(getState());
+      const playing = !!getPlayback(stateAfterScreenshot);
       paintGraphics(screen, mouse, playing);
       Video.seek(currentTime);
     } catch {}
@@ -525,31 +528,33 @@ export function setTrimRegion(trimRegion: {
 }
 
 export function updateTrimRegion(
-  type: "startTime" | "endTime" | "span",
-  midpointDifference: number
+  operation: TrimOperation,
+  // Calculate the shift here so we can use it to compensate
+  // for how off-center the mouse is while dragging the span.
+  relativeShift: number
 ): UIThunkAction {
   return ({ dispatch, getState }) => {
     const state = getState();
-    const hoverTime = getHoverTime(state);
-    const trimRegion = getTrimRegion(state);
+    const hoverTime = getHoverTime(state)!;
+    const trimRegion = getTrimRegion(state)!;
     const zoomRegion = getZoomRegion(state);
 
-    if (!hoverTime || !trimRegion) return;
-
-    if (type === "span") {
+    if (operation === TrimOperation.moveSpan) {
       const { startTime, endTime } = trimRegion;
       const oldSpanMidpoint = (endTime + startTime) / 2;
       const newMidpoint = hoverTime;
-      const midpointShift = newMidpoint - oldSpanMidpoint;
+      const duration = zoomRegion.endTime;
+      const translateX = newMidpoint - oldSpanMidpoint;
 
-      const newTrimRegion = {
-        startTime: clamp(startTime + midpointShift + midpointDifference, 0, zoomRegion.endTime),
-        endTime: clamp(endTime + midpointShift + midpointDifference, 0, zoomRegion.endTime),
-      };
+      const newStart = clamp(startTime + translateX + relativeShift, 0, duration);
+      const newEnd = clamp(endTime + translateX + relativeShift, newStart, duration);
+      const newTrimRegion = { startTime: newStart, endTime: newEnd };
 
       dispatch(setTrimRegion(newTrimRegion));
     } else {
-      dispatch(setTrimRegion({ ...trimRegion, [type]: hoverTime! }));
+      const type = operation === TrimOperation.resizeStart ? "startTime" : "endTime";
+
+      dispatch(setTrimRegion({ ...trimRegion, [type]: hoverTime }));
     }
   };
 }

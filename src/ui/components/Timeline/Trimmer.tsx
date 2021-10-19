@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { actions } from "ui/actions";
@@ -9,7 +9,11 @@ import { TrimRegion, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 
-export type DragTarget = "startTime" | "endTime" | "span";
+export enum TrimOperation {
+  resizeStart = "resizeStart",
+  resizeEnd = "resizeEnd",
+  moveSpan = "moveSpan",
+}
 type TrimmerProps = PropsFromRedux & { width: number };
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
@@ -31,7 +35,7 @@ function Draggers({
   onDragStart,
 }: {
   dragging: boolean;
-  onDragStart: (e: React.MouseEvent, target: DragTarget) => void;
+  onDragStart: (e: React.MouseEvent, target: TrimOperation) => void;
 }) {
   return (
     <>
@@ -40,14 +44,14 @@ function Draggers({
           dragging ? "w-1" : "w-0.5",
           "absolute top-0 left-0 h-full rounded-full bg-blue-500 transform cursor-ew-resize group-hover:w-1"
         )}
-        onMouseDown={e => onDragStart(e, "startTime")}
+        onMouseDown={e => onDragStart(e, TrimOperation.resizeStart)}
       />
       <div
         className={classNames(
           dragging ? "w-1" : "w-0.5",
           "absolute top-0 right-0 h-full rounded-full bg-blue-500 transform cursor-ew-resize group-hover:w-1"
         )}
-        onMouseDown={e => onDragStart(e, "endTime")}
+        onMouseDown={e => onDragStart(e, TrimOperation.resizeEnd)}
       />
     </>
   );
@@ -96,7 +100,7 @@ function TrimSpan({
   trimRegion: TrimRegion;
   zoomRegion: ZoomRegion;
   dragging: boolean;
-  onDragStart: (e: React.MouseEvent, target: DragTarget) => void;
+  onDragStart: (e: React.MouseEvent, target: TrimOperation) => void;
 }) {
   const { startTime, endTime } = trimRegion;
   const draggers = <Draggers {...{ dragging, onDragStart }} />;
@@ -104,7 +108,7 @@ function TrimSpan({
   return (
     <Span
       {...{ startTime, endTime, zoomRegion, draggers }}
-      onMouseDown={e => onDragStart(e, "span")}
+      onMouseDown={e => onDragStart(e, TrimOperation.moveSpan)}
     />
   );
 }
@@ -117,25 +121,28 @@ function Trimmer({
   zoomRegion,
   updateTrimRegion,
 }: TrimmerProps) {
-  const [midpointDifference, setMidpointDifference] = useState<number | null>(null);
-  const [draggingTarget, setDraggingTarget] = useState<DragTarget | null>(null);
+  const [relativeShift, setRelativeShift] = useState<number | null>(null);
+  const [draggingTarget, setDraggingTarget] = useState<TrimOperation | null>(null);
 
-  const onDragStart = (e: React.MouseEvent, target: DragTarget) => {
+  const onDragStart = (e: React.MouseEvent, target: TrimOperation) => {
     e.stopPropagation();
 
-    if (!trimRegion || !hoverTime) return;
+    // Only resize/shift the trimRegion if it exists in the first place, and we're
+    // hovered on the timeline. We don't need to do those until the user clicks and set
+    // the initial trimRegion by clicking on the timeline while in trimming mode.
+    if (!(trimRegion && hoverTime)) return;
 
     setDraggingTarget(target);
     const spanMidpoint = (trimRegion.endTime + trimRegion.startTime) / 2;
-    setMidpointDifference(spanMidpoint - hoverTime);
+    setRelativeShift(spanMidpoint - hoverTime);
   };
   const onMouseUp = () => {
     setDraggingTarget(null);
-    setMidpointDifference(null);
+    setRelativeShift(null);
   };
   const onMouseMove = () => {
-    if (!draggingTarget || !midpointDifference) return;
-    updateTrimRegion(draggingTarget, midpointDifference);
+    if (!(draggingTarget && relativeShift)) return;
+    updateTrimRegion(draggingTarget, relativeShift);
   };
   const onClick = (e: React.MouseEvent) => {
     e.stopPropagation();
