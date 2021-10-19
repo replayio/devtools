@@ -6,6 +6,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        faintGrey: "var(--faint-grey)",
         lightGrey: "var(--light-grey)",
         primaryAccent: "var(--primary-accent)",
         primaryAccentHover: "var(--primary-accent-hover)",

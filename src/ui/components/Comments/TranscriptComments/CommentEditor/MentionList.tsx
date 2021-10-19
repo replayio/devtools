@@ -53,12 +53,11 @@ export const MentionList = forwardRef((props: { items: any[]; command: any }, re
   }));
 
   return (
-    <div className="context-menu">
+    <div className="flex flex-col bg-faintGrey py-1 rounded shadow-md text-xs">
       {props.items.map((item, index) => (
         <button
-          className={classNames("context-menu-item", {
-            "bg-primaryAccent": index === selectedIndex,
-            "text-white": index === selectedIndex,
+          className={classNames("px-2 py-1 text-left", {
+            "text-primaryAccent": index === selectedIndex,
           })}
           key={index}
           onClick={() => selectItem(index)}

@@ -3,7 +3,6 @@ import { useEditor, EditorContent, Extension } from "@tiptap/react";
 import Mention from "@tiptap/extension-mention";
 import StarterKit from "@tiptap/starter-kit";
 import suggestion from "./mentionSuggestion";
-import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
 
@@ -69,7 +68,7 @@ const TipTapEditor = ({
           };
         },
       }),
-      Mention.configure({ suggestion: suggestion([]) }),
+      Mention.configure({ suggestion: suggestion([]), HTMLAttributes: { class: "font-bold" } }),
       Placeholder.configure({ placeholder }),
     ],
     editorProps: {

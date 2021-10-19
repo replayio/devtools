@@ -27,14 +27,11 @@ body {
   width: 100%;
   font-family: "Inter", sans-serif;
   color: var(--theme-body-color);
-  --light-grey: #969696;
-  --dark-grey: #696969;
-  --light-blue: #61cdff;
-  --dark-blue: #2d7eff;
-  --faint-red: rgba(255, 0, 0, 0.5);
 }
 
+#app,
 div[data-tippy-root] {
+  --faint-grey: #f9f9fa;
   --light-grey: #969696;
   --dark-grey: #696969;
   --light-blue: #61cdff;
