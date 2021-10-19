@@ -145,8 +145,9 @@ function createHttpLink(token: string | undefined) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
+  const uri = process.env.API_URL;
   return new HttpLink({
-    uri: "https://api.replay.io/v1/graphql",
+    uri,
     headers,
     fetch,
   });
