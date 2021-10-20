@@ -30,9 +30,9 @@ function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
     }
   }, [editing]);
 
-  // if (nags?.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
-  //   return null;
-  // }
+  if (nags?.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
+    return null;
+  }
 
   return (
     <div className="p-2 py-1 text-white bg-gray-400 font-sans text-xs flex flex-row items-center space-x-1">
