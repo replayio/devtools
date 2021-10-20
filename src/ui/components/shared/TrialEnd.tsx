@@ -13,13 +13,10 @@ export function TrialEnd({
   className?: string;
   onClick?: () => void;
 }) {
-  let style;
-
-  if (color === "yellow") {
-    style = { backgroundColor: "#FFFB96" };
-  } else {
-    style = { backgroundColor: "#E9E9EB" };
-  }
+  const style = {
+    backgroundColor: color === "yellow" ? "#FFFB96" : "#E9E9EB",
+    cursor: onClick ? "pointer" : "default",
+  };
 
   if (expiresIn >= 21) {
     return null;

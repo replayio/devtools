@@ -7,7 +7,10 @@ import { UIState } from "ui/state";
 import BlankScreen from "./BlankScreen";
 import classNames from "classnames";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
-import { isDevelopment } from "ui/utils/environment";
+import { getRecordingId, isDevelopment } from "ui/utils/environment";
+import hooks from "ui/hooks";
+import { useHistory } from "react-router";
+import { setModal } from "ui/actions/app";
 
 export function PopupBlockedError() {
   const error = { message: "OAuth consent popup blocked" };
@@ -76,14 +79,39 @@ function LibraryButton() {
     <button
       type="button"
       onClick={onClick}
-      className={classNames(
-        "w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
+      className="w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
     >
       Back to Library
     </button>
   );
 }
+
+function TeamBillingButtonBase({ currentWorkspaceId, setModal }: BillingPropsFromRedux) {
+  const history = useHistory();
+  const onClick = () => {
+    history.push(`/team/${currentWorkspaceId}/settings/billing`);
+    setModal("workspace-settings");
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
+    >
+      Update Subscription
+    </button>
+  );
+}
+
+const billingConnector = connect(
+  (state: UIState) => ({
+    currentWorkspaceId: selectors.getWorkspaceId(state),
+  }),
+  { setModal }
+);
+type BillingPropsFromRedux = ConnectedProps<typeof billingConnector>;
+const TeamBillingButton = billingConnector(TeamBillingButtonBase);
 
 function ActionButton({ action }: { action: string }) {
   let button;
@@ -94,6 +122,8 @@ function ActionButton({ action }: { action: string }) {
     button = <SignInButton />;
   } else if (action == "library") {
     button = <LibraryButton />;
+  } else if (action == "team-billing") {
+    button = <TeamBillingButton />;
   }
 
   return <div>{button}</div>;
@@ -166,6 +196,9 @@ function UnexpectedErrorScreen({ error }: { error: UnexpectedError }) {
 }
 
 function TrialExpired() {
+  const recordingId = getRecordingId();
+  const { recording, loading } = hooks.useGetRecording(recordingId!);
+
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
       <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
@@ -180,7 +213,9 @@ function TrialExpired() {
               expired.
             </div>
           </div>
-          <ActionButton action={"library"} />
+          <ActionButton
+            action={loading || recording?.userRole !== "team-admin" ? "library" : "team-billing"}
+          />
         </div>
       </section>
     </Modal>

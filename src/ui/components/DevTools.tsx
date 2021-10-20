@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { createSession } from "ui/actions/session";
+import { clearTrialExpired, createSession } from "ui/actions/session";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import Header from "./Header/index";
 import { LoadingScreen } from "./shared/BlankScreen";
@@ -13,11 +13,18 @@ import "ui/setup/dynamic/devtools";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
-function _DevTools({ loadingFinished, viewMode, createSession }: PropsFromRedux) {
+function _DevTools({
+  clearTrialExpired,
+  loadingFinished,
+  viewMode,
+  createSession,
+}: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   useEffect(() => {
     createSession(recordingId);
-  }, [recordingId]);
+
+    return () => clearTrialExpired();
+  }, [clearTrialExpired, recordingId]);
 
   if (!loadingFinished) {
     return <LoadingScreen />;
@@ -38,6 +45,7 @@ const connector = connect(
   }),
   {
     createSession,
+    clearTrialExpired,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

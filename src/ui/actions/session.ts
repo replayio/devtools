@@ -26,7 +26,7 @@ import { ApolloError } from "@apollo/client";
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
 };
-export type SetTrialExpiredAction = Action<"set_trial_expired">;
+export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boolean };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type SessionActions =
   | SetExpectedErrorAction
@@ -222,8 +222,11 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
   };
 }
 
-export function setTrialExpired(): SetTrialExpiredAction {
-  return { type: "set_trial_expired" };
+export function setTrialExpired(expired = true): SetTrialExpiredAction {
+  return { type: "set_trial_expired", expired };
+}
+export function clearTrialExpired(): UIThunkAction {
+  return ({ dispatch }) => dispatch(setTrialExpired(false));
 }
 export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
   return ({ getState, dispatch }) => {
