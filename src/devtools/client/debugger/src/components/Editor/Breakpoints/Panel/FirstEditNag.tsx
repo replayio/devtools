@@ -8,8 +8,10 @@ const TEXT = {
   success: "Check the console! We went back in time to add those print statements!",
 };
 
+type Step = keyof typeof TEXT;
+
 function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
-  const [step, setStep] = useState<"clickPrompt" | "enterPrompt" | "success">("clickPrompt");
+  const [step, setStep] = useState<Step>("clickPrompt");
   const updateUserNags = hooks.useUpdateUserNags();
 
   useEffect(() => {
