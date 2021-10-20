@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
-
 import { Nag } from "ui/hooks/users";
+import "./FirstEditNag.css";
+
 const TEXT = {
   clickPrompt: "Want to see something cool? Click below to edit...",
   enterPrompt: "Now type something here...",
@@ -35,7 +36,7 @@ function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
   }
 
   return (
-    <div className="p-2 py-1 text-white bg-gray-400 font-sans text-xs flex flex-row items-center space-x-1">
+    <div className="first-edit-nag p-2 py-1 text-white font-sans text-xs flex flex-row items-center space-x-1">
       <img src="/images/sparkle.svg" className="w-3" />
       <span>{TEXT[step]}</span>
     </div>
