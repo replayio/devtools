@@ -2,9 +2,8 @@ import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 import * as Sentry from "@sentry/react";
 import { skipTelemetry } from "./environment";
-import { Recording } from "ui/types";
+import { Recording, UserSettings } from "ui/types";
 import { UserInfo } from "ui/hooks/users";
-import { prefs } from "./prefs";
 
 let setup = false;
 
@@ -13,14 +12,16 @@ export default {
     recording,
     userInfo,
     auth0User,
+    userSettings,
   }: {
     recording?: Recording;
     userInfo?: Omit<UserInfo, "loading">;
     auth0User: any;
+    userSettings: UserSettings;
   }) => {
     // Skip if the recording was either created or viewed by an internal user
     if (
-      prefs.disableLogRocket ||
+      userSettings.disableLogRocket ||
       recording?.user?.internal ||
       userInfo?.internal ||
       skipTelemetry()

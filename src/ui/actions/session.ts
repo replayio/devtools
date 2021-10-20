@@ -22,6 +22,7 @@ import { jumpToInitialPausePoint } from "./timeline";
 import { Recording } from "ui/types";
 import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
+import { getUserSettings } from "ui/hooks/settings";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -106,6 +107,7 @@ function getRecordingNotAccessibleError(
 export function createSession(recordingId: string): UIThunkAction {
   return async ({ getState, dispatch }) => {
     try {
+      const userSettings = await getUserSettings();
       const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording);
 
@@ -120,6 +122,7 @@ export function createSession(recordingId: string): UIThunkAction {
         recording,
         userInfo,
         auth0User: tokenManager.auth0Client?.user,
+        userSettings,
       });
 
       registerRecording({ recording, userInfo });

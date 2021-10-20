@@ -1,11 +1,11 @@
+const Services = require("Services");
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
+import { mutate, query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
-import type { UserSettings, Workspace, WorkspaceUserRole } from "../types";
+import type { UserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
-import { prefs } from "ui/utils/prefs";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
@@ -77,29 +77,45 @@ function convertUserSettings(data: any): UserSettings {
     enableRepaint: settings.enableRepaint,
     enableGlobalSearch: settings.enableGlobalSearch,
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
-    disableLogRocket: !!prefs.disableLogRocket,
+    disableLogRocket: settings.disableLogRocket,
   };
 }
 
-export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
-  const [updateUserSetting, { error }] = useMutation(
-    gql`
-      mutation UpdateUserSettings($newValue: ${type}) {
-        updateUserSettings(
-          input: { ${key}: $newValue },
-        ) {
-          success
-        }
+function getUpdateUserSettingQuery(key: SettingItemKey, type: "uuid" | "Boolean") {
+  return gql`
+    mutation UpdateUserSettings($newValue: ${type}) {
+      updateUserSettings(
+        input: { ${key}: $newValue },
+      ) {
+        success
       }
-    `,
-    { refetchQueries: ["GetUserSettings"] }
-  );
+    }
+  `;
+}
+
+export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
+  const [updateUserSetting, { error }] = useMutation(getUpdateUserSettingQuery(key, type), {
+    refetchQueries: ["GetUserSettings"],
+  });
 
   if (error) {
     console.error("Apollo error while updating a user setting:", error);
   }
 
   return updateUserSetting;
+}
+
+export async function migratePrefToSettings(prefKey: string, settingKey: SettingItemKey) {
+  if (Services.prefs.prefHasUserValue(prefKey)) {
+    const newValue = Services.prefs.getBoolPref(prefKey);
+    await mutate({
+      mutation: getUpdateUserSettingQuery(settingKey, "Boolean"),
+      variables: {
+        newValue,
+      },
+    });
+    Services.prefs.clearUserPref(prefKey);
+  }
 }
 
 export function useUpdateDefaultWorkspace() {
