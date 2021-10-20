@@ -54,7 +54,13 @@ export function SummaryExpression({
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
 
-  return (
+  const ValueExpression = () => (
+    <span className="expression">
+      <Expression {...{ value, isEditable }} />
+    </span>
+  );
+
+  const Button = ({ children }) => (
     <button
       className={classNames(
         "group flex flex-row items-top space-x-1 p-0.5",
@@ -63,38 +69,40 @@ export function SummaryExpression({
       disabled={!isEditable}
       onClick={handleClick}
     >
-      {isEditable ? (
-        <>
-          <span className="expression">
-            <Expression {...{ value, isEditable }} />
-          </span>
-          <MaterialIcon
-            className="opacity-0 group-hover:opacity-100 "
-            style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
-          >
-            edit
-          </MaterialIcon>
-        </>
-      ) : (
-        <>
-          <Popup
-            trigger={
-              <span className="expression">
-                <Expression {...{ value, isEditable }} />
-              </span>
-            }
-          >
-            {isTeamDeveloper ? (
-              "Editing logpoints is available for Developers in the Team plan"
-            ) : (
-              <>
-                This log cannot be edited because <br />
-                it was hit {prefs.maxHitsDisplayed}+ times
-              </>
-            )}
-          </Popup>
-        </>
-      )}
+      {children}
     </button>
+  );
+
+  if (isEditable) {
+    <Button>
+      <>
+        <ValueExpression />
+        <MaterialIcon
+          className="opacity-0 group-hover:opacity-100 "
+          style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
+        >
+          edit
+        </MaterialIcon>
+      </>
+    </Button>;
+  }
+
+  if (!isTeamDeveloper) {
+    return (
+      <Button>
+        <Popup trigger={<ValueExpression />}>
+          Editing logpoints is available for Developers in the Team plan
+        </Popup>
+      </Button>
+    );
+  }
+
+  return (
+    <Button>
+      <Popup trigger={<ValueExpression />}>
+        This log cannot be edited because <br />
+        it was hit {prefs.maxHitsDisplayed}+ times
+      </Popup>
+    </Button>
   );
 }
