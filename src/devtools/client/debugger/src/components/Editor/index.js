@@ -142,7 +142,7 @@ class Editor extends PureComponent {
     return editor;
   }
 
-  onClosePress = (key, e) => {
+  onClosePress = e => {
     const { cx, selectedSource } = this.props;
     if (selectedSource) {
       e.preventDefault();
@@ -200,7 +200,7 @@ class Editor extends PureComponent {
    * split console. Restore it here, but preventDefault if and only if there
    * is a multiselection.
    */
-  onEscape = (key, e) => {
+  onEscape = e => {
     if (!this.state.editor) {
       return;
     }
