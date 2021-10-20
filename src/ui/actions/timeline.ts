@@ -38,7 +38,7 @@ import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { isRepaintEnabled } from "protocol/enable-repaint";
-import { getModal } from "ui/reducers/app";
+import { getModal, isRegionLoaded } from "ui/reducers/app";
 import clamp from "lodash/clamp";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
@@ -177,7 +177,12 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     try {
-      if (!isRepaintEnabled()) {
+      // we don't show a screenshot if repainting is enabled to avoid jitter
+      // caused by showing a recorded screenshot first and then replacing it
+      // with a repainted screenshot. But if the current region hasn't been
+      // loaded yet, waiting for the repainted screenshot may take a long time,
+      // so in this case we do show a recorded screenshot first
+      if (!isRepaintEnabled() || !isRegionLoaded(store.getState(), time)) {
         const { screen, mouse } = await getGraphicsAtTime(time);
 
         if (screen && getCurrentTime(getState()) == time) {
