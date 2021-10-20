@@ -3,9 +3,9 @@ import hooks from "ui/hooks";
 
 import { Nag } from "ui/hooks/users";
 const TEXT = {
-  clickPrompt: "Click below to edit the message",
-  enterPrompt: "Type something and hit Enter",
-  success: "The console has been refreshed",
+  clickPrompt: "Want to see something cool? Click below to edit...",
+  enterPrompt: "Now type something here...",
+  success: "Check the console! We went back in time to add those print statements!",
 };
 
 function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
@@ -33,7 +33,7 @@ function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
   }
 
   return (
-    <div className="p-2 py-1 text-white bg-primaryAccent font-sans text-xs flex flex-row items-center space-x-1">
+    <div className="p-2 py-1 text-white bg-black font-sans text-xs flex flex-row items-center space-x-1">
       <img src="/images/sparkle.svg" className="w-3" />
       <span>{TEXT[step]}</span>
     </div>
