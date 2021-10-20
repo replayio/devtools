@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import { prefs } from "ui/utils/prefs";
 import Checkbox from "../Forms/Checkbox";
@@ -63,11 +63,22 @@ function NotificationPreferences({
 }
 
 function PrivacyPreferences() {
-  const toggleDisableLogRocket = () => {
-    prefs.disableLogRocket = !prefs.disableLogRocket;
-    setDisableLogRocket(prefs.disableLogRocket);
+  const [disableLogRocket, setDisableLogRocket] = useState<boolean>();
+  const { userSettings, loading } = hooks.useGetUserSettings();
+  const updateLogRocket = hooks.useUpdateUserSetting("disableLogRocket", "Boolean");
+
+  const toggle = (newValue: boolean) => {
+    setDisableLogRocket(newValue);
+    updateLogRocket({
+      variables: {
+        newValue,
+      },
+    });
   };
-  const [disableLogRocket, setDisableLogRocket] = useState(prefs.disableLogRocket);
+
+  useEffect(() => {
+    setDisableLogRocket(userSettings.disableLogRocket);
+  }, [loading]);
 
   return (
     <div className="space-y-4">
@@ -80,8 +91,9 @@ function PrivacyPreferences() {
         >
           <Checkbox
             id="disableLogRocket"
-            checked={!!disableLogRocket}
-            onChange={toggleDisableLogRocket}
+            checked={disableLogRocket}
+            disabled={loading}
+            onChange={ev => toggle(ev.currentTarget.checked)}
           />
           <div>Disable LogRocket Session Replay</div>
         </label>

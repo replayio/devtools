@@ -60,6 +60,7 @@ function LibraryLoader(props: PropsFromRedux) {
   const [showClaimError, setShowClaimError] = useState(false);
 
   const auth = useAuth0();
+  const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
   const userInfo = hooks.useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
@@ -80,10 +81,10 @@ function LibraryLoader(props: PropsFromRedux) {
   }
 
   useEffect(() => {
-    if (!userInfo.loading) {
-      LogRocket.createSession({ userInfo, auth0User: auth.user });
+    if (!userInfo.loading && !userSettingsLoading) {
+      LogRocket.createSession({ userInfo, auth0User: auth.user, userSettings });
     }
-  }, [auth, userInfo]);
+  }, [auth, userInfo, userSettings, userSettingsLoading]);
 
   useEffect(function handleTeamInvitationCode() {
     const code = hasTeamInvitationCode();

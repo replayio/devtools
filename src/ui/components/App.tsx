@@ -23,6 +23,7 @@ import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
+import { migratePrefToSettings } from "ui/hooks/settings";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -72,6 +73,12 @@ function App({ theme, modal, children }: AppProps) {
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
   }, [theme]);
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      migratePrefToSettings("devtools.disableLogRocket", "disableLogRocket");
+    }
+  }, [auth.isAuthenticated]);
 
   if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
     return <LoadingScreen />;
