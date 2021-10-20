@@ -78,7 +78,7 @@ function LineNumberTooltip({
   // Show a loading state immediately while we wait for the analysis points
   // to be generated.
   if (!analysisPoints) {
-    return <StaticTooltip targetNode={lineNumberNode}>...</StaticTooltip>;
+    return <StaticTooltip targetNode={lineNumberNode}>Loading…</StaticTooltip>;
   }
 
   if (analysisPoints === "error") {
