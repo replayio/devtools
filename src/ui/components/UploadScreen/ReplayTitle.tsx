@@ -1,5 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect } from "react";
-import { TextInput } from "ui/components/shared/Forms";
+import React, { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 export default function ReplayTitle({
   inputValue,
@@ -13,18 +12,14 @@ export default function ReplayTitle({
   };
 
   return (
-    <div>
-      <label htmlFor="replay-title" className="block text-xs uppercase font-semibold ">
-        Title
-      </label>
-      <div className="mt-1">
-        <TextInput
-          placeholder="Your replay's title"
-          value={inputValue}
-          onChange={onChange}
-          id="replay-title"
-        />
-      </div>
+    <div className="flex flex-col space-y-3">
+      <div>Replay Title</div>
+      <input
+        type="textbox"
+        className="bg-white rounded-lg shadow-xl py-3.5 px-6 font-medium focus:outline-none focus:ring-2 focus:ring-primaryAccent"
+        onChange={onChange}
+        value={inputValue}
+      />
     </div>
   );
 }

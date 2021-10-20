@@ -156,12 +156,10 @@ export function OnboardingModalContainer({
           theme === "dark" ? "bg-black text-white" : "bg-white text-black"
         )}
       >
-        <>
-          <BubbleBackground />
-          <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
-            {children}
-          </Modal>
-        </>
+        <BubbleBackground />
+        <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
+          {children}
+        </Modal>
       </div>
     </OnboardingContext.Provider>
   );

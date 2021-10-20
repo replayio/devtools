@@ -59,7 +59,7 @@ export default function SelectMenu({
   const selectedName = options.find(option => option.id === selected)!.name;
 
   return (
-    <div className="text-sm">
+    <div>
       <Listbox value={selected} onChange={setSelected}>
         {({ open }) => (
           <>

@@ -31,9 +31,9 @@ export function Dropdown({
   menuItemsClassName,
   widthClass = "w-56",
 }: {
-  children: (React.ReactElement | null)[];
+  children: React.ReactElement | (React.ReactElement | null)[];
   menuItemsClassName?: string;
-  widthClass?: "w-56" | "w-80";
+  widthClass?: "w-56" | "w-64" | "w-80";
 }) {
   return (
     <Menu as="div" className="inline-block text-left recording-options">
