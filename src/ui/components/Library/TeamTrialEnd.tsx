@@ -30,10 +30,8 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
   const isAdmin = roles?.includes("admin") || false;
   const onClick = isAdmin
     ? () => {
-        if (isAdmin) {
-          history.push(`/team/${currentWorkspaceId}/settings/billing`);
-          setModal("workspace-settings");
-        }
+        history.push(`/team/${currentWorkspaceId}/settings/billing`);
+        setModal("workspace-settings");
       }
     : undefined;
 

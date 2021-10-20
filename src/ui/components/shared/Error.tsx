@@ -79,9 +79,7 @@ function LibraryButton() {
     <button
       type="button"
       onClick={onClick}
-      className={classNames(
-        "w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
+      className="w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
     >
       Back to Library
     </button>
@@ -99,9 +97,7 @@ function TeamBillingButtonBase({ currentWorkspaceId, setModal }: BillingPropsFro
     <button
       type="button"
       onClick={onClick}
-      className={classNames(
-        "w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
+      className="w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
     >
       Update Subscription
     </button>
