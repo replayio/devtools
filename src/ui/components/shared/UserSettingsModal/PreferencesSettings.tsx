@@ -80,6 +80,8 @@ function PrivacyPreferences() {
     setDisableLogRocket(userSettings.disableLogRocket);
   }, [loading]);
 
+  if (loading) return null;
+
   return (
     <div className="space-y-4">
       <div className="text-lg">Privacy Preferences</div>
