@@ -85,12 +85,12 @@ export function SummaryExpression({
             }
           >
             {isTeamDeveloper ? (
-              "Editing logpoints is available for Developers in the Team plan"
-            ) : (
               <>
                 This log cannot be edited because <br />
                 it was hit {prefs.maxHitsDisplayed}+ times
               </>
+            ) : (
+              "Editing logpoints is available for Developers in the Team plan"
             )}
           </Popup>
         </>
