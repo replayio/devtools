@@ -35,8 +35,22 @@ Everybody's welcome to join us [on Discord](https://replay.io/discord/). We can 
 
 ### Running tests:
 
+To run the end-to-end tests make sure that devtools is running locally on port 8080 and run:
+
 ```
 node test/run.js [--pattern pat]
+```
+
+To run the unit tests:
+
+```
+npm test
+```
+
+Note that any options passed after `--` will be passed on to the test runner (jest). So, if you wanted jest to watch the project for changes and run tests when files were saved you could run:
+
+```
+npm test -- --watch
 ```
 
 #### Running tests against local builds of the browser

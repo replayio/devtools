@@ -163,3 +163,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/mockTest
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: npm install --force
+      - name: Run tests
+        run: npm test
