@@ -14,6 +14,7 @@ import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { findFunctionText } from "../../utils/function";
 import { getTruncatedFileName } from "../../utils/source";
+import { Redacted } from "ui/components/Redacted";
 
 import actions from "../../actions";
 import {
@@ -179,7 +180,9 @@ export class Outline extends Component {
         onContextMenu={e => this.onContextMenu(e, func)}
       >
         <span className="outline-list__element-icon">λ</span>
-        <PreviewFunction func={{ name, parameterNames }} />
+        <Redacted className="inline-block">
+          <PreviewFunction func={{ name, parameterNames }} />
+        </Redacted>
       </li>
     );
   }

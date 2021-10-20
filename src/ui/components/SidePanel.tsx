@@ -4,7 +4,6 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
-import { Redacted } from "./Redacted";
 const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPanes").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
@@ -14,17 +13,9 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
   let sidepanel;
 
   if (selectedPrimaryPanel === "explorer") {
-    sidepanel = (
-      <Redacted className="h-full">
-        <PrimaryPanes />
-      </Redacted>
-    );
+    sidepanel = <PrimaryPanes />;
   } else if (selectedPrimaryPanel === "debug") {
-    sidepanel = (
-      <Redacted className="h-full">
-        <SecondaryPanes />
-      </Redacted>
-    );
+    sidepanel = <SecondaryPanes />;
   } else if (selectedPrimaryPanel === "comments") {
     sidepanel = <Transcript />;
   } else if (selectedPrimaryPanel === "events") {
