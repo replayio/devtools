@@ -88,22 +88,30 @@ const TipTapEditor = ({
 
   useEffect(() => {
     if (takeFocus) {
-      console.log("taking focus");
       editor?.commands.focus("end");
     }
   }, [takeFocus]);
 
   return (
-    <EditorContent
-      className={classNames("outline-none w-full rounded-md py-1 px-2 transition", {
-        "bg-white": editable,
-        "border-gray-400": editable,
-        "cursor-text": editable,
-        border: editable,
-      })}
-      editor={editor}
-      onBlur={blur}
-    />
+    <div
+      className="w-full"
+      onClick={e => {
+        if (editable) {
+          e.stopPropagation();
+        }
+      }}
+    >
+      <EditorContent
+        className={classNames("outline-none w-full rounded-md py-1 px-2 transition", {
+          "bg-white": editable,
+          "border-gray-400": editable,
+          "cursor-text": editable,
+          border: editable,
+        })}
+        editor={editor}
+        onBlur={blur}
+      />
+    </div>
   );
 };
 

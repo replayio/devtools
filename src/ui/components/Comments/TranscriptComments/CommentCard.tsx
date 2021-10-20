@@ -106,11 +106,13 @@ function CommentItemHeader({
 }
 
 function CommentItem({
-  pendingComment,
   comment,
+  pendingComment,
+  type,
 }: {
-  pendingComment: PendingComment | null;
   comment: Comment | Reply;
+  pendingComment: PendingComment | null;
+  type: "comment" | "reply";
 }) {
   const isEditing = Boolean(pendingComment?.comment?.id == comment.id);
   const showOptions = !isEditing;
@@ -118,7 +120,11 @@ function CommentItem({
   return (
     <div className="space-y-1.5 group">
       <CommentItemHeader {...{ comment, showOptions }} />
-      <ExistingCommentEditor comment={comment} pendingComment={pendingComment} />
+      <ExistingCommentEditor
+        comment={comment}
+        type={type}
+        editable={pendingComment?.comment.id === comment.id}
+      />
     </div>
   );
 }
@@ -191,10 +197,10 @@ function CommentCard({
         })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
-        <CommentItem comment={comment as Comment} pendingComment={pendingComment} />
+        <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
         {comment.replies?.map((reply: Reply) => (
           <div key={reply.id}>
-            <CommentItem comment={reply} pendingComment={pendingComment} />
+            <CommentItem type="reply" comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
         {isPaused && !pendingComment ? (
