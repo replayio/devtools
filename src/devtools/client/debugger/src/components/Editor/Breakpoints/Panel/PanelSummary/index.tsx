@@ -52,7 +52,7 @@ function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const isEditable = !isHot && isTeamDeveloper;
+  const isEditable = Boolean(analysisPoints && !isHot && isTeamDeveloper);
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -93,7 +93,7 @@ function PanelSummary({
     return (
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
-          <Log value={logValue} hasCondition={!!conditionValue} isUnderMaxHitsEditable={!isHot} />
+          <Log isEditable={false} value={logValue} hasCondition={!!conditionValue} />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -111,8 +111,8 @@ function PanelSummary({
             </div>
           }
         >
-          This log is hidden from the console <br />
-          because it was hit {prefs.maxHitsDisplayed}+ times
+          This log cannot be edited because <br />
+          it was hit {prefs.maxHitsDisplayed}+ times
         </Popup>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -123,15 +123,11 @@ function PanelSummary({
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center flex-col flex-grow">
         {conditionValue ? (
-          <Condition
-            handleClick={handleClick}
-            isUnderMaxHitsEditable={!isHot}
-            value={conditionValue}
-          />
+          <Condition handleClick={handleClick} isEditable={isEditable} value={conditionValue} />
         ) : null}
         <Log
           handleClick={handleClick}
-          isUnderMaxHitsEditable={!isHot}
+          isEditable={isEditable}
           hasCondition={!!conditionValue}
           value={logValue}
         />
