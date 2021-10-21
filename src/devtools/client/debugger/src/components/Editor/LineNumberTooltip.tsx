@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { ReplayLogo } from "ui/components/shared/Onboarding";
+import ReplayLogo from "ui/components/shared/ReplayLogo";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
