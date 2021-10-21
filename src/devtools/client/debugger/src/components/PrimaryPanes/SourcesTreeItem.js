@@ -11,6 +11,7 @@ import { showMenu } from "devtools-contextmenu";
 
 import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
+import { Redacted } from "ui/components/Redacted";
 
 import {
   getGeneratedSourceByURL,
@@ -30,7 +31,6 @@ import {
 } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
-import { features } from "../../utils/prefs";
 import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
 
@@ -237,10 +237,11 @@ class SourceTreeItem extends Component {
       >
         {this.renderItemArrow()}
         {this.renderIcon(item, depth)}
-        <span className="label">
+
+        <Redacted className="label">
           {this.renderItemName(depth)}
           {query} {suffix}
-        </span>
+        </Redacted>
       </div>
     );
   }

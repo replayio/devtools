@@ -13,6 +13,7 @@ import { setUnexpectedError } from "ui/actions/session";
 import A11yIntention from "./A11yIntention";
 import { ShortcutsModal } from "./ShortcutsModal";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import { Redacted } from "ui/components/Redacted";
 
 import {
   getActiveSearch,
@@ -53,14 +54,6 @@ import { isDemo } from "ui/utils/environment";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 
 class Debugger extends Component {
-  onLayoutChange;
-  getChildContext;
-  renderEditorPane;
-  renderLayout;
-  toggleQuickOpenModal;
-  onEscape;
-  onCommandSlash;
-
   state = {
     shortcutsModalEnabled: false,
   };
@@ -177,7 +170,7 @@ class Debugger extends Component {
     const horizontal = this.isHorizontal();
 
     return (
-      <div className="editor-pane">
+      <Redacted className="editor-pane">
         <div className="editor-container">
           {!isDemo() && <EditorTabs horizontal={horizontal} />}
           <Editor />
@@ -190,7 +183,7 @@ class Debugger extends Component {
           {!isDemo() && <EditorFooter horizontal={horizontal} />}
           <ProjectSearch />
         </div>
-      </div>
+      </Redacted>
     );
   };
 
