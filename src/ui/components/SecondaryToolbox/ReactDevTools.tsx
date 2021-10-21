@@ -9,7 +9,7 @@ import { Annotation } from "ui/state/reactDevTools";
 import { getAnnotations, getCurrentPoint } from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive } from "ui/actions/app";
 import { setHasReactComponents } from "ui/actions/reactDevTools";
-import Highlighter from "highlighter/highlighter.js";
+import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 

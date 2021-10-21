@@ -247,13 +247,13 @@ CanvasFrameAnonymousContentHelper.prototype = {
     const node = this.nodeBuilder();
 
     const container = document.getElementById("highlighter-root");
-    container.appendChild(node);
+    container?.appendChild(node);
     this._content = node;
   },
 
   _remove() {
     const container = document.getElementById("highlighter-root");
-    if (container.firstChild) {
+    if (container && container.firstChild) {
       container.removeChild(container.firstChild);
     }
     this._content = null;
