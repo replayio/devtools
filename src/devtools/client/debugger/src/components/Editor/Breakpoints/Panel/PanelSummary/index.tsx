@@ -40,10 +40,7 @@ function PanelSummary({
   const logValue = breakpoint.options.logValue;
 
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
-  const isUnderMaxHitsEditable = !!(
-    analysisPoints && analysisPoints.length < prefs.maxHitsEditable
-  );
-  const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
+  const isEditable = Boolean(analysisPoints && !isHot && isTeamDeveloper);
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -75,7 +72,7 @@ function PanelSummary({
     return (
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
-          <Log value={logValue} hasCondition={!!conditionValue} {...{ isUnderMaxHitsEditable }} />
+          <Log value={logValue} hasCondition={!!conditionValue} />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -105,15 +102,11 @@ function PanelSummary({
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center flex-col flex-grow">
         {conditionValue ? (
-          <Condition
-            handleClick={handleClick}
-            isUnderMaxHitsEditable={isUnderMaxHitsEditable}
-            value={conditionValue}
-          />
+          <Condition handleClick={handleClick} isEditable={isEditable} value={conditionValue} />
         ) : null}
         <Log
           handleClick={handleClick}
-          isUnderMaxHitsEditable={isUnderMaxHitsEditable}
+          isEditable={isEditable}
           hasCondition={!!conditionValue}
           value={logValue}
         />

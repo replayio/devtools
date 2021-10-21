@@ -9,7 +9,7 @@ const { prefs } = require("ui/utils/prefs");
 
 export interface SummaryExpressionProps {
   value: string;
-  isUnderMaxHitsEditable: boolean;
+  isEditable: boolean;
 }
 
 function getSyntaxHighlightedMarkup(string: string) {
@@ -45,14 +45,13 @@ function Expression({ value, isEditable }: { value: string; isEditable: boolean 
 }
 
 export function SummaryExpression({
-  isUnderMaxHitsEditable,
+  isEditable,
   handleClick,
   value,
 }: SummaryExpressionProps & {
   handleClick: (event: React.MouseEvent) => void;
 }) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
-  const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
 
   return (
     <button
