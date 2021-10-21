@@ -4,7 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
-import { Plugin, PluginKey } from "prosemirror-state";
+import { GitHubLink } from "./githubLink";
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -46,6 +46,7 @@ const TipTapEditor = ({
   const editor = useEditor({
     extensions: [
       StarterKit,
+      GitHubLink,
       // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
       Placeholder.configure({ placeholder }),
       Extension.create({
