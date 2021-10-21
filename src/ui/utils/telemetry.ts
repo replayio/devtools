@@ -8,6 +8,7 @@ import { prefs } from "./prefs";
 import { UserInfo } from "ui/hooks/users";
 
 let mixpanelDisabled = false;
+const timings: any = {};
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -62,6 +63,8 @@ type TelemetryUser = {
 };
 
 let telemetryUser: TelemetryUser | undefined;
+let telemetryProperties: any = {};
+
 let workspaceContext: Workspace | undefined;
 
 export function setWorkspaceContext(workspace: Workspace) {
@@ -129,4 +132,15 @@ export async function trackEvent(event: string, additionalContext?: Object) {
   }
 
   mixpanel.track(event, context);
+}
+
+export function trackTiming(event: string, properties: any = {}) {
+  if (!timings[event]) {
+    timings[event] = new Date();
+  }
+
+  const duration: number = new Date() - timings[event];
+  delete timings[event];
+
+  sendTelemetryEvent(event, { duration, ...properties });
 }

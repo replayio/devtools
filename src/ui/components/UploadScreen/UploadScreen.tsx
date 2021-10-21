@@ -9,7 +9,7 @@ import { Recording, UserSettings, Workspace } from "ui/types";
 import { LoadingScreen } from "../shared/BlankScreen";
 import MaterialIcon from "../shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { trackEvent } from "ui/utils/telemetry";
+import { trackEvent, trackTiming } from "ui/utils/telemetry";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 const { isDemoReplay } = require("ui/utils/demo");
 
@@ -285,6 +285,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
     setStatus("saving");
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
+    trackTiming("kpi-time-to-view-replay");
     trackEvent(isDemoReplay(recording) ? "create demo replay" : "create replay");
 
     await initializeRecording({

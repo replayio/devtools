@@ -32,6 +32,7 @@ import { compareBigInt } from "ui/utils/helpers";
 import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
+import { trackTiming } from "ui/utils/telemetry";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -237,6 +238,9 @@ export function setDisplayedLoadingProgress(
 }
 
 export function setLoadingFinished(finished: boolean): SetLoadingFinishedAction {
+  if (finished) {
+    trackTiming("kpi-time-to-view-replay");
+  }
   return { type: "set_loading_finished", finished };
 }
 
