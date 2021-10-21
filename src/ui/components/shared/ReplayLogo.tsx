@@ -34,14 +34,14 @@ export default function ReplayLogo({
   wide,
   size = "lg",
 }: {
-  color?: "white" | "gray" | "fuschia";
+  color?: keyof typeof logoColors;
   wide?: boolean;
   size?: keyof typeof logoSizes;
 }) {
   const height = `h-${logoSizes[size]}`;
 
   if (wide) {
-    return <img className={`${height} w-auto`} src={"/images/logo-wide.svg"} />;
+    return <img className={`${height} w-auto`} src="/images/logo-wide.svg" />;
   }
 
   const colorCode = logoColors[color];
