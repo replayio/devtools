@@ -453,7 +453,7 @@ function isError(message) {
 
 // messages with a resource:///modules path are considered internal
 function isBrowserInternalMessage(msg) {
-  return msg.match(/resource:\/\/\/modules\/\S+\.jsm/);
+  return msg?.match(/resource:\/\/\/modules\/\S+\.jsm/);
 }
 
 module.exports = {
