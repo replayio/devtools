@@ -18,7 +18,7 @@ loader.lazyRequireGetter(
   "devtools/client/shared/widgets/tooltip/RulePreviewTooltip"
 );
 
-const Highlighter = require("highlighter/highlighter");
+const Highlighter = require("highlighter/highlighter").default;
 
 const NUMERIC = /^-?[\d\.]+$/;
 
