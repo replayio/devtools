@@ -7,6 +7,7 @@ import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
 const { prefs } = require("ui/utils/prefs");
 import "./LineNumberTooltip.css";
 import StaticTooltip from "./StaticTooltip";
@@ -66,6 +67,13 @@ function LineNumberTooltip({
       editor.codeMirror.off("gutterLineLeave", clearHoveredLineNumber);
     };
   }, []);
+
+  useEffect(() => {
+    if (analysisPoints)
+      trackEvent(
+        analysisPoints.length ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits"
+      );
+  }, [analysisPoints]);
 
   if (!lineNumberNode) {
     return null;

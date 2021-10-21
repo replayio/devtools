@@ -9,6 +9,7 @@ import classnames from "classnames";
 const { MODE } = require("../../reps/constants");
 const Utils = require("../utils");
 import { Item } from "./ObjectInspector";
+import { trackEvent } from "ui/utils/telemetry";
 const {
   nodeHasAccessors,
   nodeHasProperties,
@@ -223,6 +224,7 @@ class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
           onLabelClick
             ? (event: React.MouseEvent) => {
                 event.stopPropagation();
+                trackEvent("object_inspector.label_click");
 
                 // If the user selected text, bail out.
                 if (Utils.selection.documentHasSelection((event.target as Element).ownerDocument)) {

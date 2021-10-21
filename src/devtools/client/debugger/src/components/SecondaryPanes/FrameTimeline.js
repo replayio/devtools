@@ -13,6 +13,7 @@ import { actions } from "ui/actions";
 import classnames from "classnames";
 import "./FrameTimeline.css";
 import ReactTooltip from "react-tooltip";
+import { trackEvent } from "ui/utils/telemetry";
 
 function getBoundingClientRect(element) {
   if (!element) {
@@ -88,6 +89,7 @@ class FrameTimeline extends Component {
 
   onMouseDown = event => {
     const progress = this.getProgress(event.clientX);
+    trackEvent("frame_timeline.start");
     this.setState({ scrubbing: true, scrubbingProgress: progress });
   };
 

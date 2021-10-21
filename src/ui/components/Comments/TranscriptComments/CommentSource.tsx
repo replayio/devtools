@@ -5,6 +5,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { trackEvent } from "ui/utils/telemetry";
 
 type PropsFromParent = {
   comment: any;
@@ -34,6 +35,7 @@ function CommentSource({
 
   const onSelectSource = () => {
     setViewMode("dev");
+    trackEvent("comments.select_location");
     selectLocation(context, comment.sourceLocation);
   };
 

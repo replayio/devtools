@@ -13,6 +13,7 @@ import Tab from "./Tab";
 import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
 import { isPretty } from "../../utils/source";
 import actions from "../../actions";
+import { trackEvent } from "ui/utils/telemetry";
 
 import "./Tabs.css";
 
@@ -94,11 +95,13 @@ class Tabs extends PureComponent {
   }
 
   onTabDragStart = (source, index) => {
+    trackEvent("tabs.drag_start");
     this.draggedSource = source;
     this.draggedSourceIndex = index;
   };
 
   onTabDragEnd = () => {
+    trackEvent("tabs.drag_stop");
     this.draggedSource = null;
     this.draggedSourceIndex = null;
   };

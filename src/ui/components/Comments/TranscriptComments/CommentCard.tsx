@@ -18,6 +18,7 @@ import differenceInYears from "date-fns/differenceInYears";
 
 import { AvatarImage } from "ui/components/Avatar";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
+import { trackEvent } from "ui/utils/telemetry";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function formatRelativeTime(date: Date) {
@@ -161,7 +162,10 @@ function CommentCard({
         className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
         onMouseEnter={() => setHoveredComment("pendingCommentId")}
         onMouseLeave={() => setHoveredComment(null)}
-        onClick={() => setIsFocused(true)}
+        onClick={() => {
+          trackEvent("comments.focus");
+          setIsFocused(true);
+        }}
       >
         <div className={classNames("py-2.5 w-full border-l-2 border-secondaryAccent")}>
           <div className={classNames("px-2.5 pl-2 space-y-2")}>

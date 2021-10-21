@@ -35,6 +35,7 @@ import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
 import Trimmer from "./Trimmer";
 import TrimButton from "./TrimButton";
+import { trackEvent } from "ui/utils/telemetry";
 
 function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
   return (
@@ -127,6 +128,7 @@ class Timeline extends Component<PropsFromRedux> {
     const hoveringOverMarker = !!hoveredComment;
     const mouseTime = this.getMouseTime(e);
 
+    trackEvent("timeline.progress_select");
     if (isTrimming) {
       return;
     }
@@ -163,7 +165,7 @@ class Timeline extends Component<PropsFromRedux> {
     const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
       if (disabled) return;
-
+      trackEvent("timeline.replay");
       clearPendingComment();
       replayPlayback();
     };
@@ -172,8 +174,10 @@ class Timeline extends Component<PropsFromRedux> {
 
       clearPendingComment();
       if (playback) {
+        trackEvent("timeline.pause");
         stopPlayback();
       } else {
+        trackEvent("timeline.play");
         startPlayback();
       }
     };

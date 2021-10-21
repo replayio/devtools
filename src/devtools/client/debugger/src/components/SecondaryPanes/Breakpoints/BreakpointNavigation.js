@@ -8,6 +8,7 @@ import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 const { prefs } = require("ui/utils/prefs");
+const { trackEvent } = require("ui/utils/telemetry");
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import "./BreakpointNavigation.css";
@@ -26,6 +27,7 @@ function BreakpointNavigation({
   const [lastExecutionPoint, setLastExecutionPoint] = useState(null);
 
   const navigateToPoint = point => {
+    trackEvent("breakpoint.navigate");
     if (point) {
       seek(point.point, point.time, true);
     }
@@ -45,6 +47,14 @@ function BreakpointNavigation({
     if (executionPoint && lastExecutionPoint !== executionPoint)
       setLastExecutionPoint(executionPoint);
   }, [executionPoint]);
+
+  useEffect(() => {
+    if (analysisPoints) {
+      trackEvent(analysisPoints.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
+        hits: analysisPoints.length,
+      });
+    }
+  }, [analysisPoints]);
 
   return (
     <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>

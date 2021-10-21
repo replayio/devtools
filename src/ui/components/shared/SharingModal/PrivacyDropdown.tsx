@@ -5,6 +5,7 @@ import { WorkspaceId } from "ui/state/app";
 import { Recording } from "ui/types";
 import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
+import { trackEvent } from "ui/utils/telemetry";
 
 export default function PrivacyDropdown({ recording }: { recording: Recording }) {
   const [expanded, setExpanded] = useState(false);
@@ -16,12 +17,14 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
 
   const setPublic = () => {
+    trackEvent("share_modal.set_public");
     if (isPrivate) {
       toggleIsPrivate();
     }
     setExpanded(false);
   };
   const setPrivate = () => {
+    trackEvent("share_modal.set_private");
     if (!isPrivate) {
       toggleIsPrivate();
     }
@@ -29,6 +32,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   };
   const handleMoveToTeam = (targetWorkspaceId: WorkspaceId | null) => {
     if (targetWorkspaceId !== workspaceId) {
+      trackEvent("share_modal.set_team");
       updateRecordingWorkspace(recording.id, workspaceId, targetWorkspaceId);
     }
 

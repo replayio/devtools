@@ -10,15 +10,15 @@ import actions from "../../actions";
 import { features } from "../../utils/prefs";
 
 import {
-  getSelectedSource,
   getSelectedFrame,
   getFrameScope,
   getPauseReason,
   getThreadContext,
   getLastExpandedScopes,
 } from "../../selectors";
-import { getScopes, ScopeFront } from "../../utils/pause/scopes";
+import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
+import { trackEvent } from "ui/utils/telemetry";
 
 const { objectInspector } = require("devtools-reps");
 
@@ -162,7 +162,10 @@ class Scopes extends PureComponent {
             onDOMNodeMouseOver={grip => highlightDomElement(grip)}
             onDOMNodeMouseOut={grip => unHighlightDomElement(grip)}
             onContextMenu={this.onContextMenu}
-            setExpanded={(path, expand) => setExpandedScope(cx, path, expand)}
+            setExpanded={(path, expand) => {
+              trackEvent("scopes.set_expanded");
+              setExpandedScope(cx, path, expand);
+            }}
             initiallyExpanded={initiallyExpanded}
             renderItemActions={this.renderWatchpointButton}
           />
