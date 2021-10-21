@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
@@ -15,6 +14,7 @@ import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
+import { trackEvent } from "ui/utils/telemetry";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -38,6 +38,7 @@ function PanelButtons({
 
   const onClick = (panel: PanelName) => {
     setSelectedPanel(panel);
+    trackEvent(`toolbox.secondary.${panel}_select`);
 
     // The comments panel doesn't have to be initialized by the toolbox,
     // only the console and the inspector.

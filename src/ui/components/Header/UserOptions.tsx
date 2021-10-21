@@ -9,6 +9,7 @@ import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
 import { features } from "ui/utils/prefs";
+import { trackEvent } from "ui/utils/telemetry";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
@@ -34,6 +35,8 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   }
 
   const onDocsClick: React.MouseEventHandler = event => {
+    trackEvent("user_options.select_docs");
+
     const docsUrl = `https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02`;
 
     if (event.metaKey) {
@@ -43,6 +46,8 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   };
   const onLaunchClick: React.MouseEventHandler = event => {
     setExpanded(false);
+    trackEvent("user_options.launch_replay");
+
     if (features.launchBrowser) {
       setModal("browser-launch");
     } else {
@@ -56,10 +61,14 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   };
   const onShareClick = () => {
     setExpanded(false);
+    trackEvent("user_options.select_share");
+
     setModal("sharing", { recordingId });
   };
   const onSettingsClick = () => {
     setExpanded(false);
+    trackEvent("user_options.select_settings");
+
     setModal("settings");
   };
 

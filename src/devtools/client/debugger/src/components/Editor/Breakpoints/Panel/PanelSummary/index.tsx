@@ -11,6 +11,7 @@ import { selectors } from "ui/reducers";
 
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
+const { trackEvent } = require("ui/utils/telemetry");
 
 import "reactjs-popup/dist/index.css";
 import "ui/components/reactjs-popup.css";
@@ -61,6 +62,8 @@ function PanelSummary({
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    trackEvent("breakpoint.add_comment");
 
     if (pausedOnHit) {
       console.log("createFrameComment", currentTime, executionPoint, breakpoint);

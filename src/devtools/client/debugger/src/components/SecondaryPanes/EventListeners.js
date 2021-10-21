@@ -13,8 +13,10 @@ import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
 import { features } from "ui/utils/prefs";
+import { trackEvent } from "ui/utils/telemetry";
 
 import "./EventListeners.css";
+import { track } from "react-dom-factories";
 
 const mouseClicks = [
   "event.mouse.auxclick",
@@ -66,6 +68,8 @@ class EventListeners extends Component {
       addEventListenerExpanded,
     } = this.props;
 
+    trackEvent("console.events.category_toggle");
+
     if (expandedCategories.includes(category)) {
       removeEventListenerExpanded(category);
     } else {
@@ -77,6 +81,7 @@ class EventListeners extends Component {
     const { addEventListeners, removeEventListeners } = this.props;
 
     if (isChecked) {
+      trackEvent("console.events.category_select");
       addEventListeners(eventIds);
     } else {
       removeEventListeners(eventIds);
@@ -102,11 +107,12 @@ class EventListeners extends Component {
     }
   };
 
-  onFocus = event => {
+  onFocus = () => {
+    trackEvent("console.events.search");
     this.setState({ focused: true });
   };
 
-  onBlur = event => {
+  onBlur = () => {
     this.setState({ focused: false });
   };
 

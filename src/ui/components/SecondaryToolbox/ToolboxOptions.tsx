@@ -8,6 +8,7 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import classNames from "classnames";
 import MaterialIcon from "../shared/MaterialIcon";
+import { trackEvent } from "ui/utils/telemetry";
 
 function ToolboxOptions({
   showVideoPanel,
@@ -48,7 +49,10 @@ function ToolboxOptions({
                     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     "block px-4 py-2"
                   )}
-                  onClick={() => setShowVideoPanel(!showVideoPanel)}
+                  onClick={() => {
+                    trackEvent("toolbox.secondary.video_toggle");
+                    setShowVideoPanel(!showVideoPanel);
+                  }}
                 >
                   {`${showVideoPanel ? "Hide" : "Show"} Video`}
                 </a>
@@ -62,7 +66,10 @@ function ToolboxOptions({
                     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     "block px-4 py-2"
                   )}
-                  onClick={() => setShowEditor(!showEditor)}
+                  onClick={() => {
+                    trackEvent("toolbox.secondary.editor_toggle");
+                    setShowEditor(!showEditor);
+                  }}
                 >
                   {`${showEditor ? "Hide" : "Show"} Editor`}
                 </a>

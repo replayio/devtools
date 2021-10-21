@@ -250,8 +250,9 @@ export function setBreakpointOptions(cx, location, options = {}) {
 
     // Note: setting a breakpoint's options implicitly enables it.
     breakpoint = { ...breakpoint, disabled: false, options };
-
     trackEvent("edit breakpoint");
+    trackEvent("breakpoint.edit");
+
     dispatch({
       type: "SET_BREAKPOINT",
       cx,

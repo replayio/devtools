@@ -34,6 +34,7 @@ import {
 } from "../../selectors";
 
 import classnames from "classnames";
+import { trackEvent } from "ui/utils/telemetry";
 
 class Tab extends PureComponent {
   onTabContextMenu = (event, tab) => {
@@ -56,6 +57,7 @@ class Tab extends PureComponent {
       ensureSourcesIsVisible,
     } = this.props;
 
+    trackEvent("tabs.context_menu");
     const tabCount = tabSources.length;
     const otherTabs = tabSources.filter(t => t.id !== tab);
     const sourceTab = tabSources.find(t => t.id == tab);
@@ -169,12 +171,14 @@ class Tab extends PureComponent {
 
     function onClickClose(e) {
       e.stopPropagation();
+      trackEvent("tabs.close");
       closeTab(cx, source);
     }
 
     function handleTabClick(e) {
       e.preventDefault();
       e.stopPropagation();
+      trackEvent("tabs.select");
       return selectSource(cx, sourceId);
     }
 

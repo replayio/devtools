@@ -8,6 +8,7 @@ import "./CommentActions.css";
 import classNames from "classnames";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { trackEvent } from "ui/utils/telemetry";
 
 type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
@@ -37,6 +38,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     }. \n\nAre you sure you want to proceed?`;
 
     if (window.confirm(message)) {
+      trackEvent("comments.delete");
       if (isRoot) {
         deleteComment(comment.id, recordingId!);
       } else {
@@ -47,6 +49,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   const editComment = (e: React.MouseEvent) => {
     e.stopPropagation();
     setExpanded(false);
+    trackEvent("comments.start_edit");
 
     editItem(comment);
   };

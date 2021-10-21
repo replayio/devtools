@@ -15,6 +15,7 @@ import { isDemo } from "ui/utils/environment";
 import "./Toolbox.css";
 import { useIntercom } from "react-use-intercom";
 import useAuth0 from "ui/utils/useAuth0";
+import { trackEvent } from "ui/utils/telemetry";
 
 function IndexingLoader({
   progressPercentage,
@@ -65,10 +66,12 @@ function Toolbar({
 }: PropsFromRedux) {
   const onClick = (panel: PrimaryPanelName) => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
+      trackEvent(`toolbox.toggle_sidebar`);
       togglePaneCollapse();
     }
 
     if (selectedPrimaryPanel != panel) {
+      trackEvent(`toolbox.primary.${panel}_select`);
       setSelectedPrimaryPanel(panel);
     }
   };

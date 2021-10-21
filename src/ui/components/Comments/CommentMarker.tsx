@@ -7,6 +7,7 @@ import { actions } from "ui/actions";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
+import { trackEvent } from "ui/utils/telemetry";
 
 const markerWidth = 19;
 
@@ -37,6 +38,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
 
   onClick = () => {
     const { comment, seekToComment } = this.props;
+    trackEvent("timeline.comment_select");
     seekToComment(comment);
   };
 

@@ -18,6 +18,7 @@ import { UIState } from "ui/state";
 import "./Header.css";
 import classNames from "classnames";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
+import { trackEvent } from "ui/utils/telemetry";
 
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   const { users, loading, error } = useGetActiveSessions(
@@ -83,7 +84,10 @@ function HeaderTitle({
       inputNode.current!.blur();
     }
   };
-  const onFocus = () => editing === EditState.Inactive && setEditing(EditState.Active);
+  const onFocus = () => {
+    trackEvent("header.edit_title");
+    return editing === EditState.Inactive && setEditing(EditState.Active);
+  };
   const onBlur = () => {
     if (editing !== EditState.Active) return;
     const currentValue = inputNode.current!.textContent;

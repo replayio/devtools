@@ -3,6 +3,7 @@ const { useState } = React;
 const EventListeners = require("devtools/client/debugger/src/components/SecondaryPanes/EventListeners")
   .default;
 const Dropdown = require("ui/components/shared/Dropdown").default;
+const { trackEvent } = require("ui/utils/telemetry");
 
 require("./Events.css");
 
@@ -20,7 +21,12 @@ export function Events() {
     <div className="event-breakpoints text-xs">
       <Dropdown
         buttonContent={buttonContent}
-        setExpanded={setExpanded}
+        setExpanded={expanded => {
+          if (expanded) {
+            trackEvent("console.events.open");
+          }
+          setExpanded(expanded);
+        }}
         expanded={expanded}
         buttonStyle={"secondary"}
       >
