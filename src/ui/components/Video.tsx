@@ -8,6 +8,7 @@ import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UIState } from "ui/state";
+import ReplayLogo from "./shared/ReplayLogo";
 
 function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
@@ -58,7 +59,10 @@ function Video({
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
 
   return (
-    <div id="video">
+    <div id="video" className="bg-toolbarBackground">
+      <div className="absolute w-full h-full flex items-center justify-center">
+        <ReplayLogo size="sm" color="gray" />
+      </div>
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {showCommentTool ? (
