@@ -1,20 +1,24 @@
 import React from "react";
 import { Workspace } from "ui/types";
+import { MY_LIBRARY, personalWorkspace } from "./Sharing";
 
 const getIconAndText = (
   isPublic: boolean,
-  selectedWorkspaceId: string | null,
+  selectedWorkspaceId: string,
   workspaceName: string
-) => {
+): {
+  text: string;
+  icon: string;
+} => {
   let text, icon;
 
   if (!isPublic) {
-    if (selectedWorkspaceId) {
-      text = `Shared privately with ${workspaceName}`;
-      icon = "groups";
-    } else {
+    if ((selectedWorkspaceId = MY_LIBRARY)) {
       text = `Only you can view this`;
       icon = "person";
+    } else {
+      text = `Shared privately with ${workspaceName}`;
+      icon = "groups";
     }
   } else {
     text = "This replay can be viewed by anyone with the link";
@@ -24,18 +28,19 @@ const getIconAndText = (
   return { text, icon };
 };
 
+type SettingsPreviewProps = {
+  onClick: () => void;
+  isPublic: boolean;
+  workspaces: Workspace[];
+  selectedWorkspaceId: string;
+};
+
 export default function SettingsPreview({
   onClick,
   isPublic,
   workspaces,
   selectedWorkspaceId,
-}: {
-  onClick: () => void;
-  isPublic: boolean;
-  workspaces: Workspace[];
-  selectedWorkspaceId: string | null;
-}) {
-  const personalWorkspace = { id: null, name: "My Library" };
+}: SettingsPreviewProps) {
   const workspaceName = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId)!
     .name;
 

@@ -8,7 +8,7 @@ import { LoadingScreen } from "../shared/BlankScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
 import BubbleBackground from "../shared/Onboarding/BubbleBackground";
-import Sharing from "./Sharing";
+import Sharing, { MY_LIBRARY } from "./Sharing";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
@@ -98,8 +98,8 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
   // Before being initialized, public/private behaves similarly since non-authors
   // can't view the replay.
   const [isPublic, setIsPublic] = useState(false);
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
-    userSettings?.defaultWorkspaceId || null
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(
+    userSettings?.defaultWorkspaceId || MY_LIBRARY
   );
 
   const initializeRecording = hooks.useInitializeRecording();

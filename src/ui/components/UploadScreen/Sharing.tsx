@@ -5,10 +5,13 @@ import { Workspace } from "ui/types";
 import { Toggle } from "../shared/Forms";
 import SettingsPreview from "./SettingsPreview";
 
+export const MY_LIBRARY = "My Library";
+export const personalWorkspace = { id: MY_LIBRARY, name: MY_LIBRARY };
+
 type SharingProps = {
   workspaces: Workspace[];
-  selectedWorkspaceId: string | null;
-  setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
+  selectedWorkspaceId: string;
+  setSelectedWorkspaceId: Dispatch<SetStateAction<string>>;
   isPublic: boolean;
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 };
@@ -21,7 +24,7 @@ function EditableSettings({
   setIsPublic,
 }: Omit<SharingProps, "showSharingSettings">) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-  const handleWorkspaceSelect = (id: string | null) => {
+  const handleWorkspaceSelect = (id: string) => {
     updateDefaultWorkspace({
       variables: { workspaceId: id },
     });
@@ -46,15 +49,14 @@ function EditableSettings({
 
 export default function Sharing(props: SharingProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const toggleIsEditing = () => setIsEditing(!isEditing);
 
-  let content;
-
-  if (isEditing) {
-    content = <EditableSettings {...props} />;
-  } else {
-    content = <SettingsPreview {...props} onClick={toggleIsEditing} />;
-  }
-
-  return <div className="relative border-t border-gray-300 py-10 px-8">{content}</div>;
+  return (
+    <div className="relative border-t border-gray-300 py-10 px-8">
+      {isEditing ? (
+        <EditableSettings {...props} />
+      ) : (
+        <SettingsPreview {...props} onClick={() => setIsEditing(!isEditing)} />
+      )}
+    </div>
+  );
 }

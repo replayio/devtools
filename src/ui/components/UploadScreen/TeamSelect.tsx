@@ -3,6 +3,7 @@ import { Workspace } from "ui/types";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";
 import { SelectorIcon } from "@heroicons/react/solid";
+import { personalWorkspace } from "./Sharing";
 
 const TeamSelectButton = ({ selectedWorkspaceName }: { selectedWorkspaceName: string }) => {
   return (
@@ -21,11 +22,10 @@ export default function TeamSelect({
   handleWorkspaceSelect,
 }: {
   workspaces: Workspace[];
-  selectedWorkspaceId: string | null;
-  handleWorkspaceSelect: (id: string | null) => void;
+  selectedWorkspaceId: string;
+  handleWorkspaceSelect: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const personalWorkspace = { id: null, name: "My Library" };
   const displayedWorkspaces = [personalWorkspace, ...workspaces].sort();
 
   const handleSelect = (workspace: Workspace | typeof personalWorkspace) => {
@@ -47,9 +47,9 @@ export default function TeamSelect({
     >
       <Dropdown widthClass="w-64">
         <div className="max-h-48 overflow-auto">
-          {displayedWorkspaces.map(w => (
-            <DropdownItem onClick={() => handleSelect(w)} key={w.id}>
-              {w.name}
+          {displayedWorkspaces.map(workspace => (
+            <DropdownItem onClick={() => handleSelect(workspace)} key={workspace.id}>
+              {workspace.name}
             </DropdownItem>
           ))}
         </div>

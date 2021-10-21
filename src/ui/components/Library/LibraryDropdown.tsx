@@ -31,7 +31,7 @@ export function Dropdown({
   menuItemsClassName,
   widthClass = "w-56",
 }: {
-  children: React.ReactElement | (React.ReactElement | null)[];
+  children: React.ReactNode;
   menuItemsClassName?: string;
   widthClass?: "w-56" | "w-64" | "w-80";
 }) {
