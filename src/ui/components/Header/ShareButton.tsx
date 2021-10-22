@@ -2,10 +2,14 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { trackEvent } from "ui/utils/telemetry";
 
 function ShareButton({ setModal }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
-  const onClick = () => setModal("sharing", { recordingId: recordingId! });
+  const onClick = () => {
+    trackEvent("header.open_share");
+    setModal("sharing", { recordingId: recordingId! });
+  };
 
   return (
     <button

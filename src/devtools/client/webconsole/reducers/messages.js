@@ -14,6 +14,7 @@ const { getSourceNames } = require("devtools/client/shared/source-utils");
 const { log } = require("protocol/socket");
 const { assert, compareNumericStrings } = require("protocol/utils");
 const { appendToHistory } = require("ui/utils/commandHistory");
+const { isGroupType } = require("devtools/client/webconsole/utils/messages");
 
 const MessageState = overrides =>
   Object.freeze(
@@ -173,6 +174,63 @@ function messages(state = MessageState(), action) {
 
     case constants.MESSAGES_CLEAR:
       return MessageState({});
+
+    case constants.MESSAGE_OPEN:
+      const openState = { ...state };
+      openState.messagesUiById = [...messagesUiById, action.id];
+      const currMessage = messagesById.get(action.id);
+
+      // If the message is a console.group/groupCollapsed or a warning group.
+      if (currMessage && isGroupType(currMessage.type)) {
+        // We want to make its children visible
+        const messagesToShow = [...messagesById].reduce((res, [id, message]) => {
+          if (
+            !visibleMessages.includes(message.id) &&
+            isGroupType(currMessage.type) &&
+            getParentGroups(message.groupId, groupsById).includes(action.id) &&
+            getMessageVisibility(message, {
+              messagesState: openState,
+              filtersState,
+              // We want to check if the message is in an open group
+              // only if it is not a direct child of the group we're opening.
+              checkGroup: message.groupId !== action.id,
+            }).visible
+          ) {
+            res.push(id);
+          }
+          return res;
+        }, []);
+
+        // We can then insert the messages ids right after the one of the group.
+        const insertIndex = visibleMessages.indexOf(action.id) + 1;
+        openState.visibleMessages = [
+          ...visibleMessages.slice(0, insertIndex),
+          ...messagesToShow,
+          ...visibleMessages.slice(insertIndex),
+        ];
+      }
+
+      return openState;
+
+    case constants.MESSAGE_CLOSE:
+      console.log("MESAGE CLOSE");
+      const closeState = { ...state };
+      const messageId = action.id;
+      const index = closeState.messagesUiById.indexOf(messageId);
+      closeState.messagesUiById.splice(index, 1);
+      closeState.messagesUiById = [...closeState.messagesUiById];
+
+      // If the message is a group
+      if (isGroupType(messagesById.get(messageId).type)) {
+        // Hide all its children
+        closeState.visibleMessages = visibleMessages.filter((id, i, arr) => {
+          const message = messagesById.get(id);
+
+          const parentGroups = getParentGroups(message.groupId, groupsById);
+          return parentGroups.includes(messageId) === false;
+        });
+      }
+      return closeState;
 
     case constants.MESSAGES_CLEAR_EVALUATIONS: {
       const removedIds = [];

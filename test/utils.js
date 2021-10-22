@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const os = require("os");
+const https = require("https");
 const { spawnSync } = require("child_process");
 
 const GeckoInstallDirectories = [
@@ -85,4 +86,37 @@ function defer() {
   return { promise, resolve, reject };
 }
 
-module.exports = { findGeckoPath, createTestScript, tmpFile, spawnChecked, defer };
+function sendTelemetryEvent(telemetryEvent, tags) {
+  if (!process.env.INPUT_GITHUB_CI) {
+    return;
+  }
+
+  const options = {
+    hostname: "telemetry.replay.io",
+    por: 443,
+    path: "/",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  try {
+    const request = https.request(options, () => {});
+    request.on("error", e => {
+      log(`Error sending telemetry ping: ${e}`);
+    });
+    request.write(JSON.stringify({ event: telemetryEvent, ...tags }));
+    request.end();
+  } catch (e) {
+    console.error(`Couldn't send telemetry event ${telemetryEvent}`, e);
+  }
+}
+
+module.exports = {
+  findGeckoPath,
+  createTestScript,
+  tmpFile,
+  sendTelemetryEvent,
+  spawnChecked,
+  defer,
+};

@@ -2,11 +2,12 @@ import React, { useRef, useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { ReplayLogo } from "ui/components/shared/Onboarding";
+import ReplayLogo from "ui/components/shared/ReplayLogo";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
 const { prefs } = require("ui/utils/prefs");
 import "./LineNumberTooltip.css";
 import StaticTooltip from "./StaticTooltip";
@@ -67,6 +68,13 @@ function LineNumberTooltip({
     };
   }, []);
 
+  useEffect(() => {
+    if (analysisPoints)
+      trackEvent(
+        analysisPoints.length ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits"
+      );
+  }, [analysisPoints]);
+
   if (!lineNumberNode) {
     return null;
   }
@@ -78,7 +86,7 @@ function LineNumberTooltip({
   // Show a loading state immediately while we wait for the analysis points
   // to be generated.
   if (!analysisPoints) {
-    return <StaticTooltip targetNode={lineNumberNode}>...</StaticTooltip>;
+    return <StaticTooltip targetNode={lineNumberNode}>Loading…</StaticTooltip>;
   }
 
   if (analysisPoints === "error") {

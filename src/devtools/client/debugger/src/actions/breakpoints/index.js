@@ -48,7 +48,7 @@ export * from "./syncBreakpoint";
  * @static
  */
 export function disableBreakpointsInSource(cx, source) {
-  return async ({ dispatch, getState, client }) => {
+  return async ({ dispatch, getState }) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       if (!breakpoint.disabled) {
@@ -65,7 +65,8 @@ export function disableBreakpointsInSource(cx, source) {
  * @static
  */
 export function enableBreakpointsInSource(cx, source) {
-  return async ({ dispatch, getState, client }) => {
+  return async ({ dispatch, getState }) => {
+    trackEvent("breakpoints.remove_all_in_source");
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       if (breakpoint.disabled) {
@@ -83,6 +84,8 @@ export function enableBreakpointsInSource(cx, source) {
  */
 export function removeAllBreakpoints(cx) {
   return async ({ dispatch, getState }) => {
+    trackEvent("breakpoints.remove_all");
+
     const breakpointList = getBreakpointsList(getState());
     await Promise.all(breakpointList.map(bp => dispatch(removeBreakpoint(cx, bp))));
     dispatch({ type: "REMOVE_BREAKPOINTS" });
@@ -225,6 +228,7 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
     }
 
     trackEvent("add breakpoint");
+    trackEvent("breakpoint.add");
 
     const breakpointLocation = {
       sourceId: source.id,
@@ -261,7 +265,7 @@ export function addBreakpointAtColumn(cx, location) {
       logValue: getLogValue(source, state, location),
     };
 
-    trackEvent("add column breakpoint");
+    trackEvent("breakpoint.add_column");
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
@@ -269,6 +273,8 @@ export function addBreakpointAtColumn(cx, location) {
 
 export function removeBreakpointsAtLine(cx, sourceId, line) {
   return ({ dispatch, getState }) => {
+    trackEvent("breakpoint.remove");
+
     dispatch(removeRequestedBreakpoint({ sourceId, line }));
     const breakpointsAtLine = getBreakpointsForSource(getState(), sourceId, line);
     return dispatch(removeBreakpoints(cx, breakpointsAtLine));

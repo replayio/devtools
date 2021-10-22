@@ -23,12 +23,6 @@ function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewC
       return;
     }
 
-    // For now we can simply bail if the input happens to be empty. We should fix
-    // this in the next pass to handle and show an error prompt.
-    if (inputValue == "") {
-      return;
-    }
-
     if (type == "new_reply") {
       handleReplySave(comment as PendingNewReply, inputValue);
     } else {

@@ -20,7 +20,6 @@
 .loader main .video {
   transition-duration: 100ms;
   flex-grow: 1;
-  background-image: url(/images/playbackBG.png);
 }
 
 .loader main .debugger {

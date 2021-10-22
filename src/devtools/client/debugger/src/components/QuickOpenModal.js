@@ -38,6 +38,7 @@ import {
 import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
+import { trackEvent } from "ui/utils/telemetry";
 
 import "./QuickOpenModal.css";
 
@@ -200,18 +201,23 @@ export class QuickOpenModal extends Component {
     }
 
     if (this.isGotoSourceQuery()) {
+      trackEvent("quick_open.select_line");
+
       const location = parseLineColumn(this.props.query);
       return this.gotoLocation({ ...location, sourceId: item.id });
     }
 
     if (this.isSymbolSearch()) {
       const start = item.location?.start;
+      trackEvent("quick_open.select_function");
+
       return this.gotoLocation({
         line: start?.line || 0,
         sourceId: start?.sourceId,
       });
     }
 
+    trackEvent("quick_open.select_source");
     this.gotoLocation({ sourceId: item.id, line: 0 });
   };
 

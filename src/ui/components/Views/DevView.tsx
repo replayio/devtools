@@ -27,6 +27,16 @@ function DevView({
     prefs.toolboxHeight = `${num}px`;
   };
 
+  function maxSize(sidePanelCollapsed: boolean, showEditor: boolean) {
+    if (showEditor) {
+      return "80%";
+    } else if (sidePanelCollapsed) {
+      return "0";
+    } else {
+      return String(prefs.sidePanelSize);
+    }
+  }
+
   useEffect(() => {
     installObserver();
   }, []);
@@ -40,7 +50,7 @@ function DevView({
           splitterSize={1}
           initialSize={prefs.toolboxHeight as string}
           minSize={showEditor || !sidePanelCollapsed ? "240px" : "0%"}
-          maxSize={showEditor || !sidePanelCollapsed ? "80%" : "0%"}
+          maxSize={maxSize(sidePanelCollapsed, showEditor)}
           vert={true}
           onMove={handleMove}
           startPanel={<Toolbox />}

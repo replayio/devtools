@@ -2,6 +2,7 @@ import React from "react";
 import classnames from "classnames";
 const { PanelInput } = require("./PanelInput");
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import { trackEvent } from "ui/utils/telemetry";
 
 export function SubmitButton({
   handleSetBreakpoint,
@@ -58,12 +59,13 @@ export default function PanelForm({
   showCondition,
 }: PanelFormProps) {
   const onLogValueChange = async (value: string) => {
+    trackEvent("breakpoint.set_log");
     setLogValue(value);
     setLogSyntaxError(await parser.hasSyntaxError(value));
   };
   const onConditionChange = async (value: string) => {
     setCondition(value);
-
+    trackEvent("breakpoint.set_condition");
     if (value === "") {
       setConditionSyntaxError(null);
     } else {

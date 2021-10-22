@@ -1,4 +1,3 @@
-import { subscriptionManager } from "framer-motion/types/utils/subscription-manager";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useHistory } from "react-router";
@@ -11,7 +10,9 @@ import { TrialEnd } from "../shared/TrialEnd";
 
 function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const { members } = hooks.useGetWorkspaceMembers(currentWorkspaceId!);
   const history = useHistory();
+  const { userId: localUserId } = hooks.useGetUserId();
 
   // There's no workspace ID if they are in their personal library.
   if (loading || !currentWorkspaceId) {
@@ -24,10 +25,14 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
     return null;
   }
 
-  const onClick = () => {
-    history.push(`/team/${currentWorkspaceId}/settings/billing`);
-    setModal("workspace-settings");
-  };
+  const roles = members?.find(m => m.userId === localUserId)?.roles;
+  const isAdmin = roles?.includes("admin") || false;
+  const onClick = isAdmin
+    ? () => {
+        history.push(`/team/${currentWorkspaceId}/settings/billing`);
+        setModal("workspace-settings");
+      }
+    : undefined;
 
   const expiresIn = subscriptionEndsIn(workspace);
 

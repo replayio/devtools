@@ -7,6 +7,7 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import Spinner from "../shared/Spinner";
 import { PendingTeamScreen } from "./PendingTeamScreen";
+import { MY_LIBRARY } from "../UploadScreen/Sharing";
 
 function ViewerLoader() {
   return (
@@ -24,7 +25,7 @@ function MyLibrary({ searchString }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName: "My Library", searchString }} />;
+  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY, searchString }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {

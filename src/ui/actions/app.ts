@@ -383,7 +383,7 @@ export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
     const replaySessions = await asyncStore.replaySessions;
     const session = replaySessions[recordingId];
 
-    if (recordingId) {
+    if (recordingId && session) {
       const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = session;
 
       dispatch(setViewMode(viewMode));

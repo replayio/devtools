@@ -9,17 +9,7 @@
 const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-
-/*
-loader.lazyGetter(this, "SearchBoxAutocompletePopup", function() {
-  return createFactory(
-    require("devtools/client/shared/components/SearchBoxAutocompletePopup")
-  );
-});
-loader.lazyGetter(this, "MDNLink", function() {
-  return createFactory(require("devtools/client/shared/components/MdnLink"));
-});
-*/
+const { trackEvent } = require("ui/utils/telemetry");
 
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 
@@ -88,6 +78,7 @@ class SearchBox extends PureComponent {
   }
 
   focus() {
+    TrackEvent("console.search.start");
     if (this.inputRef) {
       this.inputRef.current.focus();
     }
@@ -121,7 +112,7 @@ class SearchBox extends PureComponent {
 
   onClearButtonClick() {
     this.onChange("");
-
+    trackEvent("console.search.clear");
     if (this.props.onClearButtonClick) {
       this.props.onClearButtonClick();
     }

@@ -6,7 +6,10 @@
 
 import { getAllFilters } from "../selectors/filters";
 
-const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
+const {
+  prepareMessage,
+  isBrowserInternalMessage,
+} = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
 const { ThreadFront } = require("protocol/thread");
 const { LogpointHandlers } = require("protocol/logpoint");
@@ -18,7 +21,6 @@ const {
   MESSAGE_OPEN,
   MESSAGE_CLOSE,
   MESSAGE_UPDATE_PAYLOAD,
-  PAUSED_EXECUTION_POINT,
   MESSAGES_CLEAR_EVALUATIONS,
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
@@ -62,6 +64,11 @@ function onConsoleMessage(msg) {
     const sourceId = stacktrace?.[0]?.sourceId;
 
     let { url, sourceId: msgSourceId, line, column } = msg;
+
+    // Skip messages that are coming from a firefox internal JS file
+    if (isBrowserInternalMessage(msg.text)) {
+      return;
+    }
 
     if (msg.point.frame) {
       // If the execution point has a location, use any mappings in that location.

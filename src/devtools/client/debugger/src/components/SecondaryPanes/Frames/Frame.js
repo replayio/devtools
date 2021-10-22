@@ -13,6 +13,7 @@ import { formatDisplayName } from "../../../utils/pause/frames";
 import { getFilename, getFileURL } from "../../../utils/source";
 import FrameMenu from "./FrameMenu";
 import FrameIndent from "./FrameIndent";
+import { trackEvent } from "ui/utils/telemetry";
 
 function FrameTitle({ frame, options = {}, l10n }) {
   const displayName = formatDisplayName(frame, options, l10n);
@@ -84,6 +85,7 @@ export default class FrameComponent extends Component {
       return;
     }
 
+    trackEvent("call_stack.select_frame");
     this.props.selectFrame(this.props.cx, frame);
   }
 

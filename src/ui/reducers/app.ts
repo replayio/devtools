@@ -111,7 +111,7 @@ export default function update(
     }
 
     case "set_trial_expired": {
-      return { ...state, trialExpired: true };
+      return { ...state, trialExpired: action.expired };
     }
 
     case "update_theme": {

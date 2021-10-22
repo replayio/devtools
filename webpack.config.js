@@ -42,7 +42,10 @@ module.exports = {
     new NodePolyfillPlugin(),
     new HtmlWebpackPlugin({ template: "index.html", chunks: ["main"] }),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
-    new webpack.EnvironmentPlugin({ REPLAY_RELEASE: null }),
+    new webpack.EnvironmentPlugin({
+      REPLAY_RELEASE: null,
+      API_URL: "https://api.replay.io/v1/graphql",
+    }),
     new CopyPlugin({
       patterns: [
         { from: "vercel.json" },

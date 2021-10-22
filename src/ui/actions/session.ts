@@ -22,11 +22,12 @@ import { jumpToInitialPausePoint } from "./timeline";
 import { Recording } from "ui/types";
 import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
+import { getUserSettings } from "ui/hooks/settings";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
 };
-export type SetTrialExpiredAction = Action<"set_trial_expired">;
+export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boolean };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type SessionActions =
   | SetExpectedErrorAction
@@ -106,6 +107,7 @@ function getRecordingNotAccessibleError(
 export function createSession(recordingId: string): UIThunkAction {
   return async ({ getState, dispatch }) => {
     try {
+      const userSettings = await getUserSettings();
       const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording);
 
@@ -120,6 +122,7 @@ export function createSession(recordingId: string): UIThunkAction {
         recording,
         userInfo,
         auth0User: tokenManager.auth0Client?.user,
+        userSettings,
       });
 
       registerRecording({ recording, userInfo });
@@ -222,8 +225,11 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
   };
 }
 
-export function setTrialExpired(): SetTrialExpiredAction {
-  return { type: "set_trial_expired" };
+export function setTrialExpired(expired = true): SetTrialExpiredAction {
+  return { type: "set_trial_expired", expired };
+}
+export function clearTrialExpired(): UIThunkAction {
+  return ({ dispatch }) => dispatch(setTrialExpired(false));
 }
 export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
   return ({ getState, dispatch }) => {

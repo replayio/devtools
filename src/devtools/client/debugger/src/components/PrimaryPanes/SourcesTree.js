@@ -6,7 +6,7 @@
 
 // Dependencies
 import React, { Component } from "react";
-import classnames from "classnames";
+
 import { connect } from "../../utils/connect";
 
 // Selectors
@@ -41,6 +41,7 @@ import {
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
 import { getRawSourceURL } from "../../utils/source";
+import { trackEvent } from "ui/utils/telemetry";
 
 function shouldAutoExpand(depth, item, debuggeeUrl) {
   if (depth !== 1) {
@@ -123,6 +124,7 @@ class SourcesTree extends Component {
 
   selectItem = item => {
     if (item.type == "source" && !Array.isArray(item.contents)) {
+      trackEvent("source_explorer.select_source");
       this.props.selectSource(this.props.cx, item.contents.id);
     }
   };

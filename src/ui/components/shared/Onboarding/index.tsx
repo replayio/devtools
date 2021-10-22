@@ -10,6 +10,7 @@ import React, {
 import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
+import ReplayLogo from "../ReplayLogo";
 import BubbleBackground from "./BubbleBackground";
 
 const OnboardingContext = React.createContext({ theme: "dark" });
@@ -156,37 +157,11 @@ export function OnboardingModalContainer({
           theme === "dark" ? "bg-black text-white" : "bg-white text-black"
         )}
       >
-        <>
-          <BubbleBackground />
-          <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
-            {children}
-          </Modal>
-        </>
+        <BubbleBackground />
+        <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
+          {children}
+        </Modal>
       </div>
     </OnboardingContext.Provider>
   );
 }
-
-const logoSizes = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 32,
-};
-
-export const ReplayLogo = ({
-  color,
-  wide,
-  size = "lg",
-}: {
-  color?: "white";
-  wide?: boolean;
-  size?: keyof typeof logoSizes;
-}) => {
-  let src = wide ? "/images/logo-wide.svg" : "/images/logo.svg";
-  if (color === "white") {
-    src = "/images/logo-white.svg";
-  }
-
-  return <img className={`h-${logoSizes[size]} w-auto`} src={src} />;
-};

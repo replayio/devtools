@@ -28,6 +28,7 @@ import SearchInput from "./shared/SearchInput";
 import AccessibleImage from "./shared/AccessibleImage";
 
 import { PluralForm } from "devtools/shared/plural-form";
+import { trackEvent } from "ui/utils/telemetry";
 
 import "./ProjectSearch.css";
 
@@ -72,10 +73,11 @@ export class ProjectSearch extends Component {
   }
 
   doSearch(searchTerm) {
+    trackEvent("project_search.search");
     this.props.searchSources(this.props.cx, searchTerm);
   }
 
-  toggleProjectTextSearch = (key, e) => {
+  toggleProjectTextSearch = e => {
     const { cx, closeProjectSearch, setActiveSearch } = this.props;
     if (e) {
       e.preventDefault();
@@ -91,6 +93,8 @@ export class ProjectSearch extends Component {
   isProjectSearchEnabled = () => this.props.activeSearch === "project";
 
   selectMatchItem = matchItem => {
+    trackEvent("project_search.select");
+
     this.props.selectSpecificLocation(this.props.cx, {
       sourceId: matchItem.sourceId,
       line: matchItem.line,

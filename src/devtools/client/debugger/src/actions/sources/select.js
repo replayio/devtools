@@ -17,6 +17,7 @@ import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines } from ".";
 
 import { createLocation } from "../../utils/location";
+import { trackEvent } from "ui/utils/telemetry";
 import { paused } from "../pause/paused";
 
 import { ThreadFront } from "protocol/thread";
@@ -79,6 +80,7 @@ export function selectSourceURL(cx, url, options) {
  */
 export function selectSource(cx, sourceId, options = {}) {
   return async ({ dispatch }) => {
+    trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location));
   };
@@ -91,6 +93,7 @@ export function selectSource(cx, sourceId, options = {}) {
 export function selectLocation(cx, location, { keepContext = true } = {}) {
   return async ({ dispatch, getState, client }) => {
     const currentSource = getSelectedSource(getState());
+    trackEvent("sources.select_location");
 
     if (!client) {
       // No connection, do nothing. This happens when the debugger is

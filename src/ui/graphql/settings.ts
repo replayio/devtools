@@ -17,6 +17,7 @@ export const GET_USER_SETTINGS = gql`
         enableTeams
         enableRepaint
         enableGlobalSearch
+        disableLogRocket
       }
       defaultWorkspace {
         id

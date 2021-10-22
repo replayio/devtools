@@ -11,8 +11,8 @@ const { createFactory } = require("react");
 const PropTypes = require("prop-types");
 
 const { actions } = require("ui/actions");
-const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { selectors } = require("ui/reducers");
+const { trackEvent } = require("ui/utils/telemetry");
 
 // Additional Components
 const MenuButton = createFactory(require("devtools/client/shared/components/menu/MenuButton"));
@@ -56,7 +56,10 @@ class ConsoleSettings extends Component {
         checked: shouldLogExceptions,
         className: "menu-item",
         label: "Show Exceptions",
-        onClick: () => logExceptions(!shouldLogExceptions),
+        onClick: () => {
+          trackEvent("console.settings.toggle_log_exceptions");
+          logExceptions(!shouldLogExceptions);
+        },
       })
     );
 
@@ -66,7 +69,10 @@ class ConsoleSettings extends Component {
         checked: filters[FILTERS.ERROR],
         className: "menu-item",
         label: this.getLabel("Show Errors", FILTERS.ERROR),
-        onClick: () => filterToggle(FILTERS.ERROR),
+        onClick: () => {
+          trackEvent("console.settings.toggle_errors");
+          filterToggle(FILTERS.ERROR);
+        },
       })
     );
 
@@ -76,7 +82,10 @@ class ConsoleSettings extends Component {
         checked: filters[FILTERS.WARN],
         className: "menu-item",
         label: this.getLabel("Show Warnings", FILTERS.WARN),
-        onClick: () => filterToggle(FILTERS.WARN),
+        onClick: () => {
+          trackEvent("console.settings.toggle_warn");
+          filterToggle(FILTERS.WARN);
+        },
       })
     );
 
@@ -86,7 +95,10 @@ class ConsoleSettings extends Component {
         checked: filters[FILTERS.LOG],
         className: "menu-item",
         label: this.getLabel("Show Logs", FILTERS.LOG),
-        onClick: () => filterToggle(FILTERS.LOG),
+        onClick: () => {
+          trackEvent("console.settings.toggle_logs");
+          filterToggle(FILTERS.LOG);
+        },
       })
     );
 
@@ -105,7 +117,10 @@ class ConsoleSettings extends Component {
         className: "menu-item webconsole-console-settings-add-node-module-messages",
         label: "Hide Node Module Messages",
         tooltip: "While enabled, messages from the node_modules directory are hidden",
-        onClick: () => filterToggle(FILTERS.NODEMODULES),
+        onClick: () => {
+          trackEvent("console.settings.toggle_node_modules");
+          filterToggle(FILTERS.NODEMODULES);
+        },
       })
     );
 
@@ -118,7 +133,10 @@ class ConsoleSettings extends Component {
         label: "Show Timestamps",
         tooltip:
           "If you enable this option commands and output in the Web Console will display a timestamp",
-        onClick: timestampsToggle,
+        onClick: () => {
+          trackEvent("console.settings.toggle_timestamp");
+          timestampsToggle();
+        },
       })
     );
 
