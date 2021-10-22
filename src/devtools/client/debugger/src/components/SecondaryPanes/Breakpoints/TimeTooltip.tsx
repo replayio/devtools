@@ -1,6 +1,8 @@
 import React from "react";
 
-export default function TimeTooltip({ time }: { time: number }) {
+export default function TimeTooltip({ time }: { time: number | null }) {
+  if (!time) return null;
+
   const date = new Date(time || 0);
   const seconds = date.getSeconds().toString().padStart(2, "0");
   const minutes = date.getMinutes();

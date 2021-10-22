@@ -4,7 +4,7 @@ import classnames from "classnames";
 import { actions as UIActions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
-const BreakpointTimelinePoint = require("./BreakpointTimelinePoint");
+const BreakpointTimelinePoint = require("./BreakpointTimelinePoint").default;
 const { isMatchingLocation } = require("devtools/client/debugger/src/utils/breakpoint");
 const { prefs } = require("ui/utils/prefs");
 import { getVisiblePosition } from "ui/utils/timeline";
@@ -60,9 +60,15 @@ function BreakpointTimeline({
   seek,
 }: BreakpointTimelineProps) {
   const [hoveredTime, setHoveredTime] = useState<number | null>(null);
-  const [hoveredCoordinates, setHoveredCoordinates] = useState<Coordinates | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
+  const onClick = (e: React.MouseEvent) => {
+    if (!hoveredTime) return;
 
+    const event = mostRecentPaintOrMouseEvent(hoveredTime);
+    if (event && event.point) {
+      seek(event.point, hoveredTime, false);
+    }
+  };
   const onMouseMove = (e: React.MouseEvent) => {
     const { startTime, endTime } = zoomRegion;
     const { left, width } = e.currentTarget.getBoundingClientRect();
@@ -71,19 +77,9 @@ function BreakpointTimeline({
     const clickPosition = Math.max((clickLeft - left) / width, 0);
     const time = Math.ceil(startTime + (endTime - startTime) * clickPosition);
     setHoveredTime(time);
-    setHoveredCoordinates({ x: e.clientX, y: e.clientY });
   };
   const onMouseLeave = (e: React.MouseEvent) => {
     setHoveredTime(null);
-    setHoveredCoordinates(null);
-  };
-  const onClick = (e: React.MouseEvent) => {
-    if (!hoveredTime) return;
-
-    const event = mostRecentPaintOrMouseEvent(hoveredTime);
-    if (event && event.point) {
-      seek(event.point, hoveredTime, false);
-    }
   };
 
   const shouldDim =
@@ -93,32 +89,29 @@ function BreakpointTimeline({
 
   return (
     <div className="breakpoint-navigation-timeline-container relative">
-      <div
-        className={classnames("breakpoint-navigation-timeline relative cursor-pointer", {
-          dimmed: shouldDim,
-        })}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
-        onClick={onClick}
-        ref={timelineRef}
-        style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
-      >
-        <div className="progress-line full" />
-        <div className="progress-line preview-min" style={{ width: hoverPercent }} />
-        <div className="progress-line" style={{ width: `${percent}%` }} />
-        {analysisPoints && analysisPoints !== "error" ? (
-          <Points
-            analysisPoints={analysisPoints}
-            breakpoint={breakpoint}
-            hoveredItem={hoveredItem}
-          />
-        ) : null}
-        {hoveredCoordinates && hoveredTime && timelineRef.current ? (
-          <PortalTooltip targetCoordinates={hoveredCoordinates} targetElement={timelineRef.current}>
-            <TimeTooltip time={hoveredTime} />
-          </PortalTooltip>
-        ) : null}
-      </div>
+      <PortalTooltip tooltip={<TimeTooltip time={hoveredTime} />}>
+        <div
+          className={classnames("breakpoint-navigation-timeline relative cursor-pointer", {
+            dimmed: shouldDim,
+          })}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
+          onClick={onClick}
+          ref={timelineRef}
+          style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
+        >
+          <div className="progress-line full" />
+          <div className="progress-line preview-min" style={{ width: hoverPercent }} />
+          <div className="progress-line" style={{ width: `${percent}%` }} />
+          {analysisPoints && analysisPoints !== "error" ? (
+            <Points
+              analysisPoints={analysisPoints}
+              breakpoint={breakpoint}
+              hoveredItem={hoveredItem}
+            />
+          ) : null}
+        </div>
+      </PortalTooltip>
     </div>
   );
 }
