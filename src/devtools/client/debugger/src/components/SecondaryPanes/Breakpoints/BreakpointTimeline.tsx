@@ -82,8 +82,6 @@ function BreakpointTimeline({
     setHoveredTime(null);
   };
 
-  const shouldDim =
-    hoveredItem?.location && !isMatchingLocation(hoveredItem?.location, breakpoint.location);
   const hoverPercent = `${getVisiblePosition({ time: hoveredTime, zoom: zoomRegion }) * 100}%`;
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
 
@@ -91,9 +89,7 @@ function BreakpointTimeline({
     <div className="breakpoint-navigation-timeline-container relative">
       <PortalTooltip tooltip={<TimeTooltip time={hoveredTime} />}>
         <div
-          className={classnames("breakpoint-navigation-timeline relative cursor-pointer", {
-            dimmed: shouldDim,
-          })}
+          className={classnames("breakpoint-navigation-timeline relative cursor-pointer")}
           onMouseMove={onMouseMove}
           onMouseLeave={onMouseLeave}
           onClick={onClick}

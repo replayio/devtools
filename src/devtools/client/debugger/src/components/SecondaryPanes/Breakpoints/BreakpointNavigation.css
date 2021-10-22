@@ -113,16 +113,6 @@
   background: var(--grey-30);
 }
 
-.breakpoint-navigation-timeline.dimmed
-  .breakpoint-navigation-timeline-point.secondary-highlight
-  .fill {
-  fill: var(--primary-accent);
-}
-
-.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.primary-highlight {
-  z-index: var(--z-index-3--hovered-point-primary);
-}
-
 .breakpoint-navigation-timeline
   .breakpoint-navigation-timeline-point.primary-highlight:not(.pause)
   .fill {

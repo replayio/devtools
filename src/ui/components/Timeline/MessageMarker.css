@@ -44,38 +44,3 @@
 .timeline .marker:focus {
   outline: none;
 }
-
-/* Dimmed styles */
-
-.timeline.dimmed .marker.primary-highlight,
-.timeline.dimmed .marker.secondary-highlight {
-  display: block;
-}
-
-.timeline.dimmed .marker .fill {
-  fill: var(--primary-accent-light);
-}
-
-.timeline.dimmed .preview-markers-container .marker .fill {
-  fill: var(--replaying-marker-fill);
-}
-
-.timeline.dimmed .marker.secondary-highlight {
-  z-index: var(--z-index-2--hovered-point-secondary);
-}
-
-.timeline.dimmed .marker.secondary-highlight .fill {
-  fill: var(--replaying-marker-fill);
-}
-
-.timeline.dimmed .marker.primary-highlight {
-  z-index: var(--z-index-3--hovered-point-primary);
-}
-
-.timeline.dimmed .marker.paused .fill {
-  fill: var(--secondary-accent);
-}
-
-.timeline.dimmed .marker.primary-highlight:not(.paused) .fill {
-  fill: var(--new-blue-900);
-}
