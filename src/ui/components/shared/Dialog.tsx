@@ -9,7 +9,7 @@ type PropTypes = HTMLProps<HTMLDivElement> & {
 
 export function Dialog({ children, className, ...props }: PropTypes) {
   return (
-    <div {...props} className={classNames("dialog rounded-lg p-5", className)}>
+    <div {...props} className={classNames("dialog", className)}>
       {children}
     </div>
   );
