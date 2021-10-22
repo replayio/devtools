@@ -172,6 +172,7 @@ class Message extends Component {
     let overlayType, label;
     let onRewindClick = () => {
       trackEvent("console seek");
+      trackEvent("console.seek");
       dispatch(
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
