@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import * as actions from "ui/actions/app";
+import { Dialog } from "./Dialog";
 import "./Modal.css";
 
 interface ModalProps {
@@ -13,14 +14,14 @@ function Modal({ hideModal, children, showClose = true }: ModalProps) {
   return (
     <div className="modal-container">
       <div className="modal-mask" onClick={hideModal} />
-      <div className="modal-content text-sm">
+      <Dialog className="modal-content text-sm">
         {showClose && (
           <button className="modal-close" onClick={hideModal}>
             <div className="img close" />
           </button>
         )}
         {children}
-      </div>
+      </Dialog>
     </div>
   );
 }
