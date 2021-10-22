@@ -10,6 +10,7 @@ import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
+import { ConfirmProvider, ConfirmRenderer } from "ui/components/shared/ConfirmDialog";
 
 const Recording = React.lazy(() => import("./recording"));
 const Account = React.lazy(() => import("ui/components/Account"));
@@ -31,13 +32,15 @@ const AppRouting = () => {
           <IntercomProvider appId={"k7f741xx"} autoBoot>
             <App>
               <ErrorBoundary>
-                <React.Suspense fallback={<LoadingScreen />}>
-                  <Switch>
-                    <Route path="/recording/:recordingId" component={Recording} />
-                    <Route exact path="/view" component={ViewRedirect} />
-                    <Route component={Account} />
-                  </Switch>
-                </React.Suspense>
+                <ConfirmProvider>
+                  <React.Suspense fallback={<LoadingScreen />}>
+                    <Switch>
+                      <Route path="/recording/:recordingId" component={Recording} />
+                      <Route exact path="/view" component={ViewRedirect} />
+                      <Route component={Account} />
+                    </Switch>
+                  </React.Suspense>
+                </ConfirmProvider>
               </ErrorBoundary>
             </App>
           </IntercomProvider>
