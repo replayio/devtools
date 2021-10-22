@@ -81,8 +81,8 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
+        {<FirstEditNag editing={editing} />}
         <div className={classnames("breakpoint-panel", { editing })}>
-          {<FirstEditNag {...{ editing }} />}
           {editing ? (
             <PanelEditor
               breakpoint={breakpoint}

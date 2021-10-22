@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
-
 import { Nag } from "ui/hooks/users";
+import "./FirstEditNag.css";
+
 const TEXT = {
-  clickPrompt: "Click below to edit the message",
-  enterPrompt: "Type something and hit Enter",
-  success: "The console has been refreshed",
+  clickPrompt: "Edit your first print statement",
+  enterPrompt: "Add some local variables",
+  success: "Check the console",
 };
 
+type Step = keyof typeof TEXT;
+
 function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
-  const [step, setStep] = useState<"clickPrompt" | "enterPrompt" | "success">("clickPrompt");
+  const [step, setStep] = useState<Step>("clickPrompt");
   const updateUserNags = hooks.useUpdateUserNags();
 
   useEffect(() => {
@@ -33,7 +36,7 @@ function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
   }
 
   return (
-    <div className="p-2 py-1 text-white bg-primaryAccent font-sans text-xs flex flex-row items-center space-x-1">
+    <div className="first-edit-nag p-2 py-1 text-white font-sans text-xs flex flex-row items-center space-x-1">
       <img src="/images/sparkle.svg" className="w-3" />
       <span>{TEXT[step]}</span>
     </div>
