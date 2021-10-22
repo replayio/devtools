@@ -38,6 +38,7 @@ import {
 import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
+import { trackEvent } from "ui/utils/telemetry";
 
 import "./QuickOpenModal.css";
 
