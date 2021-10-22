@@ -1,4 +1,3 @@
-import { subscriptionManager } from "framer-motion/types/utils/subscription-manager";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useHistory } from "react-router";

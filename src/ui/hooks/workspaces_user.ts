@@ -2,6 +2,9 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import { WorkspaceUser } from "ui/types";
 
 export function useGetWorkspaceMembers(workspaceId: string) {
+  if (!workspaceId) {
+    return { members: [], loading: false };
+  }
   const { data, loading, error } = useQuery(
     gql`
       query GetWorkspaceMembers($workspaceId: ID!) {
