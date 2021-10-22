@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { HTMLProps } from "react";
 import MaterialIcon from "./MaterialIcon";
 
 export default function Modal({
@@ -11,6 +11,8 @@ export default function Modal({
   options = {
     maskTransparency: "transparent",
   },
+  style,
+  ...props
 }: {
   actions?: React.ReactNode;
   onMaskClick?: () => void;
@@ -19,14 +21,15 @@ export default function Modal({
   options?: {
     maskTransparency: "transparent" | "translucent";
   };
-}) {
+} & HTMLProps<HTMLDivElement>) {
   const { maskTransparency } = options;
-  const style = blurMask ? { backdropFilter: "blur(5px)", zIndex: 100 } : { zIndex: 100 };
+  const modalStyle = blurMask ? { backdropFilter: "blur(5px)", ...style } : style;
 
   return (
     <div
-      style={style}
-      className={classNames(className, "fixed w-full h-full grid justify-center items-center z-50")}
+      {...props}
+      style={modalStyle}
+      className={classNames("fixed w-full h-full grid justify-center items-center z-50", className)}
     >
       <div
         className={classNames("bg-black w-full h-full absolute", {
