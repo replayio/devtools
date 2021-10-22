@@ -1,10 +1,10 @@
-import { resolve } from "@sentry/utils";
 import { omit, uniqueId } from "lodash";
-import { number } from "prop-types";
 import React, { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { createPortal } from "react-dom";
+import { PrimaryButton, SecondaryButton } from "./Button";
 import { Dialog } from "./Dialog";
 import Modal from "./NewModal";
+import ReplayLogo from "./ReplayLogo";
 
 type ConfirmOptions = {
   message: string;
@@ -18,12 +18,31 @@ type PropTypes = ConfirmOptions & {
   onDecline: () => void;
 };
 
-export const ConfirmDialog = ({ onDecline }: PropTypes) => {
-  console.info("Dialog!");
+export const ConfirmDialog = ({
+  acceptLabel,
+  declineLabel,
+  description,
+  message,
+  onAccept,
+  onDecline,
+}: PropTypes) => {
   return (
     <Modal onMaskClick={onDecline}>
-      <Dialog>
-        <h1>Testing!</h1>
+      <Dialog
+        className="align-center"
+        style={{ animation: "dropdownFadeIn ease 200ms", minWidth: 400 }}
+      >
+        <ReplayLogo size="sm" />
+        <h1 className="text-lg font-medium mt-5">{message}</h1>
+        {description && <p className="mb-2 text-gray-500 text-xs">{description}</p>}
+        <div className="mt-6" style={{ display: "flex", justifyContent: "stretch" }}>
+          <SecondaryButton color="blue" className="m-3">
+            {declineLabel}
+          </SecondaryButton>
+          <PrimaryButton className="m-3" color="blue">
+            {acceptLabel}
+          </PrimaryButton>
+        </div>
       </Dialog>
     </Modal>
   );
@@ -37,7 +56,6 @@ const ConfirmContext = createContext<{
 export const useConfirm = () => {
   const { showConfirmation } = useContext(ConfirmContext);
   return function confirm(options: ConfirmOptions): Promise<boolean> {
-    console.info("do confirm", options);
     return new Promise(resolve => {
       showConfirmation({
         ...options,
@@ -58,7 +76,6 @@ export const ConfirmRenderer = ({
   }
 
   const { confirmations } = useContext(ConfirmContext);
-  console.info("ConfirmRenderer", confirmations);
   return (
     <>
       {Object.entries(confirmations).map(([id, options]) =>

@@ -167,7 +167,12 @@ function Library({
   }, []);
   const confirm = useConfirm();
   useEffect(() => {
-    confirm({ message: "testing" }).then(console.info);
+    confirm({
+      message: "testing",
+      description: "testing description",
+      acceptLabel: "Sounds good",
+      declineLabel: "Nevermind",
+    }).then(console.info);
   }, []);
 
   // Handle cases where the default workspace ID in prefs is for a team
