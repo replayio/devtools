@@ -20,6 +20,7 @@ import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
+import { ConfirmDialog, useConfirm } from "../shared/ConfirmDialog";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -163,6 +164,10 @@ function Library({
     if (!isLinkedFromEmail && !hasTeamInvitationCode() && showFirstReplayTutorial) {
       setModal("first-replay");
     }
+  }, []);
+  const confirm = useConfirm();
+  useEffect(() => {
+    confirm({ message: "testing" }).then(console.info);
   }, []);
 
   // Handle cases where the default workspace ID in prefs is for a team
