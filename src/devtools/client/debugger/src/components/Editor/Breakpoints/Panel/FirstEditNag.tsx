@@ -4,9 +4,9 @@ import { Nag } from "ui/hooks/users";
 import "./FirstEditNag.css";
 
 const TEXT = {
-  clickPrompt: "Want to see something cool? Click below to edit...",
-  enterPrompt: "Now type something here...",
-  success: "Check the console! We went back in time to add those print statements!",
+  clickPrompt: "Edit your first print statement",
+  enterPrompt: "Add some local variables",
+  success: "Check the console",
 };
 
 type Step = keyof typeof TEXT;
