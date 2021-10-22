@@ -51,7 +51,9 @@ function PanelButtons({
     <div className="flex flex-row items-center overflow-hidden text-sm">
       {showElements && !isNode && <NodePicker />}
       <button
-        className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
+        className={classnames("console-panel-button", {
+          expanded: selectedPanel === "console",
+        })}
         onClick={() => onClick("console")}
       >
         <div className="label">Console</div>

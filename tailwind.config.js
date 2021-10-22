@@ -15,6 +15,7 @@ module.exports = {
         secondaryAccent: "var(--secondary-accent)",
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
+        bodyColor: "var(--theme-body-color)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
