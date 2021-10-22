@@ -5,6 +5,7 @@ import MaterialIcon from "./MaterialIcon";
 export default function Modal({
   actions,
   children,
+  className,
   onMaskClick = () => {},
   blurMask = true,
   options = {
@@ -20,10 +21,13 @@ export default function Modal({
   };
 }) {
   const { maskTransparency } = options;
-  const style = blurMask ? { backdropFilter: "blur(5px)" } : {};
+  const style = blurMask ? { backdropFilter: "blur(5px)", zIndex: 100 } : { zIndex: 100 };
 
   return (
-    <div style={style} className="fixed w-full h-full grid justify-center items-center z-50">
+    <div
+      style={style}
+      className={classNames(className, "fixed w-full h-full grid justify-center items-center z-50")}
+    >
       <div
         className={classNames("bg-black w-full h-full absolute", {
           "opacity-10": maskTransparency === "translucent",

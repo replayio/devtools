@@ -27,19 +27,19 @@ export const ConfirmDialog = ({
   onDecline,
 }: PropTypes) => {
   return (
-    <Modal onMaskClick={onDecline}>
+    <Modal onMaskClick={onDecline} options={{ maskTransparency: "translucent" }}>
       <Dialog
         className="align-center"
-        style={{ animation: "dropdownFadeIn ease 200ms", minWidth: 400 }}
+        style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
       >
         <ReplayLogo size="sm" />
         <h1 className="text-lg font-medium mt-5">{message}</h1>
         {description && <p className="mb-2 text-gray-500 text-xs">{description}</p>}
         <div className="mt-6" style={{ display: "flex", justifyContent: "stretch" }}>
-          <SecondaryButton color="blue" className="m-3">
+          <SecondaryButton color="blue" className="m-3" onClick={onDecline}>
             {declineLabel}
           </SecondaryButton>
-          <PrimaryButton className="m-3" color="blue">
+          <PrimaryButton className="m-3" color="blue" onClick={onAccept}>
             {acceptLabel}
           </PrimaryButton>
         </div>
@@ -51,7 +51,12 @@ export const ConfirmDialog = ({
 const ConfirmContext = createContext<{
   confirmations: { [id: number]: PropTypes };
   showConfirmation: (options: PropTypes) => void;
-}>({ confirmations: {}, showConfirmation: () => {} });
+}>({
+  confirmations: {},
+  showConfirmation: () => {
+    console.warn("Missing ConfirmContext.Provider");
+  },
+});
 
 export const useConfirm = () => {
   const { showConfirmation } = useContext(ConfirmContext);
@@ -76,10 +81,11 @@ export const ConfirmRenderer = ({
   }
 
   const { confirmations } = useContext(ConfirmContext);
+  console.info("render confirms", confirmations);
   return (
     <>
       {Object.entries(confirmations).map(([id, options]) =>
-        createPortal(<ConfirmDialog key={id} {...options} />, element)
+        createPortal(<ConfirmDialog id={id} key={id} {...options} />, element)
       )}
     </>
   );
@@ -101,7 +107,7 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
         },
         onDecline() {
           removeConfirmation();
-          confirmation.onAccept();
+          confirmation.onDecline();
         },
       },
     }));
