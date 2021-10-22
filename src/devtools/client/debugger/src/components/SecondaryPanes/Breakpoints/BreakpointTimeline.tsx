@@ -4,15 +4,52 @@ import classnames from "classnames";
 import { actions as UIActions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
-import { connect } from "devtools/client/debugger/src/utils/connect";
-import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
-import { isMatchingLocation } from "devtools/client/debugger/src/utils/breakpoint";
+const BreakpointTimelinePoint = require("./BreakpointTimelinePoint");
+const { isMatchingLocation } = require("devtools/client/debugger/src/utils/breakpoint");
 const { prefs } = require("ui/utils/prefs");
 import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
+import { UIState } from "ui/state";
+import { connect, ConnectedProps } from "react-redux";
+import { PointDescription } from "@recordreplay/protocol";
+import { HoveredItem } from "ui/state/timeline";
+
+function Points({
+  analysisPoints,
+  hoveredItem,
+  breakpoint,
+}: {
+  breakpoint: any;
+  analysisPoints: PointDescription[];
+  hoveredItem: HoveredItem | null;
+}) {
+  if (analysisPoints.length > prefs.maxHitsDisplayed) return null;
+
+  return (
+    <>
+      {analysisPoints.map((p, i) => (
+        <BreakpointTimelinePoint
+          breakpoint={breakpoint}
+          point={p}
+          key={i}
+          index={i}
+          hoveredItem={hoveredItem}
+        />
+      ))}
+    </>
+  );
+}
+
+type BreakpointTimelineProps = PropsFromRedux & {
+  breakpoint: any;
+};
+type Coordinates = {
+  x: number;
+  y: number;
+};
 
 function BreakpointTimeline({
   breakpoint,
@@ -21,12 +58,12 @@ function BreakpointTimeline({
   currentTime,
   hoveredItem,
   seek,
-}) {
-  const [hoveredTime, setHoveredTime] = useState(0);
-  const [hoveredCoordinates, setHoveredCoordinates] = useState(null);
-  const timelineRef = useRef(null);
+}: BreakpointTimelineProps) {
+  const [hoveredTime, setHoveredTime] = useState<number | null>(null);
+  const [hoveredCoordinates, setHoveredCoordinates] = useState<Coordinates | null>(null);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
 
-  const onMouseMove = e => {
+  const onMouseMove = (e: React.MouseEvent) => {
     const { startTime, endTime } = zoomRegion;
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const clickLeft = e.clientX;
@@ -36,11 +73,13 @@ function BreakpointTimeline({
     setHoveredTime(time);
     setHoveredCoordinates({ x: e.clientX, y: e.clientY });
   };
-  const onMouseLeave = e => {
+  const onMouseLeave = (e: React.MouseEvent) => {
     setHoveredTime(null);
     setHoveredCoordinates(null);
   };
-  const onClick = e => {
+  const onClick = (e: React.MouseEvent) => {
+    if (!hoveredTime) return;
+
     const event = mostRecentPaintOrMouseEvent(hoveredTime);
     if (event && event.point) {
       seek(event.point, hoveredTime, false);
@@ -67,18 +106,14 @@ function BreakpointTimeline({
         <div className="progress-line full" />
         <div className="progress-line preview-min" style={{ width: hoverPercent }} />
         <div className="progress-line" style={{ width: `${percent}%` }} />
-        {analysisPoints !== "error" && analysisPoints?.length < prefs.maxHitsDisplayed
-          ? analysisPoints.map((p, i) => (
-              <BreakpointTimelinePoint
-                breakpoint={breakpoint}
-                point={p}
-                key={i}
-                index={i}
-                hoveredItem={hoveredItem}
-              />
-            ))
-          : null}
-        {hoveredCoordinates ? (
+        {analysisPoints && analysisPoints !== "error" ? (
+          <Points
+            analysisPoints={analysisPoints}
+            breakpoint={breakpoint}
+            hoveredItem={hoveredItem}
+          />
+        ) : null}
+        {hoveredCoordinates && hoveredTime && timelineRef.current ? (
           <PortalTooltip targetCoordinates={hoveredCoordinates} targetElement={timelineRef.current}>
             <TimeTooltip time={hoveredTime} />
           </PortalTooltip>
@@ -88,8 +123,8 @@ function BreakpointTimeline({
   );
 }
 
-export default connect(
-  (state, { breakpoint }) => ({
+const connector = connect(
+  (state: UIState, { breakpoint }: { breakpoint: any }) => ({
     analysisPoints: selectors.getAnalysisPointsForLocation(
       state,
       breakpoint.location,
@@ -102,4 +137,6 @@ export default connect(
   {
     seek: UIActions.seek,
   }
-)(BreakpointTimeline);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(BreakpointTimeline);
