@@ -12,7 +12,8 @@
   user-select: none;
 }
 
-.theme-light .timeline {
+.theme-light .timeline,
+.theme-light .breakpoint-navigation-timeline {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
   --progress-playing-background: #d4ebff;
@@ -122,7 +123,8 @@
   transform: scaleX(-1);
 }
 
-.timeline .progress-line {
+.timeline .progress-line,
+.breakpoint-navigation-timeline .progress-line {
   width: 0%;
   height: 3px;
   border-radius: 4px;
@@ -140,12 +142,14 @@
   height: 5px;
 }
 
-.timeline .progress-line.full {
+.timeline .progress-line.full,
+.breakpoint-navigation-timeline .progress-line.full {
   width: 100%;
   border-top-color: var(--progressbar-background);
 }
 
-.timeline .progress-line.preview-min {
+.timeline .progress-line.preview-min,
+.breakpoint-navigation-timeline .progress-line.preview-min {
   border-top-color: #c0c0c0;
 }
 

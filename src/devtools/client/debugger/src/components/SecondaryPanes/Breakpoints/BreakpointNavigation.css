@@ -62,10 +62,8 @@
   flex-direction: row;
   flex-grow: 1;
   background: var(--theme-toolbar-background);
-  position: relative;
   width: 100%;
   align-items: center;
-  overflow: hidden;
 }
 
 .breakpoint-navigation-timeline-point {

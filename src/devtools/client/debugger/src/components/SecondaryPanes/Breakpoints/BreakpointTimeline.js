@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import classnames from "classnames";
 
 import { actions as UIActions } from "ui/actions";
@@ -8,85 +8,64 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
 import { isMatchingLocation } from "devtools/client/debugger/src/utils/breakpoint";
 const { prefs } = require("ui/utils/prefs");
+import { getVisiblePosition } from "ui/utils/timeline";
+import PortalTooltip from "ui/components/shared/PortalTooltip";
+import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
-function getNewZoomRegion(zoomRegion, analysisPoints) {
-  let newZoomRegion = {
-    ...zoomRegion,
-    startTime: analysisPoints[0].time,
-    endTime: analysisPoints[analysisPoints.length - 1].time,
-  };
-
-  if (analysisPoints.length === 1) {
-    const deltaBefore = analysisPoints[0].time - zoomRegion.startTime;
-    const deltaAfter = zoomRegion.endTime - analysisPoints[0].time;
-
-    let startTime, endTime;
-
-    if (deltaBefore < deltaAfter) {
-      startTime = zoomRegion.startTime;
-      endTime = analysisPoints[0].time + deltaBefore;
-    } else {
-      startTime = analysisPoints[0].time - deltaAfter;
-      endTime = zoomRegion.endTime;
-    }
-
-    newZoomRegion = {
-      ...zoomRegion,
-      startTime,
-      endTime,
-    };
-  }
-
-  return newZoomRegion;
-}
-
-function getProgressPercent(time, zoomRegion) {
-  const { startTime, endTime } = zoomRegion;
-  if (!time) {
-    return 0;
-  }
-
-  if (time <= startTime) {
-    return 0;
-  }
-
-  if (time >= endTime) {
-    return 1;
-  }
-
-  return (time - startTime) / (endTime - startTime);
-}
+import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 
 function BreakpointTimeline({
   breakpoint,
   analysisPoints,
   zoomRegion,
-  setZoomRegion,
-  setZoomedBreakpoint,
   currentTime,
   hoveredItem,
+  seek,
 }) {
-  const shouldDim =
-    hoveredItem?.location && !isMatchingLocation(hoveredItem?.location, breakpoint.location);
+  const [hoveredTime, setHoveredTime] = useState(0);
+  const [hoveredCoordinates, setHoveredCoordinates] = useState(null);
+  const timelineRef = useRef(null);
 
-  const handleClick = e => {
-    if (e.metaKey && analysisPoints !== "error" && analysisPoints?.length) {
-      const newZoomRegion = getNewZoomRegion(zoomRegion, analysisPoints);
-      setZoomRegion(newZoomRegion);
-      setZoomedBreakpoint(breakpoint);
+  const onMouseMove = e => {
+    const { startTime, endTime } = zoomRegion;
+    const { left, width } = e.currentTarget.getBoundingClientRect();
+    const clickLeft = e.clientX;
+
+    const clickPosition = Math.max((clickLeft - left) / width, 0);
+    const time = Math.ceil(startTime + (endTime - startTime) * clickPosition);
+    setHoveredTime(time);
+    setHoveredCoordinates({ x: e.clientX, y: e.clientY });
+  };
+  const onMouseLeave = e => {
+    setHoveredTime(null);
+    setHoveredCoordinates(null);
+  };
+  const onClick = e => {
+    const event = mostRecentPaintOrMouseEvent(hoveredTime);
+    if (event && event.point) {
+      seek(event.point, hoveredTime, false);
     }
   };
 
-  const percent = getProgressPercent(currentTime, zoomRegion) * 100;
+  const shouldDim =
+    hoveredItem?.location && !isMatchingLocation(hoveredItem?.location, breakpoint.location);
+  const hoverPercent = `${getVisiblePosition({ time: hoveredTime, zoom: zoomRegion }) * 100}%`;
+  const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
 
   return (
-    <div className="breakpoint-navigation-timeline-container">
+    <div className="breakpoint-navigation-timeline-container relative">
       <div
-        className={classnames("breakpoint-navigation-timeline", { dimmed: shouldDim })}
-        onClick={handleClick}
+        className={classnames("breakpoint-navigation-timeline relative cursor-pointer", {
+          dimmed: shouldDim,
+        })}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        onClick={onClick}
+        ref={timelineRef}
         style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
       >
         <div className="progress-line full" />
+        <div className="progress-line preview-min" style={{ width: hoverPercent }} />
         <div className="progress-line" style={{ width: `${percent}%` }} />
         {analysisPoints !== "error" && analysisPoints?.length < prefs.maxHitsDisplayed
           ? analysisPoints.map((p, i) => (
@@ -99,6 +78,11 @@ function BreakpointTimeline({
               />
             ))
           : null}
+        {hoveredCoordinates ? (
+          <PortalTooltip targetCoordinates={hoveredCoordinates} targetElement={timelineRef.current}>
+            <TimeTooltip time={hoveredTime} />
+          </PortalTooltip>
+        ) : null}
       </div>
     </div>
   );
@@ -116,6 +100,6 @@ export default connect(
     hoveredItem: selectors.getHoveredItem(state),
   }),
   {
-    setZoomRegion: UIActions.setZoomRegion,
+    seek: UIActions.seek,
   }
 )(BreakpointTimeline);
