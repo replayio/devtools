@@ -156,17 +156,15 @@ const settings: Settings<
     component: function DeleteTeam({ hideModal, setWorkspaceId, workspaceId }) {
       const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
-      const confirm = useConfirm();
+      const { confirmDestructive } = useConfirm();
 
       const handleDeleteTeam = () => {
-        console.info("handleDeleteTeam");
-        confirm({
+        confirmDestructive({
           message: `Unexpected bad things will happen if you don't read this!`,
           description: `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`,
-          acceptLabel: "Delete this repository",
+          acceptLabel: "Delete team",
           declineLabel: "Nevermind",
         }).then(confirmed => {
-          console.info("confirmed?", confirmed);
           if (confirmed) {
             deleteWorkspace({
               variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },

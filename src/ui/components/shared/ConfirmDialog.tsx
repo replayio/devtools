@@ -11,6 +11,7 @@ type ConfirmOptions = {
   description?: string;
   acceptLabel: string;
   declineLabel: string;
+  variation?: "normal" | "destructive";
 };
 
 type PropTypes = ConfirmOptions & {
@@ -25,21 +26,30 @@ export const ConfirmDialog = ({
   message,
   onAccept,
   onDecline,
+  variation = "normal",
 }: PropTypes) => {
   return (
-    <Modal onMaskClick={onDecline} options={{ maskTransparency: "translucent" }}>
+    <Modal
+      onMaskClick={onDecline}
+      options={{ maskTransparency: "translucent" }}
+      style={{ zIndex: 100 }}
+    >
       <Dialog
-        className="align-center"
+        className="flex flex-col items-center"
         style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
       >
         <ReplayLogo size="sm" />
-        <h1 className="text-lg font-medium mt-5">{message}</h1>
-        {description && <p className="mb-2 text-gray-500 text-xs">{description}</p>}
-        <div className="mt-6" style={{ display: "flex", justifyContent: "stretch" }}>
-          <SecondaryButton color="blue" className="m-3" onClick={onDecline}>
+        <h1 className="text-center text-lg font-medium mt-5">{message}</h1>
+        {description && <p className="mt-2 text-center text-gray-500 text-xs">{description}</p>}
+        <div className="mt-6 flex w-full">
+          <SecondaryButton color="blue" className="m-3 flex-1 justify-center" onClick={onDecline}>
             {declineLabel}
           </SecondaryButton>
-          <PrimaryButton className="m-3" color="blue" onClick={onAccept}>
+          <PrimaryButton
+            className="m-3 flex-1 justify-center"
+            color={variation === "destructive" ? "red" : "blue"}
+            onClick={onAccept}
+          >
             {acceptLabel}
           </PrimaryButton>
         </div>
@@ -60,7 +70,7 @@ const ConfirmContext = createContext<{
 
 export const useConfirm = () => {
   const { showConfirmation } = useContext(ConfirmContext);
-  return function confirm(options: ConfirmOptions): Promise<boolean> {
+  function confirm(options: ConfirmOptions): Promise<boolean> {
     return new Promise(resolve => {
       showConfirmation({
         ...options,
@@ -68,6 +78,12 @@ export const useConfirm = () => {
         onDecline: () => resolve(false),
       });
     });
+  }
+  return {
+    confirm,
+    confirmDestructive: (options: ConfirmOptions) => {
+      return confirm({ ...options, variation: "destructive" });
+    },
   };
 };
 
@@ -81,11 +97,10 @@ export const ConfirmRenderer = ({
   }
 
   const { confirmations } = useContext(ConfirmContext);
-  console.info("render confirms", confirmations);
   return (
     <>
       {Object.entries(confirmations).map(([id, options]) =>
-        createPortal(<ConfirmDialog id={id} key={id} {...options} />, element)
+        createPortal(<ConfirmDialog key={id} {...options} />, element)
       )}
     </>
   );
