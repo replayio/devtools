@@ -7,6 +7,32 @@ import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
 
+export function getPrivacySummaryAndIcon(recording: Recording) {
+  const workspaceId = recording.workspace?.id || null;
+  let summary, icon;
+
+  if (!recording.private) {
+    icon = "link";
+    summary = "Anyone with the link can view";
+  } else {
+    if (workspaceId) {
+      icon = "domain";
+      summary = (
+        <span>
+          {`Members of `}
+          <span className="underline">{recording.workspace?.name}</span>
+          {` can view`}
+        </span>
+      );
+    } else {
+      icon = "group";
+      summary = "Only people with access can view";
+    }
+  }
+
+  return { summary, icon };
+}
+
 export default function PrivacyDropdown({ recording }: { recording: Recording }) {
   const [expanded, setExpanded] = useState(false);
   const isPrivate = recording.private;
@@ -40,21 +66,11 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
     setExpanded(false);
   };
 
+  const { summary } = getPrivacySummaryAndIcon(recording);
+
   const button = (
     <div className="flex flex-row space-x-1">
-      <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">
-        {!isPrivate ? (
-          "Anyone with the link can view"
-        ) : workspaceId ? (
-          <span>
-            {`Members of `}
-            <span className="underline">{recording.workspace?.name}</span>
-            {` can view`}
-          </span>
-        ) : (
-          "Only people with access can view"
-        )}
-      </span>
+      <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">{summary}</span>
       {isOwner ? (
         <div style={{ lineHeight: "0px" }}>
           <MaterialIcon style={{ fontSize: "16px" }}>expand_more</MaterialIcon>
