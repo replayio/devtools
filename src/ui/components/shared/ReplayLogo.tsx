@@ -1,10 +1,10 @@
 import React from "react";
 
 const logoSizes = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 32,
+  xs: "h-4",
+  sm: "h-8",
+  md: "h-16",
+  lg: "h-32",
 };
 const logoColors = {
   white: "#FFF",
@@ -38,7 +38,7 @@ export default function ReplayLogo({
   wide?: boolean;
   size?: keyof typeof logoSizes;
 }) {
-  const height = `h-${logoSizes[size]}`;
+  const height = logoSizes[size];
 
   if (wide) {
     return <img className={`${height} w-auto`} src="/images/logo-wide.svg" />;
