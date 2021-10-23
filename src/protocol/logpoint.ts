@@ -354,12 +354,7 @@ export function setLogpointByURL(
 const eventTypePoints: Record<string, PointDescription[]> = {};
 const eventTypeLogGroupId: Record<string, string> = {};
 
-export async function fetchEventTypePoints(categories: EventTypeCategory[]) {
-  const eventTypes = categories
-    .map(cat => cat.events)
-    .flat()
-    .map(e => e.id);
-
+export async function fetchEventTypePoints(eventTypes: string[]) {
   const sessionId = await ThreadFront.waitForSession();
 
   await Promise.all(
