@@ -54,9 +54,6 @@ class SourceTreeItem extends Component {
   onContextMenu = (event, item) => {
     const copySourceUri2Label = "Copy source URI";
     const copySourceUri2Key = "u";
-    const setDirectoryRootLabel = "Set directory root";
-    const setDirectoryRootKey = "r";
-    const removeDirectoryRootLabel = "Remove directory root";
 
     event.stopPropagation();
     event.preventDefault();
@@ -85,14 +82,7 @@ class SourceTreeItem extends Component {
             disabled: !shouldBlackbox(source),
             click: () => this.props.toggleBlackBox(cx, source),
           };
-          const downloadFileItem = {
-            id: "node-menu-download-file",
-            label: "Download file",
-            accesskey: "d",
-            disabled: false,
-            click: () => this.handleDownloadFile(cx, source, item),
-          };
-          menuOptions.push(copySourceUri2, blackBoxMenuItem, downloadFileItem);
+          menuOptions.push(copySourceUri2, blackBoxMenuItem);
         }
       }
     }
