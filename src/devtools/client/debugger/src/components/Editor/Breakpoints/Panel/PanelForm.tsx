@@ -18,7 +18,7 @@ export function SubmitButton({
       type="button"
       disabled={disabled}
       onClick={handleSetBreakpoint}
-      title={disabled ? "Invalid expression(s)" : "Save expression(s)"}
+      title={disabled ? "Syntax error" : "Save expression"}
       className={classnames(
         "inline-flex items-center p-1 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent flex-shrink-0 font-sans text-white",
         disabled ? "bg-gray-400 cursor-default" : "bg-primaryAccent hover:bg-primaryAccentHover"
@@ -31,11 +31,9 @@ export function SubmitButton({
 
 interface PanelFormProps {
   logValue: string;
-  logSyntaxError: string | null;
   setLogValue: (value: string) => void;
   setLogSyntaxError: (value: string | null) => void;
   condition: string;
-  conditionSyntaxError: string | null;
   setCondition: (value: string) => void;
   setConditionSyntaxError: (value: string | null) => void;
   handleSetBreakpoint: () => void;
@@ -46,11 +44,9 @@ interface PanelFormProps {
 
 export default function PanelForm({
   logValue,
-  logSyntaxError,
   setLogValue,
   setLogSyntaxError,
   condition,
-  conditionSyntaxError,
   setCondition,
   setConditionSyntaxError,
   handleSetBreakpoint,
@@ -77,7 +73,7 @@ export default function PanelForm({
     <div className="flex-grow overflow-hidden">
       <form className="flex flex-col space-y-1">
         {showCondition ? (
-          <div className={classnames("form-row", { invalid: conditionSyntaxError })}>
+          <div className={classnames("form-row")}>
             <div className="w-6 flex-shrink-0 mr-1">if</div>
             <PanelInput
               id="condition"
@@ -89,7 +85,7 @@ export default function PanelForm({
             />
           </div>
         ) : null}
-        <div className={classnames("form-row", { invalid: logSyntaxError })}>
+        <div className={classnames("form-row")}>
           {showCondition ? <div className="w-6 flex-shrink-0 mr-1">log</div> : null}
           <PanelInput
             id="logpoint"
