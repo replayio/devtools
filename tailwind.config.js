@@ -8,12 +8,14 @@ module.exports = {
       colors: {
         lightGrey: "var(--light-grey)",
         primaryAccent: "var(--primary-accent)",
+        primaryAccentText: "var(--primary-accent-text)",
         primaryAccentHover: "var(--primary-accent-hover)",
-        primaryAccentHoverLegacy: "var(--primary-accent-hover-legacy)",
+        primaryAccentLegacyHover: "var(--primary-accent-legacy-hover)",
         primaryAccentLegacy: "var(--primary-accent-legacy)",
         secondaryAccent: "var(--secondary-accent)",
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
+        bodyColor: "var(--theme-body-color)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

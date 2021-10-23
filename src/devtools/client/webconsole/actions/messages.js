@@ -4,9 +4,12 @@
 
 "use strict";
 
-import { getAllFilters, isBrowserInternalMessage } from "../selectors/filters";
+import { getAllFilters } from "../selectors/filters";
 
-const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
+const {
+  prepareMessage,
+  isBrowserInternalMessage,
+} = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
 const { ThreadFront } = require("protocol/thread");
 const { LogpointHandlers } = require("protocol/logpoint");
@@ -18,7 +21,6 @@ const {
   MESSAGE_OPEN,
   MESSAGE_CLOSE,
   MESSAGE_UPDATE_PAYLOAD,
-  PAUSED_EXECUTION_POINT,
   MESSAGES_CLEAR_EVALUATIONS,
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");

@@ -117,6 +117,7 @@ class Message extends Component {
 
   onViewSourceInDebugger = frame => {
     const { dispatch } = this.props;
+    trackEvent("console.select_source ");
     dispatch(actions.onViewSourceInDebugger(frame));
   };
 
@@ -171,6 +172,7 @@ class Message extends Component {
     let overlayType, label;
     let onRewindClick = () => {
       trackEvent("console seek");
+      trackEvent("console.seek");
       dispatch(
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
@@ -178,6 +180,7 @@ class Message extends Component {
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
     let handleAddComment = () => {
+      trackEvent("console.add_comment");
       dispatch(actions.createComment(executionPointTime, executionPoint, undefined, true, frame));
     };
 

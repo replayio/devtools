@@ -19,7 +19,6 @@ const { getAllMessagesById } = require("devtools/client/webconsole/selectors/mes
 
 // Utilities
 const { PluralForm } = require("devtools/shared/plural-form");
-
 // Constants
 const { FILTERBAR_DISPLAY_MODES, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
@@ -30,6 +29,7 @@ const ConsoleSettings = createFactory(
 );
 const SearchBox = createFactory(require("devtools/client/shared/components/SearchBox"));
 const { isDemo } = require("ui/utils/environment");
+const { trackEvent } = require("ui/utils/telemetry");
 
 const PropTypes = require("prop-types");
 
@@ -160,7 +160,10 @@ class FilterBar extends Component {
       className: "devtools-button devtools-clear-icon",
       title: evaluationsExist ? "Clear console evaluations" : "No console evaluations to clear",
       disabled: !evaluationsExist,
-      onClick: messagesClearEvaluations,
+      onClick: () => {
+        trackEvent("console.clear_messages");
+        messagesClearEvaluations();
+      },
     });
   }
 

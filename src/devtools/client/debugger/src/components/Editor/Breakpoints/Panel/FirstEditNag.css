@@ -1,0 +1,4 @@
+.first-edit-nag {
+  background: var(--theme-popup-color);
+  color: var(--theme-popup-background);
+}

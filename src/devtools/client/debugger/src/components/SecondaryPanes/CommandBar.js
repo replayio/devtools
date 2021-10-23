@@ -13,6 +13,7 @@ import { getIsWaitingOnBreak, getSkipPausing, getThreadContext } from "../../sel
 import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
 import { debugBtn } from "../shared/Button/CommandBarButton";
+import { trackEvent } from "ui/utils/telemetry";
 import "./CommandBar.css";
 
 import { appinfo } from "devtools-services";
@@ -108,9 +109,21 @@ class CommandBar extends Component {
     const className = cx.isPaused ? "active" : "disabled";
 
     return [
-      debugBtn(() => this.props.rewind(cx), "rewind", className, "Rewind Execution", !cx.isPaused),
       debugBtn(
-        () => this.props.resume(cx),
+        () => {
+          trackEvent("debugger.rewind");
+          this.props.rewind(cx);
+        },
+        "rewind",
+        className,
+        "Rewind Execution",
+        !cx.isPaused
+      ),
+      debugBtn(
+        () => {
+          trackEvent("debugger.resume");
+          this.props.resume(cx);
+        },
         "resume",
         className,
         L10N.getFormatStr("resumeButtonTooltip", formatKey("resume")),
@@ -118,14 +131,20 @@ class CommandBar extends Component {
       ),
       <div key="divider-2" className="divider" />,
       debugBtn(
-        () => this.props.reverseStepOver(cx),
+        () => {
+          trackEvent("debugger.reverse_step_over");
+          this.props.reverseStepOver(cx);
+        },
         "reverseStepOver",
         className,
         "Reverse step over",
         !cx.isPaused
       ),
       debugBtn(
-        () => this.props.stepOver(cx),
+        () => {
+          trackEvent("debugger.step_over");
+          this.props.stepOver(cx);
+        },
         "stepOver",
         className,
         L10N.getFormatStr("stepOverTooltip", formatKey("stepOver")),
@@ -133,14 +152,20 @@ class CommandBar extends Component {
       ),
       <div key="divider-3" className="divider" />,
       debugBtn(
-        () => this.props.stepIn(cx),
+        () => {
+          trackEvent("debugger.step_in");
+          this.props.stepIn(cx);
+        },
         "stepIn",
         className,
         L10N.getFormatStr("stepInTooltip", formatKey("stepIn")),
         !cx.isPaused
       ),
       debugBtn(
-        () => this.props.stepOut(cx),
+        () => {
+          trackEvent("debugger.step_out");
+          this.props.stepOut(cx);
+        },
         "stepOut",
         className,
         L10N.getFormatStr("stepOutTooltip", formatKey("stepOut")),

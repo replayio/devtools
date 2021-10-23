@@ -7,15 +7,27 @@
   min-width: 300px;
 }
 
+.breakpoint-panel-wrapper > :first-child {
+  max-width: 500px;
+  min-width: 300px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.breakpoint-panel-wrapper > :last-child {
+  max-width: 500px;
+  min-width: 300px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
 .breakpoint-panel {
   cursor: initial;
   position: relative;
   display: flex;
   flex-direction: column;
   background: var(--theme-toolbar-background);
-  border-radius: 4px;
   border: 1px solid var(--theme-splitter-color);
-  line-height: 16px;
   color: var(--theme-toolbar-color);
   overflow: hidden;
 }
@@ -231,4 +243,21 @@ non-editing markup */
 
 .breakpoint-panel .add-comment-icon {
   font-size: 1rem;
+}
+
+.breakpoint-panel .summary:hover .expression {
+  background-image: linear-gradient(to right, var(--theme-highlight-purple) 50%, transparent 0%);
+  background-position: 1px 14px;
+  background-size: 5px 1.5px;
+  background-repeat: repeat-x;
+}
+
+.breakpoint-panel .summary:hover {
+  background: hsl(240, 8%, 99%);
+  cursor: pointer;
+}
+
+.breakpoint-panel .summary:hover .pencil {
+  opacity: 1;
+  color: var(--theme-highlight-purple);
 }

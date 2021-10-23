@@ -51,7 +51,10 @@ export function registerRecording({
 
   Sentry.setContext("recording", { recordingId: recording.id, url: window.location.href });
 
-  if (recording.user?.internal || userInfo?.internal || skipTelemetry()) {
+  if (
+    !prefs.logTelemetryEvent &&
+    (recording.user?.internal || userInfo?.internal || skipTelemetry())
+  ) {
     mixpanelDisabled = true;
   } else {
     mixpanel.register({ recordingId: recording.id });
@@ -130,7 +133,7 @@ export async function trackEvent(event: string, additionalContext?: Object) {
   };
 
   if (prefs.logTelemetryEvent) {
-    console.log("mixpanel event", { event, context });
+    console.log("🔴", event, context);
   }
 
   mixpanel.track(event, context);

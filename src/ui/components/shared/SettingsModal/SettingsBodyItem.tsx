@@ -36,7 +36,7 @@ function Dropdown<K>({ value }: InputProps<K>) {
 
   return (
     <div className="w-48">
-      <SelectMenu selected={value} setSelected={onChange} options={[]} />
+      <SelectMenu selected={value} setSelected={onChange} options={[]} className="text-sm" />
     </div>
   );
 }
