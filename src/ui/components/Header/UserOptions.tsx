@@ -36,8 +36,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
-
-    const docsUrl = `https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02`;
+    const docsUrl = `https://replayio.notion.site/Docs-9f8863871e024ea6acc64d6564004a22`;
 
     if (event.metaKey) {
       return window.open(docsUrl, "replaydocs");
