@@ -8,7 +8,9 @@ import { prefs } from "./prefs";
 import { UserInfo } from "ui/hooks/users";
 
 let mixpanelDisabled = false;
-const timings: any = {};
+const STORAGE_KEY = "devtools.telemetry.timing";
+const timings: Record<string, number> =
+  JSON.parse(localStorage.getItem(STORAGE_KEY) || "false") || {};
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -92,12 +94,12 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
 }
 
 export async function sendTelemetryEvent(event: string, tags: any = {}) {
-  if (!prefs.logTelemetryEvent && skipTelemetry()) {
-    return;
-  }
-
   if (prefs.logTelemetryEvent) {
     console.log("telemetry event", { event, tags });
+  }
+
+  if (skipTelemetry()) {
+    return;
   }
 
   try {
@@ -135,12 +137,19 @@ export async function trackEvent(event: string, additionalContext?: Object) {
 }
 
 export function trackTiming(event: string, properties: any = {}) {
+  let duration: number | undefined;
   if (!timings[event]) {
-    timings[event] = new Date();
+    timings[event] = Date.now();
+  } else {
+    duration = Date.now() - timings[event];
+    delete timings[event];
   }
 
-  const duration: number = new Date() - timings[event];
-  delete timings[event];
-
   sendTelemetryEvent(event, { duration, ...properties });
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(timings));
+  });
 }
