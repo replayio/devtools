@@ -5,6 +5,7 @@ import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
 import { GitHubLink } from "./githubLink";
+import { ReplayLink } from "./replayLink";
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -47,6 +48,7 @@ const TipTapEditor = ({
     extensions: [
       StarterKit,
       GitHubLink,
+      ReplayLink,
       // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
       Placeholder.configure({ placeholder }),
       Extension.create({
