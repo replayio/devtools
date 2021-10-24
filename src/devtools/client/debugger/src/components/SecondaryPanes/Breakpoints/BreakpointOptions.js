@@ -13,20 +13,31 @@ const highlightText = memoize(
   text => text
 );
 
-function BreakpointOptions({ breakpoint, editor, cx, selectSpecificLocation }) {
+function Highlighted({ expression, editor }) {
+  return <span dangerouslySetInnerHTML={highlightText(expression, editor)} />;
+}
+
+function BreakpointOptions({ breakpoint, editor }) {
   const { logValue, condition } = breakpoint.options;
+
+  if (!condition) {
+    return (
+      <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+        <Highlighted expression={logValue} editor={editor} />;
+      </span>
+    );
+  }
 
   return (
     <div className="breakpoint-options">
-      {condition ? (
-        <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-          if(
-          <span dangerouslySetInnerHTML={highlightText(condition, editor)} />)
-        </span>
-      ) : null}
+      <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+        if(
+        <Highlighted expression={condition} editor={editor} />)
+      </span>
+
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
         log(
-        <span dangerouslySetInnerHTML={highlightText(logValue, editor)} />)
+        <Highlighted expression={logValue} editor={editor} />)
       </span>
     </div>
   );
