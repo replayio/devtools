@@ -25,10 +25,9 @@ function EditableSettings({
 }: Omit<SharingProps, "showSharingSettings">) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const handleWorkspaceSelect = (id: string) => {
-    updateDefaultWorkspace({
-      variables: { workspaceId: id },
-    });
     setSelectedWorkspaceId(id);
+    const dbWorkspaceId = id === "My Library" ? null : id;
+    updateDefaultWorkspace({ variables: { workspaceId: dbWorkspaceId } });
   };
 
   return (
