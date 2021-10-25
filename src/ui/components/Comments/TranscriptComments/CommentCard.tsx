@@ -101,12 +101,7 @@ function CommentItemHeader({
           {relativeDate}
         </span>
       </div>
-      {showOptions ? (
-        <CommentActions
-          comment={comment}
-          isRoot={"replies" in comment && !!comment.replies.length}
-        />
-      ) : null}
+      {showOptions ? <CommentActions comment={comment} isRoot={"replies" in comment} /> : null}
     </div>
   );
 }
