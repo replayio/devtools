@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactNode, SetStateAction, Dispatch } from "react";
 import hooks from "ui/hooks";
 import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
@@ -9,6 +9,7 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
 import BubbleBackground from "../shared/Onboarding/BubbleBackground";
 import Sharing, { MY_LIBRARY } from "./Sharing";
+import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
@@ -80,7 +81,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 
 function ReplayScreenshot({ screenData }: { screenData: string }) {
   return (
-    <div className="bg-white rounded-lg px-6 pt-6 shadow-xl h-64" style={{ height: "320px" }}>
+    <div className="rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish" style={{ height: "280px" }}>
       <img src={screenData} className="h-full m-auto" />
     </div>
   );
@@ -91,6 +92,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
   const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
@@ -154,22 +156,34 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
         className="relative flex flex-col items-center space-y-11 overflow-auto"
         onSubmit={onSubmit}
       >
-        <div
-          className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
-          style={{ width: "620px" }}
-        >
-          <div className="absolute w-full h-full bg-white opacity-40" />
-          <div className="py-9 px-8 space-y-6 relative">
-            <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
-            <ReplayScreenshot screenData={screenData!} />
+        <div className="flex flex-row space-x-4" style={{ height: isPublic ? "620px" : "" }}>
+          <div
+            className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
+            style={{ width: "620px" }}
+          >
+            <div className="absolute w-full h-full bg-jellyfish" />
+            <div className="py-9 px-8 space-y-6 relative">
+              <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
+              <ReplayScreenshot screenData={screenData!} />
+            </div>
+            <div className="py-9 space-y-6 px-8 border-t border-gray-300 relative">
+              <Sharing
+                workspaces={workspaces}
+                selectedWorkspaceId={selectedWorkspaceId}
+                setSelectedWorkspaceId={setSelectedWorkspaceId}
+                isPublic={isPublic}
+                setIsPublic={setIsPublic}
+              />
+              {isPublic ? (
+                <ToggleShowPrivacyButton
+                  showPrivacy={showPrivacy}
+                  operations={recording.operations}
+                  setShowPrivacy={setShowPrivacy}
+                />
+              ) : null}
+            </div>
           </div>
-          <Sharing
-            workspaces={workspaces}
-            selectedWorkspaceId={selectedWorkspaceId}
-            setSelectedWorkspaceId={setSelectedWorkspaceId}
-            isPublic={isPublic}
-            setIsPublic={setIsPublic}
-          />
+          {showPrivacy && isPublic ? <Privacy operations={recording.operations} /> : null}
         </div>
         <Actions onDiscard={onDiscard} status={status} />
       </form>

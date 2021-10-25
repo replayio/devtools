@@ -16,6 +16,7 @@ module.exports = {
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
         bodyColor: "var(--theme-body-color)",
+        jellyfish: "rgba(255,255,255,0.4)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

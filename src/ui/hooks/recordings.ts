@@ -194,6 +194,7 @@ function convertRecording(rec: any): Recording | undefined {
     collaborators,
     ownerNeedsInvite: rec.ownerNeedsInvite,
     userRole: rec.userRole,
+    operations: rec.operations,
   };
 }
 
