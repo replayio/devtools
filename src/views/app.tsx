@@ -10,7 +10,7 @@ import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
-import { ConfirmProvider, ConfirmRenderer } from "ui/components/shared/ConfirmDialog";
+import { ConfirmProvider } from "ui/components/shared/Confirm";
 
 const Recording = React.lazy(() => import("./recording"));
 const Account = React.lazy(() => import("ui/components/Account"));

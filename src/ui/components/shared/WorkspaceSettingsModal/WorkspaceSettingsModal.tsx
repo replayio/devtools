@@ -15,7 +15,6 @@ import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import { Button, DisabledButton, PrimaryButton } from "../Button";
-import { useConfirm } from "../ConfirmDialog";
 
 export function WorkspaceMembers({
   members,
@@ -156,24 +155,21 @@ const settings: Settings<
     component: function DeleteTeam({ hideModal, setWorkspaceId, workspaceId }) {
       const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
-      const { confirmDestructive } = useConfirm();
 
       const handleDeleteTeam = () => {
-        confirmDestructive({
-          message: `Unexpected bad things will happen if you don't read this!`,
-          description: `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`,
-          acceptLabel: "Delete team",
-          declineLabel: "Nevermind",
-        }).then(confirmed => {
-          if (confirmed) {
-            deleteWorkspace({
-              variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
-            });
-            hideModal();
-            setWorkspaceId(null);
-            updateDefaultWorkspace({ variables: { workspaceId: null } });
-          }
-        });
+        const line1 = `Unexpected bad things will happen if you don't read this!`;
+        const line2 = `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`;
+        const line3 = `Click OK to proceed.`;
+        const message = `${line1}\n\n${line2}\n\n${line3}`;
+
+        if (window.confirm(message)) {
+          deleteWorkspace({
+            variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
+          });
+          hideModal();
+          setWorkspaceId(null);
+          updateDefaultWorkspace({ variables: { workspaceId: null } });
+        }
       };
 
       return (
