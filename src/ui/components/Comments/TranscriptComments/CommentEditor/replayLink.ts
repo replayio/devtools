@@ -5,7 +5,7 @@ export interface ReplayLinkOptions {
   HTMLAttributes: Record<string, any>;
 }
 
-export const inputRegex = /(https:\/\/app.replay.io\/recording\/(.*)\?.*)/g;
+export const inputRegex = /(https:\/\/app.replay.io\/recording\/(.*)\??.*)/g;
 
 const getAttributes = (match: string[]) => {
   const [href, , recordingId] = match;
