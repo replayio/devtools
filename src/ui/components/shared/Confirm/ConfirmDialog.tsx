@@ -8,12 +8,11 @@ import {
   DialogTitle,
 } from "../Dialog";
 import React, { HTMLProps } from "react";
-import ReplayLogo from "../ReplayLogo";
 import classNames from "classnames";
 
 export type ConfirmOptions = {
   acceptLabel: string;
-  declineLabel: string;
+  declineLabel?: string;
   description?: string;
   message: string;
   onAccept: () => void;
@@ -26,7 +25,7 @@ type PropTypes = ConfirmOptions & DialogPropTypes;
 export const ConfirmDialog = ({
   acceptLabel,
   className,
-  declineLabel,
+  declineLabel = "Cancel",
   description,
   message,
   onAccept,
