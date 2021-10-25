@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
+import { useConfirm } from "ui/components/shared/Confirm";
 
 type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
@@ -21,6 +22,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReply = hooks.useDeleteCommentReply();
   const [expanded, setExpanded] = useState(false);
+  const { confirmDestructive } = useConfirm();
 
   const isCommentAuthor = userId === comment.user.id;
 
@@ -33,18 +35,28 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     setExpanded(false);
 
     const replyCount = ("replies" in comment && comment.replies?.length) || 0;
-    const message = `Deleting this comment will permanently delete this comment${
+    const message = `Delete this comment`;
+    const description = `Deleting this comment will permanently remove it${
       replyCount ? ` and its ${replyCount} repl${replyCount == 1 ? "y" : "ies"}` : ""
     }. \n\nAre you sure you want to proceed?`;
 
-    if (window.confirm(message)) {
+    confirmDestructive({
+      message,
+      description,
+      acceptLabel: "Yes, delete it",
+      declineLabel: "Nevermind",
+    }).then(confirmed => {
+      if (!confirmed) {
+        return;
+      }
+
       trackEvent("comments.delete");
       if (isRoot) {
         deleteComment(comment.id, recordingId!);
       } else {
         deleteCommentReply(comment.id, recordingId!);
       }
-    }
+    });
   };
   const editComment = (e: React.MouseEvent) => {
     e.stopPropagation();
