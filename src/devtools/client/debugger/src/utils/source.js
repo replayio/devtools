@@ -25,6 +25,7 @@ export const sourceTypes = {
   js: "javascript",
   jsx: "react",
   ts: "typescript",
+  tsx: "typescript",
   vue: "vue",
 };
 
