@@ -125,6 +125,14 @@ function CommentCard({
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
+  useEffect(() => {
+    // If _this_ comment is the pending comment, but it isn't focused, focus it!
+    // That will maintain the comment editor's focus when you reposition the marker.
+    if (!isFocused && pendingComment?.comment.id === comment.id) {
+      setIsFocused(true);
+    }
+  }, [comment, isFocused, pendingComment]);
+
   const replyKeys = commentKeys(comment.replies);
 
   if (comment.id === PENDING_COMMENT_ID) {
