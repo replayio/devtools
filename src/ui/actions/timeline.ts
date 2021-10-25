@@ -100,10 +100,10 @@ export function jumpToInitialPausePoint(): UIThunkAction {
   return async ({ getState, dispatch }) => {
     assert(ThreadFront.recordingId);
 
+    await ThreadFront.waitForSession();
     const { duration } = await ThreadFront.getRecordingDescription();
     dispatch(setRecordingDescription(duration));
 
-    await ThreadFront.waitForSession();
     const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
     let { point, time } = endpoint;
 
