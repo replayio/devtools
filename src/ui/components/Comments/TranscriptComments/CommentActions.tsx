@@ -11,6 +11,26 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
 import { useConfirm } from "ui/components/shared/Confirm";
 
+function getDeleteMessage(replyCount: number) {
+  if (replyCount > 1) {
+    return "Delete comment and replies?";
+  }
+  if (replyCount === 1) {
+    return "Delete comment and reply?";
+  }
+  return "Delete comment?";
+}
+
+function getDeleteDescription(replyCount: number) {
+  if (replyCount > 1) {
+    return "Deleting this comment will permanently remove it and its replies";
+  }
+  if (replyCount === 1) {
+    return "Deleting this comment will permanently remove it and its reply";
+  }
+  return "Deleting this comment will permanently remove it";
+}
+
 type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
   isRoot: boolean;
@@ -35,10 +55,8 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     setExpanded(false);
 
     const replyCount = ("replies" in comment && comment.replies?.length) || 0;
-    const message = replyCount === 0 ? "Delete comment?" : "Delete comment and replies?";
-    const description = `Deleting this comment will permanently remove it${
-      replyCount ? ` and its ${replyCount} repl${replyCount == 1 ? "y" : "ies"}` : ""
-    }. \n\nAre you sure you want to proceed?`;
+    const message = getDeleteMessage(replyCount);
+    const description = `${getDeleteDescription(replyCount)}. Are you sure you want to proceed?`;
 
     confirmDestructive({
       message,
