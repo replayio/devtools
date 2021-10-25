@@ -4,7 +4,6 @@ import { User } from "ui/types";
 export interface CommentsState {
   pendingComment: PendingComment | null;
   hoveredComment: any;
-  shouldShowLoneEvents: boolean;
 }
 
 export interface SourceLocation {
