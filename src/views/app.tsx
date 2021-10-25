@@ -30,19 +30,19 @@ const AppRouting = () => {
       <tokenManager.Auth0Provider>
         <ApolloWrapper>
           <IntercomProvider appId={"k7f741xx"} autoBoot>
-            <ConfirmProvider>
-              <App>
-                <ErrorBoundary>
-                  <React.Suspense fallback={<LoadingScreen />}>
+            <App>
+              <ErrorBoundary>
+                <React.Suspense fallback={<LoadingScreen />}>
+                  <ConfirmProvider>
                     <Switch>
                       <Route path="/recording/:recordingId" component={Recording} />
                       <Route exact path="/view" component={ViewRedirect} />
                       <Route component={Account} />
                     </Switch>
-                  </React.Suspense>
-                </ErrorBoundary>
-              </App>
-            </ConfirmProvider>
+                  </ConfirmProvider>
+                </React.Suspense>
+              </ErrorBoundary>
+            </App>
           </IntercomProvider>
         </ApolloWrapper>
       </tokenManager.Auth0Provider>
