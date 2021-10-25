@@ -35,7 +35,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     setExpanded(false);
 
     const replyCount = ("replies" in comment && comment.replies?.length) || 0;
-    const message = `Delete this comment`;
+    const message = replyCount === 0 ? "Delete comment?" : "Delete comment and replies?";
     const description = `Deleting this comment will permanently remove it${
       replyCount ? ` and its ${replyCount} repl${replyCount == 1 ? "y" : "ies"}` : ""
     }. \n\nAre you sure you want to proceed?`;
@@ -43,8 +43,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     confirmDestructive({
       message,
       description,
-      acceptLabel: "Yes, delete it",
-      declineLabel: "Nevermind",
+      acceptLabel: "Delete comment",
     }).then(confirmed => {
       if (!confirmed) {
         return;
