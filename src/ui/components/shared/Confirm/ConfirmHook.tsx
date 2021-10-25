@@ -1,7 +1,8 @@
 import { omit, uniqueId } from "lodash";
 import React, { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { createPortal } from "react-dom";
-import { ConfirmDialog, ConfirmOptions } from "./ConfirmDialog";
+import { ConfirmModal } from "./ConfirmModal";
+import { ConfirmOptions } from "./ConfirmDialog";
 
 const ConfirmContext = createContext<{
   confirmations: { [id: number]: ConfirmOptions };
@@ -14,6 +15,7 @@ const ConfirmContext = createContext<{
 });
 
 type ConfirmHook = (options: Omit<ConfirmOptions, "onAccept" | "onDecline">) => Promise<boolean>;
+
 export const useConfirm = () => {
   const { showConfirmation } = useContext(ConfirmContext);
 
@@ -54,7 +56,7 @@ export const ConfirmRenderer = ({
   return (
     <>
       {Object.entries(confirmations).map(([id, options]) =>
-        createPortal(<ConfirmDialog key={id} {...options} />, element)
+        createPortal(<ConfirmModal key={id} {...options} />, element)
       )}
     </>
   );

@@ -1,7 +1,15 @@
 import { PrimaryButton, SecondaryButton } from "../Button";
-import { Dialog } from "../Dialog";
+import {
+  Dialog,
+  DialogActions,
+  DialogDescription,
+  DialogLogo,
+  DialogPropTypes,
+  DialogTitle,
+} from "../Dialog";
 import React, { HTMLProps } from "react";
 import ReplayLogo from "../ReplayLogo";
+import classNames from "classnames";
 
 export type ConfirmOptions = {
   acceptLabel: string;
@@ -13,37 +21,40 @@ export type ConfirmOptions = {
   variation?: "normal" | "destructive";
 };
 
-type PropTypes = ConfirmOptions & HTMLProps<HTMLDivElement>;
+type PropTypes = ConfirmOptions & DialogPropTypes;
 
 export const ConfirmDialog = ({
   acceptLabel,
+  className,
   declineLabel,
   description,
   message,
   onAccept,
   onDecline,
   variation = "normal",
+  ...props
 }: PropTypes) => {
   return (
     <Dialog
-      className="flex flex-col items-center"
+      {...props}
+      className={classNames("flex flex-col items-center", className)}
       style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
     >
-      <ReplayLogo size="sm" />
-      <h1 className="text-center text-lg font-medium mt-5">{message}</h1>
-      {description && <p className="mt-2 text-center text-gray-500 text-xs">{description}</p>}
-      <div className="mt-6 flex w-full">
-        <SecondaryButton color="blue" className="m-3 flex-1 justify-center" onClick={onDecline}>
+      <DialogLogo />
+      <DialogTitle>{message}</DialogTitle>
+      {description && <DialogDescription>{description}</DialogDescription>}
+      <DialogActions>
+        <SecondaryButton color="blue" className="flex-1 mx-3 justify-center" onClick={onDecline}>
           {declineLabel}
         </SecondaryButton>
         <PrimaryButton
-          className="m-3 flex-1 justify-center"
+          className="flex-1 mx-2 justify-center"
           color={variation === "destructive" ? "red" : "blue"}
           onClick={onAccept}
         >
           {acceptLabel}
         </PrimaryButton>
-      </div>
+      </DialogActions>
     </Dialog>
   );
 };
