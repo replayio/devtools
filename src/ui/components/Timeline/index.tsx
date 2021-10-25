@@ -341,18 +341,15 @@ class Timeline extends Component<PropsFromRedux> {
       currentTime,
       hoverTime,
       precachedTime,
-      hoveredLineNumberLocation,
-      hoveredItem,
       recordingDuration,
       isTrimming,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
-    const shouldDim = hoveredLineNumberLocation || hoveredItem;
 
     return (
-      <div className={classnames("timeline", { dimmed: shouldDim })}>
+      <div className="timeline">
         {this.renderCommands()}
         <div className={classnames("progress-bar-container", { paused: true })}>
           <div
@@ -408,7 +405,6 @@ const connector = connect(
     messages: selectors.getMessagesForTimeline(state),
     viewMode: selectors.getViewMode(state),
     selectedPanel: selectors.getSelectedPanel(state),
-    hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
     hoveredItem: selectors.getHoveredItem(state),
     hoveredComment: selectors.getHoveredComment(state),

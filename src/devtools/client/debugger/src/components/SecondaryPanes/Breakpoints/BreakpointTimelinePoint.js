@@ -51,6 +51,10 @@ function BreakpointTimelinePoint({
       clearHoveredItem();
     }
   };
+  const onClick = e => {
+    e.stopPropagation();
+    seek(point.point, point.time, true);
+  };
 
   const { startTime, endTime } = zoomRegion;
   const leftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
@@ -65,7 +69,7 @@ function BreakpointTimelinePoint({
         "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
       title={`${index + 1}/${analysisPoints.length}`}
-      onClick={() => seek(point.point, point.time, true)}
+      onClick={onClick}
       style={{ left: `calc(${leftPercentOffset}% - ${pointWidth / 2}px)` }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
