@@ -8,7 +8,6 @@ import "./CommentTool.css";
 import { Comment, Reply } from "ui/state/comments";
 import classNames from "classnames";
 import { Canvas } from "ui/state/app";
-import { ThreadFront } from "protocol/thread";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import useAuth0 from "ui/utils/useAuth0";
 import { useGetUserId } from "ui/hooks/users";
@@ -171,7 +170,7 @@ function CommentTool({
         {pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment" ? (
           <span>{"Move the marker"}</span>
         ) : (
-          `Add comment ${ThreadFront.currentPointHasFrames ? "to this line of code" : ""}`
+          "Add comment"
         )}
       </div>
     </div>
