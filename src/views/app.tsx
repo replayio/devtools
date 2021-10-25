@@ -10,6 +10,7 @@ import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
+import { ConfirmProvider } from "ui/components/shared/Confirm";
 
 const Recording = React.lazy(() => import("./recording"));
 const Account = React.lazy(() => import("ui/components/Account"));
@@ -29,17 +30,19 @@ const AppRouting = () => {
       <tokenManager.Auth0Provider>
         <ApolloWrapper>
           <IntercomProvider appId={"k7f741xx"} autoBoot>
-            <App>
-              <ErrorBoundary>
-                <React.Suspense fallback={<LoadingScreen />}>
-                  <Switch>
-                    <Route path="/recording/:recordingId" component={Recording} />
-                    <Route exact path="/view" component={ViewRedirect} />
-                    <Route component={Account} />
-                  </Switch>
-                </React.Suspense>
-              </ErrorBoundary>
-            </App>
+            <ConfirmProvider>
+              <App>
+                <ErrorBoundary>
+                  <React.Suspense fallback={<LoadingScreen />}>
+                    <Switch>
+                      <Route path="/recording/:recordingId" component={Recording} />
+                      <Route exact path="/view" component={ViewRedirect} />
+                      <Route component={Account} />
+                    </Switch>
+                  </React.Suspense>
+                </ErrorBoundary>
+              </App>
+            </ConfirmProvider>
           </IntercomProvider>
         </ApolloWrapper>
       </tokenManager.Auth0Provider>
