@@ -59,10 +59,14 @@ const TipTapEditor = ({
           return {
             "Cmd-Enter": ({ editor }) => {
               handleSubmit(JSON.stringify(editor.getJSON()));
+              blur();
+              close();
               return true;
             },
             Enter: ({ editor }) => {
               handleSubmit(JSON.stringify(editor.getJSON()));
+              blur();
+              close();
               return true;
             },
             Escape: ({ editor }) => {

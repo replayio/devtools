@@ -2,18 +2,17 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
-import { PendingNewComment, PendingNewReply } from "ui/state/comments";
+import { Comment, Reply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
 import { useAuth0 } from "@auth0/auth0-react";
 
 interface NewCommentEditorProps extends PropsFromRedux {
-  comment: PendingNewComment | PendingNewReply;
+  comment: Comment | Reply;
   type: "new_reply" | "new_comment";
 }
 
 function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewCommentEditorProps) {
   const { isAuthenticated } = useAuth0();
-  const recordingId = hooks.useGetRecordingId();
   const addComment = hooks.useAddComment();
   const addCommentReply = hooks.useAddCommentReply();
 
@@ -24,30 +23,30 @@ function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewC
     }
 
     if (type == "new_reply") {
-      handleReplySave(comment as PendingNewReply, inputValue);
+      handleReplySave(comment as Reply, inputValue);
     } else {
-      handleNewSave(comment as PendingNewComment, inputValue);
+      handleNewSave(comment as Comment, inputValue);
     }
 
     clearPendingComment();
   };
 
-  const handleReplySave = async (comment: PendingNewReply, inputValue: string) => {
+  const handleReplySave = async (comment: Reply, inputValue: string) => {
     const reply = {
       ...comment,
       content: inputValue,
     };
 
-    addCommentReply(reply, recordingId!);
+    addCommentReply(reply);
   };
 
-  const handleNewSave = async (comment: PendingNewComment, inputValue: string) => {
+  const handleNewSave = async (comment: Comment, inputValue: string) => {
     const newComment = {
       ...comment,
       content: inputValue,
     };
 
-    addComment(newComment, recordingId!);
+    addComment(newComment);
   };
 
   return <CommentEditor editable={true} {...{ comment, handleSubmit }} />;

@@ -4,6 +4,9 @@ inputs:
   stripe:
     description: "Stripe to run, in the form INDEX/TOTAL"
     required: true
+  github_ci:
+    description: "A flag to tell whether we are in CI"
+    required: false
 
 runs:
   using: "node12"

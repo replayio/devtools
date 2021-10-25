@@ -17,6 +17,9 @@ import "reactjs-popup/dist/index.css";
 import "ui/components/reactjs-popup.css";
 import Log from "./Log";
 import Condition from "./Condition";
+import useAuth0 from "ui/utils/useAuth0";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { useGetUserId } from "ui/hooks/users";
 
 export type Input = "condition" | "logValue";
 
@@ -37,6 +40,9 @@ function PanelSummary({
   analysisPoints,
 }: PanelSummaryProps) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
+  const { user } = useAuth0();
+  const { userId } = useGetUserId();
+  const recordingId = useGetRecordingId();
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
@@ -66,11 +72,22 @@ function PanelSummary({
     trackEvent("breakpoint.add_comment");
 
     if (pausedOnHit) {
-      console.log("createFrameComment", currentTime, executionPoint, breakpoint);
-      createFrameComment(currentTime, executionPoint, null, breakpoint);
+      createFrameComment(
+        currentTime,
+        executionPoint,
+        null,
+        { ...user, userId },
+        recordingId,
+        breakpoint
+      );
     } else {
-      console.log("createFloatingCodeComment", currentTime, executionPoint, breakpoint);
-      createFloatingCodeComment(currentTime, executionPoint, breakpoint);
+      createFloatingCodeComment(
+        currentTime,
+        executionPoint,
+        { ...user, id: userId },
+        recordingId,
+        breakpoint
+      );
     }
   };
 

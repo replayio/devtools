@@ -1,15 +1,20 @@
-const {
-  inputRegex,
-} = require("ui/components/Comments/TranscriptComments/CommentEditor/githubLink");
+const { commentKeys } = require("ui/utils/comments");
 
-describe("GitHubLink", () => {
-  test("when there are no github links it does not match", () => {
-    expect("text with no link".match(inputRegex)).toEqual(null);
-  });
+describe("commentKeys", () => {
+  test("keeps the same order even when the createdAt times changes a bit", () => {
+    const frozenNow = Date.now();
+    const secondsAgo = seconds => new Date(frozenNow - seconds * 1000);
 
-  test("when there are github links it does match", () => {
-    expect("https://github.com/RecordReplay/devtools/issues/3926".match(inputRegex)).toEqual([
-      "https://github.com/RecordReplay/devtools/issues/3926",
-    ]);
+    const optimisticResponse = [
+      { user: { id: "1" }, createdAt: secondsAgo(30) },
+      { user: { id: "1" }, createdAt: secondsAgo(15) },
+    ];
+    const serverResponse = [
+      { user: { id: "1" }, createdAt: secondsAgo(28) },
+      { user: { id: "1" }, createdAt: secondsAgo(14) },
+    ];
+
+    expect(commentKeys(optimisticResponse)).toEqual([0, 1]);
+    expect(commentKeys(serverResponse)).toEqual([0, 1]);
   });
 });

@@ -1,12 +1,14 @@
-import { RecordingId } from "@recordreplay/protocol";
 import { gql, useMutation } from "@apollo/client";
 import useAuth0 from "ui/utils/useAuth0";
 import { GET_USER_ID } from "ui/graphql/users";
 import { GET_COMMENTS } from "ui/graphql/comments";
-import { PendingNewReply } from "ui/state/comments";
+import { Reply } from "ui/state/comments";
+import { useParams } from "react-router-dom";
+import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 
 export default function useAddCommentReply() {
   const { user } = useAuth0();
+  const { recordingId } = useParams<{ recordingId: string }>();
 
   const [addCommentReply, { error }] = useMutation(
     gql`
@@ -25,8 +27,7 @@ export default function useAddCommentReply() {
     console.error("Apollo error while adding a comment:", error);
   }
 
-  return (reply: PendingNewReply, recordingId: RecordingId) => {
-    const temporaryId = new Date().toISOString();
+  return (reply: Reply) => {
     addCommentReply({
       variables: {
         input: {
@@ -38,7 +39,7 @@ export default function useAddCommentReply() {
         addCommentReply: {
           success: true,
           commentReply: {
-            id: temporaryId,
+            id: PENDING_COMMENT_ID,
             __typename: "CommentReply",
           },
           __typename: "AddCommentReply",
@@ -66,8 +67,8 @@ export default function useAddCommentReply() {
         const newReply = {
           id: commentReply.id,
           content: reply.content,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: reply.createdAt,
+          updatedAt: reply.updatedAt,
           user: {
             id: userId,
             name: user.name,
@@ -81,7 +82,7 @@ export default function useAddCommentReply() {
           ...parentComment,
           replies: [
             ...parentComment.replies.filter(
-              (r: any) => r.id !== temporaryId && r.id !== commentReply.id
+              (r: any) => r.id !== PENDING_COMMENT_ID && r.id !== commentReply.id
             ),
             newReply,
           ],

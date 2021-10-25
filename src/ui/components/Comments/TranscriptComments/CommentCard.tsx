@@ -5,57 +5,24 @@ import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
-import { Comment, PendingComment, PendingNewComment, Reply } from "ui/state/comments";
+import { Comment, PendingComment, Reply } from "ui/state/comments";
 import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 
-import differenceInMinutes from "date-fns/differenceInMinutes";
-import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
-import differenceInWeeks from "date-fns/differenceInWeeks";
-import differenceInMonths from "date-fns/differenceInMonths";
-import differenceInYears from "date-fns/differenceInYears";
-
 import { AvatarImage } from "ui/components/Avatar";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { trackEvent } from "ui/utils/telemetry";
+import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-
-function formatRelativeTime(date: Date) {
-  const minutes = differenceInMinutes(Date.now(), date);
-  const days = differenceInCalendarDays(Date.now(), date);
-  const weeks = differenceInWeeks(Date.now(), date);
-  const months = differenceInMonths(Date.now(), date);
-  const years = differenceInYears(Date.now(), date);
-
-  if (years > 0) {
-    return `${years}y`;
-  }
-  if (months > 0) {
-    return `${months}m`;
-  }
-  if (weeks > 0) {
-    return `${weeks}w`;
-  }
-  if (days > 0) {
-    return `${days}d`;
-  }
-  if (minutes >= 60) {
-    return `${Math.floor(minutes / 60)}h`;
-  }
-  if (minutes > 0) {
-    return `${minutes}m`;
-  }
-  return "Now";
-}
 
 function BorderBridge({
   comments,
   comment,
   isPaused,
 }: {
-  comments: (Comment | PendingNewComment)[];
-  comment: Comment | PendingNewComment;
+  comments: Comment[];
+  comment: Comment;
   isPaused: boolean;
 }) {
   const currentIndex = comments.findIndex(c => c === comment);
@@ -131,8 +98,8 @@ function CommentItem({
 }
 
 type PropsFromParent = {
-  comment: PendingNewComment;
-  comments: PendingNewComment[];
+  comment: Comment;
+  comments: Comment[];
 };
 type CommentCardProps = PropsFromRedux & PropsFromParent;
 
@@ -158,11 +125,13 @@ function CommentCard({
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
+  const replyKeys = commentKeys(comment.replies);
+
   if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
         className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
-        onMouseEnter={() => setHoveredComment("pendingCommentId")}
+        onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
         onClick={() => {
           trackEvent("comments.focus");
@@ -171,7 +140,7 @@ function CommentCard({
       >
         <div className={classNames("py-2.5 w-full border-l-2 border-secondaryAccent")}>
           <div className={classNames("px-2.5 pl-2 space-y-2")}>
-            {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
+            {comment.sourceLocation && <CommentSource comment={comment} />}
             <FocusContext.Provider
               value={{
                 autofocus: true,
@@ -210,8 +179,8 @@ function CommentCard({
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
         <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
-        {comment.replies?.map((reply: Reply) => (
-          <div key={reply.id}>
+        {comment.replies?.map((reply: Reply, i: number) => (
+          <div key={replyKeys[i]}>
             <CommentItem type="reply" comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
@@ -225,8 +194,8 @@ function CommentCard({
             }}
           >
             <NewCommentEditor
-              key={`${comment.id}-${(comment.replies || []).length}`}
-              comment={{ ...comment, content: "", parentId: comment.id }}
+              key={PENDING_COMMENT_ID}
+              comment={{ ...comment, content: "", parentId: comment.id, id: PENDING_COMMENT_ID }}
               type={"new_reply"}
             />
           </FocusContext.Provider>

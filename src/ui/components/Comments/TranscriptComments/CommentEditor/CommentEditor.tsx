@@ -4,7 +4,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import { Comment, PendingNewComment, PendingNewReply, Reply } from "ui/state/comments";
+import { Comment, Reply } from "ui/state/comments";
 
 import "./CommentEditor.css";
 import { User } from "ui/types";
@@ -13,7 +13,7 @@ import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
 
 type CommentEditorProps = PropsFromRedux & {
-  comment: Comment | Reply | PendingNewComment | PendingNewReply;
+  comment: Comment | Reply;
   editable: boolean;
   handleSubmit: (inputValue: string) => void;
 };
