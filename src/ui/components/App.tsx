@@ -24,6 +24,7 @@ import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
 import { migratePrefToSettings } from "ui/hooks/settings";
+import { ConfirmRenderer } from "./shared/Confirm";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -97,6 +98,7 @@ function App({ theme, modal, children }: AppProps) {
     <>
       {children}
       {modal ? <AppModal modal={modal} /> : null}
+      <ConfirmRenderer />
       <AppErrors />
     </>
   );

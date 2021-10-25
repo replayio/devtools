@@ -90,7 +90,6 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ConfirmContext.Provider value={{ confirmations, showConfirmation }}>
       {children}
-      <ConfirmRenderer />
     </ConfirmContext.Provider>
   );
 };

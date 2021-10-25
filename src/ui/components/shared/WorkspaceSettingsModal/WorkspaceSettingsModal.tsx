@@ -163,7 +163,6 @@ const settings: Settings<
           message: `Unexpected bad things will happen if you don't read this!`,
           description: `This action cannot be undone. This will permanently delete this repository and delete all of the replays, api-keys, sourcemaps and remove all team member associations`,
           acceptLabel: "Delete team",
-          declineLabel: "Nevermind",
         }).then(confirmed => {
           if (confirmed) {
             deleteWorkspace({
