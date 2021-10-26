@@ -51,6 +51,7 @@ export default function SettingsPreview({
   return (
     <button
       className="w-full flex flex-row justify-between items-center focus:outline-none"
+      type="button"
       onClick={onClick}
       style={{ minHeight: "38px" }}
     >
