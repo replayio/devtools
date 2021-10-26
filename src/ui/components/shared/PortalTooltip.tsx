@@ -10,7 +10,7 @@ export interface TargetCoordinates {
 interface PortalTooltipProps {
   tooltip: ReactNode;
   children: ReactNode;
-  followX: boolean;
+  followX?: boolean;
 }
 
 export default function PortalTooltip({ children, tooltip, followX = false }: PortalTooltipProps) {
