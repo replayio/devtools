@@ -119,7 +119,9 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    await onSave();
+  };
+  const onSave = async () => {
     setStatus("saving");
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
@@ -160,7 +162,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
         >
           <div className="absolute w-full h-full bg-white opacity-40" />
           <div className="py-9 px-8 space-y-6 relative">
-            <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
+            <ReplayTitle onSave={onSave} inputValue={inputValue} setInputValue={setInputValue} />
             <ReplayScreenshot screenData={screenData!} />
           </div>
           <Sharing
