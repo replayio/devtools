@@ -1139,11 +1139,6 @@ class _ThreadFront {
       this.updateLocation(location);
     }
   }
-
-  isPreferredSource(sourceId: SourceId) {
-    const chosen = this._chooseSourceId(this._getAlternateSourceIds(sourceId));
-    return sourceId === chosen.sourceId;
-  }
 }
 
 export const ThreadFront = new _ThreadFront();
