@@ -10,9 +10,6 @@ export function UploadRecordingTrialEnd({
   selectedWorkspaceId: string | null;
 }) {
   const workspace = workspaces.find(w => w.id === selectedWorkspaceId);
-  // Need to assign a 0px top margin here so it doesn't get affected by the
-  // parent's space-y styling
-  const style = { marginTop: "0px" };
 
   if (!workspace) {
     return null;

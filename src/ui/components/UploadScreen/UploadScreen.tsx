@@ -180,7 +180,6 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
     return <DeletedScreen url="/" />;
   }
 
-  console.log(recording.duration > 120 * 1000);
   return (
     <div
       className="w-full h-full grid fixed z-50 items-center justify-center"
@@ -203,8 +202,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
                 <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
                 <ReplayScreenshot
                   screenData={screenData!}
-                  // showLimitWarning={recording.duration > 120 * 1000}
-                  showLimitWarning={true}
+                  showLimitWarning={recording.duration > 120 * 1000}
                 />
               </div>
               <div className="py-9 space-y-6 px-8 border-t border-gray-300 relative">
