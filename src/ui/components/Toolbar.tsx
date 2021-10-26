@@ -143,27 +143,10 @@ function Toolbar({
         ) : null}
       </div>
       <div className="flex flex-col space-y-1 items-center">
-        {progressPercentage === 100 || viewMode === "non-dev" ? (
-          <LaunchIntercomMessengerButton />
-        ) : (
+        {progressPercentage !== 100 && viewMode === "dev" ? (
           <IndexingLoader {...{ progressPercentage, viewMode }} />
-        )}
+        ) : null}
       </div>
-    </div>
-  );
-}
-
-function LaunchIntercomMessengerButton() {
-  const { show } = useIntercom();
-  const { isAuthenticated } = useAuth0();
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  return (
-    <div className="toolbar-panel-button">
-      <IconWithTooltip icon={<Help />} content={"Chat with us"} handleClick={show} />
     </div>
   );
 }
