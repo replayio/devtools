@@ -87,7 +87,7 @@ function BreakpointTimeline({
 
   return (
     <div className="breakpoint-navigation-timeline-container relative">
-      <PortalTooltip tooltip={<TimeTooltip time={hoveredTime} />}>
+      <PortalTooltip tooltip={<TimeTooltip time={hoveredTime} />} followX={true}>
         <div
           className={classnames("breakpoint-navigation-timeline relative cursor-pointer")}
           onMouseMove={onMouseMove}
