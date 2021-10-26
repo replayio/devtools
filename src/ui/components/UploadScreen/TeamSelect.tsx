@@ -45,7 +45,7 @@ export default function TeamSelect({
       distance={0}
       position="bottom-right"
     >
-      <Dropdown widthClass="w-64">
+      <Dropdown widthClass="w-64" fontSizeClass="text-base">
         <div className="max-h-48 overflow-auto">
           {displayedWorkspaces.map(workspace => (
             <DropdownItem onClick={() => handleSelect(workspace)} key={workspace.id}>
