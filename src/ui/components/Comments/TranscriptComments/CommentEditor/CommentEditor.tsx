@@ -39,14 +39,17 @@ function CommentEditor({
     <div className="comment-input-container">
       <div className={classNames("comment-input")}>
         <FocusContext.Consumer>
-          {({ autofocus, blur, isFocused }) => (
+          {({ autofocus, blur, close, isFocused }) => (
             <TipTapEditor
               autofocus={autofocus}
               blur={blur}
+              close={close}
               content={comment.content || ""}
               editable={editable}
               handleCancel={() => {
                 clearPendingComment();
+                blur();
+                close();
               }}
               handleSubmit={handleSubmit}
               possibleMentions={users || []}

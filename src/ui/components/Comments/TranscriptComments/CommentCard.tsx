@@ -140,6 +140,7 @@ export const FocusContext = React.createContext({
   autofocus: false,
   isFocused: false,
   blur: () => {},
+  close: () => {},
 });
 
 function CommentCard({
@@ -154,6 +155,7 @@ function CommentCard({
 }: CommentCardProps) {
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
 
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   if (comment.id === PENDING_COMMENT_ID) {
@@ -171,7 +173,12 @@ function CommentCard({
           <div className={classNames("px-2.5 pl-2 space-y-2")}>
             {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
             <FocusContext.Provider
-              value={{ autofocus: true, isFocused, blur: () => setIsFocused(false) }}
+              value={{
+                autofocus: true,
+                isFocused,
+                blur: () => setIsFocused(false),
+                close: () => setIsEditorOpen(false),
+              }}
             >
               <NewCommentEditor comment={comment} type={"new_comment"} />
             </FocusContext.Provider>
@@ -189,6 +196,7 @@ function CommentCard({
       )}
       onClick={() => {
         seekToComment(comment);
+        setIsEditorOpen(true);
         setIsFocused(true);
       }}
       onMouseEnter={() => setHoveredComment(comment.id)}
@@ -207,9 +215,14 @@ function CommentCard({
             <CommentItem type="reply" comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isPaused && !pendingComment ? (
+        {isEditorOpen && (
           <FocusContext.Provider
-            value={{ autofocus: isFocused, isFocused, blur: () => setIsFocused(false) }}
+            value={{
+              autofocus: isFocused,
+              isFocused,
+              blur: () => setIsFocused(false),
+              close: () => setIsEditorOpen(false),
+            }}
           >
             <NewCommentEditor
               key={`${comment.id}-${(comment.replies || []).length}`}
@@ -217,7 +230,7 @@ function CommentCard({
               type={"new_reply"}
             />
           </FocusContext.Provider>
-        ) : null}
+        )}
       </div>
     </div>
   );

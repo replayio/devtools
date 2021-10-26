@@ -10,6 +10,7 @@ import { ReplayLink } from "./replayLink";
 interface TipTapEditorProps {
   autofocus: boolean;
   blur: () => void;
+  close: () => void;
   content: string;
   editable: boolean;
   handleSubmit: (text: string) => void;
@@ -37,6 +38,7 @@ const tryToParse = (content: string): any => {
 const TipTapEditor = ({
   autofocus,
   blur,
+  close,
   content,
   editable,
   handleSubmit,
@@ -112,7 +114,12 @@ const TipTapEditor = ({
           border: editable,
         })}
         editor={editor}
-        onBlur={blur}
+        onBlur={() => {
+          blur();
+          if ((editor?.getCharacterCount() || 0) === 0) {
+            close();
+          }
+        }}
       />
     </div>
   );
