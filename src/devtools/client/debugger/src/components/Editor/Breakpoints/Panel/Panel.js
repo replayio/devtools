@@ -32,6 +32,7 @@ function getPanelWidth({ editor }) {
 function Panel({
   analysisPoints,
   breakpoint,
+  currentTime,
   editor,
   executionPoint,
   insertAt,
@@ -133,6 +134,7 @@ export default connect(
       breakpoint.location,
       breakpoint.options.condition
     ),
+    currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
   }),
   {
