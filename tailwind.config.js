@@ -25,9 +25,6 @@ module.exports = {
       cursor: {
         "ew-resize": "ew-resize",
       },
-      padding: {
-        5.5: "1.125rem",
-      },
     },
   },
   variants: {

@@ -2,35 +2,33 @@ import React, { useState } from "react";
 import PortalDropdown from "../PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import { WorkspaceId } from "ui/state/app";
-import { Recording } from "ui/types";
+import { Recording, Workspace } from "ui/types";
 import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
 
-export function getPrivacySummaryAndIcon(recording: Recording) {
-  const workspaceId = recording.workspace?.id || null;
-  let summary, icon;
+const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
+  <span>
+    {`Members of `}
+    <span className="underline">{name}</span>
+    {` can view`}
+  </span>
+);
 
+export function getPrivacySummaryAndIcon(recording: Recording) {
   if (!recording.private) {
-    icon = "link";
-    summary = "Anyone with the link can view";
-  } else {
-    if (workspaceId) {
-      icon = "domain";
-      summary = (
-        <span>
-          {`Members of `}
-          <span className="underline">{recording.workspace?.name}</span>
-          {` can view`}
-        </span>
-      );
-    } else {
-      icon = "group";
-      summary = "Only people with access can view";
-    }
+    return { icon: "link", summary: "Anyone with the link can view" };
   }
 
-  return { summary, icon };
+  if (recording.workspace) {
+    return {
+      icon: "domain",
+      summary: <WorkspacePrivacySummary workspace={recording.workspace} />,
+    };
+  }
+
+  // If the recording is private and in an individual's library.
+  return { icon: "group", summary: "Only people with access can view" };
 }
 
 export default function PrivacyDropdown({ recording }: { recording: Recording }) {

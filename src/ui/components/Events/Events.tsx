@@ -10,7 +10,6 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 import Event from "./Event";
 import EventsLoader from "./EventsLoader";
 import { trackEvent } from "ui/utils/telemetry";
-import "./Events.css";
 
 function CurrentTimeLine() {
   return <div className="bg-secondaryAccent w-full m-0" style={{ height: "3px" }} />;

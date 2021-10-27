@@ -31,18 +31,14 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
             className: "replay-info",
             component: <ReplayInfo />,
             opened: !replayInfoCollapsed,
-            onToggle: () => {
-              setReplayInfoCollapsed(!replayInfoCollapsed);
-            },
+            onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
           },
           {
             header: "Events",
-            className: "events",
+            className: "events flex-1",
             component: <Events />,
             opened: !eventsCollapsed,
-            onToggle: () => {
-              setEventsCollapsed(!eventsCollapsed);
-            },
+            onToggle: () => setEventsCollapsed(!eventsCollapsed),
           },
         ]}
       />
