@@ -35,6 +35,7 @@ import {
 
 import classnames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
+import { Redacted } from "ui/components/Redacted";
 
 class Tab extends PureComponent {
   onTabContextMenu = (event, tab) => {
@@ -190,7 +191,7 @@ class Tab extends PureComponent {
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
 
     return (
-      <div
+      <Redacted
         draggable
         onDragOver={onDragOver}
         onDragStart={onDragStart}
@@ -206,7 +207,7 @@ class Tab extends PureComponent {
         <SourceIcon source={source} shouldHide={icon => ["file", "javascript"].includes(icon)} />
         <div className="filename">{getTruncatedFileName(source, query)}</div>
         <CloseButton handleClick={onClickClose} tooltip={"Close tab"} />
-      </div>
+      </Redacted>
     );
   }
 }

@@ -19,6 +19,7 @@ import {
 import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import { trackEvent } from "ui/utils/telemetry";
+import { Redacted } from "ui/components/Redacted";
 
 const { objectInspector } = require("devtools-reps");
 
@@ -146,7 +147,7 @@ class Scopes extends PureComponent {
         contents: s.contents,
       }));
       return (
-        <div className="pane scopes-list">
+        <Redacted className="pane scopes-list">
           {originalScopesUnavailable ? (
             <div className="warning">The variables could not be mapped to their original names</div>
           ) : null}
@@ -169,7 +170,7 @@ class Scopes extends PureComponent {
             initiallyExpanded={initiallyExpanded}
             renderItemActions={this.renderWatchpointButton}
           />
-        </div>
+        </Redacted>
       );
     }
 
