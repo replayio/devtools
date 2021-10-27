@@ -67,10 +67,7 @@ export function SummaryExpression({
           <span className="expression">
             <Expression {...{ value, isEditable }} />
           </span>
-          <MaterialIcon
-            className="opacity-0 pencil"
-            style={{ fontSize: "0.75rem", lineHeight: "0.75rem" }}
-          >
+          <MaterialIcon className="opacity-0 pencil" iconSize="xs">
             edit
           </MaterialIcon>
         </>

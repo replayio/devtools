@@ -13,7 +13,12 @@ function EventsLoaderItem({ category, isLoading }: { category: string; isLoading
           <Spinner className="animate-spin h-5 w-5" />
         </div>
       ) : (
-        <MaterialIcon>done</MaterialIcon>
+        <MaterialIcon
+          iconSize="old"
+          className="border-2 border-gray-200 rounded-full cursor-pointer text-gray-400 bg-gray-200 hover:bg-white"
+        >
+          done
+        </MaterialIcon>
       )}
       <span>{category} events</span>
     </div>

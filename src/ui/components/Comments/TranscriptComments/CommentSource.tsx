@@ -56,7 +56,7 @@ function CommentSource({
             // className="flex-shrink-0 p-px w-4 h-4 opacity-0 group-hover:opacity-100"
             title="Show in the Editor"
           >
-            <MaterialIcon style={{ fontSize: "14px" }}>keyboard_arrow_right</MaterialIcon>
+            <MaterialIcon iconSize="sm">keyboard_arrow_right</MaterialIcon>
           </div>
         </div>
       </div>

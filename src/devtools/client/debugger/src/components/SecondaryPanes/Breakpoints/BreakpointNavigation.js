@@ -84,9 +84,7 @@ function BreakpointNavigation({
               style={{ height: "1.25rem", borderRadius: "100%" }}
               onClick={() => setShowCondition(!showCondition)}
             >
-              <MaterialIcon className="leading-none" style={{ fontSize: "1rem" }}>
-                filter_list
-              </MaterialIcon>
+              <MaterialIcon>filter_list</MaterialIcon>
             </button>
           </div>
         ) : null}

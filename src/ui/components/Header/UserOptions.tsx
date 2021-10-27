@@ -74,33 +74,33 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   return (
     <div className="user-options text-blue-400">
       <Dropdown
-        buttonContent={<MaterialIcon className="more">more_horiz</MaterialIcon>}
+        buttonContent={<MaterialIcon>more_horiz</MaterialIcon>}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
       >
         <button className="row" onClick={onDocsClick}>
-          <MaterialIcon>menu_book</MaterialIcon>
+          <MaterialIcon iconSize="old">menu_book</MaterialIcon>
           <span>Docs</span>
         </button>
         <button className="row" onClick={onChatClick}>
-          <MaterialIcon>help_outline</MaterialIcon>
+          <MaterialIcon iconSize="old">help_outline</MaterialIcon>
           <span>Chat with us</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
-          <MaterialIcon>settings</MaterialIcon>
+          <MaterialIcon iconSize="old">settings</MaterialIcon>
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
             <button className="row" onClick={onLaunchClick}>
-              <MaterialIcon>launch</MaterialIcon>
+              <MaterialIcon iconSize="old">launch</MaterialIcon>
               <span>Launch Replay</span>
             </button>
           )
         ) : (
           <button className="row" onClick={onLaunchClick}>
-            <MaterialIcon>download</MaterialIcon>
+            <MaterialIcon iconSize="old">download</MaterialIcon>
             <span>Download Replay</span>
           </button>
         )}

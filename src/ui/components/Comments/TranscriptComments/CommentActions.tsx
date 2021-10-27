@@ -88,7 +88,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
       outlined
       className={classNames(
         expanded ? "opacity-100" : "",
-        "h-4 w-4 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-primaryAccentHover text-base leading-4"
+        "h-4 w-4 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-primaryAccentHover"
       )}
     >
       more_vert

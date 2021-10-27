@@ -8,22 +8,6 @@
   padding: 0px 4px;
 }
 
-.material-icons {
-  font-size: 22px;
-}
-
-.user-options .material-icons.more {
-  border: 2px solid var(--cool-gray-200);
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--cool-gray-400);
-  background-color: var(--cool-gray-200);
-}
-
-.user-options .material-icons.more:hover {
-  background-color: #fff;
-}
-
 .user-options button.expand-dropdown .avatar.first-player img {
   height: 24px;
   width: 24px;
