@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import hooks from "ui/hooks";
+import { OperationsData } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
 import { getRecordingId } from "ui/utils/environment";
 import { AvatarImage } from "../Avatar";
@@ -22,7 +23,6 @@ export const ReplayInfo = () => {
 
   const time = formatRelativeTime(new Date(recording.date));
   const { summary, icon } = getPrivacySummaryAndIcon(recording);
-  const uniqueDomains = getUniqueDomains(recording.operations);
 
   return (
     <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white border-b border-splitter">
@@ -38,13 +38,19 @@ export const ReplayInfo = () => {
           <MaterialIcon>{icon}</MaterialIcon>
           <div>{summary}</div>
         </Row>
-        {recording.operations ? (
-          <Row>
-            <MaterialIcon>info</MaterialIcon>
-            <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
-          </Row>
-        ) : null}
+        {recording.operations ? <OperationsRow operations={recording.operations} /> : null}
       </div>
     </div>
   );
 };
+
+function OperationsRow({ operations }: { operations: OperationsData }) {
+  const uniqueDomains = getUniqueDomains(operations);
+
+  return (
+    <Row>
+      <MaterialIcon>info</MaterialIcon>
+      <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
+    </Row>
+  );
+}
