@@ -39,7 +39,7 @@ function TeamLibrary(props: ViewerRouterProps) {
   // If the user selects a pending team ID, we should handle is separetly to display an
   // accept/decline prompt instead of the usual library view.
   if (currentWorkspaceId && pendingWorkspaces?.map(w => w.id).includes(currentWorkspaceId)) {
-    const workspace = pendingWorkspaces.find(w => w.id);
+    const workspace = pendingWorkspaces.find(w => w.id === currentWorkspaceId);
     return <PendingTeamScreen workspace={workspace!} />;
   } else {
     return <NonPendingTeamLibrary {...props} />;
