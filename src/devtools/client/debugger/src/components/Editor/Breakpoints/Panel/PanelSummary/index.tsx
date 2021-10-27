@@ -9,7 +9,6 @@ import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
 const { trackEvent } = require("ui/utils/telemetry");
 
@@ -20,24 +19,31 @@ import Condition from "./Condition";
 import useAuth0 from "ui/utils/useAuth0";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
+import { PointDescription } from "@recordreplay/protocol";
 
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
+  analysisPoints: PointDescription[] | "error";
   breakpoint: any;
+  executionPoint: any;
+  isHot: boolean;
+  pausedOnHit: boolean;
   setInputToFocus: Dispatch<SetStateAction<Input>>;
   toggleEditingOn: () => void;
 };
 
 function PanelSummary({
-  breakpoint,
-  toggleEditingOn,
-  setInputToFocus,
-  createFrameComment,
-  createFloatingCodeComment,
-  executionPoint,
-  currentTime,
   analysisPoints,
+  breakpoint,
+  createFloatingCodeComment,
+  createFrameComment,
+  currentTime,
+  executionPoint,
+  isHot,
+  pausedOnHit,
+  setInputToFocus,
+  toggleEditingOn,
 }: PanelSummaryProps) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const { user } = useAuth0();
@@ -46,11 +52,7 @@ function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
-  const isUnderMaxHitsEditable = !!(
-    analysisPoints && analysisPoints.length < prefs.maxHitsEditable
-  );
-  const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
+  const isEditable = !isHot && isTeamDeveloper;
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -61,10 +63,6 @@ function PanelSummary({
     toggleEditingOn();
     setInputToFocus(input);
   };
-
-  const pausedOnHit =
-    analysisPoints !== "error" &&
-    !!analysisPoints?.find(point => point.point == executionPoint && point.time == currentTime);
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -95,7 +93,7 @@ function PanelSummary({
     return (
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
-          <Log value={logValue} hasCondition={!!conditionValue} {...{ isUnderMaxHitsEditable }} />
+          <Log value={logValue} hasCondition={!!conditionValue} isUnderMaxHitsEditable={!isHot} />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -127,13 +125,13 @@ function PanelSummary({
         {conditionValue ? (
           <Condition
             handleClick={handleClick}
-            isUnderMaxHitsEditable={isUnderMaxHitsEditable}
+            isUnderMaxHitsEditable={!isHot}
             value={conditionValue}
           />
         ) : null}
         <Log
           handleClick={handleClick}
-          isUnderMaxHitsEditable={isUnderMaxHitsEditable}
+          isUnderMaxHitsEditable={!isHot}
           hasCondition={!!conditionValue}
           value={logValue}
         />
@@ -150,13 +148,7 @@ function PanelSummary({
 
 const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: any }) => ({
-    executionPoint: getExecutionPoint(state),
     currentTime: selectors.getCurrentTime(state),
-    analysisPoints: selectors.getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
   }),
   {
     createFrameComment: actions.createFrameComment,
