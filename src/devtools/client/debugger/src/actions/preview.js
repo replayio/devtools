@@ -39,25 +39,29 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
 
 export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
-    const previewId = uniqueId();
-
     dispatch({
       type: "START_PREVIEW",
       value: {
-        previewId,
+        cursorPos,
         expression,
+        location,
         target,
+        tokenPos,
       },
     });
 
+    const partialPreview = getPreview(getState());
+    const previewId = partialPreview.previewId;
+
     const source = getSelectedSource(getState());
     if (!source) {
+      clearPreview(cx, previewId);
       return;
     }
 
     const selectedFrame = getSelectedFrame(getState());
-
     if (!selectedFrame) {
+      clearPreview(cx, previewId);
       return;
     }
 
@@ -77,12 +81,6 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     };
     const properties = await client.loadObjectProperties(root);
 
-    const currentTarget = getPreview(getState())?.target;
-    // Don't finish dispatching if another setPreview was started
-    if (currentTarget !== target) {
-      return;
-    }
-
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should
     // not render anything
@@ -92,18 +90,13 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     }
 
     dispatch({
-      type: "SET_PREVIEW",
+      type: "COMPLETE_PREVIEW",
       cx,
+      previewId,
       value: {
-        previewId,
-        expression,
         resultGrip: result,
         properties,
         root,
-        location,
-        tokenPos,
-        cursorPos,
-        target,
       },
     });
   };
@@ -111,14 +104,10 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
 
 export function clearPreview(cx, previewId) {
   return ({ dispatch, getState }) => {
-    const currentSelection = getPreview(getState());
-    if (!currentSelection || currentSelection.previewId !== previewId) {
-      return;
-    }
-
     return dispatch({
       type: "CLEAR_PREVIEW",
       cx,
+      previewId,
     });
   };
 }
