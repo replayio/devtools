@@ -66,8 +66,9 @@ class Preview extends PureComponent {
   };
 
   onScroll = () => {
-    if (this.props.cx.isPaused) {
-      this.props.clearPreview(this.props.cx);
+    const { clearPreview, cx, preview } = this.props;
+    if (cx.isPaused) {
+      clearPreview(cx, preview.previewId);
     }
   };
 

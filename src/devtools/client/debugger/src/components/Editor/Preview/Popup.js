@@ -168,8 +168,8 @@ export class Popup extends Component {
   }
 
   onMouseOut = () => {
-    const { clearPreview, cx } = this.props;
-    clearPreview(cx);
+    const { clearPreview, cx, preview } = this.props;
+    clearPreview(cx, preview.previewId);
   };
 
   render() {

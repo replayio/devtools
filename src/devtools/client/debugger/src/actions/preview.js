@@ -11,8 +11,8 @@ import {
   isSelectedFrameVisible,
   getSelectedSource,
   getSelectedFrame,
-  getPreviewCount,
 } from "../selectors";
+import { uniqueId } from "lodash";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
   return ({ dispatch, getState }) => {
@@ -39,17 +39,16 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
 
 export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
+    const previewId = uniqueId();
+
     dispatch({
       type: "START_PREVIEW",
       value: {
+        previewId,
         expression,
         target,
       },
     });
-    const previewCount = getPreviewCount(getState());
-    if (getPreview(getState())) {
-      dispatch(clearPreview(cx));
-    }
 
     const source = getSelectedSource(getState());
     if (!source) {
@@ -78,15 +77,17 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     };
     const properties = await client.loadObjectProperties(root);
 
+    const currentTarget = getPreview(getState())?.target;
+    // Don't finish dispatching if another setPreview was started
+    if (currentTarget !== target) {
+      return;
+    }
+
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should
     // not render anything
     if (!window.elementIsHovered(target)) {
-      return;
-    }
-
-    // Don't finish dispatching if another setPreview was started
-    if (previewCount != getPreviewCount(getState())) {
+      dispatch(clearPreview(cx, previewId));
       return;
     }
 
@@ -94,6 +95,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       type: "SET_PREVIEW",
       cx,
       value: {
+        previewId,
         expression,
         resultGrip: result,
         properties,
@@ -107,10 +109,10 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
   };
 }
 
-export function clearPreview(cx) {
-  return ({ dispatch, getState, client }) => {
+export function clearPreview(cx, previewId) {
+  return ({ dispatch, getState }) => {
     const currentSelection = getPreview(getState());
-    if (!currentSelection) {
+    if (!currentSelection || currentSelection.previewId !== previewId) {
       return;
     }
 

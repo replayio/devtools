@@ -7,7 +7,6 @@
 export function initialPreviewState() {
   return {
     preview: null,
-    previewCount: 0,
   };
 }
 
@@ -18,7 +17,7 @@ function update(state = initialPreviewState(), action) {
     }
 
     case "START_PREVIEW": {
-      return { ...state, previewCount: state.previewCount + 1, preview: action.value };
+      return { ...state, preview: action.value };
     }
 
     case "SET_PREVIEW": {
@@ -34,10 +33,6 @@ function update(state = initialPreviewState(), action) {
 
 export function getPreview(state) {
   return state.preview.preview;
-}
-
-export function getPreviewCount(state) {
-  return state.preview.previewCount;
 }
 
 export default update;
