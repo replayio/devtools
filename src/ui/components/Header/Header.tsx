@@ -71,9 +71,8 @@ function HeaderTitle({
 }) {
   const [editing, setEditing] = useState(EditState.Inactive);
   const inputNode = useRef<HTMLSpanElement>(null);
-  const { userId } = hooks.useGetUserId();
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
-  const isAuthor = userId && userId == recording.userId;
+  const canEditTitle = recording.userRole !== "none" && recording.userRole !== "collaborator";
 
   const className =
     "ml-2 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis";
@@ -113,7 +112,7 @@ function HeaderTitle({
     }
   }, [editing, hasTitle, recording.title]);
 
-  if (!isAuthor) {
+  if (!canEditTitle) {
     return <span className={className}>{displayTitle}</span>;
   }
 
