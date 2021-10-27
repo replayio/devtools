@@ -18,6 +18,7 @@ import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
 import { LoadingScreen } from "ui/components/shared/BlankScreen";
+import { apiUrl } from "./urls";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -145,9 +146,7 @@ function createHttpLink(token: string | undefined) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const url = new URL(window.location.href);
-  const dispatch = url.searchParams.get("api") || undefined;
-  const uri = dispatch ? dispatch : process.env.API_URL;
+  const uri = apiUrl();
   return new HttpLink({
     uri,
     headers,

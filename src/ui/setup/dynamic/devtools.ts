@@ -37,6 +37,7 @@ import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
 import { getUserSettings } from "ui/hooks/settings";
 import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
+import { dispatchUrl } from "ui/utils/urls";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 
@@ -56,9 +57,6 @@ declare global {
   }
   const gToolbox: DevToolsToolbox;
 }
-
-const url = new URL(window.location.href);
-const dispatch = url.searchParams.get("dispatch") || undefined;
 
 (async () => {
   window.gToolbox = new DevToolsToolbox();
@@ -103,7 +101,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
   dbgClient.bootstrap(store);
 
   // Initialize the socket so we can communicate with the server
-  initSocket(store, dispatch);
+  initSocket(store, dispatchUrl());
 
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(actions.onUploadedData(data))
