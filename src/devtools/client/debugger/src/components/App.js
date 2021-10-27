@@ -170,10 +170,12 @@ class Debugger extends Component {
     const horizontal = this.isHorizontal();
 
     return (
-      <Redacted className="editor-pane">
+      <div className="editor-pane">
         <div className="editor-container">
           {!isDemo() && <EditorTabs horizontal={horizontal} />}
-          <Editor />
+          <Redacted>
+            <Editor />
+          </Redacted>
           {!this.props.selectedSource ? (
             <WelcomeBox
               horizontal={horizontal}
@@ -181,9 +183,11 @@ class Debugger extends Component {
             />
           ) : null}
           {!isDemo() && <EditorFooter horizontal={horizontal} />}
-          <ProjectSearch />
+          <Redacted>
+            <ProjectSearch />
+          </Redacted>
         </div>
-      </Redacted>
+      </div>
     );
   };
 

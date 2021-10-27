@@ -14,6 +14,7 @@ import { getFilename, getFileURL } from "../../../utils/source";
 import FrameMenu from "./FrameMenu";
 import FrameIndent from "./FrameIndent";
 import { trackEvent } from "ui/utils/telemetry";
+import { Redacted } from "ui/components/Redacted";
 
 function FrameTitle({ frame, options = {}, l10n }) {
   const displayName = formatDisplayName(frame, options, l10n);
@@ -123,7 +124,7 @@ export default class FrameComponent extends Component {
       : undefined;
 
     return (
-      <div
+      <Redacted
         role="listitem"
         key={frame.id}
         className={className}
@@ -153,7 +154,7 @@ export default class FrameComponent extends Component {
           {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
           {this.isSelectable && <br className="clipboard-only" />}
         </div>
-      </div>
+      </Redacted>
     );
   }
 }
