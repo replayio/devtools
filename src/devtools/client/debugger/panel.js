@@ -64,9 +64,9 @@ export class DebuggerPanel {
 
   async highlightDomElement(gripOrFront) {
     if (!this._highlight) {
-      const { highlight, unhighlight } = this.toolbox.getHighlighter();
-      this._highlight = highlight;
-      this._unhighlight = unhighlight;
+      const highlighter = this.toolbox.getHighlighter();
+      this._highlight = node => highlighter.highlight(node);
+      this._unhighlight = () => highlighter.unhighlight();
     }
 
     return this._highlight(gripOrFront);
