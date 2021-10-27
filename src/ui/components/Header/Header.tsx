@@ -72,7 +72,7 @@ function HeaderTitle({
   const [editing, setEditing] = useState(EditState.Inactive);
   const inputNode = useRef<HTMLSpanElement>(null);
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
-  const canEditTitle = recording.userRole !== "none" && recording.userRole !== "collaborator";
+  const canEditTitle = recording.userRole !== "none";
 
   const className =
     "ml-2 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis";
