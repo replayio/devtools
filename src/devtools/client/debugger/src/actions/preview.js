@@ -39,7 +39,6 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
 
 export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
-    // if we pass the target here we can use it from redux
     dispatch({
       type: "START_PREVIEW",
       value: {
