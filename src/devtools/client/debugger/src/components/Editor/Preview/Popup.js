@@ -46,6 +46,7 @@ export class Popup extends Component {
   }
 
   addHighlightToToken() {
+    // could we pull the "highlight" logic out of here so we can show the highlight sooner?
     const target = this.props.preview.target;
     if (target) {
       target.classList.add("preview-token");
