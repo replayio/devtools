@@ -33,7 +33,7 @@ export const useConfirm = () => {
   );
 
   const confirmDestructive: ConfirmHook = useCallback(
-    options => confirm({ ...options, variation: "destructive" }),
+    options => confirm({ ...options, isDestructive: true }),
     [confirm]
   );
 
