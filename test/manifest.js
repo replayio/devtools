@@ -270,6 +270,11 @@ module.exports = [
     script: "highlighter.js",
     targets: ["gecko"],
   },
+  {
+    example: "doc_stacking.html",
+    script: "stacking.js",
+    targets: ["gecko"],
+  },
 
   //////////////////////////////////////////////////////////////////////////////
   // Region loading

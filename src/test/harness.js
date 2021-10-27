@@ -706,6 +706,10 @@ async function checkHighlighterShape(svgPath) {
   });
 }
 
+async function getMouseTarget(x, y) {
+  return await ThreadFront.getMouseTarget(x, y);
+}
+
 async function getRecordingTarget() {
   return ThreadFront.recordingTargetWaiter.promise;
 }
@@ -779,6 +783,7 @@ const testCommands = {
   dispatchMouseEvent,
   checkHighlighterVisible,
   checkHighlighterShape,
+  getMouseTarget,
   getRecordingTarget,
   waitForSource,
   waitForSourceCount,
