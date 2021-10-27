@@ -38,5 +38,9 @@ export function formatRelativeTime(date: Date) {
 
 export function commentKeys(comments: (Comment | Reply)[]): number[] {
   const indices = range(comments.length);
-  return sortBy(indices, [i => comments[i].user.id, i => Number(comments[i].createdAt)]);
+  const permutation = sortBy(indices, [
+    i => Number(Date.parse(comments[i].createdAt)),
+    i => comments[i].user.id,
+  ]);
+  return indices.map(i => permutation.indexOf(i));
 }
