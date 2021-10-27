@@ -113,6 +113,7 @@ function Panel({
             />
           ) : (
             <PanelSummary
+              analysisPoints={analysisPoints}
               breakpoint={breakpoint}
               toggleEditingOn={toggleEditingOn}
               setInputToFocus={setInputToFocus}
