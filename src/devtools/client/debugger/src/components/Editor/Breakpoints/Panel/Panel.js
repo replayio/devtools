@@ -115,10 +115,11 @@ function Panel({
             <PanelSummary
               analysisPoints={analysisPoints}
               breakpoint={breakpoint}
-              toggleEditingOn={toggleEditingOn}
-              setInputToFocus={setInputToFocus}
+              executionPoint={executionPoint}
               isHot={isHot}
               pausedOnHit={pausedOnHit}
+              setInputToFocus={setInputToFocus}
+              toggleEditingOn={toggleEditingOn}
             />
           )}
           <BreakpointNavigation {...{ breakpoint, editing, showCondition, setShowCondition }} />
