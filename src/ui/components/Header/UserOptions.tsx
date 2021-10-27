@@ -10,6 +10,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+import { useIntercom } from "react-use-intercom";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
@@ -18,6 +19,7 @@ interface UserOptionsProps extends PropsFromRedux {
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const recordingId = hooks.useGetRecordingId();
   const [expanded, setExpanded] = useState(false);
+  const { show } = useIntercom();
   const { isAuthenticated } = useAuth0();
 
   const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
@@ -58,17 +60,15 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
       window.location.href = launchUrl;
     }
   };
-  const onShareClick = () => {
-    setExpanded(false);
-    trackEvent("user_options.select_share");
-
-    setModal("sharing", { recordingId });
-  };
   const onSettingsClick = () => {
     setExpanded(false);
     trackEvent("user_options.select_settings");
 
     setModal("settings");
+  };
+  const onChatClick = () => {
+    setExpanded(false);
+    show();
   };
 
   return (
@@ -82,6 +82,10 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         <button className="row" onClick={onDocsClick}>
           <MaterialIcon>menu_book</MaterialIcon>
           <span>Docs</span>
+        </button>
+        <button className="row" onClick={onChatClick}>
+          <MaterialIcon>help_outline</MaterialIcon>
+          <span>Chat with us</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
           <MaterialIcon>settings</MaterialIcon>
