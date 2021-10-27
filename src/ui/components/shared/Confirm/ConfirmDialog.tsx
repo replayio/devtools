@@ -17,7 +17,7 @@ export type ConfirmOptions = {
   message: string;
   onAccept: () => void;
   onDecline: () => void;
-  variation?: "normal" | "destructive";
+  variation?: "default" | "destructive";
 };
 
 type PropTypes = ConfirmOptions & DialogPropTypes;
@@ -30,7 +30,7 @@ export const ConfirmDialog = ({
   message,
   onAccept,
   onDecline,
-  variation = "normal",
+  variation = "default",
   ...props
 }: PropTypes) => {
   return (
@@ -48,7 +48,7 @@ export const ConfirmDialog = ({
         </SecondaryButton>
         <PrimaryButton
           className="flex-1 mx-2 justify-center"
-          color={variation === "destructive" ? "red" : "blue"}
+          color={variation === "destructive" ? "pink" : "blue"}
           onClick={onAccept}
         >
           {acceptLabel}
