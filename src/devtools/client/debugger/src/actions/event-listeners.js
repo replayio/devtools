@@ -117,7 +117,11 @@ export function loadAdditionalPoints() {
 
     dispatch({ type: "LOADING_ADDITIONAL_EVENT_LISTENER_POINTS" });
     const eventBreakpoints = selectors.getEventListenerBreakpointTypes(getState());
-    const otherEventBreakpoints = difference(eventBreakpoints, INITIAL_EVENT_BREAKPOINTS);
+    const eventIds = eventBreakpoints.reduce(
+      (acc, e) => [...acc, ...e.events.map(event => event.id)],
+      []
+    );
+    const otherEventBreakpoints = difference(eventIds, INITIAL_EVENT_BREAKPOINTS);
     const eventTypePoints = await client.fetchEventTypePoints(otherEventBreakpoints);
     dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
   };
