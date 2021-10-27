@@ -17,6 +17,7 @@ module.exports = {
         toolbarBackground: "var(--theme-toolbar-background)",
         bodyColor: "var(--theme-body-color)",
         jellyfish: "rgba(255,255,255,0.4)",
+        splitter: "var(--theme-splitter-color)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

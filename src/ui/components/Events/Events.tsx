@@ -38,26 +38,19 @@ function Events({
   );
 
   return (
-    <div className="right-sidebar">
-      <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item">Events</div>
-      </div>
-      <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white h-full">
-        <div className="flex flex-col py-1.5 self-stretch space-y-1.5 w-full text-xs">
-          {progressPercentage < 100 ? <EventsLoader {...{ eventCategoriesLoading }} /> : null}
-          {events.map((e, i) => {
-            return (
-              <div key={e.point}>
-                {i === currentEventIndex ? <CurrentTimeLine /> : null}
-                <div className="px-1.5">
-                  <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
-                </div>
-              </div>
-            );
-          })}
-          {currentEventIndex === events.length ? <CurrentTimeLine /> : null}
-        </div>
-      </div>
+    <div className="flex flex-col py-1.5 self-stretch space-y-1.5 w-full text-xs">
+      {progressPercentage < 100 ? <EventsLoader {...{ eventCategoriesLoading }} /> : null}
+      {events.map((e, i) => {
+        return (
+          <div key={e.point}>
+            {i === currentEventIndex ? <CurrentTimeLine /> : null}
+            <div className="px-1.5">
+              <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
+            </div>
+          </div>
+        );
+      })}
+      {currentEventIndex === events.length ? <CurrentTimeLine /> : null}
     </div>
   );
 }

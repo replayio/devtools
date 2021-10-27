@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import { OperationsData } from "ui/types";
 import MaterialIcon from "../shared/MaterialIcon";
 
-function getUniqueDomains(operations: OperationsData) {
+export function getUniqueDomains(operations: OperationsData) {
   const cookies = operations.cookies || [];
   const storage = operations.storage || [];
   let domains = [...operations.scriptDomains, ...cookies, ...storage];
