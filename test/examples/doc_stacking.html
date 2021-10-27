@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><body>
+<style>
+body > div {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+}
+.box1 {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: red;
+}
+.box2 {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 40px;
+  height: 40px;
+  background-color: green;
+}
+</style>
+<div style="left: 0px; top: 0px;">
+  <div class="box1"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 100px; top: 0px;">
+  <div class="box1"></div>
+  <div class="box2" style="position: static;"></div>
+</div>
+<div style="left: 200px; top: 0px;">
+  <div class="box1" style="z-index: -1;"></div>
+</div>
+<div style="left: 300px; top: 0px;">
+  <div class="box1" style="z-index: 2;"></div>
+  <div class="box2" style="z-index: 1;"></div>
+</div>
+<div style="left: 0px; top: 100px;">
+  <div class="box1" style="position: static; float: left;"></div>
+  <div style="height: 20px;"></div>
+  <div class="box2" style="position: static;"></div>
+</div>
+<div style="left: 100px; top: 100px;">
+  <div class="box1"></div>
+  <div class="box2" style="visibility: hidden;"></div>
+</div>
+<div style="left: 200px; top: 100px;">
+  <div class="box1"></div>
+  <div class="box2" style="pointer-events: none;"></div>
+</div>
+<script>
+  window.setTimeout(() => {
+    dump(`RecReplaySendAsyncMessage Example__Finished`);
+  });
+</script>  
+</body></html>
