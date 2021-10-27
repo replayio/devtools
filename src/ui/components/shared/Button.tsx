@@ -30,6 +30,14 @@ function getColorCode(color: Colors, num: ColorScale) {
     }
   }
 
+  if (color === "pink") {
+    if (num === 600) {
+      return "secondaryAccent";
+    } else if (num === 700) {
+      return "secondaryAccentHover";
+    }
+  }
+
   return `${color}-${num}`;
 }
 
