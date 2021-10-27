@@ -11,6 +11,7 @@ import Popup from "./Popup";
 
 import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
+import { PreviewHighlight } from "./PreviewHighlight";
 
 class Preview extends PureComponent {
   target = null;
@@ -72,11 +73,18 @@ class Preview extends PureComponent {
 
   render() {
     const { preview } = this.props;
-    if (!preview || this.state.selecting) {
-      return null;
-    }
+    const { selecting } = this.state;
 
-    return <Popup preview={preview} editor={this.props.editor} editorRef={this.props.editorRef} />;
+    return (
+      <>
+        {!selecting && preview && (
+          <PreviewHighlight expression={preview.expression} target={preview.target} />
+        )}
+        {!selecting && preview?.resultGrip && (
+          <Popup preview={preview} editor={this.props.editor} editorRef={this.props.editorRef} />
+        )}
+      </>
+    );
   }
 }
 
@@ -84,6 +92,7 @@ const mapStateToProps = state => {
   return {
     cx: getThreadContext(state),
     preview: getPreview(state),
+    target: state.preview.target,
   };
 };
 

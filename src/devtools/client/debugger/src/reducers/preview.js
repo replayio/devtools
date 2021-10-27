@@ -18,11 +18,11 @@ function update(state = initialPreviewState(), action) {
     }
 
     case "START_PREVIEW": {
-      return { ...state, previewCount: state.previewCount + 1 };
+      return { ...state, previewCount: state.previewCount + 1, preview: action.value };
     }
 
     case "SET_PREVIEW": {
-      return { ...state, preview: action.value };
+      return { ...state, target: action.value.target, preview: action.value };
     }
   }
 
