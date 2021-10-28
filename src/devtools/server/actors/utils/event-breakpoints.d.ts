@@ -1,5 +1,7 @@
+export type EventId = string;
+
 export interface EventType {
-  id: string;
+  id: EventId;
   name: string;
 }
 export interface EventTypeCategory {

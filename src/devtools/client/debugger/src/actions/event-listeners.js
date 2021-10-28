@@ -14,18 +14,18 @@ import * as selectors from "../selectors";
 import { features } from "ui/utils/prefs";
 
 const INITIAL_EVENT_BREAKPOINTS = [
-  "​event.keyboard.input",
-  "​event.keyboard.keydown",
-  "​event.keyboard.keyup",
-  "​event.keyboard.keypress",
-  "​event.mouse.click",
-  "​event.mouse.dblclick",
-  "​event.mouse.mousedown",
-  "​event.mouse.mouseup",
-  "​event.mouse.contextmenu",
-  "​event.websocket.open",
-  "​event.websocket.error",
-  "​event.websocket.close",
+  "event.keyboard.input",
+  "event.keyboard.keydown",
+  "event.keyboard.keyup",
+  "event.keyboard.keypress",
+  "event.mouse.click",
+  "event.mouse.dblclick",
+  "event.mouse.mousedown",
+  "event.mouse.mouseup",
+  "event.mouse.contextmenu",
+  "event.websocket.open",
+  "event.websocket.error",
+  "event.websocket.close",
 ];
 
 export async function setupEventListeners(store) {
