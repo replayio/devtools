@@ -12,7 +12,6 @@ import {
   getSelectedSource,
   getSelectedFrame,
 } from "../selectors";
-import uniqueId from "lodash/uniqueId";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
   return ({ dispatch, getState }) => {
@@ -50,8 +49,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       },
     });
 
-    const partialPreview = getPreview(getState());
-    const previewId = partialPreview.previewId;
+    const { previewId } = getPreview(getState());
 
     const source = getSelectedSource(getState());
     if (!source) {
