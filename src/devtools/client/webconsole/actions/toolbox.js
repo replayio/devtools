@@ -17,7 +17,6 @@ export function highlightDomElement(grip) {
     const highlighter = toolbox.getHighlighter();
     const nodeFront = grip.getNodeFront();
     if (highlighter && nodeFront) {
-      await nodeFront.ensureLoaded();
       highlighter.highlight(nodeFront);
     }
   };
@@ -42,7 +41,6 @@ export function openNodeInInspector(valueFront) {
     toolbox.selectTool("inspector", "inspect_dom");
 
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
-    await nodeFront.ensureLoaded();
 
     await toolbox.selection.setNodeFront(nodeFront, {
       reason: "console",

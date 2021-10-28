@@ -50,21 +50,25 @@ export function reset(): ResetAction {
 /**
  * Clears the tree and adds the new root node.
  */
-export function newRoot(rootNodeFront: NodeFront): NewRootAction {
-  return {
-    type: "NEW_ROOT",
-    rootNode: convertNode(rootNodeFront),
+export function newRoot(rootNodeFront: NodeFront): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch({
+      type: "NEW_ROOT",
+      rootNode: await convertNode(rootNodeFront),
+    });
   };
 }
 
 /**
  * Adds the children of a node to the tree and updates the parent's `children` property.
  */
-export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): AddChildrenAction {
-  return {
-    type: "ADD_CHILDREN",
-    parentNodeId: parentFront.objectId(),
-    children: childFronts.map(node => convertNode(node)),
+export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch({
+      type: "ADD_CHILDREN",
+      parentNodeId: parentFront.objectId(),
+      children: await Promise.all(childFronts.map(node => convertNode(node))),
+    });
   };
 }
 
@@ -124,7 +128,7 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       const nodeFront = pause.getNodeFront(nodeId);
       const childNodes = await nodeFront.childNodes();
       if (ThreadFront.currentPause !== pause) return;
-      dispatch(addChildren(nodeFront, childNodes));
+      await dispatch(addChildren(nodeFront, childNodes));
     }
 
     dispatch(updateNodeExpanded(nodeId, true));
@@ -148,9 +152,6 @@ export function selectionChanged(
       dispatch(updateSelectedNode(null));
       return;
     }
-
-    await selectedNode.ensureParentsLoaded();
-    if (selection.nodeFront !== selectedNode) return;
 
     dispatch(updateSelectedNode(selectedNode.objectId()));
 
@@ -362,7 +363,7 @@ export function onPageDownKey(): UIThunkAction {
  * @param  {Boolean} isExpanded
  *         Whether or not the node is expanded.
  */
-function convertNode(node: NodeFront, { isExpanded = false } = {}): NodeInfo {
+async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promise<NodeInfo> {
   const parentNode = node.parentNode();
   const id = node.objectId();
 
@@ -370,11 +371,11 @@ function convertNode(node: NodeFront, { isExpanded = false } = {}): NodeInfo {
     attributes: node.attributes,
     children: [],
     displayName: node.nodeType === DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
-    displayType: node.displayType,
+    displayType: await node.getDisplayType(),
     hasChildren: !!node.hasChildren,
-    hasEventListeners: node.hasEventListeners,
+    hasEventListeners: await node.hasEventListeners(),
     id,
-    isDisplayed: node.isDisplayed,
+    isDisplayed: await node.isDisplayed(),
     isExpanded,
     isInlineTextChild: !!node.inlineTextChild,
     isScrollable: node.isScrollable,
