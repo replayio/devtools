@@ -16,7 +16,7 @@ module.exports = {
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
         bodyColor: "var(--theme-body-color)",
-        jellyfish: "rgba(255,255,255,0.4)",
+        jellyfish: "rgba(255,255,255,0.8)",
         splitter: "var(--theme-splitter-color)",
       },
       lineHeight: {
