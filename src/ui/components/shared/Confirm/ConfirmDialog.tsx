@@ -7,17 +7,17 @@ import {
   DialogPropTypes,
   DialogTitle,
 } from "../Dialog";
-import React, { HTMLProps } from "react";
+import React from "react";
 import classNames from "classnames";
 
 export type ConfirmOptions = {
   acceptLabel: string;
   declineLabel?: string;
   description?: string;
+  isDestructive?: boolean;
   message: string;
   onAccept: () => void;
   onDecline: () => void;
-  variation?: "normal" | "destructive";
 };
 
 type PropTypes = ConfirmOptions & DialogPropTypes;
@@ -28,9 +28,9 @@ export const ConfirmDialog = ({
   declineLabel = "Cancel",
   description,
   message,
+  isDestructive = false,
   onAccept,
   onDecline,
-  variation = "normal",
   ...props
 }: PropTypes) => {
   return (
@@ -48,7 +48,7 @@ export const ConfirmDialog = ({
         </SecondaryButton>
         <PrimaryButton
           className="flex-1 mx-2 justify-center"
-          color={variation === "destructive" ? "red" : "blue"}
+          color={isDestructive ? "pink" : "blue"}
           onClick={onAccept}
         >
           {acceptLabel}
