@@ -45,12 +45,6 @@
     // part two of the test, after reloading:
     Test.app.actions.setViewMode("dev");
 
-    // open the Pause Information panel
-    const pauseInfoButton = await Test.waitUntil(() =>
-      document.querySelector("#toolbox-toolbar .toolbar-panel-button.debug button")
-    );
-    pauseInfoButton.click();
-
     await Test.waitUntil(
       () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 1
     );
