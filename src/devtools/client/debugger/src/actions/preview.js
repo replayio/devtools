@@ -12,7 +12,7 @@ import {
   getSelectedSource,
   getSelectedFrame,
 } from "../selectors";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
   return ({ dispatch, getState }) => {
