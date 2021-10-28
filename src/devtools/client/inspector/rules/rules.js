@@ -552,8 +552,6 @@ class RulesView {
       return;
     }
 
-    await element.ensureParentsLoaded();
-
     this.pageStyle = undefined;
     this.elementStyle = new ElementStyle(
       element,
