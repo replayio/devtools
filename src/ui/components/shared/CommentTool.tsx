@@ -75,7 +75,6 @@ function CommentTool({
   setPendingComment,
   createFrameComment,
 }: CommentToolProps) {
-  const [showHelper, setShowHelper] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
   const recordingId = useGetRecordingId();
   const { user } = useAuth0();
@@ -88,7 +87,6 @@ function CommentTool({
     if (videoNode) {
       videoNode.classList.add("location-marker");
       videoNode.addEventListener("mouseup", onClickInCanvas);
-      videoNode.addEventListener("mouseenter", onMouseEnter);
       videoNode.addEventListener("mousemove", onMouseMove);
       videoNode.addEventListener("mouseleave", onMouseLeave);
     }
@@ -99,7 +97,6 @@ function CommentTool({
     if (videoNode) {
       videoNode.classList.remove("location-marker");
       videoNode.removeEventListener("mouseup", onClickInCanvas);
-      videoNode.removeEventListener("mouseenter", onMouseEnter);
       videoNode.removeEventListener("mousemove", onMouseMove);
       videoNode.removeEventListener("mouseleave", onMouseLeave);
     }
@@ -130,12 +127,8 @@ function CommentTool({
       setPendingComment(newComment);
     }
   };
-  const onMouseEnter = () => {
-    setShowHelper(true);
-  };
   const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
   const onMouseLeave = () => {
-    setShowHelper(false);
     setMousePosition(null);
   };
 
@@ -147,7 +140,6 @@ function CommentTool({
   }, [currentTime, executionPoint, pendingComment, comments]);
 
   if (
-    !showHelper ||
     !mousePosition ||
     pendingComment?.type === "edit_reply" ||
     pendingComment?.type === "new_reply"
