@@ -1,4 +1,4 @@
-import { PrimaryButton, SecondaryButton } from "../Button";
+import { Button, PrimaryButton, SecondaryButton } from "../Button";
 import {
   Dialog,
   DialogActions,
@@ -7,7 +7,7 @@ import {
   DialogPropTypes,
   DialogTitle,
 } from "../Dialog";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 
 export type ConfirmOptions = {
@@ -33,10 +33,28 @@ export const ConfirmDialog = ({
   onDecline,
   ...props
 }: PropTypes) => {
+  const primaryButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const prevActiveElement = document.activeElement;
+    primaryButtonRef.current?.focus();
+    return () => {
+      if (prevActiveElement instanceof HTMLElement) {
+        prevActiveElement.focus();
+      }
+    };
+  }, []);
+
   return (
     <Dialog
       {...props}
       className={classNames("flex flex-col items-center", className)}
+      onKeyUp={evt => {
+        if (evt.key === "Escape") {
+          evt.stopPropagation();
+          onDecline();
+        }
+      }}
       style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
     >
       <DialogLogo />
@@ -46,13 +64,16 @@ export const ConfirmDialog = ({
         <SecondaryButton color="blue" className="flex-1 mx-3 justify-center" onClick={onDecline}>
           {declineLabel}
         </SecondaryButton>
-        <PrimaryButton
+        <Button
           className="flex-1 mx-2 justify-center"
           color={isDestructive ? "pink" : "blue"}
           onClick={onAccept}
+          ref={primaryButtonRef}
+          size="md"
+          style="primary"
         >
           {acceptLabel}
-        </PrimaryButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
