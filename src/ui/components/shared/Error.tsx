@@ -11,10 +11,11 @@ import { getRecordingId, isDevelopment } from "ui/utils/environment";
 import hooks from "ui/hooks";
 import { useHistory } from "react-router";
 import { setModal } from "ui/actions/app";
+import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
+import { PrimaryButton } from "./Button";
+import BubbleModal from "ui/components/shared/Onboarding/BubbleModal";
 
 export function PopupBlockedError() {
-  const error = { message: "OAuth consent popup blocked" };
-
   return (
     <ExpectedErrorScreen
       error={{
@@ -35,16 +36,9 @@ function RefreshButton() {
   };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={clicked}
-      className={classNames(
-        "w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
-    >
+    <PrimaryButton className="flex-1 mx-2 justify-center" color="blue" onClick={onClick}>
       {clicked ? `Refreshing...` : `Refresh`}
-    </button>
+    </PrimaryButton>
   );
 }
 
@@ -58,15 +52,9 @@ function SignInButton() {
   };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={classNames(
-        "w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-      )}
-    >
+    <PrimaryButton color="blue" onClick={onClick}>
       Sign in to Replay
-    </button>
+    </PrimaryButton>
   );
 }
 
@@ -76,13 +64,9 @@ function LibraryButton() {
   };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-    >
+    <PrimaryButton color="blue" onClick={onClick}>
       Back to Library
-    </button>
+    </PrimaryButton>
   );
 }
 
@@ -94,13 +78,9 @@ function TeamBillingButtonBase({ currentWorkspaceId, setModal }: BillingPropsFro
   };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full inline-flex items-center justify-center px-16 py-2.5 border border-transparent font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
-    >
+    <PrimaryButton color="blue" onClick={onClick}>
       Update Subscription
-    </button>
+    </PrimaryButton>
   );
 }
 
@@ -126,7 +106,7 @@ function ActionButton({ action }: { action: string }) {
     button = <TeamBillingButton />;
   }
 
-  return <div>{button}</div>;
+  return <div className="m-auto">{button}</div>;
 }
 
 interface ErrorProps {
@@ -162,36 +142,35 @@ function Error({ error }: ErrorProps) {
   }
 
   return (
-    <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
-      <div className="p-12 space-y-12 items-center flex flex-col">
-        <div className="space-y-4 place-content-center">
-          <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
-        </div>
-        <div className="text-center space-y-3">
-          {message ? <div className="font-bold text-lg">{message}</div> : null}
-          {content ? <div className="text-gray-500">{content}</div> : null}
-        </div>
-        {action ? <ActionButton action={action} /> : null}
-      </div>
-    </section>
+    <Dialog
+      className={classNames("flex flex-col items-center")}
+      style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
+    >
+      <DialogLogo />
+      <DialogTitle>{message}</DialogTitle>
+      {content && <DialogDescription>{content}</DialogDescription>}
+      {action ? (
+        <DialogActions>
+          <ActionButton action={action} />
+        </DialogActions>
+      ) : null}
+    </Dialog>
   );
 }
 
 function ExpectedErrorScreen({ error }: { error: ExpectedError }) {
   return (
-    <BlankScreen className="absolute z-10">
-      <Modal>
-        <Error error={error} />
-      </Modal>
-    </BlankScreen>
+    <BubbleModal>
+      <Error error={error} />
+    </BubbleModal>
   );
 }
 
 function UnexpectedErrorScreen({ error }: { error: UnexpectedError }) {
   return (
-    <Modal options={{ maskTransparency: "translucent" }}>
+    <BubbleModal>
       <Error error={error} />
-    </Modal>
+    </BubbleModal>
   );
 }
 

@@ -11,7 +11,7 @@ import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
-import BubbleBackground from "./BubbleBackground";
+import { BubbleBackground } from "./BubbleModal";
 
 const OnboardingContext = React.createContext({ theme: "dark" });
 
