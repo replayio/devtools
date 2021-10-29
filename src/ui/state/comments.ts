@@ -4,7 +4,6 @@ import { User } from "ui/types";
 export interface CommentsState {
   pendingComment: PendingComment | null;
   hoveredComment: any;
-  shouldShowLoneEvents: boolean;
 }
 
 export interface SourceLocation {
@@ -45,11 +44,11 @@ export interface Reply extends Remark {
 
 export type PendingComment =
   | {
-      comment: PendingNewComment;
+      comment: Comment;
       type: "new_comment";
     }
   | {
-      comment: PendingNewReply;
+      comment: Reply;
       type: "new_reply";
     }
   | {
@@ -62,6 +61,3 @@ export type PendingComment =
     };
 
 export type PendingCommentAction = "edit_reply" | "edit_comment" | "new_reply" | "new_comment";
-
-export type PendingNewComment = Omit<Comment, "recordingId" | "user">;
-export type PendingNewReply = Omit<Reply, "recordingId" | "user">;

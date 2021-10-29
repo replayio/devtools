@@ -12,11 +12,14 @@ import Widget from "./Widget";
 import "./Panel.css";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { prefs } from "ui/utils/prefs";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -26,17 +29,33 @@ function getPanelWidth({ editor }) {
   return editor.getScrollInfo().clientWidth - panelIndent;
 }
 
-function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem }) {
+function Panel({
+  analysisPoints,
+  breakpoint,
+  currentTime,
+  editor,
+  executionPoint,
+  insertAt,
+  setHoveredItem,
+  clearHoveredItem,
+}) {
   const [editing, setEditing] = useState(false);
   const [showCondition, setShowCondition] = useState(!!breakpoint.options.condition);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const { nags } = hooks.useGetUserInfo();
   const updateUserNags = hooks.useUpdateUserNags();
+  const error = analysisPoints === "error";
+  const pausedOnHit =
+    !error &&
+    !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
+  const isHot = !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
+  const showNag =
+    analysisPoints && !error && !isHot && nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
 
   useEffect(() => {
     // Make sure to toggle off the first_breakpoint_add nag once the widget is opened.
-    if (nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
+    if (showNag) {
       const newNags = [...nags, Nag.FIRST_BREAKPOINT_ADD];
       updateUserNags({
         variables: { newNags },
@@ -81,7 +100,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        {<FirstEditNag editing={editing} />}
+        {showNag && <FirstEditNag editing={editing} />}
         <div className={classnames("breakpoint-panel", { editing })}>
           {editing ? (
             <PanelEditor
@@ -94,9 +113,13 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
             />
           ) : (
             <PanelSummary
+              analysisPoints={analysisPoints}
               breakpoint={breakpoint}
-              toggleEditingOn={toggleEditingOn}
+              executionPoint={executionPoint}
+              isHot={isHot}
+              pausedOnHit={pausedOnHit}
               setInputToFocus={setInputToFocus}
+              toggleEditingOn={toggleEditingOn}
             />
           )}
           <BreakpointNavigation {...{ breakpoint, editing, showCondition, setShowCondition }} />
@@ -106,7 +129,18 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
   );
 }
 
-export default connect(() => ({}), {
-  setHoveredItem: actions.setHoveredItem,
-  clearHoveredItem: actions.clearHoveredItem,
-})(Panel);
+export default connect(
+  (state, { breakpoint }) => ({
+    analysisPoints: selectors.getAnalysisPointsForLocation(
+      state,
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
+    currentTime: selectors.getCurrentTime(state),
+    executionPoint: getExecutionPoint(state),
+  }),
+  {
+    setHoveredItem: actions.setHoveredItem,
+    clearHoveredItem: actions.clearHoveredItem,
+  }
+)(Panel);

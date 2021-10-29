@@ -5,7 +5,6 @@
 //
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
-import classnames from "classnames";
 import actions from "../../actions";
 import {
   getSelectedSourceWithContent,
@@ -14,9 +13,9 @@ import {
   getSource,
 } from "../../selectors";
 
-import { getFilename, shouldBlackbox } from "../../utils/source";
-import AccessibleImage from "../shared/AccessibleImage";
+import { getFilename } from "../../utils/source";
 import { ThreadFront } from "protocol/thread";
+import { RedactedSpan } from "ui/components/Redacted";
 
 import "./Footer.css";
 
@@ -74,7 +73,7 @@ class SourceFooter extends PureComponent {
         onClick={() => showAlternateSource(selectedSource, alternateSource)}
         title={tooltip}
       >
-        <span>{title}</span>
+        <RedactedSpan data-redacted>{title}</RedactedSpan>
       </button>
     );
   }

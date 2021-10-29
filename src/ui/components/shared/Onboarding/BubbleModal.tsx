@@ -1,6 +1,6 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-export default function BubbleBackground() {
+export function BubbleBackground() {
   return (
     <div className="w-full h-full absolute">
       <div className="absolute">
@@ -17,6 +17,18 @@ export default function BubbleBackground() {
           style={{ width: "75vw" }}
         />
       </div>
+    </div>
+  );
+}
+
+export default function BubbleModal({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="w-full h-full grid fixed z-50 items-center justify-center"
+      style={{ background: "#f3f3f4" }}
+    >
+      <BubbleBackground />
+      <div className="relative">{children}</div>
     </div>
   );
 }

@@ -62,10 +62,8 @@
   flex-direction: row;
   flex-grow: 1;
   background: var(--theme-toolbar-background);
-  position: relative;
   width: 100%;
   align-items: center;
-  overflow: hidden;
 }
 
 .breakpoint-navigation-timeline-point {
@@ -113,16 +111,6 @@
 .breakpoint-navigation-timeline .progress-line.full {
   width: 100%;
   background: var(--grey-30);
-}
-
-.breakpoint-navigation-timeline.dimmed
-  .breakpoint-navigation-timeline-point.secondary-highlight
-  .fill {
-  fill: var(--primary-accent);
-}
-
-.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.primary-highlight {
-  z-index: var(--z-index-3--hovered-point-primary);
 }
 
 .breakpoint-navigation-timeline

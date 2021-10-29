@@ -8,6 +8,8 @@ import { setSelectedPrimaryPanel } from "./app";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
+import { RecordingId } from "@recordreplay/protocol";
+import { User } from "ui/types";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -21,13 +23,8 @@ const {
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 type UpdatePendingCommentContent = Action<"update_pending_comment_content"> & { content: string };
-type SetShouldShowLoneEvents = Action<"set_should_show_lone_events"> & { value: boolean };
 
-export type CommentsAction =
-  | SetPendingComment
-  | SetHoveredComment
-  | SetShouldShowLoneEvents
-  | UpdatePendingCommentContent;
+export type CommentsAction = SetPendingComment | SetHoveredComment | UpdatePendingCommentContent;
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
   return { type: "set_pending_comment", comment };
@@ -45,19 +42,14 @@ export function updatePendingCommentContent(content: string): UpdatePendingComme
   return { type: "update_pending_comment_content", content };
 }
 
-export function toggleShowLoneEvents(): UIThunkAction {
-  return ({ dispatch, getState }) => {
-    const newValue = !selectors.getShouldShowLoneEvents(getState());
-    dispatch({ type: "set_should_show_lone_events", value: newValue });
-  };
-}
-
 export function createComment(
   time: number,
   point: string,
   position: { x: number; y: number } | null,
   hasFrames: boolean,
-  sourceLocation: SourceLocation | null
+  sourceLocation: SourceLocation | null,
+  user: User,
+  recordingId: RecordingId
 ): UIThunkAction {
   return async ({ dispatch }) => {
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
@@ -74,11 +66,13 @@ export function createComment(
         point,
         position,
         primaryLabel,
+        recordingId,
         replies: [],
         secondaryLabel,
         sourceLocation,
         time,
         updatedAt: new Date().toISOString(),
+        user,
       },
     };
 
@@ -91,12 +85,14 @@ export function createFrameComment(
   time: number,
   point: string,
   position: { x: number; y: number } | null,
+  user: User,
+  recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
   return async ({ dispatch }) => {
     const sourceLocation =
       breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
-    dispatch(createComment(time, point, position, true, sourceLocation || null));
+    dispatch(createComment(time, point, position, true, sourceLocation || null, user, recordingId));
   };
 }
 
@@ -107,11 +103,13 @@ function getCurrentPauseSourceLocationWithTimeout() {
 export function createFloatingCodeComment(
   time: number,
   point: string,
+  user: User,
+  recordingId: RecordingId,
   breakpoint: any
 ): UIThunkAction {
   return async ({ dispatch }) => {
     const { location: sourceLocation } = breakpoint;
-    dispatch(createComment(time, point, null, false, sourceLocation || null));
+    dispatch(createComment(time, point, null, false, sourceLocation || null, user, recordingId));
   };
 }
 
@@ -183,26 +181,5 @@ export function seekToComment(item: Comment | Reply | PendingComment["comment"])
       cx = selectors.getThreadContext(getState());
       dispatch(actions.selectLocation(cx, item.sourceLocation));
     }
-  };
-}
-
-export function replyToComment(parentId: string, point: string, time: number): UIThunkAction {
-  return ({ dispatch }) => {
-    const pendingComment: PendingComment = {
-      type: "new_reply",
-      comment: {
-        content: "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        id: PENDING_COMMENT_ID,
-        hasFrames: false,
-        sourceLocation: null,
-        parentId,
-        point,
-        time,
-      },
-    };
-
-    dispatch(setPendingComment(pendingComment));
   };
 }

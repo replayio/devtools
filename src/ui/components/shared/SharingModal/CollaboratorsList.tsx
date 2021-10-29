@@ -29,7 +29,9 @@ function Collaborator({
     iconAndName = (
       <>
         <div className="bg-gray-300 rounded-full" style={{ padding: "5px", marginRight: "8px" }}>
-          <MaterialIcon className="text-white align-middle">mail_outline</MaterialIcon>
+          <MaterialIcon className="text-white align-middle" iconSize="xl">
+            mail_outline
+          </MaterialIcon>
         </div>
         <div className="main">
           <div className="name">{collaborator.email}</div>
@@ -60,9 +62,9 @@ function Collaborator({
   );
 }
 
-function Author({ user }: {user: User | void}) {
+function Author({ user }: { user: User | void }) {
   if (!user) {
-    return null
+    return null;
   }
 
   const { picture, name } = user;

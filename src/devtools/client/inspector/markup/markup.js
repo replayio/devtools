@@ -1,6 +1,6 @@
 const { ThreadFront } = require("protocol/thread");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
-const Highlighter = require("highlighter/highlighter.js");
+const Highlighter = require("highlighter/highlighter").default;
 const { selectors } = require("ui/reducers");
 
 const {

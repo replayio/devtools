@@ -45,9 +45,11 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
           <div className="text-lg">
             You were invited to <strong>{name}</strong>
           </div>
-          <div className="text-xs">
-            Invited by <strong>{inviterEmail}</strong>
-          </div>
+          {inviterEmail ? (
+            <div className="text-xs">
+              Invited by <strong>{inviterEmail}</strong>
+            </div>
+          ) : null}
         </div>
         <div className="flex flex-row space-x-2 text-base">
           {loading ? (

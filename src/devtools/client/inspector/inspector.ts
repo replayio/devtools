@@ -40,7 +40,7 @@ const HighlightersOverlay = require("devtools/client/inspector/shared/highlighte
 import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
 
-const Highlighter = require("highlighter/highlighter");
+import Highlighter from "highlighter/highlighter";
 extendStore({}, inspectorReducers, {});
 
 /**
@@ -81,7 +81,7 @@ export class Inspector {
   panelDoc: Document | null;
   panelWin: Window | null;
   store: UIStore | null;
-  highlighter: any;
+  highlighter: typeof Highlighter;
 
   markup: MarkupView;
   rules: RulesView;

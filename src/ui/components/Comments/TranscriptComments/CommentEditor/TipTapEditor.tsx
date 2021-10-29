@@ -5,10 +5,12 @@ import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
 import { GitHubLink } from "./githubLink";
+import { ReplayLink } from "./replayLink";
 
 interface TipTapEditorProps {
   autofocus: boolean;
   blur: () => void;
+  close: () => void;
   content: string;
   editable: boolean;
   handleSubmit: (text: string) => void;
@@ -36,6 +38,7 @@ const tryToParse = (content: string): any => {
 const TipTapEditor = ({
   autofocus,
   blur,
+  close,
   content,
   editable,
   handleSubmit,
@@ -47,6 +50,7 @@ const TipTapEditor = ({
     extensions: [
       StarterKit,
       GitHubLink,
+      ReplayLink,
       // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
       Placeholder.configure({ placeholder }),
       Extension.create({
@@ -55,10 +59,14 @@ const TipTapEditor = ({
           return {
             "Cmd-Enter": ({ editor }) => {
               handleSubmit(JSON.stringify(editor.getJSON()));
+              blur();
+              close();
               return true;
             },
             Enter: ({ editor }) => {
               handleSubmit(JSON.stringify(editor.getJSON()));
+              blur();
+              close();
               return true;
             },
             Escape: ({ editor }) => {
@@ -110,7 +118,12 @@ const TipTapEditor = ({
           border: editable,
         })}
         editor={editor}
-        onBlur={blur}
+        onBlur={() => {
+          blur();
+          if ((editor?.getCharacterCount() || 0) === 0) {
+            close();
+          }
+        }}
       />
     </div>
   );

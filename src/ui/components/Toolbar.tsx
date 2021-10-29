@@ -89,7 +89,11 @@ function Toolbar({
           })}
         >
           <IconWithTooltip
-            icon={<MaterialIcon className="forum toolbar-panel-icon">forum</MaterialIcon>}
+            icon={
+              <MaterialIcon className="forum toolbar-panel-icon" iconSize="2xl">
+                forum
+              </MaterialIcon>
+            }
             content={"Comments"}
             handleClick={() => onClick("comments")}
           />
@@ -100,7 +104,11 @@ function Toolbar({
           })}
         >
           <IconWithTooltip
-            icon={<MaterialIcon className="list toolbar-panel-icon">list</MaterialIcon>}
+            icon={
+              <MaterialIcon className="list toolbar-panel-icon" iconSize="2xl">
+                list
+              </MaterialIcon>
+            }
             content={"Events"}
             handleClick={() => onClick("events")}
           />
@@ -115,7 +123,7 @@ function Toolbar({
             >
               <IconWithTooltip
                 icon={
-                  <MaterialIcon className="description toolbar-panel-icon">
+                  <MaterialIcon className="description toolbar-panel-icon" iconSize="2xl">
                     description
                   </MaterialIcon>
                 }
@@ -131,7 +139,7 @@ function Toolbar({
             >
               <IconWithTooltip
                 icon={
-                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon">
+                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon" iconSize="2xl">
                     motion_photos_paused
                   </MaterialIcon>
                 }
@@ -143,27 +151,10 @@ function Toolbar({
         ) : null}
       </div>
       <div className="flex flex-col space-y-1 items-center">
-        {progressPercentage === 100 || viewMode === "non-dev" ? (
-          <LaunchIntercomMessengerButton />
-        ) : (
+        {progressPercentage !== 100 && viewMode === "dev" ? (
           <IndexingLoader {...{ progressPercentage, viewMode }} />
-        )}
+        ) : null}
       </div>
-    </div>
-  );
-}
-
-function LaunchIntercomMessengerButton() {
-  const { show } = useIntercom();
-  const { isAuthenticated } = useAuth0();
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  return (
-    <div className="toolbar-panel-button">
-      <IconWithTooltip icon={<Help />} content={"Chat with us"} handleClick={show} />
     </div>
   );
 }

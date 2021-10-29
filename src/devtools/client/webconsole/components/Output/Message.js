@@ -4,6 +4,9 @@
 
 "use strict";
 
+const { getUserId } = require("ui/hooks/users");
+const { withAuth0 } = require("@auth0/auth0-react");
+const { withRouter } = require("react-router");
 const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
@@ -179,9 +182,20 @@ class Message extends Component {
 
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
-    let handleAddComment = () => {
+    let handleAddComment = async () => {
       trackEvent("console.add_comment");
-      dispatch(actions.createComment(executionPointTime, executionPoint, undefined, true, frame));
+      let userId = await getUserId();
+      dispatch(
+        actions.createComment(
+          executionPointTime,
+          executionPoint,
+          undefined,
+          true,
+          frame,
+          { ...this.props.auth0.user, id: userId },
+          this.props.match.params.recordingId
+        )
+      );
     };
 
     if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
@@ -464,4 +478,4 @@ class Message extends Component {
   }
 }
 
-module.exports = Message;
+module.exports = withAuth0(withRouter(Message));

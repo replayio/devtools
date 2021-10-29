@@ -71,7 +71,10 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 
   // Get the x/y coordinate of a mouse event wrt the recording's DOM.
   mouseEventCanvasPosition(e: MouseEvent) {
-    const canvas = document.getElementById("graphics")!;
+    const canvas = document.getElementById("graphics");
+    if (!canvas) {
+      return null;
+    }
     const bounds = canvas.getBoundingClientRect();
     if (
       e.clientX < bounds.left ||

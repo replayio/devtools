@@ -11,6 +11,7 @@ import { extendStore } from "../store";
 import app from "ui/reducers/app";
 import timeline from "ui/reducers/timeline";
 import comments from "ui/reducers/comments";
+import contextMenus from "ui/reducers/contextMenus";
 import reactDevTools from "ui/reducers/reactDevTools";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -87,6 +88,7 @@ const dispatch = url.searchParams.get("dispatch") || undefined;
     app,
     timeline,
     comments,
+    contextMenus,
     reactDevTools,
     ...debuggerReducers,
     ...consoleReducers.reducers,

@@ -122,7 +122,12 @@ export function removeUrlParameters() {
 }
 
 export function launchAndRecordUrl(url: string) {
-  const autoRecordUrl = `replay:record?url=${url}`;
+  let autoRecordUrl = url;
+
+  // replay: HTTP scheme is only supported on Mac atm
+  if (navigator.userAgent.includes("Macintosh")) {
+    autoRecordUrl = `replay:record?url=${url}`;
+  }
 
   window.open(autoRecordUrl);
 }

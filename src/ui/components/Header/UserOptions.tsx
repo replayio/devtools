@@ -10,6 +10,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+import { useIntercom } from "react-use-intercom";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
@@ -18,6 +19,7 @@ interface UserOptionsProps extends PropsFromRedux {
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const recordingId = hooks.useGetRecordingId();
   const [expanded, setExpanded] = useState(false);
+  const { show } = useIntercom();
   const { isAuthenticated } = useAuth0();
 
   const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
@@ -36,8 +38,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
-
-    const docsUrl = `https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02`;
+    const docsUrl = `https://replayio.notion.site/Docs-9f8863871e024ea6acc64d6564004a22`;
 
     if (event.metaKey) {
       return window.open(docsUrl, "replaydocs");
@@ -59,45 +60,47 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
       window.location.href = launchUrl;
     }
   };
-  const onShareClick = () => {
-    setExpanded(false);
-    trackEvent("user_options.select_share");
-
-    setModal("sharing", { recordingId });
-  };
   const onSettingsClick = () => {
     setExpanded(false);
     trackEvent("user_options.select_settings");
 
     setModal("settings");
   };
+  const onChatClick = () => {
+    setExpanded(false);
+    show();
+  };
 
   return (
     <div className="user-options text-blue-400">
       <Dropdown
-        buttonContent={<MaterialIcon className="more">more_horiz</MaterialIcon>}
+        buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
       >
         <button className="row" onClick={onDocsClick}>
-          <MaterialIcon>menu_book</MaterialIcon>
+          <MaterialIcon iconSize="xl">menu_book</MaterialIcon>
           <span>Docs</span>
         </button>
+        <button className="row" onClick={onChatClick}>
+          <MaterialIcon iconSize="xl">help_outline</MaterialIcon>
+          <span>Chat with us</span>
+        </button>
         <button className="row" onClick={onSettingsClick}>
-          <MaterialIcon>settings</MaterialIcon>
+          <MaterialIcon iconSize="xl">settings</MaterialIcon>
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
             <button className="row" onClick={onLaunchClick}>
-              <MaterialIcon>launch</MaterialIcon>
+              <MaterialIcon iconSize="xl">launch</MaterialIcon>
               <span>Launch Replay</span>
             </button>
           )
         ) : (
           <button className="row" onClick={onLaunchClick}>
-            <MaterialIcon>download</MaterialIcon>
+            <MaterialIcon iconSize="xl">download</MaterialIcon>
             <span>Download Replay</span>
           </button>
         )}

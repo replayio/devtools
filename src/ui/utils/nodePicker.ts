@@ -60,7 +60,10 @@ class NodePicker {
 
   // Get the x/y coordinate of a mouse event wrt the recording's DOM.
   private mouseEventCanvasPosition(e: MouseEvent) {
-    const canvas = document.getElementById("graphics")!;
+    const canvas = document.getElementById("graphics");
+    if (!canvas) {
+      return undefined;
+    }
     const bounds = canvas.getBoundingClientRect();
     if (
       e.clientX < bounds.left ||

@@ -8,7 +8,9 @@ import "./CommentTool.css";
 import { Comment, Reply } from "ui/state/comments";
 import classNames from "classnames";
 import { Canvas } from "ui/state/app";
-import { ThreadFront } from "protocol/thread";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import useAuth0 from "ui/utils/useAuth0";
+import { useGetUserId } from "ui/hooks/users";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -73,8 +75,10 @@ function CommentTool({
   setPendingComment,
   createFrameComment,
 }: CommentToolProps) {
-  const [showHelper, setShowHelper] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
+  const recordingId = useGetRecordingId();
+  const { user } = useAuth0();
+  const { userId } = useGetUserId();
   const captionNode = useRef<HTMLDivElement | null>(null);
 
   const addListeners = () => {
@@ -83,7 +87,6 @@ function CommentTool({
     if (videoNode) {
       videoNode.classList.add("location-marker");
       videoNode.addEventListener("mouseup", onClickInCanvas);
-      videoNode.addEventListener("mouseenter", onMouseEnter);
       videoNode.addEventListener("mousemove", onMouseMove);
       videoNode.addEventListener("mouseleave", onMouseLeave);
     }
@@ -94,7 +97,6 @@ function CommentTool({
     if (videoNode) {
       videoNode.classList.remove("location-marker");
       videoNode.removeEventListener("mouseup", onClickInCanvas);
-      videoNode.removeEventListener("mouseenter", onMouseEnter);
       videoNode.removeEventListener("mousemove", onMouseMove);
       videoNode.removeEventListener("mouseleave", onMouseLeave);
     }
@@ -107,7 +109,13 @@ function CommentTool({
     // If there's no pending comment at that point and time, create one
     // with the mouse click as its position.
     if (!pendingComment) {
-      createFrameComment(currentTime, executionPoint, mouseEventCanvasPosition(e));
+      createFrameComment(
+        currentTime,
+        executionPoint,
+        mouseEventCanvasPosition(e),
+        { ...user, id: userId },
+        recordingId
+      );
       return;
     }
 
@@ -119,12 +127,8 @@ function CommentTool({
       setPendingComment(newComment);
     }
   };
-  const onMouseEnter = () => {
-    setShowHelper(true);
-  };
   const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
   const onMouseLeave = () => {
-    setShowHelper(false);
     setMousePosition(null);
   };
 
@@ -136,7 +140,6 @@ function CommentTool({
   }, [currentTime, executionPoint, pendingComment, comments]);
 
   if (
-    !showHelper ||
     !mousePosition ||
     pendingComment?.type === "edit_reply" ||
     pendingComment?.type === "new_reply"
@@ -159,7 +162,7 @@ function CommentTool({
         {pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment" ? (
           <span>{"Move the marker"}</span>
         ) : (
-          `Add comment ${ThreadFront.currentPointHasFrames ? "to this line of code" : ""}`
+          "Add comment"
         )}
       </div>
     </div>

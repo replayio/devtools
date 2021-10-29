@@ -9,7 +9,6 @@ import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { prefs } = require("ui/utils/prefs");
 const { trackEvent } = require("ui/utils/telemetry");
 
@@ -17,34 +16,43 @@ import "reactjs-popup/dist/index.css";
 import "ui/components/reactjs-popup.css";
 import Log from "./Log";
 import Condition from "./Condition";
+import useAuth0 from "ui/utils/useAuth0";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { useGetUserId } from "ui/hooks/users";
+import { PointDescription } from "@recordreplay/protocol";
 
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
+  analysisPoints: PointDescription[] | "error";
   breakpoint: any;
+  executionPoint: any;
+  isHot: boolean;
+  pausedOnHit: boolean;
   setInputToFocus: Dispatch<SetStateAction<Input>>;
   toggleEditingOn: () => void;
 };
 
 function PanelSummary({
-  breakpoint,
-  toggleEditingOn,
-  setInputToFocus,
-  createFrameComment,
-  createFloatingCodeComment,
-  executionPoint,
-  currentTime,
   analysisPoints,
+  breakpoint,
+  createFloatingCodeComment,
+  createFrameComment,
+  currentTime,
+  executionPoint,
+  isHot,
+  pausedOnHit,
+  setInputToFocus,
+  toggleEditingOn,
 }: PanelSummaryProps) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
+  const { user } = useAuth0();
+  const { userId } = useGetUserId();
+  const recordingId = useGetRecordingId();
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
-  const isUnderMaxHitsEditable = !!(
-    analysisPoints && analysisPoints.length < prefs.maxHitsEditable
-  );
-  const isEditable = isUnderMaxHitsEditable && isTeamDeveloper;
+  const isEditable = Boolean(analysisPoints && !isHot && isTeamDeveloper);
 
   const handleClick = (event: React.MouseEvent, input: Input) => {
     if (!isEditable) {
@@ -56,21 +64,28 @@ function PanelSummary({
     setInputToFocus(input);
   };
 
-  const pausedOnHit =
-    analysisPoints !== "error" &&
-    !!analysisPoints?.find(point => point.point == executionPoint && point.time == currentTime);
-
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
 
     trackEvent("breakpoint.add_comment");
 
     if (pausedOnHit) {
-      console.log("createFrameComment", currentTime, executionPoint, breakpoint);
-      createFrameComment(currentTime, executionPoint, null, breakpoint);
+      createFrameComment(
+        currentTime,
+        executionPoint,
+        null,
+        { ...user, userId },
+        recordingId,
+        breakpoint
+      );
     } else {
-      console.log("createFloatingCodeComment", currentTime, executionPoint, breakpoint);
-      createFloatingCodeComment(currentTime, executionPoint, breakpoint);
+      createFloatingCodeComment(
+        currentTime,
+        executionPoint,
+        { ...user, id: userId },
+        recordingId,
+        breakpoint
+      );
     }
   };
 
@@ -78,7 +93,7 @@ function PanelSummary({
     return (
       <div className="summary">
         <div className="options items-center flex-col flex-grow">
-          <Log value={logValue} hasCondition={!!conditionValue} {...{ isUnderMaxHitsEditable }} />
+          <Log isEditable={false} value={logValue} hasCondition={!!conditionValue} />
         </div>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -91,13 +106,13 @@ function PanelSummary({
         <Popup
           trigger={
             <div className="flex items-center overflow-hidden space-x-2">
-              <MaterialIcon className="text-xl leading-none">warning</MaterialIcon>
+              <MaterialIcon className="text-xl">warning</MaterialIcon>
               <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
             </div>
           }
         >
-          This log is hidden from the console <br />
-          because it was hit {prefs.maxHitsDisplayed}+ times
+          This log cannot be edited because <br />
+          it was hit {prefs.maxHitsDisplayed}+ times
         </Popup>
         <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
       </div>
@@ -108,15 +123,11 @@ function PanelSummary({
     <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
       <div className="options items-center flex-col flex-grow">
         {conditionValue ? (
-          <Condition
-            handleClick={handleClick}
-            isUnderMaxHitsEditable={isUnderMaxHitsEditable}
-            value={conditionValue}
-          />
+          <Condition handleClick={handleClick} isEditable={isEditable} value={conditionValue} />
         ) : null}
         <Log
           handleClick={handleClick}
-          isUnderMaxHitsEditable={isUnderMaxHitsEditable}
+          isEditable={isEditable}
           hasCondition={!!conditionValue}
           value={logValue}
         />
@@ -132,14 +143,8 @@ function PanelSummary({
 }
 
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: any }) => ({
-    executionPoint: getExecutionPoint(state),
+  (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
-    analysisPoints: selectors.getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
   }),
   {
     createFrameComment: actions.createFrameComment,

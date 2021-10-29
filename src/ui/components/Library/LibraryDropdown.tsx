@@ -30,10 +30,12 @@ export function Dropdown({
   children,
   menuItemsClassName,
   widthClass = "w-56",
+  fontSizeClass = "text-sm",
 }: {
   children: React.ReactNode;
   menuItemsClassName?: string;
   widthClass?: "w-56" | "w-64" | "w-80";
+  fontSizeClass?: "text-sm" | "text-base";
 }) {
   return (
     <Menu as="div" className="inline-block text-left recording-options">
@@ -43,7 +45,8 @@ export function Dropdown({
           className={classNames(
             menuItemsClassName,
             widthClass,
-            "origin-top-right text-sm right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+            fontSizeClass,
+            "origin-top-right right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
           )}
         >
           <div className="py-1">{children}</div>

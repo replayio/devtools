@@ -15,7 +15,7 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisMana
 import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
-import { EventTypeCategory } from "devtools/server/actors/utils/event-breakpoints";
+import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.
@@ -354,12 +354,7 @@ export function setLogpointByURL(
 const eventTypePoints: Record<string, PointDescription[]> = {};
 const eventTypeLogGroupId: Record<string, string> = {};
 
-export async function fetchEventTypePoints(categories: EventTypeCategory[]) {
-  const eventTypes = categories
-    .map(cat => cat.events)
-    .flat()
-    .map(e => e.id);
-
+export async function fetchEventTypePoints(eventTypes: EventId[]) {
   const sessionId = await ThreadFront.waitForSession();
 
   await Promise.all(

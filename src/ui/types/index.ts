@@ -101,6 +101,13 @@ export interface Recording {
   collaborators?: string[];
   comments?: any;
   userRole?: RecordingRole;
+  operations: OperationsData;
+}
+
+export interface OperationsData {
+  scriptDomains: string[];
+  cookies?: string[];
+  storage?: string[];
 }
 
 export interface PendingWorkspaceInvitation extends Workspace {

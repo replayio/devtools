@@ -3,7 +3,7 @@ import { bootstrapStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
-import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
+import { maybeDisableMixpanel, setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
 import { getInitialAppState, getTheme, getWorkspaceId } from "ui/reducers/app";
 import { setFontLoading, setModal, setWorkspaceId } from "ui/actions/app";
@@ -55,6 +55,7 @@ export async function bootstrapApp() {
 
     const userInfo = await getUserInfo();
     if (userInfo) {
+      maybeDisableMixpanel(userInfo);
       setTelemetryContext(userInfo);
       maybeAutoOpenModal(store);
 

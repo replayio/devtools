@@ -2,10 +2,34 @@ import React, { useState } from "react";
 import PortalDropdown from "../PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import { WorkspaceId } from "ui/state/app";
-import { Recording } from "ui/types";
+import { Recording, Workspace } from "ui/types";
 import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
+
+const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
+  <span>
+    {`Members of `}
+    <span className="underline">{name}</span>
+    {` can view`}
+  </span>
+);
+
+export function getPrivacySummaryAndIcon(recording: Recording) {
+  if (!recording.private) {
+    return { icon: "link", summary: "Anyone with the link can view" };
+  }
+
+  if (recording.workspace) {
+    return {
+      icon: "domain",
+      summary: <WorkspacePrivacySummary workspace={recording.workspace} />,
+    };
+  }
+
+  // If the recording is private and in an individual's library.
+  return { icon: "group", summary: "Only people with access can view" };
+}
 
 export default function PrivacyDropdown({ recording }: { recording: Recording }) {
   const [expanded, setExpanded] = useState(false);
@@ -40,24 +64,14 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
     setExpanded(false);
   };
 
+  const { summary } = getPrivacySummaryAndIcon(recording);
+
   const button = (
     <div className="flex flex-row space-x-1">
-      <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">
-        {!isPrivate ? (
-          "Anyone with the link can view"
-        ) : workspaceId ? (
-          <span>
-            {`Members of `}
-            <span className="underline">{recording.workspace?.name}</span>
-            {` can view`}
-          </span>
-        ) : (
-          "Only people with access can view"
-        )}
-      </span>
+      <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">{summary}</span>
       {isOwner ? (
         <div style={{ lineHeight: "0px" }}>
-          <MaterialIcon style={{ fontSize: "16px" }}>expand_more</MaterialIcon>
+          <MaterialIcon>expand_more</MaterialIcon>
         </div>
       ) : null}
     </div>

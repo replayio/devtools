@@ -105,7 +105,13 @@ function sendTelemetryEvent(telemetryEvent, tags) {
     request.on("error", e => {
       log(`Error sending telemetry ping: ${e}`);
     });
-    request.write(JSON.stringify({ event: telemetryEvent, ...tags }));
+    request.write(
+      JSON.stringify({
+        event: telemetryEvent,
+        ...tags,
+        github_ref: process.env.GITHUB_REF,
+      })
+    );
     request.end();
   } catch (e) {
     console.error(`Couldn't send telemetry event ${telemetryEvent}`, e);

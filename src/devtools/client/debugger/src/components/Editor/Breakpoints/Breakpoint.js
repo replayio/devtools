@@ -4,7 +4,7 @@
 
 //
 
-import React, { PureComponent } from "react";
+import { PureComponent } from "react";
 import classnames from "classnames";
 import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";

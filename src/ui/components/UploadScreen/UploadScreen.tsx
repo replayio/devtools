@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactNode, SetStateAction, Dispatch } from "react";
 import hooks from "ui/hooks";
 import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
@@ -7,8 +7,12 @@ import { Recording, UserSettings } from "ui/types";
 import { LoadingScreen } from "../shared/BlankScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent, trackTiming } from "ui/utils/telemetry";
-import BubbleBackground from "../shared/Onboarding/BubbleBackground";
 import Sharing, { MY_LIBRARY } from "./Sharing";
+import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
+import MaterialIcon from "../shared/MaterialIcon";
+import PortalTooltip from "../shared/PortalTooltip";
+import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
+import BubbleModal from "../shared/Onboarding/BubbleModal";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
@@ -78,9 +82,38 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
   );
 }
 
-function ReplayScreenshot({ screenData }: { screenData: string }) {
+function LimitWarning() {
   return (
-    <div className="bg-white rounded-lg px-6 pt-6 shadow-xl h-64" style={{ height: "320px" }}>
+    <div className="absolute bottom-4 right-4 flex p-2 rounded-full bg-gray-500 text-white shadow-lg">
+      <PortalTooltip
+        tooltip={
+          <div
+            className="text-base bg-toolbarBackground p-2 px-3 rounded-md shadow-lg mb-4"
+            style={{ width: "200px" }}
+          >
+            {`Replays work best when under 2 minutes`}
+          </div>
+        }
+      >
+        <MaterialIcon className="select-none">warning</MaterialIcon>
+      </PortalTooltip>
+    </div>
+  );
+}
+
+function ReplayScreenshot({
+  screenData,
+  showLimitWarning,
+}: {
+  screenData: string;
+  showLimitWarning: boolean;
+}) {
+  return (
+    <div
+      className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish"
+      style={{ height: "280px" }}
+    >
+      {showLimitWarning ? <LimitWarning /> : null}
       <img src={screenData} className="h-full m-auto" />
     </div>
   );
@@ -91,6 +124,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
   const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
@@ -146,34 +180,48 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
   }
 
   return (
-    <div
-      className="w-full h-full grid fixed z-50 items-center justify-center"
-      style={{ background: "#f3f3f4" }}
-    >
-      <BubbleBackground />
-      <form
-        className="relative flex flex-col items-center space-y-11 overflow-auto"
-        onSubmit={onSubmit}
-      >
-        <div
-          className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
-          style={{ width: "620px" }}
-        >
-          <div className="absolute w-full h-full bg-white opacity-40" />
-          <div className="py-9 px-8 space-y-6 relative">
-            <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
-            <ReplayScreenshot screenData={screenData!} />
+    <BubbleModal>
+      <div className="flex flex-col items-center relative">
+        <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
+        <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
+          <div
+            className="flex flex-row space-x-4 mb-11"
+            style={{ height: isPublic ? "620px" : "" }}
+          >
+            <div
+              className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
+              style={{ width: "620px" }}
+            >
+              <div className="absolute w-full h-full bg-jellyfish" />
+              <div className="py-9 px-8 space-y-6 relative">
+                <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
+                <ReplayScreenshot
+                  screenData={screenData!}
+                  showLimitWarning={recording.duration > 120 * 1000}
+                />
+              </div>
+              <div className="py-9 space-y-6 px-8 border-t border-gray-300 relative">
+                <Sharing
+                  workspaces={workspaces}
+                  selectedWorkspaceId={selectedWorkspaceId}
+                  setSelectedWorkspaceId={setSelectedWorkspaceId}
+                  isPublic={isPublic}
+                  setIsPublic={setIsPublic}
+                />
+                {isPublic ? (
+                  <ToggleShowPrivacyButton
+                    showPrivacy={showPrivacy}
+                    operations={recording.operations}
+                    setShowPrivacy={setShowPrivacy}
+                  />
+                ) : null}
+              </div>
+            </div>
+            {showPrivacy && isPublic ? <Privacy operations={recording.operations} /> : null}
           </div>
-          <Sharing
-            workspaces={workspaces}
-            selectedWorkspaceId={selectedWorkspaceId}
-            setSelectedWorkspaceId={setSelectedWorkspaceId}
-            isPublic={isPublic}
-            setIsPublic={setIsPublic}
-          />
-        </div>
-        <Actions onDiscard={onDiscard} status={status} />
-      </form>
-    </div>
+          <Actions onDiscard={onDiscard} status={status} />
+        </form>
+      </div>
+    </BubbleModal>
   );
 }

@@ -10,22 +10,24 @@ const getIconAndText = (
   text: string;
   icon: string;
 } => {
-  let text, icon;
-
-  if (!isPublic) {
-    if ((selectedWorkspaceId = MY_LIBRARY)) {
-      text = `Only you can view this`;
-      icon = "person";
-    } else {
-      text = `Shared privately with ${workspaceName}`;
-      icon = "groups";
-    }
-  } else {
-    text = "This replay can be viewed by anyone with the link";
-    icon = "public";
+  if (isPublic) {
+    return {
+      text: "This replay can be viewed by anyone with the link",
+      icon: "public",
+    };
   }
 
-  return { text, icon };
+  if (selectedWorkspaceId === MY_LIBRARY) {
+    return {
+      text: `Only you can view this`,
+      icon: "person",
+    };
+  }
+
+  return {
+    text: `Shared privately with ${workspaceName}`,
+    icon: "groups",
+  };
 };
 
 type SettingsPreviewProps = {
@@ -49,6 +51,7 @@ export default function SettingsPreview({
   return (
     <button
       className="w-full flex flex-row justify-between items-center focus:outline-none"
+      type="button"
       onClick={onClick}
       style={{ minHeight: "38px" }}
     >

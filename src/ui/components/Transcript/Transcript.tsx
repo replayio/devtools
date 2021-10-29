@@ -1,14 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
 import "./Transcript.css";
 import { UIState } from "ui/state";
-import { Comment, PendingNewComment } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { commentKeys } from "ui/utils/comments";
 
 function Transcript({ pendingComment }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
@@ -20,12 +21,13 @@ function Transcript({ pendingComment }: PropsFromRedux) {
     return null;
   }
 
-  const displayedComments: (Comment | PendingNewComment)[] = [...comments];
+  const displayedComments: Comment[] = [...comments];
   if (pendingComment?.type == "new_comment") {
     displayedComments.push(pendingComment.comment);
   }
 
   const sortedComments = sortBy(displayedComments, ["time", "createdAt"]);
+  const keys = commentKeys(sortedComments);
 
   return (
     <div className="right-sidebar">
@@ -35,14 +37,8 @@ function Transcript({ pendingComment }: PropsFromRedux) {
       <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
           <div className="overflow-auto w-full flex-grow">
-            {sortedComments.map(comment => {
-              return (
-                <CommentCard
-                  comments={sortedComments}
-                  comment={comment}
-                  key={"id" in comment ? comment.id : 0}
-                />
-              );
+            {sortedComments.map((comment, i) => {
+              return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
             })}
           </div>
         ) : (

@@ -1,6 +1,7 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
 import { CommentsState } from "./comments";
+import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
 import { InspectorState } from "devtools/client/inspector/state";
 import { MarkupState } from "devtools/client/inspector/markup/state/markup";
@@ -15,6 +16,7 @@ export interface UIState {
   timeline: TimelineState;
   app: AppState;
   comments: CommentsState;
+  contextMenus: ContextMenusState;
   reactDevTools: ReactDevToolsState;
   inspector: InspectorState;
   markup: MarkupState;

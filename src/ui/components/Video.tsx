@@ -29,7 +29,6 @@ function Video({
   setVideoNode,
   videoUrl,
 }: PropsFromRedux) {
-  const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
@@ -86,8 +85,6 @@ const connector = connect(
   }),
   {
     setVideoNode: actions.setVideoNode,
-    togglePlayback: actions.togglePlayback,
-    clearPendingComment: actions.clearPendingComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

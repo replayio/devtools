@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { forwardRef } from "react";
 
 type ButtonSizes = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 type ButtonStyles = "primary" | "secondary" | "disabled";
@@ -27,6 +27,14 @@ function getColorCode(color: Colors, num: ColorScale) {
       return "primaryAccent";
     } else if (num === 700) {
       return "primaryAccentHover";
+    }
+  }
+
+  if (color === "pink") {
+    if (num === 600) {
+      return "secondaryAccent";
+    } else if (num === 700) {
+      return "secondaryAccentHover";
     }
   }
 
@@ -66,19 +74,14 @@ export function getButtonClasses(color: Colors, style: ButtonStyles, size: Butto
   return classNames(standardClasses, colorClasses, focusClasses);
 }
 
-export function Button({
-  size,
-  children,
-  style,
-  color,
-  className,
-  onClick = () => {},
-  type,
-}: ButtonProps & {
-  color: Colors;
-  size: ButtonSizes;
-  style: ButtonStyles;
-}) {
+export const Button = forwardRef<
+  HTMLButtonElement,
+  ButtonProps & {
+    color: Colors;
+    size: ButtonSizes;
+    style: ButtonStyles;
+  }
+>(({ size, children, style, color, className, onClick = () => {}, type }, ref) => {
   const buttonClasses = getButtonClasses(color, style, size);
 
   return (
@@ -86,12 +89,14 @@ export function Button({
       onClick={onClick}
       disabled={style === "disabled"}
       className={classNames(buttonClasses, className)}
+      ref={ref}
       type={type}
     >
       {children}
     </button>
   );
-}
+});
+Button.displayName = "Button";
 
 interface ButtonProps {
   children?: React.ReactNode;

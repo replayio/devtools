@@ -3,10 +3,10 @@ import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentEditor from "./CommentEditor";
-import { Comment, PendingNewComment, PendingNewReply, Reply } from "ui/state/comments";
+import { Comment, Reply } from "ui/state/comments";
 
 type ExistingCommentEditorProps = PropsFromRedux & {
-  comment: Comment | Reply | PendingNewComment | PendingNewReply;
+  comment: Comment | Reply;
   editable: boolean;
   type: "comment" | "reply";
 };

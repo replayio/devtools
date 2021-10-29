@@ -13,10 +13,9 @@ export default function ReplayTitle({
 
   return (
     <div className="flex flex-col space-y-3">
-      <div>Replay Title</div>
       <input
         type="textbox"
-        className="bg-white rounded-lg shadow-xl py-3.5 px-6 font-medium focus:outline-none focus:ring-2 focus:ring-primaryAccent"
+        className="bg-jellyfish rounded-lg shadow-xl py-3.5 px-6 font-medium focus:outline-none focus:ring-2 focus:ring-primaryAccent"
         onChange={onChange}
         value={inputValue}
       />

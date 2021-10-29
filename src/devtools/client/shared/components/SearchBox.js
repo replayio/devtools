@@ -78,7 +78,7 @@ class SearchBox extends PureComponent {
   }
 
   focus() {
-    TrackEvent("console.search.start");
+    trackEvent("console.search.start");
     if (this.inputRef) {
       this.inputRef.current.focus();
     }

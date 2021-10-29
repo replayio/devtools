@@ -1,5 +1,4 @@
 import {
-  RecordingId,
   SessionId,
   PointDescription,
   Location,

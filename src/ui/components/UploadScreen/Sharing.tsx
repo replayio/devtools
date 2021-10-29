@@ -25,10 +25,9 @@ function EditableSettings({
 }: Omit<SharingProps, "showSharingSettings">) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const handleWorkspaceSelect = (id: string) => {
-    updateDefaultWorkspace({
-      variables: { workspaceId: id },
-    });
     setSelectedWorkspaceId(id);
+    const dbWorkspaceId = id === "My Library" ? null : id;
+    updateDefaultWorkspace({ variables: { workspaceId: dbWorkspaceId } });
   };
 
   return (
@@ -37,7 +36,7 @@ function EditableSettings({
         <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
       ) : null}
       <div
-        className="space-x-2 flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-white"
+        className="space-x-2 flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-jellyfish"
         onClick={() => setIsPublic(!isPublic)}
       >
         <div>Public Access</div>
@@ -51,7 +50,7 @@ export default function Sharing(props: SharingProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="relative border-t border-gray-300 py-10 px-8">
+    <div className="relative">
       {isEditing ? (
         <EditableSettings {...props} />
       ) : (

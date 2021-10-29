@@ -34,6 +34,10 @@ class EventListeners extends Component {
     mode: "simple",
   };
 
+  componentDidMount() {
+    this.props.loadAdditionalPoints();
+  }
+
   hasMatch(eventOrCategoryName, searchText) {
     const lowercaseEventOrCategoryName = eventOrCategoryName.toLowerCase();
     const lowercaseSearchText = searchText.toLowerCase();
@@ -162,7 +166,7 @@ class EventListeners extends Component {
       : [];
 
     const categoryCount = categoryEvents
-      .map(event => eventTypePoints[event.id].length)
+      .map(event => eventTypePoints[event.id]?.length || 0)
       .reduce((sum, count) => sum + count, 0);
 
     if (categoryCount == 0) {
@@ -375,4 +379,5 @@ export default connect(mapStateToProps, {
   removeEventListeners: actions.removeEventListenerBreakpoints,
   addEventListenerExpanded: actions.addEventListenerExpanded,
   removeEventListenerExpanded: actions.removeEventListenerExpanded,
+  loadAdditionalPoints: actions.loadAdditionalPoints,
 })(EventListeners);
