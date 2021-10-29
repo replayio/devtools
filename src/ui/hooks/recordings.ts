@@ -139,7 +139,11 @@ export async function getRecording(recordingId: RecordingId) {
 
 export function useGetRecording(
   recordingId: RecordingId | null | undefined
-): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
+): {
+  recording: Recording | undefined;
+  isAuthorized: boolean;
+  loading: boolean;
+} {
   const { data, error, loading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
     skip: !recordingId,

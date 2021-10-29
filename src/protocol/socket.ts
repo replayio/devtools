@@ -48,7 +48,7 @@ window.addEventListener("beforeunload", () => {
   willClose = true;
 });
 
-export function initSocket(store: UIStore, address?: string) {
+export function initSocket(store: UIStore, address: string) {
   if (isMock()) {
     waitForMockEnvironment().then(env => {
       env!.setOnSocketMessage(onSocketMessage as any);
@@ -57,7 +57,7 @@ export function initSocket(store: UIStore, address?: string) {
     return;
   }
 
-  socket = new WebSocket(address || "wss://dispatch.replay.io");
+  socket = new WebSocket(address);
 
   socket.onopen = makeInfallible(onSocketOpen);
   socket.onclose = makeInfallible(() => store.dispatch(onSocketClose()));

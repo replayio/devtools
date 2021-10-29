@@ -26,9 +26,11 @@ export default function PortalDropdown(props: PortalDropdownProps) {
   );
 
   const expand = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    props.setExpanded(true);
+    if (e.button === 0) {
+      e.stopPropagation();
+      e.preventDefault();
+      props.setExpanded(true);
+    }
   };
   const collapse = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -52,7 +54,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
       <button
         type="button"
         className={`expand-dropdown w-full ${buttonStyle}`}
-        onClick={expand}
+        onMouseDown={expand}
         ref={buttonRef}
       >
         {buttonContent}
