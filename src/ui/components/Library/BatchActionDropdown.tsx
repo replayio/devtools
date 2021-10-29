@@ -56,8 +56,8 @@ function BatchActionDropdown({
 
   if (selectedIds.length > 0) {
     button = (
-      <span className={classNames("space-x-1 flex flex-row items-center leading-4")}>
-        <MaterialIcon outlined className="text-sm leading-4 font-bold" color="text-primaryAccent">
+      <span className={"space-x-1 flex flex-row items-center leading-4 text-primaryAccent"}>
+        <MaterialIcon outlined className="font-bold" iconSize="sm">
           expand_more
         </MaterialIcon>
         <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
@@ -67,7 +67,7 @@ function BatchActionDropdown({
   } else {
     button = (
       <span className={classNames("space-x-1 flex flex-row items-center leading-4")}>
-        <MaterialIcon outlined className="text-sm leading-4 font-bold">
+        <MaterialIcon outlined className="font-bold" iconSize="sm">
           expand_more
         </MaterialIcon>
         <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>

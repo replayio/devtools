@@ -67,7 +67,9 @@ function Event({
       )}
     >
       <div className="flex flex-row space-x-2 items-center overflow-hidden">
-        <MaterialIcon className="group-hover:text-primaryAccent">{icon}</MaterialIcon>
+        <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
+          {icon}
+        </MaterialIcon>
         <div
           className={classNames("overflow-ellipsis overflow-hidden whitespace-pre", {
             "font-semibold": isPaused,

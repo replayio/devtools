@@ -39,7 +39,7 @@ function SettingNavigationItem<
 
   return (
     <li onClick={onClick} className={classnames({ selected: title === selectedTab })}>
-      <MaterialIcon>{icon!}</MaterialIcon>
+      <MaterialIcon iconSize="lg">{icon!}</MaterialIcon>
       <span>{title}</span>
     </li>
   );

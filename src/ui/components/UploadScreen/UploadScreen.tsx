@@ -95,9 +95,7 @@ function LimitWarning() {
           </div>
         }
       >
-        <MaterialIcon className="select-none" style={{ fontSize: "16px" }}>
-          warning
-        </MaterialIcon>
+        <MaterialIcon className="select-none">warning</MaterialIcon>
       </PortalTooltip>
     </div>
   );

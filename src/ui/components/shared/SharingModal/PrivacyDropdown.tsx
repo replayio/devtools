@@ -71,7 +71,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
       <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">{summary}</span>
       {isOwner ? (
         <div style={{ lineHeight: "0px" }}>
-          <MaterialIcon style={{ fontSize: "16px" }}>expand_more</MaterialIcon>
+          <MaterialIcon>expand_more</MaterialIcon>
         </div>
       ) : null}
     </div>

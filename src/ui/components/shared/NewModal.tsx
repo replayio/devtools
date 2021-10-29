@@ -60,7 +60,9 @@ export function ModalContent({ children }: { children: React.ReactChild | React.
 export function ModalCloseButton({ onClose }: { onClose?: () => void }) {
   return (
     <button onClick={onClose}>
-      <MaterialIcon className="align-top">close</MaterialIcon>
+      <MaterialIcon className="align-top" iconSize="xl">
+        close
+      </MaterialIcon>
     </button>
   );
 }

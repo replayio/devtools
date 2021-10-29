@@ -29,10 +29,10 @@ export function ToggleShowPrivacyButton({
       className="p-3 bg-jellyfish rounded-lg font-normal text-left w-full flex flex-row items-center justify-between group"
     >
       <div className="space-x-2 flex flex-row items-center">
-        <MaterialIcon>storage</MaterialIcon>
+        <MaterialIcon iconSize="xl">storage</MaterialIcon>
         <span>Contains potentially sensitive data from {uniqueDomains.length} domains</span>
       </div>
-      <MaterialIcon className="opacity-0 group-hover:opacity-100">
+      <MaterialIcon className="opacity-0 group-hover:opacity-100" iconSize="xl">
         {showPrivacy ? "chevron_left" : "chevron_right"}
       </MaterialIcon>
     </button>
@@ -42,7 +42,7 @@ export function ToggleShowPrivacyButton({
 function FavIcon({ url }: { url: string }) {
   return (
     <div className="h-5 w-5 relative">
-      <MaterialIcon className="leading-5 relative" style={{ fontSize: "1.25rem" }}>
+      <MaterialIcon className="leading-5 relative" iconSize="xl">
         public
       </MaterialIcon>
       <img
@@ -55,7 +55,7 @@ function FavIcon({ url }: { url: string }) {
 
 function Source({ url }: { url: string }) {
   return (
-    <div className="flex space-x-3 items-center">
+    <div className="flex space-x-2 items-center">
       <FavIcon url={url} />
       <div>{url}</div>
     </div>
@@ -66,7 +66,7 @@ function PrivacyData({ icon, name, urls }: { icon: string; name: string; urls: s
   return (
     <div className="rounded-lg bg-jellyfish p-3 space-y-3">
       <div className="space-x-2 flex flex-row font-medium items-center">
-        <MaterialIcon>{icon}</MaterialIcon>
+        <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
         <div>{name}</div>
       </div>
       <div className="flex flex-col space-y-1.5">

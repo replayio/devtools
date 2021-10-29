@@ -28,7 +28,7 @@ export function TrialEnd({
       style={style}
       onClick={onClick}
     >
-      <MaterialIcon style={{ fontSize: "1.25rem" }}>timer</MaterialIcon>
+      <MaterialIcon iconSize="xl">timer</MaterialIcon>
       <span className="overflow-hidden whitespace-pre overflow-ellipsis">
         {expiresIn > 1 ? (
           <span>Trial expires in {expiresIn} days</span>

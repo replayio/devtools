@@ -23,7 +23,7 @@ function TrimmingModal({ hideModal }: PropsFromRedux) {
         <div className="p-8 space-y-4">
           <div className="flex flex-row space-x-2 items-center">
             <div className="text-white rounded-full bg-primaryAccent w-6 h-6 p-1">
-              <MaterialIcon style={{ fontSize: "1rem" }}>center_focus_strong</MaterialIcon>
+              <MaterialIcon>center_focus_strong</MaterialIcon>
             </div>
             <div className="text-lg">Replay trimming</div>
           </div>

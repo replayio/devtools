@@ -34,6 +34,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
             ) : (
               <MaterialIcon
                 className="material-icons mx-2.5 w-5 text-primaryAccent"
+                iconSize="lg"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
                 assignment_outline

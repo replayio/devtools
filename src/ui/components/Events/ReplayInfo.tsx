@@ -35,7 +35,7 @@ export const ReplayInfo = () => {
           </Row>
         ) : null}
         <Row>
-          <MaterialIcon>{icon}</MaterialIcon>
+          <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <div>{summary}</div>
         </Row>
         {recording.operations ? <OperationsRow operations={recording.operations} /> : null}
@@ -49,7 +49,7 @@ function OperationsRow({ operations }: { operations: OperationsData }) {
 
   return (
     <Row>
-      <MaterialIcon>info</MaterialIcon>
+      <MaterialIcon iconSize="xl">info</MaterialIcon>
       <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
     </Row>
   );
