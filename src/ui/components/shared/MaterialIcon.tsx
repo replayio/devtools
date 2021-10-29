@@ -6,6 +6,7 @@ import { UIState } from "ui/state";
 import "./MaterialIcon.css";
 
 const SIZE_STYLES = {
+  xs: "text-xs",
   sm: "text-sm",
   base: "text-base",
   lg: "text-lg",
@@ -19,7 +20,7 @@ type MaterialIconProps = PropsFromRedux &
     outlined?: boolean;
     // tailwind text color style, e.g. text-white, text-blue-200
     color?: string;
-    iconSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "old";
+    iconSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl";
   };
 
 function MaterialIcon({
