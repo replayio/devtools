@@ -19,7 +19,8 @@ function MoveRecordingMenu({
   workspaces,
 }: RecordingOptionsDropdownProps) {
   const { workspace, loading } = hooks.useGetWorkspace(currentWorkspaceId || "");
-  if (loading || !workspace?.subscription || subscriptionExpired(workspace)) return null;
+  if (loading || (workspace && (!workspace?.subscription || subscriptionExpired(workspace))))
+    return null;
 
   return (
     <>
