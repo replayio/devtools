@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import "./MaterialIcon.css";
@@ -14,24 +14,23 @@ const SIZE_STYLES = {
   "2xl": "text-2xl",
 };
 
-type MaterialIconProps = PropsFromRedux &
-  React.HTMLProps<HTMLDivElement> & {
-    children: string;
-    outlined?: boolean;
-    // tailwind text color style, e.g. text-white, text-blue-200
-    color?: string;
-    iconSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl";
-  };
+type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
+  children: string;
+  outlined?: boolean;
+  // tailwind text color style, e.g. text-white, text-blue-200
+  color?: string;
+  iconSize?: keyof typeof SIZE_STYLES;
+};
 
-function MaterialIcon({
+export default function MaterialIcon({
   children,
-  fontLoading,
   className,
   outlined,
   color,
   iconSize = "base",
   ...rest
 }: MaterialIconProps) {
+  const fontLoading = useSelector((state: UIState) => selectors.getFontLoading(state));
   return (
     <div
       {...rest}
@@ -49,8 +48,3 @@ function MaterialIcon({
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({ fontLoading: selectors.getFontLoading(state) }));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(MaterialIcon);
