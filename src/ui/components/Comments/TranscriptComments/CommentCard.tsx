@@ -133,7 +133,7 @@ function CommentCard({
         className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
         onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
-        onClick={() => {
+        onMouseDown={() => {
           trackEvent("comments.focus");
           setIsFocused(true);
         }}
@@ -163,18 +163,21 @@ function CommentCard({
         `mx-auto relative w-full border-b border-gray-300 cursor-pointer transition`,
         hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
-      onClick={() => {
-        seekToComment(comment);
-        setIsEditorOpen(true);
-        setIsFocused(true);
+      onMouseDown={e => {
+        if (e.button === 0) {
+          seekToComment(comment);
+          setIsEditorOpen(true);
+          setIsFocused(true);
+        }
       }}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
       <BorderBridge {...{ comments, comment, isPaused }} />
       <div
-        className={classNames("py-2.5 w-full border-l-2 border-transparent px-2.5 pl-2 space-y-2", {
+        className={classNames("p-2.5 pl-2 space-y-2 border-l-2", {
           "border-secondaryAccent": isPaused,
+          "border-transparent": !isPaused,
         })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
