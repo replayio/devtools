@@ -139,8 +139,13 @@ export async function getRecording(recordingId: RecordingId) {
 
 export function useGetRecording(
   recordingId: RecordingId | null | undefined
-): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+): {
+  recording: Recording | undefined;
+  isAuthorized: boolean;
+  loading: boolean;
+  refetch: () => void;
+} {
+  const { data, error, loading, refetch } = useQuery(GET_RECORDING, {
     variables: { recordingId },
     skip: !recordingId,
   });
@@ -153,7 +158,7 @@ export function useGetRecording(
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
 
-  return { recording, isAuthorized: !!isAuthorized, loading };
+  return { recording, isAuthorized: !!isAuthorized, loading, refetch };
 }
 
 export function useIsTeamDeveloper() {
