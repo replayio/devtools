@@ -15,7 +15,7 @@ import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import BubbleModal from "../shared/Onboarding/BubbleModal";
 const { isDemoReplay } = require("ui/utils/demo");
 
-type UploadScreenProps = { recording: Recording; userSettings: UserSettings };
+type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
 type Status = "saving" | "deleting" | "deleted" | null;
 
 function DeletedScreen({ url }: { url: string }) {
@@ -119,7 +119,7 @@ function ReplayScreenshot({
   );
 }
 
-export default function UploadScreen({ recording, userSettings }: UploadScreenProps) {
+export default function UploadScreen({ recording, userSettings, onUpload }: UploadScreenProps) {
   const recordingId = useGetRecordingId();
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
@@ -163,6 +163,7 @@ export default function UploadScreen({ recording, userSettings }: UploadScreenPr
       variables: { recordingId, title: inputValue, workspaceId },
     });
     updateIsPrivate({ variables: { recordingId, isPrivate: !isPublic } });
+    onUpload();
   };
   const onDiscard = () => {
     setStatus("deleting");

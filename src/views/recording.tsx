@@ -11,6 +11,7 @@ import DevTools from "ui/components/DevTools";
 function Recording({ getAccessibleRecording }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const [recording, setRecording] = useState<RecordingInfo | null>();
+  const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {
     async function getRecording() {
       setRecording(await getAccessibleRecording(recordingId));
@@ -25,8 +26,8 @@ function Recording({ getAccessibleRecording }: PropsFromRedux) {
   // Add a check to make sure the recording has an associated user ID.
   // We skip the upload step if there's no associated user ID, which
   // is the case for CI test recordings.
-  if (recording.isInitialized === false && !isTest() && recording.userId) {
-    return <Upload />;
+  if (!uploadComplete && recording.isInitialized === false && !isTest() && recording.userId) {
+    return <Upload onUpload={() => setUploadComplete(true)} />;
   } else {
     return <DevTools />;
   }
