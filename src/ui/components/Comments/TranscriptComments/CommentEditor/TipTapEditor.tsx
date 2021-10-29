@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import { Editor as EditorType } from "@tiptap/core";
+import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -9,7 +10,7 @@ import { ReplayLink } from "./replayLink";
 
 interface TipTapEditorProps {
   autofocus: boolean;
-  blur: () => void;
+  blur: (text: string) => void;
   close: () => void;
   content: string;
   editable: boolean;
@@ -20,6 +21,14 @@ interface TipTapEditorProps {
   possibleMentions: User[];
   takeFocus: boolean;
 }
+
+const getContent = (editor: EditorType) => {
+  const charCount = editor.getCharacterCount();
+  if (charCount === 0) {
+    return "";
+  }
+  return JSON.stringify(editor.getJSON());
+};
 
 const tryToParse = (content: string): any => {
   try {
@@ -58,14 +67,16 @@ const TipTapEditor = ({
         addKeyboardShortcuts() {
           return {
             "Cmd-Enter": ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
-              blur();
+              const content = getContent(editor);
+              handleSubmit(content);
+              blur(content);
               close();
               return true;
             },
             Enter: ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
-              blur();
+              const content = getContent(editor);
+              handleSubmit(content);
+              blur(content);
               close();
               return true;
             },
@@ -119,8 +130,9 @@ const TipTapEditor = ({
         })}
         editor={editor}
         onBlur={() => {
-          blur();
-          if ((editor?.getCharacterCount() || 0) === 0) {
+          const content = editor ? getContent(editor) : "";
+          blur(content);
+          if (!content) {
             close();
           }
         }}

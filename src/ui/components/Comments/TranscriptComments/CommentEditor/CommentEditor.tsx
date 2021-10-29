@@ -23,6 +23,8 @@ function CommentEditor({
   comment,
   editable,
   handleSubmit,
+  pendingComment,
+  setPendingComment,
 }: CommentEditorProps) {
   const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
@@ -35,6 +37,25 @@ function CommentEditor({
     [loading]
   );
 
+  const handleBlur = (text: string) => {
+    if (
+      !pendingComment ||
+      pendingComment.type !== "new_comment" ||
+      text === pendingComment.comment.content
+    ) {
+      return;
+    }
+
+    setPendingComment({
+      ...pendingComment,
+      comment: {
+        ...pendingComment.comment,
+        content: text,
+      },
+    });
+    blur();
+  };
+
   return (
     <div className="comment-input-container">
       <div className={classNames("comment-input")}>
@@ -42,7 +63,7 @@ function CommentEditor({
           {({ autofocus, blur, close, isFocused }) => (
             <TipTapEditor
               autofocus={autofocus}
-              blur={blur}
+              blur={handleBlur}
               close={close}
               content={comment.content || ""}
               editable={editable}
@@ -73,7 +94,7 @@ const connector = connect(
   (state: UIState) => ({
     pendingComment: selectors.getPendingComment(state),
   }),
-  { clearPendingComment: actions.clearPendingComment }
+  { clearPendingComment: actions.clearPendingComment, setPendingComment: actions.setPendingComment }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommentEditor);
