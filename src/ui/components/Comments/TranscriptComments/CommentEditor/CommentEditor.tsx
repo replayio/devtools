@@ -4,13 +4,24 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import { Comment, Reply } from "ui/state/comments";
+import { Comment, isReply, PendingComment, Remark, Reply } from "ui/state/comments";
 
 import "./CommentEditor.css";
 import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
 import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
+
+/**
+ * Updates the `content` field of a Reply or Comment in such a way that
+ * TypeScript doesn't complain at you.
+ */
+function updateCommentContent<P extends PendingComment>(pending: P, content: string): P {
+  return {
+    ...pending,
+    comment: { ...pending.comment, content },
+  };
+}
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply;
@@ -37,22 +48,12 @@ function CommentEditor({
     [loading]
   );
 
-  const handleBlur = (text: string) => {
-    if (
-      !pendingComment ||
-      pendingComment.type !== "new_comment" ||
-      text === pendingComment.comment.content
-    ) {
-      return;
+  const handleBlur = (nextContent: string) => {
+    const prevContent = pendingComment?.comment.content || "";
+    if (pendingComment && nextContent !== prevContent) {
+      setPendingComment(updateCommentContent(pendingComment, nextContent));
     }
 
-    setPendingComment({
-      ...pendingComment,
-      comment: {
-        ...pendingComment.comment,
-        content: text,
-      },
-    });
     blur();
   };
 
