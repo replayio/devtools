@@ -8,6 +8,7 @@ import { prefs } from "./prefs";
 import { UserInfo } from "ui/hooks/users";
 
 let mixpanelDisabled = false;
+const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -69,6 +70,12 @@ let workspaceContext: Workspace | undefined;
 
 export function setWorkspaceContext(workspace: Workspace) {
   workspaceContext = workspace;
+}
+
+export function maybeDisableMixpanel({ email }: TelemetryUser) {
+  if (email && QA_EMAIL_ADDRESSES.includes(email)) {
+    mixpanelDisabled = true;
+  }
 }
 
 export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
