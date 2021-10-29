@@ -6,7 +6,7 @@ import Modal from "ui/components/shared/NewModal";
 import { Recording, UserSettings } from "ui/types";
 import { LoadingScreen } from "../shared/BlankScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { trackEvent } from "ui/utils/telemetry";
+import { trackEvent, trackTiming } from "ui/utils/telemetry";
 import Sharing, { MY_LIBRARY } from "./Sharing";
 import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
 import MaterialIcon from "../shared/MaterialIcon";
@@ -157,6 +157,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     setStatus("saving");
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
+    trackTiming("kpi-time-to-view-replay");
     trackEvent(isDemoReplay(recording) ? "create demo replay" : "create replay");
 
     await initializeRecording({

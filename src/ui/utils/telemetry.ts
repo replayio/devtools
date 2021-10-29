@@ -8,6 +8,7 @@ import { prefs } from "./prefs";
 import { UserInfo } from "ui/hooks/users";
 
 let mixpanelDisabled = false;
+const timings: Record<string, number> = {};
 const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
 export function setupTelemetry() {
@@ -66,6 +67,8 @@ type TelemetryUser = {
 };
 
 let telemetryUser: TelemetryUser | undefined;
+let telemetryProperties: any = {};
+
 let workspaceContext: Workspace | undefined;
 
 export function setWorkspaceContext(workspace: Workspace) {
@@ -99,12 +102,12 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
 }
 
 export async function sendTelemetryEvent(event: string, tags: any = {}) {
-  if (!prefs.logTelemetryEvent && skipTelemetry()) {
-    return;
-  }
-
   if (prefs.logTelemetryEvent) {
     console.log("telemetry event", { event, tags });
+  }
+
+  if (skipTelemetry()) {
+    return;
   }
 
   try {
@@ -139,4 +142,16 @@ export async function trackEvent(event: string, additionalContext?: Object) {
   }
 
   mixpanel.track(event, context);
+}
+
+export function trackTiming(event: string, properties: any = {}) {
+  let duration: number | undefined;
+  if (!timings[event]) {
+    timings[event] = Date.now();
+  } else {
+    duration = Date.now() - timings[event];
+    delete timings[event];
+  }
+
+  sendTelemetryEvent(event, { duration, ...properties });
 }
