@@ -41,6 +41,7 @@ function CommentEditor({
         <FocusContext.Consumer>
           {({ autofocus, blur, close, isFocused }) => (
             <TipTapEditor
+              key={comment.updatedAt}
               autofocus={autofocus}
               blur={blur}
               close={close}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useEditor, EditorContent, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
@@ -46,6 +46,12 @@ const TipTapEditor = ({
   placeholder,
   takeFocus,
 }: TipTapEditorProps) => {
+  const onSubmit = (newContent: string) => {
+    handleSubmit(newContent);
+    blur();
+    close();
+  };
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -58,19 +64,16 @@ const TipTapEditor = ({
         addKeyboardShortcuts() {
           return {
             "Cmd-Enter": ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
-              blur();
-              close();
+              onSubmit(JSON.stringify(editor.getJSON()));
               return true;
             },
             Enter: ({ editor }) => {
-              handleSubmit(JSON.stringify(editor.getJSON()));
-              blur();
-              close();
+              onSubmit(JSON.stringify(editor.getJSON()));
               return true;
             },
             Escape: ({ editor }) => {
               editor.commands.blur();
+              editor.commands.setContent(tryToParse(content));
               handleCancel();
               return true;
             },
@@ -78,11 +81,7 @@ const TipTapEditor = ({
         },
       }),
     ],
-    editorProps: {
-      attributes: {
-        class: "focus:outline-none",
-      },
-    },
+    editorProps: { attributes: { class: "focus:outline-none" } },
     content: tryToParse(content),
     editable,
     autofocus,
