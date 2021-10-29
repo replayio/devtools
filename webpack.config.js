@@ -45,6 +45,7 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       REPLAY_RELEASE: null,
       API_URL: "https://api.replay.io/v1/graphql",
+      DISPATCH_URL: "wss://dispatch.replay.io",
     }),
     new CopyPlugin({
       patterns: [
