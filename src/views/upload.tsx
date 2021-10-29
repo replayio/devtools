@@ -6,14 +6,13 @@ import UploadScreen from "ui/components/UploadScreen";
 
 function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
   const recordingId = useGetRecordingId();
-  const { recording, refetch } = useGetRecording(recordingId);
+  const { recording } = useGetRecording(recordingId);
   // Make sure to get the user's settings before showing the upload screen.
   const { userSettings, loading } = useGetUserSettings();
 
   useEffect(() => {
     if (recording?.isInitialized) {
       window.onbeforeunload = null;
-      refetch();
     }
   });
 
