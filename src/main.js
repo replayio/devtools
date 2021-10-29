@@ -26,6 +26,7 @@ require("ui/utils/whatwg-url-fix");
 const React = require("react");
 const ReactDOM = require("react-dom");
 const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
+const { InstallRouteListener } = require("ui/utils/routeListener");
 import "devtools/client/debugger/src/components/variables.css";
 import "devtools/client/themes/variables.css";
 
@@ -46,6 +47,7 @@ ReactDOM.render(
     fallback={<BlankProgressScreen statusMessage="Fetching data" background="white" />}
   >
     <Router>
+      <InstallRouteListener />
       <Switch>
         <Route path={maintenanceMode ? "/" : "/maintenance"} component={MaintenanceModeScreen} />
         <Route exact path="/browser/error" component={BrowserError} />
