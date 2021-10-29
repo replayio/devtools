@@ -73,13 +73,15 @@ export function cancelBubbling(listener: KeyboardEventListener): KeyboardEventLi
   };
 }
 
+function isEditableTag(target: HTMLElement) {
+  return ["INPUT", "TEXTAREA"].includes(target.tagName) && target.getAttribute("readonly") === null;
+}
+
 export function isEditableElement(target: EventTarget) {
-  if (target instanceof HTMLElement) {
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
-      return true;
-    }
+  if (!(target instanceof HTMLElement)) {
+    return false;
   }
-  return false;
+  return isEditableTag(target) || target.isContentEditable;
 }
 
 export default class KeyShortcuts {

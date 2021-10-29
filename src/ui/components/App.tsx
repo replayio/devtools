@@ -72,6 +72,16 @@ function App({ theme, modal, children }: AppProps) {
   const userInfo = useGetUserInfo();
 
   useEffect(() => {
+    // Stop space bar from being used as a universal "scroll down" operator
+    // We have a big play/pause interface, so space makes way more sense for that.
+    window.addEventListener("keydown", function (e) {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  useEffect(() => {
     document.body.parentElement!.className = theme || "";
   }, [theme]);
 

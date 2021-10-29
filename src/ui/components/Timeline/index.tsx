@@ -347,6 +347,7 @@ class Timeline extends Component<PropsFromRedux> {
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
+    const formattedTime = getFormattedTime(currentTime);
 
     return (
       <div className="timeline">
@@ -380,8 +381,11 @@ class Timeline extends Component<PropsFromRedux> {
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>
-        <div className="timeline-time">
-          <span className="time-current">{getFormattedTime(currentTime)}</span>
+        <div
+          className="timeline-time text-right"
+          style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
+        >
+          <span className="time-current">{formattedTime}</span>
           <span className="time-divider">/</span>
           <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
         </div>
