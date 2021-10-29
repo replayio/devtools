@@ -9,7 +9,7 @@ interface PopupProps {
 export default function Popup({ trigger, children }: PopupProps) {
   return (
     <ReactPopup
-      trigger={trigger}
+      trigger={<>{trigger}</>}
       on="hover"
       position="right center"
       mouseEnterDelay={200}

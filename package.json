@@ -90,6 +90,7 @@
     "@recordreplay/playwright": "^1.10.3",
     "@recordreplay/recordings-cli": "^0.3.1",
     "@types/classnames": "^2.2.11",
+    "@types/codemirror": "^5.60.5",
     "@types/escape-html": "^1.0.1",
     "@types/lodash": "^4.14.168",
     "@types/logrocket-react": "^3.0.0",

@@ -71,29 +71,28 @@ function BreakpointNavigation({
       ) : (
         <div className="flex-grow" />
       )}
-      <div className="relative">
-        {editing ? (
-          <div className="absolute right-0">
-            <button
-              className={classnames(
-                "rounded-full h-5 w-5 p-px pt-0.5 border",
-                showCondition
-                  ? "border-primaryAccent text-primaryAccent"
-                  : "border-gray-500 text-gray-500"
-              )}
-              style={{ height: "1.25rem", borderRadius: "100%" }}
-              onClick={() => setShowCondition(!showCondition)}
-            >
-              <MaterialIcon>filter_list</MaterialIcon>
-            </button>
-          </div>
-        ) : null}
-        <BreakpointNavigationStatus
-          indexed={indexed}
-          executionPoint={lastExecutionPoint}
-          analysisPoints={analysisPoints}
-          isHidden={editing}
-        />
+      <div className="text-center">
+        {editing && (
+          <button
+            className={classnames(
+              "rounded-full h-5 w-5 p-px pt-0.5 border",
+              showCondition
+                ? "border-primaryAccent text-primaryAccent"
+                : "border-gray-500 text-gray-500"
+            )}
+            style={{ height: "1.25rem", borderRadius: "100%" }}
+            onClick={() => setShowCondition(!showCondition)}
+          >
+            <MaterialIcon>filter_list</MaterialIcon>
+          </button>
+        )}
+        {!editing && (
+          <BreakpointNavigationStatus
+            indexed={indexed}
+            executionPoint={lastExecutionPoint}
+            analysisPoints={analysisPoints}
+          />
+        )}
       </div>
     </div>
   );
@@ -122,7 +121,7 @@ function BreakpointNavigationCommands({ disabled, prev, next, navigateToPoint })
   );
 }
 
-function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed, isHidden }) {
+function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed }) {
   let status = "";
   let maxStatusLength = 0;
   if (!indexed) {
@@ -142,12 +141,12 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed, i
     maxStatusLength = `${analysisPoints.length}/${analysisPoints.length}`.length;
   }
 
+  console.log({ maxStatusLength });
   return (
     <div className={classnames("breakpoint-navigation-status-container")}>
       <div className="px-3 py-0.5 rounded-2xl text-gray-500 bg-gray-200">
-        <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}>
-          {status}
-        </div>
+        <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
+        {status}
       </div>
     </div>
   );

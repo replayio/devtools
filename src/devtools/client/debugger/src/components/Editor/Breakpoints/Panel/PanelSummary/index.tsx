@@ -20,6 +20,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
 import { PointDescription } from "@recordreplay/protocol";
+import classNames from "classnames";
 
 export type Input = "condition" | "logValue";
 
@@ -52,16 +53,14 @@ function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const isEditable = Boolean(analysisPoints && !isHot && isTeamDeveloper);
+  const isLoaded = Boolean(analysisPoints && !isHot);
+  const isEditable = isLoaded && isTeamDeveloper;
 
-  const handleClick = (event: React.MouseEvent, input: Input) => {
-    if (!isEditable) {
-      return;
+  const focusInput = (input: Input) => {
+    if (isEditable) {
+      toggleEditingOn();
+      setInputToFocus(input);
     }
-
-    event.stopPropagation();
-    toggleEditingOn();
-    setInputToFocus(input);
   };
 
   const addComment = (e: React.MouseEvent) => {
@@ -89,24 +88,13 @@ function PanelSummary({
     }
   };
 
-  if (!analysisPoints || analysisPoints === "error") {
-    return (
-      <div className="summary">
-        <div className="options items-center flex-col flex-grow">
-          <Log isEditable={false} value={logValue} hasCondition={!!conditionValue} />
-        </div>
-        <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
-      </div>
-    );
-  }
-
   if (isHot) {
     return (
-      <div className="summary">
+      <div className="summary flex items-center">
         <Popup
           trigger={
             <div className="flex items-center overflow-hidden space-x-2">
-              <MaterialIcon className="text-xl">warning</MaterialIcon>
+              <MaterialIcon className="text-xl pl-2">warning</MaterialIcon>
               <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
             </div>
           }
@@ -114,30 +102,40 @@ function PanelSummary({
           This log cannot be edited because <br />
           it was hit {prefs.maxHitsDisplayed}+ times
         </Popup>
-        <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+        <div className="button-container flex items-center">
+          <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="summary space-x-2" onClick={e => handleClick(e, "logValue")}>
-      <div className="options items-center flex-col flex-grow">
-        {conditionValue ? (
-          <Condition handleClick={handleClick} isEditable={isEditable} value={conditionValue} />
-        ) : null}
+    <div className={classNames("summary flex items-center", { enabled: isLoaded })}>
+      <div className="statements-container flex flex-col flex-grow">
+        {conditionValue && (
+          <Condition
+            isEditable={isEditable}
+            onClick={() => focusInput("condition")}
+            value={conditionValue}
+          />
+        )}
         <Log
-          handleClick={handleClick}
-          isEditable={isEditable}
           hasCondition={!!conditionValue}
+          isEditable={isEditable}
+          onClick={() => focusInput("logValue")}
           value={logValue}
         />
+        {!isTeamDeveloper ? (
+          <Popup
+            trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}
+          >
+            Editing logpoints is available for Developers in the Team plan
+          </Popup>
+        ) : null}
       </div>
-      {!isTeamDeveloper ? (
-        <Popup trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}>
-          Editing logpoints is available for Developers in the Team plan
-        </Popup>
-      ) : null}
-      <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+      <div className="button-container flex items-center">
+        <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+      </div>
     </div>
   );
 }

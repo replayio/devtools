@@ -1,24 +1,25 @@
-import React, { useRef, useEffect } from "react";
-import { getCodeMirror } from "devtools/client/debugger/src/utils/editor/create-editor";
+import React, { useRef, useEffect, Key } from "react";
+import CodeMirror, { Editor, EditorFromTextArea, KeyMap } from "codemirror";
+const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 
 export function PanelInput({
-  defaultValue,
   autofocus,
-  onBlur,
+  defaultValue,
   onChange,
-  onKeyDown,
   onEnter,
   onEscape,
-  onClick,
-  onMouseOver,
-  onScroll,
-  onGutterClick,
+}: {
+  autofocus: boolean;
+  defaultValue: string;
+  onChange: (cm: Editor) => void;
+  onEnter: (cm: Editor) => void;
+  onEscape: (cm: Editor) => void;
 }) {
   const textAreaNode = useRef(null);
-  const codeMirrorNode = useRef(null);
+  const codeMirrorNode = useRef<EditorFromTextArea | null>(null);
   useEffect(() => {
     requestAnimationFrame(() => {
-      let extraKeys = {
+      let extraKeys: KeyMap = {
         Esc: false,
         "Cmd-F": false,
         "Ctrl-F": false,
@@ -39,11 +40,12 @@ export function PanelInput({
 
       const CodeMirror = getCodeMirror();
       const codeMirror = CodeMirror.fromTextArea(textAreaNode.current, {
-        mode: "javascript",
-        theme: "mozilla",
-        lineNumbers: false,
         autofocus,
         extraKeys,
+        lineNumbers: false,
+        mode: "javascript",
+        scrollbarStyle: null,
+        theme: "mozilla",
       });
 
       const inputValue = defaultValue || "";
@@ -52,32 +54,8 @@ export function PanelInput({
 
       // Set code editor wrapper to be focusable
       codeMirrorWrapper.tabIndex = 0;
-      if (onKeyDown) {
-        codeMirrorWrapper.addEventListener("keydown", e => onKeyDown(e, codeMirror));
-      }
-
-      if (onClick) {
-        codeMirrorWrapper.addEventListener("keydown", e => onClick(e));
-      }
-
-      if (onBlur) {
-        codeMirror.on("blur", e => onBlur(e));
-      }
-
       if (onChange) {
-        codeMirror.on("change", (cm, e) => onChange(cm, e));
-      }
-
-      if (onMouseOver) {
-        codeMirrorWrapper.addEventListener("mouseover", e => onMouseOver(e));
-      }
-
-      if (onScroll) {
-        codeMirror.on("scroll", e => onScroll(e));
-      }
-
-      if (onGutterClick) {
-        codeMirror.on("gutterClick", onGutterClick);
+        codeMirror.on("change", onChange);
       }
 
       codeMirror.setCursor(0, inputValue.length);

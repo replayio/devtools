@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-const { PanelInput } = require("./PanelInput");
+import { PanelInput } from "./PanelInput";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -70,33 +70,29 @@ export default function PanelForm({
   };
 
   return (
-    <div className="flex-grow overflow-hidden">
-      <form className="flex flex-col space-y-1">
-        {showCondition ? (
-          <div className={classnames("form-row")}>
-            <div className="w-6 flex-shrink-0 mr-1">if</div>
-            <PanelInput
-              id="condition"
-              autofocus={inputToFocus == "condition"}
-              defaultValue={condition}
-              onChange={(cm: any) => onConditionChange(cm.getValue().trim())}
-              onEnter={handleSetBreakpoint}
-              onEscape={toggleEditingOff}
-            />
-          </div>
-        ) : null}
+    <form className="pl-2 flex-grow flex flex-col">
+      {showCondition ? (
         <div className={classnames("form-row")}>
-          {showCondition ? <div className="w-6 flex-shrink-0 mr-1">log</div> : null}
+          <div className="w-6 flex-shrink-0 mr-1">if</div>
           <PanelInput
-            id="logpoint"
-            autofocus={inputToFocus == "logValue"}
-            defaultValue={logValue}
-            onChange={(cm: any) => onLogValueChange(cm.getValue().trim())}
+            autofocus={inputToFocus == "condition"}
+            defaultValue={condition}
+            onChange={(cm: any) => onConditionChange(cm.getValue().trim())}
             onEnter={handleSetBreakpoint}
             onEscape={toggleEditingOff}
           />
         </div>
-      </form>
-    </div>
+      ) : null}
+      <div className={classnames("form-row")}>
+        {showCondition ? <div className="w-6 flex-shrink-0 mr-1">log</div> : null}
+        <PanelInput
+          autofocus={inputToFocus == "logValue"}
+          defaultValue={logValue}
+          onChange={(cm: any) => onLogValueChange(cm.getValue().trim())}
+          onEnter={handleSetBreakpoint}
+          onEscape={toggleEditingOff}
+        />
+      </div>
+    </form>
   );
 }
