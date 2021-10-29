@@ -101,11 +101,7 @@ function LineNumberTooltip({
   if (!nags || nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
     tooltipContent = (
       <>
-        {isHot ? (
-          <MaterialIcon className="mr-1" iconSize="old">
-            warning_amber
-          </MaterialIcon>
-        ) : null}
+        {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
         <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
       </>
     );
@@ -117,7 +113,7 @@ function LineNumberTooltip({
         </div>
         <div className="flex flex-col space-x-0.5">
           <div className="flex flex-row space-x-1 items-center text-white">
-            {isHot ? <MaterialIcon iconSize="old">warning_amber</MaterialIcon> : null}
+            {isHot ? <MaterialIcon>warning_amber</MaterialIcon> : null}
             <span>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</span>
           </div>
           <div>

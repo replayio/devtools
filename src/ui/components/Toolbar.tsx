@@ -90,7 +90,7 @@ function Toolbar({
         >
           <IconWithTooltip
             icon={
-              <MaterialIcon className="forum toolbar-panel-icon" iconSize="old">
+              <MaterialIcon className="forum toolbar-panel-icon" iconSize="2xl">
                 forum
               </MaterialIcon>
             }
@@ -105,7 +105,7 @@ function Toolbar({
         >
           <IconWithTooltip
             icon={
-              <MaterialIcon className="list toolbar-panel-icon" iconSize="old">
+              <MaterialIcon className="list toolbar-panel-icon" iconSize="2xl">
                 list
               </MaterialIcon>
             }
@@ -123,7 +123,7 @@ function Toolbar({
             >
               <IconWithTooltip
                 icon={
-                  <MaterialIcon className="description toolbar-panel-icon" iconSize="old">
+                  <MaterialIcon className="description toolbar-panel-icon" iconSize="2xl">
                     description
                   </MaterialIcon>
                 }
@@ -139,7 +139,7 @@ function Toolbar({
             >
               <IconWithTooltip
                 icon={
-                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon" iconSize="old">
+                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon" iconSize="2xl">
                     motion_photos_paused
                   </MaterialIcon>
                 }

@@ -120,7 +120,7 @@ function Status({
         className={classnames("material-icons opacity-0", {
           "group-hover:opacity-100": !hideArrow,
         })}
-        iconSize="old"
+        iconSize="xl"
       >
         expand_more
       </MaterialIcon>
@@ -150,7 +150,7 @@ export function NonRegisteredWorkspaceMember({
   return (
     <li className="flex flex-row items-center space-x-1.5">
       <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
-        <MaterialIcon iconSize="old">mail_outline</MaterialIcon>
+        <MaterialIcon iconSize="xl">mail_outline</MaterialIcon>
       </div>
       <div className="flex-grow whitespace-pre overflow-hidden overflow-ellipsis">
         {member.email}

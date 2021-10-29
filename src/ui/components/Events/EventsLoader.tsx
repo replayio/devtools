@@ -14,7 +14,7 @@ function EventsLoaderItem({ category, isLoading }: { category: string; isLoading
         </div>
       ) : (
         <MaterialIcon
-          iconSize="old"
+          iconSize="xl"
           className="border-2 border-gray-200 rounded-full cursor-pointer text-gray-400 bg-gray-200 hover:bg-white"
         >
           done

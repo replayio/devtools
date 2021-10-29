@@ -10,7 +10,7 @@ const SIZE_STYLES = {
   base: "text-base",
   lg: "text-lg",
   xl: "text-xl",
-  old: "old-size",
+  "2xl": "text-2xl",
 };
 
 type MaterialIconProps = PropsFromRedux &
@@ -19,7 +19,7 @@ type MaterialIconProps = PropsFromRedux &
     outlined?: boolean;
     // tailwind text color style, e.g. text-white, text-blue-200
     color?: string;
-    iconSize?: "xs" | "sm" | "base" | "lg" | "xl" | "old";
+    iconSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "old";
   };
 
 function MaterialIcon({

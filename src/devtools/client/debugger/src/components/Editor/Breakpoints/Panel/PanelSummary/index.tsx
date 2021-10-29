@@ -106,9 +106,7 @@ function PanelSummary({
         <Popup
           trigger={
             <div className="flex items-center overflow-hidden space-x-2">
-              <MaterialIcon iconSize="old" className="text-xl">
-                warning
-              </MaterialIcon>
+              <MaterialIcon className="text-xl">warning</MaterialIcon>
               <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
             </div>
           }

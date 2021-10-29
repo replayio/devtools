@@ -15,10 +15,7 @@ export function BillingBanners({
 }) {
   if (confirmed) {
     return (
-      <Banner
-        icon={<MaterialIcon iconSize="old">check_circle_outline</MaterialIcon>}
-        type="primary"
-      >
+      <Banner icon={<MaterialIcon iconSize="xl">check_circle_outline</MaterialIcon>} type="primary">
         Payment method added successfully, thank you!
       </Banner>
     );
@@ -34,7 +31,7 @@ export function BillingBanners({
 
   if (subscription.status === "trialing") {
     return (
-      <Banner icon={<MaterialIcon iconSize="old">access_time</MaterialIcon>} type="warning">
+      <Banner icon={<MaterialIcon iconSize="xl">access_time</MaterialIcon>} type="warning">
         Trial ends {formatDate(subscription.trialEnds!)}
       </Banner>
     );
@@ -43,7 +40,7 @@ export function BillingBanners({
   if (isSubscriptionCancelled(subscription)) {
     const past = Date.now() - new Date(subscription.effectiveUntil!).getTime() > 0;
     return (
-      <Banner icon={<MaterialIcon iconSize="old">access_time</MaterialIcon>} type="warning">
+      <Banner icon={<MaterialIcon iconSize="xl">access_time</MaterialIcon>} type="warning">
         Subscription {past ? "ended" : "ends"} {formatDate(subscription.effectiveUntil!)}.
       </Banner>
     );

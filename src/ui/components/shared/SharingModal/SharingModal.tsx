@@ -45,7 +45,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         <section className="p-8 flex flex-row space-x-2 bg-gray-100 items-center justify-between">
           <div className="flex flex-row space-x-3 items-center overflow-hidden">
             <div className="h-8 w-8 bg-purple-200 rounded-full font-bold flex-shrink-0 flex items-center justify-center">
-              <MaterialIcon className="text-purple-600" iconSize="old">
+              <MaterialIcon className="text-purple-600" iconSize="xl">
                 people
               </MaterialIcon>
             </div>

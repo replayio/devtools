@@ -67,7 +67,7 @@ function Event({
       )}
     >
       <div className="flex flex-row space-x-2 items-center overflow-hidden">
-        <MaterialIcon className="group-hover:text-primaryAccent" iconSize="old">
+        <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
           {icon}
         </MaterialIcon>
         <div
