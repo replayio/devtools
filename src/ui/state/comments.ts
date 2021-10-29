@@ -42,14 +42,6 @@ export interface Reply extends Remark {
   parentId: string;
 }
 
-export function isComment(maybeComment: Comment | Reply): maybeComment is Comment {
-  return "replies" in maybeComment;
-}
-
-export function isReply(maybeReply: Comment | Reply): maybeReply is Reply {
-  return "parentId" in maybeReply;
-}
-
 export type PendingComment =
   | {
       comment: Comment;
