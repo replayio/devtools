@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { Editor as EditorType } from "@tiptap/core";
-import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
+import { Editor } from "@tiptap/core";
+import { useEditor, EditorContent, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -22,7 +22,7 @@ interface TipTapEditorProps {
   takeFocus: boolean;
 }
 
-const getContent = (editor: EditorType) => {
+const getContent = (editor: Editor) => {
   const charCount = editor.getCharacterCount();
   if (charCount === 0) {
     return "";

@@ -4,7 +4,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import { Comment, isReply, PendingComment, Remark, Reply } from "ui/state/comments";
+import { Comment, PendingComment, Reply } from "ui/state/comments";
 
 import "./CommentEditor.css";
 import { User } from "ui/types";
