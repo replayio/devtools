@@ -8,9 +8,7 @@ import { prefs } from "./prefs";
 import { UserInfo } from "ui/hooks/users";
 
 let mixpanelDisabled = false;
-const STORAGE_KEY = "devtools.telemetry.timing";
-const timings: Record<string, number> =
-  JSON.parse(localStorage.getItem(STORAGE_KEY) || "false") || {};
+const timings: Record<string, number> = {};
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -149,10 +147,4 @@ export function trackTiming(event: string, properties: any = {}) {
   }
 
   sendTelemetryEvent(event, { duration, ...properties });
-}
-
-if (typeof window !== "undefined") {
-  window.addEventListener("beforeunload", () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(timings));
-  });
 }
