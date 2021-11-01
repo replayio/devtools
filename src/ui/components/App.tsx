@@ -25,6 +25,7 @@ import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
 import { migratePrefToSettings } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
+import PrivacyModal from "./shared/PrivacyModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -60,6 +61,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "trimming": {
       return <TrimmingModal />;
+    }
+    case "privacy": {
+      return <PrivacyModal />;
     }
     default: {
       return null;

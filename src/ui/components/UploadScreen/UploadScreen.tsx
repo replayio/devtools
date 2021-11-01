@@ -218,7 +218,11 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                 ) : null}
               </div>
             </div>
-            {showPrivacy && isPublic ? <Privacy operations={recording.operations} /> : null}
+            {showPrivacy && isPublic ? (
+              <div style={{ width: "440px" }}>
+                <Privacy />
+              </div>
+            ) : null}
           </div>
           <Actions onDiscard={onDiscard} status={status} />
         </form>
