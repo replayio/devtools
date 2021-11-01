@@ -98,7 +98,7 @@ function CommentTool({
 
     if (videoNode) {
       videoNode.classList.remove("location-marker");
-      videoNode.addEventListener("mousedown", onMouseDown);
+      videoNode.removeEventListener("mousedown", onMouseDown);
       videoNode.removeEventListener("mouseup", onClickInCanvas);
       videoNode.removeEventListener("mousemove", onMouseMove);
       videoNode.removeEventListener("mouseleave", onMouseLeave);
