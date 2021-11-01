@@ -1,7 +1,10 @@
 import uniq from "lodash/uniq";
 import React, { Dispatch, SetStateAction } from "react";
+import { useGetRecording } from "ui/hooks/recordings";
 import { OperationsData } from "ui/types";
+import { getRecordingId } from "ui/utils/environment";
 import MaterialIcon from "../shared/MaterialIcon";
+import Modal from "../shared/NewModal";
 
 export function getUniqueDomains(operations: OperationsData) {
   const cookies = operations.cookies || [];
@@ -78,12 +81,12 @@ function PrivacyData({ icon, name, urls }: { icon: string; name: string; urls: s
   );
 }
 
-export function Privacy({ operations }: { operations: OperationsData }) {
+export function Privacy() {
+  const { recording } = useGetRecording(getRecordingId());
+  const { operations } = recording!;
+
   return (
-    <div
-      className="flex rounded-xl shadow-xl text-lg relative p-8 bg-jellyfish overflow-hidden"
-      style={{ width: "440px" }}
-    >
+    <div className="flex w-full h-full rounded-xl shadow-xl text-lg relative p-8 bg-jellyfish overflow-hidden">
       <div className="flex flex-col space-y-7 overflow-hidden">
         <div className="flex flex-col space-y-1">
           <div className="text-2xl font-bold">Privacy</div>
