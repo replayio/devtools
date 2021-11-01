@@ -86,6 +86,7 @@ function CommentTool({
 
     if (videoNode) {
       videoNode.classList.add("location-marker");
+      videoNode.addEventListener("mousedown", onMouseDown);
       videoNode.addEventListener("mouseup", onClickInCanvas);
       videoNode.addEventListener("mousemove", onMouseMove);
       videoNode.addEventListener("mouseleave", onMouseLeave);
@@ -96,9 +97,21 @@ function CommentTool({
 
     if (videoNode) {
       videoNode.classList.remove("location-marker");
+      videoNode.addEventListener("mousedown", onMouseDown);
       videoNode.removeEventListener("mouseup", onClickInCanvas);
       videoNode.removeEventListener("mousemove", onMouseMove);
       videoNode.removeEventListener("mouseleave", onMouseLeave);
+    }
+  };
+  const onMouseDown = (evt: MouseEvent) => {
+    const focusedCommentEditor = document.activeElement?.closest("[data-commentid]");
+    if (
+      focusedCommentEditor instanceof HTMLElement &&
+      focusedCommentEditor.dataset.commentid === pendingComment?.comment.id
+    ) {
+      // If the current active element is the comment editor for the pending comment,
+      // comment tool clicks should not take focus from the editor.
+      evt.preventDefault();
     }
   };
   const onClickInCanvas = async (e: MouseEvent) => {

@@ -36,7 +36,7 @@ function CommentEditor({
   );
 
   return (
-    <div className="comment-input-container">
+    <div className="comment-input-container" data-commentid={comment.id}>
       <div className={classNames("comment-input")}>
         <FocusContext.Consumer>
           {({ autofocus, blur, close, isFocused }) => (
