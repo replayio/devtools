@@ -110,6 +110,7 @@ function CommentTool({
     }
 
     const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
+    // this uses `[id="..."]` because comment ids can have "="s in them!
     const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
 
     // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
