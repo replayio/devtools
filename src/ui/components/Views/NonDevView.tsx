@@ -38,9 +38,6 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
   const viewer = (
     <div className="vertical-panels">
       <Video />
-      <div id="timeline-container">
-        <Timeline />
-      </div>
     </div>
   );
 
@@ -50,19 +47,22 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
   };
 
   return (
-    <div className="flex flex-row h-full overflow-hidden">
-      <Toolbar />
-      <SplitBox
-        startPanel={<SidePanel />}
-        endPanel={viewer}
-        initialSize={prefs.sidePanelSize as string}
-        maxSize={sidePanelCollapsed ? "0" : "80%"}
-        minSize={sidePanelCollapsed ? "0" : "240px"}
-        onControlledPanelResized={handleMove}
-        splitterSize={1}
-        style={{ width: "100%", overflow: "hidden" }}
-        vert={true}
-      />
+    <div className="vertical-panels">
+      <div className="flex flex-row h-full overflow-hidden">
+        <Toolbar />
+        <SplitBox
+          startPanel={<SidePanel />}
+          endPanel={viewer}
+          initialSize={prefs.sidePanelSize as string}
+          maxSize={sidePanelCollapsed ? "0" : "80%"}
+          minSize={sidePanelCollapsed ? "0" : "240px"}
+          onControlledPanelResized={handleMove}
+          splitterSize={1}
+          style={{ width: "100%", overflow: "hidden" }}
+          vert={true}
+        />
+      </div>
+      <Timeline />
     </div>
   );
 }
