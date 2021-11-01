@@ -12,6 +12,10 @@ import TipTapEditor from "./TipTapEditor";
 import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
 
+export function getCommentEditorDOMId(comment: Comment | Reply) {
+  return `comment-editor-${comment.id}`;
+}
+
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply;
   editable: boolean;
@@ -36,7 +40,7 @@ function CommentEditor({
   );
 
   return (
-    <div className="comment-input-container">
+    <div className="comment-input-container" id={getCommentEditorDOMId(comment)}>
       <div className={classNames("comment-input")}>
         <FocusContext.Consumer>
           {({ autofocus, blur, close, isFocused }) => (
