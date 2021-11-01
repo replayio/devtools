@@ -11,7 +11,7 @@ import { Canvas } from "ui/state/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import useAuth0 from "ui/utils/useAuth0";
 import { useGetUserId } from "ui/hooks/users";
-import { getCommentEditorDOMId } from "../Comments/TranscriptComments/CommentEditor/CommentEditor";
+import { getCommentEditorDOMId } from "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
