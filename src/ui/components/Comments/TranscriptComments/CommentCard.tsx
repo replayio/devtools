@@ -164,11 +164,7 @@ function CommentCard({
         hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onMouseDown={e => {
-        if (e.button === 0) {
-          seekToComment(comment);
-          setIsEditorOpen(true);
-          setIsFocused(true);
-        }
+        seekToComment(comment);
       }}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
@@ -187,7 +183,7 @@ function CommentCard({
             <CommentItem type="reply" comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isEditorOpen && (
+        {isEditorOpen ? (
           <FocusContext.Provider
             value={{
               autofocus: isFocused,
@@ -202,6 +198,18 @@ function CommentCard({
               type={"new_reply"}
             />
           </FocusContext.Provider>
+        ) : (
+          <div className="pl-2 py-1 border-transparent border">
+            <button
+              className="w-1/2 text-left hover:text-primaryAccent focus:outline-none focus:text-primaryAccent"
+              onClick={() => {
+                setIsEditorOpen(true);
+                setIsFocused(true);
+              }}
+            >
+              Reply
+            </button>
+          </div>
         )}
       </div>
     </div>
