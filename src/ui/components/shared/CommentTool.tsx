@@ -110,7 +110,7 @@ function CommentTool({
     }
 
     const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
-    const isEditorFocused = !!document.activeElement.closest(`#${pendingCommentEditorId}`);
+    const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
 
     // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
     if (isEditorFocused) {
