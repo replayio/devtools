@@ -11,6 +11,7 @@ import { Canvas } from "ui/state/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import useAuth0 from "ui/utils/useAuth0";
 import { useGetUserId } from "ui/hooks/users";
+import { getCommentEditorDOMId } from "../Comments/TranscriptComments/CommentEditor/CommentEditor";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -104,13 +105,15 @@ function CommentTool({
     }
   };
   const onMouseDown = (evt: MouseEvent) => {
-    const focusedCommentEditor = document.activeElement?.closest("[data-commentid]");
-    if (
-      focusedCommentEditor instanceof HTMLElement &&
-      focusedCommentEditor.dataset.commentid === pendingComment?.comment.id
-    ) {
-      // If the current active element is the comment editor for the pending comment,
-      // comment tool clicks should not take focus from the editor.
+    if (!pendingComment || !document.activeElement) {
+      return;
+    }
+
+    const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
+    const isEditorFocused = !!document.activeElement.closest(`#${pendingCommentEditorId}`);
+
+    // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
+    if (isEditorFocused) {
       evt.preventDefault();
     }
   };
