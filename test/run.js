@@ -318,7 +318,7 @@ async function runTestViewer(path, local, timeout, env) {
       }
     }
 
-    sendTelemetryEvent("E2EFinished", { success: false, local, why });
+    sendTelemetryEvent("E2EFinished", { success: 0, local, why });
 
     failures.push(`Failed test: ${local} ${why}`);
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
@@ -348,7 +348,7 @@ async function runTestViewer(path, local, timeout, env) {
       } else if (!passed) {
         logFailure("Exited without passing test");
       } else {
-        sendTelemetryEvent("E2EFinished", { success: true, local });
+        sendTelemetryEvent("E2EFinished", { success: 1, local });
       }
     }
     resolve();
