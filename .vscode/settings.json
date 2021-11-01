@@ -1,3 +1,7 @@
 {
-  "mochaExplorer.launcherScript": "test/vscodeTestLauncher"
+  "mochaExplorer.launcherScript": "test/vscodeTestLauncher",
+  "mochaExplorer.env": {
+    "TEST_ONLY_TARGET": "gecko",
+    "HEADLESS": "true"
+  },
 }
