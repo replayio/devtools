@@ -58,8 +58,8 @@ function Video({
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
 
   return (
-    <div id="video" className="bg-toolbarBackground">
-      <div className="absolute w-full h-full flex items-center justify-center">
+    <div id="video" className="bg-toolbarBackground m-2 mr-8">
+      <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
         <ReplayLogo size="sm" color="gray" />
       </div>
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />

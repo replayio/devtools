@@ -48,7 +48,7 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
 
   return (
     <div className="vertical-panels">
-      <div className="flex flex-row h-full overflow-hidden">
+      <div className="flex flex-row h-full overflow-hidden bg-chrome">
         <Toolbar />
         <SplitBox
           startPanel={<SidePanel />}
@@ -57,7 +57,7 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
           maxSize={sidePanelCollapsed ? "0" : "80%"}
           minSize={sidePanelCollapsed ? "0" : "240px"}
           onControlledPanelResized={handleMove}
-          splitterSize={1}
+          splitterSize={16}
           style={{ width: "100%", overflow: "hidden" }}
           vert={true}
         />

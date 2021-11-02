@@ -51,6 +51,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
         width: "100%",
         height: "100%",
         borderRight: "1px solid var(--theme-splitter-color)",
+        padding: "8px",
       }}
     >
       {sidepanel}

@@ -2,9 +2,8 @@
 
 .timeline {
   -moz-appearance: none;
-  background: var(--theme-body-background);
+  background: var(--chrome);
   box-sizing: border-box;
-  border-top: 1px solid var(--theme-splitter-color);
   --progressbar-transition: 200ms;
   display: flex;
   padding: 10px 24px 12px 12px;
@@ -172,7 +171,7 @@
 }
 
 .timeline .unloaded-regions.end {
-  right: 0
+  right: 0;
 }
 
 .timeline .zoomboundary {

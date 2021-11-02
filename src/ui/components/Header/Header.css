@@ -1,6 +1,5 @@
 #header {
-  background-color: var(--theme-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
+  background-color: var(--chrome);
   height: 50px;
   display: flex;
   align-items: center;
@@ -54,7 +53,7 @@
   height: 24px;
   width: 24px;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--theme-toolbar-background);
+  box-shadow: 0 0 0 2px var(--chrome);
 }
 
 #header .avatar:not(.authenticated):not(:last-child) {
