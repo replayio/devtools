@@ -15,11 +15,12 @@ import { RecordingId } from "@recordreplay/protocol";
 import { Recording } from "ui/types";
 import { UIState } from "ui/state";
 
-import classNames from "classnames";
+import classNames from "classnames/bind";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import { trackEvent } from "ui/utils/telemetry";
 
-// import "./Header.css";
+import css from "./Header.module.css";
+const cx = classNames.bind(css);
 
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   const { users, loading, error } = useGetActiveSessions(
@@ -31,7 +32,7 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   }
 
   return (
-    <div className="avatars">
+    <div className={css.avatars}>
       {users!.map((player, i) => (
         <Avatar player={player} isFirstPlayer={false} key={i} index={i} />
       ))}
@@ -44,7 +45,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   const { isAuthenticated } = useAuth0();
 
   return (
-    <div className="links">
+    <div className={cx("links")}>
       <RecordingTrialEnd />
       {isAuthenticated ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
@@ -119,7 +120,7 @@ function HeaderTitle({
 
   return (
     <span
-      className={classNames(className, "input focus:ring-primaryAccent focus:border-blue-500", {
+      className={cx(className, "input focus:ring-primaryAccent focus:border-blue-500", {
         italic: !hasTitle && !editing,
       })}
       role="textbox"
@@ -152,12 +153,12 @@ function Header({ recordingTarget }: PropsFromRedux) {
     return <div id=""></div>;
   }
   if (loading) {
-    return <div id="header"></div>;
+    return <div className={css.header}></div>;
   }
 
   return (
-    <div id="header">
-      <div className="header-left overflow-hidden flex-grow">
+    <div className={css.header}>
+      <div className="flex flex-row items-center relative overflow-hidden flex-grow">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
@@ -168,7 +169,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
-          <div className="title">Recordings</div>
+          <div className={cx("title")}>Recordings</div>
         )}
       </div>
       <Links recordingTarget={recordingTarget} />

@@ -8,11 +8,6 @@
   padding: 0px 4px;
 }
 
-.user-options button.expand-dropdown .avatar.first-player img {
-  height: 24px;
-  width: 24px;
-}
-
 .user-options button.expand-dropdown .img {
   background: var(--theme-comment);
 }

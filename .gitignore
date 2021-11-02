@@ -9,3 +9,4 @@ test/example-recordings.json
 cypress.env.json
 .env*
 .next
+next-env.d.ts
