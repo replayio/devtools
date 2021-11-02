@@ -54,6 +54,7 @@ function InspectorSearch(inspector, input, clearBtn) {
   EventEmitter.decorate(this);
 }
 
+const exports = module.exports;
 exports.InspectorSearch = InspectorSearch;
 
 InspectorSearch.prototype = {

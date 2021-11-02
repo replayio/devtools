@@ -5,8 +5,6 @@
 "use strict";
 
 //const nodeFilterConstants = require("devtools/shared/dom-node-filter-constants");
-// loader.lazyRequireGetter(this, "DevToolsUtils", "devtools/shared/DevToolsUtils");
-// loader.lazyRequireGetter(this, "ChromeUtils");
 
 const SHEET_TYPE = {
   agent: "AGENT_SHEET",

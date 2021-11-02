@@ -1,3 +1,6 @@
+import "./test-prep";
+import "ui/utils/whatwg-url-fix";
+
 import Head from "next/head";
 import type { AppProps } from "next/app";
 import React, { useEffect, useState } from "react";
@@ -12,6 +15,7 @@ import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
+import MaintenanceModeScreen from "ui/components/MaintenanceMode";
 
 import "tailwindcss/tailwind.css";
 import "../src/base.css";
@@ -128,6 +132,10 @@ import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
+import { InstallRouteListener } from "ui/utils/routeListener";
+
+// _ONLY_ set this flag if you want to disable the frontend entirely
+const maintenanceMode = false;
 
 const AppRouting = ({ Component, pageProps }: AppProps) => {
   if (typeof window === "undefined") return null;
@@ -139,6 +147,10 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
 
   if (!store) {
     return <BlankProgressScreen progress={null} />;
+  }
+
+  if (maintenanceMode) {
+    return <MaintenanceModeScreen />;
   }
 
   return (
@@ -166,6 +178,7 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
                 </script>
               </Head>
               <App>
+                <InstallRouteListener />
                 <ErrorBoundary>
                   <React.Suspense fallback={<LoadingScreen />}>
                     <Component {...pageProps} />

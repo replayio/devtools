@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";

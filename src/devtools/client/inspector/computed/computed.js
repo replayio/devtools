@@ -23,15 +23,7 @@ const {
 const TooltipsOverlay = require("devtools/client/inspector/shared/tooltips-overlay");
 const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 
-loader.lazyRequireGetter(
-  this,
-  "StyleInspectorMenu",
-  "devtools/client/inspector/shared/style-inspector-menu"
-);
-
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
-
-loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
 
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");

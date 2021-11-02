@@ -6,18 +6,6 @@
 
 const { updateLayout } = require("devtools/client/inspector/boxmodel/actions/box-model");
 
-// loader.lazyRequireGetter(
-//   this,
-//   "EditingSession",
-//   "devtools/client/inspector/boxmodel/utils/editing-session"
-// );
-// loader.lazyRequireGetter(this, "InplaceEditor", "devtools/client/shared/inplace-editor", true);
-// loader.lazyRequireGetter(
-//   this,
-//   "RulePreviewTooltip",
-//   "devtools/client/shared/widgets/tooltip/RulePreviewTooltip"
-// );
-
 const Highlighter = require("highlighter/highlighter").default;
 
 const NUMERIC = /^-?[\d\.]+$/;

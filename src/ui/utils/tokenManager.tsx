@@ -2,7 +2,6 @@ import { Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0
 import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
-import { useHistory } from "react-router-dom";
 import { assert, defer, Deferred } from "protocol/utils";
 import { isTest } from "./environment";
 import { usesWindow } from "ssr";

@@ -13,16 +13,6 @@ const {
   VIEW_NODE_LOCATION_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
 
-// loader.lazyRequireGetter(this, "Menu", "devtools/client/framework/menu");
-// loader.lazyRequireGetter(this, "MenuItem", "devtools/client/framework/menu-item");
-// loader.lazyRequireGetter(
-//   this,
-//   "getRuleFromNode",
-//   "devtools/client/inspector/rules/utils/utils",
-//   true
-// );
-// loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
-
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
