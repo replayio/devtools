@@ -1,6 +1,6 @@
 import mixpanel, { Dict } from "mixpanel-browser";
 import { ViewMode } from "ui/state/app";
-import { getRecordingId } from "./environment";
+import { getRecordingId, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser } from "./telemetry";
 
@@ -25,7 +25,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
   const { email, internal } = userInfo;
   const isQAUser = email && QA_EMAIL_ADDRESSES.includes(email);
   const isInternal = internal;
-  const shouldDisableMixpanel = isQAUser || isInternal;
+  const shouldDisableMixpanel = isQAUser || isInternal || skipTelemetry;
 
   // This gives us an option to log telemetry events in development.
   const forceEnableMixpanel = prefs.logTelemetryEvent;
