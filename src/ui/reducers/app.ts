@@ -9,6 +9,7 @@ import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/environment";
 import { getTrimRegion } from "ui/reducers/timeline";
+import { trackEvent } from "ui/utils/telemetry";
 
 const syncInitialAppState: AppState = {
   expectedError: null,
@@ -64,9 +65,12 @@ export async function getInitialAppState(): Promise<AppState> {
 
   const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = syncInitialAppState;
 
+  const initialViewMode = session.viewMode || viewMode;
+  trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
+
   return {
     ...syncInitialAppState,
-    viewMode: session.viewMode || viewMode,
+    viewMode: initialViewMode,
     selectedPrimaryPanel: session.selectedPrimaryPanel || selectedPrimaryPanel,
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     showEditor: "showEditor" in session ? session.showEditor : showEditor,
