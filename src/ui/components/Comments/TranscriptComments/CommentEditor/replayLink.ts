@@ -5,7 +5,7 @@ export interface ReplayLinkOptions {
   HTMLAttributes: Record<string, any>;
 }
 
-export const inputRegex = /(https:\/\/app.replay.io\/recording\/(.*)\?.*)/g;
+export const inputRegex = /(https:\/\/app.replay.io\/recording\/([a-zA-z0-9\-]{36})[^ ]*)/g;
 
 const getAttributes = (match: string[]) => {
   const [href, , recordingId] = match;
@@ -18,7 +18,7 @@ const getAttributes = (match: string[]) => {
 // More info at:
 // https://www.notion.so/replayio/TipTap-Editor-0021afbf0c0e458793eba4c98cbbb47e#5a47e9da0c5d4fd1bd57436b0a48294c
 export const ReplayLink = Node.create<ReplayLinkOptions>({
-  name: "Replay-link",
+  name: "replay-link",
 
   priority: 100,
 
@@ -44,16 +44,20 @@ export const ReplayLink = Node.create<ReplayLinkOptions>({
   inline: true,
 
   parseHTML() {
-    return [{ tag: "a[href]" }];
+    return [{ tag: "a[data-replay-link]" }];
   },
 
   renderHTML({ node, HTMLAttributes }) {
     const firstPart = node.attrs.recordingId?.split("-")?.[0] || "";
     return [
       "a",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      mergeAttributes({ "data-replay-link": "" }, this.options.HTMLAttributes, HTMLAttributes),
       `replay#${firstPart}`,
     ];
+  },
+
+  renderText({ node }) {
+    return node.attrs.href;
   },
 
   addInputRules() {
