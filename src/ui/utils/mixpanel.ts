@@ -6,7 +6,11 @@ import { TelemetryUser } from "./telemetry";
 
 const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
-export let mixpanelDisabled = false;
+// Keep mixpanel disabled until we know we have the user's info
+// to send along with events. This keeps events from tests from being
+// sent to mixpanel.
+let mixpanelDisabled = true;
+
 const enableMixpanel = () => (mixpanelDisabled = false);
 const disableMixpanel = () => (mixpanelDisabled = true);
 
@@ -28,10 +32,10 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
   const forceEnableMixpanel = prefs.logTelemetryEvent;
 
   if (!shouldDisableMixpanel || forceEnableMixpanel) {
+    setMixpanelContext(userInfo);
     enableMixpanel();
     trackMixpanelEvent("session_start");
     setupSessionEndListener();
-    setMixpanelContext(userInfo);
   } else {
     disableMixpanel();
   }
