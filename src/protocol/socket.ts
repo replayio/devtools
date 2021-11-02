@@ -14,6 +14,7 @@ import { UIStore } from "ui/actions";
 import { Action, Dispatch } from "redux";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import { UnexpectedError } from "ui/state/app";
+import { endMixpanelSession } from "ui/utils/mixpanel";
 
 interface Message {
   id: number;
@@ -152,11 +153,14 @@ function onSocketMessage(evt: MessageEvent<any>) {
   }
 }
 
-const disconnectedError: UnexpectedError = {
-  message: "Are you still there?",
-  content: "Replays disconnect after 5 minutes to reduce server load. Ready when you are!",
-  action: "refresh",
-};
+export function getDisconnectionError(): UnexpectedError {
+  endMixpanelSession();
+  return {
+    message: "Are you still there?",
+    content: "Replays disconnect after 5 minutes to reduce server load. Ready when you are!",
+    action: "refresh",
+  };
+}
 
 function onSocketClose() {
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
@@ -164,7 +168,7 @@ function onSocketClose() {
     gSocketOpen = false;
 
     if (!willClose) {
-      dispatch(setUnexpectedError(disconnectedError, true));
+      dispatch(setUnexpectedError(getDisconnectionError(), true));
     }
   };
 }
@@ -186,7 +190,7 @@ function onSocketError(evt: Event) {
         })
       );
     } else {
-      dispatch(setUnexpectedError(disconnectedError, true));
+      dispatch(setUnexpectedError(getDisconnectionError(), true));
     }
   };
 }

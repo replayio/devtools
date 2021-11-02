@@ -1,19 +1,18 @@
-import mixpanel from "mixpanel-browser";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
-import { isDevelopment, skipTelemetry } from "./environment";
+import { skipTelemetry } from "./environment";
 import { Recording, Workspace } from "ui/types";
-import { isTest } from "./environment";
 import { prefs } from "./prefs";
 import { UserInfo } from "ui/hooks/users";
+import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
 
-let mixpanelDisabled = false;
 const timings: Record<string, number> = {};
-const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
 export function setupTelemetry() {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
-  mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
+  // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
+  // telemetry events are being skipped for any reason, e.g. development, test, etc.
+  initializeMixpanel();
 
   if (skipTelemetry()) {
     return;
@@ -47,39 +46,16 @@ export function registerRecording({
   if (!recording) {
     return;
   }
-
   Sentry.setContext("recording", { recordingId: recording.id, url: window.location.href });
-
-  if (
-    !prefs.logTelemetryEvent &&
-    (recording.user?.internal || userInfo?.internal || skipTelemetry())
-  ) {
-    mixpanelDisabled = true;
-  } else {
-    mixpanel.register({ recordingId: recording.id });
-  }
 }
 
-type TelemetryUser = {
+export type TelemetryUser = {
   id: string | undefined;
   email: string | undefined;
   internal: boolean;
 };
 
 let telemetryUser: TelemetryUser | undefined;
-let telemetryProperties: any = {};
-
-let workspaceContext: Workspace | undefined;
-
-export function setWorkspaceContext(workspace: Workspace) {
-  workspaceContext = workspace;
-}
-
-export function maybeDisableMixpanel({ email }: TelemetryUser) {
-  if (email && QA_EMAIL_ADDRESSES.includes(email)) {
-    mixpanelDisabled = true;
-  }
-}
 
 export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
   telemetryUser = { id, email, internal };
@@ -90,14 +66,6 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
     Sentry.setTag("anonymous", false);
   } else {
     Sentry.setTag("anonymous", true);
-  }
-
-  if (!mixpanelDisabled && id) {
-    mixpanel.identify(id);
-  }
-
-  if (!mixpanelDisabled && email) {
-    mixpanel.people.set({ $email: email });
   }
 }
 
@@ -126,24 +94,6 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
   }
 }
 
-export async function trackEvent(event: string, additionalContext?: Object) {
-  // we should be able to opt-in to logging telemetry events in development
-  if (mixpanelDisabled || (!prefs.logTelemetryEvent && (isTest() || isDevelopment()))) {
-    return;
-  }
-
-  const context = {
-    workspace: workspaceContext?.name || "",
-    ...additionalContext,
-  };
-
-  if (prefs.logTelemetryEvent) {
-    console.log("🔴", event, context);
-  }
-
-  mixpanel.track(event, context);
-}
-
 export function trackTiming(event: string, properties: any = {}) {
   let duration: number | undefined;
   if (!timings[event]) {
@@ -155,3 +105,5 @@ export function trackTiming(event: string, properties: any = {}) {
 
   sendTelemetryEvent(event, { duration, ...properties });
 }
+
+export const trackEvent = trackMixpanelEvent;
