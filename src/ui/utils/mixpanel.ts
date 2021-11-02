@@ -1,4 +1,4 @@
-import mixpanel from "mixpanel-browser";
+import mixpanel, { Dict } from "mixpanel-browser";
 import { ViewMode } from "ui/state/app";
 import { getRecordingId } from "./environment";
 import { prefs } from "./prefs";
@@ -38,18 +38,14 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
   }
 }
 
-export async function trackMixpanelEvent(event: string, additionalContext?: Object) {
-  if (mixpanelDisabled) {
-    return;
-  }
-
-  const context = { ...additionalContext };
-
+export async function trackMixpanelEvent(event: string, properties?: Dict) {
   if (prefs.logTelemetryEvent) {
-    console.log("🔴", event, context);
+    console.log("🔴", event, properties);
   }
 
-  mixpanel.track(event, context);
+  if (!mixpanelDisabled) {
+    mixpanel.track(event, properties);
+  }
 }
 
 export function setMixpanelContext({ id, email }: TelemetryUser) {
