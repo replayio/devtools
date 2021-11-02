@@ -137,7 +137,7 @@ button.jump-definition {
   background-image: url(~devtools/client/themes/images/help.svg);
 }
 .logo {
-  background-image: url(./images/logo.svg);
+  background-image: url(/images/logo.svg);
 }
 .comment-close {
   background-image: url(~devtools/client/themes/images/close.svg);
@@ -487,7 +487,7 @@ button.open-inspector {
   -webkit-mask-image: url(~devtools/client/themes/images/open-inspector.svg);
 }
 .img.lightning {
-  -webkit-mask-image: url(./images/lightning.svg);
+  -webkit-mask-image: url(/images/lightning.svg);
 }
 
 .overlay-container.rewind .img {

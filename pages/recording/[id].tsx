@@ -5,7 +5,7 @@ import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { LoadingScreen } from "ui/components/shared/BlankScreen";
-import Upload from "views/upload";
+import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 
 function Recording({ getAccessibleRecording }: PropsFromRedux) {
@@ -19,7 +19,7 @@ function Recording({ getAccessibleRecording }: PropsFromRedux) {
     getRecording();
   }, []);
 
-  if (!recording) {
+  if (!recording || typeof window === "undefined") {
     return <LoadingScreen />;
   }
 

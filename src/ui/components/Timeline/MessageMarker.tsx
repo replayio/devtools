@@ -4,7 +4,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import Marker from "./Marker";
-import "./MessageMarker.css";
+// import "./MessageMarker.css";
 
 function MessageMarker({
   message,

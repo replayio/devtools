@@ -39,6 +39,7 @@ import { asyncStore } from "ui/utils/prefs";
 import { getUserSettings } from "ui/hooks/settings";
 import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 import { assert } from "protocol/utils";
+import { requiresWindow, usesWindow } from "ssr";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 
@@ -59,18 +60,19 @@ declare global {
   const gToolbox: DevToolsToolbox;
 }
 
-const url = new URL(window.location.href);
-const dispatchUrl = url.searchParams.get("dispatch") || process.env.DISPATCH_URL;
-assert(dispatchUrl);
+requiresWindow(async () => {
+  const url = new URL(window.location.href);
+  const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
+  assert(dispatchUrl);
 
-(async () => {
   window.gToolbox = new DevToolsToolbox();
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
+  window.app = window.app || {};
   window.app.threadFront = ThreadFront;
-  window.app.actions = bindActionCreators(actions, store.dispatch);
-  window.app.selectors = bindSelectors({ store, selectors });
+  // window.app.actions = bindActionCreators(actions, store.dispatch);
+  // window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
 
@@ -102,7 +104,7 @@ assert(dispatchUrl);
     prefsService: getPrefsService(),
   };
 
-  extendStore(initialState, reducers, thunkArgs);
+  extendStore(store, initialState, reducers, thunkArgs);
 
   dbgClient.bootstrap(store);
 
@@ -140,7 +142,7 @@ assert(dispatchUrl);
   updateEnableRepaint(settings.enableRepaint);
 
   setupDemo();
-})();
+});
 
 function bindSelectors(obj: any) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {

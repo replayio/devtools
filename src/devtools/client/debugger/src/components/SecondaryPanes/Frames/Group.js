@@ -13,7 +13,7 @@ import FrameMenu from "./FrameMenu";
 import AccessibleImage from "../../shared/AccessibleImage";
 import FrameComponent from "./Frame";
 
-import "./Group.css";
+// import "./Group.css";
 
 import actions from "../../../actions";
 import Badge from "../../shared/Badge";

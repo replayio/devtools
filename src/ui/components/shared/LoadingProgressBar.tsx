@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./LoadingProgressBar.css";
+// import "./LoadingProgressBar.css";
 
 export default function LoadingProgressBar({ initialProgress = 0 }) {
   const [displayedProgress, setDisplayedProgress] = useState(initialProgress);

@@ -2,16 +2,19 @@ import { PrefsHelper } from "devtools/client/shared/prefs";
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
 import { pref } from "devtools-services";
+import { usesWindow } from "ssr";
 
 // Get prefs from the URL with the format
 // &prefs=<key>:<value>,<key>:<value> e.g. &prefs=video:true
-function getUrlPrefs() {
-  const url = new URL(window.location.href);
-  const urlPrefs = url.searchParams.get("prefs") || "";
-  return Object.fromEntries(urlPrefs.split(",").map(pref => pref.split(":")));
-}
+// function getUrlPrefs() {
+//   return usesWindow(win => {
+//     if (!win) return {};
 
-const urlPrefs = getUrlPrefs();
+//     const url = new URL(window.location.href);
+//     const urlPrefs = url.searchParams.get("prefs") || "";
+//     return Object.fromEntries(urlPrefs.split(",").map(pref => pref.split(":")));
+//   });
+// }
 
 // app prefs.
 pref("devtools.split-console", false);

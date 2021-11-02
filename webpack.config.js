@@ -42,11 +42,7 @@ module.exports = {
     new NodePolyfillPlugin(),
     new HtmlWebpackPlugin({ template: "index.html", chunks: ["main"] }),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
-    new webpack.EnvironmentPlugin({
-      REPLAY_RELEASE: null,
-      API_URL: "https://api.replay.io/v1/graphql",
-      DISPATCH_URL: "wss://dispatch.replay.io",
-    }),
+
     new CopyPlugin({
       patterns: [
         { from: "vercel.json" },
@@ -76,21 +72,6 @@ module.exports = {
             request.includes("src/devtools/client/shared/vendor") ||
             ["fs"].includes(request)
           );
-        },
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-typescript", "@babel/preset-react"],
-            plugins: [
-              "add-react-displayname",
-              "@babel/plugin-transform-flow-strip-types",
-              "@babel/plugin-transform-react-display-name",
-              "@babel/plugin-proposal-class-properties",
-              "@babel/plugin-proposal-logical-assignment-operators",
-              "@babel/plugin-proposal-nullish-coalescing-operator",
-              "@babel/plugin-proposal-optional-chaining",
-            ],
-          },
         },
       },
       {

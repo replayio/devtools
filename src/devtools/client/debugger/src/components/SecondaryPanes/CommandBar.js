@@ -14,7 +14,7 @@ import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
 import { debugBtn } from "../shared/Button/CommandBarButton";
 import { trackEvent } from "ui/utils/telemetry";
-import "./CommandBar.css";
+// import "./CommandBar.css";
 
 import { appinfo } from "devtools-services";
 

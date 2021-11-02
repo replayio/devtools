@@ -8,7 +8,7 @@ import React from "react";
 
 import AccessibleImage from "../AccessibleImage";
 
-import "./styles/CommandBarButton.css";
+// import "./styles/CommandBarButton.css";
 
 export function debugBtn(onClick, type, className, tooltip, disabled = false, ariaPressed = false) {
   return (

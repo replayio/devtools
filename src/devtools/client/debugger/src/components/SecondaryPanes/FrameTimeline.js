@@ -11,7 +11,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
 import classnames from "classnames";
-import "./FrameTimeline.css";
+// import "./FrameTimeline.css";
 import ReactTooltip from "react-tooltip";
 import { trackEvent } from "ui/utils/telemetry";
 

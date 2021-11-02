@@ -17,7 +17,7 @@ import { getFilename } from "../../utils/source";
 import { ThreadFront } from "protocol/thread";
 import { RedactedSpan } from "ui/components/Redacted";
 
-import "./Footer.css";
+// import "./Footer.css";
 
 class SourceFooter extends PureComponent {
   constructor() {

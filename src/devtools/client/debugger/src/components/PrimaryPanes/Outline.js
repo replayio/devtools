@@ -26,7 +26,7 @@ import {
 } from "../../selectors";
 
 import OutlineFilter from "./OutlineFilter";
-import "./Outline.css";
+// import "./Outline.css";
 import PreviewFunction from "../shared/PreviewFunction";
 import uniq from "lodash/uniq";
 import sortBy from "lodash/sortBy";

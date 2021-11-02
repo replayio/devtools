@@ -168,6 +168,7 @@ function editableField(options) {
   });
 }
 
+const exports = module.exports;
 exports.editableField = editableField;
 
 /**

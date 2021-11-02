@@ -3,7 +3,7 @@ import React from "react";
 import { Setting } from "./types";
 import SettingsBodyItem from "./SettingsBodyItem";
 
-import "./SettingsBody.css";
+// import "./SettingsBody.css";
 
 interface SettingsBodyProps<
   T extends string,

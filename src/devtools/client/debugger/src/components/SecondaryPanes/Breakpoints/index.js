@@ -17,7 +17,7 @@ import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoi
 
 import { getBreakpointSources } from "../../../selectors";
 
-import "./Breakpoint.css";
+// import "./Breakpoint.css";
 
 class Breakpoints extends Component {
   headlessEditor;

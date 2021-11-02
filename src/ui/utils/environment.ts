@@ -1,5 +1,7 @@
 import { MockedResponse } from "@apollo/client/testing";
+import _ from "lodash";
 import { matchPath } from "react-router-dom";
+import { usesWindow } from "ssr";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
@@ -14,7 +16,11 @@ declare global {
   }
 }
 
-const url = new URL(window.location.href);
+const url = usesWindow(win => {
+  if (!win) return new URL("https://app.replay.io");
+
+  return new URL(win.location.href);
+});
 
 export function isDevelopment() {
   return url.hostname == "localhost";
@@ -25,7 +31,9 @@ export function isFirefox() {
 }
 
 export function isReplayBrowser() {
-  return window.__IS_RECORD_REPLAY_RUNTIME__;
+  return usesWindow(win => {
+    return win ? "__IS_RECORD_REPLAY_RUNTIME__" in win : false;
+  });
 }
 
 export function getTest() {
@@ -96,8 +104,12 @@ export function hasLoadingParam() {
 }
 
 export function getRecordingId() {
-  return matchPath<{ recordingId: string }>(window.location.pathname, "/recording/:recordingId")
-    ?.params.recordingId;
+  return usesWindow(win => {
+    if (!win) return undefined;
+
+    return matchPath<{ recordingId: string }>(window.location.pathname, "/recording/:recordingId")
+      ?.params.recordingId;
+  });
 }
 
 export function getPausePointParams() {

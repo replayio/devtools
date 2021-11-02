@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { matchPath, useHistory, useLocation } from "react-router-dom";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
@@ -194,11 +193,12 @@ const settings: Settings<
 ];
 
 function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
-  const history = useHistory();
-  const { pathname } = useLocation();
-  const match = matchPath<{ workspaceId: string }>(pathname, {
-    path: "/team/:workspaceId/settings/billing",
-  });
+  // const history = useHistory();
+  // const { pathname } = useLocation();
+  const match = false;
+  // matchPath<{ workspaceId: string }>(pathname, {
+  //   path: "/team/:workspaceId/settings/billing",
+  // });
   const [defaultTab, setDefaultTab] = useState<string>("Team Members");
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
@@ -206,7 +206,7 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
   useEffect(() => {
     if (match) {
       setDefaultTab("Billing");
-      history.replace("/");
+      // history.replace("/");
     }
   }, []);
 

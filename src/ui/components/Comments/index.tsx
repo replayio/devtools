@@ -6,7 +6,7 @@ import CommentMarker from "./CommentMarker";
 import { selectors } from "../../reducers";
 import sortBy from "lodash/sortBy";
 
-import "./Comments.css";
+// import "./Comments.css";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
 

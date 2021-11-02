@@ -23,7 +23,7 @@ import {
   getFramesLoading,
 } from "../../../selectors";
 
-import "./Frames.css";
+// import "./Frames.css";
 
 const NUM_FRAMES_SHOWN = 7;
 

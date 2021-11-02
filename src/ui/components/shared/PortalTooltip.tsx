@@ -1,6 +1,6 @@
 import React, { ReactNode, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import "./PortalDropdown.css";
+// import "./PortalDropdown.css";
 
 export interface TargetCoordinates {
   x: number;

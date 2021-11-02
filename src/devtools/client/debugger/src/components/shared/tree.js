@@ -7,7 +7,7 @@ const { Component, createFactory } = React;
 import dom from "react-dom-factories";
 import PropTypes from "prop-types";
 
-require("./tree.css");
+// require("./tree.css");
 
 // depth
 const AUTO_EXPAND_DEPTH = 0;

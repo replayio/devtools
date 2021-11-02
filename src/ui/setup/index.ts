@@ -23,15 +23,18 @@ declare global {
 }
 
 export async function bootstrapApp() {
-  setupTelemetry();
-
-  setupDOMHelpers();
-
   const initialState = {
     app: await getInitialAppState(),
   };
 
   const store = bootstrapStore(initialState);
+
+  if (typeof window === "undefined") return store;
+
+  setupTelemetry();
+
+  setupDOMHelpers();
+
   window.store = store;
 
   registerStoreObserver(store, updatePrefs);
@@ -71,7 +74,9 @@ export async function bootstrapApp() {
   if (!isTest()) {
     var font1 = new FontFaceObserver("Material Icons");
     var font2 = new FontFaceObserver("Material Icons Outlined");
-    Promise.all([font1.load(), font2.load()]).then(() => store.dispatch(setFontLoading(false)));
+    Promise.all([font1.load(), font2.load()])
+      .then(() => store.dispatch(setFontLoading(false)))
+      .catch(() => console.log("Failed to load font"));
   } else {
     // FontFaceObserver doesn't work in e2e tests.
     store.dispatch(setFontLoading(false));

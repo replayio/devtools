@@ -11,8 +11,8 @@ const {
   VIEW_NODE_SHAPE_POINT_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
 
-loader.lazyRequireGetter(this, "parseURL", "devtools/client/shared/source-utils", true);
-loader.lazyRequireGetter(this, "asyncStorage", "devtools/shared/async-storage");
+// loader.lazyRequireGetter(this, "parseURL", "devtools/client/shared/source-utils", true);
+// loader.lazyRequireGetter(this, "asyncStorage", "devtools/shared/async-storage");
 
 const DEFAULT_HIGHLIGHTER_COLOR = "#9400FF";
 const SUBGRID_PARENT_ALPHA = 0.5;

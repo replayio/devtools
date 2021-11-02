@@ -5,7 +5,7 @@ const EventListeners = require("devtools/client/debugger/src/components/Secondar
 const Dropdown = require("ui/components/shared/Dropdown").default;
 const { trackEvent } = require("ui/utils/telemetry");
 
-require("./Events.css");
+// require("./Events.css");
 
 export function Events() {
   const [expanded, setExpanded] = useState(false);

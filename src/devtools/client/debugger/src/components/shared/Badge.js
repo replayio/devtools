@@ -4,7 +4,7 @@
 
 //
 import React from "react";
-import "./Badge.css";
+// import "./Badge.css";
 
 const Badge = ({ children }) => <span className="badge text-center">{children}</span>;
 

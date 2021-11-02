@@ -11,7 +11,7 @@ import times from "lodash/times";
 import zip from "lodash/zip";
 import flatten from "lodash/flatten";
 
-import "./PreviewFunction.css";
+// import "./PreviewFunction.css";
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 

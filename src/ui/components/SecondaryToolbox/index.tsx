@@ -4,7 +4,7 @@ import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 
-import "./SecondaryToolbox.css";
+// import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";

@@ -16,7 +16,7 @@ const dom = require("react-dom-factories");
 const { div } = dom;
 const { focusableSelector } = require("devtools/client/shared/focus");
 
-require("./MenuList.css");
+// require("./MenuList.css");
 
 class MenuList extends PureComponent {
   static get propTypes() {

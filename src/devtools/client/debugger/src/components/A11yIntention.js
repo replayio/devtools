@@ -4,7 +4,7 @@
 
 //
 import React from "react";
-import "./A11yIntention.css";
+// import "./A11yIntention.css";
 
 export default class A11yIntention extends React.Component {
   state = { keyboard: false };

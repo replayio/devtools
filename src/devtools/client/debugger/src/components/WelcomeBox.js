@@ -8,7 +8,7 @@ import actions from "../actions";
 import { formatKeyShortcut } from "../utils/text";
 import { useGetUserSettings } from "ui/hooks/settings";
 
-import "./WelcomeBox.css";
+// import "./WelcomeBox.css";
 
 function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
   const { userSettings, loading } = useGetUserSettings();

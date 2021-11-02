@@ -13,7 +13,7 @@ const ConsoleOutput = require("devtools/client/webconsole/components/Output/Cons
 const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar").default;
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 
-require("./App.css");
+// require("./App.css");
 
 /**
  * Console root Application component.

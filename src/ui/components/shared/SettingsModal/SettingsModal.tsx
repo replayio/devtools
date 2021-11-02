@@ -5,7 +5,7 @@ import SettingsBody from "./SettingsBody";
 
 import { Settings } from "./types";
 
-import "./SettingsModal.css";
+// import "./SettingsModal.css";
 import classnames from "classnames";
 
 export default function SettingsModal<

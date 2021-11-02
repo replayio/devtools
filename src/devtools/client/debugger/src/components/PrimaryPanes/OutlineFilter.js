@@ -7,7 +7,7 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 
-import "./OutlineFilter.css";
+// import "./OutlineFilter.css";
 
 export default class OutlineFilter extends Component {
   state = { focused: false };

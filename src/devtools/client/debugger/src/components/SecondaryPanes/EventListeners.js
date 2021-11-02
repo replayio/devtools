@@ -15,8 +15,7 @@ import AccessibleImage from "../shared/AccessibleImage";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
-import "./EventListeners.css";
-import { track } from "react-dom-factories";
+// import "./EventListeners.css";
 
 const mouseClicks = [
   "event.mouse.auxclick",

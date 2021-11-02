@@ -9,7 +9,7 @@ import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
 
-import "./Panel.css";
+// import "./Panel.css";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";

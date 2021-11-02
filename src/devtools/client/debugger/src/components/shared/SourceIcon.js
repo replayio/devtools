@@ -7,7 +7,7 @@
 import React, { PureComponent } from "react";
 import AccessibleImage from "./AccessibleImage";
 import { getSourceClassnames } from "../../utils/source";
-import "./SourceIcon.css";
+// import "./SourceIcon.css";
 
 export default class SourceIcon extends PureComponent {
   render() {

@@ -11,9 +11,10 @@
 
 "use strict";
 
+const exports = module.exports;
 const { getCSSLexer } = require("devtools/shared/css/lexer");
 
-loader.lazyRequireGetter(this, "CSS_ANGLEUNIT", "devtools/shared/css/constants", true);
+// loader.lazyRequireGetter(this, "CSS_ANGLEUNIT", "devtools/shared/css/constants", true);
 
 const SELECTOR_ATTRIBUTE = (exports.SELECTOR_ATTRIBUTE = 1);
 const SELECTOR_ELEMENT = (exports.SELECTOR_ELEMENT = 2);

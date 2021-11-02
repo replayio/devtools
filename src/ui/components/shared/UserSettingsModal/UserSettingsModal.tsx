@@ -21,7 +21,6 @@ import { AvatarImage } from "ui/components/Avatar";
 import { prefs } from "ui/utils/prefs";
 import Checkbox from "../Forms/Checkbox";
 import PreferencesSettings from "./PreferencesSettings";
-import { match, matchPath, useHistory, useLocation } from "react-router";
 
 function Support() {
   return (
@@ -205,11 +204,12 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
 export function UserSettingsModal(props: PropsFromRedux) {
   const { userSettings, loading } = hooks.useGetUserSettings();
   const { internal, loading: userInfoLoading } = hooks.useGetUserInfo();
-  const history = useHistory();
-  const { pathname } = useLocation();
-  const match = matchPath(pathname, {
-    path: "/settings/preferences",
-  });
+  // const history = useHistory();
+  // const { pathname } = useLocation();
+  const match = false;
+  // matchPath(pathname, {
+  //   path: "/settings/preferences",
+  // });
   const [defaultTab] = useState<string>(match ? "Preferences" : props.defaultSettingsTab);
 
   // TODO: This is bad and should be updated with a better generalized hook
@@ -231,11 +231,11 @@ export function UserSettingsModal(props: PropsFromRedux) {
     }
   };
 
-  useEffect(() => {
-    if (match) {
-      history.replace("/");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (match) {
+  //     history.replace("/");
+  //   }
+  // }, []);
 
   const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
 

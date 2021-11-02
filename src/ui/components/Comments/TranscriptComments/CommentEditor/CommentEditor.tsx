@@ -6,7 +6,7 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import { Comment, Reply } from "ui/state/comments";
 
-import "./CommentEditor.css";
+// import "./CommentEditor.css";
 import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
 import { FocusContext } from "../CommentCard";

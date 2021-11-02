@@ -8,3 +8,4 @@ test/example-recordings.json
 .idea/
 cypress.env.json
 .env
+.next
