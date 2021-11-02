@@ -43,16 +43,16 @@ interface PanelFormProps {
 }
 
 export default function PanelForm({
-  logValue,
-  setLogValue,
-  setLogSyntaxError,
   condition,
+  handleSetBreakpoint,
+  inputToFocus,
+  logValue,
   setCondition,
   setConditionSyntaxError,
-  handleSetBreakpoint,
-  toggleEditingOff,
-  inputToFocus,
+  setLogSyntaxError,
+  setLogValue,
   showCondition,
+  toggleEditingOff,
 }: PanelFormProps) {
   const onLogValueChange = async (value: string) => {
     trackEvent("breakpoint.set_log");
@@ -70,7 +70,7 @@ export default function PanelForm({
   };
 
   return (
-    <form className="pl-2 flex-grow flex flex-col">
+    <form className="pl-2 flex-grow flex flex-col overflow-hidden">
       {showCondition ? (
         <div className={classnames("form-row")}>
           <div className="w-6 flex-shrink-0 mr-1">if</div>
