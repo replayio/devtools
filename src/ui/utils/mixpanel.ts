@@ -13,7 +13,7 @@ const disableMixpanel = () => (mixpanelDisabled = true);
 export function initializeMixpanel() {
   // This init event becomes our Session Start point.
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
-  trackEvent("session-start");
+  trackMixpanelEvent("session-start");
   setupSessionEndListener();
 
   // Add the recordingId to the event metadata so we have a cookie crumb
@@ -38,7 +38,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
   }
 }
 
-export async function trackEvent(event: string, additionalContext?: Object) {
+export async function trackMixpanelEvent(event: string, additionalContext?: Object) {
   if (mixpanelDisabled) {
     return;
   }
@@ -66,9 +66,9 @@ export function setMixpanelContext({ id, email }: TelemetryUser) {
   }
 }
 
-export const endMixpanelSession = () => trackEvent("session-end");
+export const endMixpanelSession = () => trackMixpanelEvent("session-end");
 export const trackViewMode = (viewMode: ViewMode) =>
-  trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
+  trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
 
 function setupSessionEndListener() {
   window.addEventListener("beforeunload", endMixpanelSession);
