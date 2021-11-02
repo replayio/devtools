@@ -66,6 +66,9 @@ export const endMixpanelSession = () => trackMixpanelEvent("session-end");
 export const trackViewMode = (viewMode: ViewMode) =>
   trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
 
+export const startUploadWaitTracking = () => mixpanel.time_event("upload_recording");
+export const endUploadWaitTracking = () => trackMixpanelEvent("upload_recording");
+
 function setupSessionEndListener() {
   window.addEventListener("beforeunload", endMixpanelSession);
 }
