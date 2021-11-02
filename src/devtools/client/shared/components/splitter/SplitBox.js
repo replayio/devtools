@@ -320,7 +320,7 @@ class SplitBox extends Component {
       endPanel
         ? dom.div(
             {
-              className: endPanelControl ? "controlled" : "uncontrolled",
+              className: endPanelControl ? "controlled" : "uncontrolled mr-4",
               style: rightPanelStyle,
               role: "presentation",
               ref: div => {

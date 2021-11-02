@@ -16,6 +16,7 @@
 
 .split-box.horz {
   flex-direction: column;
+  margin-right: 20px;
 }
 
 .split-box > .uncontrolled {
@@ -23,6 +24,9 @@
   flex: 1;
   min-width: 0;
   overflow: auto;
+}
+
+.uncontrolled {
 }
 
 .split-box > .controlled {
@@ -38,7 +42,6 @@
   background-color: var(--chrome);
   background-clip: content-box;
   position: relative;
-
   box-sizing: border-box;
 
   /* Positive z-index positions the splitter on top of its siblings and makes
@@ -52,7 +55,7 @@
     var(--devtools-splitter-inline-end-width) + 1px);
 
   border-left-width: var(--devtools-splitter-inline-start-width);
-  border-right-width: var(--devtools-splitter-inline-end-width);
+  border-right-width: 40px;
 
   margin-left: calc(-1 * var(--devtools-splitter-inline-start-width) - 1px);
   margin-right: calc(-1 * var(--devtools-splitter-inline-end-width));
