@@ -11,10 +11,7 @@ const enableMixpanel = () => (mixpanelDisabled = false);
 const disableMixpanel = () => (mixpanelDisabled = true);
 
 export function initializeMixpanel() {
-  // This init event becomes our Session Start point.
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
-  trackMixpanelEvent("session-start");
-  setupSessionEndListener();
 
   // Add the recordingId to the event metadata so we have a cookie crumb
   // trail for following flows in LogRocket.
@@ -32,6 +29,8 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
 
   if (!shouldDisableMixpanel || forceEnableMixpanel) {
     enableMixpanel();
+    trackMixpanelEvent("session_start");
+    setupSessionEndListener();
     setMixpanelContext(userInfo);
   } else {
     disableMixpanel();
@@ -62,7 +61,7 @@ export function setMixpanelContext({ id, email }: TelemetryUser) {
   }
 }
 
-export const endMixpanelSession = () => trackMixpanelEvent("session-end");
+export const endMixpanelSession = () => trackMixpanelEvent("session_end");
 export const trackViewMode = (viewMode: ViewMode) =>
   trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
 
