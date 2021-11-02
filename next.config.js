@@ -1,6 +1,3 @@
-const path = require("path");
-const merge = require("merge-deep");
-
 module.exports = {
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     config.resolve.fallback = {
