@@ -15,7 +15,7 @@
 }
 
 .accordion ._header {
-  background-color: var(--theme-accordion-header-background);
+  background-color: #fff;
   border-bottom: 1px solid var(--theme-splitter-color);
   display: flex;
   font-size: 15px;

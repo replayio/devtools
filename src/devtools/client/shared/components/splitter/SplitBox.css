@@ -22,7 +22,7 @@
   display: flex;
   flex: 1;
   min-width: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .split-box > .controlled {
@@ -62,7 +62,7 @@
   /* Emphasize the horizontal splitter width and color */
   min-height: var(--devtools-emphasized-horizontal-splitter-min-height);
 
-  background-color: var(--theme-emphasized-splitter-color);
+  background-color: var(--chrome);
 
   border-top-width: var(--devtools-splitter-top-width);
   border-bottom-width: var(--devtools-splitter-bottom-width);
@@ -75,7 +75,7 @@
 
 /* Emphasized splitter has the hover style. */
 .split-box.horz > .splitter:hover {
-  background-color: var(--theme-emphasized-splitter-color-hover);
+  background-color: var(--chrome);
 }
 
 .split-box.disabled {

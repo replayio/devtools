@@ -43,11 +43,11 @@ function DevView({
 
   return (
     <div className="vertical-panels">
-      <div className={classNames("horizontal-panels", { "video-hidden": videoIsHidden })}>
+      <div className={classNames("horizontal-panels bg-chrome", { "video-hidden": videoIsHidden })}>
         <Toolbar />
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
-          splitterSize={1}
+          splitterSize={9}
           initialSize={prefs.toolboxHeight as string}
           minSize={showEditor || !sidePanelCollapsed ? "240px" : "0%"}
           maxSize={maxSize(sidePanelCollapsed, showEditor)}
