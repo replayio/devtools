@@ -90,17 +90,15 @@ class MarkupView {
     }
 
     const rootNode = await ThreadFront.getRootDOMNode();
-    await rootNode?.ensureLoaded();
     if (!rootNode || ThreadFront.currentPause !== pause) {
       return;
     }
-    this.store.dispatch(newRoot(rootNode));
+    await this.store.dispatch(newRoot(rootNode));
 
     if (this.selection.nodeFront) {
       this.store.dispatch(selectionChanged(this.selection, false));
     } else {
       const defaultNode = await rootNode.querySelector("body");
-      await defaultNode?.ensureLoaded();
       if (defaultNode && !this.selection.nodeFront && ThreadFront.currentPause === pause) {
         this.selection.setNodeFront(defaultNode, { reason: "navigateaway" });
       }

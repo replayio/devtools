@@ -13,6 +13,7 @@ import MaterialIcon from "../shared/MaterialIcon";
 import PortalTooltip from "../shared/PortalTooltip";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import BubbleModal from "../shared/Onboarding/BubbleModal";
+import { startUploadWaitTracking } from "ui/utils/mixpanel";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
@@ -159,6 +160,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
 
     trackTiming("kpi-time-to-view-replay");
     trackEvent(isDemoReplay(recording) ? "create demo replay" : "create replay");
+    startUploadWaitTracking();
 
     await initializeRecording({
       variables: { recordingId, title: inputValue, workspaceId },

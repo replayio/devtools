@@ -103,18 +103,18 @@ const TipTapEditor = ({
   return (
     <div
       className="w-full"
-      onClick={e => {
+      onMouseDown={e => {
         if (editable) {
           e.stopPropagation();
         }
       }}
     >
       <EditorContent
-        className={classNames("outline-none w-full rounded-md py-1 px-2 transition", {
+        className={classNames("outline-none w-full rounded-md py-1 px-2 transition border", {
           "bg-white": editable,
           "border-gray-400": editable,
+          "border-transparent": !editable,
           "cursor-text": editable,
-          border: editable,
         })}
         editor={editor}
         onBlur={() => {

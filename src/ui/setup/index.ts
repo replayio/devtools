@@ -3,7 +3,7 @@ import { bootstrapStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
-import { maybeDisableMixpanel, setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
+import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
 import { getInitialAppState, getTheme, getWorkspaceId } from "ui/reducers/app";
 import { setFontLoading, setModal, setWorkspaceId } from "ui/actions/app";
@@ -14,6 +14,7 @@ import { getUserInfo } from "ui/hooks/users";
 import { getUserSettings } from "ui/hooks/settings";
 import { isTest } from "ui/utils/environment";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
+import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 const FontFaceObserver = require("fontfaceobserver");
 
 declare global {
@@ -55,8 +56,8 @@ export async function bootstrapApp() {
 
     const userInfo = await getUserInfo();
     if (userInfo) {
-      maybeDisableMixpanel(userInfo);
       setTelemetryContext(userInfo);
+      maybeSetMixpanelContext(userInfo);
       maybeAutoOpenModal(store);
 
       if (!getWorkspaceId(store.getState())) {

@@ -227,7 +227,6 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
       return;
     }
 
-    trackEvent("add breakpoint");
     trackEvent("breakpoint.add");
 
     const breakpointLocation = {

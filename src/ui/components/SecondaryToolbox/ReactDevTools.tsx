@@ -98,7 +98,6 @@ class ReplayWall implements Wall {
         }
 
         const nodeFront = response.returned.getNodeFront();
-        await nodeFront?.ensureLoaded();
         if (!nodeFront || this.highlightedElementId !== id) {
           return;
         }
