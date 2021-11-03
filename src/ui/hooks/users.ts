@@ -1,6 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
-import { GET_USER_INFO, GET_USER_ID } from "ui/graphql/users";
+import { mutate, query } from "ui/utils/apolloClient";
+import { GET_USER_INFO, GET_USER_ID, UPDATE_USER_NAGS } from "ui/graphql/users";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
 import { getRecordingId } from "ui/utils/environment";
@@ -11,6 +11,17 @@ export async function getUserId() {
     variables: {},
   });
   return result?.data?.viewer?.user?.id;
+}
+
+export async function dismissNag(newNag: Nag) {
+  const user = await getUserInfo();
+  const nags = user?.nags || [];
+  const newNags = [...nags, newNag];
+
+  await mutate({
+    mutation: UPDATE_USER_NAGS,
+    variables: { newNags },
+  });
 }
 
 export function useGetUserId() {
@@ -101,16 +112,9 @@ export function useGetUserInfo() {
 }
 
 export function useUpdateUserNags() {
-  const [updateUserNags, { error }] = useMutation(
-    gql`
-      mutation UpdateUserNags($newNags: [String!]!) {
-        updateUserNags(input: { nags: $newNags }) {
-          success
-        }
-      }
-    `,
-    { refetchQueries: ["GetUser"] }
-  );
+  const [updateUserNags, { error }] = useMutation(UPDATE_USER_NAGS, {
+    refetchQueries: ["GetUser"],
+  });
 
   if (error) {
     console.error("Apollo error while updating the user's nags:", error);
