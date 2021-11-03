@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .accordion {
-  background-color: var(--theme-sidebar-background);
+  background-color: var(--chrome);
   width: 100%;
   list-style-type: none;
   padding: 0px;
@@ -16,7 +16,6 @@
 
 .accordion ._header {
   background-color: #fff;
-  border-bottom: 1px solid var(--theme-splitter-color);
   display: flex;
   font-size: 15px;
   line-height: calc(16 / 12);
@@ -30,7 +29,7 @@
 }
 
 .accordion ._header:hover {
-  background-color: var(--theme-accordion-header-hover);
+  cursor: pointer;
 }
 
 .accordion ._header .arrow {
@@ -68,12 +67,17 @@
 }
 
 .accordion ._content {
-  border-bottom: 1px solid var(--theme-splitter-color);
   font-size: var(--theme-body-font-size);
   overflow-y: auto;
   height: 100%;
+  background-color: white;
 }
 
-.accordion div:last-child ._content {
+.accordion ._content {
   border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.accordion {
+  border-radius: 0 0 8px 8px;
 }

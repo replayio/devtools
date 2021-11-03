@@ -175,3 +175,11 @@ div.sources-pane {
   flex: 1;
   overflow: auto;
 }
+
+.sources-pane {
+  border-radius: 8px 8px 0 0;
+}
+
+.accordion .sources-pane ._content {
+  border-radius: 0 0 0 0;
+}

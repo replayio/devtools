@@ -36,7 +36,7 @@ class PrimaryPanes extends Component {
   renderOutline() {
     return {
       header: "Outline",
-      className: "outlines-pane",
+      className: "outlines-pane border-t",
       component: (
         <Outline
           alphabetizeOutline={this.state.alphabetizeOutline}

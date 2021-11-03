@@ -35,7 +35,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
           },
           {
             header: "Events",
-            className: "events flex-1",
+            className: "events-info flex-1 border-t",
             component: <Events />,
             opened: !eventsCollapsed,
             onToggle: () => setEventsCollapsed(!eventsCollapsed),

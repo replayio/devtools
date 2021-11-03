@@ -38,7 +38,7 @@ function Events({
   );
 
   return (
-    <div className="flex flex-col py-1.5 self-stretch space-y-1.5 w-full text-xs">
+    <div className="flex flex-col py-1.5 self-stretch space-y-1.5 w-full text-xs bg-white">
       {progressPercentage < 100 ? <EventsLoader {...{ eventCategoriesLoading }} /> : null}
       {events.map((e, i) => {
         return (
