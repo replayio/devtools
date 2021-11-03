@@ -1,4 +1,4 @@
-import { bindActionCreators } from "redux";
+import { bindActionCreators, Store } from "redux";
 
 import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { initSocket, addEventListener } from "protocol/socket";
@@ -39,7 +39,6 @@ import { asyncStore } from "ui/utils/prefs";
 import { getUserSettings } from "ui/hooks/settings";
 import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 import { assert } from "protocol/utils";
-import { requiresWindow, usesWindow } from "ssr";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 
@@ -60,7 +59,7 @@ declare global {
   const gToolbox: DevToolsToolbox;
 }
 
-requiresWindow(async () => {
+export default async (store: Store) => {
   const url = new URL(window.location.href);
   const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
   assert(dispatchUrl);
@@ -71,8 +70,8 @@ requiresWindow(async () => {
 
   window.app = window.app || {};
   window.app.threadFront = ThreadFront;
-  // window.app.actions = bindActionCreators(actions, store.dispatch);
-  // window.app.selectors = bindSelectors({ store, selectors });
+  window.app.actions = bindActionCreators(actions, store.dispatch);
+  window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
 
@@ -142,7 +141,7 @@ requiresWindow(async () => {
   updateEnableRepaint(settings.enableRepaint);
 
   setupDemo();
-});
+};
 
 function bindSelectors(obj: any) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {

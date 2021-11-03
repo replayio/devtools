@@ -9,8 +9,6 @@ import { LoadingScreen } from "./shared/BlankScreen";
 import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 
-import "ui/setup/dynamic/devtools";
-
 const DevView = React.lazy(() => import("./Views/DevView"));
 
 function _DevTools({
