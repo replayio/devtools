@@ -16,4 +16,6 @@ export function InstallRouteListener() {
       currentRoute = newRoute;
     });
   }
+
+  return null;
 }

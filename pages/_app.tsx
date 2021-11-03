@@ -158,7 +158,7 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
           <IntercomProvider appId={"k7f741xx"} autoBoot>
             <ConfirmProvider>
               <Head>
-                <meta charset="utf-8" />
+                <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
                 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
                 <title>Replay</title>
                 <link
