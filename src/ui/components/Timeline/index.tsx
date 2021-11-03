@@ -139,7 +139,7 @@ class Timeline extends Component<PropsFromRedux> {
     if (hoverTime != null && !clickedOnCommentMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
-        if (!seek(event.point, mouseTime, false)) {
+        if (!seek(event.point, event.time, false)) {
           // if seeking to the new point failed because it is in an unloaded region,
           // we reset the timeline to the current time
           setTimelineToTime(ThreadFront.currentTime, true);
