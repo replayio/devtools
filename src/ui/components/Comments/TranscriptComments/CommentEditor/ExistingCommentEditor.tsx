@@ -6,9 +6,11 @@ import CommentEditor from "./CommentEditor";
 import { Comment, Reply } from "ui/state/comments";
 import { useGetUserId } from "ui/hooks/users";
 
-type ExistingCommentEditorProps = PropsFromRedux & {
+type ExistingCommentEditorProps = {
+  clearPendingComment: () => void;
   comment: Comment | Reply;
   editable: boolean;
+  editItem: (comment: Comment | Reply) => void;
   type: "comment" | "reply";
 };
 
@@ -25,9 +27,9 @@ function ExistingCommentEditor({
 
   const handleSubmit = (inputValue: string) => {
     if (type === "comment") {
-      updateComment(comment.id, inputValue, (comment as Comment).position);
+      // updateComment(comment.id, inputValue, (comment as Comment).position);
     } else if (type === "reply") {
-      updateCommentReply(comment.id, inputValue);
+      // updateCommentReply(comment.id, inputValue);
     }
     clearPendingComment();
   };
@@ -40,15 +42,14 @@ function ExistingCommentEditor({
         }
       }}
     >
-      <CommentEditor editable={editable} comment={comment} handleSubmit={handleSubmit} />
+      <CommentEditor
+        clearPendingComment={clearPendingComment}
+        editable={editable}
+        comment={comment}
+        handleSubmit={handleSubmit}
+      />
     </div>
   );
 }
 
-const connector = connect(null, {
-  clearPendingComment: actions.clearPendingComment,
-  editItem: actions.editItem,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(ExistingCommentEditor);
+export default ExistingCommentEditor;

@@ -9,7 +9,7 @@ export default function Invitations({}) {
     return null;
   }
 
-  const displayedWorkspaces = [...pendingWorkspaces!].sort((a, b) =>
+  const displayedWorkspaces = [...(pendingWorkspaces || [])].sort((a, b) =>
     a.name > b.name ? 1 : a.name < b.name ? -1 : 0
   );
 

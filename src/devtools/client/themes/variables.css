@@ -2,12 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*
- * IMPORTANT NOTE
- * This file is parsed in js (see client/shared/theme.js)
- * so the formatting should be consistent (i.e. no '}' inside a rule).
- */
-
 :root {
   --theme-focus-border-color-textbox: #0675d3;
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);

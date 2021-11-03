@@ -1,21 +1,17 @@
-import React, { useMemo } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import { UIState } from "ui/state";
-import hooks from "ui/hooks";
-import { Comment, Reply } from "ui/state/comments";
-
-import { User } from "ui/types";
+import "./CommentEditor.module.css";
+import React from "react";
 import TipTapEditor from "./TipTapEditor";
-import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
+import { Comment, Reply } from "ui/state/comments";
+import { FocusContext } from "../CommentCard";
+import { User } from "ui/types";
 
 export function getCommentEditorDOMId(comment: Comment | Reply) {
   return `comment-editor-${comment.id}`;
 }
 
-type CommentEditorProps = PropsFromRedux & {
+type CommentEditorProps = {
+  clearPendingComment: () => void;
   comment: Comment | Reply;
   editable: boolean;
   handleSubmit: (inputValue: string) => void;
@@ -27,22 +23,31 @@ function CommentEditor({
   editable,
   handleSubmit,
 }: CommentEditorProps) {
-  const recordingId = hooks.useGetRecordingId();
-  const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
+  // const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(comment.recordingId);
 
-  const users = useMemo(
-    () =>
-      collaborators && recording
-        ? ([...collaborators.map(c => c.user), recording.user].filter(Boolean) as User[])
-        : undefined,
-    [loading]
-  );
+  const users: User[] = []; //useMemo(
+  //   () =>
+  //     collaborators && recording
+  //       ? ([...collaborators.map(c => c.user), recording.user].filter(Boolean) as User[])
+  //       : undefined,
+  //   [loading]
+  // );
 
   return (
     <div className="comment-input-container" id={getCommentEditorDOMId(comment)}>
       <div className={classNames("comment-input")}>
         <FocusContext.Consumer>
-          {({ autofocus, blur, close, isFocused }) => (
+          {({
+            autofocus,
+            blur,
+            close,
+            isFocused,
+          }: {
+            autofocus: boolean;
+            blur: () => void;
+            close: () => void;
+            isFocused: boolean;
+          }) => (
             <TipTapEditor
               key={comment.updatedAt}
               autofocus={autofocus}
@@ -73,11 +78,4 @@ function CommentEditor({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    pendingComment: selectors.getPendingComment(state),
-  }),
-  { clearPendingComment: actions.clearPendingComment }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(CommentEditor);
+export default CommentEditor;

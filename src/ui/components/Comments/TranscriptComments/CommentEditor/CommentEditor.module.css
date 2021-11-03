@@ -1,24 +1,24 @@
-.transcript-list .comment-input-container {
+.comment-input-container {
   display: flex;
   flex-direction: column;
 }
 
-.transcript-list .comment-input-container img {
+.comment-input-container img {
   align-self: start;
 }
 
-.transcript-list .comment-input-container > :not(:first-child) {
+.comment-input-container > :not(:first-child) {
   margin-top: 8px;
 }
 
-.transcript-list .comment-input {
+.comment-input {
   flex-grow: 1;
   display: flex;
   flex-direction: row;
   align-items: stretch;
 }
 
-.transcript-list .comment-input-actions {
+.comment-input-actions {
   margin-left: 41px;
   display: flex;
   flex-direction: row;
@@ -26,45 +26,45 @@
   align-items: center;
 }
 
-.transcript-list .comment-input-actions button {
+.comment-input-actions button {
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.transcript-list .comment-input-actions button.action-cancel {
+.comment-input-actions button.action-cancel {
   text-decoration: underline;
   font-size: 12px;
 }
 
-.transcript-list .comment-input-actions button.action-submit {
+.comment-input-actions button.action-submit {
   background: var(--primary-accent);
   color: var(--theme-body-background);
   font-size: 14px;
 }
 
-.transcript-list .comment-input-actions button.action-submit:hover {
+.comment-input-actions button.action-submit:hover {
   background: var(--primary-accent);
 }
 
-.transcript-list .draft-editor-container {
+.draft-editor-container {
   /* Create a positioning context for the emoji picker */
   position: relative;
   flex-grow: 1;
 }
 
-.transcript-list .responsive-textarea {
+.responsive-textarea {
   overflow-y: hidden;
   resize: none;
   line-height: 18px;
   border: none;
 }
 
-.transcript-list .responsive-textarea:focus {
+.responsive-textarea:focus {
   outline: none;
 }
 
-.transcript-list .img.paper-airplane {
+.img.paper-airplane {
   width: 20px;
   height: 20px;
   color: var(--theme-icon-color);
@@ -73,7 +73,7 @@
   align-self: flex-end;
 }
 
-.transcript-list .img.paper-airplane:hover {
+.img.paper-airplane:hover {
   background: var(--primary-accent);
 }
 

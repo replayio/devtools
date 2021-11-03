@@ -50,7 +50,7 @@ module.exports = {
               "@babel/preset-env",
               {
                 targets: {
-                  node: 7,
+                  browsers: ["last 1 Chrome version", "last 1 Firefox version"],
                 },
                 modules: "commonjs",
               },

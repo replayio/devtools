@@ -30,20 +30,20 @@ function getDeleteDescription(replyCount: number) {
   return "Deleting this comment will permanently remove it";
 }
 
-type CommentActionsProps = PropsFromRedux & {
+type CommentActionsProps = {
   comment: Comment | Reply;
+  editItem: (comment: Comment | Reply) => void;
   isRoot: boolean;
 };
 
 function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
-  const recordingId = hooks.useGetRecordingId();
-  const { userId } = hooks.useGetUserId();
-  const deleteComment = hooks.useDeleteComment();
-  const deleteCommentReply = hooks.useDeleteCommentReply();
+  // const { userId } = hooks.useGetUserId();
+  // const deleteComment = hooks.useDeleteComment();
+  // const deleteCommentReply = hooks.useDeleteCommentReply();
   const [expanded, setExpanded] = useState(false);
   const { confirmDestructive } = useConfirm();
 
-  const isCommentAuthor = userId === comment.user.id;
+  const isCommentAuthor = true; //userId === comment.user.id;
 
   if (!isCommentAuthor) {
     return null;
@@ -68,9 +68,9 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
 
       trackEvent("comments.delete");
       if (isRoot) {
-        deleteComment(comment.id, recordingId!);
+        // deleteComment(comment.id, comment.recordingId);
       } else {
-        deleteCommentReply(comment.id, recordingId!);
+        // deleteCommentReply(comment.id, comment.recordingId);
       }
     });
   };
@@ -113,8 +113,4 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   );
 }
 
-const connector = connect(null, {
-  editItem: actions.editItem,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(CommentActions);
+export default CommentActions;

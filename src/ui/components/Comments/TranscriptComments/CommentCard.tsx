@@ -39,9 +39,11 @@ function BorderBridge({
 
 function CommentItemHeader({
   comment,
+  editItem,
   showOptions,
 }: {
   comment: Comment | Reply;
+  editItem: (comment: Comment | Reply) => void;
   showOptions: boolean;
 }) {
   const [relativeDate, setRelativeDate] = useState("");
@@ -68,17 +70,23 @@ function CommentItemHeader({
           {relativeDate}
         </span>
       </div>
-      {showOptions ? <CommentActions comment={comment} isRoot={"replies" in comment} /> : null}
+      {showOptions ? (
+        <CommentActions comment={comment} editItem={editItem} isRoot={"replies" in comment} />
+      ) : null}
     </div>
   );
 }
 
 function CommentItem({
+  clearPendingComment,
   comment,
+  editItem,
   pendingComment,
   type,
 }: {
+  clearPendingComment: () => void;
   comment: Comment | Reply;
+  editItem: (comment: Comment | Reply) => void;
   pendingComment: PendingComment | null;
   type: "comment" | "reply";
 }) {
@@ -87,8 +95,9 @@ function CommentItem({
 
   return (
     <div className="space-y-1.5 group">
-      <CommentItemHeader {...{ comment, showOptions }} />
+      <CommentItemHeader {...{ comment, editItem, showOptions }} />
       <ExistingCommentEditor
+        clearPendingComment={clearPendingComment}
         comment={comment}
         type={type}
         editable={pendingComment?.comment.id === comment.id}
@@ -110,10 +119,11 @@ export const FocusContext = React.createContext({
   close: () => {},
 });
 
-function CommentCard({
+export function CommentCard({
+  clearPendingComment,
   comment,
-  comments,
   currentTime,
+  editItem,
   executionPoint,
   hoveredComment,
   pendingComment,
@@ -169,7 +179,6 @@ function CommentCard({
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >
-      <BorderBridge {...{ comments, comment, isPaused }} />
       <div
         className={classNames("p-2.5 pl-2 space-y-2 border-l-2", {
           "border-secondaryAccent": isPaused,
@@ -177,10 +186,22 @@ function CommentCard({
         })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
-        <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
+        <CommentItem
+          clearPendingComment={clearPendingComment}
+          editItem={editItem}
+          type="comment"
+          comment={comment as Comment}
+          pendingComment={pendingComment}
+        />
         {comment.replies?.map((reply: Reply, i: number) => (
           <div key={replyKeys[i]}>
-            <CommentItem type="reply" comment={reply} pendingComment={pendingComment} />
+            <CommentItem
+              clearPendingComment={clearPendingComment}
+              editItem={editItem}
+              type="reply"
+              comment={reply}
+              pendingComment={pendingComment}
+            />
           </div>
         ))}
         {isEditorOpen ? (
@@ -224,6 +245,7 @@ const connector = connect(
     pendingComment: selectors.getPendingComment(state),
   }),
   {
+    clearPendingComment: actions.clearPendingComment,
     editItem: actions.editItem,
     seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,

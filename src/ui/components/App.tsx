@@ -26,6 +26,7 @@ import { migratePrefToSettings } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
+import classNames from "classnames";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -120,8 +121,8 @@ function App({ children, fontLoading, modal, theme }: AppProps) {
 
 const connector = connect((state: UIState) => ({
   fontLoading: selectors.getFontLoading(state),
-  theme: selectors.getTheme(state),
   modal: selectors.getModal(state),
+  theme: selectors.getTheme(state),
 }));
 export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
 
