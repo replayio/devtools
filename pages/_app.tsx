@@ -138,8 +138,6 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 const maintenanceMode = false;
 
 const AppRouting = ({ Component, pageProps }: AppProps) => {
-  if (typeof window === "undefined") return null;
-
   const [store, setStore] = useState<Store | null>(null);
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
