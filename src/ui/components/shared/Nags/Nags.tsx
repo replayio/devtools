@@ -31,6 +31,14 @@ function NagHat({
 }
 
 export function EditorNag() {
+  const { nags } = hooks.useGetUserInfo();
+
+  // Don't show the editor nag until the user has gotten past the
+  // console navigate nag.
+  if (!nags.includes(Nag.FIRST_CONSOLE_NAVIGATE)) {
+    return null;
+  }
+
   return (
     <NagHat
       mainText="Ready to add your first print statement?"
