@@ -12,15 +12,16 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background: var(--theme-toolbar-background);
+  background: #ececec;
   border-bottom: 1px solid var(--theme-splitter-color);
+  border-radius: 8px 8px 0 0;
 }
 
 /* This makes sure that in cases where the toolbox is the only one
 displayed in a column, we don't add an additional border. Otherwise,
 the border added is duplicated. */
 .secondary-toolbox-header:not(.video-hidden *) {
-  border-top: 1px solid var(--theme-splitter-color);
+  /* border-top: 1px solid var(--theme-splitter-color); */
 }
 
 .secondary-toolbox-header .panel-buttons {

@@ -170,7 +170,7 @@ class Debugger extends Component {
     const horizontal = this.isHorizontal();
 
     return (
-      <div className="editor-pane m-2">
+      <div className="editor-pane mt-2">
         <div className="editor-container">
           {!isDemo() && <EditorTabs horizontal={horizontal} />}
           <Redacted>

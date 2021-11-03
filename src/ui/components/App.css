@@ -3,6 +3,7 @@
   position: relative;
   overflow: hidden;
   flex-grow: 1;
+  margin-bottom: 14px;
 }
 
 .collapsed-toolbox {
@@ -19,6 +20,11 @@
 
 #graphicsVideo {
   max-width: unset;
+}
+
+#graphics {
+  border: 5px solid #d7d7d7;
+  border-radius: 20px;
 }
 
 .collapsed-toolbox #graphics {

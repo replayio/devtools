@@ -36,7 +36,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
       </div>
       <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
-          <div className="overflow-auto w-full flex-grow">
+          <div className="overflow-auto w-full flex-grow bg-chrome">
             {sortedComments.map((comment, i) => {
               return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
             })}

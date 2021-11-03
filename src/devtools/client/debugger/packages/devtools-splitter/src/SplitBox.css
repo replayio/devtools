@@ -31,7 +31,6 @@
 
 .split-box > .controlled {
   display: flex;
-  overflow: auto;
 }
 
 .split-box > .splitter {

@@ -113,7 +113,7 @@ function SecondaryToolbox({
   const isNode = recordingTarget === "node";
 
   return (
-    <div className={classnames(`secondary-toolbox`, { node: isNode })}>
+    <div className={classnames(`secondary-toolbox mt-2`, { node: isNode })}>
       {!isDemo() && (
         <header className="secondary-toolbox-header">
           <PanelButtons

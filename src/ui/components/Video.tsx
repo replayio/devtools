@@ -58,7 +58,7 @@ function Video({
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
 
   return (
-    <div id="video" className="bg-toolbarBackground">
+    <div id="video" className="bg-toolbarBackground mt-2">
       <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
         <ReplayLogo size="sm" color="gray" />
       </div>
