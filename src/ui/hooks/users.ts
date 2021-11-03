@@ -172,3 +172,19 @@ export function useAcceptTOS() {
 
   return acceptTOS;
 }
+
+export function useDismissNag() {
+  const { nags } = useGetUserInfo();
+  const updateUserNags = useUpdateUserNags();
+
+  return (nag: Nag) => {
+    if (nags.includes(nag)) {
+      return;
+    }
+
+    const newNags = [...nags, nag];
+    updateUserNags({
+      variables: { newNags },
+    });
+  };
+}
