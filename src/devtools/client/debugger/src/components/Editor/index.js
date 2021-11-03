@@ -30,6 +30,7 @@ import LineNumberTooltip from "./LineNumberTooltip";
 import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
+import { EditorNag } from "ui/components/shared/Nags/Nags";
 
 import {
   showSourceText,
@@ -468,6 +469,7 @@ class Editor extends PureComponent {
         })}
         ref={c => (this.$editorWrapper = c)}
       >
+        <EditorNag />
         <div className="editor-mount devtools-monospace" style={this.getInlineEditorStyles()} />
         {this.renderSearchBar()}
         {this.renderItems()}

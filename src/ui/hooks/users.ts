@@ -2,6 +2,8 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { GET_USER_INFO, GET_USER_ID } from "ui/graphql/users";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
+import { useGetRecording } from "./recordings";
+import { getRecordingId } from "ui/utils/environment";
 
 export async function getUserId() {
   const result = await query({
@@ -14,6 +16,13 @@ export async function getUserId() {
 export function useGetUserId() {
   const { data, loading, error } = useQuery(GET_USER_ID);
   return { userId: data?.viewer?.user.id, loading, error };
+}
+
+export function useUserIsAuthor() {
+  const { recording } = useGetRecording(getRecordingId());
+  const { userId } = useGetUserId();
+
+  return userId && userId === recording?.userId;
 }
 
 export type UserInfo = {
@@ -30,6 +39,8 @@ export enum Nag {
   FIRST_REPLAY_2 = "first_replay_2",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
+  FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
+  FIRST_GUTTER_CLICK = "first_gutter_click",
 }
 
 export enum EmailSubscription {
