@@ -168,3 +168,13 @@
   padding: 0 3px;
   display: inline-block;
 }
+
+.accordion .call-stack-pane ._content,
+.accordion .breakpoints-pane ._content {
+  border-radius: 0 0 0 0;
+}
+
+.accordion .call-stack-pane ._header,
+.accordion .scopes-pane ._header {
+  border-top: 1px solid #ececec;
+}

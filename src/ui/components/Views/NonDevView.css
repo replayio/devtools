@@ -4,7 +4,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  border-radius: 12px 12px 0px 0px;
+  border-radius: 8px 8px 0px 0px;
 }
 
 .right-sidebar-toolbar {
@@ -15,7 +15,6 @@
   justify-content: space-between;
   border-bottom: 1px solid var(--theme-splitter-color);
   margin-bottom: 0;
-  background-color: white;
 }
 
 .right-sidebar-toolbar-item {
@@ -26,6 +25,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding: 8px;
 }
 
 .right-sidebar .event-breakpoints button.expand-dropdown {

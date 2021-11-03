@@ -32,7 +32,7 @@ function Transcript({ pendingComment }: PropsFromRedux) {
   return (
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item comments">Comments</div>
+        <div className="right-sidebar-toolbar-item comments header-label">Comments</div>
       </div>
       <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
