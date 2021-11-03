@@ -399,7 +399,8 @@ relative layers of our application and prevents bugs arising from arbitrary z-in
 certain that you **have** to use a z-index (e.g. element with position: absolute/fixed), define a
 custom variable for it below so we can keep track of everything in one place. */
 
-#app {
+#app,
+#__next {
   --z-index-1: 10;
   --z-index-2: 20;
   --z-index-3: 30;
@@ -412,7 +413,8 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-10: 100;
 }
 
-#app {
+#app,
+#__next {
   --z-index-1--timeline-comment: var(--z-index-1);
   --z-index-1--paused-comment: var(--z-index-1);
   --z-index-1--paused-message: var(--z-index-1);

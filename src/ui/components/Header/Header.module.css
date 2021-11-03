@@ -24,13 +24,6 @@
   width: 64px;
 }
 
-.header .header-left {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
-}
-
 .header .title-container {
   color: var(--theme-toolbar-color);
   display: flex;
