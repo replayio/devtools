@@ -123,7 +123,7 @@ BoxModel.prototype = {
       this._updateReasons.push(reason);
     }
 
-    const lastRequest = async function () {
+    const lastRequest = (async () => {
       if (
         !this.inspector ||
         // !this.isPanelVisible() ||
@@ -197,14 +197,12 @@ BoxModel.prototype = {
       this._updateReasons = [];
 
       return null;
-    }
-      .bind(this)()
-      .catch(error => {
-        // If we failed because we were being destroyed while waiting for a request, ignore.
-        if (this.document) {
-          console.error(error);
-        }
-      });
+    })().catch(error => {
+      // If we failed because we were being destroyed while waiting for a request, ignore.
+      if (this.document) {
+        console.error(error);
+      }
+    });
 
     this._lastRequest = lastRequest;
   },
