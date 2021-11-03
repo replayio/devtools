@@ -1,178 +1,178 @@
 .img.webpack {
-  background-image: url(~devtools/client/debugger/images/sources/webpack.svg);
+  background-image: url(~devtools/client/debugger/images/sources/webpack.svg) !important;
 }
 .img.vue {
-  background-image: url(~devtools/client/debugger/images/sources/vuejs.svg);
+  background-image: url(~devtools/client/debugger/images/sources/vuejs.svg) !important;
 }
 .img.vuejs {
-  background-image: url(~devtools/client/debugger/images/sources/vuejs.svg);
+  background-image: url(~devtools/client/debugger/images/sources/vuejs.svg) !important;
 }
 .img.aframe {
-  background-image: url(~devtools/client/debugger/images/sources/aframe.svg);
+  background-image: url(~devtools/client/debugger/images/sources/aframe.svg) !important;
 }
 .img.angular {
-  background-image: url(~devtools/client/debugger/images/sources/angular.svg);
+  background-image: url(~devtools/client/debugger/images/sources/angular.svg) !important;
 }
 .img.choo {
-  background-image: url(~devtools/client/debugger/images/sources/choo.svg);
+  background-image: url(~devtools/client/debugger/images/sources/choo.svg) !important;
 }
 .img.dojo {
-  background-image: url(~devtools/client/debugger/images/sources/dojo.svg);
+  background-image: url(~devtools/client/debugger/images/sources/dojo.svg) !important;
 }
 .img.ember {
-  background-image: url(~devtools/client/debugger/images/sources/ember.svg);
+  background-image: url(~devtools/client/debugger/images/sources/ember.svg) !important;
 }
 .img.marko {
-  background-image: url(~devtools/client/debugger/images/sources/marko.svg);
+  background-image: url(~devtools/client/debugger/images/sources/marko.svg) !important;
 }
 .img.mobx {
-  background-image: url(~devtools/client/debugger/images/sources/mobx.svg);
+  background-image: url(~devtools/client/debugger/images/sources/mobx.svg) !important;
 }
 .img.nextjs {
-  background-image: url(~devtools/client/debugger/images/sources/nextjs.svg);
+  background-image: url(~devtools/client/debugger/images/sources/nextjs.svg) !important;
 }
 .img.node {
-  background-image: url(~devtools/client/debugger/images/sources/node.svg);
+  background-image: url(~devtools/client/debugger/images/sources/node.svg) !important;
 }
 .img.nuxtjs {
-  background-image: url(~devtools/client/debugger/images/sources/nuxtjs.svg);
+  background-image: url(~devtools/client/debugger/images/sources/nuxtjs.svg) !important;
 }
 .img.preact {
-  background-image: url(~devtools/client/debugger/images/sources/preact.svg);
+  background-image: url(~devtools/client/debugger/images/sources/preact.svg) !important;
 }
 .img.pug {
-  background-image: url(~devtools/client/debugger/images/sources/pug.svg);
+  background-image: url(~devtools/client/debugger/images/sources/pug.svg) !important;
 }
 .img.rxjs {
-  background-image: url(~devtools/client/debugger/images/sources/rxjs.svg);
+  background-image: url(~devtools/client/debugger/images/sources/rxjs.svg) !important;
 }
 .img.sencha-extjs {
-  background-image: url(~devtools/client/debugger/images/sources/sencha-extjs.svg);
+  background-image: url(~devtools/client/debugger/images/sources/sencha-extjs.svg) !important;
 }
 .webconsole-console-settings-menu-button::before {
-  background-image: url(~devtools/client/themes/images/settings.svg);
+  background-image: url(~devtools/client/themes/images/settings.svg) !important;
 }
 .webconsole-input-openEditorButton::before {
-  background-image: url(~devtools/client/themes/images/webconsole/editor.svg);
+  background-image: url(~devtools/client/themes/images/webconsole/editor.svg) !important;
 }
 .sidebar-close-button::before {
-  background-image: url(~devtools/client/themes/images/close.svg);
+  background-image: url(~devtools/client/themes/images/close.svg) !important;
 }
 .jsterm-editor
   .webconsole-editor-toolbar
   .webconsole-editor-toolbar-history-prevExpressionButton::before {
-  background-image: url(~devtools/client/themes/images/arrowhead-up.svg);
+  background-image: url(~devtools/client/themes/images/arrowhead-up.svg) !important;
 }
 .jsterm-editor
   .webconsole-editor-toolbar
   .webconsole-editor-toolbar-history-nextExpressionButton::before {
-  background-image: url(~devtools/client/themes/images/arrowhead-down.svg);
+  background-image: url(~devtools/client/themes/images/arrowhead-down.svg) !important;
 }
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton::before {
-  background-image: url(~devtools/client/themes/images/webconsole/reverse-search.svg);
+  background-image: url(~devtools/client/themes/images/webconsole/reverse-search.svg) !important;
 }
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton::before {
-  background-image: url(~devtools/client/themes/images/close.svg);
+  background-image: url(~devtools/client/themes/images/close.svg) !important;
 }
 .devtools-button.devtools-clear-icon::before {
-  background-image: url(~devtools/client/themes/images/clear.svg);
+  background-image: url(~devtools/client/themes/images/clear.svg) !important;
 }
 .devtools-searchinput {
-  background-image: url(~devtools/client/themes/images/search.svg);
+  background-image: url(~devtools/client/themes/images/search.svg) !important;
 }
 .devtools-filterinput {
-  background-image: url(~devtools/client/themes/images/filter-small.svg);
+  background-image: url(~devtools/client/themes/images/filter-small.svg) !important;
 }
 .devtools-searchinput-clear {
-  background-image: url(~devtools/client/themes/images/search-clear.svg);
+  background-image: url(~devtools/client/themes/images/search-clear.svg) !important;
 }
 .theme-twisty {
-  background-image: url(~devtools/client/themes/images/arrow.svg);
+  background-image: url(~devtools/client/themes/images/arrow.svg) !important;
 }
 .all-tabs-menu {
-  background-image: url(~devtools/client/themes/images/dropmarker.svg);
+  background-image: url(~devtools/client/themes/images/dropmarker.svg) !important;
 }
 .message.command > .icon {
-  background-image: url(~devtools/client/themes/images/webconsole/input.svg);
+  background-image: url(~devtools/client/themes/images/webconsole/input.svg) !important;
 }
 .message.result > .icon {
-  background-image: url(~devtools/client/themes/images/webconsole/return.svg);
+  background-image: url(~devtools/client/themes/images/webconsole/return.svg) !important;
 }
 .message.info > .icon {
-  background-image: url(~devtools/client/themes/images/info-small.svg);
+  background-image: url(~devtools/client/themes/images/info-small.svg) !important;
 }
 .message.error > .icon {
-  background-image: url(~devtools/client/themes/images/error-small.svg);
+  background-image: url(~devtools/client/themes/images/error-small.svg) !important;
 }
 .message.warn > .icon {
-  background-image: url(~devtools/client/themes/images/alert-small.svg);
+  background-image: url(~devtools/client/themes/images/alert-small.svg) !important;
 }
 .message.navigationMarker > .icon {
-  background-image: url(~devtools/client/themes/images/webconsole/navigation.svg);
+  background-image: url(~devtools/client/themes/images/webconsole/navigation.svg) !important;
 }
 #split-console-close-button::before {
-  background-image: url(~devtools/client/themes/images/close.svg);
+  background-image: url(~devtools/client/themes/images/close.svg) !important;
 }
 .menuitem > .command[aria-checked="true"] {
-  background-image: url(~devtools/client/themes/images/check.svg);
+  background-image: url(~devtools/client/themes/images/check.svg) !important;
 }
 .message.network > .collapse-button::before,
 .message.startGroup > .indent[data-indent="0"] ~ .collapse-button::before,
 .message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button::before {
-  background-image: url(~devtools/client/themes/images/arrow-big.svg);
+  background-image: url(~devtools/client/themes/images/arrow-big.svg) !important;
 }
 button.jump-definition {
-  background-image: url(~devtools/client/shared/components/reps/images/jump-definition-dark.svg);
+  background-image: url(~devtools/client/shared/components/reps/images/jump-definition-dark.svg) !important;
 }
 .img.column-marker {
-  background-image: url(~devtools/client/debugger/images/column-marker.svg);
+  background-image: url(~devtools/client/debugger/images/column-marker.svg) !important;
 }
 .event-tooltip-debugger-icon {
-  background-image: url(~devtools/client/shared/components/reps/images/jump-definition-dark.svg);
+  background-image: url(~devtools/client/shared/components/reps/images/jump-definition-dark.svg) !important;
 }
 .invoke-confirm .close-confirm-dialog-button::before {
-  background-image: url(~devtools/client/debugger/images/close.svg);
+  background-image: url(~devtools/client/debugger/images/close.svg) !important;
 }
 .invoke-confirm .learn-more-link::after {
-  background-image: url(~devtools/client/themes/images/help.svg);
+  background-image: url(~devtools/client/themes/images/help.svg) !important;
 }
 .logo {
-  background-image: url(/images/logo.svg);
+  background-image: url(/images/logo.svg) !important;
 }
 .comment-close {
-  background-image: url(~devtools/client/themes/images/close.svg);
+  background-image: url(~devtools/client/themes/images/close.svg) !important;
 }
 .comment-write {
-  background-image: url(~devtools/client/themes/images/pen.svg);
+  background-image: url(~devtools/client/themes/images/pen.svg) !important;
 }
 .comment-confirm {
-  background-image: url(~devtools/client/themes/images/check.svg);
+  background-image: url(~devtools/client/themes/images/check.svg) !important;
 }
 .comment-jump {
-  background-image: url(~devtools/client/debugger/images/next-circle.svg);
+  background-image: url(~devtools/client/debugger/images/next-circle.svg) !important;
 }
 .create-comment {
-  background-image: url(~devtools/client/themes/images/comment-add.svg);
+  background-image: url(~devtools/client/themes/images/comment-add.svg) !important;
 }
 .comment-marker {
-  background-image: url(~devtools/client/themes/images/comment-marker.svg);
+  background-image: url(~devtools/client/themes/images/comment-marker.svg) !important;
   background-color: transparent;
 }
 #inspector-splitter-box .sidebar-toggle::before {
-  background-image: url(~devtools/client/themes/images/close-3-pane.svg);
+  background-image: url(~devtools/client/themes/images/close-3-pane.svg) !important;
 }
 #inspector-splitter-box .sidebar-toggle.pane-collapsed::before {
-  background-image: url(~devtools/client/themes/images/open-3-pane.svg);
+  background-image: url(~devtools/client/themes/images/open-3-pane.svg) !important;
 }
 .expandable.collapsed .markup-expand-badge::before {
-  background-image: url(~devtools/client/themes/images/more.svg);
+  background-image: url(~devtools/client/themes/images/more.svg) !important;
 }
 .computed-other-property-value::before {
-  background-image: url(~devtools/client/themes/images/arrow-e.svg);
+  background-image: url(~devtools/client/themes/images/arrow-e.svg) !important;
 }
 .scrollbutton-up > .toolbarbutton-icon,
 .scrollbutton-down > .toolbarbutton-icon {
-  background-image: url(~devtools/client/themes/images/breadcrumbs-scrollbutton.svg);
+  background-image: url(~devtools/client/themes/images/breadcrumbs-scrollbutton.svg) !important;
 }
 .img.babel {
   -webkit-mask-image: url(~devtools/client/debugger/images/sources/babel.svg);
