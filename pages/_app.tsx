@@ -1,4 +1,4 @@
-import "./test-prep";
+import "../src/test-prep";
 import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
