@@ -57,6 +57,7 @@ import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
 import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import { getContextMenu } from "ui/reducers/contextMenus";
+import { setSelectedPrimaryPanel } from "ui/actions/app";
 
 import "./Editor.css";
 import { selectors } from "ui/reducers";
@@ -253,7 +254,13 @@ class Editor extends PureComponent {
   };
 
   onGutterClick = (cm, line, gutter, ev) => {
-    const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
+    const {
+      cx,
+      selectedSource,
+      addBreakpointAtLine,
+      toggleBlackBox,
+      setSelectedPrimaryPanel,
+    } = this.props;
     const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
 
     // Open the context menu then bail if the user clicks on a non-breakable line
@@ -296,6 +303,7 @@ class Editor extends PureComponent {
       return;
     }
 
+    setSelectedPrimaryPanel("debug");
     return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
   };
 
@@ -508,6 +516,7 @@ const mapDispatchToProps = dispatch => ({
       traverseResults: actions.traverseResults,
       updateCursorPosition: actions.updateCursorPosition,
       updateViewport: actions.updateViewport,
+      setSelectedPrimaryPanel,
     },
     dispatch
   ),
