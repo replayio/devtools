@@ -857,7 +857,6 @@ class _ThreadFront {
     if (pause != this.currentPause) {
       return null;
     }
-    await node.ensureParentsLoaded();
     return pause == this.currentPause ? node : null;
   }
 

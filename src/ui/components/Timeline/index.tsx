@@ -125,7 +125,10 @@ class Timeline extends Component<PropsFromRedux> {
       setTimelineState,
       isTrimming,
     } = this.props;
-    const hoveringOverMarker = !!hoveredComment;
+    // if the user clicked on a comment marker, we already seek to the comment's
+    // execution point, so we don't want to seek a second time here
+    const clickedOnCommentMarker =
+      e.target instanceof Element && [...e.target.classList].includes("comment-marker");
     const mouseTime = this.getMouseTime(e);
 
     trackEvent("timeline.progress_select");
@@ -133,7 +136,7 @@ class Timeline extends Component<PropsFromRedux> {
       return;
     }
 
-    if (hoverTime != null && !hoveringOverMarker) {
+    if (hoverTime != null && !clickedOnCommentMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
         if (!seek(event.point, mouseTime, false)) {

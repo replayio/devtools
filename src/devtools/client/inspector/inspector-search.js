@@ -112,12 +112,6 @@ InspectorSearch.prototype = {
       }
 
       const node = nodes[index];
-      await node.ensureParentsLoaded();
-
-      if (lastSearchedResult !== this._lastSearchedResult) {
-        return;
-      }
-
       this.inspector.selection.setNodeFront(node, {
         reason: "inspectorsearch",
       });

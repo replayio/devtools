@@ -5,7 +5,7 @@ export interface GitHubLinkOptions {
   HTMLAttributes: Record<string, any>;
 }
 
-export const inputRegex = /(https:\/\/github.com\/(.*)\/(.*)\/(.*)\/(\d+))/g;
+export const inputRegex = /(https:\/\/github.com\/(.*)\/(.*)\/(.*)\/(\d+)[^ ]*)/g;
 
 const getAttributes = (match: string[]) => {
   const [href, , org, repo, subpath, id] = match;
@@ -50,16 +50,19 @@ export const GitHubLink = Node.create<GitHubLinkOptions>({
   inline: true,
 
   parseHTML() {
-    return [{ tag: "a[href]" }];
+    return [{ tag: "a[data-github-link]" }];
   },
 
   renderHTML({ node, HTMLAttributes }) {
-    console.log(node);
     return [
       "a",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      mergeAttributes({ "data-github-link": "" }, this.options.HTMLAttributes, HTMLAttributes),
       `${node.attrs.org}/${node.attrs.repo}#${node.attrs.id}`,
     ];
+  },
+
+  renderText({ node }) {
+    return node.attrs.href;
   },
 
   addInputRules() {

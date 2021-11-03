@@ -7,6 +7,7 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { LoadingScreen } from "ui/components/shared/BlankScreen";
 import Upload from "views/upload";
 import DevTools from "ui/components/DevTools";
+import { endUploadWaitTracking } from "ui/utils/mixpanel";
 
 function Recording({ getAccessibleRecording }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
@@ -29,7 +30,7 @@ function Recording({ getAccessibleRecording }: PropsFromRedux) {
   if (!uploadComplete && recording.isInitialized === false && !isTest() && recording.userId) {
     return <Upload onUpload={() => setUploadComplete(true)} />;
   } else {
-    return <DevTools />;
+    return <DevTools uploadComplete={uploadComplete} />;
   }
 }
 

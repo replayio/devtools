@@ -82,7 +82,6 @@ class Selection {
    *          the node.
    */
   setNodeFront(nodeFront: NodeFront | null, { reason = "unknown", isSlotted = false } = {}) {
-    assert(!nodeFront || nodeFront.isLoaded());
     this.reason = reason;
 
     // If an inlineTextChild text node is being set, then set it's parent instead.

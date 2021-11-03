@@ -10,21 +10,30 @@ import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 
 import "ui/setup/dynamic/devtools";
+import { endUploadWaitTracking } from "ui/utils/mixpanel";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
+
+type _DevToolsProps = PropsFromRedux & DevToolsProps;
 
 function _DevTools({
   clearTrialExpired,
   loadingFinished,
   viewMode,
   createSession,
-}: PropsFromRedux) {
+  uploadComplete,
+}: _DevToolsProps) {
   const recordingId = useGetRecordingId();
   useEffect(() => {
     createSession(recordingId);
 
     return () => clearTrialExpired();
   }, [clearTrialExpired, recordingId]);
+  useEffect(() => {
+    if (uploadComplete && loadingFinished) {
+      endUploadWaitTracking();
+    }
+  }, [uploadComplete, loadingFinished]);
 
   if (!loadingFinished) {
     return <LoadingScreen />;
@@ -51,9 +60,10 @@ const connector = connect(
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const ConnectedDevTools = connector(_DevTools);
 
-const DevTools = () => (
+type DevToolsProps = { uploadComplete: boolean };
+const DevTools = (props: DevToolsProps) => (
   <WaitForReduxSlice slice="messages">
-    <ConnectedDevTools />
+    <ConnectedDevTools {...props} />
   </WaitForReduxSlice>
 );
 
