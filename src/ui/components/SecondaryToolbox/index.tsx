@@ -1,5 +1,5 @@
-import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { connect, ConnectedProps, useStore } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
@@ -15,6 +15,12 @@ import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
 import { trackEvent } from "ui/utils/telemetry";
+import * as inspectorReducers from "devtools/client/inspector/reducers";
+import { extendStore } from "ui/setup/store";
+
+import "ui/setup/dynamic/inspector";
+
+let extendedStore = false;
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -93,6 +99,19 @@ function ConsolePanel() {
 }
 
 function InspectorPanel() {
+  const store = useStore();
+  const [extended, setExtended] = useState(extendedStore);
+
+  useEffect(() => {
+    if (!extended && store) {
+      extendStore(store, {}, inspectorReducers, {});
+      extendedStore = true;
+      setExtended(true);
+    }
+  }, [store, extended]);
+
+  if (!extended) return null;
+
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
       <React.Suspense fallback={null}>

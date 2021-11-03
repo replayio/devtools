@@ -41,7 +41,6 @@ import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";
-// extendStore({}, inspectorReducers, {});
 
 /**
  * Represents an open instance of the Inspector for a tab.
