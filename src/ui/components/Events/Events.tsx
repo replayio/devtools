@@ -8,7 +8,6 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 import Event from "./Event";
-import EventsLoader from "./EventsLoader";
 import { trackEvent } from "ui/utils/telemetry";
 
 function CurrentTimeLine() {
@@ -17,14 +16,7 @@ function CurrentTimeLine() {
 
 const FILTERED_EVENT_TYPES = ["keydown", "keyup"];
 
-function Events({
-  currentTime,
-  eventCategoriesLoading,
-  events,
-  executionPoint,
-  progressPercentage,
-  seek,
-}: PropsFromRedux) {
+function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     seek(point, time, false);
@@ -39,7 +31,6 @@ function Events({
 
   return (
     <div className="flex flex-col py-1.5 self-stretch space-y-1.5 w-full text-xs">
-      {progressPercentage < 100 ? <EventsLoader {...{ eventCategoriesLoading }} /> : null}
       {events.map((e, i) => {
         return (
           <div key={e.point}>
@@ -58,10 +49,8 @@ function Events({
 const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
-    eventCategoriesLoading: selectors.getEventCategoriesLoading(state),
     events: selectors.getFlatEvents(state),
     executionPoint: getExecutionPoint(state),
-    progressPercentage: selectors.getIndexing(state),
   }),
   { seek: actions.seek }
 );
