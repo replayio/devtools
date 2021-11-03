@@ -59,7 +59,6 @@ import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import { getContextMenu } from "ui/reducers/contextMenus";
 
-import "./Editor.css";
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
 const cssVars = {

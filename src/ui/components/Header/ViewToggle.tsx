@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
-import "./ViewToggle.css";
+
 import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
 import { getSelectedPrimaryPanel, getViewMode } from "../../reducers/app";
@@ -114,7 +114,7 @@ function ViewToggle({
 
   return (
     <AnimateSharedLayout type="crossfade">
-      <button className="view-toggle" type="button">
+      <div className="view-toggle" role="button">
         <div className="inner">
           <Handle
             text="Viewer"
@@ -131,7 +131,7 @@ function ViewToggle({
             motion={motion}
           />
         </div>
-      </button>
+      </div>
     </AnimateSharedLayout>
   );
 }

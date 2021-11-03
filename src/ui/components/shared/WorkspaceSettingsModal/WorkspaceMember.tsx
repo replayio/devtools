@@ -8,8 +8,6 @@ import * as actions from "ui/actions/app";
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
 
-import "./WorkspaceMember.css";
-
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
   isAdmin: boolean;

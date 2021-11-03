@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
-import "./ScrollContainer.css";
 import { UIState } from "ui/state";
 import { ZoomRegion } from "ui/state/timeline";
 

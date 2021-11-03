@@ -5,8 +5,6 @@ import { UIState } from "ui/state";
 const AccessibleImage = require("devtools/client/debugger/src/components/shared/AccessibleImage")
   .default;
 
-import "./Hud.css";
-
 export function Hud({ hoverTime, currentTime, stalled }: Props) {
   if (stalled) {
     return (

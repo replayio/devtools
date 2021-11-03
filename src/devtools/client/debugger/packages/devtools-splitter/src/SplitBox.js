@@ -9,8 +9,6 @@ const { Component } = React;
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 
-require("./SplitBox.css");
-
 /**
  * This component represents a Splitter. The splitter supports vertical
  * as well as horizontal mode.

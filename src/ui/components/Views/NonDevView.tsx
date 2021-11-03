@@ -12,7 +12,7 @@ import Dropdown from "ui/components/shared/Dropdown";
 import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
-import "./NonDevView.css";
+
 import { UIState } from "ui/state";
 
 export function EventsFilter() {

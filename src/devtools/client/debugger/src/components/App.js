@@ -34,14 +34,6 @@ const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";
 
-import "./App.css";
-
-import "devtools/client/themes/variables.css";
-import "devtools/client/themes/webconsole.css";
-import "devtools/client/themes/common.css";
-
-import "./shared/menu.css";
-
 import ProjectSearch from "./ProjectSearch";
 import Editor from "./Editor";
 import WelcomeBox from "./WelcomeBox";

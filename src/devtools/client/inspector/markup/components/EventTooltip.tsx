@@ -6,8 +6,6 @@ import { clearEventTooltip, showEventTooltip, viewSourceInDebugger } from "../ac
 import { getEventTooltipContent, getEventTooltipNodeId } from "../reducers/eventTooltip";
 import { EventInfo } from "../state/eventTooltip";
 
-import "./EventTooltip.css";
-
 interface EventTooltipProps {
   nodeId: string;
 }

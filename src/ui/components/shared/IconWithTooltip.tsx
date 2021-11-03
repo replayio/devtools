@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import "./IconWithTooltip.css";
 
 interface IconWithTooltipProps {
   icon: React.ReactNode;

@@ -23,8 +23,6 @@ import { Redacted } from "ui/components/Redacted";
 
 const { objectInspector } = require("devtools-reps");
 
-import "./Scopes.css";
-
 const ObjectInspector = objectInspector.ObjectInspector.default;
 
 class Scopes extends PureComponent {

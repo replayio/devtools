@@ -20,8 +20,6 @@ import Outline from "./Outline";
 import SourcesTree from "./SourcesTree";
 import Accordion from "../shared/Accordion";
 
-import "./Sources.css";
-
 class PrimaryPanes extends Component {
   state = {
     alphabetizeOutline: prefs.alphabetizeOutline,

@@ -4,7 +4,6 @@
 
 export const CodeMirror = require("codemirror");
 
-require("codemirror/lib/codemirror.css");
 require("codemirror/mode/javascript/javascript");
 require("codemirror/mode/htmlmixed/htmlmixed");
 require("codemirror/mode/coffeescript/coffeescript");
@@ -16,8 +15,6 @@ require("codemirror/addon/search/searchcursor");
 require("codemirror/addon/runmode/runmode");
 require("codemirror/addon/selection/active-line");
 require("codemirror/addon/edit/matchbrackets");
-
-require("./source-editor.css");
 
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.

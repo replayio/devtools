@@ -15,7 +15,6 @@ import { RecordingId } from "@recordreplay/protocol";
 import { Recording } from "ui/types";
 import { UIState } from "ui/state";
 
-import "./Header.css";
 import classNames from "classnames";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import { trackEvent } from "ui/utils/telemetry";

@@ -14,8 +14,6 @@ const FilterBar = require("devtools/client/webconsole/components/FilterBar/Filte
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
 
-require("./App.css");
-
 /**
  * Console root Application component.
  */

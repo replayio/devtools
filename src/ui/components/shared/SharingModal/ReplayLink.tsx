@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import "./ReplayLink.css";
+
 import { RecordingId } from "@recordreplay/protocol";
 
 export function CopyButton({ recordingId }: { recordingId: RecordingId }) {

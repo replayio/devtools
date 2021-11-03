@@ -16,7 +16,6 @@ import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
 
-import "./App.css";
 import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
 import { LoadingScreen } from "./shared/BlankScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";

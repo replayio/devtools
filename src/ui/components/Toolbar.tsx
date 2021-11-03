@@ -4,7 +4,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
@@ -12,7 +12,7 @@ import { PrimaryPanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
-import "./Toolbox.css";
+
 import { useIntercom } from "react-use-intercom";
 import useAuth0 from "ui/utils/useAuth0";
 import { trackEvent } from "ui/utils/telemetry";

@@ -15,8 +15,6 @@ import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
 
-import "./Tabs.css";
-
 class Tabs extends PureComponent {
   onTabContextMenu;
   showContextMenu;
