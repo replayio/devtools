@@ -1,4 +1,4 @@
-import { requiresWindow } from "../src/ssr";
+import { requiresWindow } from "./ssr";
 
 requiresWindow(win => {
   const url = new URL(win.location.href);
