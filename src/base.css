@@ -18,22 +18,24 @@ body {
   border: 2px solid black !important;
 }
 
+:root {
+  --dark-blue: #2d7eff;
+  --dark-grey: #696969;
+  --faint-red: rgba(255, 0, 0, 0.5);
+  --light-blue: #61cdff;
+  --light-grey: #969696;
+}
+
 #__next,
 #app-container {
-  display: flex;
-  position: relative;
-  flex-direction: column;
   align-items: stretch;
-  height: 100%;
-  width: 100%;
-  font-family: "Inter", sans-serif;
   color: var(--theme-body-color);
-  background: var(--chrome);
-  --light-grey: #969696;
-  --dark-grey: #696969;
-  --light-blue: #61cdff;
-  --dark-blue: #2d7eff;
-  --faint-red: rgba(255, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", sans-serif;
+  height: 100%;
+  position: relative;
+  width: 100%;
 }
 
 .inter {

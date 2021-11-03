@@ -92,7 +92,7 @@ const partialRequestsToCompleteSummaries = (
 
 type RequestTableProps = PropsFromRedux;
 
-const RequestTable = ({ currentTime, events, seek, requests }: RequestTableProps) => {
+export const RequestTable = ({ currentTime, events, seek, requests }: RequestTableProps) => {
   const columns = useMemo(
     () => [
       {
