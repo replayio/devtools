@@ -21,6 +21,7 @@ export async function dismissNag(newNag: Nag) {
   await mutate({
     mutation: UPDATE_USER_NAGS,
     variables: { newNags },
+    refetchQueries: ["GetUser"],
   });
 }
 
