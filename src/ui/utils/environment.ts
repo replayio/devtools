@@ -1,6 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
 import _ from "lodash";
-import { matchPath } from "react-router-dom";
 import { usesWindow } from "ssr";
 
 export interface MockEnvironment {
@@ -107,8 +106,8 @@ export function getRecordingId() {
   return usesWindow(win => {
     if (!win) return undefined;
 
-    return matchPath<{ recordingId: string }>(window.location.pathname, "/recording/:recordingId")
-      ?.params.recordingId;
+    const match = window.location.pathname.match(/^\/recording\/([^\/]+)/);
+    return match ? match[1] : undefined;
   });
 }
 

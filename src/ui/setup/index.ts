@@ -1,4 +1,3 @@
-import { matchPath } from "react-router-dom";
 import { bootstrapStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
@@ -88,15 +87,11 @@ export async function bootstrapApp() {
 function maybeAutoOpenModal(store: UIStore) {
   const url = new URL(window.location.href);
 
-  const billingsMatch = matchPath<{ workspaceId: string }>(url.pathname, {
-    path: "/team/:workspaceId/settings/billing",
-  });
-  const preferencesMatch = matchPath(url.pathname, {
-    path: "/settings",
-  });
+  const billingsMatch = window.location.pathname.match(/^\/team\/([^\/]+)\/settings\/billing/);
+  const preferencesMatch = window.location.pathname.match(/^\/settings/);
 
-  if (billingsMatch?.params.workspaceId) {
-    store.dispatch(setWorkspaceId(billingsMatch.params.workspaceId));
+  if (billingsMatch) {
+    store.dispatch(setWorkspaceId(billingsMatch[1]));
     store.dispatch(setModal("workspace-settings"));
   } else if (preferencesMatch) {
     store.dispatch(setModal("settings"));

@@ -63,8 +63,6 @@
     "react-lazyload": "^3.2.0",
     "react-markdown": "^5.0.3",
     "react-redux": "^7.2.6",
-    "react-router": "^5.2.1",
-    "react-router-dom": "^5.2.0",
     "react-tooltip": "^4.2.21",
     "react-transition-group": "^2.0.1",
     "react-use-intercom": "^1.2.0",
