@@ -62,8 +62,8 @@ export function EditorNag() {
 export function ConsoleNag() {
   return (
     <NagHat
-      mainText="Check out our best feature"
-      subText="Try playing to one of our console logs"
+      mainText="Want to see something cool?"
+      subText="Try fast forwarding or rewinding to a console log"
       nagType={Nag.FIRST_CONSOLE_NAVIGATE}
     />
   );
