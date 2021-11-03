@@ -76,7 +76,6 @@ the border added is duplicated. */
 }
 
 .secondary-toolbox-header .label {
-  color: var(--tab-standard-color);
 }
 
 .secondary-toolbox-header .expanded .label {
