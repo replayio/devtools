@@ -1,7 +1,13 @@
+import classNames from "classnames";
 import React from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import MaterialIcon from "../MaterialIcon";
+
+// This is very arbitrary but we need it to keep the editor
+// from running into overflow problems.
+export const NAG_HEIGHT = "40px";
+export const NAG_HAT_CLASS = "nag-hat";
 
 function NagHat({
   mainText,
@@ -20,11 +26,16 @@ function NagHat({
   }
 
   return (
-    <div className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight">
+    <div
+      className={classNames(
+        NAG_HAT_CLASS,
+        "bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight"
+      )}
+    >
       <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
-      <div className="text-xs flex flex-col">
-        <div>{mainText}</div>
-        <div className="font-bold">{subText}</div>
+      <div className="text-xs flex flex-col overflow-hidden">
+        <div className="overflow-hidden overflow-ellipsis whitespace-pre">{mainText}</div>
+        <div className="font-bold overflow-hidden overflow-ellipsis whitespace-pre">{subText}</div>
       </div>
     </div>
   );
