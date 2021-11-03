@@ -7,6 +7,7 @@
     "dev": "next dev -p 8080",
     "test": "jest",
     "start": "next start -p 8080",
+    "build": "next build",
     "lint": "next lint",
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
