@@ -12,7 +12,7 @@ const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constant
 const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput");
 const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar").default;
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
-const MaterialIcon = require("ui/components/shared/MaterialIcon").default;
+const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
 
 /**
  * Console root Application component.
@@ -58,18 +58,6 @@ class App extends React.Component {
     window.jsterm.focus();
   };
 
-  renderConsoleHat() {
-    return (
-      <div className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center">
-        <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
-        <div className="text-xs flex flex-col">
-          <div>Check out our best feature</div>
-          <div className="font-bold">Try playing to one of our console logs</div>
-        </div>
-      </div>
-    );
-  }
-
   render() {
     const { filterBarDisplayMode } = this.props;
 
@@ -82,7 +70,7 @@ class App extends React.Component {
         }}
       >
         <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
-        {this.renderConsoleHat()}
+        <ConsoleNag />
         <div className="flexible-output-input" key="in-out-container">
           <ConsoleOutput key="console-output" />
           <JSTerm key="jsterm" />
