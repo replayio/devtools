@@ -6,9 +6,6 @@ import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
 import { createReplayURL } from "views/app";
 import Library from "../Library/index";
 
-import "./Account.css";
-import "../Header/Header.css";
-import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 import { PrimaryLgButton } from "../shared/Button";
 import {
   OnboardingActions,

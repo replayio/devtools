@@ -1,7 +1,7 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import "./ToolboxOptions.css";
+
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";

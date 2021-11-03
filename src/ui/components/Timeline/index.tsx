@@ -29,7 +29,6 @@ import EventMarker from "./EventMarker";
 import { getVisiblePosition, getFormattedTime } from "ui/utils/timeline";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
-import "./Timeline.css";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";

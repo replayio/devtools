@@ -7,8 +7,6 @@ import React from "react";
 
 import AccessibleImage from "../AccessibleImage";
 
-import "./styles/CloseButton.css";
-
 function CloseButton({ handleClick, buttonClass, tooltip }) {
   return (
     <button

@@ -19,8 +19,6 @@ const {
   nodeHasSetter,
 } = Utils.node;
 
-require("./ObjectInspector.css");
-
 export interface Item {
   name?: string;
   path: string;

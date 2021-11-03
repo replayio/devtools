@@ -11,8 +11,6 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 
-import "./Breakpoints.css";
-
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
   '<svg viewBox="0 0 60 15" width="60" height="15"><path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z"/></svg>';

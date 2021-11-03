@@ -1,7 +1,7 @@
 import React from "react";
 import { Recording, User } from "ui/types";
 import hooks from "ui/hooks";
-import "./CollaboratorsList.css";
+
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
 

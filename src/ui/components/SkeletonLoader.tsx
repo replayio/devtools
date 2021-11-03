@@ -4,7 +4,6 @@ import { ThreadFront } from "protocol/thread";
 import { prefs } from "../utils/prefs";
 import { selectors } from "../reducers";
 
-import "./SkeletonLoader.css";
 import { UIState } from "ui/state";
 
 type SkeletonProps = PropsFromRedux & {

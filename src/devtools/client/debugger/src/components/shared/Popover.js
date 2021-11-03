@@ -8,8 +8,6 @@ import classNames from "classnames";
 import BracketArrow from "./BracketArrow";
 import SmartGap from "./SmartGap";
 
-import "./Popover.css";
-
 class Popover extends Component {
   $popover;
   $tooltip;

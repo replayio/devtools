@@ -7,7 +7,6 @@ import React, { PureComponent } from "react";
 import classnames from "classnames";
 import AccessibleImage from "../AccessibleImage";
 import { CommandBarButton } from "./";
-import "./styles/PaneToggleButton.css";
 
 class PaneToggleButton extends PureComponent {
   static defaultProps = {

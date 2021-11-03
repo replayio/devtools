@@ -2,6 +2,7 @@ import { Action } from "redux";
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
 import CSSProperties from "../../css-properties";
+
 import { ThunkAction, ThunkExtraArgs } from "ui/utils/thunk";
 import { InspectorState } from "../state";
 const { OutputParser } = require("devtools/client/shared/output-parser");

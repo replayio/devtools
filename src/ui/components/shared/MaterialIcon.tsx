@@ -3,7 +3,6 @@ import React from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import "./MaterialIcon.css";
 
 const SIZE_STYLES = {
   xs: "text-xs",

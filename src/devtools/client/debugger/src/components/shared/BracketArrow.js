@@ -7,8 +7,6 @@
 import React from "react";
 import classNames from "classnames";
 
-import "./BracketArrow.css";
-
 const BracketArrow = ({ orientation, left, top, bottom }) => {
   return (
     <div
