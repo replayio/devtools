@@ -1,7 +1,6 @@
 import React from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { getRecordingId } from "ui/utils/environment";
 import MaterialIcon from "../MaterialIcon";
 
 function NagHat({
