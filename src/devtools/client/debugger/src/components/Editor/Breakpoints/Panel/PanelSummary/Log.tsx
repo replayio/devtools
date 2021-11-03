@@ -1,15 +1,13 @@
 import React from "react";
-import { Input } from ".";
 import { SummaryExpression, SummaryExpressionProps } from "./SummaryExpression";
 import SummaryRow from "./SummaryRow";
 
-type LogProps = SummaryExpressionProps & {
-  handleClick?: (event: React.MouseEvent, input: Input) => void;
-  hasCondition: boolean;
-};
+type LogProps = SummaryExpressionProps & { hasCondition: boolean; onClick: () => void };
 
-export default function Log({ handleClick = () => {}, hasCondition, ...rest }: LogProps) {
-  const expression = <SummaryExpression {...rest} handleClick={e => handleClick(e, "logValue")} />;
-
-  return <SummaryRow label={hasCondition ? "log" : null}>{expression}</SummaryRow>;
+export default function Log({ hasCondition, onClick, ...rest }: LogProps) {
+  return (
+    <SummaryRow onClick={onClick} label={hasCondition ? "log" : null}>
+      <SummaryExpression {...rest} />
+    </SummaryRow>
+  );
 }

@@ -777,7 +777,11 @@ class _ThreadFront {
   async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {
     const sessionId = await this.waitForSession();
 
-    client.Console.findMessages({}, sessionId);
+    client.Console.findMessages({}, sessionId).then(({ overflow }) => {
+      if (overflow) {
+        console.warn("Too many console messages, not all will be shown");
+      }
+    });
     client.Console.addNewMessageListener(async ({ message }) => {
       await this.ensureAllSources();
       const pause = new Pause(sessionId);
@@ -857,7 +861,6 @@ class _ThreadFront {
     if (pause != this.currentPause) {
       return null;
     }
-    await node.ensureParentsLoaded();
     return pause == this.currentPause ? node : null;
   }
 

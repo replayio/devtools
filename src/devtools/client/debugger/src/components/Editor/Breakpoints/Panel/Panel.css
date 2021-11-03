@@ -8,42 +8,36 @@
 }
 
 .breakpoint-panel-wrapper > :first-child {
-  max-width: 500px;
-  min-width: 300px;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }
 
 .breakpoint-panel-wrapper > :last-child {
-  max-width: 500px;
-  min-width: 300px;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
 
 .breakpoint-panel {
-  cursor: initial;
-  position: relative;
-  display: flex;
-  flex-direction: column;
   background: var(--theme-toolbar-background);
   border: 1px solid var(--theme-splitter-color);
   color: var(--theme-toolbar-color);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.breakpoint-panel .button-container {
+  padding: 8px;
 }
 
 .breakpoint-panel button {
-  height: 100%;
   border-radius: 4px;
+  align-self: center;
   line-height: 16px;
 }
 
 .breakpoint-panel .paused-add-comment {
   background-color: var(--secondary-accent);
-}
-
-.breakpoint-panel .edit-actions button {
-  padding: 4px 8px;
 }
 
 .breakpoint-panel .action {
@@ -53,108 +47,58 @@
 }
 
 .breakpoint-panel .summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  color: var(--grey-50);
   border-bottom: 1px solid var(--theme-splitter-color);
+  color: var(--grey-50);
+  display: flex;
+  justify-content: space-between;
 }
 
-.breakpoint-panel .summary .options {
-  font-family: var(--monospace-font-family);
-  overflow: hidden;
-}
-
-.breakpoint-panel .summary .action {
-  visibility: hidden;
-  padding: 4px 4px 4px 8px;
-}
-
-.breakpoint-panel .summary:hover .action {
-  visibility: visible;
-}
-
-.breakpoint-panel .summary:hover .img {
-  background: var(--theme-comment);
-}
-
-.breakpoint-panel .summary button.log,
-.breakpoint-panel .summary button.condition {
-  white-space: nowrap;
+.breakpoint-panel .statements-container {
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 5px;
-  width: 100%;
 }
 
-span.expression {
-  display: block;
-  text-align: left;
+.breakpoint-panel .statement {
+  align-items: center;
+  display: flex;
+  height: 28px;
+  line-height: 16px;
+  padding: 4px;
+  padding-left: 8px;
+  white-space: nowrap;
+}
+
+.breakpoint-panel .statement:first-child {
+  padding-top: 8px;
+}
+
+.breakpoint-panel .statement:last-child {
+  padding-bottom: 8px;
 }
 
 .breakpoint-panel .panel-editor {
-  padding: 8px;
   border-bottom: 1px solid var(--theme-splitter-color);
 }
 
-.breakpoint-panel .header {
-  display: flex;
-}
-
-.breakpoint-panel .header .type {
-  margin-right: 4px;
-}
-
-.breakpoint-panel .header .line {
-  margin-right: 8px;
-}
-
-.breakpoint-panel form label {
-  color: var(--theme-comment);
-  min-width: 48px;
-  margin-right: 8px;
-  text-align: end;
-}
-
-.brekapoint-panel form label .expression {
-  font-family: var(--monospace-font-family);
-}
-
-.breakpoint-panel form .form-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.breakpoint-panel form .input-container {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.breakpoint-panel form .input-container .placeholder-text {
-  position: absolute;
-  color: var(--theme-comment);
-  left: 8px;
-  font-style: italic;
-  color: var(--grey-40);
-  pointer-events: none;
-}
-
 .breakpoint-panel .panel-editor form .CodeMirror {
-  border: 1px solid transparent;
-  display: flex;
-  width: 100%;
   border-radius: 4px;
+  border: 1px solid transparent;
+  color: var(--theme-toolbar-color);
+  display: flex;
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
-  color: var(--theme-toolbar-color);
+  width: 100%;
 }
 
 .breakpoint-panel .panel-editor.conditional form .CodeMirror {
   border: 1px solid #e5e7eb;
+  height: 21px;
+}
+
+.breakpoint-panel form .form-row {
+  align-items: center;
+  height: 28px;
+  display: flex;
 }
 
 .breakpoint-panel .panel-editor form .form-row.invalid .CodeMirror {
@@ -179,50 +123,15 @@ non-editing markup */
   padding: 0px;
 }
 
-.breakpoint-panel .edit-actions {
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  align-self: flex-end;
-}
-
-.breakpoint-panel .edit-actions > *:not(:last-child) {
-  margin-right: 8px;
-}
-
-.breakpoint-panel button.save {
-  background: var(--primary-accent);
-  color: white;
-}
-
 .breakpoint-panel button.save:hover {
   background: var(--primary-accent-hover);
   color: white;
 }
 
-.breakpoint-panel button.cancel {
-  border: 1px solid var(--theme-splitter-color);
-  color: var(--theme-comment);
-}
-
 /* Breakpoint Navigation */
 
 .breakpoint-panel .breakpoint-navigation {
-  padding: 6px 8px 6px 6px;
-}
-
-.breakpoint-panel .breakpoint-navigation-timeline-container {
-  margin: 0 4px;
-}
-
-.breakpoint-panel .breakpoint-navigation-timeline {
-  box-sizing: content-box;
-  border-radius: 0px;
-  padding: 2px 0px;
-}
-
-.breakpoint-panel .breakpoint-navigation-status-container {
-  min-width: 50px;
+  padding: 6px;
 }
 
 .breakpoint-panel .breakpoint-navigation-commands .img {
@@ -233,10 +142,6 @@ non-editing markup */
   background: var(--theme-splitter-color);
 }
 
-.breakpoint-panel .breakpoint-navigation-commands button {
-  padding: 2px;
-}
-
 .breakpoint-panel .breakpoint-navigation-commands button:not(.disabled):hover {
   background-color: var(--theme-toolbar-background-hover);
 }
@@ -245,19 +150,22 @@ non-editing markup */
   font-size: 1rem;
 }
 
-.breakpoint-panel .summary:hover .expression {
+.breakpoint-panel .summary .statement:hover .expression {
   background-image: linear-gradient(to right, var(--theme-highlight-purple) 50%, transparent 0%);
   background-position: 1px 14px;
   background-size: 5px 1.5px;
   background-repeat: repeat-x;
 }
 
-.breakpoint-panel .summary:hover {
+.breakpoint-panel .summary.enabled:hover {
   background: hsl(240, 8%, 99%);
+}
+
+.breakpoint-panel .summary .statement:hover {
   cursor: pointer;
 }
 
-.breakpoint-panel .summary:hover .pencil {
+.breakpoint-panel .summary .statement:hover .pencil {
   opacity: 1;
   color: var(--theme-highlight-purple);
 }

@@ -557,13 +557,11 @@ async function getMarkupCanvasCoordinate(text, iframes = []) {
     y = 0;
   for (const iframeText of iframes) {
     const node = (await ThreadFront.searchDOM(iframeText))[0];
-    await node.ensureLoaded();
     const { left, top } = await node.getBoundingClientRect();
     x += left;
     y += top;
   }
   const node = (await ThreadFront.searchDOM(text))[0];
-  await node.ensureLoaded();
   const center = boundsCenter(await node.getBoundingClientRect());
   x += center.x;
   y += center.y;
@@ -708,6 +706,10 @@ async function checkHighlighterShape(svgPath) {
   });
 }
 
+async function getMouseTarget(x, y) {
+  return await ThreadFront.getMouseTarget(x, y);
+}
+
 async function getRecordingTarget() {
   return ThreadFront.recordingTargetWaiter.promise;
 }
@@ -781,6 +783,7 @@ const testCommands = {
   dispatchMouseEvent,
   checkHighlighterVisible,
   checkHighlighterShape,
+  getMouseTarget,
   getRecordingTarget,
   waitForSource,
   waitForSourceCount,

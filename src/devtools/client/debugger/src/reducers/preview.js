@@ -2,27 +2,45 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import uniqueId from "lodash/uniqueId";
 
 export function initialPreviewState() {
   return {
     preview: null,
-    previewCount: 0,
   };
 }
 
 function update(state = initialPreviewState(), action) {
   switch (action.type) {
     case "CLEAR_PREVIEW": {
-      return { ...state, preview: null };
+      if (action.previewId !== state.preview?.previewId) {
+        return state;
+      }
+
+      return { preview: null };
     }
 
     case "START_PREVIEW": {
-      return { ...state, previewCount: state.previewCount + 1 };
+      return {
+        preview: {
+          ...action.value,
+          previewId: uniqueId(),
+        },
+      };
     }
 
-    case "SET_PREVIEW": {
-      return { ...state, preview: action.value };
+    case "COMPLETE_PREVIEW": {
+      const { previewId, value } = action;
+      if (previewId !== state.preview?.previewId) {
+        return state;
+      }
+
+      return {
+        preview: {
+          ...state.preview,
+          ...value,
+        },
+      };
     }
   }
 
@@ -34,10 +52,6 @@ function update(state = initialPreviewState(), action) {
 
 export function getPreview(state) {
   return state.preview.preview;
-}
-
-export function getPreviewCount(state) {
-  return state.preview.previewCount;
 }
 
 export default update;

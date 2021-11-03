@@ -3,13 +3,15 @@ import React from "react";
 export default function SummaryRow({
   children,
   label,
+  onClick,
 }: {
   children: React.ReactElement;
   label: string | null;
+  onClick: () => void;
 }) {
   return (
-    <div className="flex flex-row space-x-1 items-center">
-      {label ? <div className="w-6 flex-shrink-0">{label}</div> : null}
+    <div onClick={onClick} className="statement flex flex-grow">
+      {label ? <div className="w-6">{label}</div> : null}
       {children}
     </div>
   );

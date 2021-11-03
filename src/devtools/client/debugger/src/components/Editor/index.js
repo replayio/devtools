@@ -187,6 +187,10 @@ class Editor extends PureComponent {
     const codeWrapper = codeMirror.getWrapperElement();
     const textArea = codeWrapper.querySelector("textArea");
 
+    if (key === "ArrowRight" || key === "ArrowLeft") {
+      e.preventDefault();
+      return;
+    }
     if (key === "Escape" && target == textArea) {
       e.stopPropagation();
       e.preventDefault();

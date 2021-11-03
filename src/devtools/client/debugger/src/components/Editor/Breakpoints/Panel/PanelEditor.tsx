@@ -79,9 +79,12 @@ class PanelEditor extends PureComponent<Props, State> {
 
     return (
       <div
-        className={classnames("panel-editor flex flex-row bg-white space-x-2 items-top", {
-          conditional: showCondition,
-        })}
+        className={classnames(
+          "panel-editor flex items-center flex-row bg-white space-x-2 items-top",
+          {
+            conditional: showCondition,
+          }
+        )}
       >
         <PanelForm
           {...{
@@ -99,10 +102,12 @@ class PanelEditor extends PureComponent<Props, State> {
           setCondition={this.setCondition}
           setConditionSyntaxError={this.setConditionSyntaxError}
         />
-        <SubmitButton
-          handleSetBreakpoint={this.handleSetBreakpoint}
-          disabled={!!logSyntaxError || !!conditionSyntaxError}
-        />
+        <div className="button-container flex items-center">
+          <SubmitButton
+            handleSetBreakpoint={this.handleSetBreakpoint}
+            disabled={!!logSyntaxError || !!conditionSyntaxError}
+          />
+        </div>
       </div>
     );
   }

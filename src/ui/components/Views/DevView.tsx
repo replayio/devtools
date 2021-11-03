@@ -42,9 +42,9 @@ function DevView({
   }, []);
 
   return (
-    <div className={classNames("horizontal-panels", { "video-hidden": videoIsHidden })}>
-      <Toolbar />
-      <div className="vertical-panels">
+    <div className="vertical-panels">
+      <div className={classNames("horizontal-panels", { "video-hidden": videoIsHidden })}>
+        <Toolbar />
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
@@ -57,9 +57,9 @@ function DevView({
           endPanel={<Viewer showVideo={!videoIsHidden} vertical={!showEditor} />}
           endPanelControl={false}
         />
-        <div className="timeline-container">
-          <Timeline />
-        </div>
+      </div>
+      <div className="timeline-container">
+        <Timeline />
       </div>
     </div>
   );

@@ -125,7 +125,10 @@ class Timeline extends Component<PropsFromRedux> {
       setTimelineState,
       isTrimming,
     } = this.props;
-    const hoveringOverMarker = !!hoveredComment;
+    // if the user clicked on a comment marker, we already seek to the comment's
+    // execution point, so we don't want to seek a second time here
+    const clickedOnCommentMarker =
+      e.target instanceof Element && [...e.target.classList].includes("comment-marker");
     const mouseTime = this.getMouseTime(e);
 
     trackEvent("timeline.progress_select");
@@ -133,7 +136,7 @@ class Timeline extends Component<PropsFromRedux> {
       return;
     }
 
-    if (hoverTime != null && !hoveringOverMarker) {
+    if (hoverTime != null && !clickedOnCommentMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
         if (!seek(event.point, mouseTime, false)) {
@@ -347,6 +350,7 @@ class Timeline extends Component<PropsFromRedux> {
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
+    const formattedTime = getFormattedTime(currentTime);
 
     return (
       <div className="timeline">
@@ -380,8 +384,11 @@ class Timeline extends Component<PropsFromRedux> {
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>
-        <div className="timeline-time">
-          <span className="time-current">{getFormattedTime(currentTime)}</span>
+        <div
+          className="timeline-time text-right"
+          style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
+        >
+          <span className="time-current">{formattedTime}</span>
           <span className="time-divider">/</span>
           <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
         </div>

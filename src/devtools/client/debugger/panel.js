@@ -55,7 +55,6 @@ export class DebuggerPanel {
 
     const pause = valueFront.getPause();
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
-    await nodeFront.ensureLoaded();
 
     await this.toolbox.selection.setNodeFront(nodeFront, {
       reason: "debugger",

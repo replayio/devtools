@@ -468,10 +468,12 @@ export class Pause {
 
   async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
     await this.loadMouseTargets();
-    for (const { node, rect } of this.mouseTargets!) {
+    for (const { node, rect, visibility, pointerEvents } of this.mouseTargets!) {
       const [left, top, right, bottom] = rect;
       if (
         (!nodeIds || nodeIds.includes(node)) &&
+        visibility !== "hidden" &&
+        pointerEvents !== "none" &&
         x >= left &&
         x <= right &&
         y >= top &&

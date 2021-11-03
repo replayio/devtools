@@ -38,7 +38,7 @@ function App() {
 
 function List({ list }) {
   return (
-    <ul>
+    <ul style={{ width: "100px" }}>
       {list.map(data => (
         <Item key={data.key} text={data.text} />
       ))}

@@ -25,6 +25,7 @@ import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
 import { migratePrefToSettings } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
+import PrivacyModal from "./shared/PrivacyModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -61,6 +62,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     case "trimming": {
       return <TrimmingModal />;
     }
+    case "privacy": {
+      return <PrivacyModal />;
+    }
     default: {
       return null;
     }
@@ -70,6 +74,16 @@ function AppModal({ modal }: { modal: ModalType }) {
 function App({ theme, modal, children }: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
+
+  useEffect(() => {
+    // Stop space bar from being used as a universal "scroll down" operator
+    // We have a big play/pause interface, so space makes way more sense for that.
+    window.addEventListener("keydown", function (e) {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+      }
+    });
+  });
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";

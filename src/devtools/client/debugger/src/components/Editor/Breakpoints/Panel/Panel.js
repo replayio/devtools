@@ -107,7 +107,6 @@ function Panel({
               breakpoint={breakpoint}
               toggleEditingOff={toggleEditingOff}
               inputToFocus={inputToFocus}
-              setInputToFocus={setInputToFocus}
               showCondition={showCondition}
               setShowCondition={setShowCondition}
             />

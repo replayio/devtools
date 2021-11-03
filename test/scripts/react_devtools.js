@@ -26,7 +26,7 @@ Test.describe(`Test React DevTools.`, async () => {
 
   rootComponent.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
   await Test.checkHighlighterVisible(true);
-  await Test.checkHighlighterShape("M40,16 L1280,16 L1280,35 L40,35");
+  await Test.checkHighlighterShape("M40,16 L140,16 L140,35 L40,35");
 
   rootComponent.parentElement.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
   await Test.waitUntil(() => getInspectedItem("State"));

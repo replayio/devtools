@@ -11,7 +11,6 @@ import {
   isSelectedFrameVisible,
   getSelectedSource,
   getSelectedFrame,
-  getPreviewCount,
 } from "../selectors";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
@@ -39,20 +38,28 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
 
 export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
-    dispatch({ type: "START_PREVIEW" });
-    const previewCount = getPreviewCount(getState());
-    if (getPreview(getState())) {
-      dispatch(clearPreview(cx));
-    }
+    dispatch({
+      type: "START_PREVIEW",
+      value: {
+        cursorPos,
+        expression,
+        location,
+        target,
+        tokenPos,
+      },
+    });
+
+    const { previewId } = getPreview(getState());
 
     const source = getSelectedSource(getState());
     if (!source) {
+      clearPreview(cx, previewId);
       return;
     }
 
     const selectedFrame = getSelectedFrame(getState());
-
     if (!selectedFrame) {
+      clearPreview(cx, previewId);
       return;
     }
 
@@ -76,41 +83,29 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     // on the token. If it happens to be hovered on whitespace, it should
     // not render anything
     if (!window.elementIsHovered(target)) {
-      return;
-    }
-
-    // Don't finish dispatching if another setPreview was started
-    if (previewCount != getPreviewCount(getState())) {
+      dispatch(clearPreview(cx, previewId));
       return;
     }
 
     dispatch({
-      type: "SET_PREVIEW",
+      type: "COMPLETE_PREVIEW",
       cx,
+      previewId,
       value: {
-        expression,
         resultGrip: result,
         properties,
         root,
-        location,
-        tokenPos,
-        cursorPos,
-        target,
       },
     });
   };
 }
 
-export function clearPreview(cx) {
-  return ({ dispatch, getState, client }) => {
-    const currentSelection = getPreview(getState());
-    if (!currentSelection) {
-      return;
-    }
-
+export function clearPreview(cx, previewId) {
+  return ({ dispatch, getState }) => {
     return dispatch({
       type: "CLEAR_PREVIEW",
       cx,
+      previewId,
     });
   };
 }

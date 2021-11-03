@@ -522,7 +522,7 @@ CssComputedView.prototype = {
       return;
     }
 
-    const computed = this._viewedElement.getComputedStyle();
+    const computed = await this._viewedElement.getComputedStyle();
     if (!computed) {
       return;
     }

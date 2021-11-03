@@ -25,72 +25,37 @@ function getSyntaxHighlightedMarkup(string: string) {
 
 function Expression({ value, isEditable }: { value: string; isEditable: boolean }) {
   return (
-    <span className="expression">
-      <span
-        className={
-          isEditable
-            ? "border-b border-dashed border-transparent group-hover:border-primaryAccent"
-            : ""
-        }
-      >
-        <div
-          className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
-          dangerouslySetInnerHTML={{
-            __html: getSyntaxHighlightedMarkup(value || ""),
-          }}
-        />
-      </span>
-    </span>
+    <div className={classNames({ expression: true })}>
+      <div
+        className="cm-s-mozilla font-mono overflow-hidden whitespace-pre"
+        dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(value || "") }}
+      />
+    </div>
   );
 }
 
-export function SummaryExpression({
-  isEditable,
-  handleClick,
-  value,
-}: SummaryExpressionProps & {
-  handleClick: (event: React.MouseEvent) => void;
-}) {
+export function SummaryExpression({ isEditable, value }: SummaryExpressionProps & {}) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
 
-  return (
-    <button
-      className={classNames(
-        "group flex flex-row items-top space-x-1 p-0.5",
-        !isEditable ? "bg-gray-200 cursor-auto" : "group-hover:text-primaryAccent"
-      )}
-      disabled={!isEditable}
-      onClick={handleClick}
-    >
-      {isEditable ? (
-        <>
-          <span className="expression">
-            <Expression {...{ value, isEditable }} />
-          </span>
-          <MaterialIcon className="opacity-0 pencil" iconSize="xs">
-            edit
-          </MaterialIcon>
-        </>
-      ) : (
-        <>
-          <Popup
-            trigger={
-              <span className="expression">
-                <Expression {...{ value, isEditable }} />
-              </span>
-            }
-          >
-            {isTeamDeveloper ? (
-              <>
-                This log cannot be edited because <br />
-                it was hit {prefs.maxHitsDisplayed}+ times
-              </>
-            ) : (
-              "Editing logpoints is available for Developers in the Team plan"
-            )}
-          </Popup>
-        </>
-      )}
-    </button>
+  return isEditable ? (
+    <div className="flex group hover:text-primaryAccent space-x-1 px-2">
+      <Expression value={value} isEditable={true} />
+      <MaterialIcon className="opacity-0 pencil" iconSize="xs">
+        edit
+      </MaterialIcon>
+    </div>
+  ) : (
+    <div className="bg-gray-200 px-2 rounded-sm">
+      <Popup trigger={<Expression value={value} isEditable={false} />}>
+        {isTeamDeveloper ? (
+          <>
+            This log cannot be edited because <br />
+            it was hit {prefs.maxHitsDisplayed}+ times
+          </>
+        ) : (
+          "Editing logpoints is available for Developers in the Team plan"
+        )}
+      </Popup>
+    </div>
   );
 }

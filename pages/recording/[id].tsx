@@ -34,7 +34,7 @@ function Recording({ getAccessibleRecording }: PropsFromRedux) {
   if (!uploadComplete && recording.isInitialized === false && !isTest() && recording.userId) {
     return <Upload onUpload={() => setUploadComplete(true)} />;
   } else {
-    return <DevTools />;
+    return <DevTools uploadComplete={uploadComplete} />;
   }
 }
 

@@ -41,6 +41,12 @@ To run the end-to-end tests make sure that devtools is running locally on port 8
 node test/run.js [--pattern pat]
 ```
 
+To run the mock tests:
+
+```
+node test/mock/run.js [--script scr]
+```
+
 To run the unit tests:
 
 ```
@@ -52,6 +58,11 @@ Note that any options passed after `--` will be passed on to the test runner (je
 ```
 npm test -- --watch
 ```
+
+#### Running tests in VS Code
+
+Install the [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) for the e2e and mock tests and [Jest Test Explorer](https://marketplace.visualstudio.com/items?itemName=kavod-io.vscode-jest-test-adapter) for the unit tests.
+You can set environment variables to be used in e2e or mock tests by adding them to the `mochaExplorer.env` setting in `.vscode/settings.json`.
 
 #### Running tests against local builds of the browser
 
