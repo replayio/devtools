@@ -30,6 +30,7 @@ import LineNumberTooltip from "./LineNumberTooltip";
 import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
+import { EditorNag } from "ui/components/shared/Nags/Nags";
 
 import {
   showSourceText,
@@ -60,7 +61,7 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 
 import "./Editor.css";
 import { selectors } from "ui/reducers";
-
+import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
@@ -398,17 +399,22 @@ class Editor extends PureComponent {
     showErrorMessage(editor, msg);
   }
 
+  nagIsShown() {
+    if (!this.$editorWrapper) {
+      return false;
+    }
+
+    const children = [...this.$editorWrapper.children];
+    return children && !!children.find(c => c.classList.contains("nag-hat"));
+  }
+
   getInlineEditorStyles() {
     const { searchOn } = this.props;
 
-    if (searchOn) {
-      return {
-        height: `calc(100% - ${cssVars.searchbarHeight})`,
-      };
-    }
-
     return {
-      height: "100%",
+      height: `calc(100% - ${searchOn ? cssVars.searchbarHeight : "0px"} - ${
+        this.nagIsShown() ? NAG_HEIGHT : "0px"
+      })`,
     };
   }
 
@@ -468,6 +474,7 @@ class Editor extends PureComponent {
         })}
         ref={c => (this.$editorWrapper = c)}
       >
+        <EditorNag />
         <div className="editor-mount devtools-monospace" style={this.getInlineEditorStyles()} />
         {this.renderSearchBar()}
         {this.renderItems()}
