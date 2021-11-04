@@ -18,7 +18,13 @@ const forbiddenClasses: Record<string, any> = {
   NodeBoundsFront,
 };
 
-const excludedActions = ["SET_SYMBOLS", "START_PREVIEW", "COMPLETE_PREVIEW"];
+const excludedActions = [
+  "SET_SYMBOLS",
+  "START_PREVIEW",
+  "COMPLETE_PREVIEW",
+  "UPDATE_RULES",
+  "set_computed_properties",
+];
 
 const loggedCategories = new Set<string>();
 
