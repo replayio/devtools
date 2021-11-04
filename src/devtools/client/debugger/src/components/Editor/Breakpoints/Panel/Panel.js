@@ -51,8 +51,7 @@ function Panel({
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
   const isHot = !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
-  const showNag =
-    analysisPoints && !error && !isHot && nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
+  const showNag = analysisPoints && !error && !isHot && !nags?.includes(Nag.FIRST_BREAKPOINT_ADD);
 
   useEffect(() => {
     dismissNag(Nag.FIRST_GUTTER_CLICK);
