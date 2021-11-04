@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
   OnboardingActions,
@@ -21,8 +21,10 @@ export default function WelcomeToReplay() {
           <OnboardingBody>{`Nice to meet you! I'm going to save you and your team a whole lot of time.`}</OnboardingBody>
         </OnboardingContent>
         <OnboardingActions>
-          <Link type="button" to="./import-settings" className={classes}>
-            Get Started
+          <Link href="./import-settings">
+            <a type="button" className={classes}>
+              Get Started
+            </a>
           </Link>
         </OnboardingActions>
       </OnboardingContentWrapper>

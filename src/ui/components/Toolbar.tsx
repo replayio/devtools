@@ -12,7 +12,6 @@ import { PrimaryPanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
-
 import { useIntercom } from "react-use-intercom";
 import useAuth0 from "ui/utils/useAuth0";
 import { trackEvent } from "ui/utils/telemetry";

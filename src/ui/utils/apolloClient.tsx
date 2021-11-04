@@ -145,7 +145,7 @@ function createHttpLink(token: string | undefined) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const uri = process.env.API_URL;
+  const uri = process.env.NEXT_PUBLIC_API_URL;
   return new HttpLink({
     uri,
     headers,

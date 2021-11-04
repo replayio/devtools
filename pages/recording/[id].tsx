@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { LoadingScreen } from "ui/components/shared/BlankScreen";
-import Upload from "views/upload";
+import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
-import { endUploadWaitTracking } from "ui/utils/mixpanel";
+import setup from "ui/setup/dynamic/devtools";
 
 function Recording({ getAccessibleRecording }: PropsFromRedux) {
+  const store = useStore();
   const recordingId = useGetRecordingId();
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {
+    if (!store) return;
+
+    setup(store);
     async function getRecording() {
       setRecording(await getAccessibleRecording(recordingId));
     }
     getRecording();
-  }, []);
+  }, [store]);
 
-  if (!recording) {
+  if (!recording || typeof window === "undefined") {
     return <LoadingScreen />;
   }
 

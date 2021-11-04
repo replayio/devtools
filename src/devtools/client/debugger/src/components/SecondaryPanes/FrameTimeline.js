@@ -11,7 +11,6 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
 import classnames from "classnames";
-
 import ReactTooltip from "react-tooltip";
 import { trackEvent } from "ui/utils/telemetry";
 

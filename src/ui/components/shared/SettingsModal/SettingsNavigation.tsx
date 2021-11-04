@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { Setting, Settings } from "./types";
-
 import MaterialIcon from "../MaterialIcon";
 import { SettingsHeader } from "./SettingsBody";
 

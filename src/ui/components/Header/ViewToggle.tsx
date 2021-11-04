@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
-
 import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
 import { getSelectedPrimaryPanel, getViewMode } from "../../reducers/app";

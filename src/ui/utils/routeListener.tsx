@@ -1,17 +1,21 @@
-import { useHistory } from "react-router";
+import { useRouter } from "next/router";
 
 let listenerInstalled = false;
-let currentRoute = window.location.pathname;
+let currentRoute: string | undefined;
 
 export function InstallRouteListener() {
-  const history = useHistory();
+  const router = useRouter();
   if (!listenerInstalled) {
-    history.listen((location, action) => {
+    currentRoute = window.location.pathname;
+
+    router.events.on("routeChangeComplete", () => {
       const newRoute = location.pathname;
-      if (currentRoute.startsWith("/recording/") && newRoute === "/") {
+      if (currentRoute?.startsWith("/recording/") && newRoute === "/") {
         window.location.reload();
       }
       currentRoute = newRoute;
     });
   }
+
+  return null;
 }

@@ -9,7 +9,6 @@ import { LoadingScreen } from "./shared/BlankScreen";
 import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 
-import "ui/setup/dynamic/devtools";
 import { endUploadWaitTracking } from "ui/utils/mixpanel";
 
 const DevView = React.lazy(() => import("./Views/DevView"));

@@ -11,9 +11,6 @@ const { ul, li, div } = require("react-dom-factories");
 const { scrollIntoView } = require("devtools/client/shared/scroll");
 const { preventDefaultAndStopPropagation } = require("devtools/client/shared/events");
 
-loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
-loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
-
 class ListItemClass extends Component {
   static get propTypes() {
     return {
