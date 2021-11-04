@@ -130,7 +130,7 @@ function CommentCard({
   if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
-        className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
+        className={`mx-auto w-full group border-b last:border-b-0 border-gray-300 cursor-pointer transition bg-gray-50`}
         onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
         onMouseDown={() => {
@@ -160,7 +160,7 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto relative w-full border-b border-gray-300 cursor-pointer transition`,
+        `mx-auto relative w-full border-b last:border-b-0 border-gray-300 cursor-pointer transition`,
         hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onMouseDown={e => {

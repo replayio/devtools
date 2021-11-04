@@ -176,5 +176,5 @@
 
 .accordion .call-stack-pane ._header,
 .accordion .scopes-pane ._header {
-  border-top: 1px solid #ececec;
+  border-top: 1px solid var(--theme-tab-background);
 }

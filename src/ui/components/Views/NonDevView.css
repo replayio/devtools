@@ -4,14 +4,12 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  border-radius: 8px 8px 0px 0px;
 }
 
 .right-sidebar-toolbar {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding-bottom: 0;
   justify-content: space-between;
   border-bottom: 1px solid var(--theme-splitter-color);
   margin-bottom: 0;

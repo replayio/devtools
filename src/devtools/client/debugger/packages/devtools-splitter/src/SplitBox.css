@@ -25,9 +25,6 @@
   overflow: auto;
 }
 
-.uncontrolled {
-}
-
 .split-box > .controlled {
   display: flex;
 }
