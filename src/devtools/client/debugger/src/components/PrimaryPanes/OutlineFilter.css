@@ -3,13 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 .outline-filter {
-  border: 1px solid var(--theme-splitter-color);
-  border-top: 0px;
+  margin: 3px;
+  padding: 3px;
+  background-color: var(--theme-tab-background);
+  border-radius: 8px;
 }
 
 .outline-filter-input {
   width: 100%;
-  background-color: var(--theme-sidebar-background);
   color: var(--theme-body-color);
   font-size: inherit;
   user-select: text;
@@ -17,7 +18,7 @@
 }
 
 .outline-filter-input.focused {
-  border: 1px solid var(--theme-highlight-blue);
+  border: 1px solid #ddd;
 }
 
 .outline-filter-input::placeholder {
@@ -26,5 +27,10 @@
 }
 
 .theme-dark .outline-filter-input.focused {
-  border: 1px solid var(--blue-50);
+  border: 1px solid #ddd;
+}
+
+.devtools-filterinput {
+  background-color: #fff;
+  border-radius: 6px;
 }

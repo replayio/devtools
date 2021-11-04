@@ -10,11 +10,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 8px;
   justify-content: space-between;
   border-bottom: 1px solid var(--theme-splitter-color);
   margin-bottom: 0;
-  background-color: var(--theme-accordion-header-background);
 }
 
 .right-sidebar-toolbar-item {
@@ -25,6 +23,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding: 8px;
 }
 
 .right-sidebar .event-breakpoints button.expand-dropdown {

@@ -35,7 +35,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
           },
           {
             header: "Events",
-            className: "events flex-1",
+            className: "events-info flex-1 border-t",
             component: <Events />,
             opened: !eventsCollapsed,
             onToggle: () => setEventsCollapsed(!eventsCollapsed),
@@ -45,17 +45,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
     );
   }
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRight: "1px solid var(--theme-splitter-color)",
-      }}
-    >
-      {sidepanel}
-    </div>
-  );
+  return <div className="rounded-lg overflow-hidden w-full mt-2 mr-2">{sidepanel}</div>;
 }
 
 const connector = connect((state: UIState) => ({

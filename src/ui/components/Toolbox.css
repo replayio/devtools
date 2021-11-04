@@ -20,8 +20,8 @@
   flex-direction: column;
   justify-content: space-between;
   border-top: 0px;
-  background: var(--theme-toolbar-background);
-  border-right: 1px solid var(--theme-splitter-color);
+  background: var(--chrome);
+  border-right: 1px solid var(--chrome);
 }
 
 /* Split Console styles */

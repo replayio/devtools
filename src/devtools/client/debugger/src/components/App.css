@@ -24,7 +24,6 @@ button {
   display: flex;
   position: relative;
   flex: 1;
-  background-color: var(--theme-body-background);
   height: 100%;
   overflow: hidden;
   z-index: 10; /* ensure tooltips are above other panes */

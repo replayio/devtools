@@ -40,7 +40,7 @@ function ReplayInfo({ setModal, progressPercentage }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white border-b border-splitter">
+    <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white border-splitter">
       <div className="flex flex-col p-1.5 self-stretch space-y-1.5 w-full text-xs group">
         {recording.user ? (
           <Row>
@@ -56,7 +56,7 @@ function ReplayInfo({ setModal, progressPercentage }: PropsFromRedux) {
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
-        {progressPercentage || true ? (
+        {progressPercentage < 100 ? (
           <Row>
             <Spinner className="animate-spin h-5 w-5 text-black" />
             <div>Loading Events…</div>

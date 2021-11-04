@@ -13,7 +13,7 @@
    * This can give it a focus outline when clicked, which we don't want.
    * The container itself is not in the focus order at all. */
   outline: none;
-  background-color: var(--theme-sidebar-background);
+  background-color: var(--chrome);
 }
 
 .accordion-header {
@@ -23,7 +23,6 @@
   /* Reserve 1px for the border */
   min-height: calc(var(--theme-toolbar-height) + 1px);
   margin: 0;
-  border-bottom: 1px solid var(--theme-splitter-color);
   padding: 2px 4px;
   font-size: inherit;
   font-weight: normal;
@@ -75,7 +74,6 @@
 
 .accordion-content {
   overflow: auto;
-  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .accordion-content[hidden] {

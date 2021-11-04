@@ -7,7 +7,7 @@
   height: 24px;
   width: 24px;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--theme-toolbar-background);
+  box-shadow: 0 0 0 2px var(--chrome);
 }
 
 .avatar:not(.authenticated):not(:last-child) {

@@ -1,5 +1,5 @@
 .header {
-  background-color: var(--theme-toolbar-background);
+  background-color: var(--chrome);
   border-bottom: 1px solid var(--theme-splitter-color);
   height: 50px;
   display: flex;
@@ -43,7 +43,22 @@
   align-items: center;
 }
 
+<<<<<<< HEAD:src/ui/components/Header/Header.module.css
 .header .links .avatars {
+=======
+#header .avatar:not(.authenticated) {
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--chrome);
+}
+
+#header .avatar:not(.authenticated):not(:last-child) {
+  margin-left: -10px;
+}
+
+#header .links .avatars {
+>>>>>>> upstream/master:src/ui/components/Header/Header.css
   height: 100%;
   align-items: center;
   display: flex;

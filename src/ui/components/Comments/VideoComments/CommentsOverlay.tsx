@@ -50,14 +50,15 @@ function CommentsOverlay({
   const { top, left, width, height, scale } = canvas;
   const comments = findComment({ hasuraComments, pendingComment, currentTime });
 
+  const LAYOUT_MARGIN = 10;
   return (
     <div
       className="canvas-overlay"
       style={{
-        top: top,
-        left: left,
-        width: width * scale,
-        height: height * scale,
+        top: top + LAYOUT_MARGIN,
+        left: left + LAYOUT_MARGIN,
+        width: width * scale - 2 * LAYOUT_MARGIN,
+        height: height * scale - 2 * LAYOUT_MARGIN,
       }}
     >
       <div className="canvas-comments">

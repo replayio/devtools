@@ -6,7 +6,6 @@ import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
-import { useAuth0 } from "@auth0/auth0-react";
 import { UIState } from "ui/state";
 import ReplayLogo from "./shared/ReplayLogo";
 
@@ -58,10 +57,11 @@ function Video({
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
 
   return (
-    <div id="video" className="bg-toolbarBackground">
-      <div className="absolute w-full h-full flex items-center justify-center">
+    <div id="video" className="bg-toolbarBackground mt-2">
+      <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
         <ReplayLogo size="sm" color="gray" />
       </div>
+
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {showCommentTool ? (

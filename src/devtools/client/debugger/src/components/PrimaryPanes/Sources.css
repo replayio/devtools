@@ -165,13 +165,15 @@ div.sources-pane {
   background-color: var(--theme-toolbar-hover);
 }
 
-.source-outline-tabs .tab:hover::before,
-.source-outline-tabs .tab.active::before {
-  opacity: 1;
-  transform: scaleX(1);
-}
-
 .source-outline-panel {
   flex: 1;
   overflow: auto;
+}
+
+.sources-pane {
+  border-radius: 8px 8px 0 0;
+}
+
+.accordion .sources-pane ._content {
+  border-radius: 0 0 0 0;
 }
