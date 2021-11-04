@@ -1,4 +1,3 @@
-// import "./Dialog.css";
 import classNames from "classnames";
 import React, { HTMLProps, ReactNode } from "react";
 import ReplayLogo from "./ReplayLogo";

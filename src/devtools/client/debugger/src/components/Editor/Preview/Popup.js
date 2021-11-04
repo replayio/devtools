@@ -26,8 +26,6 @@ import { getThreadContext } from "../../../selectors";
 import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
 
-// import "./Popup.css";
-
 export class Popup extends Component {
   marker;
   pos;

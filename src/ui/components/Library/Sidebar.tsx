@@ -4,7 +4,6 @@ import Invitations from "./Invitations";
 import NewTeamButton from "./NewTeamButton";
 import SidebarFooter from "./SidebarFooter";
 import TeamButton from "./TeamButton";
-// import "./Sidebar.css";
 
 export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces: Workspace[] }) {
   const userLibrary = { id: null, name: "Your Library", members: [] };

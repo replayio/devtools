@@ -10,7 +10,6 @@ import { CloseButton } from "./Button";
 
 import AccessibleImage from "./AccessibleImage";
 import classnames from "classnames";
-// import "./SearchInput.css";
 
 const arrowBtn = (onClick, type, className, tooltip) => {
   const props = {

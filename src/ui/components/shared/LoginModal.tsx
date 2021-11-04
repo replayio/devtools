@@ -2,8 +2,6 @@ import React from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/Modal";
 
-// import "./LoginModal.css";
-
 function LoginModal() {
   const { loginWithRedirect } = useAuth0();
 

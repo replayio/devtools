@@ -33,8 +33,6 @@ import FrameTimeline from "./FrameTimeline";
 
 import Scopes from "./Scopes";
 
-// import "./SecondaryPanes.css";
-
 function debugBtn(onClick, type, className, tooltip) {
   return (
     <button onClick={onClick} className={`${type} ${className}`} key={type} title={tooltip}>

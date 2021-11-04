@@ -17,8 +17,6 @@ require("codemirror/addon/runmode/runmode");
 require("codemirror/addon/selection/active-line");
 require("codemirror/addon/edit/matchbrackets");
 
-// require("./source-editor.css");
-
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;

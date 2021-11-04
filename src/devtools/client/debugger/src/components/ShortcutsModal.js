@@ -9,8 +9,6 @@ import Modal from "./shared/Modal";
 import classnames from "classnames";
 import { formatKeyShortcut } from "../utils/text";
 
-// import "./ShortcutsModal.css";
-
 export class ShortcutsModal extends Component {
   renderPrettyCombos(combo) {
     return combo

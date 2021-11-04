@@ -1,7 +1,6 @@
 import React from "react";
 
 import DebuggerApp from "devtools/client/debugger/src/components/App";
-// import "./Toolbox.css";
 
 export default function Toolbox() {
   return (

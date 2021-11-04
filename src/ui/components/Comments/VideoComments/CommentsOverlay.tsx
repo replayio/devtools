@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
-// import "./CommentsOverlay.css";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
 

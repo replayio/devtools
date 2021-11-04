@@ -4,8 +4,6 @@ import { setUserInBrowserPrefs } from "../../utils/browser";
 import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
 import Library from "../Library/index";
 
-// import "../Header/Header.css";
-// import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 import { PrimaryLgButton } from "../shared/Button";
 import {
   OnboardingActions,

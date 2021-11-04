@@ -3,7 +3,6 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import hooks from "ui/hooks";
 import Spinner from "../Spinner";
 import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
-// import "./EmailForm.css";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 

@@ -11,7 +11,6 @@ const { prefs } = require("ui/utils/prefs");
 const { trackEvent } = require("ui/utils/telemetry");
 
 import BreakpointTimeline from "./BreakpointTimeline";
-// import "./BreakpointNavigation.css";
 
 function BreakpointNavigation({
   executionPoint,

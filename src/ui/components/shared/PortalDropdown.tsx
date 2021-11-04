@@ -1,7 +1,6 @@
 import React, { CSSProperties, RefObject, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { DropdownProps } from "./Dropdown";
-// import "./PortalDropdown.css";
 
 interface PortalDropdownProps extends DropdownProps {
   distance?: number;

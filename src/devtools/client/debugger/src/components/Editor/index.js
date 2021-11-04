@@ -58,7 +58,6 @@ import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import { getContextMenu } from "ui/reducers/contextMenus";
 
-// import "./Editor.css";
 import { selectors } from "ui/reducers";
 
 const cssVars = {

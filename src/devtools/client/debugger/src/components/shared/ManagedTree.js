@@ -5,7 +5,6 @@
 //
 import React, { Component } from "react";
 import { Tree } from "./tree";
-// import "./ManagedTree.css";
 
 class ManagedTree extends Component {
   constructor(props) {

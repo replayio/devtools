@@ -9,7 +9,6 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 const { prefs } = require("ui/utils/prefs");
-// import "./LineNumberTooltip.css";
 import StaticTooltip from "./StaticTooltip";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");

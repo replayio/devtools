@@ -4,7 +4,6 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-// import "./CommentTool.css";
 import { Comment, Reply } from "ui/state/comments";
 import classNames from "classnames";
 import { Canvas } from "ui/state/app";

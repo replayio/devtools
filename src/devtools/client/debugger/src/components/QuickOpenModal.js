@@ -40,8 +40,6 @@ import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 
-// import "./QuickOpenModal.css";
-
 const updateResultsThrottle = 100;
 const maxResults = 100;
 

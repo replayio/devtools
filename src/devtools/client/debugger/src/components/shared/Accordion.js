@@ -6,8 +6,6 @@
 import React, { cloneElement, Component } from "react";
 import AccessibleImage from "./AccessibleImage";
 
-// import "./Accordion.css";
-
 class Accordion extends Component {
   handleHeaderClick(i) {
     const item = this.props.items[i];

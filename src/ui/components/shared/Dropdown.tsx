@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-// import "./Dropdown.css";
 
 export interface DropdownProps {
   buttonContent: ReactNode;

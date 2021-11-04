@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-// import "./FirstEditNag.css";
 
 const TEXT = {
   clickPrompt: "Edit your first print statement",

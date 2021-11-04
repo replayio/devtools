@@ -8,8 +8,6 @@ import classnames from "classnames";
 
 import AccessibleImage from "./AccessibleImage";
 
-// import "./ResultList.css";
-
 export default class ResultList extends Component {
   displayName;
 

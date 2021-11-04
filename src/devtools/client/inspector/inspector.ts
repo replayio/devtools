@@ -13,26 +13,6 @@ import { UIStore } from "ui/actions";
 import { extendStore } from "ui/setup/store";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 
-// require("devtools/client/themes/breadcrumbs.css");
-// require("devtools/client/themes/inspector.css");
-// require("devtools/client/themes/badge.css");
-// require("devtools/client/themes/rules.css");
-// require("devtools/client/themes/computed.css");
-// require("devtools/client/themes/changes.css");
-// require("devtools/client/themes/boxmodel.css");
-// require("devtools/client/themes/layout.css");
-// require("devtools/client/themes/splitters.css");
-// require("devtools/client/themes/variables.css");
-// require("devtools/client/themes/common.css");
-// require("devtools/client/themes/toolbars.css");
-// require("devtools/client/themes/tooltips.css");
-// require("devtools/client/themes/accessibility-color-contrast.css");
-// require("devtools/client/shared/components/tabs/Tabs.css");
-// require("devtools/client/shared/components/SidebarToggle.css");
-// require("devtools/client/inspector/components/InspectorTabPanel.css");
-// require("devtools/client/shared/components/splitter/SplitBox.css");
-// require("devtools/client/shared/components/Accordion.css");
-
 import MarkupView from "devtools/client/inspector/markup/markup";
 const BoxModel = require("devtools/client/inspector/boxmodel/box-model");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");

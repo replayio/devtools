@@ -30,8 +30,6 @@ import AccessibleImage from "./shared/AccessibleImage";
 import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
 
-// import "./ProjectSearch.css";
-
 function getFilePath(item, index) {
   return item.type === "RESULT"
     ? `${item.sourceId}-${index || "$"}`
