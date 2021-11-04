@@ -43,7 +43,7 @@ function DevView({
 
   return (
     <div className="vertical-panels">
-      <div className={classNames("horizontal-panels bg-chrome", { "video-hidden": videoIsHidden })}>
+      <div className="horizontal-panels bg-chrome">
         <Toolbar />
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}

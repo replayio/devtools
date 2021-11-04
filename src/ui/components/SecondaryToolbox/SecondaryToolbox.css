@@ -10,16 +10,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background: #ececec;
+  background: var(--theme-tab-background);
   border-bottom: 1px solid var(--theme-splitter-color);
-  border-radius: 8px 8px 0 0;
-}
-
-/* This makes sure that in cases where the toolbox is the only one
-displayed in a column, we don't add an additional border. Otherwise,
-the border added is duplicated. */
-.secondary-toolbox-header:not(.video-hidden *) {
-  /* border-top: 1px solid var(--theme-splitter-color); */
 }
 
 .secondary-toolbox-header .panel-buttons {
@@ -39,24 +31,6 @@ the border added is duplicated. */
   flex-direction: row;
   align-items: flex-end;
   overflow: hidden;
-}
-
-.secondary-toolbox-header button::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: var(--theme-body-color);
-  transition: transform 250ms var(--animation-curve), opacity 250ms var(--animation-curve);
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-.secondary-toolbox-header button.expanded::before {
-  opacity: 1;
-  transform: scaleX(1);
 }
 
 .secondary-toolbox-header button .label {

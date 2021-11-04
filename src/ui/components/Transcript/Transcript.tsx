@@ -32,14 +32,16 @@ function Transcript({ pendingComment }: PropsFromRedux) {
   return (
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item comments header-label">Comments</div>
+        <div className="right-sidebar-toolbar-item comments">Comments</div>
       </div>
       <div className="transcript-list flex-grow overflow-auto overflow-x-hidden flex flex-col items-center bg-white h-full text-xs">
         {displayedComments.length > 0 ? (
           <div className="overflow-auto w-full flex-grow bg-chrome">
-            {sortedComments.map((comment, i) => {
-              return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
-            })}
+            <div className="rounded-b-lg overflow-hidden">
+              {sortedComments.map((comment, i) => {
+                return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
+              })}
+            </div>
           </div>
         ) : (
           <div className="transcript-list p-3 self-stretch space-y-3 text-base text-gray-500 onboarding-text">

@@ -5,7 +5,7 @@
 .outline-filter {
   margin: 3px;
   padding: 3px;
-  background-color: #ececec;
+  background-color: var(--theme-tab-background);
   border-radius: 8px;
 }
 
