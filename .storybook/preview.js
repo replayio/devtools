@@ -1,3 +1,4 @@
+import "base.css";
 import "devtools/client/themes/variables.css";
 import "tailwindcss/tailwind.css";
 import { withRootAttribute } from "storybook-addon-root-attribute";

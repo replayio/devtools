@@ -1,0 +1,20 @@
+.failure {
+  background: var(--red-50);
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.success {
+  background: var(--green-60);
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.success {
+  background: var(--green-60);
+  color: white;
+}
+
+.ignored {
+  color: var(--dark-grey);
+}
