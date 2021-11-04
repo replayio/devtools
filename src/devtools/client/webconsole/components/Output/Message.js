@@ -192,7 +192,11 @@ class Message extends Component {
           true,
           frame,
           { ...this.props.auth0.user, id: userId },
+<<<<<<< HEAD
           this.props.router.query.id
+=======
+          this.props.recordingId
+>>>>>>> 722351f9 (Add recordingId to redux so that console messages can use it)
         )
       );
     };
@@ -477,4 +481,4 @@ class Message extends Component {
   }
 }
 
-module.exports = withAuth0(withRouter(Message));
+module.exports = withAuth0(Message);

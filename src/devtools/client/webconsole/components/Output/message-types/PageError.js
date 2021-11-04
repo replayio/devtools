@@ -35,6 +35,7 @@ function PageError(props) {
     timestampsVisible,
     isPaused,
     maybeScrollToBottom,
+    recordingId,
     pausedExecutionPoint,
     isFirstMessageForPoint,
   } = props;
@@ -80,6 +81,7 @@ function PageError(props) {
     repeat,
     frame,
     stacktrace,
+    recordingId,
     exceptionDocURL,
     timeStamp,
     notes,

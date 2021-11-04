@@ -45,6 +45,7 @@ function ConsoleApiCall(props) {
     maybeScrollToBottom,
     isFirstMessageForPoint,
     isPrimaryHighlighted,
+    recordingId,
     shouldScrollIntoView,
   } = props;
   const {
@@ -158,6 +159,7 @@ function ConsoleApiCall(props) {
     timestampsVisible,
     parameters,
     message,
+    recordingId,
     maybeScrollToBottom,
     isFirstMessageForPoint,
     isPrimaryHighlighted,

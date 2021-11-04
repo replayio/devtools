@@ -136,6 +136,7 @@ class ConsoleOutput extends Component {
       closestMessage,
       hoveredItem,
       loadedRegions,
+      recordingId,
     } = this.props;
 
     const messageNodes = visibleMessages
@@ -154,6 +155,7 @@ class ConsoleOutput extends Component {
           dispatch,
           key: messageId,
           messageId,
+          recordingId,
           message,
           open: messagesUi.includes(messageId),
           payload: messagesPayload.get(messageId),
@@ -198,6 +200,7 @@ function mapStateToProps(state) {
     playback: selectors.getPlayback(state),
     hoveredItem: selectors.getHoveredItem(state),
     loadedRegions: selectors.getLoadedRegions(state),
+    recordingId: selectors.getRecordingId(state),
   };
 }
 const mapDispatchToProps = dispatch => ({

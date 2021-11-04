@@ -63,6 +63,7 @@ export interface UploadInfo {
 
 export interface AppState {
   sessionId: SessionId | null;
+  recordingId: null | string;
   theme: string;
   splitConsoleOpen: boolean;
   recordingDuration: number;

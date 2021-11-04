@@ -21,7 +21,14 @@ PaywallMessage.propTypes = {
  * Displays input from the console.
  */
 function PaywallMessage(props) {
-  const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
+  const {
+    message,
+    timestampsVisible,
+    maybeScrollToBottom,
+    isPaused,
+    recordingId,
+    dispatch,
+  } = props;
   const { indent, source, level, timeStamp, executionPointTime } = message;
 
   return Message({
@@ -38,6 +45,7 @@ function PaywallMessage(props) {
     timestampsVisible,
     executionPointTime,
     maybeScrollToBottom,
+    recordingId,
     message,
     isPaused,
     dispatch,

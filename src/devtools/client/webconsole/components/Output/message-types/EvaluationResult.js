@@ -25,7 +25,15 @@ EvaluationResult.defaultProps = {
 };
 
 function EvaluationResult(props) {
-  const { dispatch, message, timestampsVisible, maybeScrollToBottom, open, isPaused } = props;
+  const {
+    dispatch,
+    message,
+    timestampsVisible,
+    maybeScrollToBottom,
+    open,
+    recordingId,
+    isPaused,
+  } = props;
 
   const {
     source,
@@ -78,6 +86,7 @@ function EvaluationResult(props) {
     messageId,
     exceptionDocURL,
     stacktrace,
+    recordingId,
     collapsible: Array.isArray(stacktrace),
     open,
     frame,

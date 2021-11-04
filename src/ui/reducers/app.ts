@@ -7,7 +7,7 @@ import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
-import { getRecordingId } from "ui/utils/environment";
+import { getRecordingId as getEnvRecordingId } from "ui/utils/environment";
 import { getTrimRegion } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -49,7 +49,7 @@ const syncInitialAppState: AppState = {
 };
 
 export async function getInitialAppState(): Promise<AppState> {
-  const recordingId = getRecordingId();
+  const recordingId = getEnvRecordingId();
 
   // If we're in the library, there are no preferences to fetch.
   if (!recordingId) {
@@ -71,6 +71,7 @@ export async function getInitialAppState(): Promise<AppState> {
   return {
     ...syncInitialAppState,
     viewMode: initialViewMode,
+    recordingId: recordingId,
     selectedPrimaryPanel: session.selectedPrimaryPanel || selectedPrimaryPanel,
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     showEditor: "showEditor" in session ? session.showEditor : showEditor,
@@ -334,6 +335,8 @@ export const getFlatEvents = (state: UIState) => {
 
   return sortedEvents;
 };
+
+export const getRecordingId = (state: UIState) => state.app.recordingId;
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
