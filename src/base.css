@@ -18,7 +18,6 @@ body {
   border: 2px solid black !important;
 }
 
-#app,
 #__next {
   display: flex;
   position: relative;

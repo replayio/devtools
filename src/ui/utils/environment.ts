@@ -1,5 +1,4 @@
 import { MockedResponse } from "@apollo/client/testing";
-import _ from "lodash";
 import { usesWindow } from "ssr";
 
 export interface MockEnvironment {

@@ -10,7 +10,7 @@ export function InstallRouteListener() {
 
     router.events.on("routeChangeComplete", () => {
       const newRoute = location.pathname;
-      if (currentRoute && currentRoute.startsWith("/recording/") && newRoute === "/") {
+      if (currentRoute?.startsWith("/recording/") && newRoute === "/") {
         window.location.reload();
       }
       currentRoute = newRoute;

@@ -45,7 +45,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   const { isAuthenticated } = useAuth0();
 
   return (
-    <div className={cx("links")}>
+    <div className={css.links}>
       <RecordingTrialEnd />
       {isAuthenticated ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
@@ -169,7 +169,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
-          <div className={cx("title")}>Recordings</div>
+          <div className={css.title}>Recordings</div>
         )}
       </div>
       <Links recordingTarget={recordingTarget} />
