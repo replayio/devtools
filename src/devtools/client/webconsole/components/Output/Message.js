@@ -6,7 +6,7 @@
 
 const { getUserId } = require("ui/hooks/users");
 const { withAuth0 } = require("@auth0/auth0-react");
-const { withRouter } = require("react-router");
+const { withRouter } = require("next/router");
 const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
@@ -192,7 +192,7 @@ class Message extends Component {
           true,
           frame,
           { ...this.props.auth0.user, id: userId },
-          this.props.match.params.recordingId
+          this.props.router.query.id
         )
       );
     };

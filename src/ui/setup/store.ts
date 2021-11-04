@@ -1,4 +1,4 @@
-import { combineReducers, applyMiddleware, Reducer } from "redux";
+import { combineReducers, applyMiddleware, Reducer, Store } from "redux";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
@@ -36,6 +36,7 @@ export function bootstrapStore(initialState: { app: AppState }) {
 }
 
 export function extendStore(
+  store: Store,
   newInitialState: Record<string, any> | undefined,
   newReducers: Record<string, any>,
   newThunkArgs: Record<string, any>

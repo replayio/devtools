@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
@@ -8,6 +7,7 @@ import { CollaboratorDbData } from "ui/components/shared/SharingModal/Collaborat
 import { useGetUserId } from "./users";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
 import { getRecordingId } from "ui/utils/environment";
+import { useRouter } from "next/dist/client/router";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -104,8 +104,8 @@ const GET_MY_RECORDINGS = gql`
 `;
 
 export function useGetRecordingId() {
-  const { recordingId } = useParams<{ recordingId: string }>();
-  return recordingId;
+  const { id } = useRouter().query;
+  return Array.isArray(id) ? id[0] : id!;
 }
 
 export async function getRecordingOwnerUserId(

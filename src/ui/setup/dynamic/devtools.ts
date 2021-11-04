@@ -1,4 +1,4 @@
-import { bindActionCreators } from "redux";
+import { bindActionCreators, Store } from "redux";
 
 import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { initSocket, addEventListener } from "protocol/socket";
@@ -59,15 +59,16 @@ declare global {
   const gToolbox: DevToolsToolbox;
 }
 
-const url = new URL(window.location.href);
-const dispatchUrl = url.searchParams.get("dispatch") || process.env.DISPATCH_URL;
-assert(dispatchUrl);
+export default async (store: Store) => {
+  const url = new URL(window.location.href);
+  const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
+  assert(dispatchUrl);
 
-(async () => {
   window.gToolbox = new DevToolsToolbox();
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
+  window.app = window.app || {};
   window.app.threadFront = ThreadFront;
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors({ store, selectors });
@@ -102,7 +103,7 @@ assert(dispatchUrl);
     prefsService: getPrefsService(),
   };
 
-  extendStore(initialState, reducers, thunkArgs);
+  extendStore(store, initialState, reducers, thunkArgs);
 
   dbgClient.bootstrap(store);
 
@@ -140,7 +141,7 @@ assert(dispatchUrl);
   updateEnableRepaint(settings.enableRepaint);
 
   setupDemo();
-})();
+};
 
 function bindSelectors(obj: any) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {

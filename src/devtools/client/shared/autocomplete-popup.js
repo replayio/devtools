@@ -6,11 +6,6 @@
 
 const EventEmitter = require("devtools/shared/event-emitter");
 
-/*
-
-loader.lazyRequireGetter(this, "colorUtils", "devtools/shared/css/color", true);
-*/
-
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 
 let itemIdCounter = 0;

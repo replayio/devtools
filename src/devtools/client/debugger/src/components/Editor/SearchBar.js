@@ -27,7 +27,6 @@ import classnames from "classnames";
 
 import SearchInput from "../shared/SearchInput";
 import debounce from "lodash/debounce";
-
 import { PluralForm } from "devtools/shared/plural-form";
 
 function getShortcuts() {

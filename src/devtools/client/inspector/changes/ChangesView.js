@@ -7,13 +7,6 @@
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 
-loader.lazyRequireGetter(
-  this,
-  "ChangesContextMenu",
-  "devtools/client/inspector/changes/ChangesContextMenu"
-);
-loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
-
 const ChangesApp = createFactory(
   require("devtools/client/inspector/changes/components/ChangesApp")
 );

@@ -1,34 +1,22 @@
-require("tailwindcss/tailwind.css");
-require("./base.css");
+import "../src/test-prep";
+import "ui/utils/whatwg-url-fix";
 
-const url = new URL(window.location.href);
-const test = url.searchParams.get("test");
-
-// During testing, make sure we clear local storage before importing
-// any code that might instantiate preferences from local storage.
-// If the url contains a "navigated" parameter, we assume this is the
-// second part of a test that contains a navigation and don't clear
-// local storage in that case.
-if (test && !url.searchParams.get("navigated")) {
-  localStorage.clear();
-  require("devtools/shared/async-storage").clear();
-}
-
-// *** WARNING ***
-//
-// Do not use "import" in this file. The import will run before we clear
-// the local storage above, and existing local storage contents may be used
-// when running automated tests, which we don't want to happen. It would
-// be good if this was less fragile...
-//
-
-require("ui/utils/whatwg-url-fix");
-const React = require("react");
-const ReactDOM = require("react-dom");
-const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
-const { InstallRouteListener } = require("ui/utils/routeListener");
-import "devtools/client/debugger/src/components/variables.css";
-import "devtools/client/themes/variables.css";
+import Head from "next/head";
+import Script from "next/script";
+import type { AppProps } from "next/app";
+import React, { useEffect, useState } from "react";
+import { Provider } from "react-redux";
+import { IntercomProvider } from "react-use-intercom";
+import tokenManager from "ui/utils/tokenManager";
+import { ApolloWrapper } from "ui/utils/apolloClient";
+import { BlankProgressScreen, LoadingScreen } from "ui/components/shared/BlankScreen";
+import ErrorBoundary from "ui/components/ErrorBoundary";
+import App from "ui/components/App";
+import { bootstrapApp } from "ui/setup";
+import "image/image.css";
+import { Store } from "redux";
+import { ConfirmProvider } from "ui/components/shared/Confirm";
+import MaintenanceModeScreen from "ui/components/MaintenanceMode";
 
 import "tailwindcss/tailwind.css";
 import "../src/base.css";
@@ -36,10 +24,12 @@ import "devtools/client/debugger/src/components/variables.css";
 import "devtools/client/themes/variables.css";
 
 /////////////////// here be dragons ... ////////////////////
+import "codemirror/lib/codemirror.css";
 import "devtools/client/debugger/packages/devtools-reps/src/object-inspector/components/ObjectInspector.css";
 import "devtools/client/debugger/packages/devtools-reps/src/reps/reps.css";
 import "devtools/client/debugger/packages/devtools-splitter/src/SplitBox.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
+import "devtools/client/debugger/src/components/App.css";
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css";
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/Panel.css";
 import "devtools/client/debugger/src/components/Editor/Editor.css";
@@ -82,7 +72,6 @@ import "devtools/client/debugger/src/components/shared/SourceIcon.css";
 import "devtools/client/debugger/src/components/shared/tree.css";
 import "devtools/client/debugger/src/components/ShortcutsModal.css";
 import "devtools/client/debugger/src/components/WelcomeBox.css";
-import "codemirror/lib/codemirror.css";
 import "devtools/client/debugger/src/utils/editor/source-editor.css";
 import "devtools/client/inspector/components/InspectorTabPanel.css";
 import "devtools/client/inspector/markup/components/EventTooltip.css";
@@ -107,17 +96,14 @@ import "devtools/client/themes/tooltips.css";
 import "devtools/client/themes/webconsole.css";
 import "devtools/client/webconsole/components/App.css";
 import "devtools/client/webconsole/components/FilterBar/Events.css";
-import "devtools/client/debugger/src/components/App.css";
 import "devtools/server/actors/highlighters.css";
 import "ui/components/App.css";
-import "ui/components/Account/Account.css";
 import "ui/components/Comments/Comments.css";
 import "ui/components/Comments/TranscriptComments/CommentActions.css";
 import "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor.css";
 import "ui/components/Comments/VideoComments/CommentsOverlay.css";
 import "ui/components/Comments/VideoComments/Hud.css";
 import "ui/components/Header/ShareDropdown.css";
-import "ui/components/Header/Header.css";
 import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
 import "ui/components/Library/Sidebar.css";
@@ -147,35 +133,60 @@ import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
-
-const BrowserError = React.lazy(() => import("views/browser/error"));
-const BrowserImport = React.lazy(() => import("views/browser/import-settings"));
-const BrowserLaunch = React.lazy(() => import("views/browser/launch"));
-const BrowserNewTab = React.lazy(() => import("views/browser/new-tab"));
-const BrowserWelcome = React.lazy(() => import("views/browser/welcome"));
-const AppRouter = React.lazy(() => import("views/app"));
-const MaintenanceModeScreen = React.lazy(() => import("ui/components/MaintenanceMode"));
-const { BlankProgressScreen } = require("ui/components/shared/BlankScreen");
+import { InstallRouteListener } from "ui/utils/routeListener";
 
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-ReactDOM.render(
-  <React.Suspense
-    fallback={<BlankProgressScreen statusMessage="Fetching data" background="white" />}
-  >
-    <Router>
-      <InstallRouteListener />
-      <Switch>
-        <Route path={maintenanceMode ? "/" : "/maintenance"} component={MaintenanceModeScreen} />
-        <Route exact path="/browser/error" component={BrowserError} />
-        <Route exact path="/browser/import-settings" component={BrowserImport} />
-        <Route exact path="/browser/launch" component={BrowserLaunch} />
-        <Route exact path="/browser/new-tab" component={BrowserNewTab} />
-        <Route exact path="/browser/welcome" component={BrowserWelcome} />
-        <Route component={AppRouter} />
-      </Switch>
-    </Router>
-  </React.Suspense>,
-  document.querySelector("#app")
-);
+const AppRouting = ({ Component, pageProps }: AppProps) => {
+  const [store, setStore] = useState<Store | null>(null);
+  useEffect(() => {
+    bootstrapApp().then((store: Store) => setStore(store));
+  }, []);
+
+  if (!store) {
+    return <BlankProgressScreen progress={null} />;
+  }
+
+  if (maintenanceMode) {
+    return <MaintenanceModeScreen />;
+  }
+
+  return (
+    <Provider store={store}>
+      <tokenManager.Auth0Provider>
+        <ApolloWrapper>
+          <IntercomProvider appId={"k7f741xx"} autoBoot>
+            <ConfirmProvider>
+              <Head>
+                <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+                <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+                <title>Replay</title>
+                <link
+                  href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
+                  rel="stylesheet"
+                />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" />
+                <link
+                  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+                  rel="stylesheet"
+                />
+              </Head>
+              <App>
+                <InstallRouteListener />
+                <ErrorBoundary>
+                  <React.Suspense fallback={<LoadingScreen />}>
+                    <Component {...pageProps} />
+                  </React.Suspense>
+                </ErrorBoundary>
+              </App>
+            </ConfirmProvider>
+          </IntercomProvider>
+        </ApolloWrapper>
+      </tokenManager.Auth0Provider>
+    </Provider>
+  );
+};
+
+export default AppRouting;

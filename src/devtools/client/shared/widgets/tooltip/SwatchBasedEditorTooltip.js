@@ -9,8 +9,6 @@ const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const InlineTooltip = require("devtools/client/shared/widgets/tooltip/InlineTooltip");
 
-loader.lazyRequireGetter(this, "KeyCodes", "devtools/client/shared/keycodes", true);
-
 const INLINE_TOOLTIP_CLASS = "inline-tooltip-container";
 
 /**

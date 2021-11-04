@@ -9,12 +9,6 @@ const {
   createNode,
 } = require("devtools/server/actors/highlighters/utils/markup");
 
-loader.lazyGetter(this, "L10N", () => {
-  const { LocalizationHelper } = require("devtools/shared/l10n");
-  const STRINGS_URI = "devtools/client/locales/debugger.properties";
-  return new LocalizationHelper(STRINGS_URI);
-});
-
 /**
  * The PausedDebuggerOverlay is a class that displays a semi-transparent mask on top of
  * the whole page and a toolbar at the top of the page.
