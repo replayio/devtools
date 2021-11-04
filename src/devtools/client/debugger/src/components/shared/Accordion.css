@@ -72,12 +72,3 @@
   height: 100%;
   background-color: white;
 }
-
-.accordion ._content {
-  border-bottom: none;
-  border-radius: 0 0 8px 8px;
-}
-
-.accordion {
-  border-radius: 0 0 8px 8px;
-}

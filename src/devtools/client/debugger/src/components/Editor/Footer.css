@@ -27,9 +27,6 @@
   display: flex;
   align-items: center;
   margin-left: auto;
-  position: relative;
-  margin-top: -7px;
-  margin-right: 5px;
 }
 
 .source-footer .commands * {

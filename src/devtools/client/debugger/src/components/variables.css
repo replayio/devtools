@@ -6,9 +6,9 @@
   /* header height is 28px + 1px for its border */
   --editor-header-height: 36px;
   /* footer height is 29px + 1px for its border */
-  --editor-footer-height: 35px;
+  --editor-footer-height: 29px;
   /* searchbar height is 29px + 1px for its top border */
-  --editor-searchbar-height: 35px;
+  --editor-searchbar-height: 29px;
   /* Remove once https://bugzilla.mozilla.org/show_bug.cgi?id=1520440 lands */
   --theme-code-line-height: calc(15 / 11);
 }

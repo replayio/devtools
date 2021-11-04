@@ -504,8 +504,6 @@ export function refreshGraphics() {
     canvas.style.transform = graphicsVideo.style.transform = `scale(${bounds.scale})`;
     canvas.style.left = graphicsVideo.style.left = String(bounds.left + LAYOUT_MARGIN) + "px";
     canvas.style.top = graphicsVideo.style.top = String(bounds.top + LAYOUT_MARGIN) + "px";
-    canvas.style.borderRadius = graphicsVideo.style.borderRadius = String(10 / bounds.scale) + "px";
-    canvas.style.borderWidth = graphicsVideo.style.borderWidth = String(1 / bounds.scale) + "px";
     if (image) {
       cx.drawImage(image, 0, 0);
     }
