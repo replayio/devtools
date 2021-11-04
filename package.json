@@ -122,7 +122,6 @@
     "framer-motion": "^3.10.0",
     "fs-extra": "^10.0.0",
     "html-webpack-plugin": "^5.3.2",
-    "jest-in-case": "^1.0.2",
     "mini-css-extract-plugin": "^2.1.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^8.3.6",
