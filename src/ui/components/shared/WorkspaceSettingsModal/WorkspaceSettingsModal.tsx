@@ -15,6 +15,7 @@ import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
+import { useRouter } from "next/router";
 
 export function WorkspaceMembers({
   members,
@@ -52,7 +53,7 @@ export function WorkspaceMembers({
   );
 }
 
-type WorkspaceFormProps = PropsFromRedux & {
+type WorkspaceFormProps = Pick<PropsFromRedux, "workspaceId"> & {
   members?: WorkspaceUser[];
 };
 
@@ -192,25 +193,25 @@ const settings: Settings<
   },
 ];
 
-function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
-  // const history = useHistory();
-  // const { pathname } = useLocation();
-  const match = false;
-  // matchPath<{ workspaceId: string }>(pathname, {
-  //   path: "/team/:workspaceId/settings/billing",
-  // });
-  const [defaultTab, setDefaultTab] = useState<string>("Team Members");
+function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) {
+  const router = useRouter();
+  const [tab, setTab] = useState<string>("Team Members");
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
 
   useEffect(() => {
-    if (match) {
-      setDefaultTab("Billing");
-      // history.replace("/");
+    if (view) {
+      const views: Record<string, string> = {
+        billing: "Billing",
+        members: "Team Members",
+        api: "API Keys",
+      };
+      setTab(views[view] || "Team Members");
+      router.replace("/team/" + workspaceId);
     }
-  }, []);
+  }, [view]);
 
-  if (match || !workspaceId) return null;
+  if (!workspaceId) return null;
 
   const roles = members?.find(m => m.userId === localUserId)?.roles;
   const isAdmin = roles?.includes("admin") || false;
@@ -229,7 +230,7 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}
-      defaultSelectedTab={defaultTab}
+      tab={tab}
       panelProps={{ isAdmin, workspaceId, ...rest }}
       settings={settings}
       size="lg"
@@ -238,10 +239,17 @@ function WorkspaceSettingsModal({ workspaceId, ...rest }: PropsFromRedux) {
   );
 }
 
-const connector = connect((state: UIState) => ({ workspaceId: selectors.getWorkspaceId(state) }), {
-  hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
-});
+const connector = connect(
+  (state: UIState) => {
+    const opts = selectors.getModalOptions(state);
+    const view = opts && "view" in opts ? opts.view : null;
+    return { workspaceId: selectors.getWorkspaceId(state), view };
+  },
+  {
+    hideModal: actions.hideModal,
+    setWorkspaceId: actions.setWorkspaceId,
+  }
+);
 export type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(WorkspaceSettingsModal);

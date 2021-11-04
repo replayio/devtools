@@ -60,7 +60,6 @@ export async function bootstrapApp() {
     if (userInfo) {
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext(userInfo);
-      maybeAutoOpenModal(store);
 
       if (!getWorkspaceId(store.getState())) {
         const userSettings = await getUserSettings();
@@ -83,18 +82,4 @@ export async function bootstrapApp() {
   }
 
   return store;
-}
-
-function maybeAutoOpenModal(store: UIStore) {
-  const url = new URL(window.location.href);
-
-  const billingsMatch = window.location.pathname.match(/^\/team\/([^\/]+)\/settings\/billing/);
-  const preferencesMatch = window.location.pathname.match(/^\/settings/);
-
-  if (billingsMatch) {
-    store.dispatch(setWorkspaceId(billingsMatch[1]));
-    store.dispatch(setModal("workspace-settings"));
-  } else if (preferencesMatch) {
-    store.dispatch(setModal("settings"));
-  }
 }
