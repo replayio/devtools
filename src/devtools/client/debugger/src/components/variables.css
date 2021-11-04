@@ -4,7 +4,7 @@
 
 :root {
   /* header height is 28px + 1px for its border */
-  --editor-header-height: 41px;
+  --editor-header-height: 36px;
   /* footer height is 29px + 1px for its border */
   --editor-footer-height: 35px;
   /* searchbar height is 29px + 1px for its top border */
