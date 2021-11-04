@@ -114,7 +114,7 @@ function ViewToggle({
 
   return (
     <AnimateSharedLayout type="crossfade">
-      <button className="view-toggle" type="button">
+      <div className="view-toggle" role="button">
         <div className="inner">
           <Handle
             text="Viewer"
@@ -131,7 +131,7 @@ function ViewToggle({
             motion={motion}
           />
         </div>
-      </button>
+      </div>
     </AnimateSharedLayout>
   );
 }
