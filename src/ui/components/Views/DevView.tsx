@@ -47,7 +47,7 @@ function DevView({
         <Toolbar />
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
-          splitterSize={9}
+          splitterSize={4}
           initialSize={prefs.toolboxHeight as string}
           minSize={showEditor || !sidePanelCollapsed ? "240px" : "0%"}
           maxSize={maxSize(sidePanelCollapsed, showEditor)}

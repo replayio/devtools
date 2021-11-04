@@ -16,7 +16,6 @@
 
 .split-box.horz {
   flex-direction: column;
-  margin-right: 20px;
 }
 
 .split-box > .uncontrolled {
@@ -54,7 +53,6 @@
     var(--devtools-splitter-inline-end-width) + 1px);
 
   border-left-width: var(--devtools-splitter-inline-start-width);
-  border-right-width: 40px;
 
   margin-left: calc(-1 * var(--devtools-splitter-inline-start-width) - 1px);
   margin-right: calc(-1 * var(--devtools-splitter-inline-end-width));

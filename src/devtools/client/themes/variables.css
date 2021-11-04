@@ -16,7 +16,7 @@
   --root-font-size: 16px;
   --devtools-base-font-size: 12px;
   --theme-body-font-size: 12px;
-  --theme-code-font-size: 12px;
+  --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);
 
   /* Toolbar size (excluding borders) */

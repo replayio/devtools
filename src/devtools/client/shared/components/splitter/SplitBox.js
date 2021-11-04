@@ -53,7 +53,7 @@ class SplitBox extends Component {
 
   static get defaultProps() {
     return {
-      splitterSize: 5,
+      splitterSize: 3,
       vert: true,
       endPanelControl: false,
     };
