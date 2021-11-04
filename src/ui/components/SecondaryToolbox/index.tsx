@@ -114,7 +114,7 @@ function SecondaryToolbox({
   return (
     <div className={classnames(`secondary-toolbox rounded-lg pt-2`, { node: isNode })}>
       {!isDemo() && (
-        <header className="secondary-toolbox-header">
+        <header className="secondary-toolbox-header rounded-t-lg">
           <PanelButtons
             selectedPanel={selectedPanel}
             setSelectedPanel={setSelectedPanel}
