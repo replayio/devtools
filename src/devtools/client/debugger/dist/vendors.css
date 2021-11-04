@@ -232,7 +232,7 @@ menuseparator {
   border: 0;
   border-style: solid;
   border-color: transparent;
-  background-color: var(--theme-splitter-color);
+  background-color: var(--chrome);
   background-clip: content-box;
   position: relative;
 
