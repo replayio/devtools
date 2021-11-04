@@ -4,7 +4,6 @@
 
 export const CodeMirror = require("codemirror");
 
-require("codemirror/lib/codemirror.css");
 require("codemirror/mode/javascript/javascript");
 require("codemirror/mode/htmlmixed/htmlmixed");
 require("codemirror/mode/coffeescript/coffeescript");

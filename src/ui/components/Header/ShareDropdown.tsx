@@ -9,7 +9,6 @@ import {
 } from "ui/hooks/recordings";
 import * as actions from "ui/actions/app";
 import Dropdown from "ui/components/shared/Dropdown";
-import "./ShareDropdown.css";
 
 function CopyUrl() {
   const recordingId = useGetRecordingId();

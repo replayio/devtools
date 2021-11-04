@@ -115,14 +115,25 @@ exports.isAgentStylesheet = function (sheet) {
  *
  * @param {CSSStyleSheet} sheet the DOM object for the style sheet.
  */
+const shortSourceCache = new Map();
 exports.shortSource = function (sheet) {
   // Use a string like "inline" if there is no source href
   if (!sheet || !sheet.href) {
     return exports.l10n("rule.sourceInline");
   }
 
+  if (shortSourceCache.has(sheet.href)) {
+    return shortSourceCache.get(sheet.href);
+  }
+
+  const shortened = computeShortSource(sheet.href);
+  shortSourceCache.set(sheet.href, shortened);
+  return shortened;
+};
+
+function computeShortSource(href) {
   // If the sheet is a data URL, return a trimmed version of it.
-  const dataUrl = sheet.href.trim().match(/^data:.*?,((?:.|\r|\n)*)$/);
+  const dataUrl = href.trim().match(/^data:.*?,((?:.|\r|\n)*)$/);
   if (dataUrl) {
     return dataUrl[1].length > MAX_DATA_URL_LENGTH
       ? `${dataUrl[1].substr(0, MAX_DATA_URL_LENGTH - 1)}…`
@@ -132,7 +143,7 @@ exports.shortSource = function (sheet) {
   // We try, in turn, the filename, filePath, query string, whole thing
   let url = {};
   try {
-    url = new URL(sheet.href);
+    url = new URL(href);
   } catch (ex) {
     // Some UA-provided stylesheets are not valid URLs.
   }
@@ -149,8 +160,8 @@ exports.shortSource = function (sheet) {
     return url.query;
   }
 
-  return sheet.href;
-};
+  return href;
+}
 
 const TAB_CHARS = "\t";
 const SPACE_CHARS = " ";

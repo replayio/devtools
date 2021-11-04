@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { useRef, useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
@@ -94,39 +95,40 @@ function LineNumberTooltip({
 
   const points = analysisPoints.length;
   const isHot = points > prefs.maxHitsDisplayed;
-
-  let tooltipContent;
-
-  if (!nags || nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
-    tooltipContent = (
-      <>
-        {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
-        <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
-      </>
-    );
-  } else {
-    tooltipContent = (
-      <div className="flex flex-row space-x-2 items-center">
-        <div className="flex flex-shrink-0">
-          <ReplayLogo size="xs" color="white" />
-        </div>
-        <div className="flex flex-col space-x-0.5">
-          <div className="flex flex-row space-x-1 items-center text-white">
-            {isHot ? <MaterialIcon>warning_amber</MaterialIcon> : null}
-            <span>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</span>
-          </div>
-          <div>
-            <strong>Click to add a print statement</strong>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const showNag = nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
 
   return (
-    <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
-      {tooltipContent}
+    <StaticTooltip
+      targetNode={lineNumberNode}
+      className={classNames({ hot: isHot, "nag-tooltip": showNag })}
+    >
+      {showNag ? (
+        <AwesomeTooltip isHot={isHot} points={points} />
+      ) : (
+        <>
+          {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
+          <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
+        </>
+      )}
     </StaticTooltip>
+  );
+}
+
+function AwesomeTooltip({ points }: { isHot: boolean; points: number }) {
+  return (
+    <div
+      className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight rounded-md text-left"
+      style={{
+        background:
+          "linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF",
+      }}
+    >
+      <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
+      <div className="text-xs flex flex-col">
+        <div>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</div>
+        <div className="font-bold">Click to add a print statement</div>
+      </div>
+    </div>
   );
 }
 

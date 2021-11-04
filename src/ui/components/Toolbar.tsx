@@ -4,7 +4,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
