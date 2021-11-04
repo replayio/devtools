@@ -2,6 +2,7 @@
   z-index: 10;
   position: absolute;
   pointer-events: none;
+  border-radius: 10px;
 }
 
 .canvas-overlay .canvas-comments {

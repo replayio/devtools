@@ -16,15 +16,12 @@
 #graphicsVideo {
   position: absolute;
   transform-origin: top left;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
 }
 
 #graphicsVideo {
   max-width: unset;
-}
-
-#graphics {
-  border: 5px solid #d7d7d7;
-  border-radius: 20px;
 }
 
 .collapsed-toolbox #graphics {
