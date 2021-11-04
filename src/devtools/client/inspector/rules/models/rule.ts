@@ -15,27 +15,6 @@ import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";
 const Services = require("Services");
 
-/*
-loader.lazyRequireGetter(
-  this,
-  "updateSourceLink",
-  "devtools/client/inspector/rules/actions/rules",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "promiseWarn",
-  "devtools/client/inspector/shared/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "parseNamedDeclarations",
-  "devtools/shared/css/parsing-utils",
-  true
-);
-*/
-
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);

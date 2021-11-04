@@ -16,11 +16,6 @@ import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
 
 class Tabs extends PureComponent {
-  onTabContextMenu;
-  showContextMenu;
-  renderTabs;
-  renderDropDown;
-  renderStartPanelToggleButton;
   _draggedSource;
   _draggedSourceIndex;
 

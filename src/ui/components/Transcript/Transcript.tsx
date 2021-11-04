@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
-
 import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";

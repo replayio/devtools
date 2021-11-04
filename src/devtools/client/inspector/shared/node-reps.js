@@ -4,25 +4,6 @@
 
 "use strict";
 
-loader.lazyGetter(this, "MODE", function () {
-  return require("devtools/client/debugger/packages/devtools-reps/src/reps/constants").MODE;
-});
-
-loader.lazyGetter(this, "ElementNode", function () {
-  return require("devtools/client/debugger/packages/devtools-reps/src/reps/element-node");
-});
-
-loader.lazyGetter(this, "TextNode", function () {
-  return require("devtools/client/debugger/packages/devtools-reps/src/reps/text-node");
-});
-
-loader.lazyRequireGetter(
-  this,
-  "translateNodeFrontToGrip",
-  "devtools/client/inspector/shared/utils",
-  true
-);
-
 /**
  * Creates either an ElementNode or a TextNode rep given a nodeFront. By default the
  * rep is created in TINY mode.

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "ui/components/shared/Modal";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsBody from "./SettingsBody";
@@ -12,7 +12,7 @@ export default function SettingsModal<
   V extends Record<string, unknown>,
   P extends Record<string, unknown>
 >({
-  defaultSelectedTab,
+  tab,
   hiddenTabs,
   loading,
   onChange,
@@ -22,7 +22,7 @@ export default function SettingsModal<
   size = "sm",
   title,
 }: {
-  defaultSelectedTab?: T;
+  tab?: T;
   hiddenTabs?: T[];
   loading?: boolean;
   onChange?: (key: keyof V, value: any) => void;
@@ -32,8 +32,14 @@ export default function SettingsModal<
   size?: "sm" | "lg";
   title?: string;
 }) {
-  const [selectedTab, setSelectedTab] = useState<T | undefined>(defaultSelectedTab);
+  const [selectedTab, setSelectedTab] = useState<T | undefined>(tab);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
+
+  useEffect(() => {
+    if (tab) {
+      setSelectedTab(tab);
+    }
+  }, [tab]);
 
   if (loading) {
     return (

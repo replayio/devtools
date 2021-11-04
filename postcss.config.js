@@ -16,15 +16,16 @@ function mapUrlDevelopment(url) {
   return newUrl;
 }
 
-module.exports = ({ file, options, env }) => {
-  return {
-    plugins: [
-      require("tailwindcss"),
-      require("autoprefixer")({
+module.exports = {
+  plugins: [
+    "tailwindcss",
+    [
+      "autoprefixer",
+      {
         flexbox: false,
         grid: false,
-      }),
-      mapUrl(mapUrlDevelopment),
+      },
     ],
-  };
+    // mapUrl(mapUrlDevelopment),
+  ],
 };

@@ -1,5 +1,6 @@
-#header {
+.header {
   background-color: var(--chrome);
+  border-bottom: 1px solid var(--theme-splitter-color);
   height: 50px;
   display: flex;
   align-items: center;
@@ -23,14 +24,7 @@
   width: 64px;
 }
 
-#header .header-left {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
-}
-
-#header .title-container {
+.header .title-container {
   color: var(--theme-toolbar-color);
   display: flex;
   flex-direction: row;
@@ -44,39 +38,23 @@
   font-size: 1.1rem;
 }
 
-#header .links {
+.header .links {
   display: flex;
   align-items: center;
 }
 
-#header .avatar:not(.authenticated) {
-  height: 24px;
-  width: 24px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--chrome);
-}
-
-#header .avatar:not(.authenticated):not(:last-child) {
-  margin-left: -10px;
-}
-
-#header .links .avatars {
+.header .links .avatars {
   height: 100%;
   align-items: center;
   display: flex;
   flex-direction: row-reverse;
 }
 
-.avatar {
-  display: flex;
-  align-items: center;
-}
-
-#header .links > * {
+.header .links > * {
   margin-left: 8px;
 }
 
-#header .title {
+.header .title {
   max-width: 640px;
   font-size: 20px;
   overflow: hidden;
@@ -89,18 +67,18 @@
   font-weight: 600;
 }
 
-#header .input {
+.header .input {
   min-width: 200px;
 }
 
-#header input.title:focus {
+.header input.title:focus {
   border: none;
   outline: none;
   background: none;
   width: 400px;
 }
 
-#header .sharebutton {
+.header .sharebutton {
   height: 28px;
 }
 

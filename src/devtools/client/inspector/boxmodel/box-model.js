@@ -6,18 +6,6 @@
 
 const { updateLayout } = require("devtools/client/inspector/boxmodel/actions/box-model");
 
-loader.lazyRequireGetter(
-  this,
-  "EditingSession",
-  "devtools/client/inspector/boxmodel/utils/editing-session"
-);
-loader.lazyRequireGetter(this, "InplaceEditor", "devtools/client/shared/inplace-editor", true);
-loader.lazyRequireGetter(
-  this,
-  "RulePreviewTooltip",
-  "devtools/client/shared/widgets/tooltip/RulePreviewTooltip"
-);
-
 const Highlighter = require("highlighter/highlighter").default;
 
 const NUMERIC = /^-?[\d\.]+$/;
@@ -135,7 +123,7 @@ BoxModel.prototype = {
       this._updateReasons.push(reason);
     }
 
-    const lastRequest = async function () {
+    const lastRequest = (async () => {
       if (
         !this.inspector ||
         // !this.isPanelVisible() ||
@@ -209,14 +197,12 @@ BoxModel.prototype = {
       this._updateReasons = [];
 
       return null;
-    }
-      .bind(this)()
-      .catch(error => {
-        // If we failed because we were being destroyed while waiting for a request, ignore.
-        if (this.document) {
-          console.error(error);
-        }
-      });
+    })().catch(error => {
+      // If we failed because we were being destroyed while waiting for a request, ignore.
+      if (this.document) {
+        console.error(error);
+      }
+    });
 
     this._lastRequest = lastRequest;
   },

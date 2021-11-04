@@ -14,19 +14,6 @@ const {
 const { TEXT_NODE } = require("devtools/shared/dom-node-constants");
 const { setIgnoreLayoutChanges } = require("devtools/shared/layout/utils");
 
-loader.lazyRequireGetter(
-  this,
-  "getBounds",
-  "devtools/server/actors/highlighters/utils/accessibility",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "Infobar",
-  "devtools/server/actors/highlighters/utils/accessibility",
-  true
-);
-
 /**
  * The AccessibleHighlighter draws the bounds of an accessible object.
  *

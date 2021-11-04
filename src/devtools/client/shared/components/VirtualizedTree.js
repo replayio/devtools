@@ -10,9 +10,6 @@ const dom = require("react-dom-factories");
 const { scrollIntoView } = require("devtools/client/shared/scroll");
 const { preventDefaultAndStopPropagation } = require("devtools/client/shared/events");
 
-loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
-loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
-
 const AUTO_EXPAND_DEPTH = 0;
 const NUMBER_OF_OFFSCREEN_ITEMS = 1;
 

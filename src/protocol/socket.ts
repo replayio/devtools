@@ -14,6 +14,7 @@ import { UIStore } from "ui/actions";
 import { Action, Dispatch } from "redux";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import { UnexpectedError } from "ui/state/app";
+import { requiresWindow } from "ssr";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 
 interface Message {
@@ -45,8 +46,10 @@ let gReceivedBytes = 0;
 let lastReceivedMessageTime = Date.now();
 
 let willClose = false;
-window.addEventListener("beforeunload", () => {
-  willClose = true;
+requiresWindow(win => {
+  win.addEventListener("beforeunload", () => {
+    willClose = true;
+  });
 });
 
 export function initSocket(store: UIStore, address: string) {

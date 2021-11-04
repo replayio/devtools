@@ -12,6 +12,7 @@ import { selectors } from "ui/reducers";
 const { prefs } = require("ui/utils/prefs");
 const { trackEvent } = require("ui/utils/telemetry");
 
+import "reactjs-popup/dist/index.css";
 import Log from "./Log";
 import Condition from "./Condition";
 import useAuth0 from "ui/utils/useAuth0";
