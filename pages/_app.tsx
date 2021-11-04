@@ -30,7 +30,6 @@ import "devtools/client/debugger/packages/devtools-splitter/src/SplitBox.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
 import "devtools/client/debugger/src/components/App.css";
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css";
-import "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/FirstEditNag.css";
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/Panel.css";
 import "devtools/client/debugger/src/components/Editor/Editor.css";
 import "devtools/client/debugger/src/components/Editor/Footer.css";
