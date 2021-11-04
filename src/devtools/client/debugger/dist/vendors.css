@@ -141,22 +141,22 @@ menuitem:hover {
   cursor: pointer;
 }
 
-menuitem[disabled=true] {
+menuitem[disabled="true"] {
   color: #cccccc;
 }
 
-menuitem[disabled=true]:hover {
+menuitem[disabled="true"]:hover {
   background-color: transparent;
   cursor: default;
 }
 
-menuitem[type=checkbox]::before {
+menuitem[type="checkbox"]::before {
   content: "";
   width: 10px;
   display: inline-block;
 }
 
-menuitem[type=checkbox][checked=true]::before {
+menuitem[type="checkbox"][checked="true"]::before {
   content: "\2713";
   left: -8px;
   position: relative;
@@ -185,7 +185,7 @@ menuseparator {
   padding: 0 3px;
 }
 
-.container[aria-selected=true] {
+.container[aria-selected="true"] {
   background-color: white;
 }
 .container {
@@ -224,6 +224,7 @@ menuseparator {
 .split-box > .controlled {
   display: flex;
   overflow: auto;
+  overflow-y: hidden;
 }
 
 .split-box > .splitter {

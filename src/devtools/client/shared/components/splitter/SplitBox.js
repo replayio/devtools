@@ -53,7 +53,7 @@ class SplitBox extends Component {
 
   static get defaultProps() {
     return {
-      splitterSize: 5,
+      splitterSize: 3,
       vert: true,
       endPanelControl: false,
     };
@@ -320,7 +320,7 @@ class SplitBox extends Component {
       endPanel
         ? dom.div(
             {
-              className: endPanelControl ? "controlled" : "uncontrolled",
+              className: endPanelControl ? "controlled" : "uncontrolled mr-2 overflow-hidden",
               style: rightPanelStyle,
               role: "presentation",
               ref: div => {

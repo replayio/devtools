@@ -20,7 +20,7 @@ body.scrubbing {
 
 .frame-timeline-container {
   border-bottom: 1px solid var(--theme-splitter-color);
-  background-color: var(--accordion-header-background);
+  background-color: #fff;
   padding: 12px 10px;
 }
 

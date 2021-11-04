@@ -92,3 +92,10 @@ deletes the comment */
 .onboarding-text .arrow {
   margin: 0 auto;
 }
+
+/* this should be inherited from a central place,
+but right now it's an orphan */
+header-label {
+  color: red;
+  font-size: 15px;
+}

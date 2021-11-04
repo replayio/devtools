@@ -15,7 +15,7 @@
   /* Text sizes */
   --root-font-size: 16px;
   --devtools-base-font-size: 12px;
-  --theme-body-font-size: 11px;
+  --theme-body-font-size: 12px;
   --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);
 
@@ -46,7 +46,7 @@
    */
 
   --primary-accent-text: #007aff;
-  --primary-accent: #01acfd;
+  --primary-accent: #01a3f0;
   --primary-accent-hover: #0194ff;
   --primary-accent-light: #85bfff;
 
@@ -58,8 +58,9 @@
   --secondary-accent-stroke: #f02d5e;
 
   --that-dark-color: #1f2937;
-
   --text-field-border: var(--cool-gray-300);
+
+  --chrome: #f6f7f7;
 
   --new-blue-50: #eff7ff;
   --new-blue-100: #dbedff;
@@ -176,7 +177,7 @@
   --theme-accordion-header-hover: var(--theme-toolbar-hover);
 
   /* Selection */
-  --theme-selection-background: var(--blue-55);
+  --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #f0f9fe;
   --theme-selection-focus-background: var(--toolbarbutton-hover-background);
   --theme-selection-focus-color: var(--grey-70);

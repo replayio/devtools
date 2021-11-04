@@ -4,9 +4,9 @@
 
 /* CSS Variables specific to this panel that aren't defined by the themes */
 .theme-dark {
-  --cell-border-color: rgba(255,255,255,0.15);
-  --cell-border-color-light: rgba(255,255,255,0.1);
-  --focus-cell-border-color: rgba(255,255,255,0.5);
+  --cell-border-color: rgba(255, 255, 255, 0.15);
+  --cell-border-color-light: rgba(255, 255, 255, 0.1);
+  --focus-cell-border-color: rgba(255, 255, 255, 0.5);
   --row-alt-background-color: rgba(86, 117, 185, 0.15);
   --row-hover-background-color: rgba(86, 117, 185, 0.25);
   --link-color: var(--blue-40);
@@ -14,16 +14,19 @@
 }
 
 .theme-light {
-  --cell-border-color: rgba(0,0,0,0.15);
-  --cell-border-color-light: rgba(0,0,0,0.1);
-  --focus-cell-border-color: rgba(0,0,0,0.3);
-  --row-alt-background-color: rgba(76,158,217,0.1);
-  --row-hover-background-color: rgba(76,158,217,0.2);
+  --cell-border-color: rgba(0, 0, 0, 0.15);
+  --cell-border-color-light: rgba(0, 0, 0, 0.1);
+  --focus-cell-border-color: rgba(0, 0, 0, 0.3);
+  --row-alt-background-color: rgba(76, 158, 217, 0.1);
+  --row-hover-background-color: rgba(76, 158, 217, 0.2);
   --link-color: var(--blue-60);
   --link-color-active: var(--blue-70);
 }
 
-html, body, #app, #memory-tool {
+html,
+body,
+#app,
+#memory-tool {
   height: 100%;
 }
 
@@ -178,7 +181,7 @@ html, body, #app, #memory-tool {
   display: flex;
   flex-direction: column;
   color: var(--theme-body-color);
-  border-bottom: 1px solid rgba(128,128,128,0.15);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.15);
   padding: 8px;
   cursor: default;
 }
@@ -235,7 +238,7 @@ html, body, #app, #memory-tool {
   margin-bottom: 14px;
 }
 
-.snapshot-list-item > .snapshot-title > input[type=checkbox] {
+.snapshot-list-item > .snapshot-title > input[type="checkbox"] {
   margin: 0;
   margin-inline-end: 5px;
 }
@@ -594,9 +597,9 @@ html, body, #app, #memory-tool {
 .separator,
 .not-available,
 .heap-tree-item-address {
-  opacity: .5;
-  margin-left: .5em;
-  margin-right: .5em;
+  opacity: 0.5;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 }
 
 .heap-tree-item-address {
