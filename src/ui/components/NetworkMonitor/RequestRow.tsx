@@ -1,5 +1,10 @@
 import { TimeStampedPoint } from "@recordreplay/protocol";
 import Status from "./Status";
+import classNames from "classnames/bind";
+import css from "./RequestRow.module.css";
+import { cs } from "date-fns/locale";
+import { repeat } from "lodash";
+const cx = classNames.bind(css);
 
 interface Header {
   name: string;
@@ -41,23 +46,22 @@ type RequestRowProps = {
   info: RequestInfo;
 };
 
-const RequestRow = ({ events, info }: RequestRowProps) => {
+const RequestRow = ({ events }: RequestRowProps) => {
   const openEventInfo = events.find(e => e.event.kind === "request");
-  const open: RequestOpenEvent | undefined = openEventInfo
-    ? (openEventInfo.event as RequestOpenEvent)
-    : undefined;
   const responseEventInfo = events.find(e => e.event.kind === "response");
-  const response: RequestResponseEvent | undefined = responseEventInfo
-    ? (responseEventInfo.event as RequestResponseEvent)
-    : undefined;
-
-  if (!(open && response)) {
+  if (!(openEventInfo && responseEventInfo)) {
     return null;
   }
+  // I thought tsc would figure these types out, apparently not!
+  const open: RequestOpenEvent = openEventInfo.event as RequestOpenEvent;
+  const response: RequestResponseEvent = responseEventInfo.event as RequestResponseEvent;
 
   return (
-    <div>
-      <Status status={response.responseStatus} />
+    <div className={cx("request-row border flex items-center")}>
+      <div className={cx("column border-r")}>
+        <Status status={response.responseStatus} />
+      </div>
+      <div className={cx("column ")}>{open.requestUrl}</div>
     </div>
   );
 };
