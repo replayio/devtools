@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { connect, ConnectedProps, useStore } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
@@ -22,7 +22,6 @@ function setupLegacyComponents(inspector: Inspector) {
 
 function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
   const isMarkupEmpty = (props.markupRootNode?.children?.length || 0) == 0;
-  const store = useStore();
 
   useEffect(() => setupLegacyComponents(props.inspector), []);
 

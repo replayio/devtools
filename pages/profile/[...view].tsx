@@ -13,7 +13,7 @@ function ProfilePage({ setModal }: PropsFromRedux) {
 
   useEffect(() => {
     if (isAuthenticated && modal === "settings") {
-      setModal("settings");
+      setModal("settings", { view: "preferences" });
       replace("/");
     }
   }, [modal]);
