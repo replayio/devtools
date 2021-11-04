@@ -46,7 +46,7 @@ export function EditorNag() {
 
   // Don't show the editor nag until the user has gotten past the
   // console navigate nag.
-  if (!nags?.includes(Nag.FIRST_CONSOLE_NAVIGATE)) {
+  if (!nags.includes(Nag.FIRST_CONSOLE_NAVIGATE)) {
     return null;
   }
 

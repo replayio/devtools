@@ -96,7 +96,7 @@ function LineNumberTooltip({
 
   const points = analysisPoints.length;
   const isHot = points > prefs.maxHitsDisplayed;
-  const showNag = !nags?.includes(Nag.FIRST_BREAKPOINT_ADD);
+  const showNag = nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
 
   return (
     <StaticTooltip
