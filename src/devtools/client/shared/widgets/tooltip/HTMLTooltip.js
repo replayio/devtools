@@ -422,6 +422,25 @@ HTMLTooltip.prototype = {
     this.preferredHeight = height;
   },
 
+  /**
+   * Show the tooltip next to the provided anchor element, or update the tooltip position
+   * if it was already visible. A preferred position can be set.
+   * The event "shown" will be fired after the tooltip is displayed.
+   *
+   * @param {Element} anchor
+   *        The reference element with which the tooltip should be aligned
+   * @param {Object} options
+   *        Optional settings for positioning the tooltip.
+   * @param {String} options.position
+   *        Optional, possible values: top|bottom
+   *        If layout permits, the tooltip will be displayed on top/bottom
+   *        of the anchor. If omitted, the tooltip will be displayed where
+   *        more space is available.
+   * @param {Number} options.x
+   *        Optional, horizontal offset between the anchor and the tooltip.
+   * @param {Number} options.y
+   *        Optional, vertical offset between the anchor and the tooltip.
+   */
   async show(anchor, options) {
     const { left, top } = this._updateContainerBounds(anchor, options);
     const isTooltipVisible = this.isVisible();
@@ -698,6 +717,10 @@ HTMLTooltip.prototype = {
     return { width, height };
   },
 
+  /**
+   * Hide the current tooltip. The event "hidden" will be fired when the tooltip
+   * is hidden.
+   */
   async hide({ fromMouseup = false } = {}) {
     // Exit if the disable autohide setting is in effect or if hide() is called
     // from a mouseup event and the tooltip has noAutoHide set to true.

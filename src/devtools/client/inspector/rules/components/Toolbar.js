@@ -11,6 +11,13 @@ const { connect } = require("react-redux");
 
 const SearchBox = createFactory(require("devtools/client/inspector/rules/components/SearchBox"));
 
+loader.lazyGetter(this, "ClassListPanel", function () {
+  return createFactory(require("devtools/client/inspector/rules/components/ClassListPanel"));
+});
+loader.lazyGetter(this, "PseudoClassPanel", function () {
+  return createFactory(require("devtools/client/inspector/rules/components/PseudoClassPanel"));
+});
+
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 
 class Toolbar extends PureComponent {

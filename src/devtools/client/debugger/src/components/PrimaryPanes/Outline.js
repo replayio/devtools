@@ -26,6 +26,7 @@ import {
 } from "../../selectors";
 
 import OutlineFilter from "./OutlineFilter";
+
 import PreviewFunction from "../shared/PreviewFunction";
 import uniq from "lodash/uniq";
 import sortBy from "lodash/sortBy";

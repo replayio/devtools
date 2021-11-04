@@ -12,8 +12,7 @@ import MaterialIcon from "../MaterialIcon";
 import PrivacyDropdown from "./PrivacyDropdown";
 
 function SharingModalWrapper(props: PropsFromRedux) {
-  const opts = props.modalOptions;
-  const recordingId = opts && "recordingId" in opts ? opts.recordingId : "";
+  const { recordingId } = props.modalOptions!;
   const { recording, loading } = hooks.useGetRecording(recordingId);
 
   if (loading || !recording) {

@@ -7,6 +7,4 @@ cypress/videos/
 test/example-recordings.json
 .idea/
 cypress.env.json
-.env*
-.next
-next-env.d.ts
+.env

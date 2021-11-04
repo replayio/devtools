@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
   OnboardingActions,
@@ -28,19 +28,16 @@ export default function ImportSettings() {
           <OnboardingBody>{`If you'd like, I can carry your settings over from your main browser so you can get started quickly.`}</OnboardingBody>
         </OnboardingContent>
         <OnboardingActions>
-          <Link href="/">
-            <a
-              type="button"
-              className={getButtonClasses("blue", "primary", "2xl")}
-              onClick={launchMigrationWizard}
-            >
-              {`Sounds helpful, let's do it`}
-            </a>
+          <Link
+            type="button"
+            to="/"
+            className={getButtonClasses("blue", "primary", "2xl")}
+            onClick={launchMigrationWizard}
+          >
+            {`Sounds helpful, let's do it`}
           </Link>
-          <Link href="/">
-            <a type="button" className={getButtonClasses("gray", "primary", "2xl")}>
-              Skip
-            </a>
+          <Link type="button" to="/" className={getButtonClasses("gray", "primary", "2xl")}>
+            Skip
           </Link>
         </OnboardingActions>
         <iframe id="migrationFrame" className="h-0 w-0" />

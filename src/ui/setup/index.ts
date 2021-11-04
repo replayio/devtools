@@ -1,3 +1,4 @@
+import { matchPath } from "react-router-dom";
 import { bootstrapStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
@@ -23,18 +24,15 @@ declare global {
 }
 
 export async function bootstrapApp() {
+  setupTelemetry();
+
+  setupDOMHelpers();
+
   const initialState = {
     app: await getInitialAppState(),
   };
 
   const store = bootstrapStore(initialState);
-
-  if (typeof window === "undefined") return store;
-
-  setupTelemetry();
-
-  setupDOMHelpers();
-
   window.store = store;
 
   registerStoreObserver(store, updatePrefs);
@@ -60,6 +58,7 @@ export async function bootstrapApp() {
     if (userInfo) {
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext(userInfo);
+      maybeAutoOpenModal(store);
 
       if (!getWorkspaceId(store.getState())) {
         const userSettings = await getUserSettings();
@@ -73,13 +72,29 @@ export async function bootstrapApp() {
   if (!isTest()) {
     var font1 = new FontFaceObserver("Material Icons");
     var font2 = new FontFaceObserver("Material Icons Outlined");
-    Promise.all([font1.load(), font2.load()])
-      .then(() => store.dispatch(setFontLoading(false)))
-      .catch(() => console.log("Failed to load font"));
+    Promise.all([font1.load(), font2.load()]).then(() => store.dispatch(setFontLoading(false)));
   } else {
     // FontFaceObserver doesn't work in e2e tests.
     store.dispatch(setFontLoading(false));
   }
 
   return store;
+}
+
+function maybeAutoOpenModal(store: UIStore) {
+  const url = new URL(window.location.href);
+
+  const billingsMatch = matchPath<{ workspaceId: string }>(url.pathname, {
+    path: "/team/:workspaceId/settings/billing",
+  });
+  const preferencesMatch = matchPath(url.pathname, {
+    path: "/settings",
+  });
+
+  if (billingsMatch?.params.workspaceId) {
+    store.dispatch(setWorkspaceId(billingsMatch.params.workspaceId));
+    store.dispatch(setModal("workspace-settings"));
+  } else if (preferencesMatch) {
+    store.dispatch(setModal("settings"));
+  }
 }

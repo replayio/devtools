@@ -11,6 +11,10 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 const { openDocLink } = require("devtools/client/shared/link");
 
+loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
+loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
+loader.lazyRequireGetter(this, "PICKER_TYPES", "devtools/shared/picker-constants");
+
 const TELEMETRY_PICKER_EYEDROPPER_OPEN_COUNT = "DEVTOOLS_PICKER_EYEDROPPER_OPENED_COUNT";
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const A11Y_CONTRAST_LEARN_MORE_LINK =

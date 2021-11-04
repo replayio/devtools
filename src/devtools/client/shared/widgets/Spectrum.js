@@ -9,6 +9,13 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const { colorUtils } = require("devtools/shared/css/color");
 const { labColors } = require("devtools/shared/css/color-db");
+loader.lazyRequireGetter(this, "getTextProperties", "devtools/shared/accessibility", true);
+loader.lazyRequireGetter(
+  this,
+  "getContrastRatioAgainstBackground",
+  "devtools/shared/accessibility",
+  true
+);
 
 const L10N = new LocalizationHelper(
   "devtools/shared/locales/accessibility.properties",

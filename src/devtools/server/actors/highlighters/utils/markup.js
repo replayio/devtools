@@ -18,7 +18,6 @@ const lazyContainer = {
   },
 };
 
-const exports = module.exports;
 exports.getComputedStyle = node => lazyContainer.CssLogic.getComputedStyle(node);
 
 exports.getBindingElementAndPseudo = node =>

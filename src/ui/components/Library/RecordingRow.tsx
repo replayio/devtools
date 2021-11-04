@@ -1,5 +1,6 @@
 import React from "react";
 import { Recording } from "ui/types";
+import { useHistory } from "react-router-dom";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import LazyLoad from "react-lazyload";
@@ -9,7 +10,6 @@ import { RecordingId } from "@recordreplay/protocol";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { useRouter } from "next/dist/client/router";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -53,7 +53,7 @@ function RecordingRow({
   removeSelectedId,
   loadReplayPrefs,
 }: RecordingRowProps) {
-  const router = useRouter();
+  const history = useHistory();
   const { userId, loading } = hooks.useGetUserId();
 
   if (loading) {
@@ -75,7 +75,7 @@ function RecordingRow({
     }
 
     loadReplayPrefs(recording.id);
-    router.push(url);
+    history.push(url);
   };
   const toggleChecked = () => {
     if (selected) {

@@ -19,7 +19,40 @@ const {
   VIEW_NODE_VARIABLE_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
 
+loader.lazyRequireGetter(this, "getColor", "devtools/client/shared/theme", true);
+
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+
+loader.lazyRequireGetter(
+  this,
+  "getImageDimensions",
+  "devtools/client/shared/widgets/tooltip/ImageTooltipHelper",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "setImageTooltip",
+  "devtools/client/shared/widgets/tooltip/ImageTooltipHelper",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "setBrokenImageTooltip",
+  "devtools/client/shared/widgets/tooltip/ImageTooltipHelper",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "setVariableTooltip",
+  "devtools/client/shared/widgets/tooltip/VariableTooltipHelper",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "InactiveCssTooltipHelper",
+  "devtools/client/shared/widgets/tooltip/inactive-css-tooltip-helper",
+  false
+);
 
 const PREF_IMAGE_TOOLTIP_SIZE = "devtools.inspector.imagePreviewTooltipSize";
 

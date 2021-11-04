@@ -9,6 +9,8 @@ const flags = require("devtools/shared/flags");
 const { ELLIPSIS } = require("devtools/shared/l10n");
 const EventEmitter = require("devtools/shared/event-emitter");
 
+// loader.lazyRequireGetter(this, "KeyShortcuts", "devtools/client/shared/key-shortcuts");
+
 const MAX_LABEL_LENGTH = 40;
 
 const NS_XHTML = "http://www.w3.org/1999/xhtml";
