@@ -578,6 +578,11 @@ class RulesView {
    * to be refresh (e.g. when print media simulation is toggled).
    */
   async updateElementStyle() {
+    // Updating the style panels can take more than 100ms and blocks the browser from
+    // rendering the updated markup panel, so we add a tiny delay here to give the browser
+    // an opportunity to render.
+    await new Promise(resolve => setTimeout(resolve, 0));
+
     await this.elementStyle.populate();
 
     // const isAddRuleEnabled = this.selection.isElementNode() && !this.selection.isAnonymousNode();

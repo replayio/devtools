@@ -399,12 +399,13 @@ export default class ElementStyle {
       // overridden state has changed for the text property.
       // _hasUpdatedCSSVariable will return true if the declaration contains any
       // of the updated CSS variable names.
-      if (
-        this._updatePropertyOverridden(textProp) ||
-        this._hasUpdatedCSSVariable(textProp, changedVariableNamesSet)
-      ) {
-        textProp.updateEditor();
-      }
+      // if (
+      //   this._updatePropertyOverridden(textProp) ||
+      //   this._hasUpdatedCSSVariable(textProp, changedVariableNamesSet)
+      // ) {
+      //   textProp.updateEditor();
+      // }
+      this._updatePropertyOverridden(textProp);
 
       // For each editor show or hide the inactive CSS icon as needed.
       // if (textProp.editor && this.unusedCssEnabled) {
