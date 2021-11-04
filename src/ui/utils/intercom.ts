@@ -9,13 +9,13 @@ const APP_ID = "k7f741xx";
 
 export function handleIntercomLogout(logout: (options?: LogoutOptions) => void) {
   requiresWindow(() => {
-    // window.Intercom("shutdown");
+    window.Intercom("shutdown");
     logout({ returnTo: window.location.origin });
   });
 }
 
 export function bootIntercom(data: any) {
   requiresWindow(() => {
-    // window.Intercom("boot", { app_id: APP_ID, ...data });
+    window.Intercom("boot", { app_id: APP_ID, ...data });
   });
 }
