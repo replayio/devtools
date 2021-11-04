@@ -32,7 +32,7 @@ export function getExpressionFromCoords(cm, coord) {
   while (startHighlight > 1 && line.charAt(startHighlight - 1) === ".") {
     const tokenBefore = tokenAtTextPosition(cm, {
       line: coord.line,
-      column: startHighlight - 2,
+      column: startHighlight - 1,
     });
 
     if (!tokenBefore || !tokenBefore.type) {

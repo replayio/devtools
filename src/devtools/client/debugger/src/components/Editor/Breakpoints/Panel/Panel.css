@@ -53,15 +53,18 @@
   justify-content: space-between;
 }
 
+.breakpoint-panel .statements-container {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .breakpoint-panel .statement {
   align-items: center;
   display: flex;
   height: 28px;
   line-height: 16px;
-  overflow: hidden;
   padding: 4px;
   padding-left: 8px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

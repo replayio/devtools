@@ -321,29 +321,6 @@ const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>
   state.app.events[type] || NO_EVENTS;
 
-// This will return an object with each category (mouse/keyboard/navigation)
-// as the key and a boolean value indicating whether it's still loading
-export const getEventCategoriesLoading = (state: UIState) => {
-  const eventCategories: EventCategory[] = ["mouse", "keyboard", "navigation"];
-  const events = Object.keys(state.app.events);
-  const eventCategoriesLoading = eventCategories.reduce(
-    (a: { [category: string]: boolean }, cat) => {
-      a[cat] = false;
-      return a;
-    },
-    {}
-  );
-
-  const maybeToggleLoading = (event: EventCategory) => {
-    if (!events.find(e => e.toLowerCase().includes(event))) {
-      eventCategoriesLoading[event] = true;
-    }
-  };
-
-  eventCategories.forEach(c => maybeToggleLoading(c));
-
-  return eventCategoriesLoading;
-};
 export const getFlatEvents = (state: UIState) => {
   let events: ReplayEvent[] = [];
 

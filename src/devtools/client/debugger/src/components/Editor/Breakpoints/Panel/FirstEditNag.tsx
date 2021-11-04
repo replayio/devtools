@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import "./FirstEditNag.css";
 
 const TEXT = {
   clickPrompt: "Edit your first print statement",
@@ -36,9 +36,15 @@ function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
   }
 
   return (
-    <div className="first-edit-nag p-2 py-1 text-white font-sans text-xs flex flex-row items-center space-x-1">
-      <img src="/images/sparkle.svg" className="w-3" />
-      <span>{TEXT[step]}</span>
+    <div
+      className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight rounded-t-md font-sans"
+      style={{
+        background:
+          "linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF",
+      }}
+    >
+      <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
+      <div className="text-xs font-bold">{TEXT[step]}</div>
     </div>
   );
 }

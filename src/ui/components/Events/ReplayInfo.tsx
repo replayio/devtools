@@ -9,6 +9,9 @@ import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
+import Spinner from "../shared/Spinner";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
   const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
@@ -24,7 +27,7 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
   return <div className={classes}>{children}</div>;
 };
 
-function ReplayInfo({ setModal }: PropsFromRedux) {
+function ReplayInfo({ setModal, progressPercentage }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
 
   if (!recording) return null;
@@ -53,6 +56,12 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
+        {progressPercentage || true ? (
+          <Row>
+            <Spinner className="animate-spin h-5 w-5 text-black" />
+            <div>Loading Events…</div>
+          </Row>
+        ) : null}
       </div>
     </div>
   );
@@ -75,6 +84,13 @@ function OperationsRow({
   );
 }
 
-const connector = connect(() => ({}), { setModal: actions.setModal });
+const connector = connect(
+  (state: UIState) => ({
+    progressPercentage: selectors.getIndexing(state),
+  }),
+  {
+    setModal: actions.setModal,
+  }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ReplayInfo);

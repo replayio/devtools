@@ -3,7 +3,7 @@ import { Recording } from "ui/types";
 import { RecordingId } from "@recordreplay/protocol";
 import BatchActionDropdown from "./BatchActionDropdown";
 import { isReplayBrowser } from "ui/utils/environment";
-import { PrimaryButton } from "../shared/Button";
+import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
@@ -133,9 +133,11 @@ function ViewerContent({
               </PrimaryButton>
             </>
           ) : (
-            <PrimaryButton color="blue" onClick={() => setIsEditing(true)}>
-              Edit
-            </PrimaryButton>
+            <div className="bg-white rounded-md">
+              <SecondaryButton color="blue" onClick={() => setIsEditing(true)}>
+                Edit
+              </SecondaryButton>
+            </div>
           )}
         </div>
       </ViewerHeader>
