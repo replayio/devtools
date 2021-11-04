@@ -28,20 +28,20 @@ interface RequestResponseEvent {
   responseFromCache: boolean;
 }
 
-type RequestEvent = RequestResponseEvent | RequestOpenEvent;
+export type RequestEvent = RequestResponseEvent | RequestOpenEvent;
 
-interface RequestEventInfo {
+export interface RequestEventInfo {
   id: string;
   time: number;
   event: RequestEvent;
 }
 
-interface RequestInfo {
+export interface RequestInfo {
   id: string;
   point: TimeStampedPoint;
 }
 
-type RequestRowProps = {
+export type RequestRowProps = {
   events: RequestEventInfo[];
   info: RequestInfo;
 };
