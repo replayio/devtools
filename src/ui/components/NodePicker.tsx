@@ -5,7 +5,6 @@ import { actions } from "ui/actions";
 import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";
 import { ThreadFront } from "protocol/thread";
-import { getDevicePixelRatio } from "protocol/graphics";
 import Highlighter from "highlighter/highlighter";
 
 export const nodePicker: any = {};
@@ -87,14 +86,10 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     }
 
     const scale = bounds.width / canvas.offsetWidth;
-    const pixelRatio = getDevicePixelRatio();
-    if (!pixelRatio) {
-      return null;
-    }
 
     return {
-      x: (e.clientX - bounds.left) / scale / pixelRatio,
-      y: (e.clientY - bounds.top) / scale / pixelRatio,
+      x: (e.clientX - bounds.left) / scale,
+      y: (e.clientY - bounds.top) / scale,
     };
   }
 
