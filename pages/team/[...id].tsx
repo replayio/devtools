@@ -11,29 +11,26 @@ function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
   const { query, replace } = useRouter();
 
-  const [, workspaceId, modal, view] = Array.isArray(query.team) ? query.team : [];
+  const [workspaceId, modal, view] = Array.isArray(query.id) ? query.id : [query.id];
 
   useEffect(() => {
-    if (workspaceId) {
+    if (workspaceId && isAuthenticated) {
+      setWorkspaceId(workspaceId);
       updateDefaultWorkspace({
         variables: {
           workspaceId,
         },
       });
+
+      replace("/");
     }
-  }, [workspaceId]);
+  }, [isAuthenticated, workspaceId]);
 
   useEffect(() => {
-    if (workspaceId && modal === "settings") {
-      setWorkspaceId(workspaceId);
+    if (isAuthenticated && workspaceId && modal === "settings") {
       setModal("workspace-settings", view ? { view } : null);
     }
-  }, [workspaceId, modal, view]);
-
-  if (!isAuthenticated || !workspaceId) {
-    replace("/");
-    return null;
-  }
+  }, [isAuthenticated, workspaceId, modal, view]);
 
   return <Account />;
 }

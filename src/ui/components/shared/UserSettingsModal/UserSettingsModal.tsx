@@ -243,7 +243,7 @@ export function UserSettingsModal(props: PropsFromRedux) {
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}
-      defaultSelectedTab={defaultTab}
+      tab={defaultTab}
       loading={loading || userInfoLoading}
       onChange={onChange}
       panelProps={{}}

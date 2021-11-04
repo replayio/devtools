@@ -15,7 +15,6 @@ import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
-import { useRouter } from "next/router";
 
 export function WorkspaceMembers({
   members,
@@ -194,7 +193,6 @@ const settings: Settings<
 ];
 
 function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) {
-  const router = useRouter();
   const [tab, setTab] = useState<string>("Team Members");
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
@@ -207,7 +205,6 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
         api: "API Keys",
       };
       setTab(views[view] || "Team Members");
-      router.replace("/team/" + workspaceId);
     }
   }, [view]);
 
