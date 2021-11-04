@@ -21,7 +21,6 @@ const MessageRepeat = require("devtools/client/webconsole/components/Output/Mess
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
 const { trackEvent } = require("ui/utils/telemetry");
-const { dismissNag, Nag } = require("ui/hooks/users");
 
 class Message extends Component {
   static get propTypes() {
@@ -181,7 +180,6 @@ class Message extends Component {
       );
 
       this.onViewSourceInDebugger({ ...frame, url: frame.source });
-      dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
     };
     let handleAddComment = async () => {
       trackEvent("console.add_comment");

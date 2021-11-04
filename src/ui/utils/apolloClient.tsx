@@ -76,14 +76,12 @@ export async function query({ variables = {}, query }: { variables: any; query: 
 export async function mutate({
   variables = {},
   mutation,
-  refetchQueries,
 }: {
   variables: any;
   mutation: DocumentNode;
-  refetchQueries?: any;
 }) {
   const apolloClient = await clientWaiter.promise;
-  return await apolloClient.mutate({ variables, mutation, refetchQueries });
+  return await apolloClient.mutate({ variables, mutation });
 }
 
 export const createApolloClient = memoizeLast(function (token: string | undefined) {

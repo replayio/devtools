@@ -44,7 +44,6 @@ function Panel({
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const { nags } = hooks.useGetUserInfo();
   const updateUserNags = hooks.useUpdateUserNags();
-  const dismissNag = hooks.useDismissNag();
   const error = analysisPoints === "error";
   const pausedOnHit =
     !error &&
@@ -54,8 +53,6 @@ function Panel({
     analysisPoints && !error && !isHot && nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
 
   useEffect(() => {
-    dismissNag(Nag.FIRST_GUTTER_CLICK);
-
     // Make sure to toggle off the first_breakpoint_add nag once the widget is opened.
     if (showNag) {
       const newNags = [...nags, Nag.FIRST_BREAKPOINT_ADD];
