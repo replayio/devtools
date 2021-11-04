@@ -80,13 +80,18 @@ export function searchSources(cx, query) {
     const validSources = getSourceList(getState()).filter(
       source => !ThreadFront.isMinifiedSource(source.id) && !isThirdParty(source)
     );
-    for (const source of validSources) {
-      if (cancelled) {
-        return;
-      }
-      await dispatch(loadSourceText({ cx, source }));
-      await dispatch(searchSource(cx, source.id, query));
-    }
+    await Promise.all(
+      validSources.map(async source => {
+        if (cancelled) {
+          return;
+        }
+        await dispatch(loadSourceText({ cx, source }));
+        if (cancelled) {
+          return;
+        }
+        await dispatch(searchSource(cx, source.id, query));
+      })
+    );
     dispatch(updateSearchStatus(cx, statusType.done));
   };
 
