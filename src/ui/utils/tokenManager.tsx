@@ -2,10 +2,9 @@ import { Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0
 import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
+import { useHistory } from "react-router-dom";
 import { assert, defer, Deferred } from "protocol/utils";
 import { isTest } from "./environment";
-import { usesWindow } from "ssr";
-import { useRouter } from "next/dist/client/router";
 
 const domain = "webreplay.us.auth0.com";
 const audience = "https://api.replay.io";
@@ -13,10 +12,10 @@ const audience = "https://api.replay.io";
 const tokenRefreshSecondsBeforeExpiry = 60;
 
 // Auth0 E2E tests require a different clientId
-const clientId: string = usesWindow(win => {
-  const isTesting = win ? new URL(win.location.href).searchParams.get("e2etest") : false;
-  return isTesting ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm" : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
-});
+const isTesting = new URL(window.location.href).searchParams.get("e2etest");
+const clientId: string = isTesting
+  ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm"
+  : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 
 export interface TokenState {
   loading?: boolean;
@@ -45,11 +44,11 @@ class TokenManager {
   }
 
   Auth0Provider = ({ children }: { children: ReactNode }) => {
-    const router = useRouter();
+    const history = useHistory();
 
     const onRedirectCallback = (appState: AppState) => {
       if (appState?.returnTo) {
-        router.replace("/");
+        history.replace(appState.returnTo);
       }
     };
 

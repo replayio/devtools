@@ -4,6 +4,27 @@
 
 "use strict";
 
+/*
+loader.lazyRequireGetter(
+  this,
+  "KeyCodes",
+  "devtools/client/shared/keycodes",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "getCSSLexer",
+  "devtools/shared/css/lexer",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "parseDeclarations",
+  "devtools/shared/css/parsing-utils",
+  true
+);
+*/
+
 const { assert } = require("protocol/utils");
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";

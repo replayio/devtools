@@ -16,6 +16,8 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/network-throttling.properties");
 const NO_THROTTLING_LABEL = L10N.getStr("responsive.noThrottling");
 
+loader.lazyRequireGetter(this, "showMenu", "devtools/client/shared/components/menu/utils", true);
+
 /**
  * This component represents selector button that can be used
  * to throttle network bandwidth.

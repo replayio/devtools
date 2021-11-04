@@ -5,6 +5,8 @@
 "use strict";
 
 const InspectorUtils = require("InspectorUtils");
+loader.lazyRequireGetter(this, "loadSheet", "devtools/shared/layout/utils", true);
+loader.lazyRequireGetter(this, "removeSheet", "devtools/shared/layout/utils", true);
 
 // How many text runs are we highlighting at a time. There may be many text runs, and we
 // want to prevent performance problems.

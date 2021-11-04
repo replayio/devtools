@@ -9,6 +9,14 @@ const { getCSSLexer } = require("devtools/shared/css/lexer");
 const { cssColors } = require("devtools/shared/css/color-db");
 
 const { CSS_ANGLEUNIT } = require("devtools/shared/css/constants");
+/*
+loader.lazyRequireGetter(
+  this,
+  "getAngleValueInDegrees",
+  "devtools/shared/css/parsing-utils",
+  true
+);
+*/
 
 const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
 
