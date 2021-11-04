@@ -51,13 +51,13 @@ export function setComputedPropertyExpanded(
   return { type: "set_computed_property_expanded", property, expanded };
 }
 
+const outputParser = new OutputParser(document, CSSProperties);
+
 async function createComputedProperties(
   elementStyle: ElementStyle
 ): Promise<ComputedPropertyState[]> {
   const computed = await elementStyle.element.getComputedStyle();
   if (!computed) return [];
-
-  const outputParser = new OutputParser(document, CSSProperties);
 
   const properties: ComputedPropertyState[] = [];
   for (const [name, value] of computed) {

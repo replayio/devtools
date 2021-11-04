@@ -1,12 +1,5 @@
 import { omit, uniqueId } from "lodash";
-import React, {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { ConfirmModal } from "./ConfirmModal";
 import { ConfirmOptions } from "./ConfirmDialog";
@@ -50,20 +43,16 @@ export const useConfirm = () => {
   };
 };
 
-export const ConfirmRenderer = () => {
-  const [element, setElement] = useState<HTMLElement | null>();
-  const { confirmations } = useContext(ConfirmContext);
-
-  useEffect(() => {
-    if (!element) {
-      setElement(document.getElementById("__next"));
-    }
-  }, [element]);
-
+export const ConfirmRenderer = ({
+  element = document.getElementById("app"),
+}: {
+  element?: HTMLElement | null;
+}) => {
   if (!element) {
     return null;
   }
 
+  const { confirmations } = useContext(ConfirmContext);
   return (
     <>
       {Object.entries(confirmations).map(([id, options]) =>

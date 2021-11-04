@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+loader.lazyRequireGetter(this, "getTabPrefs", "devtools/shared/indentation", true);
+
 const { getSourceForDisplay } = require("devtools/client/inspector/changes/utils/changes-utils");
 
 /**

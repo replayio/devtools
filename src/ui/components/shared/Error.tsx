@@ -9,11 +9,11 @@ import classNames from "classnames";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
 import { getRecordingId, isDevelopment } from "ui/utils/environment";
 import hooks from "ui/hooks";
+import { useHistory } from "react-router";
 import { setModal } from "ui/actions/app";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
 import { PrimaryButton } from "./Button";
 import BubbleModal from "ui/components/shared/Onboarding/BubbleModal";
-import { useRouter } from "next/dist/client/router";
 
 export function PopupBlockedError() {
   return (
@@ -71,9 +71,9 @@ function LibraryButton() {
 }
 
 function TeamBillingButtonBase({ currentWorkspaceId, setModal }: BillingPropsFromRedux) {
-  const router = useRouter();
+  const history = useHistory();
   const onClick = () => {
-    router.push(`/team/${currentWorkspaceId}/settings/billing`);
+    history.push(`/team/${currentWorkspaceId}/settings/billing`);
     setModal("workspace-settings");
   };
 

@@ -55,7 +55,7 @@ export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
 };
 export type SetModalAction = Action<"set_modal"> & {
   modal: ModalType | null;
-  options: { recordingId: string } | { view: string } | null;
+  options: { recordingId: string } | null;
 };
 
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
@@ -278,7 +278,7 @@ export function setAwaitingSourcemaps(awaitingSourcemaps: boolean): SetAwaitingS
 
 export function setModal(
   modalType: ModalType,
-  options: { recordingId: string } | { view: string } | null = null
+  options: { recordingId: string } | null = null
 ): SetModalAction {
   return {
     type: "set_modal",

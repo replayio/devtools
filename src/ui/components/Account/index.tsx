@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
+import { createReplayURL } from "views/app";
 import Library from "../Library/index";
 
 import { PrimaryLgButton } from "../shared/Button";
@@ -13,23 +15,6 @@ import {
   OnboardingHeader,
   OnboardingModalContainer,
 } from "../shared/Onboarding/index";
-import { useRouter } from "next/dist/client/router";
-
-/**
- * Create a (host relative) URL with the given parameters. Used for replacing
- * legacy routes with their current equivalents.
- */
-function createReplayURL(currentParams: URLSearchParams) {
-  const recordingId = currentParams.get("id");
-  const path = recordingId ? `/recording/${recordingId}` : "/";
-  const newParams = new URLSearchParams();
-  currentParams.forEach((value, key) => {
-    if (key !== "id") {
-      newParams.set(key, value);
-    }
-  });
-  return `${path}?${newParams.toString()}`;
-}
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
@@ -97,12 +82,12 @@ function WelcomePage() {
 
 export default function Account() {
   const { isAuthenticated } = useAuth0();
-  const router = useRouter();
+  const history = useHistory();
   const searchParams = new URLSearchParams(window.location.search);
 
   useEffect(() => {
     if (searchParams.get("id")) {
-      router.replace(createReplayURL(searchParams));
+      history.replace(createReplayURL(searchParams));
     }
   }, []);
 
