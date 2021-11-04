@@ -14,19 +14,10 @@ const store = {};
 const Template: Story<ComponentProps<typeof Status>> = args => <Status {...args} />;
 
 export const Success = Template.bind({});
-Success.args = {
-  status: 200,
-  family: "SUCCESS",
-};
+Success.args = { status: 200 };
 
 export const Failure = Template.bind({});
-Failure.args = {
-  status: 500,
-  family: "FAILURE",
-};
+Failure.args = { status: 500 };
 
 export const Ignored = Template.bind({});
-Ignored.args = {
-  status: 301,
-  family: "IGNORED",
-};
+Ignored.args = { status: 301 };
