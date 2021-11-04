@@ -2,6 +2,7 @@ import "../src/test-prep";
 import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
+import Script from "next/script";
 import type { AppProps } from "next/app";
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
@@ -171,9 +172,6 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
                   href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
                   rel="stylesheet"
                 />
-                <script>
-                  {`(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/k7f741xx';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();`}
-                </script>
               </Head>
               <App>
                 <InstallRouteListener />
