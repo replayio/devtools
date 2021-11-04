@@ -1,4 +1,5 @@
 module.exports = {
+  productionBrowserSourceMaps: true,
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     const entry = config.entry;
     config.entry = () => {
