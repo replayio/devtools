@@ -475,8 +475,6 @@ PrefBranch.prototype = {
    * Helper function to initialize the root PrefBranch.
    */
   _initializeRoot: function () {
-    if (typeof window === "undefined") return;
-
     if (Services._defaultPrefsEnabled) {
       /* eslint-disable no-eval */
       // let devtools = require("raw!prefs!devtools/client/preferences/devtools");
@@ -534,6 +532,10 @@ class ObserverService {
   }
 }
 
+window.telemetry = {};
+window.telemetry.histograms = {};
+window.telemetry.scalars = {};
+
 const Services = {
   _prefs: null,
 
@@ -567,16 +569,14 @@ const Services = {
    */
   appinfo: {
     get OS() {
-      if (typeof window !== "undefined") {
-        const os = window.navigator.userAgent;
-        if (os) {
-          if (os.includes("Linux")) {
-            return "Linux";
-          } else if (os.includes("Windows")) {
-            return "WINNT";
-          } else if (os.includes("Mac")) {
-            return "Darwin";
-          }
+      const os = window.navigator.userAgent;
+      if (os) {
+        if (os.includes("Linux")) {
+          return "Linux";
+        } else if (os.includes("Windows")) {
+          return "WINNT";
+        } else if (os.includes("Mac")) {
+          return "Darwin";
         }
       }
       return "Unknown";
@@ -596,6 +596,52 @@ const Services = {
     // content case.  So, being totally wrong is ok.
     get is64Bit() {
       return true;
+    },
+  },
+
+  /**
+   * A no-op implementation of Services.telemetry.  This supports just
+   * the subset of Services.telemetry that is used by devtools.
+   */
+  telemetry: {
+    getHistogramById: function (name) {
+      return {
+        add: value => {
+          if (window.telemetry.histograms[name]) {
+            window.telemetry.histograms[name].push(value);
+          } else {
+            window.telemetry.histograms[name] = [value];
+          }
+        },
+      };
+    },
+
+    getKeyedHistogramById: function (name) {
+      return {
+        add: (id, value) => {
+          if (!window.telemetry.histograms[name]) {
+            window.telemetry.histograms[name] = {};
+          }
+
+          if (!window.telemetry.histograms[name][id]) {
+            window.telemetry.histograms[name][id] = [];
+          }
+
+          window.telemetry.histograms[name][id].push(value);
+        },
+      };
+    },
+
+    scalarSet: function (scalarId, value) {
+      window.telemetry.scalars[scalarId] = value;
+    },
+
+    scalarAdd: function (scalarId, value) {
+      if (scalarId in window.telemetry.scalars) {
+        window.telemetry.scalars[scalarId] += value;
+      } else {
+        window.telemetry.scalars[scalarId] = value;
+      }
     },
   },
 

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @namespace html url("http://www.w3.org/1999/xhtml");
-:root {
+*/ :root {
   /* Bug 1458224: the initial `font-size` is different on Mac/Windows
     * (appears fixed to 11px) and Linux (bigger, depends on user settings).
     * Workaround: specify font-size on root, on form inputs, and whenever

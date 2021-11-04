@@ -27,6 +27,15 @@ const { KeyCodes } = require("devtools/client/shared/keycodes");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { findMostRelevantCssPropertyIndex } = require("devtools/client/shared/suggestion-picker");
 
+/*
+loader.lazyRequireGetter(
+  this,
+  "AppConstants",
+  "resource://gre/modules/AppConstants.jsm",
+  true
+);
+*/
+
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 const CONTENT_TYPES = {
   PLAIN_TEXT: 0,
@@ -159,7 +168,6 @@ function editableField(options) {
   });
 }
 
-const exports = module.exports;
 exports.editableField = editableField;
 
 /**

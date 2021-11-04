@@ -18,6 +18,13 @@ const EventEmitter = require("devtools/shared/event-emitter");
 const { rgbToHsl, rgbToColorName } = require("devtools/shared/css/color").colorUtils;
 const { getCurrentZoom, getFrameOffsets } = require("devtools/shared/layout/utils");
 
+loader.lazyGetter(this, "clipboardHelper", () =>
+  Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper)
+);
+loader.lazyGetter(this, "l10n", () =>
+  Services.strings.createBundle("chrome://devtools-shared/locale/eyedropper.properties")
+);
+
 const ZOOM_LEVEL_PREF = "devtools.eyedropper.zoom";
 const FORMAT_PREF = "devtools.defaultColorUnit";
 // Width of the canvas.

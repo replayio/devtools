@@ -15,6 +15,26 @@ import RulesView from "../rules";
 import TextProperty, { ComputedProperty } from "./text-property";
 
 // const { promiseWarn } = require("devtools/client/inspector/shared/utils");
+/*
+loader.lazyRequireGetter(
+  this,
+  "parseDeclarations",
+  "devtools/shared/css/parsing-utils",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "parseNamedDeclarations",
+  "devtools/shared/css/parsing-utils",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "parseSingleValue",
+  "devtools/shared/css/parsing-utils",
+  true
+);
+*/
 
 var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";

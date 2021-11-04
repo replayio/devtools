@@ -10,6 +10,7 @@ const { moveInfobar, createNode } = require("devtools/server/actors/highlighters
 const { truncateString } = require("devtools/shared/inspector/utils");
 
 const STRINGS_URI = "devtools/shared/locales/accessibility.properties";
+loader.lazyRequireGetter(this, "LocalizationHelper", "devtools/shared/l10n", true);
 DevToolsUtils.defineLazyGetter(this, "L10N", () => new LocalizationHelper(STRINGS_URI));
 
 const {

@@ -17,6 +17,20 @@ const MAX_DATA_URL_LENGTH = 40;
 
 const Services = require("Services");
 
+/*
+loader.lazyRequireGetter(
+  this,
+  "getCSSLexer",
+  "devtools/shared/css/lexer",
+  true
+);
+loader.lazyRequireGetter(
+  this,
+  "getTabPrefs",
+  "devtools/shared/indentation",
+  true
+);
+*/
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const styleInspectorL10N = new LocalizationHelper(
   "devtools/shared/locales/styleinspector.properties"

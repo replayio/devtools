@@ -3,12 +3,12 @@ import useAuth0 from "ui/utils/useAuth0";
 import { GET_USER_ID } from "ui/graphql/users";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { Reply } from "ui/state/comments";
+import { useParams } from "react-router-dom";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
-import { useGetRecordingId } from "../recordings";
 
 export default function useAddCommentReply() {
   const { user } = useAuth0();
-  const recordingId = useGetRecordingId();
+  const { recordingId } = useParams<{ recordingId: string }>();
 
   const [addCommentReply, { error }] = useMutation(
     gql`

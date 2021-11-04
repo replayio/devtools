@@ -3,6 +3,16 @@ const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
 import { pref } from "devtools-services";
 
+// Get prefs from the URL with the format
+// &prefs=<key>:<value>,<key>:<value> e.g. &prefs=video:true
+function getUrlPrefs() {
+  const url = new URL(window.location.href);
+  const urlPrefs = url.searchParams.get("prefs") || "";
+  return Object.fromEntries(urlPrefs.split(",").map(pref => pref.split(":")));
+}
+
+const urlPrefs = getUrlPrefs();
+
 // app prefs.
 pref("devtools.split-console", false);
 pref("devtools.selected-panel", "console");
