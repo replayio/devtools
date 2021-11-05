@@ -9,5 +9,9 @@ inputs:
     required: false
 
 runs:
-  using: "node12"
-  main: "./main.js"
+  using: "composite"
+  steps:
+    - run: npm ci
+      shell: bash
+    - run: node ${{ github.action_path }}/main.js
+      shell: bash
