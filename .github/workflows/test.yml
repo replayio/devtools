@@ -54,7 +54,7 @@ jobs:
   test0:
     name: Test stripe 0
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
   test1:
     name: Test stripe 1
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -79,7 +79,7 @@ jobs:
   test2:
     name: Test stripe 2
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -91,7 +91,7 @@ jobs:
   test3:
     name: Test stripe 3
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -103,7 +103,7 @@ jobs:
   test4:
     name: Test stripe 4
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -115,7 +115,7 @@ jobs:
   test5:
     name: Test stripe 5
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -127,7 +127,7 @@ jobs:
   test6:
     name: Test stripe 6
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -139,7 +139,7 @@ jobs:
   test7:
     name: Test stripe 7
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
+    needs: [wait_for_vercel, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
