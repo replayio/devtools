@@ -48,6 +48,9 @@ import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 const EditorPane = ({ children }) => (
   <div className="editor-pane overflow-hidden rounded-lg">
     <div className="editor-container relative">{children}</div>
+    <Redacted>
+      <ProjectSearch />
+    </Redacted>
   </div>
 );
 
@@ -174,9 +177,6 @@ class Debugger extends Component {
           <Editor />
         </Redacted>
         {!isDemo() && <EditorFooter horizontal={horizontal} />}
-        <Redacted>
-          <ProjectSearch />
-        </Redacted>
       </EditorPane>
     );
   }
