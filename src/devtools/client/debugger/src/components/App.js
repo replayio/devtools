@@ -218,7 +218,7 @@ class Debugger extends Component {
           maxSize={this.props.showEditor ? "80%" : "100%"}
           minSize={this.props.showEditor ? "240px" : "100%"}
           onControlledPanelResized={onResize}
-          splitterSize={1}
+          splitterSize={8}
           style={{ width: "100%", overflow: "hidden" }}
           vert={true}
         />

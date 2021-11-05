@@ -6063,7 +6063,7 @@
 
           static get defaultProps() {
             return {
-              splitterSize: 5,
+              splitterSize: 8,
               vert: true,
               endPanelControl: false,
               endPanelCollapsed: false,

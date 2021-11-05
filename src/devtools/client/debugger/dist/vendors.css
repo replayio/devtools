@@ -227,46 +227,11 @@ menuseparator {
   overflow-y: hidden;
 }
 
-.split-box > .splitter {
-  background-image: none;
-  border: 0;
-  border-style: solid;
-  border-color: transparent;
-  background-color: var(--chrome);
-  background-clip: content-box;
-  position: relative;
-
-  box-sizing: border-box;
-
-  /* Positive z-index positions the splitter on top of its siblings and makes
-     it clickable on both sides. */
-  z-index: 1;
-}
-
 .split-box.vert > .splitter {
-  /* prettier-ignore */
-  min-width: calc(var(--devtools-splitter-inline-start-width) +
-    var(--devtools-splitter-inline-end-width) + 1px);
-
-  border-left-width: var(--devtools-splitter-inline-start-width);
-  border-right-width: var(--devtools-splitter-inline-end-width);
-
-  margin-left: calc(-1 * var(--devtools-splitter-inline-start-width) - 1px);
-  margin-right: calc(-1 * var(--devtools-splitter-inline-end-width));
-
   cursor: ew-resize;
 }
 
 .split-box.horz > .splitter {
-  /* prettier-ignore */
-  min-height: calc(var(--devtools-splitter-top-width) +
-    var(--devtools-splitter-bottom-width) + 1px);
-  border-top-width: var(--devtools-splitter-top-width);
-  border-bottom-width: var(--devtools-splitter-bottom-width);
-
-  margin-top: calc(-1 * var(--devtools-splitter-top-width) - 1px);
-  margin-bottom: calc(-1 * var(--devtools-splitter-bottom-width));
-
   cursor: ns-resize;
 }
 

@@ -12,7 +12,6 @@ import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 import { UIState } from "ui/state";
-import classNames from "classnames";
 
 function DevView({
   updateTimelineDimensions,
@@ -47,7 +46,7 @@ function DevView({
         <Toolbar />
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
-          splitterSize={4}
+          splitterSize={8}
           initialSize={prefs.toolboxHeight as string}
           minSize={showEditor || !sidePanelCollapsed ? "240px" : "0%"}
           maxSize={maxSize(sidePanelCollapsed, showEditor)}

@@ -56,7 +56,7 @@ class InspectorApp extends Component<PropsFromRedux> {
         });
         sidebarSplitbox.setState({
           endPanelControl: true,
-          splitterSize: 1,
+          splitterSize: 8,
           width: prefs.splitSidebarSize,
         });
       } else {
@@ -200,7 +200,7 @@ class InspectorApp extends Component<PropsFromRedux> {
             minSize="20%"
             maxSize="80%"
             onMove={this.onSplitboxResize}
-            splitterSize={1}
+            splitterSize={8}
             endPanelControl={true}
             startPanel={markupView}
             endPanel={
@@ -210,7 +210,7 @@ class InspectorApp extends Component<PropsFromRedux> {
                 minSize={is3PaneModeEnabled ? "20%" : "0"}
                 maxSize="80%"
                 onMove={this.onSidebarSplitboxResize}
-                splitterSize={is3PaneModeEnabled ? 1 : 0}
+                splitterSize={is3PaneModeEnabled ? 8 : 0}
                 endPanelControl={is3PaneModeEnabled}
                 startPanel={
                   <div className="devtools-inspector-tab-panel">

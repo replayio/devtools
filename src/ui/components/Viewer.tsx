@@ -13,7 +13,7 @@ const Vertical = ({ showVideo }: ViewerProps) => {
   return (
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
-      splitterSize={1}
+      splitterSize={8}
       initialSize={prefs.secondaryPanelHeight}
       onResizeEnd={(num: number) => {
         prefs.secondaryPanelHeight = `${num}px`;
@@ -32,7 +32,7 @@ const Horizontal = ({ showVideo }: ViewerProps) => {
   return (
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
-      splitterSize={1}
+      splitterSize={8}
       initialSize={prefs.secondaryPanelHeight}
       onResizeEnd={(num: number) => {
         prefs.secondaryPanelHeight = `${num}px`;
