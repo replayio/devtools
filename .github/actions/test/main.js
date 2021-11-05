@@ -1,6 +1,5 @@
 const fs = require("fs");
 const { spawnSync, spawn } = require("child_process");
-
 const core = require("@actions/core");
 
 function spawnChecked(...args) {
