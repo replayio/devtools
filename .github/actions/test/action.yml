@@ -9,5 +9,8 @@ inputs:
     required: false
 
 runs:
-  using: "node12"
-  main: "npm ci && ./main.js"
+  using: "composite"
+  steps:
+    - run: npm ci
+      run: node ./main.js
+      shell: bash
