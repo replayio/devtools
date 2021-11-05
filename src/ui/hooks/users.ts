@@ -183,7 +183,7 @@ export function useDismissNag() {
   const updateUserNags = useUpdateUserNags();
 
   return (nag: Nag) => {
-    if (nags.includes(nag)) {
+    if (!nags || nags.includes(nag)) {
       return;
     }
 
