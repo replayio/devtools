@@ -7,6 +7,9 @@ inputs:
   github_ci:
     description: "A flag to tell whether we are in CI"
     required: false
+  url:
+    description: "Frontend URL to test (normally vercel preview url)"
+    required: true
 
 runs:
   using: "composite"
