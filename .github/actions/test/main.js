@@ -73,7 +73,7 @@ const devServerProcess = spawn("./node_modules/.bin/next", ["dev", "-p", "8080"]
   );
   console.log("Done Initial Webpack build");
 
-  require("../../../test/run");
+  require("../../../public/test/run");
 })().catch(err => {
   console.error(err);
   process.exit(1);
