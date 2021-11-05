@@ -8,10 +8,10 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "14"
-          cache: "npm"
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: "14"
+      #     cache: "npm"
       - uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/.next/cache
