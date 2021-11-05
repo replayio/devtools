@@ -296,7 +296,7 @@ export class Outline extends Component {
 
     return (
       <div className="outline">
-        <div className="outline__container">
+        <div className="outline__container space-y-2">
           <OutlineFilter filter={filter} updateFilter={this.updateFilter} />
           {this.renderFunctions(symbolsToDisplay)}
           {this.renderFooter()}

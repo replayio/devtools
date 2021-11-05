@@ -494,8 +494,8 @@ button.open-inspector {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
 
-.webconsole-console-settings-menu-button {
-  -webkit-mask: url(~devtools/client/themes/images/settings.svg) no-repeat center !important;
+.webconsole-console-settings-menu-button::before {
+  background-image: url(~devtools/client/themes/images/settings.svg) !important;
 }
 
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before {

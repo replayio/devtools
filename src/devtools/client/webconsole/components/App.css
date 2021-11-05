@@ -54,7 +54,6 @@
 .devtools-button.webconsole-console-settings-menu-button {
   height: 100%;
   margin: 0;
-  background: var(--theme-body-color);
 }
 
 .webconsole-app .jsterm-input-container {
