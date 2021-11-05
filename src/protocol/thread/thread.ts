@@ -214,7 +214,7 @@ class _ThreadFront {
       await gToolbox.selectTool("debugger");
       window.Test = require("test/harness");
       const script = document.createElement("script");
-      script.src = `/test?${this.testName}`;
+      script.src = `/test/scripts/${this.testName}`;
       document.head.appendChild(script);
     }
   }
