@@ -15,23 +15,23 @@ function checkForFile(path) {
   }
 }
 
-// checkForFile("replay/replay.dmg");
-// checkForFile("replay-node/macOS-replay-node");
-// checkForFile("replay-driver/macOS-recordreplay.so");
+checkForFile("replay/replay.dmg");
+checkForFile("replay-node/macOS-replay-node");
+checkForFile("replay-driver/macOS-recordreplay.so");
 
 console.log(new Date(), "Start");
 
 console.log(new Date(), "Unpackaged distribution");
 
-// spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
-// spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
-// try {
-//   spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
-// } catch (e) {}
+spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
+spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
+try {
+  spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
+} catch (e) {}
 
 console.log(new Date(), "Installed replay browser");
 
-// spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
+spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
 
 // Set environment variables needed to replay node recordings.
 process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
