@@ -221,4 +221,6 @@ if (typeof window === "object") {
       received: gReceivedBytes,
     };
   };
+
+  (window as any).protocolClient = client;
 }
