@@ -36,6 +36,6 @@ export function validateContext(state, cx) {
   validateNavigateContext(state, cx);
   const newcx = getThreadContext(state);
   if (cx.pauseCounter && cx.pauseCounter != newcx.pauseCounter) {
-    throw new ContextError("Current thread has paused or resumed");
+    console.warn("Current thread has paused or resumed");
   }
 }
