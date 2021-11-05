@@ -494,10 +494,10 @@ export function refreshGraphics() {
   const bounds = calculateBounds(video.getBoundingClientRect(), image);
 
   if (bounds) {
-    canvas.width = bounds.width * 2;
-    canvas.height = bounds.height * 2;
-    graphicsVideo.style.width = bounds.width * 2 + "px";
-    graphicsVideo.style.height = bounds.height * 2 + "px";
+    canvas.width = bounds.width;
+    canvas.height = bounds.height;
+    graphicsVideo.style.width = bounds.width + "px";
+    graphicsVideo.style.height = bounds.height + "px";
 
     canvas.style.transform = graphicsVideo.style.transform = `scale(${bounds.scale})`;
     canvas.style.left = graphicsVideo.style.left = String(bounds.left) + "px";
