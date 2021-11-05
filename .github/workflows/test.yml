@@ -4,15 +4,27 @@ on: [pull_request, workflow_dispatch]
 
 jobs:
   build:
-    name: Build macOS webpack
+    name: Build macOS app
     runs-on: macos-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          cache: "npm"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          # Generate a new cache whenever packages or source files change.
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          # If source files changed but packages didn't, rebuild from a prior cache.
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install dependencies
         run: npm install
-      - name: Build webpack
+      - name: Build app
         run: npm run export
         env:
           GIT_SHA: ${{ github.sha }}
