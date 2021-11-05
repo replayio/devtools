@@ -24,6 +24,8 @@ const { listAllRecordings } = require("@recordreplay/recordings-cli");
 // It's a lot easier to hardcode it for now though.
 const replayApiKey = "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ";
 
+const FRONTEND_URL = process.env.RECORD_REPLAY_FRONTEND || "http://localhost:8080";
+
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
   ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
   : {};
@@ -180,7 +182,7 @@ async function runTest(test, example, target) {
       case "gecko":
       case "chromium":
         exampleRecordingId = await createExampleBrowserRecording(
-          `http://localhost:8080/test/examples/${example}`,
+          `${FRONTEND_URL}/test/examples/${example}`,
           target
         );
         break;
@@ -210,8 +212,8 @@ async function runTest(test, example, target) {
     // itself.
     RECORD_REPLAY_DONT_PROCESS_RECORDINGS: "1",
     RECORD_REPLAY_TEST_URL: exampleRecordingId
-      ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
-      : `http://localhost:8080/test/examples/${example}`,
+      ? `${FRONTEND_URL}/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
+      : `${FRONTEND_URL}/test/examples/${example}`,
     // If we need to record the example we have to use the target dispatch server.
     // If we already have the example, use the default dispatch server. When running in CI
     // against a local version of the backend, this allows us to record the viewer using the
@@ -260,7 +262,7 @@ async function runTestViewer(path, local, timeout, env) {
     MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
     RECORD_REPLAY_TEST_SCRIPT: testScript,
     RECORD_REPLAY_LOCAL_TEST: local,
-    RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
+    RECORD_REPLAY_VIEW_HOST: FRONTEND_URL,
     RECORD_REPLAY_API_KEY: replayApiKey,
   });
 
@@ -273,14 +275,14 @@ async function runTestViewer(path, local, timeout, env) {
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
-    if (match && match[2].startsWith("http://localhost:8080/recording")) {
+    if (match && match[2].startsWith(`${FRONTEND_URL}/recording`)) {
       recordingId = match[1];
 
       if (env.RECORD_REPLAY_SERVER == DefaultDispatchServer) {
         addTestRecordingId(recordingId);
       }
     }
-    if (match && match[2].startsWith("http://localhost:8080/test/examples/")) {
+    if (match && match[2].startsWith(`${FRONTEND_URL}/test/examples/`)) {
       const exampleRecordingId = match[1];
       const relativePath = url.parse(match[2]).pathname.slice("/test/examples/".length);
 
