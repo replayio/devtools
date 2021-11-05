@@ -37,7 +37,7 @@ spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
 process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
 process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
-const devServerProcess = spawn("npm", ["run", "dev"], {
+const devServerProcess = spawn("node", ["./dev-server.js"], {
   detached: true,
   stdio: ["inherit", "pipe", "inherit"],
 });
