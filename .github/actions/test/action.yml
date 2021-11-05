@@ -13,5 +13,5 @@ runs:
   steps:
     - run: npm ci
       shell: bash
-    - run: node ./main.js
+    - run: node ./.github/actions/test/main.js
       shell: bash
