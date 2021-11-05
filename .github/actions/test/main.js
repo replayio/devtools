@@ -60,7 +60,7 @@ const devServerProcess = spawn("npm", ["run", "dev"], {
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
   // the risk of timing out if the build itself is slow.
-  spawnChecked("curl", ["--max-time", "600", "--range", "0-50", "http://localhost:8080/"], {
+  spawnChecked("curl", ["--max-time", "600", "--range", "0-50", process.env.VERCEL_URL], {
     stdio: "inherit",
   });
   console.log("Dev server is up");
