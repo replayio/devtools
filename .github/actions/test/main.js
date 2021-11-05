@@ -39,36 +39,7 @@ spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
 process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
 process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
-const devServerProcess = spawn("npm", ["run", "dev"], {
-  detached: true,
-  stdio: ["inherit", "pipe", "inherit"],
-});
-
 (async function () {
-  console.log("Waiting for Dev server start");
-  await Promise.race([
-    new Promise(r => {
-      devServerProcess.stdout.on("data", chunk => {
-        process.stdout.write(chunk);
-        // Once the dev server starts outputting stuff, we assume it has started
-        // its server and it is safe to curl.
-        r();
-      });
-    }),
-    new Promise(r => setTimeout(r, 10 * 1000)).then(() => {
-      throw new Error("Failed to start dev server");
-    }),
-  ]);
-  console.log("Waiting for Dev to be up");
-
-  // Wait for the initial Webpack build to complete before
-  // trying to run the tests so the tests don't run
-  // the risk of timing out if the build itself is slow.
-  spawnChecked("curl", ["--max-time", "600", "--range", "0-50", TEST_SERVER], {
-    stdio: "inherit",
-  });
-  console.log("Dev server is up");
-
   spawnChecked("node", ["../../../test/run", "--testServer", TEST_SERVER], {
     stdio: "inherit",
   });

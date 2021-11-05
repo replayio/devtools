@@ -10,6 +10,7 @@ inputs:
   server:
     description: "The URL to the server to test against"
     required: false
+    default: "https://app.replay.io/"
 
 runs:
   using: "node12"
