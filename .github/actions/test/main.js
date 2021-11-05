@@ -41,7 +41,7 @@ spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
 process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
 process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
-const devServerProcess = spawn("node_modules/.bin/webpack", ["serve"], {
+const devServerProcess = spawn("npm", ["run", "dev"], {
   detached: true,
   stdio: ["inherit", "pipe", "inherit"],
 });
@@ -68,7 +68,7 @@ const devServerProcess = spawn("node_modules/.bin/webpack", ["serve"], {
   // the risk of timing out if the build itself is slow.
   spawnChecked(
     "curl",
-    ["--max-time", "600", "--range", "0-50", "http://localhost:8080/dist/main.js"],
+    ["--max-time", "600", "--range", "0-50", "http://localhost:8080/test/manifest.js"],
     {
       stdio: "inherit",
     }
