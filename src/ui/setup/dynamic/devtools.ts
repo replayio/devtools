@@ -41,6 +41,7 @@ import { initialMessageState } from "devtools/client/webconsole/reducers/message
 import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
+import { sendMessage } from "protocol/socket";
 
 declare global {
   interface Window {
@@ -51,6 +52,7 @@ declare global {
     threadFront?: typeof ThreadFront;
     actions?: any;
     selectors?: typeof selectors;
+    sendMessage?: typeof sendMessage;
     console?: {
       prefs: typeof consolePrefs;
     };
@@ -74,6 +76,7 @@ export default async (store: Store) => {
   window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
+  window.app.sendMessage = (cmd, args = {}) => sendMessage(cmd, args, window.sessionId);
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
