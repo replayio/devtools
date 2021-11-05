@@ -14,5 +14,3 @@ inputs:
 runs:
   using: "node12"
   main: "./main.js"
-  env:
-    TEST_SERVER: ${{ inputs.server }}

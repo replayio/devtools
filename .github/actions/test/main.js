@@ -1,6 +1,8 @@
 const fs = require("fs");
 const { spawnSync, spawn } = require("child_process");
 
+const core = require("@actions/core");
+
 function spawnChecked(...args) {
   console.log(`spawn`, args);
   const rv = spawnSync.apply(this, args);
@@ -15,7 +17,7 @@ function checkForFile(path) {
   }
 }
 
-const TEST_SERVER = process.env.TEST_SERVER;
+const TEST_SERVER = core.getInput("server");
 
 checkForFile("replay/replay.dmg");
 checkForFile("replay-node/macOS-replay-node");
