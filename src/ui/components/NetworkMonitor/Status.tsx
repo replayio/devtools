@@ -5,7 +5,7 @@ const cx = classNames.bind(css);
 type StatusFamily = "SUCCESS" | "FAILURE" | "IGNORED";
 
 type StatusProps = {
-  status: number;
+  value: number;
 };
 
 const familyFor = (status: number): StatusFamily => {
@@ -30,12 +30,12 @@ const FAMILY_CLASSES: Record<StatusFamily, string> = {
   IGNORED: "ignored",
 };
 
-const Status = ({ status }: StatusProps) => {
-  const family = familyFor(status);
+const Status = ({ value }: StatusProps) => {
+  const family = familyFor(value);
   const familyClass = FAMILY_CLASSES[family];
   return (
     <div className={cx("status font-semibold inline-block rounded-md  p-1", familyClass)}>
-      {status}
+      {value}
     </div>
   );
 };
