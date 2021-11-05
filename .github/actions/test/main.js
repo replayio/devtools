@@ -43,21 +43,23 @@ const devServerProcess = spawn("node", ["./dev-server.js"], {
 });
 
 (async function () {
-  console.log("Waiting for Webpack server start");
-  await Promise.race([
-    new Promise(r => {
-      devServerProcess.stdout.on("data", chunk => {
-        process.stdout.write(chunk);
-        // Once the dev server starts outputting stuff, we assume it has started
-        // its server and it is safe to curl.
-        r();
-      });
-    }),
-    new Promise(r => setTimeout(r, 10 * 1000)).then(() => {
-      throw new Error("Failed to start dev server");
-    }),
-  ]);
+  //   console.log("Waiting for Webpack server start");
+  //   await Promise.race([
+  //     new Promise(r => {
+  //       devServerProcess.stdout.on("data", chunk => {
+  //         process.stdout.write(chunk);
+  //         // Once the dev server starts outputting stuff, we assume it has started
+  //         // its server and it is safe to curl.
+  //         r();
+  //       });
+  //     }),
+  //     new Promise(r => setTimeout(r, 10 * 1000)).then(() => {
+  //       throw new Error("Failed to start dev server");
+  //     }),
+  //   ]);
+
   console.log("Waiting for Webpack build");
+  await new Promise(r => setTimeout(r, 2000));
 
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
