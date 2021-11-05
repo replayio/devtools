@@ -493,17 +493,15 @@ export function refreshGraphics() {
   const cx = canvas.getContext("2d")!;
   const bounds = calculateBounds(video.getBoundingClientRect(), image);
 
-  const LAYOUT_MARGIN = 10;
-
   if (bounds) {
-    canvas.width = bounds.width - LAYOUT_MARGIN * 2;
-    canvas.height = bounds.height - LAYOUT_MARGIN * 2;
-    graphicsVideo.style.width = bounds.width - LAYOUT_MARGIN * 2 + "px";
-    graphicsVideo.style.height = bounds.height - LAYOUT_MARGIN * 2 + "px";
+    canvas.width = bounds.width * 2;
+    canvas.height = bounds.height * 2;
+    graphicsVideo.style.width = bounds.width * 2 + "px";
+    graphicsVideo.style.height = bounds.height * 2 + "px";
 
     canvas.style.transform = graphicsVideo.style.transform = `scale(${bounds.scale})`;
-    canvas.style.left = graphicsVideo.style.left = String(bounds.left + LAYOUT_MARGIN) + "px";
-    canvas.style.top = graphicsVideo.style.top = String(bounds.top + LAYOUT_MARGIN) + "px";
+    canvas.style.left = graphicsVideo.style.left = String(bounds.left) + "px";
+    canvas.style.top = graphicsVideo.style.top = String(bounds.top) + "px";
     if (image) {
       cx.drawImage(image, 0, 0);
     }
