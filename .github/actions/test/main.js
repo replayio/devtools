@@ -59,7 +59,7 @@ const devServerProcess = spawn("node", ["./dev-server.js"], {
   //   ]);
 
   console.log("Waiting for Webpack build");
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 10000));
 
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
