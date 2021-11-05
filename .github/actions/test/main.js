@@ -15,11 +15,14 @@ function checkForFile(path) {
   }
 }
 
+const TEST_SERVER = process.argv[1];
+
 checkForFile("replay/replay.dmg");
 checkForFile("replay-node/macOS-replay-node");
 checkForFile("replay-driver/macOS-recordreplay.so");
 
 console.log(new Date(), "Start");
+console.log("Using server url:", TEST_SERVER);
 
 spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
 spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
@@ -60,12 +63,14 @@ const devServerProcess = spawn("npm", ["run", "dev"], {
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
   // the risk of timing out if the build itself is slow.
-  spawnChecked("curl", ["--max-time", "600", "--range", "0-50", process.env.VERCEL_URL], {
+  spawnChecked("curl", ["--max-time", "600", "--range", "0-50", TEST_SERVER], {
     stdio: "inherit",
   });
   console.log("Dev server is up");
 
-  require("../../../test/run");
+  spawnChecked("node", ["../../../test/run", "--testServer", TEST_SERVER], {
+    stdio: "inherit",
+  });
 })().catch(err => {
   console.error(err);
   process.exit(1);

@@ -31,6 +31,7 @@ const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
 let count = 1;
 const patterns = [];
 let stripeIndex, stripeCount, dispatchServer;
+let testServer = "http://localhost:8080/";
 const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
@@ -84,6 +85,9 @@ function processArgs() {
       case "--server":
         dispatchServer = process.argv[++i];
         break;
+      case "--testServer":
+        testServer = process.argv[++i];
+        break;
       case "--help":
       case "-h":
       default:
@@ -94,6 +98,7 @@ function processArgs() {
 }
 
 const DefaultDispatchServer = "wss://dispatch.replay.io";
+const DefaultServer = "http://localhost:8080";
 
 function processEnvironmentVariables() {
   // The INPUT_STRIPE environment variable is set when running as a Github action.
@@ -180,7 +185,7 @@ async function runTest(test, example, target) {
       case "gecko":
       case "chromium":
         exampleRecordingId = await createExampleBrowserRecording(
-          `http://localhost:8080/test/examples/${example}`,
+          `${testServer}/test/examples/${example}`,
           target
         );
         break;
@@ -210,8 +215,8 @@ async function runTest(test, example, target) {
     // itself.
     RECORD_REPLAY_DONT_PROCESS_RECORDINGS: "1",
     RECORD_REPLAY_TEST_URL: exampleRecordingId
-      ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
-      : `http://localhost:8080/test/examples/${example}`,
+      ? `${testServer}/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
+      : `${testServer}/test/examples/${example}`,
     // If we need to record the example we have to use the target dispatch server.
     // If we already have the example, use the default dispatch server. When running in CI
     // against a local version of the backend, this allows us to record the viewer using the
@@ -260,7 +265,7 @@ async function runTestViewer(path, local, timeout, env) {
     MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
     RECORD_REPLAY_TEST_SCRIPT: testScript,
     RECORD_REPLAY_LOCAL_TEST: local,
-    RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
+    RECORD_REPLAY_VIEW_HOST: testServer,
     RECORD_REPLAY_API_KEY: replayApiKey,
   });
 
@@ -273,14 +278,14 @@ async function runTestViewer(path, local, timeout, env) {
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
-    if (match && match[2].startsWith("http://localhost:8080/recording")) {
+    if (match && match[2].startsWith(`${testServer}/recording`)) {
       recordingId = match[1];
 
       if (env.RECORD_REPLAY_SERVER == DefaultDispatchServer) {
         addTestRecordingId(recordingId);
       }
     }
-    if (match && match[2].startsWith("http://localhost:8080/test/examples/")) {
+    if (match && match[2].startsWith(`${testServer}/test/examples/`)) {
       const exampleRecordingId = match[1];
       const relativePath = url.parse(match[2]).pathname.slice("/test/examples/".length);
 
@@ -467,6 +472,7 @@ async function createExampleBrowserRecording(url, target) {
 }
 
 (async function () {
+  console.log(process.argv);
   processArgs();
   processEnvironmentVariables();
 

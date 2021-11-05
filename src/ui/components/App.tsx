@@ -88,11 +88,11 @@ function App({ theme, modal, children }: AppProps) {
     document.body.parentElement!.className = theme || "";
   }, [theme]);
 
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      migratePrefToSettings("devtools.disableLogRocket", "disableLogRocket");
-    }
-  }, [auth.isAuthenticated]);
+  // useEffect(() => {
+  //   if (auth.isAuthenticated) {
+  //     migratePrefToSettings("devtools.disableLogRocket", "disableLogRocket");
+  //   }
+  // }, [auth.isAuthenticated]);
 
   if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
     return <LoadingScreen />;

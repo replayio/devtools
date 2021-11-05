@@ -7,7 +7,12 @@ inputs:
   github_ci:
     description: "A flag to tell whether we are in CI"
     required: false
+  server:
+    description: "The URL to the server to test against"
+    required: false
 
 runs:
   using: "node12"
   main: "./main.js"
+  args:
+    - ${{ inputs.server }}
