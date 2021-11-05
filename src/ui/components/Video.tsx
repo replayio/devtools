@@ -57,19 +57,21 @@ function Video({
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
 
   return (
-    <div id="video" className="bg-toolbarBackground">
-      <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
-        <ReplayLogo size="sm" color="gray" />
-      </div>
+    <div className="pb-2 pr-2 relative overflow-hidden w-full">
+      <div id="video" className="bg-toolbarBackground">
+        <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
+          <ReplayLogo size="sm" color="gray" />
+        </div>
 
-      <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
-      <canvas id="graphics" onMouseDown={onMouseDown} />
-      {showCommentTool ? (
-        <CommentsOverlay>
-          <CommentLoader recordingId={recordingId} />
-        </CommentsOverlay>
-      ) : null}
-      <div id="highlighter-root"></div>
+        <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
+        <canvas id="graphics" onMouseDown={onMouseDown} />
+        {showCommentTool ? (
+          <CommentsOverlay>
+            <CommentLoader recordingId={recordingId} />
+          </CommentsOverlay>
+        ) : null}
+        <div id="highlighter-root"></div>
+      </div>
     </div>
   );
 }

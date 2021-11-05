@@ -131,7 +131,7 @@ function SecondaryToolbox({
   const isNode = recordingTarget === "node";
 
   return (
-    <div className={classnames(`secondary-toolbox rounded-lg pt-2`, { node: isNode })}>
+    <div className={classnames(`secondary-toolbox rounded-lg pr-2`, { node: isNode })}>
       {!isDemo() && (
         <header className="secondary-toolbox-header rounded-t-lg">
           <PanelButtons
