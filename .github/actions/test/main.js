@@ -15,15 +15,11 @@ function checkForFile(path) {
   }
 }
 
-checkForFile("dist/dist.tgz");
 checkForFile("replay/replay.dmg");
 checkForFile("replay-node/macOS-replay-node");
 checkForFile("replay-driver/macOS-recordreplay.so");
 
 console.log(new Date(), "Start");
-
-spawnChecked("mv", ["dist/dist.tgz", "dist.tgz"]);
-spawnChecked("tar", ["-xzf", "dist.tgz"]);
 
 console.log(new Date(), "Unpackaged distribution");
 
