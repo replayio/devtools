@@ -45,6 +45,12 @@ import { waitForEditor } from "../utils/editor/create-editor";
 import { isDemo } from "ui/utils/environment";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 
+const EditorPane = ({ children }) => (
+  <div className="editor-pane overflow-hidden rounded-lg">
+    <div className="editor-container relative">{children}</div>
+  </div>
+);
+
 class Debugger extends Component {
   state = {
     shortcutsModalEnabled: false,
@@ -158,30 +164,22 @@ class Debugger extends Component {
     openQuickOpen(query, project);
   };
 
-  renderEditorPane = () => {
+  renderEditor() {
     const horizontal = this.isHorizontal();
 
     return (
-      <div className="editor-pane overflow-hidden rounded-lg">
-        <div className="editor-container relative">
-          {!isDemo() && <EditorTabs horizontal={horizontal} />}
-          <Redacted>
-            <Editor />
-          </Redacted>
-          {!this.props.selectedSource ? (
-            <WelcomeBox
-              horizontal={horizontal}
-              toggleShortcutsModal={() => this.toggleShortcutsModal()}
-            />
-          ) : null}
-          {!isDemo() && <EditorFooter horizontal={horizontal} />}
-          <Redacted>
-            <ProjectSearch />
-          </Redacted>
-        </div>
-      </div>
+      <EditorPane>
+        {!isDemo() && <EditorTabs horizontal={horizontal} />}
+        <Redacted>
+          <Editor />
+        </Redacted>
+        {!isDemo() && <EditorFooter horizontal={horizontal} />}
+        <Redacted>
+          <ProjectSearch />
+        </Redacted>
+      </EditorPane>
     );
-  };
+  }
 
   toggleShortcutsModal() {
     this.setState(prevState => ({
@@ -198,12 +196,28 @@ class Debugger extends Component {
     }
   }
 
-  renderLayout = () => {
-    const { startPanelCollapsed } = this.props;
+  renderEndPane() {
+    const { selectedSource } = this.props;
+    const horizontal = this.isHorizontal();
 
-    if (isDemo()) {
-      return this.renderEditorPane();
+    if (!selectedSource) {
+      return (
+        <EditorPane>
+          <WelcomeBox
+            horizontal={horizontal}
+            toggleShortcutsModal={() => this.toggleShortcutsModal()}
+          />
+        </EditorPane>
+      );
     }
+
+    if (this.props.showEditor) {
+      return this.renderEditor();
+    }
+  }
+
+  renderLayout = () => {
+    const { startPanelCollapsed, selectedSource } = this.props;
 
     const onResize = num => {
       prefs.sidePanelSize = `${num}px`;
@@ -213,7 +227,7 @@ class Debugger extends Component {
       <div className="horizontal-panels">
         <SplitBox
           startPanel={!startPanelCollapsed && <SidePanel />}
-          endPanel={this.props.showEditor && this.renderEditorPane()}
+          endPanel={this.renderEndPane()}
           initialSize={prefs.sidePanelSize}
           maxSize={this.props.showEditor ? "80%" : "100%"}
           minSize={this.props.showEditor ? "240px" : "100%"}
