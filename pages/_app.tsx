@@ -160,7 +160,7 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
             <ConfirmProvider>
               <Head>
                 <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-                <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+                <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
                 <title>Replay</title>
                 <link
                   href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
