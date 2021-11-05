@@ -76,6 +76,7 @@
     "whatwg-url": "^9.0.0"
   },
   "devDependencies": {
+    "@actions/core": "^1.6.0",
     "@babel/core": "^7.14.8",
     "@babel/generator": "^7.14.8",
     "@babel/parser": "^7.14.8",
