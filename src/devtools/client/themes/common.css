@@ -77,17 +77,6 @@ html|input {
   margin: revert;
 }
 
-/**
-  * Override wrong system font from forms.css
-  * Bug 1458224: buttons use a wrong default font-size on Linux
-  */
-html|button,
-html|select,
-html|input {
-  font: message-box;
-  font-size: var(--theme-body-font-size);
-}
-
 /* Devtools rely on the old Gecko/HTML4 button hit testing */
 html|button > * {
   pointer-events: none;
