@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "ncc build main.js"
+    "build": "ncc build -o . main.js"
   },
   "author": "",
   "license": "ISC",
