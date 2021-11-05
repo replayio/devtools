@@ -8,6 +8,7 @@
   width: 24px;
   border-radius: 50%;
   box-shadow: 0 0 0 2px var(--chrome);
+  overflow: hidden;
 }
 
 .avatar:not(.authenticated):not(:last-child) {

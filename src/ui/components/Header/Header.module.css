@@ -1,6 +1,5 @@
 .header {
   background-color: var(--chrome);
-  border-bottom: 1px solid var(--theme-splitter-color);
   height: 50px;
   display: flex;
   align-items: center;
