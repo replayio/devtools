@@ -393,7 +393,7 @@ export class QuickOpenModal extends Component {
     const expanded = !!items && items.length > 0;
 
     return (
-      <Modal in={enabled} handleClose={this.closeModal}>
+      <Modal additionalClass={"rounded-lg"} in={enabled} handleClose={this.closeModal}>
         <SearchInput
           query={query}
           hasPrefix={true}

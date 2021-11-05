@@ -216,7 +216,7 @@ class SearchInput extends Component {
     return (
       <div className="search-outline">
         <div
-          className={classnames("search-field", size)}
+          className={classnames("search-field rounded-lg", size)}
           role="combobox"
           aria-haspopup="listbox"
           aria-owns="result-list"
