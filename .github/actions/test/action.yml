@@ -13,5 +13,7 @@ runs:
   steps:
     - run: npm ci
       shell: bash
+    - run: npm run build
+      shell: bash
     - run: node ${{ github.action_path }}/main.js
       shell: bash
