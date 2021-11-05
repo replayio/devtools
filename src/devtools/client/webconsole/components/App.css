@@ -54,6 +54,7 @@
 .devtools-button.webconsole-console-settings-menu-button {
   height: 100%;
   margin: 0;
+  background: var(--theme-body-color);
 }
 
 .webconsole-app .jsterm-input-container {
@@ -70,8 +71,8 @@
   --jsterm-padding-top: 0;
   --jsterm-padding-bottom: 0;
   min-height: calc(
-    var(--console-row-height) + var(--jsterm-border-width) +
-      var(--jsterm-padding-top) + var(--jsterm-padding-bottom)
+    var(--console-row-height) + var(--jsterm-border-width) + var(--jsterm-padding-top) +
+      var(--jsterm-padding-bottom)
   );
   padding-top: var(--jsterm-padding-top);
   padding-bottom: var(--jsterm-padding-bottom);
@@ -84,8 +85,7 @@
   --jsterm-border-width: 1px;
 }
 
-.webconsole-app:not(.jsterm-editor):not(.eager-evaluation)
-  .jsterm-input-container {
+.webconsole-app:not(.jsterm-editor):not(.eager-evaluation) .jsterm-input-container {
   /* The input should be full-height when eager evaluation is disabled. */
   --jsterm-padding-top: var(--console-input-extra-padding);
   --jsterm-padding-bottom: var(--console-input-extra-padding);
@@ -193,9 +193,7 @@
   height: unset;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-executeButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton {
   padding-inline: 4px 8px;
   height: 20px;
   margin-inline-start: 5px;
@@ -203,9 +201,7 @@
   align-items: center;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-executeButton::before {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before {
   height: 16px;
   width: 16px;
   -moz-context-properties: fill;
@@ -213,9 +209,7 @@
   margin-inline-end: 2px;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-evaluation-selector-button {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-evaluation-selector-button {
   height: 20px;
   margin-inline-start: 5px;
   padding-inline: 8px 16px !important;
@@ -223,33 +217,23 @@
   background-position-y: calc(50% + 1px) !important;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-history-prevExpressionButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-prevExpressionButton {
   grid-column: -5 / -6;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-history-nextExpressionButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-nextExpressionButton {
   grid-column: -4 / -5;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-reverseSearchButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton {
   grid-column: -3 / -4;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-historyNavSeparator {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-historyNavSeparator {
   grid-column: -2 / -3;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-closeButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton {
   grid-column: -1 / -2;
 }
 
@@ -265,9 +249,7 @@
   background-size: 16px;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-reverseSearchButton::before {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton::before {
   background-size: 14px;
 }
 

@@ -488,6 +488,7 @@ checkbox:-moz-focusring {
 
 .devtools-clear-icon {
   cursor: pointer;
+  padding-left: 5px;
 }
 
 .devtools-clear-icon[disabled] {

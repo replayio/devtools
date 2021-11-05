@@ -155,7 +155,7 @@ separately stack the pause line visuals and the code. */
   outline: var(--debug-line-border) solid 1px;
 }
 
-.new-debug-line > .CodeMirror-line [role=presentation] {
+.new-debug-line > .CodeMirror-line [role="presentation"] {
   z-index: 1;
   position: relative;
 }
@@ -177,7 +177,7 @@ separately stack the pause line visuals and the code. */
   padding-top: 1px;
   margin-top: -2px;
   margin-bottom: -3px;
-  //margin-right: -1px;
+  margin-right: -1px;
   margin-right: -14px;
   z-index: 10000;
   position: relative;

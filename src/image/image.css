@@ -49,9 +49,6 @@
 .img.sencha-extjs {
   background-image: url(~devtools/client/debugger/images/sources/sencha-extjs.svg) !important;
 }
-.webconsole-console-settings-menu-button::before {
-  background-image: url(~devtools/client/themes/images/settings.svg) !important;
-}
 .webconsole-input-openEditorButton::before {
   background-image: url(~devtools/client/themes/images/webconsole/editor.svg) !important;
 }
@@ -496,6 +493,11 @@ button.open-inspector {
 .overlay-container.fast-forward .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
+
+.webconsole-console-settings-menu-button {
+  -webkit-mask: url(~devtools/client/themes/images/settings.svg) no-repeat center !important;
+}
+
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before {
   content: url(~devtools/client/themes/images/webconsole/run.svg);
 }
