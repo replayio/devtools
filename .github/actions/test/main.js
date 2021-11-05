@@ -39,7 +39,7 @@ process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
 const devServerProcess = spawn("node", ["./dev-server.js"], {
   detached: true,
-  stdio: ["inherit", "pipe", "inherit"],
+  stdio: "inherit", // ["inherit", "pipe", "inherit"],
 });
 
 (async function () {
