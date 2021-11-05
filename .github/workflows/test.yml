@@ -17,10 +17,9 @@ jobs:
         env:
           GIT_SHA: ${{ github.sha }}
       - name: Copy test files
-        run: cp -r test out/test
+        run: cp -r test dist/test
       - name: Tar up output files
-        run: tar -czf dist.tgz out
-
+        run: tar -czf dist.tgz dist
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
