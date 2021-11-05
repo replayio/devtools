@@ -3,6 +3,13 @@ name: Run tests
 on: [pull_request, workflow_dispatch]
 
 jobs:
+  build:
+    name: Build macOS webpack
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
   download-browser:
     name: Download replay browser
     runs-on: ubuntu-latest

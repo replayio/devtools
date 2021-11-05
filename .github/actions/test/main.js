@@ -15,17 +15,11 @@ function checkForFile(path) {
   }
 }
 
-checkForFile("dist/dist.tgz");
 checkForFile("replay/replay.dmg");
 checkForFile("replay-node/macOS-replay-node");
 checkForFile("replay-driver/macOS-recordreplay.so");
 
 console.log(new Date(), "Start");
-
-spawnChecked("mv", ["dist/dist.tgz", "dist.tgz"]);
-spawnChecked("tar", ["-xzf", "dist.tgz"]);
-
-console.log(new Date(), "Unpackaged distribution");
 
 spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
 spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
@@ -47,7 +41,7 @@ const devServerProcess = spawn("npm", ["run", "dev"], {
 });
 
 (async function () {
-  console.log("Waiting for Webpack server start");
+  console.log("Waiting for Dev server start");
   await Promise.race([
     new Promise(r => {
       devServerProcess.stdout.on("data", chunk => {
@@ -61,7 +55,7 @@ const devServerProcess = spawn("npm", ["run", "dev"], {
       throw new Error("Failed to start dev server");
     }),
   ]);
-  console.log("Waiting for Webpack build");
+  console.log("Waiting for Dev to be up");
 
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
@@ -69,7 +63,7 @@ const devServerProcess = spawn("npm", ["run", "dev"], {
   spawnChecked("curl", ["--max-time", "600", "--range", "0-50", "http://localhost:8080/"], {
     stdio: "inherit",
   });
-  console.log("Done Initial Webpack build");
+  console.log("Dev server is up");
 
   require("../../../test/run");
 })().catch(err => {
