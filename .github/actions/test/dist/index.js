@@ -1726,7 +1726,7 @@ process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
 process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
 (async function () {
-  spawnChecked("node", ["../../../test/run", "--testServer", TEST_SERVER], {
+  spawnChecked("node", ["test/run", "--testServer", TEST_SERVER], {
     stdio: "inherit",
   });
 })().catch(err => {
