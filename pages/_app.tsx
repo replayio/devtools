@@ -38,7 +38,7 @@ import "devtools/client/debugger/src/components/Editor/Preview/Popup.css";
 import "devtools/client/debugger/src/components/Editor/SearchBar.css";
 import "devtools/client/debugger/src/components/Editor/Tabs.css";
 import "devtools/client/debugger/src/components/PrimaryPanes/Outline.css";
-import "devtools/client/debugger/src/components/PrimaryPanes/OutlineFilter.css";
+// import "devtools/client/debugger/src/components/PrimaryPanes/OutlineFilter.css";
 import "devtools/client/debugger/src/components/PrimaryPanes/Sources.css";
 import "devtools/client/debugger/src/components/ProjectSearch.css";
 import "devtools/client/debugger/src/components/QuickOpenModal.css";
