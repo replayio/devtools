@@ -12,5 +12,6 @@ runs:
   using: "composite"
   steps:
     - run: npm ci
-      run: node ./main.js
+      shell: bash
+    - run: node ./main.js
       shell: bash
