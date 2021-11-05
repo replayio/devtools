@@ -21,8 +21,8 @@ jobs:
         run: ./node_modules/.bin/webpack --mode=development --env REPLAY_RELEASE=$GIT_SHA
         env:
           GIT_SHA: ${{ github.sha }}
-          NEXT_PUBLIC_API_URL: https://api.replay.io/v1/graphql
-          NEXT_PUBLIC_DISPATCH_URL: wss://dispatch.replay.io
+          # NEXT_PUBLIC_API_URL: https://api.replay.io/v1/graphql
+          # NEXT_PUBLIC_DISPATCH_URL: wss://dispatch.replay.io
       - name: Tar up output files
         run: tar -czf dist.tgz index.html dist node_modules
 
