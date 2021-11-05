@@ -23,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build app
         run: npm run export
         env:
