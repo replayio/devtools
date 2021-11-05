@@ -49,7 +49,7 @@ function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewC
     addComment(newComment);
   };
 
-  return <CommentEditor editable={true} {...{ comment, handleSubmit }} />;
+  return <CommentEditor editable={true} {...{ clearPendingComment, comment, handleSubmit }} />;
 }
 
 const connector = connect(null, {

@@ -99,6 +99,7 @@ function CommentItem({
       <ExistingCommentEditor
         clearPendingComment={clearPendingComment}
         comment={comment}
+        editItem={editItem}
         type={type}
         editable={pendingComment?.comment.id === comment.id}
       />
