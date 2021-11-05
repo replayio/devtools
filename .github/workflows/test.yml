@@ -3,6 +3,15 @@ name: Run tests
 on: [pull_request, workflow_dispatch]
 
 jobs:
+  build:
+    name: Build macOS webpack
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
   download-browser:
     name: Download replay browser
     runs-on: ubuntu-latest
@@ -42,7 +51,7 @@ jobs:
   test0:
     name: Test stripe 0
     runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
+    needs: [build, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -52,110 +61,3 @@ jobs:
           server: ${{ github.event.deployment_status.target_url }}
           github_ci: true
           stripe: 0/8
-  test1:
-    name: Test stripe 1
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 1/8
-  test2:
-    name: Test stripe 2
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 2/8
-  test3:
-    name: Test stripe 3
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 3/8
-  test4:
-    name: Test stripe 4
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 4/8
-  test5:
-    name: Test stripe 5
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 5/8
-  test6:
-    name: Test stripe 6
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 6/8
-  test7:
-    name: Test stripe 7
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        with:
-          server: ${{ github.event.deployment_status.target_url }}
-          github_ci: true
-          stripe: 7/8
-  mock-test:
-    name: Mock Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/mockTest
-  unit-test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install modules
-        run: npm install --force
-      - name: Run tests
-        run: npm test
