@@ -5,6 +5,7 @@ module.exports = {
     "@storybook/addon-essentials",
     "@storybook/addon-postcss",
     "storybook-addon-root-attribute/register",
+    "storybook-css-modules-preset",
   ],
   options: {
     postcssLoaderOptions: {

@@ -37,6 +37,10 @@ module.exports = {
       test: /\.properties$/,
       loader: "raw-loader",
     });
+    config.module.rules.push({
+      test: /^\/test\//,
+      loader: "raw-loader",
+    });
 
     return config;
   },

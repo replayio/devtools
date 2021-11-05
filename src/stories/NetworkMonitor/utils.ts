@@ -32,6 +32,6 @@ export const eventsFor = (id: string, url: string, status: number): RequestEvent
 export const requestProps = (id: string, url: string, status: number): CombinedRequestInfo => {
   return {
     events: eventsFor(id, url, status),
-    info: { id, point: { point: "1", time: 1 } },
+    info: { id, point: { point: "1", time: Number(id) } },
   };
 };

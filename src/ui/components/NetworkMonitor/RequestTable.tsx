@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import keyBy from "lodash/keyBy";
 import { TimeStampedPoint } from "@recordreplay/protocol";
 import Status from "./Status";
+import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 
 interface Header {
@@ -86,11 +87,12 @@ const partialRequestsToCompleteSummaries = (
 };
 
 type RequestTableProps = {
+  currentTime: number;
   events: RequestEventInfo[];
   requests: RequestInfo[];
 };
 
-const RequestTable = ({ events, requests }: RequestTableProps) => {
+const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
   const columns = useMemo(
     () => [
       {
@@ -110,6 +112,7 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
   const data = useMemo(() => partialRequestsToCompleteSummaries(requests, events), [requests]);
   const tableInstance = useTable<RequestSummary>({ columns, data });
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const currentTimeIndex = data.findIndex(r => currentTime < r.point.time);
 
   return (
     <div>
@@ -118,7 +121,7 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
-                <th className="border p-1" {...column.getHeaderProps()}>
+                <th className="font-normal border p-1" {...column.getHeaderProps()}>
                   {column.render("Header")}
                 </th>
               ))}
@@ -126,10 +129,17 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
+          {rows.map((row, i) => {
             prepareRow(row);
+            console.log(styles);
             return (
-              <tr {...row.getRowProps()}>
+              <tr
+                className={classNames({
+                  "text-lightGrey": currentTime < row.original.point.time,
+                  [styles.next]: currentTimeIndex === i,
+                })}
+                {...row.getRowProps()}
+              >
                 {row.cells.map(cell => {
                   return (
                     <td
