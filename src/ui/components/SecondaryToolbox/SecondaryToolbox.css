@@ -11,7 +11,6 @@
   flex-direction: row;
   justify-content: space-between;
   background: var(--theme-tab-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .secondary-toolbox-header .panel-buttons {
@@ -19,6 +18,10 @@
   flex-direction: row;
   align-items: center;
   overflow: hidden;
+}
+
+.secondary-toolbox-header button.toolbox-options {
+  padding-right: 5px;
 }
 
 .secondary-toolbox-header button {

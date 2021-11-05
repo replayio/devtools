@@ -62,16 +62,6 @@
   background: var(--theme-icon-color);
 }
 
-#command-button-pick::after {
-  width: 1px;
-  position: absolute;
-  right: 0;
-  content: " ";
-  background: var(--theme-toolbar-separator);
-  height: 24px;
-  top: 5px;
-}
-
 #command-button-pick.active::before {
   background-color: var(--theme-toolbar-selected-color);
 }

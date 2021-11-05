@@ -6,7 +6,6 @@
   display: flex;
   width: 100%;
   height: var(--editor-header-height);
-  border-bottom: 1px solid var(--theme-splitter-color);
   background-color: var(--theme-tab-background);
   border-radius: 8px 8px 0 0;
   overflow: scroll;
@@ -44,7 +43,7 @@
   overflow: hidden;
   padding: 4px 10px;
   cursor: default;
-  height: calc(var(--editor-header-height) - 1px);
+  height: var(--editor-header-height);
   font-size: 15px;
   background-color: transparent;
   vertical-align: bottom;

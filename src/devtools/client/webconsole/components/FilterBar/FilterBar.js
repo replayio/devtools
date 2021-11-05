@@ -207,9 +207,6 @@ class FilterBar extends Component {
   render() {
     const { displayMode } = this.props;
 
-    const isWide = displayMode === FILTERBAR_DISPLAY_MODES.WIDE;
-
-    const separator = this.renderSeparator();
     const clearButton = this.renderClearButton();
     const searchBox = this.renderSearchBox();
     const settingsButton = this.renderSettingsButton();
@@ -221,11 +218,8 @@ class FilterBar extends Component {
           key: "primary-bar",
         },
         clearButton,
-        separator,
         searchBox,
-        isWide && separator,
         <Events />,
-        separator,
         settingsButton
       ),
     ];
