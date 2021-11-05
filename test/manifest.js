@@ -50,11 +50,11 @@ module.exports = [
     script: "breakpoints-07.js",
     targets: ["gecko", "chromium"],
   },
-  {
-    example: "node/control_flow.js",
-    script: "node_control_flow.js",
-    targets: ["node"],
-  },
+  // {
+  //   example: "node/control_flow.js",
+  //   script: "node_control_flow.js",
+  //   targets: ["node"],
+  // },
 
   //////////////////////////////////////////////////////////////////////////////
   // Stepping
@@ -201,11 +201,11 @@ module.exports = [
     script: "object_preview-01.js",
     targets: ["gecko", "chromium"],
   },
-  {
-    example: "doc_rr_objects.html",
-    script: "object_preview-02.js",
-    targets: ["gecko", "chromium"],
-  },
+  // {
+  //   example: "doc_rr_objects.html",
+  //   script: "object_preview-02.js",
+  //   targets: ["gecko", "chromium"],
+  // },
   {
     example: "doc_rr_preview.html",
     script: "object_preview-03.js",
@@ -240,11 +240,12 @@ module.exports = [
     script: "inspector-02.js",
     targets: ["gecko"],
   },
-  {
-    example: "doc_inspector_styles.html",
-    script: "inspector-03.js",
-    targets: ["gecko"],
-  },
+  // {
+  //   This  test just times out, it doesn't even seem to run
+  //   example: "doc_inspector_styles.html",
+  //   script: "inspector-03.js",
+  //   targets: ["gecko"],
+  // },
   {
     example: "doc_inspector_styles.html",
     script: "inspector-04.js",

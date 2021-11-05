@@ -1,13 +1,23 @@
 name: "Test"
-description: "Run correctness tests"
+description: "Run end-to-end tests. Note that this action assumes that Node and Next.js have already been properly setup. See the setup-next task for details."
 inputs:
   stripe:
     description: "Stripe to run, in the form INDEX/TOTAL"
     required: true
-  github_ci:
-    description: "A flag to tell whether we are in CI"
-    required: false
-
 runs:
-  using: "node12"
-  main: "./main.js"
+  using: "composite"
+  steps:
+    - run: mv node_modules/node_modules.tgz ./
+      shell: bash
+    - run: tar -xzf node_modules.tgz
+      shell: bash
+    - name: Copy .env file
+      run: cp .env.sample .env
+      shell: bash
+    - name: Start Next.js development server
+      run: ./node_modules/.bin/next dev -p 8080 &
+      shell: bash
+    - run: node ${{ github.action_path }}/main.js
+      shell: bash
+      env:
+        INPUT_STRIPE: ${{ inputs.stripe }}

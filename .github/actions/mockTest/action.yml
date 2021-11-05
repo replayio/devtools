@@ -1,6 +1,15 @@
-name: "Mock Test"
+name: "Mock Tests"
 description: "Run mock tests"
-
 runs:
-  using: "node12"
-  main: "./main.js"
+  using: "composite"
+  steps:
+    - name: Copy .env file
+      run: cp .env.sample .env
+      shell: bash
+    - name: Start Next.js development server
+      run: ./node_modules/.bin/next dev -p 8080 &
+      shell: bash
+    - run: node ${{ github.action_path }}/main.js
+      shell: bash
+      env:
+        DEBUG: "pw:api"

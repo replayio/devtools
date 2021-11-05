@@ -11,4 +11,5 @@ cypress.env.json
 !.env.sample
 .next
 next-env.d.ts
+out
 tsconfig.tsbuildinfo

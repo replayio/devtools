@@ -193,7 +193,12 @@ function showLoadingProgress(): UIThunkAction {
     // as that's not dealt with in toolbox, however we still
     // need to init the toolbox so we're not checking for
     // that here.
-    gToolbox.init(selectedPanel);
+    let i = 0;
+    while (!(window as any).gToolbox && i < 30) {
+      await waitForTime(1000);
+      i++;
+    }
+    (window as any).gToolbox.init(selectedPanel);
 
     await waitForTime(300);
     await ThreadFront.initializedWaiter.promise;

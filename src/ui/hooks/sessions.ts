@@ -35,8 +35,8 @@ export function useGetActiveSessions(recordingId: RecordingId) {
   const activeSessions = data.recording?.activeSessions || [];
   const filteredSessions = activeSessions.filter((session: Session) => session.user?.id !== userId);
 
-  // This includes the sessionId with the user. Otherwise, all
-  // anonymous users look the same (null) and we can't maintain some order.
+  // This includes the sessionId with the user. Otherwise, all anonymous users
+  // look the same (null) and we can't maintain some order.
   const users: SessionUser[] = filteredSessions
     .map((session: Session) => ({
       ...session.user,

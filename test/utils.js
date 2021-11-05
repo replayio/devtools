@@ -87,7 +87,7 @@ function defer() {
 }
 
 function sendTelemetryEvent(telemetryEvent, tags) {
-  if (!process.env.INPUT_GITHUB_CI) {
+  if (!process.env.CI) {
     return;
   }
 

@@ -16,6 +16,12 @@ const {
 } = require("./utils");
 const { listAllRecordings } = require("@recordreplay/recordings-cli");
 
+// These don't work quite perfectly yet, there are still places where we are
+// hardcoding localhost:8080, in files like `header.js` and `runTest.js`.  When
+// we move to Vercel branch preview testing, this work will have to be completed
+const EXAMPLE_SERVER = "http://localhost:8080/test/examples";
+const REPLAY_SERVER = "http://localhost:8080";
+
 // This API key allows access to the whole team that holds all these test
 // recordings. If someone wanted to, they could go in and delete the workspace
 // or recordings in it or anything. While thats not great, it's also not
@@ -133,7 +139,7 @@ async function runMatchingTests() {
       continue;
     }
 
-    const { script, example, targets } = Manifest[i];
+    const { example, script, targets } = Manifest[i];
     if (!onlyTarget) {
       for (const target of targets) {
         await runTest(script, example, target);
@@ -182,7 +188,7 @@ async function runTest(test, example, target) {
       case "gecko":
       case "chromium":
         exampleRecordingId = await createExampleBrowserRecording(
-          `http://localhost:8080/test/examples/${example}`,
+          `${EXAMPLE_SERVER}/${example}`,
           target
         );
         break;
@@ -196,6 +202,7 @@ async function runTest(test, example, target) {
     } else if (!exampleRecordingId) {
       failures.push(`Failed test: ${example} no recording created`);
       console.log(`[${elapsedTime()}] Test failed: no recording created`);
+
       return;
     }
   }
@@ -212,8 +219,8 @@ async function runTest(test, example, target) {
     // itself.
     RECORD_REPLAY_DONT_PROCESS_RECORDINGS: "1",
     RECORD_REPLAY_TEST_URL: exampleRecordingId
-      ? `http://localhost:8080/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
-      : `http://localhost:8080/test/examples/${example}`,
+      ? `${REPLAY_SERVER}/recording/${exampleRecordingId}?test=${test}&dispatch=${dispatchServer}`
+      : `${EXAMPLE_SERVER}/${example}`,
     // If we need to record the example we have to use the target dispatch server.
     // If we already have the example, use the default dispatch server. When running in CI
     // against a local version of the backend, this allows us to record the viewer using the
@@ -264,7 +271,7 @@ async function runTestViewer(path, local, timeout, env) {
     MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
     RECORD_REPLAY_TEST_SCRIPT: testScript,
     RECORD_REPLAY_LOCAL_TEST: local,
-    RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
+    RECORD_REPLAY_VIEW_HOST: REPLAY_SERVER,
     RECORD_REPLAY_API_KEY: replayApiKey,
   });
 
@@ -277,14 +284,14 @@ async function runTestViewer(path, local, timeout, env) {
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
-    if (match && match[2].startsWith("http://localhost:8080/recording")) {
+    if (match && match[2].startsWith(`${REPLAY_SERVER}/recording`)) {
       recordingId = match[1];
 
       if (env.RECORD_REPLAY_SERVER == DefaultDispatchServer) {
         addTestRecordingId(recordingId);
       }
     }
-    if (match && match[2].startsWith("http://localhost:8080/test/examples/")) {
+    if (match && match[2].startsWith(`${EXAMPLE_SERVER}/`)) {
       const exampleRecordingId = match[1];
       const relativePath = url.parse(match[2]).pathname.slice("/test/examples/".length);
 
@@ -487,7 +494,7 @@ async function createExampleBrowserRecording(url, target) {
   }
 
   if (failures.length) {
-    console.log(timings);
+    console.log({ timings });
     console.log(`[${elapsedTime()}] Had ${failures.length} test failures.`);
     failures.forEach(failure => console.log(failure));
   } else {

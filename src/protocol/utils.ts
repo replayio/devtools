@@ -24,9 +24,7 @@ export function defer<T>() {
   return { promise, resolve, reject };
 }
 
-export function waitForTime(ms: number) {
-  return new Promise<void>(resolve => setTimeout(resolve, ms));
-}
+export const waitForTime = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 export function throttle(callback: () => void, time: number) {
   let scheduled = false;
@@ -74,16 +72,14 @@ function NotAllowed() {
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   // getPrototypeOf() {
   //   NotAllowed();
-  //   return null;
   // },
   //has() {
   //  NotAllowed();
-  //  return false;
   //},
+  //set() { NotAllowed(); },
   get() {
     return undefined;
   },
-  //set() { NotAllowed(); },
   apply() {
     NotAllowed();
   },

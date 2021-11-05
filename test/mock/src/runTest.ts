@@ -32,7 +32,7 @@ function wrapped<T>(cbk: (...args: any[]) => Promise<T>, pageLog = log, inline =
       await pageLog(inline ? name : `> ${name}`);
       depth += i;
       return await cbk(...args);
-    } catch (e) {
+    } catch (e: any) {
       if (!e.handled) {
         e.handled = true;
         console.error(indent(`🛑 Error in ${name}\n`));
@@ -86,7 +86,7 @@ export const runTest = wrapped(async cbk => {
   pageLog("Browser launched");
   let success = true;
 
-  // page.on("console", console.log);
+  page.on("console", console.log);
 
   await action("Running example", async () => {
     try {
