@@ -1,10 +1,9 @@
 import { useTable } from "react-table";
 import React, { useMemo } from "react";
-import groupBy from "lodash/groupBy";
-import find from "lodash/find";
-import { repeat } from "lodash";
+import keyBy from "lodash/keyBy";
 import { TimeStampedPoint } from "@recordreplay/protocol";
 import Status from "./Status";
+import classNames from "classnames";
 
 interface Header {
   name: string;
@@ -47,32 +46,43 @@ export type CombinedRequestInfo = {
 };
 
 type RequestSummary = {
+  point: TimeStampedPoint;
   status: number;
   url: string;
 };
 
-const combinedInfoToRequestSummary = (
-  infos: RequestInfo[],
+type RequestEventMap = {
+  request: RequestOpenEvent;
+  response: RequestResponseEvent;
+};
+
+const eventsToMap = (events: RequestEvent[]): Partial<RequestEventMap> => {
+  return keyBy(events, e => e.kind);
+};
+
+const eventsByRequestId = (events: RequestEventInfo[]): Record<string, RequestEvent[]> => {
+  return events.reduce((acc: Record<string, RequestEvent[]>, eventInfo) => {
+    acc[eventInfo.id] = [eventInfo.event, ...(acc[eventInfo.id] || [])];
+    return acc;
+  }, {});
+};
+
+const partialRequestsToCompleteSummaries = (
+  requests: RequestInfo[],
   events: RequestEventInfo[]
 ): RequestSummary[] => {
-  const intermediates = groupBy(events, "id");
-  const combined = [];
-
-  for (let info of infos) {
-    const openEventInfo = events.find(e => e.event.kind === "request");
-    const responseEventInfo = events.find(e => e.event.kind === "response");
-    if (openEventInfo && responseEventInfo) {
-      // I thought tsc would figure these types out, apparently not!
-      const open: RequestOpenEvent = openEventInfo.event as RequestOpenEvent;
-      const response: RequestResponseEvent = responseEventInfo.event as RequestResponseEvent;
-      combined.push({
-        url: open.requestUrl,
-        status: response.responseStatus,
-      });
-    }
-  }
-
-  return combined;
+  const eventsMap = eventsByRequestId(events);
+  return requests
+    .map(r => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
+    .filter(
+      (r): r is RequestInfo & { events: RequestEventMap } =>
+        !!r.events.request && !!r.events.response
+    )
+    .map(request => ({
+      point: request.point,
+      status: request.events.response.responseStatus,
+      url: request.events.request.requestUrl,
+    }));
 };
 
 type RequestTableProps = {
@@ -88,6 +98,7 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
         Cell: Status,
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
+        className: "text-center",
       },
       {
         Header: "URL",
@@ -96,8 +107,7 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
     ],
     []
   );
-  const data = useMemo(() => combinedInfoToRequestSummary(requests, events), [requests]);
-
+  const data = useMemo(() => partialRequestsToCompleteSummaries(requests, events), [requests]);
   const tableInstance = useTable<RequestSummary>({ columns, data });
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
@@ -108,7 +118,9 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+                <th className="border p-1" {...column.getHeaderProps()}>
+                  {column.render("Header")}
+                </th>
               ))}
             </tr>
           ))}
@@ -120,7 +132,10 @@ const RequestTable = ({ events, requests }: RequestTableProps) => {
               <tr {...row.getRowProps()}>
                 {row.cells.map(cell => {
                   return (
-                    <td className="border p-1" {...cell.getCellProps()}>
+                    <td
+                      className={classNames("border p-1", (cell.column as any).className)}
+                      {...cell.getCellProps()}
+                    >
                       {cell.render("Cell")}
                     </td>
                   );
