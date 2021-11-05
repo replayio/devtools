@@ -15,7 +15,7 @@ function checkForFile(path) {
   }
 }
 
-const TEST_SERVER = process.argv[1];
+const TEST_SERVER = process.env.TEST_SERVER;
 
 checkForFile("replay/replay.dmg");
 checkForFile("replay-node/macOS-replay-node");

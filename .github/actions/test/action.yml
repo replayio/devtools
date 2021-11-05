@@ -14,5 +14,5 @@ inputs:
 runs:
   using: "node12"
   main: "./main.js"
-  args:
-    - ${{ inputs.server }}
+  env:
+    TEST_SERVER: ${{ inputs.server }}
