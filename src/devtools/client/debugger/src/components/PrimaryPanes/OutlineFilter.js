@@ -32,14 +32,11 @@ export default class OutlineFilter extends Component {
   };
 
   render() {
-    const { focused } = this.state;
     return (
-      <div className="outline-filter sticky top-0">
+      <div className="outline-filter sticky top-0 pt-1 px-3">
         <form>
           <input
-            className={classnames("outline-filter-input devtools-filterinput", {
-              focused,
-            })}
+            className={"w-full h-full text-xs px-2 py-1 rounded-md"}
             onFocus={() => this.setFocus(true)}
             onBlur={() => this.setFocus(false)}
             placeholder={"Filter functions"}
