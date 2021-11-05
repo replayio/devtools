@@ -68,7 +68,7 @@ jobs:
   test0:
     name: Test stripe 0
     runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver]
+    needs: [build, download-browser, download-node, download-driver]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
