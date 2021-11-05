@@ -3,6 +3,34 @@ name: Run tests
 on: [pull_request, workflow_dispatch]
 
 jobs:
+  build:
+    name: Build macOS webpack
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "15"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+      - name: Build webpack
+        run: ./node_modules/.bin/webpack --mode=development --env REPLAY_RELEASE=$GIT_SHA
+        env:
+          GIT_SHA: ${{ github.sha }}
+          NEXT_PUBLIC_API_URL: https://api.replay.io/v1/graphql
+          NEXT_PUBLIC_DISPATCH_URL: wss://dispatch.replay.io
+      - name: Tar up output files
+        run: tar -czf dist.tgz index.html dist node_modules
+
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist.tgz
   download-browser:
     name: Download replay browser
     runs-on: ubuntu-latest
@@ -39,23 +67,6 @@ jobs:
         with:
           name: replay-driver
           path: macOS-recordreplay.so
-  cache-node_modules:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
   test0:
     name: Test stripe 0
     runs-on: macos-latest
