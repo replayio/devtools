@@ -13,11 +13,13 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build webpack
-        run: ./node_modules/.bin/webpack --mode=development --env REPLAY_RELEASE=$GIT_SHA
+        run: npm run export
         env:
           GIT_SHA: ${{ github.sha }}
+      - name: Copy test files
+        run: cp -r test out/test
       - name: Tar up output files
-        run: tar -czf dist.tgz index.html dist node_modules
+        run: tar -czf dist.tgz out
 
       - name: Create artifact
         uses: actions/upload-artifact@v2

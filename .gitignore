@@ -10,3 +10,4 @@ cypress.env.json
 .env*
 .next
 next-env.d.ts
+out

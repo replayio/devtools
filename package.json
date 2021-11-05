@@ -5,6 +5,7 @@
   "main": "postcss.config.js",
   "scripts": {
     "dev": "node dev-server",
+    "export": "next build && next export",
     "test": "jest",
     "start": "next start -p 8080",
     "build": "next build",
