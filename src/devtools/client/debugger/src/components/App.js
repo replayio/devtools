@@ -162,7 +162,7 @@ class Debugger extends Component {
     const horizontal = this.isHorizontal();
 
     return (
-      <div className="editor-pane pt-2 overflow-hidden rounded-lg">
+      <div className="editor-pane overflow-hidden rounded-lg">
         <div className="editor-container relative">
           {!isDemo() && <EditorTabs horizontal={horizontal} />}
           <Redacted>

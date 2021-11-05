@@ -72,3 +72,8 @@
   height: 100%;
   background-color: white;
 }
+
+.accordion > *:last-child > ._header {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
