@@ -66,13 +66,9 @@ const devServerProcess = spawn("node_modules/.bin/serve", ["-p", "8080"], {
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
   // the risk of timing out if the build itself is slow.
-  spawnChecked(
-    "curl",
-    ["--max-time", "600", "--range", "0-50", "http://localhost:8080/dist/main.js"],
-    {
-      stdio: "inherit",
-    }
-  );
+  spawnChecked("curl", ["--max-time", "600", "--range", "0-50", "http://localhost:8080/"], {
+    stdio: "inherit",
+  });
   console.log("Done Initial Webpack build");
 
   require("../../../test/run");
