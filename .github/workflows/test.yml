@@ -8,12 +8,15 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 15
     steps:
-      - name: "Setup node"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
         uses: actions/setup-node@v2
         with:
           node-version: "16"
           cache: "npm"
-      - name: "Setup NextJS Cache"
+        run: npm ci
+      - name: Build app
         uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/.next/cache
@@ -22,11 +25,6 @@ jobs:
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: npm ci
-      - name: Build app
         run: npm run export
         env:
           GIT_SHA: ${{ github.sha }}
