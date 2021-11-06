@@ -15,11 +15,15 @@ function checkForFile(path) {
   }
 }
 
+checkForFile("dist/dist.tgz");
 checkForFile("replay/replay.dmg");
 checkForFile("replay-node/macOS-replay-node");
 checkForFile("replay-driver/macOS-recordreplay.so");
 
 console.log(new Date(), "Start");
+
+spawnChecked("mv", ["dist/dist.tgz", "dist.tgz"]);
+spawnChecked("tar", ["-xzf", "dist.tgz"]);
 
 console.log(new Date(), "Unpackaged distribution");
 
@@ -37,9 +41,13 @@ spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
 process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
 process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
-const devServerProcess = spawn("./node_modules/.bin/next", ["dev", "-p", "8080"], {
-  detached: true,
+const devServerProcess = spawn("npm", ["run", "dev"], {
   stdio: ["inherit", "pipe", "inherit"],
+  env: {
+    ...process.env,
+    NEXT_PUBLIC_API_URL: "https://api.replay.io/v1/graphql",
+    NEXT_PUBLIC_DISPATCH_URL: "wss://dispatch.replay.io",
+  },
 });
 
 (async function () {
@@ -59,14 +67,13 @@ const devServerProcess = spawn("./node_modules/.bin/next", ["dev", "-p", "8080"]
   ]);
 
   console.log("Waiting for Webpack build");
-  // await new Promise(r => setTimeout(r, 20000));
 
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
   // the risk of timing out if the build itself is slow.
   spawnChecked(
     "curl",
-    ["--max-time", "600", "--range", "0-50", "http://localhost:8080/test/manifest.js"],
+    ["--max-time", "90", "--range", "0-50", "http://localhost:8080/dist/manifest.js"],
     {
       stdio: "inherit",
     }
