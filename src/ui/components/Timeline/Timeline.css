@@ -6,7 +6,7 @@
   box-sizing: border-box;
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 10px 24px 12px 12px;
+  padding: 10px 4px 12px 6px;
   align-items: center;
   user-select: none;
 }

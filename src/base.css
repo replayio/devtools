@@ -27,6 +27,7 @@ body {
   width: 100%;
   font-family: "Inter", sans-serif;
   color: var(--theme-body-color);
+  background: var(--chrome);
   --light-grey: #969696;
   --dark-grey: #696969;
   --light-blue: #61cdff;
@@ -38,7 +39,8 @@ body {
   font-family: "Inter", sans-serif;
 }
 
-img.avatar, .avatar img {
+img.avatar,
+.avatar img {
   border-radius: 50%;
   background-color: var(--light-grey);
 }
