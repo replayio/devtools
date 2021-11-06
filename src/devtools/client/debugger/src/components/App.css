@@ -21,11 +21,12 @@ button {
 }
 
 .editor-pane {
+  background: white;
   display: flex;
-  position: relative;
   flex: 1;
   height: 100%;
   overflow: hidden;
+  position: relative;
   z-index: 10; /* ensure tooltips are above other panes */
 }
 
