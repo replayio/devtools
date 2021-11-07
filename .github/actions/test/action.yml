@@ -15,3 +15,6 @@ runs:
       shell: bash
     - run: node ${{ github.action_path }}/main.js
       shell: bash
+      with:
+        stripe: ${{ inputs.stripe }}
+        github_ci: ${{ inputs.github_ci }}
