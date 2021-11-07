@@ -62,7 +62,7 @@ function CommentItemHeader({
           {comment.user.name}
         </span>
         <span
-          className="overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0 opacity-50"
+          className="overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0 text-gray-400"
           title={relativeDate}
         >
           {relativeDate}
@@ -160,8 +160,8 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto relative w-full border-b last:border-b-0 border-gray-300 cursor-pointer transition`,
-        hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
+        `mx-auto relative w-full border-b last:border-b-0 border-gray-300 cursor-pointer transition bg-white`
+        // hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onMouseDown={e => {
         seekToComment(comment);
@@ -199,9 +199,9 @@ function CommentCard({
             />
           </FocusContext.Provider>
         ) : (
-          <div className="pl-2 py-1 border-transparent border">
+          <div className="border-transparent border">
             <button
-              className="w-1/2 text-left hover:text-primaryAccent focus:outline-none focus:text-primaryAccent"
+              className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:outline-none focus:text-primaryAccent"
               onClick={() => {
                 setIsEditorOpen(true);
                 setIsFocused(true);
