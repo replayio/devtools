@@ -11,10 +11,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: npm i serve
+    - name: Install serve
+      run: npm i serve
       shell: bash
-    - run: node ${{ github.action_path }}/main.js
+    - name: Run tests
+      run: node ${{ github.action_path }}/main.js
       shell: bash
-      with:
-        stripe: ${{ inputs.stripe }}
-        github_ci: ${{ inputs.github_ci }}
+      env:
+        INPUT_STRIPE: ${{ inputs.stripe }}
