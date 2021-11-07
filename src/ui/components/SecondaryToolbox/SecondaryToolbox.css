@@ -55,11 +55,14 @@
   color: var(--tab-standard-color);
 }
 
+.secondary-toolbox-header button:hover .label {
+  color: var(--tab-standard-hover-color);
+}
+
 .secondary-toolbox-header .expanded .label {
   color: var(--tab-selected-color);
 }
 
-.secondary-toolbox-header button:hover,
 .secondary-toolbox-header button.expanded {
   background: inherit;
   background: white;

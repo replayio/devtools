@@ -73,7 +73,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   return (
     <div className="user-options text-blue-400">
       <Dropdown
-        buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
+        buttonContent={<MaterialIcon iconSize="lg">more_vert</MaterialIcon>}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"

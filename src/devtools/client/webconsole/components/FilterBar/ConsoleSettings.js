@@ -4,161 +4,135 @@
 
 "use strict";
 
-// React & Redux
-const { Component } = require("react");
+import React, { useState } from "react";
 const { connect } = require("react-redux");
-const { createFactory } = require("react");
-const PropTypes = require("prop-types");
+import classNames from "classnames";
 
 const { actions } = require("ui/actions");
 const { selectors } = require("ui/reducers");
 const { trackEvent } = require("ui/utils/telemetry");
 
-// Additional Components
-const MenuButton = createFactory(require("devtools/client/shared/components/menu/MenuButton"));
-
-const MenuItem = createFactory(require("devtools/client/shared/components/menu/MenuItem"));
-const MenuList = createFactory(require("devtools/client/shared/components/menu/MenuList"));
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownDivider,
+  DropdownItemContent,
+} from "ui/components/Library/LibraryDropdown";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 const { FILTERS } = require("devtools/client/webconsole/constants");
 
-class ConsoleSettings extends Component {
-  static get propTypes() {
-    return {
-      timestampsVisible: PropTypes.bool.isRequired,
-    };
-  }
+function _ConsoleSettings({
+  filters,
+  filteredMessagesCount,
+  shouldLogExceptions,
+  filterToggle,
+  timestampsToggle,
+  timestampsVisible,
+  logExceptions,
+}) {
+  const [expanded, setExpanded] = useState(false);
 
-  getLabel(baseLabel, filterKey) {
-    const { filters, filteredMessagesCount } = this.props;
-
+  function getLabel(baseLabel, filterKey) {
     const count = filteredMessagesCount[filterKey];
-    if (filters[filterKey] || count === 0) {
+    if (count === 0) {
       return baseLabel;
     }
     return `${baseLabel} (${count})`;
   }
 
-  renderMenuItems() {
-    const {
-      timestampsVisible,
-      filters,
-      filterToggle,
-      timestampsToggle,
-      shouldLogExceptions,
-      logExceptions,
-    } = this.props;
-    const items = [];
+  const button = (
+    <MaterialIcon outlined className="h-4 w-4 text-gray-600 hover:text-primaryAccentHover">
+      more_vert
+    </MaterialIcon>
+  );
 
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-log-exceptions",
-        checked: shouldLogExceptions,
-        className: "menu-item",
-        label: "Show Exceptions",
-        onClick: () => {
-          trackEvent("console.settings.toggle_log_exceptions");
-          logExceptions(!shouldLogExceptions);
-        },
-      })
-    );
+  return (
+    <PortalDropdown
+      buttonContent={button}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle=""
+      distance={0}
+      position="bottom-left"
+    >
+      <Dropdown>
+        {/* Show Error */}
+        <DropdownItem
+          onClick={() => {
+            trackEvent("console.settings.toggle_log_exceptions");
+            logExceptions(!shouldLogExceptions);
+          }}
+        >
+          <DropdownItemContent selected={shouldLogExceptions} icon="bug_report">
+            Show Exceptions
+          </DropdownItemContent>
+        </DropdownItem>
 
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-filter-errors",
-        checked: filters[FILTERS.ERROR],
-        className: "menu-item",
-        label: this.getLabel("Show Errors", FILTERS.ERROR),
-        onClick: () => {
-          trackEvent("console.settings.toggle_errors");
-          filterToggle(FILTERS.ERROR);
-        },
-      })
-    );
+        {/* Error */}
+        <DropdownItem
+          onClick={() => {
+            trackEvent("console.settings.toggle_error");
+            filterToggle(FILTERS.ERROR);
+          }}
+        >
+          <DropdownItemContent selected={filters[FILTERS.ERROR]} icon="error_outline">
+            {getLabel("Show Errors", FILTERS.ERROR)}
+          </DropdownItemContent>
+        </DropdownItem>
 
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-filter-warnings",
-        checked: filters[FILTERS.WARN],
-        className: "menu-item",
-        label: this.getLabel("Show Warnings", FILTERS.WARN),
-        onClick: () => {
-          trackEvent("console.settings.toggle_warn");
-          filterToggle(FILTERS.WARN);
-        },
-      })
-    );
+        {/* Warning */}
+        <DropdownItem
+          onClick={() => {
+            trackEvent("console.settings.toggle_warn");
+            filterToggle(FILTERS.WARN);
+          }}
+        >
+          <DropdownItemContent selected={filters[FILTERS.WARN]} icon="report_problem">
+            {getLabel("Show Warnings", FILTERS.WARN)}
+          </DropdownItemContent>
+        </DropdownItem>
 
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-filter-logs",
-        checked: filters[FILTERS.LOG],
-        className: "menu-item",
-        label: this.getLabel("Show Logs", FILTERS.LOG),
-        onClick: () => {
-          trackEvent("console.settings.toggle_logs");
-          filterToggle(FILTERS.LOG);
-        },
-      })
-    );
+        {/* Logs */}
+        <DropdownItem
+          onClick={() => {
+            trackEvent("console.settings.toggle_logs");
+            filterToggle(FILTERS.LOG);
+          }}
+        >
+          <DropdownItemContent selected={filters[FILTERS.LOG]} icon="article">
+            {getLabel("Show Logs", FILTERS.LOG)}
+          </DropdownItemContent>
+        </DropdownItem>
+        <DropdownDivider />
 
-    items.push(
-      MenuItem({
-        key: "separator",
-        role: "menuseparator",
-      })
-    );
-
-    // Filter for node modules
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-add-node-module-messages",
-        checked: !filters[FILTERS.NODEMODULES],
-        className: "menu-item webconsole-console-settings-add-node-module-messages",
-        label: "Hide Node Module Messages",
-        tooltip: "While enabled, messages from the node_modules directory are hidden",
-        onClick: () => {
-          trackEvent("console.settings.toggle_node_modules");
-          filterToggle(FILTERS.NODEMODULES);
-        },
-      })
-    );
-
-    // Timestamps
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-menu-item-timestamps",
-        checked: timestampsVisible,
-        className: "menu-item webconsole-console-settings-menu-item-timestamps",
-        label: "Show Timestamps",
-        tooltip:
-          "If you enable this option commands and output in the Web Console will display a timestamp",
-        onClick: () => {
-          trackEvent("console.settings.toggle_timestamp");
-          timestampsToggle();
-        },
-      })
-    );
-
-    return MenuList({ id: "webconsole-console-settings-menu-list" }, items);
-  }
-
-  render() {
-    return MenuButton(
-      {
-        menuId: "webconsole-console-settings-menu-button",
-        toolboxDoc: document,
-        className: "devtools-button webconsole-console-settings-menu-button",
-        title: "Console Settings",
-      },
-      // We pass the children in a function so we don't require the MenuItem and MenuList
-      // components until we need to display them (i.e. when the button is clicked).
-      () => this.renderMenuItems()
-    );
-  }
+        <DropdownItem
+          onClick={() => {
+            trackEvent("console.settings.toggle_node_modules");
+            filterToggle(FILTERS.NODEMODULES);
+          }}
+        >
+          <DropdownItemContent selected={!filters[FILTERS.NODEMODULES]} icon="book">
+            Hide Node Modules
+          </DropdownItemContent>
+        </DropdownItem>
+        <DropdownItem
+          onClick={() => {
+            trackEvent("console.settings.toggle_timestamp");
+            timestampsToggle();
+          }}
+        >
+          <DropdownItemContent selected={timestampsVisible} icon="schedule">
+            Show Timestamps
+          </DropdownItemContent>
+        </DropdownItem>
+      </Dropdown>
+    </PortalDropdown>
+  );
 }
 
-module.exports = connect(
+export default connect(
   state => ({
     filters: selectors.getAllFilters(state),
     filteredMessagesCount: selectors.getFilteredMessagesCount(state),
@@ -169,4 +143,4 @@ module.exports = connect(
     timestampsToggle: actions.timestampsToggle,
     logExceptions: actions.logExceptions,
   }
-)(ConsoleSettings);
+)(_ConsoleSettings);

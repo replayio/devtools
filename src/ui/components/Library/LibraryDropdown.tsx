@@ -95,10 +95,12 @@ export function DropdownItemContent({
       <div
         className={classNames(
           "w-4 flex flex-row items-center",
-          selected ? "text-primaryAccent" : ""
+          selected ? "text-primaryAccent" : "text-gray-400"
         )}
       >
-        <MaterialIcon style={{ fontSize: "20px" }}>{icon}</MaterialIcon>
+        <MaterialIcon outlined={true} style={{ fontSize: "20px" }}>
+          {icon}
+        </MaterialIcon>
       </div>
       <span className="whitespace-pre overflow-hidden overflow-ellipsis">{children}</span>
     </div>

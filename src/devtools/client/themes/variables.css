@@ -152,6 +152,7 @@
   /* Jon's new tab work */
   --tab-selected-color: var(--theme-body-color);
   --tab-standard-color: #9c9c9e;
+  --tab-standard-hover-color: #6e6e78;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
