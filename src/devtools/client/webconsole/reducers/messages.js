@@ -77,8 +77,6 @@ function cloneState(state) {
  */
 // eslint-disable-next-line complexity
 function addMessage(newMessage, state, filtersState) {
-  const { messagesById } = state;
-
   if (newMessage.type === constants.MESSAGE_TYPE.NULL_MESSAGE) {
     // When the message has a NULL type, we don't add it.
     return state;
@@ -132,7 +130,9 @@ function addMessage(newMessage, state, filtersState) {
     maybeSortVisibleMessages(state);
   } else if (DEFAULT_FILTERS.includes(cause)) {
     state.filteredMessagesCount.global++;
-    state.filteredMessagesCount[cause]++;
+  }
+  if (addedMessage.level) {
+    state.filteredMessagesCount[addedMessage.level]++;
   }
 
   return removeMessagesFromState(state, removedIds);
@@ -320,7 +320,9 @@ function setVisibleMessages({ messagesState, filtersState, forceTimestampSort = 
       messagesToShow.push(msgId);
     } else if (DEFAULT_FILTERS.includes(cause)) {
       filtered.global = filtered.global + 1;
-      filtered[cause] = filtered[cause] + 1;
+    }
+    if (message.level) {
+      filtered[message.level] = filtered[message.level] + 1;
     }
   });
 

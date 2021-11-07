@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Comment, Reply } from "ui/state/comments";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import classNames from "classnames";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";

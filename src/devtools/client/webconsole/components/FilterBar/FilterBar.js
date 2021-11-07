@@ -24,9 +24,9 @@ const { FILTERBAR_DISPLAY_MODES, MESSAGE_TYPE } = require("devtools/client/webco
 
 // Additional Components
 const { Events } = require("devtools/client/webconsole/components/FilterBar/Events");
-const ConsoleSettings = createFactory(
-  require("devtools/client/webconsole/components/FilterBar/ConsoleSettings")
-);
+const ConsoleSettings = require("devtools/client/webconsole/components/FilterBar/ConsoleSettings")
+  .default;
+
 const SearchBox = createFactory(require("devtools/client/shared/components/SearchBox"));
 const { isDemo } = require("ui/utils/environment");
 const { trackEvent } = require("ui/utils/telemetry");
@@ -199,9 +199,7 @@ class FilterBar extends Component {
   renderSettingsButton() {
     const { timestampsVisible } = this.props;
 
-    return ConsoleSettings({
-      timestampsVisible,
-    });
+    return <ConsoleSettings timestampsVisible={timestampsVisible}></ConsoleSettings>;
   }
 
   render() {
