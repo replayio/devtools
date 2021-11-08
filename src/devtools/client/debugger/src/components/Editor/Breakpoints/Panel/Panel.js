@@ -43,8 +43,7 @@ function Panel({
   const [showCondition, setShowCondition] = useState(!!breakpoint.options.condition);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
-  const { nags } = hooks.useGetUserInfo();
-  const updateUserNags = hooks.useUpdateUserNags();
+  const dismissNag = hooks.useDismissNag();
   const error = analysisPoints === "error";
   const pausedOnHit =
     !error &&
@@ -53,13 +52,13 @@ function Panel({
   const showNag = analysisPoints && !error && !isHot && shouldShowNag(Nag.FIRST_BREAKPOINT_ADD);
 
   useEffect(() => {
-    // Make sure to toggle off the first_breakpoint_add nag once the widget is opened.
-    if (showNag) {
-      const newNags = [...nags, Nag.FIRST_BREAKPOINT_ADD];
-      updateUserNags({
-        variables: { newNags },
-      });
-    }
+    editor.editor.on("refresh", updateWidth);
+    dismissNag(Nag.FIRST_GUTTER_CLICK);
+
+    return () => {
+      dismissNag(Nag.FIRST_BREAKPOINT_REMOVED);
+      editor.editor.off("refresh", updateWidth);
+    };
   }, []);
 
   useEffect(() => {
@@ -68,8 +67,16 @@ function Panel({
     window.dispatchEvent(new Event("resize"));
   });
 
-  const toggleEditingOn = () => setEditing(true);
-  const toggleEditingOff = () => setEditing(false);
+  const toggleEditingOn = () => {
+    dismissNag(Nag.FIRST_BREAKPOINT_ADD);
+    setEditing(true);
+  };
+
+  const toggleEditingOff = () => {
+    dismissNag(Nag.FIRST_BREAKPOINT_EDIT);
+    setEditing(false);
+  };
+
   const updateWidth = () => setWidth(getPanelWidth(editor));
 
   const onMouseEnter = () => {
@@ -80,16 +87,12 @@ function Panel({
 
     setHoveredItem(hoveredItem);
   };
+
   const onMouseLeave = e => {
     if (!inBreakpointPanel(e)) {
       clearHoveredItem();
     }
   };
-
-  useEffect(() => {
-    editor.editor.on("refresh", updateWidth);
-    return () => editor.editor.off("refresh", updateWidth);
-  }, []);
 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
@@ -108,6 +111,7 @@ function Panel({
               inputToFocus={inputToFocus}
               showCondition={showCondition}
               setShowCondition={setShowCondition}
+              dismissNag={dismissNag}
             />
           ) : (
             <PanelSummary

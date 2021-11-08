@@ -11,27 +11,32 @@ const TEXT = {
 
 type Step = keyof typeof TEXT;
 
-function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
-  const [step, setStep] = useState<Step>("clickPrompt");
-  const updateUserNags = hooks.useUpdateUserNags();
+function getStep(nags: Nag[], editing: boolean): Step | void {
+  if (!nags) {
+    return undefined;
+  }
 
-  useEffect(() => {
-    if (step === "clickPrompt") {
-      if (editing) {
-        setStep("enterPrompt");
-      }
-    } else if (step === "enterPrompt") {
-      if (!editing) {
-        setStep("success");
-        const newNags = [...nags, Nag.FIRST_BREAKPOINT_EDIT];
-        updateUserNags({
-          variables: { newNags },
-        });
-      }
-    }
-  }, [editing]);
+  if (!nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
+    return "clickPrompt";
+  }
 
-  if (nags?.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
+  if (editing && !nags.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
+    return "enterPrompt";
+  }
+
+  if (!nags.includes(Nag.FIRST_BREAKPOINT_REMOVED)) {
+    return "success";
+  }
+
+  return undefined;
+}
+
+export default function FirstEditNag({ editing }: { editing: boolean }) {
+  const { nags } = hooks.useGetUserInfo();
+
+  const step = getStep(nags, editing);
+
+  if (!step) {
     return null;
   }
 
@@ -47,24 +52,4 @@ function FirstEditNag({ editing, nags }: { editing: boolean; nags: Nag[] }) {
       <div className="text-xs font-bold">{TEXT[step]}</div>
     </div>
   );
-}
-
-// This saves a snapshot of the user's nags locally before rendering the FirstEditNag
-// component. This way, the nag UI doesn't disappear immediately after the user dismisses
-// the first edit nag.
-export default function FirstEditNagWrapper({ editing }: { editing: boolean }) {
-  const { nags } = hooks.useGetUserInfo();
-  const [localNags, setLocalNags] = useState<Nag[] | null>(null);
-
-  useEffect(() => {
-    if (nags && !localNags) {
-      setLocalNags(nags);
-    }
-  }, [nags]);
-
-  if (!localNags) {
-    return null;
-  }
-
-  return <FirstEditNag editing={editing} nags={localNags} />;
 }

@@ -98,19 +98,26 @@ function LineNumberTooltip({
   const isHot = points > prefs.maxHitsDisplayed;
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
+  if (showNag) {
+    return (
+      <StaticTooltip
+        targetNode={lineNumberNode}
+        className={classNames({ hot: isHot, "nag-tooltip": showNag })}
+      >
+        <AwesomeTooltip isHot={isHot} points={points} />
+      </StaticTooltip>
+    );
+  }
+
   return (
     <StaticTooltip
       targetNode={lineNumberNode}
       className={classNames({ hot: isHot, "nag-tooltip": showNag })}
     >
-      {showNag ? (
-        <AwesomeTooltip isHot={isHot} points={points} />
-      ) : (
-        <>
-          {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
-          <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
-        </>
-      )}
+      <>
+        {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
+        <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
+      </>
     </StaticTooltip>
   );
 }

@@ -45,15 +45,11 @@ function Navigation({
   setCurrent: Dispatch<SetStateAction<number>>;
   hideModal: typeof actions.hideModal;
 }) {
-  const userInfo = hooks.useGetUserInfo();
-  const updateUserNags = hooks.useUpdateUserNags();
+  const dismissNag = hooks.useDismissNag();
 
   const onSkipOrDone = () => {
     hideModal();
-    const newNags = [...userInfo.nags, Nag.FIRST_REPLAY];
-    updateUserNags({
-      variables: { newNags },
-    });
+    dismissNag(Nag.FIRST_REPLAY);
   };
 
   return (
