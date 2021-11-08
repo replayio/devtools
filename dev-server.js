@@ -1,3 +1,4 @@
+const url = require("url");
 const http = require("http");
 const path = require("path");
 const fs = require("fs");
@@ -18,14 +19,16 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   http
     .createServer((req, res) => {
-      if (req.url.startsWith("/test/")) {
-        const ext = req.url.substring(req.url.lastIndexOf("."));
+      const parsedUrl = url.parse(req.url, true);
+      const pathname = parsedUrl.pathname;
+      if (pathname.startsWith("/test/")) {
+        const ext = pathname.substring(pathname.lastIndexOf("."));
         res.writeHead(200, {
           "Content-Type": ContentTypes[ext] || "text/plain",
         });
-        fs.createReadStream(path.join(__dirname, req.url)).pipe(res);
+        fs.createReadStream(path.join(__dirname, pathname)).pipe(res);
       } else {
-        handle(req, res);
+        handle(req, res, parsedUrl);
       }
     })
     .listen(8080, err => {
