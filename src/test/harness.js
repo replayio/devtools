@@ -198,10 +198,9 @@ function isPaused() {
 }
 
 async function waitForLoadedScopes() {
-  const scopes = await waitUntil(() => document.querySelector(".scopes-list"));
   // Since scopes auto-expand, we can assume they are loaded when there is a tree node
   // with the aria-level attribute equal to "2".
-  await waitUntil(() => scopes.querySelector('.tree-node[aria-level="2"]'));
+  await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'));
 }
 
 function waitForSelectedSource(url) {
