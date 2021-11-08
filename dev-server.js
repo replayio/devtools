@@ -19,7 +19,7 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   http
     .createServer((req, res) => {
-      const parsedUrl = url.parse(req.url, true);
+      const parsedUrl = url.parse("http://localhost:8080" + req.url, true);
       const pathname = parsedUrl.pathname;
       if (pathname.startsWith("/test/")) {
         const ext = pathname.substring(pathname.lastIndexOf("."));
