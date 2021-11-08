@@ -21,9 +21,9 @@ function ToolboxOptions({
         <Menu.Button className="toolbox-options flex items-center text-gray-400 hover:text-gray-600">
           <MaterialIcon
             outlined
-            className="leading-none text-gray-800 text-l material-icons-outlined"
+            className="leading-none hover:text-primaryAccentHover text-gray-800 text-xl material-icons-outlined"
           >
-            more_vert
+            view_compact
           </MaterialIcon>
         </Menu.Button>
       </div>
