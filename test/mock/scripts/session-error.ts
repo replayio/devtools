@@ -41,5 +41,5 @@ const bindings = basicBindings();
 runTest("sessionError", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
   await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
-  await page.textContent("text=Unexpected session error");
+  await page.textContent("text=Something went wrong while replaying");
 });
