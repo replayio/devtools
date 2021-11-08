@@ -16,6 +16,11 @@ export async function getUserId() {
 export async function dismissNag(newNag: Nag) {
   const user = await getUserInfo();
   const nags = user?.nags || [];
+
+  if (nags.includes(newNag)) {
+    return;
+  }
+
   const newNags = [...nags, newNag];
 
   await mutate({
@@ -51,6 +56,7 @@ export enum Nag {
   FIRST_REPLAY_2 = "first_replay_2",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
+  FIRST_BREAKPOINT_REMOVED = "first_breakpoint_removed",
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   FIRST_GUTTER_CLICK = "first_gutter_click",
 }

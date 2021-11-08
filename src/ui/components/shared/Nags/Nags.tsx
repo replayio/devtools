@@ -19,9 +19,8 @@ function NagHat({
   nagType: Nag;
 }) {
   const { nags } = hooks.useGetUserInfo();
-  const isAuthor = hooks.useUserIsAuthor();
 
-  if (!nags || (nags && nags.includes(nagType)) || !isAuthor) {
+  if (!nags || (nags && nags.includes(nagType))) {
     return null;
   }
 
@@ -44,9 +43,7 @@ function NagHat({
 export function EditorNag() {
   const { nags } = hooks.useGetUserInfo();
 
-  // Don't show the editor nag until the user has gotten past the
-  // console navigate nag.
-  if (nags && !nags.includes(Nag.FIRST_CONSOLE_NAVIGATE)) {
+  if (!nags) {
     return null;
   }
 
