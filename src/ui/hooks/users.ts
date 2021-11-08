@@ -3,7 +3,7 @@ import { mutate, query } from "ui/utils/apolloClient";
 import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
-import { getRecordingId } from "ui/utils/environment";
+import { getRecordingId, isTest } from "ui/utils/environment";
 
 export async function getUserId() {
   const result = await query({
@@ -118,10 +118,15 @@ export function useDismissNag() {
     console.error("Apollo error while updating the user's nags:", error);
   }
 
-  return (nag: Nag) =>
+  return (nag: Nag) => {
+    if (isTest()) {
+      return;
+    }
+
     dismissNag({
       variables: { nag },
     });
+  };
 }
 
 export function useSubscribeToEmailType() {
