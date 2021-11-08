@@ -1,6 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { mutate, query } from "ui/utils/apolloClient";
-import { GET_USER_INFO, GET_USER_ID, UPDATE_USER_NAGS } from "ui/graphql/users";
+import { GET_USER_INFO, GET_USER_ID, UPDATE_USER_NAGS, DISMISS_NAG } from "ui/graphql/users";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
 import { getRecordingId } from "ui/utils/environment";
@@ -13,19 +13,10 @@ export async function getUserId() {
   return result?.data?.viewer?.user?.id;
 }
 
-export async function dismissNag(newNag: Nag) {
-  const user = await getUserInfo();
-  const nags = user?.nags || [];
-
-  if (nags.includes(newNag)) {
-    return;
-  }
-
-  const newNags = [...nags, newNag];
-
+export async function dismissNag(nag: Nag) {
   await mutate({
-    mutation: UPDATE_USER_NAGS,
-    variables: { newNags },
+    mutation: DISMISS_NAG,
+    variables: { nag },
     refetchQueries: ["GetUser"],
   });
 }
@@ -118,8 +109,8 @@ export function useGetUserInfo() {
   };
 }
 
-export function useUpdateUserNags() {
-  const [updateUserNags, { error }] = useMutation(UPDATE_USER_NAGS, {
+export function useDismissNag() {
+  const [dismissNag, { error }] = useMutation(DISMISS_NAG, {
     refetchQueries: ["GetUser"],
   });
 
@@ -127,7 +118,10 @@ export function useUpdateUserNags() {
     console.error("Apollo error while updating the user's nags:", error);
   }
 
-  return updateUserNags;
+  return (nag: Nag) =>
+    dismissNag({
+      variables: { nag },
+    });
 }
 
 export function useSubscribeToEmailType() {
@@ -182,20 +176,4 @@ export function useAcceptTOS() {
   );
 
   return acceptTOS;
-}
-
-export function useDismissNag() {
-  const { nags } = useGetUserInfo();
-  const updateUserNags = useUpdateUserNags();
-
-  return (nag: Nag) => {
-    if (!nags || nags.includes(nag)) {
-      return;
-    }
-
-    const newNags = [...nags, nag];
-    updateUserNags({
-      variables: { newNags },
-    });
-  };
 }

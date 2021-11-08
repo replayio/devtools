@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const UPDATE_USER_NAGS = gql`
-  mutation UpdateUserNags($newNags: [String!]!) {
-    updateUserNags(input: { nags: $newNags }) {
+export const DISMISS_NAG = gql`
+  mutation DismissNag($nag: String!) {
+    dismissNag(input: { nag: $nag }) {
       success
     }
   }

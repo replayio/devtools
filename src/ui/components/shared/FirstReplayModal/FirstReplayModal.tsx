@@ -15,17 +15,11 @@ import {
   OnboardingContentWrapper,
 } from "../Onboarding/index";
 
-const FIRST_REPLAY_TARGET = "https://static.replay.io/demo";
-
 function FirstReplayModal({ hideModal }: PropsFromRedux) {
-  const userInfo = hooks.useGetUserInfo();
-  const updateUserNags = hooks.useUpdateUserNags();
+  const dismissNag = hooks.useDismissNag();
 
   const handleOpen = () => {
-    const newNags = [...userInfo.nags, Nag.FIRST_REPLAY_2];
-    updateUserNags({
-      variables: { newNags },
-    });
+    dismissNag(Nag.FIRST_REPLAY_2);
     hideModal();
     launchAndRecordUrl("https://static.replay.io/demo");
   };
