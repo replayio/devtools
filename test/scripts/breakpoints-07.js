@@ -31,7 +31,7 @@
     await checkBreakpointPanel(1);
     await checkDebugLine();
 
-    closeEditor();
+    await closeEditor();
     // click the second source link in the console
     document.querySelectorAll(".webconsole-output .frame-link-source")[1].click();
     await checkBreakpointPanel(1);
@@ -66,7 +66,9 @@ async function checkDebugLine() {
   );
 }
 
-function closeEditor() {
+async function closeEditor() {
   document.querySelector(".source-tabs .close").click();
-  Test.assert(document.querySelector(".breakpoint-navigation-status-container") === null);
+  await Test.waitUntil(
+    () => document.querySelector(".breakpoint-navigation-status-container") === null
+  );
 }

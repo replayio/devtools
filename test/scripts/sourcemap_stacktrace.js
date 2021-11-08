@@ -3,13 +3,13 @@ Test.describe(`Test that stacktraces are sourcemapped.`, async () => {
 
   const errorMsg = await Test.waitUntil(() => document.querySelector(".message.error"));
 
-  let trace = errorMsg.querySelector(".objectBox-stackTrace");
+  let trace = await Test.waitUntil(() => errorMsg.querySelector(".objectBox-stackTrace"));
   await checkTopFrame(trace);
 
   const btn = errorMsg.querySelector(".collapse-button");
   btn.click();
 
-  trace = errorMsg.querySelector(".stacktrace");
+  trace = await Test.waitUntil(() => errorMsg.querySelector(".stacktrace"));
   await checkTopFrame(trace);
 });
 
