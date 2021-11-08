@@ -89,7 +89,7 @@ function App({ theme, modal, children }: AppProps) {
   }, [theme]);
 
   useEffect(() => {
-    if (auth.isAuthenticated) {
+    if (!isTest() && auth.isAuthenticated) {
       migratePrefToSettings("devtools.disableLogRocket", "disableLogRocket");
     }
   }, [auth.isAuthenticated]);
