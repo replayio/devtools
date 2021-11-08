@@ -1,6 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { mutate, query } from "ui/utils/apolloClient";
-import { GET_USER_INFO, GET_USER_ID, UPDATE_USER_NAGS, DISMISS_NAG } from "ui/graphql/users";
+import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
 import { getRecordingId } from "ui/utils/environment";
