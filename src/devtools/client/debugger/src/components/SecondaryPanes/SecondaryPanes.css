@@ -9,7 +9,6 @@
   flex-direction: column;
   flex: 1;
   white-space: nowrap;
-  background-color: var(--theme-sidebar-background);
   --breakpoint-expression-right-clear-space: 36px;
 }
 
