@@ -113,13 +113,14 @@ export function useDismissNag() {
   const [dismissNag, { error }] = useMutation(DISMISS_NAG, {
     refetchQueries: ["GetUser"],
   });
+  const { nags } = useGetUserInfo();
 
   if (error) {
     console.error("Apollo error while updating the user's nags:", error);
   }
 
   return (nag: Nag) => {
-    if (isTest()) {
+    if (!nags || nags.includes(nag)) {
       return;
     }
 
