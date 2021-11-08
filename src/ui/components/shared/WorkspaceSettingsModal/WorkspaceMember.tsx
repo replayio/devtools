@@ -7,6 +7,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
+import { useConfirm } from "../Confirm";
 
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
@@ -135,14 +136,19 @@ export function NonRegisteredWorkspaceMember({
 }) {
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
   const [expanded, setExpanded] = useState(false);
+  const { confirmDestructive } = useConfirm();
 
   const handleDelete = () => {
     setExpanded(false);
-    const message = `Are you sure you want to remove ${member.email} from this team?`;
-
-    if (window.confirm(message)) {
-      deleteUserFromWorkspace({ variables: { membershipId: member.membershipId } });
-    }
+    confirmDestructive({
+      message: "Remove team member?",
+      description: `Are you sure you want to remove ${member.email} from this team?`,
+      acceptLabel: "Remove them",
+    }).then(confirmed => {
+      if (confirmed) {
+        deleteUserFromWorkspace({ variables: { membershipId: member.membershipId } });
+      }
+    });
   };
 
   return (
