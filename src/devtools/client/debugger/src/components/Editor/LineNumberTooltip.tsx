@@ -9,6 +9,7 @@ import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
+import { shouldShowNag } from "ui/utils/user";
 const { prefs } = require("ui/utils/prefs");
 import StaticTooltip from "./StaticTooltip";
 
@@ -95,7 +96,7 @@ function LineNumberTooltip({
 
   const points = analysisPoints.length;
   const isHot = points > prefs.maxHitsDisplayed;
-  const showNag = nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
+  const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
   return (
     <StaticTooltip

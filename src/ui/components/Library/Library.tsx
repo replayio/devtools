@@ -14,6 +14,7 @@ import {
   hasTeamInvitationCode,
   removeUrlParameters,
 } from "ui/utils/environment";
+import { shouldShowNag } from "ui/utils/user";
 import { setExpectedError } from "ui/actions/session";
 import { LoadingScreen } from "../shared/BlankScreen";
 import Sidebar from "./Sidebar";
@@ -158,7 +159,7 @@ function Library({
     }
 
     const showFirstReplayTutorial =
-      !nags.includes(Nag.FIRST_REPLAY_2) && window.__IS_RECORD_REPLAY_RUNTIME__;
+      shouldShowNag(nags, Nag.FIRST_REPLAY_2) && window.__IS_RECORD_REPLAY_RUNTIME__;
 
     if (!isLinkedFromEmail && !hasTeamInvitationCode() && showFirstReplayTutorial) {
       setModal("first-replay");
