@@ -140,7 +140,6 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
     maxStatusLength = `${analysisPoints.length}/${analysisPoints.length}`.length;
   }
 
-  console.log({ maxStatusLength });
   return (
     <div className={classnames("breakpoint-navigation-status-container")}>
       <div className="px-3 py-0.5 rounded-2xl text-gray-500 bg-gray-200">
