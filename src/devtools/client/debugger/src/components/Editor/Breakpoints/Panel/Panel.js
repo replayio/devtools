@@ -19,6 +19,7 @@ import FirstEditNag from "./FirstEditNag";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
+import { shouldShowNag } from "ui/utils/user";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -49,8 +50,7 @@ function Panel({
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
   const isHot = !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
-  const showNag =
-    analysisPoints && !error && !isHot && nags && !nags.includes(Nag.FIRST_BREAKPOINT_ADD);
+  const showNag = analysisPoints && !error && !isHot && shouldShowNag(Nag.FIRST_BREAKPOINT_ADD);
 
   useEffect(() => {
     // Make sure to toggle off the first_breakpoint_add nag once the widget is opened.
