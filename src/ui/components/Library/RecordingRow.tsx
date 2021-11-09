@@ -75,7 +75,7 @@ function RecordingRow({
     }
 
     loadReplayPrefs(recording.id);
-    router.push(url);
+    window.location.href = url;
   };
   const toggleChecked = () => {
     if (selected) {
