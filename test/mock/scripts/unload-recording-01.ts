@@ -1,6 +1,7 @@
 // Check that unloaded regions in the recording are reflected in the UI.
 
-import { runTest, devtoolsURL, waitUntil } from "../src/runTest";
+import { runTest, devtoolsURL } from "../src/runTest";
+import { waitUntil } from "../../../src/test/harness";
 import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import {
@@ -41,14 +42,18 @@ const messageHandlers = {
   ...basicMessageHandlers(),
   "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
     h.emitEvent("Session.loadedRegions", {
-      loaded: [{
-        begin: { point: "50000", time: 50000 },
-        end: h.bindings.endpoint,
-      }],
-      loading: [{
-        begin: { point: "50000", time: 50000 },
-        end: h.bindings.endpoint,
-      }],
+      loaded: [
+        {
+          begin: { point: "50000", time: 50000 },
+          end: h.bindings.endpoint,
+        },
+      ],
+      loading: [
+        {
+          begin: { point: "50000", time: 50000 },
+          end: h.bindings.endpoint,
+        },
+      ],
     });
     return new Promise(resolve => {});
   },

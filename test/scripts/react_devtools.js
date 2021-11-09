@@ -8,31 +8,41 @@ Test.describe(`Test React DevTools.`, async () => {
   await Test.warpToMessage("Initial list");
 
   await Test.selectReactDevTools();
-  await Test.waitUntil(() => getComponents().length === 3);
+  await Test.waitUntil(() => getComponents().length === 3, {
+    waitingFor: "There to be 3 components in ReactDevTools",
+  });
 
   await Test.selectConsole();
   await Test.warpToMessage("Added an entry");
 
   await Test.selectReactDevTools();
-  await Test.waitUntil(() => getComponents().length === 4);
+  await Test.waitUntil(() => getComponents().length === 4, {
+    waitingFor: "There to be 4 components in ReactDevTools",
+  });
 
   await Test.selectConsole();
   await Test.warpToMessage("Removed an entry");
 
   await Test.selectReactDevTools();
-  await Test.waitUntil(() => getComponents().length === 3);
+  await Test.waitUntil(() => getComponents().length === 3, {
+    waitingFor: "There to be 3 components in ReactDevTools",
+  });
 
   const rootComponent = getComponents()[0];
 
   rootComponent.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
   await Test.checkHighlighterVisible(true);
-  await Test.checkHighlighterShape("M40,16 L140,16 L140,35 L40,35");
+  await Test.checkHighlighterShape("M40,16 L140,16 L140,36 L40,36");
 
   rootComponent.parentElement.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-  await Test.waitUntil(() => getInspectedItem("State"));
+  await Test.waitUntil(() => getInspectedItem("State"), {
+    waitingFor: "State to be the inspectedItem",
+  });
 
   getInspectedItem("State").parentElement.firstChild.click();
-  await Test.waitUntil(() => getInspectedItem("0"));
+  await Test.waitUntil(() => getInspectedItem("0"), { waitingFor: "0 to be the inspected item" });
   getInspectedItem("0").parentElement.firstChild.click();
-  await Test.waitUntil(() => getInspectedItem("key") && getInspectedItem("text"));
+  await Test.waitUntil(() => getInspectedItem("key") && getInspectedItem("text"), {
+    waitingFor: "key and text to be the inspected items",
+  });
 });

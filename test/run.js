@@ -37,6 +37,7 @@ let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
 let testTimeout = 240;
 let onlyTarget = undefined;
+const timings = {};
 
 function processArgs() {
   const usage = `
@@ -167,6 +168,7 @@ async function runTest(test, example, target) {
   }
 
   console.log(`[${elapsedTime()}] Starting test ${test} target ${target}`);
+  const startTime = Date.now();
 
   // Recording ID to load in the viewer. If not set, we will record the example
   // in the browser before stopping and switching to the viewer.
@@ -225,6 +227,8 @@ async function runTest(test, example, target) {
   }
 
   await runTestViewer("test/harness.js", test, testTimeout, env);
+  timings[`${test}-${target}`] = Date.now() - startTime;
+  console.log({ timings });
 }
 
 function spawnGecko(env) {
@@ -297,6 +301,14 @@ async function runTestViewer(path, local, timeout, env) {
       if (nodeRecordingId) {
         console.log(`Test passed, found backend node recording ${nodeRecordingId}`);
       }
+    }
+    if (
+      /waitUntil\(\) timed out/.test(data.toString()) ||
+      /Error: Assertion failed/.test(data.toString())
+    ) {
+      logFailure(data.toString());
+      gecko.kill();
+      resolve();
     }
     process.stdout.write(data);
   }
@@ -475,6 +487,7 @@ async function createExampleBrowserRecording(url, target) {
   }
 
   if (failures.length) {
+    console.log(timings);
     console.log(`[${elapsedTime()}] Had ${failures.length} test failures.`);
     failures.forEach(failure => console.log(failure));
   } else {

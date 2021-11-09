@@ -1,14 +1,18 @@
 // Harness for use by automated tests. Adapted from various test devtools
 // test harnesses.
 
-const { sendMessage, addEventListener } = require("protocol/socket");
+const { sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
-const { assert, waitForTime } = require("protocol/utils");
+const { assert } = require("protocol/utils");
 const mapValues = require("lodash/mapValues");
 const isEqual = require("lodash/isEqual");
-const { defer } = require("../protocol/utils");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
+
+export function waitForTime(ms, waitingFor) {
+  console.log(`waiting ${ms}ms for ${waitingFor}`);
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const dbgSelectors = {};
 for (const [name, method] of Object.entries(dbg.selectors)) {
@@ -18,13 +22,14 @@ for (const [name, method] of Object.entries(dbg.selectors)) {
 function waitForElapsedTime(time, ms) {
   const wait = time + ms - Date.now();
   if (wait > 0) {
-    return waitForTime(wait);
+    return waitForTime(wait, `time to reach ${time}`);
   }
 }
 
-const WaitTimeout = 1000 * 60;
+const WaitTimeout = 1000 * 10;
 
-async function waitUntil(fn, timeout = WaitTimeout) {
+export async function waitUntil(fn, options) {
+  const { timeout, waitingFor } = { timeout: WaitTimeout, waitingFor: "unknown", ...options };
   const start = Date.now();
   while (true) {
     const rv = fn();
@@ -36,20 +41,22 @@ async function waitUntil(fn, timeout = WaitTimeout) {
       break;
     }
     if (elapsed < 1000) {
-      await waitForTime(50);
+      await waitForTime(50, waitingFor);
     } else if (elapsed < 5000) {
-      await waitForTime(200);
+      await waitForTime(200, waitingFor);
     } else {
-      await waitForTime(1000);
+      await waitForTime(1000, waitingFor);
     }
   }
-  console.trace("waitUntil() timed out");
-  throw new Error("waitUntil() timed out");
+  throw new Error(`waitUntil() timed out waiting for ${waitingFor}`);
 }
 
 function start() {
   app.actions.setViewMode("dev");
-  return waitUntil(() => isFullyLoaded() && app.selectors.getViewMode() == "dev", 1000 * 120);
+  return waitUntil(() => isFullyLoaded() && app.selectors.getViewMode() == "dev", {
+    timeout: 1000 * 120,
+    waitingFor: "the page to load",
+  });
 }
 
 function finish() {
@@ -58,7 +65,7 @@ function finish() {
 
   // This is pretty goofy but this is recognized during automated tests and sent
   // to the UI process to indicate the test has finished.
-  dump(`RecReplaySendAsyncMessage TestFinished`);
+  dump?.(`RecReplaySendAsyncMessage TestFinished`);
 }
 
 function isFullyLoaded() {
@@ -72,7 +79,9 @@ function isFullyLoaded() {
 }
 
 async function clickElement(selector) {
-  const element = await waitUntil(() => document.querySelector(selector));
+  const element = await waitUntil(() => document.querySelector(selector), {
+    waitingFor: `${selector} to appear`,
+  });
   if (!element) {
     console.log(`Could not find element with selector ${selector}`);
   }
@@ -89,28 +98,22 @@ function selectDebugger() {
 
 async function selectInspector() {
   await clickElement("button.inspector-panel-button");
-  // ensure that the inspector is fully initialized, including its legacy components
-  await waitUntil(() => document.querySelector(".inspector .html-arrowscrollbox-inner"));
+  // ensure that the inspector is fully initialized, including its legacy
+  // components.
+  await waitUntil(() => document.querySelector(".inspector ul.children"), {
+    waitingFor: "inspector to initialize",
+  });
 }
 
-async function selectReactDevTools() {
-  return clickElement("button.components-panel-button");
-}
-
-function getContext() {
-  return dbgSelectors.getContext();
-}
-
-function getThreadContext() {
-  return dbgSelectors.getThreadContext();
-}
+const selectReactDevTools = async () => clickElement("button.components-panel-button");
+const getContext = () => dbgSelectors.getContext();
+const getThreadContext = () => dbgSelectors.getThreadContext();
 
 function findSource(url) {
   if (typeof url !== "string") {
-    // Support passing in a source object itelf all APIs that use this
-    // function support both styles
-    const source = url;
-    return source;
+    // Support passing in a source object itelf all APIs that use this function
+    // support both styles
+    return url;
   }
 
   const sources = dbgSelectors.getSourceList();
@@ -118,7 +121,7 @@ function findSource(url) {
 }
 
 function waitForSource(url) {
-  return waitUntil(() => findSource(url));
+  return waitUntil(() => findSource(url), { waitingFor: `source: ${url} to be present` });
 }
 
 function countSources(url) {
@@ -127,7 +130,9 @@ function countSources(url) {
 }
 
 function waitForSourceCount(url, count) {
-  return waitUntil(() => countSources(url) === count);
+  return waitUntil(() => countSources(url) === count, {
+    waitingFor: `${count} source to be present`,
+  });
 }
 
 async function selectSource(url) {
@@ -151,9 +156,12 @@ async function addBreakpoint(url, line, column, options) {
     await dbg.actions.addBreakpointAtLine(getContext(), line);
   }
 
-  await waitUntil(() => {
-    return dbgSelectors.getBreakpointCount() == bpCount + 1;
-  });
+  await waitUntil(
+    () => {
+      return dbgSelectors.getBreakpointCount() == bpCount + 1;
+    },
+    { waitingFor: "breakpoint to be set" }
+  );
   await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
@@ -201,30 +209,37 @@ async function waitForLoadedScopes() {
   // Since scopes auto-expand, we can assume they are loaded when there is a tree node
   // with the aria-level attribute equal to "2".
   await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'));
+  await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'), {
+    waitingFor: "scopes to be loaded (via tree node)",
+  });
 }
 
 function waitForSelectedSource(url) {
   const { getSelectedSourceWithContent, hasSymbols, getBreakableLines } = dbgSelectors;
 
-  return waitUntil(() => {
-    const source = getSelectedSourceWithContent() || {};
-    if (!source.content) {
-      return false;
-    }
+  return waitUntil(
+    () => {
+      const source = getSelectedSourceWithContent() || {};
+      if (!source.content) {
+        return false;
+      }
 
-    if (!url) {
-      return true;
-    }
+      if (!url) {
+        return true;
+      }
 
-    const newSource = findSource(url);
-    if (newSource.id != source.id) {
-      return false;
-    }
+      const newSource = findSource(url);
+      if (newSource.id != source.id) {
+        return false;
+      }
 
-    // The hasSymbols check is disabled. Sometimes the parser worker fails for
-    // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
-    return /*hasSymbols(source) &&*/ getBreakableLines(source.id);
-  });
+      // The hasSymbols check is disabled. Sometimes the parser worker fails for
+      // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
+      // return hasSymbols(source) && getBreakableLines(source.id);
+      return getBreakableLines(source.id);
+    },
+    { waitingFor: `source ${url} to be selected` }
+  );
 }
 
 async function waitForPaused(url) {
@@ -232,12 +247,8 @@ async function waitForPaused(url) {
   // Make sure that the debug primary panel is selected so that the test can
   // interact with the pause navigation and info.
   store.dispatch({ type: "set_selected_primary_panel", panel: "debug" });
-
-  await waitUntil(() => {
-    return isPaused() && !!getSelectedScope();
-  });
-
-  await waitUntil(() => getFrames());
+  await waitUntil(() => isPaused() && !!getSelectedScope(), { waitingFor: "execution to pause" });
+  await waitUntil(() => getFrames(), { waitingFor: "frames to populate" });
   await waitForLoadedScopes();
   await waitForSelectedSource(url);
 }
@@ -247,7 +258,7 @@ async function waitForPausedNoSource() {
   // interact with the pause navigation and info.
   store.dispatch({ type: "set_selected_primary_panel", panel: "debug" });
 
-  await waitUntil(() => isPaused());
+  await waitUntil(() => isPaused(), { waitingFor: "execution to pause" });
 }
 
 function hasFrames() {
@@ -261,7 +272,9 @@ function getVisibleSelectedFrameLine() {
 }
 
 async function waitForPausedLine(line) {
-  await waitUntil(() => line == getVisibleSelectedFrameLine());
+  await waitUntil(() => line == getVisibleSelectedFrameLine(), {
+    waitingFor: `line ${line} to paused`,
+  });
 }
 
 function resumeThenPauseAtLineFunctionFactory(method) {
@@ -301,10 +314,13 @@ async function checkEvaluateInTopFrame(text, expected) {
   selectConsole();
   executeInConsole(text);
 
-  await waitUntil(() => {
-    const node = document.querySelector(".message.result .objectBox");
-    return node?.innerText == `${expected}`;
-  });
+  await waitUntil(
+    () => {
+      const node = document.querySelector(".message.result .objectBox");
+      return node?.innerText == `${expected}`;
+    },
+    { waitingFor: `message with text "${expected}"` }
+  );
 
   await clickElement(".devtools-clear-icon");
   selectDebugger();
@@ -312,17 +328,22 @@ async function checkEvaluateInTopFrame(text, expected) {
 
 async function waitForScopeValue(name, value) {
   const expected = value !== undefined ? `${name}\n: \n${value}` : name;
-  return waitUntil(() => {
-    const nodes = document.querySelectorAll(".scopes-pane .object-node");
-    return [...nodes].some(node => node.innerText == expected);
-  });
+  return waitUntil(
+    () => {
+      const nodes = document.querySelectorAll(".scopes-pane .object-node");
+      return [...nodes].some(node => node.innerText == expected);
+    },
+    { waitingFor: `scope "${value}" to be present` }
+  );
 }
 
 async function toggleBlackboxSelectedSource() {
   const { getSelectedSource } = dbgSelectors;
   const blackboxed = getSelectedSource().isBlackBoxed;
   dbg.actions.toggleBlackBox(getContext(), getSelectedSource());
-  await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
+  await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed, {
+    waitingFor: "source to be blackboxed",
+  });
   await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
@@ -361,16 +382,22 @@ function getAllMessages(opts) {
 }
 
 function checkAllMessages(expected, opts) {
-  return waitUntil(() => {
-    return isEqual(getAllMessages(opts), expected);
-  });
+  return waitUntil(
+    () => {
+      return isEqual(getAllMessages(opts), expected);
+    },
+    { waitingFor: `messages with ${opts} to match ${expected}` }
+  );
 }
 
 function waitForMessage(text, extraSelector) {
-  return waitUntil(() => {
-    const messages = findMessages(text, extraSelector);
-    return messages?.[0];
-  });
+  return waitUntil(
+    () => {
+      const messages = findMessages(text, extraSelector);
+      return messages?.[0];
+    },
+    { waitingFor: `a message: ${text} with selector: ${extraSelector}` }
+  );
 }
 
 async function warpToMessage(text) {
@@ -386,10 +413,13 @@ function checkPausedMessage(text) {
 }
 
 function waitForMessageCount(text, count) {
-  return waitUntil(() => {
-    const messages = findMessages(text);
-    return messages.length == count ? messages : null;
-  });
+  return waitUntil(
+    () => {
+      const messages = findMessages(text);
+      return messages.length == count ? messages : null;
+    },
+    { waitingFor: `${count} messages with text: "${text}"` }
+  );
 }
 
 async function checkMessageStack(text, expectedFrameLines, expand) {
@@ -397,11 +427,15 @@ async function checkMessageStack(text, expectedFrameLines, expand) {
   assert(!msgNode.classList.contains("open"));
 
   if (expand) {
-    const button = await waitUntil(() => msgNode.querySelector(".collapse-button"));
+    const button = await waitUntil(() => msgNode.querySelector(".collapse-button"), {
+      waitingFor: `collapse button to be visible`,
+    });
     button.click();
   }
 
-  const framesNode = await waitUntil(() => msgNode.querySelector(".frames"));
+  const framesNode = await waitUntil(() => msgNode.querySelector(".frames"), {
+    waitingFor: ".frames to be present",
+  });
   const frameNodes = Array.from(framesNode.querySelectorAll(".frame"));
   assert(frameNodes.length == expectedFrameLines.length);
 
@@ -424,14 +458,19 @@ function findObjectInspectorNode(oi, nodeLabel) {
 }
 
 async function findMessageExpandableObjectInspector(msg) {
-  return waitUntil(() => {
-    const inspectors = msg.querySelectorAll(".object-inspector");
-    return [...inspectors].find(oi => oi.querySelector(".arrow"));
-  });
+  return waitUntil(
+    () => {
+      const inspectors = msg.querySelectorAll(".object-inspector");
+      return [...inspectors].find(oi => oi.querySelector(".arrow"));
+    },
+    { waitingFor: `findMessageExpandableObjectInspector(${msg})` }
+  );
 }
 
 async function toggleObjectInspectorNode(node) {
-  const arrow = await waitUntil(() => node.querySelector(".arrow"));
+  const arrow = await waitUntil(() => node.querySelector(".arrow"), {
+    waitingFor: ".arrow to be present",
+  });
   arrow.click();
 }
 
@@ -440,25 +479,33 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
   await toggleObjectInspectorNode(oi);
 
   for (const label of expandList) {
-    const labelNode = await waitUntil(() => findObjectInspectorNode(oi, label));
+    const labelNode = await waitUntil(() => findObjectInspectorNode(oi, label), {
+      waitingFor: `findObjectInspectorNode(${oi}, ${label})`,
+    });
     await toggleObjectInspectorNode(labelNode);
   }
 
-  await waitUntil(() => {
-    const nodes = oi.querySelectorAll(".tree-node");
-    if (nodes && nodes.length > 1) {
-      const properties = [...nodes].map(n => n.textContent);
-      return expected.every(s => properties.find(v => v.includes(s)));
-    }
-    return null;
-  });
+  await waitUntil(
+    () => {
+      const nodes = oi.querySelectorAll(".tree-node");
+      if (nodes && nodes.length > 1) {
+        const properties = [...nodes].map(n => n.textContent);
+        return expected.every(s => properties.find(v => v.includes(s)));
+      }
+      return null;
+    },
+    { waitingFor: ".tree-node to be present" }
+  );
 }
 
 function findScopeNode(text) {
-  return waitUntil(() => {
-    const nodes = document.querySelectorAll(".scopes-list .node");
-    return [...nodes].find(node => node.innerText.includes(text));
-  });
+  return waitUntil(
+    () => {
+      const nodes = document.querySelectorAll(".scopes-list .node");
+      return [...nodes].find(node => node.innerText.includes(text));
+    },
+    { waitingFor: `scope node "${text}" to be present` }
+  );
 }
 
 async function toggleScopeNode(text) {
@@ -474,16 +521,22 @@ async function executeInConsole(value) {
 }
 
 function waitForFrameTimeline(width) {
-  return waitUntil(() => {
-    const elem = document.querySelector(".frame-timeline-progress");
-    return elem?.style.width == width;
-  });
+  return waitUntil(
+    () => {
+      const elem = document.querySelector(".frame-timeline-progress");
+      return elem?.style.width == width;
+    },
+    { waitingFor: `timeline to be ${width} wide` }
+  );
 }
 async function checkFrames(count) {
-  return waitUntil(() => {
-    const frames = dbgSelectors.getFrames();
-    return frames.length == count;
-  });
+  return waitUntil(
+    () => {
+      const frames = dbgSelectors.getFrames();
+      return frames.length == count;
+    },
+    { waitingFor: `${count} frames to be present` }
+  );
 }
 
 async function selectFrame(index) {
@@ -505,16 +558,21 @@ async function toggleMappedSources() {
 }
 
 async function playbackRecording() {
-  const timeline = await waitUntil(() => gToolbox.timeline);
+  const timeline = await waitUntil(() => gToolbox.timeline, {
+    waitingFor: "timeline to be visible",
+  });
   timeline.startPlayback();
-  await waitUntil(() => !timeline.state.playback);
+  await waitUntil(() => !timeline.state.playback, { waitingFor: "playback to start" });
 }
 
 async function findMarkupNode(text) {
-  return waitUntil(() => {
-    const nodes = document.querySelectorAll("#markup-box .editor");
-    return [...nodes].find(n => n.innerText.includes(text));
-  });
+  return waitUntil(
+    () => {
+      const nodes = document.querySelectorAll("#markup-box .editor");
+      return [...nodes].find(n => n.innerText.includes(text));
+    },
+    { waitingFor: `markup node with ${text} to be present` }
+  );
 }
 
 async function toggleMarkupNode(node) {
@@ -534,14 +592,17 @@ async function searchMarkup(text) {
 }
 
 async function waitForSelectedMarkupNode(text) {
-  return waitUntil(() => {
-    const node = document.querySelector(".theme-selected");
-    if (!node) {
-      return false;
-    }
-    const editor = node.parentNode.querySelector(".editor");
-    return editor.innerText.includes(text);
-  });
+  return waitUntil(
+    () => {
+      const node = document.querySelector(".theme-selected");
+      if (!node) {
+        return false;
+      }
+      const editor = node.parentNode.querySelector(".editor");
+      return editor.innerText.includes(text);
+    },
+    { waitingFor: `waitForSelectedMarkupNode(${text}) ` }
+  );
 }
 
 function boundsCenter(bounds) {
@@ -581,20 +642,23 @@ async function selectMarkupNode(node) {
 async function checkComputedStyle(style, value, matchedSelectors = undefined) {
   await clickElement("#computedview-tab");
   const matchedSelectorsJSON = matchedSelectors ? JSON.stringify(matchedSelectors) : undefined;
-  await waitUntil(() => {
-    const names = document.querySelectorAll(".computed-property-name");
-    const propertyName = [...names].find(n => n.textContent.includes(style));
-    if (!propertyName) {
-      return false;
-    }
-    const container = propertyName.closest(".computed-property-view");
-    if (!container) {
-      return false;
-    }
-    const propertyValue = container.querySelector(".computed-property-value");
-    const selectors = matchedSelectors ? JSON.stringify(getMatchedSelectors(style)) : undefined;
-    return propertyValue.textContent.includes(value) && selectors === matchedSelectorsJSON;
-  });
+  await waitUntil(
+    () => {
+      const names = document.querySelectorAll(".computed-property-name");
+      const propertyName = [...names].find(n => n.textContent.includes(style));
+      if (!propertyName) {
+        return false;
+      }
+      const container = propertyName.closest(".computed-property-view");
+      if (!container) {
+        return false;
+      }
+      const propertyValue = container.querySelector(".computed-property-value");
+      const selectors = matchedSelectors ? JSON.stringify(getMatchedSelectors(style)) : undefined;
+      return propertyValue.textContent.includes(value) && selectors === matchedSelectorsJSON;
+    },
+    { waitingFor: `computedStyle, ${style} to match ${value}` }
+  );
 }
 
 function getMatchedSelectors(property) {
@@ -659,17 +723,22 @@ function getAppliedRulesJSON() {
 
 async function checkAppliedRules(expected) {
   await ensurePseudoElementRulesExpanded();
-  await waitUntil(() => {
-    const json = getAppliedRulesJSON();
-    return JSON.stringify(json) == JSON.stringify(expected);
-  });
+  await waitUntil(
+    () => {
+      const json = getAppliedRulesJSON();
+      return JSON.stringify(json) == JSON.stringify(expected);
+    },
+    { waitingFor: `applied rules to be: ${expected}` }
+  );
 }
 
 async function ensurePseudoElementRulesExpanded() {
   const header = document.getElementById("rules-section-pseudoelement-header");
   if (header && header.getAttribute("aria-expanded") != "true") {
     header.click();
-    await waitUntil(() => header.getAttribute("aria-expanded") == "true");
+    await waitUntil(() => header.getAttribute("aria-expanded") == "true", {
+      waitingFor: "pseudo element rules to expand",
+    });
   }
 }
 
@@ -680,29 +749,32 @@ function dispatchMouseEvent(element, eventName) {
 }
 
 async function checkHighlighterVisible(visible) {
-  await waitUntil(() => {
-    const highlighterNode = document.getElementById("box-model-elements");
-    const isVisible = highlighterNode?.attributes["hidden"]?.textContent !== "true";
-    return isVisible === visible;
-  });
+  await waitUntil(
+    () => {
+      const highlighterNode = document.getElementById("box-model-elements");
+      const isVisible = highlighterNode?.attributes["hidden"]?.textContent !== "true";
+      return isVisible === visible;
+    },
+    { waitingFor: `highlighter to be ${visible ? "" : "in"}visible` }
+  );
 }
 
 async function checkHighlighterShape(svgPath) {
   const expectedCoords = svgPath.substring(1).split(/ L|,/);
-  await waitUntil(() => {
-    const highlighterNode = document.getElementById("box-model-content");
-    const highlighterPath = highlighterNode?.attributes["d"].textContent;
-    if (!highlighterPath) {
+  const highlighterPath = await waitUntil(
+    () => {
+      const highlighterNode = document.getElementById("box-model-content");
+      return (highlighterPath = highlighterNode?.attributes["d"].textContent);
+    },
+    { waitingFor: "highlighter to appear" }
+  );
+  const highlighterCoords = highlighterPath.substring(1).split(/ L|,/);
+  for (let i = 0; i < 8; i++) {
+    if (Math.abs(highlighterCoords[i] - expectedCoords[i]) >= 1) {
+      console.log(`expected ${expectedCoords}, received ${highlighterCoords}`);
       return false;
     }
-    const highlighterCoords = highlighterPath.substring(1).split(/ L|,/);
-    for (let i = 0; i < 8; i++) {
-      if (Math.abs(highlighterCoords[i] - expectedCoords[i]) >= 1) {
-        return false;
-      }
-    }
-    return true;
-  });
+  }
 }
 
 async function getMouseTarget(x, y) {

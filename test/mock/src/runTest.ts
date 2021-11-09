@@ -118,17 +118,32 @@ export function devtoolsURL({ id }: { id: string }) {
   return url;
 }
 
-const WaitTimeout = 30_000;
+export function waitForTime(ms: number, waitingFor: string) {
+  console.log(`waiting ${ms}ms for ${waitingFor}`);
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-export async function waitUntil(callback: () => Promise<boolean>) {
-  const startTime = Date.now();
+const WaitTimeout = 1000 * 10;
+
+async function waitUntil(fn: () => any, options: { timeout?: number; waitingFor?: string }) {
+  const { timeout, waitingFor } = { timeout: WaitTimeout, waitingFor: "unknown", ...options };
+  const start = Date.now();
   while (true) {
-    if (Date.now() - startTime > WaitTimeout) {
-      throw new Error("waitUntil() timed out");
+    const rv = fn();
+    if (rv) {
+      return rv;
     }
-    if (await callback()) {
-      return;
+    const elapsed = Date.now() - start;
+    if (elapsed >= timeout) {
+      break;
     }
-    await new Promise(resolve => setTimeout(resolve, 200));
+    if (elapsed < 1000) {
+      await waitForTime(50, waitingFor);
+    } else if (elapsed < 5000) {
+      await waitForTime(200, waitingFor);
+    } else {
+      await waitForTime(1000, waitingFor);
+    }
   }
+  throw new Error(`waitUntil() timed out waiting for ${waitingFor}`);
 }
