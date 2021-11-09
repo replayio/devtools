@@ -39,10 +39,6 @@
   flex-direction: column;
 }
 
-.secondary-panes .accordion li {
-  display: contents;
-}
-
 .secondary-panes-wrapper .accordion li:last-child ._content {
   border-bottom: 0;
 }
