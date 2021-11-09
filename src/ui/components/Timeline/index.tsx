@@ -86,12 +86,10 @@ class Timeline extends Component<PropsFromRedux> {
     if (!this.$progressBar) {
       return;
     }
-    const { hideTooltip, currentTime } = this.props;
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
       window.clearInterval(this.hoverInterval);
       this.hoverInterval = undefined;
-      hideTooltip();
     }
   };
 
@@ -421,7 +419,6 @@ const connector = connect(
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
-    hideTooltip: actions.hideTooltip,
     setTimelineState: actions.setTimelineState,
     updateTimelineDimensions: actions.updateTimelineDimensions,
     seek: actions.seek,

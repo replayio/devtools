@@ -12,10 +12,7 @@ function initialTimelineState(): TimelineState {
     unprocessedRegions: [],
     shouldAnimate: true,
     recordingDuration: null,
-    screenShot: null,
     timelineDimensions: { left: 1, top: 1, width: 1 },
-    mouse: null,
-    tooltip: null,
     hoveredItem: null,
     trimRegion: null,
   };
@@ -37,10 +34,6 @@ export default function update(
     case "set_playback_stalled": {
       const playback = state.playback ? { ...state.playback, stalled: action.stalled } : null;
       return { ...state, playback };
-    }
-
-    case "update_tooltip": {
-      return { ...state, tooltip: action.tooltip };
     }
 
     case "set_hovered_item": {
@@ -68,10 +61,7 @@ export const getPlayback = (state: UIState) => state.timeline.playback;
 export const isPlaybackStalled = (state: UIState) => state.timeline.playback?.stalled || false;
 export const getUnprocessedRegions = (state: UIState) => state.timeline.unprocessedRegions;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
-export const getScreenShot = (state: UIState) => state.timeline.screenShot;
-export const getMouse = (state: UIState) => state.timeline.mouse;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
-export const getTooltip = (state: UIState) => state.timeline.tooltip;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getTrimRegion = (state: UIState) => state.timeline.trimRegion;
