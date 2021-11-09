@@ -9,7 +9,11 @@ import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
 const timings: Record<string, number> = {};
 
 export function setupTelemetry() {
-  const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
+  const ignoreList = [
+    "Current thread has paused or resumed",
+    "Current thread has changed",
+    "Failed to load Stripe.js",
+  ];
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.
   initializeMixpanel();
