@@ -161,7 +161,7 @@ export function getDisconnectionError(): UnexpectedError {
   return {
     message: "Ready when you are!",
     content: "Replays disconnect after 5 minutes to reduce server load.",
-    action: "Refresh",
+    action: "refresh",
   };
 }
 
