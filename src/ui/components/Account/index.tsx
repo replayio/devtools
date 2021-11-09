@@ -96,7 +96,7 @@ function WelcomePage() {
 }
 
 export default function Account() {
-  const { isAuthenticated } = useAuth0();
+  const { isLoading, isAuthenticated } = useAuth0();
   const router = useRouter();
   const searchParams = new URLSearchParams(window.location.search);
 
@@ -106,7 +106,7 @@ export default function Account() {
     }
   }, []);
 
-  if (searchParams.get("id")) {
+  if (isLoading || searchParams.get("id")) {
     return null;
   }
 
