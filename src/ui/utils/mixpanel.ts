@@ -1,6 +1,6 @@
 import mixpanel, { Dict } from "mixpanel-browser";
 import { ViewMode } from "ui/state/app";
-import { getRecordingId, skipTelemetry } from "./environment";
+import { getRecordingId, isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser } from "./telemetry";
 
@@ -52,6 +52,8 @@ export async function trackMixpanelEvent(event: string, properties?: Dict) {
 }
 
 export function setMixpanelContext({ id, email }: TelemetryUser) {
+  mixpanel.register({ isReplayBrowser: isReplayBrowser() });
+
   if (id) {
     mixpanel.identify(id);
   }
