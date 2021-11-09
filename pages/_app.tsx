@@ -2,7 +2,6 @@ import "../src/test-prep";
 import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
-import Script from "next/script";
 import type { AppProps } from "next/app";
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";

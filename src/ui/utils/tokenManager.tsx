@@ -3,7 +3,6 @@ import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 import { assert, defer, Deferred } from "protocol/utils";
-import { isTest } from "./environment";
 import { usesWindow } from "ssr";
 import { useRouter } from "next/dist/client/router";
 
@@ -159,7 +158,7 @@ class TokenManager {
 
     try {
       return await this.auth0Client.getAccessTokenSilently({ audience, ignoreCache: refresh });
-    } catch (e) {
+    } catch (e: any) {
       if (e.error !== "login_required" && e.error !== "consent_required") {
         throw e;
       }

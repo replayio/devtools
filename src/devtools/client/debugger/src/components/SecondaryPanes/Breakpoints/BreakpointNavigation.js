@@ -125,7 +125,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
   let maxStatusLength = 0;
   if (!indexed) {
     status = "Indexing";
-  } else if (!analysisPoints | !executionPoint) {
+  } else if (!analysisPoints || !executionPoint) {
     status = "Loading";
   } else if (analysisPoints === "error") {
     status = "Failed";

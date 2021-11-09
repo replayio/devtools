@@ -170,7 +170,7 @@ export function useIsTeamDeveloper() {
     console.error("Apollo error while getting the user's role", error);
   }
 
-  return { isTeamDeveloper: data.recording.userRole !== "team-user", loading };
+  return { isTeamDeveloper: data?.recording.userRole !== "team-user", loading };
 }
 
 function convertRecording(rec: any): Recording | undefined {

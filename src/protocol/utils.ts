@@ -81,7 +81,7 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   //  return false;
   //},
   get() {
-    NotAllowed();
+    return undefined;
   },
   //set() { NotAllowed(); },
   apply() {
