@@ -45,7 +45,7 @@ node test/run.js [--pattern pat]
 To run the mock tests:
 
 ```
-node test/mock/run.js [--script scr]
+node test/mock/run.js [--pattern pat]
 ```
 
 To run the unit tests:

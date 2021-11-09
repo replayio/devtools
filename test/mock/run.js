@@ -1,20 +1,26 @@
 const { spawnSync } = require("child_process");
 const manifest = require("./manifest");
 const { listAllRecordings, uploadRecording } = require("@recordreplay/recordings-cli");
+const { match } = require("assert");
 
 const devtools = `${__dirname}/../..`;
-const scriptsToRun = [];
+let scriptsToRun = [];
 
 function processArgs() {
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
     switch (arg) {
-      case "--script":
-        const script = process.argv[++i];
-        if (manifest.includes(script)) {
-          scriptsToRun.push(script);
-        } else {
-          console.log(`${script} does not appear in the manifest`);
+      case "--pattern":
+        const pattern = process.argv[++i];
+
+        if (pattern) {
+          const matched = manifest.filter(t => t.match(pattern));
+          if (!matched.length) {
+            console.log(
+              `supplied pattern: ${pattern} matched 0 tests in the manifest. It will be ignored.`
+            );
+          }
+          scriptsToRun = scriptsToRun.concat(matched);
         }
         break;
     }
