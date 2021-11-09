@@ -4,6 +4,7 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { launchAndRecordUrl } from "ui/utils/environment";
+import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryLgButton } from "../Button";
 import { TextInputCopy } from "../NewWorkspaceModal/InvitationLink";
 import {
@@ -21,6 +22,7 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
   const handleOpen = () => {
     dismissNag(Nag.FIRST_REPLAY_2);
     hideModal();
+    trackEvent("onboarding.demo_replay_launch");
     launchAndRecordUrl("https://static.replay.io/demo");
   };
 

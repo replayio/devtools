@@ -21,6 +21,7 @@ import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
+import { trackEvent } from "ui/utils/telemetry";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -149,11 +150,13 @@ function Library({
     const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
 
     if (isTeamLeaderInvite()) {
+      trackEvent("onboarding.replay_invite");
       setModal("team-leader-onboarding");
     } else if (pendingWorkspaces?.length) {
       // Show the single invite modal to users who have just signed up for Replay
       // because they were invited to a team.
       if (pendingWorkspaces.length === 1 && workspaces.length === 0) {
+        trackEvent("onboarding.team_invite");
         setModal("single-invite");
       }
     }
@@ -162,6 +165,7 @@ function Library({
       shouldShowNag(nags, Nag.FIRST_REPLAY_2) && window.__IS_RECORD_REPLAY_RUNTIME__;
 
     if (!isLinkedFromEmail && !hasTeamInvitationCode() && showFirstReplayTutorial) {
+      trackEvent("onboarding.demo_replay_prompt");
       setModal("first-replay");
     }
   }, []);
