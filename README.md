@@ -16,7 +16,8 @@ Replay's DevTools is a React app built on top of the Replay [protocol](https://w
 git clone git@github.com:RecordReplay/devtools.git
 cd devtools
 npm install
-npm start
+cp .env.sample .env
+npm run dev
 ```
 
 Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/d5ce272f-a3de-4af6-8943-2595cb54f1e3).

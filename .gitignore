@@ -8,6 +8,7 @@ test/example-recordings.json
 .idea/
 cypress.env.json
 .env*
+!.env.sample
 .next
 next-env.d.ts
 tsconfig.tsbuildinfo
