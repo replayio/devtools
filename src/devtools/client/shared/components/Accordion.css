@@ -13,7 +13,6 @@
    * This can give it a focus outline when clicked, which we don't want.
    * The container itself is not in the focus order at all. */
   outline: none;
-  background-color: var(--chrome);
 }
 
 .accordion-header {

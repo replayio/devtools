@@ -72,8 +72,9 @@ function CommentTool({
   executionPoint,
   comments,
   canvas,
-  setPendingComment,
   createFrameComment,
+  setPendingComment,
+  setSelectedPrimaryPanel,
 }: CommentToolProps) {
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
   const recordingId = useGetRecordingId();
@@ -141,6 +142,7 @@ function CommentTool({
       newComment.comment.position = mouseEventCanvasPosition(e);
 
       setPendingComment(newComment);
+      setSelectedPrimaryPanel("comments");
     }
   };
   const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
@@ -196,6 +198,7 @@ const connector = connect(
   {
     setPendingComment: actions.setPendingComment,
     createFrameComment: actions.createFrameComment,
+    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

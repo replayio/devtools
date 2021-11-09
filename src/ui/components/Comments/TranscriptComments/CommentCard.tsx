@@ -199,7 +199,7 @@ function CommentCard({
             />
           </FocusContext.Provider>
         ) : (
-          <div className="border-transparent border">
+          <div className="border-transparent border pl-1">
             <button
               className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:outline-none focus:text-primaryAccent"
               onClick={() => {

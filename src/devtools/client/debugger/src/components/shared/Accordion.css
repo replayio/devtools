@@ -3,7 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .accordion {
-  background-color: var(--chrome);
   width: 100%;
   list-style-type: none;
   padding: 0px;
@@ -71,9 +70,4 @@
   overflow-y: auto;
   height: 100%;
   background-color: white;
-}
-
-.accordion > .collapsed:last-child > ._header {
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
 }
