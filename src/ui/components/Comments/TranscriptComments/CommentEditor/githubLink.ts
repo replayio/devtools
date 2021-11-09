@@ -25,12 +25,14 @@ export const GitHubLink = Node.create<GitHubLinkOptions>({
 
   priority: 100,
 
-  defaultOptions: {
-    HTMLAttributes: {
-      class: "text-primaryAccentText hover:text-primaryAccentLegacyHover",
-      rel: "nofollow",
-      target: "_blank",
-    },
+  addOptions() {
+    return {
+      HTMLAttributes: {
+        class: "text-primaryAccentText hover:text-primaryAccentLegacyHover",
+        rel: "nofollow",
+        target: "_blank",
+      },
+    };
   },
 
   addAttributes() {

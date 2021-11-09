@@ -22,12 +22,14 @@ export const ReplayLink = Node.create<ReplayLinkOptions>({
 
   priority: 100,
 
-  defaultOptions: {
-    HTMLAttributes: {
-      class: "text-primaryAccentText hover:text-primaryAccentLegacyHover",
-      rel: "nofollow",
-      target: "_blank",
-    },
+  addOptions() {
+    return {
+      HTMLAttributes: {
+        class: "text-primaryAccentText hover:text-primaryAccentLegacyHover",
+        rel: "nofollow",
+        target: "_blank",
+      },
+    };
   },
 
   addAttributes() {
