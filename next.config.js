@@ -1,3 +1,5 @@
+const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
+
 module.exports = {
   productionBrowserSourceMaps: true,
 
@@ -10,6 +12,8 @@ module.exports = {
         searchWorker: "./src/devtools/client/debugger/src/workers/search/worker",
       }));
     };
+
+    config.plugins.push(new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }));
 
     // handles build error from webpack/runtime/compat
     // https://github.com/vercel/next.js/issues/25484
