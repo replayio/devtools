@@ -56,7 +56,7 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
           maxSize={sidePanelCollapsed ? "0" : "80%"}
           minSize={sidePanelCollapsed ? "0" : "240px"}
           onControlledPanelResized={handleMove}
-          splitterSize={1}
+          splitterSize={8}
           style={{ width: "100%", overflow: "hidden" }}
           vert={true}
         />
