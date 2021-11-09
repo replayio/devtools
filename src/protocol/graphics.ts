@@ -2,7 +2,7 @@
 
 import { ThreadFront } from "./thread";
 import { assert, binarySearch } from "./utils";
-import { ScreenshotCache } from "./screenshot-cache";
+import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import {
   TimeStampedPoint,
@@ -228,38 +228,56 @@ export function setupGraphics(store: UIStore) {
     });
   });
 
-  ThreadFront.on("paused", async () => {
+  ThreadFront.on("paused", async ({ point, time }) => {
+    let screen: ScreenShot | undefined;
+    let mouse: MouseAndClickPosition | undefined;
+    try {
+      const rv = await getGraphicsAtTime(time);
+      screen = rv.screen;
+      mouse = rv.mouse;
+    } catch (err) {
+      if (err instanceof DownloadCancelledError) {
+        return;
+      }
+      throw err;
+    }
+
+    if (point !== ThreadFront.currentPoint) {
+      return;
+    }
+    if (screen) {
+      paintGraphics(screen, mouse);
+    }
+
+    store.dispatch(precacheScreenshots(time));
+
     if (!isRepaintEnabled()) {
       return;
     }
 
     await ThreadFront.ensureAllSources();
+    if (point !== ThreadFront.currentPoint) {
+      return;
+    }
     ThreadFront.ensureCurrentPause();
     const pause = ThreadFront.currentPause;
     assert(pause);
 
     const rv = await pause.repaintGraphics();
-    if (pause === ThreadFront.currentPause) {
-      // First try to use the new graphics,
-      // then fallback to the most recent graphics.
-      if (rv) {
-        const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-        let { description, screenShot } = rv;
-        if (screenShot) {
-          repaintedScreenshots.set(description.hash, screenShot);
-        } else {
-          screenShot = repaintedScreenshots.get(description.hash);
-          if (!screenShot) {
-            console.error("Missing repainted screenshot", description);
-            return;
-          }
-        }
-        paintGraphics(screenShot, mouse);
-      } else {
-        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-        paintGraphics(screen, mouse);
+    if (!rv || pause !== ThreadFront.currentPause) {
+      return;
+    }
+    let { description, screenShot } = rv;
+    if (screenShot) {
+      repaintedScreenshots.set(description.hash, screenShot);
+    } else {
+      screenShot = repaintedScreenshots.get(description.hash);
+      if (!screenShot) {
+        console.error("Missing repainted screenshot", description);
+        return;
       }
     }
+    paintGraphics(screenShot, mouse);
   });
 }
 

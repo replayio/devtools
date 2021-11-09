@@ -24,28 +24,19 @@ import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-import {
-  TimelineState,
-  Tooltip,
-  ZoomRegion,
-  HoveredItem,
-  TrimRegion,
-  TrimOperation,
-} from "ui/state/timeline";
+import { TimelineState, ZoomRegion, HoveredItem, TrimOperation } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { isRepaintEnabled } from "protocol/enable-repaint";
-import { getModal, isRegionLoaded } from "ui/reducers/app";
+import { getModal } from "ui/reducers/app";
 import clamp from "lodash/clamp";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
 };
 export type SetPlaybackStalledAction = Action<"set_playback_stalled"> & { stalled: boolean };
-export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip | null };
 export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
 export type SetHoveredItemAction = Action<"set_hovered_item"> & {
   hoveredItem: HoveredItem | null;
@@ -63,7 +54,6 @@ export type SetTrimRegionAction = Action<"set_trim_region"> & {
 export type TimelineActions =
   | SetTimelineStateAction
   | SetPlaybackStalledAction
-  | UpdateTooltipAction
   | SetZoomRegionAction
   | SetHoveredItemAction
   | SetPlaybackPrecachedTimeAction
@@ -173,27 +163,8 @@ function onWarp(store: UIStore) {
 }
 
 function onPaused({ time }: PauseEventArgs): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async ({ dispatch }) => {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
-
-    try {
-      // we don't show a screenshot if repainting is enabled to avoid jitter
-      // caused by showing a recorded screenshot first and then replacing it
-      // with a repainted screenshot. But if the current region hasn't been
-      // loaded yet, waiting for the repainted screenshot may take a long time,
-      // so in this case we do show a recorded screenshot first
-      if (!isRepaintEnabled() || !isRegionLoaded(store.getState(), time)) {
-        const { screen, mouse } = await getGraphicsAtTime(time);
-
-        if (screen && getCurrentTime(getState()) == time) {
-          dispatch(setTimelineState({ screenShot: screen, mouse }));
-          paintGraphics(screen, mouse);
-          Video.seek(time);
-        }
-      }
-
-      dispatch(precacheScreenshots(time));
-    } catch (e) {}
   };
 }
 
@@ -205,7 +176,6 @@ function setRecordingDescription(duration: number): UIThunkAction {
       setTimelineState({
         recordingDuration: duration,
         currentTime: duration,
-        screenShot: null,
         zoomRegion: { ...zoomRegion, endTime: duration },
       })
     );
@@ -232,7 +202,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
     const stateBeforeScreenshot = getState();
     const isTrimming = getModal(stateBeforeScreenshot) === "trimming";
 
-    if (!updateGraphics || isRepaintEnabled() || isTrimming) {
+    if (!updateGraphics || isTrimming) {
       return;
     }
 
@@ -256,17 +226,6 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 export function setPlaybackStalled(stalled: boolean): SetPlaybackStalledAction {
   console.log(`Stalled: ${stalled}`);
   return { type: "set_playback_stalled", stalled };
-}
-
-export function hideTooltip(): UIThunkAction {
-  return ({ dispatch }) => {
-    dispatch(updateTooltip(null));
-    dispatch(setTimelineToTime(null));
-  };
-}
-
-function updateTooltip(tooltip: Tooltip | null): UpdateTooltipAction {
-  return { type: "update_tooltip", tooltip };
 }
 
 export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {

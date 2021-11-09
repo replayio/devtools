@@ -1,9 +1,4 @@
-import { ScreenShot, TimeRange, Location, MouseEventKind } from "@recordreplay/protocol";
-import { MouseAndClickPosition } from "../../protocol/graphics";
-
-export interface Tooltip {
-  left: number;
-}
+import { TimeRange, Location } from "@recordreplay/protocol";
 
 export interface ZoomRegion {
   endTime: number;
@@ -25,15 +20,12 @@ export interface TimelineState {
     stalled?: boolean;
   } | null;
   playbackPrecachedTime: number;
-  screenShot: ScreenShot | null;
-  mouse: MouseAndClickPosition | null | undefined;
   recordingDuration: number | null;
   zoomRegion: ZoomRegion;
   timelineDimensions: { width: number; left: number; top: number };
   hoverTime: number | null;
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
-  tooltip: Tooltip | null;
   hoveredItem: HoveredItem | null;
   trimRegion: { startTime: number; endTime: number } | null;
 }
