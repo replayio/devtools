@@ -1,2 +1,7 @@
 public/
 .git/
+src/devtools/client/debugger/**/fixtures/**
+src/devtools/client/debugger/dist
+node_modules
+src/devtools/client/shared/vendor/
+src/devtools/client/shared/sourceeditor/codemirror
