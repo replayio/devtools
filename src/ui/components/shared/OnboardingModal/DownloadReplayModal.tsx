@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import { Nag, useDismissNag } from "ui/hooks/users";
 import { removeUrlParameters } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryLgButton, SecondaryLgButton } from "../Button";
@@ -42,9 +43,11 @@ function InitialScreen({
 function DownloadReplayModal({ hideModal, children }: PropsFromRedux & { children: ReactNode }) {
   const [current, setCurrent] = useState<number>(1);
   const [randomNumber, setRandomNumber] = useState<number>(Math.random());
+  const dismissNag = useDismissNag();
 
   const onSkipToLibrary = () => {
     removeUrlParameters();
+    dismissNag(Nag.DOWNLOAD_REPLAY);
     trackEvent("skipped-replay-download");
     hideModal();
   };
