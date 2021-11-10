@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
+import classNames from "classnames";
 
 import AppErrors from "./shared/Error";
 import LoginModal from "./shared/LoginModal";
@@ -70,7 +71,7 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-function App({ theme, modal, children }: AppProps) {
+function App({ children, fontLoading, modal, theme }: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
 
@@ -108,16 +109,17 @@ function App({ theme, modal, children }: AppProps) {
   }
 
   return (
-    <>
+    <div id="app-container" className={classNames({ "font-loading": fontLoading })}>
       {children}
       {modal ? <AppModal modal={modal} /> : null}
       <ConfirmRenderer />
       <AppErrors />
-    </>
+    </div>
   );
 }
 
 const connector = connect((state: UIState) => ({
+  fontLoading: selectors.getFontLoading(state),
   theme: selectors.getTheme(state),
   modal: selectors.getModal(state),
 }));

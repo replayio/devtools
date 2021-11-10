@@ -18,7 +18,8 @@ body {
   border: 2px solid black !important;
 }
 
-#__next {
+#__next,
+#app-container {
   display: flex;
   position: relative;
   flex-direction: column;
