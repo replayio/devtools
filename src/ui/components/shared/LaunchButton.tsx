@@ -2,10 +2,14 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { features } from "ui/utils/prefs";
+import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryButton } from "../shared/Button";
 
 function ShareButton({ setModal }: PropsFromRedux) {
-  const onClick = () => setModal("browser-launch");
+  const onClick = () => {
+    trackEvent("onboarding.launch_replay");
+    setModal("browser-launch");
+  };
 
   if (window.__IS_RECORD_REPLAY_RUNTIME__ || !features.launchBrowser) return null;
 
