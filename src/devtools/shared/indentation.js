@@ -136,7 +136,7 @@ function detectIndentation(textIteratorFn) {
   });
 
   // this file is not indented at all
-  if (total == 0) {
+  if (total === 0) {
     return null;
   }
 
