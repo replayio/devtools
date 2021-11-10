@@ -22,7 +22,7 @@
     "@auth0/auth0-react": "^1.2.0",
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.1",
-    "@recordreplay/protocol": "^0.13.0",
+    "@recordreplay/protocol": "^0.14.0",
     "@sentry/react": "^6.8.0",
     "@sentry/tracing": "^6.8.0",
     "@storybook/addon-postcss": "^2.0.0",
