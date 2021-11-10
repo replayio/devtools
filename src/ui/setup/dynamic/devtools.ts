@@ -42,6 +42,8 @@ import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 import { sendMessage } from "protocol/socket";
+import { setupNetwork } from "devtools/client/webconsole/actions/network";
+import network from "ui/reducers/network";
 
 declare global {
   interface Window {
@@ -104,6 +106,7 @@ export default async (store: Store) => {
     timeline,
     comments,
     contextMenus,
+    network,
     reactDevTools,
     ...debuggerReducers,
     ...consoleReducers.reducers,
@@ -147,7 +150,7 @@ export default async (store: Store) => {
   initOutputSyntaxHighlighting();
   setupMessages(store);
   setupLogpoints(store);
-  ThreadFront.findNetworkRequests();
+  setupNetwork(store);
   setupExceptions(store);
   setupReactDevTools(store);
 

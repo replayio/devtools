@@ -62,40 +62,40 @@ export interface UploadInfo {
 }
 
 export interface AppState {
-  sessionId: SessionId | null;
-  theme: string;
-  splitConsoleOpen: boolean;
-  recordingDuration: number;
-  indexing: number;
-  loading: number;
-  displayedLoadingProgress: number | null;
-  loadingFinished: boolean;
-  uploading: UploadInfo | null;
+  analysisPoints: AnalysisPoints;
   awaitingSourcemaps: boolean;
+  canvas: Canvas | null;
+  defaultSettingsTab: SettingsTabTitle;
+  displayedLoadingProgress: number | null;
+  events: Events;
   expectedError: ExpectedError | null;
-  unexpectedError: UnexpectedError | null;
+  fontLoading: boolean;
+  hoveredLineNumberLocation: Location | null;
+  indexing: number;
+  initializedPanels: PanelName[];
+  isNodePickerActive: boolean;
+  loadedRegions: loadedRegions | null;
+  loading: number;
+  loadingFinished: boolean;
   modal: ModalType | null;
   modalOptions: { recordingId: string } | { view: string } | null;
+  recordingDuration: number;
+  recordingTarget: RecordingTarget | null;
+  recordingWorkspace: Workspace | null;
   selectedPanel: PanelName;
   selectedPrimaryPanel: PrimaryPanelName;
-  initializedPanels: PanelName[];
-  analysisPoints: AnalysisPoints;
-  viewMode: ViewMode;
-  hoveredLineNumberLocation: Location | null;
-  events: Events;
-  isNodePickerActive: boolean;
-  canvas: Canvas | null;
-  videoUrl: string | null;
-  videoNode: HTMLVideoElement | null;
-  workspaceId: WorkspaceId | null;
-  defaultSettingsTab: SettingsTabTitle;
-  recordingTarget: RecordingTarget | null;
-  fontLoading: boolean;
-  recordingWorkspace: Workspace | null;
-  loadedRegions: loadedRegions | null;
-  showVideoPanel: boolean;
+  sessionId: SessionId | null;
   showEditor: boolean;
+  showVideoPanel: boolean;
+  splitConsoleOpen: boolean;
+  theme: string;
   trialExpired: boolean;
+  unexpectedError: UnexpectedError | null;
+  uploading: UploadInfo | null;
+  videoNode: HTMLVideoElement | null;
+  videoUrl: string | null;
+  viewMode: ViewMode;
+  workspaceId: WorkspaceId | null;
 }
 
 export interface AnalysisPoints {

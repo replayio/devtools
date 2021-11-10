@@ -11,20 +11,22 @@ import { PseudoClassesState } from "devtools/client/inspector/rules/state/pseudo
 import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
+import { NetworkState } from "ui/reducers/network";
 
 export interface UIState {
-  timeline: TimelineState;
   app: AppState;
+  classList: ClassListState;
   comments: CommentsState;
+  computed: ComputedState;
   contextMenus: ContextMenusState;
-  reactDevTools: ReactDevToolsState;
+  eventListenerBreakpoints: any;
+  eventTooltip: EventTooltipState;
   inspector: InspectorState;
   markup: MarkupState;
   messages: MessageState;
-  eventTooltip: EventTooltipState;
-  classList: ClassListState;
+  network: NetworkState;
   pseudoClasses: PseudoClassesState;
+  reactDevTools: ReactDevToolsState;
   rules: RulesState;
-  computed: ComputedState;
-  eventListenerBreakpoints: any;
+  timeline: TimelineState;
 }

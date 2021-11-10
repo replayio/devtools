@@ -3,6 +3,8 @@ import React, { useMemo } from "react";
 import keyBy from "lodash/keyBy";
 import {
   RequestEvent,
+  RequestEventInfo,
+  RequestInfo,
   RequestOpenEvent,
   RequestResponseEvent,
   TimeStampedPoint,
@@ -10,28 +12,33 @@ import {
 import Status from "./Status";
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
+import { connect, ConnectedProps } from "react-redux";
+import { selectors } from "ui/reducers/network";
+import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers";
+import { UIState } from "ui/state";
+import { getCurrentTime } from "ui/reducers/timeline";
 
 type RequestSummary = {
   domain: string;
   method: string;
   name: string;
-  point: TimeStampedPoint;
+  point: TimeStampedPoint | undefined;
   status: number;
   time: number;
   url: string;
 };
 
 type RequestEventMap = {
-  request: RequestOpenEvent;
-  response: RequestResponseEvent;
+  request: { time: number; event: RequestOpenEvent };
+  response: { time: number; event: RequestResponseEvent };
 };
 
-const eventsToMap = (events: RequestEvent[]): Partial<RequestEventMap> => {
-  return keyBy(events, e => e.kind);
+const eventsToMap = (events: RequestEventInfo[]): Partial<RequestEventMap> => {
+  return keyBy(events, e => e.event.kind);
 };
 
-const eventsByRequestId = (events: RequestEvent[]): Record<string, RequestEvent[]> => {
-  return events.reduce((acc: Record<string, RequestEvent[]>, eventInfo) => {
+const eventsByRequestId = (events: RequestEventInfo[]): Record<string, RequestEventInfo[]> => {
+  return events.reduce((acc: Record<string, RequestEventInfo[]>, eventInfo) => {
     acc[eventInfo.id] = [eventInfo, ...(acc[eventInfo.id] || [])];
     return acc;
   }, {});
@@ -45,7 +52,7 @@ const name = (url: string): string =>
     .pop() || "";
 const partialRequestsToCompleteSummaries = (
   requests: RequestInfo[],
-  events: RequestEvent[]
+  events: RequestEventInfo[]
 ): RequestSummary[] => {
   const eventsMap = eventsByRequestId(events);
   return requests
@@ -55,21 +62,17 @@ const partialRequestsToCompleteSummaries = (
         !!r.events.request && !!r.events.response
     )
     .map(request => ({
-      domain: host(request.events.request.requestUrl),
-      method: request.events.request.requestMethod,
-      name: name(request.events.request.requestUrl),
+      domain: host(request.events.request.event.requestUrl),
+      method: request.events.request.event.requestMethod,
+      name: name(request.events.request.event.requestUrl),
       point: request.point,
-      status: request.events.response.responseStatus,
+      status: request.events.response.event.responseStatus,
       time: request.events.response.time - request.events.request.time,
-      url: request.events.request.requestUrl,
+      url: request.events.request.event.requestUrl,
     }));
 };
 
-type RequestTableProps = {
-  currentTime: number;
-  events: RequestEvent[];
-  requests: RequestInfo[];
-};
+type RequestTableProps = PropsFromRedux;
 
 const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
   const columns = useMemo(
@@ -105,13 +108,14 @@ const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
     []
   );
   const data = useMemo(() => partialRequestsToCompleteSummaries(requests, events), [requests]);
+  console.log(data);
   const tableInstance = useTable<RequestSummary>({ columns, data });
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
-  const currentTimeIndex = data.findIndex(r => currentTime < r.point.time);
+  const currentTimeIndex = data.findIndex(r => currentTime < (r.point?.time || 0));
 
   return (
     <div>
-      <table className="w-full" {...getTableProps()}>
+      <table className={classNames("w-full", styles.request)} {...getTableProps()}>
         <thead>
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
@@ -129,7 +133,7 @@ const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
             return (
               <tr
                 className={classNames({
-                  "text-lightGrey": currentTime < row.original.point.time,
+                  "text-lightGrey": currentTime < (row.original.point?.time || 0),
                   [styles.next]: currentTimeIndex === i,
                 })}
                 {...row.getRowProps()}
@@ -154,3 +158,11 @@ const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
 };
 
 export default RequestTable;
+
+const connector = connect((state: UIState) => ({
+  events: selectors.getEvents(state),
+  requests: selectors.getRequests(state),
+  currentTime: getCurrentTime(state),
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export const ConnectedRequestTable = connector(RequestTable);

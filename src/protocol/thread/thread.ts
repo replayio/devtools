@@ -30,6 +30,7 @@ import {
   annotations,
   SameLineSourceLocations,
   RequestEventInfo,
+  RequestInfo,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -785,8 +786,12 @@ class _ThreadFront {
     }) => void
   ) {
     const sessionId = await this.waitForSession();
-    client.Network.findRequests({}, sessionId).then(console.log);
-    client.Network.addRequestsListener(onRequestsReceived);
+    client.Network.addRequestsListener(
+      async ({ events, requests }: { requests: RequestInfo[]; events: RequestEventInfo[] }) => {
+        onRequestsReceived({ requests, events });
+      }
+    );
+    client.Network.findRequests({}, sessionId);
   }
 
   async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {

@@ -2,17 +2,19 @@ import { RequestInfo, RequestEventInfo } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 
 export const setupNetwork = (store: any) => {
-  ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onNetworkRequests(msg)));
+  ThreadFront.findNetworkRequests(({ requests, events }) => {
+    store.dispatch(onNetworkRequestsThunk({ requests, events }));
+  });
 };
 
-const onNetworkRequests = ({
-  requests,
+const onNetworkRequestsThunk = ({
   events,
+  requests,
 }: {
-  requests: RequestInfo[];
   events: RequestEventInfo[];
+  requests: RequestInfo[];
 }) => {
-  return async ({ dispatch }) => {
-    dispatch(addNetworkRequests(requests, events));
+  return async ({ dispatch }: { dispatch: any }) => {
+    dispatch({ type: "NEW_NETWORK_REQUESTS", payload: { requests, events } });
   };
 };

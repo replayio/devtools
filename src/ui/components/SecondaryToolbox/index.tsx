@@ -18,6 +18,7 @@ import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { extendStore } from "ui/setup/store";
 
 import "ui/setup/dynamic/inspector";
+import { ConnectedRequestTable } from "../NetworkMonitor/RequestTable";
 
 let extendedStore = false;
 
@@ -91,7 +92,8 @@ function ConsolePanel() {
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        <WebConsoleApp />
+        <ConnectedRequestTable currentTime={0} />
+        {/* <WebConsoleApp /> */}
       </div>
     </div>
   );
