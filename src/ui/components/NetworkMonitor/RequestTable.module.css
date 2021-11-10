@@ -1,8 +1,7 @@
-.next::before {
-  position: absolute;
-  border: 2px solid red;
-  content: "";
-  display: block;
-  height: 0px;
-  width: 100%;
+table {
+  border-collapse: collapse;
+}
+
+tr.next td {
+  border-top: 2px solid var(--secondary-accent);
 }
