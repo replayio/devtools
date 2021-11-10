@@ -1,6 +1,5 @@
 src/devtools/client/debugger/**/fixtures/**
 src/devtools/client/debugger/dist
-src/devtools/client/debugger/bin/
 node_modules
 src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
