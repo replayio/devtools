@@ -16,7 +16,12 @@ import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
-import { firstReplay, hasTeamInvitationCode, singleInvitation } from "ui/utils/onboarding";
+import {
+  downloadReplay,
+  firstReplay,
+  hasTeamInvitationCode,
+  singleInvitation,
+} from "ui/utils/onboarding";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -132,6 +137,7 @@ function Library({
 }: LibraryProps) {
   const [searchString, setSearchString] = useState("");
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+  const dismissNag = hooks.useDismissNag();
 
   useEffect(function handleDeletedTeam() {
     // After rendering null, update the workspaceId to display the user's library
@@ -145,6 +151,9 @@ function Library({
     if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
       trackEvent("onboarding.team_invite");
       setModal("single-invite");
+    } else if (downloadReplay(nags, dismissNag)) {
+      trackEvent("onboarding.download_replay_prompt");
+      setModal("download-replay");
     } else if (firstReplay(nags)) {
       trackEvent("onboarding.demo_replay_prompt");
       setModal("first-replay");

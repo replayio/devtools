@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, {
   Dispatch,
   MouseEventHandler,
+  ReactNode,
   SetStateAction,
   useContext,
   useEffect,
@@ -55,11 +56,7 @@ export function OnboardingHeader({ children }: { children: string }) {
   return <div className="text-5xl font-extrabold">{children}</div>;
 }
 
-export function OnboardingBody({
-  children,
-}: {
-  children: string | React.ReactChild | React.ReactChild[];
-}) {
+export function OnboardingBody({ children }: { children: string | ReactNode }) {
   return <div className="text-center">{children}</div>;
 }
 

@@ -31,6 +31,7 @@ export type ModalType =
   | "single-invite"
   | "browser-launch"
   | "first-replay"
+  | "download-replay"
   | "trimming"
   | "privacy";
 export type WorkspaceId = string;
