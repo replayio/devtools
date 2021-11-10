@@ -119,7 +119,7 @@ function detectIndentation(textIteratorFn) {
       width++;
     }
     // don't count lines that are all spaces
-    if (width == text.length) {
+    if (width === text.length) {
       last = 0;
       return;
     }
