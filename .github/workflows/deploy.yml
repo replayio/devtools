@@ -5,26 +5,20 @@ on:
       - master
 
 jobs:
-  build:
-    name: Build webpack
+  build-server:
+    name: Build the Development Server
     runs-on: macos-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: npm install
-      - name: Build webpack
-        run: ./node_modules/.bin/webpack --mode=development --env REPLAY_RELEASE=$GIT_SHA
-        env:
-          GIT_SHA: ${{ github.sha }}
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/npm-install
       - name: Tar up output files
-        run: tar -czf dist.tgz index.html dist node_modules
-      - name: Create artifact
+        run: tar -czf node_modules.tgz node_modules
+      - name: "Create artifact: node_modules"
         uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: dist.tgz
+          name: node_modules
+          path: node_modules.tgz
   download-browser:
     name: Download replay browser
     runs-on: ubuntu-latest
@@ -62,100 +56,131 @@ jobs:
           name: replay-driver
           path: macOS-recordreplay.so
   test0:
-    name: Test stripe 0
+    name: End-to-end tests (0)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 0/8
+          stripe: 0/9
   test1:
-    name: Test stripe 1
+    name: End-to-end tests (1)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 1/8
+          stripe: 1/9
   test2:
-    name: Test stripe 2
+    name: End-to-end tests (2)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 2/8
+          stripe: 2/9
   test3:
-    name: Test stripe 3
+    name: End-to-end tests (3)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 3/8
+          stripe: 3/9
   test4:
-    name: Test stripe 4
+    name: End-to-end tests (4)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 4/8
+          stripe: 4/9
   test5:
-    name: Test stripe 5
+    name: End-to-end tests (5)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 5/8
+          stripe: 5/9
   test6:
-    name: Test stripe 6
+    name: End-to-end tests (6)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 6/8
+          stripe: 6/9
   test7:
-    name: Test stripe 7
+    name: End-to-end tests (7)
     runs-on: macos-latest
-    needs: [build, download-browser, download-node, download-driver]
-    timeout-minutes: 15
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
         with:
-          stripe: 7/8
+          stripe: 7/9
+  test8:
+    name: End-to-end tests (8)
+    runs-on: macos-latest
+    needs: [build-server, download-browser, download-node, download-driver]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/setup-next
+      - uses: ./.github/actions/test
+        with:
+          stripe: 8/9
   mock-test:
     name: Mock Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-     - uses: actions/checkout@v2
-     - uses: ./.github/actions/mockTest
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/npm-install
+      - uses: ./.github/actions/setup-next
+      - uses: ./.github/actions/mockTest
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/npm-install
+      - name: Run tests
+        run: npm test
   deploy:
     name: Deploy to S3
     runs-on: ubuntu-latest
