@@ -17,6 +17,7 @@ import { selectors } from "ui/reducers/network";
 import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers";
 import { UIState } from "ui/state";
 import { getCurrentTime } from "ui/reducers/timeline";
+import { actions } from "ui/actions";
 
 type RequestSummary = {
   domain: string;
@@ -74,7 +75,7 @@ const partialRequestsToCompleteSummaries = (
 
 type RequestTableProps = PropsFromRedux;
 
-const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
+const RequestTable = ({ currentTime, events, seekToTime, requests }: RequestTableProps) => {
   const columns = useMemo(
     () => [
       {
@@ -136,6 +137,12 @@ const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
                   "text-lightGrey": currentTime < (row.original.point?.time || 0),
                   [styles.next]: currentTimeIndex === i,
                 })}
+                onClick={() => {
+                  if (!row.original.point) {
+                    return;
+                  }
+                  seekToTime(row.original.point?.time);
+                }}
                 {...row.getRowProps()}
               >
                 {row.cells.map(cell => {
@@ -159,10 +166,13 @@ const RequestTable = ({ currentTime, events, requests }: RequestTableProps) => {
 
 export default RequestTable;
 
-const connector = connect((state: UIState) => ({
-  events: selectors.getEvents(state),
-  requests: selectors.getRequests(state),
-  currentTime: getCurrentTime(state),
-}));
+const connector = connect(
+  (state: UIState) => ({
+    events: selectors.getEvents(state),
+    requests: selectors.getRequests(state),
+    currentTime: getCurrentTime(state),
+  }),
+  { seekToTime: actions.seekToTime }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export const ConnectedRequestTable = connector(RequestTable);
