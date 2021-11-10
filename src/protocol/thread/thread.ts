@@ -774,6 +774,12 @@ class _ThreadFront {
     });
   }
 
+  async findNetworkRequests() {
+    const sessionId = await this.waitForSession();
+    client.Network.findRequests({}, sessionId).then(console.log);
+    client.Network.addRequestsListener(console.log);
+  }
+
   async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {
     const sessionId = await this.waitForSession();
 

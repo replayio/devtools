@@ -139,6 +139,7 @@ export default async (store: Store) => {
     )
   );
 
+  // This should be idempotent and then hot reloaing will be less borked.
   setupApp(store);
   setupTimeline(store);
   setupEventListeners(store);
@@ -146,6 +147,7 @@ export default async (store: Store) => {
   initOutputSyntaxHighlighting();
   setupMessages(store);
   setupLogpoints(store);
+  ThreadFront.findNetworkRequests();
   setupExceptions(store);
   setupReactDevTools(store);
 
