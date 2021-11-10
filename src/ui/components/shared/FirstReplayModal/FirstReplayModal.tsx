@@ -16,6 +16,8 @@ import {
   OnboardingContentWrapper,
 } from "../Onboarding/index";
 
+export const REPLAY_DEMO_URL = "https://static.replay.io/demo/";
+
 function FirstReplayModal({ hideModal }: PropsFromRedux) {
   const dismissNag = hooks.useDismissNag();
 
@@ -23,7 +25,7 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
     dismissNag(Nag.FIRST_REPLAY_2);
     hideModal();
     trackEvent("onboarding.demo_replay_launch");
-    launchAndRecordUrl("https://static.replay.io/demo");
+    launchAndRecordUrl(REPLAY_DEMO_URL);
   };
 
   return (

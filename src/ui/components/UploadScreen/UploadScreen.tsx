@@ -159,7 +159,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
     trackTiming("kpi-time-to-view-replay");
-    trackEvent(isDemoReplay(recording) ? "create demo replay" : "create replay");
+    trackEvent("create replay", { isDemo: isDemoReplay(recording) });
     startUploadWaitTracking();
 
     await initializeRecording({
