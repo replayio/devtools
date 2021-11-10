@@ -50,6 +50,7 @@ export enum Nag {
   FIRST_BREAKPOINT_REMOVED = "first_breakpoint_removed",
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   FIRST_GUTTER_CLICK = "first_gutter_click",
+  DOWNLOAD_REPLAY = "download_replay",
 }
 
 export enum EmailSubscription {

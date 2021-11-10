@@ -24,6 +24,7 @@ import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
 import { migratePrefToSettings } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
+import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -53,6 +54,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "first-replay": {
       return <FirstReplayModal />;
+    }
+    case "download-replay": {
+      return <DownloadReplayPromptModal />;
     }
     case "trimming": {
       return <TrimmingModal />;
