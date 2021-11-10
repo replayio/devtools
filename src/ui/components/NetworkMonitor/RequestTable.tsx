@@ -1,49 +1,15 @@
 import { useTable } from "react-table";
 import React, { useMemo } from "react";
 import keyBy from "lodash/keyBy";
-import { TimeStampedPoint } from "@recordreplay/protocol";
+import {
+  RequestEvent,
+  RequestOpenEvent,
+  RequestResponseEvent,
+  TimeStampedPoint,
+} from "@recordreplay/protocol";
 import Status from "./Status";
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
-
-interface Header {
-  name: string;
-  value: string;
-}
-
-interface RequestOpenEvent extends RequestEventInfo {
-  kind: "request";
-  requestUrl: string;
-  requestMethod: string;
-  requestHeaders: Header[];
-  requestCause: string;
-}
-
-export interface RequestEventInfo {
-  id: string;
-  time: number;
-}
-
-interface RequestResponseEvent extends RequestEventInfo {
-  kind: "response";
-  responseHeaders: Header[];
-  responseProtocolVersion: string;
-  responseStatus: number;
-  responseStatusText: string;
-  responseFromCache: boolean;
-}
-
-export type RequestEvent = RequestResponseEvent | RequestOpenEvent;
-
-export interface RequestInfo {
-  id: string;
-  point: TimeStampedPoint;
-}
-
-export type CombinedRequestInfo = {
-  events: RequestEvent[];
-  info: RequestInfo;
-};
 
 type RequestSummary = {
   domain: string;
@@ -83,7 +49,7 @@ const partialRequestsToCompleteSummaries = (
 ): RequestSummary[] => {
   const eventsMap = eventsByRequestId(events);
   return requests
-    .map(r => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
+    .map((r: RequestInfo) => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
     .filter(
       (r): r is RequestInfo & { events: RequestEventMap } =>
         !!r.events.request && !!r.events.response
