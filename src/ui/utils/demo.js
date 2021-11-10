@@ -1,5 +1,6 @@
 import { isDemo } from "ui/utils/environment";
 import { ThreadFront } from "protocol/thread";
+import { REPLAY_DEMO_URL } from "ui/components/shared/FirstReplayModal/FirstReplayModal";
 
 export async function setupDemo() {
   if (!isDemo()) {
@@ -27,5 +28,5 @@ export async function setupDemo() {
 }
 
 export function isDemoReplay(recording) {
-  return recording?.title == "Your first replay";
+  return recording?.url === REPLAY_DEMO_URL;
 }
