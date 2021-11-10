@@ -29,7 +29,6 @@ export type ModalType =
   | "workspace-settings"
   | "onboarding"
   | "single-invite"
-  | "team-leader-onboarding"
   | "browser-launch"
   | "first-replay"
   | "trimming"

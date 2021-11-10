@@ -8,13 +8,7 @@ import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import {
-  isTeamLeaderInvite,
-  isTeamMemberInvite,
-  hasTeamInvitationCode,
-  removeUrlParameters,
-} from "ui/utils/environment";
-import { shouldShowNag } from "ui/utils/user";
+import { removeUrlParameters } from "ui/utils/environment";
 import { setExpectedError } from "ui/actions/session";
 import { LoadingScreen } from "../shared/BlankScreen";
 import Sidebar from "./Sidebar";
@@ -22,6 +16,7 @@ import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
+import { firstReplay, hasTeamInvitationCode, singleInvitation } from "ui/utils/onboarding";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -147,24 +142,10 @@ function Library({
     }
   }, []);
   useEffect(function handleOnboardingModals() {
-    const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
-
-    if (isTeamLeaderInvite()) {
-      trackEvent("onboarding.replay_invite");
-      setModal("team-leader-onboarding");
-    } else if (pendingWorkspaces?.length) {
-      // Show the single invite modal to users who have just signed up for Replay
-      // because they were invited to a team.
-      if (pendingWorkspaces.length === 1 && workspaces.length === 0) {
-        trackEvent("onboarding.team_invite");
-        setModal("single-invite");
-      }
-    }
-
-    const showFirstReplayTutorial =
-      shouldShowNag(nags, Nag.FIRST_REPLAY_2) && window.__IS_RECORD_REPLAY_RUNTIME__;
-
-    if (!isLinkedFromEmail && !hasTeamInvitationCode() && showFirstReplayTutorial) {
+    if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
+      trackEvent("onboarding.team_invite");
+      setModal("single-invite");
+    } else if (firstReplay(nags)) {
       trackEvent("onboarding.demo_replay_prompt");
       setModal("first-replay");
     }

@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const url = usesWindow(win => {
+export const url = usesWindow(win => {
   if (!win) return new URL("https://app.replay.io");
 
   return new URL(win.location.href);
@@ -36,18 +36,6 @@ export function isReplayBrowser() {
 
 export function getTest() {
   return url.searchParams.get("test");
-}
-
-export function isTeamMemberInvite() {
-  return new URL(window.location.href).searchParams.get("teaminvite");
-}
-
-export function isTeamLeaderInvite() {
-  return new URL(window.location.href).searchParams.get("replayinvite");
-}
-
-export function hasTeamInvitationCode() {
-  return new URL(window.location.href).searchParams.get("invitationcode");
 }
 
 // Return whether we are running one of the tests in our e2e test suite.

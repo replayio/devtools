@@ -16,7 +16,6 @@ import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
 
-import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
 import { LoadingScreen } from "./shared/BlankScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
@@ -48,9 +47,6 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "single-invite": {
       return <SingleInviteModal />;
-    }
-    case "team-leader-onboarding": {
-      return <TeamLeaderOnboardingModal />;
     }
     case "browser-launch": {
       return <LaunchBrowserModal />;

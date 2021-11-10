@@ -1,19 +1,12 @@
 import React, { useEffect } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
-import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
 import Library from "../Library/index";
 
 import { PrimaryLgButton } from "../shared/Button";
-import {
-  OnboardingActions,
-  OnboardingBody,
-  OnboardingContent,
-  OnboardingContentWrapper,
-  OnboardingHeader,
-  OnboardingModalContainer,
-} from "../shared/Onboarding/index";
+import { OnboardingContentWrapper, OnboardingModalContainer } from "../shared/Onboarding/index";
 import { useRouter } from "next/dist/client/router";
+import { isTeamMemberInvite } from "ui/utils/onboarding";
 
 /**
  * Create a (host relative) URL with the given parameters. Used for replacing
@@ -47,26 +40,6 @@ function WelcomePage() {
   useEffect(() => {
     setUserInBrowserPrefs(null);
   }, []);
-
-  if (isTeamLeaderInvite()) {
-    return (
-      <OnboardingModalContainer>
-        <OnboardingContentWrapper>
-          <OnboardingContent>
-            <OnboardingHeader>👋 Welcome</OnboardingHeader>
-            <OnboardingBody>
-              {"Welcome to Replay - the new way to record, replay, and debug web applications!"}
-            </OnboardingBody>
-          </OnboardingContent>
-          <OnboardingActions>
-            <PrimaryLgButton color="blue" onClick={onLogin}>
-              Sign in with Google
-            </PrimaryLgButton>
-          </OnboardingActions>
-        </OnboardingContentWrapper>
-      </OnboardingModalContainer>
-    );
-  }
 
   return (
     <OnboardingModalContainer theme="light">
