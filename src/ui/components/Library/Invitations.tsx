@@ -1,25 +1,19 @@
 import React from "react";
 import hooks from "ui/hooks";
+import sortBy from "lodash/sortBy";
+
 import TeamButton from "./TeamButton";
 
 export default function Invitations({}) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
 
-  if (loading) {
-    return null;
-  }
-
-  const displayedWorkspaces = [...(pendingWorkspaces || [])].sort((a, b) =>
-    a.name > b.name ? 1 : a.name < b.name ? -1 : 0
-  );
-
-  if (displayedWorkspaces.length === 0) {
+  if (loading || !pendingWorkspaces || !pendingWorkspaces.length) {
     return null;
   }
 
   return (
     <>
-      {displayedWorkspaces.map(workspace => (
+      {sortBy(pendingWorkspaces, "name").map(workspace => (
         <TeamButton id={workspace.id} text={workspace.name} key={workspace.id} isNew />
       ))}
     </>
