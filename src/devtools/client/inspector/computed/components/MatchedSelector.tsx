@@ -14,6 +14,7 @@ export default function MatchedSelector(props: MatchedSelectorProps) {
       <span className="rule-link">
         <a
           target="_blank"
+          rel="noreferrer noopener"
           className="computed-link theme-link"
           title={selector.stylesheetURL}
           tabIndex={0}

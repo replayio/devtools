@@ -95,7 +95,7 @@ export function Privacy() {
             <a
               href="https://www.replay.io/security-privacy"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="underline text-primaryAccent"
             >
               Learn more
