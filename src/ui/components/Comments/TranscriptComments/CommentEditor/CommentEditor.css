@@ -1,0 +1,91 @@
+.transcript-list .comment-input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.transcript-list .comment-input-container img {
+  align-self: start;
+}
+
+.transcript-list .comment-input-container > :not(:first-child) {
+  margin-top: 8px;
+}
+
+.transcript-list .comment-input {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.transcript-list .comment-input-actions {
+  margin-left: 41px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transcript-list .comment-input-actions button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.transcript-list .comment-input-actions button.action-cancel {
+  text-decoration: underline;
+  font-size: 12px;
+}
+
+.transcript-list .comment-input-actions button.action-submit {
+  background: var(--primary-accent);
+  color: var(--theme-body-background);
+  font-size: 14px;
+}
+
+.transcript-list .comment-input-actions button.action-submit:hover {
+  background: var(--primary-accent);
+}
+
+.transcript-list .draft-editor-container {
+  /* Create a positioning context for the emoji picker */
+  position: relative;
+  flex-grow: 1;
+}
+
+.transcript-list .responsive-textarea {
+  overflow-y: hidden;
+  resize: none;
+  line-height: 18px;
+  border: none;
+}
+
+.transcript-list .responsive-textarea:focus {
+  outline: none;
+}
+
+.transcript-list .img.paper-airplane {
+  width: 20px;
+  height: 20px;
+  color: var(--theme-icon-color);
+  transform: rotate(90deg);
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.transcript-list .img.paper-airplane:hover {
+  background: var(--primary-accent);
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9197a3;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror {
+  word-wrap: break-word;
+  white-space: break-spaces;
+}
