@@ -157,7 +157,7 @@ function onSocketMessage(evt: MessageEvent<any>) {
 }
 
 export function getDisconnectionError(): UnexpectedError {
-  endMixpanelSession();
+  endMixpanelSession("disconnected");
   return {
     message: "Ready when you are!",
     content: "Replays disconnect after 5 minutes to reduce server load.",
