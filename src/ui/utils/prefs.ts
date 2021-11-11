@@ -22,23 +22,24 @@ pref("devtools.showRedactions", false);
 pref("devtools.disableLogRocket", false);
 
 // app features
-pref("devtools.features.comments", true);
-pref("devtools.features.commentMentions", false);
-pref("devtools.features.commentEmojis", false);
-pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
-pref("devtools.features.videoComments", false);
+pref("devtools.features.columnBreakpoints", false);
+pref("devtools.features.commentEmojis", false);
+pref("devtools.features.commentMentions", false);
+pref("devtools.features.comments", true);
 pref("devtools.features.consoleHover", false);
-pref("devtools.features.transcriptHover", false);
-pref("devtools.features.widgetHover", false);
+pref("devtools.features.eventCount", true);
+pref("devtools.features.launchBrowser", true);
+pref("devtools.features.network", false);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
-pref("devtools.features.videoPlayback", false);
-pref("devtools.features.launchBrowser", true);
 pref("devtools.features.termsOfService", false);
-pref("devtools.features.eventCount", true);
-pref("devtools.features.columnBreakpoints", false);
+pref("devtools.features.transcriptHover", false);
 pref("devtools.features.trimming", false);
+pref("devtools.features.users", true);
+pref("devtools.features.videoComments", false);
+pref("devtools.features.videoPlayback", false);
+pref("devtools.features.widgetHover", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -60,24 +61,25 @@ export const prefs = new PrefsHelper("devtools", {
 });
 
 export const features = new PrefsHelper("devtools.features", {
-  comments: ["Bool", "comments"],
-  commentMentions: ["Bool", "commentMentions"],
-  commentEmojis: ["Bool", "commentEmojis"],
-  users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
-  videoComments: ["Bool", "videoComments"],
-  private: ["Bool", "private"],
+  columnBreakpoints: ["Bool", "columnBreakpoints"],
+  commentEmojis: ["Bool", "commentEmojis"],
+  commentMentions: ["Bool", "commentMentions"],
+  comments: ["Bool", "comments"],
   consoleHover: ["Bool", "consoleHover"],
-  transcriptHover: ["Bool", "transcriptHover"],
-  widgetHover: ["Bool", "widgetHover"],
+  eventCount: ["Bool", "eventCount"],
+  launchBrowser: ["Bool", "launchBrowser"],
+  network: ["Bool", "network"],
+  private: ["Bool", "private"],
   reactDevtools: ["Bool", "reactDevtools"],
   smoothPlayback: ["Bool", "smoothPlayback"],
-  videoPlayback: ["Bool", "videoPlayback"],
-  launchBrowser: ["Bool", "launchBrowser"],
   termsOfService: ["Bool", "termsOfService"],
-  eventCount: ["Bool", "eventCount"],
-  columnBreakpoints: ["Bool", "columnBreakpoints"],
+  transcriptHover: ["Bool", "transcriptHover"],
   trimming: ["Bool", "trimming"],
+  users: ["Bool", "users"],
+  videoComments: ["Bool", "videoComments"],
+  videoPlayback: ["Bool", "videoPlayback"],
+  widgetHover: ["Bool", "widgetHover"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

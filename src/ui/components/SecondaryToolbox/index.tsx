@@ -19,23 +19,24 @@ import { extendStore } from "ui/setup/store";
 
 import "ui/setup/dynamic/inspector";
 import { ConnectedRequestTable } from "../NetworkMonitor/RequestTable";
+import { features } from "ui/utils/prefs";
 
 let extendedStore = false;
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
+  hasReactComponents: boolean;
+  isNode: boolean;
   selectedPanel: PanelName;
   setSelectedPanel: (panel: PanelName) => any;
-  isNode: boolean;
-  hasReactComponents: boolean;
 }
 
 function PanelButtons({
+  hasReactComponents,
+  isNode,
   selectedPanel,
   setSelectedPanel,
-  isNode,
-  hasReactComponents,
 }: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
 
@@ -80,14 +81,16 @@ function PanelButtons({
           <div className="label">React</div>
         </button>
       )}
-      <button
-        className={classnames("console-panel-button", {
-          expanded: selectedPanel === "network",
-        })}
-        onClick={() => onClick("network")}
-      >
-        <div className="label">Network</div>
-      </button>
+      {features.network && (
+        <button
+          className={classnames("console-panel-button", {
+            expanded: selectedPanel === "network",
+          })}
+          onClick={() => onClick("network")}
+        >
+          <div className="label">Network</div>
+        </button>
+      )}
     </div>
   );
 }
