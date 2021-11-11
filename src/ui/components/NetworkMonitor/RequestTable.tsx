@@ -18,12 +18,15 @@ import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers
 import { UIState } from "ui/state";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { actions } from "ui/actions";
+import { sortBy } from "lodash";
 
 type RequestSummary = {
   domain: string;
+  end: number;
   method: string;
   name: string;
   point: TimeStampedPoint | undefined;
+  start: number;
   status: number;
   time: number;
   url: string;
@@ -56,7 +59,7 @@ const partialRequestsToCompleteSummaries = (
   events: RequestEventInfo[]
 ): RequestSummary[] => {
   const eventsMap = eventsByRequestId(events);
-  return requests
+  const summaries = requests
     .map((r: RequestInfo) => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
     .filter(
       (r): r is RequestInfo & { events: RequestEventMap } =>
@@ -64,13 +67,16 @@ const partialRequestsToCompleteSummaries = (
     )
     .map(request => ({
       domain: host(request.events.request.event.requestUrl),
+      end: request.events.response.time,
       method: request.events.request.event.requestMethod,
       name: name(request.events.request.event.requestUrl),
       point: request.point,
       status: request.events.response.event.responseStatus,
+      start: request.events.request.time,
       time: request.events.response.time - request.events.request.time,
       url: request.events.request.event.requestUrl,
     }));
+  return sortBy(summaries, "start");
 };
 
 type RequestTableProps = PropsFromRedux;
