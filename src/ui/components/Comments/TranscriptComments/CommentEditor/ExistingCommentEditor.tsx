@@ -21,9 +21,9 @@ function ExistingCommentEditor({
   editItem,
   type,
 }: ExistingCommentEditorProps) {
-  const { userId } = useGetUserId();
-  const updateComment = hooks.useUpdateComment();
-  const updateCommentReply = hooks.useUpdateCommentReply();
+  // const { userId } = useGetUserId();
+  // const updateComment = hooks.useUpdateComment();
+  // const updateCommentReply = hooks.useUpdateCommentReply();
 
   const handleSubmit = (inputValue: string) => {
     if (type === "comment") {
@@ -37,9 +37,9 @@ function ExistingCommentEditor({
   return (
     <div
       onDoubleClick={() => {
-        if (comment.user.id === userId) {
-          editItem(comment);
-        }
+        // if (comment.user.id === userId) {
+        //   editItem(comment);
+        // }
       }}
     >
       <CommentEditor

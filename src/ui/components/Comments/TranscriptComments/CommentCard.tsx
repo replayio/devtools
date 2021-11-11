@@ -70,9 +70,9 @@ function CommentItemHeader({
           {relativeDate}
         </span>
       </div>
-      {showOptions ? (
+      {/* {showOptions ? (
         <CommentActions comment={comment} editItem={editItem} isRoot={"replies" in comment} />
-      ) : null}
+      ) : null} */}
     </div>
   );
 }
@@ -159,7 +159,7 @@ export function CommentCard({
                 close: () => setIsEditorOpen(false),
               }}
             >
-              <NewCommentEditor comment={comment} type={"new_comment"} />
+              {/* <NewCommentEditor comment={comment} type={"new_comment"} /> */}
             </FocusContext.Provider>
           </div>
         </div>

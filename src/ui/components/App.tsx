@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
-import classNames from "classnames";
 
 import AppErrors from "./shared/Error";
 import LoginModal from "./shared/LoginModal";
