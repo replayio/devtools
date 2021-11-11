@@ -67,7 +67,8 @@ export function setMixpanelContext({ id, email }: TelemetryUser) {
   }
 }
 
-export const endMixpanelSession = () => trackMixpanelEvent("session_end");
+export const endMixpanelSession = (reason: string) => () =>
+  trackMixpanelEvent("session_end", { reason });
 export const trackViewMode = (viewMode: ViewMode) =>
   trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
 
@@ -75,5 +76,5 @@ export const startUploadWaitTracking = () => mixpanel.time_event("upload_recordi
 export const endUploadWaitTracking = () => trackMixpanelEvent("upload_recording");
 
 function setupSessionEndListener() {
-  window.addEventListener("beforeunload", endMixpanelSession);
+  window.addEventListener("beforeunload", endMixpanelSession("unloaded"));
 }
