@@ -28,7 +28,7 @@ export default function TOSScreen() {
             <a
               href="https://replay.io/tos.html"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="text-primaryAccent underline"
             >
               Terms of Use
@@ -51,7 +51,7 @@ export default function TOSScreen() {
             <a
               href="https://replay.io/privacy.html"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="text-primaryAccent underline"
             >
               Privacy Policy

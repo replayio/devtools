@@ -19,7 +19,7 @@ export function TeamPricingPage({
         <a
           href="https://www.replay.io/pricing"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="text-primaryAccent underline"
         >
           Learn More
@@ -38,7 +38,7 @@ export function TeamPricingPage({
       <a
         href="https://www.replay.io/terms-of-use"
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
         className="underline"
       >
         Terms of service and cancellation policy

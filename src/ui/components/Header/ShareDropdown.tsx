@@ -83,7 +83,7 @@ function PrivacyNote({ isPrivate, isOwner }: { isPrivate: boolean; isOwner: bool
           you&#39;re viewing.{" "}
           <a
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             href="https://replayio.notion.site/Sharing-replays-2af70ebdfb1c47e5b9246f25ca377ef2"
           >
             Learn more

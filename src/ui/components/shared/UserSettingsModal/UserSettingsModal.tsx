@@ -28,7 +28,7 @@ function Support() {
           <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
           <div className="description">
             Come chat with us on our{" "}
-            <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noreferrer">
+            <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noopener noreferrer">
               Discord server.
             </a>
           </div>
@@ -83,7 +83,7 @@ function Legal() {
               className="underline"
               href="https://www.replay.io/terms-of-use"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Terms of Use
             </a>
@@ -96,7 +96,7 @@ function Legal() {
               className="underline"
               href="https://www.replay.io/privacy-policy"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Privacy Policy
             </a>
