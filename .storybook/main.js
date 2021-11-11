@@ -21,12 +21,8 @@ module.exports = {
       "src/devtools/client/debugger/dist",
       "src/devtools/client/debugger/packages",
       "src/devtools/client/shared/vendor",
-      // "node_modules",
       ...config.resolve.modules,
     ];
-
-    // const cssIndex = config.module.rules.findIndex(r => r.test.toString().match(/css/));
-    // config.module.rules.splice(cssIndex, 1);
 
     config.externals = [
       ...(config.externals || []),
@@ -53,23 +49,6 @@ module.exports = {
           );
         },
       },
-      // {
-      //   test: /\.css$/,
-      //   use: [
-      //     // MiniCssExtractPlugin.loader,
-      //     "style-loader",
-      //     {
-      //       loader: "css-loader",
-      //       options: {
-      //         importLoaders: 1,
-      //         url: {
-      //           filter: (url, resourcePath) => resourcePath.endsWith("/src/image/image.css"),
-      //         },
-      //       },
-      //     },
-      //     "postcss-loader",
-      //   ],
-      // },
       ...config.module.rules,
     ];
 
