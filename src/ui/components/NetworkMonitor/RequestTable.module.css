@@ -3,7 +3,7 @@ table.requests {
 }
 
 .row {
-  border-top: 2px solid var(--theme-toolbar-background);
+  border-bottom: 2px solid var(--theme-toolbar-background);
 }
 
 .row.last {
@@ -24,8 +24,4 @@ table.requests {
 
 .name {
   flex: auto;
-}
-
-.time {
-  flex: 0 0 8ch;
 }

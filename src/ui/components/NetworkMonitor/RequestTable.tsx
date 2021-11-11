@@ -115,11 +115,6 @@ const RequestTable = ({ currentTime, events, seek, requests }: RequestTableProps
         Header: "Name",
         accessor: "name" as const,
       },
-      {
-        Header: "Time",
-        accessor: "time" as const,
-        className: "m-auto",
-      },
     ],
     []
   );
