@@ -7,6 +7,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
+import { useConfirm } from "../shared/Confirm";
 
 type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
 
@@ -18,16 +19,22 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
   const declinePendingInvitation = hooks.useRejectPendingInvitation(onDeclineCompleted);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
+  const { confirmDestructive } = useConfirm();
+
   const handleAccept = () => {
     acceptPendingInvitation({ variables: { workspaceId: id } });
     setLoading(true);
   };
   const handleDecline = () => {
-    const message = "Are you sure you want to decline this invitation?";
-    if (window.confirm(message)) {
-      declinePendingInvitation({ variables: { workspaceId: id } });
-      setLoading(true);
-    }
+    confirmDestructive({
+      message: "Are you sure you want to decline this invitation?",
+      acceptLabel: "Decline invitation",
+    }).then(confirmed => {
+      if (confirmed) {
+        declinePendingInvitation({ variables: { workspaceId: id } });
+        setLoading(true);
+      }
+    });
   };
   function onDeclineCompleted() {
     setWorkspaceId(null);

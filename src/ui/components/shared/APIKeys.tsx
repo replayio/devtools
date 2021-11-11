@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ApiKey, ApiKeyResponse, ApiKeyScope } from "ui/types";
+import { useConfirm } from "./Confirm";
 
 import TextInput from "./Forms/TextInput";
 import MaterialIcon from "./MaterialIcon";
@@ -57,6 +58,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
 }
 
 function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: string) => void }) {
+  const { confirmDestructive } = useConfirm();
   if (apiKeys.length === 0) return null;
 
   return (
@@ -77,12 +79,16 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
               <button
                 className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
                 onClick={() => {
-                  const message =
-                    "This action will permanently delete this API key. \n\nAre you sure you want to proceed?";
-
-                  if (window.confirm(message)) {
-                    onDelete(apiKey.id);
-                  }
+                  confirmDestructive({
+                    message: "Delete API key?",
+                    description:
+                      "This action will permanently delete this API key. \n\nAre you sure you want to proceed?",
+                    acceptLabel: "Delete API key",
+                  }).then(confirmed => {
+                    if (confirmed) {
+                      onDelete(apiKey.id);
+                    }
+                  });
                 }}
               >
                 Delete

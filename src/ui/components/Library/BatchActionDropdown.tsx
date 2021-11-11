@@ -11,6 +11,22 @@ import MaterialIcon from "../shared/MaterialIcon";
 import classNames from "classnames";
 import PortalDropdown from "../shared/PortalDropdown";
 import MoveRecordingMenu from "./MoveRecordingMenu";
+import { useConfirm } from "../shared/Confirm";
+
+const getConfirmOptions = (count: number) => {
+  if (count === 1) {
+    return {
+      message: "Delete replay?",
+      description: `This action will permanently delete this replay.`,
+      acceptLabel: "Delete replay",
+    };
+  }
+  return {
+    message: `Delete ${count} replays?`,
+    description: `This action will permanently delete ${count} replays`,
+    acceptLabel: "Delete replays",
+  };
+};
 
 type BatchActionDropdownProps = PropsFromRedux & {
   selectedIds: RecordingId[];
@@ -26,23 +42,20 @@ function BatchActionDropdown({
   const [expanded, setExpanded] = useState(false);
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
+  const { confirmDestructive } = useConfirm();
 
   if (loading) {
     return null;
   }
 
   const deleteSelectedIds = () => {
-    const count = selectedIds.length;
-    const message = `This action will permanently delete ${count == 1 ? "this" : count} replay${
-      count == 1 ? "" : "s"
-    }. \n\nAre you sure you want to proceed?`;
-
-    if (window.confirm(message)) {
-      selectedIds.forEach(recordingId => deleteRecording(recordingId, currentWorkspaceId));
-      setSelectedIds([]);
-    }
-
-    setExpanded(false);
+    confirmDestructive(getConfirmOptions(selectedIds.length)).then(confirmed => {
+      if (confirmed) {
+        selectedIds.forEach(recordingId => deleteRecording(recordingId, currentWorkspaceId));
+        setSelectedIds([]);
+      }
+      setExpanded(false);
+    });
   };
   const updateRecordings = (targetWorkspaceId: WorkspaceId | null) => {
     selectedIds.forEach(recordingId =>
