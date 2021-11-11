@@ -777,20 +777,10 @@ class _ThreadFront {
   }
 
   async findNetworkRequests(
-    onRequestsReceived: ({
-      requests,
-      events,
-    }: {
-      requests: RequestInfo[];
-      events: RequestEventInfo[];
-    }) => void
+    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void
   ) {
     const sessionId = await this.waitForSession();
-    client.Network.addRequestsListener(
-      async ({ events, requests }: { requests: RequestInfo[]; events: RequestEventInfo[] }) => {
-        onRequestsReceived({ requests, events });
-      }
-    );
+    client.Network.addRequestsListener(onRequestsReceived);
     client.Network.findRequests({}, sessionId);
   }
 

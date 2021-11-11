@@ -2,6 +2,30 @@ table.requests {
   border-collapse: collapse;
 }
 
-tr.next td {
+.row {
+  border-top: 2px solid var(--theme-toolbar-background);
+}
+
+.row.next {
   border-top: 2px solid var(--secondary-accent);
+}
+
+.status {
+  flex: 0 0 50px;
+}
+
+.method {
+  flex: 0 0 55px;
+}
+
+.domain {
+  flex: 0 0 25%;
+}
+
+.name {
+  flex: auto;
+}
+
+.time {
+  flex: 0 0 8ch;
 }

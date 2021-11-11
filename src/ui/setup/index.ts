@@ -14,7 +14,6 @@ import { getUserSettings } from "ui/hooks/settings";
 import { isTest } from "ui/utils/environment";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
-import { Store } from "react-devtools-inline/frontend";
 const FontFaceObserver = require("fontfaceobserver");
 
 declare global {
@@ -22,6 +21,10 @@ declare global {
     store: UIStore;
   }
 }
+
+// Just to grab the type of Dispatch
+let store: UIStore;
+export type AppDispatch = typeof store.dispatch;
 
 export async function bootstrapApp() {
   const initialState = {
@@ -84,6 +87,3 @@ export async function bootstrapApp() {
 
   return store;
 }
-
-let store: UIStore;
-export type AppDispatch = typeof store.dispatch;

@@ -2,7 +2,7 @@ import { useTable } from "react-table";
 import React, { useMemo } from "react";
 import keyBy from "lodash/keyBy";
 import {
-  RequestEvent,
+  Header,
   RequestEventInfo,
   RequestInfo,
   RequestOpenEvent,
@@ -14,7 +14,6 @@ import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers/network";
-import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers";
 import { UIState } from "ui/state";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { actions } from "ui/actions";
@@ -26,6 +25,8 @@ type RequestSummary = {
   method: string;
   name: string;
   point: TimeStampedPoint | undefined;
+  requestHeaders: Header[];
+  responseHeaders: Header[];
   start: number;
   status: number;
   time: number;
@@ -65,17 +66,23 @@ const partialRequestsToCompleteSummaries = (
       (r): r is RequestInfo & { events: RequestEventMap } =>
         !!r.events.request && !!r.events.response
     )
-    .map(request => ({
-      domain: host(request.events.request.event.requestUrl),
-      end: request.events.response.time,
-      method: request.events.request.event.requestMethod,
-      name: name(request.events.request.event.requestUrl),
-      point: request.point,
-      status: request.events.response.event.responseStatus,
-      start: request.events.request.time,
-      time: request.events.response.time - request.events.request.time,
-      url: request.events.request.event.requestUrl,
-    }));
+    .map((r: RequestInfo & { events: RequestEventMap }) => {
+      const request = r.events.request;
+      const response = r.events.response;
+      return {
+        domain: host(request.event.requestUrl),
+        end: request.time,
+        requestHeaders: request.event.requestHeaders,
+        responseHeaders: response.event.responseHeaders,
+        method: request.event.requestMethod,
+        name: name(request.event.requestUrl),
+        point: r.point,
+        status: response.event.responseStatus,
+        start: request.time,
+        time: response.time - request.time,
+        url: request.event.requestUrl,
+      };
+    });
   return sortBy(summaries, "start");
 };
 
@@ -89,11 +96,12 @@ const RequestTable = ({ currentTime, events, seekToTime, requests }: RequestTabl
         Cell: Status,
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
-        className: "text-center",
+        className: "m-auto",
       },
       {
         Header: "Method",
         accessor: "method" as const,
+        className: "m-auto",
       },
       {
         Header: "Domain",
@@ -106,6 +114,7 @@ const RequestTable = ({ currentTime, events, seekToTime, requests }: RequestTabl
       {
         Header: "Time",
         accessor: "time" as const,
+        className: "m-auto",
       },
     ],
     []
@@ -116,25 +125,28 @@ const RequestTable = ({ currentTime, events, seekToTime, requests }: RequestTabl
   const currentTimeIndex = data.findIndex(r => currentTime < (r.point?.time || 0));
 
   return (
-    <div className="overflow-y-scroll">
-      <table className={classNames("w-full", styles.request)} {...getTableProps()}>
-        <thead className="sticky top-0">
+    <div className="bg-white overflow-y-scroll">
+      <div className={classNames("w-full", styles.request)} {...getTableProps()}>
+        <div className="sticky top-0">
           {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <div className="flex" {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
-                <th className="bg-chrome font-normal border p-1" {...column.getHeaderProps()}>
+                <div
+                  className={classNames("bg-white font-normal p-1", styles[column.id])}
+                  {...column.getHeaderProps()}
+                >
                   {column.render("Header")}
-                </th>
+                </div>
               ))}
-            </tr>
+            </div>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
+        </div>
+        <div {...getTableBodyProps()}>
           {rows.map((row, i) => {
             prepareRow(row);
             return (
-              <tr
-                className={classNames({
+              <div
+                className={classNames("flex items-stretch", styles.row, {
                   "text-lightGrey": currentTime < (row.original.point?.time || 0),
                   [styles.next]: currentTimeIndex === i,
                 })}
@@ -148,19 +160,22 @@ const RequestTable = ({ currentTime, events, seekToTime, requests }: RequestTabl
               >
                 {row.cells.map(cell => {
                   return (
-                    <td
-                      className={classNames("border p-1", (cell.column as any).className)}
+                    <div
+                      className={classNames(
+                        "whitespace-nowrap p-1 flex items-center overflow-hidden",
+                        styles[cell.column.id]
+                      )}
                       {...cell.getCellProps()}
                     >
-                      {cell.render("Cell")}
-                    </td>
+                      <div className={(cell.column as any).className}>{cell.render("Cell")}</div>
+                    </div>
                   );
                 })}
-              </tr>
+              </div>
             );
           })}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
   );
 };
