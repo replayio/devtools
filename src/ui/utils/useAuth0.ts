@@ -1,5 +1,7 @@
 import { useAuth0 as useOrigAuth0, Auth0ContextInterface } from "@auth0/auth0-react";
+import { useGetUserInfo } from "ui/hooks/users";
 import { isTest, isMock } from "./environment";
+import useToken from "./useToken";
 
 const TEST_AUTH = {
   isLoading: false,
@@ -22,6 +24,25 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
  */
 export default function useAuth0() {
   const auth = useOrigAuth0();
+  const { loading, name, email, picture } = useGetUserInfo();
+  const { token, apiKey } = useToken();
+
+  if (apiKey && token) {
+    return {
+      isLoading: loading,
+      isAuthenticated: true,
+      user: loading
+        ? undefined
+        : {
+            sub: "api-key",
+            name,
+            email,
+            picture,
+          },
+      loginWithRedirect: () => {},
+      logout: () => {},
+    };
+  }
 
   if (isTest() || isMock()) {
     return TEST_AUTH;
