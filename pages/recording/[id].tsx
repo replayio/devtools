@@ -17,8 +17,8 @@ function Recording({ getAccessibleRecording }: PropsFromRedux) {
   useEffect(() => {
     if (!store) return;
 
-    setup(store);
     async function getRecording() {
+      await setup(store);
       setRecording(await getAccessibleRecording(recordingId));
     }
     getRecording();
