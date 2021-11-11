@@ -12,6 +12,7 @@ import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";
 import classNames from "classnames";
 import MoveRecordingMenu from "./MoveRecordingMenu";
+import { useConfirm } from "../shared/Confirm";
 
 type RecordingOptionsDropdownProps = PropsFromRedux & {
   recording: Recording;
@@ -29,6 +30,7 @@ function RecordingOptionsDropdown({
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
   const recordingId = recording.id;
+  const { confirmDestructive } = useConfirm();
 
   const toggleIsPrivate = () => {
     setIsPrivate(!isPrivate);
@@ -36,13 +38,17 @@ function RecordingOptionsDropdown({
     setExpanded(false);
   };
   const onDeleteRecording = (recordingId: RecordingId) => {
-    const message =
-      "This action will permanently delete this replay. \n\nAre you sure you want to proceed?";
-
-    if (window.confirm(message)) {
-      deleteRecording(recordingId, currentWorkspaceId);
-    }
-    setExpanded(false);
+    confirmDestructive({
+      message: "Delete replay?",
+      description:
+        "This action will permanently delete this replay. \n\nAre you sure you want to proceed?",
+      acceptLabel: "Delete replay",
+    }).then(confirmed => {
+      if (confirmed) {
+        deleteRecording(recordingId, currentWorkspaceId);
+      }
+      setExpanded(false);
+    });
   };
   const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
     updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId);
