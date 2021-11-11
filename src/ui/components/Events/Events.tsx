@@ -9,9 +9,24 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 
 import Event from "./Event";
 import { trackEvent } from "ui/utils/telemetry";
+import classNames from "classnames";
 
-function CurrentTimeLine() {
-  return <div className="bg-secondaryAccent w-full m-0" style={{ height: "3px" }} />;
+function CurrentTimeLine({
+  currentEventIndex,
+  index,
+}: {
+  currentEventIndex: number;
+  index: number;
+}) {
+  return (
+    <div
+      className={classNames("w-full m-0", {
+        "bg-secondaryAccent": currentEventIndex === index,
+        "bg-transparent": currentEventIndex === index,
+      })}
+      style={{ height: "3px" }}
+    />
+  );
 }
 
 const FILTERED_EVENT_TYPES = ["keydown", "keyup"];
@@ -30,20 +45,18 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   );
 
   return (
-
-    <div className="flex flex-col py-1.5 self-stretch space-y-1.5 w-full text-xs bg-white">
-    
+    <div className="flex flex-col py-1.5 self-stretch w-full text-xs bg-white">
       {events.map((e, i) => {
         return (
           <div key={e.point}>
-            {i === currentEventIndex ? <CurrentTimeLine /> : null}
+            <CurrentTimeLine currentEventIndex={currentEventIndex} index={i} />
             <div className="px-1.5">
               <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
             </div>
           </div>
         );
       })}
-      {currentEventIndex === events.length ? <CurrentTimeLine /> : null}
+      <CurrentTimeLine currentEventIndex={currentEventIndex} index={events.length} />
     </div>
   );
 }
