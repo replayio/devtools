@@ -80,7 +80,6 @@ export const prefs = new PrefsHelper("devtools", {
   logging: ["Bool", "debugger.logging"],
   timing: ["Bool", "debugger.timing"],
   editorWrapping: ["Bool", "debugger.ui.editor-wrapping"],
-  alphabetizeOutline: ["Bool", "debugger.alphabetize-outline"],
   outlineExpanded: ["Bool", "debugger.outline-expanded"],
   sourcesCollapsed: ["Bool", "debugger.sources-collapsed"],
   clientSourceMapsEnabled: ["Bool", "source-map.client-service.enabled"],

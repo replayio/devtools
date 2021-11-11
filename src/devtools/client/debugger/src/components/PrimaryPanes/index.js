@@ -21,26 +21,11 @@ import SourcesTree from "./SourcesTree";
 import Accordion from "../shared/Accordion";
 
 class PrimaryPanes extends Component {
-  state = {
-    alphabetizeOutline: prefs.alphabetizeOutline,
-  };
-
-  onAlphabetizeClick = () => {
-    const alphabetizeOutline = !prefs.alphabetizeOutline;
-    prefs.alphabetizeOutline = alphabetizeOutline;
-    this.setState({ alphabetizeOutline });
-  };
-
   renderOutline() {
     return {
       header: "Outline",
       className: "outlines-pane border-t",
-      component: (
-        <Outline
-          alphabetizeOutline={this.state.alphabetizeOutline}
-          onAlphabetizeClick={this.onAlphabetizeClick}
-        />
-      ),
+      component: <Outline />,
       opened: prefs.outlineExpanded,
       onToggle: opened => {
         prefs.outlineExpanded = opened;

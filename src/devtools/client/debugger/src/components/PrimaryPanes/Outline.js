@@ -28,7 +28,6 @@ import {
 import OutlineFilter from "./OutlineFilter";
 import PreviewFunction from "../shared/PreviewFunction";
 import uniq from "lodash/uniq";
-import sortBy from "lodash/sortBy";
 
 /**
  * Check whether the name argument matches the fuzzy filter argument
@@ -58,12 +57,8 @@ function isVisible(element, parent) {
 
 export class Outline extends Component {
   focusedElRef;
-
-  constructor(props) {
-    super(props);
-    this.focusedElRef = null;
-    this.state = { filter: "", focusedItem: null };
-  }
+  state = { filter: "", focusedItem: null };
+  focusedElRef = null;
 
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -108,40 +103,6 @@ export class Outline extends Component {
     this.setState({ focusedItem: selectedItem });
   }
 
-  onContextMenu(event, func) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    const { selectedSource, getFunctionText, flashLineRange } = this.props;
-
-    const copyFunctionKey = "F";
-    const copyFunctionLabel = "Copy function";
-
-    if (!selectedSource) {
-      return;
-    }
-
-    const sourceLine = func.location.start.line;
-    const functionText = getFunctionText(sourceLine);
-
-    const copyFunctionItem = {
-      id: "node-menu-copy-function",
-      label: copyFunctionLabel,
-      accesskey: copyFunctionKey,
-      disabled: !functionText,
-      click: () => {
-        flashLineRange({
-          start: func.location.start.line,
-          end: func.location.end.line,
-          sourceId: selectedSource.id,
-        });
-        return copyToTheClipboard(functionText);
-      },
-    };
-    const menuOptions = [copyFunctionItem];
-    showMenu(event, menuOptions);
-  }
-
   updateFilter = filter => {
     this.setState({ filter: filter.trim() });
   };
@@ -180,7 +141,6 @@ export class Outline extends Component {
           trackEvent("outline.select");
           this.selectItem(func);
         }}
-        onContextMenu={e => this.onContextMenu(e, func)}
       >
         <span className="outline-list__element-icon">λ</span>
         <Redacted className="inline-block">
@@ -247,32 +207,11 @@ export class Outline extends Component {
       func => filterOutlineItem(func.name, filter) && !!func.klass
     );
 
-    if (this.props.alphabetizeOutline) {
-      namedFunctions = sortBy(namedFunctions, "name");
-      classes = sortBy(classes, "klass");
-      classFunctions = sortBy(classFunctions, "name");
-    }
-
     return (
       <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">
         {namedFunctions.map(func => this.renderFunction(func))}
         {classes.map(klass => this.renderClassFunctions(klass, classFunctions))}
       </ul>
-    );
-  }
-
-  renderFooter() {
-    return (
-      <div className="outline-footer">
-        <button
-          onClick={this.props.onAlphabetizeClick}
-          className={
-            this.props.alphabetizeOutline ? "sort-button sort-button--active" : "sort-button"
-          }
-        >
-          {"Sort by name"}
-        </button>
-      </div>
     );
   }
 
@@ -299,7 +238,6 @@ export class Outline extends Component {
         <div className="outline__container space-y-2">
           <OutlineFilter filter={filter} updateFilter={this.updateFilter} />
           {this.renderFunctions(symbolsToDisplay)}
-          {this.renderFooter()}
         </div>
       </div>
     );

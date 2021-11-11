@@ -27,6 +27,12 @@
   overflow-y: hidden;
 }
 
+.outlines-pane > ._content,
+.outlines-pane .outline__container {
+  height: 100%;
+  overflow-y: auto;
+}
+
 .outlines-pane.expanded {
   flex: 1;
 }
@@ -42,13 +48,11 @@
 }
 
 .outline-list {
-  margin: 0;
-  padding: 0;
-  bottom: 25px;
-  left: 0;
-  right: 0;
+  margin-top: 10px;
+  padding-bottom: 10px;
   list-style-type: none;
   overflow: auto;
+  overflow-x: hidden;
 }
 
 .outline-list__class-list {

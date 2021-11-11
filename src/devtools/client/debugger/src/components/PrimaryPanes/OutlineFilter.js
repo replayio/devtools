@@ -5,7 +5,6 @@
 //
 
 import React, { Component } from "react";
-import classnames from "classnames";
 
 export default class OutlineFilter extends Component {
   state = { focused: false };
@@ -33,7 +32,7 @@ export default class OutlineFilter extends Component {
 
   render() {
     return (
-      <div className="outline-filter sticky top-0 pt-1 px-3">
+      <div className="outline-filter pt-1 px-3">
         <form>
           <input
             className={"w-full h-full text-xs px-2 py-1 rounded-md"}
