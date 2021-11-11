@@ -115,7 +115,6 @@ function CommentCard({
   comments,
   currentTime,
   executionPoint,
-  hoveredComment,
   pendingComment,
   seekToComment,
   setHoveredComment,

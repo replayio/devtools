@@ -22,6 +22,7 @@ export type PanelName =
   | "viewer";
 export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events";
 export type ViewMode = "dev" | "non-dev";
+export type ModalOptionsType = { recordingId?: string; view?: string; loom?: string } | null;
 export type ModalType =
   | "sharing"
   | "login"
@@ -34,7 +35,8 @@ export type ModalType =
   | "first-replay"
   | "download-replay"
   | "trimming"
-  | "privacy";
+  | "privacy"
+  | "loom";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"
@@ -79,7 +81,7 @@ export interface AppState {
   loading: number;
   loadingFinished: boolean;
   modal: ModalType | null;
-  modalOptions: { recordingId: string } | { view: string } | null;
+  modalOptions: ModalOptionsType;
   recordingDuration: number;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
