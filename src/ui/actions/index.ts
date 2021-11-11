@@ -18,18 +18,20 @@ import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
+import { NetworkAction } from "./network";
 
 type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 
 export type UIAction =
   | AppActions
-  | TimelineActions
   | CommentsAction
-  | ReactDevToolsAction
-  | MarkupAction
+  | DebuggerAction
   | EventTooltipAction
+  | MarkupAction
+  | NetworkAction
+  | ReactDevToolsAction
   | SessionActions
-  | DebuggerAction;
+  | TimelineActions;
 
 export type UIThunkAction<TReturn = void> = ThunkAction<TReturn, UIState, ThunkExtraArgs, UIAction>;
 

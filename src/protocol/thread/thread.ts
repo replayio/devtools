@@ -29,6 +29,8 @@ import {
   loadedRegions,
   annotations,
   SameLineSourceLocations,
+  RequestEventInfo,
+  RequestInfo,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -772,6 +774,14 @@ class _ThreadFront {
       assert(this.sessionId);
       await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);
     });
+  }
+
+  async findNetworkRequests(
+    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void
+  ) {
+    const sessionId = await this.waitForSession();
+    client.Network.addRequestsListener(onRequestsReceived);
+    client.Network.findRequests({}, sessionId);
   }
 
   async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {

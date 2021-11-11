@@ -22,6 +22,10 @@ declare global {
   }
 }
 
+// Just to grab the type of Dispatch
+let store: UIStore;
+export type AppDispatch = typeof store.dispatch;
+
 export async function bootstrapApp() {
   const initialState = {
     app: await getInitialAppState(),
@@ -70,15 +74,15 @@ export async function bootstrapApp() {
     initLaunchDarkly();
   });
 
-  if (!isTest()) {
+  if (isTest()) {
+    // FontFaceObserver doesn't work in e2e tests.
+    store.dispatch(setFontLoading(false));
+  } else {
     var font1 = new FontFaceObserver("Material Icons");
     var font2 = new FontFaceObserver("Material Icons Outlined");
     Promise.all([font1.load(), font2.load()])
       .then(() => store.dispatch(setFontLoading(false)))
       .catch(() => console.log("Failed to load font"));
-  } else {
-    // FontFaceObserver doesn't work in e2e tests.
-    store.dispatch(setFontLoading(false));
   }
 
   return store;

@@ -18,23 +18,25 @@ import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { extendStore } from "ui/setup/store";
 
 import "ui/setup/dynamic/inspector";
+import { ConnectedRequestTable } from "../NetworkMonitor/RequestTable";
+import { features } from "ui/utils/prefs";
 
 let extendedStore = false;
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
+  hasReactComponents: boolean;
+  isNode: boolean;
   selectedPanel: PanelName;
   setSelectedPanel: (panel: PanelName) => any;
-  isNode: boolean;
-  hasReactComponents: boolean;
 }
 
 function PanelButtons({
+  hasReactComponents,
+  isNode,
   selectedPanel,
   setSelectedPanel,
-  isNode,
-  hasReactComponents,
 }: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
 
@@ -45,11 +47,7 @@ function PanelButtons({
     setSelectedPanel(panel);
     trackEvent(`toolbox.secondary.${panel}_select`);
 
-    // The comments panel doesn't have to be initialized by the toolbox,
-    // only the console and the inspector.
-    if (panel !== "comments") {
-      gToolbox.selectTool(panel);
-    }
+    gToolbox.selectTool(panel);
   };
 
   return (
@@ -81,6 +79,16 @@ function PanelButtons({
           onClick={() => onClick("react-components")}
         >
           <div className="label">React</div>
+        </button>
+      )}
+      {features.network && (
+        <button
+          className={classnames("console-panel-button", {
+            expanded: selectedPanel === "network",
+          })}
+          onClick={() => onClick("network")}
+        >
+          <div className="label">Network</div>
         </button>
       )}
     </div>
@@ -131,9 +139,9 @@ function SecondaryToolbox({
   const isNode = recordingTarget === "node";
 
   return (
-    <div className={classnames(`secondary-toolbox rounded-lg pt-2`, { node: isNode })}>
+    <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
       {!isDemo() && (
-        <header className="secondary-toolbox-header rounded-t-lg">
+        <header className="secondary-toolbox-header">
           <PanelButtons
             selectedPanel={selectedPanel}
             setSelectedPanel={setSelectedPanel}
@@ -144,6 +152,7 @@ function SecondaryToolbox({
         </header>
       )}
       <Redacted className="secondary-toolbox-content text-xs">
+        {selectedPanel === "network" && <ConnectedRequestTable />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {showReact && hasReactComponents && selectedPanel === "react-components" ? (

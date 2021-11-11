@@ -53,7 +53,6 @@ function RecordingRow({
   removeSelectedId,
   loadReplayPrefs,
 }: RecordingRowProps) {
-  const router = useRouter();
   const { userId, loading } = hooks.useGetUserId();
 
   if (loading) {

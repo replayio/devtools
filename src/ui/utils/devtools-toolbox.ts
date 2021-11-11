@@ -9,7 +9,7 @@ import Selection from "devtools/client/framework/selection";
 
 export type StartablePanelName = "debugger" | "inspector" | "react-components";
 
-export type PanelName = StartablePanelName | "console" | "comments" | "viewer";
+export type PanelName = StartablePanelName | "console" | "comments" | "viewer" | "network";
 
 declare global {
   const store: UIStore;
@@ -102,7 +102,7 @@ export class DevToolsToolbox {
     // recordingLoaded however if we start at the "Comments"
     // tab it runs and throws an error at startPanel() above
     // because the comments panel isn't handled by the toolbox
-    if (["console", "comments", "viewer"].includes(name)) {
+    if (["console", "comments", "viewer", "network"].includes(name)) {
       return;
     }
 
