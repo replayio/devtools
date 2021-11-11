@@ -13,11 +13,11 @@ import Status from "./Status";
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers/network";
 import { UIState } from "ui/state";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { actions } from "ui/actions";
 import { sortBy } from "lodash";
+import { getEvents, getRequests } from "ui/reducers/network";
 
 type RequestSummary = {
   domain: string;
@@ -184,8 +184,8 @@ export default RequestTable;
 
 const connector = connect(
   (state: UIState) => ({
-    events: selectors.getEvents(state),
-    requests: selectors.getRequests(state),
+    events: getEvents(state),
+    requests: getRequests(state),
     currentTime: getCurrentTime(state),
   }),
   { seekToTime: actions.seekToTime }

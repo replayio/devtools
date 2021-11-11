@@ -25,16 +25,7 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
   }
 };
 
-const getEvents = (state: UIState) => state.network.events;
-const getRequests = (state: UIState) => state.network.requests;
-
-export const selectors = {
-  getEvents,
-  getRequests,
-  getNetworkRequests: createSelector(getEvents, getRequests, (events, requests) => ({
-    events,
-    requests,
-  })),
-};
+export const getEvents = (state: UIState) => state.network.events;
+export const getRequests = (state: UIState) => state.network.requests;
 
 export default update;
