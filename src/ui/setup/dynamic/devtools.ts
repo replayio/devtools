@@ -42,8 +42,6 @@ import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
 import { sendMessage } from "protocol/socket";
-import { setupNetwork } from "devtools/client/webconsole/actions/network";
-import network from "ui/reducers/network";
 
 declare global {
   interface Window {
@@ -106,7 +104,6 @@ export default async (store: Store) => {
     timeline,
     comments,
     contextMenus,
-    network,
     reactDevTools,
     ...debuggerReducers,
     ...consoleReducers.reducers,
@@ -118,44 +115,39 @@ export default async (store: Store) => {
     prefsService: getPrefsService(),
   };
 
-  if (!window.loaded) {
-    extendStore(store, initialState, reducers, thunkArgs);
+  extendStore(store, initialState, reducers, thunkArgs);
 
-    dbgClient.bootstrap(store);
+  dbgClient.bootstrap(store);
 
-    // Initialize the socket so we can communicate with the server
-    initSocket(store, dispatchUrl);
+  // Initialize the socket so we can communicate with the server
+  initSocket(store, dispatchUrl);
 
-    addEventListener("Recording.uploadedData", (data: uploadedData) =>
-      store.dispatch(actions.onUploadedData(data))
-    );
-    addEventListener("Recording.awaitingSourcemaps", () =>
-      store.dispatch(actions.setAwaitingSourcemaps(true))
-    );
-    addEventListener("Recording.sessionError", (error: sessionError) =>
-      store.dispatch(
-        actions.setUnexpectedError({
-          ...error,
-          message: "Our apologies!",
-          content: "Something went wrong while replaying, we'll look into it as soon as possible.",
-          action: "refresh",
-        })
-      )
-    );
+  addEventListener("Recording.uploadedData", (data: uploadedData) =>
+    store.dispatch(actions.onUploadedData(data))
+  );
+  addEventListener("Recording.awaitingSourcemaps", () =>
+    store.dispatch(actions.setAwaitingSourcemaps(true))
+  );
+  addEventListener("Recording.sessionError", (error: sessionError) =>
+    store.dispatch(
+      actions.setUnexpectedError({
+        ...error,
+        message: "Our apologies!",
+        content: "Something went wrong while replaying, we'll look into it as soon as possible.",
+        action: "refresh",
+      })
+    )
+  );
 
-    setupApp(store);
-    setupTimeline(store);
-    setupEventListeners(store);
-    setupGraphics(store);
-    initOutputSyntaxHighlighting();
-    setupMessages(store);
-    setupLogpoints(store);
-    setupNetwork(store);
-    setupExceptions(store);
-    setupReactDevTools(store);
-    window.loaded = true;
-    console.log("maybe");
-  }
+  setupApp(store);
+  setupTimeline(store);
+  setupEventListeners(store);
+  setupGraphics(store);
+  initOutputSyntaxHighlighting();
+  setupMessages(store);
+  setupLogpoints(store);
+  setupExceptions(store);
+  setupReactDevTools(store);
 
   const settings = await getUserSettings();
   updateEnableRepaint(settings.enableRepaint);
