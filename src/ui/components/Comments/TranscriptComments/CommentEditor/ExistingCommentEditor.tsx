@@ -6,6 +6,20 @@ import CommentEditor from "./CommentEditor";
 import { Comment, Reply } from "ui/state/comments";
 import { useGetUserId } from "ui/hooks/users";
 
+const LoomComment = connect(null, { setModal: actions.setModal })(
+  ({ setModal, loom }: { loom: string; setModal: typeof actions.setModal }) => {
+    function showLoom() {
+      setModal("loom", { loom });
+    }
+
+    return (
+      <div onClick={showLoom}>
+        <img src={`https://cdn.loom.com/sessions/thumbnails/${loom}-with-play.jpg`} />
+      </div>
+    );
+  }
+);
+
 type ExistingCommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply;
   editable: boolean;
@@ -31,6 +45,11 @@ function ExistingCommentEditor({
     }
     clearPendingComment();
   };
+
+  const loom = comment.content.match(/loom\.com\/share\/(\S*?)(\"|\?)/)?.[1];
+  if (loom) {
+    return <LoomComment loom={loom} />;
+  }
 
   return (
     <div

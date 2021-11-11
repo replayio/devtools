@@ -18,6 +18,7 @@ import {
   PrimaryPanelName,
   ViewMode,
   ModalType,
+  ModalOptionsType,
   UploadInfo,
   Canvas,
   WorkspaceId,
@@ -55,7 +56,7 @@ export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
 };
 export type SetModalAction = Action<"set_modal"> & {
   modal: ModalType | null;
-  options: { recordingId: string } | { view: string } | null;
+  options: ModalOptionsType;
 };
 
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
@@ -276,10 +277,7 @@ export function setAwaitingSourcemaps(awaitingSourcemaps: boolean): SetAwaitingS
   return { type: "set_awaiting_sourcemaps", awaitingSourcemaps };
 }
 
-export function setModal(
-  modalType: ModalType,
-  options: { recordingId: string } | { view: string } | null = null
-): SetModalAction {
+export function setModal(modalType: ModalType, options: ModalOptionsType = null): SetModalAction {
   return {
     type: "set_modal",
     modal: modalType,
