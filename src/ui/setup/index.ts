@@ -14,6 +14,7 @@ import { getUserSettings } from "ui/hooks/settings";
 import { isTest } from "ui/utils/environment";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
+import { Store } from "react-devtools-inline/frontend";
 const FontFaceObserver = require("fontfaceobserver");
 
 declare global {
@@ -83,3 +84,6 @@ export async function bootstrapApp() {
 
   return store;
 }
+
+let store: UIStore;
+export type AppDispatch = typeof store.dispatch;

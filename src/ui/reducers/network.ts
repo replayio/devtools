@@ -1,6 +1,7 @@
 import { createSelector } from "reselect";
 import { RequestEventInfo, RequestInfo } from "@recordreplay/protocol";
 import { UIState } from "ui/state";
+import { NetworkAction } from "ui/actions/network";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -11,13 +12,6 @@ const initialState = (): NetworkState => ({
   events: [],
   requests: [],
 });
-
-type NewNetworkRequestsAction = {
-  type: "NEW_NETWORK_REQUESTS";
-  payload: { requests: RequestInfo[]; events: RequestEventInfo[] };
-};
-
-type NetworkAction = NewNetworkRequestsAction;
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
   switch (action.type) {
