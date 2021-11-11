@@ -14,7 +14,7 @@ import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import reactDevTools from "ui/reducers/reactDevTools";
 import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import { actions, UIStore } from "ui/actions";
 const { setupApp, setupTimeline, setupReactDevTools, createSession } = actions;
 
 import * as dbgClient from "devtools/client/debugger/src/client";
@@ -47,6 +47,7 @@ declare global {
   interface Window {
     gToolbox: DevToolsToolbox;
     L10N: any;
+    hasAlreadyBootstrapped: boolean;
   }
   interface AppHelpers {
     threadFront?: typeof ThreadFront;
@@ -61,7 +62,15 @@ declare global {
   const gToolbox: DevToolsToolbox;
 }
 
+const bootstrap = (store: UIStore) => {};
+
 export default async (store: Store) => {
+  if (window.hasAlreadyBootstrapped) {
+    return;
+  } else {
+    window.hasAlreadyBootstrapped = true;
+  }
+
   const url = new URL(window.location.href);
   const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
   assert(dispatchUrl);
