@@ -11,19 +11,10 @@ import Event from "./Event";
 import { trackEvent } from "ui/utils/telemetry";
 import classNames from "classnames";
 
-function CurrentTimeLine({
-  currentEventIndex,
-  index,
-}: {
-  currentEventIndex: number;
-  index: number;
-}) {
+function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (
     <div
-      className={classNames("w-full m-0", {
-        "bg-secondaryAccent": currentEventIndex === index,
-        "bg-transparent": currentEventIndex === index,
-      })}
+      className={classNames("m-0", isActive ? "bg-secondaryAccent" : "bg-transparent")}
       style={{ height: "3px" }}
     />
   );
@@ -45,18 +36,18 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   );
 
   return (
-    <div className="flex flex-col py-1.5 self-stretch w-full text-xs bg-white">
+    <div className="py-1.5 text-xs bg-white">
       {events.map((e, i) => {
         return (
           <div key={e.point}>
-            <CurrentTimeLine currentEventIndex={currentEventIndex} index={i} />
+            <CurrentTimeLine isActive={currentEventIndex === i} />
             <div className="px-1.5">
               <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
             </div>
           </div>
         );
       })}
-      <CurrentTimeLine currentEventIndex={currentEventIndex} index={events.length} />
+      <CurrentTimeLine isActive={currentEventIndex === events.length} />
     </div>
   );
 }
