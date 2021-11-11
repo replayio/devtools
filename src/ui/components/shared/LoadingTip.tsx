@@ -1,5 +1,9 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
 
 const TIPS = [
   {
@@ -33,9 +37,8 @@ const TIPS = [
   },
 ];
 
-export default function LoadingTip() {
-  const [tipIndex, setTipIndex] = useState(0);
-  const { title, description, icon } = TIPS[tipIndex];
+function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRedux) {
+  const { title, description, icon } = TIPS[loadingPageTipIndex];
 
   return (
     <div className="bottom-6 absolute left-1/2 transform -translate-x-1/2">
@@ -51,12 +54,12 @@ export default function LoadingTip() {
           <div className="flex flex-row space-x-1">
             {TIPS.map((t, i) => (
               <button
-                className={classNames("rounded-full h-2 w-2", {
-                  "bg-gray-300": tipIndex !== i,
-                  "bg-gray-500": tipIndex === i,
-                })}
+                className={classNames(
+                  "rounded-full h-2 w-2",
+                  loadingPageTipIndex === i ? "bg-gray-500" : "bg-gray-300"
+                )}
                 key={i}
-                onClick={() => setTipIndex(i)}
+                onClick={() => setLoadingPageTipIndex(i)}
               />
             ))}
           </div>
@@ -65,3 +68,15 @@ export default function LoadingTip() {
     </div>
   );
 }
+
+const connector = connect(
+  (state: UIState) => ({
+    loadingPageTipIndex: selectors.getLoadingPageTipIndex(state),
+  }),
+  {
+    setLoadingPageTipIndex: actions.setLoadingPageTipIndex,
+  }
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(LoadingTip);
