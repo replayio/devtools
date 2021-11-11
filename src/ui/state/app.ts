@@ -13,12 +13,13 @@ import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 
 export type PanelName =
+  | "comments"
   | "console"
   | "debugger"
   | "inspector"
-  | "viewer"
+  | "network"
   | "react-components"
-  | "comments";
+  | "viewer";
 export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events";
 export type ViewMode = "dev" | "non-dev";
 export type ModalType =

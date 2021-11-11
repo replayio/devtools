@@ -101,27 +101,22 @@ const RequestTable = ({ currentTime, events, seekToTime, requests }: RequestTabl
         Header: "Time",
         accessor: "time" as const,
       },
-      // {
-      //   Header: "URL",
-      //   accessor: "url" as const,
-      // },
     ],
     []
   );
   const data = useMemo(() => partialRequestsToCompleteSummaries(requests, events), [requests]);
-  console.log(data);
   const tableInstance = useTable<RequestSummary>({ columns, data });
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
   const currentTimeIndex = data.findIndex(r => currentTime < (r.point?.time || 0));
 
   return (
-    <div>
+    <div className="overflow-y-scroll">
       <table className={classNames("w-full", styles.request)} {...getTableProps()}>
-        <thead>
+        <thead className="sticky top-0">
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
-                <th className="font-normal border p-1" {...column.getHeaderProps()}>
+                <th className="bg-chrome font-normal border p-1" {...column.getHeaderProps()}>
                   {column.render("Header")}
                 </th>
               ))}

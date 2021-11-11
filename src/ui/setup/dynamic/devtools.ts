@@ -118,41 +118,44 @@ export default async (store: Store) => {
     prefsService: getPrefsService(),
   };
 
-  extendStore(store, initialState, reducers, thunkArgs);
+  if (!window.loaded) {
+    extendStore(store, initialState, reducers, thunkArgs);
 
-  dbgClient.bootstrap(store);
+    dbgClient.bootstrap(store);
 
-  // Initialize the socket so we can communicate with the server
-  initSocket(store, dispatchUrl);
+    // Initialize the socket so we can communicate with the server
+    initSocket(store, dispatchUrl);
 
-  addEventListener("Recording.uploadedData", (data: uploadedData) =>
-    store.dispatch(actions.onUploadedData(data))
-  );
-  addEventListener("Recording.awaitingSourcemaps", () =>
-    store.dispatch(actions.setAwaitingSourcemaps(true))
-  );
-  addEventListener("Recording.sessionError", (error: sessionError) =>
-    store.dispatch(
-      actions.setUnexpectedError({
-        ...error,
-        message: "Our apologies!",
-        content: "Something went wrong while replaying, we'll look into it as soon as possible.",
-        action: "refresh",
-      })
-    )
-  );
+    addEventListener("Recording.uploadedData", (data: uploadedData) =>
+      store.dispatch(actions.onUploadedData(data))
+    );
+    addEventListener("Recording.awaitingSourcemaps", () =>
+      store.dispatch(actions.setAwaitingSourcemaps(true))
+    );
+    addEventListener("Recording.sessionError", (error: sessionError) =>
+      store.dispatch(
+        actions.setUnexpectedError({
+          ...error,
+          message: "Our apologies!",
+          content: "Something went wrong while replaying, we'll look into it as soon as possible.",
+          action: "refresh",
+        })
+      )
+    );
 
-  // This should be idempotent and then hot reloaing will be less borked.
-  setupApp(store);
-  setupTimeline(store);
-  setupEventListeners(store);
-  setupGraphics(store);
-  initOutputSyntaxHighlighting();
-  setupMessages(store);
-  setupLogpoints(store);
-  setupNetwork(store);
-  setupExceptions(store);
-  setupReactDevTools(store);
+    setupApp(store);
+    setupTimeline(store);
+    setupEventListeners(store);
+    setupGraphics(store);
+    initOutputSyntaxHighlighting();
+    setupMessages(store);
+    setupLogpoints(store);
+    setupNetwork(store);
+    setupExceptions(store);
+    setupReactDevTools(store);
+    window.loaded = true;
+    console.log("maybe");
+  }
 
   const settings = await getUserSettings();
   updateEnableRepaint(settings.enableRepaint);

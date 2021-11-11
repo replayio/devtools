@@ -46,11 +46,7 @@ function PanelButtons({
     setSelectedPanel(panel);
     trackEvent(`toolbox.secondary.${panel}_select`);
 
-    // The comments panel doesn't have to be initialized by the toolbox,
-    // only the console and the inspector.
-    if (panel !== "comments") {
-      gToolbox.selectTool(panel);
-    }
+    gToolbox.selectTool(panel);
   };
 
   return (
@@ -84,6 +80,14 @@ function PanelButtons({
           <div className="label">React</div>
         </button>
       )}
+      <button
+        className={classnames("console-panel-button", {
+          expanded: selectedPanel === "network",
+        })}
+        onClick={() => onClick("network")}
+      >
+        <div className="label">Network</div>
+      </button>
     </div>
   );
 }
@@ -92,8 +96,7 @@ function ConsolePanel() {
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        <ConnectedRequestTable currentTime={0} />
-        {/* <WebConsoleApp /> */}
+        <WebConsoleApp />
       </div>
     </div>
   );
@@ -146,6 +149,7 @@ function SecondaryToolbox({
         </header>
       )}
       <Redacted className="secondary-toolbox-content text-xs">
+        {selectedPanel === "network" && <ConnectedRequestTable />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {showReact && hasReactComponents && selectedPanel === "react-components" ? (
