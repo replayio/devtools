@@ -19,6 +19,7 @@ import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import InvitationLink from "./InvitationLink";
+import { useConfirm } from "../Confirm";
 
 function ModalButton({
   children,
@@ -87,22 +88,24 @@ function NextButton({
   total: number;
   setCurrent: Dispatch<SetStateAction<number>>;
   hideModal: typeof actions.hideModal;
-  didUserConfirm: () => boolean;
+  didUserConfirm: () => Promise<boolean>;
   onNext?: () => void;
   allowNext: boolean;
 }) {
   const [nextClicked, setNextClicked] = useState<boolean>(false);
 
   const onClick = () => {
-    if (!didUserConfirm()) {
-      return;
-    }
+    didUserConfirm().then(confirmed => {
+      if (!confirmed) {
+        return;
+      }
 
-    if (onNext) {
-      onNext();
-    }
+      if (onNext) {
+        onNext();
+      }
 
-    setNextClicked(true);
+      setNextClicked(true);
+    });
   };
 
   useEffect(() => {
@@ -199,7 +202,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
         {isValidTeamName(inputValue) ? (
           <NextButton
             onNext={handleSave}
-            didUserConfirm={() => true}
+            didUserConfirm={() => Promise.resolve(true)}
             {...{ current, total, setCurrent, hideModal, allowNext }}
           />
         ) : (
@@ -220,6 +223,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     setIsLoading(false);
   });
   const textInputRef = useRef<HTMLInputElement>(null);
+  const { confirmDestructive } = useConfirm();
 
   // This is hacky. A member entry will only have an e-mail if it was pending. If
   // they had already accepted, we don't expose that member's e-mail. This is not
@@ -251,10 +255,12 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
   const didUserConfirm = () => {
-    const message =
-      "You started tried to invite someone, but didn't press the invite button. Are you sure you want to proceed?";
-
-    return window.confirm(message);
+    return confirmDestructive({
+      message: "Continue without sending invitations?",
+      description:
+        "You started to invite someone, but didn't press the invite button. Are you sure you want to proceed?",
+      acceptLabel: "Continue anyways",
+    });
   };
 
   useEffect(() => {
