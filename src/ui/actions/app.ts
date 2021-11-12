@@ -102,6 +102,9 @@ export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 export type SetShowEditorAction = Action<"set_show_editor"> & {
   showEditor: boolean;
 };
+export type setLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
+  index: number;
+};
 
 export type AppActions =
   | SetRecordingDurationAction
@@ -134,7 +137,8 @@ export type AppActions =
   | SetLoadedRegions
   | SetShowVideoPanelAction
   | SetShowEditorAction
-  | SetAwaitingSourcemapsAction;
+  | SetAwaitingSourcemapsAction
+  | setLoadingPageTipIndexAction;
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -394,4 +398,8 @@ export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
       dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
     }
   };
+}
+
+export function setLoadingPageTipIndex(index: number): setLoadingPageTipIndexAction {
+  return { type: "set_loading_page_tip_index", index };
 }

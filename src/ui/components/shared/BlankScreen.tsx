@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
   getAwaitingSourcemaps,
@@ -8,6 +8,7 @@ import {
   getUploading,
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
+import LoadingTip from "./LoadingTip";
 
 const BACKGROUNDS = {
   white: "white",
@@ -19,7 +20,7 @@ export default function BlankScreen({
   background,
   className,
 }: {
-  children?: React.ReactElement | React.ReactElement[];
+  children?: ReactNode;
   background?: "white" | "blue-gradient";
   className?: string;
 }) {
@@ -28,7 +29,10 @@ export default function BlankScreen({
     background && BACKGROUNDS[background] ? BACKGROUNDS[background] : BACKGROUNDS["white"];
 
   return (
-    <main className={`w-full h-full grid ${className}`} style={{ background: backgroundStyle }}>
+    <main
+      className={`w-full relative h-full grid ${className}`}
+      style={{ background: backgroundStyle }}
+    >
       {children}
     </main>
   );
@@ -92,7 +96,13 @@ function Logo({ scale = 1 }) {
 }
 
 // White progress screen used for showing the scanning progress of a replay
-export function BlankProgressScreen({ progress }: { progress: null | number }) {
+export function BlankProgressScreen({
+  progress,
+  hideTips,
+}: {
+  progress: null | number;
+  hideTips?: boolean;
+}) {
   return (
     <BlankScreen>
       <div className="m-auto">
@@ -110,6 +120,7 @@ export function BlankProgressScreen({ progress }: { progress: null | number }) {
           </div>
         </div>
       </div>
+      {!hideTips ? <LoadingTip /> : null}
     </BlankScreen>
   );
 }
@@ -123,7 +134,6 @@ function _LoadingScreen({ uploading, awaitingSourcemaps, progress, finished }: P
   if (awaitingSourcemaps) {
     return <BlankLoadingScreen statusMessage={"Uploading sourcemaps"} />;
   } else if (uploading) {
-
     const amount = `${Math.round(+uploading.amount)}Mb`;
     const statusMessage = amount ? `Uploading ${amount}` : "Uploading";
 

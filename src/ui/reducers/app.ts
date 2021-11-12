@@ -46,6 +46,7 @@ const syncInitialAppState: AppState = {
   loadedRegions: null,
   showVideoPanel: true,
   showEditor: true,
+  loadingPageTipIndex: 0,
 };
 
 export async function getInitialAppState(): Promise<AppState> {
@@ -259,6 +260,10 @@ export default function update(
       return { ...state, showEditor: action.showEditor };
     }
 
+    case "set_loading_page_tip_index": {
+      return { ...state, loadingPageTipIndex: action.index };
+    }
+
     default: {
       return state;
     }
@@ -369,3 +374,4 @@ export const isFinishedLoadingRegions = (state: UIState) => {
   return isSameTimeStampedPointRange(loading, loaded);
 };
 export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
+export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
