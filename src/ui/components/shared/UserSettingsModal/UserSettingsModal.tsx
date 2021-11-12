@@ -19,6 +19,7 @@ import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 import PreferencesSettings from "./PreferencesSettings";
+import ExternalLink from "../ExternalLink";
 
 function Support() {
   return (
@@ -28,9 +29,7 @@ function Support() {
           <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
           <div className="description">
             Come chat with us on our{" "}
-            <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noopener noreferrer">
-              Discord server.
-            </a>
+            <ExternalLink href="https://discord.gg/n2dTK6kcRX">Discord server.</ExternalLink>
           </div>
         </label>
       </li>
@@ -79,27 +78,17 @@ function Legal() {
       <div className="space-y-3">
         <div className="space-y-1.5">
           <SettingsBodyHeader>
-            <a
-              className="underline"
-              href="https://www.replay.io/terms-of-use"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <ExternalLink className="underline" href="https://www.replay.io/terms-of-use">
               Terms of Use
-            </a>
+            </ExternalLink>
           </SettingsBodyHeader>
           <div>{`The Terms of Use help define Replay's relationship with you as you interact with our services.`}</div>
         </div>
         <div className="space-y-1.5">
           <SettingsBodyHeader>
-            <a
-              className="underline"
-              href="https://www.replay.io/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <ExternalLink className="underline" href="https://www.replay.io/privacy-policy">
               Privacy Policy
-            </a>
+            </ExternalLink>
           </SettingsBodyHeader>
           <div>{`Our Privacy Policy outlines how you can update, manage, and delete your information.`}</div>
         </div>

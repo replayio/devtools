@@ -1,5 +1,6 @@
 import React from "react";
 import { Subscription } from "ui/types";
+import ExternalLink from "../ExternalLink";
 import { Button } from "../Button";
 import { PlanDetails } from "./PlanDetails";
 
@@ -15,15 +16,10 @@ export function TeamPricingPage({
       <p className="mb-4">
         With a Replay Team Plan, you can expand your debugging superpowers with powerful
         collaboration features that make it easy to work together to fix bugs and understand your
-        software better.{" "}
-        <a
-          href="https://www.replay.io/pricing"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primaryAccent underline"
-        >
+        software better.
+        <ExternalLink href="https://www.replay.io/pricing" className="text-primaryAccent underline">
           Learn More
-        </a>
+        </ExternalLink>
       </p>
       <PlanDetails subscription={subscription} />
       <Button
@@ -35,14 +31,9 @@ export function TeamPricingPage({
       >
         Add Payment Method
       </Button>
-      <a
-        href="https://www.replay.io/terms-of-use"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline"
-      >
+      <ExternalLink href="https://www.replay.io/terms-of-use" className="underline">
         Terms of service and cancellation policy
-      </a>
+      </ExternalLink>
     </section>
   );
 }
