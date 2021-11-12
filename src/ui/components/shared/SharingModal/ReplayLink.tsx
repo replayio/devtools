@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { RecordingId } from "@recordreplay/protocol";
+import { trackEvent } from "ui/utils/telemetry";
 
 export function CopyButton({ recordingId }: { recordingId: RecordingId }) {
   const [showCopied, setShowCopied] = useState(false);
@@ -8,6 +9,7 @@ export function CopyButton({ recordingId }: { recordingId: RecordingId }) {
 
   const onClick = () => {
     navigator.clipboard.writeText(url);
+    trackEvent("copy replay link");
 
     if (timeoutKey.current) {
       clearTimeout(timeoutKey.current);
