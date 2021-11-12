@@ -11,7 +11,7 @@ import {
   onUpKey,
 } from "../actions/markup";
 import useKeyShortcuts from "ui/utils/use-key-shortcuts";
-import { cancelBubbling } from "ui/utils/key-shortcuts";
+import { cancelBubbling, preventDefault } from "ui/utils/key-shortcuts";
 import Node from "./Node";
 import { MarkupProps } from "./MarkupApp";
 
@@ -21,12 +21,12 @@ function Nodes(props: MarkupProps & PropsFromRedux) {
   const ref = useRef<HTMLUListElement>(null);
   useKeyShortcuts(
     {
-      Up: cancelBubbling(onUpKey),
-      Down: cancelBubbling(onDownKey),
-      Left: cancelBubbling(onLeftKey),
-      Right: cancelBubbling(onRightKey),
-      PageUp: cancelBubbling(onPageUpKey),
-      PageDown: cancelBubbling(onPageDownKey),
+      Up: cancelBubbling(preventDefault(onUpKey)),
+      Down: cancelBubbling(preventDefault(onDownKey)),
+      Left: cancelBubbling(preventDefault(onLeftKey)),
+      Right: cancelBubbling(preventDefault(onRightKey)),
+      PageUp: cancelBubbling(preventDefault(onPageUpKey)),
+      PageDown: cancelBubbling(preventDefault(onPageDownKey)),
     },
     ref
   );

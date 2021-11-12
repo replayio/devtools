@@ -175,11 +175,11 @@ export function selectionChanged(
   };
 }
 
-export function selectNode(nodeId: string): UIThunkAction {
+export function selectNode(nodeId: string, reason?: string): UIThunkAction {
   return ({ toolbox }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
-      toolbox.selection.setNodeFront(nodeFront);
+      toolbox.selection.setNodeFront(nodeFront, { reason });
     }
   };
 }
@@ -266,7 +266,7 @@ export function onLeftKey(): UIThunkAction {
       if (parentNodeId != null) {
         const parentNodeInfo = getNodeInfo(state, parentNodeId);
         if (parentNodeInfo && parentNodeInfo.type !== DOCUMENT_TYPE_NODE) {
-          dispatch(selectNode(parentNodeId));
+          dispatch(selectNode(parentNodeId, "keyboard"));
         }
       }
     }
@@ -288,11 +288,11 @@ export function onRightKey(): UIThunkAction {
     } else {
       const firstChildId = selectedNodeInfo.children[0];
       if (firstChildId != null) {
-        dispatch(selectNode(firstChildId));
+        dispatch(selectNode(firstChildId, "keyboard"));
         return;
       }
       const nextNodeId = getNextNodeId(state, selectedNodeId);
-      dispatch(selectNode(nextNodeId));
+      dispatch(selectNode(nextNodeId, "keyboard"));
     }
   };
 }
@@ -306,7 +306,7 @@ export function onUpKey(): UIThunkAction {
     }
 
     const previousNodeId = getPreviousNodeId(state, selectedNodeId);
-    dispatch(selectNode(previousNodeId));
+    dispatch(selectNode(previousNodeId, "keyboard"));
   };
 }
 
@@ -319,7 +319,7 @@ export function onDownKey(): UIThunkAction {
     }
 
     const nextNodeId = getNextNodeId(state, selectedNodeId);
-    dispatch(selectNode(nextNodeId));
+    dispatch(selectNode(nextNodeId, "keyboard"));
   };
 }
 
@@ -335,7 +335,7 @@ export function onPageUpKey(): UIThunkAction {
     for (let i = 0; i < 10; i++) {
       previousNodeId = getPreviousNodeId(state, previousNodeId);
     }
-    dispatch(selectNode(previousNodeId));
+    dispatch(selectNode(previousNodeId, "keyboard"));
   };
 }
 
@@ -351,7 +351,7 @@ export function onPageDownKey(): UIThunkAction {
     for (let i = 0; i < 10; i++) {
       nextNodeId = getNextNodeId(state, nextNodeId);
     }
-    dispatch(selectNode(nextNodeId));
+    dispatch(selectNode(nextNodeId, "keyboard"));
   };
 }
 

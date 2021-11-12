@@ -73,6 +73,13 @@ export function cancelBubbling(listener: KeyboardEventListener): KeyboardEventLi
   };
 }
 
+export function preventDefault(listener: KeyboardEventListener): KeyboardEventListener {
+  return (event: KeyboardEvent) => {
+    event.preventDefault();
+    listener(event);
+  };
+}
+
 function isEditableTag(target: HTMLElement) {
   return ["INPUT", "TEXTAREA"].includes(target.tagName) && target.getAttribute("readonly") === null;
 }
