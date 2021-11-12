@@ -9,6 +9,7 @@ import {
 } from "ui/hooks/recordings";
 import * as actions from "ui/actions/app";
 import Dropdown from "ui/components/shared/Dropdown";
+import ExternalLink from "../shared/ExternalLink";
 
 function CopyUrl() {
   const recordingId = useGetRecordingId();
@@ -81,13 +82,9 @@ function PrivacyNote({ isPrivate, isOwner }: { isPrivate: boolean; isOwner: bool
         <div className="label-description">
           Replay records everything including passwords you&#39;ve typed and sensitive data
           you&#39;re viewing.{" "}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://replayio.notion.site/Sharing-replays-2af70ebdfb1c47e5b9246f25ca377ef2"
-          >
+          <ExternalLink href="https://replayio.notion.site/Sharing-replays-2af70ebdfb1c47e5b9246f25ca377ef2">
             Learn more
-          </a>
+          </ExternalLink>
         </div>
       </div>
     </div>

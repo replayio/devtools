@@ -3,6 +3,7 @@ import { useAcceptTOS } from "ui/hooks/users";
 import BlankScreen from "./shared/BlankScreen";
 import { PrimaryButton } from "./shared/Button";
 import Modal from "./shared/NewModal";
+import ExternalLink from "./shared/ExternalLink";
 
 export const LATEST_TOS_VERSION = 1;
 
@@ -48,14 +49,12 @@ export default function TOSScreen() {
           </ul>
           <div>
             Besides these terms, we also publish a{" "}
-            <a
+            <ExternalLink
               href="https://replay.io/privacy.html"
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-primaryAccent underline"
             >
               Privacy Policy
-            </a>{" "}
+            </ExternalLink>{" "}
             which outline how we treat the personal information we collect as you use our services.
           </div>
           <PrimaryButton color="blue" onClick={handleAccept}>

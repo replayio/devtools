@@ -1,4 +1,5 @@
 import React from "react";
+import ExternalLink from "ui/components/shared/ExternalLink";
 import { MatchedSelectorState } from "../state";
 const DeclarationValue = require("../../rules/components/DeclarationValue");
 
@@ -12,15 +13,13 @@ export default function MatchedSelector(props: MatchedSelectorProps) {
   return (
     <div className={selector.overridden ? "computed-overridden" : ""}>
       <span className="rule-link">
-        <a
-          target="_blank"
-          rel="noreferrer noopener"
+        <ExternalLink
           className="computed-link theme-link"
           title={selector.stylesheetURL}
           tabIndex={0}
         >
           {selector.stylesheet}
-        </a>
+        </ExternalLink>
       </span>
       <span dir="ltr" className="rule-text theme-fg-color3">
         <div className="fix-get-selection">{selector.selector}</div>

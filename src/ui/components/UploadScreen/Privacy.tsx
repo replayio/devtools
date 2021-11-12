@@ -3,8 +3,8 @@ import React, { Dispatch, SetStateAction } from "react";
 import { useGetRecording } from "ui/hooks/recordings";
 import { OperationsData } from "ui/types";
 import { getRecordingId } from "ui/utils/environment";
+import ExternalLink from "../shared/ExternalLink";
 import MaterialIcon from "../shared/MaterialIcon";
-import Modal from "../shared/NewModal";
 
 export function getUniqueDomains(operations: OperationsData) {
   const cookies = operations.cookies || [];
@@ -92,14 +92,12 @@ export function Privacy() {
           <div className="text-2xl font-bold">Privacy</div>
           <div className="">
             {`Replays include all of the data needed to replay the browser. `}
-            <a
+            <ExternalLink
               href="https://www.replay.io/security-privacy"
-              target="_blank"
-              rel="noopener noreferrer"
               className="underline text-primaryAccent"
             >
               Learn more
-            </a>
+            </ExternalLink>
           </div>
         </div>
         <div className="flex flex-col space-y-5 overflow-auto">
