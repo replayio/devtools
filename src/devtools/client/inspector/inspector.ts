@@ -85,6 +85,8 @@ export class Inspector {
     (this.panelWin as any).inspector = this;
     this.store = (window as any).app.store;
 
+    extendStore(this.store!, {}, inspectorReducers, {});
+
     this.highlighter = Highlighter;
 
     this.markup = new MarkupView(this);
