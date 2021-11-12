@@ -96,7 +96,13 @@ function Logo({ scale = 1 }) {
 }
 
 // White progress screen used for showing the scanning progress of a replay
-export function BlankProgressScreen({ progress }: { progress: null | number }) {
+export function BlankProgressScreen({
+  progress,
+  hideTips,
+}: {
+  progress: null | number;
+  hideTips?: boolean;
+}) {
   return (
     <BlankScreen>
       <div className="m-auto">
@@ -114,7 +120,7 @@ export function BlankProgressScreen({ progress }: { progress: null | number }) {
           </div>
         </div>
       </div>
-      <LoadingTip />
+      {!hideTips ? <LoadingTip /> : null}
     </BlankScreen>
   );
 }
