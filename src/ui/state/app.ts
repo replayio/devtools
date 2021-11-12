@@ -11,6 +11,7 @@ import {
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
+import { Reply } from "./comments";
 
 export type PanelName =
   | "comments"
@@ -22,7 +23,12 @@ export type PanelName =
   | "viewer";
 export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events";
 export type ViewMode = "dev" | "non-dev";
-export type ModalOptionsType = { recordingId?: string; view?: string; loom?: string } | null;
+export type ModalOptionsType = {
+  recordingId?: string;
+  view?: string;
+  loom?: string;
+  comment?: Reply;
+} | null;
 export type ModalType =
   | "sharing"
   | "login"
@@ -36,7 +42,8 @@ export type ModalType =
   | "download-replay"
   | "trimming"
   | "privacy"
-  | "loom";
+  | "loom"
+  | "attachment";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"

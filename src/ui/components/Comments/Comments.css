@@ -20,6 +20,10 @@
   border-radius: 8px;
 }
 
+.comment-card:hover .comment-actions {
+  opacity: 1;
+}
+
 /* This avoids flickering in the UI when a user adds a new comment
 that starts off as empty, and then proceeds to press cancel which
 deletes the comment */

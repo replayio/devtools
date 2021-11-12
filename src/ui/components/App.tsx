@@ -25,6 +25,7 @@ import { migratePrefToSettings } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
+import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
 import classNames from "classnames";
 
@@ -68,6 +69,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "loom": {
       return <LoomModal />;
+    }
+    case "attachment": {
+      return <NewAttachment />;
     }
     default: {
       return null;
