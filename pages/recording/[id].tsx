@@ -15,14 +15,14 @@ function Recording({ getAccessibleRecording }: PropsFromRedux) {
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {
-    if (!store) return;
+    if (!store || !recordingId) return;
 
     async function getRecording() {
       await setup(store);
       setRecording(await getAccessibleRecording(recordingId));
     }
     getRecording();
-  }, [store]);
+  }, [recordingId, store]);
 
   if (!recording || typeof window === "undefined") {
     return <LoadingScreen />;
