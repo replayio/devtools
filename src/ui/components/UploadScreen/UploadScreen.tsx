@@ -170,6 +170,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   };
   const onDiscard = () => {
     setStatus("deleting");
+    trackEvent("discard replay", { isDemo: isDemoReplay(recording) });
     window.onbeforeunload = null;
     deleteRecording({ variables: { recordingId } });
   };
