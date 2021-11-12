@@ -5,13 +5,15 @@ import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { LoadingScreen } from "ui/components/shared/BlankScreen";
+import { useRouter } from "next/router";
 import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
 
 function Recording({ getAccessibleRecording }: PropsFromRedux) {
+  const router = useRouter();
   const store = useStore();
-  const recordingId = useGetRecordingId();
+  const recordingId = router.query.id;
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {
