@@ -152,6 +152,11 @@ export class ValueFront {
     return (this.hasPreview() && this._object!.preview!.promiseState) || null;
   }
 
+  previewProxyState() {
+    // Older recordings did not set proxyState so this could be null.
+    return (this.hasPreview() && this._object!.preview!.proxyState) || null;
+  }
+
   className() {
     if (this._object) {
       return this._object.className;
@@ -346,6 +351,20 @@ export class ValueFront {
         rv.unshift({
           name: "<state>",
           contents: state,
+        });
+      }
+    } else if (this.className() === "Proxy") {
+      const result = this.previewProxyState();
+      if (result) {
+        const { target, handler } = result;
+
+        rv.unshift({
+          name: "<handler>",
+          contents: handler,
+        });
+        rv.unshift({
+          name: "<target>",
+          contents: target,
         });
       }
     }
