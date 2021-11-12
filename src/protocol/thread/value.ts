@@ -353,7 +353,9 @@ export class ValueFront {
           contents: state,
         });
       }
-    } else if (this.className() === "Proxy") {
+    }
+
+    if (this.className() === "Proxy") {
       const result = this.previewProxyState();
       if (result) {
         const { target, handler } = result;
@@ -367,11 +369,12 @@ export class ValueFront {
           contents: target,
         });
       }
+    } else {
+      rv.push({
+        name: "<prototype>",
+        contents: this._object!.preview!.prototypeValue,
+      });
     }
-    rv.push({
-      name: "<prototype>",
-      contents: this._object!.preview!.prototypeValue,
-    });
     return rv;
   }
 
