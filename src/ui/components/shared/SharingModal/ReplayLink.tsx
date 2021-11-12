@@ -9,7 +9,7 @@ export function CopyButton({ recordingId }: { recordingId: RecordingId }) {
 
   const onClick = () => {
     navigator.clipboard.writeText(url);
-    trackEvent("copy replay link");
+    trackEvent("share.copy_link");
 
     if (timeoutKey.current) {
       clearTimeout(timeoutKey.current);
