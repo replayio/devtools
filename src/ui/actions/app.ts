@@ -24,6 +24,7 @@ import {
   WorkspaceId,
   SettingsTabTitle,
   EventKind,
+  ReplayEvent,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { trackEvent } from "ui/utils/telemetry";
@@ -205,27 +206,31 @@ function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAc
 }
 
 function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
-  const sortedEvents = events.sort((a: KeyboardEvent, b: KeyboardEvent) =>
-    compareBigInt(BigInt(a.point), BigInt(b.point))
-  );
-  const keyboardEvents = groupBy(sortedEvents, event => event.kind);
+  const groupedEvents = groupBy(events, event => event.kind);
 
-  Object.keys(keyboardEvents).map(event => {
-    store.dispatch(setEventsForType(keyboardEvents[event], event));
+  Object.entries(groupedEvents).map(([eventKind, kindEvents]) => {
+    const keyboardEvents = [
+      ...selectors.getEventsForType(store.getState(), eventKind),
+      ...kindEvents,
+    ];
+    keyboardEvents.sort((a: ReplayEvent, b: ReplayEvent) =>
+      compareBigInt(BigInt(a.point), BigInt(b.point))
+    );
+
+    store.dispatch(setEventsForType(keyboardEvents, eventKind));
   });
 }
 
 function onNavigationEvents(events: NavigationEvent[], store: UIStore) {
-  const sortedEvents = events.sort((a: NavigationEvent, b: NavigationEvent) =>
+  const navEvents = [
+    ...selectors.getEventsForType(store.getState(), "navigation"),
+    ...events.map(e => ({ ...e, kind: "navigation" })),
+  ];
+  navEvents.sort((a: ReplayEvent, b: ReplayEvent) =>
     compareBigInt(BigInt(a.point), BigInt(b.point))
   );
 
-  store.dispatch(
-    setEventsForType(
-      sortedEvents.map(e => ({ ...e, kind: "navigation" })),
-      "navigation"
-    )
-  );
+  store.dispatch(setEventsForType(navEvents, "navigation"));
 }
 
 function setRecordingDuration(duration: number): SetRecordingDurationAction {

@@ -107,12 +107,6 @@ const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, pa
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
 
-// All mouse events that have occurred in the recording, in order.
-const gKeyboardEvents: KeyboardEvent[] = [];
-
-// All mouse events that have occurred in the recording, in order.
-const gNavigationEvents: NavigationEvent[] = [];
-
 // All mouse click events that have occurred in the recording, in order.
 const gMouseClickEvents: MouseEvent[] = [];
 
