@@ -114,7 +114,7 @@ export function BlankProgressScreen({ progress }: { progress: null | number }) {
           </div>
         </div>
       </div>
-      {progress ? <LoadingTip /> : null}
+      <LoadingTip />
     </BlankScreen>
   );
 }

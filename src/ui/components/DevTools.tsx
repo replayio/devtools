@@ -34,7 +34,7 @@ function _DevTools({
     }
   }, [uploadComplete, loadingFinished]);
 
-  if (!loadingFinished || true) {
+  if (!loadingFinished) {
     return <LoadingScreen />;
   }
 
