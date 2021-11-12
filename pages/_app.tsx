@@ -144,7 +144,7 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
   if (!store) {
     // We hide the tips here since we don't have the store ready yet, which
     // the tips need to work properly.
-    return <BlankProgressScreen progress={null} hideTips />;
+    return <BlankProgressScreen progress={null} />;
   }
 
   if (maintenanceMode) {
