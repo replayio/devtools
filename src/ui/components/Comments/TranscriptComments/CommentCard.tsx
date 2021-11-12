@@ -14,6 +14,7 @@ import { AvatarImage } from "ui/components/Avatar";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import { commentKeys, formatRelativeTime } from "ui/utils/comments";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function BorderBridge({
@@ -116,6 +117,7 @@ function CommentCard({
   currentTime,
   executionPoint,
   pendingComment,
+  setModal,
   seekToComment,
   setHoveredComment,
 }: CommentCardProps) {
@@ -125,6 +127,10 @@ function CommentCard({
   const [isFocused, setIsFocused] = useState(false);
 
   const replyKeys = commentKeys(comment.replies);
+  const onAttachmentClick = () =>
+    setModal("attachment", {
+      comment: { ...comment, content: "", parentId: comment.id, id: PENDING_COMMENT_ID },
+    });
 
   if (comment.id === PENDING_COMMENT_ID) {
     return (
@@ -159,7 +165,7 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `mx-auto relative w-full border-b last:border-b-0 border-gray-300 cursor-pointer transition bg-white`
+        `comment-card mx-auto relative w-full border-b last:border-b-0 border-gray-300 cursor-pointer transition bg-white`
         // hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onMouseDown={e => {
@@ -170,7 +176,7 @@ function CommentCard({
     >
       <BorderBridge {...{ comments, comment, isPaused }} />
       <div
-        className={classNames("p-2.5 pl-2 space-y-2 border-l-2", {
+        className={classNames(" p-2.5 pl-2 space-y-2 border-l-2", {
           "border-secondaryAccent": isPaused,
           "border-transparent": !isPaused,
         })}
@@ -198,7 +204,7 @@ function CommentCard({
             />
           </FocusContext.Provider>
         ) : (
-          <div className="border-transparent border pl-1">
+          <div className="border-transparent border pl-1 flex justify-between">
             <button
               className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:outline-none focus:text-primaryAccent"
               onClick={() => {
@@ -208,6 +214,12 @@ function CommentCard({
             >
               Reply
             </button>
+
+            <div className="comment-actions opacity-0 mr-2 select-none">
+              <MaterialIcon className="text-gray-400" onClick={onAttachmentClick}>
+                attachment
+              </MaterialIcon>
+            </div>
           </div>
         )}
       </div>
@@ -226,6 +238,7 @@ const connector = connect(
     editItem: actions.editItem,
     seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
+    setModal: actions.setModal,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
