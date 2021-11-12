@@ -1,4 +1,4 @@
-![](https://replay.io/assets/logo.svg)
+![](/public/images/logo.svg)
 
 ## Replay
 
