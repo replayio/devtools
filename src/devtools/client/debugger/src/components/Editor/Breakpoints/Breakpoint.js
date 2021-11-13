@@ -10,6 +10,7 @@ import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
+import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
@@ -81,6 +82,7 @@ class Breakpoint extends PureComponent {
     const line = toEditorLine(selectedLocation.line);
     const doc = getDocument(sourceId);
 
+    resizeBreakpointGutter(editor.codeMirror);
     doc.setGutterMarker(line, "breakpoints", this.makeMarker());
 
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
