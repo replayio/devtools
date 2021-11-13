@@ -466,6 +466,11 @@ function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | nul
   const maxScale = 1 / (gDevicePixelRatio || 1);
   let bounds = { height: 0, width: 0, left: 0, top: 0, scale: 1 };
 
+  // add padding to the container bounds so that the
+  // image is not flush with the screen
+  const horizontalPadding = 50;
+  const verticalPadding = image ? horizontalPadding * (image.height / image.width) : 0;
+
   if (image && image.width > 0 && image.height > 0) {
     bounds.width = image.width;
     bounds.height = image.height;
@@ -474,8 +479,8 @@ function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | nul
   }
 
   bounds.scale = Math.min(
-    containerBounds.width / bounds.width,
-    containerBounds.height / bounds.height,
+    (containerBounds.width - horizontalPadding) / bounds.width,
+    (containerBounds.height - verticalPadding) / bounds.height,
     maxScale
   );
 
