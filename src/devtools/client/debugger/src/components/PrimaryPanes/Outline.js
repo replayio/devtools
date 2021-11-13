@@ -6,6 +6,9 @@
 
 import React, { Component } from "react";
 import { showMenu } from "devtools-contextmenu";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
+
 import { connect } from "../../utils/connect";
 import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
 const classnames = require("classnames");
@@ -57,8 +60,12 @@ function isVisible(element, parent) {
 
 export class Outline extends Component {
   focusedElRef;
-  state = { filter: "", focusedItem: null };
+  state = { filter: "", focusedItem: null, functions: [], namedFunctions: [] };
   focusedElRef = null;
+
+  componentDidMount() {
+    this.updateSymbols("");
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -67,6 +74,10 @@ export class Outline extends Component {
       this.props.cursorPosition !== prevProps.cursorPosition
     ) {
       this.setFocus(this.props.cursorPosition);
+    }
+
+    if (this.props.symbols != prevProps.symbols) {
+      this.updateSymbols(this.state.filter);
     }
 
     //confirm we aren't rescrolling back up the outline panel unnecessarily
@@ -103,8 +114,29 @@ export class Outline extends Component {
     this.setState({ focusedItem: selectedItem });
   }
 
+  updateSymbols(filter) {
+    const { symbols } = this.props;
+
+    if (!symbols || !symbols.functions) {
+      this.setState({ classes: [], namedFunctions: [], functions: [] });
+      return;
+    }
+    const functions = symbols.functions.filter(func => func.name != "anonymous");
+
+    let classes = uniq(functions.map(func => func.klass));
+
+    let namedFunctions = functions.filter(
+      func => filterOutlineItem(func.name, filter) && !func.klass && !classes.includes(func.name)
+    );
+
+    console.log({ namedFunctions });
+    this.setState({ classes, namedFunctions, functions });
+  }
+
   updateFilter = filter => {
-    this.setState({ filter: filter.trim() });
+    const newFilter = filter.trim();
+    this.setState({ filter: newFilter });
+    this.updateSymbols(newFilter);
   };
 
   renderPlaceholder() {
@@ -210,13 +242,14 @@ export class Outline extends Component {
     return (
       <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">
         {namedFunctions.map(func => this.renderFunction(func))}
-        {classes.map(klass => this.renderClassFunctions(klass, classFunctions))}
       </ul>
     );
   }
 
   render() {
     const { symbols, selectedSource } = this.props;
+    const { functions, namedFunctions } = this.state;
+
     const { filter } = this.state;
 
     if (!selectedSource) {
@@ -227,11 +260,33 @@ export class Outline extends Component {
       return this.renderLoading();
     }
 
-    const symbolsToDisplay = symbols.functions.filter(func => func.name != "anonymous");
-
-    if (symbolsToDisplay.length === 0) {
+    if (functions.length === 0) {
       return this.renderPlaceholder();
     }
+
+    const Row = ({ index, style }) => <div style={style}>Row {index}</div>;
+
+    return (
+      <div className="outline">
+        <div className="outline__container">
+          <AutoSizer>
+            {({ height, width }) => (
+              <>
+                <OutlineFilter filter={filter} updateFilter={this.updateFilter} />
+                <List
+                  height={height - 100}
+                  itemCount={namedFunctions.length}
+                  itemSize={20}
+                  width={width}
+                >
+                  {({ index }) => this.renderFunction(namedFunctions[index])}
+                </List>
+              </>
+            )}
+          </AutoSizer>
+        </div>
+      </div>
+    );
 
     return (
       <div className="outline">
