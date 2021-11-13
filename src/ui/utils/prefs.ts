@@ -41,6 +41,7 @@ pref("devtools.features.users", true);
 pref("devtools.features.videoComments", false);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.widgetHover", false);
+pref("devtools.features.commentAttachments", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -82,6 +83,7 @@ export const features = new PrefsHelper("devtools.features", {
   videoComments: ["Bool", "videoComments"],
   videoPlayback: ["Bool", "videoPlayback"],
   widgetHover: ["Bool", "widgetHover"],
+  commentAttachments: ["Bool", "commentAttachments"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

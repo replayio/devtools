@@ -43,6 +43,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Jump from an event to a line of code",
     key: "enableEventLink",
   },
+  {
+    label: "Comment Attachments",
+    description: "Add Loom video comments ",
+    key: "enableCommentAttachments",
+  },
 ];
 
 function Experiment({
@@ -77,6 +82,9 @@ export default function ExperimentalSettings({}) {
 
   const [enableNetworkMonitor, setEnableNetworkMonitor] = useState(!!features.network);
   const [enableEventLink, setEnableEventLink] = useState(!!features.eventLink);
+  const [enableCommentAttachments, setEnableCommentAttachments] = useState(
+    !!features.commentAttachments
+  );
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableRepaint") {
@@ -94,10 +102,13 @@ export default function ExperimentalSettings({}) {
     } else if (key === "enableEventLink") {
       features.eventLink = value;
       setEnableEventLink(!!features.eventLink);
+    } else if (key === "enableCommentAttachments") {
+      features.commentAttachments = value;
+      setEnableCommentAttachments(!!features.commentAttachments);
     }
   };
 
-  const localSettings = { enableNetworkMonitor, enableEventLink };
+  const localSettings = { enableNetworkMonitor, enableEventLink, enableCommentAttachments };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {

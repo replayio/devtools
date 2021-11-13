@@ -19,6 +19,7 @@ export type UserSettings = {
 export type LocalUserSettings = {
   enableNetworkMonitor: boolean;
   enableEventLink: boolean;
+  enableCommentAttachments: boolean;
 };
 
 export type CombinedUserSettings = UserSettings & LocalUserSettings;
