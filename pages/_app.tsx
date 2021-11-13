@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
-import { BlankProgressScreen, LoadingScreen } from "ui/components/shared/BlankScreen";
+import { LoadingScreen, LoadingScreenTemplate } from "ui/components/shared/BlankScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
@@ -144,7 +144,11 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
   if (!store) {
     // We hide the tips here since we don't have the store ready yet, which
     // the tips need to work properly.
-    return <BlankProgressScreen progress={null} />;
+    return (
+      <LoadingScreenTemplate>
+        <div className="w-56 h-1"></div>
+      </LoadingScreenTemplate>
+    );
   }
 
   if (maintenanceMode) {

@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import React, { ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
@@ -38,39 +37,27 @@ export default function BlankScreen({
   );
 }
 
-// General use loading screen with an indefinite spinner, a message and a blue/white background
-export function BlankLoadingScreen({
-  statusMessage = "Loading replay",
+export function LoadingScreenTemplate({
+  children,
+  showTips,
 }: {
-  statusMessage?: string;
+  children?: ReactNode;
+  showTips?: boolean;
 }) {
-  // The status message is optional, and so it's possible for the loading screen spinner
-  // to bounce up and down. That's why we keep a defaultStatusMessage as the div's content,
-  // but keep it invisible if there's no statusMessage provided.
   return (
     <BlankScreen>
-      <div className="m-auto">
-        <div
-          className={classNames(
-            "flex flex-col items-center space-y-10 opacity-90 rounded-md p-6 bg-white",
-            {}
-          )}
-        >
+      <div className="m-auto text-lg">
+        <div className="flex flex-col items-center space-y-10">
           <Logo />
-          <div
-            className={classNames("text-lg", {
-              invisible: !statusMessage,
-            })}
-          >
-            {statusMessage}
-          </div>
+          {children}
         </div>
       </div>
+      {showTips ? <LoadingTip /> : null}
     </BlankScreen>
   );
 }
 
-function Logo({ scale = 1 }) {
+function Logo() {
   return (
     <svg
       width="100"
@@ -96,45 +83,41 @@ function Logo({ scale = 1 }) {
 }
 
 // White progress screen used for showing the scanning progress of a replay
-export function BlankProgressScreen({ progress }: { progress: null | number }) {
+export function ProgressBar({ progress }: { progress: number }) {
   return (
-    <BlankScreen>
-      <div className="m-auto">
-        <div className="flex flex-col items-center space-y-10">
-          <Logo />
-          <div className="w-56 h-1 ">
-            {progress && (
-              <div className="bg-gray-200 rounded-lg overflow-hidden w-56 relative h-1">
-                <div
-                  className="absolute t-0 h-full bg-primaryAccent"
-                  style={{ width: `${progress}%`, transitionDuration: "200ms" }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      {progress ? <LoadingTip /> : null}
-    </BlankScreen>
+    <div className="bg-gray-200 rounded-lg overflow-hidden w-56 relative h-1">
+      <div
+        className="absolute t-0 h-full bg-primaryAccent"
+        style={{ width: `${progress}%`, transitionDuration: "200ms" }}
+      />
+    </div>
   );
 }
 
-function _LoadingScreen({ uploading, awaitingSourcemaps, progress, finished }: PropsFromRedux) {
-  if (!awaitingSourcemaps && !uploading && progress && !finished) {
-    return <BlankProgressScreen progress={progress} />;
-  }
-
+function _LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRedux) {
   // The backend send events in this order: uploading replay -> uploading sourcemaps.
   if (awaitingSourcemaps) {
-    return <BlankLoadingScreen statusMessage={"Uploading sourcemaps"} />;
+    return (
+      <LoadingScreenTemplate>
+        <div>Uploading sourcemaps</div>
+      </LoadingScreenTemplate>
+    );
   } else if (uploading) {
     const amount = `${Math.round(+uploading.amount)}Mb`;
-    const statusMessage = amount ? `Uploading ${amount}` : "Uploading";
+    const message = amount ? `Uploading ${amount}` : "Uploading";
 
-    return <BlankLoadingScreen statusMessage={statusMessage} />;
+    return (
+      <LoadingScreenTemplate>
+        <div>{message}</div>
+      </LoadingScreenTemplate>
+    );
   }
 
-  return <BlankProgressScreen progress={progress} />;
+  return (
+    <LoadingScreenTemplate showTips={!!progress}>
+      <div className="w-56 h-1">{progress ? <ProgressBar progress={progress} /> : null}</div>
+    </LoadingScreenTemplate>
+  );
 }
 
 const connector = connect((state: UIState) => ({
