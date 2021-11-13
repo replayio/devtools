@@ -34,12 +34,12 @@ export function useUserIsAuthor() {
 }
 
 export type UserInfo = {
-  id: string;
-  email: string;
-  internal: boolean;
-  loading: boolean;
-  nags: Nag[];
   acceptedTOSVersion: number | null;
+  email: string;
+  id: string;
+  internal: boolean;
+  nags: Nag[];
+  unsubscribedEmailTypes: string[];
 };
 
 export enum Nag {
@@ -59,7 +59,7 @@ export enum EmailSubscription {
   NEW_TEAM_INVITE = "new_team_invite",
 }
 
-export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefined> {
+export async function getUserInfo(): Promise<UserInfo | undefined> {
   const result = await query({
     query: GET_USER_INFO,
     variables: {},
@@ -73,11 +73,12 @@ export async function getUserInfo(): Promise<Omit<UserInfo, "loading"> | undefin
     return undefined;
   }
   return {
-    id: viewer.user.id,
+    acceptedTOSVersion: viewer.acceptedTOSVersion,
     email: viewer.email,
+    id: viewer.user.id,
     internal: viewer.internal,
     nags: viewer.nags,
-    acceptedTOSVersion: viewer.acceptedTOSVersion,
+    unsubscribedEmailTypes: viewer.unsubscribedEmailTypes,
   };
 }
 

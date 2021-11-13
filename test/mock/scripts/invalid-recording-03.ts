@@ -3,7 +3,7 @@
 import { runTest, devtoolsURL } from "../src/runTest";
 import { installMockEnvironment } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
-import { createGetUserMock } from "../src/graphql";
+import { createGetUserMock, createUserSettingsMock } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
 import { GET_RECORDING } from "ui/graphql/recordings";
@@ -22,7 +22,7 @@ const errorMock = {
     errors: [new GraphQLError(errorMessage)],
   },
 };
-const graphqlMocks = [...createGetUserMock({ user }), errorMock];
+const graphqlMocks = [...createUserSettingsMock(), ...createGetUserMock({ user }), errorMock];
 const messageHandlers = basicMessageHandlers();
 const bindings = basicBindings();
 

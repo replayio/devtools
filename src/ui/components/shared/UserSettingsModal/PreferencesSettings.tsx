@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
-import { prefs } from "ui/utils/prefs";
 import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
-import Radio from "../Forms/Radio";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",

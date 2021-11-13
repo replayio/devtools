@@ -1,25 +1,26 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
-import { Recording } from "ui/types";
+import { Recording, RecordingRole, WorkspaceSubscriptionStatus } from "ui/types";
 import { cloneResponse } from "./utils";
 
 const mockRecording = {
-  url: "https://mock.org",
-  title: "Mock Title",
-  duration: 10,
+  collaborators: [],
   createdAt: "2021-07-05T10:03:13.466Z",
-  private: false,
+  duration: 10,
+  id: "mock-recording-id",
   isInitialized: true,
+  operations: { scriptDomains: [] },
   ownerNeedsInvite: false,
+  private: false,
+  title: "Mock Title",
+  url: "https://mock.org",
+  userRole: RecordingRole.None,
+  workspace: null,
   owner: {
     id: "00000000-0000-0000-0000-000000000000",
     name: "Mock User",
     picture: "",
     internal: false,
-  },
-  workspace: null,
-  collaborators: {
-    edges: [],
   },
 };
 

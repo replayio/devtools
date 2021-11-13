@@ -80,7 +80,7 @@ function getRecordingNotAccessibleError(
   recording?: Recording,
   userId?: string
 ): ExpectedError | undefined {
-  const isAuthorized = !!(isTest() || recording);
+  const isAuthorized = !!((isTest() && !isMock()) || recording);
   const isAuthenticated = !!(isTest() || isMock() || tokenManager.auth0Client?.isAuthenticated);
 
   if (isAuthorized) {
@@ -125,7 +125,7 @@ export function createSession(recordingId: string): UIThunkAction {
         userSettings,
       });
 
-      registerRecording({ recording, userInfo });
+      registerRecording({ recording });
 
       if (
         recording.workspace &&

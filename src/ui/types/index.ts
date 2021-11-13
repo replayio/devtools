@@ -7,13 +7,13 @@ export interface User {
 
 export type UserSettings = {
   apiKeys: ApiKey[];
-  showElements: boolean;
-  showReact: boolean;
-  enableTeams: boolean;
-  enableRepaint: boolean;
-  enableGlobalSearch: boolean;
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
+  enableGlobalSearch: boolean;
+  enableRepaint: boolean;
+  enableTeams: boolean;
+  showElements: boolean;
+  showReact: boolean;
 };
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";

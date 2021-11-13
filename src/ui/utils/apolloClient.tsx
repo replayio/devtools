@@ -119,8 +119,15 @@ export function extractGraphQLError(error: ApolloError | undefined): string | un
 function createApolloCache() {
   return new InMemoryCache({
     typePolicies: {
+      Query: {
+        fields: {
+          viewer: {
+            merge: true,
+          },
+        },
+      },
       AuthenticatedUser: {
-        keyFields: [],
+        merge: true,
       },
       Recording: {
         keyFields: ["uuid"],

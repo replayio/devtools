@@ -1,8 +1,19 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { GET_USER_SETTINGS } from "ui/graphql/settings";
+import { UserSettings } from "ui/types";
 import { cloneResponse } from "./utils";
 
 export function createUserSettingsMock(): MockedResponse[] {
+  const settings: UserSettings = {
+    apiKeys: [],
+    defaultWorkspaceId: null,
+    disableLogRocket: false,
+    enableGlobalSearch: false,
+    enableRepaint: false,
+    enableTeams: true,
+    showElements: false,
+    showReact: false,
+  };
   const rv = {
     request: {
       query: GET_USER_SETTINGS,
@@ -10,13 +21,8 @@ export function createUserSettingsMock(): MockedResponse[] {
     result: {
       data: {
         viewer: {
-          settings: {
-            showElements: false,
-            showReact: false,
-            enableTeams: true,
-            enableRepaint: false,
-            enableGlobalSearch: false,
-          },
+          apiKeys: [],
+          settings,
           defaultWorkspace: null,
         },
       },

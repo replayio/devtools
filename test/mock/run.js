@@ -41,7 +41,6 @@ async function main() {
         cwd: devtools,
         env: {
           ...process.env,
-          PLAYWRIGHT_HEADLESS: "1",
         },
       }
     );

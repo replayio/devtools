@@ -40,13 +40,7 @@ export function setupTelemetry() {
   });
 }
 
-export function registerRecording({
-  recording,
-  userInfo,
-}: {
-  recording?: Recording;
-  userInfo?: Omit<UserInfo, "loading">;
-}) {
+export function registerRecording({ recording }: { recording?: Recording }) {
   if (!recording) {
     return;
   }

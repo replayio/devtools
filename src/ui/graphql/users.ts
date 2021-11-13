@@ -14,10 +14,10 @@ export const GET_USER_INFO = gql`
       user {
         id
       }
+      acceptedTOSVersion
       email
       internal
       nags
-      acceptedTOSVersion
       unsubscribedEmailTypes
     }
   }
