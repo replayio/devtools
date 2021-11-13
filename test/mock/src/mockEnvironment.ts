@@ -14,7 +14,7 @@ export interface MockHandlerHelpers {
   Errors: Record<string, Error>;
   emitEvent: (method: string, params: any) => void;
   bindings: Record<string, any>;
-};
+}
 
 type MockHandler = (params: any, helpers: MockHandlerHelpers) => any;
 export type MockHandlerRecord = Record<string, MockHandler>;
@@ -69,7 +69,7 @@ function doInstall(options: MockOptionsJSON) {
   const keys = Object.keys(options.messageHandlers);
   for (let i = 0; i < keys.length; i++) {
     const name = keys[i];
-    eval(`messageHandlers["${name}"] = ${options.messageHandlers[name]};`);
+    eval(`messageHandlers["${name}"] = ${options.messageHandlers[name]};`); // nosemgrep
   }
 
   let receiveMessageCallback: (arg: { data: string }) => unknown;
@@ -94,20 +94,23 @@ function doInstall(options: MockOptionsJSON) {
       } catch (e) {
         promise = Promise.reject(e);
       }
-      promise.then(result => {
-        const response = { id: msg.id, result };
-        setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
-      }, e => {
-        let error;
-        if (e.code && e.message) {
-          error = e;
-        } else {
-          console.error(`Mock message handler error ${e}`);
-          error = helpers.Errors.InternalError;
+      promise.then(
+        result => {
+          const response = { id: msg.id, result };
+          setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+        },
+        e => {
+          let error;
+          if (e.code && e.message) {
+            error = e;
+          } else {
+            console.error(`Mock message handler error ${e}`);
+            error = helpers.Errors.InternalError;
+          }
+          const response = { id: msg.id, error };
+          setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
         }
-        const response = { id: msg.id, error };
-        setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
-      });
+      );
     },
   };
 }
