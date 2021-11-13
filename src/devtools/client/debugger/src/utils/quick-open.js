@@ -137,6 +137,10 @@ export function formatSources(sources, tabUrls) {
   for (let i = 0; i < sources.length; ++i) {
     const source = sources[i];
 
+    if (!source.url || source.url.includes("webpack-internal") || source.url.includes(".css")) {
+      continue;
+    }
+
     if (!!source.relativeUrl && !isPretty(source) && !sourceURLs.has(source.url)) {
       formattedSources.push(formatSourcesForList(source, tabUrls));
       sourceURLs.add(source.url);
