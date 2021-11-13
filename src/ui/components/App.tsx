@@ -15,6 +15,7 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
+import { prefs } from "ui/utils/prefs";
 
 import { LoadingScreen } from "./shared/BlankScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
@@ -117,7 +118,10 @@ function App({ children, fontLoading, modal, theme }: AppProps) {
   }
 
   return (
-    <div id="app-container" className={classNames({ "font-loading": fontLoading })}>
+    <div
+      id="app-container"
+      className={classNames({ "font-loading": fontLoading, showRedactions: prefs.showRedactions })}
+    >
       {children}
       {modal ? <AppModal modal={modal} /> : null}
       <ConfirmRenderer />

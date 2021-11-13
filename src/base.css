@@ -13,7 +13,7 @@ body {
   box-sizing: border-box;
 }
 
-.showRedactions[data-private="true"] {
+.showRedactions [data-private="true"] {
   background: black !important;
   border: 2px solid black !important;
 }

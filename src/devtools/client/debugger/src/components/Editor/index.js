@@ -466,7 +466,10 @@ class Editor extends PureComponent {
         ref={c => (this.$editorWrapper = c)}
       >
         <EditorNag />
-        <div className="editor-mount devtools-monospace" style={this.getInlineEditorStyles()} />
+        <Redacted
+          className="editor-mount devtools-monospace"
+          style={this.getInlineEditorStyles()}
+        />
         {this.renderSearchBar()}
         {this.renderItems()}
       </div>

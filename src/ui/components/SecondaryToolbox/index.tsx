@@ -11,7 +11,6 @@ import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
-import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
 import { trackEvent } from "ui/utils/telemetry";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
@@ -128,14 +127,41 @@ function InspectorPanel() {
   );
 }
 
+function Panel({
+  selectedPanel,
+  hasReactComponents,
+}: {
+  selectedPanel: PanelName;
+  hasReactComponents: boolean;
+}) {
+  const { userSettings } = hooks.useGetUserSettings();
+  const showReact = userSettings.showReact;
+
+  if (selectedPanel === "network") {
+    return <ConnectedRequestTable />;
+  }
+
+  if (selectedPanel === "console") {
+    return <ConsolePanel />;
+  }
+
+  if (selectedPanel === "inspector") {
+    return <InspectorPanel />;
+  }
+
+  if (showReact && hasReactComponents && selectedPanel === "react-components") {
+    <ReactDevtoolsPanel />;
+  }
+
+  return <ConsolePanel />;
+}
+
 function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
   recordingTarget,
   hasReactComponents,
 }: PropsFromRedux) {
-  const { userSettings } = hooks.useGetUserSettings();
-  const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
 
   return (
@@ -151,14 +177,9 @@ function SecondaryToolbox({
           <ToolboxOptions />
         </header>
       )}
-      <Redacted className="secondary-toolbox-content text-xs">
-        {selectedPanel === "network" && <ConnectedRequestTable />}
-        {selectedPanel === "console" ? <ConsolePanel /> : null}
-        {selectedPanel === "inspector" ? <InspectorPanel /> : null}
-        {showReact && hasReactComponents && selectedPanel === "react-components" ? (
-          <ReactDevtoolsPanel />
-        ) : null}
-      </Redacted>
+      <div className="secondary-toolbox-content text-xs">
+        <Panel selectedPanel={selectedPanel} hasReactComponents={hasReactComponents} />
+      </div>
     </div>
   );
 }

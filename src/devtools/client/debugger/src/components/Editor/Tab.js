@@ -191,7 +191,7 @@ class Tab extends PureComponent {
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
 
     return (
-      <Redacted
+      <div
         draggable
         onDragOver={onDragOver}
         onDragStart={onDragStart}
@@ -205,9 +205,9 @@ class Tab extends PureComponent {
         title={getFileURL(source, false)}
       >
         <SourceIcon source={source} shouldHide={icon => ["file", "javascript"].includes(icon)} />
-        <div className="filename">{getTruncatedFileName(source, query)}</div>
+        <Redacted className="filename">{getTruncatedFileName(source, query)}</Redacted>
         <CloseButton handleClick={onClickClose} tooltip={"Close tab"} />
-      </Redacted>
+      </div>
     );
   }
 }

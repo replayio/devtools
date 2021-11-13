@@ -406,7 +406,7 @@ class Message extends Component {
 
     // Configure the location.
     const location = dom.span(
-      { className: "message-location devtools-monospace" },
+      { className: "message-location devtools-monospace", "data-private": true },
       frame
         ? FrameView({
             frame,
@@ -461,7 +461,7 @@ class Message extends Component {
           // Add whitespaces for formatting when copying to the clipboard.
           timestampEl ? " " : null,
           dom.span(
-            { className: "message-body devtools-monospace" },
+            { className: "message-body devtools-monospace", "data-private": true },
             location,
             " ",
             ...bodyElements,

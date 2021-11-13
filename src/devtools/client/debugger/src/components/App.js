@@ -172,11 +172,9 @@ class Debugger extends Component {
 
     return (
       <EditorPane>
-        {!isDemo() && <EditorTabs horizontal={horizontal} />}
-        <Redacted>
-          <Editor />
-        </Redacted>
-        {!isDemo() && <EditorFooter horizontal={horizontal} />}
+        {<EditorTabs horizontal={horizontal} />}
+        <Editor />
+        {<EditorFooter horizontal={horizontal} />}
       </EditorPane>
     );
   }
