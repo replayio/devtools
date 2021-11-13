@@ -21,6 +21,7 @@ function _DevTools({
   viewMode,
   createSession,
   uploadComplete,
+  sessionId,
 }: _DevToolsProps) {
   const recordingId = useGetRecordingId();
   useEffect(() => {
@@ -30,7 +31,7 @@ function _DevTools({
   }, [clearTrialExpired, recordingId]);
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
-      endUploadWaitTracking();
+      endUploadWaitTracking(sessionId!);
     }
   }, [uploadComplete, loadingFinished]);
 
@@ -50,6 +51,7 @@ const connector = connect(
   (state: UIState) => ({
     loadingFinished: selectors.getLoadingFinished(state),
     viewMode: selectors.getViewMode(state),
+    sessionId: selectors.getSessionId(state),
   }),
   {
     createSession,

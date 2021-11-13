@@ -1,3 +1,4 @@
+import { SessionId } from "@recordreplay/protocol";
 import mixpanel, { Dict } from "mixpanel-browser";
 import { ViewMode } from "ui/state/app";
 import { getRecordingId, isReplayBrowser, skipTelemetry } from "./environment";
@@ -73,7 +74,8 @@ export const trackViewMode = (viewMode: ViewMode) =>
   trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
 
 export const startUploadWaitTracking = () => mixpanel.time_event("upload_recording");
-export const endUploadWaitTracking = () => trackMixpanelEvent("upload_recording");
+export const endUploadWaitTracking = (sessionId: SessionId) =>
+  trackMixpanelEvent("upload_recording", { sessionId });
 
 function setupSessionEndListener() {
   window.addEventListener("beforeunload", endMixpanelSession("unloaded"));
