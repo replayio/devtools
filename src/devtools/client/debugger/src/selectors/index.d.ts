@@ -22,3 +22,6 @@ export function getSourcesCollapsed(state: UIState): any;
 export function getThreadContext(state: UIState): any;
 export function getVisibleSelectedFrame(state: UIState): SelectedFrame | null;
 export function hasFrames(state: UIState): boolean;
+export function getSelectedSourceWithContent(state: UIState): any;
+export function getSymbols(state: UIState, source: any): any;
+export function getCursorPosition(state: UIState): any;

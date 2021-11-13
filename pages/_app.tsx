@@ -37,7 +37,7 @@ import "devtools/client/debugger/src/components/Editor/LineNumberTooltip.css";
 import "devtools/client/debugger/src/components/Editor/Preview/Popup.css";
 import "devtools/client/debugger/src/components/Editor/SearchBar.css";
 import "devtools/client/debugger/src/components/Editor/Tabs.css";
-import "devtools/client/debugger/src/components/Outline/Outline.css";
+import "devtools/client/debugger/src/components/SourceOutline/Outline.css";
 import "devtools/client/debugger/src/components/PrimaryPanes/Sources.css";
 import "devtools/client/debugger/src/components/FullTextSearch/FullTextSearch.css";
 import "devtools/client/debugger/src/components/QuickOpenModal.css";

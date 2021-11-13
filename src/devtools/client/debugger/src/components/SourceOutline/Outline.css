@@ -16,7 +16,11 @@
   flex-direction: column;
 }
 
-.outlines-pane .outline > div {
+.outline {
+  height: 100%;
+}
+
+.outline > div {
   width: 100%;
   position: relative;
 }

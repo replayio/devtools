@@ -15,9 +15,7 @@ const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
 export default class PreviewFunction extends Component {
   renderFunctionName(func) {
-    const { l10n } = this.context;
     const name = (func.functionName ? func.functionName() : func.name) || "<anonymous>";
-
     return <span className="function-name">{name}</span>;
   }
 
