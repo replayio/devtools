@@ -28,7 +28,7 @@ export default function BubbleModal({ children }: { children: ReactNode }) {
       style={{ background: "#f3f3f4" }}
     >
       <BubbleBackground />
-      <div className="relative">{children}</div>
+      {children}
     </div>
   );
 }

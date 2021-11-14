@@ -9,6 +9,7 @@ import {
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import LoadingTip from "./LoadingTip";
+import BubbleModal from "../shared/Onboarding/BubbleModal";
 
 const BACKGROUNDS = {
   white: "white",
@@ -48,7 +49,7 @@ export function BlankLoadingScreen({
   // to bounce up and down. That's why we keep a defaultStatusMessage as the div's content,
   // but keep it invisible if there's no statusMessage provided.
   return (
-    <BlankScreen>
+    <BubbleModal>
       <div className="m-auto">
         <div
           className={classNames(
@@ -66,7 +67,7 @@ export function BlankLoadingScreen({
           </div>
         </div>
       </div>
-    </BlankScreen>
+    </BubbleModal>
   );
 }
 
@@ -98,7 +99,7 @@ function Logo({ scale = 1 }) {
 // White progress screen used for showing the scanning progress of a replay
 export function BlankProgressScreen({ progress }: { progress: null | number }) {
   return (
-    <BlankScreen>
+    <BubbleModal>
       <div className="m-auto">
         <div className="flex flex-col items-center space-y-10">
           <Logo />
@@ -115,7 +116,7 @@ export function BlankProgressScreen({ progress }: { progress: null | number }) {
         </div>
       </div>
       {progress ? <LoadingTip /> : null}
-    </BlankScreen>
+    </BubbleModal>
   );
 }
 
