@@ -16,7 +16,7 @@ import {
 import { connect } from "../../utils/connect";
 import { prefs } from "../../utils/prefs";
 
-import Outline from "./Outline";
+import Outline from "./NewOutline";
 import SourcesTree from "./SourcesTree";
 import Accordion from "../shared/Accordion";
 

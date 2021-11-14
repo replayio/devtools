@@ -10,10 +10,10 @@ import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import { connect } from "../../utils/connect";
-import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
 const classnames = require("classnames");
 
 import { findClosestEnclosedSymbol } from "../../utils/ast";
+import { fuzzySearch } from "../../utils/function";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { findFunctionText } from "../../utils/function";
 import { getTruncatedFileName } from "../../utils/source";
@@ -31,23 +31,6 @@ import {
 import OutlineFilter from "./OutlineFilter";
 import PreviewFunction from "../shared/PreviewFunction";
 import uniq from "lodash/uniq";
-
-/**
- * Check whether the name argument matches the fuzzy filter argument
- */
-const filterOutlineItem = (name, filter) => {
-  // Set higher to make the fuzzaldrin filter more specific
-  const FUZZALDRIN_FILTER_THRESHOLD = 15000;
-  if (!filter) {
-    return true;
-  }
-
-  if (filter.length === 1) {
-    // when filter is a single char just check if it starts with the char
-    return filter.toLowerCase() === name.toLowerCase()[0];
-  }
-  return fuzzaldrinScore(name, filter) > FUZZALDRIN_FILTER_THRESHOLD;
-};
 
 // Checks if an element is visible inside its parent element
 function isVisible(element, parent) {
@@ -126,7 +109,7 @@ export class Outline extends Component {
     let classes = uniq(functions.map(func => func.klass));
 
     let namedFunctions = functions.filter(
-      func => filterOutlineItem(func.name, filter) && !func.klass && !classes.includes(func.name)
+      func => fuzzySearch(func.name, filter) && !func.klass && !classes.includes(func.name)
     );
 
     console.log({ namedFunctions });
