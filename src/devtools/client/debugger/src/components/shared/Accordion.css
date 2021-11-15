@@ -73,6 +73,5 @@
 .accordion ._content {
   font-size: var(--theme-body-font-size);
   overflow-y: auto;
-  height: 100%;
   background-color: white;
 }
