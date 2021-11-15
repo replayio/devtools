@@ -116,8 +116,8 @@ const gNavigationEvents: NavigationEvent[] = [];
 // All mouse click events that have occurred in the recording, in order.
 const gMouseClickEvents: MouseEvent[] = [];
 
-// Device pixel ratio used by recording screen shots.
-let gDevicePixelRatio: number;
+// Device pixel ratio used by the current screenshot.
+let gDevicePixelRatio = 1;
 
 function onPaints({ paints }: paintPoints) {
   paints.forEach(({ point, time, screenShots }) => {
@@ -222,10 +222,6 @@ export function setupGraphics(store: UIStore) {
       client.Graphics.getPlaybackVideo({}, sessionId);
       client.Graphics.addPlaybackVideoFragmentListener(param => Video.append(param.fragment));
     }
-
-    client.Graphics.getDevicePixelRatio({}, sessionId).then(({ ratio }) => {
-      gDevicePixelRatio = ratio;
-    });
   });
 
   ThreadFront.on("paused", async ({ point, time }) => {
@@ -424,6 +420,7 @@ export function paintGraphics(
     gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
   }
   gDrawMouse = mouse || null;
+  gDevicePixelRatio = screenShot?.scale || 1;
   refreshGraphics();
 }
 
