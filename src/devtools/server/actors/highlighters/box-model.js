@@ -24,7 +24,7 @@ const nodeConstants = require("devtools/shared/dom-node-constants");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STRINGS_URI = "devtools/shared/locales/highlighters.properties";
 const L10N = new LocalizationHelper(STRINGS_URI);
-const { refreshGraphics, getDevicePixelRatio } = require("protocol/graphics");
+const { refreshGraphics } = require("protocol/graphics");
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
@@ -32,22 +32,6 @@ const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"];
 const BOX_MODEL_SIDES = ["top", "right", "bottom", "left"];
 // Width of boxmodelhighlighter guides
 const GUIDE_STROKE_WIDTH = 1;
-
-function scaleQuad({ p1, p2, p3, p4 }, scale) {
-  return {
-    p1: scaleCoordinates(p1, scale),
-    p2: scaleCoordinates(p2, scale),
-    p3: scaleCoordinates(p3, scale),
-    p4: scaleCoordinates(p4, scale),
-  };
-}
-
-function scaleCoordinates({ x, y }, scale) {
-  return {
-    x: x / scale,
-    y: y / scale,
-  };
-}
 
 /**
  * The BoxModelHighlighter draws the box model regions on top of a node.
@@ -537,8 +521,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
   }
 
   _getBoxPathCoordinates(boxQuad, nextBoxQuad) {
-    const scale = getDevicePixelRatio();
-    const { p1, p2, p3, p4 } = scaleQuad(boxQuad, scale);
+    const { p1, p2, p3, p4 } = boxQuad;
 
     let path;
     if (!nextBoxQuad || !this.options.onlyRegionArea) {
@@ -566,7 +549,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
         p4.y;
     } else {
       // Otherwise, just draw the region itself, not a filled rectangle.
-      const { p1: np1, p2: np2, p3: np3, p4: np4 } = scaleQuad(nextBoxQuad, scale);
+      const { p1: np1, p2: np2, p3: np3, p4: np4 } = nextBoxQuad;
       path =
         "M" +
         p1.x +
@@ -728,8 +711,6 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       return false;
     }
 
-    const scale = getDevicePixelRatio();
-    point = point / scale;
     if (side === "top" || side === "bottom") {
       guide.setAttribute("x1", "0");
       guide.setAttribute("y1", point + "");
