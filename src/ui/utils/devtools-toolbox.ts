@@ -2,6 +2,8 @@ import Highlighter from "highlighter/highlighter";
 import { ThreadFront } from "protocol/thread";
 import { defer, EventEmitter } from "protocol/utils";
 import { actions, UIStore } from "ui/actions";
+import { extendStore } from "ui/setup/store";
+import * as inspectorReducers from "devtools/client/inspector/reducers";
 
 import { DebuggerPanel } from "devtools/client/debugger/panel";
 import { Inspector } from "devtools/client/inspector/inspector";
@@ -50,6 +52,8 @@ export class DevToolsToolbox {
     // on any of those messages, either on the console or the timeline, the debugger
     // panel is ready to be opened.
     await this.startPanel("debugger");
+
+    extendStore(store, {}, inspectorReducers, {});
 
     await this.selectTool(selectedPanel);
   }

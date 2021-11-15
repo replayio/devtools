@@ -10,8 +10,6 @@ const EventEmitter = require("devtools/shared/event-emitter");
 // const { log } = require("protocol/socket");
 import { NodeFront } from "protocol/thread/node";
 import { UIStore } from "ui/actions";
-import { extendStore } from "ui/setup/store";
-import * as inspectorReducers from "devtools/client/inspector/reducers";
 
 import MarkupView from "devtools/client/inspector/markup/markup";
 const BoxModel = require("devtools/client/inspector/boxmodel/box-model");
@@ -84,8 +82,6 @@ export class Inspector {
     this.panelWin = window;
     (this.panelWin as any).inspector = this;
     this.store = (window as any).app.store;
-
-    extendStore(this.store!, {}, inspectorReducers, {});
 
     this.highlighter = Highlighter;
 
