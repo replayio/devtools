@@ -13,6 +13,11 @@
   height: 100%;
 }
 
+.accordion > li {
+  display: flex;
+  flex-direction: column;
+}
+
 .accordion ._header {
   background-color: #fff;
   display: flex;
