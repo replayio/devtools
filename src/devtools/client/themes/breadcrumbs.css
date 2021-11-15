@@ -109,7 +109,7 @@
 }
 
 .breadcrumbs-widget-item:not(:first-child)::before {
-  content: url(chrome://devtools/skin/images/breadcrumbs-divider.svg);
+  content: url(~devtools/client/debugger/images/breadcrumbs-divider.svg);
   background: none;
   position: relative;
   left: -3px;
