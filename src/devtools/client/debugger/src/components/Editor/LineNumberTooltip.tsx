@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useRef, useState, useEffect, ReactChild } from "react";
+import React, { useRef, useState, useEffect, ReactChild, ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -143,16 +143,11 @@ function LineNumberTooltip({
   );
 }
 
-function AwesomeTooltip({
-  children,
-  isAwesome,
-}: {
-  children: React.ReactNode;
-  isAwesome: boolean;
-}) {
+function AwesomeTooltip({ children, isAwesome }: { children: ReactNode; isAwesome: boolean }) {
   if (!isAwesome) {
-    return children;
+    return <>{children}</>;
   }
+
   return (
     <div
       className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight rounded-md text-left"
