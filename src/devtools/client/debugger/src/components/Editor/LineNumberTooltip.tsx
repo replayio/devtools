@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, ReactChild, ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -76,18 +76,34 @@ function LineNumberTooltip({
       );
   }, [analysisPoints]);
 
+  const showNag = shouldShowNag(nags, Nag.FIRST_GUTTER_CLICK);
+
   if (!lineNumberNode) {
     return null;
   }
 
   if (!indexed) {
-    return <StaticTooltip targetNode={lineNumberNode}>Indexing</StaticTooltip>;
+    return (
+      <StaticTooltip
+        targetNode={lineNumberNode}
+        className={classNames({ "awesome-tooltip": showNag })}
+      >
+        <AwesomeTooltip isAwesome={showNag}>Indexing</AwesomeTooltip>
+      </StaticTooltip>
+    );
   }
 
   // Show a loading state immediately while we wait for the analysis points
   // to be generated.
   if (!analysisPoints) {
-    return <StaticTooltip targetNode={lineNumberNode}>Loading…</StaticTooltip>;
+    return (
+      <StaticTooltip
+        targetNode={lineNumberNode}
+        className={classNames({ "awesome-tooltip": showNag })}
+      >
+        <AwesomeTooltip isAwesome={showNag}>Loading…</AwesomeTooltip>
+      </StaticTooltip>
+    );
   }
 
   if (analysisPoints === "error") {
@@ -96,15 +112,20 @@ function LineNumberTooltip({
 
   const points = analysisPoints.length;
   const isHot = points > prefs.maxHitsDisplayed;
-  const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
   if (showNag) {
     return (
       <StaticTooltip
         targetNode={lineNumberNode}
-        className={classNames({ hot: isHot, "nag-tooltip": showNag })}
+        className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
       >
-        <AwesomeTooltip isHot={isHot} points={points} />
+        <AwesomeTooltip isAwesome={showNag}>
+          <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
+          <div className="text-xs flex flex-col">
+            <div>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</div>
+            <div className="font-bold">Click to add a print statement</div>
+          </div>
+        </AwesomeTooltip>
       </StaticTooltip>
     );
   }
@@ -112,7 +133,7 @@ function LineNumberTooltip({
   return (
     <StaticTooltip
       targetNode={lineNumberNode}
-      className={classNames({ hot: isHot, "nag-tooltip": showNag })}
+      className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
     >
       <>
         {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
@@ -122,7 +143,11 @@ function LineNumberTooltip({
   );
 }
 
-function AwesomeTooltip({ points }: { isHot: boolean; points: number }) {
+function AwesomeTooltip({ children, isAwesome }: { children: ReactNode; isAwesome: boolean }) {
+  if (!isAwesome) {
+    return <>{children}</>;
+  }
+
   return (
     <div
       className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight rounded-md text-left"
@@ -131,11 +156,7 @@ function AwesomeTooltip({ points }: { isHot: boolean; points: number }) {
           "linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF",
       }}
     >
-      <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
-      <div className="text-xs flex flex-col">
-        <div>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</div>
-        <div className="font-bold">Click to add a print statement</div>
-      </div>
+      {children}
     </div>
   );
 }

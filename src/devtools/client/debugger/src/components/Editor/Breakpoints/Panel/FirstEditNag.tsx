@@ -35,7 +35,6 @@ export default function FirstEditNag({ editing }: { editing: boolean }) {
   const { nags } = hooks.useGetUserInfo();
 
   const step = getStep(nags, editing);
-
   if (!step) {
     return null;
   }
