@@ -3,6 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
+import classNames from "classnames";
+import { findLastIndex, lastIndexOf } from "lodash";
 import React, { cloneElement, Component } from "react";
 import AccessibleImage from "./AccessibleImage";
 
@@ -29,9 +31,15 @@ class Accordion extends Component {
 
   renderContainer = (item, i) => {
     const { opened } = item;
+    const lastOpenedIndex = i === findLastIndex(this.props.items, item => item.opened);
 
     return (
-      <li className={`${item.className} ${item.opened ? "expanded" : "collapsed"}`} key={i}>
+      <li
+        className={classNames(item.className, item.opened ? "expanded" : "collapsed", {
+          lastOpen: lastOpenedIndex,
+        })}
+        key={i}
+      >
         <h2
           className="_header"
           tabIndex="0"

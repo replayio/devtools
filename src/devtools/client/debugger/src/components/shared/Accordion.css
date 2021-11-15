@@ -75,3 +75,15 @@
   overflow-y: auto;
   background-color: white;
 }
+
+.accordion li {
+  flex: 1;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  min-height: fit-content;
+}
+
+.accordion li.expanded {
+  min-height: 20%;
+}

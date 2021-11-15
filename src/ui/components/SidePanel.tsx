@@ -5,7 +5,7 @@ import { UIState } from "ui/state";
 import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
-const PrimaryPanes = require("devtools/client/debugger/src/components/PrimaryPanes").default;
+import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 

@@ -51,7 +51,6 @@ import "devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css
 import "devtools/client/debugger/src/components/SecondaryPanes/Scopes.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/SecondaryPanes.css";
 import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
-import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 import "devtools/client/debugger/src/components/shared/Accordion.css";
 import "devtools/client/debugger/src/components/shared/Badge.css";
 import "devtools/client/debugger/src/components/shared/BracketArrow.css";
