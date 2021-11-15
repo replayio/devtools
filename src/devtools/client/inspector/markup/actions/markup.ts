@@ -1,5 +1,5 @@
 import { Action } from "redux";
-import { assert } from "protocol/utils";
+import { assert, defer, Deferred } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
 import Selection from "devtools/client/framework/selection";
@@ -38,10 +38,16 @@ export type MarkupAction =
   | UpdateSelectedNodeAction
   | UpdateScrollIntoViewNodeAction;
 
+let rootNodeWaiter: Deferred<void> | undefined;
+
 /**
  * Clears the tree
  */
 export function reset(): ResetAction {
+  if (rootNodeWaiter) {
+    rootNodeWaiter.resolve();
+  }
+  rootNodeWaiter = defer();
   return {
     type: "RESET",
   };
@@ -50,12 +56,26 @@ export function reset(): ResetAction {
 /**
  * Clears the tree and adds the new root node.
  */
-export function newRoot(rootNodeFront: NodeFront): UIThunkAction {
+export function newRoot(): UIThunkAction {
   return async ({ dispatch }) => {
+    const pause = ThreadFront.currentPause;
+    assert(pause);
+    const rootNodeFront = await ThreadFront.getRootDOMNode();
+    if (!rootNodeFront || ThreadFront.currentPause !== pause) {
+      return;
+    }
+    const rootNode = await convertNode(rootNodeFront);
+    if (ThreadFront.currentPause !== pause) {
+      return;
+    }
     dispatch({
       type: "NEW_ROOT",
-      rootNode: await convertNode(rootNodeFront),
+      rootNode,
     });
+    if (rootNodeWaiter) {
+      rootNodeWaiter.resolve();
+      rootNodeWaiter = undefined;
+    }
   };
 }
 
@@ -150,6 +170,13 @@ export function selectionChanged(
     const selectedNode = selection.nodeFront;
     if (!selectedNode) {
       dispatch(updateSelectedNode(null));
+      return;
+    }
+
+    if (rootNodeWaiter) {
+      await rootNodeWaiter.promise;
+    }
+    if (selection.nodeFront !== selectedNode) {
       return;
     }
 
