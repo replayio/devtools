@@ -87,6 +87,7 @@ export interface AppState {
   loadedRegions: loadedRegions | null;
   loading: number;
   loadingFinished: boolean;
+  loadingPageTipIndex: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   recordingDuration: number;
@@ -106,7 +107,6 @@ export interface AppState {
   videoUrl: string | null;
   viewMode: ViewMode;
   workspaceId: WorkspaceId | null;
-  loadingPageTipIndex: number;
 }
 
 export interface AnalysisPoints {
