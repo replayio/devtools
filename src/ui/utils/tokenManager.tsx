@@ -48,7 +48,7 @@ class TokenManager {
 
     const onRedirectCallback = (appState: AppState) => {
       if (appState?.returnTo) {
-        router.replace("/");
+        router.replace(appState?.returnTo);
       }
     };
 
