@@ -5,6 +5,7 @@
 import { assert } from "protocol/utils";
 import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
+import { setSelectedPanel } from "ui/actions/app";
 
 export class DebuggerPanel {
   constructor(toolbox) {
@@ -52,6 +53,7 @@ export class DebuggerPanel {
 
   async openElementInInspector(valueFront) {
     this.toolbox.selectTool("inspector");
+    this._store.dispatch(setSelectedPanel("inspector"));
 
     const pause = valueFront.getPause();
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
