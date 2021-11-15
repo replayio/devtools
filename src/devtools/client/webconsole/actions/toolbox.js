@@ -5,6 +5,7 @@
 "use strict";
 
 import { ThreadFront } from "protocol/thread";
+import { setSelectedPanel } from "ui/actions/app";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
 
@@ -32,13 +33,14 @@ export function unHighlightDomElement(grip) {
 }
 
 export function openNodeInInspector(valueFront) {
-  return async ({ getState, toolbox }) => {
+  return async ({ getState, dispatch, toolbox }) => {
     const pause = valueFront.getPause();
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
     }
 
     toolbox.selectTool("inspector", "inspect_dom");
+    dispatch(setSelectedPanel("inspector"));
 
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
 
