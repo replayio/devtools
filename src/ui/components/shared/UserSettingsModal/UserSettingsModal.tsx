@@ -179,7 +179,7 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUser
         label: "Network Monitor",
         type: "checkbox",
         key: "enableNetworkMonitor",
-        description: "Network Monitor request table (refresh required)",
+        description: "Network Monitor request table",
         disabled: false,
       },
     ],
