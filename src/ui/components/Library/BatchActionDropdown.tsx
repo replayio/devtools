@@ -76,7 +76,7 @@ function BatchActionDropdown({
         <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
       </span>
     );
-    buttonClasses = getButtonClasses("blue", "secondary", "md");
+    buttonClasses = classNames("bg-white", getButtonClasses("blue", "secondary", "md"));
   } else {
     button = (
       <span className={classNames("space-x-1 flex flex-row items-center leading-4")}>
