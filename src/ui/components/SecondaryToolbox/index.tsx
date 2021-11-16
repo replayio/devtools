@@ -138,9 +138,7 @@ function SecondaryToolbox({
   const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
 
-  const allowedPanels = getAllowedPanels(userSettings);
-
-  if (!allowedPanels.includes(selectedPanel)) {
+  if (!getAllowedPanels(userSettings).includes(selectedPanel)) {
     setSelectedPanel("console");
   }
 

@@ -6,8 +6,6 @@ import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { UserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
-import { features } from "ui/utils/prefs";
-import { useEffect, useState } from "react";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
