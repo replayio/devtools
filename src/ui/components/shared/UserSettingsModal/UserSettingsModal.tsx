@@ -9,7 +9,7 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
-import { ApiKey, UserSettings } from "ui/types";
+import { ApiKey, CombinedUserSettings, UserSettings } from "ui/types";
 
 import APIKeys from "../APIKeys";
 import SettingsModal from "../SettingsModal";
@@ -125,7 +125,7 @@ function ApiKeysWrapper({ settings }: { settings?: UserSettings }) {
   return <UserAPIKeys apiKeys={settings.apiKeys} />;
 }
 
-const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings, {}> => [
+const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUserSettings, {}> => [
   {
     title: "Personal",
     icon: "person",
@@ -209,7 +209,7 @@ export function UserSettingsModal(props: PropsFromRedux) {
 
   const [enableNetworkMonitor, setEnableNetworkMonitor] = useState(!!features.network);
 
-  const onChange = (key: keyof UserSettings, value: any) => {
+  const onChange = (key: keyof CombinedUserSettings, value: any) => {
     if (key === "enableRepaint") {
       updateRepaint({ variables: { newValue: value } });
       updateEnableRepaint(value);

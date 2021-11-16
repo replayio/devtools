@@ -18,7 +18,6 @@ const emptySettings: UserSettings = {
   enableGlobalSearch: false,
   defaultWorkspaceId: null,
   disableLogRocket: false,
-  enableNetworkMonitor: false,
 };
 
 const testSettings: UserSettings = {
@@ -30,7 +29,6 @@ const testSettings: UserSettings = {
   enableGlobalSearch: false,
   defaultWorkspaceId: null,
   disableLogRocket: false,
-  enableNetworkMonitor: false,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
