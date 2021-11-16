@@ -128,16 +128,14 @@ function ViewerContent({
           {isEditing ? (
             <>
               <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
-              <PrimaryButton color="blue" onClick={handleDoneEditing}>
+              <PrimaryButton className="bg-white" color="blue" onClick={handleDoneEditing}>
                 Done
               </PrimaryButton>
             </>
           ) : (
-            <div className="bg-white rounded-md">
-              <SecondaryButton color="blue" onClick={() => setIsEditing(true)}>
-                Edit
-              </SecondaryButton>
-            </div>
+            <SecondaryButton className="bg-white" color="blue" onClick={() => setIsEditing(true)}>
+              Edit
+            </SecondaryButton>
           )}
         </div>
       </ViewerHeader>
