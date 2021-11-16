@@ -48,7 +48,7 @@ function IndexingLoader({
       <CircularProgressbar
         value={progressPercentage}
         strokeWidth={10}
-        styles={buildStyles({ pathColor: `#353535`, trailColor: `#ECECED` })}
+        styles={buildStyles({ pathColor: `#000000`, trailColor: `#FFFFFF` })}
       />
     </div>
   );
@@ -149,8 +149,8 @@ function Toolbar({
           </>
         ) : null}
       </div>
-      <div className="flex flex-col space-y-1 items-center">
-        {progressPercentage !== 100 && viewMode === "dev" ? (
+      <div className="flex flex-col space-y-1 items-center progressLoader">
+        {progressPercentage !== 101 && viewMode === "dev" ? (
           <IndexingLoader {...{ progressPercentage, viewMode }} />
         ) : null}
       </div>
