@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
+import { trackEvent } from "ui/utils/telemetry";
 import { getButtonClasses } from "./Button";
 import Modal, { ModalCloseButton } from "./NewModal";
 
@@ -36,6 +37,7 @@ function LaunchBrowser({
               {`Don't have Replay yet? Download it on `}
               <a
                 href="https://static.replay.io/downloads/replay.dmg"
+                onClick={() => trackEvent("launch.download_replay", { OS: "mac" })}
                 className="underline"
                 title="Download for Mac"
               >
@@ -44,15 +46,21 @@ function LaunchBrowser({
               {`, `}
               <a
                 href="https://static.replay.io/downloads/linux-replay.tar.bz2"
+                onClick={() => trackEvent("launch.download_replay", { OS: "linux" })}
                 className="underline"
                 title="Download for Linux"
               >
                 Linux
               </a>
               {`, and `}
-              <span className="cursor-default" title="Coming soon">
-                Windows (coming soon)
-              </span>
+              <a
+                href="https://static.replay.io/downloads/windows-replay.zip"
+                onClick={() => trackEvent("launch.download_replay", { OS: "windows" })}
+                className="underline"
+                title="Download for Windows"
+              >
+                Windows
+              </a>
             </p>
           </div>
         </div>
