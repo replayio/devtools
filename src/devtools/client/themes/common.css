@@ -35,13 +35,6 @@
   --monospace-font-family: Menlo, Consolas, monospace;
 }
 
-.progressLoader {
-  position: absolute;
-  bottom: 16px;
-  left: 10px;
-  opacity: 0.4;
-}
-
 /**
   * Customize the dark theme's scrollbar colors to avoid excessive contrast.
   */
@@ -629,6 +622,15 @@ checkbox:-moz-focusring {
   -moz-context-properties: fill;
   fill: var(--theme-icon-dimmed-color);
   transform: rotate(-90deg);
+}
+
+/* global loader */
+
+.progressLoader {
+  position: absolute;
+  z-index: 99;
+  bottom: 14px;
+  left: 8px;
 }
 
 /* Mirror the twisty for rtl direction */
