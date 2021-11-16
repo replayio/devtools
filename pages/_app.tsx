@@ -2,7 +2,8 @@ import "../src/test-prep";
 import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
-import type { AppProps } from "next/app";
+import type { AppContext, AppProps } from "next/app";
+import NextApp from "next/app";
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
@@ -135,7 +136,7 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-const AppRouting = ({ Component, pageProps }: AppProps) => {
+const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
   const [store, setStore] = useState<Store | null>(null);
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
@@ -153,7 +154,7 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
 
   return (
     <Provider store={store}>
-      <tokenManager.Auth0Provider>
+      <tokenManager.Auth0Provider apiKey={apiKey}>
         <ApolloWrapper>
           <IntercomProvider appId={"k7f741xx"} autoBoot>
             <ConfirmProvider>
@@ -186,6 +187,26 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
       </tokenManager.Auth0Provider>
     </Provider>
   );
+};
+
+interface AuthProps {
+  apiKey?: string;
+}
+AppRouting.getInitialProps = (appContext: AppContext) => {
+  const props = NextApp.getInitialProps(appContext);
+  const authHeader = appContext.ctx.req?.headers.authorization;
+  const authProps: AuthProps = { apiKey: undefined };
+
+  if (authHeader) {
+    const [scheme, token] = authHeader.split(" ", 2);
+    if (!token || !/^Bearer$/i.test(scheme)) {
+      console.error("Format is Authorization: Bearer [token]");
+    } else {
+      authProps.apiKey = token;
+    }
+  }
+
+  return { ...props, ...authProps };
 };
 
 export default AppRouting;

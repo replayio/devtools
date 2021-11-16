@@ -49,7 +49,7 @@ function Support() {
 
 function Personal() {
   const { logout, user } = useAuth0();
-  const { name, picture, email } = user!;
+  const { name, picture, email } = user || {};
 
   return (
     <div className="space-y-12">

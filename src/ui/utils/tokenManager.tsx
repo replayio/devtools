@@ -18,6 +18,7 @@ const clientId: string = usesWindow(win => {
 });
 
 export interface TokenState {
+  apiKey?: boolean;
   loading?: boolean;
   token?: string;
   error?: any;
@@ -43,7 +44,7 @@ class TokenManager {
     // }
   }
 
-  Auth0Provider = ({ children }: { children: ReactNode }) => {
+  Auth0Provider = ({ children, apiKey }: { apiKey?: string; children: ReactNode }) => {
     const router = useRouter();
 
     const onRedirectCallback = (appState: AppState) => {
@@ -74,7 +75,13 @@ class TokenManager {
               return;
             }
 
-            setTimeout(() => this.update(false), 0);
+            setTimeout(() => {
+              if (apiKey) {
+                this.setApiKey(apiKey);
+              } else {
+                this.update(false);
+              }
+            }, 0);
 
             return null;
           }}
@@ -112,6 +119,10 @@ class TokenManager {
       clearTimeout(this.refreshTimeout);
       this.refreshTimeout = undefined;
     }
+  }
+
+  private setApiKey(apiKey: string) {
+    this.setState({ token: apiKey, apiKey: true }, this.deferredState);
   }
 
   private async update(refresh: boolean) {
