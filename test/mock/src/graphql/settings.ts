@@ -13,6 +13,7 @@ export function createUserSettingsMock(): MockedResponse[] {
     enableTeams: true,
     showElements: false,
     showReact: false,
+    enableNetworkMonitor: false,
   };
   const rv = {
     request: {

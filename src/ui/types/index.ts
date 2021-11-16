@@ -14,6 +14,10 @@ export type UserSettings = {
   enableTeams: boolean;
   showElements: boolean;
   showReact: boolean;
+} & LocalUserSettings;
+
+export type LocalUserSettings = {
+  enableNetworkMonitor: boolean;
 };
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";

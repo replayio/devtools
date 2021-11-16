@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -18,6 +18,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import "ui/setup/dynamic/inspector";
 import { ConnectedRequestTable } from "../NetworkMonitor/RequestTable";
 import { features } from "ui/utils/prefs";
+import { UserSettings } from "ui/types";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -111,6 +112,22 @@ function InspectorPanel() {
   );
 }
 
+function getAllowedPanels(settings: UserSettings) {
+  const allowedPanels = ["console"];
+
+  if (features.network) {
+    allowedPanels.push("network");
+  }
+  if (settings.showReact) {
+    allowedPanels.push("react-components");
+  }
+  if (settings.showElements) {
+    allowedPanels.push("inspector");
+  }
+
+  return allowedPanels;
+}
+
 function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
@@ -120,6 +137,12 @@ function SecondaryToolbox({
   const { userSettings } = hooks.useGetUserSettings();
   const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
+
+  const allowedPanels = getAllowedPanels(userSettings);
+
+  if (!allowedPanels.includes(selectedPanel)) {
+    setSelectedPanel("console");
+  }
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
