@@ -35,16 +35,7 @@ import { prefs, features } from "ui/utils/prefs";
 import Trimmer from "./Trimmer";
 import TrimButton from "./TrimButton";
 import { trackEvent } from "ui/utils/telemetry";
-
-function ReplayButton({ onClick, disabled }: { onClick: MouseEventHandler; disabled: boolean }) {
-  return (
-    <button onClick={onClick} disabled={disabled}>
-      <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-        <img className="w-6 h-6 m-auto" src="/images/playback-refresh.svg" />
-      </div>
-    </button>
-  );
-}
+import IndexingLoader from "../shared/IndexingLoader";
 
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
@@ -185,14 +176,20 @@ class Timeline extends Component<PropsFromRedux> {
     if (currentTime == recordingDuration) {
       return (
         <div className="commands">
-          <ReplayButton onClick={replay} disabled={disabled} />
+          <button className="relative" onClick={replay} disabled={disabled}>
+            <IndexingLoader />
+            <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
+              <img className="w-6 h-6 m-auto" src="/images/playback-refresh.svg" />
+            </div>
+          </button>
         </div>
       );
     }
 
     return (
       <div className="commands">
-        <button onClick={togglePlayback} disabled={disabled}>
+        <button className="relative" onClick={togglePlayback} disabled={disabled}>
+          <IndexingLoader />
           {playback ? (
             <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
               <img className="w-6 h-6 m-auto" src="/images/playback-pause.svg" />

@@ -35,13 +35,6 @@
   --monospace-font-family: Menlo, Consolas, monospace;
 }
 
-.progressLoader {
-  position: absolute;
-  bottom: 16px;
-  left: 10px;
-  opacity: 0.4;
-}
-
 /**
   * Customize the dark theme's scrollbar colors to avoid excessive contrast.
   */
