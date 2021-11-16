@@ -31,7 +31,7 @@ export function downloadReplay(nags: Nag[], dismissNag: (nag: Nag) => void): boo
   if (isReplayBrowser()) {
     dismissNag(Nag.DOWNLOAD_REPLAY);
 
-    return false
+    return false;
   }
 
   return shouldShowNag(nags, Nag.DOWNLOAD_REPLAY);
