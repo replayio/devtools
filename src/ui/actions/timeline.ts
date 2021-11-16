@@ -15,6 +15,7 @@ import {
 } from "protocol/graphics";
 import {
   getCurrentTime,
+  getHoveredItem,
   getHoverTime,
   getPlayback,
   getTrimRegion,
@@ -480,7 +481,11 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
 }
 
 export function clearHoveredItem(): UIThunkAction {
-  return ({ dispatch }) => {
+  return ({ dispatch, getState }) => {
+    const hoveredItem = getHoveredItem(getState());
+    if (!hoveredItem) {
+      return;
+    }
     dispatch({ type: "set_hovered_item", hoveredItem: null });
     dispatch(setTimelineToTime(null));
   };
