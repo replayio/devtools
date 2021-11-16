@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { updateEnableRepaint } from "protocol/enable-repaint";
@@ -9,7 +9,7 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
-import { ApiKey, UserSettings } from "ui/types";
+import { ApiKey, CombinedUserSettings, UserSettings } from "ui/types";
 
 import APIKeys from "../APIKeys";
 import SettingsModal from "../SettingsModal";
@@ -20,6 +20,7 @@ import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 import PreferencesSettings from "./PreferencesSettings";
 import ExternalLink from "../ExternalLink";
+import { features } from "ui/utils/prefs";
 
 function Support() {
   return (
@@ -124,7 +125,7 @@ function ApiKeysWrapper({ settings }: { settings?: UserSettings }) {
   return <UserAPIKeys apiKeys={settings.apiKeys} />;
 }
 
-const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings, {}> => [
+const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUserSettings, {}> => [
   {
     title: "Personal",
     icon: "person",
@@ -145,21 +146,21 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
     icon: "biotech",
     items: [
       {
-        label: "Enable React DevTools",
+        label: "React DevTools",
         type: "checkbox",
         key: "showReact",
         description: "Inspect the React component tree",
         disabled: false,
       },
       {
-        label: "Enable global function search",
+        label: "Global function search",
         type: "checkbox",
         key: "enableGlobalSearch",
         description: "Search for functions in all source files",
         disabled: false,
       },
       {
-        label: "Enable the Elements pane",
+        label: "Elements pane",
         type: "checkbox",
         key: "showElements",
         description: "Inspect HTML markup and CSS styling",
@@ -167,12 +168,19 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, UserSettings
         comingSoon: !internal,
       },
       {
-        label: "Enable repainting",
+        label: "Repainting",
         type: "checkbox",
         key: "enableRepaint",
         description: "Repaint the DOM on demand",
         disabled: false,
         comingSoon: !internal,
+      },
+      {
+        label: "Network Monitor",
+        type: "checkbox",
+        key: "enableNetworkMonitor",
+        description: "Network Monitor request table (refresh required)",
+        disabled: false,
       },
     ],
   },
@@ -199,7 +207,9 @@ export function UserSettingsModal(props: PropsFromRedux) {
   const updateElements = hooks.useUpdateUserSetting("showElements", "Boolean");
   const updateGlobalSearch = hooks.useUpdateUserSetting("enableGlobalSearch", "Boolean");
 
-  const onChange = (key: keyof UserSettings, value: any) => {
+  const [enableNetworkMonitor, setEnableNetworkMonitor] = useState(!!features.network);
+
+  const onChange = (key: keyof CombinedUserSettings, value: any) => {
     if (key === "enableRepaint") {
       updateRepaint({ variables: { newValue: value } });
       updateEnableRepaint(value);
@@ -209,6 +219,9 @@ export function UserSettingsModal(props: PropsFromRedux) {
       updateElements({ variables: { newValue: value } });
     } else if (key === "enableGlobalSearch") {
       updateGlobalSearch({ variables: { newValue: value } });
+    } else if (key === "enableNetworkMonitor") {
+      features.network = value;
+      setEnableNetworkMonitor(!!features.network);
     }
   };
 
@@ -223,7 +236,7 @@ export function UserSettingsModal(props: PropsFromRedux) {
       onChange={onChange}
       panelProps={{}}
       settings={settings}
-      values={userSettings}
+      values={{ ...userSettings, enableNetworkMonitor }}
     />
   );
 }

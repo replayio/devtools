@@ -16,6 +16,12 @@ export type UserSettings = {
   showReact: boolean;
 };
 
+export type LocalUserSettings = {
+  enableNetworkMonitor: boolean;
+};
+
+export type CombinedUserSettings = UserSettings & LocalUserSettings;
+
 export type ApiKeyScope = "admin:all" | "write:sourcemap";
 
 export interface ApiKey {

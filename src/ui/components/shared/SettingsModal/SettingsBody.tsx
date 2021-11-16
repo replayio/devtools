@@ -47,7 +47,7 @@ export default function SettingsBody<
   return (
     <SettingsBodyWrapper>
       <SettingsHeader>{title}</SettingsHeader>
-      <ul>
+      <ul className="overflow-auto">
         {selectedSetting.items.map((item, index) => (
           <SettingsBodyItem item={item} values={values} key={index} onChange={onChange} />
         ))}
