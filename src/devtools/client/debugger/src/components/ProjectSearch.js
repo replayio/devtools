@@ -13,7 +13,6 @@ import actions from "../actions";
 import { getEditor } from "../utils/editor";
 import { highlightMatches } from "../utils/project-search";
 
-import { statusType } from "../reducers/project-text-search";
 import { getRelativePath } from "../utils/sources-tree";
 import {
   getActiveSearch,
@@ -21,6 +20,7 @@ import {
   getTextSearchStatus,
   getTextSearchQuery,
   getContext,
+  getSources,
 } from "../selectors";
 
 import ManagedTree from "./shared/ManagedTree";
@@ -29,6 +29,8 @@ import AccessibleImage from "./shared/AccessibleImage";
 
 import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
+import { ThreadFront } from "protocol/thread";
+import { groupBy } from "lodash";
 
 function getFilePath(item, index) {
   return item.type === "RESULT"
@@ -48,6 +50,11 @@ export class ProjectSearch extends Component {
       inputValue: this.props.query || "",
       inputFocused: false,
       focusedItem: null,
+      results: {
+        status: "DONE",
+        query: "",
+        matches: [],
+      },
     };
   }
 
@@ -70,9 +77,52 @@ export class ProjectSearch extends Component {
     }
   }
 
-  doSearch(searchTerm) {
+  async doSearch(query) {
     trackEvent("project_search.search");
-    this.props.searchSources(this.props.cx, searchTerm);
+    this.setState({ results: { status: "LOADING", query, matches: [] } });
+
+    const safeUpdateResults = nextResults => {
+      if (query === this.state.results.query) {
+        console.info("do update", nextResults);
+        this.setState({ results: { ...this.state.results, ...nextResults } });
+      } else {
+        console.info("skip update", nextResults);
+      }
+    };
+
+    await ThreadFront.searchSources({ query }, matches => {
+      console.info("matches", query, matches);
+      const bestResults = matches.filter(
+        match => !ThreadFront.isMinifiedSource(match.location.sourceId)
+      );
+      const sources = this.props.sources;
+      const resultsBySource = groupBy(bestResults, res => res.location.sourceId);
+      const newMatches = Object.entries(resultsBySource).map(([sourceId, matches]) => {
+        return {
+          type: "RESULT",
+          sourceId,
+          filepath: sources.values[sourceId]?.url,
+          matches: matches.map(match => {
+            const matchStr = [...match.context]
+              .slice(match.contextStart.column, match.contextEnd.column)
+              .join("");
+            return {
+              type: "MATCH",
+              column: match.location.column,
+              line: match.location.line,
+              sourceId,
+              match: matchStr,
+              matchIndex: match.context.indexOf(matchStr),
+              value: match.context,
+            };
+          }),
+        };
+      });
+      safeUpdateResults({ matches: [...this.state.results.matches, ...newMatches] });
+    });
+
+    console.info("DONE");
+    safeUpdateResults({ status: "DONE" });
   }
 
   toggleProjectTextSearch = e => {
@@ -106,7 +156,7 @@ export class ProjectSearch extends Component {
     );
   };
 
-  getResultCount = () => this.props.results.reduce((count, file) => count + file.matches.length, 0);
+  getResultCount = () => this.state.results.length;
 
   onKeyDown = e => {
     if (e.key === "Escape") {
@@ -120,7 +170,7 @@ export class ProjectSearch extends Component {
     }
     this.setState({ focusedItem: null });
     const query = sanitizeQuery(this.state.inputValue);
-    if (query) {
+    if (query && query.length >= 3) {
       this.doSearch(query);
     }
   };
@@ -189,14 +239,15 @@ export class ProjectSearch extends Component {
   };
 
   renderResults = () => {
-    const { status, results } = this.props;
-    if (!this.props.query) {
+    const { results } = this.state;
+    if (!results.query) {
       return;
     }
-    if (results.length) {
+    const matches = results.matches;
+    if (matches.length) {
       return (
         <ManagedTree
-          getRoots={() => results}
+          getRoots={() => matches}
           getChildren={file => file.matches || []}
           itemHeight={24}
           autoExpandAll={true}
@@ -210,7 +261,8 @@ export class ProjectSearch extends Component {
         />
       );
     }
-    const msg = status === statusType.fetching ? "Loading\u2026" : "No results found";
+
+    const msg = results.status === "LOADING" ? "Loading\u2026" : "No results found";
     return <div className="no-result-msg absolute-center">{msg}</div>;
   };
 
@@ -224,11 +276,12 @@ export class ProjectSearch extends Component {
   };
 
   shouldShowErrorEmoji() {
-    return !this.getResultCount() && this.props.status === statusType.done;
+    return !this.getResultCount() && this.state.results.status === "DONE";
   }
 
   renderInput() {
-    const { cx, closeProjectSearch, status } = this.props;
+    const { cx, closeProjectSearch } = this.props;
+    const { status } = this.state.results;
     return (
       <SearchInput
         query={this.state.inputValue}
@@ -237,7 +290,7 @@ export class ProjectSearch extends Component {
         size="big"
         showErrorEmoji={this.shouldShowErrorEmoji()}
         summaryMsg={this.renderSummary()}
-        isLoading={status === statusType.fetching}
+        isLoading={status === "LOADING"}
         onChange={this.inputOnChange}
         onFocus={() => this.setState({ inputFocused: true })}
         onBlur={() => this.setState({ inputFocused: false })}
@@ -253,6 +306,7 @@ export class ProjectSearch extends Component {
     if (!this.isProjectSearchEnabled()) {
       return null;
     }
+    console.info(this.state.results);
 
     return (
       <div className="search-container">
@@ -274,6 +328,7 @@ const mapStateToProps = state => ({
   activeSearch: getActiveSearch(state),
   results: getTextSearchResults(state),
   query: getTextSearchQuery(state),
+  sources: getSources(state),
   status: getTextSearchStatus(state),
 });
 
