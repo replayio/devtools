@@ -52,6 +52,17 @@ export async function trackMixpanelEvent(event: string, properties?: Dict) {
   }
 }
 
+const eventsBeingOnlyTrackedOnce: string[] = [];
+
+export async function trackEventOnce(event: string, properties?: Dict) {
+  if (eventsBeingOnlyTrackedOnce.includes(event)) {
+    return;
+  }
+
+  eventsBeingOnlyTrackedOnce.push(event);
+  trackMixpanelEvent(event, properties);
+}
+
 export function setMixpanelContext({ id, email }: TelemetryUser) {
   mixpanel.register({ isReplayBrowser: isReplayBrowser() });
 
