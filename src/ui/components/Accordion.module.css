@@ -14,7 +14,7 @@
 .accordionItemContainer.open {
   flex: 0 1 auto;
   min-height: 20%;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .accordionItemContainer {

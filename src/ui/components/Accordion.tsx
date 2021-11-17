@@ -8,6 +8,7 @@ export interface AccordionItem {
   header: string;
   onToggle?: (open: boolean) => void;
   collapsed?: boolean;
+  button?: React.ReactNode;
 }
 
 const Accordion = ({ items }: { items: AccordionItem[] }) => {
@@ -20,7 +21,7 @@ const Accordion = ({ items }: { items: AccordionItem[] }) => {
         styles[`items-${items.filter(i => !i.collapsed).length}`]
       )}
     >
-      {state.map(({ className, onToggle, header, component, collapsed }, i) => {
+      {state.map(({ className, onToggle, header, component, collapsed, button }, i) => {
         return (
           <div
             key={i}
@@ -38,13 +39,15 @@ const Accordion = ({ items }: { items: AccordionItem[] }) => {
                 setState(newState);
               }}
             >
-              <h2>
+              <h2 className="flex justify-between items-center">
                 <span
                   className={classNames("img arrow", { expanded: !collapsed })}
                   style={{ marginInlineEnd: "4px" }}
                 />
-
-                {header}
+                <div className="flex flex-grow justify-between overflow-hidden">
+                  <div className="overflow-hidden whitespace-pre overflow-ellipsis">{header}</div>
+                  {button}
+                </div>
               </h2>
             </div>
             <div className={classNames(styles.content, { [styles.open]: !collapsed })}>
