@@ -52,14 +52,14 @@ export async function trackMixpanelEvent(event: string, properties?: Dict) {
   }
 }
 
-const eventsBeingOnlyTrackedOnce: string[] = [];
+const eventsBeingOnlyTrackedOnce = new Set();
 
 export async function trackEventOnce(event: string, properties?: Dict) {
-  if (eventsBeingOnlyTrackedOnce.includes(event)) {
+  if (eventsBeingOnlyTrackedOnce.has(event)) {
     return;
   }
 
-  eventsBeingOnlyTrackedOnce.push(event);
+  eventsBeingOnlyTrackedOnce.add(event);
   trackMixpanelEvent(event, properties);
 }
 
