@@ -20,6 +20,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { prefs } from "devtools/client/webconsole/utils/prefs";
 import Accordion from "ui/components/Accordion";
+import QuickOpenButton from "./QuickOpenButton";
 
 class PrimaryPanes extends Component<PropsFromRedux> {
   renderOutline() {
@@ -43,6 +44,7 @@ class PrimaryPanes extends Component<PropsFromRedux> {
         this.props.toggleSourcesCollapse();
       },
       collapsed: prefs.sourcesCollapsed,
+      button: <QuickOpenButton />,
     };
   }
 
