@@ -77,10 +77,6 @@
   width: 400px;
 }
 
-.header .sharebutton {
-  height: 28px;
-}
-
 button.login {
   color: var(--primary-accent);
   box-shadow: 0px 0px 0px 1px var(--primary-accent) inset;
