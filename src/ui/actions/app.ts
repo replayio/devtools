@@ -248,9 +248,6 @@ export function setDisplayedLoadingProgress(
 }
 
 export function setLoadingFinished(finished: boolean): SetLoadingFinishedAction {
-  if (finished) {
-    trackTiming("kpi-time-to-view-replay");
-  }
   return { type: "set_loading_finished", finished };
 }
 
