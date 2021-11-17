@@ -67,15 +67,17 @@ export function useGetUserSettings() {
 }
 
 export const useFeature = (prefKey: keyof typeof features) => {
+  const fullKey = `devtools.features.${prefKey}`;
   const [pref, setPref] = useState(Boolean(features[prefKey]));
 
   useEffect(() => {
     const onUpdate = (prefs: any) => {
-      setPref(prefs.getBoolPref(`devtools.features.${prefKey}`));
+      setPref(prefs.getBoolPref(fullKey));
     };
 
     prefsService.addObserver(`devtools.features.${prefKey}`, onUpdate, false);
-  }, [prefKey]);
+    return () => prefsService.removeObserver(fullKey, onUpdate, false);
+  }, [fullKey]);
 
   return pref;
 };
