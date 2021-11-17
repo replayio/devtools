@@ -88,10 +88,20 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
   display: flex;
   flex-direction: column;
   flex: 1;
+  height: 100%;
 }
 
 .secondary-toolbox .toolbox-bottom-panels .toolbox-panel {
   flex: 1;
   min-height: 0;
   height: 100%;
+}
+
+.secondary-toolbox .splitter {
+  background: white;
+}
+
+.secondary-toolbox .splitter:hover,
+.secondary-toolbox .splitter:active {
+  background: var(--tab-hover-color);
 }

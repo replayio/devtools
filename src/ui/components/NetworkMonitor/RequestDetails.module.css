@@ -1,0 +1,34 @@
+.requestDetails {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  height: 100%;
+}
+
+.headerTable {
+  display: flex;
+  flex: 1 1 0;
+  overflow: scroll;
+}
+
+h2.title {
+  flex: 0 0 auto;
+}
+
+.row {
+  white-space: nowrap;
+}
+
+.request {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.method {
+  font-weight: bold;
+}
+
+.status {
+  font-weight: bold;
+}

@@ -1,0 +1,83 @@
+import {
+  Header,
+  RequestEventInfo,
+  RequestInfo,
+  RequestOpenEvent,
+  RequestResponseEvent,
+  TimeStampedPoint,
+} from "@recordreplay/protocol";
+import keyBy from "lodash/keyBy";
+import sortBy from "lodash/sortBy";
+
+export type RequestSummary = {
+  domain: string;
+  end: number;
+  method: string;
+  name: string;
+  point: TimeStampedPoint | undefined;
+  requestHeaders: Header[];
+  responseHeaders: Header[];
+  start: number;
+  status: number;
+  time: number;
+  url: string;
+};
+
+export type RequestEventMap = {
+  request: { time: number; event: RequestOpenEvent };
+  response: { time: number; event: RequestResponseEvent };
+};
+
+export const eventsToMap = (events: RequestEventInfo[]): Partial<RequestEventMap> => {
+  return keyBy(events, e => e.event.kind);
+};
+
+export const eventsByRequestId = (
+  events: RequestEventInfo[]
+): Record<string, RequestEventInfo[]> => {
+  return events.reduce((acc: Record<string, RequestEventInfo[]>, eventInfo) => {
+    acc[eventInfo.id] = [eventInfo, ...(acc[eventInfo.id] || [])];
+    return acc;
+  }, {});
+};
+
+const host = (url: string): string => new URL(url).host;
+const name = (url: string): string =>
+  new URL(url).pathname
+    .split("/")
+    .filter(f => f.length)
+    .pop() || "";
+
+export const partialRequestsToCompleteSummaries = (
+  requests: RequestInfo[],
+  events: RequestEventInfo[]
+): RequestSummary[] => {
+  const eventsMap = eventsByRequestId(events);
+  const summaries = requests
+    .map((r: RequestInfo) => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
+    .filter(
+      (r): r is RequestInfo & { events: RequestEventMap } =>
+        !!r.events.request && !!r.events.response
+    )
+    .map((r: RequestInfo & { events: RequestEventMap }) => {
+      const request = r.events.request;
+      const response = r.events.response;
+      return {
+        domain: host(request.event.requestUrl),
+        end: response.time,
+        requestHeaders: request.event.requestHeaders,
+        responseHeaders: response.event.responseHeaders,
+        method: request.event.requestMethod,
+        name: name(request.event.requestUrl),
+        point: r.point,
+        status: response.event.responseStatus,
+        start: request.time,
+        time: response.time - request.time,
+        url: request.event.requestUrl,
+      };
+    });
+  return sortBy(
+    summaries.filter(s => !!s.point),
+    s => s.point?.time
+  );
+};
