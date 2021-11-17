@@ -61,6 +61,7 @@ function LineNumberTooltip({
   };
 
   useEffect(() => {
+    editor.codeMirror.on("lineEnter", () => trackEvent("editor.line_hover"));
     editor.codeMirror.on("gutterLineEnter", setHoveredLineNumber);
     editor.codeMirror.on("gutterLineLeave", clearHoveredLineNumber);
     return () => {
