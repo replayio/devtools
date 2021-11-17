@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
+import hooks from "ui/hooks";
+import { Nag } from "ui/hooks/users";
 import { PrimaryLgButton } from "../Button";
 import { OnboardingActions, OnboardingBody, OnboardingHeader } from "../Onboarding/index";
 
 export function DownloadingPage({ onFinished }: { onFinished: () => void }) {
+  const dismissNag = hooks.useDismissNag();
+
+  useEffect(() => {
+    dismissNag(Nag.DOWNLOAD_REPLAY);
+  }, []);
+
   return (
     <>
       <OnboardingHeader>Downloading Replay ...</OnboardingHeader>
