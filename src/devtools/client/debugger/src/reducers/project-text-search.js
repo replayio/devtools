@@ -43,6 +43,17 @@ function update(state = initialProjectTextSearchState(), action) {
         matches: action.result.matches.map(m => ({ type: "MATCH", ...m })),
       };
       return { ...state, results: [...state.results, result] };
+    case "ADD_SEARCH_RESULTS":
+      if (action.results.length === 0) {
+        return state;
+      }
+
+      const formattedResults = action.results.map(result => ({
+        type: "RESULT",
+        ...result,
+        matches: result.matches.map(m => ({ type: "MATCH", ...m })),
+      }));
+      return { ...state, results: [...state.results, ...formattedResults] };
 
     case "UPDATE_STATUS":
       const ongoingSearch = action.status == statusType.fetching ? state.ongoingSearch : null;
