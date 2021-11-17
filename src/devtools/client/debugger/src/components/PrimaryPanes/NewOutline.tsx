@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo, useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import classnames from "classnames";
@@ -14,7 +14,7 @@ import OutlineFilter from "./OutlineFilter";
 
 import { connect } from "devtools/client/debugger/src/utils/connect";
 
-function formatData(symbols, filter) {
+function formatData(symbols: any, filter: string) {
   if (!symbols || !symbols.functions) {
     return { classes: [], namedFunctions: [], functions: [] };
   }
@@ -30,15 +30,28 @@ function formatData(symbols, filter) {
   return { classes, namedFunctions };
 }
 
-function NewOutline({ selectLocation, symbols }) {
+type PropTypes = {
+  selectLocation: any;
+  symbols: {
+    functions: {}[];
+    classes: {}[];
+    hasJsx: boolean;
+    hasTypes: boolean;
+    loading: boolean;
+  };
+};
+
+function NewOutline({ selectLocation, symbols }: PropTypes) {
+  const [filter, setFilter] = useState("");
+
   const namedFunctions = useMemo(() => {
     console.info("symbol change!", symbols);
-    const { namedFunctions } = formatData(symbols);
+    const { namedFunctions } = formatData(symbols, filter);
     return namedFunctions;
-  }, [symbols]);
+  }, [filter, symbols]);
 
   const Function = useCallback(
-    function Function({ index, style }) {
+    ({ index, style }) => {
       const func = namedFunctions[index];
       const { name, location, parameterNames } = func;
 
@@ -62,7 +75,7 @@ function NewOutline({ selectLocation, symbols }) {
   return (
     <div className="outline">
       <div className="outline__container">
-        {/* <OutlineFilter filter={filter} updateFilter={this.updateFilter} /> */}
+        <OutlineFilter filter={filter} updateFilter={setFilter} />
         <AutoSizer>
           {({ height, width }) => (
             <List
