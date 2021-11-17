@@ -39,6 +39,7 @@ function LineNumberTooltip({
     targetNode: HTMLElement;
     lineNumber: number;
   }) => {
+    trackEvent("editor.gutter_mouse_over");
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
     // for the same line number. In that case, we shouldn't run
