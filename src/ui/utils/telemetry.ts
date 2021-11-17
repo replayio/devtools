@@ -99,9 +99,8 @@ export function trackTiming(event: string, properties: any = {}) {
   } else {
     duration = Date.now() - timings[event];
     delete timings[event];
+    sendTelemetryEvent(event, { duration, ...properties });
   }
-
-  sendTelemetryEvent(event, { duration, ...properties });
 }
 
 export const trackEvent = trackMixpanelEvent;

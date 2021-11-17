@@ -23,8 +23,8 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
   const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
   const isCollaborator =
-    isAuthenticated &&
-    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000");
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
+    isAuthenticated;
   const showShare = isOwner || isCollaborator;
 
   if (isDeployPreview()) {

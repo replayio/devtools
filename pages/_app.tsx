@@ -2,13 +2,14 @@ import "../src/test-prep";
 import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
-import type { AppProps } from "next/app";
+import type { AppContext, AppProps } from "next/app";
+import NextApp from "next/app";
 import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
-import { BlankProgressScreen, LoadingScreen } from "ui/components/shared/BlankScreen";
+import { LoadingScreen, LoadingScreenTemplate } from "ui/components/shared/BlankScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
@@ -49,7 +50,6 @@ import "devtools/client/debugger/src/components/SecondaryPanes/Frames/Group.css"
 import "devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Scopes.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/SecondaryPanes.css";
-import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 import "devtools/client/debugger/src/components/shared/Accordion.css";
 import "devtools/client/debugger/src/components/shared/Badge.css";
@@ -135,7 +135,7 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-const AppRouting = ({ Component, pageProps }: AppProps) => {
+const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
   const [store, setStore] = useState<Store | null>(null);
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
@@ -144,7 +144,11 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
   if (!store) {
     // We hide the tips here since we don't have the store ready yet, which
     // the tips need to work properly.
-    return <BlankProgressScreen progress={null} />;
+    return (
+      <LoadingScreenTemplate>
+        <div className="w-56 h-1"></div>
+      </LoadingScreenTemplate>
+    );
   }
 
   if (maintenanceMode) {
@@ -153,7 +157,7 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
 
   return (
     <Provider store={store}>
-      <tokenManager.Auth0Provider>
+      <tokenManager.Auth0Provider apiKey={apiKey}>
         <ApolloWrapper>
           <IntercomProvider appId={"k7f741xx"} autoBoot>
             <ConfirmProvider>
@@ -186,6 +190,26 @@ const AppRouting = ({ Component, pageProps }: AppProps) => {
       </tokenManager.Auth0Provider>
     </Provider>
   );
+};
+
+interface AuthProps {
+  apiKey?: string;
+}
+AppRouting.getInitialProps = (appContext: AppContext) => {
+  const props = NextApp.getInitialProps(appContext);
+  const authHeader = appContext.ctx.req?.headers.authorization;
+  const authProps: AuthProps = { apiKey: undefined };
+
+  if (authHeader) {
+    const [scheme, token] = authHeader.split(" ", 2);
+    if (!token || !/^Bearer$/i.test(scheme)) {
+      console.error("Format is Authorization: Bearer [token]");
+    } else {
+      authProps.apiKey = token;
+    }
+  }
+
+  return { ...props, ...authProps };
 };
 
 export default AppRouting;

@@ -1,16 +1,18 @@
 export const prefs: {
+  editor: boolean;
+  filterDebug: boolean;
   filterError: boolean;
-  filterWarn: boolean;
   filterInfo: boolean;
   filterLog: boolean;
-  filterDebug: boolean;
   filterNodeModules: boolean;
-  persistLogs: boolean;
+  filterWarn: boolean;
+  inputContext: boolean;
   inputHistoryCount: boolean;
-  editor: boolean;
+  outlineExpanded: boolean;
+  persistLogs: boolean;
+  sourcesCollapsed: boolean;
   timestampMessages: boolean;
   timestampsVisible: boolean;
-  inputContext: boolean;
 };
 
 export function getPrefsService(): {

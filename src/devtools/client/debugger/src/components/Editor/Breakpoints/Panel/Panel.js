@@ -50,15 +50,16 @@ function Panel({
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
   const isHot = !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
-  const showNag =
-    analysisPoints && !error && !isHot && shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
+  const showNag = analysisPoints && !error && !isHot;
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
     dismissNag(Nag.FIRST_GUTTER_CLICK);
 
     return () => {
-      dismissNag(Nag.FIRST_BREAKPOINT_REMOVED);
+      if (nags?.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
+        dismissNag(Nag.FIRST_BREAKPOINT_REMOVED);
+      }
       editor.editor.off("refresh", updateWidth);
     };
   }, []);

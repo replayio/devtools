@@ -3,7 +3,7 @@ import mixpanel, { Dict } from "mixpanel-browser";
 import { ViewMode } from "ui/state/app";
 import { getRecordingId, isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
-import { TelemetryUser } from "./telemetry";
+import { TelemetryUser, trackTiming } from "./telemetry";
 
 const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
@@ -73,9 +73,16 @@ export const endMixpanelSession = (reason: string) => () =>
 export const trackViewMode = (viewMode: ViewMode) =>
   trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
 
-export const startUploadWaitTracking = () => mixpanel.time_event("upload_recording");
-export const endUploadWaitTracking = (sessionId: SessionId) =>
+export const startUploadWaitTracking = () => {
+  // This one gets tracked in Honeycomb.
+  trackTiming("kpi-time-to-view-replay");
+  mixpanel.time_event("upload_recording");
+};
+export const endUploadWaitTracking = (sessionId: SessionId) => {
+  // This one gets tracked in Honeycomb.
+  trackTiming("kpi-time-to-view-replay");
   trackMixpanelEvent("upload_recording", { sessionId });
+};
 
 function setupSessionEndListener() {
   window.addEventListener("beforeunload", endMixpanelSession("unloaded"));

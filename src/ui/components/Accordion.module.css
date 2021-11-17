@@ -1,0 +1,46 @@
+.accordion {
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.accordionItemContainer:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-top: none;
+}
+
+.accordionItemContainer.open {
+  flex: 0 1 auto;
+  min-height: 20%;
+  overflow-y: auto;
+}
+
+.accordionItemContainer {
+  border-top-width: 1px;
+}
+
+.accordionItemContainer:not(.open) {
+  flex-shrink: 0;
+}
+
+.accordionItemContainer .header {
+  background: white;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1.25;
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.content:not(.open) {
+  height: 0;
+  overflow: hidden;
+}
+
+.content.open {
+  height: auto;
+}

@@ -73,7 +73,7 @@ class SecondaryPanes extends Component {
     const { shouldLogExceptions, logExceptions } = this.props;
 
     return {
-      header: "Breakpoints",
+      header: "Print Statements",
       className: "breakpoints-pane",
       component: (
         <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />

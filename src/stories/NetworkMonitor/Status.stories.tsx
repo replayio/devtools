@@ -9,8 +9,6 @@ export default {
   component: Status,
 } as Meta;
 
-const store = {};
-
 const Template: Story<ComponentProps<typeof Status>> = args => <Status {...args} />;
 
 export const Success = Template.bind({});

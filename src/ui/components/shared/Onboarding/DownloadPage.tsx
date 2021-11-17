@@ -30,6 +30,7 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
   };
   const handleWindows = () => {
     trackEvent("downloaded-windows");
+    startDownload("https://static.replay.io/downloads/windows-replay.zip");
   };
 
   return (
@@ -40,11 +41,9 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
       <PrimaryLgButton color="blue" onClick={handleLinux}>
         <DownloadButtonContent text="Linux" imgUrl="/images/icon-linux.svg" />
       </PrimaryLgButton>
-      <div title="Coming soon" onClick={handleWindows}>
-        <DisabledLgButton>
-          <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
-        </DisabledLgButton>
-      </div>
+      <PrimaryLgButton color="blue" onClick={handleWindows}>
+        <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
+      </PrimaryLgButton>
     </div>
   );
 }

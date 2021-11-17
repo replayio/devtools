@@ -6,7 +6,7 @@ import { AvatarImage } from "../Avatar";
 
 function SidebarFooter({ setModal }: PropsFromRedux) {
   const { user } = useAuth0();
-  const { name, picture } = user!;
+  const { name, picture } = user || { name: "", picture: "" };
 
   const handleSettingsClick = () => {
     setModal("settings");

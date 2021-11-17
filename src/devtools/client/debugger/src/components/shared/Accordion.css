@@ -13,6 +13,11 @@
   height: 100%;
 }
 
+.accordion > li {
+  display: flex;
+  flex-direction: column;
+}
+
 .accordion ._header {
   background-color: #fff;
   display: flex;
@@ -68,6 +73,17 @@
 .accordion ._content {
   font-size: var(--theme-body-font-size);
   overflow-y: auto;
-  height: 100%;
   background-color: white;
+}
+
+.accordion li {
+  flex: 1;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  min-height: fit-content;
+}
+
+.accordion li.expanded {
+  min-height: 20%;
 }

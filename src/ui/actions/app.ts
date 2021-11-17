@@ -103,7 +103,7 @@ export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 export type SetShowEditorAction = Action<"set_show_editor"> & {
   showEditor: boolean;
 };
-export type setLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
+export type SetLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
   index: number;
 };
 
@@ -139,7 +139,7 @@ export type AppActions =
   | SetShowVideoPanelAction
   | SetShowEditorAction
   | SetAwaitingSourcemapsAction
-  | setLoadingPageTipIndexAction;
+  | SetLoadingPageTipIndexAction;
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -248,9 +248,6 @@ export function setDisplayedLoadingProgress(
 }
 
 export function setLoadingFinished(finished: boolean): SetLoadingFinishedAction {
-  if (finished) {
-    trackTiming("kpi-time-to-view-replay");
-  }
   return { type: "set_loading_finished", finished };
 }
 
@@ -405,6 +402,6 @@ export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
   };
 }
 
-export function setLoadingPageTipIndex(index: number): setLoadingPageTipIndexAction {
+export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAction {
   return { type: "set_loading_page_tip_index", index };
 }

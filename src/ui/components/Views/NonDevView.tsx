@@ -46,7 +46,7 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
   };
 
   return (
-    <div className="vertical-panels">
+    <div className="vertical-panels pr-2">
       <div className="flex flex-row h-full overflow-hidden bg-chrome">
         <Toolbar />
         <SplitBox

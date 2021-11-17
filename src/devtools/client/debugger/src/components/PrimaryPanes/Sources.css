@@ -4,31 +4,10 @@
 
 .sources-panel {
   background-color: var(--theme-sidebar-background);
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
 }
 
 .sources-panel * {
   user-select: none;
-}
-
-.sources-pane {
-  display: flex;
-  flex-direction: column;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-div.sources-pane {
-  height: 100%;
-}
-
-.sources-pane.expanded {
-  flex: 1;
-  height: 100%;
 }
 
 .sources-list .img.blackBox {
@@ -36,16 +15,9 @@ div.sources-pane {
   background-color: var(--theme-icon-checked-color);
 }
 
-.sources-list {
-  flex: 1;
-  display: flex;
-  height: 100%;
-}
-
 .sources-list .managed-tree {
   flex: 1;
   display: flex;
-  height: 100%;
   overflow-y: auto;
 }
 
@@ -109,10 +81,6 @@ div.sources-pane {
   user-select: none;
   justify-content: center;
   align-items: center;
-}
-
-.sources-panel .outline {
-  height: 100%;
 }
 
 .source-outline-tabs {

@@ -17,7 +17,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import "ui/setup/dynamic/inspector";
 import { ConnectedRequestTable } from "../NetworkMonitor/RequestTable";
-import { features } from "ui/utils/prefs";
+import { UserSettings } from "ui/types";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -35,6 +35,7 @@ function PanelButtons({
   setSelectedPanel,
 }: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
+  const hasNetwork = hooks.useFeature("network");
 
   const showReact = userSettings.showReact;
   const showElements = userSettings.showElements;
@@ -77,7 +78,7 @@ function PanelButtons({
           <div className="label">React</div>
         </button>
       )}
-      {features.network && (
+      {hasNetwork && (
         <button
           className={classnames("console-panel-button", {
             expanded: selectedPanel === "network",
@@ -111,6 +112,22 @@ function InspectorPanel() {
   );
 }
 
+function getAllowedPanels(settings: UserSettings, hasNetwork: boolean) {
+  const allowedPanels = ["console"];
+
+  if (hasNetwork) {
+    allowedPanels.push("network");
+  }
+  if (settings.showReact) {
+    allowedPanels.push("react-components");
+  }
+  if (settings.showElements) {
+    allowedPanels.push("inspector");
+  }
+
+  return allowedPanels;
+}
+
 function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
@@ -118,8 +135,13 @@ function SecondaryToolbox({
   hasReactComponents,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
+  const hasNetwork = hooks.useFeature("network");
   const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
+
+  if (!getAllowedPanels(userSettings, hasNetwork).includes(selectedPanel)) {
+    setSelectedPanel("console");
+  }
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>

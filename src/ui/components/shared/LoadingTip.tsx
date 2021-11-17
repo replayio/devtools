@@ -32,7 +32,7 @@ const TIPS = [
 ];
 
 function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRedux) {
-  const { title, description, icon } = TIPS[loadingPageTipIndex];
+  const { title, description, icon } = TIPS[loadingPageTipIndex || 0];
   const key = useRef<any>();
 
   const resetAutoNext = () => clearTimeout(key.current);
@@ -76,12 +76,8 @@ function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRe
 }
 
 const connector = connect(
-  (state: UIState) => ({
-    loadingPageTipIndex: selectors.getLoadingPageTipIndex(state),
-  }),
-  {
-    setLoadingPageTipIndex: actions.setLoadingPageTipIndex,
-  }
+  (state: UIState) => ({ loadingPageTipIndex: selectors.getLoadingPageTipIndex(state) }),
+  { setLoadingPageTipIndex: actions.setLoadingPageTipIndex }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

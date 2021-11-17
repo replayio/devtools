@@ -41,7 +41,7 @@ function DevView({
   }, []);
 
   return (
-    <div className="vertical-panels">
+    <div className="vertical-panels pr-2">
       <div className="horizontal-panels bg-chrome">
         <Toolbar />
         <SplitBox

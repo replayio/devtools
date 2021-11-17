@@ -13,35 +13,38 @@ import {
   getContext,
   getSourcesCollapsed,
 } from "../../selectors";
-import { connect } from "../../utils/connect";
-import { prefs } from "../../utils/prefs";
 
 import Outline from "./Outline";
 import SourcesTree from "./SourcesTree";
-import Accordion from "../shared/Accordion";
+import { connect, ConnectedProps } from "react-redux";
+import { UIState } from "ui/state";
+import { prefs } from "devtools/client/webconsole/utils/prefs";
+import Accordion from "ui/components/Accordion";
+import QuickOpenButton from "./QuickOpenButton";
 
-class PrimaryPanes extends Component {
+class PrimaryPanes extends Component<PropsFromRedux> {
   renderOutline() {
     return {
-      header: "Outline",
       className: "outlines-pane border-t",
       component: <Outline />,
-      opened: prefs.outlineExpanded,
-      onToggle: opened => {
+      header: "Outline",
+      onToggle: (opened: boolean) => {
         prefs.outlineExpanded = opened;
       },
+      collapsed: !prefs.outlineExpanded,
     };
   }
 
   renderSources() {
     return {
-      header: "Sources",
       className: "sources-pane",
       component: <SourcesTree />,
-      opened: !prefs.sourcesCollapsed,
-      onToggle: opened => {
+      header: "Sources",
+      onToggle: () => {
         this.props.toggleSourcesCollapse();
       },
+      collapsed: prefs.sourcesCollapsed,
+      button: <QuickOpenButton />,
     };
   }
 
@@ -49,14 +52,11 @@ class PrimaryPanes extends Component {
     return [this.renderSources(), this.renderOutline()];
   }
   render() {
-    const { selectedTab } = this.props;
-    const activeIndex = selectedTab === "sources" ? 0 : 1;
-
     return <Accordion items={this.getItems()} />;
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: UIState) => {
   return {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
@@ -71,5 +71,7 @@ const connector = connect(mapStateToProps, {
   closeActiveSearch: actions.closeActiveSearch,
   toggleSourcesCollapse: actions.toggleSourcesCollapse,
 });
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(PrimaryPanes);

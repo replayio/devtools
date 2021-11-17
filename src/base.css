@@ -24,6 +24,7 @@ body {
   --faint-red: rgba(255, 0, 0, 0.5);
   --light-blue: #61cdff;
   --light-grey: #969696;
+  font-family: "Inter", sans-serif;
 }
 
 #__next,
@@ -32,10 +33,10 @@ body {
   color: var(--theme-body-color);
   display: flex;
   flex-direction: column;
-  font-family: "Inter", sans-serif;
   height: 100%;
   position: relative;
   width: 100%;
+  background: var(--chrome);
 }
 
 .inter {
@@ -46,4 +47,20 @@ img.avatar,
 .avatar img {
   border-radius: 50%;
   background-color: var(--light-grey);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 8px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: rgba(113, 113, 113, 0.5);
 }

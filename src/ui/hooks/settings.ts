@@ -6,6 +6,9 @@ import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { UserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
+import { features } from "ui/utils/prefs";
+import { prefs as prefsService } from "devtools-services";
+import { useEffect, useState } from "react";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
@@ -62,6 +65,22 @@ export function useGetUserSettings() {
 
   return { userSettings: convertUserSettings(data), error, loading };
 }
+
+export const useFeature = (prefKey: keyof typeof features) => {
+  const fullKey = `devtools.features.${prefKey}`;
+  const [pref, setPref] = useState(Boolean(features[prefKey]));
+
+  useEffect(() => {
+    const onUpdate = (prefs: any) => {
+      setPref(prefs.getBoolPref(fullKey));
+    };
+
+    prefsService.addObserver(`devtools.features.${prefKey}`, onUpdate, false);
+    return () => prefsService.removeObserver(fullKey, onUpdate, false);
+  }, [fullKey]);
+
+  return pref;
+};
 
 function convertUserSettings(data: any): UserSettings {
   if (!data?.viewer) {
