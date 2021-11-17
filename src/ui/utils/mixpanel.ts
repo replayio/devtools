@@ -80,7 +80,7 @@ export const startUploadWaitTracking = () => {
 };
 export const endUploadWaitTracking = (sessionId: SessionId) => {
   // This one gets tracked in Honeycomb.
-  trackTiming("kpi-time-to-view-replay");
+  trackTiming("kpi-time-to-view-replay", { sessionId });
   trackMixpanelEvent("upload_recording", { sessionId });
 };
 
