@@ -6,16 +6,20 @@ import {
   RequestResponseEvent,
   TimeStampedPoint,
 } from "@recordreplay/protocol";
+import { zipObject } from "lodash";
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
+import { UrlCopy } from "../shared/SharingModal/ReplayLink";
 
 export type RequestSummary = {
   domain: string;
+  documentType: string;
   end: number;
   id: string;
   method: string;
   name: string;
   point: TimeStampedPoint;
+  queryParams: [string, string][];
   triggerPoint: TimeStampedPoint | undefined;
   requestHeaders: Header[];
   responseHeaders: Header[];
@@ -49,6 +53,16 @@ const name = (url: string): string =>
     .split("/")
     .filter(f => f.length)
     .pop() || "";
+const queryParams = (url: string): [string, string][] => {
+  //@ts-ignore
+  return Array.from(new URL(url).searchParams.entries() as [string, string][]);
+};
+const documentType = (headers: Header[]): string => {
+  const contentType =
+    headers.find(h => h.name.toLowerCase() === "content-type")?.value || "unknown";
+  // chop off any charset or other extra data
+  return contentType.match(/^(.*)[,;]/)?.[0] || contentType;
+};
 
 export const partialRequestsToCompleteSummaries = (
   requests: RequestInfo[],
@@ -66,6 +80,7 @@ export const partialRequestsToCompleteSummaries = (
       const response = r.events.response;
       return {
         domain: host(request.event.requestUrl),
+        documentType: documentType(response.event.responseHeaders),
         end: response.time,
         id: r.id,
         requestHeaders: request.event.requestHeaders,
@@ -76,10 +91,11 @@ export const partialRequestsToCompleteSummaries = (
           point: r.point,
           time: r.time,
         },
-        triggerPoint: r.triggerPoint,
+        queryParams: queryParams(request.event.requestUrl),
         status: response.event.responseStatus,
         start: request.time,
         time: response.time - request.time,
+        triggerPoint: r.triggerPoint,
         url: request.event.requestUrl,
       };
     });

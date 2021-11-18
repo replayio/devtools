@@ -6,10 +6,15 @@
   height: 100%;
 }
 
-.headerTable {
+.headerTable,
+.request {
   display: flex;
   flex: 1 1 0;
   overflow: scroll;
+}
+
+.request {
+  flex: 0 1 auto;
 }
 
 h2.title {
@@ -18,11 +23,6 @@ h2.title {
 
 .row {
   white-space: nowrap;
-}
-
-.request {
-  flex: 0 0 auto;
-  display: flex;
 }
 
 .method {

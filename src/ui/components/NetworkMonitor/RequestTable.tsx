@@ -1,12 +1,11 @@
 import { useGlobalFilter, useBlockLayout, useResizeColumns, useTable } from "react-table";
 import React, { useMemo } from "react";
-import Status from "./Status";
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 import { partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 import { RequestEventInfo, RequestInfo } from "@recordreplay/protocol";
 import MaterialIcon from "../shared/MaterialIcon";
-import { find } from "lodash";
+import find from "lodash/find";
 
 const RequestTable = ({
   currentTime,
@@ -24,8 +23,11 @@ const RequestTable = ({
   const columns = useMemo(
     () => [
       {
+        Header: "Name",
+        accessor: "name" as const,
+      },
+      {
         Header: "Status",
-        Cell: Status,
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
         className: "m-auto",
@@ -42,10 +44,6 @@ const RequestTable = ({
       {
         Header: "Domain",
         accessor: "domain" as const,
-      },
-      {
-        Header: "Name",
-        accessor: "name" as const,
       },
     ],
     []
@@ -70,15 +68,15 @@ const RequestTable = ({
 
   return (
     <div className="bg-white w-full overflow-y-scroll">
-      <div className={classNames("", styles.request)} {...getTableProps()}>
-        <div className="sticky top-0 border-b">
+      <div className={classNames(styles.request)} {...getTableProps()}>
+        <div className="sticky z-10 top-0 border-b">
           {headerGroups.map(headerGroup => (
-            <div className="flex" {...headerGroup.getHeaderGroupProps()}>
+            <div
+              className="flex bg-white font-normal items-center"
+              {...headerGroup.getHeaderGroupProps()}
+            >
               {headerGroup.headers.map(column => (
-                <div
-                  className={classNames("bg-white font-normal p-1", styles[column.id])}
-                  {...column.getHeaderProps()}
-                >
+                <div className={classNames("p-1", styles[column.id])} {...column.getHeaderProps()}>
                   {column.render("Header")}
                   <div
                     //@ts-ignore
@@ -113,15 +111,34 @@ const RequestTable = ({
                   "text-lightGrey": currentTime <= (row.original.point?.time || 0),
                   [styles.current]: selectedRequestId === row.original.id,
                 })}
-                onClick={() => {
-                  onClick(row.original);
-                  if (!row.original.point) {
-                    return;
-                  }
-                  seek(row.original.point.point, row.original.point.time, false);
-                }}
+                onClick={() => onClick(row.original)}
               >
                 <div {...row.getRowProps()}>
+                  {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
+                    <div
+                      className={classNames(styles.seekBadge)}
+                      onClick={() => {
+                        if (!row.original.triggerPoint) {
+                          return;
+                        }
+                        seek(
+                          row.original.triggerPoint.point,
+                          row.original.triggerPoint.time,
+                          false
+                        );
+                      }}
+                    >
+                      <div
+                        className={classNames("img", {
+                          [styles.fastForward]: row.original.triggerPoint.time > currentTime,
+                          [styles.rewind]: row.original.triggerPoint.time < currentTime,
+                        })}
+                      />
+                      <span className={classNames("px-2 text-white", styles.verbose)}>
+                        {row.original.triggerPoint.time > currentTime ? "Fast-forward" : "Rewind"}
+                      </span>
+                    </div>
+                  )}
                   {row.cells.map(cell => {
                     return (
                       <div
