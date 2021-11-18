@@ -4,7 +4,7 @@
 
 //
 
-import React, { Component } from "react";
+import React, { Component, PureComponent } from "react";
 import { showMenu } from "devtools-contextmenu";
 import { connect } from "../../utils/connect";
 import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
@@ -55,18 +55,54 @@ function isVisible(element, parent) {
   return parentTop < elTop && parentBottom > elBottom;
 }
 
-export class Outline extends Component {
+const OutlineFunction = React.memo(function OutlineFunction({
+  isFocused,
+  location,
+  name,
+  onSelect,
+  parameterNames,
+}) {
+  return (
+    <li
+      key={`${name}:${location.start.line}:${location.start.column}`}
+      className={classnames("outline-list__element", { focused: isFocused })}
+      // ref={el => {
+      //   if (isFocused) {
+      //     this.focusedElRef = el;
+      //   }
+      // }}
+      onClick={() => {
+        trackEvent("outline.select");
+        this.selectItem(func);
+      }}
+    >
+      <span className="outline-list__element-icon">λ</span>
+      <Redacted className="inline-block">
+        <PreviewFunction func={{ name, parameterNames }} />
+      </Redacted>
+    </li>
+  );
+});
+
+export class Outline extends PureComponent {
   focusedElRef;
   state = { filter: "", focusedItem: null };
   focusedElRef = null;
 
   componentDidUpdate(prevProps, prevState) {
+    console.group("update");
+    for (const [propName, prop] of Object.entries(prevProps)) {
+      if (prevProps[propName] !== this.props[propName]) {
+        console.info(propName, prevProps[propName], "=>", this.props[propName]);
+      }
+    }
+    console.groupEnd("update");
     if (
       this.props.cursorPosition &&
       this.props.symbols &&
       this.props.cursorPosition !== prevProps.cursorPosition
     ) {
-      this.setFocus(this.props.cursorPosition);
+      // this.setFocus(this.props.cursorPosition);
     }
 
     //confirm we aren't rescrolling back up the outline panel unnecessarily
@@ -93,6 +129,7 @@ export class Outline extends Component {
     if (!selectedSource || !selectedItem) {
       return;
     }
+    trackEvent("outline.select");
 
     selectLocation(cx, {
       sourceId: selectedSource.id,
@@ -129,24 +166,12 @@ export class Outline extends Component {
     const isFocused = focusedItem === func;
 
     return (
-      <li
-        key={`${name}:${location.start.line}:${location.start.column}`}
-        className={classnames("outline-list__element", { focused: isFocused })}
-        ref={el => {
-          if (isFocused) {
-            this.focusedElRef = el;
-          }
-        }}
-        onClick={() => {
-          trackEvent("outline.select");
-          this.selectItem(func);
-        }}
-      >
-        <span className="outline-list__element-icon">λ</span>
-        <Redacted className="inline-block">
-          <PreviewFunction func={{ name, parameterNames }} />
-        </Redacted>
-      </li>
+      <OutlineFunction
+        isFocused={isFocused}
+        location={location}
+        name={name}
+        parameterNames={parameterNames}
+      />
     );
   }
 
@@ -216,6 +241,7 @@ export class Outline extends Component {
   }
 
   render() {
+    console.info(this.props);
     const { symbols, selectedSource } = this.props;
     const { filter } = this.state;
 
@@ -253,13 +279,6 @@ const mapStateToProps = state => {
     symbols,
     selectedSource: selectedSource,
     cursorPosition: getCursorPosition(state),
-    getFunctionText: line => {
-      if (selectedSource) {
-        return findFunctionText(line, selectedSource, symbols);
-      }
-
-      return null;
-    },
   };
 };
 
