@@ -17,6 +17,9 @@ export default function Connection() {
       return;
     }
 
+    // FIXME [ryanjduffy]: This results in an additional auth roundtrip with the
+    // id provider but works around auth0 no handling idp-initiated
+    // authentication.
     auth0.loginWithRedirect({ connection });
   }, []);
 
