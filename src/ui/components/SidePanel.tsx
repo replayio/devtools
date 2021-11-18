@@ -6,6 +6,7 @@ import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
+const ProjectSearch = require("devtools/client/debugger/src/components/ProjectSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 
@@ -22,6 +23,8 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
     sidepanel = <SecondaryPanes />;
   } else if (selectedPrimaryPanel === "comments") {
     sidepanel = <Transcript />;
+  } else if (selectedPrimaryPanel === "search") {
+    sidepanel = <ProjectSearch />;
   } else if (selectedPrimaryPanel === "events") {
     sidepanel = (
       <Accordion
