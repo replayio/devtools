@@ -68,12 +68,49 @@ const OutlineFunction = React.memo(function OutlineFunction({ isFocused, func, o
     <li
       className={classnames("outline-list__element", { focused: isFocused })}
       ref={itemRef}
-      onClick={() => onSelect(func)}
+      onClick={onSelect ? () => onSelect(func) : undefined}
     >
       <span className="outline-list__element-icon">λ</span>
       <Redacted className="inline-block">
         <PreviewFunction func={func} />
       </Redacted>
+    </li>
+  );
+});
+
+const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
+  classFunc,
+  classInfo,
+  isFocused,
+  onSelect,
+  children,
+}) {
+  const itemRef = useRef();
+  useEffect(() => {
+    if (isFocused && itemRef.current) {
+      console.info("focus", itemRef.current);
+      itemRef.current.scrollIntoView({ block: "center" });
+    }
+  }, [isFocused]);
+
+  const item = classFunc || classInfo;
+
+  return (
+    <li className="outline-list__class" key={item.name}>
+      <h2
+        className={classnames("", { focused: isFocused })}
+        onClick={() => onSelect(item)}
+        ref={itemRef}
+      >
+        {classFunc ? (
+          <OutlineFunction func={classFunc} isFocused={false} />
+        ) : (
+          <div>
+            <span className="keyword">class</span> {item.name}
+          </div>
+        )}
+      </h2>
+      <ul className="outline-list__class-list">{children}</ul>
     </li>
   );
 });
@@ -179,17 +216,9 @@ export class Outline extends PureComponent {
     const isFocused = focusedItem === item;
 
     return (
-      <li className="outline-list__class" key={klass}>
-        <h2
-          className={classnames("", { focused: isFocused })}
-          onClick={() => this.selectItem(item)}
-        >
-          {classFunc ? this.renderFunction(classFunc) : this.renderClassHeader(klass)}
-        </h2>
-        <ul className="outline-list__class-list">
-          {classFunctions.map(func => this.renderFunction(func))}
-        </ul>
-      </li>
+      <OutlineClassFunctions classFunc={classFunc} classInfo={classInfo} isFocused={isFocused}>
+        {classFunctions.map(func => this.renderFunction(func))}
+      </OutlineClassFunctions>
     );
   }
 
