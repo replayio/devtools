@@ -54,6 +54,53 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   maybeUpdateReplaySessions(state);
 }
 
+async function getReplaySessions() {
+  return await asyncStore.replaySessions;
+}
+
+export enum LocalNag {
+  // Yank the user's select left sidebar panel to show the explorer (sources + outline)
+  // on the first time they switch to the DevTools view, so they don't miss it.
+  YANK_TO_SOURCE = "yank_to_source",
+}
+
+export async function isLocalNagDismissed(nag: LocalNag) {
+  const recordingId = getRecordingId();
+
+  // Bail if we're not in a recording.
+  if (!recordingId) {
+    return;
+  }
+
+  const replaySessions = await getReplaySessions();
+  const replaySession = replaySessions[recordingId];
+
+  return replaySession.localNags.includes(nag);
+}
+
+// This allows us to insert a local nag on a per session (replay) basis.
+export async function dismissLocalNag(nag: LocalNag) {
+  const recordingId = getRecordingId();
+
+  // Bail if we're not in a recording.
+  if (!recordingId) {
+    return;
+  }
+
+  const previousReplaySessions = await getReplaySessions();
+  const previousReplaySession = previousReplaySessions[recordingId];
+
+  const updatedReplaySession = {
+    ...previousReplaySession,
+    localNags: [
+      ...previousReplaySession.localNags,
+      ...(!previousReplaySession.localNags.includes(nag) ? [nag] : []),
+    ],
+  };
+
+  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: updatedReplaySession };
+}
+
 async function maybeUpdateReplaySessions(state: UIState) {
   const recordingId = getRecordingId();
 
@@ -62,13 +109,16 @@ async function maybeUpdateReplaySessions(state: UIState) {
     return;
   }
 
-  const previousReplaySessions = await asyncStore.replaySessions;
+  const previousReplaySessions = await getReplaySessions();
+  const previousReplaySession = previousReplaySessions[recordingId];
+
   const currentReplaySession = {
     viewMode: getViewMode(state),
     showEditor: getShowEditor(state),
     showVideoPanel: getShowVideoPanel(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
+    localNags: [...(previousReplaySession?.localNags || [])],
   };
 
-  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId!]: currentReplaySession };
+  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
 }
