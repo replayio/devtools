@@ -12,6 +12,7 @@ import {
   isNodeExpanded,
 } from "../selectors/markup";
 import { UIState } from "ui/state";
+import Highlighter from "highlighter/highlighter";
 const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
 
 export type ResetAction = Action<"RESET">;
@@ -179,6 +180,7 @@ export function selectNode(nodeId: string, reason?: string): UIThunkAction {
   return ({ toolbox }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
+      Highlighter.highlight(nodeFront, 1000);
       toolbox.selection.setNodeFront(nodeFront, { reason });
     }
   };
