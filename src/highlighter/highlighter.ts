@@ -11,11 +11,18 @@ import { BoxModelHighlighter } from "devtools/server/actors/highlighters/box-mod
 class Highlighter {
   private boxModelHighlighter: BoxModelHighlighter | undefined;
   currentNode: NodeFront | NodeBoundsFront | null = null;
+  private timeout: NodeJS.Timeout | undefined;
 
-  async highlight(node: NodeFront | NodeBoundsFront) {
+  async highlight(node: NodeFront | NodeBoundsFront, duration?: number) {
     if (!node) {
       return;
     }
+
+    this.clearTimeout();
+    if (duration) {
+      this.timeout = setTimeout(() => this.unhighlight(), duration);
+    }
+
     this.currentNode = node;
     if ("getBoxModel" in node) {
       await node.getBoxModel();
@@ -31,9 +38,17 @@ class Highlighter {
   }
 
   unhighlight() {
+    this.clearTimeout();
     this.maybeDestroyBrokenHighlighter();
     this.boxModelHighlighter?.hide();
     this.currentNode = null;
+  }
+
+  private clearTimeout() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = undefined;
+    }
   }
 
   private maybeDestroyBrokenHighlighter() {
