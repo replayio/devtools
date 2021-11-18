@@ -36,4 +36,14 @@ describe("sliceCodePoints", () => {
     // as opposed to code units...
     expect(substring).not.toEqual(unicodeStr.slice(4, 5));
   });
+
+  it("works with no `to` index", () => {
+    const substring = sliceCodePoints(unicodeStr, 4);
+    expect(substring).toMatchInlineSnapshot(`"👻"`);
+  });
+
+  it("works with a negative index", () => {
+    const substring = sliceCodePoints(unicodeStr, -1);
+    expect(substring).toMatchInlineSnapshot(`"👻"`);
+  });
 });
