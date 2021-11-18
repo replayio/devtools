@@ -31,6 +31,35 @@ import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
 import { groupBy } from "lodash";
+import { isThirdParty } from "../utils/source";
+
+const formatMatches = (matches, sourcesById) => {
+  const resultsBySource = groupBy(matches, res => res.location.sourceId);
+  return Object.entries(resultsBySource).map(([sourceId, matches]) => {
+    return {
+      type: "RESULT",
+      sourceId,
+      filepath: sourcesById[sourceId]?.url,
+      matches: matches.map(match => {
+        // We have to do this array dance to navigate the string in unicode "code points"
+        // because `colunm` is calculated using "code points" as opposed to JS strings
+        // which use "code units". It makes a difference in string with fun unicode characters.
+        const matchStr = [...match.context]
+          .slice(match.contextStart.column, match.contextEnd.column)
+          .join("");
+        return {
+          type: "MATCH",
+          column: match.location.column,
+          line: match.location.line,
+          sourceId,
+          match: matchStr,
+          matchIndex: match.context.indexOf(matchStr),
+          value: match.context,
+        };
+      }),
+    };
+  });
+};
 
 function getFilePath(item, index) {
   return item.type === "RESULT"
@@ -79,50 +108,30 @@ export class ProjectSearch extends Component {
 
   async doSearch(query) {
     trackEvent("project_search.search");
-    this.setState({ results: { status: "LOADING", query, matches: [] } });
 
-    const safeUpdateResults = nextResults => {
-      if (query === this.state.results.query) {
-        console.info("do update", nextResults);
-        this.setState({ results: { ...this.state.results, ...nextResults } });
-      } else {
-        console.info("skip update", nextResults);
-      }
+    const updateResults = getNextResults => {
+      this.setState(prevState => ({
+        results: {
+          ...prevState.results,
+          ...getNextResults(prevState.results),
+        },
+      }));
     };
 
+    updateResults(() => ({ status: "LOADING", query, matches: [] }));
+
     await ThreadFront.searchSources({ query }, matches => {
-      console.info("matches", query, matches);
-      const bestResults = matches.filter(
-        match => !ThreadFront.isMinifiedSource(match.location.sourceId)
-      );
-      const sources = this.props.sources;
-      const resultsBySource = groupBy(bestResults, res => res.location.sourceId);
-      const newMatches = Object.entries(resultsBySource).map(([sourceId, matches]) => {
-        return {
-          type: "RESULT",
-          sourceId,
-          filepath: sources.values[sourceId]?.url,
-          matches: matches.map(match => {
-            const matchStr = [...match.context]
-              .slice(match.contextStart.column, match.contextEnd.column)
-              .join("");
-            return {
-              type: "MATCH",
-              column: match.location.column,
-              line: match.location.line,
-              sourceId,
-              match: matchStr,
-              matchIndex: match.context.indexOf(matchStr),
-              value: match.context,
-            };
-          }),
-        };
+      const { sourcesById } = this.props;
+      const bestMatches = matches.filter(match => {
+        const { sourceId } = match.location;
+        const source = sourcesById[sourceId];
+        return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
       });
-      safeUpdateResults({ matches: [...this.state.results.matches, ...newMatches] });
+      const newMatches = formatMatches(bestMatches, sourcesById);
+      updateResults(prevResults => ({ matches: [...prevResults.matches, ...newMatches] }));
     });
 
-    console.info("DONE");
-    safeUpdateResults({ status: "DONE" });
+    updateResults(() => ({ status: "DONE" }));
   }
 
   toggleProjectTextSearch = e => {
@@ -170,7 +179,7 @@ export class ProjectSearch extends Component {
     }
     this.setState({ focusedItem: null });
     const query = sanitizeQuery(this.state.inputValue);
-    if (query && query.length >= 3) {
+    if (query && query !== this.state.query && query.length >= 3) {
       this.doSearch(query);
     }
   };
@@ -306,7 +315,6 @@ export class ProjectSearch extends Component {
     if (!this.isProjectSearchEnabled()) {
       return null;
     }
-    console.info(this.state.results);
 
     return (
       <div className="search-container">
@@ -328,7 +336,7 @@ const mapStateToProps = state => ({
   activeSearch: getActiveSearch(state),
   results: getTextSearchResults(state),
   query: getTextSearchQuery(state),
-  sources: getSources(state),
+  sourcesById: getSources(state).values,
   status: getTextSearchStatus(state),
 });
 
