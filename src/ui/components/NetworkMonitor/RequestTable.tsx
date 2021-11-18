@@ -1,4 +1,4 @@
-import { useTable } from "react-table";
+import { useBlockLayout, useResizeColumns, useTable } from "react-table";
 import React, { useMemo } from "react";
 import keyBy from "lodash/keyBy";
 import {
@@ -101,11 +101,15 @@ export const RequestTable = ({ currentTime, events, seek, requests }: RequestTab
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
         className: "m-auto",
+        width: 50,
+        maxWidth: 100,
       },
       {
         Header: "Method",
         accessor: "method" as const,
         className: "m-auto",
+        width: 50,
+        maxWidth: 100,
       },
       {
         Header: "Domain",
@@ -119,14 +123,26 @@ export const RequestTable = ({ currentTime, events, seek, requests }: RequestTab
     []
   );
   const data = useMemo(() => partialRequestsToCompleteSummaries(requests, events), [requests]);
-  const tableInstance = useTable<RequestSummary>({ columns, data });
+  const defaultColumn = React.useMemo(
+    () => ({
+      minWidth: 50,
+      width: 200,
+      maxWidth: 1000,
+    }),
+    []
+  );
+  const tableInstance = useTable<RequestSummary>(
+    { columns, data, defaultColumn },
+    useBlockLayout,
+    useResizeColumns
+  );
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
   const currentTimeIndex = findLastIndex(data, r => currentTime > (r.point?.time || 0));
 
   return (
     <div className="bg-white overflow-y-scroll">
       <div className={classNames("w-full", styles.request)} {...getTableProps()}>
-        <div className="sticky top-0">
+        <div className="sticky top-0 border-b">
           {headerGroups.map(headerGroup => (
             <div className="flex" {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
@@ -135,6 +151,14 @@ export const RequestTable = ({ currentTime, events, seek, requests }: RequestTab
                   {...column.getHeaderProps()}
                 >
                   {column.render("Header")}
+                  <div
+                    //@ts-ignore
+                    {...column.getResizerProps()}
+                    className={classNames("select-none", styles.resizer, {
+                      //@ts-ignore typescript freaking *hates* react-table
+                      isResizing: column.isResizing,
+                    })}
+                  />
                 </div>
               ))}
             </div>
@@ -145,7 +169,7 @@ export const RequestTable = ({ currentTime, events, seek, requests }: RequestTab
             prepareRow(row);
             return (
               <div
-                className={classNames("flex items-stretch", styles.row, {
+                className={classNames(styles.row, {
                   "text-lightGrey": currentTime <= (row.original.point?.time || 0),
                   [styles.last]: currentTimeIndex === i,
                 })}
@@ -155,21 +179,23 @@ export const RequestTable = ({ currentTime, events, seek, requests }: RequestTab
                   }
                   seek(row.original.point.point, row.original.point.time, false);
                 }}
-                {...row.getRowProps()}
               >
-                {row.cells.map(cell => {
-                  return (
-                    <div
-                      className={classNames(
-                        "whitespace-nowrap p-1 flex items-center overflow-hidden",
-                        styles[cell.column.id]
-                      )}
-                      {...cell.getCellProps()}
-                    >
-                      <div className={(cell.column as any).className}>{cell.render("Cell")}</div>
-                    </div>
-                  );
-                })}
+                <div {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      <div
+                        className={classNames(
+                          "whitespace-nowrap p-1 items-center overflow-hidden",
+                          styles[cell.column.id]
+                        )}
+                        {...cell.getCellProps()}
+                        style={{ ...cell.getCellProps().style, display: "flex" }}
+                      >
+                        <div className={(cell.column as any).className}>{cell.render("Cell")}</div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}

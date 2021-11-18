@@ -10,18 +10,17 @@ table.requests {
   border-bottom: 2px solid var(--secondary-accent);
 }
 
-.status {
-  flex: 0 0 50px;
+.resizer {
+  display: inline-block;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(-50%);
+  width: 8px;
 }
 
-.method {
-  flex: 0 0 55px;
-}
-
-.domain {
-  flex: 0 0 25%;
-}
-
-.name {
-  flex: auto;
+.resizer:hover,
+.resizer:active {
+  background: var(--primary-accent);
 }
