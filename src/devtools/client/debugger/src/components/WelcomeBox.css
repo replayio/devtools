@@ -37,9 +37,8 @@
 
 .welcomebox__searchSources,
 .welcomebox__searchProject,
-.welcomebox__allShortcuts
-{
-  background-color: #ececec;
+.welcomebox__allShortcuts {
+  background-color: var(--chrome);
   margin: 15px 0;
   border-radius: 8px;
   display: block;
@@ -49,7 +48,7 @@
 .welcomebox__searchSources:hover,
 .welcomebox__searchProject:hover,
 .welcomebox__allShortcuts:hover {
-  background-color: #ddd;
+  background-color: var(--theme-tab-background);
 }
 
 .shortcutKey {
