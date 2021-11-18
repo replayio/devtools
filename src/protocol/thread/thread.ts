@@ -133,7 +133,7 @@ class _ThreadFront {
   // Map sourceId to info about the source.
   sources = new Map<string, Source>();
 
-  private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> | undefined;
+  private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
 
   // Resolve hooks for promises waiting on a source ID to be known.
   sourceWaiters = new ArrayMap<string, () => void>();
@@ -198,6 +198,17 @@ class _ThreadFront {
   on!: (name: string, handler: (value?: any) => void) => void;
   off!: (name: string, handler: (value?: any) => void) => void;
   emit!: (name: string, value?: any) => void;
+
+  constructor() {
+    client.Debugger.addSearchSourceContentsMatchesListener(
+      ({ searchId, matches }: { searchId: string; matches: SearchSourceContentsMatch[] }) => {
+        const searchWaiter = this.searchWaiters?.get(searchId);
+        if (searchWaiter) {
+          searchWaiter(matches);
+        }
+      }
+    );
+  }
 
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
@@ -345,18 +356,6 @@ class _ThreadFront {
     { query }: { query: string },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ) {
-    if (!this.searchWaiters) {
-      this.searchWaiters = new Map();
-      client.Debugger.addSearchSourceContentsMatchesListener(
-        ({ searchId, matches }: { searchId: string; matches: SearchSourceContentsMatch[] }) => {
-          const searchWaiter = this.searchWaiters?.get(searchId);
-          if (searchWaiter) {
-            searchWaiter(matches);
-          }
-        }
-      );
-    }
-
     const sessionId = await this.waitForSession();
     const searchId = uniqueId("search-");
     this.searchWaiters.set(searchId, onMatches);
