@@ -72,6 +72,7 @@ Basic.args = {
     method: "GET",
     name: "613b96978e0f48b736fbb935_SpaceGrotesk-Bold.woff2",
     point: { point: "1947111322047004550402308086694092", time: 984 },
+    triggerPoint: undefined,
     status: 200,
     start: 984,
     time: 166,
