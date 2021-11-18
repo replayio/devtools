@@ -7,6 +7,7 @@ function queryParams() {
 }
 
 export const isTeamMemberInvite = () => queryParams().get("teaminvite");
+export const isTeamLeaderInvite = () => queryParams().get("replayinvite");
 export const hasTeamInvitationCode = () => queryParams().get("invitationcode");
 export const isTeamReferral = () => isTeamMemberInvite() || hasTeamInvitationCode();
 

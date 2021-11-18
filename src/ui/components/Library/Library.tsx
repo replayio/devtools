@@ -20,6 +20,7 @@ import {
   downloadReplay,
   firstReplay,
   hasTeamInvitationCode,
+  isTeamLeaderInvite,
   singleInvitation,
 } from "ui/utils/onboarding";
 
@@ -148,7 +149,10 @@ function Library({
     }
   }, []);
   useEffect(function handleOnboardingModals() {
-    if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
+    if (isTeamLeaderInvite()) {
+      trackEvent("onboarding.replay_invite");
+      setModal("team-leader-onboarding");
+    } else if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
       trackEvent("onboarding.team_invite");
       setModal("single-invite");
     } else if (downloadReplay(nags, dismissNag)) {
