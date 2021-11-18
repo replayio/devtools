@@ -78,6 +78,11 @@ export const requestProps = (
 ): { events: RequestEventInfo[]; info: RequestInfo } => {
   return {
     events: eventsFor(id, url, status, method),
-    info: { id, time: Number(id), point: { point: "1", time: Number(id) } },
+    info: {
+      id,
+      time: Number(id),
+      point: "1",
+      triggerPoint: undefined,
+    },
   };
 };

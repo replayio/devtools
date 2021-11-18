@@ -7,7 +7,7 @@ import {
   TimeStampedPoint,
 } from "@recordreplay/protocol";
 import keyBy from "lodash/keyBy";
-import sortBy from "lodash/sortBy";
+import { compareNumericStrings } from "protocol/utils";
 
 export type RequestSummary = {
   domain: string;
@@ -15,7 +15,8 @@ export type RequestSummary = {
   id: string;
   method: string;
   name: string;
-  point: TimeStampedPoint | undefined;
+  point: TimeStampedPoint;
+  triggerPoint: TimeStampedPoint | undefined;
   requestHeaders: Header[];
   responseHeaders: Header[];
   start: number;
@@ -71,15 +72,17 @@ export const partialRequestsToCompleteSummaries = (
         responseHeaders: response.event.responseHeaders,
         method: request.event.requestMethod,
         name: name(request.event.requestUrl),
-        point: r.point,
+        point: {
+          point: r.point,
+          time: r.time,
+        },
+        triggerPoint: r.triggerPoint,
         status: response.event.responseStatus,
         start: request.time,
         time: response.time - request.time,
         url: request.event.requestUrl,
       };
     });
-  return sortBy(
-    summaries.filter(s => !!s.point),
-    s => s.point?.time
-  );
+  summaries.sort((a, b) => compareNumericStrings(a.point.point, b.point.point));
+  return summaries;
 };
