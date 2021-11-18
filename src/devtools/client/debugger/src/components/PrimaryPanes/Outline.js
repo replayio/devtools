@@ -4,7 +4,7 @@
 
 //
 
-import React, { Component, PureComponent } from "react";
+import React, { Component, PureComponent, useEffect, useRef } from "react";
 import { showMenu } from "devtools-contextmenu";
 import { connect } from "../../utils/connect";
 import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
@@ -29,6 +29,8 @@ import OutlineFilter from "./OutlineFilter";
 import PreviewFunction from "../shared/PreviewFunction";
 import uniq from "lodash/uniq";
 
+const getFunctionKey = ({ name, location }) =>
+  `${name}:${location.start.line}:${location.start.column}`;
 /**
  * Check whether the name argument matches the fuzzy filter argument
  */
@@ -55,54 +57,38 @@ function isVisible(element, parent) {
   return parentTop < elTop && parentBottom > elBottom;
 }
 
-const OutlineFunction = React.memo(function OutlineFunction({
-  isFocused,
-  location,
-  name,
-  onSelect,
-  parameterNames,
-}) {
+const OutlineFunction = React.memo(function OutlineFunction({ isFocused, func, onSelect }) {
+  const itemRef = useRef();
+  useEffect(() => {
+    if (isFocused && itemRef.current) {
+      itemRef.current.scrollIntoView({ block: "center" });
+    }
+  }, [isFocused]);
   return (
     <li
-      key={`${name}:${location.start.line}:${location.start.column}`}
       className={classnames("outline-list__element", { focused: isFocused })}
-      // ref={el => {
-      //   if (isFocused) {
-      //     this.focusedElRef = el;
-      //   }
-      // }}
-      onClick={() => {
-        trackEvent("outline.select");
-        this.selectItem(func);
-      }}
+      ref={itemRef}
+      onClick={() => onSelect(func)}
     >
       <span className="outline-list__element-icon">λ</span>
       <Redacted className="inline-block">
-        <PreviewFunction func={{ name, parameterNames }} />
+        <PreviewFunction func={func} />
       </Redacted>
     </li>
   );
 });
-
 export class Outline extends PureComponent {
-  focusedElRef;
   state = { filter: "", focusedItem: null };
+  scrollContainerRef = null;
   focusedElRef = null;
 
   componentDidUpdate(prevProps, prevState) {
-    console.group("update");
-    for (const [propName, prop] of Object.entries(prevProps)) {
-      if (prevProps[propName] !== this.props[propName]) {
-        console.info(propName, prevProps[propName], "=>", this.props[propName]);
-      }
-    }
-    console.groupEnd("update");
     if (
       this.props.cursorPosition &&
       this.props.symbols &&
       this.props.cursorPosition !== prevProps.cursorPosition
     ) {
-      // this.setFocus(this.props.cursorPosition);
+      this.setFocus(this.props.cursorPosition);
     }
 
     //confirm we aren't rescrolling back up the outline panel unnecessarily
@@ -124,12 +110,11 @@ export class Outline extends PureComponent {
     this.setState({ focusedItem: closestItem });
   }
 
-  selectItem(selectedItem) {
+  selectItem = selectedItem => {
     const { cx, selectedSource, selectLocation } = this.props;
     if (!selectedSource || !selectedItem) {
       return;
     }
-    trackEvent("outline.select");
 
     selectLocation(cx, {
       sourceId: selectedSource.id,
@@ -138,7 +123,7 @@ export class Outline extends PureComponent {
     });
 
     this.setState({ focusedItem: selectedItem });
-  }
+  };
 
   updateFilter = filter => {
     this.setState({ filter: filter.trim() });
@@ -162,16 +147,11 @@ export class Outline extends PureComponent {
 
   renderFunction(func) {
     const { focusedItem } = this.state;
-    const { name, location, parameterNames } = func;
     const isFocused = focusedItem === func;
+    const key = getFunctionKey(func);
 
     return (
-      <OutlineFunction
-        isFocused={isFocused}
-        location={location}
-        name={name}
-        parameterNames={parameterNames}
-      />
+      <OutlineFunction key={key} isFocused={isFocused} func={func} onSelect={this.selectItem} />
     );
   }
 
@@ -199,15 +179,7 @@ export class Outline extends PureComponent {
     const isFocused = focusedItem === item;
 
     return (
-      <li
-        className="outline-list__class"
-        ref={el => {
-          if (isFocused) {
-            this.focusedElRef = el;
-          }
-        }}
-        key={klass}
-      >
+      <li className="outline-list__class" key={klass}>
         <h2
           className={classnames("", { focused: isFocused })}
           onClick={() => this.selectItem(item)}
@@ -241,7 +213,6 @@ export class Outline extends PureComponent {
   }
 
   render() {
-    console.info(this.props);
     const { symbols, selectedSource } = this.props;
     const { filter } = this.state;
 
