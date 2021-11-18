@@ -31,12 +31,15 @@ import {
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
+  searchSourceContentsMatches,
+  SearchSourceContentsMatch,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
 import { Pause } from "./pause";
+import { uniqueId } from "lodash";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -130,6 +133,8 @@ class _ThreadFront {
   // Map sourceId to info about the source.
   sources = new Map<string, Source>();
 
+  private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
+
   // Resolve hooks for promises waiting on a source ID to be known.
   sourceWaiters = new ArrayMap<string, () => void>();
 
@@ -193,6 +198,17 @@ class _ThreadFront {
   on!: (name: string, handler: (value?: any) => void) => void;
   off!: (name: string, handler: (value?: any) => void) => void;
   emit!: (name: string, value?: any) => void;
+
+  constructor() {
+    client.Debugger.addSearchSourceContentsMatchesListener(
+      ({ searchId, matches }: { searchId: string; matches: SearchSourceContentsMatch[] }) => {
+        const searchWaiter = this.searchWaiters?.get(searchId);
+        if (searchWaiter) {
+          searchWaiter(matches);
+        }
+      }
+    );
+  }
 
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
@@ -333,6 +349,20 @@ class _ThreadFront {
       if (sourceId === this.getCorrespondingSourceIds(sourceId)[0]) {
         onSource({ sourceId, ...source });
       }
+    }
+  }
+
+  async searchSources(
+    { query }: { query: string },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ) {
+    const sessionId = await this.waitForSession();
+    const searchId = uniqueId("search-");
+    this.searchWaiters.set(searchId, onMatches);
+    try {
+      await client.Debugger.searchSourceContents({ searchId, query }, sessionId);
+    } finally {
+      this.searchWaiters.delete(searchId);
     }
   }
 
