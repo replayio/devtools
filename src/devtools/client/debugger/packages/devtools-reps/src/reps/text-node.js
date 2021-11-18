@@ -75,7 +75,7 @@ function TextNode(props) {
 }
 
 function getTextContent(grip) {
-  return cropString(grip.preview.textContent);
+  return cropString(grip._object?.preview?.node?.nodeValue || "");
 }
 
 function getTitle(grip) {
