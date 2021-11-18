@@ -32,6 +32,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
 import { groupBy } from "lodash";
 import { isThirdParty } from "../utils/source";
+import { sliceCodePoints } from "ui/utils/codePointString";
 
 const formatMatches = (matches, sourcesById) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
@@ -44,9 +45,11 @@ const formatMatches = (matches, sourcesById) => {
         // We have to do this array dance to navigate the string in unicode "code points"
         // because `colunm` is calculated using "code points" as opposed to JS strings
         // which use "code units". It makes a difference in string with fun unicode characters.
-        const matchStr = [...match.context]
-          .slice(match.contextStart.column, match.contextEnd.column)
-          .join("");
+        const matchStr = sliceCodePoints(
+          match.context,
+          match.contextStart.column,
+          match.contextEnd.column
+        );
         return {
           type: "MATCH",
           column: match.location.column,
