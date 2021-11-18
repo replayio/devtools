@@ -88,7 +88,6 @@ const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
   const itemRef = useRef();
   useEffect(() => {
     if (isFocused && itemRef.current) {
-      console.info("focus", itemRef.current);
       itemRef.current.scrollIntoView({ block: "center" });
     }
   }, [isFocused]);
