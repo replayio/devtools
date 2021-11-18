@@ -6,8 +6,8 @@ table.requests {
   border-bottom: 2px solid var(--theme-toolbar-background);
 }
 
-.row.last {
-  border-bottom: 2px solid var(--secondary-accent);
+.row.current {
+  border-top: 2px solid var(--secondary-accent);
 }
 
 .resizer {

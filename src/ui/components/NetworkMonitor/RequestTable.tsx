@@ -1,11 +1,12 @@
-import { useBlockLayout, useResizeColumns, useTable } from "react-table";
+import { useGlobalFilter, useBlockLayout, useResizeColumns, useTable } from "react-table";
 import React, { useMemo } from "react";
 import Status from "./Status";
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
-import findLastIndex from "lodash/findLastIndex";
 import { partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 import { RequestEventInfo, RequestInfo } from "@recordreplay/protocol";
+import MaterialIcon from "../shared/MaterialIcon";
+import { find } from "lodash";
 
 const RequestTable = ({
   currentTime,
@@ -61,10 +62,11 @@ const RequestTable = ({
   const tableInstance = useTable<RequestSummary>(
     { columns, data, defaultColumn },
     useBlockLayout,
+    useGlobalFilter,
     useResizeColumns
   );
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
-  const currentTimeIndex = findLastIndex(data, r => currentTime > (r.point?.time || 0));
+  const selectedRequestId = find(data, r => (r.point?.time || 0) >= currentTime)?.id;
 
   return (
     <div className="bg-white w-full overflow-y-scroll">
@@ -91,6 +93,17 @@ const RequestTable = ({
             </div>
           ))}
         </div>
+        <div className="py-1 px-4 border-b flex items-center">
+          <MaterialIcon iconSize="lg">search</MaterialIcon>
+          <input
+            placeholder="Filter requests"
+            onChange={e => {
+              //@ts-ignore
+              tableInstance.setGlobalFilter(e.target.value);
+            }}
+            className="border rounded-sm px-1"
+          />
+        </div>
         <div {...getTableBodyProps()}>
           {rows.map((row, i) => {
             prepareRow(row);
@@ -98,7 +111,7 @@ const RequestTable = ({
               <div
                 className={classNames(styles.row, {
                   "text-lightGrey": currentTime <= (row.original.point?.time || 0),
-                  [styles.last]: currentTimeIndex === i,
+                  [styles.current]: selectedRequestId === row.original.id,
                 })}
                 onClick={() => {
                   onClick(row.original);
@@ -130,7 +143,7 @@ const RequestTable = ({
         </div>
         <div
           className={classNames(styles.row, {
-            [styles.last]: currentTimeIndex === -1,
+            [styles.current]: selectedRequestId === undefined,
           })}
         />
       </div>

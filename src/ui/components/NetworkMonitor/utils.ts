@@ -12,6 +12,7 @@ import sortBy from "lodash/sortBy";
 export type RequestSummary = {
   domain: string;
   end: number;
+  id: string;
   method: string;
   name: string;
   point: TimeStampedPoint | undefined;
@@ -65,6 +66,7 @@ export const partialRequestsToCompleteSummaries = (
       return {
         domain: host(request.event.requestUrl),
         end: response.time,
+        id: r.id,
         requestHeaders: request.event.requestHeaders,
         responseHeaders: response.event.responseHeaders,
         method: request.event.requestMethod,
