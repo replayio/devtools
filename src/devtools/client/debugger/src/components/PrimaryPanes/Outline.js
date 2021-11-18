@@ -4,18 +4,14 @@
 
 //
 
-import React, { Component, PureComponent, useEffect, useRef } from "react";
-import { showMenu } from "devtools-contextmenu";
+import React, { Component, useEffect, useRef } from "react";
 import { connect } from "../../utils/connect";
 import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
 const classnames = require("classnames");
 
 import { findClosestEnclosedSymbol } from "../../utils/ast";
-import { copyToTheClipboard } from "../../utils/clipboard";
-import { findFunctionText } from "../../utils/function";
 import { getTruncatedFileName } from "../../utils/source";
 import { Redacted } from "ui/components/Redacted";
-import { trackEvent } from "ui/utils/telemetry";
 
 import actions from "../../actions";
 import {
@@ -113,7 +109,7 @@ const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
     </li>
   );
 });
-export class Outline extends PureComponent {
+export class Outline extends Component {
   state = { filter: "", focusedItem: null };
   scrollContainerRef = null;
   focusedElRef = null;
