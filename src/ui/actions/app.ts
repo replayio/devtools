@@ -31,10 +31,10 @@ import { trackEvent } from "ui/utils/telemetry";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import { isTest } from "ui/utils/environment";
+import { getRecordingId, isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
-import { trackTiming } from "ui/utils/telemetry";
+import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -331,9 +331,18 @@ export function setEventsForType(
   };
 }
 
-export function setViewMode(viewMode: ViewMode): SetViewMode {
-  trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
-  return { type: "set_view_mode", viewMode };
+export function setViewMode(viewMode: ViewMode): UIThunkAction {
+  return async ({ dispatch }) => {
+    // There's a possible race condition here so it's important to handle the nag logic first.
+    // Otherwise, it's possible for the nag to not be properly dismissed.
+    if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
+      await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
+      dispatch(setSelectedPrimaryPanel("explorer"));
+    }
+
+    dispatch({ type: "set_view_mode", viewMode });
+    trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
+  };
 }
 
 export function setHoveredLineNumberLocation(
