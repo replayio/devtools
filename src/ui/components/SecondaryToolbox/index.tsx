@@ -19,6 +19,7 @@ import "ui/setup/dynamic/inspector";
 import { UserSettings } from "ui/types";
 import NetworkMonitor from "../NetworkMonitor";
 import classNames from "classnames";
+import WaitForReduxSlice from "../WaitForReduxSlice";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -106,9 +107,11 @@ function ConsolePanel() {
 function InspectorPanel() {
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
-      <React.Suspense fallback={null}>
-        <InspectorApp />
-      </React.Suspense>
+      <WaitForReduxSlice slice="inspector">
+        <React.Suspense fallback={null}>
+          <InspectorApp />
+        </React.Suspense>
+      </WaitForReduxSlice>
     </div>
   );
 }
