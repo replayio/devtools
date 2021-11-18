@@ -24,7 +24,6 @@ import {
 } from "../selectors";
 
 import ManagedTree from "./shared/ManagedTree";
-import SearchInput from "./shared/SearchInput";
 import AccessibleImage from "./shared/AccessibleImage";
 
 import { PluralForm } from "devtools/shared/plural-form";
@@ -300,18 +299,19 @@ export class ProjectSearch extends Component {
 
     return (
       <div className="p-2">
-        <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center">
+        <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
           <MaterialIcon>search</MaterialIcon>
           <input
             style={{ boxShadow: "unset" }}
             placeholder="Find in files…"
-            className="border-0 bg-transparent p-0 px-2 flex-grow text-xs focus:outline-none"
+            className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
             type="text"
             value={this.state.inputValue}
             onChange={this.inputOnChange}
             onFocus={() => this.setState({ inputFocused: true })}
             onBlur={() => this.setState({ inputFocused: false })}
             onKeyDown={this.onKeyDown}
+            autoFocus
           />
           {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
           {status === "DONE" && inputValue ? (
