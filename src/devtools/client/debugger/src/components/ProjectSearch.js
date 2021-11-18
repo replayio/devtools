@@ -253,10 +253,10 @@ export class ProjectSearch extends Component {
 
   renderResults = () => {
     const { results } = this.state;
+    const { status, matches } = results;
     if (!results.query) {
       return;
     }
-    const matches = results.matches;
 
     if (!matches.length) {
       const msg = results.status === "LOADING" ? "Loading\u2026" : "No results found";
@@ -264,19 +264,26 @@ export class ProjectSearch extends Component {
     }
 
     return (
-      <ManagedTree
-        getRoots={() => matches}
-        getChildren={file => file.matches || []}
-        itemHeight={24}
-        autoExpandAll={true}
-        autoExpandDepth={1}
-        autoExpandNodeChildrenLimit={100}
-        getParent={item => null}
-        getPath={getFilePath}
-        renderItem={this.renderItem}
-        focused={this.state.focusedItem}
-        onFocus={this.onFocus}
-      />
+      <div className="px-2">
+        {status === "DONE" ? (
+          <div className="whitespace-pre pl-2">
+            {matches.length} result{matches.length === 1 ? "" : "s"}
+          </div>
+        ) : null}
+        <ManagedTree
+          getRoots={() => matches}
+          getChildren={file => file.matches || []}
+          itemHeight={24}
+          autoExpandAll={true}
+          autoExpandDepth={1}
+          autoExpandNodeChildrenLimit={100}
+          getParent={item => null}
+          getPath={getFilePath}
+          renderItem={this.renderItem}
+          focused={this.state.focusedItem}
+          onFocus={this.onFocus}
+        />
+      </div>
     );
   };
 
@@ -294,8 +301,8 @@ export class ProjectSearch extends Component {
   }
 
   renderInput() {
-    const { results, inputValue } = this.state;
-    const { status, matches } = results;
+    const { results } = this.state;
+    const { status } = results;
 
     return (
       <div className="p-2">
@@ -314,11 +321,6 @@ export class ProjectSearch extends Component {
             autoFocus
           />
           {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
-          {status === "DONE" && inputValue ? (
-            <div className="whitespace-pre">
-              {matches.length} result{matches.length === 1 ? "" : "s"}
-            </div>
-          ) : null}
         </div>
       </div>
     );
