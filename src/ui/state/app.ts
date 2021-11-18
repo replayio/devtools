@@ -43,8 +43,7 @@ export type ModalType =
   | "trimming"
   | "privacy"
   | "loom"
-  | "attachment"
-  | "team-leader-onboarding";
+  | "attachment";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"
