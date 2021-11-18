@@ -28,6 +28,7 @@ import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
 import classNames from "classnames";
+import TeamLeaderOnboardingModal from "./shared/OnboardingModal/TeamLeaderOnboardingModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -72,6 +73,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "attachment": {
       return <NewAttachment />;
+    }
+    case "team-leader-onboarding": {
+      return <TeamLeaderOnboardingModal />;
     }
     default: {
       return null;
