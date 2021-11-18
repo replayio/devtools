@@ -22,6 +22,7 @@ export const Basic = Template.bind({});
 
 Basic.args = {
   request: {
+    id: "2",
     domain: "assets.website-files.com",
     end: 984,
     requestHeaders: [
