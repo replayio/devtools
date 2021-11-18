@@ -1,5 +1,4 @@
 import React from "react";
-import { WebAuth } from "auth0-js";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useAuth0 from "ui/utils/useAuth0";
