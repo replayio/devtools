@@ -45,7 +45,11 @@ const formatMatches = (matches, sourcesById) => {
         // We have to do this array dance to navigate the string in unicode "code points"
         // because `colunm` is calculated using "code points" as opposed to JS strings
         // which use "code units". It makes a difference in string with fun unicode characters.
-        const matchStr = sliceCodePoints(match.contextStart.column, match.contextEnd.column);
+        const matchStr = sliceCodePoints(
+          match.context,
+          match.contextStart.column,
+          match.contextEnd.column
+        );
         return {
           type: "MATCH",
           column: match.location.column,
