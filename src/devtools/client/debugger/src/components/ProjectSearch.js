@@ -24,7 +24,6 @@ import {
 } from "../selectors";
 
 import ManagedTree from "./shared/ManagedTree";
-import SearchInput from "./shared/SearchInput";
 import AccessibleImage from "./shared/AccessibleImage";
 
 import { PluralForm } from "devtools/shared/plural-form";
@@ -33,6 +32,8 @@ import { ThreadFront } from "protocol/thread";
 import { groupBy } from "lodash";
 import { isThirdParty } from "../utils/source";
 import { sliceCodePoints } from "ui/utils/codePointString";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Spinner from "ui/components/shared/Spinner";
 
 const formatMatches = (matches, sourcesById) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
@@ -256,26 +257,27 @@ export class ProjectSearch extends Component {
       return;
     }
     const matches = results.matches;
-    if (matches.length) {
-      return (
-        <ManagedTree
-          getRoots={() => matches}
-          getChildren={file => file.matches || []}
-          itemHeight={24}
-          autoExpandAll={true}
-          autoExpandDepth={1}
-          autoExpandNodeChildrenLimit={100}
-          getParent={item => null}
-          getPath={getFilePath}
-          renderItem={this.renderItem}
-          focused={this.state.focusedItem}
-          onFocus={this.onFocus}
-        />
-      );
+
+    if (!matches.length) {
+      const msg = results.status === "LOADING" ? "Loading\u2026" : "No results found";
+      return <div className="px-2">{msg}</div>;
     }
 
-    const msg = results.status === "LOADING" ? "Loading\u2026" : "No results found";
-    return <div className="no-result-msg absolute-center">{msg}</div>;
+    return (
+      <ManagedTree
+        getRoots={() => matches}
+        getChildren={file => file.matches || []}
+        itemHeight={24}
+        autoExpandAll={true}
+        autoExpandDepth={1}
+        autoExpandNodeChildrenLimit={100}
+        getParent={item => null}
+        getPath={getFilePath}
+        renderItem={this.renderItem}
+        focused={this.state.focusedItem}
+        onFocus={this.onFocus}
+      />
+    );
   };
 
   renderSummary = () => {
@@ -292,33 +294,37 @@ export class ProjectSearch extends Component {
   }
 
   renderInput() {
-    const { cx, closeProjectSearch } = this.props;
-    const { status } = this.state.results;
+    const { results, inputValue } = this.state;
+    const { status, matches } = results;
+
     return (
-      <SearchInput
-        query={this.state.inputValue}
-        count={this.getResultCount()}
-        placeholder={"Find in files…"}
-        size="big"
-        showErrorEmoji={this.shouldShowErrorEmoji()}
-        summaryMsg={this.renderSummary()}
-        isLoading={status === "LOADING"}
-        onChange={this.inputOnChange}
-        onFocus={() => this.setState({ inputFocused: true })}
-        onBlur={() => this.setState({ inputFocused: false })}
-        onKeyDown={this.onKeyDown}
-        onHistoryScroll={this.onHistoryScroll}
-        handleClose={() => closeProjectSearch(cx)}
-        ref="searchInput"
-      />
+      <div className="p-2">
+        <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
+          <MaterialIcon>search</MaterialIcon>
+          <input
+            style={{ boxShadow: "unset" }}
+            placeholder="Find in files…"
+            className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
+            type="text"
+            value={this.state.inputValue}
+            onChange={this.inputOnChange}
+            onFocus={() => this.setState({ inputFocused: true })}
+            onBlur={() => this.setState({ inputFocused: false })}
+            onKeyDown={this.onKeyDown}
+            autoFocus
+          />
+          {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
+          {status === "DONE" && inputValue ? (
+            <div className="whitespace-pre">
+              {matches.length} result{matches.length === 1 ? "" : "s"}
+            </div>
+          ) : null}
+        </div>
+      </div>
     );
   }
 
   render() {
-    if (!this.isProjectSearchEnabled()) {
-      return null;
-    }
-
     return (
       <div className="search-container">
         <div className="project-text-search">
