@@ -11,9 +11,7 @@
 
 import { isFulfilled } from "../utils/async-value";
 import { findSourceMatches } from "../workers/search";
-import { getSource, getSources, getSourceList, getSourceContent } from "../selectors";
-import { isThirdParty } from "../utils/source";
-import { loadSourceText } from "./sources/loadSourceText";
+import { getSource, getSourceContent } from "../selectors";
 import {
   statusType,
   getTextSearchOperation,
@@ -21,6 +19,26 @@ import {
 } from "../reducers/project-text-search";
 import { ThreadFront } from "protocol/thread";
 import { groupBy } from "lodash";
+
+const mapSearchResultMatches = (matches, source) => {
+  return {
+    sourceId: source.id,
+    filepath: source?.url,
+    matches: matches.map(match => {
+      const matchStr = [...match.context]
+        .slice(match.contextStart.column, match.contextEnd.column)
+        .join("");
+      return {
+        column: match.location.column,
+        line: match.location.line,
+        sourceId: source.id,
+        match: matchStr,
+        matchIndex: match.context.indexOf(matchStr),
+        value: match.context,
+      };
+    }),
+  };
+};
 
 export function addSearchQuery(cx, query) {
   return { type: "ADD_QUERY", cx, query };
@@ -86,42 +104,14 @@ export function searchSources(cx, query) {
     await dispatch(clearSearchResults(cx));
     await dispatch(addSearchQuery(cx, query));
     dispatch(updateSearchStatus(cx, statusType.fetching));
-    // const validSources = getSourceList(getState()).filter(
-    //   source => !ThreadFront.isMinifiedSource(source.id) && !isThirdParty(source)
-    // );
-    // for (const source of validSources) {
-    //   if (cancelled) {
-    //     return;
-    //   }
-    //   await dispatch(loadSourceText({ cx, source }));
-    //   await dispatch(searchSource(cx, source.id, query));
-    // }
     await ThreadFront.searchSources({ query }, matches => {
-      console.info(matches);
-      const sources = getSources(getState());
       const bestResults = matches.filter(
         match => !ThreadFront.isMinifiedSource(match.location.sourceId)
       );
       const resultsBySource = groupBy(bestResults, res => res.location.sourceId);
-      const results = Object.entries(resultsBySource).map(([sourceId, matches]) => {
-        return {
-          sourceId,
-          filepath: sources.values[sourceId]?.url,
-          matches: matches.map(match => {
-            const matchStr = [...match.context]
-              .slice(match.contextStart.column, match.contextEnd.column)
-              .join("");
-            return {
-              column: match.location.column,
-              line: match.location.line,
-              sourceId,
-              match: matchStr,
-              matchIndex: match.context.indexOf(matchStr),
-              value: match.context,
-            };
-          }),
-        };
-      });
+      const results = Object.entries(resultsBySource).map(([sourceId, matches]) =>
+        mapSearchResultMatches(matches, getSource(getState(), sourceId))
+      );
       dispatch(addSearchResults(cx, results));
     });
     dispatch(updateSearchStatus(cx, statusType.done));
