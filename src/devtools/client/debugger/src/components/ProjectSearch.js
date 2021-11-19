@@ -35,7 +35,7 @@ import { sliceCodePoints } from "ui/utils/codePointString";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Spinner from "ui/components/shared/Spinner";
 
-const formatMatches = (matches, sourcesById) => {
+const formatMatchesBySource = (matches, sourcesById) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
   return Object.entries(resultsBySource).map(([sourceId, matches]) => {
     return {
@@ -86,7 +86,7 @@ export class ProjectSearch extends Component {
       results: {
         status: "DONE",
         query: "",
-        matches: [],
+        matchesBySource: [],
       },
     };
   }
@@ -122,7 +122,7 @@ export class ProjectSearch extends Component {
       }));
     };
 
-    updateResults(() => ({ status: "LOADING", query, matches: [] }));
+    updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
 
     await ThreadFront.searchSources({ query }, matches => {
       const { sourcesById } = this.props;
@@ -131,8 +131,10 @@ export class ProjectSearch extends Component {
         const source = sourcesById[sourceId];
         return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
       });
-      const newMatches = formatMatches(bestMatches, sourcesById);
-      updateResults(prevResults => ({ matches: [...prevResults.matches, ...newMatches] }));
+      const newMatchesBySource = formatMatchesBySource(bestMatches, sourcesById);
+      updateResults(prevResults => ({
+        matchesBySource: [...prevResults.matchesBySource, ...newMatchesBySource],
+      }));
     });
 
     updateResults(() => ({ status: "DONE" }));
@@ -169,7 +171,11 @@ export class ProjectSearch extends Component {
     );
   };
 
-  getResultCount = () => this.state.results.length;
+  getTotalMatches = () =>
+    this.state.results.matchesBySource.reduce(
+      (count, sourceMatch) => sourceMatch.matches.length + count,
+      0
+    );
 
   onKeyDown = e => {
     if (e.key === "Escape") {
@@ -253,25 +259,26 @@ export class ProjectSearch extends Component {
 
   renderResults = () => {
     const { results } = this.state;
-    const { status, matches } = results;
+    const { status, matchesBySource } = results;
     if (!results.query) {
       return;
     }
 
-    if (!matches.length) {
-      const msg = results.status === "LOADING" ? "Loading\u2026" : "No results found";
+    if (!matchesBySource.length) {
+      const msg = status === "LOADING" ? "Loading\u2026" : "No results found";
       return <div className="px-2">{msg}</div>;
     }
 
+    const totalMatches = this.getTotalMatches();
     return (
-      <div className="px-2">
+      <div className="overflow-hidden px-2">
         {status === "DONE" ? (
           <div className="whitespace-pre pl-2">
-            {matches.length} result{matches.length === 1 ? "" : "s"}
+            {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
           </div>
         ) : null}
         <ManagedTree
-          getRoots={() => matches}
+          getRoots={() => matchesBySource}
           getChildren={file => file.matches || []}
           itemHeight={24}
           autoExpandAll={true}
@@ -290,14 +297,14 @@ export class ProjectSearch extends Component {
   renderSummary = () => {
     if (this.props.query !== "") {
       const resultsSummaryString = "#1 result;#1 results";
-      const count = this.getResultCount();
+      const count = this.getTotalMatches();
       return PluralForm.get(count, resultsSummaryString).replace("#1", count);
     }
     return "";
   };
 
   shouldShowErrorEmoji() {
-    return !this.getResultCount() && this.state.results.status === "DONE";
+    return !this.getTotalMatches() && this.state.results.status === "DONE";
   }
 
   renderInput() {

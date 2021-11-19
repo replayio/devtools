@@ -92,11 +92,11 @@ export function isPrettyURL(url) {
 }
 
 export function isThirdParty(source) {
-  const url = source.url;
-  if (!source || !url) {
+  if (!source?.url) {
     return false;
   }
 
+  const { url } = source;
   return url.includes("node_modules") || url.includes("bower_components");
 }
 
