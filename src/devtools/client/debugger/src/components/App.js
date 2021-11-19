@@ -44,12 +44,32 @@ import SidePanel from "ui/components/SidePanel";
 import { waitForEditor } from "../utils/editor/create-editor";
 import { isDemo } from "ui/utils/environment";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
+import classNames from "classnames";
 
-const EditorPane = ({ children }) => (
-  <div className="editor-pane overflow-hidden rounded-lg">
-    <div className="editor-container relative">{children}</div>
-  </div>
-);
+var resizeObserver;
+
+const EditorPane = ({ children }) => {
+  const [width, setWidth] = useState(null);
+  const paneNode = useRef();
+
+  useEffect(() => {
+    resizeObserver = new ResizeObserver(() => {
+      const newWidth = paneNode.current.getBoundingClientRect().width;
+      setWidth(newWidth);
+    });
+
+    resizeObserver.observe(paneNode.current);
+  }, []);
+
+  return (
+    <div
+      className={classNames("editor-pane overflow-hidden rounded-lg", { narrow: width < 240 })}
+      ref={paneNode}
+    >
+      <div className="editor-container relative">{children}</div>
+    </div>
+  );
+};
 
 class Debugger extends Component {
   state = {
