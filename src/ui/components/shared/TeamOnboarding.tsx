@@ -51,9 +51,6 @@ function IntroPage({ onSkipToDownload, onNext, organization }: SlideBodyProps) {
         <PrimaryLgButton color="blue" onClick={onNext}>
           {organization ? "Create an organization" : "Create a team"}
         </PrimaryLgButton>
-        <PrimaryLgButton color="gray" onClick={() => onSkipToDownload("intro-page")}>
-          Skip for now
-        </PrimaryLgButton>
       </OnboardingActions>
     </>
   );
@@ -127,9 +124,6 @@ function TeamNamePage({
       </div>
       <OnboardingActions>
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
-        <PrimaryLgButton color="gray" onClick={() => onSkipToDownload("team-name-page")}>
-          Skip for now
-        </PrimaryLgButton>
       </OnboardingActions>
     </>
   );
@@ -290,7 +284,7 @@ function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
 
   console.log("hello", current);
   return (
-    <OnboardingModalContainer {...{ randomNumber }}>
+    <OnboardingModalContainer {...{ randomNumber }} theme="light">
       <OnboardingContentWrapper>{slide}</OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
