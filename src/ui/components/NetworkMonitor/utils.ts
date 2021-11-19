@@ -6,10 +6,8 @@ import {
   RequestResponseEvent,
   TimeStampedPoint,
 } from "@recordreplay/protocol";
-import { zipObject } from "lodash";
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
-import { UrlCopy } from "../shared/SharingModal/ReplayLink";
 
 export type RequestSummary = {
   domain: string;

@@ -21,11 +21,12 @@ export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFro
       endPanel={selectedRequest ? <RequestDetails request={selectedRequest} /> : <div />}
       startPanel={
         <RequestTable
-          onClick={setSelectedRequest}
-          seek={seek}
-          requests={requests}
-          events={events}
           currentTime={currentTime}
+          events={events}
+          onClick={setSelectedRequest}
+          requests={requests}
+          seek={seek}
+          selectedRequest={selectedRequest}
         />
       }
       vert={true}

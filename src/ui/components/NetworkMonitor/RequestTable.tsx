@@ -5,20 +5,21 @@ import classNames from "classnames";
 import { partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 import { RequestEventInfo, RequestInfo } from "@recordreplay/protocol";
 import MaterialIcon from "../shared/MaterialIcon";
-import find from "lodash/find";
 
 const RequestTable = ({
   currentTime,
   events,
   onClick,
-  seek,
   requests,
+  seek,
+  selectedRequest,
 }: {
   currentTime: number;
   events: RequestEventInfo[];
+  onClick: (request: RequestSummary) => void;
   requests: RequestInfo[];
   seek: (point: string, time: number, hasFrames: boolean, pauseId?: string | undefined) => boolean;
-  onClick: (request: RequestSummary) => void;
+  selectedRequest?: RequestSummary;
 }) => {
   const columns = useMemo(
     () => [
@@ -64,54 +65,74 @@ const RequestTable = ({
     useResizeColumns
   );
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
-  const selectedRequestId = find(data, r => (r.point?.time || 0) >= currentTime)?.id;
+
+  let renderingRequestsInThePast = true;
 
   return (
     <div className="bg-white w-full overflow-y-scroll">
       <div className={classNames(styles.request)} {...getTableProps()}>
-        <div className="sticky z-10 top-0 border-b">
-          {headerGroups.map(headerGroup => (
-            <div
-              className="flex bg-white font-normal items-center"
-              {...headerGroup.getHeaderGroupProps()}
-            >
-              {headerGroup.headers.map(column => (
-                <div className={classNames("p-1", styles[column.id])} {...column.getHeaderProps()}>
-                  {column.render("Header")}
+        <div className="sticky z-10 top-0 bg-white">
+          <div className="border-b">
+            {headerGroups.map(headerGroup => (
+              <div className="flex font-normal items-center" {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
                   <div
-                    //@ts-ignore
-                    {...column.getResizerProps()}
-                    className={classNames("select-none", styles.resizer, {
-                      //@ts-ignore typescript freaking *hates* react-table
-                      isResizing: column.isResizing,
-                    })}
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="py-1 px-4 border-b flex items-center">
-          <MaterialIcon iconSize="lg">search</MaterialIcon>
-          <input
-            placeholder="Filter requests"
-            onChange={e => {
-              //@ts-ignore
-              tableInstance.setGlobalFilter(e.target.value);
-            }}
-            className="border rounded-sm px-1"
-          />
+                    className={classNames("p-1", styles[column.id])}
+                    {...column.getHeaderProps()}
+                  >
+                    {column.render("Header")}
+                    <div
+                      //@ts-ignore
+                      {...column.getResizerProps()}
+                      className={classNames("select-none", styles.resizer, {
+                        //@ts-ignore typescript freaking *hates* react-table
+                        isResizing: column.isResizing,
+                      })}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="py-1 px-4 border-b flex items-center">
+            <MaterialIcon iconSize="lg">search</MaterialIcon>
+            <input
+              placeholder="Filter requests"
+              onChange={e => {
+                //@ts-ignore
+                tableInstance.setGlobalFilter(e.target.value);
+              }}
+              className="border rounded-sm px-1"
+            />
+          </div>
         </div>
         <div {...getTableBodyProps()}>
-          {rows.map((row, i) => {
+          {rows.map(row => {
+            let currentRow = false;
+            // Did we just pass the row boundary that contains the current time?
+            // If so, let's render this row as the "current" row and all rows
+            // after it as future rows.
+            if (
+              selectedRequest?.id === row.original.id ||
+              (!selectedRequest &&
+                renderingRequestsInThePast &&
+                currentTime <= row.original.point.time)
+            ) {
+              renderingRequestsInThePast = false;
+              currentRow = true;
+            }
+
             prepareRow(row);
             return (
               <div
                 className={classNames(styles.row, {
-                  "text-lightGrey": currentTime <= (row.original.point?.time || 0),
-                  [styles.current]: selectedRequestId === row.original.id,
+                  [styles.current]: currentRow,
+                  "text-lightGrey": !renderingRequestsInThePast,
                 })}
-                onClick={() => onClick(row.original)}
+                onClick={() => {
+                  seek(row.original.point.point, row.original.point.time, false);
+                  onClick(row.original);
+                }}
               >
                 <div {...row.getRowProps()}>
                   {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
@@ -121,11 +142,7 @@ const RequestTable = ({
                         if (!row.original.triggerPoint) {
                           return;
                         }
-                        seek(
-                          row.original.triggerPoint.point,
-                          row.original.triggerPoint.time,
-                          false
-                        );
+                        seek(row.original.triggerPoint.point, row.original.triggerPoint.time, true);
                       }}
                     >
                       <div
@@ -160,7 +177,7 @@ const RequestTable = ({
         </div>
         <div
           className={classNames(styles.row, {
-            [styles.current]: selectedRequestId === undefined,
+            [styles.current]: data.every(r => (r.point?.time || 0) <= currentTime),
           })}
         />
       </div>
