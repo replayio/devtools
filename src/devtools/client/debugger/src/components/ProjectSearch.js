@@ -35,7 +35,7 @@ import { sliceCodePoints } from "ui/utils/codePointString";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Spinner from "ui/components/shared/Spinner";
 
-const formatMatches = (matches, sourcesById) => {
+const formatMatchesBySource = (matches, sourcesById) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
   return Object.entries(resultsBySource).map(([sourceId, matches]) => {
     return {
@@ -131,7 +131,7 @@ export class ProjectSearch extends Component {
         const source = sourcesById[sourceId];
         return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
       });
-      const newMatchesBySource = formatMatches(bestMatches, sourcesById);
+      const newMatchesBySource = formatMatchesBySource(bestMatches, sourcesById);
       updateResults(prevResults => ({
         matchesBySource: [...prevResults.matchesBySource, ...newMatchesBySource],
       }));
