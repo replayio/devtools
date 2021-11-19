@@ -22,6 +22,7 @@ export const Basic = Template.bind({});
 
 Basic.args = {
   request: {
+    documentType: "application/octet-stream",
     domain: "assets.website-files.com",
     end: 984,
     id: "1",
