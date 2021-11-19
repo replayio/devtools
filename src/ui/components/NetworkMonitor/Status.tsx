@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import styles from "./Status.module.css";
 
-type StatusFamily = "SUCCESS" | "FAILURE" | "IGNORED";
+type StatusFamily = "SUCCESS" | "FAILURE" | "IGNORED" | "INFO";
 
 type StatusProps = {
   value: number;
@@ -20,6 +20,11 @@ const familyFor = (status: number): StatusFamily => {
   if (status >= 200) {
     return "SUCCESS";
   }
+  if (status >= 100) {
+    return "INFO";
+  }
+  return null as never;
+
   throw `Don't know how to compute a status family for status: ${status}`;
 };
 
@@ -27,6 +32,7 @@ const FAMILY_CLASSES: Record<StatusFamily, string[]> = {
   SUCCESS: ["success", "shadow"],
   FAILURE: ["failure", "shadow"],
   IGNORED: ["ignored"],
+  INFO: ["ignored"],
 };
 
 const Status = ({ value }: StatusProps) => {
