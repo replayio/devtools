@@ -98,10 +98,5 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
 }
 
 .secondary-toolbox .splitter {
-  background: white;
-}
-
-.secondary-toolbox .splitter:hover,
-.secondary-toolbox .splitter:active {
-  background: var(--tab-hover-color);
+  background: var(--chrome);
 }

@@ -453,6 +453,10 @@ ul.children + .tag-line::before {
   color: var(--theme-contrast-color);
 }
 
+#markup-root-wrapper {
+  width: fit-content;
+}
+
 #markup-root ul {
   outline: none;
 }
