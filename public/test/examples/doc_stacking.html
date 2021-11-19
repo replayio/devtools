@@ -3,8 +3,9 @@
 <style>
 body > div {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
+  padding: 5px;
 }
 .box1 {
   position: absolute;
@@ -50,6 +51,18 @@ body > div {
 <div style="left: 200px; top: 100px;">
   <div class="box1"></div>
   <div class="box2" style="pointer-events: none;"></div>
+</div>
+<div style="left: 300px; top: 100px;">
+  <div class="box1" style="position: static; z-index: 1;"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 0px; top: 200px; display: flex;">
+  <div class="box1" style="position: static; z-index: 1;"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 100px; top: 200px; display: grid;">
+  <div class="box1" style="position: static; z-index: 1;"></div>
+  <div class="box2"></div>
 </div>
 <script>
   window.setTimeout(() => {
