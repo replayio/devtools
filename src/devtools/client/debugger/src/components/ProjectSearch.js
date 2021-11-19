@@ -271,7 +271,7 @@ export class ProjectSearch extends Component {
 
     const totalMatches = this.getTotalMatches();
     return (
-      <div className="px-2">
+      <div className="overflow-hidden px-2">
         {status === "DONE" ? (
           <div className="whitespace-pre pl-2">
             {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
