@@ -74,22 +74,20 @@ function NewOutline({ selectLocation, symbols }: PropTypes) {
 
   return (
     <div className="outline">
-      <div className="outline__container">
-        <OutlineFilter filter={filter} updateFilter={setFilter} />
-        <AutoSizer>
-          {({ height, width }) => (
-            <List
-              innerElementType="ol"
-              height={height}
-              width={width}
-              itemCount={namedFunctions.length}
-              itemSize={22}
-            >
-              {Function}
-            </List>
-          )}
-        </AutoSizer>
-      </div>
+      <OutlineFilter filter={filter} updateFilter={setFilter} />
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            innerElementType="ol"
+            height={height}
+            width={width}
+            itemCount={namedFunctions.length}
+            itemSize={22}
+          >
+            {Function}
+          </List>
+        )}
+      </AutoSizer>
     </div>
   );
 }
