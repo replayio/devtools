@@ -59,7 +59,7 @@ const documentType = (headers: Header[]): string => {
   const contentType =
     headers.find(h => h.name.toLowerCase() === "content-type")?.value || "unknown";
   // chop off any charset or other extra data
-  return contentType.match(/^(.*)[,;]/)?.[0] || contentType;
+  return contentType.match(/^(.*)[,;]/)?.[1] || contentType;
 };
 
 export const partialRequestsToCompleteSummaries = (
