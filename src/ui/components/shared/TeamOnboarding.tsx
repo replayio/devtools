@@ -4,8 +4,8 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
-import { PrimaryLgButton } from "../Button";
-import { TextInput } from "../Forms";
+import { PrimaryLgButton } from "./Button";
+import { TextInput } from "./Forms";
 import {
   OnboardingActions,
   OnboardingBody,
@@ -15,13 +15,14 @@ import {
   OnboardingHeader,
   NextButton,
   OnboardingModalContainer,
-} from "../Onboarding/index";
-import InvitationLink from "../NewWorkspaceModal/InvitationLink";
-import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
+} from "./Onboarding/index";
+import InvitationLink from "./NewWorkspaceModal/InvitationLink";
+import { WorkspaceMembers } from "./WorkspaceSettingsModal/WorkspaceSettingsModal";
 import { trackEvent } from "ui/utils/telemetry";
 import { removeUrlParameters } from "ui/utils/environment";
-import { DownloadPage } from "../Onboarding/DownloadPage";
-import { DownloadingPage } from "../Onboarding/DownloadingPage";
+import { DownloadPage } from "./Onboarding/DownloadPage";
+import { DownloadingPage } from "./Onboarding/DownloadingPage";
+import { useRouter } from "next/router";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -34,9 +35,10 @@ type SlideBodyProps = PropsFromRedux & {
   onFinished: () => void;
   newWorkspace: Workspace | null;
   current: number;
+  organization?: boolean;
 };
 
-function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
+function IntroPage({ onSkipToDownload, onNext, organization }: SlideBodyProps) {
   return (
     <>
       <OnboardingContent>
@@ -47,10 +49,7 @@ function IntroPage({ onSkipToDownload, onNext }: SlideBodyProps) {
       </OnboardingContent>
       <OnboardingActions>
         <PrimaryLgButton color="blue" onClick={onNext}>
-          Create a team
-        </PrimaryLgButton>
-        <PrimaryLgButton color="gray" onClick={() => onSkipToDownload("intro-page")}>
-          Skip for now
+          {organization ? "Create an organization" : "Create a team"}
         </PrimaryLgButton>
       </OnboardingActions>
     </>
@@ -63,6 +62,7 @@ function TeamNamePage({
   setCurrent,
   current,
   onSkipToDownload,
+  organization,
 }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [allowNext, setAllowNext] = useState<boolean>(false);
@@ -96,7 +96,7 @@ function TeamNamePage({
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: "team-v1",
+        planKey: organization ? "org-v1" : "team-v1",
       },
     });
     trackEvent("created-team");
@@ -124,9 +124,6 @@ function TeamNamePage({
       </div>
       <OnboardingActions>
         <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
-        <PrimaryLgButton color="gray" onClick={() => onSkipToDownload("team-name-page")}>
-          Skip for now
-        </PrimaryLgButton>
       </OnboardingActions>
     </>
   );
@@ -228,7 +225,8 @@ function TeamMemberInvitationPage({
 // This modal is used whenever a user is invited to Replay via the Replay invitations
 // tab in the settings panel. This should guide them through 1) creating a team, and/or
 // 2) downloading the Replay browser.
-function OnboardingModal(props: PropsFromRedux) {
+function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
+  const router = useRouter();
   const [current, setCurrent] = useState<number>(1);
   const [randomNumber, setRandomNumber] = useState<number>(Math.random());
   const [newWorkspace, setNewWorkspace] = useState<Workspace | null>(null);
@@ -251,12 +249,12 @@ function OnboardingModal(props: PropsFromRedux) {
   const onSkipToLibrary = () => {
     removeUrlParameters();
     trackEvent("skipped-replay-download");
-    props.hideModal();
+    router.push("/");
   };
   const onFinished = () => {
     removeUrlParameters();
     trackEvent("finished-onboarding");
-    props.hideModal();
+    router.push("/");
   };
 
   const newProps = {
@@ -286,7 +284,7 @@ function OnboardingModal(props: PropsFromRedux) {
 
   console.log("hello", current);
   return (
-    <OnboardingModalContainer {...{ randomNumber }}>
+    <OnboardingModalContainer {...{ randomNumber }} theme="light">
       <OnboardingContentWrapper>{slide}</OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
@@ -297,4 +295,4 @@ const connector = connect(() => ({}), {
   setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(OnboardingModal);
+export default connector(TeamOnboarding);

@@ -23,6 +23,7 @@ import {
   isTeamLeaderInvite,
   singleInvitation,
 } from "ui/utils/onboarding";
+import { useRouter } from "next/router";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -136,6 +137,7 @@ function Library({
   pendingWorkspaces,
   nags,
 }: LibraryProps) {
+  const router = useRouter();
   const [searchString, setSearchString] = useState("");
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
@@ -149,10 +151,7 @@ function Library({
     }
   }, []);
   useEffect(function handleOnboardingModals() {
-    if (isTeamLeaderInvite()) {
-      trackEvent("onboarding.replay_invite");
-      setModal("team-leader-onboarding");
-    } else if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
+    if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
       trackEvent("onboarding.team_invite");
       setModal("single-invite");
     } else if (downloadReplay(nags, dismissNag)) {
@@ -163,6 +162,12 @@ function Library({
       setModal("first-replay");
     }
   }, []);
+
+  // FIXME [ryanjduffy]: Backwards compatibility for ?replayinvite=true flow
+  if (isTeamLeaderInvite()) {
+    router.replace("/team/new");
+    return null;
+  }
 
   // Handle cases where the default workspace ID in prefs is for a team
   // that the user is no longer a part of. This occurs when the user is removed
