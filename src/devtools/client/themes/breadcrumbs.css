@@ -124,7 +124,7 @@
 .breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-tag,
 .breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-pseudo-classes,
 .breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-classes {
-  color: var(--theme-highlight-blue);
+  color: var(--primary-accent);
 }
 
 .theme-dark .breadcrumbs-widget-item {

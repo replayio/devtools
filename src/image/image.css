@@ -86,6 +86,9 @@
 .theme-twisty {
   background-image: url(~devtools/client/themes/images/arrow.svg) !important;
 }
+.selected > .theme-twisty {
+  background-image: url(~devtools/client/themes/images/arrow-white.svg) !important;
+}
 .all-tabs-menu {
   background-image: url(~devtools/client/themes/images/dropmarker.svg) !important;
 }
