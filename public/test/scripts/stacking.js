@@ -21,7 +21,7 @@ Test.describe(
 
     // floating elements are in front of unpositioned elements
     target = await Test.getMouseTarget(40, 130);
-    Test.assert(quadsAreEqual(target._rect, [0, 100, 40, 140]));
+    Test.assert(quadsAreEqual(target._rect, [5, 105, 45, 145]));
 
     // elements with visibility: hidden are ignored
     target = await Test.getMouseTarget(140, 140);
@@ -30,6 +30,18 @@ Test.describe(
     // elements with pointer-events: none are ignored
     target = await Test.getMouseTarget(240, 140);
     Test.assert(quadsAreEqual(target._rect, [210, 110, 250, 150]));
+
+    // the z-index is ignored for unpositioned elements
+    target = await Test.getMouseTarget(340, 140);
+    Test.assert(quadsAreEqual(target._rect, [330, 130, 370, 170]));
+
+    // ... except if they are flex items
+    target = await Test.getMouseTarget(40, 240);
+    Test.assert(quadsAreEqual(target._rect, [5, 205, 45, 245]));
+
+    // ... or grid items
+    target = await Test.getMouseTarget(140, 240);
+    Test.assert(quadsAreEqual(target._rect, [105, 205, 145, 245]));
   }
 );
 
