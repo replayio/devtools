@@ -28,6 +28,7 @@ import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
 import classNames from "classnames";
+import KeyboardShortcuts from "./KeyboardShortcuts";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -122,6 +123,7 @@ function App({ children, fontLoading, modal, theme }: AppProps) {
       {modal ? <AppModal modal={modal} /> : null}
       <ConfirmRenderer />
       <AppErrors />
+      <KeyboardShortcuts />
     </div>
   );
 }
