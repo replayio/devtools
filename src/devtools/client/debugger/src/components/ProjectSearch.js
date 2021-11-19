@@ -274,7 +274,7 @@ export class ProjectSearch extends Component {
       <div className="px-2">
         {status === "DONE" ? (
           <div className="whitespace-pre pl-2">
-            {totalMatches} result{totalMatches === 1 ? "" : "s"}
+            {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
           </div>
         ) : null}
         <ManagedTree
