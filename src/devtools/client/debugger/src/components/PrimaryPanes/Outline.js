@@ -239,6 +239,7 @@ export class Outline extends Component {
   render() {
     const { symbols, selectedSource } = this.props;
     const { filter } = this.state;
+    console.info({ symbols, selectedSource });
 
     if (!selectedSource) {
       return this.renderPlaceholder();

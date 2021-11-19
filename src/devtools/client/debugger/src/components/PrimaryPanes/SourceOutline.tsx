@@ -1,18 +1,14 @@
-import React, { useMemo, useCallback, useState } from "react";
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import React, { useMemo, useCallback, useState, HTMLProps } from "react";
 import classnames from "classnames";
 
-import actions from "../../actions";
-import * as selectors from "../../selectors";
-import { Redacted } from "ui/components/Redacted";
-
-import PreviewFunction from "../shared/PreviewFunction";
 import { fuzzySearch } from "../../utils/function";
 import uniq from "lodash/uniq";
-import OutlineFilter from "./OutlineFilter";
-
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { Location } from "@recordreplay/protocol";
+import { Class } from "@babel/types";
+import { SourceLocation } from "graphql";
+import { Source } from "protocol/thread/thread";
 
 function formatData(symbols: any, filter: string) {
   if (!symbols || !symbols.functions) {
@@ -30,22 +26,58 @@ function formatData(symbols: any, filter: string) {
   return { classes, namedFunctions };
 }
 
-type PropTypes = {
-  selectLocation: any;
+type SymbolLocation = {
+  start: SourceLocation;
+  end: SourceLocation;
+};
+
+type ClassSymbol = {
+  name: string;
+  parent: null | ClassSymbol;
+};
+
+type FunctionSymbol = {
+  name: string | null;
+  identifier: string | null;
+  index: number;
+  klass: string | null;
+  location: SymbolLocation;
+  parameterNames: string[];
+};
+
+type PropTypes = HTMLProps<HTMLDivElement> & {
+  selectLocation: {
+    id: string;
+    url: string;
+    relativeUrl: string;
+    isPrettyPrinted: boolean;
+    content: {
+      state: string;
+      value: {
+        type: "text";
+        value: string;
+      };
+    };
+  };
   symbols: {
-    functions: {}[];
-    classes: {}[];
+    functions: FunctionSymbol[];
+    classes: ClassSymbol[];
     hasJsx: boolean;
     hasTypes: boolean;
     loading: boolean;
   };
 };
 
-function NewOutline({ selectLocation, symbols }: PropTypes) {
+export function SourceOutline({
+  className,
+  selectLocation,
+  selectedSource,
+  symbols,
+  ...props
+}: PropTypes) {
   const [filter, setFilter] = useState("");
 
   const namedFunctions = useMemo(() => {
-    console.info("symbol change!", symbols);
     const { namedFunctions } = formatData(symbols, filter);
     return namedFunctions;
   }, [filter, symbols]);
@@ -54,6 +86,7 @@ function NewOutline({ selectLocation, symbols }: PropTypes) {
     ({ index, style }) => {
       const func = namedFunctions[index];
       const { name, location, parameterNames } = func;
+      console.info(func);
 
       return (
         <li
@@ -63,18 +96,20 @@ function NewOutline({ selectLocation, symbols }: PropTypes) {
           style={style}
         >
           <span className="outline-list__element-icon">λ</span>
-          <Redacted className="inline-block">
+          {name}
+          {/* <Redacted className="inline-block">
             <PreviewFunction func={{ name, parameterNames }} />
-          </Redacted>
+          </Redacted> */}
         </li>
       );
     },
     [namedFunctions]
   );
+  console.info(namedFunctions);
 
   return (
-    <div className="outline">
-      <OutlineFilter filter={filter} updateFilter={setFilter} />
+    <div {...props} className={classnames("h-full", className)}>
+      {/* <OutlineFilter filter={filter} updateFilter={setFilter} /> */}
       <AutoSizer>
         {({ height, width }) => (
           <List
@@ -91,17 +126,3 @@ function NewOutline({ selectLocation, symbols }: PropTypes) {
     </div>
   );
 }
-
-const mapStateToProps = state => {
-  const selectedSource = selectors.getSelectedSourceWithContent(state);
-  const symbols = selectedSource ? selectors.getSymbols(state, selectedSource) : null;
-
-  return {
-    selectedSource,
-    symbols,
-  };
-};
-
-export default connect(mapStateToProps, {
-  selectLocation: actions.selectLocation,
-})(NewOutline);
