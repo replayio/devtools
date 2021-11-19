@@ -100,7 +100,6 @@ function TeamNamePage({
       variables: {
         name: inputValue,
         planKey: organization ? "org-v1" : "team-v1",
-        organization,
       },
     });
     trackEvent("created-team");

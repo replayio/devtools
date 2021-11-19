@@ -15,13 +15,10 @@ import { PendingWorkspaceInvitation, Subscription, Workspace, WorkspaceUserRole 
 const NO_WORKSPACES: Workspace[] = [];
 
 export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
-  const [createNewWorkspace, { error }] = useMutation<
-    any,
-    { name: string; planKey?: string; organization?: boolean }
-  >(
+  const [createNewWorkspace, { error }] = useMutation<any, { name: string; planKey?: string }>(
     gql`
-      mutation CreateNewWorkspace($name: String!, $planKey: String, $organization: Boolean) {
-        createWorkspace(input: { name: $name, planKey: $planKey, organization: $organization }) {
+      mutation CreateNewWorkspace($name: String!, $planKey: String!) {
+        createWorkspace(input: { name: $name, planKey: $planKey }) {
           success
           workspace {
             id
