@@ -15,11 +15,19 @@ function setupShortcuts() {
 
 const globalShortcuts = setupShortcuts();
 
-function KeyboardShortcuts({ setSelectedPrimaryPanel }: PropsFromRedux) {
+function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: PropsFromRedux) {
+  const openFileSearch = () => {
+    if (viewMode !== "dev") {
+      setViewMode("dev");
+    }
+
+    setSelectedPrimaryPanel("search");
+  };
+
   useEffect(() => {
     if (!globalShortcuts) return;
 
-    globalShortcuts.on("CmdOrCtrl+Shift+F", () => setSelectedPrimaryPanel("search"));
+    globalShortcuts.on("CmdOrCtrl+Shift+F", openFileSearch);
   }, []);
 
   return null;
@@ -28,8 +36,9 @@ function KeyboardShortcuts({ setSelectedPrimaryPanel }: PropsFromRedux) {
 const connector = connect(
   (state: UIState) => ({
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
+    viewMode: selectors.getViewMode(state),
   }),
-  { setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel }
+  { setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel, setViewMode: actions.setViewMode }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(KeyboardShortcuts);
