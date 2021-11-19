@@ -334,7 +334,6 @@ export class ProjectSearch extends Component {
   }
 
   render() {
-    console.info(this.state);
     return (
       <div className="search-container">
         <div className="project-text-search">
