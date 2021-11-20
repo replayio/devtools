@@ -2,13 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+.outlines-pane > ._content,
+.outlines-pane .outline {
+  height: 100%;
+  overflow-y: hidden;
+}
+
 .outline__container {
   height: 100%;
+  overflow-y: hidden;
+
   display: flex;
   flex-direction: column;
 }
 
-.outline > div {
+.outlines-pane .outline > div {
   width: 100%;
   position: relative;
 }
@@ -132,32 +140,5 @@
 
 .outline-list__element.focused .outline-list__element-icon,
 .outline-list__element.focused .function-signature * {
-  color: var(--theme-selection-color);
-}
-
-.outline-footer {
-  display: flex;
-  box-sizing: border-box;
-  min-height: 25px;
-  flex-grow: 0;
-  background: var(--theme-body-background);
-  border-top: 1px solid var(--theme-splitter-color);
-  opacity: 1;
-  z-index: 1;
-  user-select: none;
-}
-
-.outline-footer button {
-  color: var(--theme-body-color);
-}
-
-.sort-button {
-  cursor: pointer;
-  padding: 0 1em;
-  transition: background-color 0.2s ease-out;
-}
-
-.outline-footer .sort-button--active {
-  background: var(--theme-selection-background);
   color: var(--theme-selection-color);
 }
