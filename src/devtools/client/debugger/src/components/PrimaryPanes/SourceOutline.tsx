@@ -134,7 +134,7 @@ export function SourceOutline({
   const items = useMemo(() => getOutlineSymbols(symbols, filter), [filter, symbols]);
 
   const focusedSymbol = useMemo(
-    () => findClosestEnclosedSymbol(symbols, cursorPosition),
+    () => (cursorPosition ? findClosestEnclosedSymbol(symbols, cursorPosition) : null),
     [cursorPosition, symbols]
   );
 
