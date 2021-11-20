@@ -190,7 +190,7 @@ class Message extends Component {
         actions.createComment(
           executionPointTime,
           executionPoint,
-          undefined,
+          null,
           true,
           frame,
           { ...this.props.auth0.user, id: userId },
