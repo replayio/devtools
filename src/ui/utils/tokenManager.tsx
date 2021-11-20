@@ -13,8 +13,8 @@ const tokenRefreshSecondsBeforeExpiry = 60;
 
 // Auth0 E2E tests require a different clientId
 const clientId: string = usesWindow(win => {
-  // const isTesting = win ? new URL(win.location.href).searchParams.get("e2etest") : false;
-  return "hIAHByYBMYKvKUh06Sro6vAgrMcolImb"; // isTesting ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm" : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
+  const isTesting = win ? new URL(win.location.href).searchParams.get("e2etest") : false;
+  return isTesting ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm" : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 });
 
 export interface TokenState {
