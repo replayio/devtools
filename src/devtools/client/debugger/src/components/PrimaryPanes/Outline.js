@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import React, { Component, useEffect, useRef } from "react";
 import { connect } from "../../utils/connect";
 import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
@@ -24,6 +22,7 @@ import {
 import OutlineFilter from "./OutlineFilter";
 import PreviewFunction from "../shared/PreviewFunction";
 import uniq from "lodash/uniq";
+import { isVisible } from "ui/utils/dom";
 
 const getFunctionKey = ({ name, location }) =>
   `${name}:${location.start.line}:${location.start.column}`;
@@ -44,19 +43,16 @@ const filterOutlineItem = (name, filter) => {
   return fuzzaldrinScore(name, filter) > FUZZALDRIN_FILTER_THRESHOLD;
 };
 
-// Checks if an element is visible inside its parent element
-function isVisible(element, parent) {
-  const parentTop = parent.getBoundingClientRect().top;
-  const parentBottom = parent.getBoundingClientRect().bottom;
-  const elTop = element.getBoundingClientRect().top;
-  const elBottom = element.getBoundingClientRect().bottom;
-  return parentTop < elTop && parentBottom > elBottom;
-}
-
-const OutlineFunction = React.memo(function OutlineFunction({ isFocused, func, onSelect }) {
+const OutlineFunction = React.memo(function OutlineFunction({
+  isFocused,
+  func,
+  onSelect,
+  outlineList,
+}) {
   const itemRef = useRef();
+
   useEffect(() => {
-    if (isFocused && itemRef.current) {
+    if (isFocused && itemRef.current && !isVisible(outlineList, itemRef.current)) {
       itemRef.current.scrollIntoView({ block: "center" });
     }
   }, [isFocused]);
@@ -79,9 +75,11 @@ const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
   classInfo,
   isFocused,
   onSelect,
+  outlineList,
   children,
 }) {
   const itemRef = useRef();
+
   useEffect(() => {
     if (isFocused && itemRef.current) {
       itemRef.current.scrollIntoView({ block: "center" });
@@ -98,7 +96,7 @@ const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
         ref={itemRef}
       >
         {classFunc ? (
-          <OutlineFunction func={classFunc} isFocused={false} />
+          <OutlineFunction func={classFunc} isFocused={false} outlineList={outlineList} />
         ) : (
           <div>
             <span className="keyword">class</span> {item.name}
@@ -129,7 +127,7 @@ export class Outline extends Component {
     if (
       this.focusedElRef &&
       isUniqueEvent &&
-      !isVisible(this.focusedElRef, this.refs.outlineList)
+      !isVisible(this.refs.outlineList, this.focusedElRef)
     ) {
       this.focusedElRef.scrollIntoView({ block: "center" });
     }
@@ -181,9 +179,15 @@ export class Outline extends Component {
     const { focusedItem } = this.state;
     const isFocused = focusedItem === func;
     const key = getFunctionKey(func);
-
+    const outlineList = this.refs.outlineList;
     return (
-      <OutlineFunction key={key} isFocused={isFocused} func={func} onSelect={this.selectItem} />
+      <OutlineFunction
+        key={key}
+        isFocused={isFocused}
+        func={func}
+        onSelect={this.selectItem}
+        outlineList={outlineList}
+      />
     );
   }
 
@@ -197,6 +201,7 @@ export class Outline extends Component {
 
   renderClassFunctions(klass, functions) {
     const { symbols } = this.props;
+    const outlineList = this.refs.outlineList;
 
     if (!symbols || symbols.loading || klass == null || functions.length == 0) {
       return null;
@@ -209,9 +214,13 @@ export class Outline extends Component {
 
     const item = classFunc || classInfo;
     const isFocused = focusedItem === item;
-
     return (
-      <OutlineClassFunctions classFunc={classFunc} classInfo={classInfo} isFocused={isFocused}>
+      <OutlineClassFunctions
+        classFunc={classFunc}
+        classInfo={classInfo}
+        isFocused={isFocused}
+        outlineList={outlineList}
+      >
         {classFunctions.map(func => this.renderFunction(func))}
       </OutlineClassFunctions>
     );
