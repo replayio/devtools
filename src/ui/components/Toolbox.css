@@ -39,6 +39,9 @@
 }
 
 /* Toolbar Styles */
+.toolbar-panel-button:first-child {
+  margin-top: 0;
+}
 
 .toolbar-panel-button {
   float: left;
@@ -49,6 +52,7 @@
   border-radius: 4px;
   cursor: pointer;
   transition-duration: 200ms;
+  margin-top: 4px;
 }
 
 .toolbar-panel-button:hover {
