@@ -3,7 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Remark } from "ui/state/comments";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
-import { omit } from "lodash";
+import omit from "lodash/omit";
 import { GET_USER_ID } from "ui/graphql/users";
 
 export default function useAddComment() {

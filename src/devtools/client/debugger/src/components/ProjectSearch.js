@@ -29,7 +29,7 @@ import AccessibleImage from "./shared/AccessibleImage";
 import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
-import { groupBy } from "lodash";
+import groupBy from "lodash/groupBy";
 import { isThirdParty } from "../utils/source";
 import { sliceCodePoints } from "ui/utils/codePointString";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
