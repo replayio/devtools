@@ -22,6 +22,7 @@ const Template: Story<ComponentProps<typeof SourceOutline>> = args => (
 export const Basic = Template.bind({});
 
 Basic.args = {
+  sourceId: "pp123",
   symbols: {
     functions: [
       {
