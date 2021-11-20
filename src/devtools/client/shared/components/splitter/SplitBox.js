@@ -223,14 +223,8 @@ class SplitBox extends Component {
   // eslint-disable-next-line complexity
   render() {
     const { endPanelControl, splitterSize, vert } = this.state;
-    const {
-      startPanel,
-      endPanel,
-      minSize,
-      maxSize,
-      onSelectContainerElement,
-      initialSize,
-    } = this.props;
+    const { startPanel, endPanel, minSize, maxSize, onSelectContainerElement, initialSize } =
+      this.props;
 
     const style = Object.assign(
       {

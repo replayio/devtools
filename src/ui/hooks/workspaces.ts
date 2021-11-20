@@ -17,7 +17,7 @@ const NO_WORKSPACES: Workspace[] = [];
 export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
   const [createNewWorkspace, { error }] = useMutation<any, { name: string; planKey?: string }>(
     gql`
-      mutation CreateNewWorkspace($name: String!, $planKey: String) {
+      mutation CreateNewWorkspace($name: String!, $planKey: String!) {
         createWorkspace(input: { name: $name, planKey: $planKey }) {
           success
           workspace {

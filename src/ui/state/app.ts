@@ -21,7 +21,7 @@ export type PanelName =
   | "network"
   | "react-components"
   | "viewer";
-export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events";
+export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events" | "search";
 export type ViewMode = "dev" | "non-dev";
 export type ModalOptionsType = {
   recordingId?: string;

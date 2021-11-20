@@ -75,7 +75,7 @@ export const useFeature = (prefKey: keyof typeof features) => {
       setPref(prefs.getBoolPref(fullKey));
     };
 
-    prefsService.addObserver(`devtools.features.${prefKey}`, onUpdate, false);
+    prefsService.addObserver(fullKey, onUpdate, false);
     return () => prefsService.removeObserver(fullKey, onUpdate, false);
   }, [fullKey]);
 

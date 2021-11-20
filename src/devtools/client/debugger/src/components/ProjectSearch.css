@@ -1,21 +1,9 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-.search-container {
-  position: absolute;
-  top: var(--editor-header-height);
-  left: 0;
-  width: calc(100% - 1px);
-  height: calc(100% - var(--editor-header-height));
-  display: flex;
-  flex-direction: column;
-  z-index: 20;
-  background-color: var(--theme-body-background);
+ .search-container {
+  height: 100%;
   overflow-y: hidden;
-
-  /* Using the same colors as the Netmonitor's --table-selection-background-hover */
-  --search-result-background-hover: rgba(209, 232, 255, 0.8);
 }
 
 .theme-dark .search-container {

@@ -2,17 +2,15 @@ import React, { ComponentProps } from "react";
 
 import { Story, Meta } from "@storybook/react";
 
-import RequestTable from "ui/components/NetworkMonitor/RequestTable";
+import NetworkMonitor from "ui/components/NetworkMonitor";
 import { requestProps } from "./utils";
 
 export default {
-  title: "Network Monitor/Request Table",
-  component: RequestTable,
+  title: "Network Monitor/Network Monitor",
+  component: NetworkMonitor,
 } as Meta;
 
-const Template: Story<ComponentProps<typeof RequestTable>> = args => <RequestTable {...args} />;
-
-export const Loaded = Template.bind({});
+const Template: Story<ComponentProps<typeof NetworkMonitor>> = args => <NetworkMonitor {...args} />;
 
 const requests = [
   requestProps("1", "https://app.replay.io/graphql", 200),
@@ -21,9 +19,10 @@ const requests = [
   requestProps("4", "https://app.replay.io/graphql", 400),
 ];
 
-Loaded.args = {
+export const Basic = Template.bind({});
+
+Basic.args = {
   currentTime: 3,
   events: requests.flatMap(r => r.events),
   requests: requests.map(r => r.info),
-  seek: (point: string, time: number, hasFrames: boolean, pauseId?: string | undefined) => false,
 };

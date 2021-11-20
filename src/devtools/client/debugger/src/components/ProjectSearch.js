@@ -13,7 +13,6 @@ import actions from "../actions";
 import { getEditor } from "../utils/editor";
 import { highlightMatches } from "../utils/project-search";
 
-import { statusType } from "../reducers/project-text-search";
 import { getRelativePath } from "../utils/sources-tree";
 import {
   getActiveSearch,
@@ -21,14 +20,50 @@ import {
   getTextSearchStatus,
   getTextSearchQuery,
   getContext,
+  getSources,
 } from "../selectors";
 
 import ManagedTree from "./shared/ManagedTree";
-import SearchInput from "./shared/SearchInput";
 import AccessibleImage from "./shared/AccessibleImage";
 
 import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
+import { ThreadFront } from "protocol/thread";
+import { groupBy } from "lodash";
+import { isThirdParty } from "../utils/source";
+import { sliceCodePoints } from "ui/utils/codePointString";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Spinner from "ui/components/shared/Spinner";
+
+const formatMatchesBySource = (matches, sourcesById) => {
+  const resultsBySource = groupBy(matches, res => res.location.sourceId);
+  return Object.entries(resultsBySource).map(([sourceId, matches]) => {
+    return {
+      type: "RESULT",
+      sourceId,
+      filepath: sourcesById[sourceId]?.url,
+      matches: matches.map(match => {
+        // We have to do this array dance to navigate the string in unicode "code points"
+        // because `colunm` is calculated using "code points" as opposed to JS strings
+        // which use "code units". It makes a difference in string with fun unicode characters.
+        const matchStr = sliceCodePoints(
+          match.context,
+          match.contextStart.column,
+          match.contextEnd.column
+        );
+        return {
+          type: "MATCH",
+          column: match.location.column,
+          line: match.location.line,
+          sourceId,
+          match: matchStr,
+          matchIndex: match.context.indexOf(matchStr),
+          value: match.context,
+        };
+      }),
+    };
+  });
+};
 
 function getFilePath(item, index) {
   return item.type === "RESULT"
@@ -48,6 +83,11 @@ export class ProjectSearch extends Component {
       inputValue: this.props.query || "",
       inputFocused: false,
       focusedItem: null,
+      results: {
+        status: "DONE",
+        query: "",
+        matchesBySource: [],
+      },
     };
   }
 
@@ -70,9 +110,34 @@ export class ProjectSearch extends Component {
     }
   }
 
-  doSearch(searchTerm) {
+  async doSearch(query) {
     trackEvent("project_search.search");
-    this.props.searchSources(this.props.cx, searchTerm);
+
+    const updateResults = getNextResults => {
+      this.setState(prevState => ({
+        results: {
+          ...prevState.results,
+          ...getNextResults(prevState.results),
+        },
+      }));
+    };
+
+    updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
+
+    await ThreadFront.searchSources({ query }, matches => {
+      const { sourcesById } = this.props;
+      const bestMatches = matches.filter(match => {
+        const { sourceId } = match.location;
+        const source = sourcesById[sourceId];
+        return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
+      });
+      const newMatchesBySource = formatMatchesBySource(bestMatches, sourcesById);
+      updateResults(prevResults => ({
+        matchesBySource: [...prevResults.matchesBySource, ...newMatchesBySource],
+      }));
+    });
+
+    updateResults(() => ({ status: "DONE" }));
   }
 
   toggleProjectTextSearch = e => {
@@ -106,7 +171,11 @@ export class ProjectSearch extends Component {
     );
   };
 
-  getResultCount = () => this.props.results.reduce((count, file) => count + file.matches.length, 0);
+  getTotalMatches = () =>
+    this.state.results.matchesBySource.reduce(
+      (count, sourceMatch) => sourceMatch.matches.length + count,
+      0
+    );
 
   onKeyDown = e => {
     if (e.key === "Escape") {
@@ -120,7 +189,7 @@ export class ProjectSearch extends Component {
     }
     this.setState({ focusedItem: null });
     const query = sanitizeQuery(this.state.inputValue);
-    if (query) {
+    if (query && query !== this.state.query && query.length >= 3) {
       this.doSearch(query);
     }
   };
@@ -189,14 +258,27 @@ export class ProjectSearch extends Component {
   };
 
   renderResults = () => {
-    const { status, results } = this.props;
-    if (!this.props.query) {
+    const { results } = this.state;
+    const { status, matchesBySource } = results;
+    if (!results.query) {
       return;
     }
-    if (results.length) {
-      return (
+
+    if (!matchesBySource.length) {
+      const msg = status === "LOADING" ? "Loading\u2026" : "No results found";
+      return <div className="px-2">{msg}</div>;
+    }
+
+    const totalMatches = this.getTotalMatches();
+    return (
+      <div className="overflow-hidden px-2">
+        {status === "DONE" ? (
+          <div className="whitespace-pre pl-2">
+            {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
+          </div>
+        ) : null}
         <ManagedTree
-          getRoots={() => results}
+          getRoots={() => matchesBySource}
           getChildren={file => file.matches || []}
           itemHeight={24}
           autoExpandAll={true}
@@ -208,52 +290,50 @@ export class ProjectSearch extends Component {
           focused={this.state.focusedItem}
           onFocus={this.onFocus}
         />
-      );
-    }
-    const msg = status === statusType.fetching ? "Loading\u2026" : "No results found";
-    return <div className="no-result-msg absolute-center">{msg}</div>;
+      </div>
+    );
   };
 
   renderSummary = () => {
     if (this.props.query !== "") {
       const resultsSummaryString = "#1 result;#1 results";
-      const count = this.getResultCount();
+      const count = this.getTotalMatches();
       return PluralForm.get(count, resultsSummaryString).replace("#1", count);
     }
     return "";
   };
 
   shouldShowErrorEmoji() {
-    return !this.getResultCount() && this.props.status === statusType.done;
+    return !this.getTotalMatches() && this.state.results.status === "DONE";
   }
 
   renderInput() {
-    const { cx, closeProjectSearch, status } = this.props;
+    const { results } = this.state;
+    const { status } = results;
+
     return (
-      <SearchInput
-        query={this.state.inputValue}
-        count={this.getResultCount()}
-        placeholder={"Find in files…"}
-        size="big"
-        showErrorEmoji={this.shouldShowErrorEmoji()}
-        summaryMsg={this.renderSummary()}
-        isLoading={status === statusType.fetching}
-        onChange={this.inputOnChange}
-        onFocus={() => this.setState({ inputFocused: true })}
-        onBlur={() => this.setState({ inputFocused: false })}
-        onKeyDown={this.onKeyDown}
-        onHistoryScroll={this.onHistoryScroll}
-        handleClose={() => closeProjectSearch(cx)}
-        ref="searchInput"
-      />
+      <div className="p-2">
+        <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
+          <MaterialIcon>search</MaterialIcon>
+          <input
+            style={{ boxShadow: "unset" }}
+            placeholder="Find in files…"
+            className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
+            type="text"
+            value={this.state.inputValue}
+            onChange={this.inputOnChange}
+            onFocus={() => this.setState({ inputFocused: true })}
+            onBlur={() => this.setState({ inputFocused: false })}
+            onKeyDown={this.onKeyDown}
+            autoFocus
+          />
+          {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
+        </div>
+      </div>
     );
   }
 
   render() {
-    if (!this.isProjectSearchEnabled()) {
-      return null;
-    }
-
     return (
       <div className="search-container">
         <div className="project-text-search">
@@ -274,6 +354,7 @@ const mapStateToProps = state => ({
   activeSearch: getActiveSearch(state),
   results: getTextSearchResults(state),
   query: getTextSearchQuery(state),
+  sourcesById: getSources(state).values,
   status: getTextSearchStatus(state),
 });
 

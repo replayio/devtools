@@ -52,6 +52,17 @@ export async function trackMixpanelEvent(event: string, properties?: Dict) {
   }
 }
 
+const eventsBeingOnlyTrackedOnce = new Set();
+
+export async function trackEventOnce(event: string, properties?: Dict) {
+  if (eventsBeingOnlyTrackedOnce.has(event)) {
+    return;
+  }
+
+  eventsBeingOnlyTrackedOnce.add(event);
+  trackMixpanelEvent(event, properties);
+}
+
 export function setMixpanelContext({ id, email }: TelemetryUser) {
   mixpanel.register({ isReplayBrowser: isReplayBrowser() });
 
@@ -80,7 +91,7 @@ export const startUploadWaitTracking = () => {
 };
 export const endUploadWaitTracking = (sessionId: SessionId) => {
   // This one gets tracked in Honeycomb.
-  trackTiming("kpi-time-to-view-replay");
+  trackTiming("kpi-time-to-view-replay", { sessionId });
   trackMixpanelEvent("upload_recording", { sessionId });
 };
 

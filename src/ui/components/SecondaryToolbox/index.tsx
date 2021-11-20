@@ -16,8 +16,10 @@ import ToolboxOptions from "./ToolboxOptions";
 import { trackEvent } from "ui/utils/telemetry";
 
 import "ui/setup/dynamic/inspector";
-import { ConnectedRequestTable } from "../NetworkMonitor/RequestTable";
 import { UserSettings } from "ui/types";
+import NetworkMonitor from "../NetworkMonitor";
+import classNames from "classnames";
+import WaitForReduxSlice from "../WaitForReduxSlice";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -105,20 +107,26 @@ function ConsolePanel() {
 function InspectorPanel() {
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
-      <React.Suspense fallback={null}>
-        <InspectorApp />
-      </React.Suspense>
+      <WaitForReduxSlice slice="inspector">
+        <React.Suspense fallback={null}>
+          <InspectorApp />
+        </React.Suspense>
+      </WaitForReduxSlice>
     </div>
   );
 }
 
-function getAllowedPanels(settings: UserSettings, hasNetwork: boolean) {
+function getAllowedPanels(
+  settings: UserSettings,
+  hasNetwork: boolean,
+  hasReactComponents: boolean
+) {
   const allowedPanels = ["console"];
 
   if (hasNetwork) {
     allowedPanels.push("network");
   }
-  if (settings.showReact) {
+  if (settings.showReact && hasReactComponents) {
     allowedPanels.push("react-components");
   }
   if (settings.showElements) {
@@ -136,10 +144,9 @@ function SecondaryToolbox({
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
   const hasNetwork = hooks.useFeature("network");
-  const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
 
-  if (!getAllowedPanels(userSettings, hasNetwork).includes(selectedPanel)) {
+  if (!getAllowedPanels(userSettings, hasNetwork, hasReactComponents).includes(selectedPanel)) {
     setSelectedPanel("console");
   }
 
@@ -157,12 +164,22 @@ function SecondaryToolbox({
         </header>
       )}
       <Redacted className="secondary-toolbox-content text-xs">
-        {selectedPanel === "network" && <ConnectedRequestTable />}
-        {selectedPanel === "console" ? <ConsolePanel /> : null}
-        {selectedPanel === "inspector" ? <InspectorPanel /> : null}
-        {showReact && hasReactComponents && selectedPanel === "react-components" ? (
+        {/* {selectedPanel === "network" && <NetworkMonitor />} */}
+        <div className={classNames("h-full", { hidden: selectedPanel !== "network" })}>
+          <NetworkMonitor />
+        </div>
+        {/* {selectedPanel === "console" ? <ConsolePanel /> : null} */}
+        <div className={classNames("h-full", { hidden: selectedPanel !== "console" })}>
+          <ConsolePanel />
+        </div>
+        {/* {selectedPanel === "inspector" ? <InspectorPanel /> : null} */}
+        <div className={classNames("h-full", { hidden: selectedPanel !== "inspector" })}>
+          <InspectorPanel />
+        </div>
+        {/* {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null} */}
+        <div className={classNames("h-full", { hidden: selectedPanel !== "react-components" })}>
           <ReactDevtoolsPanel />
-        ) : null}
+        </div>
       </Redacted>
     </div>
   );

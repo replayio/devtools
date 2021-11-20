@@ -32,21 +32,30 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  width: 100%;
+}
+
+.welcomebox__searchSources,
+.welcomebox__searchProject,
+.welcomebox__allShortcuts {
+  background-color: var(--chrome);
+  margin: 15px 0;
+  border-radius: 8px;
+  display: block;
+  font-size: 15px;
 }
 
 .welcomebox__searchSources:hover,
 .welcomebox__searchProject:hover,
 .welcomebox__allShortcuts:hover {
-  color: var(--theme-body-color);
+  background-color: var(--theme-tab-background);
 }
 
 .shortcutKey {
   direction: ltr;
   text-align: right;
   padding-right: 10px;
-  font-size: 14px;
   line-height: 18px;
-  color: var(--theme-body-color);
 }
 
 .shortcutKey:dir(rtl) {
@@ -62,14 +71,14 @@
 .shortcutLabel {
   text-align: start;
   padding-left: 10px;
-  font-size: 14px;
   line-height: 18px;
 }
 
 .shortcutFunction {
   margin: 0 auto;
-  color: var(--theme-comment);
   display: table;
+  min-width: 300px;
+  max-width: 400px;
 }
 
 .shortcutFunction p {
@@ -78,6 +87,6 @@
 
 .shortcutFunction .shortcutKey,
 .shortcutFunction .shortcutLabel {
-  padding: 10px 5px;
+  padding: 10px 15px;
   display: table-cell;
 }

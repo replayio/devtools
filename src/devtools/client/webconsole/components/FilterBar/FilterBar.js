@@ -24,8 +24,8 @@ const { FILTERBAR_DISPLAY_MODES, MESSAGE_TYPE } = require("devtools/client/webco
 
 // Additional Components
 const { Events } = require("devtools/client/webconsole/components/FilterBar/Events");
-const ConsoleSettings = require("devtools/client/webconsole/components/FilterBar/ConsoleSettings")
-  .default;
+const ConsoleSettings =
+  require("devtools/client/webconsole/components/FilterBar/ConsoleSettings").default;
 
 const SearchBox = createFactory(require("devtools/client/shared/components/SearchBox"));
 const { isDemo } = require("ui/utils/environment");
@@ -124,6 +124,9 @@ class FilterBar extends Component {
       const filterButtonsToolbar = this.wrapperNode.querySelector(
         ".webconsole-filterbar-secondary"
       );
+      if (!filterButtonsToolbar) {
+        return;
+      }
 
       const buttonMargin = 5;
       const filterButtonsToolbarWidth = Array.from(filterButtonsToolbar.children).reduce(
