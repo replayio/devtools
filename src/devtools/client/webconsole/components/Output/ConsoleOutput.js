@@ -7,6 +7,7 @@ const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const { actions } = require("ui/actions");
+const { isVisible } = require("ui/utils/dom");
 const ReactDOM = require("react-dom");
 const { selectors } = require("ui/reducers");
 const { isDemo } = require("ui/utils/environment");
@@ -47,12 +48,6 @@ class ConsoleOutput extends Component {
     this.maybeScrollToResult(prevProps);
   }
 
-  isVisible(parent, child) {
-    const { top, bottom } = child.getBoundingClientRect();
-    const scrolledParentRect = parent.getBoundingClientRect();
-    return top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
-  }
-
   scrollToClosestMessage() {
     const { closestMessage } = this.props;
 
@@ -68,7 +63,7 @@ class ConsoleOutput extends Component {
     }
 
     // Don't scroll to the message if it's already in view.
-    if (this.isVisible(outputNode, element)) {
+    if (isVisible(outputNode, element)) {
       return;
     }
 
@@ -97,7 +92,7 @@ class ConsoleOutput extends Component {
     }
 
     // Don't scroll to the evaluation result if it's already in view.
-    if (this.isVisible(node, resultNode)) {
+    if (isVisible(node, resultNode)) {
       return;
     }
 
