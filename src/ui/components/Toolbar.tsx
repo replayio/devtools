@@ -18,7 +18,6 @@ function Toolbar({
   setSelectedPrimaryPanel,
   togglePaneCollapse,
   panelCollapsed,
-  progressPercentage,
   viewMode,
   isPaused,
 }: PropsFromRedux) {
@@ -90,6 +89,21 @@ function Toolbar({
               />
             </div>
             <div
+              className={classnames("toolbar-panel-button search", {
+                active: selectedPrimaryPanel == "search",
+              })}
+            >
+              <IconWithTooltip
+                icon={
+                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon" iconSize="2xl">
+                    search
+                  </MaterialIcon>
+                }
+                content={"Search"}
+                handleClick={() => onClick("search")}
+              />
+            </div>
+            <div
               className={classnames("toolbar-panel-button debug", {
                 active: selectedPrimaryPanel == "debug",
                 paused: isPaused,
@@ -103,21 +117,6 @@ function Toolbar({
                 }
                 content={"Pause Information"}
                 handleClick={() => onClick("debug")}
-              />
-            </div>
-            <div
-              className={classnames("toolbar-panel-button search", {
-                active: selectedPrimaryPanel == "search",
-              })}
-            >
-              <IconWithTooltip
-                icon={
-                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon" iconSize="2xl">
-                    search
-                  </MaterialIcon>
-                }
-                content={"Search"}
-                handleClick={() => onClick("search")}
               />
             </div>
           </>
