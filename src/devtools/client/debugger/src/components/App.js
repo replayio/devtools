@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component, useEffect, useState, useRef } from "react";
+import React, { Component, useEffect, useState, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import { connect } from "../utils/connect";
@@ -34,7 +34,6 @@ const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";
 
-import ProjectSearch from "./ProjectSearch";
 import Editor from "./Editor";
 import WelcomeBox from "./WelcomeBox";
 import EditorTabs from "./Editor/Tabs";
@@ -44,12 +43,24 @@ import SidePanel from "ui/components/SidePanel";
 import { waitForEditor } from "../utils/editor/create-editor";
 import { isDemo } from "ui/utils/environment";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
+import useWidthObserver from "ui/utils/useWidthObserver";
+import classNames from "classnames";
 
-const EditorPane = ({ children }) => (
-  <div className="editor-pane overflow-hidden rounded-lg">
-    <div className="editor-container relative">{children}</div>
-  </div>
-);
+const EditorPane = ({ children }) => {
+  const [paneNode, setPanelNode] = useState(null);
+  const nodeWidth = useWidthObserver(paneNode);
+
+  return (
+    <div
+      className={classNames("editor-pane overflow-hidden rounded-lg", {
+        narrow: nodeWidth && nodeWidth < 240,
+      })}
+      ref={node => setPanelNode(node)}
+    >
+      <div className="editor-container relative">{children}</div>
+    </div>
+  );
+};
 
 class Debugger extends Component {
   state = {
