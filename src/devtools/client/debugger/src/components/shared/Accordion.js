@@ -4,7 +4,8 @@
 
 //
 import classNames from "classnames";
-import { findLastIndex, lastIndexOf } from "lodash";
+import findLastIndex from "lodash/findLastIndex";
+import lastIndexOf from "lodash/lastIndexOf";
 import React, { cloneElement, Component } from "react";
 import AccessibleImage from "./AccessibleImage";
 
