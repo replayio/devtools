@@ -1,17 +1,15 @@
-import React, { useMemo, useCallback, useState, HTMLProps, useRef, useEffect } from "react";
+import React, { HTMLProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
 
 import { fuzzySearch } from "../../utils/function";
-import uniq from "lodash/uniq";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Source, SourceLocation } from "graphql";
 import OutlineFilter from "./OutlineFilter";
 import { Redacted } from "ui/components/Redacted";
 import PreviewFunction from "../shared/PreviewFunction";
-import { groupBy, keyBy, reduce, sortBy } from "lodash";
+import { groupBy, keyBy } from "lodash";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
-import { Location } from "@recordreplay/protocol";
+import { Location, SourceLocation } from "@recordreplay/protocol";
 
 type ClassSymbol = {
   name: string;
@@ -98,7 +96,7 @@ const SourceOutlineClass = React.memo(function OutlineClassFunctions({
         className={classnames("cursor-pointer", { focused: isFocused })}
         onClick={() => onSelect(klass)}
       >
-        {"paramNames" in klass ? (
+        {isFunctionSymbol(klass) ? (
           <SourceOutlineFunction func={klass} isFocused={false} />
         ) : (
           <div>
@@ -131,7 +129,7 @@ export function SourceOutline({
 }: PropTypes) {
   const [filter, setFilter] = useState("");
 
-  const items = useMemo(() => getOutlineSymbols(symbols, filter), [filter, symbols]);
+  const outlineSymbols = useMemo(() => getOutlineSymbols(symbols, filter), [filter, symbols]);
 
   const focusedSymbol = useMemo(
     () => (cursorPosition ? findClosestEnclosedSymbol(symbols, cursorPosition) : null),
@@ -150,7 +148,7 @@ export function SourceOutline({
 
   const OutlineItem = useCallback(
     ({ index, style }) => {
-      const symbol = items[index];
+      const symbol = outlineSymbols[index];
       const isFocused = focusedSymbol === symbol;
       return (
         <div style={style}>
@@ -170,7 +168,7 @@ export function SourceOutline({
         </div>
       );
     },
-    [handleSelectSymbol, items]
+    [handleSelectSymbol, outlineSymbols]
   );
 
   return (
@@ -183,7 +181,7 @@ export function SourceOutline({
               innerElementType="ol"
               height={height}
               width={width}
-              itemCount={items.length}
+              itemCount={outlineSymbols.length}
               itemSize={24}
             >
               {OutlineItem}

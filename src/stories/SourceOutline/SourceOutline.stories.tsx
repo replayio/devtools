@@ -7,8 +7,8 @@ export default {
   title: "Soure Outline/Outline",
   component: SourceOutline,
   argTypes: {
-    onSelectLocation: {
-      action: "location selected",
+    onChangeCursorPosition: {
+      action: "outline item selected",
     },
   },
 } as Meta;
@@ -22,6 +22,11 @@ const Template: Story<ComponentProps<typeof SourceOutline>> = args => (
 export const Basic = Template.bind({});
 
 Basic.args = {
+  cursorPosition: {
+    sourceId: "pp123",
+    line: 264,
+    column: 2,
+  },
   sourceId: "pp123",
   symbols: {
     functions: [
