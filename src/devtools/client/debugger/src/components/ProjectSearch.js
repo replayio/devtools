@@ -177,12 +177,6 @@ export class ProjectSearch extends Component {
     );
   };
 
-  getTotalMatches = () =>
-    this.state.results.matchesBySource.reduce(
-      (count, sourceMatch) => sourceMatch.matches.length + count,
-      0
-    );
-
   onKeyDown = e => {
     if (e.key === "Escape") {
       return;
@@ -245,12 +239,9 @@ export class ProjectSearch extends Component {
   renderMatch = (match, focused) => {
     return (
       <div
-        className={classnames("result", { focused })}
-        onClick={() => setTimeout(() => this.selectMatchItem(match), 50)}
+        className={classnames("result pl-4", { focused })}
+        onClick={() => this.selectMatchItem(match)}
       >
-        <span className="line-number" key={match.line}>
-          {match.line}
-        </span>
         {highlightMatches(match)}
       </div>
     );
@@ -262,6 +253,26 @@ export class ProjectSearch extends Component {
     }
     return this.renderMatch(item, focused);
   };
+
+  renderSummary() {
+    const { results } = this.state;
+    const { status, matchesBySource } = results;
+
+    if (status !== "DONE") {
+      return null;
+    }
+
+    const totalMatches = matchesBySource.reduce(
+      (count, sourceMatch) => sourceMatch.matches.length + count,
+      0
+    );
+
+    return (
+      <div className="whitespace-pre pl-2">
+        {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
+      </div>
+    );
+  }
 
   renderResults = () => {
     const { results } = this.state;
@@ -275,43 +286,27 @@ export class ProjectSearch extends Component {
       return <div className="px-2">{msg}</div>;
     }
 
-    const totalMatches = this.getTotalMatches();
     return (
-      <div className="overflow-hidden px-2">
-        {status === "DONE" ? (
-          <div className="whitespace-pre pl-2">
-            {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
-          </div>
-        ) : null}
-        <ManagedTree
-          getRoots={() => matchesBySource}
-          getChildren={file => file.matches || []}
-          itemHeight={24}
-          autoExpandAll={true}
-          autoExpandDepth={1}
-          autoExpandNodeChildrenLimit={100}
-          getParent={item => null}
-          getPath={getFilePath}
-          renderItem={this.renderItem}
-          focused={this.state.focusedItem}
-          onFocus={this.onFocus}
-        />
+      <div className="overflow-hidden px-2 flex flex-col">
+        {this.renderSummary()}
+        <div className="h-full overflow-y-auto">
+          <ManagedTree
+            getRoots={() => matchesBySource}
+            getChildren={file => file.matches || []}
+            itemHeight={24}
+            autoExpandAll={true}
+            autoExpandDepth={1}
+            autoExpandNodeChildrenLimit={100}
+            getParent={item => null}
+            getPath={getFilePath}
+            renderItem={this.renderItem}
+            focused={this.state.focusedItem}
+            onFocus={this.onFocus}
+          />
+        </div>
       </div>
     );
   };
-
-  renderSummary = () => {
-    if (this.props.query !== "") {
-      const resultsSummaryString = "#1 result;#1 results";
-      const count = this.getTotalMatches();
-      return PluralForm.get(count, resultsSummaryString).replace("#1", count);
-    }
-    return "";
-  };
-
-  shouldShowErrorEmoji() {
-    return !this.getTotalMatches() && this.state.results.status === "DONE";
-  }
 
   renderInput() {
     const { results } = this.state;
