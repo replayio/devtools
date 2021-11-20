@@ -29,40 +29,46 @@ import AccessibleImage from "./shared/AccessibleImage";
 import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
-import { groupBy } from "lodash";
+import groupBy from "lodash/groupBy";
+import sortBy from "lodash/sortBy";
 import { isThirdParty } from "../utils/source";
 import { sliceCodePoints } from "ui/utils/codePointString";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Spinner from "ui/components/shared/Spinner";
 
+const formatSourceMatches = (source, matches) => ({
+  type: "RESULT",
+  sourceId: source.id,
+  filepath: source.url,
+  matches: matches.map(match => {
+    // We have to do this array dance to navigate the string in unicode "code points"
+    // because `colunm` is calculated using "code points" as opposed to JS strings
+    // which use "code units". It makes a difference in string with fun unicode characters.
+    const matchStr = sliceCodePoints(
+      match.context,
+      match.contextStart.column,
+      match.contextEnd.column
+    );
+    return {
+      type: "MATCH",
+      column: match.location.column,
+      line: match.location.line,
+      sourceId: source.id,
+      match: matchStr,
+      matchIndex: match.context.indexOf(matchStr),
+      value: match.context,
+    };
+  }),
+});
+
 const formatMatchesBySource = (matches, sourcesById) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
-  return Object.entries(resultsBySource).map(([sourceId, matches]) => {
-    return {
-      type: "RESULT",
-      sourceId,
-      filepath: sourcesById[sourceId]?.url,
-      matches: matches.map(match => {
-        // We have to do this array dance to navigate the string in unicode "code points"
-        // because `colunm` is calculated using "code points" as opposed to JS strings
-        // which use "code units". It makes a difference in string with fun unicode characters.
-        const matchStr = sliceCodePoints(
-          match.context,
-          match.contextStart.column,
-          match.contextEnd.column
-        );
-        return {
-          type: "MATCH",
-          column: match.location.column,
-          line: match.location.line,
-          sourceId,
-          match: matchStr,
-          matchIndex: match.context.indexOf(matchStr),
-          value: match.context,
-        };
-      }),
-    };
-  });
+  const filteredResults = Object.entries(resultsBySource)
+    .map(([sourceId, matches]) => [sourcesById[sourceId], matches])
+    .filter(([source]) => !!source);
+
+  const sorted = sortBy(filteredResults, ([source]) => [source.isOriginal ? 0 : 1, source.url]);
+  return sorted.map(([source, matches]) => formatSourceMatches(source, matches));
 };
 
 function getFilePath(item, index) {

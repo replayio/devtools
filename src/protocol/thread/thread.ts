@@ -31,7 +31,6 @@ import {
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
-  searchSourceContentsMatches,
   SearchSourceContentsMatch,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
@@ -39,7 +38,7 @@ import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
 import { Pause } from "./pause";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 
 export interface RecordingDescription {
   duration: TimeStamp;
