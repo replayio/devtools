@@ -24,11 +24,17 @@ function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: P
     setSelectedPrimaryPanel("search");
   };
 
+  // The shortcuts have to be reassigned every time the dependencies change,
+  // otherwise we end up with a stale prop.
   useEffect(() => {
     if (!globalShortcuts) return;
 
     globalShortcuts.on("CmdOrCtrl+Shift+F", openFullTextSearch);
-  }, []);
+
+    return () => {
+      globalShortcuts.off("CmdOrCtrl+Shift+F", openFullTextSearch);
+    };
+  }, [viewMode]);
 
   return null;
 }
