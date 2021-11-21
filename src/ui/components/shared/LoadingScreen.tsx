@@ -8,7 +8,7 @@ import {
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import LoadingTip from "./LoadingTip";
-import { BlankViewportWrapper } from "./Viewport";
+import { BubbleViewportWrapper } from "./Viewport";
 
 export function LoadingScreenTemplate({
   children,
@@ -18,15 +18,14 @@ export function LoadingScreenTemplate({
   showTips?: boolean;
 }) {
   return (
-    <BlankViewportWrapper>
+    <BubbleViewportWrapper footer={showTips ? <LoadingTip /> : null}>
       <div className="m-auto text-lg">
         <div className="flex flex-col items-center space-y-10">
           <Logo />
           {children}
         </div>
       </div>
-      {showTips ? <LoadingTip /> : null}
-    </BlankViewportWrapper>
+    </BubbleViewportWrapper>
   );
 }
 

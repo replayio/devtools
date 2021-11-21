@@ -22,11 +22,18 @@ function FullViewportWrapper({
   );
 }
 
-export function BubbleViewportWrapper({ children }: { children?: ReactNode }) {
+export function BubbleViewportWrapper({
+  children,
+  footer,
+}: {
+  children?: ReactNode;
+  footer?: ReactNode;
+}) {
   return (
     <FullViewportWrapper style={{ background: "#f3f3f4" }}>
       <BubbleBackground />
       <div className="relative">{children}</div>
+      {footer}
     </FullViewportWrapper>
   );
 }
