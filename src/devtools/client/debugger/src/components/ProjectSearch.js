@@ -183,11 +183,15 @@ export class ProjectSearch extends Component {
       column: matchItem.column,
     });
 
-    this.props.doSearchForHighlight(
-      this.state.inputValue,
-      getEditor(),
-      matchItem.line,
-      matchItem.column
+    setTimeout(
+      () =>
+        this.props.doSearchForHighlight(
+          this.state.inputValue,
+          getEditor(),
+          matchItem.line,
+          matchItem.column
+        ),
+      20
     );
   };
 
@@ -259,7 +263,7 @@ export class ProjectSearch extends Component {
             autoExpandAll={true}
             autoExpandDepth={1}
             autoExpandNodeChildrenLimit={100}
-            getParent={item => null}
+            getParent={item => matchesBySource.find(source => source.sourceId === item.sourceId)}
             getPath={getFilePath}
             renderItem={(item, depth, focused, _, expanded) => (
               <FullTextItem
