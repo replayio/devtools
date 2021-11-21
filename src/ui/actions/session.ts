@@ -97,8 +97,8 @@ function getRecordingNotAccessibleError(
   }
 
   return {
-    message: "",
-    content: "",
+    message: "Almost there",
+    content: "This is a private replay. Please sign in.",
     action: "sign-in",
   };
 }
