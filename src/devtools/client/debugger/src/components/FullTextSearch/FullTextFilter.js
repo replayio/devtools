@@ -49,7 +49,7 @@ export function FullTextFilter({ results, onKeyDown }) {
           onChange={e => setValue(e.target.value)}
           onKeyDown={inputOnKeyDown}
           autoFocus
-        />{" "}
+        />
         {results.status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
       </div>
     </div>
