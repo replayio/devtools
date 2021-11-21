@@ -16,7 +16,7 @@ function setupShortcuts() {
 const globalShortcuts = setupShortcuts();
 
 function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: PropsFromRedux) {
-  const openFileSearch = () => {
+  const openFullTextSearch = () => {
     if (viewMode !== "dev") {
       setViewMode("dev");
     }
@@ -27,7 +27,7 @@ function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: P
   useEffect(() => {
     if (!globalShortcuts) return;
 
-    globalShortcuts.on("CmdOrCtrl+Shift+F", openFileSearch);
+    globalShortcuts.on("CmdOrCtrl+Shift+F", openFullTextSearch);
   }, []);
 
   return null;
