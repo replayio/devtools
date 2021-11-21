@@ -83,10 +83,10 @@ async function doSearch(query, sourcesById, updateResults) {
   updateResults(() => ({ status: "DONE" }));
 }
 
-function getFilePath(item, index) {
+function getFilePath(item) {
   return item.type === "RESULT"
-    ? `${item.sourceId}-${index || "$"}`
-    : `${item.sourceId}-${item.line}-${item.column}-${index || "$"}`;
+    ? `${item.sourceId}`
+    : `${item.sourceId}-${item.line}-${item.column}`;
 }
 
 function sanitizeQuery(query) {
@@ -113,28 +113,9 @@ function FullTextSummary({ results }) {
   );
 }
 
-function FullTextFilter({ results, onSearch }) {
+function FullTextFilter({ results, onKeyDown }) {
   const { status } = results;
   const [inputValue, setInputValue] = useState("");
-
-  const onKeyDown = e => {
-    if (e.key === "Escape") {
-      return;
-    }
-
-    e.stopPropagation();
-
-    if (e.key !== "Enter") {
-      return;
-    }
-
-    const query = sanitizeQuery(inputValue);
-    onSearch(query);
-  };
-
-  const onChange = e => {
-    setInputValue(e.target.value);
-  };
 
   return (
     <div className="p-2">
@@ -146,7 +127,7 @@ function FullTextFilter({ results, onSearch }) {
           className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
           type="text"
           value={inputValue}
-          onChange={onChange}
+          onChange={e => setInputValue(e.target.value)}
           onKeyDown={onKeyDown}
           autoFocus
         />
@@ -162,7 +143,11 @@ function FullTextItem({ item, focused, expanded, onSelect }) {
     const matches = ` (${matchesLength} match${matchesLength > 1 ? "es" : ""})`;
 
     return (
-      <div className={classnames("file-result", { focused })} key={item.sourceId}>
+      <div
+        tabindex="0"
+        className={classnames("file-result focus:outline-none", { focused })}
+        key={item.sourceId}
+      >
         <AccessibleImage className={classnames("arrow", { expanded })} />
         <AccessibleImage className="file" />
         <span className="file-path">{getRelativePath(item.filepath)}</span>
@@ -206,8 +191,26 @@ export class ProjectSearch extends Component {
     );
   };
 
-  onSearch = query => {
+  onKeyDown = e => {
     const { sourcesById } = this.props;
+
+    if (e.key === "Escape") {
+      return;
+    }
+
+    e.stopPropagation();
+
+    if (e.key === "ArrowDown") {
+      this.$results.querySelector(".file-result:first-child").focus();
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key !== "Enter") {
+      return;
+    }
+
+    const query = sanitizeQuery(e.target.value);
     const updateResults = getNextResults => {
       this.setState(prevState => ({
         results: {
@@ -248,7 +251,7 @@ export class ProjectSearch extends Component {
     return (
       <div className="overflow-hidden px-2 flex flex-col">
         <FullTextSummary results={results} onSearch={this.onSearch} />
-        <div className="h-full overflow-y-auto">
+        <div ref={r => (this.$results = r)} className="h-full overflow-y-auto">
           <ManagedTree
             getRoots={() => matchesBySource}
             getChildren={file => file.matches || []}
@@ -279,7 +282,7 @@ export class ProjectSearch extends Component {
       <div className="search-container">
         <div className="project-text-search">
           <div className="header">
-            <FullTextFilter results={this.state.results} onSearch={this.onSearch} />
+            <FullTextFilter results={this.state.results} onKeyDown={this.onKeyDown} />
           </div>
           {this.renderResults()}
         </div>
