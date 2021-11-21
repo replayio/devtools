@@ -20,7 +20,6 @@ import ui from "./ui";
 import fileSearch from "./file-search";
 import ast from "./ast";
 import preview from "./preview";
-import projectTextSearch from "./project-text-search";
 import quickOpen from "./quick-open";
 import sourceTree from "./source-tree";
 import threads from "./threads";
@@ -37,7 +36,6 @@ export default {
   ui,
   fileSearch,
   ast,
-  projectTextSearch,
   quickOpen,
   sourceTree,
   threads,

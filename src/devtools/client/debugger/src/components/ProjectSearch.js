@@ -5,7 +5,7 @@
 //
 
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { connect } from "../utils/connect";
 import classnames from "classnames";
 import actions from "../actions";
@@ -14,19 +14,11 @@ import { getEditor } from "../utils/editor";
 import { highlightMatches } from "../utils/project-search";
 
 import { getRelativePath } from "../utils/sources-tree";
-import {
-  getActiveSearch,
-  getTextSearchResults,
-  getTextSearchStatus,
-  getTextSearchQuery,
-  getContext,
-  getSources,
-} from "../selectors";
+import { getContext, getSources } from "../selectors";
 
 import ManagedTree from "./shared/ManagedTree";
 import AccessibleImage from "./shared/AccessibleImage";
 
-import { PluralForm } from "devtools/shared/plural-form";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
 import groupBy from "lodash/groupBy";
@@ -82,39 +74,78 @@ function sanitizeQuery(query) {
   return query.replace(/\\$/, "");
 }
 
-export class ProjectSearch extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      inputValue: this.props.query || "",
-      inputFocused: false,
-      focusedItem: null,
-      results: {
-        status: "DONE",
-        query: "",
-        matchesBySource: [],
-      },
-    };
+function FullTextSummary({ results }) {
+  const { status, matchesBySource } = results;
+
+  if (status !== "DONE") {
+    return null;
   }
 
-  componentDidMount() {
-    const { shortcuts } = this.context;
-    // Todo: Fix the way we handle keyboard events here. -jvv
-    shortcuts?.on("Enter", this.onEnterPress);
-  }
+  const totalMatches = matchesBySource.reduce(
+    (count, sourceMatch) => sourceMatch.matches.length + count,
+    0
+  );
 
-  componentWillUnmount() {
-    const { shortcuts } = this.context;
-    // Todo: Fix the way we handle keyboard events here. -jvv
-    shortcuts?.off("Enter", this.onEnterPress);
-  }
+  return (
+    <div className="whitespace-pre pl-2">
+      {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
+    </div>
+  );
+}
 
-  componentDidUpdate(prevProps) {
-    // If the query changes in redux, also change it in the UI
-    if (prevProps.query !== this.props.query) {
-      this.setState({ inputValue: this.props.query });
+function FullTextFilter({ results, onSearch }) {
+  const { status } = results;
+  const [inputValue, setInputValue] = useState("");
+
+  const onKeyDown = e => {
+    if (e.key === "Escape") {
+      return;
     }
-  }
+
+    e.stopPropagation();
+
+    if (e.key !== "Enter") {
+      return;
+    }
+
+    const query = sanitizeQuery(inputValue);
+    onSearch(query);
+  };
+
+  const onChange = e => {
+    setInputValue(e.target.value);
+  };
+
+  return (
+    <div className="p-2">
+      <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
+        <MaterialIcon>search</MaterialIcon>
+        <input
+          style={{ boxShadow: "unset" }}
+          placeholder="Find in files…"
+          className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
+          type="text"
+          value={inputValue}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          autoFocus
+        />
+        {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
+      </div>
+    </div>
+  );
+}
+
+export class ProjectSearch extends Component {
+  state = {
+    focusedItem: null,
+    inputValue: "",
+    results: {
+      status: "DONE",
+      query: "",
+      matchesBySource: [],
+    },
+  };
 
   async doSearch(query) {
     trackEvent("project_search.search");
@@ -146,21 +177,6 @@ export class ProjectSearch extends Component {
     updateResults(() => ({ status: "DONE" }));
   }
 
-  toggleProjectTextSearch = e => {
-    const { cx, closeProjectSearch, setActiveSearch } = this.props;
-    if (e) {
-      e.preventDefault();
-    }
-
-    if (this.isProjectSearchEnabled()) {
-      return closeProjectSearch(cx);
-    }
-
-    return setActiveSearch("project");
-  };
-
-  isProjectSearchEnabled = () => this.props.activeSearch === "project";
-
   selectMatchItem = matchItem => {
     trackEvent("project_search.select");
 
@@ -169,6 +185,7 @@ export class ProjectSearch extends Component {
       line: matchItem.line,
       column: matchItem.column,
     });
+
     this.props.doSearchForHighlight(
       this.state.inputValue,
       getEditor(),
@@ -177,33 +194,10 @@ export class ProjectSearch extends Component {
     );
   };
 
-  onKeyDown = e => {
-    if (e.key === "Escape") {
-      return;
-    }
-
-    e.stopPropagation();
-
-    if (e.key !== "Enter") {
-      return;
-    }
-    this.setState({ focusedItem: null });
-    const query = sanitizeQuery(this.state.inputValue);
+  onSearch = query => {
+    this.setState({ focusedItem: null, inputValue: query });
     if (query && query !== this.state.query && query.length >= 3) {
       this.doSearch(query);
-    }
-  };
-
-  onHistoryScroll = query => {
-    this.setState({ inputValue: query });
-  };
-
-  onEnterPress = () => {
-    if (!this.isProjectSearchEnabled() || !this.state.focusedItem || this.state.inputFocused) {
-      return;
-    }
-    if (this.state.focusedItem.type === "MATCH") {
-      this.selectMatchItem(this.state.focusedItem);
     }
   };
 
@@ -211,14 +205,9 @@ export class ProjectSearch extends Component {
     if (this.state.focusedItem !== item) {
       this.setState({ focusedItem: item });
     }
-  };
 
-  inputOnChange = e => {
-    const inputValue = e.target.value;
-    const { cx, clearSearch } = this.props;
-    this.setState({ inputValue });
-    if (inputValue === "") {
-      clearSearch(cx);
+    if (item?.type === "MATCH") {
+      this.selectMatchItem(item);
     }
   };
 
@@ -254,26 +243,6 @@ export class ProjectSearch extends Component {
     return this.renderMatch(item, focused);
   };
 
-  renderSummary() {
-    const { results } = this.state;
-    const { status, matchesBySource } = results;
-
-    if (status !== "DONE") {
-      return null;
-    }
-
-    const totalMatches = matchesBySource.reduce(
-      (count, sourceMatch) => sourceMatch.matches.length + count,
-      0
-    );
-
-    return (
-      <div className="whitespace-pre pl-2">
-        {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
-      </div>
-    );
-  }
-
   renderResults = () => {
     const { results } = this.state;
     const { status, matchesBySource } = results;
@@ -288,7 +257,7 @@ export class ProjectSearch extends Component {
 
     return (
       <div className="overflow-hidden px-2 flex flex-col">
-        {this.renderSummary()}
+        <FullTextSummary results={results} onSearch={this.onSearch} />
         <div className="h-full overflow-y-auto">
           <ManagedTree
             getRoots={() => matchesBySource}
@@ -308,61 +277,26 @@ export class ProjectSearch extends Component {
     );
   };
 
-  renderInput() {
-    const { results } = this.state;
-    const { status } = results;
-
-    return (
-      <div className="p-2">
-        <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
-          <MaterialIcon>search</MaterialIcon>
-          <input
-            style={{ boxShadow: "unset" }}
-            placeholder="Find in files…"
-            className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
-            type="text"
-            value={this.state.inputValue}
-            onChange={this.inputOnChange}
-            onFocus={() => this.setState({ inputFocused: true })}
-            onBlur={() => this.setState({ inputFocused: false })}
-            onKeyDown={this.onKeyDown}
-            autoFocus
-          />
-          {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
-        </div>
-      </div>
-    );
-  }
-
   render() {
     return (
       <div className="search-container">
         <div className="project-text-search">
-          <div className="header">{this.renderInput()}</div>
+          <div className="header">
+            <FullTextFilter results={this.state.results} onSearch={this.onSearch} />
+          </div>
           {this.renderResults()}
         </div>
       </div>
     );
   }
 }
-ProjectSearch.contextTypes = {
-  shortcuts: PropTypes.object,
-};
 
 const mapStateToProps = state => ({
   cx: getContext(state),
-  activeSearch: getActiveSearch(state),
-  results: getTextSearchResults(state),
-  query: getTextSearchQuery(state),
   sourcesById: getSources(state).values,
-  status: getTextSearchStatus(state),
 });
 
 export default connect(mapStateToProps, {
-  closeProjectSearch: actions.closeProjectSearch,
-  searchSources: actions.searchSources,
-  clearSearch: actions.clearSearch,
   selectSpecificLocation: actions.selectSpecificLocation,
-  setActiveSearch: actions.setActiveSearch,
   doSearchForHighlight: actions.doSearchForHighlight,
 })(ProjectSearch);
