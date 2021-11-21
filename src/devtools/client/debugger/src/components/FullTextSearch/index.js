@@ -123,12 +123,6 @@ export class FullTextSearch extends Component {
   onKeyDown = e => {
     const { sourcesById } = this.props;
 
-    if (e.key === "Escape") {
-      return;
-    }
-
-    e.stopPropagation();
-
     if (e.key === "ArrowDown") {
       this.$results.querySelector(".file-result:first-child").focus();
       e.preventDefault();
@@ -152,7 +146,10 @@ export class FullTextSearch extends Component {
     this.setState({ focusedItem: null, inputValue: query });
     if (query && query !== this.state.query && query.length >= 3) {
       doSearch(query, sourcesById, updateResults);
+      return query;
     }
+
+    return null;
   };
 
   onFocus = item => {
@@ -179,7 +176,7 @@ export class FullTextSearch extends Component {
 
     return (
       <div className="overflow-hidden px-2 flex flex-col">
-        <FullTextSummary results={results} onSearch={this.onSearch} />
+        <FullTextSummary results={results} />
         <div ref={r => (this.$results = r)} className="h-full overflow-y-auto">
           <ManagedTree
             getRoots={() => matchesBySource}
@@ -211,7 +208,11 @@ export class FullTextSearch extends Component {
       <div className="search-container">
         <div className="project-text-search">
           <div className="header">
-            <FullTextFilter results={this.state.results} onKeyDown={this.onKeyDown} />
+            <FullTextFilter
+              results={this.state.results}
+              onKeyDown={this.onKeyDown}
+              onSearch={this.onSearch}
+            />
           </div>
           {this.renderResults()}
         </div>
