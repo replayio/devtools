@@ -2,22 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import React, { Component } from "react";
+import { connect } from "../../utils/connect";
+import actions from "../../actions";
 
-import PropTypes from "prop-types";
-import React, { Component, useState } from "react";
-import { connect } from "../utils/connect";
-import classnames from "classnames";
-import actions from "../actions";
+import { getEditor } from "../../utils/editor";
 
-import { getEditor } from "../utils/editor";
-import { highlightMatches } from "../utils/project-search";
+import { getContext, getSources } from "../../selectors";
 
-import { getRelativePath } from "../utils/sources-tree";
-import { getContext, getSources } from "../selectors";
-
-import ManagedTree from "./shared/ManagedTree";
-import AccessibleImage from "./shared/AccessibleImage";
+import ManagedTree from "../shared/ManagedTree";
 
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
@@ -25,8 +18,9 @@ import groupBy from "lodash/groupBy";
 import sortBy from "lodash/sortBy";
 import { isThirdParty } from "../utils/source";
 import { sliceCodePoints } from "ui/utils/codePointString";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import Spinner from "ui/components/shared/Spinner";
+import { FullTextFilter } from "./FullTextFilter";
+import { FullTextItem } from "./FullTextItem";
+import { FullTextSummary } from "./FullTextSummary";
 
 const formatSourceMatches = (source, matches) => ({
   type: "RESULT",
@@ -94,76 +88,7 @@ function sanitizeQuery(query) {
   return query.replace(/\\$/, "");
 }
 
-function FullTextSummary({ results }) {
-  const { status, matchesBySource } = results;
-
-  if (status !== "DONE") {
-    return null;
-  }
-
-  const totalMatches = matchesBySource.reduce(
-    (count, sourceMatch) => sourceMatch.matches.length + count,
-    0
-  );
-
-  return (
-    <div className="whitespace-pre pl-2">
-      {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
-    </div>
-  );
-}
-
-function FullTextFilter({ results, onKeyDown }) {
-  const { status } = results;
-  const [inputValue, setInputValue] = useState("");
-
-  return (
-    <div className="p-2">
-      <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
-        <MaterialIcon>search</MaterialIcon>
-        <input
-          style={{ boxShadow: "unset" }}
-          placeholder="Find in files…"
-          className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
-          type="text"
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={onKeyDown}
-          autoFocus
-        />
-        {status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
-      </div>
-    </div>
-  );
-}
-
-function FullTextItem({ item, focused, expanded, onSelect }) {
-  if (item.type === "RESULT") {
-    const matchesLength = item.matches.length;
-    const matches = ` (${matchesLength} match${matchesLength > 1 ? "es" : ""})`;
-
-    return (
-      <div
-        tabindex="0"
-        className={classnames("file-result focus:outline-none", { focused })}
-        key={item.sourceId}
-      >
-        <AccessibleImage className={classnames("arrow", { expanded })} />
-        <AccessibleImage className="file" />
-        <span className="file-path">{getRelativePath(item.filepath)}</span>
-        <span className="matches-summary">{matches}</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className={classnames("result pl-4", { focused })} onClick={() => onSelect(item)}>
-      {highlightMatches(item)}
-    </div>
-  );
-}
-
-export class ProjectSearch extends Component {
+export class FullTextSearch extends Component {
   state = {
     focusedItem: null,
     inputValue: "",
@@ -303,4 +228,4 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   selectSpecificLocation: actions.selectSpecificLocation,
   doSearchForHighlight: actions.doSearchForHighlight,
-})(ProjectSearch);
+})(FullTextSearch);

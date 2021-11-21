@@ -82,7 +82,7 @@ class Debugger extends Component {
     globalShortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-    globalShortcuts.on("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
+    globalShortcuts.on("CmdOrCtrl+Shift+F", this.toggleFullTextSearch);
 
     if (this.props.enableGlobalSearch) {
       globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
@@ -99,7 +99,7 @@ class Debugger extends Component {
     globalShortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-    globalShortcuts.off("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
+    globalShortcuts.off("CmdOrCtrl+Shift+F", this.toggleFullTextSearch);
 
     if (this.props.enableGlobalSearch) {
       globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
@@ -151,13 +151,10 @@ class Debugger extends Component {
     return this.props.orientation === "horizontal";
   }
 
-  toggleProjectTextSearch = () => {
-    console.log(this.props.selectedPrimaryPanel);
+  toggleFullTextSearch = () => {
     if (this.props.selectedPrimaryPanel != "search") {
-      console.log("open search");
       this.props.setSelectedPrimaryPanel("search");
     } else {
-      console.log("trying to close the thing");
       this.props.togglePaneCollapse();
     }
   };
