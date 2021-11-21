@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAcceptTOS } from "ui/hooks/users";
 import { PrimaryButton } from "./shared/Button";
-import Modal from "./shared/NewModal";
 import ExternalLink from "./shared/ExternalLink";
+import { BubbleViewportWrapper } from "./shared/Viewport";
 
 export const LATEST_TOS_VERSION = 1;
 
@@ -12,9 +12,9 @@ export default function TOSScreen() {
   const handleAccept = () => acceptTOS({ variables: { version: LATEST_TOS_VERSION } });
 
   return (
-    <Modal options={{ maskTransparency: "transparent" }}>
+    <BubbleViewportWrapper>
       <div
-        className="p-9 bg-white rounded-lg shadow-xl text-xl space-y-6 relative flex flex-col items-center"
+        className="p-9 bg-white rounded-lg text-base shadow-xl space-y-6 relative flex flex-col items-center"
         style={{ width: "520px" }}
       >
         <div className="space-y-4 place-content-center">
@@ -58,6 +58,6 @@ export default function TOSScreen() {
           I’ve read and accept the terms of service
         </PrimaryButton>
       </div>
-    </Modal>
+    </BubbleViewportWrapper>
   );
 }
