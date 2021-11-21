@@ -136,6 +136,28 @@ function FullTextFilter({ results, onSearch }) {
   );
 }
 
+function FullTextItem({ item, focused, expanded, onSelect }) {
+  if (item.type === "RESULT") {
+    const matchesLength = item.matches.length;
+    const matches = ` (${matchesLength} match${matchesLength > 1 ? "es" : ""})`;
+
+    return (
+      <div className={classnames("file-result", { focused })} key={item.sourceId}>
+        <AccessibleImage className={classnames("arrow", { expanded })} />
+        <AccessibleImage className="file" />
+        <span className="file-path">{getRelativePath(item.filepath)}</span>
+        <span className="matches-summary">{matches}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classnames("result pl-4", { focused })} onClick={() => onSelect(item)}>
+      {highlightMatches(item)}
+    </div>
+  );
+}
+
 export class ProjectSearch extends Component {
   state = {
     focusedItem: null,
@@ -211,38 +233,6 @@ export class ProjectSearch extends Component {
     }
   };
 
-  renderFile = (file, focused, expanded) => {
-    const matchesLength = file.matches.length;
-    const matches = ` (${matchesLength} match${matchesLength > 1 ? "es" : ""})`;
-
-    return (
-      <div className={classnames("file-result", { focused })} key={file.sourceId}>
-        <AccessibleImage className={classnames("arrow", { expanded })} />
-        <AccessibleImage className="file" />
-        <span className="file-path">{getRelativePath(file.filepath)}</span>
-        <span className="matches-summary">{matches}</span>
-      </div>
-    );
-  };
-
-  renderMatch = (match, focused) => {
-    return (
-      <div
-        className={classnames("result pl-4", { focused })}
-        onClick={() => this.selectMatchItem(match)}
-      >
-        {highlightMatches(match)}
-      </div>
-    );
-  };
-
-  renderItem = (item, depth, focused, _, expanded) => {
-    if (item.type === "RESULT") {
-      return this.renderFile(item, focused, expanded);
-    }
-    return this.renderMatch(item, focused);
-  };
-
   renderResults = () => {
     const { results } = this.state;
     const { status, matchesBySource } = results;
@@ -268,7 +258,14 @@ export class ProjectSearch extends Component {
             autoExpandNodeChildrenLimit={100}
             getParent={item => null}
             getPath={getFilePath}
-            renderItem={this.renderItem}
+            renderItem={(item, depth, focused, _, expanded) => (
+              <FullTextItem
+                item={item}
+                focused={focused}
+                expanded={expanded}
+                onSelect={item => this.selectMatchItem(item)}
+              />
+            )}
             focused={this.state.focusedItem}
             onFocus={this.onFocus}
           />
