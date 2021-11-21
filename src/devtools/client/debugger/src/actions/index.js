@@ -8,7 +8,6 @@ import * as pause from "./pause";
 import * as navigation from "./navigation";
 import * as ui from "./ui";
 import * as fileSearch from "./file-search";
-import * as projectTextSearch from "./project-text-search";
 import * as quickOpen from "./quick-open";
 import * as sourceTree from "./source-tree";
 import * as sources from "./sources";
@@ -30,7 +29,6 @@ export default {
   ...ui,
   ...fileSearch,
   ...objectInspector.actions,
-  ...projectTextSearch,
   ...quickOpen,
   ...sourceTree,
   ...toolbox,

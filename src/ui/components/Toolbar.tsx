@@ -18,7 +18,6 @@ function Toolbar({
   setSelectedPrimaryPanel,
   togglePaneCollapse,
   panelCollapsed,
-  progressPercentage,
   viewMode,
   isPaused,
 }: PropsFromRedux) {
