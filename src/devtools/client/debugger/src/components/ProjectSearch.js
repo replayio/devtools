@@ -63,6 +63,26 @@ const formatMatchesBySource = (matches, sourcesById) => {
   return sorted.map(([source, matches]) => formatSourceMatches(source, matches));
 };
 
+async function doSearch(query, sourcesById, updateResults) {
+  trackEvent("project_search.search");
+
+  updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
+
+  await ThreadFront.searchSources({ query }, matches => {
+    const bestMatches = matches.filter(match => {
+      const { sourceId } = match.location;
+      const source = sourcesById[sourceId];
+      return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
+    });
+    const newMatchesBySource = formatMatchesBySource(bestMatches, sourcesById);
+    updateResults(prevResults => ({
+      matchesBySource: [...prevResults.matchesBySource, ...newMatchesBySource],
+    }));
+  });
+
+  updateResults(() => ({ status: "DONE" }));
+}
+
 function getFilePath(item, index) {
   return item.type === "RESULT"
     ? `${item.sourceId}-${index || "$"}`
@@ -169,36 +189,6 @@ export class ProjectSearch extends Component {
     },
   };
 
-  async doSearch(query) {
-    trackEvent("project_search.search");
-
-    const updateResults = getNextResults => {
-      this.setState(prevState => ({
-        results: {
-          ...prevState.results,
-          ...getNextResults(prevState.results),
-        },
-      }));
-    };
-
-    updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
-
-    await ThreadFront.searchSources({ query }, matches => {
-      const { sourcesById } = this.props;
-      const bestMatches = matches.filter(match => {
-        const { sourceId } = match.location;
-        const source = sourcesById[sourceId];
-        return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
-      });
-      const newMatchesBySource = formatMatchesBySource(bestMatches, sourcesById);
-      updateResults(prevResults => ({
-        matchesBySource: [...prevResults.matchesBySource, ...newMatchesBySource],
-      }));
-    });
-
-    updateResults(() => ({ status: "DONE" }));
-  }
-
   selectMatchItem = matchItem => {
     trackEvent("project_search.select");
 
@@ -217,9 +207,19 @@ export class ProjectSearch extends Component {
   };
 
   onSearch = query => {
+    const { sourcesById } = this.props;
+    const updateResults = getNextResults => {
+      this.setState(prevState => ({
+        results: {
+          ...prevState.results,
+          ...getNextResults(prevState.results),
+        },
+      }));
+    };
+
     this.setState({ focusedItem: null, inputValue: query });
     if (query && query !== this.state.query && query.length >= 3) {
-      this.doSearch(query);
+      doSearch(query, sourcesById, updateResults);
     }
   };
 
