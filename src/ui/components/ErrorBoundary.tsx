@@ -5,6 +5,7 @@ import { UnexpectedError } from "ui/state/app";
 import { getUnexpectedError } from "ui/reducers/app";
 import { setUnexpectedError } from "ui/actions/session";
 import BlankScreen from "./shared/BlankScreen";
+import { isDevelopment } from "ui/utils/environment";
 
 export const ReplayUpdatedError: UnexpectedError = {
   message: "Replay updated",
@@ -17,14 +18,18 @@ class ErrorBoundary extends Component<PropsFromRedux & { children: ReactNode }> 
     const { setUnexpectedError } = this.props;
 
     if (error.name === "ChunkLoadError") {
-      setUnexpectedError(ReplayUpdatedError, true);
-    } else {
-      setUnexpectedError({
-        message: "Unexpected error",
-        content: "An unexpected error occurred. Please refresh the page.",
-        action: "refresh",
-      });
+      return setUnexpectedError(ReplayUpdatedError, true);
     }
+
+    if (isDevelopment()) {
+      return;
+    }
+
+    setUnexpectedError({
+      message: "Unexpected error",
+      content: "An unexpected error occurred. Please refresh the page.",
+      action: "refresh",
+    });
   }
 
   render() {

@@ -141,10 +141,6 @@ class Tab extends PureComponent {
     showMenu(e, buildMenu(items));
   }
 
-  isProjectSearchEnabled() {
-    return this.props.activeSearch === "project";
-  }
-
   isSourceSearchEnabled() {
     return this.props.activeSearch === "source";
   }
@@ -163,11 +159,7 @@ class Tab extends PureComponent {
       onDragEnd,
     } = this.props;
     const sourceId = source.id;
-    const active =
-      selectedSource &&
-      sourceId == selectedSource.id &&
-      !this.isProjectSearchEnabled() &&
-      !this.isSourceSearchEnabled();
+    const active = selectedSource && sourceId == selectedSource.id && !this.isSourceSearchEnabled();
     const isPrettyCode = isPretty(source);
 
     function onClickClose(e) {

@@ -10,6 +10,7 @@ import { features } from "../utils/prefs";
 import { prefs } from "../../../../../ui/utils/prefs";
 import actions from "../actions";
 import { setUnexpectedError } from "ui/actions/session";
+import { setSelectedPrimaryPanel } from "ui/actions/app";
 import A11yIntention from "./A11yIntention";
 import { ShortcutsModal } from "./ShortcutsModal";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
@@ -22,7 +23,8 @@ import {
   getQuickOpenEnabled,
   getSelectedSource,
 } from "../selectors";
-import { getSelectedPanel, getShowEditor } from "ui/reducers/app.ts";
+
+import { getSelectedPanel, getSelectedPrimaryPanel, getShowEditor } from "ui/reducers/app.ts";
 import { useGetUserSettings } from "ui/hooks/settings";
 
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
@@ -80,6 +82,8 @@ class Debugger extends Component {
     globalShortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
+    globalShortcuts.on("CmdOrCtrl+Shift+F", this.toggleFullTextSearch);
+
     if (this.props.enableGlobalSearch) {
       globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
     }
@@ -95,6 +99,8 @@ class Debugger extends Component {
     globalShortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
+    globalShortcuts.off("CmdOrCtrl+Shift+F", this.toggleFullTextSearch);
+
     if (this.props.enableGlobalSearch) {
       globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
     }
@@ -144,6 +150,14 @@ class Debugger extends Component {
   isHorizontal() {
     return this.props.orientation === "horizontal";
   }
+
+  toggleFullTextSearch = () => {
+    if (this.props.selectedPrimaryPanel != "search") {
+      this.props.setSelectedPrimaryPanel("search");
+    } else {
+      this.props.togglePaneCollapse();
+    }
+  };
 
   toggleFunctionQuickOpenModal = e => {
     this.toggleQuickOpenModal(e, "@");
@@ -321,6 +335,7 @@ function DebuggerLoader(props) {
 
 const mapStateToProps = state => ({
   activeSearch: getActiveSearch(state),
+  selectedPrimaryPanel: getSelectedPrimaryPanel(state),
   orientation: getOrientation(state),
   quickOpenEnabled: getQuickOpenEnabled(state),
   selectedPanel: getSelectedPanel(state),
@@ -330,11 +345,11 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  setActiveSearch: actions.setActiveSearch,
   closeActiveSearch: actions.closeActiveSearch,
-  closeProjectSearch: actions.closeProjectSearch,
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
   refreshCodeMirror: actions.refreshCodeMirror,
+  togglePaneCollapse: actions.togglePaneCollapse,
+  setSelectedPrimaryPanel,
   setUnexpectedError,
 })(DebuggerLoader);

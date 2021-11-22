@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
- .search-container {
+.search-container {
   height: 100%;
   overflow-y: hidden;
 }
@@ -30,16 +30,6 @@
   background-color: var(--search-result-background-hover);
 }
 
-.project-text-search .result .line-number {
-  grid-column: 1;
-  width: 100%;
-  padding-block: 1px;
-  padding-inline-start: 4px;
-  padding-inline-end: 6px;
-  text-align: end;
-  color: var(--theme-text-color-alt);
-}
-
 .project-text-search .result .line-value {
   grid-column: 2;
   padding-block: 1px;
@@ -58,10 +48,6 @@
   border-bottom: none;
   color: var(--theme-selection-background);
   background-color: var(--theme-selection-color);
-}
-
-.project-text-search .tree-indent {
-  display: none;
 }
 
 .project-text-search .no-result-msg {
@@ -122,23 +108,10 @@
 
 .project-text-search .managed-tree .tree {
   height: 100%;
-  display: grid;
+  display: block;
   /* Align the second column to the search input's text value */
-  grid-template-columns: minmax(40px, auto) 1fr;
   overflow-x: hidden;
   padding-top: 4px;
-}
-
-/* Fake padding-bottom using a pseudo-element because Gecko doesn't render the
-   padding-bottom in a scroll container */
-.project-text-search .tree::after {
-  content: "";
-  display: block;
-  height: 4px;
-}
-
-.project-text-search .managed-tree .tree .tree-node {
-  display: contents;
 }
 
 /* Focus values */
