@@ -41,7 +41,6 @@ const syncInitialAppState: AppState = {
   workspaceId: null,
   defaultSettingsTab: "Personal",
   recordingTarget: null,
-  fontLoading: true,
   recordingWorkspace: null,
   loadedRegions: null,
   showVideoPanel: true,
@@ -244,10 +243,6 @@ export default function update(
       return { ...state, recordingTarget: action.recordingTarget };
     }
 
-    case "set_material_icons_loaded": {
-      return { ...state, fontLoading: action.fontLoading };
-    }
-
     case "set_recording_workspace": {
       return { ...state, recordingWorkspace: action.workspace };
     }
@@ -346,7 +341,6 @@ export const getVideoNode = (state: UIState) => state.app.videoNode;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
-export const getFontLoading = (state: UIState) => state.app.fontLoading;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const getShowVideoPanel = (state: UIState) => state.app.showVideoPanel;
 export const getShowEditor = (state: UIState) => state.app.showEditor;

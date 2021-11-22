@@ -5,7 +5,7 @@ import { setupDOMHelpers } from "./dom";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
 import { getInitialAppState, getTheme, getWorkspaceId } from "ui/reducers/app";
-import { setFontLoading, setModal, setWorkspaceId } from "ui/actions/app";
+import { setWorkspaceId } from "ui/actions/app";
 import tokenManager from "ui/utils/tokenManager";
 import { bootIntercom } from "ui/utils/intercom";
 import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
@@ -74,14 +74,15 @@ export async function bootstrapApp() {
     initLaunchDarkly();
   });
 
+  const success = () => (document.documentElement.className += " fonts-loaded");
   if (isTest()) {
     // FontFaceObserver doesn't work in e2e tests.
-    store.dispatch(setFontLoading(false));
+    success();
   } else {
     var font1 = new FontFaceObserver("Material Icons");
     var font2 = new FontFaceObserver("Material Icons Outlined");
     Promise.all([font1.load(), font2.load()])
-      .then(() => store.dispatch(setFontLoading(false)))
+      .then(success)
       .catch(() => console.log("Failed to load font"));
   }
 

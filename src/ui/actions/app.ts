@@ -88,9 +88,6 @@ export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
 export type SetRecordingTargetAction = Action<"set_recording_target"> & {
   recordingTarget: RecordingTarget;
 };
-export type SetFontLoading = Action<"set_material_icons_loaded"> & {
-  fontLoading: boolean;
-};
 export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
   workspace: Workspace;
 };
@@ -133,7 +130,6 @@ export type AppActions =
   | SetWorkspaceId
   | SetDefaultSettingsTab
   | SetRecordingTargetAction
-  | SetFontLoading
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
   | SetShowVideoPanelAction
@@ -377,10 +373,6 @@ export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSet
 
 export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordingTargetAction {
   return { type: "set_recording_target", recordingTarget };
-}
-
-export function setFontLoading(value: boolean): SetFontLoading {
-  return { type: "set_material_icons_loaded", fontLoading: value };
 }
 
 export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspaceAction {
