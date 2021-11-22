@@ -87,9 +87,10 @@ const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
   }, [isFocused]);
 
   const item = classFunc || classInfo;
+  const className = item.klass && item.name == "anonymous" ? item.klass : item.name;
 
   return (
-    <li className="outline-list__class" key={item.name}>
+    <li className="outline-list__class" key={className}>
       <h2
         className={classnames("", { focused: isFocused })}
         onClick={() => onSelect(item)}
@@ -99,7 +100,7 @@ const OutlineClassFunctions = React.memo(function OutlineClassFunctions({
           <OutlineFunction func={classFunc} isFocused={false} outlineList={outlineList} />
         ) : (
           <div>
-            <span className="keyword">class</span> {item.name}
+            <span className="keyword">class</span> {className}
           </div>
         )}
       </h2>
@@ -208,20 +209,21 @@ export class Outline extends Component {
     }
 
     const { focusedItem } = this.state;
-    const classFunc = functions.find(func => func.name === klass);
-    const classFunctions = functions.filter(func => func.klass === klass);
-    const classInfo = symbols.classes.find(c => c.name === klass);
+    const classFunc = symbols.functions.find(func => func.name === klass);
+    const classInfo = symbols.functions.find(c => c.klass === klass);
 
     const item = classFunc || classInfo;
     const isFocused = focusedItem === item;
+
     return (
       <OutlineClassFunctions
         classFunc={classFunc}
         classInfo={classInfo}
         isFocused={isFocused}
         outlineList={outlineList}
+        onSelect={this.selectItem}
       >
-        {classFunctions.map(func => this.renderFunction(func))}
+        {functions.map(func => this.renderFunction(func))}
       </OutlineClassFunctions>
     );
   }
