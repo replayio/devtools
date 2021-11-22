@@ -50,7 +50,7 @@ function LineNumberTooltip({
         if (lineNumber === lastHoveredLineNumber.current) {
           runAnalysisOnLine(lineNumber);
         }
-      }, 100);
+      }, 200);
     }
 
     updateHoveredLineNumber(lineNumber);

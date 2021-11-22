@@ -16,16 +16,21 @@ function safeJsonParse(text) {
 }
 
 function getLineNumberNode(target) {
-  const wrapper = target.closest(".CodeMirror-gutter-wrapper");
+  const row =
+    target.closest(".CodeMirror-gutter-wrapper")?.parentElement ||
+    target.closest(".CodeMirror-line")?.parentElement;
+
+  if (!row) return null;
+
+  const wrapper = row.querySelector(".CodeMirror-gutter-wrapper");
+
   return wrapper.querySelector(".CodeMirror-linenumber");
 }
 
 function isValidTarget(target) {
-  const isGutterNode = target.closest(".CodeMirror-gutter-wrapper");
+  const lineNumberNode = getLineNumberNode(target);
 
-  if (!isGutterNode) {
-    return false;
-  }
+  if (!lineNumberNode) return false;
 
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
@@ -42,7 +47,7 @@ export function onGutterMouseOver(codeMirror) {
     }
 
     const lineNumberNode = getLineNumberNode(target);
-    const lineNumber = safeJsonParse(lineNumberNode.firstChild.textContent);
+    const lineNumber = safeJsonParse(lineNumberNode.textContent);
 
     target.addEventListener(
       "mouseleave",
