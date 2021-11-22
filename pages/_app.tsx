@@ -113,7 +113,6 @@ import "ui/components/shared/Dropdown.css";
 import "ui/components/shared/IconWithTooltip.css";
 import "ui/components/shared/LoadingProgressBar.css";
 import "ui/components/shared/LoginModal.css";
-import "ui/components/shared/MaterialIcon.css";
 import "ui/components/shared/Modal.css";
 import "ui/components/shared/PortalDropdown.css";
 import "ui/components/shared/SettingsModal/SettingsBody.css";
@@ -165,16 +164,8 @@ const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
                 <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
                 <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
                 <title>Replay</title>
-                <link
-                  href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
-                  rel="stylesheet"
-                />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" />
-                <link
-                  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-                  rel="stylesheet"
-                />
+                <link rel="stylesheet" href="/fonts/inter/inter.css" />
+                <link rel="stylesheet" href="/fonts/material_icons/material_icons.css" />
               </Head>
               <App>
                 <InstallRouteListener />

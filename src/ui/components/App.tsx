@@ -79,7 +79,7 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-function App({ children, fontLoading, modal, theme }: AppProps) {
+function App({ children, modal, theme }: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
 
@@ -117,7 +117,7 @@ function App({ children, fontLoading, modal, theme }: AppProps) {
   }
 
   return (
-    <div id="app-container" className={classNames({ "font-loading": fontLoading })}>
+    <div id="app-container">
       {children}
       {modal ? <AppModal modal={modal} /> : null}
       <ConfirmRenderer />
@@ -127,7 +127,6 @@ function App({ children, fontLoading, modal, theme }: AppProps) {
 }
 
 const connector = connect((state: UIState) => ({
-  fontLoading: selectors.getFontLoading(state),
   modal: selectors.getModal(state),
   theme: selectors.getTheme(state),
 }));

@@ -33,7 +33,7 @@
 
 :root {
   --monospace-font-family: Menlo, Consolas, monospace;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
 }
 
 /**
@@ -183,8 +183,7 @@ button::selection {
   z-index: -1;
 }
 
-.shortcutFunction p
-{
+.shortcutFunction p {
   border: 1px solid red;
 }
 
