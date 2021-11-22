@@ -233,9 +233,11 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
 export function setTrialExpired(expired = true): SetTrialExpiredAction {
   return { type: "set_trial_expired", expired };
 }
+
 export function clearTrialExpired(): UIThunkAction {
   return ({ dispatch }) => dispatch(setTrialExpired(false));
 }
+
 export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
   return ({ getState, dispatch }) => {
     const state = getState();
