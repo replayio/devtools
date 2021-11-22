@@ -74,6 +74,7 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   hoverTimer = () => {
+    const { setTimelineToTime } = this.props;
     if (!this.$progressBar) {
       return;
     }
@@ -81,6 +82,7 @@ class Timeline extends Component<PropsFromRedux> {
     if (!isHovered) {
       window.clearInterval(this.hoverInterval);
       this.hoverInterval = undefined;
+      setTimelineToTime(null);
     }
   };
 
@@ -333,14 +335,8 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   render() {
-    const {
-      zoomRegion,
-      currentTime,
-      hoverTime,
-      precachedTime,
-      recordingDuration,
-      isTrimming,
-    } = this.props;
+    const { zoomRegion, currentTime, hoverTime, precachedTime, recordingDuration, isTrimming } =
+      this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
