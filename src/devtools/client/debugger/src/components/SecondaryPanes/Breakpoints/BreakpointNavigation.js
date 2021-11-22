@@ -32,8 +32,6 @@ function BreakpointNavigation({
     }
   };
   const isEmpty = analysisPoints && (analysisPoints === "error" || analysisPoints?.length == 0);
-  const isHot =
-    analysisPoints && analysisPoints !== "error" && analysisPoints.length > prefs.maxHitsDisplayed;
 
   let prev, next;
 
@@ -58,12 +56,7 @@ function BreakpointNavigation({
   return (
     <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
       {!isEmpty ? (
-        <BreakpointNavigationCommands
-          disabled={isHot}
-          prev={prev}
-          next={next}
-          navigateToPoint={navigateToPoint}
-        />
+        <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
       {analysisPoints !== "error" ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
@@ -97,9 +90,9 @@ function BreakpointNavigation({
   );
 }
 
-function BreakpointNavigationCommands({ disabled, prev, next, navigateToPoint }) {
-  const prevDisabled = disabled || !prev;
-  const nextDisabled = disabled || !next;
+function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
+  const prevDisabled = !prev;
+  const nextDisabled = !next;
   return (
     <div className="breakpoint-navigation-commands">
       <button
