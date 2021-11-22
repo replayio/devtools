@@ -124,7 +124,7 @@ function ViewerContent({
       <ViewerHeader>
         {HeaderLeft}
         <div className="flex flex-row space-x-3 items-center">
-          {workspaceName === MY_LIBRARY ? <TeamTrialEnd /> : null}
+          <TeamTrialEnd />
           {isEditing ? (
             <>
               <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
