@@ -51,7 +51,7 @@ const Accordion = ({ items }: { items: AccordionItem[] }) => {
               </h2>
             </div>
             <div className={classNames(styles.content, { [styles.open]: !collapsed })}>
-              {component}
+              {!collapsed && component}
             </div>
           </div>
         );
