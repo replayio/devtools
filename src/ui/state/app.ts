@@ -116,7 +116,15 @@ interface Events {
   [key: string]: ReplayEvent[];
 }
 
-export type ReplayEvent = MouseEvent | KeyboardEvent | NavigationEvent;
+type ReplayMouseEvent = Omit<MouseEvent, "kind"> & {
+  kind: "mousedown";
+};
+type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
+  kind: "navigation";
+};
+type ReplayKeyboardEvent = KeyboardEvent;
+
+export type ReplayEvent = ReplayMouseEvent | ReplayKeyboardEvent | ReplayNavigationEvent;
 
 export type EventCategory = "mouse" | "keyboard" | "navigation";
 export type EventKind = MouseEventKind | KeyboardEventKind | string;

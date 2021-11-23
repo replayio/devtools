@@ -104,9 +104,20 @@ export function ensureSourcesIsVisible() {
   };
 }
 
+export function openSourceLink(sourceId, line, column) {
+  return async ({ dispatch, getState }) => {
+    const cx = getContext(getState());
+    const location = { sourceId, line, column };
+
+    dispatch(showSource(cx, sourceId));
+    await dispatch(selectSource(cx, sourceId, location));
+  };
+}
+
 export function showSource(cx, sourceId) {
   return ({ dispatch, getState }) => {
     const source = getSource(getState(), sourceId);
+
     if (!source) {
       return;
     }
