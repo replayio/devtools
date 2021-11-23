@@ -27,10 +27,10 @@ import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
-import classNames from "classnames";
 import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
+import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -75,6 +75,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "attachment": {
       return <NewAttachment />;
+    }
+    case "sourcemap-setup": {
+      return <SourcemapSetupModal />;
     }
     default: {
       return null;

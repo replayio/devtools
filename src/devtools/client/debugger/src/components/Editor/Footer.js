@@ -16,6 +16,7 @@ import {
 import { getFilename } from "../../utils/source";
 import { ThreadFront } from "protocol/thread";
 import { RedactedSpan } from "ui/components/Redacted";
+import SourcemapToggle from "./SourcemapToggle";
 
 class SourceFooter extends PureComponent {
   constructor() {
@@ -48,34 +49,6 @@ class SourceFooter extends PureComponent {
     }
   }
 
-  renderSourceSummary() {
-    const { alternateSource, selectedSource, showAlternateSource } = this.props;
-
-    if (!alternateSource) {
-      return null;
-    }
-
-    const filename = getFilename(alternateSource);
-    const title = L10N.getFormatStr("sourceFooter.alternateSource", filename);
-
-    const original = ThreadFront.isSourceMappedSource(selectedSource.id);
-
-    const tooltip = L10N.getFormatStr(
-      original ? "sourceFooter.generatedSourceTooltip" : "sourceFooter.originalSourceTooltip",
-      filename
-    );
-
-    return (
-      <button
-        className="mapped-source"
-        onClick={() => showAlternateSource(selectedSource, alternateSource)}
-        title={tooltip}
-      >
-        <RedactedSpan data-redacted>{title}</RedactedSpan>
-      </button>
-    );
-  }
-
   onCursorChange = event => {
     const { line, ch } = event.doc.getCursor();
     this.setState({ cursorPosition: { line, column: ch } });
@@ -104,10 +77,8 @@ class SourceFooter extends PureComponent {
   render() {
     return (
       <div className="source-footer">
-        <div className="source-footer-end">
-          {this.renderSourceSummary()}
-          {this.renderCursorPosition()}
-        </div>
+        <SourcemapToggle />
+        <div className="source-footer-end">{this.renderCursorPosition()}</div>
       </div>
     );
   }
