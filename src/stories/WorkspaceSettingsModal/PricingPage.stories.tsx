@@ -68,6 +68,7 @@ export const BetaTester = Template.bind({});
 
 BetaTester.args = {
   subscription: {
+    billingSchedule: null,
     createdAt: new Date().toISOString(),
     createdBy: { name: "test", id: "test", internal: false, picture: "" },
     displayName: "Beta Tester Appreciation",
