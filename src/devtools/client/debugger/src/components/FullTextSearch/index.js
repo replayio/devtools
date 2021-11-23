@@ -59,6 +59,7 @@ export class FullTextSearch extends Component {
     const { sourcesById } = this.props;
 
     if (e.key === "ArrowDown") {
+      trackEvent("project_search.go_to_first_result");
       this.searchRef.current.querySelector(".file-result:first-child").focus();
       e.preventDefault();
       return;
