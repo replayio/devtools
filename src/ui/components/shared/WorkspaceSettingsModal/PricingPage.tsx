@@ -1,5 +1,5 @@
 import React from "react";
-import { Subscription, SubscriptionWithPricing } from "ui/types";
+import { SubscriptionWithPricing } from "ui/types";
 import ExternalLink from "../ExternalLink";
 import { Button } from "../Button";
 import { PlanDetails } from "./PlanDetails";

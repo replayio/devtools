@@ -1,19 +1,26 @@
-const { fullPricingDetailsForSubscription, cycleCharge } = require("ui/utils/billing");
+const {
+  subscriptionWithPricing,
+  cycleCharge,
+} = require("ui/components/shared/WorkspaceSettingsModal/utils");
 
-describe("fullPricingDetailsForSubscription", () => {
+describe("subscriptionWithPricing", () => {
   test("will return team pricing if the plan key is team-v1", () => {
-    expect(fullPricingDetailsForSubscription({ plan: { key: "team-v1" } })).toEqual({
+    expect(subscriptionWithPricing({ plan: { key: "team-v1" } })).toEqual({
       plan: { key: "team-v1" },
       billingSchedule: "monthly",
+      displayName: "Team",
       seatPrice: 20,
+      trial: false,
     });
   });
 
   test("will return org pricing if the plan key is org-v1", () => {
-    expect(fullPricingDetailsForSubscription({ plan: { key: "org-v1" } })).toEqual({
+    expect(subscriptionWithPricing({ plan: { key: "org-v1" } })).toEqual({
       plan: { key: "org-v1" },
       billingSchedule: "monthly",
+      displayName: "Organization",
       seatPrice: 75,
+      trial: false,
     });
   });
 });
