@@ -5,6 +5,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { trackEvent } from "ui/utils/telemetry";
 
 function setupShortcuts() {
   return usesWindow(win => {
@@ -21,6 +22,7 @@ function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: P
       setViewMode("dev");
     }
 
+    trackEvent("key_shortcut.full_text_search");
     setSelectedPrimaryPanel("search");
   };
 
