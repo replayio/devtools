@@ -14,6 +14,7 @@ export const GET_USER_INFO = gql`
       user {
         id
       }
+      motd
       acceptedTOSVersion
       email
       internal

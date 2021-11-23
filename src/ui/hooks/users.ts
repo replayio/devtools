@@ -34,6 +34,7 @@ export function useUserIsAuthor() {
 }
 
 export type UserInfo = {
+  motd: string | null;
   acceptedTOSVersion: number | null;
   email: string;
   id: string;
@@ -73,6 +74,7 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
     return undefined;
   }
   return {
+    motd: viewer.motd,
     acceptedTOSVersion: viewer.acceptedTOSVersion,
     email: viewer.email,
     id: viewer.user.id,
@@ -97,6 +99,7 @@ export function useGetUserInfo() {
   const nags: Nag[] = data?.viewer?.nags;
   const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
   const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
+  const motd: string = data?.viewer?.motd;
 
   return {
     loading,
@@ -108,6 +111,7 @@ export function useGetUserInfo() {
     picture,
     acceptedTOSVersion,
     unsubscribedEmailTypes,
+    motd,
   };
 }
 
