@@ -20,7 +20,7 @@ import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { AvatarImage } from "ui/components/Avatar";
 import PreferencesSettings from "./PreferencesSettings";
 import ExternalLink from "../ExternalLink";
-import { features } from "ui/utils/prefs";
+import ExperimentalSettings from "./ExperimentalSettings";
 
 function Support() {
   return (
@@ -125,7 +125,7 @@ function ApiKeysWrapper({ settings }: { settings?: UserSettings }) {
   return <UserAPIKeys apiKeys={settings.apiKeys} />;
 }
 
-const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUserSettings, {}> => [
+const getSettings = (): Settings<SettingsTabTitle, CombinedUserSettings, {}> => [
   {
     title: "Personal",
     icon: "person",
@@ -144,45 +144,7 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUser
   {
     title: "Experimental",
     icon: "biotech",
-    items: [
-      {
-        label: "React DevTools",
-        type: "checkbox",
-        key: "showReact",
-        description: "Inspect the React component tree",
-        disabled: false,
-      },
-      {
-        label: "Global function search",
-        type: "checkbox",
-        key: "enableGlobalSearch",
-        description: "Search for functions in all source files",
-        disabled: false,
-      },
-      {
-        label: "Elements pane",
-        type: "checkbox",
-        key: "showElements",
-        description: "Inspect HTML markup and CSS styling",
-        disabled: false,
-        comingSoon: !internal,
-      },
-      {
-        label: "Repainting",
-        type: "checkbox",
-        key: "enableRepaint",
-        description: "Repaint the DOM on demand",
-        disabled: false,
-        comingSoon: !internal,
-      },
-      {
-        label: "Network Monitor",
-        type: "checkbox",
-        key: "enableNetworkMonitor",
-        description: "Network Monitor request table",
-        disabled: false,
-      },
-    ],
+    component: ExperimentalSettings,
   },
   {
     title: "Support",
@@ -197,50 +159,21 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUser
 ];
 
 export function UserSettingsModal(props: PropsFromRedux) {
-  const { userSettings, loading } = hooks.useGetUserSettings();
   const { features: orgFeatures, loading: orgFeaturesLoading } = hooks.useGetUserInfo();
-  const { internal, loading: userInfoLoading } = hooks.useGetUserInfo();
   const view = props.view === "preferences" ? "Preferences" : props.defaultSettingsTab;
-
-  // TODO: This is bad and should be updated with a better generalized hook
-  const updateRepaint = hooks.useUpdateUserSetting("enableRepaint", "Boolean");
-  const updateReact = hooks.useUpdateUserSetting("showReact", "Boolean");
-  const updateElements = hooks.useUpdateUserSetting("showElements", "Boolean");
-  const updateGlobalSearch = hooks.useUpdateUserSetting("enableGlobalSearch", "Boolean");
-
-  const [enableNetworkMonitor, setEnableNetworkMonitor] = useState(!!features.network);
-
-  const onChange = (key: keyof CombinedUserSettings, value: any) => {
-    if (key === "enableRepaint") {
-      updateRepaint({ variables: { newValue: value } });
-      updateEnableRepaint(value);
-    } else if (key === "showReact") {
-      updateReact({ variables: { newValue: value } });
-    } else if (key === "showElements") {
-      updateElements({ variables: { newValue: value } });
-    } else if (key === "enableGlobalSearch") {
-      updateGlobalSearch({ variables: { newValue: value } });
-    } else if (key === "enableNetworkMonitor") {
-      features.network = value;
-      setEnableNetworkMonitor(!!features.network);
-    }
-  };
-
   const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
+
   if (!orgFeatures.library && hiddenTabs) {
     hiddenTabs.push("API Keys");
   }
 
-  const settings = getSettings(internal);
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}
       tab={view}
-      loading={loading || userInfoLoading || orgFeaturesLoading}
-      onChange={onChange}
       panelProps={{}}
-      settings={settings}
-      values={{ ...userSettings, enableNetworkMonitor }}
+      settings={getSettings()}
+      loading={orgFeaturesLoading}
     />
   );
 }
