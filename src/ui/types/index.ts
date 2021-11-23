@@ -59,6 +59,8 @@ export interface PaymentMethod {
   };
 }
 
+type PlanKey = "org-v1" | "team-v1";
+
 export interface Subscription {
   id: string;
   createdAt: string;
@@ -71,7 +73,7 @@ export interface Subscription {
   plan: {
     id: string;
     name: string;
-    key: string;
+    key: PlanKey;
     createdAt: string;
   };
   paymentMethods: PaymentMethod[];
