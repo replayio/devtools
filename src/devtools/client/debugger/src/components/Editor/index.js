@@ -49,7 +49,7 @@ import {
   getSourceLocationFromMouseEvent,
   hasDocument,
   onTokenMouseOver,
-  onGutterMouseOver,
+  onLineMouseOver,
   startOperation,
   endOperation,
   clearDocuments,
@@ -129,7 +129,7 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("keydown", e => this.onKeyDown(e));
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
-    codeMirrorWrapper.addEventListener("mouseover", onGutterMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", onLineMouseOver(codeMirror));
     codeMirrorWrapper.addEventListener("mouseover", () => trackEventOnce("editor.mouse_over"));
 
     if (!isFirefox()) {

@@ -33,10 +33,10 @@ function LineNumberTooltip({
   const lastHoveredLineNumber = useRef<number | null>(null);
 
   const setHoveredLineNumber = ({
-    targetNode,
+    lineNumberNode: targetNode,
     lineNumber,
   }: {
-    targetNode: HTMLElement;
+    lineNumberNode: HTMLElement;
     lineNumber: number;
   }) => {
     trackEvent("editor.gutter_mouse_over");
@@ -62,11 +62,11 @@ function LineNumberTooltip({
   };
 
   useEffect(() => {
-    editor.codeMirror.on("gutterLineEnter", setHoveredLineNumber);
-    editor.codeMirror.on("gutterLineLeave", clearHoveredLineNumber);
+    editor.codeMirror.on("lineEnter", setHoveredLineNumber);
+    editor.codeMirror.on("lineLeave", clearHoveredLineNumber);
     return () => {
-      editor.codeMirror.off("gutterLineEnter", setHoveredLineNumber);
-      editor.codeMirror.off("gutterLineLeave", clearHoveredLineNumber);
+      editor.codeMirror.off("lineEnter", setHoveredLineNumber);
+      editor.codeMirror.off("lineLeave", clearHoveredLineNumber);
     };
   }, []);
 
