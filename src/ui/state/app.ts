@@ -79,6 +79,7 @@ export interface AppState {
   displayedLoadingProgress: number | null;
   events: Events;
   expectedError: ExpectedError | null;
+  fontLoading: boolean;
   hoveredLineNumberLocation: Location | null;
   indexing: number;
   initializedPanels: PanelName[];
