@@ -118,7 +118,7 @@ const settings: Settings<
   {
     title: "Team Members",
     icon: "group",
-    component: function TeamMebers({ isAdmin, workspaceId, settings, ...rest }) {
+    component: function TeamMembers({ isAdmin, workspaceId, settings, ...rest }) {
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
