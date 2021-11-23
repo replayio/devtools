@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
-import { LoadingScreen, LoadingScreenTemplate } from "ui/components/shared/BlankScreen";
+import LoadingScreen, { LoadingScreenTemplate } from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";

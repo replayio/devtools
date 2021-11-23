@@ -4,7 +4,7 @@ import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { LoadingScreen } from "ui/components/shared/BlankScreen";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";

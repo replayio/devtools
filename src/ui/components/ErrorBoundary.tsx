@@ -4,8 +4,8 @@ import { UIState } from "ui/state";
 import { UnexpectedError } from "ui/state/app";
 import { getUnexpectedError } from "ui/reducers/app";
 import { setUnexpectedError } from "ui/actions/session";
-import BlankScreen from "./shared/BlankScreen";
 import { isDevelopment } from "ui/utils/environment";
+import { BlankViewportWrapper } from "./shared/Viewport";
 
 export const ReplayUpdatedError: UnexpectedError = {
   message: "Replay updated",
@@ -34,7 +34,7 @@ class ErrorBoundary extends Component<PropsFromRedux & { children: ReactNode }> 
 
   render() {
     const { unexpectedError } = this.props;
-    return unexpectedError ? <BlankScreen /> : this.props.children;
+    return unexpectedError ? <BlankViewportWrapper /> : this.props.children;
   }
 }
 

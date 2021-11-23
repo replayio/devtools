@@ -8,34 +8,7 @@ import {
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import LoadingTip from "./LoadingTip";
-
-const BACKGROUNDS = {
-  white: "white",
-  "blue-gradient": "linear-gradient(to bottom right, #68DCFC, #4689F8)",
-};
-
-export default function BlankScreen({
-  children,
-  background,
-  className,
-}: {
-  children?: ReactNode;
-  background?: "white" | "blue-gradient";
-  className?: string;
-}) {
-  // Default to `white`
-  const backgroundStyle =
-    background && BACKGROUNDS[background] ? BACKGROUNDS[background] : BACKGROUNDS["white"];
-
-  return (
-    <main
-      className={`w-full relative h-full grid ${className}`}
-      style={{ background: backgroundStyle }}
-    >
-      {children}
-    </main>
-  );
-}
+import { BlankViewportWrapper } from "./Viewport";
 
 export function LoadingScreenTemplate({
   children,
@@ -45,7 +18,7 @@ export function LoadingScreenTemplate({
   showTips?: boolean;
 }) {
   return (
-    <BlankScreen>
+    <BlankViewportWrapper>
       <div className="m-auto text-lg">
         <div className="flex flex-col items-center space-y-10">
           <Logo />
@@ -53,7 +26,7 @@ export function LoadingScreenTemplate({
         </div>
       </div>
       {showTips ? <LoadingTip /> : null}
-    </BlankScreen>
+    </BlankViewportWrapper>
   );
 }
 
@@ -94,7 +67,7 @@ export function ProgressBar({ progress }: { progress: number }) {
   );
 }
 
-function _LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRedux) {
+function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRedux) {
   // The backend send events in this order: uploading replay -> uploading sourcemaps.
   if (awaitingSourcemaps) {
     return (
@@ -128,4 +101,4 @@ const connector = connect((state: UIState) => ({
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export const LoadingScreen = connector(_LoadingScreen);
+export default connector(LoadingScreen);

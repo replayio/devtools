@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import BlankScreen from "ui/components/shared/BlankScreen";
+import React from "react";
 import { LaunchBrowser } from "ui/components/shared/LaunchBrowserModal";
+import { BlankViewportWrapper } from "ui/components/shared/Viewport";
 
 const BrowserLaunch = () => {
   const library = "replay:library";
 
   return (
-    <BlankScreen className="absolute z-10">
+    <BlankViewportWrapper>
       <LaunchBrowser path={library}>
         <p className="text-center">
           <a
@@ -17,7 +17,7 @@ const BrowserLaunch = () => {
           </a>
         </p>
       </LaunchBrowser>
-    </BlankScreen>
+    </BlankViewportWrapper>
   );
 };
 
