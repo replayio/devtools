@@ -20,22 +20,18 @@ function getLineNumberNode(target) {
     target.closest(".CodeMirror-gutter-wrapper")?.parentElement ||
     target.closest(".CodeMirror-line")?.parentElement;
 
-  if (!row) return null;
-
-  const wrapper = row.querySelector(".CodeMirror-gutter-wrapper");
-
-  return wrapper.querySelector(".CodeMirror-linenumber");
+  return row.querySelector(".CodeMirror-linenumber");
 }
 
 function isValidTarget(target) {
-  const lineNumberNode = getLineNumberNode(target);
-
-  if (!lineNumberNode) return false;
-
+  const isRow =
+    target.closest(".CodeMirror-gutter-wrapper")?.parentElement ||
+    target.closest(".CodeMirror-line")?.parentElement;
+  const isWidget = target.closest(".CodeMirror-linewidget");
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
-  return !isNonBreakableLineNode && !isTooltip;
+  return isRow && !isWidget && !isNonBreakableLineNode && !isTooltip;
 }
 
 export function onGutterMouseOver(codeMirror) {
