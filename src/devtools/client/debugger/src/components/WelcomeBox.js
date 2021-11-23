@@ -7,8 +7,14 @@ import { connect } from "../utils/connect";
 import actions from "../actions";
 import { formatKeyShortcut } from "../utils/text";
 import { useGetUserSettings } from "ui/hooks/settings";
+import { setSelectedPrimaryPanel } from "ui/actions/app";
 
-function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
+function WelcomeBox({
+  setActiveSearch,
+  openQuickOpen,
+  toggleShortcutsModal,
+  setSelectedPrimaryPanel,
+}) {
   const { userSettings, loading } = useGetUserSettings();
   if (loading) {
     return null;
@@ -43,7 +49,7 @@ function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
             className="welcomebox__searchProject"
             role="button"
             tabIndex="0"
-            onClick={setActiveSearch.bind(null, "project")}
+            onClick={() => setSelectedPrimaryPanel("search")}
           >
             <span className="shortcutLabel">{"%S Find in files".substring(2)}</span>
             <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+Shift+F")}</span>
@@ -66,4 +72,5 @@ function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
 export default connect(() => ({}), {
   setActiveSearch: actions.setActiveSearch,
   openQuickOpen: actions.openQuickOpen,
+  setSelectedPrimaryPanel,
 })(WelcomeBox);
