@@ -15,7 +15,6 @@ export default function SettingsModal<
   tab,
   hiddenTabs,
   loading,
-  onChange,
   panelProps,
   settings,
   values,
@@ -25,7 +24,6 @@ export default function SettingsModal<
   tab?: T;
   hiddenTabs?: T[];
   loading?: boolean;
-  onChange?: (key: keyof V, value: any) => void;
   panelProps: P;
   settings: Settings<T, V, P>;
   values?: V;
@@ -53,12 +51,7 @@ export default function SettingsModal<
     <div className={classnames("settings-modal", { "settings-modal-large": size === "lg" })}>
       <Modal>
         <SettingsNavigation {...{ hiddenTabs, settings, selectedTab, setSelectedTab, title }} />
-        <SettingsBody
-          values={values}
-          selectedSetting={selectedSetting}
-          onChange={onChange}
-          panelProps={panelProps}
-        />
+        <SettingsBody values={values} selectedSetting={selectedSetting} panelProps={panelProps} />
       </Modal>
     </div>
   );
