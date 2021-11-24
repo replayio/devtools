@@ -43,14 +43,20 @@ export type UserInfo = {
 };
 
 export enum Nag {
-  FIRST_REPLAY = "first_replay",
   FIRST_REPLAY_2 = "first_replay_2",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
-  FIRST_BREAKPOINT_REMOVED = "first_breakpoint_removed",
+  FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
-  FIRST_GUTTER_CLICK = "first_gutter_click",
   DOWNLOAD_REPLAY = "download_replay",
+}
+
+// Keeping a list of unused nag types here so we don't accidentally
+// overwrite them as we come up with new ones.
+enum DeprecatedNag {
+  FIRST_REPLAY = "first_replay",
+  FIRST_BREAKPOINT_REMOVED = "first_breakpoint_removed",
+  FIRST_GUTTER_CLICK = "first_gutter_click",
 }
 
 export enum EmailSubscription {

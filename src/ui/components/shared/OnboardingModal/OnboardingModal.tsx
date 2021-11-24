@@ -49,7 +49,7 @@ function Navigation({
 
   const onSkipOrDone = () => {
     hideModal();
-    dismissNag(Nag.FIRST_REPLAY);
+    dismissNag(Nag.FIRST_REPLAY_2);
   };
 
   return (

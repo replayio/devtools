@@ -76,7 +76,7 @@ function LineNumberTooltip({
       );
   }, [analysisPoints]);
 
-  const showNag = shouldShowNag(nags, Nag.FIRST_GUTTER_CLICK);
+  const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
   if (!lineNumberNode) {
     return null;

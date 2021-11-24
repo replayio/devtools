@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { shouldShowNag } from "ui/utils/user";
 import MaterialIcon from "../MaterialIcon";
 
 // This is very arbitrary but we need it to keep the editor
@@ -20,7 +21,7 @@ function NagHat({
 }) {
   const { nags } = hooks.useGetUserInfo();
 
-  if (!nags || (nags && nags.includes(nagType))) {
+  if (!shouldShowNag(nags, nagType)) {
     return null;
   }
 
@@ -56,7 +57,7 @@ export function EditorNag() {
     <NagHat
       mainText="Ready to add your first print statement?"
       subText="Click on a line number in the gutter"
-      nagType={Nag.FIRST_GUTTER_CLICK}
+      nagType={Nag.FIRST_BREAKPOINT_ADD}
     />
   );
 }
