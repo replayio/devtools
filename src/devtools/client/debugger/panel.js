@@ -115,7 +115,6 @@ export class DebuggerPanel {
   }
 
   async selectSource(sourceId, line, column) {
-    debugger;
     const cx = this._selectors.getContext(this._getState());
     const location = { sourceId, line, column };
 

@@ -6,40 +6,25 @@ import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 import Matches from "./Matches";
 
-const TIME_WINDOW = 1000;
-
-function getPointsForEvent(eventName: any, event: ReplayEvent, points: any) {
-  const eventPoints = points[eventName];
-  const { time } = event;
-
-  return eventPoints.filter((p: any) => Math.abs(time - p.time) < TIME_WINDOW / 2);
-}
-
-function Event({
-  onSeek,
-  currentTime,
-  executionPoint,
-  event,
-  points,
-}: {
+type EventProps = {
   event: ReplayEvent;
   currentTime: any;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
-  points?: any;
-}) {
+};
+
+export default function Event({ onSeek, currentTime, executionPoint, event }: EventProps) {
   const isPaused = event.time === currentTime && executionPoint === event.point;
 
   let text: string;
   let title: string;
   let icon: string;
-  let pointArray: any[] = [];
 
   if (event.kind?.includes("mouse")) {
     text = "Mouse Click";
     title = "Mouse Click Event";
     icon = "ads_click";
-    pointArray = getPointsForEvent("event.mouse.click", event, points);
+    // pointArray = getPointsForEvent("event.mouse.click", event, eventTypePoints);
   } else if (event.kind?.includes("navigation")) {
     const ev = event as NavigationEvent;
     text = `${ev.url}`;
@@ -99,9 +84,7 @@ function Event({
           {getFormattedTime(event.time)}
         </div>
       </button>
-      {pointArray.length ? <Matches points={pointArray} onSeek={onSeek} /> : null}
+      <Matches onSeek={onSeek} event={event} />
     </div>
   );
 }
-
-export default Event;

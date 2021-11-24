@@ -10,7 +10,6 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 import Event from "./Event";
 import { trackEvent } from "ui/utils/telemetry";
 import classNames from "classnames";
-const { getEventListenerPoints } = require("devtools/client/debugger/src/reducers/event-listeners");
 
 function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (
@@ -23,7 +22,7 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 
 const FILTERED_EVENT_TYPES = ["keydown", "keyup"];
 
-function Events({ currentTime, events, executionPoint, seek, points }: PropsFromRedux) {
+function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     seek(point, time, false);
@@ -43,7 +42,7 @@ function Events({ currentTime, events, executionPoint, seek, points }: PropsFrom
           <div key={e.point}>
             <CurrentTimeLine isActive={currentEventIndex === i} />
             <div className="px-1.5">
-              <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint, points }} />
+              <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
             </div>
           </div>
         );
@@ -57,7 +56,6 @@ const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     events: selectors.getFlatEvents(state),
-    points: getEventListenerPoints(state),
     executionPoint: getExecutionPoint(state),
   }),
   { seek: actions.seek }
