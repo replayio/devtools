@@ -31,7 +31,6 @@ import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
 import { EditorNag } from "ui/components/shared/Nags/Nags";
-import { trackEventOnce } from "ui/utils/mixpanel";
 
 import {
   showSourceText,
@@ -49,7 +48,7 @@ import {
   getSourceLocationFromMouseEvent,
   hasDocument,
   onTokenMouseOver,
-  onGutterMouseOver,
+  onLineMouseOver,
   startOperation,
   endOperation,
   clearDocuments,
@@ -129,8 +128,7 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("keydown", e => this.onKeyDown(e));
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
-    codeMirrorWrapper.addEventListener("mouseover", onGutterMouseOver(codeMirror));
-    codeMirrorWrapper.addEventListener("mouseover", () => trackEventOnce("editor.mouse_over"));
+    codeMirrorWrapper.addEventListener("mouseover", onLineMouseOver(codeMirror));
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
