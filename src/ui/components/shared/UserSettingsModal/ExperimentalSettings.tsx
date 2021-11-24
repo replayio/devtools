@@ -8,28 +8,34 @@ import { features } from "ui/utils/prefs";
 type ExperimentalKey = keyof CombinedUserSettings;
 interface ExperimentalSetting {
   label: string;
+  description: string;
   key: ExperimentalKey;
 }
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
     label: "React DevTools",
+    description: "Inspect the React component tree",
     key: "showReact",
   },
   {
     label: "Global function search",
+    description: "Search for functions in all source files",
     key: "enableGlobalSearch",
   },
   {
     label: "Elements pane",
+    description: "Inspect HTML markup and CSS styling",
     key: "showElements",
   },
   {
     label: "Repainting",
+    description: "Repaint the DOM on demand",
     key: "enableRepaint",
   },
   {
     label: "Network Monitor",
+    description: "Inspect network activity",
     key: "enableNetworkMonitor",
   },
 ];
@@ -43,10 +49,13 @@ function Experiment({
   checked: boolean;
   onChange: (key: ExperimentalKey, value: any) => void;
 }) {
-  const { label, key } = setting;
+  const { label, key, description } = setting;
   return (
     <CheckboxRow id={key} onChange={() => onChange(key, !checked)} checked={checked}>
-      {label}
+      <div className="flex flex-col space-y-0.5">
+        <div className="leading-relaxed">{label}</div>
+        <div className="text-gray-500 text-xs">{description}</div>
+      </div>
     </CheckboxRow>
   );
 }
