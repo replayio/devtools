@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
+import Matches from "./Matches";
 
 const TIME_WINDOW = 1000;
 
@@ -61,11 +62,8 @@ function Event({
     title = `${eventText} event`;
   }
 
-  console.log({ points });
-
   return (
-    <button
-      onClick={() => onSeek(event.point, event.time)}
+    <div
       onKeyDown={event => {
         if (event.key === " ") {
           event.preventDefault();
@@ -81,7 +79,10 @@ function Event({
         }
       )}
     >
-      <div className="flex flex-row justify-between w-full items-center space-x-2">
+      <button
+        onClick={() => onSeek(event.point, event.time)}
+        className="flex flex-row justify-between w-full items-center space-x-2"
+      >
         <div className="flex flex-row space-x-2 items-center overflow-hidden">
           <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
             {icon}
@@ -97,21 +98,8 @@ function Event({
         <div className={classNames({ "text-primaryAccent": isPaused })}>
           {getFormattedTime(event.time)}
         </div>
-      </div>
-      {pointArray.length ? <Matches points={pointArray} /> : null}
-    </button>
-  );
-}
-
-function Matches({ points }: { points: any[] }) {
-  return (
-    <div className="flex flex-col space-y-1 items-start">
-      <div>Matches found:</div>
-      <div>
-        {points.map((p, i) => (
-          <div key={i}>{`"mouseClick": 0:${Math.round(p.time)}`}</div>
-        ))}
-      </div>
+      </button>
+      {pointArray.length ? <Matches points={pointArray} onSeek={onSeek} /> : null}
     </div>
   );
 }

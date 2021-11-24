@@ -110,6 +110,7 @@ export function showSource(cx, sourceId) {
     if (!source) {
       return;
     }
+    debugger;
 
     dispatch(setPrimaryPaneTab("sources"));
     dispatch(selectSource(cx, source.id));
