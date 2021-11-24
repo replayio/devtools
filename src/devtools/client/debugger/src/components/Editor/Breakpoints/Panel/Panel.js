@@ -19,7 +19,6 @@ import FirstEditNag from "./FirstEditNag";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
-import { shouldShowNag } from "ui/utils/user";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -54,12 +53,9 @@ function Panel({
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
-    dismissNag(Nag.FIRST_GUTTER_CLICK);
+    dismissNag(Nag.FIRST_BREAKPOINT_ADD);
 
     return () => {
-      if (nags?.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
-        dismissNag(Nag.FIRST_BREAKPOINT_REMOVED);
-      }
       editor.editor.off("refresh", updateWidth);
     };
   }, []);
@@ -71,12 +67,12 @@ function Panel({
   });
 
   const toggleEditingOn = () => {
-    dismissNag(Nag.FIRST_BREAKPOINT_ADD);
+    dismissNag(Nag.FIRST_BREAKPOINT_EDIT);
     setEditing(true);
   };
 
   const toggleEditingOff = () => {
-    dismissNag(Nag.FIRST_BREAKPOINT_EDIT);
+    dismissNag(Nag.FIRST_BREAKPOINT_SAVE);
     setEditing(false);
   };
 
