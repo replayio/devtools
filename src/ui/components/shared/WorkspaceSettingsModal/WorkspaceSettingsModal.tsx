@@ -15,6 +15,7 @@ import WorkspaceSubscription from "./WorkspaceSubscription";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
+import GeneralSettings from "./GeneralSettings";
 
 export function WorkspaceMembers({
   members,
@@ -102,7 +103,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
   );
 }
 
-export type SettingsTabTitle = "Team Members" | "Billing" | "API Keys" | "Delete Team";
+export type SettingsTabTitle = "General" | "Team Members" | "Billing" | "API Keys" | "Delete Team";
 
 const settings: Settings<
   SettingsTabTitle,
@@ -116,9 +117,14 @@ const settings: Settings<
   }
 > = [
   {
+    component: GeneralSettings,
+    icon: "settings",
+    title: "General",
+  },
+  {
     title: "Team Members",
     icon: "group",
-    component: function TeamMebers({ isAdmin, workspaceId, settings, ...rest }) {
+    component: function TeamMembers({ isAdmin, workspaceId, settings, ...rest }) {
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
@@ -195,6 +201,7 @@ const settings: Settings<
 function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) {
   const [tab, setTab] = useState<string>("Team Members");
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
+  const { workspace } = hooks.useGetWorkspace(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
 
   useEffect(() => {
@@ -208,7 +215,7 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
     }
   }, [view]);
 
-  if (!workspaceId) return null;
+  if (!(workspaceId && workspace)) return null;
 
   const roles = members?.find(m => m.userId === localUserId)?.roles;
   const isAdmin = roles?.includes("admin") || false;
@@ -231,7 +238,7 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
       panelProps={{ isAdmin, workspaceId, ...rest }}
       settings={settings}
       size="lg"
-      title="Team Settings"
+      title={workspace.name || "Team Settings"}
     />
   );
 }
