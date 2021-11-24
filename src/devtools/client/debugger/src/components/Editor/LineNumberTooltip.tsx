@@ -39,7 +39,6 @@ function LineNumberTooltip({
     lineNumberNode: HTMLElement;
     lineNumber: number;
   }) => {
-    trackEvent("editor.gutter_mouse_over");
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
     // for the same line number. In that case, we shouldn't run
@@ -62,11 +61,11 @@ function LineNumberTooltip({
   };
 
   useEffect(() => {
-    editor.codeMirror.on("lineEnter", setHoveredLineNumber);
-    editor.codeMirror.on("lineLeave", clearHoveredLineNumber);
+    editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
+    editor.codeMirror.on("lineMouseLeave", clearHoveredLineNumber);
     return () => {
-      editor.codeMirror.off("lineEnter", setHoveredLineNumber);
-      editor.codeMirror.off("lineLeave", clearHoveredLineNumber);
+      editor.codeMirror.off("lineMouseEnter", setHoveredLineNumber);
+      editor.codeMirror.off("lineMouseLeave", clearHoveredLineNumber);
     };
   }, []);
 

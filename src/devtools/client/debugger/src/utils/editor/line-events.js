@@ -1,3 +1,6 @@
+import { trackEventOnce } from "ui/utils/mixpanel";
+import { trackEvent } from "ui/utils/telemetry";
+
 function dispatch(codeMirror, eventName, data) {
   codeMirror.constructor.signal(codeMirror, eventName, data);
 }
@@ -24,10 +27,12 @@ function isValidTarget(target) {
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
-  return isCodeMirrorBody && !isInWidget && !isNonBreakableLineNode && !isTooltip;
+  return isCodeMirrorBody && !isWidget && !isNonBreakableLineNode && !isTooltip;
 }
 
 function emitGutterMouseEnter(codeMirror, target) {
+  trackEvent("editor.gutter_mouse_over");
+
   const row = target.closest(".CodeMirror-gutter-wrapper").parentElement;
   const lineNumberNode = getLineNumberNode(row);
   const lineNumber = safeJsonParse(lineNumberNode.textContent);
@@ -47,6 +52,8 @@ function emitGutterMouseEnter(codeMirror, target) {
 }
 
 function emitLineMouseEnter(codeMirror, target) {
+  trackEventOnce("editor.mouse_over");
+
   const row =
     target.closest(".CodeMirror-line")?.parentElement ||
     target.closest(".CodeMirror-gutter-wrapper")?.parentElement;
@@ -55,14 +62,14 @@ function emitLineMouseEnter(codeMirror, target) {
 
   target.addEventListener(
     "mouseleave",
-    event => dispatch(codeMirror, "lineLeave", { lineNumberNode, lineNumber }),
+    event => dispatch(codeMirror, "lineMouseLeave", { lineNumberNode, lineNumber }),
     {
       capture: true,
       once: true,
     }
   );
 
-  dispatch(codeMirror, "lineEnter", { lineNumberNode, lineNumber });
+  dispatch(codeMirror, "lineMouseEnter", { lineNumberNode, lineNumber });
 }
 
 export function onLineMouseOver(codeMirror) {

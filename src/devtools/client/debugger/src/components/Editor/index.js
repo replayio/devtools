@@ -31,7 +31,6 @@ import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
 import { EditorNag } from "ui/components/shared/Nags/Nags";
-import { trackEventOnce } from "ui/utils/mixpanel";
 
 import {
   showSourceText,
@@ -130,7 +129,6 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
     codeMirrorWrapper.addEventListener("mouseover", onLineMouseOver(codeMirror));
-    codeMirrorWrapper.addEventListener("mouseover", () => trackEventOnce("editor.mouse_over"));
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
