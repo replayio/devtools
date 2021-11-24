@@ -22,9 +22,39 @@ import { isVisible } from "ui/utils/dom";
 import { OutlineFunction } from "./OutlineFunction";
 import { filterOutlineItem } from "./filterOutlineItem";
 import { ClassFunctionsList } from "./ClassFunctionsList";
+import { getBreakpointPositions } from "../../reducers/sources";
+import { getLocationKey } from "../../utils/breakpoint";
 
 export const getFunctionKey = ({ name, location }) =>
   `${name}:${location.start.line}:${location.start.column}`;
+
+function fetchOutlineItemCount({ item }) {
+  return ({ dispatch, getState, client }) => {
+    if (hasOutlineItemCount(getState(), item)) {
+      return;
+    }
+
+    const breakablePositions = getBreakpointPositions(getState(), item.location.sourceId);
+    // check to see if the locaton is breakable
+    // if not get the next position on the current or next line
+    const analysisLocation = {};
+
+    // run FAP for this location and get the points back
+    const points = await foo;
+
+    dispatch({
+      type: "outline_item_count",
+      itemKey: getLocationKey(item.location),
+      points,
+    });
+  };
+}
+
+function fetchOutlineItemCounts(functionList) {
+  return ({ dispatch }) => {
+    functionList.forEach(item => dispatch(fetchOutlineItemCount(item)));
+  };
+}
 
 export class Outline extends Component {
   state = { filter: "", focusedItem: null };
@@ -78,6 +108,21 @@ export class Outline extends Component {
     this.setState({ filter: filter.trim() });
   };
 
+  onScroll = debounce(e => {
+    console.log(e);
+    const scrollTop = e.target.scrollTop;
+    const height = e.target.clientHeight;
+    const itemHeight = e.target.firstChild.clientHeight;
+    const offset = scrollTop / itemHeight;
+
+    // so this is the problem with my approach...
+    // the parent component knows which namedFunctions are available that's namedFunctions below
+    // we do know know about the classFunctionList because that's calculated in ClassFunctionsList
+    // we should refactor that code so that is also available up here and we can fetch that as well
+    const visibleFunctions = [];
+    fetchOutlineItemCounts(visibleFunctions);
+  }, 1000);
+
   renderFunctions(functions) {
     const { filter, focusedItem } = this.state;
     let classes = uniq(functions.map(func => func.klass));
@@ -87,24 +132,27 @@ export class Outline extends Component {
 
     return (
       <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">
-        {namedFunctions.map(func => (
-          <OutlineFunction
-            key={getFunctionKey(func)}
-            isFocused={focusedItem === func}
-            func={func}
-            onSelect={this.selectItem}
-            outlineList={this.refs.outlineList}
-          />
-        ))}
-        {classes.map(klass => (
-          <ClassFunctionsList
-            klass={klass}
-            functions={functions}
-            onSelect={this.selectItem}
-            focusedItem={focusedItem}
-            outlineList={this.refs.outlineList}
-          />
-        ))}
+        <div onScroll={this.onScroll}>
+          {namedFunctions.map(func => (
+            <OutlineFunction
+              onScroll={this.onScroll}
+              key={getFunctionKey(func)}
+              isFocused={focusedItem === func}
+              func={func}
+              onSelect={this.selectItem}
+              outlineList={this.refs.outlineList}
+            />
+          ))}
+          {classes.map(klass => (
+            <ClassFunctionsList
+              klass={klass}
+              functions={functions}
+              onSelect={this.selectItem}
+              focusedItem={focusedItem}
+              outlineList={this.refs.outlineList}
+            />
+          ))}
+        </div>
       </ul>
     );
   }
