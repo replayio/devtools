@@ -75,7 +75,7 @@ export async function isLocalNagDismissed(nag: LocalNag) {
   const replaySessions = await getReplaySessions();
   const replaySession = replaySessions[recordingId];
 
-  return replaySession.localNags.includes(nag);
+  return replaySession?.localNags.includes(nag);
 }
 
 // This allows us to insert a local nag on a per session (replay) basis.
