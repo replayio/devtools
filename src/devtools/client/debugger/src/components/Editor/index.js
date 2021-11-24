@@ -27,6 +27,7 @@ import DebugLine from "./DebugLine";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
 import LineNumberTooltip from "./LineNumberTooltip";
+import GithubBlueButton from "./GithubBlueButton";
 import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
@@ -432,6 +433,7 @@ class Editor extends PureComponent {
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
         <LineNumberTooltip editor={editor} />
+        <GithubBlueButton editor={editor} />
         <HighlightLines editor={editor} />
         {
           <EditorMenu
