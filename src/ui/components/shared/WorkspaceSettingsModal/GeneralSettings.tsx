@@ -21,8 +21,9 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId!);
   const { data } = hooks.useGetWorkspaceSubscription(workspaceId);
+  const { data: settings } = hooks.useGetWorkspaceSettings(workspaceId);
 
-  if (!(workspace && data)) {
+  if (!(workspace && data && settings)) {
     return null;
   }
 
@@ -34,7 +35,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
       <Row>
         <Label>Name</Label>
         <Input>
-          <input className="rounded-md text-sm w-full" type="text" value={workspace?.name} />
+          <input className="rounded-md text-sm w-full" type="text" defaultValue={workspace?.name} />
         </Input>
       </Row>
       <Row>
@@ -101,11 +102,12 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Row>
           <Label className="self-start">Welcome Message</Label>
           <textarea
-            disabled={disabled}
             className={classNames("rounded-md w-full mr-2 text-sm", {
               "bg-toolbarBackground": disabled,
               "border-gray-300": disabled,
             })}
+            disabled={disabled}
+            defaultValue={settings.welcomeMessage}
           />
         </Row>
       </div>

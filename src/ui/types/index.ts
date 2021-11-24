@@ -121,16 +121,21 @@ export interface PendingWorkspaceInvitation extends Workspace {
 }
 
 export interface Workspace {
-  name: string;
+  apiKeys?: ApiKey[];
+  domain: string;
+  hasPaymentMethod: boolean;
   id: string;
   invitationCode: string;
-  domain: string;
   isDomainLimitedCode: boolean;
-  recordingCount?: number;
   members?: User[];
-  apiKeys?: ApiKey[];
+  name: string;
+  recordingCount?: number;
+  settings: WorkspaceSettings;
   subscription?: Subscription;
-  hasPaymentMethod: boolean;
+}
+
+export interface WorkspaceSettings {
+  welcomeMessage?: string;
 }
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";
