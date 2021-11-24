@@ -86,7 +86,7 @@ export function Privacy() {
   const { operations } = recording!;
 
   return (
-    <div className="flex w-full h-full rounded-xl shadow-xl text-lg relative p-8 bg-jellyfish overflow-hidden">
+    <div className="flex w-full h-full rounded-xl shadow-xl text-md relative p-8 bg-white overflow-hidden">
       <div className="flex flex-col space-y-7 overflow-hidden">
         <div className="flex flex-col space-y-1">
           <div className="text-2xl font-bold">Privacy</div>
