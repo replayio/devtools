@@ -27,6 +27,8 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
     return null;
   }
 
+  console.log(settings);
+
   const { subscription } = data?.node;
   const disabled = subscription.plan.key !== "org-v1";
 
@@ -107,7 +109,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
               "border-gray-300": disabled,
             })}
             disabled={disabled}
-            defaultValue={settings.welcomeMessage}
+            defaultValue={settings.motd}
           />
         </Row>
       </div>

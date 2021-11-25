@@ -50,7 +50,7 @@ export const GET_WORKSPACE_SETTINGS = gql`
     node(id: $workspaceId) {
       ... on Workspace {
         settings {
-          welcomeMessage
+          motd
         }
       }
     }

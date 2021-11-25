@@ -135,7 +135,13 @@ export interface Workspace {
 }
 
 export interface WorkspaceSettings {
-  welcomeMessage?: string;
+  features: {
+    allowList: string[];
+    blockList: string[];
+    library: boolean;
+    public: boolean;
+  };
+  motd?: string;
 }
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";
