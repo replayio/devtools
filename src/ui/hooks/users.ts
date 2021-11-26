@@ -40,6 +40,7 @@ export type UserInfo = {
   internal: boolean;
   nags: Nag[];
   unsubscribedEmailTypes: string[];
+  features: { apiKey: boolean; library: boolean };
 };
 
 export enum Nag {
@@ -85,10 +86,11 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
     internal: viewer.internal,
     nags: viewer.nags,
     unsubscribedEmailTypes: viewer.unsubscribedEmailTypes,
+    features: viewer.features || {},
   };
 }
 
-export function useGetUserInfo() {
+export function useGetUserInfo(): UserInfo & { loading: boolean } {
   const { data, loading, error } = useQuery(GET_USER_INFO);
 
   if (error) {
@@ -96,13 +98,12 @@ export function useGetUserInfo() {
   }
 
   const id: string = data?.viewer?.user.id;
-  const name: string = data?.viewer?.user.name;
-  const picture: string = data?.viewer?.user.picture;
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
   const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
   const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
+  const features = data?.viewer?.features || {};
 
   return {
     loading,
@@ -110,10 +111,9 @@ export function useGetUserInfo() {
     email,
     internal,
     nags,
-    name,
-    picture,
     acceptedTOSVersion,
     unsubscribedEmailTypes,
+    features,
   };
 }
 
