@@ -227,7 +227,7 @@ export function UserSettingsModal(props: PropsFromRedux) {
   };
 
   const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
-  if (!orgFeatures.apiKey && hiddenTabs) {
+  if (!orgFeatures.library && hiddenTabs) {
     hiddenTabs.push("API Keys");
   }
 
