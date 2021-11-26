@@ -15,7 +15,6 @@ export const GET_USER_INFO = gql`
         id
       }
       features {
-        apiKey
         library
       }
       acceptedTOSVersion

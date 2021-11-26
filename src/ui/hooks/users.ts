@@ -40,7 +40,7 @@ export type UserInfo = {
   internal: boolean;
   nags: Nag[];
   unsubscribedEmailTypes: string[];
-  features: { apiKey: boolean; library: boolean };
+  features: { library: boolean };
 };
 
 export enum Nag {
