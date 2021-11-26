@@ -55,13 +55,7 @@ function ReplayInfo({ setModal, progressPercentage }: PropsFromRedux) {
         </Row>
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
-        ) : null}
-        {progressPercentage < 100 ? (
-          <Row>
-            <Spinner className="animate-spin h-5 w-5 text-black" />
-            <div>Loading Events…</div>
-          </Row>
-        ) : null}
+        ) : null}      
       </div>
     </div>
   );
