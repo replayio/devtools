@@ -17,6 +17,11 @@ const TeamSelectButton = ({ selectedWorkspaceName }: { selectedWorkspaceName: st
   );
 };
 
+interface DisplayedWorkspace {
+  id: string;
+  name: string;
+}
+
 export default function TeamSelect({
   workspaces,
   selectedWorkspaceId,
@@ -28,13 +33,13 @@ export default function TeamSelect({
 }) {
   const userInfo = useGetUserInfo();
   const [expanded, setExpanded] = useState(false);
-  const displayedWorkspaces: { id: string; name: string }[] = [...workspaces].sort();
+  let displayedWorkspaces: DisplayedWorkspace[] = [...workspaces].sort();
 
   if (userInfo.features.library) {
-    displayedWorkspaces.unshift(personalWorkspace);
+    displayedWorkspaces = [personalWorkspace, ...displayedWorkspaces];
   }
 
-  const handleSelect = (workspace: Workspace | typeof personalWorkspace) => {
+  const handleSelect = (workspace: DisplayedWorkspace) => {
     handleWorkspaceSelect(workspace.id);
     setExpanded(false);
   };
