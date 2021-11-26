@@ -4,6 +4,7 @@ import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";
 import { SelectorIcon } from "@heroicons/react/solid";
 import { personalWorkspace } from "./Sharing";
+import { useGetUserInfo } from "ui/hooks/users";
 
 const TeamSelectButton = ({ selectedWorkspaceName }: { selectedWorkspaceName: string }) => {
   return (
@@ -16,6 +17,11 @@ const TeamSelectButton = ({ selectedWorkspaceName }: { selectedWorkspaceName: st
   );
 };
 
+interface DisplayedWorkspace {
+  id: string;
+  name: string;
+}
+
 export default function TeamSelect({
   workspaces,
   selectedWorkspaceId,
@@ -25,15 +31,22 @@ export default function TeamSelect({
   selectedWorkspaceId: string;
   handleWorkspaceSelect: (id: string) => void;
 }) {
+  const userInfo = useGetUserInfo();
   const [expanded, setExpanded] = useState(false);
-  const displayedWorkspaces = [personalWorkspace, ...workspaces].sort();
+  let displayedWorkspaces: DisplayedWorkspace[] = [...workspaces].sort();
 
-  const handleSelect = (workspace: Workspace | typeof personalWorkspace) => {
+  if (userInfo.features.library) {
+    displayedWorkspaces = [personalWorkspace, ...displayedWorkspaces];
+  }
+
+  const handleSelect = (workspace: DisplayedWorkspace) => {
     handleWorkspaceSelect(workspace.id);
     setExpanded(false);
   };
 
-  const selectedWorkspaceName = displayedWorkspaces.find(w => w.id === selectedWorkspaceId)!.name;
+  const selectedWorkspace =
+    displayedWorkspaces.find(w => w.id === selectedWorkspaceId) || displayedWorkspaces[0];
+  const selectedWorkspaceName = selectedWorkspace.name;
   const button = <TeamSelectButton selectedWorkspaceName={selectedWorkspaceName} />;
 
   return (

@@ -25,7 +25,7 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
  */
 export default function useAuth0() {
   const auth = useOrigAuth0();
-  const { loading, name, email, picture } = useGetUserInfo();
+  const { loading, email } = useGetUserInfo();
   const { token, apiKey } = useToken();
 
   if (apiKey && token) {
@@ -36,9 +36,7 @@ export default function useAuth0() {
         ? undefined
         : {
             sub: "api-key",
-            name,
             email,
-            picture,
           },
       loginWithRedirect: () => {},
       logout: () => {},

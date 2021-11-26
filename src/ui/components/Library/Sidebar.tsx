@@ -1,4 +1,5 @@
 import React from "react";
+import { useGetUserInfo } from "ui/hooks/users";
 import { Workspace } from "ui/types";
 import Invitations from "./Invitations";
 import NewTeamButton from "./NewTeamButton";
@@ -6,6 +7,7 @@ import SidebarFooter from "./SidebarFooter";
 import TeamButton from "./TeamButton";
 
 export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces: Workspace[] }) {
+  const { features } = useGetUserInfo();
   const userLibrary = { id: null, name: "Your Library", members: [] };
 
   // This corresponds with tailwind colors: thumb is gray-500 and track is gray-800
@@ -20,7 +22,9 @@ export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces
         className="library-sidebar flex flex-col flex-grow text-sm overflow-auto"
         style={scrollbarStyle}
       >
-        <TeamButton key={userLibrary.id} id={userLibrary.id} text={userLibrary.name} />
+        {features.library ? (
+          <TeamButton key={userLibrary.id} id={userLibrary.id} text={userLibrary.name} />
+        ) : null}
         <Invitations />
         {nonPendingWorkspaces.map(w => (
           <TeamButton key={w.id} id={w.id} text={w.name} workspace={w} />

@@ -198,6 +198,7 @@ const getSettings = (internal: boolean): Settings<SettingsTabTitle, CombinedUser
 
 export function UserSettingsModal(props: PropsFromRedux) {
   const { userSettings, loading } = hooks.useGetUserSettings();
+  const { features: orgFeatures, loading: orgFeaturesLoading } = hooks.useGetUserInfo();
   const { internal, loading: userInfoLoading } = hooks.useGetUserInfo();
   const view = props.view === "preferences" ? "Preferences" : props.defaultSettingsTab;
 
@@ -226,13 +227,16 @@ export function UserSettingsModal(props: PropsFromRedux) {
   };
 
   const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
+  if (!orgFeatures.library && hiddenTabs) {
+    hiddenTabs.push("API Keys");
+  }
 
   const settings = getSettings(internal);
   return (
     <SettingsModal
       hiddenTabs={hiddenTabs}
       tab={view}
-      loading={loading || userInfoLoading}
+      loading={loading || userInfoLoading || orgFeaturesLoading}
       onChange={onChange}
       panelProps={{}}
       settings={settings}

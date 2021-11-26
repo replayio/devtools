@@ -14,6 +14,9 @@ export const GET_USER_INFO = gql`
       user {
         id
       }
+      features {
+        library
+      }
       acceptedTOSVersion
       email
       internal
