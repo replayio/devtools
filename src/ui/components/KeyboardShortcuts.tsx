@@ -16,7 +16,12 @@ function setupShortcuts() {
 
 const globalShortcuts = setupShortcuts();
 
-function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: PropsFromRedux) {
+function KeyboardShortcuts({
+  viewMode,
+  setSelectedPrimaryPanel,
+  togglePaneCollapse,
+  setViewMode,
+}: PropsFromRedux) {
   const openFullTextSearch = () => {
     if (viewMode !== "dev") {
       setViewMode("dev");
@@ -25,6 +30,10 @@ function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: P
     trackEvent("key_shortcut.full_text_search");
     setSelectedPrimaryPanel("search");
   };
+  const toggleLeftSidebar = () => {
+    trackEvent("key_shortcut.toggle_left_sidebar");
+    togglePaneCollapse();
+  };
 
   // The shortcuts have to be reassigned every time the dependencies change,
   // otherwise we end up with a stale prop.
@@ -32,9 +41,11 @@ function KeyboardShortcuts({ viewMode, setSelectedPrimaryPanel, setViewMode }: P
     if (!globalShortcuts) return;
 
     globalShortcuts.on("CmdOrCtrl+Shift+F", openFullTextSearch);
+    globalShortcuts.on("CmdOrCtrl+B", toggleLeftSidebar);
 
     return () => {
       globalShortcuts.off("CmdOrCtrl+Shift+F", openFullTextSearch);
+      globalShortcuts.off("CmdOrCtrl+B", toggleLeftSidebar);
     };
   }, [viewMode]);
 
@@ -46,7 +57,11 @@ const connector = connect(
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     viewMode: selectors.getViewMode(state),
   }),
-  { setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel, setViewMode: actions.setViewMode }
+  {
+    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
+    setViewMode: actions.setViewMode,
+    togglePaneCollapse: actions.togglePaneCollapse,
+  }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(KeyboardShortcuts);

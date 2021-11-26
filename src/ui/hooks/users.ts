@@ -40,18 +40,25 @@ export type UserInfo = {
   id: string;
   internal: boolean;
   nags: Nag[];
-  unsubscribedEmailTypes: string[];
+  unsubscribedEmailTypes: EmailSubscription[];
+  features: { library: boolean };
 };
 
 export enum Nag {
-  FIRST_REPLAY = "first_replay",
   FIRST_REPLAY_2 = "first_replay_2",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
-  FIRST_BREAKPOINT_REMOVED = "first_breakpoint_removed",
+  FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
-  FIRST_GUTTER_CLICK = "first_gutter_click",
   DOWNLOAD_REPLAY = "download_replay",
+}
+
+// Keeping a list of unused nag types here so we don't accidentally
+// overwrite them as we come up with new ones.
+enum DeprecatedNag {
+  FIRST_REPLAY = "first_replay",
+  FIRST_BREAKPOINT_REMOVED = "first_breakpoint_removed",
+  FIRST_GUTTER_CLICK = "first_gutter_click",
 }
 
 export enum EmailSubscription {
@@ -81,10 +88,11 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
     internal: viewer.internal,
     nags: viewer.nags,
     unsubscribedEmailTypes: viewer.unsubscribedEmailTypes,
+    features: viewer.features || {},
   };
 }
 
-export function useGetUserInfo() {
+export function useGetUserInfo(): UserInfo & { loading: boolean } {
   const { data, loading, error } = useQuery(GET_USER_INFO);
 
   if (error) {
@@ -92,14 +100,13 @@ export function useGetUserInfo() {
   }
 
   const id: string = data?.viewer?.user.id;
-  const name: string = data?.viewer?.user.name;
-  const picture: string = data?.viewer?.user.picture;
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
   const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
   const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
   const motd: string = data?.viewer?.motd;
+  const features = data?.viewer?.features || {};
 
   return {
     loading,
@@ -107,11 +114,10 @@ export function useGetUserInfo() {
     email,
     internal,
     nags,
-    name,
-    picture,
     acceptedTOSVersion,
     unsubscribedEmailTypes,
     motd,
+    features,
   };
 }
 

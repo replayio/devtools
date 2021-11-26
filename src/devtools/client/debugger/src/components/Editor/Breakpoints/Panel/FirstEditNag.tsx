@@ -2,39 +2,33 @@ import React, { useEffect, useState } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { shouldShowNag } from "ui/utils/user";
 
 const TEXT = {
-  clickPrompt: "Edit your first print statement",
-  enterPrompt: "Add some local variables",
+  editPrompt: "Edit your first print statement",
+  savePrompt: "Add some local variables",
   success: "Check the console",
 };
 
 type Step = keyof typeof TEXT;
 
-function getStep(nags: Nag[], editing: boolean): Step | void {
-  if (!nags) {
-    return undefined;
-  }
-
-  if (!nags.includes(Nag.FIRST_BREAKPOINT_ADD)) {
-    return "clickPrompt";
-  }
-
-  if (editing && !nags.includes(Nag.FIRST_BREAKPOINT_EDIT)) {
-    return "enterPrompt";
-  }
-
-  if (!nags.includes(Nag.FIRST_BREAKPOINT_REMOVED)) {
-    return "success";
-  }
-
-  return undefined;
-}
-
 export default function FirstEditNag({ editing }: { editing: boolean }) {
+  const [step, setStep] = useState<Step | null>(null);
   const { nags } = hooks.useGetUserInfo();
 
-  const step = getStep(nags, editing);
+  useEffect(() => {
+    if (shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT)) {
+      setStep("editPrompt");
+    } else if (editing && shouldShowNag(nags, Nag.FIRST_BREAKPOINT_SAVE)) {
+      setStep("savePrompt");
+    }
+
+    // Show the user the success state if they've just finished saving the breakpoint.
+    if (step === "savePrompt" && !shouldShowNag(nags, Nag.FIRST_BREAKPOINT_SAVE)) {
+      setStep("success");
+    }
+  }, [nags, editing]);
+
   if (!step) {
     return null;
   }

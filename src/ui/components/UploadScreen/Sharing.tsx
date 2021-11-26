@@ -36,7 +36,7 @@ function EditableSettings({
         <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
       ) : null}
       <div
-        className="space-x-2 flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-jellyfish"
+        className="space-x-2 select-none flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-jellyfish"
         onClick={() => setIsPublic(!isPublic)}
       >
         <div>Public Access</div>
