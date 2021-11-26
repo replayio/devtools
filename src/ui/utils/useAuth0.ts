@@ -15,6 +15,7 @@ const TEST_AUTH = {
   },
   loginWithRedirect: () => {},
   logout: () => {},
+  getAccessTokenSilently: () => Promise.resolve(),
 };
 
 export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
@@ -41,6 +42,7 @@ export default function useAuth0() {
           },
       loginWithRedirect: () => {},
       logout: () => {},
+      getAccessTokenSilently: () => Promise.resolve(),
     };
   }
 
