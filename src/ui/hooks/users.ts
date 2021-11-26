@@ -39,7 +39,7 @@ export type UserInfo = {
   id: string;
   internal: boolean;
   nags: Nag[];
-  unsubscribedEmailTypes: string[];
+  unsubscribedEmailTypes: EmailSubscription[];
   features: { library: boolean };
 };
 
