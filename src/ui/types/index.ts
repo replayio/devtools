@@ -59,6 +59,8 @@ export interface PaymentMethod {
   };
 }
 
+type PlanKey = "org-v1" | "team-v1" | "test-team-v1" | "beta-v1" | "test-beta-v1";
+
 export interface Subscription {
   id: string;
   createdAt: string;
@@ -71,11 +73,22 @@ export interface Subscription {
   plan: {
     id: string;
     name: string;
-    key: string;
+    key: PlanKey;
     createdAt: string;
   };
   paymentMethods: PaymentMethod[];
 }
+
+export type BillingSchedule = "annual" | "monthly";
+
+export interface PlanPricing {
+  billingSchedule: BillingSchedule | null;
+  displayName: string;
+  seatPrice: number;
+  trial: boolean;
+}
+
+export interface SubscriptionWithPricing extends Subscription, PlanPricing {}
 
 export enum RecordingRole {
   // A user accessing a public recording may have no role (even if authenticated)

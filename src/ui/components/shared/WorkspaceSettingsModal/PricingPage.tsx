@@ -1,22 +1,22 @@
 import React from "react";
-import { Subscription } from "ui/types";
+import { SubscriptionWithPricing } from "ui/types";
 import ExternalLink from "../ExternalLink";
 import { Button } from "../Button";
 import { PlanDetails } from "./PlanDetails";
 
-export function TeamPricingPage({
+export function PricingPage({
   subscription,
   onEnterCard,
 }: {
-  subscription: Subscription;
+  subscription: SubscriptionWithPricing;
   onEnterCard: () => void;
 }) {
   return (
     <section>
       <p className="mb-4">
-        With a Replay Team Plan, you can expand your debugging superpowers with powerful
-        collaboration features that make it easy to work together to fix bugs and understand your
-        software better.
+        With a Replay {subscription.displayName} Plan, you can expand your debugging superpowers
+        with powerful collaboration features that make it easy to work together to fix bugs and
+        understand your software better.
         <ExternalLink href="https://www.replay.io/pricing" className="text-primaryAccent underline">
           Learn More
         </ExternalLink>

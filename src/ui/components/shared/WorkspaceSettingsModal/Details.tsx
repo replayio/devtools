@@ -1,11 +1,10 @@
 import React from "react";
-import hooks from "ui/hooks";
-import { Subscription, Workspace } from "ui/types";
+import { Subscription, SubscriptionWithPricing, Workspace } from "ui/types";
 import { Button } from "../Button";
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
 import { BillingBanners } from "./BillingBanners";
 import { ExpirationRow } from "./ExpirationRow";
-import { isSubscriptionCancelled, getPlanDisplayText, formatPaymentMethod, Views } from "./utils";
+import { isSubscriptionCancelled, formatPaymentMethod, Views } from "./utils";
 import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
 function TrialDetails({
@@ -64,7 +63,7 @@ function SubscriptionDetails({
   onAddPaymentMethod,
   onDeletePaymentMethod,
 }: {
-  subscription: Subscription;
+  subscription: SubscriptionWithPricing;
   onAddPaymentMethod: () => void;
   onDeletePaymentMethod: () => void;
 }) {
@@ -72,7 +71,10 @@ function SubscriptionDetails({
     <section>
       <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
         <span>Current Plan</span>
-        <span>{getPlanDisplayText(subscription)}</span>
+        <span>
+          {subscription.displayName}
+          {subscription.trial ? " (Trial)" : ""}
+        </span>
       </div>
       <ExpirationRow subscription={subscription} />
       <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
@@ -109,7 +111,7 @@ export function Details({
   confirmed,
 }: {
   confirmed?: boolean;
-  subscription: Subscription;
+  subscription: SubscriptionWithPricing;
   workspace: Workspace;
   setView: (view: Views) => void;
 }) {

@@ -61,7 +61,6 @@ function TeamNamePage({
   setNewWorkspace,
   setCurrent,
   current,
-  onSkipToDownload,
   organization,
 }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
