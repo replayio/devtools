@@ -11,8 +11,8 @@ import { SettingsHeader } from "../SettingsModal/SettingsBody";
 import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
-import { TeamPricingPage } from "./TeamPricingPage";
-import { Views } from "./utils";
+import { PricingPage } from "./PricingPage";
+import { getSubscriptionWithPricing, Views } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -73,21 +73,23 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     );
   }
 
+  const subscriptionWithPricing = getSubscriptionWithPricing(subscription);
+
   return (
     <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
       {view === "details" && (
         <Details
           workspace={workspace}
-          subscription={subscription}
+          subscription={subscriptionWithPricing}
           setView={setView}
           confirmed={confirmed}
         />
       )}
       {view === "add-payment-method" && (
         <>
-          <SettingsHeader>Team Plan Pricing</SettingsHeader>
-          <TeamPricingPage
-            subscription={subscription}
+          <SettingsHeader>{`${subscriptionWithPricing.displayName} Plan Pricing`}</SettingsHeader>
+          <PricingPage
+            subscription={subscriptionWithPricing}
             onEnterCard={() => setView("enter-payment-method")}
           />
         </>
@@ -113,7 +115,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         <>
           <SettingsHeader>Remove Payment Method</SettingsHeader>
           <DeleteConfirmation
-            subscription={subscription}
+            subscription={subscriptionWithPricing}
             workspaceId={workspaceId}
             onDone={() => setView("details")}
           />
