@@ -8,8 +8,8 @@ import hooks from "ui/hooks";
 import Spinner from "../shared/Spinner";
 import { PendingTeamScreen } from "./PendingTeamScreen";
 import { MY_LIBRARY } from "../UploadScreen/Sharing";
-import BlankScreen from "../shared/BlankScreen";
 import { actions } from "ui/actions";
+import { BlankViewportWrapper } from "../shared/Viewport";
 
 function ViewerLoader() {
   return (
@@ -76,7 +76,7 @@ function ViewerRouter(props: ViewerRouterProps) {
   const { features, loading } = hooks.useGetUserInfo();
   const { currentWorkspaceId } = props;
 
-  if (loading) return <BlankScreen />;
+  if (loading) return <BlankViewportWrapper />;
 
   useEffect(() => {
     if (currentWorkspaceId === null && !features.library && !nonPendingLoading) {
