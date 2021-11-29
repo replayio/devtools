@@ -75,6 +75,13 @@ export async function isLocalNagDismissed(nag: LocalNag) {
   const replaySessions = await getReplaySessions();
   const replaySession = replaySessions[recordingId];
 
+  // If for some reason we don't have this replay session, return
+  // true so that our default state is to behave as if we wanted to hide
+  // the local nag.
+  if (!replaySession) {
+    return true;
+  }
+
   return replaySession.localNags.includes(nag);
 }
 
