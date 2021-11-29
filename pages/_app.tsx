@@ -132,7 +132,7 @@ import "ui/components/Views/NonDevView.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 
 // _ONLY_ set this flag if you want to disable the frontend entirely
-const maintenanceMode = true;
+const maintenanceMode = false;
 
 const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
   const [store, setStore] = useState<Store | null>(null);
