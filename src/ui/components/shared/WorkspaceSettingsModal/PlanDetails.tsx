@@ -5,7 +5,6 @@ import startCase from "lodash/startCase";
 import { cycleCharge } from "./utils";
 
 export function PlanDetails({ subscription }: { subscription: SubscriptionWithPricing }) {
-  console.log(subscription);
   return (
     <>
       <ExpirationRow subscription={subscription} />
