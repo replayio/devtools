@@ -10,7 +10,7 @@ import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 import { removeUrlParameters } from "ui/utils/environment";
 import { setExpectedError } from "ui/actions/session";
-import { LoadingScreen } from "../shared/BlankScreen";
+import LoadingScreen from "../shared/LoadingScreen";
 import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";

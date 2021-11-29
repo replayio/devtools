@@ -11,8 +11,8 @@ import hooks from "ui/hooks";
 import { setModal } from "ui/actions/app";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
 import { PrimaryButton } from "./Button";
-import BubbleModal from "ui/components/shared/Onboarding/BubbleModal";
 import { useRouter } from "next/dist/client/router";
+import { BubbleViewportWrapper } from "./Viewport";
 
 export function PopupBlockedError() {
   return (
@@ -134,17 +134,17 @@ function Error({ error }: ErrorProps) {
 
 function ExpectedErrorScreen({ error }: { error: ExpectedError }) {
   return (
-    <BubbleModal>
+    <BubbleViewportWrapper>
       <Error error={error} />
-    </BubbleModal>
+    </BubbleViewportWrapper>
   );
 }
 
 function UnexpectedErrorScreen({ error }: { error: UnexpectedError }) {
   return (
-    <BubbleModal>
+    <BubbleViewportWrapper>
       <Error error={error} />
-    </BubbleModal>
+    </BubbleViewportWrapper>
   );
 }
 

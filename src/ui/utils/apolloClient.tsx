@@ -17,7 +17,7 @@ import { RetryLink } from "@apollo/client/link/retry";
 import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
-import { LoadingScreen } from "ui/components/shared/BlankScreen";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 

@@ -1,23 +1,23 @@
-import React, { useEffect } from "react";
-import BlankScreen from "ui/components/shared/BlankScreen";
+import React from "react";
 import { LaunchBrowser } from "ui/components/shared/LaunchBrowserModal";
+import { BubbleViewportWrapper } from "ui/components/shared/Viewport";
 
 const BrowserLaunch = () => {
   const library = "replay:library";
 
   return (
-    <BlankScreen className="absolute z-10">
+    <BubbleViewportWrapper>
       <LaunchBrowser path={library}>
         <p className="text-center">
           <a
-            className="inline-flex items-center bg-primaryAccent text-white h-12 px-4"
+            className="inline-flex items-center bg-primaryAccent text-white h-12 px-4 rounded-md"
             href={library}
           >
             Open Replay
           </a>
         </p>
       </LaunchBrowser>
-    </BlankScreen>
+    </BubbleViewportWrapper>
   );
 };
 
