@@ -1,11 +1,11 @@
 const {
-  subscriptionWithPricing,
+  getSubscriptionWithPricing,
   cycleCharge,
 } = require("ui/components/shared/WorkspaceSettingsModal/utils");
 
 describe("subscriptionWithPricing", () => {
   test("will return team pricing if the plan key is team-v1", () => {
-    expect(subscriptionWithPricing({ plan: { key: "team-v1" } })).toEqual({
+    expect(getSubscriptionWithPricing({ plan: { key: "team-v1" } })).toEqual({
       plan: { key: "team-v1" },
       billingSchedule: "monthly",
       displayName: "Team",
@@ -15,7 +15,7 @@ describe("subscriptionWithPricing", () => {
   });
 
   test("will return org pricing if the plan key is org-v1", () => {
-    expect(subscriptionWithPricing({ plan: { key: "org-v1" } })).toEqual({
+    expect(getSubscriptionWithPricing({ plan: { key: "org-v1" } })).toEqual({
       plan: { key: "org-v1" },
       billingSchedule: "monthly",
       displayName: "Organization",

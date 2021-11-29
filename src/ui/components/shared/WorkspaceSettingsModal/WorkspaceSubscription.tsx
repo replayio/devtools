@@ -12,7 +12,7 @@ import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
 import { PricingPage } from "./PricingPage";
-import { subscriptionWithPricing as getSubscriptionWithPricing, Views } from "./utils";
+import { getSubscriptionWithPricing, Views } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force

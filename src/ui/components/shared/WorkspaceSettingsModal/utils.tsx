@@ -65,7 +65,7 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
   }
 };
 
-export const subscriptionWithPricing = (subscription: Subscription): SubscriptionWithPricing => {
+export const getSubscriptionWithPricing = (subscription: Subscription): SubscriptionWithPricing => {
   return { ...subscription, ...pricingDetailsForSubscription(subscription) };
 };
 
