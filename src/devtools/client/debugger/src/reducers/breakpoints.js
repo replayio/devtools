@@ -143,10 +143,13 @@ export function getBreakpointForLocation(state, location) {
     return undefined;
   }
 
-  return getBreakpointsList(state).find(bp => {
+  const list = getBreakpointsList(state);
+  const ret = list.find(bp => {
     const loc = bp.location;
     return isMatchingLocation(loc, location);
   });
+
+  return ret;
 }
 
 export function hasLogpoint(state, location) {

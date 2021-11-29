@@ -1,18 +1,15 @@
-import classNames from "classnames";
 import ReactDOM from "react-dom";
-
-import React, { useRef, useState, useEffect, ReactChild, ReactNode } from "react";
+import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import ReplayLogo from "ui/components/shared/ReplayLogo";
-import hooks from "ui/hooks";
-import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { trackEvent } from "ui/utils/telemetry";
-import { shouldShowNag } from "ui/utils/user";
-const { prefs } = require("ui/utils/prefs");
+import { addBreakpointAtLine } from "../../actions/breakpoints";
+import { getBreakpointsForSource } from "../../reducers/breakpoints";
+import { getSelectedSource } from "../../reducers/sources";
+import { removeBreakpoint } from "../../actions/breakpoints/modify";
+import classNames from "classnames";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -21,7 +18,13 @@ const {
 
 type LineNumberTooltipProps = PropsFromRedux & { editor: any };
 
-function LineNumberTooltip({ editor }: LineNumberTooltipProps) {
+function LineNumberTooltip({
+  editor,
+  addBreakpointAtLine,
+  cx,
+  breakpoints,
+  removeBreakpoint,
+}: LineNumberTooltipProps) {
   const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
@@ -33,12 +36,23 @@ function LineNumberTooltip({ editor }: LineNumberTooltipProps) {
     lineNumber: number;
   }) => {
     setHoveredLineNumber(lineNumber);
-    console.log({ targetNode });
     setLineNumberNode(targetNode);
   };
   const onLineLeave = () => {
     setLineNumberNode(null);
     setHoveredLineNumber(null);
+  };
+  const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
+  const onClick = (event: React.MouseEvent) => {
+    if (!hoveredLineNumber) {
+      return;
+    }
+
+    if (bp) {
+      return removeBreakpoint(cx, bp);
+    }
+
+    return addBreakpointAtLine(cx, hoveredLineNumber, event.altKey, event.shiftKey);
   };
 
   useEffect(() => {
@@ -50,34 +64,28 @@ function LineNumberTooltip({ editor }: LineNumberTooltipProps) {
     };
   }, []);
 
-  console.log("a123");
   if (!lineNumberNode) {
     return null;
   }
-  console.log("b123");
 
-  const { top, left, right, height, width } = lineNumberNode.getBoundingClientRect();
+  const { height, width } = lineNumberNode.getBoundingClientRect();
   const style = {
-    top: `${top + (1 / 2) * height}px`,
-    left: `${right + (1 / 2) * width}px`,
-    marginLeft: `8px`,
+    top: `${(1 / 2) * height}px`,
+    left: `${width}px`,
   };
 
-  console.log(">>>b123");
   return ReactDOM.createPortal(
-    <div className={`bg-blue-500 p-2 absolute z-50 rounded-md text-white`} style={style}>
-      +
-    </div>,
-    document.body
-  );
-
-  return (
-    <StaticTooltip targetNode={lineNumberNode}>
-      <>
-        {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
-        <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
-      </>
-    </StaticTooltip>
+    <button
+      className={classNames(
+        bp ? "bg-red-500" : "bg-primaryAccent",
+        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 duration-150 hover:scale-125 ml-1"
+      )}
+      style={style}
+      onClick={onClick}
+    >
+      <MaterialIcon>{bp ? "remove" : "add"}</MaterialIcon>
+    </button>,
+    lineNumberNode.parentElement!
   );
 }
 
@@ -85,11 +93,15 @@ const connector = connect(
   (state: UIState) => ({
     indexed: selectors.getIndexed(state),
     analysisPoints: selectors.getPointsForHoveredLineNumber(state),
+    cx: selectors.getThreadContext(state),
+    breakpoints: getBreakpointsForSource(state, getSelectedSource(state).id),
   }),
   {
     runAnalysisOnLine: runAnalysisOnLine,
     setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
     updateHoveredLineNumber: updateHoveredLineNumber,
+    addBreakpointAtLine: addBreakpointAtLine,
+    removeBreakpoint: removeBreakpoint,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
