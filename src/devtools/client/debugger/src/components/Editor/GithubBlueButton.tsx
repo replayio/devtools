@@ -56,8 +56,12 @@ function LineNumberTooltip({ editor }: LineNumberTooltipProps) {
   }
   console.log("b123");
 
-  const { top, left, right } = lineNumberNode.getBoundingClientRect();
-  const style = { top: `${top}px`, left: `${right}px`, marginLeft: `8px` };
+  const { top, left, right, height, width } = lineNumberNode.getBoundingClientRect();
+  const style = {
+    top: `${top + (1 / 2) * height}px`,
+    left: `${right + (1 / 2) * width}px`,
+    marginLeft: `8px`,
+  };
 
   console.log(">>>b123");
   return ReactDOM.createPortal(
