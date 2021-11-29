@@ -1,15 +1,26 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import Checkbox from "../Forms/Checkbox";
 
 type CheckboxRowProps = React.HTMLProps<HTMLInputElement> & {
-  children: ReactNode;
+  label: string;
+  description?: string;
 };
 
-export function CheckboxRow({ id, checked, onChange, children }: CheckboxRowProps) {
+export function CheckboxRow({ id, checked, onChange, label, description }: CheckboxRowProps) {
   return (
-    <label className="flex items-start space-x-2 cursor-pointer" data-private htmlFor={id}>
+    <label
+      className="grid cursor-pointer items-center"
+      style={{ gridTemplateColumns: "auto minmax(0, 1fr)", gap: "0 0.5rem" }}
+      data-private
+      htmlFor={id}
+    >
       <Checkbox id={id} checked={checked} onChange={onChange} />
-      <div>{children}</div>
+      <div>{label}</div>
+      {description ? (
+        <div className="text-gray-500 text-xs mb-1" style={{ gridColumnStart: "2" }}>
+          {description}
+        </div>
+      ) : null}
     </label>
   );
 }

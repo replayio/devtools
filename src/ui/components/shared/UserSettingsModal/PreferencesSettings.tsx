@@ -31,11 +31,7 @@ function Notification({
     }
   };
 
-  return (
-    <CheckboxRow id={emailType} checked={checked} onChange={handleChange}>
-      {content}
-    </CheckboxRow>
-  );
+  return <CheckboxRow id={emailType} checked={checked} onChange={handleChange} label={content} />;
 }
 
 function NotificationPreferences({

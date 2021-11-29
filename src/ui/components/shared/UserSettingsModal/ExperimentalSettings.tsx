@@ -51,12 +51,13 @@ function Experiment({
 }) {
   const { label, key, description } = setting;
   return (
-    <CheckboxRow id={key} onChange={() => onChange(key, !checked)} checked={checked}>
-      <div className="flex flex-col space-y-0.5">
-        <div className="leading-relaxed">{label}</div>
-        <div className="text-gray-500 text-xs">{description}</div>
-      </div>
-    </CheckboxRow>
+    <CheckboxRow
+      id={key}
+      onChange={() => onChange(key, !checked)}
+      checked={checked}
+      label={label}
+      description={description}
+    />
   );
 }
 
