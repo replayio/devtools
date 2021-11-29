@@ -4,7 +4,15 @@ import { OutlineFunction } from "./OutlineFunction";
 import { filterOutlineItem } from "./filterOutlineItem";
 import { getFunctionKey } from "./Outline";
 
-export function ClassFunctionsList({ symbols, functions, outlineList, focusedItem, onSelect }) {
+export function ClassFunctionsList({
+  symbols,
+  functions,
+  outlineList,
+  klass,
+  focusedItem,
+  onSelect,
+  filter,
+}) {
   if (!symbols || symbols.loading || klass == null || functions.length == 0) {
     return null;
   }

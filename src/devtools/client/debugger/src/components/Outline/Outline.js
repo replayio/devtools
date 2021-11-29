@@ -96,9 +96,12 @@ export class Outline extends Component {
             outlineList={this.refs.outlineList}
           />
         ))}
-        {classes.map(klass => (
+        {classes.map((klass, i) => (
           <ClassFunctionsList
+            key={i}
             klass={klass}
+            filter={filter}
+            symbols={this.props.symbols}
             functions={functions}
             onSelect={this.selectItem}
             focusedItem={focusedItem}
