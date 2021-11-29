@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
+import { CheckboxRow } from "./CheckboxRow";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
@@ -30,12 +31,7 @@ function Notification({
     }
   };
 
-  return (
-    <label className="flex items-center space-x-2 cursor-pointer" data-private htmlFor={emailType}>
-      <Checkbox id={emailType} checked={checked} onChange={handleChange} />
-      <div>{content}</div>
-    </label>
-  );
+  return <CheckboxRow id={emailType} checked={checked} onChange={handleChange} label={content} />;
 }
 
 function NotificationPreferences({

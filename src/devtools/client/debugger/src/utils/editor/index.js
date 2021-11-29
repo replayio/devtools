@@ -9,7 +9,7 @@ export * from "./get-token-location";
 export * from "./source-search";
 export * from "../ui";
 export { onTokenMouseOver } from "./token-events";
-export { onGutterMouseOver } from "./gutter-events";
+export { onLineMouseOver } from "./line-events";
 
 import { createEditor } from "./create-editor";
 import { findNext, findPrev } from "./source-search";

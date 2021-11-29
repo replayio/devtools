@@ -4,7 +4,7 @@ import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
 import { Recording, UserSettings } from "ui/types";
-import { LoadingScreen } from "../shared/BlankScreen";
+import LoadingScreen from "../shared/LoadingScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
 import Sharing, { MY_LIBRARY } from "./Sharing";
@@ -12,8 +12,8 @@ import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
 import MaterialIcon from "../shared/MaterialIcon";
 import PortalTooltip from "../shared/PortalTooltip";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
-import BubbleModal from "../shared/Onboarding/BubbleModal";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
+import { BubbleViewportWrapper } from "../shared/Viewport";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
@@ -183,8 +183,8 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   }
 
   return (
-    <BubbleModal>
-      <div className="flex flex-col items-center relative">
+    <BubbleViewportWrapper>
+      <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
           <div
@@ -229,6 +229,6 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
           <Actions onDiscard={onDiscard} status={status} />
         </form>
       </div>
-    </BubbleModal>
+    </BubbleViewportWrapper>
   );
 }

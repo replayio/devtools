@@ -14,8 +14,9 @@ import actions from "../../../actions";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-import { getBreakpointSources } from "../../../selectors";
+import { getBreakpointSources, getSelectedSource } from "../../../selectors";
 
 class Breakpoints extends Component {
   headlessEditor;
@@ -40,12 +41,19 @@ class Breakpoints extends Component {
   }
 
   renderBreakpoints() {
-    const { breakpointSources } = this.props;
+    const { breakpointSources, selectedSource } = this.props;
 
     if (!breakpointSources.length) {
       return (
-        <div className="p-2 whitespace-pre-wrap text-sm">
-          There is nothing here yet. Try adding a breakpoint in a source file.
+        <div className="onboarding-text p-3 space-y-3 text-gray-500 text-base whitespace-normal">
+          <MaterialIcon className="large-icon">info</MaterialIcon>
+          <p>{`You haven't added any print statements yet.`}</p>
+          {selectedSource ? (
+            <>
+              <p>{`Try clicking on a line number in the editor.`}</p>
+              <img src="/images/comment-onboarding-arrow.svg" className="arrow" />
+            </>
+          ) : null}
         </div>
       );
     }
@@ -86,6 +94,7 @@ class Breakpoints extends Component {
 
 const mapStateToProps = state => ({
   breakpointSources: getBreakpointSources(state),
+  selectedSource: getSelectedSource(state),
 });
 
 export default connect(mapStateToProps, {

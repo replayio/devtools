@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Viewer from "./Viewer";
 
 import { connect, ConnectedProps } from "react-redux";
@@ -8,6 +8,8 @@ import hooks from "ui/hooks";
 import Spinner from "../shared/Spinner";
 import { PendingTeamScreen } from "./PendingTeamScreen";
 import { MY_LIBRARY } from "../UploadScreen/Sharing";
+import { actions } from "ui/actions";
+import { BlankViewportWrapper } from "../shared/Viewport";
 
 function ViewerLoader() {
   return (
@@ -70,17 +72,43 @@ type ViewerRouterProps = PropsFromRedux & {
 };
 
 function ViewerRouter(props: ViewerRouterProps) {
+  const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+  const { features, loading } = hooks.useGetUserInfo();
   const { currentWorkspaceId } = props;
 
-  if (currentWorkspaceId === null) {
+  if (loading) return <BlankViewportWrapper />;
+
+  useEffect(() => {
+    if (currentWorkspaceId === null && !features.library && !nonPendingLoading) {
+      if (!workspaces.length) {
+        // This shouldn't be reachable because the library can only be disabled
+        // by a workspace setting which means the user must be in a workspace
+        props.setUnexpectedError({
+          message: "Unexpected error",
+          content: "Unable to find an active team",
+        });
+
+        return;
+      }
+
+      props.setWorkspaceId(workspaces[0].id);
+    }
+  });
+
+  if (currentWorkspaceId === null && features.library) {
     return <MyLibrary {...props} />;
-  } else {
+  } else if (currentWorkspaceId) {
     return <TeamLibrary {...props} />;
   }
+
+  return null;
 }
 
-const connector = connect((state: UIState) => ({
-  currentWorkspaceId: selectors.getWorkspaceId(state),
-}));
+const connector = connect(
+  (state: UIState) => ({
+    currentWorkspaceId: selectors.getWorkspaceId(state),
+  }),
+  { setWorkspaceId: actions.setWorkspaceId, setUnexpectedError: actions.setUnexpectedError }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ViewerRouter);

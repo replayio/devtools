@@ -5,7 +5,7 @@ import { UIState } from "ui/state";
 import { clearTrialExpired, createSession } from "ui/actions/session";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import Header from "./Header/index";
-import { LoadingScreen } from "./shared/BlankScreen";
+import LoadingScreen from "./shared/LoadingScreen";
 import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 

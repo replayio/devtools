@@ -47,7 +47,7 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
           </div>
         );
       })}
-      <CurrentTimeLine isActive={currentEventIndex === events.length} />
+      <CurrentTimeLine isActive={currentEventIndex === events.length && !!events.length} />
     </div>
   );
 }

@@ -14,7 +14,7 @@ import {
   getSourcesCollapsed,
 } from "../../selectors";
 
-import Outline from "./Outline";
+import Outline from "../Outline/Outline";
 import SourcesTree from "./SourcesTree";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";

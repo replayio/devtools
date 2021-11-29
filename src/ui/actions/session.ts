@@ -12,7 +12,7 @@ import { validateUUID } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { getTest, isDevelopment, getRecordingId, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
-import { registerRecording, sendTelemetryEvent } from "ui/utils/telemetry";
+import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 
 import { ExpectedError, UnexpectedError } from "ui/state/app";
@@ -88,6 +88,7 @@ function getRecordingNotAccessibleError(
   }
 
   if (isAuthenticated) {
+    trackEvent("error.unauthorized_viewer");
     return {
       message: "You don't have permission to view this replay",
       content:
@@ -96,6 +97,7 @@ function getRecordingNotAccessibleError(
     };
   }
 
+  trackEvent("error.unauthenticated_viewer");
   return {
     message: "Almost there",
     content: "This is a private replay. Please sign in.",

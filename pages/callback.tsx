@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useAuth0 from "ui/utils/useAuth0";
-import { LoadingScreen } from "ui/components/shared/BlankScreen";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
 
 export default function Connection() {
   const auth0 = useAuth0();
@@ -11,15 +11,18 @@ export default function Connection() {
   const connection = Array.isArray(q.connection) ? q.connection[0] : q.connection;
 
   useEffect(() => {
+    const home = window.location.origin + "/";
     if (!connection || auth0.isAuthenticated) {
-      router.replace("/");
+      router.replace(home);
       return;
     }
 
-    // FIXME [ryanjduffy]: This results in an additional auth roundtrip with the
-    // id provider but works around auth0 no handling idp-initiated
-    // authentication.
-    auth0.loginWithRedirect({ connection });
+    auth0.getAccessTokenSilently({ connection, redirect_uri: home }).catch(e =>
+      auth0.loginWithRedirect({
+        connection,
+        redirectUri: home,
+      })
+    );
   }, []);
 
   return <LoadingScreen />;
