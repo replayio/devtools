@@ -116,15 +116,12 @@ interface Events {
   [key: string]: ReplayEvent[];
 }
 
-type ReplayMouseEvent = Omit<MouseEvent, "kind"> & {
-  kind: "mousedown";
-};
-type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
+// Todo: We should move this deifnition to the protocol instead of typing it here.
+export type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
   kind: "navigation";
 };
-type ReplayKeyboardEvent = KeyboardEvent;
 
-export type ReplayEvent = ReplayMouseEvent | ReplayKeyboardEvent | ReplayNavigationEvent;
+export type ReplayEvent = MouseEvent | KeyboardEvent | ReplayNavigationEvent;
 
 export type EventCategory = "mouse" | "keyboard" | "navigation";
 export type EventKind = MouseEventKind | KeyboardEventKind | string;

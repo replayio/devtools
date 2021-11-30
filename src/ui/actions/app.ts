@@ -25,13 +25,14 @@ import {
   SettingsTabTitle,
   EventKind,
   ReplayEvent,
+  ReplayNavigationEvent,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { trackEvent } from "ui/utils/telemetry";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import { getRecordingId, isTest } from "ui/utils/environment";
+import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
@@ -70,7 +71,7 @@ export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
   condition: string;
 };
 export type SetEventsForType = Action<"set_events"> & {
-  events: (MouseEvent | KeyboardEvent | NavigationEvent)[];
+  events: (MouseEvent | KeyboardEvent | ReplayNavigationEvent)[];
   eventType: EventKind;
 };
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
@@ -154,7 +155,9 @@ export function setupApp(store: UIStore) {
     client.Session.addKeyboardEventsListener(({ events }) => onKeyboardEvents(events, store));
 
     client.Session.findNavigationEvents({}, sessionId);
-    client.Session.addNavigationEventsListener(({ events }) => onNavigationEvents(events, store));
+    client.Session.addNavigationEventsListener(({ events }) =>
+      onNavigationEvents(events as ReplayNavigationEvent[], store)
+    );
   });
 
   ThreadFront.ensureProcessed("basic", undefined, regions =>
@@ -217,16 +220,15 @@ function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
   });
 }
 
-function onNavigationEvents(events: NavigationEvent[], store: UIStore) {
-  const navEvents = [
+function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
+  const currentNavEvents: ReplayNavigationEvent[] = events.map(e => ({ ...e, kind: "navigation" }));
+  const newNavEvents = [
     ...selectors.getEventsForType(store.getState(), "navigation"),
-    ...events.map(e => ({ ...e, kind: "navigation" })),
+    ...currentNavEvents,
   ];
-  navEvents.sort((a: ReplayEvent, b: ReplayEvent) =>
-    compareBigInt(BigInt(a.point), BigInt(b.point))
-  );
+  newNavEvents.sort((a, b) => compareBigInt(BigInt(a.point), BigInt(b.point)));
 
-  store.dispatch(setEventsForType(navEvents, "navigation"));
+  store.dispatch(setEventsForType(newNavEvents, "navigation"));
 }
 
 function setRecordingDuration(duration: number): SetRecordingDurationAction {
@@ -316,10 +318,7 @@ export function setAnalysisError(location: Location, condition = ""): SetAnalysi
   };
 }
 
-export function setEventsForType(
-  events: (MouseEvent | KeyboardEvent | NavigationEvent)[],
-  eventType: EventKind
-): SetEventsForType {
+export function setEventsForType(events: ReplayEvent[], eventType: EventKind): SetEventsForType {
   return {
     type: "set_events",
     eventType,
