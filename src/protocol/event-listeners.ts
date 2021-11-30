@@ -30,19 +30,21 @@ export async function getFrameworkEventListeners(node: NodeFront) {
 
 export function logpointGetFrameworkEventListeners(frameId: string, frameworkListeners: string) {
   const evalText = `
-(array => {
-  const rv = [];
-  for (const maybeEvent of array) {
-    if (!(maybeEvent instanceof Event)) {
-      continue;
-    }
-    for (let node = maybeEvent.target; node; node = node.parentNode) {
-      const props = Object.getOwnPropertyNames(node);
-      const reactProp = props.find(v => v.startsWith("__reactEventHandlers$"));
-      if (!reactProp) {
-        continue;
+  (args => {
+    const rv = [];
+    try {
+      const event = args.find(arg => arg instanceof Event);
+      if (!event) {
+        return undefined;
       }
-      const reactObj = node[reactProp];
+
+      const node = event.target
+      const props = Object.getOwnPropertyNames(node);
+      const reactProps = props.find(v => v.startsWith("__reactProps$"));
+      if (!reactProps) {
+        return undefined;
+      }
+      const reactObj = node[reactProps];
       const eventProps = Object.getOwnPropertyNames(reactObj);
       for (const name of eventProps) {
         const v = reactObj[name];
@@ -50,11 +52,13 @@ export function logpointGetFrameworkEventListeners(frameId: string, frameworkLis
           rv.push(name, v);
         }
       }
+    } catch (e) {
+      return undefined;
     }
-  }
-  return rv;
-})([...arguments])
-`;
+
+    return rv;
+  })([...arguments])
+  `;
 
   return `
 const { result: frameworkResult } = sendCommand(
