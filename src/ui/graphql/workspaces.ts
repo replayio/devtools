@@ -45,18 +45,6 @@ export const UPDATE_WORKSPACE_MEMBER_ROLE = gql`
   }
 `;
 
-export const GET_WORKSPACE_SETTINGS = gql`
-  query GetWorkspaceSettings($workspaceId: ID!) {
-    node(id: $workspaceId) {
-      ... on Workspace {
-        settings {
-          motd
-        }
-      }
-    }
-  }
-`;
-
 export const GET_WORKSPACE_SUBSCRIPTION = gql`
   query GetWorkspaceSubscription($workspaceId: ID!) {
     node(id: $workspaceId) {

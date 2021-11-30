@@ -21,9 +21,8 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 
 const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId!);
-  const { data: settings } = hooks.useGetWorkspaceSettings(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [message, setMessage] = useState(settings?.motd || undefined);
+  const [message, setMessage] = useState(workspace?.settings?.motd || undefined);
   const ref = useRef<NodeJS.Timeout | undefined>();
 
   useEffect(() => {

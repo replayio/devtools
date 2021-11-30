@@ -5,7 +5,6 @@ import {
   DELETE_WORKSPACE_API_KEY,
   DELETE_WORKSPACE_PAYMENT_METHOD,
   GET_WORKSPACE_API_KEYS,
-  GET_WORKSPACE_SETTINGS,
   GET_WORKSPACE_SUBSCRIPTION,
   PREPARE_WORKSPACE_PAYMENT_METHOD,
   SET_WORKSPACE_DEFAULT_PAYMENT_METHOD,
@@ -282,16 +281,6 @@ export function useGetWorkspaceSubscription(workspaceId: string) {
   });
 
   return { data, loading, error, refetch };
-}
-
-export function useGetWorkspaceSettings(workspaceId: string) {
-  const { data, loading, error, refetch } = useQuery<{
-    node: Pick<Required<Workspace>, "settings">;
-  }>(GET_WORKSPACE_SETTINGS, {
-    variables: { workspaceId },
-  });
-
-  return { data: data?.node.settings, loading, error, refetch };
 }
 
 export function useCancelWorkspaceSubscription() {
