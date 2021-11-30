@@ -9,8 +9,9 @@ import LoadingScreen from "./shared/LoadingScreen";
 import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 
-import { endUploadWaitTracking } from "ui/utils/mixpanel";
+import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
+import { useUserIsAuthor } from "ui/hooks/users";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -25,6 +26,15 @@ function _DevTools({
   sessionId,
 }: _DevToolsProps) {
   const recordingId = useGetRecordingId();
+  const { userIsAuthor, loading } = useUserIsAuthor();
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    trackEventOnce("session.devtools_start", { userIsAuthor });
+  }, [loading]);
   useEffect(() => {
     createSession(recordingId);
 

@@ -27,10 +27,14 @@ export function useGetUserId() {
 }
 
 export function useUserIsAuthor() {
-  const { recording } = useGetRecording(getRecordingId());
-  const { userId } = useGetUserId();
+  const { recording, loading: loading1 } = useGetRecording(getRecordingId());
+  const { userId, loading: loading2 } = useGetUserId();
 
-  return userId && userId === recording?.userId;
+  if (loading1 || loading2) {
+    return { userIsAuthor: null, loading: true };
+  }
+
+  return { userIsAuthor: userId && userId === recording?.userId, loading: false };
 }
 
 export type UserInfo = {
@@ -44,6 +48,7 @@ export type UserInfo = {
 };
 
 export enum Nag {
+  FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
