@@ -44,6 +44,7 @@ export type UserInfo = {
 };
 
 export enum Nag {
+  FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
