@@ -27,7 +27,7 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
   return <div className={classes}>{children}</div>;
 };
 
-function ReplayInfo({ setModal, progressPercentage }: PropsFromRedux) {
+function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
 
   if (!recording) return null;
@@ -56,12 +56,6 @@ function ReplayInfo({ setModal, progressPercentage }: PropsFromRedux) {
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
-        {progressPercentage < 100 ? (
-          <Row>
-            <Spinner className="animate-spin h-5 w-5 text-black" />
-            <div>Loading Events…</div>
-          </Row>
-        ) : null}
       </div>
     </div>
   );
@@ -84,13 +78,8 @@ function OperationsRow({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    progressPercentage: selectors.getIndexing(state),
-  }),
-  {
-    setModal: actions.setModal,
-  }
-);
+const connector = connect(() => ({}), {
+  setModal: actions.setModal,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ReplayInfo);
