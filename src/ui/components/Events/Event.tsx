@@ -4,6 +4,7 @@ import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 import Matches from "./Matches";
+import { features } from "ui/utils/prefs";
 
 type EventProps = {
   event: ReplayEvent;
@@ -72,7 +73,7 @@ export default function Event({ onSeek, currentTime, executionPoint, event }: Ev
         <Label>{label}</Label>
       </div>
       <div className="flex space-x-2">
-        <Matches simpleEvent={event} />
+        {features.eventLink ? <Matches simpleEvent={event} /> : null}
         <div>{getFormattedTime(time)}</div>
       </div>
     </div>
