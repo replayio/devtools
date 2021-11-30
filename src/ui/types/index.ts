@@ -145,16 +145,19 @@ export interface Workspace {
   recordingCount?: number;
   settings: WorkspaceSettings;
   subscription?: Subscription;
+  isOrganization: boolean;
 }
 
 export interface WorkspaceSettings {
   features: {
-    allowList: string[];
-    blockList: string[];
-    library: boolean;
-    public: boolean;
+    user: {
+      library: boolean;
+    };
+    recording: {
+      public: boolean;
+    };
   };
-  motd?: string;
+  motd: string | null;
 }
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";

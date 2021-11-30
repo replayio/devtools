@@ -16,6 +16,7 @@ import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember
 import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
 import GeneralSettings from "./GeneralSettings";
+import OrganizationSettings from "./OrganizationSettings";
 
 export function WorkspaceMembers({
   members,
@@ -103,7 +104,13 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
   );
 }
 
-export type SettingsTabTitle = "General" | "Team Members" | "Billing" | "API Keys" | "Delete Team";
+export type SettingsTabTitle =
+  | "Profile"
+  | "Organization"
+  | "Team Members"
+  | "Billing"
+  | "API Keys"
+  | "Delete Team";
 
 const settings: Settings<
   SettingsTabTitle,
@@ -119,7 +126,12 @@ const settings: Settings<
   {
     component: GeneralSettings,
     icon: "settings",
-    title: "General",
+    title: "Profile",
+  },
+  {
+    component: OrganizationSettings,
+    icon: "business",
+    title: "Organization",
   },
   {
     title: "Team Members",

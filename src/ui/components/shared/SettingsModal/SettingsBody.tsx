@@ -17,11 +17,7 @@ function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)
 }
 
 export function SettingsHeader({ children }: { children: React.ReactChild }) {
-  return (
-    <h1 className="text-2xl" style={{ maxWidth: "121px" }}>
-      {children}
-    </h1>
-  );
+  return <h1 className="text-2xl">{children}</h1>;
 }
 
 export function SettingsBodyHeader({ children }: { children: React.ReactChild }) {

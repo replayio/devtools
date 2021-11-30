@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
@@ -15,104 +15,53 @@ const Input = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Row = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex py-4 items-center">{children}</div>;
+  return <div className="flex items-center">{children}</div>;
 };
 
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId!);
-  const { data } = hooks.useGetWorkspaceSubscription(workspaceId);
-  const { data: settings } = hooks.useGetWorkspaceSettings(workspaceId);
+  const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
+  const [name, setName] = useState(workspace?.name);
+  const ref = useRef<NodeJS.Timeout | undefined>();
 
-  if (!(workspace && data && settings)) {
+  useEffect(() => {
+    if (ref.current) {
+      clearTimeout(ref.current);
+    }
+
+    ref.current = setTimeout(() => {
+      updateWorkspaceSettings({
+        variables: {
+          workspaceId,
+          name: name,
+        },
+      });
+    }, 500);
+  }, [name]);
+
+  if (!workspace) {
     return null;
   }
 
-  console.log(settings);
-
-  const { subscription } = data?.node;
-  const disabled = subscription.plan.key !== "org-v1";
-
   return (
-    <div>
+    <div className="space-y-4">
       <Row>
         <Label>Name</Label>
         <Input>
-          <input className="rounded-md text-sm w-full" type="text" defaultValue={workspace?.name} />
+          <input
+            className="rounded-md text-sm w-full"
+            type="text"
+            value={name}
+            onChange={e => setName(e.currentTarget.value)}
+          />
         </Input>
       </Row>
-      <Row>
+      {/* <Row>
         <Label>Logo</Label>
         <Input>
           <button className="border p-2 rounded-md">Upload</button>
         </Input>
-      </Row>
-      <div className={classNames({ "text-gray-500": disabled })}>
-        <Row>
-          <div className="w-full relative">
-            <div className="absolute w-full h-0 border-t top-1/2 z-0" />
-            <div className="relative w-max mx-auto text-center bg-toolbarBackground z-10 px-4">
-              Organization
-            </div>
-          </div>
-        </Row>
-        <Row>
-          <Label>SSO</Label>
-          <Input>
-            <label className="flex items-center" htmlFor="restrict_users_to_domain">
-              <input
-                className={classNames("rounded-sm mr-2 text-sm", {
-                  "bg-toolbarBackground": disabled,
-                  "border-gray-300": disabled,
-                })}
-                disabled={disabled}
-                type="checkbox"
-                id="restrict_users_to_domain"
-                name="restrict_users_to_domain"
-              />
-              <span>Limit users to {workspace?.domain}</span>
-            </label>
-          </Input>
-        </Row>
-        <Row>
-          <Label>Allow Recordings From</Label>
-          <Input>
-            <input
-              className={classNames("rounded-md mr-2 w-full text-sm", {
-                "bg-toolbarBackground": disabled,
-                "border-gray-300": disabled,
-              })}
-              disabled={disabled}
-              placeholder={`staging.${workspace?.domain}`}
-              type="text"
-            />
-          </Input>
-        </Row>
-        <Row>
-          <Label>Block Recordings From</Label>
-          <Input>
-            <input
-              disabled={disabled}
-              placeholder={`production.${workspace?.domain}`}
-              type="text"
-              className={classNames("rounded-md w-full mr-2 text-sm", {
-                "bg-toolbarBackground": disabled,
-                "border-gray-300": disabled,
-              })}
-            />
-          </Input>
-        </Row>
-        <Row>
-          <Label className="self-start">Welcome Message</Label>
-          <textarea
-            className={classNames("rounded-md w-full mr-2 text-sm", {
-              "bg-toolbarBackground": disabled,
-              "border-gray-300": disabled,
-            })}
-            disabled={disabled}
-            defaultValue={settings.motd}
-          />
-        </Row>
-      </div>
+      </Row> */}
     </div>
   );
 };

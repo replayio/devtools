@@ -11,7 +11,13 @@ import {
   SET_WORKSPACE_DEFAULT_PAYMENT_METHOD,
   UPDATE_WORKSPACE_MEMBER_ROLE,
 } from "ui/graphql/workspaces";
-import { PendingWorkspaceInvitation, Subscription, Workspace, WorkspaceUserRole } from "ui/types";
+import {
+  PendingWorkspaceInvitation,
+  Subscription,
+  Workspace,
+  WorkspaceSettings,
+  WorkspaceUserRole,
+} from "ui/types";
 
 const NO_WORKSPACES: Workspace[] = [];
 
@@ -45,8 +51,6 @@ export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
   return createNewWorkspace;
 }
 
-export function useGetWorkspaceFeatures(id) {}
-
 export function useGetPendingWorkspaces() {
   const { data, loading, error } = useQuery(
     gql`
@@ -59,6 +63,7 @@ export function useGetPendingWorkspaces() {
                   id
                   name
                   recordingCount
+                  isOrganization
                 }
                 inviterEmail
               }
@@ -98,6 +103,38 @@ export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; l
   };
 }
 
+export function useUpdateWorkspaceSettings() {
+  const [updateWorkspaceSettings] = useMutation<
+    any,
+    {
+      workspaceId: string;
+      name?: string | null;
+      motd?: string | null;
+      features?: Partial<WorkspaceSettings["features"]>;
+    }
+  >(
+    gql`
+      mutation UpdateWorkspaceSettings(
+        $workspaceId: ID!
+        $name: String
+        $motd: String
+        $features: JSONObject
+      ) {
+        updateWorkspaceSettings(
+          input: { workspaceId: $workspaceId, name: $name, motd: $motd, features: $features }
+        ) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetNonPendingWorkspaces"],
+    }
+  );
+
+  return updateWorkspaceSettings;
+}
+
 export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading: boolean } {
   const { data, loading, error } = useQuery(
     gql`
@@ -112,10 +149,15 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 domain
                 isDomainLimitedCode
                 hasPaymentMethod
+                isOrganization
                 subscription {
                   status
                   trialEnds
                   effectiveUntil
+                }
+                settings {
+                  motd
+                  features
                 }
                 members {
                   edges {
