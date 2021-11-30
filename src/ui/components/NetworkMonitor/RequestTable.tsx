@@ -133,6 +133,7 @@ const RequestTable = ({
                   seek(row.original.point.point, row.original.point.time, false);
                   onClick(row.original);
                 }}
+                key={row.getRowProps().key}
               >
                 <div {...row.getRowProps()}>
                   {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
