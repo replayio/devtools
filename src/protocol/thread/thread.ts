@@ -353,14 +353,14 @@ class _ThreadFront {
   }
 
   async searchSources(
-    { query }: { query: string },
+    { query, sourceIds }: { query: string; sourceIds?: string[] },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ) {
     const sessionId = await this.waitForSession();
     const searchId = uniqueId("search-");
     this.searchWaiters.set(searchId, onMatches);
     try {
-      await client.Debugger.searchSourceContents({ searchId, query }, sessionId);
+      await client.Debugger.searchSourceContents({ searchId, query, sourceIds } as any, sessionId);
     } finally {
       this.searchWaiters.delete(searchId);
     }

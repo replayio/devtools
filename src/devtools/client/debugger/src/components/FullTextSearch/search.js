@@ -36,26 +36,45 @@ const formatMatchesBySource = (matches, sourcesById) => {
     .map(([sourceId, matches]) => [sourcesById[sourceId], matches])
     .filter(([source]) => !!source);
 
-  const sorted = sortBy(filteredResults, ([source]) => [source.isOriginal ? 0 : 1, source.url]);
-  return sorted.map(([source, matches]) => formatSourceMatches(source, matches));
+  return filteredResults.map(([source, matches]) => formatSourceMatches(source, matches));
 };
 
 export async function search(query, sourcesById, updateResults) {
   trackEvent("project_search.search");
 
+  const sourceIds = getSourceIDsToSearch(sourcesById);
+
   updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
 
-  await ThreadFront.searchSources({ query }, matches => {
-    const bestMatches = matches.filter(match => {
-      const { sourceId } = match.location;
-      const source = sourcesById[sourceId];
-      return !ThreadFront.isMinifiedSource(sourceId) && !isThirdParty(source);
+  await ThreadFront.searchSources({ query, sourceIds }, matches => {
+    updateResults(prevResults => {
+      const newMatchesBySource = formatMatchesBySource(matches, sourcesById);
+      const matchesBySource = [...prevResults.matchesBySource, ...newMatchesBySource];
+      return { matchesBySource };
     });
-    const newMatchesBySource = formatMatchesBySource(bestMatches, sourcesById);
-    updateResults(prevResults => ({
-      matchesBySource: [...prevResults.matchesBySource, ...newMatchesBySource],
-    }));
   });
 
   updateResults(() => ({ status: "DONE" }));
+}
+
+function getSourceIDsToSearch(sourcesById) {
+  const sourceIds = [];
+  for (const sourceId in sourcesById) {
+    if (ThreadFront.isMinifiedSource(sourceId)) {
+      continue;
+    }
+    const correspondingSourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
+    if (correspondingSourceId !== sourceId) {
+      continue;
+    }
+    const source = sourcesById[sourceId];
+    if (isThirdParty(source)) {
+      continue;
+    }
+    sourceIds.push(sourceId);
+  }
+  return sortBy(sourceIds, sourceId => {
+    const source = sourcesById[sourceId];
+    return [source.isOriginal ? 0 : 1, source.url];
+  });
 }
