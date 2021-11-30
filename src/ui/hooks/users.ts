@@ -27,10 +27,14 @@ export function useGetUserId() {
 }
 
 export function useUserIsAuthor() {
-  const { recording } = useGetRecording(getRecordingId());
-  const { userId } = useGetUserId();
+  const { recording, loading: loading1 } = useGetRecording(getRecordingId());
+  const { userId, loading: loading2 } = useGetUserId();
 
-  return userId && userId === recording?.userId;
+  if (loading1 || loading2) {
+    return { userIsAuthor: null, loading: true };
+  }
+
+  return { userIsAuthor: userId && userId === recording?.userId, loading: false };
 }
 
 export type UserInfo = {
