@@ -38,6 +38,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Inspect network activity",
     key: "enableNetworkMonitor",
   },
+  {
+    label: "Event Link",
+    description: "Jump from an event to a line of code",
+    key: "enableEventLink",
+  },
 ];
 
 function Experiment({
@@ -71,6 +76,7 @@ export default function ExperimentalSettings({}) {
   const updateGlobalSearch = hooks.useUpdateUserSetting("enableGlobalSearch", "Boolean");
 
   const [enableNetworkMonitor, setEnableNetworkMonitor] = useState(!!features.network);
+  const [enableEventLink, setEnableEventLink] = useState(!!features.eventLink);
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableRepaint") {
@@ -85,10 +91,14 @@ export default function ExperimentalSettings({}) {
     } else if (key === "enableNetworkMonitor") {
       features.network = value;
       setEnableNetworkMonitor(!!features.network);
+    } else if (key === "enableEventLink") {
+      features.eventLink = value;
+      setEnableEventLink(!!features.eventLink);
     }
   };
 
-  const settings = { ...userSettings, enableNetworkMonitor };
+  const localSettings = { enableNetworkMonitor, enableEventLink };
+  const settings = { ...userSettings, ...localSettings };
 
   if (loading) {
     return null;

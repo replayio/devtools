@@ -20,15 +20,11 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   );
 }
 
-const FILTERED_EVENT_TYPES = ["keydown", "keyup"];
-
 function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     seek(point, time, false);
   };
-
-  events = events.filter(e => !FILTERED_EVENT_TYPES.includes(e.kind || ""));
 
   const currentEventIndex = sortedLastIndex(
     events.map(e => e.time),
