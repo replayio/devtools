@@ -10,6 +10,11 @@ export interface FrameworkEventListener {
   tags: string;
 }
 
+const REACT_OBJECT_KEYS = {
+  16: "__reactEventHandlers$",
+  17: "__reactProps$",
+};
+
 export async function getFrameworkEventListeners(node: NodeFront) {
   const obj = node.getObjectFront();
   const props = await obj.loadChildren();
@@ -40,11 +45,11 @@ export function logpointGetFrameworkEventListeners(frameId: string, frameworkLis
 
       const node = event.target
       const props = Object.getOwnPropertyNames(node);
-      const reactProps = props.find(v => v.startsWith("__reactProps$"));
-      if (!reactProps) {
+      const reactObjKey = props.find(v => v.startsWith("${REACT_OBJECT_KEYS[16]}") || v.startsWith("${REACT_OBJECT_KEYS[17]}"));
+      if (!reactObjKey) {
         return undefined;
       }
-      const reactObj = node[reactProps];
+      const reactObj = node[reactObjKey];
       const eventProps = Object.getOwnPropertyNames(reactObj);
       for (const name of eventProps) {
         const v = reactObj[name];
