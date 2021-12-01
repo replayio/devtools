@@ -152,7 +152,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
             onChange={e => setMessage(e.currentTarget.value)}
             value={message}
           />
-          <a href="/browser/new-tab" rel="noreferrer" target="_blank">
+          <a href="/browser/new-tab" rel="noreferrer noopener" target="_blank">
             Preview
           </a>
         </div>
