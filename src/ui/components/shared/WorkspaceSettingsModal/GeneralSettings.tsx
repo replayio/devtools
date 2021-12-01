@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
+import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
   return (
@@ -19,25 +20,19 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 };
 
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
-  const { workspace } = hooks.useGetWorkspace(workspaceId!);
+  const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [name, setName] = useState(workspace?.name);
-  const ref = useRef<NodeJS.Timeout | undefined>();
-
-  useEffect(() => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
-
-    ref.current = setTimeout(() => {
+  const [name, setName] = useDebounceState(
+    workspace?.name,
+    name =>
+      name &&
       updateWorkspaceSettings({
         variables: {
           workspaceId,
-          name: name,
+          name,
         },
-      });
-    }, 500);
-  }, [name]);
+      })
+  );
 
   if (!workspace) {
     return null;
