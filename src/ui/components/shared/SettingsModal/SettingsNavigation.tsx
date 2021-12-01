@@ -22,7 +22,7 @@ interface SettingNavigationProps<
   settings: Settings<T, V, P>;
   selectedTab?: T;
   setSelectedTab: (title: T) => void;
-  title?: string;
+  title?: React.ReactNode;
   hiddenTabs?: T[];
 }
 

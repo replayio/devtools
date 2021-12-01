@@ -28,7 +28,7 @@ export default function SettingsModal<
   settings: Settings<T, V, P>;
   values?: V;
   size?: "sm" | "lg";
-  title?: string | React.ReactNode;
+  title?: React.ReactNode;
 }) {
   const [selectedTab, setSelectedTab] = useState<T | undefined>(tab);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;

@@ -27,7 +27,7 @@ const useImageUpload = (
   const [err, setErr] = useState<string>();
   const [img, setImg] = useState(image);
 
-  const handleUpload = (input: HTMLInputElement) => {
+  const onUpload = (input: HTMLInputElement) => {
     if (!input.files?.[0]) return;
 
     input.files[0].arrayBuffer().then(b => {
@@ -45,13 +45,13 @@ const useImageUpload = (
     });
   };
 
-  return [img, err, handleUpload];
+  return { img, err, onUpload };
 };
 
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [img, err, handleUpload] = useImageUpload(workspace?.logo, 250, logo =>
+  const { img, err, onUpload } = useImageUpload(workspace?.logo, 250, logo =>
     updateWorkspaceSettings({
       variables: {
         workspaceId,
@@ -98,7 +98,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
                 type="file"
                 className="invisible h-1 w-0"
                 accept="image/png"
-                onChange={e => handleUpload(e.currentTarget)}
+                onChange={e => onUpload(e.currentTarget)}
               />
               <span>Upload</span>
               <span className="text-sm material-icons ml-2">upload</span>

@@ -17,6 +17,7 @@ import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
 import GeneralSettings from "./GeneralSettings";
 import OrganizationSettings from "./OrganizationSettings";
+import Base64Image from "../Base64Image";
 
 export function WorkspaceMembers({
   members,
@@ -252,7 +253,7 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
       size="lg"
       title={
         workspace.logo ? (
-          <img src={`data:image/png;base64,${workspace.logo}`} className="max-h-12" />
+          <Base64Image src={workspace.logo} className="max-h-12" />
         ) : (
           workspace.name || "Team Settings"
         )

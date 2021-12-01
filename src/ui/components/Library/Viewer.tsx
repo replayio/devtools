@@ -51,7 +51,7 @@ export default function Viewer({
   searchString,
 }: {
   recordings: Recording[];
-  workspaceName: string;
+  workspaceName: string | React.ReactNode;
   searchString: string;
 }) {
   const filteredRecordings = searchString
@@ -72,7 +72,7 @@ function ViewerContent({
   workspaceName,
 }: {
   recordings: Recording[];
-  workspaceName: string;
+  workspaceName: string | React.ReactNode;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -87,10 +87,8 @@ function ViewerContent({
 
   const HeaderLeft = (
     <ViewerHeaderLeft>
-      <>
-        <span>{workspaceName}</span>
-        <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
-      </>
+      <span>{workspaceName}</span>
+      <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
     </ViewerHeaderLeft>
   );
 

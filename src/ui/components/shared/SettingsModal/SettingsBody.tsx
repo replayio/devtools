@@ -16,7 +16,7 @@ function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)
   return <main className="text-sm">{children}</main>;
 }
 
-export function SettingsHeader({ children }: { children: React.ReactChild }) {
+export function SettingsHeader({ children }: { children: React.ReactNode }) {
   return <h1 className="text-2xl">{children}</h1>;
 }
 

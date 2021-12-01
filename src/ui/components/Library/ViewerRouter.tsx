@@ -10,6 +10,7 @@ import { PendingTeamScreen } from "./PendingTeamScreen";
 import { MY_LIBRARY } from "../UploadScreen/Sharing";
 import { actions } from "ui/actions";
 import { BlankViewportWrapper } from "../shared/Viewport";
+import Base64Image from "../shared/Base64Image";
 
 function ViewerLoader() {
   return (
@@ -56,11 +57,17 @@ function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRoute
     return <ViewerLoader />;
   }
 
+  const workspace = workspaces.find(ws => ws.id === currentWorkspaceId)!;
+
   return (
     <Viewer
       {...{
         recordings,
-        workspaceName: workspaces.find(ws => ws.id === currentWorkspaceId)!.name,
+        workspaceName: workspace.logo ? (
+          <Base64Image src={workspace.logo} className="max-h-12" />
+        ) : (
+          workspace.name
+        ),
         searchString,
       }}
     />
