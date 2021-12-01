@@ -1,5 +1,7 @@
 // Routines for finding framework-specific event listeners within a pause.
 
+import { AnalysisEntry, PointDescription } from "@recordreplay/protocol";
+import { getUnwrappedFrameworkPoint } from "./logpoint";
 import { ValueFront } from "./thread";
 import { NodeFront } from "./thread/node";
 
@@ -13,6 +15,22 @@ export interface FrameworkEventListener {
 const REACT_OBJECT_KEYS = {
   16: "__reactEventHandlers$",
   17: "__reactProps$",
+};
+
+export const unwrapFrameworkPoints = async (analysisResults: Record<string, AnalysisEntry[]>) => {
+  const unwrappedPoints: Record<string, (PointDescription | undefined)[]> = {};
+
+  await Promise.all(
+    Object.entries(analysisResults).map(async ([key, r]) => {
+      const point = await getUnwrappedFrameworkPoint(r);
+      console.log("unwrapped", { point });
+      unwrappedPoints[key] = point || [];
+    })
+  );
+
+  console.log("unwrappedPoints", unwrappedPoints);
+
+  return unwrappedPoints;
 };
 
 export async function getFrameworkEventListeners(node: NodeFront) {

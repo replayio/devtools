@@ -56,6 +56,36 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
   });
 }
 
+export async function getUnwrappedFrameworkPoint(result: AnalysisEntry[]) {
+  const logGroupId = newLogGroupId();
+
+  console.log(">>>getUnwrappedFrameworkPoint", result);
+  if (!LogpointHandlers.onResult || result.length >= prefs.maxHitsDisplayed) {
+    return;
+  }
+
+  const newResults = await Promise.all(
+    result.map(async ({ key: point, value: { time, pauseId, data, frameworkListeners } }, i) => {
+      console.log(">>>result", { point, value: { time, pauseId, data, frameworkListeners }, i });
+      await ThreadFront.ensureAllSources();
+      const pause = new Pause(ThreadFront.sessionId!);
+      pause.instantiate(pauseId, point, time, /* hasFrames */ true);
+      pause.addData(data);
+
+      if (!frameworkListeners) {
+        return;
+      }
+
+      const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
+      return await _findFrameworkListeners(logGroupId, point, frameworkListenersFront, i);
+    })
+  );
+
+  const results = newResults.flat();
+  console.log("newResults", { results });
+  return results;
+}
+
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
   if (!LogpointHandlers.onResult || result.length >= prefs.maxHitsDisplayed) {
     return;
@@ -352,31 +382,52 @@ export function setLogpointByURL(
 }
 
 const eventTypePoints: Record<string, PointDescription[]> = {};
+const eventTypeResults: Record<string, AnalysisEntry[]> = {};
 const eventTypeLogGroupId: Record<string, string> = {};
 
+// -jvv
 export async function fetchEventTypePoints(eventTypes: EventId[]) {
+  const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
   const sessionId = await ThreadFront.waitForSession();
 
   await Promise.all(
     eventTypes.map(async eventType => {
       const collectedPoints: PointDescription[] = [];
+      const collectedResults: AnalysisEntry[] = [];
       await analysisManager.runAnalysis(
         {
           sessionId,
-          mapper: `return [{ key: input.point, value: input }];`,
+          mapper,
           effectful: false,
           eventHandlerEntryPoints: [{ eventType }],
         },
         {
-          onAnalysisPoints: points => collectedPoints.push(...points),
+          onAnalysisPoints: points => {
+            // console.log("onAnalysisPoints", { points });
+            collectedPoints.push(...points);
+          },
+          onAnalysisResult: result => {
+            console.log("onAnalysisResult", { result });
+
+            const logGroupId = newLogGroupId();
+            eventTypeLogGroupId[eventType] = logGroupId;
+
+            console.log(">>>start waiting");
+            collectedResults.push(...result);
+            // const rv = await getUnwrappedFrameworkPoint(logGroupId, result);
+            // console.log(">>>end waiting");
+          },
         }
       );
       eventTypePoints[eventType] = collectedPoints;
-      return collectedPoints;
+      eventTypeResults[eventType] = collectedResults;
+      return { collectedPoints, collectedResults };
     })
   );
 
-  return eventTypePoints;
+  console.log(">>finished", { eventTypePoints, eventTypeResults });
+
+  return { eventTypePoints, eventTypeResults };
 }
 
 // Event listener logpoints use a multistage analysis. First, the normal
@@ -452,15 +503,65 @@ export async function setEventLogpoint(
     eventHandlerEntryPoints: eventTypes.map(eventType => ({ eventType })),
   };
   const handler: AnalysisHandler<void> = {
-    onAnalysisResult: result => showLogpointsResult(logGroupId, result),
+    onAnalysisResult: result => {
+      console.log("SEL onAnalysisResult", { result });
+      showLogpointsResult(logGroupId, result);
+    },
   };
   if (points) {
     showLogpointsLoading(logGroupId, points);
   } else {
-    handler.onAnalysisPoints = points => showLogpointsLoading(logGroupId, points);
+    handler.onAnalysisPoints = points => {
+      console.log("SEL onAnalysisPoints", { points });
+      showLogpointsLoading(logGroupId, points);
+    };
   }
 
   await analysisManager.runAnalysis(params, handler);
+}
+
+async function _findFrameworkListeners(
+  logGroupId: string,
+  point: ExecutionPoint,
+  frameworkListeners: ValueFront,
+  i: number
+) {
+  const locations = [];
+  const children = await frameworkListeners.loadChildren();
+  const collectedPoints: PointDescription[] = [];
+
+  for (const { contents } of children) {
+    if (contents.isObject() && contents.className() == "Function") {
+      locations.push(contents.functionLocationFromLogpoint()!);
+    }
+  }
+  if (!locations.length) {
+    return;
+  }
+
+  const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
+  const sessionId = await ThreadFront.waitForSession();
+  const params: AnalysisParams = {
+    sessionId,
+    mapper,
+    effectful: true,
+    locations: locations.map(location => ({ location, onStackFrame: point })),
+  };
+  const handler: AnalysisHandler<void> = {
+    onAnalysisPoints: points => {
+      // showLogpointsLoading(logGroupId, points)
+      console.log("FFL", { points, i });
+      collectedPoints.push(...points);
+    },
+    onAnalysisResult: result => {
+      // showLogpointsResult(logGroupId, result)
+      // console.log("FFL", { result, i });
+    },
+  };
+
+  await analysisManager.runAnalysis(params, handler);
+  console.log(">>FFL", { collectedPoints });
+  return collectedPoints;
 }
 
 async function findFrameworkListeners(

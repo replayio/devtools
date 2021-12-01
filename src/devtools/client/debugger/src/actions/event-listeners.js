@@ -9,6 +9,7 @@ import remove from "lodash/remove";
 import difference from "lodash/difference";
 
 const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
+import { unwrapFrameworkPoints } from "protocol/event-listeners";
 import * as selectors from "../selectors";
 
 import { features } from "ui/utils/prefs";
@@ -103,8 +104,22 @@ export function getEventListenerBreakpointTypes() {
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
     if (features.eventCount) {
-      const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
+      const { eventTypePoints, eventTypeResults } = await client.fetchEventTypePoints(
+        INITIAL_EVENT_BREAKPOINTS
+      );
+      console.log({ eventTypePoints, eventTypeResults });
       dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
+
+      const unwrappedFrameworkPoints = await unwrapFrameworkPoints(eventTypeResults);
+
+      if (unwrappedFrameworkPoints) {
+        dispatch({
+          type: "RECEIVE_FRAMEWORK_POINTS",
+          eventTypeFrameworkPoints: unwrappedFrameworkPoints,
+        });
+      }
+
+      console.log({ unwrappedFrameworkPoints });
     }
   };
 }

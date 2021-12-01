@@ -10,7 +10,7 @@ import { clientEvents } from "./events";
 import Reps from "devtools-reps";
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
-const { fetchEventTypePoints } = require("protocol/logpoint");
+const { fetchEventTypePoints, getUnwrappedFrameworkPoint } = require("protocol/logpoint");
 const {
   setLogpoint,
   setLogpointByURL,
@@ -388,6 +388,7 @@ const clientCommands = {
   getMainThread,
   setSkipPausing,
   fetchEventTypePoints,
+  getUnwrappedFrameworkPoint,
   setEventListenerBreakpoints,
   getFrontByID,
   fetchAncestorFramePositions,

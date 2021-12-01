@@ -34,6 +34,18 @@ function update(state = initialEventListenerState(), action) {
         eventTypePoints: { ...state.eventTypePoints, ...action.eventTypePoints },
       };
 
+    case "RECEIVE_FRAMEWORK_POINTS":
+      const newTypePoints = { ...state.eventTypePoints };
+
+      Object.entries(action.eventTypeFrameworkPoints).forEach(([key, events]) => {
+        newTypePoints[key] = [...newTypePoints[key], ...events];
+      });
+
+      return {
+        ...state,
+        eventTypePoints: newTypePoints,
+      };
+
     case "UPDATE_EVENT_LISTENER_EXPANDED":
       return { ...state, expanded: action.expanded };
 
