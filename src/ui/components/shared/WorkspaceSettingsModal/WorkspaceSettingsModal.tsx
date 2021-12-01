@@ -250,7 +250,13 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
       panelProps={{ isAdmin, workspaceId, ...rest }}
       settings={settings}
       size="lg"
-      title={workspace.name || "Team Settings"}
+      title={
+        workspace.logo ? (
+          <img src={`data:image/png;base64,${workspace.logo}`} className="max-h-12" />
+        ) : (
+          workspace.name || "Team Settings"
+        )
+      }
     />
   );
 }

@@ -108,6 +108,7 @@ export function useUpdateWorkspaceSettings() {
     {
       workspaceId: string;
       name?: string | null;
+      logo?: string | null;
       motd?: string | null;
       features?: Partial<WorkspaceSettings["features"]>;
     }
@@ -116,11 +117,18 @@ export function useUpdateWorkspaceSettings() {
       mutation UpdateWorkspaceSettings(
         $workspaceId: ID!
         $name: String
+        $logo: String
         $motd: String
         $features: JSONObject
       ) {
         updateWorkspaceSettings(
-          input: { workspaceId: $workspaceId, name: $name, motd: $motd, features: $features }
+          input: {
+            workspaceId: $workspaceId
+            name: $name
+            logo: $logo
+            motd: $motd
+            features: $features
+          }
         ) {
           success
         }
@@ -144,6 +152,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
               node {
                 id
                 name
+                logo
                 invitationCode
                 domain
                 isDomainLimitedCode
