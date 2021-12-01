@@ -331,8 +331,10 @@ export const getFlatEvents = (state: UIState) => {
   const sortedEvents = events.sort((a: ReplayEvent, b: ReplayEvent) =>
     compareBigInt(BigInt(a.point), BigInt(b.point))
   );
+  const filteredEventTypes = ["keydown", "keyup"];
+  const filteredEvents = sortedEvents.filter(e => !filteredEventTypes.includes(e.kind));
 
-  return sortedEvents;
+  return filteredEvents;
 };
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;

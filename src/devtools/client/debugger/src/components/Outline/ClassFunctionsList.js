@@ -17,8 +17,8 @@ export function ClassFunctionsList({
     return null;
   }
 
-  const classFunc = symbols.functions.find(func => func.name === klass);
-  const classInfo = symbols.functions.find(c => c.klass === klass);
+  const classFunc = functions.find(func => func.name === klass);
+  const classInfo = symbols.classes.find(c => c.name === klass);
   let classFunctions = functions.filter(
     func => filterOutlineItem(func.name, filter) && !!func.klass
   );

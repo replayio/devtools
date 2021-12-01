@@ -116,7 +116,12 @@ interface Events {
   [key: string]: ReplayEvent[];
 }
 
-export type ReplayEvent = MouseEvent | KeyboardEvent | NavigationEvent;
+// Todo: We should move this deifnition to the protocol instead of typing it here.
+export type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
+  kind: "navigation";
+};
+
+export type ReplayEvent = MouseEvent | KeyboardEvent | ReplayNavigationEvent;
 
 export type EventCategory = "mouse" | "keyboard" | "navigation";
 export type EventKind = MouseEventKind | KeyboardEventKind | string;

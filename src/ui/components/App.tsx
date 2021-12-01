@@ -14,7 +14,7 @@ import { isDeployPreview, isTest } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
-import { useGetUserInfo } from "ui/hooks/users";
+import { Nag, useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "./shared/LoadingScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
@@ -28,6 +28,9 @@ import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
 import classNames from "classnames";
+import hooks from "ui/hooks";
+import { shouldShowNag } from "ui/utils/user";
+import { trackEvent } from "ui/utils/telemetry";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -81,7 +84,15 @@ function AppModal({ modal }: { modal: ModalType }) {
 
 function App({ children, modal, theme }: AppProps) {
   const auth = useAuth0();
+  const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
+
+  useEffect(() => {
+    if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
+      trackEvent("login.first_log_in");
+      dismissNag(Nag.FIRST_LOG_IN);
+    }
+  }, [userInfo.nags]);
 
   useEffect(() => {
     // Stop space bar from being used as a universal "scroll down" operator

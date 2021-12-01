@@ -108,27 +108,6 @@ export function useGetRecordingId() {
   return Array.isArray(id) ? id[0] : id!;
 }
 
-export async function getRecordingOwnerUserId(
-  recordingId: RecordingId
-): Promise<string | undefined> {
-  const result = await query({
-    query: GET_RECORDING_USER_ID,
-    variables: { recordingId },
-  });
-
-  return result.data.recording?.owner?.id;
-}
-
-export function useGetRecordingOwnerUserId(
-  recordingId: RecordingId | null
-): { userId: string | undefined; loading: boolean } {
-  const { data, loading } = useQuery(GET_RECORDING_USER_ID, {
-    variables: { recordingId },
-    skip: !recordingId,
-  });
-  return { userId: data?.recording?.owner?.id, loading };
-}
-
 export async function getRecording(recordingId: RecordingId) {
   const result = await query({
     query: GET_RECORDING,
@@ -137,9 +116,7 @@ export async function getRecording(recordingId: RecordingId) {
   return convertRecording(result.data?.recording);
 }
 
-export function useGetRecording(
-  recordingId: RecordingId | null | undefined
-): {
+export function useGetRecording(recordingId: RecordingId | null | undefined): {
   recording: Recording | undefined;
   isAuthorized: boolean;
   loading: boolean;
@@ -202,9 +179,7 @@ function convertRecording(rec: any): Recording | undefined {
   };
 }
 
-export function useGetRecordingPhoto(
-  recordingId: RecordingId
-): {
+export function useGetRecordingPhoto(recordingId: RecordingId): {
   error: ApolloError | undefined;
   loading: boolean;
   screenData?: string;
@@ -233,9 +208,7 @@ export function useGetRecordingPhoto(
   return { error, loading, screenData };
 }
 
-export function useGetOwnersAndCollaborators(
-  recordingId: RecordingId
-): {
+export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
   error: ApolloError | undefined;
   loading: boolean;
   recording: Recording | undefined;

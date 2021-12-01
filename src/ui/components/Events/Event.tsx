@@ -1,68 +1,68 @@
-import React from "react";
-import { KeyboardEvent, NavigationEvent } from "@recordreplay/protocol";
+import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import classNames from "classnames";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
+import Matches from "./Matches";
+import { features } from "ui/utils/prefs";
 
-function Event({
-  onSeek,
-  currentTime,
-  executionPoint,
-  event,
-}: {
+type EventProps = {
   event: ReplayEvent;
   currentTime: any;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
-}) {
-  const isPaused = event.time === currentTime && executionPoint === event.point;
+};
 
-  let text: string;
-  let title: string;
-  let icon: string;
+const EVENT_KINDS: { [key: string]: EventKind } = {
+  keydown: { icon: "keyboard", label: "Key Down", key: "event.keyboard.keydown" },
+  keyup: { icon: "keyboard", label: "Key Up", key: "event.keyboard.keyup" },
+  keypress: { icon: "keyboard", label: "Key Press", key: "event.keyboard.keypress" },
+  mousedown: { icon: "ads_click", label: "Click", key: "event.mouse.click" },
+  navigation: { icon: "navigation", label: "Navigation" },
+};
 
-  if (event.kind?.includes("mouse")) {
-    text = "Mouse Click";
-    title = "Mouse Click Event";
-    icon = "ads_click";
-  } else if (event.kind?.includes("navigation")) {
-    const ev = event as NavigationEvent;
-    text = `${ev.url}`;
-    title = "Navigation Event";
-    icon = "place";
-  } else {
-    icon = "keyboard";
-    let ev = event as KeyboardEvent;
-    let eventText;
+type Kind = keyof typeof EVENT_KINDS;
+type EventKind = { icon: EventKindIcon; label: EventKindLabel; key?: EventKindKey };
+type EventKindIcon = "keyboard" | "ads_click" | "navigation";
+type EventKindLabel = "Key Down" | "Key Up" | "Key Press" | "Click" | "Navigation";
+export type EventKindKey =
+  | "event.keyboard.keydown"
+  | "event.keyboard.keyup"
+  | "event.keyboard.keypress"
+  | "event.mouse.click";
 
-    if (ev.kind === "keydown") {
-      eventText = `Key Down`;
-    } else if (ev.kind === "keyup") {
-      eventText = `Key Up`;
-    } else {
-      eventText = `Key Press`;
-    }
+export const getReplayEvent = (kind: Kind) => EVENT_KINDS[kind];
+const getEventLabel = (event: ReplayEvent) => {
+  const { kind } = event;
+  const { label } = getReplayEvent(kind);
 
-    text = `${eventText} ${ev.key}`;
-    title = `${eventText} event`;
+  if ("key" in event) {
+    return `${label} ${event.key}`;
   }
 
+  return label;
+};
+
+export default function Event({ onSeek, currentTime, executionPoint, event }: EventProps) {
+  const { kind, point, time } = event;
+  const isPaused = time === currentTime && executionPoint === point;
+
+  const label = getEventLabel(event);
+  const { icon } = getReplayEvent(kind);
+
+  const onKeyDown = (e: KeyboardEvent) => e.key === " " && e.preventDefault();
+  const onClick = (e: MouseEvent) => onSeek(point, time);
+
   return (
-    <button
-      onClick={() => onSeek(event.point, event.time)}
-      onKeyDown={event => {
-        if (event.key === " ") {
-          event.preventDefault();
-        }
-      }}
-      title={title}
+    <div
+      onClick={onClick}
+      onKeyDown={onKeyDown}
       className={classNames(
-        "group",
-        "flex flex-row w-full items-center justify-between p-3 rounded-lg hover:bg-gray-100 focus:outline-none space-x-2",
+        "flex flex-row justify-between items-center space-x-2 user-select-none",
+        "group block p-3 w-full rounded-lg hover:bg-gray-100 focus:outline-none",
         {
-          "text-lightGrey": currentTime < event.time,
-          "text-primaryAccent": isPaused,
+          "text-lightGrey": currentTime < time,
+          "text-primaryAccent font-semibold": isPaused,
         }
       )}
     >
@@ -70,19 +70,16 @@ function Event({
         <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
           {icon}
         </MaterialIcon>
-        <div
-          className={classNames("overflow-ellipsis overflow-hidden whitespace-pre", {
-            "font-semibold": isPaused,
-          })}
-        >
-          {text}
-        </div>
+        <Label>{label}</Label>
       </div>
-      <div className={classNames({ "text-primaryAccent": isPaused })}>
-        {getFormattedTime(event.time)}
+      <div className="flex space-x-2">
+        {features.eventLink ? <Matches simpleEvent={event} /> : null}
+        <div>{getFormattedTime(time)}</div>
       </div>
-    </button>
+    </div>
   );
 }
 
-export default Event;
+const Label = ({ children }: { children: ReactNode }) => (
+  <div className="overflow-ellipsis overflow-hidden whitespace-pre font-normal">{children}</div>
+);
