@@ -38,7 +38,7 @@ export function logpointGetFrameworkEventListeners(frameId: string, frameworkLis
     }
     for (let node = maybeEvent.target; node; node = node.parentNode) {
       const props = Object.getOwnPropertyNames(node);
-      const reactProp = props.find(v => v.startsWith("__reactEventHandlers$"));
+      const reactProp = props.find(v => v.startsWith("__reactEventHandlers$") || v.startsWith("__reactProps$"));
       if (!reactProp) {
         continue;
       }
