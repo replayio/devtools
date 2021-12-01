@@ -10,6 +10,7 @@ import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/environment";
 import { getTrimRegion } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
+import { getRecording } from "ui/hooks/recordings";
 
 const syncInitialAppState: AppState = {
   expectedError: null,
@@ -18,7 +19,7 @@ const syncInitialAppState: AppState = {
   theme: "theme-light",
   splitConsoleOpen: prefs.splitConsole as boolean,
   selectedPanel: prefs.selectedPanel as PanelName,
-  selectedPrimaryPanel: "comments",
+  selectedPrimaryPanel: "events",
   initializedPanels: [],
   recordingDuration: 0,
   indexing: 0,
@@ -48,6 +49,18 @@ const syncInitialAppState: AppState = {
   loadingPageTipIndex: 0,
 };
 
+const getDefaultSelectedPrimaryPanel = (comments: any, session?: any) => {
+  if (session) {
+    return session.selectedPrimaryPanel;
+  }
+
+  if (comments.length) {
+    return "comments";
+  } else {
+    return syncInitialAppState.selectedPrimaryPanel;
+  }
+};
+
 export async function getInitialAppState(): Promise<AppState> {
   const recordingId = getRecordingId();
 
@@ -56,14 +69,23 @@ export async function getInitialAppState(): Promise<AppState> {
     return syncInitialAppState;
   }
 
-  const replaySessions = await asyncStore.replaySessions;
-  const session = replaySessions[recordingId!];
+  const recording = await getRecording(recordingId!);
 
-  if (!session) {
+  if (!recording) {
     return syncInitialAppState;
   }
 
+  const { comments, userRole } = recording;
+  const replaySessions = await asyncStore.replaySessions;
+  const session = replaySessions[recordingId!];
   const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = syncInitialAppState;
+
+  if (!session) {
+    return {
+      ...syncInitialAppState,
+      selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(comments),
+    };
+  }
 
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
