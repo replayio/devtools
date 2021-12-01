@@ -4,6 +4,7 @@ import TeamSelect from "./TeamSelect";
 import { Workspace } from "ui/types";
 import { Toggle } from "../shared/Forms";
 import SettingsPreview from "./SettingsPreview";
+import classNames from "classnames";
 
 export const MY_LIBRARY = "My Library";
 export const personalWorkspace = { id: MY_LIBRARY, name: MY_LIBRARY };
@@ -30,17 +31,23 @@ function EditableSettings({
     updateDefaultWorkspace({ variables: { workspaceId: dbWorkspaceId } });
   };
 
+  const workspace = workspaces.find(w => w.id === selectedWorkspaceId);
+  const disabled = workspace?.settings.features.recording.public === false;
+
   return (
     <div className="w-full grid grid-cols-2 gap-5 text-base">
       {workspaces.length ? (
         <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
       ) : null}
       <div
-        className="space-x-2 select-none flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-jellyfish"
-        onClick={() => setIsPublic(!isPublic)}
+        className={classNames(
+          disabled ? "opacity-60" : undefined,
+          "space-x-2 select-none flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-jellyfish"
+        )}
+        onClick={() => !disabled && setIsPublic(!isPublic)}
       >
         <div>Public Access</div>
-        <Toggle enabled={isPublic} setEnabled={setIsPublic} />
+        <Toggle enabled={isPublic && !disabled} setEnabled={disabled ? () => {} : setIsPublic} />
       </div>
     </div>
   );
