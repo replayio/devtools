@@ -150,15 +150,20 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
       </Row> */}
       <Row>
         <Label className="self-start">Welcome Message</Label>
-        <textarea
-          className={classNames("rounded-md w-full h-20 text-sm", {
-            "bg-toolbarBackground": disabled,
-            "border-gray-300": disabled,
-          })}
-          disabled={disabled}
-          onChange={e => setMessage(e.currentTarget.value)}
-          value={message}
-        />
+        <div>
+          <textarea
+            className={classNames("rounded-md w-full h-20 text-sm", {
+              "bg-toolbarBackground": disabled,
+              "border-gray-300": disabled,
+            })}
+            disabled={disabled}
+            onChange={e => setMessage(e.currentTarget.value)}
+            value={message}
+          />
+          <a href="/browser/new-tab" rel="noreferrer" target="_blank">
+            Preview
+          </a>
+        </div>
       </Row>
     </div>
   );
