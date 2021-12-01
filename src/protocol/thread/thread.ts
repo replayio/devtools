@@ -267,7 +267,8 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
-      // console.log("LoadedRegions", parameters);
+      // Log loaded regions to help with diagnostics.
+      console.log("LoadedRegions", parameters);
       listenerCallback(parameters);
     });
 
