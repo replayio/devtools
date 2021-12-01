@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
 import { WorkspaceSettings } from "ui/types";
+import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
   return (
@@ -20,25 +21,16 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 };
 
 const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
-  const { workspace } = hooks.useGetWorkspace(workspaceId!);
+  const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [message, setMessage] = useState(workspace?.settings?.motd || undefined);
-  const ref = useRef<NodeJS.Timeout | undefined>();
-
-  useEffect(() => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
-
-    ref.current = setTimeout(() => {
-      updateWorkspaceSettings({
-        variables: {
-          workspaceId,
-          motd: message,
-        },
-      });
-    }, 500);
-  }, [message]);
+  const [message, setMessage] = useDebounceState(workspace?.settings?.motd || undefined, motd =>
+    updateWorkspaceSettings({
+      variables: {
+        workspaceId,
+        motd,
+      },
+    })
+  );
 
   const updateFeature = (features: Partial<WorkspaceSettings["features"]>) => {
     updateWorkspaceSettings({
