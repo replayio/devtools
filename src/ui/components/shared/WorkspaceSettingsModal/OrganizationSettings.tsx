@@ -41,8 +41,6 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   }, [message]);
 
   const updateFeature = (features: Partial<WorkspaceSettings["features"]>) => {
-    if (!settings) return;
-
     updateWorkspaceSettings({
       variables: {
         workspaceId,
