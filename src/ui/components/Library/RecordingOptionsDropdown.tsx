@@ -13,6 +13,7 @@ import PortalDropdown from "../shared/PortalDropdown";
 import classNames from "classnames";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../shared/Confirm";
+import { isPublicDisabled } from "ui/utils/org";
 
 type RecordingOptionsDropdownProps = PropsFromRedux & {
   recording: Recording;
@@ -31,8 +32,6 @@ function RecordingOptionsDropdown({
   const updateIsPrivate = hooks.useUpdateIsPrivate();
   const recordingId = recording.id;
   const { confirmDestructive } = useConfirm();
-
-  const workspace = workspaces.find(w => w.id === currentWorkspaceId);
 
   const toggleIsPrivate = () => {
     setIsPrivate(!isPrivate);
@@ -83,11 +82,11 @@ function RecordingOptionsDropdown({
     >
       <Dropdown>
         <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
-        {workspace?.settings.features.recording.public ? (
+        {isPublicDisabled(workspaces, currentWorkspaceId || "My Library") ? null : (
           <DropdownItem onClick={toggleIsPrivate}>{`Make ${
             isPrivate ? "public" : "private"
           }`}</DropdownItem>
-        ) : null}
+        )}
         <DropdownItem onClick={handleShareClick}>Share</DropdownItem>
         {!loading ? (
           <MoveRecordingMenu workspaces={workspaces} onMoveRecording={updateRecording} />

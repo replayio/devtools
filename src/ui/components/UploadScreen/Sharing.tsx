@@ -5,6 +5,7 @@ import { Workspace } from "ui/types";
 import { Toggle } from "../shared/Forms";
 import SettingsPreview from "./SettingsPreview";
 import classNames from "classnames";
+import { isPublicDisabled } from "ui/utils/org";
 
 export const MY_LIBRARY = "My Library";
 export const personalWorkspace = { id: MY_LIBRARY, name: MY_LIBRARY };
@@ -16,17 +17,6 @@ type SharingProps = {
   isPublic: boolean;
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 };
-
-function isPublicDisabled(workspaces: Workspace[], selectedWorkspaceId: string) {
-  const workspace = workspaces.find(w => w.id === selectedWorkspaceId);
-  const publicDisabledMyLibrary = workspaces.some(
-    w => w.settings.features.recording.public === false
-  );
-  return (
-    (selectedWorkspaceId === "My Library" && publicDisabledMyLibrary) ||
-    workspace?.settings.features.recording.public === false
-  );
-}
 
 function EditableSettings({
   workspaces,
