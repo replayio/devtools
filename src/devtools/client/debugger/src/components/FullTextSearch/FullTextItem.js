@@ -3,6 +3,7 @@ import classnames from "classnames";
 import { highlightMatches } from "../../utils/project-search";
 import { getRelativePath } from "../../utils/sources-tree";
 import AccessibleImage from "../shared/AccessibleImage";
+import { RedactedSpan, Redacted } from "ui/components/Redacted";
 
 export function FullTextItem({ item, focused, expanded, onSelect }) {
   if (item.type === "RESULT") {
@@ -17,15 +18,15 @@ export function FullTextItem({ item, focused, expanded, onSelect }) {
       >
         <AccessibleImage className={classnames("arrow", { expanded })} />
         <AccessibleImage className="file" />
-        <span className="file-path">{getRelativePath(item.filepath)}</span>
-        <span className="matches-summary">{matches}</span>
+        <RedactedSpan className="file-path">{getRelativePath(item.filepath)}</RedactedSpan>
+        <RedactedSpan className="matches-summary">{matches}</RedactedSpan>
       </div>
     );
   }
 
   return (
-    <div className={classnames("result pl-4", { focused })} onClick={() => onSelect(item)}>
+    <Redacted className={classnames("result pl-4", { focused })} onClick={() => onSelect(item)}>
       {highlightMatches(item)}
-    </div>
+    </Redacted>
   );
 }
