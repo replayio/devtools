@@ -51,14 +51,16 @@ const useImageUpload = (
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
+  const updateWorkspaceLogo = hooks.useUpdateWorkspaceLogo();
   const { img, err, onUpload } = useImageUpload(workspace?.logo, 50, logo =>
-    updateWorkspaceSettings({
+    updateWorkspaceLogo({
       variables: {
         workspaceId,
         logo,
       },
     })
   );
+
   const [name, setName] = useDebounceState(
     workspace?.name,
     name =>

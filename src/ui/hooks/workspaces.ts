@@ -102,6 +102,29 @@ export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; l
   };
 }
 
+export function useUpdateWorkspaceLogo() {
+  const [updateWorkspaceLogo] = useMutation<
+    any,
+    {
+      workspaceId: string;
+      logo: string | null;
+    }
+  >(
+    gql`
+      mutation UpdateWorkspaceLogo($workspaceId: ID!, $logo: String) {
+        updateWorkspaceLogo(input: { workspaceId: $workspaceId, logo: $logo }) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetNonPendingWorkspaces"],
+    }
+  );
+
+  return updateWorkspaceLogo;
+}
+
 export function useUpdateWorkspaceSettings() {
   const [updateWorkspaceSettings] = useMutation<
     any,
@@ -117,18 +140,11 @@ export function useUpdateWorkspaceSettings() {
       mutation UpdateWorkspaceSettings(
         $workspaceId: ID!
         $name: String
-        $logo: String
         $motd: String
         $features: JSONObject
       ) {
         updateWorkspaceSettings(
-          input: {
-            workspaceId: $workspaceId
-            name: $name
-            logo: $logo
-            motd: $motd
-            features: $features
-          }
+          input: { workspaceId: $workspaceId, name: $name, motd: $motd, features: $features }
         ) {
           success
         }
