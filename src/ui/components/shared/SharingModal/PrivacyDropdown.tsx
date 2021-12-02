@@ -33,12 +33,13 @@ export function getPrivacySummaryAndIcon(recording: Recording) {
 
 export default function PrivacyDropdown({ recording }: { recording: Recording }) {
   const [expanded, setExpanded] = useState(false);
-  const isPrivate = recording.private;
-  const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace(false);
   const { workspaces } = hooks.useGetNonPendingWorkspaces();
   const workspaceId = recording.workspace?.id || null;
   const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
+  const workspace = workspaces.find(w => w.id === workspaceId);
+  const isPrivate = recording.private || workspace?.settings.features.recording.public === false;
+  const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
 
   const setPublic = () => {
     trackEvent("share_modal.set_public");
@@ -95,11 +96,13 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
       position="bottom-right"
     >
       <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
-        <DropdownItem onClick={setPublic}>
-          <DropdownItemContent icon="link" selected={!isPrivate}>
-            Anyone with the link
-          </DropdownItemContent>
-        </DropdownItem>
+        {workspace?.settings.features.recording.public === true ? (
+          <DropdownItem onClick={setPublic}>
+            <DropdownItemContent icon="link" selected={!isPrivate}>
+              Anyone with the link
+            </DropdownItemContent>
+          </DropdownItem>
+        ) : null}
         <DropdownItem onClick={() => handleMoveToTeam(null)}>
           <DropdownItemContent icon="domain" selected={isPrivate && !workspaceId}>
             Only people with access

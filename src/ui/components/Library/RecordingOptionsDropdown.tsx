@@ -32,6 +32,8 @@ function RecordingOptionsDropdown({
   const recordingId = recording.id;
   const { confirmDestructive } = useConfirm();
 
+  const workspace = workspaces.find(w => w.id === currentWorkspaceId);
+
   const toggleIsPrivate = () => {
     setIsPrivate(!isPrivate);
     updateIsPrivate({ variables: { recordingId: recording.id, isPrivate: !isPrivate } });
@@ -81,9 +83,11 @@ function RecordingOptionsDropdown({
     >
       <Dropdown>
         <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
-        <DropdownItem onClick={toggleIsPrivate}>{`Make ${
-          isPrivate ? "public" : "private"
-        }`}</DropdownItem>
+        {workspace?.settings.features.recording.public ? (
+          <DropdownItem onClick={toggleIsPrivate}>{`Make ${
+            isPrivate ? "public" : "private"
+          }`}</DropdownItem>
+        ) : null}
         <DropdownItem onClick={handleShareClick}>Share</DropdownItem>
         {!loading ? (
           <MoveRecordingMenu workspaces={workspaces} onMoveRecording={updateRecording} />

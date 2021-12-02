@@ -1,5 +1,7 @@
+import classNames from "classnames";
 import React from "react";
 import { Workspace } from "ui/types";
+import { getOrganizationSettings } from "ui/utils/org";
 import { MY_LIBRARY, personalWorkspace } from "./Sharing";
 
 const getIconAndText = (
@@ -43,16 +45,23 @@ export default function SettingsPreview({
   workspaces,
   selectedWorkspaceId,
 }: SettingsPreviewProps) {
-  const workspaceName = [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId)!
-    .name;
+  const { features } = getOrganizationSettings(workspaces);
+  const canEdit = workspaces.length > 1 || features.user.library || features.recording.public;
+
+  const workspaceName = canEdit
+    ? [...workspaces, personalWorkspace].find(w => w.id === selectedWorkspaceId)!.name
+    : workspaces[0]!.name;
 
   const { icon, text } = getIconAndText(isPublic, selectedWorkspaceId, workspaceName);
 
   return (
     <button
-      className="w-full flex flex-row justify-between items-center focus:outline-none"
+      className={classNames(
+        !canEdit && "cursor-default",
+        "w-full flex flex-row justify-between items-center focus:outline-none"
+      )}
       type="button"
-      onClick={onClick}
+      onClick={canEdit ? onClick : undefined}
       style={{ minHeight: "38px" }}
     >
       <div className="space-x-2.5 flex flex-row items-center">
@@ -61,12 +70,14 @@ export default function SettingsPreview({
         </span>
         <div className="font-medium">{text}</div>
       </div>
-      <div className="space-x-2 flex flex-row items-center text-primaryAccent">
-        <div className="font-medium">Edit</div>
-        <span className="material-icons" style={{ fontSize: "24px" }}>
-          edit
-        </span>
-      </div>
+      {canEdit ? (
+        <div className="space-x-2 flex flex-row items-center text-primaryAccent">
+          <div className="font-medium">Edit</div>
+          <span className="material-icons" style={{ fontSize: "24px" }}>
+            edit
+          </span>
+        </div>
+      ) : null}
     </button>
   );
 }
