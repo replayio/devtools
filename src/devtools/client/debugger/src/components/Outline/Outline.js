@@ -122,7 +122,7 @@ export class Outline extends Component {
       return <div className="outline-pane-info">{placeholderMessage}</div>;
     }
 
-    if (!symbols || symbols.loading || true) {
+    if (!symbols || symbols.loading) {
       return (
         <div className="flex p-4 justify-center">
           <Spinner className="animate-spin h-4 w-4 text-gray-500" />

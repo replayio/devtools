@@ -170,7 +170,7 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, p
   };
 }
 
-function removeLogGroupId(logGroupId) {
+export function removeLogGroupId(logGroupId) {
   return { type: "REMOVE_LOG_GROUP_ID", logGroupId };
 }
 

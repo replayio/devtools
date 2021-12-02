@@ -26,6 +26,7 @@ import { setSkipPausing } from "../pause/skipPausing";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
 import { trackEvent } from "ui/utils/telemetry";
+import { removeLogGroupId } from "devtools/client/webconsole/actions/messages";
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -137,9 +138,21 @@ export function addBreakpoint(
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
       // to remove any installed breakpoint in the server.
-      await client.removeBreakpoint(location);
-    } else {
-      await client.setBreakpoint(breakpoint.location, breakpoint.options);
+      return await client.removeBreakpoint(location);
+    }
+
+    const [oldLogGroupId, logGroupId] = await client.setBreakpoint(
+      breakpoint.location,
+      breakpoint.options
+    );
+
+    // Keep a reference to the analysis's log group id in redux. That way, we can reference
+    // and clear it if we happen to remove the breakpoint before the analysis is finished.
+    dispatch(setBreakpointOptions(cx, location, { ...options, logGroupId }));
+
+    // This is defensive just to make sure we always clear unneeded logGroupIds.
+    if (oldLogGroupId !== logGroupId) {
+      dispatch(removeLogGroupId(oldLogGroupId));
     }
   };
 }
@@ -188,6 +201,10 @@ export function removeBreakpoint(cx, initialBreakpoint) {
     // If the breakpoint is disabled then it is not installed in the server.
     if (!breakpoint.disabled) {
       await client.removeBreakpoint(breakpoint.location);
+    }
+
+    if (breakpoint.options.logGroupId) {
+      dispatch(removeLogGroupId);
     }
   };
 }

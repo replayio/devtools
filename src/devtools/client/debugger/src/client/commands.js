@@ -114,8 +114,9 @@ function hasBreakpoint(location) {
   return !!breakpoints[locationKey(location)];
 }
 
-function setBreakpoint(location, options) {
+async function setBreakpoint(location, options) {
   maybeClearLogpoint(location);
+  const oldLogGroupId = options.logGroupId;
   options = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options };
 
@@ -133,7 +134,10 @@ function setBreakpoint(location, options) {
       promises.push(setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition));
     }
   }
-  return Promise.all(promises);
+
+  await Promise.all(promises);
+
+  return { oldLogGroupId, logGroupId: options.logGroupId };
 }
 
 function removeBreakpoint(location) {
