@@ -4,33 +4,25 @@ import { Setting, Settings } from "./types";
 import MaterialIcon from "../MaterialIcon";
 import { SettingsHeader } from "./SettingsBody";
 
-interface SettingNavigationItemProps<
-  T extends string,
-  V extends Record<string, unknown>,
-  P extends Record<string, unknown>
-> {
-  setting: Setting<T, V, P>;
+interface SettingNavigationItemProps<T extends string, P extends Record<string, unknown>> {
+  setting: Setting<T, P>;
   selectedTab?: T;
   setSelectedTab: (title: T) => void;
 }
 
-interface SettingNavigationProps<
-  T extends string,
-  V extends Record<string, unknown>,
-  P extends Record<string, unknown>
-> {
-  settings: Settings<T, V, P>;
+interface SettingNavigationProps<T extends string, P extends Record<string, unknown>> {
+  settings: Settings<T, P>;
   selectedTab?: T;
   setSelectedTab: (title: T) => void;
   title?: React.ReactNode;
   hiddenTabs?: T[];
 }
 
-function SettingNavigationItem<
-  T extends string,
-  V extends Record<string, unknown>,
-  P extends Record<string, unknown>
->({ setting, selectedTab, setSelectedTab }: SettingNavigationItemProps<T, V, P>) {
+function SettingNavigationItem<T extends string, P extends Record<string, unknown>>({
+  setting,
+  selectedTab,
+  setSelectedTab,
+}: SettingNavigationItemProps<T, P>) {
   const { title, icon } = setting;
   const onClick = () => {
     setSelectedTab(title);
@@ -44,17 +36,13 @@ function SettingNavigationItem<
   );
 }
 
-export default function SettingNavigation<
-  T extends string,
-  V extends Record<string, unknown>,
-  P extends Record<string, unknown>
->({
+export default function SettingNavigation<T extends string, P extends Record<string, unknown>>({
   hiddenTabs,
   settings,
   selectedTab,
   setSelectedTab,
   title = "Settings",
-}: SettingNavigationProps<T, V, P>) {
+}: SettingNavigationProps<T, P>) {
   return (
     <nav style={{ maxWidth: 240 }}>
       <SettingsHeader>{title}</SettingsHeader>

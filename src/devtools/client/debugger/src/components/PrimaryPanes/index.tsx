@@ -43,7 +43,7 @@ class PrimaryPanes extends Component<PropsFromRedux> {
       onToggle: () => {
         this.props.toggleSourcesCollapse();
       },
-      collapsed: prefs.sourcesCollapsed,
+      collapsed: !!prefs.sourcesCollapsed,
       button: <QuickOpenButton />,
     };
   }
