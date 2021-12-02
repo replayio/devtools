@@ -56,7 +56,7 @@ export default function SettingNavigation<
   title = "Settings",
 }: SettingNavigationProps<T, V, P>) {
   return (
-    <nav>
+    <nav style={{ maxWidth: 240 }}>
       <SettingsHeader>{title}</SettingsHeader>
       <ul>
         {settings
