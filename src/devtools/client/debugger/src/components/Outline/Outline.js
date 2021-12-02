@@ -6,7 +6,7 @@ import React, { Component } from "react";
 import { connect } from "../../utils/connect";
 
 import { findClosestEnclosedSymbol } from "../../utils/ast";
-import { getTruncatedFileName } from "../../utils/source";
+import Spinner from "ui/components/shared/Spinner";
 
 import actions from "../../actions";
 import {
@@ -123,12 +123,11 @@ export class Outline extends Component {
     }
 
     if (!symbols || symbols.loading) {
-      if (this.props.selectedSource) {
-        const filename = getTruncatedFileName(this.props.selectedSource, "");
-        return <div className="outline-pane-info">{`Loading ${filename}...`}</div>;
-      }
-
-      return <div className="outline-pane-info">Loading...</div>;
+      return (
+        <div className="flex p-4 justify-center">
+          <Spinner className="animate-spin h-4 w-4 text-gray-500" />
+        </div>
+      );
     }
 
     const symbolsToDisplay = symbols.functions.filter(func => func.name != "anonymous");
