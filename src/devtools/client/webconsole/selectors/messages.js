@@ -113,3 +113,7 @@ export const getClosestMessage = createSelector(
 export function getMessage(state, id) {
   return getAllMessagesById(state).get(id);
 }
+
+export function hasPendingLogGroupIds(state) {
+  return !!state.messages.pendingLogGroupIds.size;
+}

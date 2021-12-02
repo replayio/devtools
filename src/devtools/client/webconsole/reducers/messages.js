@@ -45,6 +45,8 @@ const MessageState = overrides =>
         hasExecutionPoints: false,
         // Id of the last messages that was added.
         lastMessageId: null,
+        // Set of logpointIds for analyses that have been kicked off but haven't resolved yet.
+        pendingLogGroupIds: new Set(),
       },
       overrides
     )
@@ -64,6 +66,7 @@ function cloneState(state) {
     pausedExecutionPointTime: state.pausedExecutionPointTime,
     hasExecutionPoints: state.hasExecutionPoints,
     lastMessageId: state.lastMessageId,
+    pendingLogGroupIds: new Set(state.pendingLogGroupIds),
   };
 }
 
@@ -171,6 +174,23 @@ function messages(state = MessageState(), action) {
         }
       });
       return newState;
+
+    case "REMOVE_LOG_GROUP_ID": {
+      const newPendingLogGroupIds = new Set(state.pendingLogGroupIds);
+      newPendingLogGroupIds.delete(action.logGroupId);
+
+      return {
+        ...state,
+        pendingLogGroupIds: newPendingLogGroupIds,
+      };
+    }
+
+    case "ADD_LOG_GROUP_ID": {
+      return {
+        ...state,
+        pendingLogGroupIds: new Set([...state.pendingLogGroupIds, action.logGroupId]),
+      };
+    }
 
     case constants.MESSAGES_CLEAR:
       return MessageState({});

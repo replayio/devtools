@@ -34,7 +34,11 @@ export function setupMessages(store) {
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
   LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
     store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
-  LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
+  LogpointHandlers.clearLogpoint = logGroupId => {
+    store.dispatch(removeLogGroupId(logGroupId));
+    store.dispatch(messagesClearLogpoint(logGroupId));
+  };
+  LogpointHandlers.onError = logGroupId => store.dispatch(removeLogGroupId(logGroupId));
 
   ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));
 }
@@ -139,6 +143,7 @@ function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) 
     };
 
     dispatch(dispatchMessageAdd(packet));
+    dispatch({ type: "ADD_LOG_GROUP_ID", logGroupId });
   };
 }
 
@@ -161,7 +166,12 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, p
     };
 
     dispatch(dispatchMessageAdd(packet));
+    dispatch({ type: "REMOVE_LOG_GROUP_ID", logGroupId });
   };
+}
+
+function removeLogGroupId(logGroupId) {
+  return { type: "REMOVE_LOG_GROUP_ID", logGroupId };
 }
 
 function dispatchMessageAdd(packet) {

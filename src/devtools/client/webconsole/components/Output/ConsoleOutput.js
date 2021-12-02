@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+const React = require("react");
 const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
@@ -11,6 +12,7 @@ const { isVisible } = require("ui/utils/dom");
 const ReactDOM = require("react-dom");
 const { selectors } = require("ui/reducers");
 const { isDemo } = require("ui/utils/environment");
+const ConsoleLoadingBar = require("./ConsoleLoadingBar").default;
 
 const PropTypes = require("prop-types");
 const {
@@ -170,6 +172,7 @@ class ConsoleOutput extends Component {
           this.outputNode = node;
         },
       },
+      <ConsoleLoadingBar />,
       messageNodes
     );
   }

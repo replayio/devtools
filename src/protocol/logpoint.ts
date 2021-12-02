@@ -35,6 +35,7 @@ export const LogpointHandlers: {
     location: Location
   ) => void;
   clearLogpoint?: (logGroupId: string) => void;
+  onError?: (logGroupId: string) => void;
 } = {};
 
 let store: UIStore;
@@ -286,6 +287,7 @@ async function setMultiSourceLogpoint(
   try {
     await analysisManager.runAnalysis(params, handler);
   } catch {
+    LogpointHandlers.onError!(logGroupId);
     saveAnalysisError(locations, condition);
     return;
   }
