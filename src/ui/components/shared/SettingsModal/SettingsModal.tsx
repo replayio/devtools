@@ -7,17 +7,12 @@ import { Settings } from "./types";
 
 import classnames from "classnames";
 
-export default function SettingsModal<
-  T extends string,
-  V extends Record<string, unknown>,
-  P extends Record<string, unknown>
->({
+export default function SettingsModal<T extends string, P extends Record<string, unknown>>({
   tab,
   hiddenTabs,
   loading,
   panelProps,
   settings,
-  values,
   size = "sm",
   title,
 }: {
@@ -25,8 +20,7 @@ export default function SettingsModal<
   hiddenTabs?: T[];
   loading?: boolean;
   panelProps: P;
-  settings: Settings<T, V, P>;
-  values?: V;
+  settings: Settings<T, P>;
   size?: "sm" | "lg";
   title?: React.ReactNode;
 }) {
@@ -51,7 +45,7 @@ export default function SettingsModal<
     <div className={classnames("settings-modal", { "settings-modal-large": size === "lg" })}>
       <Modal>
         <SettingsNavigation {...{ hiddenTabs, settings, selectedTab, setSelectedTab, title }} />
-        <SettingsBody values={values} selectedSetting={selectedSetting} panelProps={panelProps} />
+        <SettingsBody selectedSetting={selectedSetting} panelProps={panelProps} />
       </Modal>
     </div>
   );

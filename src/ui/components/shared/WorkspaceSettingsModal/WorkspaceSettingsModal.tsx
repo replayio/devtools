@@ -115,7 +115,6 @@ export type SettingsTabTitle =
 
 const settings: Settings<
   SettingsTabTitle,
-  {},
   {
     settings?: any;
     isAdmin: boolean;

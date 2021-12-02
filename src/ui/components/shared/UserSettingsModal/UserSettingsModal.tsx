@@ -98,13 +98,16 @@ function Legal() {
   );
 }
 
-function UserAPIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
+function UserAPIKeys() {
+  const { userSettings, loading } = hooks.useGetUserSettings();
   const { addUserApiKey, loading: addLoading, error: addError } = hooks.useAddUserApiKey();
   const { deleteUserApiKey } = hooks.useDeleteUserApiKey();
 
+  if (loading) return null;
+
   return (
     <APIKeys
-      apiKeys={apiKeys}
+      apiKeys={userSettings.apiKeys}
       description="API Keys allow you to upload recordings programmatically from your automated tests or from your continuous integration environment."
       loading={addLoading}
       error={addError}
@@ -119,13 +122,7 @@ function UserAPIKeys({ apiKeys }: { apiKeys: ApiKey[] }) {
   );
 }
 
-function ApiKeysWrapper({ settings }: { settings?: UserSettings }) {
-  if (!settings) return null;
-
-  return <UserAPIKeys apiKeys={settings.apiKeys} />;
-}
-
-const getSettings = (): Settings<SettingsTabTitle, CombinedUserSettings, {}> => [
+const getSettings = (): Settings<SettingsTabTitle, {}> => [
   {
     title: "Personal",
     icon: "person",
@@ -134,7 +131,7 @@ const getSettings = (): Settings<SettingsTabTitle, CombinedUserSettings, {}> => 
   {
     title: "API Keys",
     icon: "vpn_key",
-    component: ApiKeysWrapper,
+    component: UserAPIKeys,
   },
   {
     title: "Preferences",
