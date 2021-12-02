@@ -51,7 +51,7 @@ const useImageUpload = (
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const { img, err, onUpload } = useImageUpload(workspace?.logo, 250, logo =>
+  const { img, err, onUpload } = useImageUpload(workspace?.logo, 50, logo =>
     updateWorkspaceSettings({
       variables: {
         workspaceId,
