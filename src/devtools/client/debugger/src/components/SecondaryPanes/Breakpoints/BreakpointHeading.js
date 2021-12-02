@@ -11,6 +11,7 @@ import { getHasSiblingOfSameName, getContext } from "../../../selectors";
 import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { CloseButton } from "../../shared/Button";
+import { Redacted } from "ui/components/Redacted";
 
 class BreakpointHeading extends PureComponent {
   onContextMenu = e => {
@@ -56,7 +57,7 @@ class BreakpointHeading extends PureComponent {
         onContextMenu={this.onContextMenu}
         onClick={this.onClick}
       >
-        <div className="breakpoint-heading-label">{fileName}</div>
+        <Redacted className="breakpoint-heading-label">{fileName}</Redacted>
         <div className="breakpoint-heading-actions">
           <CloseButton
             handleClick={e => this.removeBreakpoint(e)}

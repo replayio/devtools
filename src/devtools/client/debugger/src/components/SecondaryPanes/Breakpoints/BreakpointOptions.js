@@ -3,6 +3,7 @@ import actions from "../../../actions";
 import { getContext } from "../../../selectors";
 import { connect } from "../../../utils/connect";
 import memoize from "lodash/memoize";
+import { RedactedSpan } from "ui/components/Redacted";
 
 const highlightText = memoize(
   (text = "", editor) => {
@@ -14,7 +15,7 @@ const highlightText = memoize(
 );
 
 function Highlighted({ expression, editor }) {
-  return <span dangerouslySetInnerHTML={highlightText(expression, editor)} />;
+  return <RedactedSpan dangerouslySetInnerHTML={highlightText(expression, editor)} />;
 }
 
 function BreakpointOptions({ breakpoint, editor }) {
@@ -23,7 +24,7 @@ function BreakpointOptions({ breakpoint, editor }) {
   if (!condition) {
     return (
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-        <Highlighted expression={logValue} editor={editor} />;
+        <Highlighted expression={logValue} editor={editor} />
       </span>
     );
   }
