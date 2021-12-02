@@ -4,6 +4,7 @@
 
 // Adapter for using server-side highlighter code.
 
+import { ThreadFront } from "protocol/thread/thread";
 import { NodeFront } from "protocol/thread/node";
 import { NodeBoundsFront } from "protocol/thread/bounds";
 import { BoxModelHighlighter } from "devtools/server/actors/highlighters/box-model";
@@ -12,6 +13,10 @@ class Highlighter {
   private boxModelHighlighter: BoxModelHighlighter | undefined;
   currentNode: NodeFront | NodeBoundsFront | null = null;
   private timeout: NodeJS.Timeout | undefined;
+
+  constructor() {
+    ThreadFront.on("paused", () => this.unhighlight());
+  }
 
   async highlight(node: NodeFront | NodeBoundsFront, duration?: number) {
     if (!node) {

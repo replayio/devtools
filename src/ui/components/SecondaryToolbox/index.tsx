@@ -164,22 +164,10 @@ function SecondaryToolbox({
         </header>
       )}
       <Redacted className="secondary-toolbox-content text-xs">
-        {/* {selectedPanel === "network" && <NetworkMonitor />} */}
-        <div className={classNames("h-full", { hidden: selectedPanel !== "network" })}>
-          <NetworkMonitor />
-        </div>
-        {/* {selectedPanel === "console" ? <ConsolePanel /> : null} */}
-        <div className={classNames("h-full", { hidden: selectedPanel !== "console" })}>
-          <ConsolePanel />
-        </div>
-        {/* {selectedPanel === "inspector" ? <InspectorPanel /> : null} */}
-        <div className={classNames("h-full", { hidden: selectedPanel !== "inspector" })}>
-          <InspectorPanel />
-        </div>
-        {/* {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null} */}
-        <div className={classNames("h-full", { hidden: selectedPanel !== "react-components" })}>
-          <ReactDevtoolsPanel />
-        </div>
+        {selectedPanel === "network" && <NetworkMonitor />}
+        {selectedPanel === "console" ? <ConsolePanel /> : null}
+        {selectedPanel === "inspector" ? <InspectorPanel /> : null}
+        {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
       </Redacted>
     </div>
   );
