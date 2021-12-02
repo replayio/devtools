@@ -102,12 +102,36 @@ export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; l
   };
 }
 
+export function useUpdateWorkspaceLogo() {
+  const [updateWorkspaceLogo] = useMutation<
+    any,
+    {
+      workspaceId: string;
+      logo: string | null;
+    }
+  >(
+    gql`
+      mutation UpdateWorkspaceLogo($workspaceId: ID!, $logo: String) {
+        updateWorkspaceLogo(input: { workspaceId: $workspaceId, logo: $logo }) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetNonPendingWorkspaces"],
+    }
+  );
+
+  return updateWorkspaceLogo;
+}
+
 export function useUpdateWorkspaceSettings() {
   const [updateWorkspaceSettings] = useMutation<
     any,
     {
       workspaceId: string;
       name?: string | null;
+      logo?: string | null;
       motd?: string | null;
       features?: Partial<WorkspaceSettings["features"]>;
     }
@@ -144,6 +168,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
               node {
                 id
                 name
+                logo
                 invitationCode
                 domain
                 isDomainLimitedCode

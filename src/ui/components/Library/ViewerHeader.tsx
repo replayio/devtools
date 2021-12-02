@@ -13,5 +13,7 @@ export function ViewerHeaderLeft({
 }: {
   children: React.ReactChild | React.ReactChild[];
 }) {
-  return <div className="flex flex-row space-x-2 text-2xl font-semibold">{children}</div>;
+  return (
+    <div className="flex flex-row space-x-2 text-2xl font-semibold items-center">{children}</div>
+  );
 }

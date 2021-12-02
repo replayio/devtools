@@ -19,9 +19,48 @@ const Row = ({ children }: { children: React.ReactNode }) => {
   return <div className="flex items-center">{children}</div>;
 };
 
+const useImageUpload = (
+  image: string | undefined,
+  maxSize: number,
+  callback: (img: string) => void
+) => {
+  const [err, setErr] = useState<string>();
+  const [img, setImg] = useState(image);
+
+  const onUpload = (input: HTMLInputElement) => {
+    if (!input.files?.[0]) return;
+
+    input.files[0].arrayBuffer().then(b => {
+      if (maxSize && b.byteLength > maxSize * 1024) {
+        setErr(`Image must be less than ${maxSize} kilobytes`);
+        return;
+      }
+
+      const ua = new Uint8Array(b);
+      const str = ua.reduce((a, b) => a + String.fromCharCode(b), "");
+      const newImage = btoa(str);
+      setErr(undefined);
+      setImg(newImage);
+      callback(newImage);
+    });
+  };
+
+  return { img, err, onUpload };
+};
+
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
+  const updateWorkspaceLogo = hooks.useUpdateWorkspaceLogo();
+  const { img, err, onUpload } = useImageUpload(workspace?.logo, 50, logo =>
+    updateWorkspaceLogo({
+      variables: {
+        workspaceId,
+        logo,
+      },
+    })
+  );
+
   const [name, setName] = useDebounceState(
     workspace?.name,
     name =>
@@ -51,12 +90,25 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
           />
         </Input>
       </Row>
-      {/* <Row>
-        <Label>Logo</Label>
+      <Row>
+        <Label className="self-start">Logo</Label>
         <Input>
-          <button className="border p-2 rounded-md">Upload</button>
+          <div className="flex flex-col items-start space-y-4">
+            {img ? <img className="block max-h-12" src={`data:image/png;base64,${img}`} /> : null}
+            <label className="cursor-pointer border rounded-md p-2 flex-inline items-center justify-center">
+              <input
+                type="file"
+                className="invisible h-1 w-0"
+                accept="image/png"
+                onChange={e => onUpload(e.currentTarget)}
+              />
+              <span>Upload</span>
+              <span className="text-sm material-icons ml-2">upload</span>
+            </label>
+            {err ? <div className="text-red-500">{err}</div> : null}
+          </div>
         </Input>
-      </Row> */}
+      </Row>
     </div>
   );
 };

@@ -17,6 +17,7 @@ import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
 import GeneralSettings from "./GeneralSettings";
 import OrganizationSettings from "./OrganizationSettings";
+import Base64Image from "../Base64Image";
 
 export function WorkspaceMembers({
   members,
@@ -250,7 +251,13 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
       panelProps={{ isAdmin, workspaceId, ...rest }}
       settings={settings}
       size="lg"
-      title={workspace.name || "Team Settings"}
+      title={
+        workspace.logo ? (
+          <Base64Image src={workspace.logo} className="max-h-12" />
+        ) : (
+          workspace.name || "Team Settings"
+        )
+      }
     />
   );
 }
