@@ -18,7 +18,7 @@ import Outline from "../Outline/Outline";
 import SourcesTree from "./SourcesTree";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { prefs } from "devtools/client/webconsole/utils/prefs";
+import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import Accordion from "ui/components/Accordion";
 import QuickOpenButton from "./QuickOpenButton";
 
