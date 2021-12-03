@@ -19,13 +19,13 @@ export function getOrganizationSettings(workspaces: Workspace[]) {
   return org?.settings || getDefaultOrganizationSettings();
 }
 
-export function isPublicDisabled(workspaces: Workspace[], selectedWorkspaceId: string) {
+export function isPublicDisabled(workspaces: Workspace[], selectedWorkspaceId: string | null) {
   const workspace = workspaces.find(w => w.id === selectedWorkspaceId);
   const publicDisabledMyLibrary = workspaces.some(
     w => w.settings.features.recording.public === false
   );
   return (
-    (selectedWorkspaceId === "My Library" && publicDisabledMyLibrary) ||
+    (!selectedWorkspaceId && publicDisabledMyLibrary) ||
     workspace?.settings.features.recording.public === false
   );
 }

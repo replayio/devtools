@@ -6,6 +6,7 @@ import { Recording, Workspace } from "ui/types";
 import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
+import { isPublicDisabled } from "ui/utils/org";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>
@@ -37,8 +38,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   const { workspaces } = hooks.useGetNonPendingWorkspaces();
   const workspaceId = recording.workspace?.id || null;
   const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
-  const workspace = workspaces.find(w => w.id === workspaceId);
-  const isPrivate = recording.private || workspace?.settings.features.recording.public === false;
+  const isPrivate = recording.private;
   const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
 
   const setPublic = () => {
@@ -96,13 +96,13 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
       position="bottom-right"
     >
       <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
-        {workspace?.settings.features.recording.public === true ? (
+        {isPublicDisabled(workspaces, workspaceId) ? null : (
           <DropdownItem onClick={setPublic}>
             <DropdownItemContent icon="link" selected={!isPrivate}>
               Anyone with the link
             </DropdownItemContent>
           </DropdownItem>
-        ) : null}
+        )}
         <DropdownItem onClick={() => handleMoveToTeam(null)}>
           <DropdownItemContent icon="domain" selected={isPrivate && !workspaceId}>
             Only people with access
