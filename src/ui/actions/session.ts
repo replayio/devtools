@@ -139,10 +139,10 @@ export function createSession(recordingId: string): UIThunkAction {
       ThreadFront.setTest(getTest() || undefined);
       ThreadFront.recordingId = recordingId;
 
+      dispatch(showLoadingProgress());
       const { sessionId } = await sendMessage("Recording.createSession", {
         recordingId,
       });
-      dispatch(showLoadingProgress());
 
       window.sessionId = sessionId;
       ThreadFront.setSessionId(sessionId);
