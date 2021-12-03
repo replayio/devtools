@@ -1,17 +1,23 @@
+const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
 const self = "'self' https://*.replay.io wss://*.replay.io";
-const csp = `
+const csp = phase => {
+  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+  return `
   frame-ancestors ${self};
   default-src ${self};
-  style-src ${self} 'unsafe-inline';
-  script-src ${self} 'unsafe-eval' data: blob: https://*.stripe.com https://*.lr-ingest.io https://*.intercom.io https://*.intercomcdn.com https://*.launchdarkly.com;
+  style-src ${self} ${isDev ? "'unsafe-inline'" : ""};
+  script-src ${self} ${
+    isDev ? "'unsafe-eval' data: blob:" : ""
+  } https://*.stripe.com https://*.lr-ingest.io https://*.intercom.io https://*.intercomcdn.com https://*.launchdarkly.com;
   connect-src ${self} https://webreplay.us.auth0.com https://*.launchdarkly.com/ https://*.stripe.com https://*.sentry.io https://*.intercom.io wss://*.intercom.io;
   img-src ${self} https: data:;
   frame-src ${self} https://webreplay.us.auth0.com https://*.stripe.com;
 `;
+};
 
-module.exports = {
+module.exports = phase => ({
   productionBrowserSourceMaps: true,
 
   async headers() {
@@ -25,7 +31,7 @@ module.exports = {
           },
           {
             key: "Content-Security-Policy",
-            value: csp.split("\n").join(""),
+            value: csp(phase).split("\n").join(""),
           },
         ],
       },
@@ -70,4 +76,4 @@ module.exports = {
 
     return config;
   },
-};
+});
