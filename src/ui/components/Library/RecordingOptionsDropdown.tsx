@@ -82,7 +82,7 @@ function RecordingOptionsDropdown({
     >
       <Dropdown>
         <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
-        {isPublicDisabled(workspaces, currentWorkspaceId || "My Library") ? null : (
+        {isPublicDisabled(workspaces, currentWorkspaceId) ? null : (
           <DropdownItem onClick={toggleIsPrivate}>{`Make ${
             isPrivate ? "public" : "private"
           }`}</DropdownItem>
