@@ -3,6 +3,24 @@ const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 module.exports = {
   productionBrowserSourceMaps: true,
 
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://*.replay.io/",
+          },
+        ],
+      },
+    ];
+  },
+
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     const entry = config.entry;
     config.entry = () => {
