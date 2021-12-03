@@ -6,7 +6,7 @@ const csp = `
   default-src ${self};
   style-src ${self} 'unsafe-inline';
   script-src ${self} 'unsafe-eval' data: blob: https://*.stripe.com https://*.lr-ingest.io https://*.intercom.io https://*.intercomcdn.com https://*.launchdarkly.com;
-  connect-src ${self} https://webreplay.us.auth0.com https://*.launchdarkly.com/ https://*.stripe.com https://*.intercom.io wss://*.intercom.io;
+  connect-src ${self} https://webreplay.us.auth0.com https://*.launchdarkly.com/ https://*.stripe.com https://*.sentry.io https://*.intercom.io wss://*.intercom.io;
   img-src ${self} https: data:;
   frame-src ${self} https://webreplay.us.auth0.com https://*.stripe.com;
 `;
