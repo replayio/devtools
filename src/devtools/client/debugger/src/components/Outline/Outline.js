@@ -22,9 +22,22 @@ import { isVisible } from "ui/utils/dom";
 import { OutlineFunction } from "./OutlineFunction";
 import { filterOutlineItem } from "./filterOutlineItem";
 import { ClassFunctionsList } from "./ClassFunctionsList";
+import memoize from "lodash/memoize";
 
 export const getFunctionKey = ({ name, location }) =>
   `${name}:${location.start.line}:${location.start.column}`;
+
+const findNamedFunctions = memoize(function findNamedFunctions(filter, functions) {
+  let classes = uniq(functions.map(func => func.klass));
+
+  const namedFunctions = functions
+    .filter(
+      func => filterOutlineItem(func.name, filter) && !func.klass && !classes.includes(func.name)
+    )
+    .slice(0, 500);
+
+  return { namedFunctions, classes };
+});
 
 export class Outline extends Component {
   state = { filter: "", focusedItem: null };
@@ -80,10 +93,7 @@ export class Outline extends Component {
 
   renderFunctions(functions) {
     const { filter, focusedItem } = this.state;
-    let classes = uniq(functions.map(func => func.klass));
-    let namedFunctions = functions.filter(
-      func => filterOutlineItem(func.name, filter) && !func.klass && !classes.includes(func.name)
-    );
+    let { namedFunctions, classes } = findNamedFunctions(filter, functions);
 
     return (
       <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">

@@ -179,7 +179,7 @@ class Editor extends PureComponent {
     return fromEditorLine(line);
   }
 
-  onEditorScroll = debounce(this.props.updateViewport, 75);
+  onEditorScroll = debounce(this.props.updateViewport, 200);
 
   onKeyDown(e) {
     const { codeMirror } = this.state.editor;

@@ -3,8 +3,21 @@ import { OutlineClassFunctions } from "./OutlineClassFunctions";
 import { OutlineFunction } from "./OutlineFunction";
 import { filterOutlineItem } from "./filterOutlineItem";
 import { getFunctionKey } from "./Outline";
+import memoize from "lodash/memoize";
 
-export function ClassFunctionsList({
+const findFunctions = memoize(
+  function findFunctions(klass, filter, symbols, functions) {
+    const classFunc = functions.find(func => func.name === klass);
+    const classInfo = symbols.classes.find(c => c.name === klass);
+    let classFunctions = functions
+      .filter(func => filterOutlineItem(func.name, filter) && !!func.klass)
+      .slice(0, 50);
+    return { classFunc, classInfo, classFunctions };
+  },
+  (klass, filter) => klass + filter
+);
+
+export const ClassFunctionsList = React.memo(function ClassFunctionsList({
   symbols,
   functions,
   outlineList,
@@ -17,12 +30,7 @@ export function ClassFunctionsList({
     return null;
   }
 
-  const classFunc = functions.find(func => func.name === klass);
-  const classInfo = symbols.classes.find(c => c.name === klass);
-  let classFunctions = functions.filter(
-    func => filterOutlineItem(func.name, filter) && !!func.klass
-  );
-
+  const { classFunctions, classFunc, classInfo } = findFunctions(klass, filter, symbols, functions);
   const item = classFunc || classInfo;
   const isFocused = focusedItem === item;
 
@@ -45,4 +53,4 @@ export function ClassFunctionsList({
       ))}
     </OutlineClassFunctions>
   );
-}
+});
