@@ -515,10 +515,9 @@ export function refreshGraphics() {
       cx.drawImage(image, 0, 0);
     }
 
-    onRefreshGraphics({
-      ...bounds,
-      gDevicePixelRatio,
-    });
+    if (onRefreshGraphics) {
+      onRefreshGraphics({ ...bounds, gDevicePixelRatio });
+    }
 
     // Apply the same transforms to any displayed highlighter.
     const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
