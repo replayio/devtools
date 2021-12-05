@@ -3,7 +3,7 @@ import React, { ComponentProps } from "react";
 import { Story, Meta } from "@storybook/react";
 
 import RequestTable from "ui/components/NetworkMonitor/RequestTable";
-import { requestProps } from "./utils";
+import { requestSummary } from "./utils";
 
 export default {
   title: "Network Monitor/Request Table",
@@ -15,15 +15,14 @@ const Template: Story<ComponentProps<typeof RequestTable>> = args => <RequestTab
 export const Loaded = Template.bind({});
 
 const requests = [
-  requestProps("1", "https://app.replay.io/graphql", 200),
-  requestProps("2", "https://app.replay.io/graphql", 500, "POST"),
-  requestProps("3", "https://www.replay.io", 301),
-  requestProps("4", "https://app.replay.io/graphql", 400),
+  requestSummary("1", "https://app.replay.io/graphql", 200),
+  requestSummary("2", "https://app.replay.io/graphql", 500, "POST"),
+  requestSummary("3", "https://www.replay.io", 301),
+  requestSummary("4", "https://app.replay.io/graphql", 400),
 ];
 
 Loaded.args = {
   currentTime: 3,
-  events: requests.flatMap(r => r.events),
-  requests: requests.map(r => r.info),
+  data: requests,
   seek: (point: string, time: number, hasFrames: boolean, pauseId?: string | undefined) => false,
 };

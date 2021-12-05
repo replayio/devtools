@@ -1,4 +1,5 @@
 import { RequestInfo, RequestEventInfo } from "@recordreplay/protocol";
+import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 export const eventsFor = (
   id: string,
@@ -68,6 +69,31 @@ export const eventsFor = (
       },
     },
   ];
+};
+
+export const requestSummary = (
+  id: string,
+  url: string,
+  status: number,
+  method: string = "GET"
+): RequestSummary => {
+  return {
+    domain: "replay.io",
+    documentType: "html",
+    end: 1600,
+    id,
+    method,
+    name: "replay.io",
+    point: { point: "0", time: 0 },
+    queryParams: [["foo", "bar"]],
+    triggerPoint: { point: "0", time: 0 },
+    requestHeaders: [{ name: "foo", value: "bar" }],
+    responseHeaders: [{ name: "foo", value: "bar" }],
+    start: 0,
+    status,
+    time: 1600,
+    url,
+  };
 };
 
 export const requestProps = (

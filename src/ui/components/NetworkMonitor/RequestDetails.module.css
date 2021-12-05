@@ -2,19 +2,19 @@
   background: white;
   display: flex;
   flex-direction: column;
+  overflow-x: auto;
   font-size: 12px;
   height: 100%;
 }
 
-.headerTable,
-.request {
+.requestDetails .request {
   display: flex;
-  flex: 1 1 0;
-  overflow: scroll;
+  flex: 0 1 auto;
 }
 
-.request {
-  flex: 0 1 auto;
+.headerTable {
+  display: flex;
+  flex: 0 1 0;
 }
 
 h2.title {

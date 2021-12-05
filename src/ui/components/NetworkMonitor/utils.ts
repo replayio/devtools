@@ -27,6 +27,23 @@ export type RequestSummary = {
   url: string;
 };
 
+export const REQUEST_TYPES = {
+  css: "CSS",
+  font: "Font",
+  html: "HTML",
+  img: "Image",
+  javascript: "Javascript",
+  json: "JSON",
+  manifest: "Manifest",
+  media: "Media",
+  other: "Other",
+  wasm: "WASM",
+  websocket: "WS",
+  xhr: "Fetch/XHR",
+};
+
+export type RequestType = keyof typeof REQUEST_TYPES;
+
 export type RequestEventMap = {
   request: { time: number; event: RequestOpenEvent };
   response: { time: number; event: RequestResponseEvent };
@@ -51,11 +68,12 @@ const name = (url: string): string =>
     .split("/")
     .filter(f => f.length)
     .pop() || "";
+
 const queryParams = (url: string): [string, string][] => {
   //@ts-ignore
   return Array.from(new URL(url).searchParams.entries() as [string, string][]);
 };
-const documentType = (headers: Header[]): string => {
+const getDocumentType = (headers: Header[]): string => {
   const contentType =
     headers.find(h => h.name.toLowerCase() === "content-type")?.value || "unknown";
   // chop off any charset or other extra data
@@ -64,7 +82,8 @@ const documentType = (headers: Header[]): string => {
 
 export const partialRequestsToCompleteSummaries = (
   requests: RequestInfo[],
-  events: RequestEventInfo[]
+  events: RequestEventInfo[],
+  types: Set<RequestType>
 ): RequestSummary[] => {
   const eventsMap = eventsByRequestId(events);
   const summaries = requests
@@ -76,9 +95,12 @@ export const partialRequestsToCompleteSummaries = (
     .map((r: RequestInfo & { events: RequestEventMap }) => {
       const request = r.events.request;
       const response = r.events.response;
+      const documentType = getDocumentType(response.event.responseHeaders);
+      const type: RequestType = (documentType?.split("/")?.[1] || documentType) as RequestType;
       return {
         domain: host(request.event.requestUrl),
-        documentType: documentType(response.event.responseHeaders),
+        documentType,
+        type,
         end: response.time,
         id: r.id,
         requestHeaders: request.event.requestHeaders,
@@ -96,7 +118,26 @@ export const partialRequestsToCompleteSummaries = (
         triggerPoint: r.triggerPoint,
         url: request.event.requestUrl,
       };
+    })
+    .filter(row => {
+      if (types.size === 0) {
+        return true;
+      }
+
+      if (types.has(row.type)) {
+        return true;
+      }
+
+      if (types.has("font") && row.type.match(/(woff|ttf)/)) {
+        return true;
+      }
+
+      if (types.has("img") && row.type.match(/(svg|jpeg|png|gif)/)) {
+        return true;
+      }
+      return false;
     });
+
   summaries.sort((a, b) => compareNumericStrings(a.point.point, b.point.point));
   return summaries;
 };

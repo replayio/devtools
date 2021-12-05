@@ -7,31 +7,52 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
-import { RequestSummary } from "./utils";
+import { RequestSummary, RequestType } from "./utils";
+import FilterBar from "./FilterBar";
+import Table from "./Table";
 
 export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFromRedux) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
+  const [types, setTypes] = useState<Set<RequestType>>(new Set(["json"]));
+
+  const toggleType = (type: RequestType) => {
+    if (types.has(type)) {
+      types.delete(type);
+    } else {
+      types.add(type);
+    }
+    setTypes(new Set(types));
+  };
 
   return (
-    <SplitBox
-      className="max-h-full"
-      initialSize="50%"
-      minSize={selectedRequest ? "20%" : "100%"}
-      maxSize={selectedRequest ? "80%" : "100%"}
-      endPanel={selectedRequest ? <RequestDetails request={selectedRequest} /> : <div />}
-      startPanel={
-        <RequestTable
-          currentTime={currentTime}
-          events={events}
-          onClick={setSelectedRequest}
-          requests={requests}
-          seek={seek}
-          selectedRequest={selectedRequest}
-        />
-      }
-      vert={true}
-      splitterSize={8}
-    />
+    <div className="overflow-hidden h-full">
+      <Table events={events} requests={requests} types={types}>
+        {({ table, data }: { table: any; data: RequestSummary[] }) => (
+          <>
+            <FilterBar types={types} toggleType={toggleType} table={table} />
+            <SplitBox
+              className="max-h-full"
+              initialSize="50%"
+              minSize={selectedRequest ? "20%" : "100%"}
+              maxSize={selectedRequest ? "80%" : "100%"}
+              endPanel={selectedRequest ? <RequestDetails request={selectedRequest} /> : <div />}
+              startPanel={
+                <RequestTable
+                  table={table}
+                  data={data}
+                  currentTime={currentTime}
+                  onRowSelect={setSelectedRequest}
+                  seek={seek}
+                  selectedRequest={selectedRequest}
+                />
+              }
+              vert={true}
+              splitterSize={2}
+            />
+          </>
+        )}
+      </Table>
+    </div>
   );
 };
 

@@ -3,6 +3,8 @@ import { RequestSummary } from "./utils";
 import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
 import sortBy from "lodash/sortBy";
+import PanelTabs from "devtools/client/shared/components/PanelTabs";
+import ComingSoon from "./ComingSoon";
 
 interface Detail {
   name: string;
@@ -12,14 +14,14 @@ interface Detail {
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
     <div className={className}>
-      <div className={classNames("text-gray-400 px-4 flex flex-col")}>
+      <div className={classNames("px-4 flex flex-col")}>
         {details.map(h => (
           <div title={h.name} className={classNames(styles.row, styles.value)} key={h.name}>
             {h.name}
           </div>
         ))}
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col text-gray-400 ">
         {details.map(h => (
           <div title={h.value} className={classNames(styles.row, styles.value)} key={h.name}>
             {h.value}
@@ -37,7 +39,7 @@ const TriangleToggle = ({ open }: { open: boolean }) => (
   />
 );
 
-const RequestDetails = ({ request }: { request: RequestSummary }) => {
+const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [requestExpanded, setRequestExpanded] = useState(true);
   const [requestHeadersExpanded, setRequestHeadersExpanded] = useState(true);
   const [responseHeadersExpanded, setResponseHeadersExpanded] = useState(true);
@@ -51,15 +53,12 @@ const RequestDetails = ({ request }: { request: RequestSummary }) => {
     () => sortBy(request?.responseHeaders, r => r.name.toLowerCase()),
     [request]
   );
-
-  if (!request) {
-    return null;
-  }
-
   return (
-    <div className={classNames("border-l w-full", styles.requestDetails)}>
+    <>
       <div
-        className={classNames("flex items-center py-1 whitespace-nowrap cursor-pointer")}
+        className={classNames(
+          "flex items-center py-1 whitespace-nowrap cursor-pointer font-semibold"
+        )}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
         <TriangleToggle open={requestExpanded} />
@@ -79,7 +78,7 @@ const RequestDetails = ({ request }: { request: RequestSummary }) => {
         />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
       >
         <TriangleToggle open={requestHeadersExpanded} />
@@ -89,7 +88,7 @@ const RequestDetails = ({ request }: { request: RequestSummary }) => {
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
         onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
       >
         <TriangleToggle open={responseHeadersExpanded} />
@@ -101,7 +100,7 @@ const RequestDetails = ({ request }: { request: RequestSummary }) => {
       {request.queryParams.length > 0 && (
         <div>
           <h2
-            className={classNames("py-1 border-t cursor-pointer", styles.title)}
+            className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
             onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
           >
             <TriangleToggle open={queryParametersExpanded} />
@@ -118,6 +117,33 @@ const RequestDetails = ({ request }: { request: RequestSummary }) => {
           )}
         </div>
       )}
+    </>
+  );
+};
+
+const RequestDetails = ({ request }: { request: RequestSummary }) => {
+  const [activeTab, setActiveTab] = useState("headers");
+
+  const tabs = [
+    { id: "headers", title: "Headers" },
+    { id: "response", title: "Response" },
+    { id: "preview", title: "Preview" },
+  ];
+
+  if (!request) {
+    return null;
+  }
+
+  return (
+    <div className="h-full  w-full">
+      <div className="overflow-hidden">
+        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
+      <div className={classNames("", styles.requestDetails)}>
+        {activeTab == "headers" && <HeadersPanel request={request} />}
+        {activeTab == "response" && <ComingSoon />}
+        {activeTab == "preview" && <ComingSoon />}
+      </div>
     </div>
   );
 };
