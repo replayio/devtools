@@ -18,9 +18,9 @@ const csp = (props: any) => {
       isDev ? "http://localhost:* http://*.replay.local ws://localhost:* " : ""
     }`,
     `frame-src https://js.stripe.com https://hooks.stripe.com`,
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: ${hash} ${
+    `script-src 'self' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash} ${
       // Required by local dev server
-      isDev ? "" : "'strict-dynamic'"
+      isDev ? "'unsafe-eval'" : ""
     }`,
 
     // From vercel's CSP config
