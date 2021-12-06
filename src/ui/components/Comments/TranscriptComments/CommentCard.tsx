@@ -15,6 +15,7 @@ import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { features } from "ui/utils/prefs";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function BorderBridge({
@@ -216,9 +217,11 @@ function CommentCard({
             </button>
 
             <div className="comment-actions opacity-0 mr-2 select-none">
-              <MaterialIcon className="text-gray-400" onClick={onAttachmentClick}>
-                attachment
-              </MaterialIcon>
+              {features.commentAttachments && (
+                <MaterialIcon className="text-gray-400" onClick={onAttachmentClick}>
+                  attachment
+                </MaterialIcon>
+              )}
             </div>
           </div>
         )}
