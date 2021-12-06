@@ -14,7 +14,7 @@ import {
   getSourcesCollapsed,
 } from "../../selectors";
 
-import Outline from "../Outline/Outline";
+import Outline from "../SourceOutline/SourceOutline";
 import SourcesTree from "./SourcesTree";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
@@ -25,7 +25,7 @@ import QuickOpenButton from "./QuickOpenButton";
 class PrimaryPanes extends Component<PropsFromRedux> {
   renderOutline() {
     return {
-      className: "outlines-pane border-t",
+      className: "outlines-pane h-full border-t",
       component: <Outline />,
       header: "Outline",
       onToggle: (opened: boolean) => {

@@ -8,7 +8,6 @@ import {
   MouseEvent,
   loadedRegions,
   KeyboardEvent,
-  NavigationEvent,
   RecordingId,
 } from "@recordreplay/protocol";
 import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
