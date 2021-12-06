@@ -24,7 +24,6 @@ const csp = (props: any) => {
     }`,
 
     // From vercel's CSP config
-    isDev ? `style-src 'self' 'unsafe-inline'` : "",
     isDev ? `font-src 'self' data:` : "",
 
     // Required by LogRocket
