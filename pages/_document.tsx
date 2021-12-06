@@ -46,6 +46,7 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
           <meta httpEquiv="Content-Security-Policy" content={csp(this.props)} />
         </Head>
         <body>
