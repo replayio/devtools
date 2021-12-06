@@ -6,6 +6,7 @@ const {
   ELEMENT_NODE,
   TEXT_NODE,
 } = require("devtools/shared/dom-node-constants");
+import { assert } from "protocol/utils";
 const { features } = require("devtools/client/inspector/prefs");
 import {
   getNode,
@@ -67,7 +68,16 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
   }
 
   scrollIntoView(el: HTMLElement | null) {
-    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!el) {
+      return;
+    }
+    const { top, bottom } = el.getBoundingClientRect();
+    const container = document.getElementById("markup-box");
+    assert(container);
+    const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
+    if (top < containerTop || bottom > containerBottom) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 
   /**
