@@ -1,16 +1,5 @@
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
-const self = "'self' https://*.replay.io wss://*.replay.io";
-const csp = `
-  frame-ancestors ${self};
-  default-src ${self};
-  style-src ${self} 'unsafe-inline';
-  script-src ${self} 'unsafe-eval' data: blob: https://*.stripe.com https://*.lr-ingest.io https://*.intercom.io https://*.intercomcdn.com https://*.launchdarkly.com;
-  connect-src ${self} https://webreplay.us.auth0.com https://*.launchdarkly.com/ https://*.stripe.com https://*.sentry.io https://*.intercom.io wss://*.intercom.io;
-  img-src ${self} https: data:;
-  frame-src ${self} https://webreplay.us.auth0.com https://*.stripe.com;
-`;
-
 module.exports = {
   productionBrowserSourceMaps: true,
 
@@ -25,7 +14,8 @@ module.exports = {
           },
           {
             key: "Content-Security-Policy",
-            value: csp.split("\n").join(""),
+            value:
+              "frame-ancestors 'self' https://*.replay.io/; report-uri https://o437061.ingest.sentry.io/api/5399075/security/?sentry_key=41c20dff316f42fea692ef4f0d055261",
           },
         ],
       },
