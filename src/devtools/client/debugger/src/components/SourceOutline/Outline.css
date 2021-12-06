@@ -130,6 +130,10 @@
   padding-inline-start: 1rem;
 }
 
+.outline-list__element.indent {
+  padding-inline-start: 1rem;
+}
+
 .outline-list__element-icon {
   padding-inline-end: 0.4rem;
 }
