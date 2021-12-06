@@ -31,6 +31,9 @@ const csp = (props: any) => {
     `child-src 'self' blob:`,
     `worker-src 'self' blob:`,
 
+    // Required by intercom
+    `style-src 'self' 'unsafe-inline'`,
+
     // Required to inline images from the database and from external avaters
     `img-src 'self' data: https:`,
   ]
