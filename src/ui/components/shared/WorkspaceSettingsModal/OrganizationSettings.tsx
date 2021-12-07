@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
-import { WorkspaceSettings } from "ui/types";
+import { PartialWorkspaceSettingsFeatures, WorkspaceSettings } from "ui/types";
 import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
@@ -32,7 +32,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
     })
   );
 
-  const updateFeature = (features: Partial<WorkspaceSettings["features"]>) => {
+  const updateFeature = (features: PartialWorkspaceSettingsFeatures) => {
     updateWorkspaceSettings({
       variables: {
         workspaceId,
@@ -120,6 +120,35 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               checked={!workspace.settings.features.user.library}
               onChange={e => updateFeature({ user: { library: !e.currentTarget.checked } })}
             />
+          </label>
+        </Input>
+      </Row>
+      <Row>
+        <Label>Automatically Add Users</Label>
+        <Input>
+          <label className="flex items-center" htmlFor="auto_add_users">
+            <select
+              className={classNames("rounded-sm ml-0 text-sm", {
+                "bg-toolbarBackground": disabled,
+                "border-gray-300": disabled,
+              })}
+              disabled={disabled}
+              id="auto_add_users"
+              name="auto_add_users"
+              value={workspace.settings.features.user.autoJoin || 0}
+              onChange={e =>
+                updateFeature({
+                  user: {
+                    autoJoin: Number(e.currentTarget.selectedOptions.item(0)?.value) || null,
+                  },
+                })
+              }
+            >
+              <option value="0">None</option>
+              <option value="1">Viewer</option>
+              <option value="3">Developer</option>
+              <option value="131">Admin</option>
+            </select>
           </label>
         </Input>
       </Row>

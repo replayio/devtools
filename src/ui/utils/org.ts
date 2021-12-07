@@ -5,6 +5,7 @@ export function getDefaultOrganizationSettings(): WorkspaceSettings {
     features: {
       user: {
         library: true,
+        autoJoin: null,
       },
       recording: {
         public: true,

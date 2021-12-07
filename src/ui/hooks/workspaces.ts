@@ -11,6 +11,7 @@ import {
   UPDATE_WORKSPACE_MEMBER_ROLE,
 } from "ui/graphql/workspaces";
 import {
+  PartialWorkspaceSettingsFeatures,
   PendingWorkspaceInvitation,
   Subscription,
   Workspace,
@@ -133,7 +134,7 @@ export function useUpdateWorkspaceSettings() {
       name?: string | null;
       logo?: string | null;
       motd?: string | null;
-      features?: Partial<WorkspaceSettings["features"]>;
+      features?: PartialWorkspaceSettingsFeatures;
     }
   >(
     gql`
