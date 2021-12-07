@@ -79,9 +79,9 @@ export default function ExperimentalSettings({}) {
   const updateReact = hooks.useUpdateUserSetting("showReact", "Boolean");
   const updateElements = hooks.useUpdateUserSetting("showElements", "Boolean");
   const updateGlobalSearch = hooks.useUpdateUserSetting("enableGlobalSearch", "Boolean");
+  const updateNetworkMonitor = hooks.useUpdateUserSetting("enableNetworkMonitor", "Boolean");
+  const updateEventLink = hooks.useUpdateUserSetting("enableEventLink", "Boolean");
 
-  const [enableNetworkMonitor, setEnableNetworkMonitor] = useState(!!features.network);
-  const [enableEventLink, setEnableEventLink] = useState(!!features.eventLink);
   const [enableCommentAttachments, setEnableCommentAttachments] = useState(
     !!features.commentAttachments
   );
@@ -97,18 +97,16 @@ export default function ExperimentalSettings({}) {
     } else if (key === "enableGlobalSearch") {
       updateGlobalSearch({ variables: { newValue: value } });
     } else if (key === "enableNetworkMonitor") {
-      features.network = value;
-      setEnableNetworkMonitor(!!features.network);
+      updateNetworkMonitor({ variables: { newValue: value } });
     } else if (key === "enableEventLink") {
-      features.eventLink = value;
-      setEnableEventLink(!!features.eventLink);
+      updateEventLink({ variables: { newValue: value } });
     } else if (key === "enableCommentAttachments") {
       features.commentAttachments = value;
       setEnableCommentAttachments(!!features.commentAttachments);
     }
   };
 
-  const localSettings = { enableNetworkMonitor, enableEventLink, enableCommentAttachments };
+  const localSettings = { enableCommentAttachments };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {

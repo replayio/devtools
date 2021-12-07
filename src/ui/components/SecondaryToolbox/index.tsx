@@ -18,7 +18,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import "ui/setup/dynamic/inspector";
 import { UserSettings } from "ui/types";
 import NetworkMonitor from "../NetworkMonitor";
-import classNames from "classnames";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
@@ -37,10 +36,7 @@ function PanelButtons({
   setSelectedPanel,
 }: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
-  const hasNetwork = hooks.useFeature("network");
-
-  const showReact = userSettings.showReact;
-  const showElements = userSettings.showElements;
+  const { enableNetworkMonitor, showReact, showElements } = userSettings;
 
   const onClick = (panel: PanelName) => {
     setSelectedPanel(panel);
@@ -80,7 +76,7 @@ function PanelButtons({
           <div className="label">React</div>
         </button>
       )}
-      {hasNetwork && (
+      {enableNetworkMonitor && (
         <button
           className={classnames("console-panel-button", {
             expanded: selectedPanel === "network",
@@ -116,20 +112,17 @@ function InspectorPanel() {
   );
 }
 
-function getAllowedPanels(
-  settings: UserSettings,
-  hasNetwork: boolean,
-  hasReactComponents: boolean
-) {
+function getAllowedPanels(settings: UserSettings, hasReactComponents: boolean) {
   const allowedPanels = ["console"];
+  const { enableNetworkMonitor, showReact, showElements } = settings;
 
-  if (hasNetwork) {
+  if (enableNetworkMonitor) {
     allowedPanels.push("network");
   }
-  if (settings.showReact && hasReactComponents) {
+  if (showReact && hasReactComponents) {
     allowedPanels.push("react-components");
   }
-  if (settings.showElements) {
+  if (showElements) {
     allowedPanels.push("inspector");
   }
 
@@ -143,10 +136,9 @@ function SecondaryToolbox({
   hasReactComponents,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
-  const hasNetwork = hooks.useFeature("network");
   const isNode = recordingTarget === "node";
 
-  if (!getAllowedPanels(userSettings, hasNetwork, hasReactComponents).includes(selectedPanel)) {
+  if (!getAllowedPanels(userSettings, hasReactComponents).includes(selectedPanel)) {
     setSelectedPanel("console");
   }
 

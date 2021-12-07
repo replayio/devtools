@@ -10,6 +10,7 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 import Event from "./Event";
 import { trackEvent } from "ui/utils/telemetry";
 import classNames from "classnames";
+import hooks from "ui/hooks";
 
 function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (
@@ -21,6 +22,8 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 }
 
 function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
+  const { userSettings } = hooks.useGetUserSettings();
+
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     seek(point, time, false);
@@ -38,7 +41,13 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
           <div key={e.point}>
             <CurrentTimeLine isActive={currentEventIndex === i} />
             <div className="px-1.5">
-              <Event onSeek={onSeek} event={e} {...{ currentTime, executionPoint }} />
+              <Event
+                onSeek={onSeek}
+                event={e}
+                currentTime={currentTime}
+                executionPoint={executionPoint}
+                showLink={userSettings.enableEventLink}
+              />
             </div>
           </div>
         );

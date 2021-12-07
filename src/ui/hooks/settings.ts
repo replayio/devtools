@@ -12,24 +12,28 @@ import { useEffect, useState } from "react";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
-  showElements: false,
-  showReact: false,
-  enableTeams: true,
-  enableRepaint: false,
-  enableGlobalSearch: false,
   defaultWorkspaceId: null,
   disableLogRocket: false,
+  enableEventLink: false,
+  enableGlobalSearch: false,
+  enableNetworkMonitor: false,
+  enableRepaint: false,
+  enableTeams: true,
+  showElements: false,
+  showReact: false,
 };
 
 const testSettings: UserSettings = {
   apiKeys: [],
-  showElements: true,
-  showReact: true,
-  enableTeams: true,
-  enableRepaint: false,
-  enableGlobalSearch: false,
   defaultWorkspaceId: null,
   disableLogRocket: false,
+  enableEventLink: false,
+  enableGlobalSearch: false,
+  enableNetworkMonitor: false,
+  enableRepaint: false,
+  enableTeams: true,
+  showElements: true,
+  showReact: true,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
@@ -90,13 +94,15 @@ function convertUserSettings(data: any): UserSettings {
   const settings = data.viewer.settings;
   return {
     apiKeys: data.viewer.apiKeys,
-    showElements: settings.showElements,
-    showReact: settings.showReact,
-    enableTeams: settings.enableTeams,
-    enableRepaint: settings.enableRepaint,
-    enableGlobalSearch: settings.enableGlobalSearch,
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
+    enableEventLink: settings.enableEventLink,
+    enableGlobalSearch: settings.enableGlobalSearch,
+    enableNetworkMonitor: settings.enableNetworkMonitor,
+    enableRepaint: settings.enableRepaint,
+    enableTeams: settings.enableTeams,
+    showElements: settings.showElements,
+    showReact: settings.showReact,
   };
 }
 

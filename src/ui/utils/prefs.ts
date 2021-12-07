@@ -30,8 +30,6 @@ pref("devtools.features.comments", true);
 pref("devtools.features.consoleHover", false);
 pref("devtools.features.eventCount", true);
 pref("devtools.features.launchBrowser", true);
-pref("devtools.features.network", false);
-pref("devtools.features.eventLink", false);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
 pref("devtools.features.termsOfService", false);
@@ -71,8 +69,6 @@ export const features = new PrefsHelper("devtools.features", {
   consoleHover: ["Bool", "consoleHover"],
   eventCount: ["Bool", "eventCount"],
   launchBrowser: ["Bool", "launchBrowser"],
-  network: ["Bool", "network"],
-  eventLink: ["Bool", "eventLink"],
   private: ["Bool", "private"],
   reactDevtools: ["Bool", "reactDevtools"],
   smoothPlayback: ["Bool", "smoothPlayback"],

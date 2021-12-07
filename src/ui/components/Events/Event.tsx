@@ -4,13 +4,13 @@ import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 import Matches from "./Matches";
-import { features } from "ui/utils/prefs";
 
 type EventProps = {
-  event: ReplayEvent;
   currentTime: any;
+  event: ReplayEvent;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
+  showLink: boolean;
 };
 
 const EVENT_KINDS: { [key: string]: EventKind } = {
@@ -43,7 +43,13 @@ const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
-export default function Event({ onSeek, currentTime, executionPoint, event }: EventProps) {
+export default function Event({
+  currentTime,
+  executionPoint,
+  event,
+  onSeek,
+  showLink,
+}: EventProps) {
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
 
@@ -73,7 +79,7 @@ export default function Event({ onSeek, currentTime, executionPoint, event }: Ev
         <Label>{label}</Label>
       </div>
       <div className="flex space-x-2">
-        {features.eventLink ? <Matches simpleEvent={event} /> : null}
+        {showLink ? <Matches simpleEvent={event} /> : null}
         <div>{getFormattedTime(time)}</div>
       </div>
     </div>

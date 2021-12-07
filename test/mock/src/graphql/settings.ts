@@ -8,6 +8,8 @@ export function createUserSettingsMock(): MockedResponse[] {
     apiKeys: [],
     defaultWorkspaceId: null,
     disableLogRocket: false,
+    enableEventLink: false,
+    enableNetworkMonitor: false,
     enableGlobalSearch: false,
     enableRepaint: false,
     enableTeams: true,
