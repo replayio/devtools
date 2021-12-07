@@ -9,7 +9,8 @@ import { Switch } from "@headlessui/react";
 import classNames from "classnames";
 import { setModal } from "ui/actions/app";
 
-const isNextUrl = (url: string) => url.includes("/_next/");
+export const isNextUrl = (url: string) => url.includes("/_next/");
+
 const shouldHaveSourcemaps = (source: Source, alternateSource: Source | null) =>
   isNextUrl(source.url) || !!alternateSource;
 
