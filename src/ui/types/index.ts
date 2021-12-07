@@ -9,13 +9,13 @@ export type UserSettings = {
   apiKeys: ApiKey[];
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
+  enableEventLink: boolean;
   enableGlobalSearch: boolean;
+  enableNetworkMonitor: boolean;
   enableRepaint: boolean;
   enableTeams: boolean;
   showElements: boolean;
   showReact: boolean;
-  enableNetworkMonitor: boolean;
-  enableEventLink: boolean;
 };
 
 export type LocalUserSettings = {

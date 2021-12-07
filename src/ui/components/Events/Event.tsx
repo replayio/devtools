@@ -6,8 +6,8 @@ import MaterialIcon from "../shared/MaterialIcon";
 import Matches from "./Matches";
 
 type EventProps = {
-  event: ReplayEvent;
   currentTime: any;
+  event: ReplayEvent;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
   showLink: boolean;
@@ -44,10 +44,10 @@ const getEventLabel = (event: ReplayEvent) => {
 };
 
 export default function Event({
-  onSeek,
   currentTime,
   executionPoint,
   event,
+  onSeek,
   showLink,
 }: EventProps) {
   const { kind, point, time } = event;

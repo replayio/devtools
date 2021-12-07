@@ -12,14 +12,14 @@ export const GET_USER_SETTINGS = gql`
         maxRecordings
       }
       settings {
+        disableLogRocket
+        enableEventLink
+        enableGlobalSearch
+        enableNetworkMonitor
+        enableRepaint
+        enableTeams
         showElements
         showReact
-        enableTeams
-        enableRepaint
-        enableGlobalSearch
-        disableLogRocket
-        enableNetworkMonitor
-        enableEventLink
       }
       defaultWorkspace {
         id
