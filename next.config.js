@@ -14,7 +14,8 @@ module.exports = {
           },
           {
             key: "Content-Security-Policy",
-            value: "frame-ancestors 'self' https://*.replay.io/",
+            value:
+              "frame-ancestors 'self' https://*.replay.io/; report-uri https://o437061.ingest.sentry.io/api/5399075/security/?sentry_key=41c20dff316f42fea692ef4f0d055261",
           },
         ],
       },
