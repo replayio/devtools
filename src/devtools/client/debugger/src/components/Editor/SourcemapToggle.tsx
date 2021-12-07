@@ -1,21 +1,17 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { UIState } from "ui/state";
 import { getAlternateSource } from "../../reducers/pause";
-import {
-  getIsSourceMappedSource,
-  getSelectedSourceWithContent,
-  Source,
-} from "../../reducers/sources";
+import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
 import actions from "../../actions";
 import { connect, ConnectedProps } from "react-redux";
-
-const isNextUrl = (url: string) => url.includes("/_next/");
-const shouldHaveSourcemaps = (source: Source, alternateSource: Source | null) =>
-  isNextUrl(source.url) || !!alternateSource;
 
 import { Switch } from "@headlessui/react";
 import classNames from "classnames";
 import { setModal } from "ui/actions/app";
+
+const isNextUrl = (url: string) => url.includes("/_next/");
+const shouldHaveSourcemaps = (source: Source, alternateSource: Source | null) =>
+  isNextUrl(source.url) || !!alternateSource;
 
 function SourcemapError({ onClick }: { onClick: () => void }) {
   return (
@@ -68,7 +64,6 @@ export function Toggle({
 export function SourcemapToggle({
   selectedSource,
   alternateSource,
-  isSourceMappedSource,
   setModal,
   showAlternateSource,
 }: PropsFromRedux) {
@@ -85,7 +80,11 @@ export function SourcemapToggle({
 
   return (
     <div className="flex items-center pl-3 space-x-1">
-      <Toggle enabled={isSourceMappedSource} setEnabled={setEnabled} disabled={!alternateSource} />
+      <Toggle
+        enabled={selectedSource.isOriginal}
+        setEnabled={setEnabled}
+        disabled={!alternateSource}
+      />
       {!alternateSource ? <SourcemapError onClick={onErrorClick} /> : <div>Original Source</div>}
     </div>
   );
@@ -95,7 +94,6 @@ const connector = connect(
   (state: UIState) => ({
     selectedSource: getSelectedSourceWithContent(state),
     alternateSource: getAlternateSource(state),
-    isSourceMappedSource: getIsSourceMappedSource(state),
   }),
   {
     showAlternateSource: actions.showAlternateSource,
