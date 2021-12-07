@@ -6,6 +6,7 @@ import sortBy from "lodash/sortBy";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
+import { trackEvent } from "ui/utils/telemetry";
 
 interface Detail {
   name: string;
@@ -54,13 +55,35 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
     () => sortBy(request?.responseHeaders, r => r.name.toLowerCase()),
     [request]
   );
+
+  const toggleRequestExpanded = () => {
+    trackEvent("network_monitor.toggle_request_expanded", { expanded: !requestExpanded });
+    setRequestExpanded(!requestExpanded);
+  };
+  const toggleRequestHeadersExpanded = () => {
+    trackEvent("network_monitor.toggle_request_headers_expanded", {
+      expanded: !requestHeadersExpanded,
+    });
+    setRequestHeadersExpanded(!requestHeadersExpanded);
+  };
+  const toggleResponseHeadersExpanded = () => () => {
+    trackEvent("network_monitor.toggle_response_headers_expanded", {
+      expanded: !responseHeadersExpanded,
+    });
+    setResponseHeadersExpanded(!responseHeadersExpanded);
+  };
+  const toggleQueryParametersExpanded = () => {
+    trackEvent("network_monitor.toggle_query_parameters_expanded", {
+      expanded: !queryParametersExpanded,
+    });
+    setQueryParametersExpanded(!queryParametersExpanded);
+  };
+
   return (
     <>
       <div
-        className={classNames(
-          "flex items-center py-1 whitespace-nowrap cursor-pointer font-semibold"
-        )}
-        onClick={() => setRequestExpanded(!requestExpanded)}
+        className="flex items-center py-1 whitespace-nowrap cursor-pointer font-semibold"
+        onClick={toggleRequestExpanded}
       >
         <TriangleToggle open={requestExpanded} />
         General
@@ -80,7 +103,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       )}
       <h2
         className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
-        onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
+        onClick={toggleRequestHeadersExpanded}
       >
         <TriangleToggle open={requestHeadersExpanded} />
         Request Headers
@@ -90,7 +113,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       )}
       <h2
         className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
-        onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
+        onClick={toggleResponseHeadersExpanded}
       >
         <TriangleToggle open={responseHeadersExpanded} />
         Response Headers
@@ -102,7 +125,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <div>
           <h2
             className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
-            onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
+            onClick={toggleQueryParametersExpanded}
           >
             <TriangleToggle open={queryParametersExpanded} />
             Query Parameters
