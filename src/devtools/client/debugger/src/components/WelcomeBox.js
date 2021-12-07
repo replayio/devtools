@@ -15,6 +15,7 @@ function WelcomeBox({
   toggleShortcutsModal,
   setSelectedPrimaryPanel,
 }) {
+  return null;
   const { userSettings, loading } = useGetUserSettings();
   if (loading) {
     return null;
