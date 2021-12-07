@@ -6,16 +6,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
 import actions from "../../actions";
-import {
-  getSelectedSourceWithContent,
-  getContext,
-  getAlternateSourceId,
-  getSource,
-} from "../../selectors";
-
-import { getFilename } from "../../utils/source";
-import { ThreadFront } from "protocol/thread";
-import { RedactedSpan } from "ui/components/Redacted";
+import { getSelectedSourceWithContent } from "../../selectors";
 import SourcemapToggle from "./SourcemapToggle";
 
 class SourceFooter extends PureComponent {
@@ -84,20 +75,12 @@ class SourceFooter extends PureComponent {
   }
 }
 
-const mapStateToProps = state => {
-  const selectedSource = getSelectedSourceWithContent(state);
-  const alternateSourceId = getAlternateSourceId(state, selectedSource);
-  const alternateSource = alternateSourceId ? getSource(state, alternateSourceId) : null;
-
-  return {
-    cx: getContext(state),
-    selectedSource,
-    alternateSource,
-  };
-};
-
-export default connect(mapStateToProps, {
-  toggleBlackBox: actions.toggleBlackBox,
-  showAlternateSource: actions.showAlternateSource,
-  togglePaneCollapse: actions.togglePaneCollapse,
-})(SourceFooter);
+export default connect(
+  state => ({
+    selectedSource: getSelectedSourceWithContent(state),
+  }),
+  {
+    toggleBlackBox: actions.toggleBlackBox,
+    togglePaneCollapse: actions.togglePaneCollapse,
+  }
+)(SourceFooter);

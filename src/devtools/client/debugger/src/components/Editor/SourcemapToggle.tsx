@@ -1,17 +1,17 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { UIState } from "ui/state";
-import { getAlternateSourceId } from "../../reducers/pause";
-import { getSelectedSourceWithContent, getSource } from "../../reducers/sources";
+import { getAlternateSource } from "../../reducers/pause";
+import { getSelectedSourceWithContent } from "../../reducers/sources";
 import actions from "../../actions";
 import { connect, ConnectedProps } from "react-redux";
 import { Source } from "../../reducers/source";
 
 const isNextUrl = (url: string) => url.includes("/_next/");
 
-const isSourcemapped = (selectedSource: Source, alternateSource: Source) =>
+const isSourcemapped = (selectedSource: Source, alternateSource: Source | null) =>
   !selectedSource.isOriginal && !!alternateSource;
 
-const shouldHaveSourcemaps = (source: Source, alternateSource: Source) =>
+const shouldHaveSourcemaps = (source: Source, alternateSource: Source | null) =>
   isNextUrl(source.url) || !!alternateSource;
 
 import { Switch } from "@headlessui/react";
@@ -93,20 +93,15 @@ export function SourcemapToggle({
   );
 }
 
-const mapStateToProps = (state: UIState): { selectedSource: Source; alternateSource: Source } => {
-  const selectedSource = getSelectedSourceWithContent(state);
-  const alternateSourceId = getAlternateSourceId(state, selectedSource);
-  const alternateSource = alternateSourceId ? getSource(state, alternateSourceId) : null;
-
-  return {
-    selectedSource,
-    alternateSource,
-  };
-};
-
-const connector = connect(mapStateToProps, {
-  showAlternateSource: actions.showAlternateSource,
-  setModal: actions.setModal,
-});
+const connector = connect(
+  (state: UIState) => ({
+    selectedSource: getSelectedSourceWithContent(state),
+    alternateSource: getAlternateSource(state),
+  }),
+  {
+    showAlternateSource: actions.showAlternateSource,
+    setModal: actions.setModal,
+  }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(SourcemapToggle);

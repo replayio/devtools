@@ -1,5 +1,6 @@
 import { string } from "prop-types";
 import { UIState } from "ui/state";
+import { Source } from "./source";
 
 declare function getExecutionPoint(state: UIState): string | null;
-export function getAlternateSourceId(state: UIState, selectedSource: Source): string;
+export function getAlternateSource(state: UIState): Source | null;

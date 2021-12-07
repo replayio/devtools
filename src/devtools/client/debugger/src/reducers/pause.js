@@ -15,6 +15,7 @@ import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
+import { getSource } from "./sources";
 
 function createPauseState() {
   return {
@@ -368,7 +369,7 @@ export function getResumePoint(state, type) {
 // Get the ID of any alternate source that can be switched to from selectedSource.
 // This only works when the debugger is paused somewhere, and we have an
 // alternate location for the location of the selected frame.
-export function getAlternateSourceId(state, selectedSource) {
+function getAlternateSourceId(state, selectedSource) {
   if (!selectedSource) {
     return null;
   }
@@ -383,6 +384,17 @@ export function getAlternateSourceId(state, selectedSource) {
   }
   const { alternateLocation } = selectedFrame;
   return alternateLocation ? alternateLocation.sourceId : null;
+}
+
+export function getAlternateSource(state) {
+  const selectedSource = getSelectedSourceWithContent(state);
+  const alternateSourceId = getAlternateSourceId(state, selectedSource);
+
+  if (!alternateSourceId) {
+    return null;
+  }
+
+  return getSource(state, alternateSourceId);
 }
 
 export default update;
