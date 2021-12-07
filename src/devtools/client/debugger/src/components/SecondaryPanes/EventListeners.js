@@ -14,15 +14,7 @@ import { selectors } from "ui/reducers";
 import AccessibleImage from "../shared/AccessibleImage";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-
-const mouseClicks = [
-  "event.mouse.auxclick",
-  "event.mouse.click",
-  "event.mouse.dblclick",
-  "event.mouse.mousedown",
-  "event.mouse.mouseup",
-  "event.mouse.contextmenu",
-];
+import Spinner from "ui/components/shared/Spinner";
 
 class EventListeners extends Component {
   state = {
@@ -63,11 +55,8 @@ class EventListeners extends Component {
   }
 
   onCategoryToggle(category) {
-    const {
-      expandedCategories,
-      removeEventListenerExpanded,
-      addEventListenerExpanded,
-    } = this.props;
+    const { expandedCategories, removeEventListenerExpanded, addEventListenerExpanded } =
+      this.props;
 
     trackEvent("console.events.category_toggle");
 
@@ -179,45 +168,37 @@ class EventListeners extends Component {
   }
 
   renderCategories() {
-    const { categories } = this.props;
+    const { categories, isLoadingInitialPoints, isLoadingAdditionalPoints } = this.props;
 
     const commonCategories = categories.filter(category =>
       ["Keyboard", "Mouse"].includes(category.name)
     );
+
     const otherCategories = categories.filter(
       category => !["Keyboard", "Mouse"].includes(category.name)
     );
 
     return (
       <div className="flex flex-col space-y-1.5">
-        {commonCategories.length
-          ? this.renderCategoriesSection("Common Events", commonCategories)
-          : null}
-        {this.renderCategoriesSection("Other Events", otherCategories)}
+        {this.renderCategoriesSection("Common Events", isLoadingInitialPoints, commonCategories)}
+        {this.renderCategoriesSection("Other Events", isLoadingAdditionalPoints, otherCategories)}
       </div>
     );
   }
 
-  renderCategoriesSection(label, categories) {
-    let content;
-
-    if (!features.eventCount) {
-      content = categories.map((category, index) => {
-        return (
-          <li className="event-listener-group" key={index}>
-            {this.renderCategoryHeading(category)}
-            {this.renderCategoryListing(category)}
-          </li>
-        );
-      });
-    } else {
-      content = categories.map((category, index) => this.renderCategoryItem(category, index));
-    }
-
+  renderCategoriesSection(label, isLoading, categories) {
     return (
       <div className="flex flex-col space-y-1">
         <div className="text-sm font-semibold">{label}</div>
-        <ul className="event-listeners-list">{content}</ul>
+        <ul className="event-listeners-list">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-12">
+              <Spinner className="animate-spin h-4 w-4" />
+            </div>
+          ) : categories.length > 0 ? (
+            categories.map((category, index) => this.renderCategoryItem(category, index))
+          ) : null}
+        </ul>
       </div>
     );
   }
@@ -286,11 +267,8 @@ class EventListeners extends Component {
   }
 
   renderCategoryHeading(category) {
-    const { activeEventListeners, expandedCategories } = this.props;
-    const { events } = category;
-
+    const { expandedCategories } = this.props;
     const expanded = expandedCategories.includes(category.name);
-    const checked = events.every(({ id }) => activeEventListeners.includes(id));
 
     return (
       <div className="event-listener-header" onClick={() => this.onCategoryToggle(category.name)}>
@@ -369,6 +347,8 @@ const mapStateToProps = state => ({
   categories: selectors.getEventListenerBreakpointTypes(state),
   expandedCategories: selectors.getEventListenerExpanded(state),
   eventTypePoints: selectors.getEventListenerPoints(state),
+  isLoadingInitialPoints: selectors.isLoadingInitialPoints(state),
+  isLoadingAdditionalPoints: selectors.isLoadingAdditionalPoints(state),
 });
 
 export default connect(mapStateToProps, {

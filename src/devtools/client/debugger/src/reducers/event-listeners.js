@@ -13,6 +13,7 @@ export function initialEventListenerState() {
     expanded: [],
     logEventBreakpoints: prefs.logEventBreakpoints,
     eventTypePoints: {},
+    loadingInitialPoints: true,
     loadingAdditionalPoints: true,
   };
 }
@@ -31,6 +32,7 @@ function update(state = initialEventListenerState(), action) {
     case "RECEIVE_EVENT_LISTENER_POINTS":
       return {
         ...state,
+        loadingInitialPoints: false,
         eventTypePoints: { ...state.eventTypePoints, ...action.eventTypePoints },
       };
 
@@ -60,6 +62,10 @@ export function getEventListenerPoints(state) {
 
 export function isLoadingAdditionalPoints(state) {
   return state.eventListenerBreakpoints.loadingAdditionalPoints;
+}
+
+export function isLoadingInitialPoints(state) {
+  return state.eventListenerBreakpoints.loadingInitialPoints;
 }
 
 export default update;
