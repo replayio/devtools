@@ -43,7 +43,8 @@ export type ModalType =
   | "trimming"
   | "privacy"
   | "loom"
-  | "attachment";
+  | "attachment"
+  | "sourcemap-setup";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"

@@ -5,17 +5,8 @@
 //
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
-import actions from "../../actions";
-import {
-  getSelectedSourceWithContent,
-  getContext,
-  getAlternateSourceId,
-  getSource,
-} from "../../selectors";
-
-import { getFilename } from "../../utils/source";
-import { ThreadFront } from "protocol/thread";
-import { RedactedSpan } from "ui/components/Redacted";
+import { getSelectedSourceWithContent } from "../../selectors";
+import SourcemapToggle from "./SourcemapToggle";
 
 class SourceFooter extends PureComponent {
   constructor() {
@@ -48,34 +39,6 @@ class SourceFooter extends PureComponent {
     }
   }
 
-  renderSourceSummary() {
-    const { alternateSource, selectedSource, showAlternateSource } = this.props;
-
-    if (!alternateSource) {
-      return null;
-    }
-
-    const filename = getFilename(alternateSource);
-    const title = L10N.getFormatStr("sourceFooter.alternateSource", filename);
-
-    const original = ThreadFront.isSourceMappedSource(selectedSource.id);
-
-    const tooltip = L10N.getFormatStr(
-      original ? "sourceFooter.generatedSourceTooltip" : "sourceFooter.originalSourceTooltip",
-      filename
-    );
-
-    return (
-      <button
-        className="mapped-source"
-        onClick={() => showAlternateSource(selectedSource, alternateSource)}
-        title={tooltip}
-      >
-        <RedactedSpan data-redacted>{title}</RedactedSpan>
-      </button>
-    );
-  }
-
   onCursorChange = event => {
     const { line, ch } = event.doc.getCursor();
     this.setState({ cursorPosition: { line, column: ch } });
@@ -104,29 +67,13 @@ class SourceFooter extends PureComponent {
   render() {
     return (
       <div className="source-footer">
-        <div className="source-footer-end">
-          {this.renderSourceSummary()}
-          {this.renderCursorPosition()}
-        </div>
+        <SourcemapToggle />
+        <div className="source-footer-end">{this.renderCursorPosition()}</div>
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
-  const selectedSource = getSelectedSourceWithContent(state);
-  const alternateSourceId = getAlternateSourceId(state, selectedSource);
-  const alternateSource = alternateSourceId ? getSource(state, alternateSourceId) : null;
-
-  return {
-    cx: getContext(state),
-    selectedSource,
-    alternateSource,
-  };
-};
-
-export default connect(mapStateToProps, {
-  toggleBlackBox: actions.toggleBlackBox,
-  showAlternateSource: actions.showAlternateSource,
-  togglePaneCollapse: actions.togglePaneCollapse,
-})(SourceFooter);
+export default connect(state => ({
+  selectedSource: getSelectedSourceWithContent(state),
+}))(SourceFooter);

@@ -17,12 +17,6 @@
   box-sizing: border-box;
 }
 
-.source-footer-start {
-  display: flex;
-  align-items: center;
-  justify-self: start;
-}
-
 .source-footer-end {
   display: flex;
   align-items: center;

@@ -23,8 +23,3 @@ export type SourceSymbols = {
   functions: FunctionSymbol[];
   loading: boolean;
 };
-
-export type Source = {
-  id: string;
-  url: string;
-};
