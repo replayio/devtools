@@ -58,7 +58,7 @@ export default function Event({ onSeek, currentTime, executionPoint, event }: Ev
       onClick={onClick}
       onKeyDown={onKeyDown}
       className={classNames(
-        "flex flex-row justify-between items-center space-x-2 user-select-none",
+        "event flex flex-row justify-between items-center space-x-2 user-select-none",
         "group block p-3 w-full rounded-lg hover:bg-gray-100 focus:outline-none",
         {
           "text-lightGrey": currentTime < time,

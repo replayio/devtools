@@ -34,8 +34,12 @@ function Match({
   };
 
   return (
-    <button className="flex" onClick={onClick} title={getTimestamp(time)}>
-      <MaterialIcon>info</MaterialIcon>
+    <button
+      className="event-match flex opacity-0 text-gray-500 hover:text-gray-700"
+      onClick={onClick}
+      title={getTimestamp(time)}
+    >
+      <MaterialIcon outlined={true}>description</MaterialIcon>
     </button>
   );
 }
