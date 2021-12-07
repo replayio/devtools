@@ -12,6 +12,7 @@ import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { NetworkState } from "ui/reducers/network";
+import { LayoutState } from "./layout";
 
 export interface UIState {
   app: AppState;
@@ -22,6 +23,7 @@ export interface UIState {
   eventListenerBreakpoints: any;
   eventTooltip: EventTooltipState;
   inspector: InspectorState;
+  layout: LayoutState;
   markup: MarkupState;
   messages: MessageState;
   network: NetworkState;

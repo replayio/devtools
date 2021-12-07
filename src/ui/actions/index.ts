@@ -4,6 +4,7 @@ import * as appActions from "./app";
 import * as timelineActions from "./timeline";
 import * as sessionActions from "./session";
 import * as commentsActions from "./comments";
+import * as layoutActions from "./layout";
 import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkAction, ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
@@ -19,6 +20,7 @@ import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eve
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
 import { NetworkAction } from "./network";
+import { LayoutAction } from "./layout";
 
 type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 
@@ -27,6 +29,7 @@ export type UIAction =
   | CommentsAction
   | DebuggerAction
   | EventTooltipAction
+  | LayoutAction
   | MarkupAction
   | NetworkAction
   | ReactDevToolsAction
@@ -41,11 +44,12 @@ export type UIStore = Store<UIState, UIAction> & {
 
 export const actions = {
   ...appActions,
-  ...timelineActions,
   ...commentsActions,
-  ...reactDevToolsActions,
-  ...eventListeners,
-  ...debuggerActions,
   ...consoleActions,
+  ...debuggerActions,
+  ...eventListeners,
+  ...layoutActions,
+  ...reactDevToolsActions,
   ...sessionActions,
+  ...timelineActions,
 };
