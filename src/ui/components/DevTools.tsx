@@ -12,6 +12,7 @@ import WaitForReduxSlice from "./WaitForReduxSlice";
 import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
+import Launcher from "./Launcher";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -54,6 +55,7 @@ function _DevTools({
     <>
       <Header />
       {viewMode == "dev" ? <DevView /> : <NonDevView />}
+      <Launcher />
       <KeyboardShortcuts />
     </>
   );

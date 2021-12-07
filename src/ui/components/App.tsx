@@ -27,7 +27,6 @@ import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
-import classNames from "classnames";
 import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
