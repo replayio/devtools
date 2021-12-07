@@ -34,6 +34,7 @@ import {
   getBreakableLinesForSourceActors,
 } from "./source-actors";
 import uniq from "lodash/uniq";
+import { ThreadFront } from "protocol/thread";
 
 export function initialSourcesState() {
   return {
@@ -662,6 +663,11 @@ export function getTextAtLocation(state, id, location) {
   const text = getTextAtPosition(id, content, { ...location, column: 0 });
 
   return text;
+}
+
+export function getIsSourceMappedSource(state) {
+  const sourceId = getSelectedSourceId(state);
+  return ThreadFront.isSourceMappedSource(sourceId);
 }
 
 export default update;

@@ -22,4 +22,5 @@ export type Source = {
   introductionType?: "scriptElement";
 };
 
-export function getSelectedSource(state: UIState);
+export function getSelectedSourceWithContent(state: UIState): Source;
+export function getIsSourceMappedSource(state: UIState): boolean;

@@ -1,21 +1,21 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { UIState } from "ui/state";
 import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSourceWithContent } from "../../reducers/sources";
+import {
+  getIsSourceMappedSource,
+  getSelectedSourceWithContent,
+  Source,
+} from "../../reducers/sources";
 import actions from "../../actions";
 import { connect, ConnectedProps } from "react-redux";
-import { Source } from "../../reducers/source";
 
 const isNextUrl = (url: string) => url.includes("/_next/");
-
-const isSourcemapped = (selectedSource: Source, alternateSource: Source | null) =>
-  !selectedSource.isOriginal && !!alternateSource;
-
 const shouldHaveSourcemaps = (source: Source, alternateSource: Source | null) =>
   isNextUrl(source.url) || !!alternateSource;
 
 import { Switch } from "@headlessui/react";
 import classNames from "classnames";
+import { setModal } from "ui/actions/app";
 
 function SourcemapError({ onClick }: { onClick: () => void }) {
   return (
@@ -68,18 +68,16 @@ export function Toggle({
 export function SourcemapToggle({
   selectedSource,
   alternateSource,
+  isSourceMappedSource,
   setModal,
   showAlternateSource,
 }: PropsFromRedux) {
-  const [showMapped, setShowMapped] = useState(isSourcemapped(selectedSource, alternateSource));
-
   if (!shouldHaveSourcemaps(selectedSource, alternateSource)) {
     return null;
   }
 
   const setEnabled = (v: React.SetStateAction<boolean>) => {
     showAlternateSource(selectedSource, alternateSource);
-    setShowMapped(v);
   };
   const onErrorClick = () => {
     setModal("sourcemap-setup");
@@ -87,7 +85,7 @@ export function SourcemapToggle({
 
   return (
     <div className="flex items-center pl-3 space-x-1">
-      <Toggle enabled={showMapped} setEnabled={setEnabled} disabled={!alternateSource} />
+      <Toggle enabled={isSourceMappedSource} setEnabled={setEnabled} disabled={!alternateSource} />
       {!alternateSource ? <SourcemapError onClick={onErrorClick} /> : <div>Original Source</div>}
     </div>
   );
@@ -97,10 +95,11 @@ const connector = connect(
   (state: UIState) => ({
     selectedSource: getSelectedSourceWithContent(state),
     alternateSource: getAlternateSource(state),
+    isSourceMappedSource: getIsSourceMappedSource(state),
   }),
   {
     showAlternateSource: actions.showAlternateSource,
-    setModal: actions.setModal,
+    setModal,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

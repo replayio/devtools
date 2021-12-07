@@ -15,7 +15,7 @@ import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { getSource } from "./sources";
+import { getSelectedSourceWithContent, getSource } from "./sources";
 
 function createPauseState() {
   return {

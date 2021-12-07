@@ -5,7 +5,6 @@
 //
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
-import actions from "../../actions";
 import { getSelectedSourceWithContent } from "../../selectors";
 import SourcemapToggle from "./SourcemapToggle";
 
@@ -75,12 +74,6 @@ class SourceFooter extends PureComponent {
   }
 }
 
-export default connect(
-  state => ({
-    selectedSource: getSelectedSourceWithContent(state),
-  }),
-  {
-    toggleBlackBox: actions.toggleBlackBox,
-    togglePaneCollapse: actions.togglePaneCollapse,
-  }
-)(SourceFooter);
+export default connect(state => ({
+  selectedSource: getSelectedSourceWithContent(state),
+}))(SourceFooter);
