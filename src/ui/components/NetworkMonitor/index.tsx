@@ -13,7 +13,9 @@ import Table from "./Table";
 
 export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFromRedux) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
-  const [types, setTypes] = useState<Set<RequestType>>(new Set(["json"]));
+  const [types, setTypes] = useState<Set<RequestType>>(new Set(["xhr"]));
+
+  const closePanel = () => setSelectedRequest(undefined);
 
   const toggleType = (type: RequestType) => {
     if (types.has(type)) {
@@ -35,7 +37,13 @@ export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFro
               initialSize="50%"
               minSize={selectedRequest ? "20%" : "100%"}
               maxSize={selectedRequest ? "80%" : "100%"}
-              endPanel={selectedRequest ? <RequestDetails request={selectedRequest} /> : <div />}
+              endPanel={
+                selectedRequest ? (
+                  <RequestDetails closePanel={closePanel} request={selectedRequest} />
+                ) : (
+                  <div />
+                )
+              }
               startPanel={
                 <RequestTable
                   table={table}

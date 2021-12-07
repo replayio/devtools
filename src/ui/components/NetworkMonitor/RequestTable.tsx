@@ -34,7 +34,10 @@ const RequestTable = ({
   return (
     <div className="bg-white w-full overflow-y-auto">
       <div className={classNames(styles.request)} {...getTableProps()}>
-        <div className="sticky z-10 top-0 bg-white">
+        <div
+          className="sticky z-10 top-0"
+          style={{ background: "var(--theme-tab-toolbar-background)" }}
+        >
           <HeaderGroups headerGroups={headerGroups} />
         </div>
         <div {...getTableBodyProps()}>

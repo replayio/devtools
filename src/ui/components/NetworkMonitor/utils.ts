@@ -28,18 +28,17 @@ export type RequestSummary = {
 };
 
 export const REQUEST_TYPES = {
+  xhr: "Fetch/XHR",
+  javascript: "Javascript",
   css: "CSS",
   font: "Font",
   html: "HTML",
   img: "Image",
-  javascript: "Javascript",
-  json: "JSON",
   manifest: "Manifest",
   media: "Media",
   other: "Other",
   wasm: "WASM",
   websocket: "WS",
-  xhr: "Fetch/XHR",
 };
 
 export type RequestType = keyof typeof REQUEST_TYPES;
@@ -125,6 +124,9 @@ export const partialRequestsToCompleteSummaries = (
       }
 
       if (types.has(row.type)) {
+        return true;
+      }
+      if (types.has("xhr") && row.type.match(/json/)) {
         return true;
       }
 

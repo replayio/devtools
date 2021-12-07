@@ -20,13 +20,16 @@ export default function TypesDropdown({
     </MaterialIcon>
   );
 
-  const TypeItem = ({ type, label }: { type: RequestType; label: string }) => (
-    <DropdownItem onClick={() => toggleType(type)}>
-      <DropdownItemContent selected={types.has(type)} icon="bug_report">
-        {label}
-      </DropdownItemContent>
-    </DropdownItem>
-  );
+  const TypeItem = ({ type, label }: { type: RequestType; label: string }) => {
+    const icon = "description";
+    return (
+      <DropdownItem onClick={() => toggleType(type)}>
+        <DropdownItemContent selected={types.has(type)} icon={icon}>
+          {label}
+        </DropdownItemContent>
+      </DropdownItem>
+    );
+  };
 
   return (
     <PortalDropdown
