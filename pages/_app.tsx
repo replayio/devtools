@@ -105,6 +105,7 @@ import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
 import "ui/components/Library/Sidebar.css";
 import "ui/components/reactjs-popup.css";
+import "ui/components/Events/Events.css";
 import "ui/components/SecondaryToolbox/SecondaryToolbox.css";
 import "ui/components/SecondaryToolbox/ToolboxOptions.css";
 import "ui/components/shared/CommentTool.css";
