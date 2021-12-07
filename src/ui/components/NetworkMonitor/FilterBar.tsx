@@ -21,7 +21,7 @@ export default function FilterBar({
       <input
         placeholder="Filter requests"
         onChange={e => table.setGlobalFilter(e.target.value)}
-        className=" px-1 bg-transparent"
+        className="px-1 bg-transparent w-full  focus:outline-none"
       />
     </div>
   );

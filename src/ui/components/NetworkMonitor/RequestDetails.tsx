@@ -5,6 +5,7 @@ import classNames from "classnames";
 import sortBy from "lodash/sortBy";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import ComingSoon from "./ComingSoon";
+import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 
 interface Detail {
   name: string;
@@ -121,13 +122,22 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   );
 };
 
-const RequestDetails = ({ request }: { request: RequestSummary }) => {
+const RequestDetails = ({
+  closePanel,
+  request,
+}: {
+  closePanel: () => void;
+  request: RequestSummary;
+}) => {
   const [activeTab, setActiveTab] = useState("headers");
 
   const tabs = [
     { id: "headers", title: "Headers" },
+    { id: "cookies", title: "Cookies" },
     { id: "response", title: "Response" },
-    { id: "preview", title: "Preview" },
+    { id: "request", title: "Request" },
+    { id: "initiator", title: "Stack Trace" },
+    { id: "timings", title: "Timings" },
   ];
 
   if (!request) {
@@ -135,14 +145,18 @@ const RequestDetails = ({ request }: { request: RequestSummary }) => {
   }
 
   return (
-    <div className="h-full  w-full">
-      <div className="overflow-hidden">
+    <div className="h-full w-full overflow-hidden">
+      <div className="overflow-hidden flex items-center justify-between">
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
       </div>
       <div className={classNames("", styles.requestDetails)}>
         {activeTab == "headers" && <HeadersPanel request={request} />}
+        {activeTab == "cookies" && <ComingSoon />}
         {activeTab == "response" && <ComingSoon />}
-        {activeTab == "preview" && <ComingSoon />}
+        {activeTab == "request" && <ComingSoon />}
+        {activeTab == "initiator" && <ComingSoon />}
+        {activeTab == "timings" && <ComingSoon />}
       </div>
     </div>
   );
