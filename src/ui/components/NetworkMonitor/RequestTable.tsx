@@ -5,6 +5,8 @@ import { RequestSummary } from "./utils";
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
 import { Row, TableInstance } from "react-table";
+import { fi } from "date-fns/locale";
+import { first } from "lodash";
 
 const RequestTable = ({
   currentTime,
@@ -55,7 +57,6 @@ const RequestTable = ({
                 prepareRow={prepareRow}
                 isFirstInFuture={firstInFuture}
                 isInPast={inPast}
-                key={row.getRowProps().key}
               />
             );
           })}

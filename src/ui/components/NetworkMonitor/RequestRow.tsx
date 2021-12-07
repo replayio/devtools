@@ -3,7 +3,6 @@ import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 import { RequestSummary } from "./utils";
 import { Row } from "react-table";
-import { trackEvent } from "ui/utils/telemetry";
 
 export const RequestRow = ({
   currentTime,
@@ -34,32 +33,26 @@ export const RequestRow = ({
   //   currentRow = true;
   // }
   prepareRow(row);
-
-  const onRowClick = () => {
-    trackEvent("network_monitor.row_click");
-    onClick(row.original);
-  };
-  const onTriggerPointClick = () => {
-    trackEvent("network_monitor.trigger_point_click");
-
-    if (!row.original.triggerPoint) {
-      return;
-    }
-
-    onSeek(row.original);
-  };
-
   return (
     <div
       className={classNames(styles.row, {
         [styles.current]: isFirstInFuture,
         "text-lightGrey": !isInPast,
       })}
-      onClick={onRowClick}
+      onClick={() => onClick(row.original)}
+      key={row.getRowProps().key}
     >
       <div {...row.getRowProps()}>
         {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
-          <div className={classNames(styles.seekBadge)} onClick={onTriggerPointClick}>
+          <div
+            className={classNames(styles.seekBadge)}
+            onClick={() => {
+              if (!row.original.triggerPoint) {
+                return;
+              }
+              onSeek(row.original);
+            }}
+          >
             <div
               className={classNames("img", {
                 [styles.fastForward]: row.original.triggerPoint.time > currentTime,
