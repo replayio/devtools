@@ -18,6 +18,8 @@ export const GET_USER_SETTINGS = gql`
         enableRepaint
         enableGlobalSearch
         disableLogRocket
+        enableNetworkMonitor
+        enableEventLink
       }
       defaultWorkspace {
         id

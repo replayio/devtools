@@ -19,6 +19,8 @@ const emptySettings: UserSettings = {
   enableGlobalSearch: false,
   defaultWorkspaceId: null,
   disableLogRocket: false,
+  enableNetworkMonitor: false,
+  enableEventLink: false,
 };
 
 const testSettings: UserSettings = {
@@ -30,6 +32,8 @@ const testSettings: UserSettings = {
   enableGlobalSearch: false,
   defaultWorkspaceId: null,
   disableLogRocket: false,
+  enableNetworkMonitor: false,
+  enableEventLink: false,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
@@ -97,6 +101,8 @@ function convertUserSettings(data: any): UserSettings {
     enableGlobalSearch: settings.enableGlobalSearch,
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
+    enableNetworkMonitor: settings.enableNetworkMonitor,
+    enableEventLink: settings.enableEventLink,
   };
 }
 

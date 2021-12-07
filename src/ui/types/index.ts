@@ -14,11 +14,11 @@ export type UserSettings = {
   enableTeams: boolean;
   showElements: boolean;
   showReact: boolean;
+  enableNetworkMonitor: boolean;
+  enableEventLink: boolean;
 };
 
 export type LocalUserSettings = {
-  enableNetworkMonitor: boolean;
-  enableEventLink: boolean;
   enableCommentAttachments: boolean;
 };
 
