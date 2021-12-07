@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { RequestType, REQUEST_TYPES } from "./utils";
+import { RequestType, REQUEST_ICONS, REQUEST_TYPES } from "./utils";
 
 export default function TypesDropdown({
   types,
@@ -20,8 +20,7 @@ export default function TypesDropdown({
     </MaterialIcon>
   );
 
-  const TypeItem = ({ type, label }: { type: RequestType; label: string }) => {
-    const icon = "description";
+  const TypeItem = ({ icon, label, type }: { icon: string; label: string; type: RequestType }) => {
     return (
       <DropdownItem onClick={() => toggleType(type)}>
         <DropdownItemContent selected={types.has(type)} icon={icon}>
@@ -42,7 +41,11 @@ export default function TypesDropdown({
     >
       <Dropdown>
         {Object.entries(REQUEST_TYPES).map((pair: string[]) => (
-          <TypeItem type={pair[0] as RequestType} label={pair[1]} />
+          <TypeItem
+            icon={REQUEST_ICONS[pair[0]] || "description"}
+            type={pair[0] as RequestType}
+            label={pair[1]}
+          />
         ))}
       </Dropdown>
     </PortalDropdown>
