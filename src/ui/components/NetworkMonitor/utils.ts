@@ -38,7 +38,21 @@ export const REQUEST_TYPES = {
   media: "Media",
   other: "Other",
   wasm: "WASM",
-  websocket: "WS",
+  websocket: "Websocket",
+};
+
+export const REQUEST_ICONS: Record<string, string> = {
+  xhr: "description",
+  javascript: "code",
+  css: "color_lens",
+  font: "text_fields",
+  html: "description",
+  img: "perm_media",
+  manifest: "description",
+  media: "perm_media",
+  other: "question_mark",
+  wasm: "handyman",
+  websocket: "autorenew",
 };
 
 export type RequestType = keyof typeof REQUEST_TYPES;

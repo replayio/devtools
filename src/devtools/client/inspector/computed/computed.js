@@ -164,7 +164,6 @@ function CssComputedView(inspector, document) {
   const doc = this.styleDocument;
   this.element = doc.getElementById("computed-property-container");
   this.searchField = doc.getElementById("computed-searchbox");
-  this.searchClearButton = doc.getElementById("computed-searchinput-clear");
   this.includeBrowserStylesCheckbox = doc.getElementById("browser-style-checkbox");
 
   this.shortcuts = new KeyShortcuts({ window: this.styleWindow });
@@ -176,7 +175,6 @@ function CssComputedView(inspector, document) {
   this.element.addEventListener("click", this._onClick);
   this.element.addEventListener("contextmenu", this._onContextMenu);
   this.searchField.addEventListener("input", this._onFilterStyles);
-  this.searchClearButton.addEventListener("click", this._onClearSearch);
   this.includeBrowserStylesCheckbox.addEventListener("input", this._onIncludeBrowserStyles);
 
   if (flags.testing) {
@@ -207,8 +205,6 @@ function CssComputedView(inspector, document) {
   if (this.ruleView) {
     this.ruleView.on("ruleview-changed", this.refreshPanel);
   }
-
-  this.searchClearButton.hidden = true;
 
   // No results text.
   this.noResults = this.styleDocument.getElementById("computed-no-results");
@@ -613,7 +609,6 @@ CssComputedView.prototype = {
     }
 
     const filterTimeout = this.searchField.value.length > 0 ? FILTER_CHANGED_TIMEOUT : 0;
-    this.searchClearButton.hidden = this.searchField.value.length === 0;
 
     this._filterChangedTimeout = setTimeout(() => {
       this.refreshPanel();
@@ -794,7 +789,6 @@ CssComputedView.prototype = {
     this.element.removeEventListener("click", this._onClick);
     this.element.removeEventListener("contextmenu", this._onContextMenu);
     this.searchField.removeEventListener("input", this._onFilterStyles);
-    this.searchClearButton.removeEventListener("click", this._onClearSearch);
     this.styleDocument.removeEventListener("copy", this._onCopy);
     this.styleDocument.removeEventListener("mousedown", this.focusWindow);
     this.includeBrowserStylesCheckbox.removeEventListener("input", this._onIncludeBrowserStyles);
@@ -806,7 +800,6 @@ CssComputedView.prototype = {
     // Nodes used in templating
     this.element = null;
     this.searchField = null;
-    this.searchClearButton = null;
     this.includeBrowserStylesCheckbox = null;
 
     // Property views
