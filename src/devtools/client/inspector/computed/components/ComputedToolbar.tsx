@@ -14,13 +14,6 @@ function ComputedToolbar(props: PropsFromRedux) {
     }
   }, 150);
 
-  function clearSearch() {
-    setComputedPropertySearch("");
-    if (searchFieldRef.current) {
-      searchFieldRef.current.value = "";
-    }
-  }
-
   function setShowAll(event: FormEvent<HTMLInputElement>) {
     setShowBrowserStyles(event.currentTarget.checked);
   }
@@ -31,16 +24,12 @@ function ComputedToolbar(props: PropsFromRedux) {
         <input
           id="computed-searchbox"
           className="devtools-filterinput"
-          type="search"
+          type="input"
+          autoComplete="off"
           placeholder="Filter Styles"
           ref={searchFieldRef}
           onInput={setSearch}
         />
-        <button
-          id="computed-searchinput-clear"
-          className="devtools-searchinput-clear"
-          onClick={clearSearch}
-        ></button>
       </div>
       <div className="devtools-separator"></div>
       <input
