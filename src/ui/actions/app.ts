@@ -35,6 +35,9 @@ import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
+import { CommandKey } from "ui/components/CommandPalette";
+import { hideCommandPalette } from "./layout";
+import { prefs } from "devtools/client/debugger/src/utils/prefs";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -403,4 +406,32 @@ export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
 
 export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAction {
   return { type: "set_loading_page_tip_index", index };
+}
+
+export function executeCommand(key: CommandKey): UIThunkAction {
+  return ({ dispatch }) => {
+    if (key === "open_viewer") {
+      dispatch(setViewMode("non-dev"));
+    } else if (key === "open_devtools") {
+      dispatch(setViewMode("dev"));
+    } else if (key === "open_full_text_search") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("search"));
+    } else if (key === "open_sources" || key === "open_outline") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("explorer"));
+    } else if (key === "open_print_statements") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("debug"));
+    } else if (key === "open_console") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPanel("console"));
+    } else if (key === "show_privacy") {
+      dispatch(setModal("privacy"));
+    } else if (key === "show_sharing") {
+      dispatch(setModal("sharing"));
+    }
+
+    dispatch(hideCommandPalette());
+  };
 }
