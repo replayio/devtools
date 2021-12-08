@@ -1,5 +1,6 @@
 import React, { FormEvent, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 const { debounce } = require("devtools/shared/debounce");
 import { setComputedPropertySearch, setShowBrowserStyles } from "../actions";
 
@@ -32,12 +33,7 @@ function ComputedToolbar(props: PropsFromRedux) {
         />
       </div>
       <div className="devtools-separator"></div>
-      <input
-        id="browser-style-checkbox"
-        type="checkbox"
-        className="includebrowserstyles"
-        onInput={setShowAll}
-      />
+      <Checkbox id="browser-style-checkbox" onChange={setShowAll} />
       <label id="browser-style-checkbox-label" htmlFor="browser-style-checkbox">
         Browser Styles
       </label>
