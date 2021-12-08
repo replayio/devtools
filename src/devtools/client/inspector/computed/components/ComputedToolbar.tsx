@@ -1,5 +1,6 @@
 import React, { FormEvent, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 const { debounce } = require("devtools/shared/debounce");
 import { setComputedPropertySearch, setShowBrowserStyles } from "../actions";
 
@@ -14,13 +15,6 @@ function ComputedToolbar(props: PropsFromRedux) {
     }
   }, 150);
 
-  function clearSearch() {
-    setComputedPropertySearch("");
-    if (searchFieldRef.current) {
-      searchFieldRef.current.value = "";
-    }
-  }
-
   function setShowAll(event: FormEvent<HTMLInputElement>) {
     setShowBrowserStyles(event.currentTarget.checked);
   }
@@ -31,24 +25,15 @@ function ComputedToolbar(props: PropsFromRedux) {
         <input
           id="computed-searchbox"
           className="devtools-filterinput"
-          type="search"
+          type="input"
+          autoComplete="off"
           placeholder="Filter Styles"
           ref={searchFieldRef}
           onInput={setSearch}
         />
-        <button
-          id="computed-searchinput-clear"
-          className="devtools-searchinput-clear"
-          onClick={clearSearch}
-        ></button>
       </div>
       <div className="devtools-separator"></div>
-      <input
-        id="browser-style-checkbox"
-        type="checkbox"
-        className="includebrowserstyles"
-        onInput={setShowAll}
-      />
+      <Checkbox id="browser-style-checkbox" onChange={setShowAll} />
       <label id="browser-style-checkbox-label" htmlFor="browser-style-checkbox">
         Browser Styles
       </label>
