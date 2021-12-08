@@ -55,7 +55,7 @@
   visibility: hidden;
 }
 
-.fonts-loaded .material-icons,
-.fonts-loaded .material-icons-outlined {
+.material-icons,
+.material-icons-outlined {
   visibility: visible;
 }
