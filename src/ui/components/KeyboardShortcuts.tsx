@@ -38,11 +38,14 @@ function KeyboardShortcuts({
     trackEvent("key_shortcut.full_text_search");
     setSelectedPrimaryPanel("search");
   };
-  const toggleLeftSidebar = () => {
+  const toggleLeftSidebar = (e: KeyboardEvent) => {
+    e.preventDefault();
+
     trackEvent("key_shortcut.toggle_left_sidebar");
     togglePaneCollapse();
   };
-  const togglePalette = () => {
+  const togglePalette = (e: KeyboardEvent) => {
+    e.preventDefault();
     trackEvent("key_shortcut.show_command_palette");
     toggleCommandPalette();
   };

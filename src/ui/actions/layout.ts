@@ -10,7 +10,7 @@ export function setShowCommandPalette(value: boolean): SetShowCommandPalette {
   return { type: "set_show_command_palette", value };
 }
 export function hideCommandPalette(): SetShowCommandPalette {
-  return { type: "set_show_command_palette", value: false };
+  return setShowCommandPalette(false);
 }
 export function toggleCommandPalette(): UIThunkAction {
   return ({ dispatch, getState }) => {

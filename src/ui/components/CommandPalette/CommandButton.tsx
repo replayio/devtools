@@ -2,7 +2,7 @@ import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { Command } from ".";
+import { Command } from "./CommandPalette";
 
 type CommandButtonProps = PropsFromRedux & { command: Command };
 
@@ -19,7 +19,7 @@ function CommandButton({ command, executeCommand }: CommandButtonProps) {
       className="px-4 py-1 flex hover:bg-gray-200 justify-between transition"
     >
       <div>{label}</div>
-      <div className="text-gray-400">{formatKeyShortcut(shortcut)}</div>
+      {shortcut ? <div className="text-gray-400">{formatKeyShortcut(shortcut)}</div> : null}
     </button>
   );
 }

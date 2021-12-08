@@ -6,7 +6,7 @@ import Modal from "../shared/NewModal";
 import CommandButton from "./CommandButton";
 const { filter } = require("fuzzaldrin-plus");
 
-export type Command = { key: CommandKey; label: string; shortcut: string };
+export type Command = { key: CommandKey; label: string; shortcut?: string };
 export type CommandKey =
   | "open_viewer"
   | "open_devtools"
@@ -19,22 +19,15 @@ export type CommandKey =
   | "show_sharing";
 
 const COMMANDS: Command[] = [
-  { key: "open_viewer", label: "Open Viewer", shortcut: "CMd+V" },
-  { key: "open_devtools", label: "Open DevTools", shortcut: "" },
-  { key: "open_full_text_search", label: "Open Full Text Search", shortcut: "" },
-  { key: "open_sources", label: "Open Sources", shortcut: "" },
-  { key: "open_outline", label: "Open Outline", shortcut: "" },
-  { key: "open_print_statements", label: "Open Print Statements", shortcut: "" },
-  { key: "open_console", label: "Open Console", shortcut: "" },
-  { key: "show_privacy", label: "Show Privacy Information", shortcut: "" },
-  { key: "show_sharing", label: "Show Sharing Options", shortcut: "" },
-
-  // Things that should probably done in a separate pass.
-  // { label: "Open React DevTools", shortcut: "" },
-  // { label: "Open Elements", shortcut: "" },
-  // { label: "Open Event Breakpoints", shortcut: "" },
-  // { label: "Show shortcuts", shortcut: "" },
-  // { label: "Add a comment", shortcut: "" },
+  { key: "open_viewer", label: "Open Viewer" },
+  { key: "open_devtools", label: "Open DevTools" },
+  { key: "open_full_text_search", label: "Open Full Text Search", shortcut: "CmdOrCtrl+Shift+F" },
+  { key: "open_sources", label: "Open Sources" },
+  { key: "open_outline", label: "Open Outline" },
+  { key: "open_print_statements", label: "Open Print Statements" },
+  { key: "open_console", label: "Open Console" },
+  { key: "show_privacy", label: "Show Privacy Information" },
+  { key: "show_sharing", label: "Show Sharing Options" },
 ];
 
 function CommandPalette({ hideCommandPalette }: PropsFromRedux) {
@@ -44,7 +37,6 @@ function CommandPalette({ hideCommandPalette }: PropsFromRedux) {
     setSearchString(e.target.value);
   };
   const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log({ e });
     if (e.key === "Escape") {
       hideCommandPalette();
     }

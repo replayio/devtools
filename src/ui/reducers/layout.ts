@@ -10,13 +10,6 @@ function initialLayoutState(): LayoutState {
 
 export default function update(state = initialLayoutState(), action: LayoutAction): LayoutState {
   switch (action.type) {
-    // case "set_view_mode": {
-    //   return {
-    //     ...state,
-    //     showCommandPalette: false,
-    //   };
-    // }
-
     case "set_show_command_palette": {
       return {
         ...state,
