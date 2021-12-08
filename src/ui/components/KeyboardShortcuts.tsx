@@ -22,7 +22,9 @@ function KeyboardShortcuts({
   togglePaneCollapse,
   setViewMode,
 }: PropsFromRedux) {
-  const openFullTextSearch = () => {
+  const openFullTextSearch = (e: KeyboardEvent) => {
+    e.preventDefault();
+
     if (viewMode !== "dev") {
       setViewMode("dev");
     }
