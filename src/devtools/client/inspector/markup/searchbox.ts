@@ -9,7 +9,6 @@ export default class MarkupSearchbox {
   private inspector: Inspector;
   private markupPanel!: HTMLElement;
   private searchBox!: HTMLElement;
-  private searchClearButton!: HTMLElement;
   private searchResultsContainer!: HTMLElement;
   private searchResultsLabel!: HTMLElement;
   private _search: any;
@@ -21,7 +20,7 @@ export default class MarkupSearchbox {
 
   get search() {
     if (!this._search) {
-      this._search = new InspectorSearch(this.inspector, this.searchBox, this.searchClearButton);
+      this._search = new InspectorSearch(this.inspector, this.searchBox);
     }
 
     return this._search;
@@ -33,7 +32,6 @@ export default class MarkupSearchbox {
   setupSearchBox() {
     this.markupPanel = document.getElementById("inspector-main-content")!;
     this.searchBox = document.getElementById("inspector-searchbox")!;
-    this.searchClearButton = document.getElementById("inspector-searchinput-clear")!;
     this.searchResultsContainer = document.getElementById("inspector-searchlabel-container")!;
     this.searchResultsLabel = document.getElementById("inspector-searchlabel")!;
 
