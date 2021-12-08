@@ -18,10 +18,8 @@ const csp = (props: any) => {
       isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : ""
     }`,
     `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com`,
-    `script-src 'self' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash} ${
-      // Required by local dev server
-      isDev ? "'unsafe-eval'" : ""
-    }`,
+    // unsafe-eval is required by intercom
+    `script-src 'self' 'unsafe-eval' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://webreplay.us.auth0.com`,
 
     // From vercel's CSP config
