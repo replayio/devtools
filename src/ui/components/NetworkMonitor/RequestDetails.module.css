@@ -21,14 +21,15 @@ h2.title {
   flex: 0 0 auto;
 }
 
-.row {
-  white-space: nowrap;
-}
-
 .method {
   font-weight: bold;
 }
 
 .status {
   font-weight: bold;
+}
+
+.row {
+  padding-left: 1rem;
+  word-break: break-all;
 }

@@ -11,6 +11,7 @@ const RequestTable = ({
   data,
   onRowSelect,
   seek,
+  selectedRequest,
   table,
 }: {
   currentTime: number;
@@ -53,6 +54,7 @@ const RequestTable = ({
                 currentTime={currentTime}
                 isFirstInFuture={firstInFuture}
                 isInPast={inPast}
+                isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}
                 onClick={onRowSelect}
                 onSeek={onSeek}

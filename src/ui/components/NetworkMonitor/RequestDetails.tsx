@@ -14,21 +14,12 @@ interface Detail {
 
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
-    <div className={className}>
-      <div className={classNames("px-4 flex flex-col")}>
-        {details.map(h => (
-          <div title={h.name} className={classNames(styles.row, styles.value)} key={h.name}>
-            {h.name}
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col text-gray-400 ">
-        {details.map(h => (
-          <div title={h.value} className={classNames(styles.row, styles.value)} key={h.name}>
-            {h.value}
-          </div>
-        ))}
-      </div>
+    <div className={classNames(className, "flex flex-col")}>
+      {details.map(h => (
+        <div className={classNames(styles.row)} key={h.name}>
+          <span className="font-bold">{h.name}:</span> {h.value}
+        </div>
+      ))}
     </div>
   );
 };
@@ -57,9 +48,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   return (
     <>
       <div
-        className={classNames(
-          "flex items-center py-1 whitespace-nowrap cursor-pointer font-semibold"
-        )}
+        className={classNames("flex items-center py-1 cursor-pointer font-bold")}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
         <TriangleToggle open={requestExpanded} />
@@ -79,7 +68,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
       >
         <TriangleToggle open={requestHeadersExpanded} />
@@ -89,7 +78,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
       >
         <TriangleToggle open={responseHeadersExpanded} />
@@ -101,7 +90,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       {request.queryParams.length > 0 && (
         <div>
           <h2
-            className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+            className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
             onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
           >
             <TriangleToggle open={queryParametersExpanded} />
@@ -146,11 +135,11 @@ const RequestDetails = ({
 
   return (
     <div className="h-full w-full overflow-hidden">
-      <div className="overflow-hidden flex items-center justify-between">
-        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
-      </div>
       <div className={classNames("", styles.requestDetails)}>
+        <div className="flex justify-between bg-toolbarBackground items-center">
+          <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+          <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
+        </div>
         {activeTab == "headers" && <HeadersPanel request={request} />}
         {activeTab == "cookies" && <ComingSoon />}
         {activeTab == "response" && <ComingSoon />}
