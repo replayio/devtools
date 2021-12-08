@@ -54,6 +54,7 @@ OrgLibraryDisabled.args = {
         features: {
           user: {
             library: false,
+            autoJoin: null,
           },
           recording: {
             public: true,
@@ -83,6 +84,7 @@ OrgPublicDisabled.args = {
         features: {
           user: {
             library: true,
+            autoJoin: null,
           },
           recording: {
             public: false,
@@ -112,6 +114,7 @@ OrgLibraryAndPublicDisabled.args = {
         features: {
           user: {
             library: false,
+            autoJoin: null,
           },
           recording: {
             public: false,

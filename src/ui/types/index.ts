@@ -155,6 +155,7 @@ export interface WorkspaceSettings {
   features: {
     user: {
       library: boolean;
+      autoJoin: number | null;
     };
     recording: {
       public: boolean;
@@ -162,6 +163,11 @@ export interface WorkspaceSettings {
   };
   motd: string | null;
 }
+
+// https://typeofnan.dev/creating-your-own-deeppartial-type-in-typescript/
+type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
+
+export type PartialWorkspaceSettingsFeatures = DeepPartial<WorkspaceSettings["features"]>;
 
 export type WorkspaceUserRole = "viewer" | "debugger" | "admin";
 
