@@ -22,9 +22,10 @@ const csp = (props: any) => {
     `script-src 'self' 'unsafe-eval' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://webreplay.us.auth0.com`,
 
-    // From vercel's CSP config
-    isDev ? `font-src 'self' data:` : "",
-
+    // From vercel's CSP config and Google fonts
+    `font-src 'self' data: https://fonts.gstatic.com`,
+    // Google fonts
+    `style-src-elem 'self' 'unsafe-inline' https://fonts.gstatic.com`,
     // Required by LogRocket
     `child-src 'self' blob:`,
     `worker-src 'self' blob:`,
