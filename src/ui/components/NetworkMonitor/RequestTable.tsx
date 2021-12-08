@@ -5,8 +5,6 @@ import { RequestSummary } from "./utils";
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
 import { Row, TableInstance } from "react-table";
-import { fi } from "date-fns/locale";
-import { first } from "lodash";
 
 const RequestTable = ({
   currentTime,
@@ -48,15 +46,17 @@ const RequestTable = ({
               firstInFuture = true;
             }
 
+            prepareRow(row);
+
             return (
               <RequestRow
-                row={row}
-                onClick={onRowSelect}
                 currentTime={currentTime}
-                onSeek={onSeek}
-                prepareRow={prepareRow}
                 isFirstInFuture={firstInFuture}
                 isInPast={inPast}
+                key={row.getRowProps().key}
+                onClick={onRowSelect}
+                onSeek={onSeek}
+                row={row}
               />
             );
           })}

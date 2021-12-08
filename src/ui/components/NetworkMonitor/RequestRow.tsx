@@ -10,7 +10,6 @@ export const RequestRow = ({
   isInPast,
   onClick,
   onSeek,
-  prepareRow,
   row,
 }: {
   currentTime: number;
@@ -18,10 +17,9 @@ export const RequestRow = ({
   isInPast: boolean;
   onClick: (row: RequestSummary) => void;
   onSeek: (row: RequestSummary) => void;
-  prepareRow: (row: Row<RequestSummary>) => void;
   row: Row<RequestSummary>;
 }) => {
-  let currentRow = false;
+  // let currentRow = false;
   // Did we just pass the row boundary that contains the current time?
   // If so, let's render this row as the "current" row and all rows
   // after it as future rows.
@@ -32,7 +30,6 @@ export const RequestRow = ({
   //   renderingRequestsInThePast = false;
   //   currentRow = true;
   // }
-  prepareRow(row);
   return (
     <div
       className={classNames(styles.row, {

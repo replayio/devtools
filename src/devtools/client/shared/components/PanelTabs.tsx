@@ -46,7 +46,7 @@ export default function PanelTabs({
         <nav className="tabs-navigation">
           <ul className="tabs-menu" role="tablist">
             {tabs.map((tab: Tab) => (
-              <PanelTab setActiveTab={setActiveTab} tab={tab} activeTab={activeTab} />
+              <PanelTab key={tab.id} setActiveTab={setActiveTab} tab={tab} activeTab={activeTab} />
             ))}
           </ul>
         </nav>
