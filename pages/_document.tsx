@@ -15,13 +15,14 @@ const csp = (props: any) => {
     `default-src 'self'`,
     `connect-src 'self' https://api.replay.io wss://dispatch.replay.io https://webreplay.us.auth0.com https://api-js.mixpanel.com https://*.sentry.io https://*.intercom.io wss://*.intercom.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com ${
       // Required to talk to local backend in development
-      isDev ? "http://localhost:* http://*.replay.local ws://localhost:* " : ""
+      isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : ""
     }`,
-    `frame-src https://js.stripe.com https://hooks.stripe.com`,
+    `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com`,
     `script-src 'self' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash} ${
       // Required by local dev server
       isDev ? "'unsafe-eval'" : ""
     }`,
+    `form-action https://webreplay.us.auth0.com`,
 
     // From vercel's CSP config
     isDev ? `font-src 'self' data:` : "",
