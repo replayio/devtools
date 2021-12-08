@@ -24,17 +24,14 @@ const MAX_SUGGESTIONS = 15;
  * @param {DOMNode} input
  *        The input element to which the panel will be attached and from where
  *        search input will be taken.
- * @param {DOMNode} clearBtn
- *        The clear button in the input field that will clear the input value.
  *
  * Emits the following events:
  * - search-cleared: when the search box is emptied
  * - search-result: when a search is made and a result is selected
  */
-function InspectorSearch(inspector, input, clearBtn) {
+function InspectorSearch(inspector, input) {
   this.inspector = inspector;
   this.searchBox = input;
-  this.searchClearButton = clearBtn;
   this._lastSearched = null;
   this._lastSearchedResults = null;
 
@@ -44,7 +41,6 @@ function InspectorSearch(inspector, input, clearBtn) {
 
   this.searchBox.addEventListener("keydown", this._onKeyDown, true);
   this.searchBox.addEventListener("input", this._onInput, true);
-  this.searchClearButton.addEventListener("click", this._onClearSearch);
 
   // For testing, we need to be able to wait for the most recent node request
   // to finish.  Tests can watch this promise for that.
@@ -61,9 +57,7 @@ InspectorSearch.prototype = {
   destroy: function () {
     this.searchBox.removeEventListener("keydown", this._onKeyDown, true);
     this.searchBox.removeEventListener("input", this._onInput, true);
-    this.searchClearButton.removeEventListener("click", this._onClearSearch);
     this.searchBox = null;
-    this.searchClearButton = null;
     this.autocompleter.destroy();
   },
 
@@ -127,10 +121,7 @@ InspectorSearch.prototype = {
 
   _onInput: function () {
     if (this.searchBox.value.length === 0) {
-      this.searchClearButton.hidden = true;
       this._onSearch();
-    } else {
-      this.searchClearButton.hidden = false;
     }
   },
 
@@ -149,7 +140,6 @@ InspectorSearch.prototype = {
   _onClearSearch: function () {
     this.searchBox.parentNode.classList.remove("devtools-searchbox-no-match");
     this.searchBox.value = "";
-    this.searchClearButton.hidden = true;
     this.emit("search-cleared");
   },
 };
