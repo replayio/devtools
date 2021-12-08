@@ -33,15 +33,10 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
             <input
               id="inspector-searchbox"
               className="devtools-searchinput"
-              type="search"
+              type="input"
               placeholder="Search HTML"
+              autoComplete="off"
             />
-            <button
-              id="inspector-searchinput-clear"
-              className="devtools-searchinput-clear"
-              hidden={true}
-              tabIndex={-1}
-            ></button>
           </div>
           <div id="inspector-searchlabel-container" hidden={true}>
             <div className="devtools-separator"></div>
