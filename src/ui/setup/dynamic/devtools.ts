@@ -106,10 +106,10 @@ export default async (store: Store) => {
     app,
     comments,
     contextMenus,
+    layout,
     network,
     reactDevTools,
     timeline,
-    layout,
     ...debuggerReducers,
     ...consoleReducers.reducers,
   };

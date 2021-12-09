@@ -35,9 +35,9 @@ import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { CommandKey } from "ui/components/CommandPalette";
 import { hideCommandPalette } from "./layout";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
+import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };

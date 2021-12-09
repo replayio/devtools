@@ -24,10 +24,12 @@ function KeyboardShortcuts({
   viewMode,
 }: PropsFromRedux) {
   const addShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
-    globalShortcuts!.on(key, callback);
+    if (!globalShortcuts) return;
+    globalShortcuts.on(key, callback);
   };
   const removeShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
-    globalShortcuts!.off(key, callback);
+    if (!globalShortcuts) return;
+    globalShortcuts.off(key, callback);
   };
 
   const openFullTextSearch = (e: KeyboardEvent) => {
@@ -53,8 +55,6 @@ function KeyboardShortcuts({
   // The shortcuts have to be reassigned every time the dependencies change,
   // otherwise we end up with a stale prop.
   useEffect(() => {
-    if (!globalShortcuts) return;
-
     addShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
     addShortcut("CmdOrCtrl+B", toggleLeftSidebar);
     addShortcut("CmdOrCtrl+K", togglePalette);
