@@ -21,7 +21,7 @@ const RequestTable = ({
   selectedRequest?: RequestSummary;
   table: TableInstance<RequestSummary>;
 }) => {
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
+  const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
   const onSeek = (request: RequestSummary) => {
     seek(request.point.point, request.point.time, true);
@@ -37,7 +37,7 @@ const RequestTable = ({
           className="sticky z-10 top-0"
           style={{ background: "var(--theme-tab-toolbar-background)" }}
         >
-          <HeaderGroups headerGroups={headerGroups} />
+          <HeaderGroups columns={columns} headerGroups={headerGroups} />
         </div>
         <div {...getTableBodyProps()}>
           {rows.map((row: Row<RequestSummary>) => {

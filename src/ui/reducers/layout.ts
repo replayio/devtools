@@ -23,4 +23,4 @@ export default function update(state = initialLayoutState(), action: LayoutActio
   }
 }
 
-export const getShowCommandPalette = (state: UIState) => state.layout.showCommandPalette;
+export const getShowCommandPalette = (state: UIState) => state.layout?.showCommandPalette;
