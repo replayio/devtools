@@ -64,6 +64,20 @@ body > div {
   <div class="box1" style="position: static; z-index: 1;"></div>
   <div class="box2"></div>
 </div>
+<div style="left: 200px; top: 200px;">
+  <div class="box1" style="z-index: 2;"></div>
+</div>
+<div style="left: 200px; top: 200px;">
+  <div class="box2" style="z-index: 1;"></div>
+</div>
+<div style="left: 300px; top: 200px;">
+  <div style="position: relative; left: 5px; top: 5px;">
+    <div class="box1" style="position: static;"></div>
+  </div>
+  <div style="margin-left: 25px; margin-top: -15px;">
+    <div class="box2" style="position: static;"></div>
+  </div>
+</div>
 <script>
   window.setTimeout(() => {
     dump(`RecReplaySendAsyncMessage Example__Finished`);
