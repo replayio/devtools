@@ -288,8 +288,21 @@ function hasCSSVariable(propertyValue, variableName) {
   return regex.test(propertyValue);
 }
 
+/**
+ * Returns filtered class names that are nullish or falsey, concatenated into a
+ * single class name.
+ *
+ * @param {Array} classNames
+ *        Array of class names (Array<string | null | false | undefined>).
+ * @return {String}
+ */
+const classes = (...classNames) => {
+  return classNames.filter(_class => !!_class).join(" ");
+};
+
 module.exports = {
   getNodeInfo,
   getRuleFromNode,
   hasCSSVariable,
+  classes,
 };

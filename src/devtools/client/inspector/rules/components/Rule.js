@@ -9,9 +9,7 @@ const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 // const { editableItem } = require("devtools/client/shared/inplace-editor");
 
-const Declarations = createFactory(
-  require("devtools/client/inspector/rules/components/Declarations")
-);
+import { Declarations } from "devtools/client/inspector/rules/components/Declarations";
 const Selector = createFactory(require("devtools/client/inspector/rules/components/Selector"));
 const SelectorHighlighter = createFactory(
   require("devtools/client/inspector/rules/components/SelectorHighlighter")
