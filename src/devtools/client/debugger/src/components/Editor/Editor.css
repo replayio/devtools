@@ -89,9 +89,9 @@ html[dir="rtl"] .editor-mount {
 }
 
 /* set the linenumber white when there is a breakpoint */
-.editor-wrapper .new-breakpoint .CodeMirror-gutter-wrapper .CodeMirror-linenumber {
+/* .editor-wrapper .new-breakpoint .CodeMirror-gutter-wrapper .CodeMirror-linenumber {
   color: white;
-}
+} */
 
 /* move the breakpoint below the other gutter elements */
 .new-breakpoint .CodeMirror-gutter-elt:nth-child(2) {

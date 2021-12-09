@@ -54,6 +54,7 @@
 }
 
 .editor.new-breakpoint svg {
+  visibility: hidden;
   fill: var(--breakpoint-fill);
   stroke: var(--breakpoint-stroke);
   width: 60px;
