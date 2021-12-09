@@ -1,6 +1,7 @@
 type Tab = {
   id: string;
   title: string;
+  visible: boolean;
 };
 
 function PanelTab({
@@ -45,9 +46,16 @@ export default function PanelTabs({
       <div className="tabs">
         <nav className="tabs-navigation">
           <ul className="tabs-menu" role="tablist">
-            {tabs.map((tab: Tab) => (
-              <PanelTab key={tab.id} setActiveTab={setActiveTab} tab={tab} activeTab={activeTab} />
-            ))}
+            {tabs
+              .filter(t => t.visible)
+              .map((tab: Tab) => (
+                <PanelTab
+                  key={tab.id}
+                  setActiveTab={setActiveTab}
+                  tab={tab}
+                  activeTab={activeTab}
+                />
+              ))}
           </ul>
         </nav>
       </div>

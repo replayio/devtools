@@ -17,7 +17,7 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
     <div className={classNames(className, "flex flex-col")}>
       {details.map(h => (
         <div className={classNames(styles.row)} key={h.name}>
-          <span className="font-bold">{h.name}:</span> {h.value}
+          <span className="font-bold text-gray-500">{h.name}:</span> {h.value}
         </div>
       ))}
     </div>
@@ -31,6 +31,38 @@ const TriangleToggle = ({ open }: { open: boolean }) => (
   />
 );
 
+const parseCookie = (str: string): Record<string, string> => {
+  return str
+    .split(";")
+    .map(v => v.split("="))
+    .reduce((acc: Record<string, string>, v) => {
+      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+      return acc;
+    }, {});
+};
+
+const cookieHeader = (request: RequestSummary): string | undefined => {
+  return request.requestHeaders.find(r => r.name.toLowerCase() === "cookie")?.value;
+};
+
+const Cookies = ({ request }: { request: RequestSummary }) => {
+  return (
+    <div>
+      <h2 className={classNames("p-4 py-1 border-t cursor-pointer font-bold", styles.title)}>
+        Request Cookies
+      </h2>
+      <DetailTable
+        className={styles.request}
+        details={Object.entries(parseCookie(cookieHeader(request) || "")).map(
+          (value: [string, string]) => {
+            return { name: value[0], value: value[1] };
+          }
+        )}
+      />
+    </div>
+  );
+};
+
 const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [requestExpanded, setRequestExpanded] = useState(true);
   const [requestHeadersExpanded, setRequestHeadersExpanded] = useState(true);
@@ -38,11 +70,11 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [queryParametersExpanded, setQueryParametersExpanded] = useState(true);
 
   const requestHeaders = useMemo(
-    () => sortBy(request?.requestHeaders, r => r.name.toLowerCase()),
+    () => sortBy(request.requestHeaders, r => r.name.toLowerCase()),
     [request]
   );
   const responseHeaders = useMemo(
-    () => sortBy(request?.responseHeaders, r => r.name.toLowerCase()),
+    () => sortBy(request.responseHeaders, r => r.name.toLowerCase()),
     [request]
   );
   return (
@@ -121,12 +153,12 @@ const RequestDetails = ({
   const [activeTab, setActiveTab] = useState("headers");
 
   const tabs = [
-    { id: "headers", title: "Headers" },
-    { id: "cookies", title: "Cookies" },
-    { id: "response", title: "Response" },
-    { id: "request", title: "Request" },
-    { id: "initiator", title: "Stack Trace" },
-    { id: "timings", title: "Timings" },
+    { id: "headers", title: "Headers", visible: true },
+    { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
+    { id: "response", title: "Response", visible: true },
+    { id: "request", title: "Request", visible: true },
+    { id: "initiator", title: "Stack Trace", visible: true },
+    { id: "timings", title: "Timings", visible: true },
   ];
 
   if (!request) {
@@ -141,7 +173,7 @@ const RequestDetails = ({
           <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
         </div>
         {activeTab == "headers" && <HeadersPanel request={request} />}
-        {activeTab == "cookies" && <ComingSoon />}
+        {activeTab == "cookies" && <Cookies request={request} />}
         {activeTab == "response" && <ComingSoon />}
         {activeTab == "request" && <ComingSoon />}
         {activeTab == "initiator" && <ComingSoon />}
