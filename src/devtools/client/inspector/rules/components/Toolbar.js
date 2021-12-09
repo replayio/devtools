@@ -9,7 +9,7 @@ const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 
-const SearchBox = createFactory(require("devtools/client/inspector/rules/components/SearchBox"));
+import { SearchBox } from "devtools/client/inspector/rules/components/SearchBox";
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 
@@ -71,8 +71,8 @@ class Toolbar extends PureComponent {
   }
 
   render() {
-    const { isAddRuleEnabled, isClassPanelExpanded } = this.props;
-    const { isPseudoClassPanelExpanded } = this.state;
+    // const { isAddRuleEnabled, isClassPanelExpanded } = this.props;
+    // const { isPseudoClassPanelExpanded } = this.state;
 
     return dom.div(
       {
@@ -83,42 +83,45 @@ class Toolbar extends PureComponent {
           id: "ruleview-toolbar",
           className: "devtools-toolbar devtools-input-toolbar",
         },
-        SearchBox({}),
-        dom.div({ className: "devtools-separator" }),
-        dom.div(
-          { id: "ruleview-command-toolbar" },
-          dom.button({
-            id: "pseudo-class-panel-toggle",
-            className: "devtools-button" + (isPseudoClassPanelExpanded ? " checked" : ""),
-            onClick: this.onPseudoClassPanelToggle,
-            title: getStr("rule.togglePseudo.tooltip"),
-          }),
-          dom.button({
-            id: "class-panel-toggle",
-            className: "devtools-button" + (isClassPanelExpanded ? " checked" : ""),
-            onClick: this.onClassPanelToggle,
-            title: getStr("rule.classPanel.toggleClass.tooltip"),
-          }),
-          dom.button({
-            id: "ruleview-add-rule-button",
-            className: "devtools-button",
-            disabled: !isAddRuleEnabled,
-            onClick: this.onAddRuleClick,
-            title: getStr("rule.addRule.tooltip"),
-          })
-        )
-      ),
-      isClassPanelExpanded
-        ? ClassListPanel({
-            onAddClass: this.props.onAddClass,
-            onSetClassState: this.props.onSetClassState,
-          })
-        : null,
-      isPseudoClassPanelExpanded
-        ? PseudoClassPanel({
-            onTogglePseudoClass: this.props.onTogglePseudoClass,
-          })
-        : null
+        SearchBox({})
+        // we will disable 'classes' and 'pseudo classes' panels for the time
+        // being and reconsider readdding/reimplementing on another occasion
+        //
+        // dom.div({ className: "devtools-separator" }),
+        // dom.div(
+        //   { id: "ruleview-command-toolbar" },
+        //   dom.button({
+        //     id: "pseudo-class-panel-toggle",
+        //     className: "devtools-button" + (isPseudoClassPanelExpanded ? " checked" : ""),
+        //     onClick: this.onPseudoClassPanelToggle,
+        //     title: getStr("rule.togglePseudo.tooltip"),
+        //   }),
+        //   dom.button({
+        //     id: "class-panel-toggle",
+        //     className: "devtools-button" + (isClassPanelExpanded ? " checked" : ""),
+        //     onClick: this.onClassPanelToggle,
+        //     title: getStr("rule.classPanel.toggleClass.tooltip"),
+        //   }),
+        //   dom.button({
+        //     id: "ruleview-add-rule-button",
+        //     className: "devtools-button",
+        //     disabled: !isAddRuleEnabled,
+        //     onClick: this.onAddRuleClick,
+        //     title: getStr("rule.addRule.tooltip"),
+        //   })
+        // )
+      )
+      // isClassPanelExpanded
+      //   ? ClassListPanel({
+      //       onAddClass: this.props.onAddClass,
+      //       onSetClassState: this.props.onSetClassState,
+      //     })
+      //   : null,
+      // isPseudoClassPanelExpanded
+      //   ? PseudoClassPanel({
+      //       onTogglePseudoClass: this.props.onTogglePseudoClass,
+      //     })
+      //   : null
     );
   }
 }

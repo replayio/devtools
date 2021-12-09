@@ -13,7 +13,7 @@ const { connect } = require("react-redux");
 const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
 const Rule = createFactory(require("devtools/client/inspector/rules/components/Rule"));
 const Rules = createFactory(require("devtools/client/inspector/rules/components/Rules"));
-// const Toolbar = createFactory(require("devtools/client/inspector/rules/components/Toolbar"));
+const Toolbar = createFactory(require("devtools/client/inspector/rules/components/Toolbar"));
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 const Types = require("devtools/client/inspector/rules/types");
@@ -200,13 +200,13 @@ class RulesApp extends PureComponent {
         id: "sidebar-panel-ruleview",
         className: "theme-sidebar inspector-tabpanel",
       },
-      // Toolbar({
-      //   onAddClass: this.props.onAddClass,
-      //   onAddRule: this.props.onAddRule,
-      //   onSetClassState: this.props.onSetClassState,
-      //   onToggleClassPanelExpanded: this.props.onToggleClassPanelExpanded,
-      //   onTogglePseudoClass: this.props.onTogglePseudoClass,
-      // }),
+      Toolbar({
+        onAddClass: this.props.onAddClass,
+        onAddRule: this.props.onAddRule,
+        onSetClassState: this.props.onSetClassState,
+        onToggleClassPanelExpanded: this.props.onToggleClassPanelExpanded,
+        onTogglePseudoClass: this.props.onTogglePseudoClass,
+      }),
       dom.div(
         {
           id: "ruleview-container",
