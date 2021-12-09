@@ -16,15 +16,15 @@ const {
   updateHoveredLineNumber,
 } = require("devtools/client/debugger/src/actions/breakpoints/index");
 
-type LineNumberTooltipProps = PropsFromRedux & { editor: any };
+type ShowWidgetButtonProps = PropsFromRedux & { editor: any };
 
-function LineNumberTooltip({
+function ShowWidgetButton({
   editor,
   addBreakpointAtLine,
   cx,
   breakpoints,
   removeBreakpoint,
-}: LineNumberTooltipProps) {
+}: ShowWidgetButtonProps) {
   const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
@@ -64,7 +64,7 @@ function LineNumberTooltip({
     };
   }, []);
 
-  if (!lineNumberNode) {
+  if (!lineNumberNode || bp) {
     return null;
   }
 
@@ -83,7 +83,7 @@ function LineNumberTooltip({
       style={style}
       onClick={onClick}
     >
-      <MaterialIcon>{bp ? "remove" : "add"}</MaterialIcon>
+      <MaterialIcon>{"add"}</MaterialIcon>
     </button>,
     lineNumberNode.parentElement!
   );
@@ -105,4 +105,4 @@ const connector = connect(
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(LineNumberTooltip);
+export default connector(ShowWidgetButton);

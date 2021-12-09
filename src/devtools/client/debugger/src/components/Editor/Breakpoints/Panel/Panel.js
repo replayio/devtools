@@ -3,11 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
+import RemoveWidgetButton from "./RemoveWidgetButton";
 
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
@@ -42,6 +43,7 @@ function Panel({
   const [showCondition, setShowCondition] = useState(!!breakpoint.options.condition);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
+  const [panelNode, setPanelNode] = useState(null);
   const dismissNag = hooks.useDismissNag();
   const { nags } = hooks.useGetUserInfo();
   const error = analysisPoints === "error";
@@ -93,6 +95,10 @@ function Panel({
     }
   };
 
+  const onClick = e => {
+    console.log(panelNode);
+  };
+
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
       <div
@@ -100,6 +106,8 @@ function Panel({
         style={{ width: `${width}px` }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
+        ref={node => setPanelNode(node)}
+        onClick={onClick}
       >
         {showNag && <FirstEditNag editing={editing} />}
         <div className={classnames("breakpoint-panel", { editing })}>
@@ -126,6 +134,7 @@ function Panel({
           <BreakpointNavigation {...{ breakpoint, editing, showCondition, setShowCondition }} />
         </div>
       </div>
+      {panelNode ? <RemoveWidgetButton breakpoint={breakpoint} panelNode={panelNode} /> : null}
     </Widget>
   );
 }

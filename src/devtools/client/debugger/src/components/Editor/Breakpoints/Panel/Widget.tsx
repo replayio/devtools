@@ -9,6 +9,12 @@ interface WidgetProps {
   insertAt: number;
 }
 
+interface WidgetContextType {
+  node: HTMLDivElement | null;
+}
+
+export const WidgetContext = React.createContext<WidgetContextType>({ node: null });
+
 export default function Widget({ location, children, editor, insertAt }: WidgetProps) {
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,5 +43,8 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
     return null;
   }
 
-  return ReactDOM.createPortal(<>{children}</>, node);
+  return ReactDOM.createPortal(
+    <WidgetContext.Provider value={{ node }}>{children}</WidgetContext.Provider>,
+    node
+  );
 }
