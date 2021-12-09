@@ -13,6 +13,7 @@ import timeline from "ui/reducers/timeline";
 import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import reactDevTools from "ui/reducers/reactDevTools";
+import layout from "ui/reducers/layout";
 import { selectors } from "ui/reducers";
 import { actions, UIStore } from "ui/actions";
 const { setupApp, setupTimeline, setupReactDevTools, createSession } = actions;
@@ -103,11 +104,12 @@ export default async (store: Store) => {
 
   const reducers = {
     app,
-    timeline,
     comments,
     contextMenus,
+    layout,
     network,
     reactDevTools,
+    timeline,
     ...debuggerReducers,
     ...consoleReducers.reducers,
   };
