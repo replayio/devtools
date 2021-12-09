@@ -1,5 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
-import { GET_USER_INFO, GET_USER_ID } from "ui/graphql/users";
+import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
 import { cloneResponse } from "./utils";
 
 export function createGetUserMock(opts: { user?: { id: string; uuid: string } }): MockedResponse[] {
@@ -12,14 +12,18 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
     unsubscribedEmailTypes: [],
     user: { id: opts.user?.id || "1" },
   };
+  const dismissNag = {
+    request: {
+      query: DISMISS_NAG,
+    },
+    result: {},
+  };
   const getUser = {
     request: {
       query: GET_USER_INFO,
     },
     result: {
-      data: {
-        viewer: userInfo,
-      },
+      data: { viewer: userInfo },
     },
   };
   const getUserId = {
@@ -34,5 +38,9 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
       },
     },
   };
-  return [...cloneResponse(getUser, 8), ...cloneResponse(getUserId, 8)];
+  return [
+    ...cloneResponse(getUser, 8),
+    ...cloneResponse(getUserId, 8),
+    ...cloneResponse(dismissNag, 1),
+  ];
 }
