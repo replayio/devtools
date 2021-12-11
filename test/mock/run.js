@@ -1,7 +1,6 @@
 const { spawnSync } = require("child_process");
 const manifest = require("./manifest");
 const { listAllRecordings, uploadRecording } = require("@recordreplay/recordings-cli");
-const { match } = require("assert");
 
 const devtools = `${__dirname}/../..`;
 let scriptsToRun = [];

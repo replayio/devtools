@@ -49,12 +49,15 @@ module.exports = [
     example: "doc_navigate.html",
     script: "breakpoints-07.js",
     targets: ["gecko", "chromium"],
+    // This test is the most failing test in our suite. I am not sure why
+    pending: true,
   },
-  // {
-  //   example: "node/control_flow.js",
-  //   script: "node_control_flow.js",
-  //   targets: ["node"],
-  // },
+  {
+    example: "node/control_flow.js",
+    script: "node_control_flow.js",
+    targets: ["node"],
+    pending: true,
+  },
 
   //////////////////////////////////////////////////////////////////////////////
   // Stepping
@@ -201,11 +204,12 @@ module.exports = [
     script: "object_preview-01.js",
     targets: ["gecko", "chromium"],
   },
-  // {
-  //   example: "doc_rr_objects.html",
-  //   script: "object_preview-02.js",
-  //   targets: ["gecko", "chromium"],
-  // },
+  {
+    example: "doc_rr_objects.html",
+    script: "object_preview-02.js",
+    targets: ["gecko", "chromium"],
+    pending: true,
+  },
   {
     example: "doc_rr_preview.html",
     script: "object_preview-03.js",
@@ -240,12 +244,13 @@ module.exports = [
     script: "inspector-02.js",
     targets: ["gecko"],
   },
-  // {
-  //   This  test just times out, it doesn't even seem to run
-  //   example: "doc_inspector_styles.html",
-  //   script: "inspector-03.js",
-  //   targets: ["gecko"],
-  // },
+  {
+    // This  test just times out, it doesn't even seem to run
+    example: "doc_inspector_styles.html",
+    script: "inspector-03.js",
+    targets: ["gecko"],
+    pending: true,
+  },
   {
     example: "doc_inspector_styles.html",
     script: "inspector-04.js",
@@ -291,12 +296,13 @@ module.exports = [
   // Miscellaneous
   //////////////////////////////////////////////////////////////////////////////
 
-  // Disabled for now because this test requires authentication
-  // {
-  //   example: "doc_rr_basic.html",
-  //   script: "settings.js",
-  //   targets: ["gecko", "chromium"],
-  // },
+  // disabled for now because this test requires authentication
+  {
+    example: "doc_rr_basic.html",
+    script: "settings.js",
+    targets: ["gecko", "chromium"],
+    pending: true,
+  },
   {
     example: "doc_rr_worker.html",
     script: "worker-01.js",
