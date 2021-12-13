@@ -17,6 +17,11 @@
     url(/fonts/material_icons/MaterialIconsOutlined-Regular.otf) format("opentype");
 }
 
+.material-icon-loaded .material-icons,
+.material-icon-loaded .material-icons-outlined {
+  opacity: 1;
+}
+
 .material-icons,
 .material-icons-outlined {
   font-weight: normal;
@@ -29,6 +34,8 @@
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
+  opacity: 0;
+  width: 1rem;
 
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
