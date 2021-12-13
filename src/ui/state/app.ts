@@ -106,6 +106,7 @@ export interface AppState {
   videoUrl: string | null;
   viewMode: ViewMode;
   workspaceId: WorkspaceId | null;
+  mouseTargetsLoading: boolean;
 }
 
 export interface AnalysisPoints {
