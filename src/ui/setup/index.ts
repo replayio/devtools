@@ -60,13 +60,15 @@ export async function bootstrapApp() {
 
     const userInfo = await getUserInfo();
     if (userInfo) {
-      setTelemetryContext(userInfo);
-      maybeSetMixpanelContext(userInfo);
-
-      if (!getWorkspaceId(store.getState())) {
+      let workspaceId = getWorkspaceId(store.getState());
+      if (!workspaceId) {
         const userSettings = await getUserSettings();
         store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+        workspaceId = userSettings.defaultWorkspaceId;
       }
+
+      setTelemetryContext(userInfo);
+      maybeSetMixpanelContext({ ...userInfo, workspaceId });
     }
 
     initLaunchDarkly();

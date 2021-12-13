@@ -15,7 +15,6 @@ import {
   PendingWorkspaceInvitation,
   Subscription,
   Workspace,
-  WorkspaceSettings,
   WorkspaceUserRole,
 } from "ui/types";
 
