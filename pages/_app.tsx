@@ -99,7 +99,6 @@ import "ui/components/Comments/Comments.css";
 import "ui/components/Comments/TranscriptComments/CommentActions.css";
 import "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor.css";
 import "ui/components/Comments/VideoComments/CommentsOverlay.css";
-import "ui/components/Comments/VideoComments/Hud.css";
 import "ui/components/Header/ShareDropdown.css";
 import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
