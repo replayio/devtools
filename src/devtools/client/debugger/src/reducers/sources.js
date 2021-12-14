@@ -50,6 +50,7 @@ export function initialSourcesState() {
     selectedLocationHasScrolled: false,
     chromeAndExtensionsEnabled: prefs.chromeAndExtensionsEnabled,
     focusedItem: null,
+    sourcesLoading: true,
   };
 }
 
@@ -164,6 +165,9 @@ function update(state = initialSourcesState(), action) {
 
     case "SET_FOCUSED_SOURCE_ITEM":
       return { ...state, focusedItem: action.item };
+
+    case "SOURCES_LOADED":
+      return { ...state, sourcesLoading: false };
 
     case "BATCH":
       action.updates.forEach(u => (state = update(state, u)));
@@ -662,6 +666,10 @@ export function getTextAtLocation(state, id, location) {
   const text = getTextAtPosition(id, content, { ...location, column: 0 });
 
   return text;
+}
+
+export function getSourcesLoading(state) {
+  return state.sources.sourcesLoading;
 }
 
 export default update;

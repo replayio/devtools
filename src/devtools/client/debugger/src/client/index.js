@@ -44,10 +44,10 @@ export async function loadInitialState() {
 let boundActions;
 let store;
 
-function setupDebugger() {
+async function setupDebugger() {
   store.dispatch(actions.connect("", ThreadFront.actor, {}, false));
 
-  ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
+  await ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
     clientEvents.newSource(ThreadFront, {
       source: {
         actor: sourceId,
@@ -56,6 +56,7 @@ function setupDebugger() {
       },
     })
   );
+  store.dispatch({ type: "SOURCES_LOADED" });
 
   syncBreakpoints();
 }
