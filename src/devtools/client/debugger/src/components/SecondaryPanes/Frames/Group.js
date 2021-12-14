@@ -4,7 +4,6 @@
 
 //
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import classNames from "classnames";
 
 import { getLibraryFromUrl } from "../../../utils/pause/frames";
@@ -125,15 +124,13 @@ export default class Group extends Component {
   }
 
   renderDescription() {
-    const { l10n } = this.context;
     const { group } = this.props;
 
     const frame = group[0];
     const expanded = this.state.expanded;
-    const l10NEntry = this.state.expanded
-      ? "callStack.group.collapseTooltip"
-      : "callStack.group.expandTooltip";
-    const title = l10n.getFormatStr(l10NEntry, frame.library);
+    const title = this.state.expanded
+      ? `Collapse ${frame.library} frames`
+      : `Expand ${frame.library} frames`;
 
     return (
       <div
@@ -169,4 +166,3 @@ export default class Group extends Component {
 }
 
 Group.displayName = "Group";
-Group.contextTypes = { l10n: PropTypes.object };
