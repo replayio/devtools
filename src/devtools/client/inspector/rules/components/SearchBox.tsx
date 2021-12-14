@@ -8,7 +8,12 @@ import React, { FC } from "react";
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 
-export const SearchBox: FC = () => {
+type SearchBoxProps = {
+  query: string;
+  onQueryChange: (query: string) => void;
+};
+
+export const SearchBox: FC<SearchBoxProps> = ({ query, onQueryChange }) => {
   return (
     <div className="devtools-searchbox">
       <input
@@ -17,6 +22,8 @@ export const SearchBox: FC = () => {
         autoComplete="off"
         className="devtools-filterinput"
         placeholder={getStr("rule.filterStyles.placeholder")}
+        value={query}
+        onChange={e => onQueryChange(e.target.value)}
       />
     </div>
   );

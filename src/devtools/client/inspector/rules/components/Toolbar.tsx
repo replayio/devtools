@@ -14,6 +14,8 @@ type ToolbarProps = {
   onSetClassState: Function;
   onToggleClassPanelExpanded: Function;
   onTogglePseudoClass: Function;
+  rulesQuery: string;
+  onRulesQueryChange: (query: string) => void;
 };
 
 export const Toolbar: FC<ToolbarProps> = ({
@@ -22,6 +24,8 @@ export const Toolbar: FC<ToolbarProps> = ({
   onSetClassState,
   onToggleClassPanelExpanded,
   onTogglePseudoClass,
+  rulesQuery,
+  onRulesQueryChange,
 }) => {
   // const { isAddRuleEnable } = useSelector((state: { rules: RulesState }) => ({
   //   isAddRuleEnabled: state.rules.isAddRuleEnabled,
@@ -41,7 +45,7 @@ export const Toolbar: FC<ToolbarProps> = ({
   return (
     <div id="ruleview-toolbar-container">
       <div id="ruleview-toolbar" className="devtools-toolbar devtools-input-toolbar">
-        <SearchBox />
+        <SearchBox query={rulesQuery} onQueryChange={onRulesQueryChange} />
         {/*
         dom.div({ className: "devtools-separator" }),
         dom.div(

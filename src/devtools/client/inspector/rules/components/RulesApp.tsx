@@ -5,7 +5,7 @@
 "use strict";
 
 const Services = require("Services");
-import React, { FC } from "react";
+import React, { FC, useMemo, useState } from "react";
 
 import Accordion from "devtools/client/shared/components/Accordion";
 import Rule from "devtools/client/inspector/rules/components/Rule";
@@ -52,22 +52,40 @@ export const RulesApp: FC<RulesAppProps> = ({
     rules: state.rules.rules || [],
   }));
 
-  const inheritedRules = [];
-  // const keyframesRules = [];
-  const pseudoElementRules = [];
-  const styleRules = [];
+  const [rulesQuery, setRulesQuery] = useState("");
 
-  for (const rule of rules) {
-    if (rule.inheritance) {
-      inheritedRules.push(rule);
-      // } else if (rule.keyframesRule) {
-      // keyframesRules.push(rule);
-    } else if (rule.pseudoElement) {
-      pseudoElementRules.push(rule);
-    } else {
-      styleRules.push(rule);
+  const { inheritedRules, pseudoElementRules, styleRules } = useMemo(() => {
+    const inheritedRules = [];
+    // const keyframesRules = [];
+    const pseudoElementRules = [];
+    const styleRules = [];
+
+    const filteredRules = rules.filter(
+      rule =>
+        rule.selector.selectors?.some(selector => selector.match(rulesQuery)) ||
+        rule.declarations.some(
+          declaration => declaration.name.match(rulesQuery) || declaration.value.match(rulesQuery)
+        )
+    );
+
+    for (const rule of filteredRules) {
+      if (rule.inheritance) {
+        inheritedRules.push(rule);
+        // } else if (rule.keyframesRule) {
+        // keyframesRules.push(rule);
+      } else if (rule.pseudoElement) {
+        pseudoElementRules.push(rule);
+      } else {
+        styleRules.push(rule);
+      }
     }
-  }
+
+    return {
+      inheritedRules,
+      pseudoElementRules,
+      styleRules,
+    };
+  }, [rules, rulesQuery]);
 
   const ruleProps = {
     onToggleDeclaration,
@@ -202,6 +220,8 @@ export const RulesApp: FC<RulesAppProps> = ({
         onSetClassState={onSetClassState}
         onToggleClassPanelExpanded={onToggleClassPanelExpanded}
         onTogglePseudoClass={onTogglePseudoClass}
+        rulesQuery={rulesQuery}
+        onRulesQueryChange={setRulesQuery}
       />
       <div id="ruleview-container" className="ruleview">
         <div id="ruleview-container-focusable" onContextMenu={onContextMenu} tabIndex={-1}>
@@ -209,9 +229,9 @@ export const RulesApp: FC<RulesAppProps> = ({
             rules.length > 0 ? (
               <>
                 {renderPseudoElementRules(pseudoElementRules)}
+                {/* renderKeyframesRules(keyframesRules) */}
                 {renderStyleRules(styleRules)}
                 {renderInheritedRules(inheritedRules)}
-                {/* renderKeyframesRules(keyframesRules) */}
               </>
             ) : (
               <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>
