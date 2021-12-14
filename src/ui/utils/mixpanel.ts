@@ -35,7 +35,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
   if (!shouldDisableMixpanel || forceEnableMixpanel) {
     setMixpanelContext(userInfo);
     enableMixpanel();
-    trackMixpanelEvent("session_start");
+    trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
     setupSessionEndListener();
   } else {
     disableMixpanel();
@@ -45,6 +45,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
 export const maybeTrackTeamChange = (newWorkspaceId: string | null) => {
   if (!mixpanelDisabled) {
     mixpanel.people.set({ workspaceId: newWorkspaceId });
+    trackMixpanelEvent("team_change", { workspaceId: newWorkspaceId });
   }
 };
 
