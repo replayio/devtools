@@ -57,6 +57,11 @@
   color: var(--theme-selection-color);
 }
 
+.attr-value::selection,
+.attr-name::selection {
+  background: var(--theme-highlight-bluegrey);
+}
+
 .devtools-monospace {
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
