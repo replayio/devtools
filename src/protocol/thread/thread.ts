@@ -227,7 +227,6 @@ class _ThreadFront {
     this.ensureCurrentPause();
 
     if (this.testName) {
-      client.Internal.labelTestSession({ sessionId });
       await gToolbox.selectTool("debugger");
       window.Test = require("test/harness");
       const script = document.createElement("script");
