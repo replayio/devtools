@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React from "react";
+import React, { useEffect } from "react";
 
 const SIZE_STYLES = {
   xs: "text-xs",
@@ -18,6 +18,22 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   iconSize?: keyof typeof SIZE_STYLES;
 };
 
+let isChecking = false;
+function useMaterialIconCheck() {
+  useEffect(() => {
+    if (isChecking) {
+      return;
+    }
+    isChecking = true;
+    let id = setInterval(() => {
+      if (typeof document === "object" && (document as any).fonts.check("12px Material Icons")) {
+        document.body.classList.add("material-icon-loaded");
+        clearInterval(id);
+      }
+    }, 100);
+  }, []);
+}
+
 export default function MaterialIcon({
   children,
   className,
@@ -26,6 +42,8 @@ export default function MaterialIcon({
   iconSize = "base",
   ...rest
 }: MaterialIconProps) {
+  useMaterialIconCheck();
+
   return (
     <div
       {...rest}
