@@ -17,8 +17,8 @@ export interface TimelineState {
     startTime: number;
     startDate: number;
     time: number;
-    stalled?: boolean;
   } | null;
+  stalled?: boolean;
   playbackPrecachedTime: number;
   recordingDuration: number | null;
   zoomRegion: ZoomRegion;

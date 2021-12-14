@@ -8,6 +8,7 @@ import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import ReplayLogo from "./shared/ReplayLogo";
+import Spinner from "./shared/Spinner";
 
 function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
@@ -26,6 +27,7 @@ function Video({
   pendingComment,
   recordingTarget,
   setVideoNode,
+  stalled,
   videoUrl,
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
@@ -55,9 +57,8 @@ function Video({
   };
 
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
-
   return (
-    <div id="video" className="bg-toolbarBackground">
+    <div id="video" className="bg-toolbarBackground relative">
       <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
         <ReplayLogo size="sm" color="gray" />
       </div>
@@ -67,6 +68,11 @@ function Video({
       {showCommentTool ? (
         <CommentsOverlay>
           <CommentLoader recordingId={recordingId} />
+          {stalled && (
+            <div className="absolute bottom-5 flex right-5 opacity-50 z-20">
+              <Spinner className="animate-spin w-4" />
+            </div>
+          )}
         </CommentsOverlay>
       ) : null}
       <div id="highlighter-root"></div>
@@ -82,6 +88,7 @@ const connector = connect(
     playback: selectors.getPlayback(state),
     recordingTarget: selectors.getRecordingTarget(state),
     videoUrl: selectors.getVideoUrl(state),
+    stalled: selectors.isPlaybackStalled(state),
   }),
   {
     setVideoNode: actions.setVideoNode,
