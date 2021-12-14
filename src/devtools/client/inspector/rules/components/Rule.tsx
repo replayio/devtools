@@ -29,8 +29,6 @@ export const Rule: FC<RuleProps> = ({
   query,
   rule: { id, declarations, sourceLink, selector, type, isUserAgentStyle, isUnmatched },
 }) => {
-  const closeBraceSpan = useRef<HTMLDivElement | null>(null);
-
   return (
     <div
       className={
@@ -81,11 +79,7 @@ export const Rule: FC<RuleProps> = ({
           //   })
           // )
         }
-        <div
-          className="ruleview-ruleclose"
-          ref={closeBraceSpan}
-          tabIndex={!isUserAgentStyle ? 0 : -1}
-        >
+        <div className="ruleview-ruleclose" tabIndex={!isUserAgentStyle ? 0 : -1}>
           {"}"}
         </div>
       </div>
