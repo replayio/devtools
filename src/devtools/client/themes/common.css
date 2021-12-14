@@ -58,6 +58,7 @@
 }
 
 .attr-value::selection,
+.attr-value *::selection,
 .attr-name::selection {
   background: var(--theme-highlight-bluegrey);
 }
