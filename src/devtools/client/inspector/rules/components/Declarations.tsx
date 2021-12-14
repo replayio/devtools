@@ -5,12 +5,12 @@
 import React, { FC } from "react";
 
 import { Declaration } from "devtools/client/inspector/rules/components/Declaration";
-import { Declaration as DeclarationType } from "devtools/client/inspector/rules/types";
+import { DeclarationState } from "../state/rules";
 
 type DeclarationsProps = {
-  declarations: DeclarationType[];
+  declarations: DeclarationState[];
   // isUserAgentStyle: boolean;
-  // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationType['id']) => void;
+  // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationState['id']) => void;
   // showDeclarationNameEditor: Function
   // showDeclarationValueEditor: Function
 };

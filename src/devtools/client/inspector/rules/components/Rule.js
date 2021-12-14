@@ -147,4 +147,4 @@ class Rule extends PureComponent {
   }
 }
 
-module.exports = Rule;
+export default Rule;

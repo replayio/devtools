@@ -6,15 +6,15 @@ import React, { FC, useRef, useState } from "react";
 // const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 import { DeclarationValue } from "devtools/client/inspector/rules/components/DeclarationValue";
+import { DeclarationState } from "../state/rules";
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 const { classes } = require("devtools/client/inspector/rules/utils/utils");
-import { Declaration as DeclarationType } from "devtools/client/inspector/rules/types";
 
 type DeclarationProps = {
-  declaration: DeclarationType;
+  declaration: DeclarationState;
   // isUserAgentStyle: boolean;
-  // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationType['id']) => void;
+  // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationState['id']) => void;
   // showDeclarationNameEditor: Function
   // showDeclarationValueEditor: Function
 };
