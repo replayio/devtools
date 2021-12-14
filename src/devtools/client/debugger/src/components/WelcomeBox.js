@@ -2,16 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component } from "react";
+import React from "react";
 import { connect } from "../utils/connect";
 import actions from "../actions";
-import { formatKeyShortcut } from "../utils/text";
 import { useGetUserSettings } from "ui/hooks/settings";
 import { setSelectedPrimaryPanel } from "ui/actions/app";
-import BubbleBackground from "ui/components/shared/Onboarding/BubbleBackground";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 function LaunchButton({ action }) {
+  if (!action.enabled) {
+    return null;
+  }
   return (
     <div
       className="mx-4 w-32 h-32 py-2 flex flex-col justify-around items-center blur rounded-md"
@@ -28,19 +29,14 @@ function LaunchButton({ action }) {
           {action.icon}
         </MaterialIcon>
       </div>
-      <span style={{ color: "#3487FF" }} className="text-md font-semibold">
+      <span style={{ color: "#3487FF" }} className="text-md font-semibold text-center">
         {action.label}
       </span>
     </div>
   );
 }
 
-function WelcomeBox({
-  setActiveSearch,
-  openQuickOpen,
-  toggleShortcutsModal,
-  setSelectedPrimaryPanel,
-}) {
+function WelcomeBox({ openQuickOpen, setSelectedPrimaryPanel }) {
   const { userSettings, loading } = useGetUserSettings();
   if (loading) {
     return null;
@@ -48,7 +44,12 @@ function WelcomeBox({
 
   const actions = [
     { label: "Open file", icon: "description", onClick: () => openQuickOpen() },
-    { label: "Search functions", icon: "alternate_email", onClick: () => openQuickOpen("@", true) },
+    {
+      label: "Search functions",
+      enabled: userSettings.enableGlobalSearch,
+      icon: "alternate_email",
+      onClick: () => openQuickOpen("@", true),
+    },
     {
       label: "Search text",
       icon: "search",
@@ -71,7 +72,6 @@ function WelcomeBox({
 }
 
 export default connect(() => ({}), {
-  setActiveSearch: actions.setActiveSearch,
   openQuickOpen: actions.openQuickOpen,
   setSelectedPrimaryPanel,
 })(WelcomeBox);
