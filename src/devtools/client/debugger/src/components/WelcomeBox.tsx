@@ -8,8 +8,15 @@ import actions from "../actions";
 import { useGetUserSettings } from "ui/hooks/settings";
 import { setSelectedPrimaryPanel } from "ui/actions/app";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { ConnectedProps } from "react-redux";
 
-function LaunchButton({ action }) {
+type Action = {
+  enabled: boolean;
+  icon: string;
+  label: string;
+  onClick: () => void;
+};
+function LaunchButton({ action }: { action: Action }) {
   if (!action.enabled) {
     return null;
   }
@@ -18,14 +25,14 @@ function LaunchButton({ action }) {
       className="mx-4 w-32 h-32 py-2 flex flex-col justify-around items-center blur rounded-md"
       style={{ background: "rgba(255,255,255,0.6)" }}
       role="button"
-      tabIndex="0"
+      tabIndex={0}
       onClick={action.onClick}
     >
       <div
         className="w-16 h-16 flex items-center justify-center bg-primaryAccent color-white"
         style={{ borderRadius: "80px" }}
       >
-        <MaterialIcon className="text-white -translate-x-1/2 transform" iconSize="4xl">
+        <MaterialIcon className="text-white transform" iconSize="4xl">
           {action.icon}
         </MaterialIcon>
       </div>
@@ -36,14 +43,14 @@ function LaunchButton({ action }) {
   );
 }
 
-function WelcomeBox({ openQuickOpen, setSelectedPrimaryPanel }) {
+function WelcomeBox({ openQuickOpen, setSelectedPrimaryPanel }: PropsFromRedux) {
   const { userSettings, loading } = useGetUserSettings();
   if (loading) {
     return null;
   }
 
   const actions = [
-    { label: "Open file", icon: "description", onClick: () => openQuickOpen() },
+    { label: "Open file", enabled: true, icon: "description", onClick: () => openQuickOpen() },
     {
       label: "Search functions",
       enabled: userSettings.enableGlobalSearch,
@@ -52,6 +59,7 @@ function WelcomeBox({ openQuickOpen, setSelectedPrimaryPanel }) {
     },
     {
       label: "Search text",
+      enabled: true,
       icon: "search",
       onClick: () => setSelectedPrimaryPanel("search"),
     },
@@ -71,7 +79,10 @@ function WelcomeBox({ openQuickOpen, setSelectedPrimaryPanel }) {
   );
 }
 
-export default connect(() => ({}), {
+const connector = connect(() => ({}), {
   openQuickOpen: actions.openQuickOpen,
   setSelectedPrimaryPanel,
-})(WelcomeBox);
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(WelcomeBox);
