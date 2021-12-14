@@ -2,97 +2,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React, { FC, useRef, useState } from "react";
-// const { editableItem } = require("devtools/client/shared/inplace-editor");
-
+import React, { FC, useState } from "react";
 import { DeclarationValue } from "devtools/client/inspector/rules/components/DeclarationValue";
 import { DeclarationState } from "../state/rules";
-
-const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
-const { classes } = require("devtools/client/inspector/rules/utils/utils");
+import classnames from "classnames";
+import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 
 type DeclarationProps = {
   declaration: DeclarationState;
-  // isUserAgentStyle: boolean;
-  // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationState['id']) => void;
-  // showDeclarationNameEditor: Function
-  // showDeclarationValueEditor: Function
   query: string;
 };
 
-export const Declaration: FC<DeclarationProps> = ({
-  declaration,
-  // isUserAgentStyle,
-  // onToggleDeclaration,
-  // showDeclarationNameEditor,
-  // showDeclarationValueEditor
-  query,
-}) => {
+export const Declaration: FC<DeclarationProps> = ({ declaration, query }) => {
   const [isComputedListExpanded, setIsComputedListExpanded] = useState(false);
 
-  const nameSpanRef = useRef<HTMLSpanElement | null>(null);
-  const valueSpanRef = useRef<HTMLSpanElement | null>(null);
+  // Only show the computed list expander or the shorthand overridden list if:
+  // - The computed properties are actually different from the current property
+  //   (i.e these are longhands while the current property is the shorthand).
+  // - All of the computed properties have defined values. In case the current property
+  //   value contains CSS variables, then the computed properties will be missing and we
+  //   want to avoid showing them.
+  const hasComputed =
+    declaration.computedProperties.some(c => c.name !== declaration.name) &&
+    !declaration.computedProperties.every(c => !c.value);
 
-  /*
-  componentDidMount() {
-    if (this.props.isUserAgentStyle) {
-      // Declaration is not editable.
-      return;
-    }
-
-    const { ruleId, id } = this.props.declaration;
-
-    editableItem(
-      {
-        element: this.nameSpanRef.current,
-      },
-      element => {
-        this.props.showDeclarationNameEditor(element, ruleId, id);
-      }
-    );
-
-    editableItem(
-      {
-        element: this.valueSpanRef.current,
-      },
-      element => {
-        this.props.showDeclarationValueEditor(element, ruleId, id);
-      }
-    );
-  }
-  */
-  const hasComputed = (() => {
-    // Only show the computed list expander or the shorthand overridden list if:
-    // - The computed properties are actually different from the current property
-    //   (i.e these are longhands while the current property is the shorthand).
-    // - All of the computed properties have defined values. In case the current property
-    //   value contains CSS variables, then the computed properties will be missing and we
-    //   want to avoid showing them.
-    const { computedProperties } = declaration;
-    return (
-      computedProperties.some(c => c.name !== declaration.name) &&
-      !computedProperties.every(c => !c.value)
-    );
-  })();
-
-  // const onComputedExpanderClick = (event) => {
-  //   event.stopPropagation();
-
-  //   this.setState(prevState => {
-  //     return { isComputedListExpanded: !prevState.isComputedListExpanded };
-  //   });
-  // }
-
-  // const onToggleDeclarationChange = (event) => {
-  //   event.stopPropagation();
-  //   const { id, ruleId } = declaration;
-  //   this.props.onToggleDeclaration(declaration.ruleId, declaration.id);
-  // }
-
-  // renderComputedPropertyList() {
-  //   if (!this.state.isComputedListExpanded) {
-  //     return null;
-  //   }
+  const onComputedExpanderClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setIsComputedListExpanded(!isComputedListExpanded);
+  };
 
   const computedPropertyList = isComputedListExpanded && (
     <ul
@@ -104,7 +41,7 @@ export const Declaration: FC<DeclarationProps> = ({
       {declaration.computedProperties.map(({ name, value, isOverridden }) => (
         <li
           key={`${name}${value}`}
-          className={classes("ruleview-computed", isOverridden && "ruleview-overridden")}
+          className={classnames("ruleview-computed", { "ruleview-overridden": isOverridden })}
         >
           <span className="ruleview-namecontainer">
             <span className="ruleview-propertyname theme-fg-color3">{name}</span>
@@ -119,13 +56,14 @@ export const Declaration: FC<DeclarationProps> = ({
     </ul>
   );
 
-  const overriddenFilter =
-    !declaration.isDeclarationValid || !declaration.isOverridden ? null : (
-      <div
-        className="ruleview-overridden-rule-filter"
-        title={getStr("rule.filterProperty.title")}
-      ></div>
-    );
+  // unused
+  // const overriddenFilter =
+  //   !declaration.isDeclarationValid || !declaration.isOverridden ? null : (
+  //     <div
+  //       className="ruleview-overridden-rule-filter"
+  //       title={getStr("rule.filterProperty.title")}
+  //     ></div>
+  //   );
 
   const overriddenComputedProperties = declaration.computedProperties.filter(
     prop => prop.isOverridden
@@ -171,45 +109,30 @@ export const Declaration: FC<DeclarationProps> = ({
     value,
   } = declaration;
 
-  const declarationClassName = classes(
-    "ruleview-property",
-    query && (name.match(query) || value.match(query)) && "ruleview-matched",
-    (!isEnabled || !isKnownProperty || isOverridden) && "ruleview-overridden",
-    isPropertyChanged && "ruleview-changed"
-  );
+  const declarationClassName = classnames("ruleview-property", {
+    "ruleview-matched": query && (name.match(query) || value.match(query)),
+    "ruleview-overridden": !isEnabled || !isKnownProperty || isOverridden,
+    "ruleview-changed": isPropertyChanged,
+  });
 
   return (
     <li className={declarationClassName} data-declaration-id={id}>
       <div className="ruleview-propertycontainer">
-        <input
-          type="checkbox"
-          aria-labelledby={id}
-          className="ruleview-enableproperty"
-          checked={isEnabled}
-          /* onChange={onToggleDeclarationChange} */
-          tabIndex={-1}
-          style={{
-            visibility: "hidden",
-          }}
-        />
         <span className="ruleview-namecontainer">
-          <span
-            id={id}
-            className="ruleview-propertyname theme-fg-color3"
-            ref={nameSpanRef}
-            tabIndex={0}
-          >
+          <span id={id} className="ruleview-propertyname theme-fg-color3" tabIndex={0}>
             {name}
           </span>
           {": "}
           <span
-            className={classes("ruleview-expander theme-twisty", isComputedListExpanded && "open")}
-            // onClick={onComputedExpanderClick}
+            className={classnames("ruleview-expander theme-twisty", {
+              open: isComputedListExpanded,
+            })}
+            onClick={onComputedExpanderClick}
             style={{ display: hasComputed ? "inline-block" : "none" }}
           ></span>
         </span>
         <span className="ruleview-propertyvaluecontainer">
-          <span className="ruleview-propertyvalue theme-fg-color1" ref={valueSpanRef} tabIndex={0}>
+          <span className="ruleview-propertyvalue theme-fg-color1" tabIndex={0}>
             <DeclarationValue
               {...{
                 colorSpanClassName: "ruleview-color",
