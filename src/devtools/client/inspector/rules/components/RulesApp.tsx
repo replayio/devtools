@@ -61,6 +61,7 @@ export const RulesApp: FC<RulesAppProps> = ({
     showDeclarationValueEditor,
     showNewDeclarationEditor,
     showSelectorEditor,
+    query: rulesQuery,
   };
 
   const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -149,7 +150,7 @@ export const RulesApp: FC<RulesAppProps> = ({
       return null;
     }
 
-    return <Rules {...ruleProps} rules={rules} query={rulesQuery} />;
+    return <Rules {...ruleProps} rules={rules} />;
   };
 
   const renderPseudoElementRules = (rules: RuleState[]) => {
@@ -163,7 +164,6 @@ export const RulesApp: FC<RulesAppProps> = ({
         componentProps: {
           ...ruleProps,
           rules,
-          query: rulesQuery,
         },
         header: getStr("rule.pseudoElement"),
         id: "rules-section-pseudoelement",
@@ -183,18 +183,25 @@ export const RulesApp: FC<RulesAppProps> = ({
   };
 
   const rulesElements = useMemo(() => {
+    if (!rulesQuery && rules.length === 0) {
+      return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
+    }
+
     const inheritedRules = [];
     // const keyframesRules = [];
     const pseudoElementRules = [];
     const styleRules = [];
 
-    const filteredRules = rules.filter(
-      rule =>
-        rule.selector.selectors?.some(selector => selector.match(rulesQuery)) ||
-        rule.declarations.some(
-          declaration => declaration.name.match(rulesQuery) || declaration.value.match(rulesQuery)
+    const filteredRules = rulesQuery
+      ? rules.filter(
+          rule =>
+            rule.selector.selectors?.some(selector => selector.match(rulesQuery)) ||
+            rule.declarations.some(
+              declaration =>
+                declaration.name.match(rulesQuery) || declaration.value.match(rulesQuery)
+            )
         )
-    );
+      : rules;
 
     for (const rule of filteredRules) {
       if (rule.inheritance) {
@@ -209,7 +216,7 @@ export const RulesApp: FC<RulesAppProps> = ({
     }
 
     if (!filteredRules.length) {
-      return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
+      return <div className="devtools-sidepanel-no-result">{getStr("rule.noMatching")}</div>;
     }
 
     return (
