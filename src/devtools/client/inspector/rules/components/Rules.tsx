@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React, { FC } from "react";
-import Rule from "devtools/client/inspector/rules/components/Rule";
+import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { RuleState } from "../state/rules";
 
 type RulesProps = {

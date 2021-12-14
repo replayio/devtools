@@ -92,5 +92,3 @@ export const Rule: FC<RuleProps> = ({
     </div>
   );
 };
-
-export default Rule;
