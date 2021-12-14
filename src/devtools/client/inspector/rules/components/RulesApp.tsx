@@ -54,39 +54,6 @@ export const RulesApp: FC<RulesAppProps> = ({
 
   const [rulesQuery, setRulesQuery] = useState("");
 
-  const { inheritedRules, pseudoElementRules, styleRules } = useMemo(() => {
-    const inheritedRules = [];
-    // const keyframesRules = [];
-    const pseudoElementRules = [];
-    const styleRules = [];
-
-    const filteredRules = rules.filter(
-      rule =>
-        rule.selector.selectors?.some(selector => selector.match(rulesQuery)) ||
-        rule.declarations.some(
-          declaration => declaration.name.match(rulesQuery) || declaration.value.match(rulesQuery)
-        )
-    );
-
-    for (const rule of filteredRules) {
-      if (rule.inheritance) {
-        inheritedRules.push(rule);
-        // } else if (rule.keyframesRule) {
-        // keyframesRules.push(rule);
-      } else if (rule.pseudoElement) {
-        pseudoElementRules.push(rule);
-      } else {
-        styleRules.push(rule);
-      }
-    }
-
-    return {
-      inheritedRules,
-      pseudoElementRules,
-      styleRules,
-    };
-  }, [rules, rulesQuery]);
-
   const ruleProps = {
     onToggleDeclaration,
     onToggleSelectorHighlighter,
@@ -180,7 +147,7 @@ export const RulesApp: FC<RulesAppProps> = ({
       return null;
     }
 
-    return <Rules {...ruleProps} rules={rules} />;
+    return <Rules {...ruleProps} rules={rules} query={rulesQuery} />;
   };
 
   const renderPseudoElementRules = (rules: RuleState[]) => {
@@ -212,6 +179,46 @@ export const RulesApp: FC<RulesAppProps> = ({
     );
   };
 
+  const rulesElements = useMemo(() => {
+    const inheritedRules = [];
+    // const keyframesRules = [];
+    const pseudoElementRules = [];
+    const styleRules = [];
+
+    const filteredRules = rules.filter(
+      rule =>
+        rule.selector.selectors?.some(selector => selector.match(rulesQuery)) ||
+        rule.declarations.some(
+          declaration => declaration.name.match(rulesQuery) || declaration.value.match(rulesQuery)
+        )
+    );
+
+    for (const rule of filteredRules) {
+      if (rule.inheritance) {
+        inheritedRules.push(rule);
+        // } else if (rule.keyframesRule) {
+        // keyframesRules.push(rule);
+      } else if (rule.pseudoElement) {
+        pseudoElementRules.push(rule);
+      } else {
+        styleRules.push(rule);
+      }
+    }
+
+    if (!filteredRules.length) {
+      return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
+    }
+
+    return (
+      <>
+        {renderPseudoElementRules(pseudoElementRules)}
+        {/* renderKeyframesRules(keyframesRules) */}
+        {renderStyleRules(styleRules)}
+        {renderInheritedRules(inheritedRules)}
+      </>
+    );
+  }, [rules, rulesQuery]);
+
   return (
     <div id="sidebar-panel-ruleview" className="theme-sidebar inspector-tabpanel">
       <Toolbar
@@ -226,16 +233,7 @@ export const RulesApp: FC<RulesAppProps> = ({
       <div id="ruleview-container" className="ruleview">
         <div id="ruleview-container-focusable" onContextMenu={onContextMenu} tabIndex={-1}>
           {rules ? (
-            rules.length > 0 ? (
-              <>
-                {renderPseudoElementRules(pseudoElementRules)}
-                {/* renderKeyframesRules(keyframesRules) */}
-                {renderStyleRules(styleRules)}
-                {renderInheritedRules(inheritedRules)}
-              </>
-            ) : (
-              <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>
-            )
+            rulesElements
           ) : (
             <div className="devtools-sidepanel-no-result">{getStr("rule.notAvailable")}</div>
           )}

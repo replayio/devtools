@@ -17,6 +17,7 @@ type DeclarationProps = {
   // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationState['id']) => void;
   // showDeclarationNameEditor: Function
   // showDeclarationValueEditor: Function
+  query: string;
 };
 
 export const Declaration: FC<DeclarationProps> = ({
@@ -25,6 +26,7 @@ export const Declaration: FC<DeclarationProps> = ({
   // onToggleDeclaration,
   // showDeclarationNameEditor,
   // showDeclarationValueEditor
+  query,
 }) => {
   const [isComputedListExpanded, setIsComputedListExpanded] = useState(false);
 
@@ -158,11 +160,20 @@ export const Declaration: FC<DeclarationProps> = ({
     ></div>
   );
 
-  const { id, isEnabled, isKnownProperty, isOverridden, isPropertyChanged, name, parsedValue } =
-    declaration;
+  const {
+    id,
+    isEnabled,
+    isKnownProperty,
+    isOverridden,
+    isPropertyChanged,
+    name,
+    parsedValue,
+    value,
+  } = declaration;
 
   const declarationClassName = classes(
     "ruleview-property",
+    query && (name.match(query) || value.match(query)) && "ruleview-matched",
     (!isEnabled || !isKnownProperty || isOverridden) && "ruleview-overridden",
     isPropertyChanged && "ruleview-changed"
   );

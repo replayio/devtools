@@ -14,6 +14,7 @@ type RulesProps = {
   showDeclarationValueEditor: Function;
   showNewDeclarationEditor: Function;
   showSelectorEditor: Function;
+  query: string;
 };
 
 export const Rules: FC<RulesProps> = ({ rules, children, ...rest }) => {

@@ -13,9 +13,10 @@ type DeclarationsProps = {
   // onToggleDeclaration: (ruleIdd: Rule['id'], declarationId: DeclarationState['id']) => void;
   // showDeclarationNameEditor: Function
   // showDeclarationValueEditor: Function
+  query: string;
 };
 
-export const Declarations: FC<DeclarationsProps> = ({ declarations }) => {
+export const Declarations: FC<DeclarationsProps> = ({ declarations, query }) => {
   if (declarations.length === 0) {
     return null;
   }
@@ -25,7 +26,7 @@ export const Declarations: FC<DeclarationsProps> = ({ declarations }) => {
       {declarations
         .filter(declaration => !declaration.isInvisible)
         .map(declaration => (
-          <Declaration key={declaration.id} declaration={declaration} />
+          <Declaration key={declaration.id} declaration={declaration} query={query} />
         ))}
     </ul>
   );

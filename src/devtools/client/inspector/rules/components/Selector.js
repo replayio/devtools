@@ -27,6 +27,7 @@ class Selector extends PureComponent {
       selector: PropTypes.shape(Types.selector).isRequired,
       showSelectorEditor: PropTypes.func.isRequired,
       type: PropTypes.number.isRequired,
+      query: PropTypes.string.isRequired,
     };
   }
 
@@ -122,7 +123,11 @@ class Selector extends PureComponent {
   render() {
     return dom.span(
       {
-        className: "ruleview-selectorcontainer",
+        className:
+          "ruleview-selectorcontainer" +
+          (this.props.query && this.props.selector.selectorText.match(this.props.query)
+            ? " ruleview-selector-matched"
+            : ""),
         ref: this.selectorRef,
         tabIndex: 0,
       },

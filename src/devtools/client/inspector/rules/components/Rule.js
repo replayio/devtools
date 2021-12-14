@@ -28,6 +28,7 @@ class Rule extends PureComponent {
       showDeclarationValueEditor: PropTypes.func.isRequired,
       showNewDeclarationEditor: PropTypes.func.isRequired,
       showSelectorEditor: PropTypes.func.isRequired,
+      query: PropTypes.string.isRequired,
     };
   }
 
@@ -79,6 +80,7 @@ class Rule extends PureComponent {
       showDeclarationNameEditor,
       showDeclarationValueEditor,
       showSelectorEditor,
+      query,
     } = this.props;
     const { declarations, id, isUnmatched, isUserAgentStyle, selector, sourceLink, type } = rule;
 
@@ -106,6 +108,7 @@ class Rule extends PureComponent {
             selector,
             showSelectorEditor,
             type,
+            query,
           }),
           // type !== CSSRule.KEYFRAME_RULE
           //   ? SelectorHighlighter({
@@ -121,6 +124,7 @@ class Rule extends PureComponent {
           onToggleDeclaration,
           showDeclarationNameEditor,
           showDeclarationValueEditor,
+          query,
         }),
         // dom.li(
         //   {
