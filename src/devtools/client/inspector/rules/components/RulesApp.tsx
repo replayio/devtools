@@ -1,9 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-"use strict";
-
 const Services = require("Services");
 import React, { FC, useMemo, useState } from "react";
 
@@ -12,19 +6,14 @@ import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
-const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
+import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useSelector } from "react-redux";
 import { RulesState, RuleState } from "../state/rules";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
 type RulesAppProps = {
-  onAddClass: Function;
-  onAddRule: Function;
-  onSetClassState: Function;
-  onToggleClassPanelExpanded: Function;
   onToggleDeclaration: Function;
-  onTogglePseudoClass: Function;
   onToggleSelectorHighlighter: Function;
   rules: RuleState[];
   showContextMenu: Function;
@@ -42,11 +31,6 @@ export const RulesApp: FC<RulesAppProps> = ({
   onToggleSelectorHighlighter,
   showDeclarationNameEditor,
   showSelectorEditor,
-  onAddClass,
-  onAddRule,
-  onSetClassState,
-  onToggleClassPanelExpanded,
-  onTogglePseudoClass,
 }) => {
   const { rules } = useSelector((state: { rules: RulesState }) => ({
     rules: state.rules.rules || [],
@@ -111,40 +95,6 @@ export const RulesApp: FC<RulesAppProps> = ({
     return output;
   };
 
-  // renderKeyframesRules(rules) {
-  //   if (!rules.length) {
-  //     return null;
-  //   }
-
-  //   const output = [];
-  //   let lastKeyframes;
-
-  //   for (const rule of rules) {
-  //     if (rule.keyframesRule.id === lastKeyframes) {
-  //       continue;
-  //     }
-
-  //     lastKeyframes = rule.keyframesRule.id;
-
-  //     const items = [
-  //       {
-  //         component: Rules,
-  //         componentProps: {
-  //           ...ruleProps,
-  //           rules: rules.filter(r => r.keyframesRule.id === lastKeyframes),
-  //         },
-  //         header: rule.keyframesRule.keyframesName,
-  //         id: "rules-section-keyframes",
-  //         opened: true,
-  //       },
-  //     ];
-
-  //     output.push(Accordion({ items }));
-  //   }
-
-  //   return output;
-  // }
-
   const renderStyleRules = (rules: RuleState[]) => {
     if (!rules.length) {
       return null;
@@ -191,7 +141,6 @@ export const RulesApp: FC<RulesAppProps> = ({
     }
 
     const inheritedRules = [];
-    // const keyframesRules = [];
     const pseudoElementRules = [];
     const styleRules = [];
 
@@ -209,8 +158,6 @@ export const RulesApp: FC<RulesAppProps> = ({
     for (const rule of filteredRules) {
       if (rule.inheritance) {
         inheritedRules.push(rule);
-        // } else if (rule.keyframesRule) {
-        // keyframesRules.push(rule);
       } else if (rule.pseudoElement) {
         pseudoElementRules.push(rule);
       } else {
@@ -219,13 +166,12 @@ export const RulesApp: FC<RulesAppProps> = ({
     }
 
     if (!filteredRules.length) {
-      return <div className="devtools-sidepanel-no-result">{getStr("rule.noMatching")}</div>;
+      return <div className="devtools-sidepanel-no-result">No matching selector or style.</div>;
     }
 
     return (
       <>
         {renderPseudoElementRules(pseudoElementRules)}
-        {/* renderKeyframesRules(keyframesRules) */}
         {renderStyleRules(styleRules)}
         {renderInheritedRules(inheritedRules)}
       </>
@@ -234,15 +180,7 @@ export const RulesApp: FC<RulesAppProps> = ({
 
   return (
     <div id="sidebar-panel-ruleview" className="theme-sidebar inspector-tabpanel">
-      <Toolbar
-        onAddClass={onAddClass}
-        onAddRule={onAddRule}
-        onSetClassState={onSetClassState}
-        onToggleClassPanelExpanded={onToggleClassPanelExpanded}
-        onTogglePseudoClass={onTogglePseudoClass}
-        rulesQuery={rulesQuery}
-        onRulesQueryChange={setRulesQuery}
-      />
+      <Toolbar rulesQuery={rulesQuery} onRulesQueryChange={setRulesQuery} />
       <div id="ruleview-container" className="ruleview">
         <div id="ruleview-container-focusable" onContextMenu={onContextMenu} tabIndex={-1}>
           {rules ? (

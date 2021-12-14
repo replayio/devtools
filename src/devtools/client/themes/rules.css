@@ -691,7 +691,7 @@
 }
 
 .ruleview-selector-matched {
-  background: yellow;
+  background: var(--theme-highlight-yellow);
 }
 
 .ruleview-selector-separator,
@@ -760,5 +760,5 @@
 }
 
 .ruleview-matched {
-  background-color: yellow;
+  background-color: var(--theme-highlight-yellow);
 }
