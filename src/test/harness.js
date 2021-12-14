@@ -554,7 +554,7 @@ async function toggleExceptionLogging() {
 }
 
 async function toggleMappedSources() {
-  return clickElement(".mapped-source");
+  return clickElement(".mapped-source button");
 }
 
 async function playbackRecording() {

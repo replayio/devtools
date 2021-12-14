@@ -4,10 +4,21 @@ table.requests {
 
 .row {
   position: relative;
+  border: 2px solid transparent;
+}
+
+.row:hover {
+  cursor: pointer;
 }
 
 .row:not(:first-child) {
   border-top: 2px solid var(--theme-toolbar-background);
+}
+
+.row.selected {
+  background: var(--primary-accent);
+  border-color: var(--primary-accent);
+  color: white;
 }
 
 .row.current {

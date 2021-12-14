@@ -14,21 +14,12 @@ interface Detail {
 
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
-    <div className={className}>
-      <div className={classNames("px-4 flex flex-col")}>
-        {details.map(h => (
-          <div title={h.name} className={classNames(styles.row, styles.value)} key={h.name}>
-            {h.name}
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col text-gray-400 ">
-        {details.map(h => (
-          <div title={h.value} className={classNames(styles.row, styles.value)} key={h.name}>
-            {h.value}
-          </div>
-        ))}
-      </div>
+    <div className={classNames(className, "flex flex-col")}>
+      {details.map(h => (
+        <div className={classNames(styles.row)} key={h.name}>
+          <span className="font-bold text-gray-500">{h.name}:</span> {h.value}
+        </div>
+      ))}
     </div>
   );
 };
@@ -40,6 +31,38 @@ const TriangleToggle = ({ open }: { open: boolean }) => (
   />
 );
 
+const parseCookie = (str: string): Record<string, string> => {
+  return str
+    .split(";")
+    .map(v => v.split("="))
+    .reduce((acc: Record<string, string>, v) => {
+      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+      return acc;
+    }, {});
+};
+
+const cookieHeader = (request: RequestSummary): string | undefined => {
+  return request.requestHeaders.find(r => r.name.toLowerCase() === "cookie")?.value;
+};
+
+const Cookies = ({ request }: { request: RequestSummary }) => {
+  return (
+    <div>
+      <h2 className={classNames("p-4 py-1 border-t cursor-pointer font-bold", styles.title)}>
+        Request Cookies
+      </h2>
+      <DetailTable
+        className={styles.request}
+        details={Object.entries(parseCookie(cookieHeader(request) || "")).map(
+          (value: [string, string]) => {
+            return { name: value[0], value: value[1] };
+          }
+        )}
+      />
+    </div>
+  );
+};
+
 const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [requestExpanded, setRequestExpanded] = useState(true);
   const [requestHeadersExpanded, setRequestHeadersExpanded] = useState(true);
@@ -47,19 +70,17 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [queryParametersExpanded, setQueryParametersExpanded] = useState(true);
 
   const requestHeaders = useMemo(
-    () => sortBy(request?.requestHeaders, r => r.name.toLowerCase()),
+    () => sortBy(request.requestHeaders, r => r.name.toLowerCase()),
     [request]
   );
   const responseHeaders = useMemo(
-    () => sortBy(request?.responseHeaders, r => r.name.toLowerCase()),
+    () => sortBy(request.responseHeaders, r => r.name.toLowerCase()),
     [request]
   );
   return (
     <>
       <div
-        className={classNames(
-          "flex items-center py-1 whitespace-nowrap cursor-pointer font-semibold"
-        )}
+        className={classNames("flex items-center py-1 cursor-pointer font-bold")}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
         <TriangleToggle open={requestExpanded} />
@@ -79,7 +100,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
       >
         <TriangleToggle open={requestHeadersExpanded} />
@@ -89,7 +110,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
       >
         <TriangleToggle open={responseHeadersExpanded} />
@@ -101,7 +122,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       {request.queryParams.length > 0 && (
         <div>
           <h2
-            className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+            className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
             onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
           >
             <TriangleToggle open={queryParametersExpanded} />
@@ -132,12 +153,12 @@ const RequestDetails = ({
   const [activeTab, setActiveTab] = useState("headers");
 
   const tabs = [
-    { id: "headers", title: "Headers" },
-    { id: "cookies", title: "Cookies" },
-    { id: "response", title: "Response" },
-    { id: "request", title: "Request" },
-    { id: "initiator", title: "Stack Trace" },
-    { id: "timings", title: "Timings" },
+    { id: "headers", title: "Headers", visible: true },
+    { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
+    { id: "response", title: "Response", visible: true },
+    { id: "request", title: "Request", visible: true },
+    { id: "initiator", title: "Stack Trace", visible: true },
+    { id: "timings", title: "Timings", visible: true },
   ];
 
   if (!request) {
@@ -146,13 +167,13 @@ const RequestDetails = ({
 
   return (
     <div className="h-full w-full overflow-hidden">
-      <div className="overflow-hidden flex items-center justify-between">
-        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
-      </div>
       <div className={classNames("", styles.requestDetails)}>
+        <div className="flex justify-between bg-toolbarBackground items-center">
+          <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+          <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
+        </div>
         {activeTab == "headers" && <HeadersPanel request={request} />}
-        {activeTab == "cookies" && <ComingSoon />}
+        {activeTab == "cookies" && <Cookies request={request} />}
         {activeTab == "response" && <ComingSoon />}
         {activeTab == "request" && <ComingSoon />}
         {activeTab == "initiator" && <ComingSoon />}

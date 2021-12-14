@@ -11,10 +11,8 @@ import { bootIntercom } from "ui/utils/intercom";
 import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
 import { getUserInfo } from "ui/hooks/users";
 import { getUserSettings } from "ui/hooks/settings";
-import { isTest } from "ui/utils/environment";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
-const FontFaceObserver = require("fontfaceobserver");
 
 declare global {
   interface Window {
@@ -62,29 +60,19 @@ export async function bootstrapApp() {
 
     const userInfo = await getUserInfo();
     if (userInfo) {
-      setTelemetryContext(userInfo);
-      maybeSetMixpanelContext(userInfo);
-
-      if (!getWorkspaceId(store.getState())) {
+      let workspaceId = getWorkspaceId(store.getState());
+      if (!workspaceId) {
         const userSettings = await getUserSettings();
         store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
+        workspaceId = userSettings.defaultWorkspaceId;
       }
+
+      setTelemetryContext(userInfo);
+      maybeSetMixpanelContext({ ...userInfo, workspaceId });
     }
 
     initLaunchDarkly();
   });
-
-  const success = () => (document.documentElement.className += " fonts-loaded");
-  if (isTest()) {
-    // FontFaceObserver doesn't work in e2e tests.
-    success();
-  } else {
-    var font1 = new FontFaceObserver("Material Icons");
-    var font2 = new FontFaceObserver("Material Icons Outlined");
-    Promise.all([font1.load(), font2.load()])
-      .then(success)
-      .catch(() => console.log("Failed to load font"));
-  }
 
   return store;
 }

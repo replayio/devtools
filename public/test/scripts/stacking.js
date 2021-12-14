@@ -42,6 +42,14 @@ Test.describe(
     // ... or grid items
     target = await Test.getMouseTarget(140, 240);
     Test.assert(quadsAreEqual(target._rect, [105, 205, 145, 245]));
+
+    // positioned elements without z-index don't create a stacking context
+    target = await Test.getMouseTarget(240, 240);
+    Test.assert(quadsAreEqual(target._rect, [210, 210, 250, 250]));
+
+    // children of positioned elements are in front of children of unpositioned ones
+    target = await Test.getMouseTarget(340, 240);
+    Test.assert(quadsAreEqual(target._rect, [310, 210, 350, 250]));
   }
 );
 

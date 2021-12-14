@@ -12,6 +12,7 @@ import WaitForReduxSlice from "./WaitForReduxSlice";
 import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
+import CommandPalette from "./CommandPalette";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -19,11 +20,12 @@ type _DevToolsProps = PropsFromRedux & DevToolsProps;
 
 function _DevTools({
   clearTrialExpired,
-  loadingFinished,
-  viewMode,
   createSession,
-  uploadComplete,
+  loadingFinished,
   sessionId,
+  showCommandPalette,
+  uploadComplete,
+  viewMode,
 }: _DevToolsProps) {
   const recordingId = useGetRecordingId();
   const { userIsAuthor, loading } = useUserIsAuthor();
@@ -54,6 +56,7 @@ function _DevTools({
     <>
       <Header />
       {viewMode == "dev" ? <DevView /> : <NonDevView />}
+      {showCommandPalette ? <CommandPalette /> : null}
       <KeyboardShortcuts />
     </>
   );
@@ -64,6 +67,7 @@ const connector = connect(
     loadingFinished: selectors.getLoadingFinished(state),
     viewMode: selectors.getViewMode(state),
     sessionId: selectors.getSessionId(state),
+    showCommandPalette: selectors.getShowCommandPalette(state),
   }),
   {
     createSession,

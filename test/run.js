@@ -15,6 +15,7 @@ const {
   defer,
 } = require("./utils");
 const { listAllRecordings } = require("@recordreplay/recordings-cli");
+const { default: next } = require("next");
 
 // These don't work quite perfectly yet, there are still places where we are
 // hardcoding localhost:8080, in files like `header.js` and `runTest.js`.  When
@@ -139,7 +140,11 @@ async function runMatchingTests() {
       continue;
     }
 
-    const { example, script, targets } = Manifest[i];
+    const { pending, example, script, targets } = Manifest[i];
+    if (pending) {
+      console.log(`Pending test: ${script}`);
+      continue;
+    }
     if (!onlyTarget) {
       for (const target of targets) {
         await runTest(script, example, target);

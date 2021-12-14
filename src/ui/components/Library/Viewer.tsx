@@ -8,7 +8,6 @@ import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
 import TeamTrialEnd from "./TeamTrialEnd";
-import { MY_LIBRARY } from "../UploadScreen/Sharing";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {

@@ -1,12 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
-import { HeaderGroup } from "react-table";
+import { Column, HeaderGroup } from "react-table";
 import { RequestSummary } from "./utils";
+import { ContextMenu } from "../ContextMenu";
+import ColumnsDropdown from "./ColumnsDropdown";
 
-export function HeaderGroups({ headerGroups }: { headerGroups: HeaderGroup<RequestSummary>[] }) {
+interface MenuLocation {
+  x: number;
+  y: number;
+}
+
+export function HeaderGroups({
+  columns,
+  headerGroups,
+}: {
+  columns: Column[];
+  headerGroups: HeaderGroup<RequestSummary>[];
+}) {
+  const [menuLocation, setMenuLocation] = useState<MenuLocation>();
   return (
-    <div className="border-b">
+    <div
+      onContextMenu={ev => {
+        ev.preventDefault();
+        setMenuLocation({ x: ev.pageX, y: ev.pageY });
+      }}
+      className="border-b"
+    >
+      {menuLocation ? (
+        <ContextMenu x={menuLocation.x} y={menuLocation.y} close={() => setMenuLocation(undefined)}>
+          <ColumnsDropdown columns={columns} />
+        </ContextMenu>
+      ) : (
+        ""
+      )}
       {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => (
         <div className="flex font-normal items-center" {...headerGroup.getHeaderGroupProps()}>
           {headerGroup.headers.map(column => (

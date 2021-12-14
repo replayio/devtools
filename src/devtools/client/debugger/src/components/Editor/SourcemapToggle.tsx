@@ -80,7 +80,7 @@ export function SourcemapToggle({
   };
 
   return (
-    <div className="flex items-center pl-3 space-x-1">
+    <div className="flex items-center pl-3 space-x-1 mapped-source">
       <Toggle
         enabled={selectedSource.isOriginal}
         setEnabled={setEnabled}

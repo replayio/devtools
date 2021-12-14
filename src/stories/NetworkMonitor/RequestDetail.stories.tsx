@@ -16,8 +16,6 @@ const Template: Story<ComponentProps<typeof RequestDetails>> = args => (
   </div>
 );
 
-const request = requestProps("1", "https://app.replay.io/graphql", 200);
-
 export const Basic = Template.bind({});
 
 Basic.args = {
@@ -43,6 +41,7 @@ Basic.args = {
         value:
           "https://assets.website-files.com/613b96978e0f483f60fbb8c0/css/replay-new.2b6f812de.min.css",
       },
+      { name: "Cookie", value: "name=value; name2=value2" },
       { name: "Origin", value: "https://www.replay.io" },
     ],
     responseHeaders: [
