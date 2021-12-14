@@ -8,7 +8,7 @@ const Services = require("Services");
 import React, { FC, useMemo, useState } from "react";
 
 import Accordion from "devtools/client/shared/components/Accordion";
-import Rule from "devtools/client/inspector/rules/components/Rule";
+import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
@@ -158,13 +158,16 @@ export const RulesApp: FC<RulesAppProps> = ({
       return null;
     }
 
+    type FCProps<C> = C extends FC<infer P> ? P : never;
+    const componentProps: FCProps<typeof Rules> = {
+      rules,
+      ...ruleProps,
+    };
+
     const items = [
       {
         component: Rules,
-        componentProps: {
-          ...ruleProps,
-          rules,
-        },
+        componentProps,
         header: getStr("rule.pseudoElement"),
         id: "rules-section-pseudoelement",
         opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
