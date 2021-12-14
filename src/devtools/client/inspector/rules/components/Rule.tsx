@@ -46,14 +46,7 @@ export const Rule: FC<RuleProps> = ({
       />
       <div className="ruleview-code">
         <div>
-          <Selector
-            id={id}
-            isUserAgentStyle={isUserAgentStyle}
-            selector={selector}
-            showSelectorEditor={showSelectorEditor}
-            type={type}
-            query={query}
-          />
+          <Selector {...{ id, isUserAgentStyle, selector, showSelectorEditor, type, query }} />
           {
             // type !== CSSRule.KEYFRAME_RULE
             //   ? SelectorHighlighter({
