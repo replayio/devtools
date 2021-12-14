@@ -102,7 +102,9 @@ export const RulesApp: FC<RulesAppProps> = ({
         );
       }
 
-      output.push(<Rule key={`${inheritedNodeId}|${rule.id}`} rule={rule} {...ruleProps} />);
+      output.push(
+        <Rule key={`${inheritedNodeId}|${rule.id}`} rule={rule} {...ruleProps} query={rulesQuery} />
+      );
     }
 
     return output;
@@ -161,6 +163,7 @@ export const RulesApp: FC<RulesAppProps> = ({
         componentProps: {
           ...ruleProps,
           rules,
+          query: rulesQuery,
         },
         header: getStr("rule.pseudoElement"),
         id: "rules-section-pseudoelement",
