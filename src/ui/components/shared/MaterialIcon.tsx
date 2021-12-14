@@ -8,6 +8,7 @@ const SIZE_STYLES = {
   lg: "text-lg",
   xl: "text-xl",
   "2xl": "text-2xl",
+  "4xl": "text-4xl",
 };
 
 type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {

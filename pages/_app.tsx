@@ -68,7 +68,6 @@ import "devtools/client/debugger/src/components/shared/SearchInput.css";
 import "devtools/client/debugger/src/components/shared/SourceIcon.css";
 import "devtools/client/debugger/src/components/shared/tree.css";
 import "devtools/client/debugger/src/components/ShortcutsModal.css";
-import "devtools/client/debugger/src/components/WelcomeBox.css";
 import "devtools/client/debugger/src/utils/editor/source-editor.css";
 import "devtools/client/inspector/components/InspectorTabPanel.css";
 import "devtools/client/inspector/markup/components/EventTooltip.css";
