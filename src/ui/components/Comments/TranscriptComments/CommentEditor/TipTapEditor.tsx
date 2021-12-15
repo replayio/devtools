@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { EditorContent, Extension, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -52,40 +52,42 @@ const TipTapEditor = ({
     close();
   };
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      GitHubLink,
-      ReplayLink,
-      // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
-      Placeholder.configure({ placeholder }),
-      Extension.create({
-        name: "submitOnEnter",
-        addKeyboardShortcuts() {
-          return {
-            "Cmd-Enter": ({ editor }) => {
-              onSubmit(JSON.stringify(editor.getJSON()));
-              return true;
-            },
-            Enter: ({ editor }) => {
-              onSubmit(JSON.stringify(editor.getJSON()));
-              return true;
-            },
-            Escape: ({ editor }) => {
-              editor.commands.blur();
-              editor.commands.setContent(tryToParse(content));
-              handleCancel();
-              return true;
-            },
-          };
-        },
-      }),
-    ],
-    editorProps: { attributes: { class: "focus:outline-none" } },
-    content: tryToParse(content),
-    editable,
-    autofocus,
-  });
+  const editor = useMemo(() => {
+    return new Editor({
+      extensions: [
+        StarterKit,
+        GitHubLink,
+        ReplayLink,
+        // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
+        Placeholder.configure({ placeholder }),
+        Extension.create({
+          name: "submitOnEnter",
+          addKeyboardShortcuts() {
+            return {
+              "Cmd-Enter": ({ editor }) => {
+                onSubmit(JSON.stringify(editor.getJSON()));
+                return true;
+              },
+              Enter: ({ editor }) => {
+                onSubmit(JSON.stringify(editor.getJSON()));
+                return true;
+              },
+              Escape: ({ editor }) => {
+                editor.commands.blur();
+                editor.commands.setContent(tryToParse(content));
+                handleCancel();
+                return true;
+              },
+            };
+          },
+        }),
+      ],
+      editorProps: { attributes: { class: "focus:outline-none" } },
+      content: tryToParse(content),
+      editable,
+      autofocus,
+    });
+  }, [onSubmit]);
 
   useEffect(() => {
     editor?.setEditable(editable);
