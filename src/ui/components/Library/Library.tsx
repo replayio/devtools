@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";

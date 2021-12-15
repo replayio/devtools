@@ -4,7 +4,7 @@ import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import { Comment, Reply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 
 interface NewCommentEditorProps extends PropsFromRedux {
   comment: Comment | Reply;
