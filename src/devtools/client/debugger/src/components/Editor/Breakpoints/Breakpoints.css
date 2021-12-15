@@ -33,9 +33,9 @@
 }
 
 .editor-wrapper
-  :not(.empty-line):not(.new-breakpoint)
+  :not(.empty-line):not(.new-breakpoint):hover
   > .CodeMirror-gutter-wrapper
-  > .CodeMirror-linenumber:hover::after {
+  > .CodeMirror-linenumber::after {
   content: "";
   position: absolute;
   /* paint below the number */
@@ -54,7 +54,6 @@
 }
 
 .editor.new-breakpoint svg {
-  visibility: hidden;
   fill: var(--breakpoint-fill);
   stroke: var(--breakpoint-stroke);
   width: 60px;

@@ -113,8 +113,10 @@ class ColumnBreakpoint extends Component {
 
   render() {
     const { editor, columnBreakpoint, insertAt } = this.props;
+    const { breakpoint } = columnBreakpoint;
 
-    if (!columnBreakpoint.breakpoint) {
+    console.log(breakpoint);
+    if (!breakpoint || !("logValue" in breakpoint.options)) {
       return null;
     }
 

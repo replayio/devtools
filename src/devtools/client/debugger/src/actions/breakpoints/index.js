@@ -236,9 +236,11 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
       line,
     };
 
-    const options = {
-      logValue: getLogValue(source, state, breakpointLocation),
-    };
+    const options = shouldLog
+      ? {
+          logValue: getLogValue(source, state, breakpointLocation),
+        }
+      : {};
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };

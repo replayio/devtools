@@ -24,7 +24,7 @@ function BreakpointOptions({ breakpoint, editor }) {
   if (!condition) {
     return (
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-        <Highlighted expression={logValue} editor={editor} />
+        <Highlighted expression={logValue ? logValue : breakpoint.text} editor={editor} />
       </span>
     );
   }

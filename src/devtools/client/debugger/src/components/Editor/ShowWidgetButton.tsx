@@ -10,6 +10,7 @@ import { getBreakpointsForSource } from "../../reducers/breakpoints";
 import { getSelectedSource } from "../../reducers/sources";
 import { removeBreakpoint } from "../../actions/breakpoints/modify";
 import classNames from "classnames";
+import { trackEvent } from "ui/utils/telemetry";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -48,11 +49,13 @@ function ShowWidgetButton({
       return;
     }
 
-    if (bp) {
+    if (bp?.options.logValue) {
+      trackEvent("breakpoint.minus_click");
       return removeBreakpoint(cx, bp);
     }
 
-    return addBreakpointAtLine(cx, hoveredLineNumber, event.altKey, event.shiftKey);
+    trackEvent("breakpoint.plus_click");
+    return addBreakpointAtLine(cx, hoveredLineNumber, true, event.shiftKey);
   };
 
   useEffect(() => {
@@ -64,7 +67,7 @@ function ShowWidgetButton({
     };
   }, []);
 
-  if (!lineNumberNode || bp) {
+  if (!lineNumberNode) {
     return null;
   }
 
@@ -78,12 +81,12 @@ function ShowWidgetButton({
     <button
       className={classNames(
         "bg-primaryAccent",
-        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 duration-150 hover:scale-125 ml-1"
+        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 hover:scale-110 ml-1"
       )}
       style={style}
       onClick={onClick}
     >
-      <MaterialIcon>{"add"}</MaterialIcon>
+      <MaterialIcon>{bp?.options.logValue ? "remove" : "add"}</MaterialIcon>
     </button>,
     lineNumberNode.parentElement!
   );
