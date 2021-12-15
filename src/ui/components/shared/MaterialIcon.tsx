@@ -19,7 +19,7 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   iconSize?: keyof typeof SIZE_STYLES;
 };
 
-function useMaterialIconCheck() {
+const useMaterialIconCheck = () => {
   useEffect(() => {
     document.fonts.ready.then(() => {
       if (typeof document === "object" && document.fonts.check("12px Material Icons")) {
@@ -28,7 +28,7 @@ function useMaterialIconCheck() {
       }
     });
   }, []);
-}
+};
 
 export default function MaterialIcon({
   children,
