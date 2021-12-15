@@ -17,11 +17,15 @@ export class Modal extends React.Component {
   };
 
   render() {
-    const { additionalClass, children, handleClose, status } = this.props;
+    const { additionalClass, children, handleClose, status, width } = this.props;
 
     return (
       <div className="modal-wrapper" onClick={handleClose}>
-        <div className={classnames("modal", additionalClass, status)} onClick={this.onClick}>
+        <div
+          style={{ width }}
+          className={classnames("modal", additionalClass, status)}
+          onClick={this.onClick}
+        >
           {children}
         </div>
       </div>
@@ -33,11 +37,22 @@ Modal.contextTypes = {
   shortcuts: PropTypes.object,
 };
 
-export default function Slide({ in: inProp, children, additionalClass, handleClose }) {
+export default function Slide({
+  width = "50%",
+  in: inProp,
+  children,
+  additionalClass,
+  handleClose,
+}) {
   return (
     <Transition in={inProp} timeout={transitionTimeout} appear>
       {status => (
-        <Modal status={status} additionalClass={additionalClass} handleClose={handleClose}>
+        <Modal
+          width={width}
+          status={status}
+          additionalClass={additionalClass}
+          handleClose={handleClose}
+        >
           {children}
         </Modal>
       )}

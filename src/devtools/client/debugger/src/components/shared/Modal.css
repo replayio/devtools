@@ -17,7 +17,6 @@
 
 .modal {
   display: flex;
-  width: 80%;
   max-height: 80vh;
   overflow-y: auto;
   background-color: var(--theme-toolbar-background);

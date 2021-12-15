@@ -30,15 +30,27 @@ const COMMANDS: Command[] = [
   { key: "show_sharing", label: "Show Sharing Options" },
 ];
 
-function CommandPalette({ hideCommandPalette }: PropsFromRedux) {
+function CommandPalette({ hideCommandPalette, executeCommand }: PropsFromRedux) {
   const [searchString, setSearchString] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
   };
-  const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
       hideCommandPalette();
+    } else if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+      e.preventDefault();
+      const direction = e.key === "ArrowUp" ? -1 : 1;
+      const index = activeIndex + direction;
+      const resultCount = shownCommands.length;
+      const nextIndex = (index + resultCount) % resultCount || 0;
+      setActiveIndex(nextIndex);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      executeCommand(shownCommands[activeIndex].key);
     }
   };
 
@@ -51,17 +63,18 @@ function CommandPalette({ hideCommandPalette }: PropsFromRedux) {
       onMaskClick={() => hideCommandPalette()}
     >
       <div className="w-96 h-64 flex flex-col overflow-hidden rounded-md bg-gray-100 shadow-xl ">
-        <div className="p-2 border-b border-gray-300" onKeyPress={onKeyPress}>
+        <div className="p-2 border-b border-gray-300">
           <TextInput
             value={searchString}
             onChange={onChange}
+            onKeyDown={onKeyDown}
             autoFocus
             placeholder="What would you like to do?"
           />
         </div>
         <div className="flex-grow text-sm flex flex-col overflow-auto">
-          {shownCommands.map((command: Command) => (
-            <CommandButton command={command} key={command.label} />
+          {shownCommands.map((command: Command, index: number) => (
+            <CommandButton active={index == activeIndex} command={command} key={command.label} />
           ))}
         </div>
       </div>
@@ -71,6 +84,7 @@ function CommandPalette({ hideCommandPalette }: PropsFromRedux) {
 
 const connector = connect(null, {
   hideCommandPalette: actions.hideCommandPalette,
+  executeCommand: actions.executeCommand,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommandPalette);
