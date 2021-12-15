@@ -3,6 +3,7 @@ import { Declarations } from "devtools/client/inspector/rules/components/Declara
 import { RuleState } from "../state/rules";
 import Selector from "devtools/client/inspector/rules/components/Selector";
 import { SourceLink } from "devtools/client/inspector/rules/components/SourceLink";
+import classNames from "classnames";
 
 type RuleProps = {
   showSelectorEditor: Function;
@@ -17,11 +18,10 @@ export const Rule: FC<RuleProps> = ({
 }) => {
   return (
     <div
-      className={
-        "ruleview-rule devtools-monospace" +
-        (isUnmatched ? " unmatched" : "") +
-        (isUserAgentStyle ? " uneditable" : "")
-      }
+      className={classNames("ruleview-rule devtools-monospace", {
+        unmatched: isUnmatched,
+        uneditable: isUserAgentStyle,
+      })}
       data-rule-id={id}
     >
       <SourceLink
