@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { EditorContent, Extension, Editor } from "@tiptap/react";
+import React, { useEffect, useState } from "react";
+import { useEditor, EditorContent, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -52,8 +52,8 @@ const TipTapEditor = ({
     close();
   };
 
-  const editor = useMemo(() => {
-    return new Editor({
+  const editor = useEditor(
+    {
       extensions: [
         StarterKit,
         GitHubLink,
@@ -86,8 +86,9 @@ const TipTapEditor = ({
       content: tryToParse(content),
       editable,
       autofocus,
-    });
-  }, [onSubmit]);
+    },
+    [onSubmit]
+  );
 
   useEffect(() => {
     editor?.setEditable(editable);
