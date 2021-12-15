@@ -8,7 +8,7 @@ const FontFamily = createFactory(
 );
 const Url = createFactory(require("devtools/client/inspector/rules/components/value/Url"));
 
-class DeclarationValue extends PureComponent {
+export class DeclarationValue extends PureComponent {
   static get propTypes() {
     return {
       colorSpanClassName: PropTypes.string,
@@ -53,5 +53,3 @@ class DeclarationValue extends PureComponent {
     });
   }
 }
-
-module.exports = DeclarationValue;

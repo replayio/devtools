@@ -162,7 +162,7 @@
 
 .ruleview-namecontainer {
   cursor: text;
-  margin-left: -35px;
+  margin-left: -15px;
 }
 
 .ruleview-computed > .ruleview-namecontainer {
@@ -690,6 +690,10 @@
   cursor: text;
 }
 
+.ruleview-selector-matched {
+  background: var(--theme-highlight-yellow);
+}
+
 .ruleview-selector-separator,
 .ruleview-selector-unmatched,
 .ruleview-unmatched-variable {
@@ -753,4 +757,8 @@
 
 .flash-out {
   transition: background 1s;
+}
+
+.ruleview-matched {
+  background-color: var(--theme-highlight-yellow);
 }

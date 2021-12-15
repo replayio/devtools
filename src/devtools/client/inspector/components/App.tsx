@@ -6,7 +6,7 @@ import * as InspectorActions from "../actions";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 const { prefs } = require("devtools/client/inspector/prefs");
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
-const RulesApp = require("devtools/client/inspector/rules/components/RulesApp");
+import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 const LayoutApp = require("devtools/client/inspector/layout/components/LayoutApp");
 import { selectors } from "ui/reducers";
