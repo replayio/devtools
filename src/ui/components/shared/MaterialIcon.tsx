@@ -22,7 +22,10 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
 const useMaterialIconCheck = () => {
   useEffect(() => {
     document.fonts.ready.then(() => {
-      if (typeof document === "object" && document.fonts.check("12px Material Icons")) {
+      if (
+        typeof document === "object" &&
+        (document as { fonts: FontFaceSet }).fonts.check("12px Material Icons")
+      ) {
         document.body.classList.add("material-icon-loaded");
       }
     });
