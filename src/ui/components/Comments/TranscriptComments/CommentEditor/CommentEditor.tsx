@@ -10,6 +10,7 @@ import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
 import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
+import useAuth0 from "ui/utils/useAuth0";
 
 export function getCommentEditorDOMId(comment: Comment | Reply) {
   return `comment-editor-${comment.id}`;
@@ -27,6 +28,7 @@ function CommentEditor({
   editable,
   handleSubmit,
 }: CommentEditorProps) {
+  const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
@@ -37,6 +39,8 @@ function CommentEditor({
         : undefined,
     [loading]
   );
+
+  if (!isAuthenticated) return null;
 
   return (
     <div className="comment-input-container" id={getCommentEditorDOMId(comment)}>

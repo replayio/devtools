@@ -52,43 +52,40 @@ const TipTapEditor = ({
     close();
   };
 
-  const editor = useEditor(
-    {
-      extensions: [
-        StarterKit,
-        GitHubLink,
-        ReplayLink,
-        // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
-        Placeholder.configure({ placeholder }),
-        Extension.create({
-          name: "submitOnEnter",
-          addKeyboardShortcuts() {
-            return {
-              "Cmd-Enter": ({ editor }) => {
-                onSubmit(JSON.stringify(editor.getJSON()));
-                return true;
-              },
-              Enter: ({ editor }) => {
-                onSubmit(JSON.stringify(editor.getJSON()));
-                return true;
-              },
-              Escape: ({ editor }) => {
-                editor.commands.blur();
-                editor.commands.setContent(tryToParse(content));
-                handleCancel();
-                return true;
-              },
-            };
-          },
-        }),
-      ],
-      editorProps: { attributes: { class: "focus:outline-none" } },
-      content: tryToParse(content),
-      editable,
-      autofocus,
-    },
-    [onSubmit]
-  );
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      GitHubLink,
+      ReplayLink,
+      // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
+      Placeholder.configure({ placeholder }),
+      Extension.create({
+        name: "submitOnEnter",
+        addKeyboardShortcuts() {
+          return {
+            "Cmd-Enter": ({ editor }) => {
+              onSubmit(JSON.stringify(editor.getJSON()));
+              return true;
+            },
+            Enter: ({ editor }) => {
+              onSubmit(JSON.stringify(editor.getJSON()));
+              return true;
+            },
+            Escape: ({ editor }) => {
+              editor.commands.blur();
+              editor.commands.setContent(tryToParse(content));
+              handleCancel();
+              return true;
+            },
+          };
+        },
+      }),
+    ],
+    editorProps: { attributes: { class: "focus:outline-none" } },
+    content: tryToParse(content),
+    editable,
+    autofocus,
+  });
 
   useEffect(() => {
     editor?.setEditable(editable);
