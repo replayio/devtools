@@ -9,8 +9,6 @@ import classnames from "classnames";
 import AccessibleImage from "./AccessibleImage";
 
 export default class ResultList extends Component {
-  displayName;
-
   static defaultProps = {
     size: "small",
     role: "listbox",

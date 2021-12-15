@@ -393,7 +393,12 @@ export class QuickOpenModal extends Component {
     const expanded = !!items && items.length > 0;
 
     return (
-      <Modal additionalClass={"rounded-lg"} in={enabled} handleClose={this.closeModal}>
+      <Modal
+        width="500px"
+        additionalClass={"border-b rounded-lg"}
+        in={enabled}
+        handleClose={this.closeModal}
+      >
         <SearchInput
           query={query}
           hasPrefix={true}
@@ -408,7 +413,7 @@ export class QuickOpenModal extends Component {
           expanded={expanded}
           showClose={false}
           selectedItemId={expanded && items[selectedIndex] ? items[selectedIndex].id : ""}
-          {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
+          size="big"
         />
         {results && items && (
           <ResultList
