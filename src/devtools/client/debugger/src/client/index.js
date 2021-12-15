@@ -18,16 +18,6 @@ import * as selectors from "../selectors";
 import { updatePrefs } from "../utils/bootstrap";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
-async function syncBreakpoints() {
-  const breakpoints = await asyncStore.pendingBreakpoints;
-  const breakpointValues = Object.values(breakpoints);
-  breakpointValues.forEach(({ disabled, options, location }) => {
-    if (!disabled) {
-      clientCommands.setBreakpoint(location, options);
-    }
-  });
-}
-
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const tabs = { tabs: await asyncStore.tabs };
@@ -57,8 +47,6 @@ async function setupDebugger() {
     })
   );
   store.dispatch({ type: "SOURCES_LOADED" });
-
-  syncBreakpoints();
 }
 
 export function bootstrap(_store) {
