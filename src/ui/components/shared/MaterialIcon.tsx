@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 
 const SIZE_STYLES = {
   xs: "text-xs",
@@ -20,26 +20,13 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 function useMaterialIconCheck() {
-  const intervalId = useRef(-1);
-
   useEffect(() => {
-    if (intervalId.current !== -1) {
-      return;
-    }
-
-    intervalId.current = window.setInterval(() => {
-      if (
-        typeof document === "object" &&
-        (document as { fonts: FontFaceSet }).fonts.check("12px Material Icons")
-      ) {
+    document.fonts.ready.then(() => {
+      if (typeof document === "object" && document.fonts.check("12px Material Icons")) {
+        console.log("ready");
         document.body.classList.add("material-icon-loaded");
-        clearInterval(intervalId.current);
       }
-    }, 100);
-
-    return () => {
-      clearInterval(intervalId.current);
-    };
+    });
   }, []);
 }
 
