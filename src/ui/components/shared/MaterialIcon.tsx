@@ -23,7 +23,6 @@ const useMaterialIconCheck = () => {
   useEffect(() => {
     document.fonts.ready.then(() => {
       if (typeof document === "object" && document.fonts.check("12px Material Icons")) {
-        console.log("ready");
         document.body.classList.add("material-icon-loaded");
       }
     });
