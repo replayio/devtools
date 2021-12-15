@@ -74,31 +74,28 @@ export function formatSymbol(symbol) {
   };
 }
 
-export const formatProjectSymbols = function formatProjectSymbols(
-  projectSymbols,
-  displayedSources
-) {
-  const sourceFunctions = Object.entries(projectSymbols)
-    .map(([sourceId, symbols]) => {
-      const source = displayedSources[sourceId];
+export function formatProjectFunctions(functions, displayedSources) {
+  const sourceFunctions = functions
+    .map(({ name, loc }) => {
+      const source = displayedSources[loc.sourceId];
       if (!source?.url) {
         return [];
       }
 
-      return symbols?.functions?.map(symbol => ({
-        id: `${symbol.name}:${symbol.location.start.line}`,
-        title: symbol.name,
-        subtitle: symbol.location.start.line,
+      return {
+        id: `${name}:${loc.line}:${loc.column}`,
+        title: name,
+        subtitle: loc.line,
         secondaryTitle: getTruncatedFileName(source),
-        value: symbol.name,
-        location: { end: symbol.location.end, start: { ...symbol.location.start, sourceId } },
-      }));
+        value: name,
+        location: { start: loc },
+      };
     })
     .flat()
     .filter(i => i);
 
-  return { functions: sourceFunctions };
-};
+  return sourceFunctions;
+}
 
 export function formatSymbols(symbols) {
   if (!symbols?.functions || symbols.loading) {

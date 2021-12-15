@@ -1,8 +1,8 @@
-import { isThirdParty } from "../../utils/source";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
 import groupBy from "lodash/groupBy";
-import sortBy from "lodash/sortBy";
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
+
 import { sliceCodePoints } from "ui/utils/codePointString";
 
 const formatSourceMatches = (source, matches) => ({
@@ -55,26 +55,4 @@ export async function search(query, sourcesById, updateResults) {
   });
 
   updateResults(() => ({ status: "DONE" }));
-}
-
-function getSourceIDsToSearch(sourcesById) {
-  const sourceIds = [];
-  for (const sourceId in sourcesById) {
-    if (ThreadFront.isMinifiedSource(sourceId)) {
-      continue;
-    }
-    const correspondingSourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
-    if (correspondingSourceId !== sourceId) {
-      continue;
-    }
-    const source = sourcesById[sourceId];
-    if (isThirdParty(source)) {
-      continue;
-    }
-    sourceIds.push(sourceId);
-  }
-  return sortBy(sourceIds, sourceId => {
-    const source = sourcesById[sourceId];
-    return [source.isOriginal ? 0 : 1, source.url];
-  });
 }
