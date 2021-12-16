@@ -11,9 +11,7 @@ import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import UserSettingsModal from "./shared/UserSettingsModal";
 import OnboardingModal from "./shared/OnboardingModal/index";
 import { isDeployPreview, isTest } from "ui/utils/environment";
-import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { ModalType } from "ui/state/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "./shared/LoadingScreen";
@@ -31,6 +29,8 @@ import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
+import { selectors } from "ui/reducers";
+import { ModalType } from "ui/state/layout";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {

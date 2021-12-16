@@ -1,15 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 
-import { updateEnableRepaint } from "protocol/enable-repaint";
 import { handleIntercomLogout } from "ui/utils/intercom";
 import useAuth0 from "ui/utils/useAuth0";
 import hooks from "ui/hooks";
-import * as actions from "ui/actions/app";
-import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { SettingsTabTitle } from "ui/state/app";
-import { ApiKey, CombinedUserSettings, UserSettings } from "ui/types";
 
 import APIKeys from "../APIKeys";
 import SettingsModal from "../SettingsModal";
@@ -21,6 +16,9 @@ import { AvatarImage } from "ui/components/Avatar";
 import PreferencesSettings from "./PreferencesSettings";
 import ExternalLink from "../ExternalLink";
 import ExperimentalSettings from "./ExperimentalSettings";
+import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
+import { SettingsTabTitle } from "ui/state/layout";
 
 function Support() {
   return (

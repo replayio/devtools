@@ -1,6 +1,6 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { Privacy } from "../UploadScreen/Privacy";
 import Modal from "./NewModal";
 

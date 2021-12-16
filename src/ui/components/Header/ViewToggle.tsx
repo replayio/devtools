@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
-import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
-import { getSelectedPrimaryPanel, getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
-import { ViewMode } from "ui/state/app";
+import { ViewMode } from "ui/state/layout";
+import { selectors } from "ui/reducers";
 
 const TOGGLE_DELAY = 300;
 
@@ -137,11 +136,11 @@ function ViewToggle({
 
 const connector = connect(
   (state: UIState) => ({
-    viewMode: getViewMode(state),
-    selectedPrimaryPanel: getSelectedPrimaryPanel(state),
+    viewMode: selectors.getViewMode(state),
+    selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
   }),
   {
-    setViewMode,
+    setViewMode: actions.setViewMode,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }
 );

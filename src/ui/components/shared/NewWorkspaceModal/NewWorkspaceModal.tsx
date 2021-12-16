@@ -9,17 +9,16 @@ import React, {
   useState,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
-import { features } from "ui/utils/prefs";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import InvitationLink from "./InvitationLink";
 import { useConfirm } from "../Confirm";
+import { actions } from "ui/actions";
 
 function ModalButton({
   children,

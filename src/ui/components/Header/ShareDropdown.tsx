@@ -7,7 +7,7 @@ import {
   useToggleIsPrivate,
   useGetRecordingId,
 } from "ui/hooks/recordings";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import Dropdown from "ui/components/shared/Dropdown";
 import ExternalLink from "../shared/ExternalLink";
 

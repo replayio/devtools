@@ -3,13 +3,13 @@ import { connect, ConnectedProps } from "react-redux";
 import Modal from "ui/components/shared/NewModal";
 import { CopyButton } from "./ReplayLink";
 import hooks from "ui/hooks";
-import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { Recording } from "ui/types";
 import { actions } from "ui/actions";
 import Collaborators from "./Collaborators";
 import MaterialIcon from "../MaterialIcon";
 import PrivacyDropdown from "./PrivacyDropdown";
+import { selectors } from "ui/reducers";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;

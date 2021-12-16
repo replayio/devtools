@@ -1,9 +1,9 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import MaterialIcon from "../MaterialIcon";
+import { selectors } from "ui/reducers";
 
 function TrimmingModal({ hideModal }: PropsFromRedux) {
   const timelineNode = document.querySelector(".timeline");

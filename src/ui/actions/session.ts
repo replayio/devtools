@@ -4,8 +4,7 @@ import { Action } from "redux";
 
 import tokenManager from "ui/utils/tokenManager";
 import { UIThunkAction } from "ui/actions";
-import * as actions from "ui/actions/app";
-import * as selectors from "ui/reducers/app";
+import { actions } from "ui/actions";
 import { ThreadFront } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
 import { validateUUID } from "ui/utils/helpers";
@@ -23,6 +22,7 @@ import { Recording } from "ui/types";
 import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
 import { getUserSettings } from "ui/hooks/settings";
+import { selectors } from "ui/reducers";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;

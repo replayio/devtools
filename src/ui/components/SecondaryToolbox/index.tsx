@@ -9,7 +9,6 @@ import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
-import { PanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
@@ -19,6 +18,7 @@ import "ui/setup/dynamic/inspector";
 import { UserSettings } from "ui/types";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
+import { PanelName } from "ui/state/layout";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 

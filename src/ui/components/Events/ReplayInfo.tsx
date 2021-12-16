@@ -8,7 +8,7 @@ import MaterialIcon from "../shared/MaterialIcon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import Spinner from "../shared/Spinner";

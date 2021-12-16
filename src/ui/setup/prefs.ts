@@ -7,9 +7,9 @@ import {
   getShowEditor,
   getShowVideoPanel,
   getViewMode,
-} from "ui/reducers/app";
+} from "ui/reducers/layout";
 import { getRecordingId } from "ui/utils/environment";
-import { ViewMode } from "ui/state/app";
+import { ViewMode } from "ui/state/layout";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;

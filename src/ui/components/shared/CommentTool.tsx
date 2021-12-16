@@ -6,11 +6,11 @@ import { selectors } from "ui/reducers";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 import { Comment, Reply } from "ui/state/comments";
 import classNames from "classnames";
-import { Canvas } from "ui/state/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import useAuth0 from "ui/utils/useAuth0";
 import { useGetUserId } from "ui/hooks/users";
 import { getCommentEditorDOMId } from "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor";
+import { Canvas } from "ui/state/layout";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");

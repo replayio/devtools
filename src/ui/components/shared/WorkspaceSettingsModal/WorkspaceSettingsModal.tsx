@@ -1,8 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
-import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
@@ -18,6 +16,8 @@ import { useConfirm } from "../Confirm";
 import GeneralSettings from "./GeneralSettings";
 import OrganizationSettings from "./OrganizationSettings";
 import Base64Image from "../Base64Image";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 
 export function WorkspaceMembers({
   members,

@@ -6,7 +6,6 @@ import React from "react";
 import { connect } from "../utils/connect";
 import actions from "../actions";
 import { useGetUserSettings } from "ui/hooks/settings";
-import { setSelectedPrimaryPanel } from "ui/actions/app";
 import { actions as appActions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { ConnectedProps } from "react-redux";
@@ -90,8 +89,8 @@ function WelcomeBox({
         </div>
       </div>
       <div className="launcher justify-center z-10 flex mt-4 px-8 w-full ">
-        {actions.map(action => (
-          <LaunchButton action={action} />
+        {actions.map((action, i) => (
+          <LaunchButton action={action} key={i} />
         ))}
       </div>
       <div className="absolute z-0">
@@ -104,7 +103,7 @@ function WelcomeBox({
 const connector = connect(() => ({}), {
   openQuickOpen: actions.openQuickOpen,
   setShowCommandPalette: appActions.setShowCommandPalette,
-  setSelectedPrimaryPanel,
+  setSelectedPrimaryPanel: appActions.setSelectedPrimaryPanel,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -11,49 +11,9 @@ import {
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
-import { Reply } from "./comments";
+import { PanelName } from "./layout";
 
-export type PanelName =
-  | "comments"
-  | "console"
-  | "debugger"
-  | "inspector"
-  | "network"
-  | "react-components"
-  | "viewer";
-export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events" | "search";
-export type ViewMode = "dev" | "non-dev";
-export type ModalOptionsType = {
-  recordingId?: string;
-  view?: string;
-  loom?: string;
-  comment?: Reply;
-} | null;
-export type ModalType =
-  | "sharing"
-  | "login"
-  | "settings"
-  | "new-workspace"
-  | "workspace-settings"
-  | "onboarding"
-  | "single-invite"
-  | "browser-launch"
-  | "first-replay"
-  | "download-replay"
-  | "trimming"
-  | "privacy"
-  | "loom"
-  | "attachment"
-  | "sourcemap-setup";
 export type WorkspaceId = string;
-export type SettingsTabTitle =
-  | "Experimental"
-  | "Invitations"
-  | "Support"
-  | "Personal"
-  | "Legal"
-  | "API Keys"
-  | "Preferences";
 
 export interface ExpectedError {
   message: string;
@@ -75,8 +35,6 @@ export interface UploadInfo {
 export interface AppState {
   analysisPoints: AnalysisPoints;
   awaitingSourcemaps: boolean;
-  canvas: Canvas | null;
-  defaultSettingsTab: SettingsTabTitle;
   displayedLoadingProgress: number | null;
   events: Events;
   expectedError: ExpectedError | null;
@@ -87,24 +45,16 @@ export interface AppState {
   loadedRegions: loadedRegions | null;
   loading: number;
   loadingFinished: boolean;
-  loadingPageTipIndex: number;
-  modal: ModalType | null;
-  modalOptions: ModalOptionsType;
   recordingDuration: number;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
-  selectedPanel: PanelName;
-  selectedPrimaryPanel: PrimaryPanelName;
   sessionId: SessionId | null;
-  showEditor: boolean;
-  showVideoPanel: boolean;
-  theme: string;
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
   videoNode: HTMLVideoElement | null;
   videoUrl: string | null;
-  viewMode: ViewMode;
+
   workspaceId: WorkspaceId | null;
 }
 
@@ -125,12 +75,3 @@ export type ReplayEvent = MouseEvent | KeyboardEvent | ReplayNavigationEvent;
 
 export type EventCategory = "mouse" | "keyboard" | "navigation";
 export type EventKind = MouseEventKind | KeyboardEventKind | string;
-
-export interface Canvas {
-  gDevicePixelRatio: number;
-  height: number;
-  left: number;
-  scale: number;
-  top: number;
-  width: number;
-}

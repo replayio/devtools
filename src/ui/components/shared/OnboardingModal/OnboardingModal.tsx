@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import Modal from "../NewModal";

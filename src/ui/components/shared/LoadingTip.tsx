@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { setLoadingPageTipIndex } from "ui/actions/app";
+import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 
@@ -81,7 +81,7 @@ const connector = connect(
     loadingPageTipIndex: selectors.getLoadingPageTipIndex(state),
   }),
   {
-    setLoadingPageTipIndex,
+    setLoadingPageTipIndex: actions.setLoadingPageTipIndex,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

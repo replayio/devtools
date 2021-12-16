@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";

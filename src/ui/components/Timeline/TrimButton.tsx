@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import MaterialIcon from "../shared/MaterialIcon";

@@ -9,7 +9,6 @@ import { RecordingId } from "@recordreplay/protocol";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { useRouter } from "next/dist/client/router";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -51,7 +50,7 @@ function RecordingRow({
   selected,
   addSelectedId,
   removeSelectedId,
-  loadReplayPrefs,
+  loadReplayLayoutPrefs,
 }: RecordingRowProps) {
   const { userId, loading } = hooks.useGetUserId();
 
@@ -73,7 +72,7 @@ function RecordingRow({
       return window.open(url);
     }
 
-    loadReplayPrefs(recording.id);
+    loadReplayLayoutPrefs(recording.id);
     window.location.href = url;
   };
   const toggleChecked = () => {
@@ -181,6 +180,6 @@ function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   );
 }
 
-const connector = connect(() => ({}), { loadReplayPrefs: actions.loadReplayPrefs });
+const connector = connect(() => ({}), { loadReplayLayoutPrefs: actions.loadReplayLayoutPrefs });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(RecordingRow);

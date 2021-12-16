@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import SidebarButton from "./SidebarButton";

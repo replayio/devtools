@@ -13,30 +13,27 @@ import {
 import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import {
-  PanelName,
-  PrimaryPanelName,
-  ViewMode,
-  ModalType,
-  ModalOptionsType,
   UploadInfo,
-  Canvas,
   WorkspaceId,
-  SettingsTabTitle,
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
-import { trackEvent } from "ui/utils/telemetry";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
 import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
-import { asyncStore } from "ui/utils/prefs";
-import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { hideCommandPalette } from "./layout";
+import {
+  hideCommandPalette,
+  setModal,
+  setSelectedPanel,
+  setSelectedPrimaryPanel,
+  setViewMode,
+} from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
+import { PanelName } from "ui/state/layout";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -46,21 +43,11 @@ export type SetDisplayedLoadingProgressAction = Action<"set_displayed_loading_pr
 export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finished: boolean };
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
-export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
-export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
-export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
-  panel: PrimaryPanelName;
-};
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
   awaitingSourcemaps: boolean;
 };
-export type SetModalAction = Action<"set_modal"> & {
-  modal: ModalType | null;
-  options: ModalOptionsType;
-};
-
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[];
   location: Location;
@@ -74,18 +61,13 @@ export type SetEventsForType = Action<"set_events"> & {
   events: (MouseEvent | KeyboardEvent | ReplayNavigationEvent)[];
   eventType: EventKind;
 };
-export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
   location: Location | null;
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
-export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
 export type SetVideoUrl = Action<"set_video_url"> & { videoUrl: string };
 export type SetVideoNode = Action<"set_video_node"> & { videoNode: HTMLVideoElement | null };
 export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId | null };
-export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
-  tabTitle: SettingsTabTitle;
-};
 export type SetRecordingTargetAction = Action<"set_recording_target"> & {
   recordingTarget: RecordingTarget;
 };
@@ -95,15 +77,6 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
   parameters: loadedRegions;
 };
-export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
-  showVideoPanel: boolean;
-};
-export type SetShowEditorAction = Action<"set_show_editor"> & {
-  showEditor: boolean;
-};
-export type SetLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
-  index: number;
-};
 
 export type AppActions =
   | SetRecordingDurationAction
@@ -112,30 +85,20 @@ export type AppActions =
   | SetLoadingFinishedAction
   | IndexingAction
   | SetSessionIdAction
-  | UpdateThemeAction
-  | SetSelectedPanelAction
-  | SetSelectedPrimaryPanelAction
   | SetInitializedPanelsAction
   | SetUploadingAction
-  | SetModalAction
   | SetAnalysisPointsAction
   | SetAnalysisErrorAction
   | SetEventsForType
-  | SetViewMode
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
-  | SetCanvas
   | SetVideoUrl
   | SetVideoNode
   | SetWorkspaceId
-  | SetDefaultSettingsTab
   | SetRecordingTargetAction
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
-  | SetShowVideoPanelAction
-  | SetShowEditorAction
-  | SetAwaitingSourcemapsAction
-  | SetLoadingPageTipIndexAction;
+  | SetAwaitingSourcemapsAction;
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -252,18 +215,6 @@ function setIndexing(indexing: number): IndexingAction {
   return { type: "indexing", indexing };
 }
 
-export function updateTheme(theme: string): UpdateThemeAction {
-  return { type: "update_theme", theme };
-}
-
-export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
-  return { type: "set_selected_panel", panel };
-}
-
-export function setSelectedPrimaryPanel(panel: PrimaryPanelName): SetSelectedPrimaryPanelAction {
-  return { type: "set_selected_primary_panel", panel };
-}
-
 export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
   return { type: "set_initialized_panels", panel };
 }
@@ -274,22 +225,6 @@ export function setUploading(uploading: UploadInfo | null): SetUploadingAction {
 
 export function setAwaitingSourcemaps(awaitingSourcemaps: boolean): SetAwaitingSourcemapsAction {
   return { type: "set_awaiting_sourcemaps", awaitingSourcemaps };
-}
-
-export function setModal(modalType: ModalType, options: ModalOptionsType = null): SetModalAction {
-  return {
-    type: "set_modal",
-    modal: modalType,
-    options,
-  };
-}
-
-export function hideModal(): SetModalAction {
-  return {
-    type: "set_modal",
-    modal: null,
-    options: null,
-  };
 }
 
 export function setAnalysisPoints(
@@ -321,20 +256,6 @@ export function setEventsForType(events: ReplayEvent[], eventType: EventKind): S
   };
 }
 
-export function setViewMode(viewMode: ViewMode): UIThunkAction {
-  return async ({ dispatch }) => {
-    // There's a possible race condition here so it's important to handle the nag logic first.
-    // Otherwise, it's possible for the nag to not be properly dismissed.
-    if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
-      await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
-      dispatch(setSelectedPrimaryPanel("explorer"));
-    }
-
-    dispatch({ type: "set_view_mode", viewMode });
-    trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
-  };
-}
-
 export function setHoveredLineNumberLocation(
   location: Location | null
 ): SetHoveredLineNumberLocation {
@@ -353,16 +274,8 @@ export function setVideoNode(videoNode: HTMLVideoElement | null): SetVideoNode {
   return { type: "set_video_node", videoNode };
 }
 
-export function setCanvas(canvas: Canvas): SetCanvas {
-  return { type: "set_canvas", canvas };
-}
-
 export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId {
   return { type: "set_workspace_id", workspaceId };
-}
-
-export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSettingsTab {
-  return { type: "set_default_settings_tab", tabTitle };
 }
 
 export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordingTargetAction {
@@ -371,34 +284,6 @@ export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordi
 
 export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspaceAction {
   return { type: "set_recording_workspace", workspace };
-}
-
-export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
-  return { type: "set_show_video_panel", showVideoPanel };
-}
-
-export function setShowEditor(showEditor: boolean): SetShowEditorAction {
-  return { type: "set_show_editor", showEditor };
-}
-
-export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
-  return async ({ dispatch }) => {
-    const replaySessions = await asyncStore.replaySessions;
-    const session = replaySessions[recordingId];
-
-    if (recordingId && session) {
-      const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = session;
-
-      dispatch(setViewMode(viewMode));
-      dispatch(setShowEditor(showEditor));
-      dispatch(setShowVideoPanel(showVideoPanel));
-      dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
-    }
-  };
-}
-
-export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAction {
-  return { type: "set_loading_page_tip_index", index };
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {

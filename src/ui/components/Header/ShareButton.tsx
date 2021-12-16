@@ -1,6 +1,6 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
 import MaterialIcon from "../shared/MaterialIcon";

@@ -20,7 +20,7 @@ import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eve
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
 import { NetworkAction } from "./network";
-import { LayoutAction } from "./layout";
+import { LayoutActions } from "./layout";
 
 type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 
@@ -29,7 +29,7 @@ export type UIAction =
   | CommentsAction
   | DebuggerAction
   | EventTooltipAction
-  | LayoutAction
+  | LayoutActions
   | MarkupAction
   | NetworkAction
   | ReactDevToolsAction

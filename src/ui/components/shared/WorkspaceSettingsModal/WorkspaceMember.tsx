@@ -4,7 +4,7 @@ import hooks from "ui/hooks";
 import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
 import { useConfirm } from "../Confirm";

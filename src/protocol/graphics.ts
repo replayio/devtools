@@ -14,11 +14,12 @@ import {
 import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { Canvas } from "ui/state/app";
-import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
+import { setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { isRepaintEnabled } from "./enable-repaint";
+import { setCanvas } from "ui/actions/layout";
+import { Canvas } from "ui/state/layout";
 
 const { features } = require("ui/utils/prefs");
 

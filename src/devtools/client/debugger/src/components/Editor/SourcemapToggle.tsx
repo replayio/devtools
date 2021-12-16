@@ -4,10 +4,9 @@ import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
 import actions from "../../actions";
 import { connect, ConnectedProps } from "react-redux";
-
 import { Switch } from "@headlessui/react";
 import classNames from "classnames";
-import { setModal } from "ui/actions/app";
+import { actions as uiActions } from "ui/actions";
 
 export const isNextUrl = (url: string) => url.includes("/_next/");
 
@@ -98,7 +97,7 @@ const connector = connect(
   }),
   {
     showAlternateSource: actions.showAlternateSource,
-    setModal,
+    setModal: uiActions.setModal,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

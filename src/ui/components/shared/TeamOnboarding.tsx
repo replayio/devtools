@@ -1,6 +1,5 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
@@ -23,6 +22,7 @@ import { removeUrlParameters } from "ui/utils/environment";
 import { DownloadPage } from "./Onboarding/DownloadPage";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
 import { useRouter } from "next/router";
+import { actions } from "ui/actions";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 

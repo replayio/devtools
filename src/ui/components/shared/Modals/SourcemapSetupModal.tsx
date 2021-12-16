@@ -3,7 +3,7 @@ import { isNextUrl } from "devtools/client/debugger/src/components/Editor/Source
 import { getSelectedSourceWithContent } from "devtools/client/debugger/src/selectors";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
+import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { PrimaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
