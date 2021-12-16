@@ -7,7 +7,6 @@ import {
   getShowEditor,
   getShowVideoPanel,
   getViewMode,
-  isSplitConsoleOpen,
 } from "ui/reducers/app";
 import { getRecordingId } from "ui/utils/environment";
 import { ViewMode } from "ui/state/app";
@@ -46,7 +45,6 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   }
 
   updatePref("viewMode", getViewMode);
-  updatePref("splitConsole", isSplitConsoleOpen);
   updatePref("selectedPanel", getSelectedPanel);
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);

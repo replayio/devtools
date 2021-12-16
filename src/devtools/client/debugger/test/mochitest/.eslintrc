@@ -44,7 +44,6 @@
     "getContext": false,
     "getEditorLineGutter": false,
     "getCM": false,
-    "getDebuggerSplitConsole": false,
     "hasConsoleMessage": false,
     "findConsoleMessage": false,
     "promise": false,
