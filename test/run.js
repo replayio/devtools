@@ -342,7 +342,7 @@ async function runTestViewer(path, local, timeout, env) {
       }
     }
 
-    sendTelemetryEvent("E2EFinished", { success: 0, local, why });
+    sendTelemetryEvent("E2EFinished", { success: 0, local, why: why.replace(/ts=[\d]+/, ""))
 
     failures.push(`Failed test: ${local} ${why}`);
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
