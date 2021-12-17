@@ -2,7 +2,7 @@ import { Action } from "redux";
 import { assert, defer, Deferred } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
-import Selection from "devtools/client/framework/selection";
+import Selection, { NodeSelectionReason } from "devtools/client/framework/selection";
 import { NodeInfo } from "../state/markup";
 import { UIThunkAction } from "ui/actions";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../selectors/markup";
 import { UIState } from "ui/state";
 import Highlighter from "highlighter/highlighter";
+import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
 
 export type ResetAction = Action<"RESET">;
@@ -130,7 +131,9 @@ export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoView
  * If shouldScrollIntoView is true, the node is scrolled into view if its children need to be loaded.
  */
 export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThunkAction {
+  console.log("expandNode");
   return async ({ dispatch, getState }) => {
+    console.log("a_expandNode");
     const tree = getState().markup.tree;
     const node = tree[nodeId];
     assert(node);
@@ -167,6 +170,7 @@ export function selectionChanged(
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
 ): UIThunkAction {
+  console.log("selectionChanged");
   return async ({ dispatch }) => {
     const selectedNode = selection.nodeFront;
     if (!selectedNode) {
@@ -203,8 +207,10 @@ export function selectionChanged(
   };
 }
 
-export function selectNode(nodeId: string, reason?: string): UIThunkAction {
-  return ({ toolbox }) => {
+export function selectNode(nodeId: string, reason?: NodeSelectionReason): UIThunkAction {
+  console.log("selectNode");
+  return ({ toolbox }: { toolbox: DevToolsToolbox }) => {
+    console.log("a_expandNode");
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);
