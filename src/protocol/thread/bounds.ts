@@ -6,13 +6,13 @@ import { Pause } from "./pause";
 // that might not be loaded yet, for the node picker.
 export class NodeBoundsFront {
   private _pause: Pause;
-  private _rect: Rect;
+  private _rects: Rect[];
   nodeId: ObjectId;
   then = undefined;
 
-  constructor(pause: Pause, nodeId: ObjectId, rect: Rect) {
+  constructor(pause: Pause, nodeId: ObjectId, rects: Rect[]) {
     this._pause = pause;
-    this._rect = rect;
+    this._rects = rects;
 
     this.nodeId = nodeId;
   }
@@ -22,19 +22,20 @@ export class NodeBoundsFront {
   }
 
   getBoxQuads(box: any) {
-    return buildBoxQuadsFromRect(this._rect);
+    return buildBoxQuadsFromRects(this._rects);
   }
 }
 
 Object.setPrototypeOf(NodeBoundsFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
-function buildBoxQuadsFromRect([left, top, right, bottom]: number[]) {
-  return [
-    DOMQuad.fromQuad({
+function buildBoxQuadsFromRects(rects: Rect[]) {
+  return rects.map(rect => {
+    const [left, top, right, bottom] = rect;
+    return DOMQuad.fromQuad({
       p1: { x: left, y: top },
       p2: { x: right, y: top },
       p3: { x: right, y: bottom },
       p4: { x: left, y: bottom },
-    }),
-  ];
+    });
+  });
 }
