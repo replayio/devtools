@@ -9,7 +9,7 @@ pref("devtools.selected-panel", "console");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
-pref("devtools.toolbox-height", "50%");
+pref("devtools.toolbox-size", "50%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
 pref("devtools.sidePanelSize", "240px");
@@ -46,7 +46,7 @@ export const prefs = new PrefsHelper("devtools", {
   user: ["Json", "user"],
   recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
-  toolboxHeight: ["String", "toolbox-height"],
+  toolboxSize: ["String", "toolbox-size"],
   viewMode: ["String", "view-mode"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],

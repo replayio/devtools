@@ -8,13 +8,35 @@ import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 import { installObserver } from "../../../protocol/graphics";
-import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 import { UIState } from "ui/state";
 
+function minSize(sidePanelCollapsed: boolean, showEditor: boolean): string {
+  if (!sidePanelCollapsed && showEditor) {
+    return "300px";
+  }
+
+  if (!sidePanelCollapsed || showEditor) {
+    return "200px";
+  }
+
+  return "0px";
+}
+
+function maxSize(sidePanelCollapsed: boolean, showEditor: boolean) {
+  if (showEditor) {
+    return "80%";
+  }
+
+  if (sidePanelCollapsed) {
+    return "0";
+  }
+
+  return String(prefs.sidePanelSize);
+}
+
 function DevView({
-  updateTimelineDimensions,
   recordingTarget,
   showVideoPanel,
   showEditor,
@@ -22,19 +44,8 @@ function DevView({
 }: PropsFromRedux) {
   const videoIsHidden = !showVideoPanel || recordingTarget == "node";
   const handleMove = (num: number) => {
-    updateTimelineDimensions();
-    prefs.toolboxHeight = `${num}px`;
+    prefs.toolboxSize = `${num}px`;
   };
-
-  function maxSize(sidePanelCollapsed: boolean, showEditor: boolean) {
-    if (showEditor) {
-      return "80%";
-    } else if (sidePanelCollapsed) {
-      return "0";
-    } else {
-      return String(prefs.sidePanelSize);
-    }
-  }
 
   useEffect(() => {
     installObserver();
@@ -47,8 +58,8 @@ function DevView({
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={8}
-          initialSize={prefs.toolboxHeight as string}
-          minSize={showEditor || !sidePanelCollapsed ? "240px" : "0%"}
+          initialSize={prefs.toolboxSize as string}
+          minSize={minSize(sidePanelCollapsed, showEditor)}
           maxSize={maxSize(sidePanelCollapsed, showEditor)}
           vert={true}
           onMove={handleMove}
@@ -64,17 +75,12 @@ function DevView({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    recordingTarget: selectors.getRecordingTarget(state),
-    showVideoPanel: selectors.getShowVideoPanel(state),
-    showEditor: selectors.getShowEditor(state),
-    sidePanelCollapsed: selectors.getPaneCollapse(state),
-  }),
-  {
-    updateTimelineDimensions,
-  }
-);
+const connector = connect((state: UIState) => ({
+  recordingTarget: selectors.getRecordingTarget(state),
+  showVideoPanel: selectors.getShowVideoPanel(state),
+  showEditor: selectors.getShowEditor(state),
+  sidePanelCollapsed: selectors.getPaneCollapse(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(DevView);
