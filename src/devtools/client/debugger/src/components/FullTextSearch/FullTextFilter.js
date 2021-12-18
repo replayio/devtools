@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Spinner from "ui/components/shared/Spinner";
 
-export function FullTextFilter({ results, onKeyDown }) {
-  const [value, setValue] = useState("");
+export function FullTextFilter({
+  value,
+  setValue,
+  focused,
+  results,
+  onKeyDown,
+  focusFullTextInput,
+}) {
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const inputRef = useRef();
+
+  useEffect(() => inputRef.current?.focus(), []);
+  useEffect(() => inputRef.current?.focus(), [focused]);
 
   function inputOnKeyDown(e) {
     if (e.key === "Escape") {
@@ -46,6 +56,8 @@ export function FullTextFilter({ results, onKeyDown }) {
           value={value}
           onChange={e => setValue(e.target.value)}
           onKeyDown={inputOnKeyDown}
+          onFocus={() => focusFullTextInput(false)}
+          ref={inputRef}
           autoFocus
         />
         {results.status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
