@@ -209,14 +209,16 @@ const RequestDetails = ({
           <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
           <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
         </div>
-        {activeTab == "headers" && <HeadersPanel request={request} />}
-        {activeTab == "cookies" && <Cookies request={request} />}
-        {activeTab == "response" && <ComingSoon />}
-        {activeTab == "request" && <ComingSoon />}
-        {activeTab == "stackTrace" && (
-          <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
-        )}
-        {activeTab == "timings" && <ComingSoon />}
+        <div className="overflow-auto">
+          {activeTab == "headers" && <HeadersPanel request={request} />}
+          {activeTab == "cookies" && <Cookies request={request} />}
+          {activeTab == "response" && <ComingSoon />}
+          {activeTab == "request" && <ComingSoon />}
+          {activeTab == "stackTrace" && (
+            <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
+          )}
+          {activeTab == "timings" && <ComingSoon />}
+        </div>
       </div>
     </div>
   );
