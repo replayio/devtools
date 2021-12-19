@@ -36,6 +36,18 @@
   font-family: Inter, sans-serif;
 }
 
+.theme-body-font-size {
+  font-size: var(--theme-body-font-size);
+}
+
+.theme-code-font-size {
+  font-size: var(--theme-code-font-size);
+}
+
+.theme-tab-font-size {
+  font-size: var(--theme-tab-font-size);
+}
+
 /**
   * Customize the dark theme's scrollbar colors to avoid excessive contrast.
   */

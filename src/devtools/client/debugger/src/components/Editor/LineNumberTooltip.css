@@ -4,6 +4,7 @@
   animation: static-tooltip 200ms ease;
   opacity: 0;
   animation-fill-mode: forwards;
+  font-size: var(--theme-body-font-size);
   min-width: 42px; /* Reduces jitter between loading state (...) and non-loading state (3 hits) */
   pointer-events: none;
 }
@@ -28,7 +29,7 @@
 }
 
 .static-tooltip.hot .material-icons {
-  font-size: 16px;
+  font-size: var(--theme-body-font-size);
   color: white;
   margin-right: 4px;
 }

@@ -44,7 +44,7 @@
   padding: 4px 10px;
   cursor: default;
   height: var(--editor-header-height);
-  font-size: 15px;
+  font-size: var(--theme-tab-font-size);
   background-color: transparent;
   vertical-align: bottom;
 }
