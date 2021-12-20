@@ -384,14 +384,6 @@ export function onPageDownKey(): UIThunkAction {
   };
 }
 
-/**
- * Given a NodeFront, return the representation for the markup tree.
- *
- * @param  {NodeFront} node
- *         The NodeFront of the node to add to the markup tree.
- * @param  {Boolean} isExpanded
- *         Whether or not the node is expanded.
- */
 async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promise<NodeInfo> {
   const parentNode = node.parentNode();
   const id = node.objectId();
