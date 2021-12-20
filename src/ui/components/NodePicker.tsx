@@ -143,6 +143,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
           active: nodePickerActive,
         })}
         onClick={() => this.clickNodePickerButton()}
+        title="Select an element in the video to inspect it"
       ></div>
     );
   }
