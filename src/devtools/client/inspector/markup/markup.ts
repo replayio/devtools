@@ -49,9 +49,7 @@ class MarkupView {
   }
 
   async init() {
-    if (!this.inspector) {
-      return;
-    }
+    assert(this.inspector);
 
     this.updateIsInspectorVisible();
     this.store?.subscribe(this.updateIsInspectorVisible);
@@ -197,6 +195,8 @@ class MarkupView {
   onSelectNode(nodeId: string) {
     assert(ThreadFront.currentPause);
 
+    console.log(`select ${nodeId}`);
+
     this.selection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
       reason: "markup",
     });
@@ -243,11 +243,7 @@ class MarkupView {
    * Updates the markup tree based on the current node selection.
    */
   async update(_: any, reason: NodeSelectionReason) {
-    if (!this.selection) {
-      return;
-    }
-
-    if (!this.isInspectorVisible || !this.selection.isNode()) {
+    if (!this.isInspectorVisible || !this.selection || !this.selection.isNode()) {
       return;
     }
 

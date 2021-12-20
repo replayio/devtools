@@ -345,10 +345,10 @@ class RulesView {
    * @param  {String} value
    *         The pseudo class to toggle on or off.
    */
-  // onTogglePseudoClass(value) {
-  //   this.store.dispatch(togglePseudoClass(value));
-  //   this.inspector.togglePseudoClass(value);
-  // }
+  onTogglePseudoClass(value) {
+    // this.store.dispatch(togglePseudoClass(value));
+    // this.inspector.togglePseudoClass(value);
+  }
 
   /**
    * Handler for toggling the selector highlighter for the given selector.

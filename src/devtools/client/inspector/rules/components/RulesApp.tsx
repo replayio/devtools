@@ -9,8 +9,11 @@ import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useSelector } from "react-redux";
 import { RulesState, RuleState } from "../state/rules";
+import { RuleInheritance } from "../models/rule";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
+
+type InheritedRule = RuleState & { inheritance: RuleInheritance };
 
 type RulesAppProps = {
   onToggleDeclaration: Function;
@@ -63,19 +66,11 @@ export const RulesApp: FC<RulesAppProps> = ({
     showContextMenu(event);
   };
 
-  const renderInheritedRules = (rules: RuleState[]) => {
-    if (!rules.length) {
-      return null;
-    }
-
+  const renderInheritedRules = (rules: InheritedRule[]) => {
     const output = [];
     let lastInheritedNodeId;
 
     for (const rule of rules) {
-      if (!rule.inheritance) {
-        continue;
-      }
-
       const { inheritedNodeId, inheritedSource } = rule.inheritance;
 
       if (inheritedNodeId !== lastInheritedNodeId) {
@@ -96,18 +91,10 @@ export const RulesApp: FC<RulesAppProps> = ({
   };
 
   const renderStyleRules = (rules: RuleState[]) => {
-    if (!rules.length) {
-      return null;
-    }
-
     return <Rules {...ruleProps} rules={rules} />;
   };
 
   const renderPseudoElementRules = (rules: RuleState[]) => {
-    if (!rules.length) {
-      return null;
-    }
-
     type FCProps<C> = C extends FC<infer P> ? P : never;
     const componentProps: FCProps<typeof Rules> = {
       rules,
@@ -140,9 +127,9 @@ export const RulesApp: FC<RulesAppProps> = ({
       return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
     }
 
-    const inheritedRules = [];
-    const pseudoElementRules = [];
-    const styleRules = [];
+    const inheritedRules: InheritedRule[] = [];
+    const pseudoElementRules: RuleState[] = [];
+    const styleRules: RuleState[] = [];
 
     const filteredRules = rulesQuery
       ? rules.filter(
@@ -155,9 +142,14 @@ export const RulesApp: FC<RulesAppProps> = ({
         )
       : rules;
 
+    // const filteredNonEmptyRules = filteredRules.filter(rule => rule.declarations.length !== 0);
+    if (!filteredRules.length) {
+      return <div className="devtools-sidepanel-no-result">No matching selector or style.</div>;
+    }
+
     for (const rule of filteredRules) {
       if (rule.inheritance) {
-        inheritedRules.push(rule);
+        inheritedRules.push(rule as InheritedRule);
       } else if (rule.pseudoElement) {
         pseudoElementRules.push(rule);
       } else {
@@ -165,15 +157,18 @@ export const RulesApp: FC<RulesAppProps> = ({
       }
     }
 
-    if (!filteredRules.length) {
-      return <div className="devtools-sidepanel-no-result">No matching selector or style.</div>;
-    }
+    console.clear();
+    console.log({
+      pseudoElementRules,
+      styleRules,
+      inheritedRules,
+    });
 
     return (
       <>
-        {renderPseudoElementRules(pseudoElementRules)}
-        {renderStyleRules(styleRules)}
-        {renderInheritedRules(inheritedRules)}
+        {pseudoElementRules.length && renderPseudoElementRules(pseudoElementRules)}
+        {styleRules.length && renderStyleRules(styleRules)}
+        {inheritedRules.length && renderInheritedRules(inheritedRules)}
       </>
     );
   }, [rules, rulesQuery]);
