@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RequestSummary } from "./utils";
 import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
@@ -6,6 +6,8 @@ import sortBy from "lodash/sortBy";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
+import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
+import { WiredFrame } from "protocol/thread/pause";
 
 interface Detail {
   name: string;
@@ -59,6 +61,25 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
           }
         )}
       />
+    </div>
+  );
+};
+
+const StackTrace = ({
+  cx,
+  frames,
+  selectFrame,
+}: {
+  cx: any;
+  frames: WiredFrame[];
+  selectFrame: (cx: any, frame: WiredFrame) => void;
+}) => {
+  return (
+    <div>
+      <h1 className="p-3 font-bold">Stack Trace</h1>
+      <div className="px-2">
+        <Frames cx={cx} framesLoading={true} frames={frames} selectFrame={selectFrame} />
+      </div>
     </div>
   );
 };
@@ -143,23 +164,39 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   );
 };
 
+const DEFAULT_TAB = "headers";
+
 const RequestDetails = ({
   closePanel,
+  cx,
+  frames,
   request,
+  selectFrame,
 }: {
   closePanel: () => void;
+  cx: any;
+  frames: WiredFrame[];
   request: RequestSummary;
+  selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
-  const [activeTab, setActiveTab] = useState("headers");
+  const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
   const tabs = [
     { id: "headers", title: "Headers", visible: true },
     { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
     { id: "response", title: "Response", visible: true },
     { id: "request", title: "Request", visible: true },
-    { id: "initiator", title: "Stack Trace", visible: true },
+    { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
     { id: "timings", title: "Timings", visible: true },
   ];
+
+  const activeTabs = tabs.filter(t => t.visible);
+
+  useEffect(() => {
+    if (!activeTabs.find(t => t.id === activeTab)) {
+      setActiveTab(DEFAULT_TAB);
+    }
+  }, [activeTab, activeTabs]);
 
   if (!request) {
     return null;
@@ -172,12 +209,16 @@ const RequestDetails = ({
           <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
           <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
         </div>
-        {activeTab == "headers" && <HeadersPanel request={request} />}
-        {activeTab == "cookies" && <Cookies request={request} />}
-        {activeTab == "response" && <ComingSoon />}
-        {activeTab == "request" && <ComingSoon />}
-        {activeTab == "initiator" && <ComingSoon />}
-        {activeTab == "timings" && <ComingSoon />}
+        <div className="overflow-auto">
+          {activeTab == "headers" && <HeadersPanel request={request} />}
+          {activeTab == "cookies" && <Cookies request={request} />}
+          {activeTab == "response" && <ComingSoon />}
+          {activeTab == "request" && <ComingSoon />}
+          {activeTab == "stackTrace" && (
+            <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
+          )}
+          {activeTab == "timings" && <ComingSoon />}
+        </div>
       </div>
     </div>
   );
