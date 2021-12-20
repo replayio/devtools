@@ -62,7 +62,7 @@
 }
 
 #command-button-pick.active::before {
-  background-color: var(--theme-toolbar-selected-color);
+  background-color: var(--theme-selection-background);
 }
 
 #command-button-pick:hover {
