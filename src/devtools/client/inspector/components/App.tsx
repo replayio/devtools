@@ -1,4 +1,4 @@
-import React, { Component, ReactElement } from "react";
+import React, { Component, ReactElement, ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { UIState } from "ui/state";
@@ -15,11 +15,12 @@ import { InspectorActiveTab } from "../state";
 
 import "ui/setup/dynamic/inspector";
 
-export interface InspectorPanel {
-  id: InspectorActiveTab;
-  title: string;
-  panel: ReactElement;
-}
+const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
+  ruleview: "Rules",
+  computedview: "Computed",
+  layoutview: "Layout",
+  eventlistenersview: "Event Listeners",
+} as const;
 
 class InspectorApp extends Component<PropsFromRedux> {
   private sidebarContainerRef = React.createRef<HTMLDivElement>();
@@ -91,85 +92,41 @@ class InspectorApp extends Component<PropsFromRedux> {
     const { initializedPanels, is3PaneModeEnabled, activeTab, setActiveTab } = this.props;
 
     const inspector = gToolbox.getPanel("inspector");
-    let rulesPanel: InspectorPanel | null = null;
-    let layoutPanel: InspectorPanel | null = null;
-    let computedPanel: InspectorPanel | null = null;
-    let eventListenersPanel: InspectorPanel | null = null;
+
+    const availableTabs: InspectorActiveTab[] = !is3PaneModeEnabled
+      ? ["ruleview", "computedview", "layoutview", "eventlistenersview"]
+      : ["computedview", "layoutview", "eventlistenersview"];
+
+    let activePanel: ReactNode | null = null;
     if (inspector && initializedPanels.includes("inspector")) {
-      rulesPanel = {
-        id: "ruleview",
-        title: "Rules",
-        panel: <RulesApp {...inspector.rules.getRulesProps()} />,
-      };
+      switch (activeTab) {
+        case "ruleview": {
+          if (!is3PaneModeEnabled) {
+            activePanel = <RulesApp {...inspector.rules.getRulesProps()} />;
+          }
+          break;
+        }
 
-      const layoutProps = {
-        ...inspector.getCommonComponentProps(),
-        ...inspector.boxModel.getComponentProps(),
-        showBoxModelProperties: true,
-      };
-      layoutPanel = {
-        id: "layoutview",
-        title: "Layout",
-        panel: <LayoutApp {...layoutProps} />,
-      };
+        case "computedview": {
+          activePanel = <ComputedApp />;
+          break;
+        }
 
-      computedPanel = {
-        id: "computedview",
-        title: "Computed",
-        panel: <ComputedApp />,
-      };
+        case "layoutview": {
+          const layoutProps = {
+            ...inspector.getCommonComponentProps(),
+            ...inspector.boxModel.getComponentProps(),
+            showBoxModelProperties: true,
+          };
+          activePanel = <LayoutApp {...layoutProps} />;
+          break;
+        }
 
-      eventListenersPanel = {
-        id: "eventlistenersview",
-        title: "Event Listeners",
-        panel: <EventListenersApp />,
-      };
-    }
-
-    const panels: InspectorPanel[] = [];
-    if (rulesPanel && !is3PaneModeEnabled) {
-      panels.push(rulesPanel);
-    }
-    if (computedPanel) {
-      panels.push(computedPanel);
-    }
-    if (layoutPanel) {
-      panels.push(layoutPanel);
-    }
-    if (eventListenersPanel) {
-      panels.push(eventListenersPanel);
-    }
-    let activePanel: ReactElement | undefined;
-
-    const tabs = panels.map(panel => {
-      const isPanelSelected = activeTab === panel.id;
-      if (isPanelSelected) {
-        activePanel = (
-          <div key={panel.id} className="tab-panel-box" role="tabpanel">
-            {panel.panel}
-          </div>
-        );
+        case "eventlistenersview": {
+          activePanel = <EventListenersApp />;
+        }
       }
-
-      return (
-        <li
-          key={panel.id}
-          className={classnames("tabs-menu-item", { "is-active": isPanelSelected })}
-          role="presentation"
-        >
-          <span className="devtools-tab-line"></span>
-          <a
-            id={`${panel.id}-tab`}
-            tabIndex={isPanelSelected ? 0 : -1}
-            title={panel.title}
-            role="tab"
-            onClick={() => setActiveTab(panel.id)}
-          >
-            {panel.title}
-          </a>
-        </li>
-      );
-    });
+    }
 
     return (
       <div className="devtools-sidebar-tabs">
@@ -182,7 +139,28 @@ class InspectorApp extends Component<PropsFromRedux> {
               expandPaneTitle={"Toggle on the 3-pane inspector"}
             /> */}
             <ul className="tabs-menu" role="tablist">
-              {tabs}
+              {availableTabs.map(panelId => {
+                const isPanelSelected = activeTab === panelId;
+
+                return (
+                  <li
+                    key={panelId}
+                    className={classnames("tabs-menu-item", { "is-active": isPanelSelected })}
+                    role="presentation"
+                  >
+                    <span className="devtools-tab-line"></span>
+                    <a
+                      id={`${panelId}-tab`}
+                      tabIndex={isPanelSelected ? 0 : -1}
+                      title={INSPECTOR_TAB_TITLES[panelId]}
+                      role="tab"
+                      onClick={() => setActiveTab(panelId)}
+                    >
+                      {INSPECTOR_TAB_TITLES[panelId]}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
           <div className="panels">{activePanel}</div>
