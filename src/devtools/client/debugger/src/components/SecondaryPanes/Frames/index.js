@@ -60,7 +60,6 @@ class Frames extends Component {
     const {
       cx,
       selectFrame,
-      selectLocation,
       selectedFrame,
       toggleBlackBox,
       frameworkGroupingOn,
@@ -86,7 +85,6 @@ class Frames extends Component {
               copyStackTrace={this.copyStackTrace}
               frameworkGroupingOn={frameworkGroupingOn}
               selectFrame={selectFrame}
-              selectLocation={selectLocation}
               selectedFrame={selectedFrame}
               toggleBlackBox={toggleBlackBox}
               key={String(frameOrGroup.id)}
@@ -103,7 +101,6 @@ class Frames extends Component {
               copyStackTrace={this.copyStackTrace}
               frameworkGroupingOn={frameworkGroupingOn}
               selectFrame={selectFrame}
-              selectLocation={selectLocation}
               selectedFrame={selectedFrame}
               toggleBlackBox={toggleBlackBox}
               key={frameOrGroup[0].id}
@@ -124,9 +121,7 @@ class Frames extends Component {
     if (!frames) {
       return (
         <div className="pane frames">
-          <div className="pane-info empty">
-            {L10N.getStr(framesLoading ? "callStack.loading" : "callStack.notPaused")}
-          </div>
+          <div className="pane-info empty">{framesLoading ? "Loading..." : "Not paused"}</div>
         </div>
       );
     }
@@ -150,7 +145,6 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   selectFrame: actions.selectFrame,
-  selectLocation: actions.selectLocation,
   toggleBlackBox: actions.toggleBlackBox,
   toggleFrameworkGrouping: actions.toggleFrameworkGrouping,
 })(Frames);

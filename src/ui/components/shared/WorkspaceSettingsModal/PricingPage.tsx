@@ -16,7 +16,7 @@ export function PricingPage({
       <p className="mb-4">
         With a Replay {subscription.displayName} Plan, you can expand your debugging superpowers
         with powerful collaboration features that make it easy to work together to fix bugs and
-        understand your software better.
+        understand your software better.{" "}
         <ExternalLink href="https://www.replay.io/pricing" className="text-primaryAccent underline">
           Learn More
         </ExternalLink>

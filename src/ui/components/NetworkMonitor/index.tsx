@@ -2,7 +2,7 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { getEvents, getRequests } from "ui/reducers/network";
+import { getEvents, getFormattedFrames, getRequests } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import RequestDetails from "./RequestDetails";
@@ -10,8 +10,19 @@ import RequestTable from "./RequestTable";
 import { RequestSummary, RequestType } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
+import { fetchFrames } from "ui/actions/network";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
 
-export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFromRedux) => {
+export const NetworkMonitor = ({
+  currentTime,
+  cx,
+  events,
+  fetchFrames,
+  frames,
+  requests,
+  seek,
+  selectFrame,
+}: PropsFromRedux) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
   const [types, setTypes] = useState<Set<RequestType>>(new Set(["xhr"]));
 
@@ -39,7 +50,13 @@ export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFro
               maxSize={selectedRequest ? "80%" : "100%"}
               endPanel={
                 selectedRequest ? (
-                  <RequestDetails closePanel={closePanel} request={selectedRequest} />
+                  <RequestDetails
+                    closePanel={closePanel}
+                    cx={cx}
+                    request={selectedRequest}
+                    frames={frames[selectedRequest?.point.point]}
+                    selectFrame={selectFrame}
+                  />
                 ) : (
                   <div />
                 )
@@ -49,7 +66,10 @@ export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFro
                   table={table}
                   data={data}
                   currentTime={currentTime}
-                  onRowSelect={setSelectedRequest}
+                  onRowSelect={row => {
+                    fetchFrames(row.point);
+                    setSelectedRequest(row);
+                  }}
                   seek={seek}
                   selectedRequest={selectedRequest}
                 />
@@ -66,11 +86,17 @@ export const NetworkMonitor = ({ seek, requests, events, currentTime }: PropsFro
 
 const connector = connect(
   (state: UIState) => ({
-    events: getEvents(state),
-    requests: getRequests(state),
     currentTime: getCurrentTime(state),
+    cx: getThreadContext(state),
+    events: getEvents(state),
+    frames: getFormattedFrames(state),
+    requests: getRequests(state),
   }),
-  { seek: actions.seek }
+  {
+    fetchFrames: fetchFrames,
+    seek: actions.seek,
+    selectFrame: actions.selectFrame,
+  }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
