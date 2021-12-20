@@ -509,8 +509,8 @@ export class Pause {
     return null;
   }
 
-  async repaintGraphics() {
-    if (this.repaintGraphicsWaiter) {
+  async repaintGraphics(force = false) {
+    if (this.repaintGraphicsWaiter && !force) {
       return this.repaintGraphicsWaiter.promise;
     }
     this.repaintGraphicsWaiter = defer();

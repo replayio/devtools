@@ -40,6 +40,7 @@ import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
 import { Pause } from "./pause";
 import uniqueId from "lodash/uniqueId";
+import { repaint } from "protocol/graphics";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -627,6 +628,7 @@ class _ThreadFront {
     } else if (rv.exception) {
       rv.exception = new ValueFront(pause, rv.exception);
     }
+    repaint(true);
     return rv;
   }
 
