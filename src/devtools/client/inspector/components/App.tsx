@@ -119,11 +119,11 @@ class InspectorApp extends Component<PropsFromRedux> {
     if (rulesPanel && !is3PaneModeEnabled) {
       panels.push(rulesPanel);
     }
-    if (layoutPanel) {
-      panels.push(layoutPanel);
-    }
     if (computedPanel) {
       panels.push(computedPanel);
+    }
+    if (layoutPanel) {
+      panels.push(layoutPanel);
     }
     let activePanel: ReactElement | undefined;
 
