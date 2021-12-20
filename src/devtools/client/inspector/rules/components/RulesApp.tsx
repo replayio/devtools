@@ -1,5 +1,5 @@
 const Services = require("Services");
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, useCallback, useMemo, useState } from "react";
 
 import Accordion from "devtools/client/shared/components/Accordion";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
@@ -10,6 +10,7 @@ import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useSelector } from "react-redux";
 import { RulesState, RuleState } from "../state/rules";
 import { RuleInheritance } from "../models/rule";
+import _ from "lodash";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
@@ -41,15 +42,17 @@ export const RulesApp: FC<RulesAppProps> = ({
 
   const [rulesQuery, setRulesQuery] = useState("");
 
-  const ruleProps = {
-    onToggleDeclaration,
-    onToggleSelectorHighlighter,
-    showDeclarationNameEditor,
-    showDeclarationValueEditor,
-    showNewDeclarationEditor,
-    showSelectorEditor,
-    query: rulesQuery,
-  };
+  const ruleProps = useMemo(
+    () => ({
+      onToggleDeclaration,
+      onToggleSelectorHighlighter,
+      showDeclarationNameEditor,
+      showDeclarationValueEditor,
+      showNewDeclarationEditor,
+      showSelectorEditor,
+    }),
+    []
+  );
 
   const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     if (
@@ -66,73 +69,86 @@ export const RulesApp: FC<RulesAppProps> = ({
     showContextMenu(event);
   };
 
-  const renderInheritedRules = (rules: InheritedRule[]) => {
-    const output = [];
-    let lastInheritedNodeId;
+  const renderInheritedRules = useCallback(
+    (rules: InheritedRule[]) => {
+      const output = [];
+      let lastInheritedNodeId;
 
-    for (const rule of rules) {
-      const { inheritedNodeId, inheritedSource } = rule.inheritance;
+      for (const rule of rules) {
+        const { inheritedNodeId, inheritedSource } = rule.inheritance;
 
-      if (inheritedNodeId !== lastInheritedNodeId) {
-        lastInheritedNodeId = inheritedNodeId;
+        if (inheritedNodeId !== lastInheritedNodeId) {
+          lastInheritedNodeId = inheritedNodeId;
+          output.push(
+            <div key={inheritedNodeId} className="ruleview-header">
+              {inheritedSource}
+            </div>
+          );
+        }
+
         output.push(
-          <div key={inheritedNodeId} className="ruleview-header">
-            {inheritedSource}
-          </div>
+          <Rule
+            key={`${inheritedNodeId}|${rule.id}`}
+            rule={rule}
+            {...ruleProps}
+            query={rulesQuery}
+          />
         );
       }
 
-      output.push(
-        <Rule key={`${inheritedNodeId}|${rule.id}`} rule={rule} {...ruleProps} query={rulesQuery} />
-      );
-    }
+      return output;
+    },
+    [rulesQuery, ruleProps]
+  );
 
-    return output;
-  };
+  const renderStyleRules = useCallback(
+    (rules: RuleState[]) => {
+      return <Rules {...ruleProps} query={rulesQuery} rules={rules} />;
+    },
+    [rulesQuery, ruleProps]
+  );
 
-  const renderStyleRules = (rules: RuleState[]) => {
-    return <Rules {...ruleProps} rules={rules} />;
-  };
+  const renderPseudoElementRules = useCallback(
+    (rules: RuleState[]) => {
+      type FCProps<C> = C extends FC<infer P> ? P : never;
+      const componentProps: FCProps<typeof Rules> = {
+        rules,
+        query: rulesQuery,
+        ...ruleProps,
+      };
 
-  const renderPseudoElementRules = (rules: RuleState[]) => {
-    type FCProps<C> = C extends FC<infer P> ? P : never;
-    const componentProps: FCProps<typeof Rules> = {
-      rules,
-      ...ruleProps,
-    };
-
-    const items = [
-      {
-        component: Rules,
-        componentProps,
-        header: getStr("rule.pseudoElement"),
-        id: "rules-section-pseudoelement",
-        opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
-        onToggle: (opened: boolean) => {
-          Services.prefs.setBoolPref(SHOW_PSEUDO_ELEMENTS_PREF, opened);
+      const items = [
+        {
+          component: Rules,
+          componentProps,
+          header: getStr("rule.pseudoElement"),
+          id: "rules-section-pseudoelement",
+          opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
+          onToggle: (opened: boolean) => {
+            Services.prefs.setBoolPref(SHOW_PSEUDO_ELEMENTS_PREF, opened);
+          },
         },
-      },
-    ];
+      ];
 
-    return (
-      <>
-        <Accordion items={items} />
-        <div className="ruleview-header">{getStr("rule.selectedElement")}</div>
-      </>
-    );
-  };
+      return (
+        <>
+          <Accordion items={items} />
+          <div className="ruleview-header">{getStr("rule.selectedElement")}</div>
+        </>
+      );
+    },
+    [ruleProps, rulesQuery]
+  );
 
   const rulesElements = useMemo(() => {
     if (!rulesQuery && rules.length === 0) {
       return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
     }
 
-    const inheritedRules: InheritedRule[] = [];
-    const pseudoElementRules: RuleState[] = [];
-    const styleRules: RuleState[] = [];
+    const nonEmptyRules = rules.filter(rule => rule.declarations.length !== 0);
 
     const filteredRules = rulesQuery
-      ? rules.filter(
+      ? nonEmptyRules.filter(
           rule =>
             rule.selector.selectors?.some(selector => selector.match(rulesQuery)) ||
             rule.declarations.some(
@@ -140,12 +156,15 @@ export const RulesApp: FC<RulesAppProps> = ({
                 declaration.name.match(rulesQuery) || declaration.value.match(rulesQuery)
             )
         )
-      : rules;
+      : nonEmptyRules;
 
-    // const filteredNonEmptyRules = filteredRules.filter(rule => rule.declarations.length !== 0);
     if (!filteredRules.length) {
       return <div className="devtools-sidepanel-no-result">No matching selector or style.</div>;
     }
+
+    const inheritedRules: InheritedRule[] = [];
+    const pseudoElementRules: RuleState[] = [];
+    const styleRules: RuleState[] = [];
 
     for (const rule of filteredRules) {
       if (rule.inheritance) {
@@ -158,6 +177,8 @@ export const RulesApp: FC<RulesAppProps> = ({
     }
 
     console.clear();
+    console.log(rules);
+    console.log(nonEmptyRules);
     console.log({
       pseudoElementRules,
       styleRules,
@@ -171,7 +192,7 @@ export const RulesApp: FC<RulesAppProps> = ({
         {inheritedRules.length && renderInheritedRules(inheritedRules)}
       </>
     );
-  }, [rules, rulesQuery]);
+  }, [rules, rulesQuery, renderInheritedRules, renderStyleRules, renderPseudoElementRules]);
 
   return (
     <div id="sidebar-panel-ruleview" className="theme-sidebar inspector-tabpanel">
