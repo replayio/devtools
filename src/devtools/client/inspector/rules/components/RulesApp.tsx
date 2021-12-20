@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { RulesState, RuleState } from "../state/rules";
 import { RuleInheritance } from "../models/rule";
 import _ from "lodash";
+import { declaration } from "../types";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
@@ -145,7 +146,9 @@ export const RulesApp: FC<RulesAppProps> = ({
       return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
     }
 
-    const nonEmptyRules = rules.filter(rule => rule.declarations.length !== 0);
+    const nonEmptyRules = rules.filter(rule =>
+      rule.declarations.some(declaration => !declaration.isInvisible)
+    );
 
     const filteredRules = rulesQuery
       ? nonEmptyRules.filter(
@@ -175,15 +178,6 @@ export const RulesApp: FC<RulesAppProps> = ({
         styleRules.push(rule);
       }
     }
-
-    console.clear();
-    console.log(rules);
-    console.log(nonEmptyRules);
-    console.log({
-      pseudoElementRules,
-      styleRules,
-      inheritedRules,
-    });
 
     return (
       <>
