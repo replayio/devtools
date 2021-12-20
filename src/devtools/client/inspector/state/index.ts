@@ -1,8 +1,10 @@
 const { prefs } = require("devtools/client/inspector/prefs");
 
+export type InspectorActiveTab = "ruleview" | "layoutview" | "computedview" | "eventlistenersview";
+
 export interface InspectorState {
   is3PaneModeEnabled: boolean;
-  activeTab: string;
+  activeTab: InspectorActiveTab;
 }
 
 export function initialInspectorState(): InspectorState {

@@ -1,20 +1,22 @@
 import React, { Component, ReactElement } from "react";
 import { connect, ConnectedProps } from "react-redux";
-const classnames = require("classnames");
+import classnames from "classnames";
 import { UIState } from "ui/state";
 import * as InspectorActions from "../actions";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-const { prefs } = require("devtools/client/inspector/prefs");
+import { prefs } from "devtools/client/inspector/prefs";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
-const LayoutApp = require("devtools/client/inspector/layout/components/LayoutApp");
+import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
+import { EventListenersApp } from "../event-listeners/EventListenersApp";
 import { selectors } from "ui/reducers";
+import { InspectorActiveTab } from "../state";
 
 import "ui/setup/dynamic/inspector";
 
 export interface InspectorPanel {
-  id: string;
+  id: InspectorActiveTab;
   title: string;
   panel: ReactElement;
 }
@@ -89,7 +91,10 @@ class InspectorApp extends Component<PropsFromRedux> {
     const { initializedPanels, is3PaneModeEnabled, activeTab, setActiveTab } = this.props;
 
     const inspector = gToolbox.getPanel("inspector");
-    let rulesPanel, layoutPanel, computedPanel;
+    let rulesPanel: InspectorPanel | null = null;
+    let layoutPanel: InspectorPanel | null = null;
+    let computedPanel: InspectorPanel | null = null;
+    let eventListenersPanel: InspectorPanel | null = null;
     if (inspector && initializedPanels.includes("inspector")) {
       rulesPanel = {
         id: "ruleview",
@@ -113,6 +118,12 @@ class InspectorApp extends Component<PropsFromRedux> {
         title: "Computed",
         panel: <ComputedApp />,
       };
+
+      eventListenersPanel = {
+        id: "eventlistenersview",
+        title: "Event Listeners",
+        panel: <EventListenersApp />,
+      };
     }
 
     const panels: InspectorPanel[] = [];
@@ -124,6 +135,9 @@ class InspectorApp extends Component<PropsFromRedux> {
     }
     if (layoutPanel) {
       panels.push(layoutPanel);
+    }
+    if (eventListenersPanel) {
+      panels.push(eventListenersPanel);
     }
     let activePanel: ReactElement | undefined;
 
@@ -137,10 +151,12 @@ class InspectorApp extends Component<PropsFromRedux> {
         );
       }
 
-      const className = classnames("tabs-menu-item", isPanelSelected ? "is-active" : undefined);
-
       return (
-        <li key={panel.id} className={className} role="presentation">
+        <li
+          key={panel.id}
+          className={classnames("tabs-menu-item", { "is-active": isPanelSelected })}
+          role="presentation"
+        >
           <span className="devtools-tab-line"></span>
           <a
             id={`${panel.id}-tab`}
