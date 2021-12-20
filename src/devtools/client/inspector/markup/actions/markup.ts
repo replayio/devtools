@@ -131,12 +131,7 @@ export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoView
  * If shouldScrollIntoView is true, the node is scrolled into view if its children need to be loaded.
  */
 export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThunkAction {
-  console.log(`expandNode ${nodeId}`);
-  // console.trace(nodeId);
   return async ({ dispatch, getState }) => {
-    const start = performance.now();
-    performance.mark(`expand ${nodeId}`);
-    console.log(`a_expandNode ${nodeId}`);
     const tree = getState().markup.tree;
     const node = tree[nodeId];
     assert(node);
@@ -153,21 +148,12 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       const pause = ThreadFront.currentPause;
       assert(pause);
       const nodeFront = pause.getNodeFront(nodeId);
-      const _st1 = performance.now();
       const childNodes = await nodeFront.childNodes();
       if (ThreadFront.currentPause !== pause) return;
-      const _st2 = performance.now();
       await dispatch(addChildren(nodeFront, childNodes));
-      const _en1 = performance.now();
-      console.log(
-        `getting kids took ${(_en1 - _st2).toFixed(0)}/${(_en1 - _st1).toFixed(0)}ms for kids`
-      );
     }
 
     dispatch(updateNodeExpanded(nodeId, true));
-    const end = performance.now();
-    console.log(`expandNode took ${(end - start).toFixed(0)}ms`);
-    performance.mark(`end expand ${nodeId}`);
   };
 }
 
@@ -182,9 +168,7 @@ export function selectionChanged(
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
 ): UIThunkAction {
-  console.log(`selectionChanged ${selection.nodeFront?.id}`);
   return async ({ dispatch }) => {
-    console.log(`a_selectionChanged ${selection.nodeFront?.id}`);
     const selectedNode = selection.nodeFront;
     if (!selectedNode) {
       dispatch(updateSelectedNode(null));
@@ -221,9 +205,7 @@ export function selectionChanged(
 }
 
 export function selectNode(nodeId: string, reason?: NodeSelectionReason): UIThunkAction {
-  console.log(`selectNode ${nodeId}`);
   return ({ toolbox }: { toolbox: DevToolsToolbox }) => {
-    console.log(`a_selectNode ${nodeId}`);
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);
