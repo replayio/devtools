@@ -1,7 +1,6 @@
 .static-tooltip {
   position: fixed;
   line-height: 16px;
-  margin-top: -5px;
   animation: static-tooltip 200ms ease;
   opacity: 0;
   animation-fill-mode: forwards;

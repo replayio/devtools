@@ -20,6 +20,8 @@ function safeJsonParse(text) {
 
 const getLineNumberNode = target => target.querySelector(".CodeMirror-linenumber");
 const isHoveredOnLineGutter = target => target.closest(".CodeMirror-gutter-wrapper");
+const isHoveredOnLineNumber = target =>
+  target.closest(".CodeMirror-linenumber") || target.closest(".CodeMirror-gutter-elt");
 
 function isValidTarget(target) {
   const isCodeMirrorBody = target.closest(".CodeMirror-code");
@@ -84,6 +86,9 @@ export function onLineMouseOver(codeMirror) {
       emitGutterMouseEnter(codeMirror, target);
     }
 
-    emitLineMouseEnter(codeMirror, target);
+    // Only emit lineMouseEnter if the mouse is not on the gutter.
+    if (!isHoveredOnLineNumber(target)) {
+      emitLineMouseEnter(codeMirror, target);
+    }
   };
 }

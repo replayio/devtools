@@ -19,18 +19,10 @@ function StaticTooltip({
   const { top, left, right } = targetNode.getBoundingClientRect();
   const docWidth = document.querySelector("html")!.getBoundingClientRect().width;
 
-  let style;
-
-  // Show tooltip on the left is side panel is expanded. If collapsed, show it on the
-  // right because otherwise it gets cut off.
-  if (startPanelCollapsed) {
-    style = { top: `${top}px`, left: `${right}px`, marginLeft: `8px` };
-  } else {
-    style = { top: `${top}px`, right: `${docWidth - left}px`, marginRight: `8px` };
-  }
+  let style = { top: `${top}px`, left: `${right}px` };
 
   return ReactDOM.createPortal(
-    <div className={`static-tooltip text-sm z-10 ${className}`} style={style}>
+    <div className={`static-tooltip text-sm z-10 ml-1 -mt-7 ${className}`} style={style}>
       {children}
     </div>,
     document.body

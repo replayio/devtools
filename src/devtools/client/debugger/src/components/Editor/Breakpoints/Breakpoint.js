@@ -74,7 +74,9 @@ class Breakpoint extends PureComponent {
     const { breakpoint, editor, selectedSource } = props;
     const selectedLocation = breakpoint.location;
 
-    if (!selectedSource) {
+    // Don't show the breakpoint visual in the gutter if the user
+    // added a print statement.
+    if (!selectedSource || breakpoint.options.logValue) {
       return;
     }
 
@@ -85,7 +87,11 @@ class Breakpoint extends PureComponent {
     resizeBreakpointGutter(editor.codeMirror);
     doc.setGutterMarker(line, "breakpoints", this.makeMarker());
 
+    // Don't show the new breakpoint visual if the user just added print statements.
+    // console.log({ breakpoint });
+    // if (!breakpoint.options.logValue || true) {
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
+    // }
     editor.codeMirror.removeLineClass(line, "line", "breakpoint-disabled");
 
     if (breakpoint.disabled) {
