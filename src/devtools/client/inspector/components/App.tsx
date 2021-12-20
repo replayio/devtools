@@ -93,7 +93,7 @@ class InspectorApp extends Component<PropsFromRedux> {
 
     const inspector = gToolbox.getPanel("inspector");
 
-    const availableTabs: InspectorActiveTab[] = !is3PaneModeEnabled
+    const availableTabs: readonly InspectorActiveTab[] = !is3PaneModeEnabled
       ? ["ruleview", "computedview", "layoutview", "eventlistenersview"]
       : ["computedview", "layoutview", "eventlistenersview"];
 
