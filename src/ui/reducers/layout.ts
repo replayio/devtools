@@ -5,6 +5,7 @@ import { prefs } from "../utils/prefs";
 import { getRecordingId } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
 import { asyncStore } from "../utils/prefs";
+import { getRecording } from "ui/hooks/recordings";
 
 const syncInitialLayoutState: LayoutState = {
   canvas: null,
@@ -13,12 +14,24 @@ const syncInitialLayoutState: LayoutState = {
   modal: null,
   modalOptions: null,
   selectedPanel: prefs.selectedPanel as PanelName,
-  selectedPrimaryPanel: "comments",
+  selectedPrimaryPanel: "events",
   showCommandPalette: false,
   showEditor: true,
   showVideoPanel: true,
   theme: "theme-light",
   viewMode: "non-dev",
+};
+
+const getDefaultSelectedPrimaryPanel = (comments: Comment, session?: any) => {
+  if (session) {
+    return session.selectedPrimaryPanel;
+  }
+
+  if (comments.length) {
+    return "comments";
+  } else {
+    return syncInitialLayoutState.selectedPrimaryPanel;
+  }
 };
 
 export async function getInitialLayoutState(): Promise<LayoutState> {
@@ -29,11 +42,21 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     return syncInitialLayoutState;
   }
 
+  const recording = await getRecording(recordingId);
+
+  if (!recording) {
+    return syncInitialLayoutState;
+  }
+
+  const { comments } = recording;
   const replaySessions = await asyncStore.replaySessions;
   const session = replaySessions[recordingId!];
 
   if (!session) {
-    return syncInitialLayoutState;
+    return {
+      ...syncInitialLayoutState,
+      selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(comments, session),
+    };
   }
 
   const { selectedPrimaryPanel, showVideoPanel, showEditor, viewMode } = syncInitialLayoutState;
@@ -44,7 +67,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
   return {
     ...syncInitialLayoutState,
     viewMode: initialViewMode,
-    selectedPrimaryPanel: session.selectedPrimaryPanel || selectedPrimaryPanel,
+    selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(comments, session),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     showEditor: "showEditor" in session ? session.showEditor : showEditor,
   };
