@@ -195,8 +195,6 @@ class MarkupView {
   onSelectNode(nodeId: string) {
     assert(ThreadFront.currentPause);
 
-    console.log(`select ${nodeId}`);
-
     this.selection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
       reason: "markup",
     });
