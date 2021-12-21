@@ -64,8 +64,8 @@ function ViewToggle({
 
   useEffect(() => {
     import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
-    preloadPromise.current = import("../Views/DevView");
   }, []);
+
   useEffect(() => {
     // It's possible for the view to be toggled by something else apart from this component.
     // When that happens, we need to update the localViewMode so that it displays
@@ -91,7 +91,8 @@ function ViewToggle({
     const delayPromise = new Promise<void>(resolve => {
       toggleTimeoutKey.current = setTimeout(() => resolve(), TOGGLE_DELAY);
     });
-    await Promise.all([preloadPromise, delayPromise]);
+
+    await delayPromise;
 
     // We switch to viewing comments only if the current view is something that
     // wouldn't be visible in Viewer Mode normally (like debug or explorer)
