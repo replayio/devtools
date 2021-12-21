@@ -156,7 +156,7 @@ class MarkupView {
 
   get eventTooltip() {
     if (!this._eventTooltip) {
-      this._eventTooltip = new HTMLTooltip(null, {
+      this._eventTooltip = new HTMLTooltip(window.document, {
         // @ts-ignore
         type: "arrow",
         consumeOutsideClicks: false,
