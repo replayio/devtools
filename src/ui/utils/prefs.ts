@@ -42,7 +42,6 @@ pref("devtools.features.widgetHover", false);
 pref("devtools.features.commentAttachments", false);
 
 export const prefs = new PrefsHelper("devtools", {
-  splitConsole: ["Bool", "split-console"],
   selectedPanel: ["String", "selected-panel"],
   user: ["Json", "user"],
   recordingId: ["Json", "recording-id"],

@@ -4,6 +4,8 @@
 
 "use strict";
 
+import { prefs } from "../utils/prefs";
+
 const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
 
 const {
@@ -13,6 +15,18 @@ const {
   PREFS,
   FILTERS,
 } = require("devtools/client/webconsole/constants");
+
+const updatePrefs = (filter, active) => {
+  const FILTER_PREF_MAP = {
+    error: "filterError",
+    warn: "filterWarn",
+    info: "filterInfo",
+    debug: "filterDebug",
+    log: "filterLog",
+  };
+  const prefKey = FILTER_PREF_MAP[filter];
+  prefs[prefKey] = active;
+};
 
 export function filterTextSet(text) {
   return ({ dispatch, getState }) => {
@@ -26,17 +40,17 @@ export function filterTextSet(text) {
 }
 
 export function filterToggle(filter) {
-  return ({ dispatch, getState, prefsService }) => {
+  return ({ dispatch, getState }) => {
     const filters = getAllFilters(getState());
-    const filtersState = { ...filters, [filter]: !filters[filter] };
+    const newValue = !filters[filter];
+    const filtersState = { ...filters, [filter]: newValue };
 
     dispatch({
       type: FILTER_TOGGLE,
       filtersState,
       filter,
     });
-
-    prefsService.setBoolPref(PREFS.FILTER[filter.toUpperCase()], filtersState[filter]);
+    updatePrefs(filter, newValue);
   };
 }
 

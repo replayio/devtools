@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { AvatarImage } from "../Avatar";

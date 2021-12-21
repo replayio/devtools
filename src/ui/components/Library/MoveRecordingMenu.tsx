@@ -19,7 +19,14 @@ function MoveRecordingMenu({
   workspaces,
 }: RecordingOptionsDropdownProps) {
   const { workspace, loading } = hooks.useGetWorkspace(currentWorkspaceId || "");
-  if (loading || (workspace && (!workspace?.subscription || subscriptionExpired(workspace))))
+
+  const availableWorkspaces = workspaces.filter(w => w.id !== currentWorkspaceId);
+
+  if (
+    availableWorkspaces.length === 0 ||
+    loading ||
+    (workspace && (!workspace?.subscription || subscriptionExpired(workspace)))
+  )
     return null;
 
   return (
@@ -30,13 +37,11 @@ function MoveRecordingMenu({
         {currentWorkspaceId !== null ? (
           <DropdownItem onClick={() => onMoveRecording(null)}>Your library</DropdownItem>
         ) : null}
-        {workspaces
-          .filter(w => w.id !== currentWorkspaceId)
-          .map(({ id, name }) => (
-            <DropdownItem onClick={() => onMoveRecording(id)} key={id}>
-              {name}
-            </DropdownItem>
-          ))}
+        {availableWorkspaces.map(({ id, name }) => (
+          <DropdownItem onClick={() => onMoveRecording(id)} key={id}>
+            {name}
+          </DropdownItem>
+        ))}
       </div>
     </>
   );

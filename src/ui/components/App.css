@@ -58,11 +58,15 @@
 }
 
 #command-button-pick::before {
-  background: var(--theme-icon-color);
+  background-color: var(--theme-icon-color);
+}
+
+#command-button-pick:hover::before {
+  background-color: var(--theme-icon-dimmed-color);
 }
 
 #command-button-pick.active::before {
-  background-color: var(--theme-toolbar-selected-color);
+  background-color: var(--theme-selection-background);
 }
 
 #command-button-pick:hover {

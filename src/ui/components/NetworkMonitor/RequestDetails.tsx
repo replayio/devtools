@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RequestSummary } from "./utils";
 import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
@@ -6,6 +6,8 @@ import sortBy from "lodash/sortBy";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
+import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
+import { WiredFrame } from "protocol/thread/pause";
 
 interface Detail {
   name: string;
@@ -14,21 +16,12 @@ interface Detail {
 
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
-    <div className={className}>
-      <div className={classNames("px-4 flex flex-col")}>
-        {details.map(h => (
-          <div title={h.name} className={classNames(styles.row, styles.value)} key={h.name}>
-            {h.name}
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col text-gray-400 ">
-        {details.map(h => (
-          <div title={h.value} className={classNames(styles.row, styles.value)} key={h.name}>
-            {h.value}
-          </div>
-        ))}
-      </div>
+    <div className={classNames(className, "flex flex-col")}>
+      {details.map(h => (
+        <div className={classNames(styles.row)} key={h.name}>
+          <span className="font-bold text-gray-500">{h.name}:</span> {h.value}
+        </div>
+      ))}
     </div>
   );
 };
@@ -40,6 +33,57 @@ const TriangleToggle = ({ open }: { open: boolean }) => (
   />
 );
 
+const parseCookie = (str: string): Record<string, string> => {
+  return str
+    .split(";")
+    .map(v => v.split("="))
+    .reduce((acc: Record<string, string>, v) => {
+      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+      return acc;
+    }, {});
+};
+
+const cookieHeader = (request: RequestSummary): string | undefined => {
+  return request.requestHeaders.find(r => r.name.toLowerCase() === "cookie")?.value;
+};
+
+const Cookies = ({ request }: { request: RequestSummary }) => {
+  return (
+    <div>
+      <h2 className={classNames("p-4 py-1 border-t cursor-pointer font-bold", styles.title)}>
+        Request Cookies
+      </h2>
+      <DetailTable
+        className={styles.request}
+        details={Object.entries(parseCookie(cookieHeader(request) || "")).map(
+          (value: [string, string]) => {
+            return { name: value[0], value: value[1] };
+          }
+        )}
+      />
+    </div>
+  );
+};
+
+const StackTrace = ({
+  cx,
+  frames,
+  selectFrame,
+}: {
+  cx: any;
+  frames: WiredFrame[];
+  selectFrame: (cx: any, frame: WiredFrame) => void;
+}) => {
+  return (
+    <div>
+      <h1 className="p-3 font-bold">Stack Trace</h1>
+      <div className="px-2">
+        <Frames cx={cx} framesLoading={true} frames={frames} selectFrame={selectFrame} />
+      </div>
+    </div>
+  );
+};
+
 const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [requestExpanded, setRequestExpanded] = useState(true);
   const [requestHeadersExpanded, setRequestHeadersExpanded] = useState(true);
@@ -47,19 +91,17 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [queryParametersExpanded, setQueryParametersExpanded] = useState(true);
 
   const requestHeaders = useMemo(
-    () => sortBy(request?.requestHeaders, r => r.name.toLowerCase()),
+    () => sortBy(request.requestHeaders, r => r.name.toLowerCase()),
     [request]
   );
   const responseHeaders = useMemo(
-    () => sortBy(request?.responseHeaders, r => r.name.toLowerCase()),
+    () => sortBy(request.responseHeaders, r => r.name.toLowerCase()),
     [request]
   );
   return (
     <>
       <div
-        className={classNames(
-          "flex items-center py-1 whitespace-nowrap cursor-pointer font-semibold"
-        )}
+        className={classNames("flex items-center py-1 cursor-pointer font-bold")}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
         <TriangleToggle open={requestExpanded} />
@@ -79,7 +121,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
       >
         <TriangleToggle open={requestHeadersExpanded} />
@@ -89,7 +131,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
       <h2
-        className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
       >
         <TriangleToggle open={responseHeadersExpanded} />
@@ -101,7 +143,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       {request.queryParams.length > 0 && (
         <div>
           <h2
-            className={classNames("py-1 border-t cursor-pointer font-semibold", styles.title)}
+            className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
             onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
           >
             <TriangleToggle open={queryParametersExpanded} />
@@ -122,23 +164,39 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   );
 };
 
+const DEFAULT_TAB = "headers";
+
 const RequestDetails = ({
   closePanel,
+  cx,
+  frames,
   request,
+  selectFrame,
 }: {
   closePanel: () => void;
+  cx: any;
+  frames: WiredFrame[];
   request: RequestSummary;
+  selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
-  const [activeTab, setActiveTab] = useState("headers");
+  const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
   const tabs = [
-    { id: "headers", title: "Headers" },
-    { id: "cookies", title: "Cookies" },
-    { id: "response", title: "Response" },
-    { id: "request", title: "Request" },
-    { id: "initiator", title: "Stack Trace" },
-    { id: "timings", title: "Timings" },
+    { id: "headers", title: "Headers", visible: true },
+    { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
+    { id: "response", title: "Response", visible: true },
+    { id: "request", title: "Request", visible: true },
+    { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
+    { id: "timings", title: "Timings", visible: true },
   ];
+
+  const activeTabs = tabs.filter(t => t.visible);
+
+  useEffect(() => {
+    if (!activeTabs.find(t => t.id === activeTab)) {
+      setActiveTab(DEFAULT_TAB);
+    }
+  }, [activeTab, activeTabs]);
 
   if (!request) {
     return null;
@@ -146,17 +204,21 @@ const RequestDetails = ({
 
   return (
     <div className="h-full w-full overflow-hidden">
-      <div className="overflow-hidden flex items-center justify-between">
-        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
-      </div>
       <div className={classNames("", styles.requestDetails)}>
-        {activeTab == "headers" && <HeadersPanel request={request} />}
-        {activeTab == "cookies" && <ComingSoon />}
-        {activeTab == "response" && <ComingSoon />}
-        {activeTab == "request" && <ComingSoon />}
-        {activeTab == "initiator" && <ComingSoon />}
-        {activeTab == "timings" && <ComingSoon />}
+        <div className="flex justify-between bg-toolbarBackground items-center">
+          <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+          <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
+        </div>
+        <div className="overflow-auto">
+          {activeTab == "headers" && <HeadersPanel request={request} />}
+          {activeTab == "cookies" && <Cookies request={request} />}
+          {activeTab == "response" && <ComingSoon />}
+          {activeTab == "request" && <ComingSoon />}
+          {activeTab == "stackTrace" && (
+            <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
+          )}
+          {activeTab == "timings" && <ComingSoon />}
+        </div>
       </div>
     </div>
   );

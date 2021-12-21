@@ -223,13 +223,8 @@ export class Pause {
 
     (objects || []).forEach(object => {
       if (object.preview) {
-        const {
-          properties,
-          containerEntries,
-          promiseState,
-          proxyState,
-          getterValues,
-        } = object.preview;
+        const { properties, containerEntries, promiseState, proxyState, getterValues } =
+          object.preview;
 
         const newProperties = [];
         for (const p of properties || []) {
@@ -486,18 +481,29 @@ export class Pause {
 
   async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
     await this.loadMouseTargets();
-    for (const { node, rect, visibility, pointerEvents } of this.mouseTargets!) {
-      const [left, top, right, bottom] = rect;
+    for (let { node, rect, rects, clipBounds, visibility, pointerEvents } of this.mouseTargets!) {
+      if (nodeIds && !nodeIds.includes(node)) {
+        continue;
+      }
+      if (visibility === "hidden" || pointerEvents === "none") {
+        continue;
+      }
       if (
-        (!nodeIds || nodeIds.includes(node)) &&
-        visibility !== "hidden" &&
-        pointerEvents !== "none" &&
-        x >= left &&
-        x <= right &&
-        y >= top &&
-        y <= bottom
+        (clipBounds?.left !== undefined && x < clipBounds.left) ||
+        (clipBounds?.right !== undefined && x > clipBounds.right) ||
+        (clipBounds?.top !== undefined && y < clipBounds.top) ||
+        (clipBounds?.bottom !== undefined && y > clipBounds.bottom)
       ) {
-        return new NodeBoundsFront(this, node, rect);
+        continue;
+      }
+
+      // in the protocol, rects is set to undefined if there is only one rect
+      rects ||= [rect];
+      for (const r of rects) {
+        const [left, top, right, bottom] = r;
+        if (x >= left && x <= right && y >= top && y <= bottom) {
+          return new NodeBoundsFront(this, node, rects);
+        }
       }
     }
     return null;

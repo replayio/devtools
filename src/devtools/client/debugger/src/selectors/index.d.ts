@@ -1,5 +1,7 @@
 import { UIState } from "ui/state";
 import { Location } from "@recordreplay/protocol";
+import { UIThunkAction } from "ui/actions";
+import { WiredFrame } from "protocol/thread/pause";
 
 export interface UrlLocation extends Location {
   sourceUrl: string;

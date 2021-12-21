@@ -9,7 +9,7 @@ const PropTypes = require("prop-types");
 /**
  * A CSS class.
  */
-exports.classes = {
+export const classes = {
   // The CSS class name.
   name: PropTypes.string,
 
@@ -20,7 +20,7 @@ exports.classes = {
 /**
  * A CSS declaration.
  */
-const declaration = (exports.declaration = {
+export const declaration = {
   // Array of the computed properties for a CSS declaration.
   computedProperties: PropTypes.arrayOf(
     PropTypes.shape({
@@ -72,12 +72,12 @@ const declaration = (exports.declaration = {
 
   // The declaration's property value.
   value: PropTypes.string,
-});
+};
 
 /**
  * The pseudo classes redux structure.
  */
-exports.pseudoClasses = {
+export const pseudoClasses = {
   // An object containing the :active pseudo class toggle state.
   ":active": PropTypes.shape({
     // Whether or not the :active pseudo class is checked.
@@ -114,7 +114,7 @@ exports.pseudoClasses = {
 /**
  * A CSS selector.
  */
-const selector = (exports.selector = {
+export const selector = {
   // Function that returns a Promise containing an unique CSS selector.
   getUniqueSelector: PropTypes.func,
   // Array of the selectors that match the selected element.
@@ -123,12 +123,23 @@ const selector = (exports.selector = {
   selectorText: PropTypes.string,
   // Array of the CSS rule's selectors.
   selectors: PropTypes.arrayOf(PropTypes.string),
-});
+};
+
+export type Selector = {
+  // Function that returns a Promise containing an unique CSS selector.
+  getUniqueSelector: Function;
+  // Array of the selectors that match the selected element.
+  matchedSelectors: string[];
+  // The CSS rule's selector text content.
+  selectorText: string;
+  // Array of the CSS rule's selectors.
+  selectors: string[];
+};
 
 /**
  * A CSS Rule.
  */
-const rule = (exports.rule = {
+export const rule = {
   // Array of CSS declarations.
   declarations: PropTypes.arrayOf(PropTypes.shape(declaration)),
 
@@ -174,9 +185,9 @@ const rule = (exports.rule = {
   // The type of CSS rule.
   // See https://developer.mozilla.org/en-US/docs/Web/API/CSSRule#Type_constants
   type: PropTypes.number,
-});
+};
 
-exports.rules = {
+export const rules = {
   isAddRuleEnabled: PropTypes.bool.isRequired,
   highlightedSelector: PropTypes.string.isRequired,
   rules: PropTypes.arrayOf(PropTypes.shape(rule)),

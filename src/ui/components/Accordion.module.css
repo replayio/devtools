@@ -12,9 +12,10 @@
 }
 
 .accordionItemContainer.open {
-  flex: 0 1 auto;
+  flex: 1 1;
   min-height: 20%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .accordionItemContainer {
@@ -22,7 +23,7 @@
 }
 
 .accordionItemContainer:not(.open) {
-  flex-shrink: 0;
+  flex: 0 1 min-content;
 }
 
 .accordionItemContainer .header {
@@ -43,4 +44,5 @@
 
 .content.open {
   height: 100%;
+  overflow-y: auto;
 }

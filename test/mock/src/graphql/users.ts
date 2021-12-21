@@ -1,5 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
-import { GET_USER_INFO, GET_USER_ID } from "ui/graphql/users";
+import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
 import { cloneResponse } from "./utils";
 
 export function createGetUserMock(opts: { user?: { id: string; uuid: string } }): MockedResponse[] {
@@ -17,9 +17,7 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
       query: GET_USER_INFO,
     },
     result: {
-      data: {
-        viewer: userInfo,
-      },
+      data: { viewer: userInfo },
     },
   };
   const getUserId = {

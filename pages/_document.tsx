@@ -14,19 +14,20 @@ const csp = (props: any) => {
   return [
     `default-src 'self'`,
     `connect-src 'self' https://api.replay.io wss://dispatch.replay.io https://telemetry.replay.io https://webreplay.us.auth0.com https://api-js.mixpanel.com https://*.sentry.io https://*.intercom.io wss://*.intercom.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com ${
-      // Required to talk to local backend in development
-      isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : ""
+      // Required to talk to local backend in development. Enabling
+      // localhost:8000 for prod to support the ?dispatch parameter when running
+      // the local backend
+      isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : "ws://localhost:8000"
     }`,
     `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com`,
-    `script-src 'self' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash} ${
-      // Required by local dev server
-      isDev ? "'unsafe-eval'" : ""
-    }`,
+    // unsafe-eval is required by intercom
+    `script-src 'self' 'unsafe-eval' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://webreplay.us.auth0.com`,
 
-    // From vercel's CSP config
-    isDev ? `font-src 'self' data:` : "",
-
+    // From vercel's CSP config and Google fonts
+    `font-src 'self' data: https://fonts.gstatic.com`,
+    // Google fonts
+    `style-src-elem 'self' 'unsafe-inline' https://fonts.gstatic.com`,
     // Required by LogRocket
     `child-src 'self' blob:`,
     `worker-src 'self' blob:`,

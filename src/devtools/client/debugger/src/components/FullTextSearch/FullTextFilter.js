@@ -12,8 +12,6 @@ export function FullTextFilter({ results, onKeyDown }) {
       return;
     }
 
-    e.stopPropagation();
-
     if (e.key === "ArrowUp") {
       e.preventDefault();
       const newIndex = (historyIndex + 1) % history.length;

@@ -5,14 +5,13 @@ import { RequestSummary } from "./utils";
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
 import { Row, TableInstance } from "react-table";
-import { fi } from "date-fns/locale";
-import { first } from "lodash";
 
 const RequestTable = ({
   currentTime,
   data,
   onRowSelect,
   seek,
+  selectedRequest,
   table,
 }: {
   currentTime: number;
@@ -22,7 +21,7 @@ const RequestTable = ({
   selectedRequest?: RequestSummary;
   table: TableInstance<RequestSummary>;
 }) => {
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
+  const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
   const onSeek = (request: RequestSummary) => {
     seek(request.point.point, request.point.time, true);
@@ -38,7 +37,7 @@ const RequestTable = ({
           className="sticky z-10 top-0"
           style={{ background: "var(--theme-tab-toolbar-background)" }}
         >
-          <HeaderGroups headerGroups={headerGroups} />
+          <HeaderGroups columns={columns} headerGroups={headerGroups} />
         </div>
         <div {...getTableBodyProps()}>
           {rows.map((row: Row<RequestSummary>) => {
@@ -48,15 +47,18 @@ const RequestTable = ({
               firstInFuture = true;
             }
 
+            prepareRow(row);
+
             return (
               <RequestRow
-                row={row}
-                onClick={onRowSelect}
                 currentTime={currentTime}
-                onSeek={onSeek}
-                prepareRow={prepareRow}
                 isFirstInFuture={firstInFuture}
                 isInPast={inPast}
+                isSelected={selectedRequest?.id === row.original.id}
+                key={row.getRowProps().key}
+                onClick={onRowSelect}
+                onSeek={onSeek}
+                row={row}
               />
             );
           })}

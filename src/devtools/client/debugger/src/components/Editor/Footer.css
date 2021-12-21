@@ -57,18 +57,6 @@
   background-color: var(--theme-icon-checked-color);
 }
 
-.source-footer .mapped-source,
-.source-footer .cursor-position {
-  color: var(--theme-body-color);
-  padding-right: 2.5px;
-}
-
-.source-footer .mapped-source {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .source-footer .cursor-position {
   padding: 5px;
   white-space: nowrap;

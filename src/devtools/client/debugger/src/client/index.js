@@ -18,16 +18,6 @@ import * as selectors from "../selectors";
 import { updatePrefs } from "../utils/bootstrap";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
-async function syncBreakpoints() {
-  const breakpoints = await asyncStore.pendingBreakpoints;
-  const breakpointValues = Object.values(breakpoints);
-  breakpointValues.forEach(({ disabled, options, location }) => {
-    if (!disabled) {
-      clientCommands.setBreakpoint(location, options);
-    }
-  });
-}
-
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const tabs = { tabs: await asyncStore.tabs };
@@ -44,10 +34,10 @@ export async function loadInitialState() {
 let boundActions;
 let store;
 
-function setupDebugger() {
+async function setupDebugger() {
   store.dispatch(actions.connect("", ThreadFront.actor, {}, false));
 
-  ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
+  await ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
     clientEvents.newSource(ThreadFront, {
       source: {
         actor: sourceId,
@@ -56,8 +46,7 @@ function setupDebugger() {
       },
     })
   );
-
-  syncBreakpoints();
+  store.dispatch({ type: "SOURCES_LOADED" });
 }
 
 export function bootstrap(_store) {

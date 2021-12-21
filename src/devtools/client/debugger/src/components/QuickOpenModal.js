@@ -8,7 +8,6 @@ import { connect } from "../utils/connect";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
 import throttle from "lodash/throttle";
-import { createSelector } from "reselect";
 import actions from "../actions";
 import {
   getSourceList,
@@ -18,12 +17,10 @@ import {
   getQuickOpenProject,
   getSelectedSource,
   getSourceContent,
-  getProjectSymbols,
   getSymbols,
   getTabs,
   getDisplayedSources,
   isSymbolsLoading,
-  getProjectSymbolsLoading,
   getContext,
 } from "../selectors";
 import { memoizeLast } from "../utils/memoizeLast";
@@ -33,12 +30,12 @@ import {
   parseLineColumn,
   formatShortcutResults,
   formatSources,
-  formatProjectSymbols,
 } from "../utils/quick-open";
 import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
+import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 
 const updateResultsThrottle = 100;
 const maxResults = 100;
@@ -70,9 +67,7 @@ export class QuickOpenModal extends Component {
   }
 
   componentDidMount() {
-    const { query, shortcutsModalEnabled, toggleShortcutsModal } = this.props;
-
-    this.updateResults(query);
+    const { shortcutsModalEnabled, toggleShortcutsModal } = this.props;
 
     if (shortcutsModalEnabled) {
       toggleShortcutsModal();
@@ -90,7 +85,7 @@ export class QuickOpenModal extends Component {
       hasChanged("enabled") ||
       hasChanged("query") ||
       hasChanged("symbols") ||
-      hasChanged("projectSymbols")
+      hasChanged("globalFunctions")
     ) {
       this.updateResults(this.props.query);
     }
@@ -119,24 +114,21 @@ export class QuickOpenModal extends Component {
   };
 
   getFunctions() {
-    const { project, projectSymbols, symbols } = this.props;
-    return project ? projectSymbols.functions : symbols.functions;
+    const { project, symbols, globalFunctions } = this.props;
+
+    return project ? globalFunctions : symbols.functions;
   }
 
-  searchSymbols = query => {
-    let results = this.getFunctions();
-    results = results.filter(result => result.title !== "anonymous");
-
-    if (query.length <= 3) {
-      results = results.slice(0, 10000);
-    }
+  searchFunctions(query) {
+    let fns = this.getFunctions();
 
     if (query === "@" || query === "#") {
-      return this.setResults(results);
+      return this.setResults(fns);
     }
-    results = filter(results, query.slice(1));
-    return this.setResults(results);
-  };
+
+    fns = filter(fns, query.slice(1));
+    return this.setResults(fns);
+  }
 
   searchShortcuts = query => {
     const results = formatShortcutResults();
@@ -172,8 +164,8 @@ export class QuickOpenModal extends Component {
       return this.showTopSources();
     }
 
-    if (this.isSymbolSearch()) {
-      return this.searchSymbols(query);
+    if (this.isFunctionQuery()) {
+      return this.searchFunctions(query);
     }
 
     if (this.isShortcutQuery()) {
@@ -205,7 +197,7 @@ export class QuickOpenModal extends Component {
       return this.gotoLocation({ ...location, sourceId: item.id });
     }
 
-    if (this.isSymbolSearch()) {
+    if (this.isFunctionQuery()) {
       const start = item.location?.start;
       trackEvent("quick_open.select_function");
 
@@ -221,7 +213,8 @@ export class QuickOpenModal extends Component {
 
   onSelectResultItem = item => {
     const { selectedSource, highlightLineRange, project } = this.props;
-    if (selectedSource == null || !this.isSymbolSearch()) {
+
+    if (selectedSource == null || !this.isFunctionQuery()) {
       return;
     }
 
@@ -268,7 +261,7 @@ export class QuickOpenModal extends Component {
     const { selectedSource, selectedContentLoaded, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
     const noSource = !selectedSource || !selectedContentLoaded;
-    if ((noSource && this.isSymbolSearch()) || this.isGotoQuery()) {
+    if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {
       return;
     }
 
@@ -277,8 +270,9 @@ export class QuickOpenModal extends Component {
 
   onKeyDown = e => {
     const { enabled, query } = this.props;
-    const { results, selectedIndex } = this.state;
+    const { selectedIndex } = this.state;
     const isGoToQuery = this.isGotoQuery();
+    const results = this.state.results;
 
     if ((!enabled || !results) && !isGoToQuery) {
       return;
@@ -307,12 +301,12 @@ export class QuickOpenModal extends Component {
 
   getResultCount = () => {
     const results = this.state.results;
+
     return results && results.length ? results.length : 0;
   };
 
   // Query helpers
   isFunctionQuery = () => this.props.searchType === "functions";
-  isSymbolSearch = () => this.isFunctionQuery();
   isGotoQuery = () => this.props.searchType === "goto";
   isGotoSourceQuery = () => this.props.searchType === "gotoSource";
   isShortcutQuery = () => this.props.searchType === "shortcuts";
@@ -358,20 +352,14 @@ export class QuickOpenModal extends Component {
   }
 
   getSummaryMessage() {
-    const { symbolsLoading, projectSymbolsLoading, project } = this.props;
+    const { symbolsLoading, project, globalFunctionsLoading } = this.props;
 
     if (this.isGotoQuery()) {
       return "Go to line";
     }
 
-    if (project && projectSymbolsLoading) {
-      const { loaded, total } = projectSymbolsLoading;
-      if (loaded == total) {
-        const functions = this.getFunctions();
-        return `${functions.length} functions`;
-      }
-
-      return `Loading ${loaded} of ${total} files\u2026`;
+    if (project && globalFunctionsLoading) {
+      return `Loading functions`;
     }
 
     if (this.isFunctionQuery() && symbolsLoading) {
@@ -393,7 +381,12 @@ export class QuickOpenModal extends Component {
     const expanded = !!items && items.length > 0;
 
     return (
-      <Modal additionalClass={"rounded-lg"} in={enabled} handleClose={this.closeModal}>
+      <Modal
+        width="500px"
+        additionalClass={"border-b rounded-lg"}
+        in={enabled}
+        handleClose={this.closeModal}
+      >
         <SearchInput
           query={query}
           hasPrefix={true}
@@ -408,7 +401,7 @@ export class QuickOpenModal extends Component {
           expanded={expanded}
           showClose={false}
           selectedItemId={expanded && items[selectedIndex] ? items[selectedIndex].id : ""}
-          {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
+          size="big"
         />
         {results && items && (
           <ResultList
@@ -426,12 +419,6 @@ export class QuickOpenModal extends Component {
   }
 }
 
-const selectProjectSymbols = createSelector(
-  getDisplayedSources,
-  getProjectSymbols,
-  (displayedSources, symbols) => formatProjectSymbols(symbols, displayedSources)
-);
-
 /* istanbul ignore next: ignoring testing of redux connection stuff */
 function mapStateToProps(state) {
   const selectedSource = getSelectedSource(state);
@@ -448,11 +435,11 @@ function mapStateToProps(state) {
       ? !!getSourceContent(state, selectedSource.id)
       : undefined,
     symbols: formatSymbols(getSymbols(state, selectedSource)),
-    projectSymbols: selectProjectSymbols(state),
-    projectSymbolsLoading: getProjectSymbolsLoading(state),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     query: getQuickOpenQuery(state),
     searchType: getQuickOpenType(state),
+    globalFunctions: getGlobalFunctions(state) || [],
+    globalFunctionsLoading: isGlobalFunctionsLoading(state),
     tabs,
   };
 }

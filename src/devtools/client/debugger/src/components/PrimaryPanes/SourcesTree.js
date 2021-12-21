@@ -13,6 +13,7 @@ import { connect } from "../../utils/connect";
 import {
   getShownSource,
   getSelectedSource,
+  getSourcesLoading,
   getDebuggeeUrl,
   getExpandedState,
   getDisplayedSources,
@@ -233,37 +234,32 @@ class SourcesTree extends Component {
     return <ManagedTree {...treeProps} />;
   }
 
-  renderPane(child) {
+  render() {
+    const { sourcesLoading } = this.props;
+    if (sourcesLoading) {
+      return (
+        <div key="pane" className="sources-pane">
+          {this.renderEmptyElement("Sources are loading.")}
+        </div>
+      );
+    }
+
+    if (this.isEmpty()) {
+      return (
+        <div key="pane" className="sources-pane">
+          {this.renderEmptyElement("This page has no sources.")}
+        </div>
+      );
+    }
+
     return (
       <div key="pane" className="sources-pane">
-        {child}
-      </div>
-    );
-  }
-
-  render() {
-    return this.renderPane(
-      this.isEmpty() ? (
-        this.renderEmptyElement("This page has no sources.")
-      ) : (
         <div key="tree" className="sources-list">
           {this.renderTree()}
         </div>
-      )
+      </div>
     );
   }
-}
-
-function getSourceForTree(state, displayedSources, source) {
-  if (!source) {
-    return null;
-  }
-
-  if (!source.isPrettyPrinted) {
-    return source;
-  }
-
-  return getGeneratedSourceByURL(state, getRawSourceURL(source.url));
 }
 
 const mapStateToProps = (state, props) => {
@@ -273,6 +269,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     cx: getContext(state),
+    sourcesLoading: getSourcesLoading(state),
     shownSource: shownSource,
     selectedSource: selectedSource,
     debuggeeUrl: getDebuggeeUrl(state),

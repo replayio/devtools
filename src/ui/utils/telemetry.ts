@@ -3,7 +3,6 @@ import { Integrations } from "@sentry/tracing";
 import { skipTelemetry } from "./environment";
 import { Recording, Workspace } from "ui/types";
 import { prefs } from "./prefs";
-import { UserInfo } from "ui/hooks/users";
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
 
 const timings: Record<string, number> = {};

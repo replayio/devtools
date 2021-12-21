@@ -17,6 +17,8 @@ import { parse as parseURL } from "../utils/url";
 import { memoizeLast } from "../utils/memoizeLast";
 export { isMinified } from "./isMinified";
 import { getURL, getFileExtension } from "./sources-tree";
+import sortBy from "lodash/sortBy";
+import { ThreadFront } from "protocol/thread";
 
 import { isFulfilled } from "./async-value";
 
@@ -454,4 +456,26 @@ export function isExtensionDirectoryPath(url) {
 export function getPlainUrl(url) {
   const queryStart = url.indexOf("?");
   return queryStart !== -1 ? url.slice(0, queryStart) : url;
+}
+
+export function getSourceIDsToSearch(sourcesById) {
+  const sourceIds = [];
+  for (const sourceId in sourcesById) {
+    if (ThreadFront.isMinifiedSource(sourceId)) {
+      continue;
+    }
+    const correspondingSourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
+    if (correspondingSourceId !== sourceId) {
+      continue;
+    }
+    const source = sourcesById[sourceId];
+    if (isThirdParty(source)) {
+      continue;
+    }
+    sourceIds.push(sourceId);
+  }
+  return sortBy(sourceIds, sourceId => {
+    const source = sourcesById[sourceId];
+    return [source.isOriginal ? 0 : 1, source.url];
+  });
 }

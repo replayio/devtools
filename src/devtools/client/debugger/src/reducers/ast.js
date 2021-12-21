@@ -6,6 +6,8 @@ export function initialASTState() {
   return {
     symbols: {},
     projectSymbolsLoading: null,
+    globalFunctions: null,
+    loadingGlobalFunctions: false,
   };
 }
 
@@ -27,15 +29,18 @@ function update(state = initialASTState(), action) {
       };
     }
 
-    case "LOADING_SYMBOLS": {
-      return { ...state, projectSymbolsLoading: action.loading, symbols: action.symbols };
-    }
-
-    case "LOADED_SYMBOLS": {
+    case "LOADING_GLOBAL_FUNCTIONS": {
       return {
         ...state,
-        symbols: { ...state.symbols, ...action.symbols },
-        projectSymbolsLoading: action.loading,
+        loadingGlobalFunctions: true,
+      };
+    }
+
+    case "SET_GLOBAL_FUNCTIONS": {
+      return {
+        ...state,
+        loadingGlobalFunctions: false,
+        globalFunctions: action.globalFns,
       };
     }
 
@@ -68,10 +73,6 @@ export function getSymbols(state, source) {
   return state.ast.symbols[source.id] || null;
 }
 
-export function getProjectSymbols(state) {
-  return state.ast.symbols;
-}
-
 export function hasSymbols(state, source) {
   const symbols = getSymbols(state, source);
 
@@ -82,10 +83,6 @@ export function hasSymbols(state, source) {
   return !symbols.loading;
 }
 
-export function getProjectSymbolsLoading(state) {
-  return state.ast.projectSymbolsLoading;
-}
-
 export function isSymbolsLoading(state, source) {
   const symbols = getSymbols(state, source);
   if (!symbols) {
@@ -93,6 +90,14 @@ export function isSymbolsLoading(state, source) {
   }
 
   return symbols.loading;
+}
+
+export function isGlobalFunctionsLoading(state) {
+  return state.ast.loadingGlobalFunctions;
+}
+
+export function getGlobalFunctions(state) {
+  return state.ast.globalFunctions;
 }
 
 export default update;

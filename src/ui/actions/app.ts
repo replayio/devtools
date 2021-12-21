@@ -35,6 +35,8 @@ import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
+import { hideCommandPalette } from "./layout";
+import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -45,7 +47,6 @@ export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finish
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
-export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
 export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
@@ -112,7 +113,6 @@ export type AppActions =
   | IndexingAction
   | SetSessionIdAction
   | UpdateThemeAction
-  | SetSplitConsoleAction
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetInitializedPanelsAction
@@ -254,10 +254,6 @@ function setIndexing(indexing: number): IndexingAction {
 
 export function updateTheme(theme: string): UpdateThemeAction {
   return { type: "update_theme", theme };
-}
-
-export function setSplitConsole(open: boolean): SetSplitConsoleAction {
-  return { type: "set_split_console", splitConsole: open };
 }
 
 export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
@@ -403,4 +399,32 @@ export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
 
 export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAction {
   return { type: "set_loading_page_tip_index", index };
+}
+
+export function executeCommand(key: CommandKey): UIThunkAction {
+  return ({ dispatch }) => {
+    if (key === "open_viewer") {
+      dispatch(setViewMode("non-dev"));
+    } else if (key === "open_devtools") {
+      dispatch(setViewMode("dev"));
+    } else if (key === "open_full_text_search") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("search"));
+    } else if (key === "open_sources" || key === "open_outline") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("explorer"));
+    } else if (key === "open_print_statements") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("debug"));
+    } else if (key === "open_console") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPanel("console"));
+    } else if (key === "show_privacy") {
+      dispatch(setModal("privacy"));
+    } else if (key === "show_sharing") {
+      dispatch(setModal("sharing"));
+    }
+
+    dispatch(hideCommandPalette());
+  };
 }

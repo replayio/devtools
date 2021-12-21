@@ -460,3 +460,8 @@ ul.children + .tag-line::before {
 #markup-root ul {
   outline: none;
 }
+
+.attr-name,
+.attr-value {
+  user-select: all;
+}

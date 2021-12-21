@@ -252,7 +252,6 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, {
-  closeSplitConsole: actions.closeSplitConsole,
   filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
   messagesClearEvaluations: actions.messagesClearEvaluations,
   filterTextSet: actions.filterTextSet,

@@ -32,6 +32,7 @@ import {
   RequestEventInfo,
   RequestInfo,
   SearchSourceContentsMatch,
+  FunctionMatch,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -133,6 +134,7 @@ class _ThreadFront {
   sources = new Map<string, Source>();
 
   private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
+  private fnSearchWaiters: Map<string, (params: FunctionMatch[]) => void> = new Map();
 
   // Resolve hooks for promises waiting on a source ID to be known.
   sourceWaiters = new ArrayMap<string, () => void>();
@@ -207,6 +209,14 @@ class _ThreadFront {
         }
       }
     );
+    client.Debugger.addFunctionsMatchesListener(
+      ({ searchId, matches }: { searchId: string; matches: FunctionMatch[] }) => {
+        const searchWaiter = this.fnSearchWaiters?.get(searchId);
+        if (searchWaiter) {
+          searchWaiter(matches);
+        }
+      }
+    );
   }
 
   async setSessionId(sessionId: SessionId) {
@@ -227,7 +237,6 @@ class _ThreadFront {
     this.ensureCurrentPause();
 
     if (this.testName) {
-      client.Internal.labelTestSession({ sessionId });
       await gToolbox.selectTool("debugger");
       window.Test = require("test/harness");
       const script = document.createElement("script");
@@ -363,6 +372,22 @@ class _ThreadFront {
       await client.Debugger.searchSourceContents({ searchId, query, sourceIds } as any, sessionId);
     } finally {
       this.searchWaiters.delete(searchId);
+    }
+  }
+
+  async searchFunctions(
+    { query, sourceIds }: { query: string; sourceIds?: string[] },
+    onMatches: (matches: FunctionMatch[]) => void
+  ) {
+    const sessionId = await this.waitForSession();
+    const searchId = uniqueId("fn-search-");
+    this.fnSearchWaiters.set(searchId, onMatches);
+
+    try {
+      // await client.Debugger.searchFunctions({ searchId, query }, sessionId);
+      await client.Debugger.searchFunctions({ searchId, query, sourceIds }, sessionId);
+    } finally {
+      this.fnSearchWaiters.delete(searchId);
     }
   }
 

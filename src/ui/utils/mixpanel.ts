@@ -23,7 +23,7 @@ export function initializeMixpanel() {
   mixpanel.register({ recordingId: getRecordingId() });
 }
 
-export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
+export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId: string | null }) {
   const { email, internal } = userInfo;
   const isQAUser = email && QA_EMAIL_ADDRESSES.includes(email);
   const isInternal = internal;
@@ -35,12 +35,19 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser) {
   if (!shouldDisableMixpanel || forceEnableMixpanel) {
     setMixpanelContext(userInfo);
     enableMixpanel();
-    trackMixpanelEvent("session_start");
+    trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
     setupSessionEndListener();
   } else {
     disableMixpanel();
   }
 }
+
+export const maybeTrackTeamChange = (newWorkspaceId: string | null) => {
+  if (!mixpanelDisabled) {
+    mixpanel.people.set({ workspaceId: newWorkspaceId });
+    trackMixpanelEvent("team_change", { workspaceId: newWorkspaceId });
+  }
+};
 
 export async function trackMixpanelEvent(event: string, properties?: Dict) {
   if (prefs.logTelemetryEvent) {
@@ -63,7 +70,11 @@ export async function trackEventOnce(event: string, properties?: Dict) {
   trackMixpanelEvent(event, properties);
 }
 
-export function setMixpanelContext({ id, email }: TelemetryUser) {
+export function setMixpanelContext({
+  id,
+  email,
+  workspaceId,
+}: TelemetryUser & { workspaceId: string | null }) {
   mixpanel.register({ isReplayBrowser: isReplayBrowser() });
 
   if (id) {
@@ -72,6 +83,10 @@ export function setMixpanelContext({ id, email }: TelemetryUser) {
 
   if (email) {
     mixpanel.people.set({ $email: email });
+  }
+
+  if (workspaceId) {
+    mixpanel.people.set({ workspaceId });
   }
 
   if (prefs.logTelemetryEvent) {

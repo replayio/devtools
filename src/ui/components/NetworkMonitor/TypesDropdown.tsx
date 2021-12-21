@@ -42,6 +42,7 @@ export default function TypesDropdown({
       <Dropdown>
         {Object.entries(REQUEST_TYPES).map((pair: string[]) => (
           <TypeItem
+            key={pair[0]}
             icon={REQUEST_ICONS[pair[0]] || "description"}
             type={pair[0] as RequestType}
             label={pair[1]}

@@ -7,18 +7,16 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import {
   TimeStampedPoint,
   MouseEvent,
-  KeyboardEvent,
   paintPoints,
   ScreenShot,
   findPaintsResult,
-  NavigationEvent,
 } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
 import { UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
-import { setPlaybackPrecachedTime } from "ui/actions/timeline";
+import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { isRepaintEnabled } from "./enable-repaint";
 
@@ -253,7 +251,12 @@ export function setupGraphics(store: UIStore) {
     const pause = ThreadFront.currentPause;
     assert(pause);
 
+    let graphicsFetched = false;
+    // Show a stalled message if the graphics have not fetched after half a second
+    setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
     const rv = await pause.repaintGraphics();
+    graphicsFetched = true;
+    store.dispatch(setPlaybackStalled(false));
     if (!rv || pause !== ThreadFront.currentPause) {
       return;
     }

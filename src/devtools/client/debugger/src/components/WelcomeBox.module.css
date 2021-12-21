@@ -1,0 +1,19 @@
+.command-palette {
+  background: rgba(255, 255, 255, 0.6);
+  /* This is hard coded to be the same as the launcher */
+  width: 450px;
+}
+
+.command-palette:hover {
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+.launch-button {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.launch-button:hover {
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}

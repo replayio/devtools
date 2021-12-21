@@ -8,6 +8,7 @@ import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
 import { Workspace } from "ui/types";
 import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
+import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 
 function TeamButton({
   text,
@@ -30,6 +31,8 @@ function TeamButton({
   const handleTeamClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setWorkspaceId(id);
+
+    maybeTrackTeamChange(id);
 
     // We only set the new team as the default team if this is a non-pending team.
     // Otherwise, it would be possible to set pending teams as a default team.
