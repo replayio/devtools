@@ -15,7 +15,7 @@ import {
 } from "../selectors";
 import { getFilename } from "../utils/source";
 import { makeShallowQuery } from "../utils/resource";
-import { sortSelectedBreakpoints } from "../utils/breakpoint";
+import { isBreakable, isPrintStatement, sortSelectedBreakpoints } from "../utils/breakpoint";
 
 function getBreakpointsForSource(source, selectedSource, breakpoints) {
   return sortSelectedBreakpoints(breakpoints, selectedSource).filter(
@@ -47,8 +47,28 @@ export const getBreakpointSources = createSelector(
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints),
+        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints).filter(bp =>
+          isBreakable(bp)
+        ),
       }))
       .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
+  }
+);
+
+export const getPrintStatementSources = createSelector(
+  getBreakpointsList,
+  findBreakpointSources,
+  getSelectedSource,
+  (breakpoints, sources, selectedSource) => {
+    const ret = sources
+      .map(source => ({
+        source,
+        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints).filter(bp =>
+          isPrintStatement(bp)
+        ),
+      }))
+      .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
+    console.log({ ret });
+    return ret;
   }
 );

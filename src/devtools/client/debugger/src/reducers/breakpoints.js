@@ -9,7 +9,13 @@
  * @module reducers/breakpoints
  */
 
-import { getLocationKey, isMatchingLocation } from "../utils/breakpoint";
+import {
+  getLocationKey,
+  isBreakable,
+  isMatchingLocation,
+  isPrintStatement,
+} from "../utils/breakpoint";
+import { getSelectedSource } from "../selectors";
 
 // eslint-disable-next-line max-len
 import { getBreakpointsList } from "../selectors/breakpoints";
@@ -124,6 +130,42 @@ export function getBreakpoint(state, location) {
 export function getBreakpointsDisabled(state) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.every(breakpoint => breakpoint.disabled);
+}
+
+export function getPrintStatementsForSource(state, sourceId, line) {
+  if (!sourceId) {
+    return [];
+  }
+
+  const breakpoints = getBreakpointsList(state);
+  return breakpoints
+    .filter(bp => {
+      const location = bp.location;
+      return location.sourceId === sourceId && (!line || line == location.line);
+    })
+    .filter(bp => isPrintStatement(bp));
+}
+
+export function getBreakpointsForSourceId(state, line) {
+  const { id: sourceId } = getSelectedSource(state);
+
+  if (!sourceId) {
+    return [];
+  }
+
+  return getBreakpointsForSource(state, sourceId, line);
+}
+
+export function getBreakableBreakpointsForSource(state, sourceId, line) {
+  if (!sourceId) {
+    return [];
+  }
+
+  const breakpoints = getBreakpointsList(state);
+  return breakpoints.filter(bp => {
+    const location = bp.location;
+    return location.sourceId === sourceId && (!line || line == location.line) && isBreakable(bp);
+  });
 }
 
 export function getBreakpointsForSource(state, sourceId, line) {

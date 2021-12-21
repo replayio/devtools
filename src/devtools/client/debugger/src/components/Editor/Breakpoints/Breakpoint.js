@@ -11,6 +11,7 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
+import { isBreakable, isPrintStatement } from "../../../utils/breakpoint";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
@@ -74,9 +75,7 @@ class Breakpoint extends PureComponent {
     const { breakpoint, editor, selectedSource } = props;
     const selectedLocation = breakpoint.location;
 
-    // Don't show the breakpoint visual in the gutter if the user
-    // added a print statement.
-    if (!selectedSource || breakpoint.options.logValue) {
+    if (!selectedSource || !isBreakable(breakpoint)) {
       return;
     }
 

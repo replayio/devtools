@@ -12,7 +12,7 @@ import classnames from "classnames";
 import actions from "../../../actions";
 import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpoint";
 import { features } from "../../../utils/prefs";
-import { getBreakpointsList, getSelectedFrame, getContext } from "../../../selectors";
+import { getSelectedFrame, getContext } from "../../../selectors";
 
 import BreakpointOptions from "./BreakpointOptions";
 import { CloseButton } from "../../shared/Button";
@@ -32,10 +32,10 @@ class Breakpoint extends PureComponent {
   };
 
   removeBreakpoint = event => {
-    const { cx, removeBreakpoint, breakpoint } = this.props;
+    const { cx, onRemoveBreakpoint, breakpoint } = this.props;
     event.stopPropagation();
 
-    removeBreakpoint(cx, breakpoint);
+    onRemoveBreakpoint(cx, breakpoint);
   };
 
   isCurrentlyPausedAtBreakpoint() {
@@ -98,11 +98,9 @@ const getFormattedFrame = createSelector(getSelectedFrame, frame => {
 
 const mapStateToProps = state => ({
   cx: getContext(state),
-  breakpoints: getBreakpointsList(state),
   frame: getFormattedFrame(state),
 });
 
 export default connect(mapStateToProps, {
   selectSpecificLocation: actions.selectSpecificLocation,
-  removeBreakpoint: actions.removeBreakpoint,
 })(Breakpoint);

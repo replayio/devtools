@@ -15,7 +15,6 @@ import {
   getIsWaitingOnBreak,
   getPauseCommand,
   getSelectedFrame,
-  getShouldLogExceptions,
   getThreadContext,
   getSourceFromId,
   getFramesLoading,
@@ -24,8 +23,8 @@ import {
 import AccessibleImage from "../shared/AccessibleImage";
 import { prefs } from "../../utils/prefs";
 
-import Breakpoints from "./Breakpoints";
-import SplitBox from "devtools-splitter";
+import PrintStatements from "./PrintStatements";
+import BreakpointsPane from "./BreakpointsPane";
 import Frames from "./Frames";
 import Accordion from "../shared/Accordion";
 import CommandBar from "./CommandBar";
@@ -69,15 +68,23 @@ class SecondaryPanes extends Component {
     };
   }
 
-  getBreakpointsItem() {
-    const { shouldLogExceptions, logExceptions } = this.props;
-
+  getPrintStatementItems() {
     return {
       header: "Print Statements",
       className: "breakpoints-pane",
-      component: (
-        <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />
-      ),
+      component: <PrintStatements />,
+      opened: prefs.breakpointsVisible,
+      onToggle: opened => {
+        prefs.breakpointsVisible = opened;
+      },
+    };
+  }
+
+  getBreakpointItems() {
+    return {
+      header: "Breakpoints",
+      className: "breakpoints-pane",
+      component: <BreakpointsPane />,
       opened: prefs.breakpointsVisible,
       onToggle: opened => {
         prefs.breakpointsVisible = opened;
@@ -89,7 +96,7 @@ class SecondaryPanes extends Component {
     const items = [];
     const { horizontal, hasFrames, framesLoading } = this.props;
 
-    items.push(this.getBreakpointsItem());
+    items.push(this.getBreakpointItems(), this.getPrintStatementItems());
 
     if (hasFrames) {
       items.push(this.getCallStackItem());
@@ -158,7 +165,6 @@ const mapStateToProps = state => {
     isWaitingOnBreak: getIsWaitingOnBreak(state),
     renderWhyPauseDelay: getRenderWhyPauseDelay(state),
     selectedFrame,
-    shouldLogExceptions: getShouldLogExceptions(state),
     source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };
 };

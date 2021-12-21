@@ -5,12 +5,10 @@ import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { addBreakpointAtLine } from "../../actions/breakpoints";
+import { togglePrintStatement } from "../../actions/breakpoints";
 import { getBreakpointsForSource } from "../../reducers/breakpoints";
 import { getSelectedSource } from "../../reducers/sources";
-import { removeBreakpoint } from "../../actions/breakpoints/modify";
 import classNames from "classnames";
-import { trackEvent } from "ui/utils/telemetry";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -21,10 +19,9 @@ type ShowWidgetButtonProps = PropsFromRedux & { editor: any };
 
 function ShowWidgetButton({
   editor,
-  addBreakpointAtLine,
+  togglePrintStatement,
   cx,
   breakpoints,
-  removeBreakpoint,
 }: ShowWidgetButtonProps) {
   const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
@@ -44,18 +41,12 @@ function ShowWidgetButton({
     setHoveredLineNumber(null);
   };
   const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
-  const onClick = (event: React.MouseEvent) => {
+  const onClick = () => {
     if (!hoveredLineNumber) {
       return;
     }
 
-    if (bp?.options.logValue) {
-      trackEvent("breakpoint.minus_click");
-      return removeBreakpoint(cx, bp);
-    }
-
-    trackEvent("breakpoint.plus_click");
-    return addBreakpointAtLine(cx, hoveredLineNumber, true, event.shiftKey);
+    togglePrintStatement(cx, bp, hoveredLineNumber);
   };
 
   useEffect(() => {
@@ -103,8 +94,7 @@ const connector = connect(
     runAnalysisOnLine: runAnalysisOnLine,
     setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
     updateHoveredLineNumber: updateHoveredLineNumber,
-    addBreakpointAtLine: addBreakpointAtLine,
-    removeBreakpoint: removeBreakpoint,
+    togglePrintStatement,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

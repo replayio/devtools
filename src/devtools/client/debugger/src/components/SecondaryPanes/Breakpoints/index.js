@@ -10,13 +10,12 @@ import { connect } from "../../../utils/connect";
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
 
-import actions from "../../../actions";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-import { getBreakpointSources, getSelectedSource } from "../../../selectors";
+import { getSelectedSource } from "../../../selectors";
 
 class Breakpoints extends Component {
   headlessEditor;
@@ -41,7 +40,8 @@ class Breakpoints extends Component {
   }
 
   renderBreakpoints() {
-    const { breakpointSources, selectedSource } = this.props;
+    const { breakpointSources, selectedSource, onRemoveBreakpoints, onRemoveBreakpoint } =
+      this.props;
 
     if (!breakpointSources.length) {
       return (
@@ -72,13 +72,18 @@ class Breakpoints extends Component {
                 sources={sources}
                 editor={this.getEditor()}
                 key={getLocationKey(breakpoint.location)}
+                onRemoveBreakpoint={onRemoveBreakpoint}
               />
             );
           });
 
           return (
             <div className="breakpoints-list-source" key={source.id}>
-              <BreakpointHeading source={source} key="header" />
+              <BreakpointHeading
+                source={source}
+                key="header"
+                onRemoveBreakpoints={onRemoveBreakpoints}
+              />
               {renderedBreakpoints}
             </div>
           );
@@ -92,11 +97,6 @@ class Breakpoints extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  breakpointSources: getBreakpointSources(state),
+export default connect(state => ({
   selectedSource: getSelectedSource(state),
-});
-
-export default connect(mapStateToProps, {
-  logExceptions: actions.logExceptions,
-})(Breakpoints);
+}))(Breakpoints);
