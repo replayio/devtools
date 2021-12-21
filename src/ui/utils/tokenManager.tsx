@@ -4,7 +4,8 @@ import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 import { assert, defer, Deferred } from "protocol/utils";
 import { usesWindow } from "ssr";
-import { useRouter } from "next/dist/client/router";
+import { useRouter } from "next/router";
+import { listenForAccessToken } from "./browser";
 
 const domain = "webreplay.us.auth0.com";
 const audience = "https://api.replay.io";
@@ -18,7 +19,7 @@ const clientId: string = usesWindow(win => {
 });
 
 export interface TokenState {
-  apiKey?: boolean;
+  external?: boolean;
   loading?: boolean;
   token?: string;
   error?: any;
@@ -42,6 +43,14 @@ class TokenManager {
     //   };
     //   this.deferredState.resolve(this.currentState);
     // }
+
+    if (typeof window !== "undefined") {
+      listenForAccessToken(token => {
+        if (token) {
+          this.setExternalAuth(token);
+        }
+      });
+    }
   }
 
   Auth0Provider = ({ children, apiKey }: { apiKey?: string; children: ReactNode }) => {
@@ -77,7 +86,7 @@ class TokenManager {
 
             setTimeout(() => {
               if (apiKey) {
-                this.setApiKey(apiKey);
+                this.setExternalAuth(apiKey);
               } else {
                 this.update(false);
               }
@@ -121,8 +130,8 @@ class TokenManager {
     }
   }
 
-  private setApiKey(apiKey: string) {
-    this.setState({ token: apiKey, apiKey: true }, this.deferredState);
+  private setExternalAuth(token: string) {
+    this.setState({ token, external: true }, this.deferredState);
   }
 
   private async update(refresh: boolean) {

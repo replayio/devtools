@@ -57,8 +57,10 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
+      audience: "https://api.replay.io",
       grant_type: "authorization_code",
       client_id: "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo",
+      scope: "openid profile offline_access",
       code_verifier: verifier,
       code,
       redirect_uri: (process.env.VERCEL_URL || "http://localhost:8080") + "/api/browser/callback",
@@ -67,10 +69,9 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
 
   const token = await resp.json();
 
-  if (token && token.access_token) {
+  if (token && token.refresh_token) {
     return token;
   } else {
-    console.log(token);
     throw new Error("Failed to retrieve token");
   }
 }
@@ -94,11 +95,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       throw new Error("Invalid auth request");
     }
 
-    console.log({ browserAuth, verifier, id, state });
-
     const token = await fetchToken(code, verifier);
-    console.log(token);
-    await fulfillAuthRequest(state, token.id_token);
+    await fulfillAuthRequest(state, token.refresh_token);
 
     res.redirect("/browser/auth");
   } catch (e: any) {

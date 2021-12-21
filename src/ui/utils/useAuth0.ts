@@ -26,16 +26,16 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
 export default function useAuth0() {
   const auth = useOrigAuth0();
   const { loading, email } = useGetUserInfo();
-  const { token, apiKey } = useToken();
+  const { token, external } = useToken();
 
-  if (apiKey && token) {
+  if (external && token) {
     return {
       isLoading: loading,
       isAuthenticated: true,
       user: loading
         ? undefined
         : {
-            sub: "api-key",
+            sub: "external-auth",
             email,
           },
       loginWithRedirect: () => {},

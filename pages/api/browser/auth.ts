@@ -55,9 +55,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const redirectUri =
       (process.env.VERCEL_URL || "http://localhost:8080") + "/api/browser/callback";
     const { id, challenge, serverKey } = await initAuthRequest(key);
-    const url = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid profile offline_access&state=${id}`;
-
-    console.log({ id, serverKey });
+    const url = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid profile offline_access&state=${id}&audience=https://api.replay.io`;
 
     res.setHeader(
       "Set-Cookie",
