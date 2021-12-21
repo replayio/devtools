@@ -29,15 +29,15 @@ function LineNumberTooltip({
   updateHoveredLineNumber,
 }: LineNumberTooltipProps) {
   const { nags } = hooks.useGetUserInfo();
-  const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
+  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
 
   const setHoveredLineNumber = ({
-    lineNumberNode: targetNode,
     lineNumber,
+    lineNode,
   }: {
-    lineNumberNode: HTMLElement;
     lineNumber: number;
+    lineNode: HTMLElement;
   }) => {
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
@@ -53,10 +53,10 @@ function LineNumberTooltip({
     }
 
     updateHoveredLineNumber(lineNumber);
-    setLineNumberNode(targetNode);
+    setTargetNode(lineNode);
   };
   const clearHoveredLineNumber = () => {
-    setLineNumberNode(null);
+    setTargetNode(null);
     setHoveredLineNumberLocation(null);
   };
 
@@ -78,16 +78,13 @@ function LineNumberTooltip({
 
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
-  if (!lineNumberNode) {
+  if (!targetNode) {
     return null;
   }
 
   if (!indexed) {
     return (
-      <StaticTooltip
-        targetNode={lineNumberNode}
-        className={classNames({ "awesome-tooltip": showNag })}
-      >
+      <StaticTooltip targetNode={targetNode} className={classNames({ "awesome-tooltip": showNag })}>
         <AwesomeTooltip isAwesome={showNag}>Indexing</AwesomeTooltip>
       </StaticTooltip>
     );
@@ -97,17 +94,14 @@ function LineNumberTooltip({
   // to be generated.
   if (!analysisPoints) {
     return (
-      <StaticTooltip
-        targetNode={lineNumberNode}
-        className={classNames({ "awesome-tooltip": showNag })}
-      >
+      <StaticTooltip targetNode={targetNode} className={classNames({ "awesome-tooltip": showNag })}>
         <AwesomeTooltip isAwesome={showNag}>Loading…</AwesomeTooltip>
       </StaticTooltip>
     );
   }
 
   if (analysisPoints === "error") {
-    return <StaticTooltip targetNode={lineNumberNode}>Failed</StaticTooltip>;
+    return <StaticTooltip targetNode={targetNode}>Failed</StaticTooltip>;
   }
 
   const points = analysisPoints.length;
@@ -116,7 +110,7 @@ function LineNumberTooltip({
   if (showNag) {
     return (
       <StaticTooltip
-        targetNode={lineNumberNode}
+        targetNode={targetNode}
         className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
       >
         <AwesomeTooltip isAwesome={showNag}>
@@ -132,7 +126,7 @@ function LineNumberTooltip({
 
   return (
     <StaticTooltip
-      targetNode={lineNumberNode}
+      targetNode={targetNode}
       className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
     >
       <>

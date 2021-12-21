@@ -4,7 +4,6 @@ import { UIState } from "ui/state";
 import { getBreakableBreakpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
 import actions from "../../actions";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 type PrintStatementsProps = PropsFromRedux & {
   logExceptions: boolean;
@@ -15,15 +14,7 @@ function BreakpointsPane({
   removeBreakableBreakpoint,
   removeBreakableBreakpointsInSource,
 }: PrintStatementsProps) {
-  const emptyContent = (
-    <>
-      <span>{`Hover over a line in the editor and click on `}</span>
-      <span className="bg-primaryAccent inline-flex rounded-sm text-white">
-        <MaterialIcon iconSize="xs">add</MaterialIcon>
-      </span>
-      <span>{` to add a print statement`}</span>
-    </>
-  );
+  const emptyContent = "Click on a line number in the editor to add a breakpoint";
 
   return (
     <Breakpoints

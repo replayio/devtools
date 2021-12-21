@@ -25,7 +25,7 @@ function BreakpointOptions({ breakpoint, editor, type }) {
     return (
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
         <Highlighted
-          expression={type === "print-statement" ? breakpoint.text : logValue}
+          expression={type === "print-statement" ? logValue : breakpoint.text}
           editor={editor}
         />
       </span>

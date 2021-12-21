@@ -16,13 +16,11 @@ function StaticTooltip({
   className,
   startPanelCollapsed,
 }: StaticTooltipProps) {
-  const { top, left, right } = targetNode.getBoundingClientRect();
-  const docWidth = document.querySelector("html")!.getBoundingClientRect().width;
-
-  let style = { top: `${top}px`, left: `${right}px` };
+  const { top, left } = targetNode.getBoundingClientRect();
+  let style = { top: `${top}px`, left: `${left}px` };
 
   return ReactDOM.createPortal(
-    <div className={`static-tooltip text-sm z-10 ml-1 -mt-7 ${className}`} style={style}>
+    <div className={`static-tooltip text-sm z-10 -mt-7 ml-1 ${className}`} style={style}>
       {children}
     </div>,
     document.body

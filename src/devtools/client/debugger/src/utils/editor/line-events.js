@@ -1,11 +1,10 @@
 import { trackEventOnce } from "ui/utils/mixpanel";
-import { trackEvent } from "ui/utils/telemetry";
 
-function dispatch(codeMirror, eventName, data) {
+export function dispatch(codeMirror, eventName, data) {
   codeMirror.constructor.signal(codeMirror, eventName, data);
 }
 
-function safeJsonParse(text) {
+export function safeJsonParse(text) {
   let parsedJson;
 
   try {
@@ -18,76 +17,49 @@ function safeJsonParse(text) {
   return parsedJson;
 }
 
-const getLineNumberNode = target => target.querySelector(".CodeMirror-linenumber");
-const isHoveredOnLineGutter = target => target.closest(".CodeMirror-gutter-wrapper");
-const isHoveredOnLineNumber = target =>
-  target.closest(".CodeMirror-linenumber") || target.closest(".CodeMirror-gutter-elt");
+export const getLineNumberNode = target => target.querySelector(".CodeMirror-linenumber");
+const isHoveredOnLine = target => !!target.closest(".CodeMirror-line");
 
 function isValidTarget(target) {
-  const isCodeMirrorBody = target.closest(".CodeMirror-code");
-  const isWidget = target.closest(".CodeMirror-linewidget");
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
-  return isCodeMirrorBody && !isWidget && !isNonBreakableLineNode && !isTooltip;
-}
-
-function emitGutterMouseEnter(codeMirror, target) {
-  trackEvent("editor.gutter_mouse_over");
-
-  const row = target.closest(".CodeMirror-gutter-wrapper").parentElement;
-  const lineNumberNode = getLineNumberNode(row);
-  const lineNumber = safeJsonParse(lineNumberNode.textContent);
-
-  target.addEventListener(
-    "mouseleave",
-    event => {
-      dispatch(codeMirror, "gutterMouseLeave", { lineNumberNode, lineNumber });
-    },
-    {
-      capture: true,
-      once: true,
-    }
-  );
-
-  dispatch(codeMirror, "gutterMouseEnter", { lineNumberNode, lineNumber });
+  return isHoveredOnLine(target) && !isNonBreakableLineNode && !isTooltip;
 }
 
 function emitLineMouseEnter(codeMirror, target) {
   trackEventOnce("editor.mouse_over");
 
-  const row =
-    target.closest(".CodeMirror-line")?.parentElement ||
-    target.closest(".CodeMirror-gutter-wrapper")?.parentElement;
+  const lineNode = target.closest(".CodeMirror-line");
+  const row = lineNode.parentElement;
+
   const lineNumberNode = getLineNumberNode(row);
   const lineNumber = safeJsonParse(lineNumberNode.textContent);
 
   target.addEventListener(
     "mouseleave",
-    event => dispatch(codeMirror, "lineMouseLeave", { lineNumberNode, lineNumber }),
+    event => dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode }),
     {
       capture: true,
       once: true,
     }
   );
 
-  dispatch(codeMirror, "lineMouseEnter", { lineNumberNode, lineNumber });
+  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode });
 }
 
 export function onLineMouseOver(codeMirror) {
   return event => {
-    let { target } = event;
+    let target = event.target;
 
-    if (!isValidTarget(target)) {
-      return;
+    // Hacky, try to fix this.
+    if (target.closest(".CodeMirror-linewidget")) {
+      target = target
+        .closest(".CodeMirror-linewidget")
+        .parentElement.querySelector(".CodeMirror-line");
     }
 
-    if (isHoveredOnLineGutter(target)) {
-      emitGutterMouseEnter(codeMirror, target);
-    }
-
-    // Only emit lineMouseEnter if the mouse is not on the gutter.
-    if (!isHoveredOnLineNumber(target)) {
+    if (isValidTarget(target)) {
       emitLineMouseEnter(codeMirror, target);
     }
   };

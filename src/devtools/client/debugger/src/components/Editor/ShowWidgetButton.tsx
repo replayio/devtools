@@ -23,24 +23,22 @@ function ShowWidgetButton({
   cx,
   breakpoints,
 }: ShowWidgetButtonProps) {
-  const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
+  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
-  const onLineEnter = ({
-    lineNumberNode: targetNode,
-    lineNumber,
-  }: {
-    lineNumberNode: HTMLElement;
-    lineNumber: number;
-  }) => {
+  const onLineEnter = ({ lineNode, lineNumber }: { lineNode: HTMLElement; lineNumber: number }) => {
     setHoveredLineNumber(lineNumber);
-    setLineNumberNode(targetNode);
+    setTargetNode(lineNode);
   };
   const onLineLeave = () => {
-    setLineNumberNode(null);
+    setTargetNode(null);
     setHoveredLineNumber(null);
   };
   const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
+  const onMouseDown = (e: React.MouseEvent) => {
+    // This keeps the cursor in CodeMirror from moving after clicking on the button.
+    e.stopPropagation();
+  };
   const onClick = () => {
     if (!hoveredLineNumber) {
       return;
@@ -58,28 +56,28 @@ function ShowWidgetButton({
     };
   }, []);
 
-  if (!lineNumberNode) {
+  if (!targetNode) {
     return null;
   }
 
-  const { height, width } = lineNumberNode.getBoundingClientRect();
+  const { height } = targetNode.getBoundingClientRect();
   const style = {
     top: `${(1 / 2) * height}px`,
-    left: `${width}px`,
   };
 
   return ReactDOM.createPortal(
     <button
       className={classNames(
         "bg-primaryAccent",
-        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 hover:scale-110 ml-1"
+        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 transition hover:scale-125 shadow-lg"
       )}
       style={style}
       onClick={onClick}
+      onMouseDown={onMouseDown}
     >
       <MaterialIcon>{bp?.options.logValue ? "remove" : "add"}</MaterialIcon>
     </button>,
-    lineNumberNode.parentElement!
+    targetNode
   );
 }
 
