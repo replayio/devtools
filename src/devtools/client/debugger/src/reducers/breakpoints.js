@@ -9,12 +9,7 @@
  * @module reducers/breakpoints
  */
 
-import {
-  getLocationKey,
-  isBreakable,
-  isMatchingLocation,
-  isPrintStatement,
-} from "../utils/breakpoint";
+import { getLocationKey, isMatchingLocation } from "../utils/breakpoint";
 import { getSelectedSource } from "../selectors";
 
 // eslint-disable-next-line max-len
@@ -132,20 +127,6 @@ export function getBreakpointsDisabled(state) {
   return breakpoints.every(breakpoint => breakpoint.disabled);
 }
 
-export function getPrintStatementsForSource(state, sourceId, line) {
-  if (!sourceId) {
-    return [];
-  }
-
-  const breakpoints = getBreakpointsList(state);
-  return breakpoints
-    .filter(bp => {
-      const location = bp.location;
-      return location.sourceId === sourceId && (!line || line == location.line);
-    })
-    .filter(bp => isPrintStatement(bp));
-}
-
 export function getBreakpointsForSourceId(state, line) {
   const { id: sourceId } = getSelectedSource(state);
 
@@ -154,18 +135,6 @@ export function getBreakpointsForSourceId(state, line) {
   }
 
   return getBreakpointsForSource(state, sourceId, line);
-}
-
-export function getBreakableBreakpointsForSource(state, sourceId, line) {
-  if (!sourceId) {
-    return [];
-  }
-
-  const breakpoints = getBreakpointsList(state);
-  return breakpoints.filter(bp => {
-    const location = bp.location;
-    return location.sourceId === sourceId && (!line || line == location.line) && isBreakable(bp);
-  });
 }
 
 export function getBreakpointsForSource(state, sourceId, line) {
@@ -185,13 +154,10 @@ export function getBreakpointForLocation(state, location) {
     return undefined;
   }
 
-  const list = getBreakpointsList(state);
-  const ret = list.find(bp => {
+  return getBreakpointsList(state).find(bp => {
     const loc = bp.location;
     return isMatchingLocation(loc, location);
   });
-
-  return ret;
 }
 
 export function hasLogpoint(state, location) {
@@ -199,4 +165,6 @@ export function hasLogpoint(state, location) {
   return breakpoint && breakpoint.options.logValue;
 }
 
+export * from "./breakpoints/breakable-breakpoints";
+export * from "./breakpoints/print-statements";
 export default update;

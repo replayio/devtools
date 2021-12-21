@@ -1,7 +1,7 @@
 import { UIThunkAction } from "ui/actions";
 import { Breakpoint } from "../../reducers/breakpoints";
 
-interface Context {
+export interface Context {
   isPaused: boolean;
   navigateCounter: number;
   pauseCounter: number;
@@ -17,8 +17,3 @@ export function addBreakpointAtLine(
   breakable: boolean
 ): UIThunkAction;
 export function addBreakableBreakpointAtLine(cx: Context, line: number): UIThunkAction;
-export function togglePrintStatement(
-  cx: Context,
-  breakpoint: Breakpoint,
-  line: number
-): UIThunkAction;

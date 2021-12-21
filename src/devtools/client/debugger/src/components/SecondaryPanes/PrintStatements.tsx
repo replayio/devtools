@@ -14,8 +14,12 @@ function PrintStatements({
   removePrintStatement,
   removePrintStatementsInSource,
 }: PrintStatementsProps) {
+  const emptyContent = "Click on a line number in the editor to add a breakpoint";
+
   return (
     <Breakpoints
+      type="print-statement"
+      emptyContent={emptyContent}
       breakpointSources={printStatementSources}
       onRemoveBreakpoint={removePrintStatement}
       onRemoveBreakpoints={removePrintStatementsInSource}

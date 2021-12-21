@@ -1,4 +1,5 @@
 import { Context } from "@apollo/client";
+import { Location } from "@recordreplay/protocol";
 import { UIThunkAction } from "ui/actions";
 import { Breakpoint } from ".";
 
@@ -8,4 +9,8 @@ export function removeBreakpointOption(
   breakpoint: Breakpoint,
   option: "logValue" | "breakable"
 ): UIThunkAction;
-export function removeBreakableBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAction;
+export function removeRequestedBreakpoint(
+  location: Omit<Location, "column">
+): Action<"REMOVE_REQUESTED_BREAKPOINT"> & {
+  location: Omit<Location, "column">;
+};

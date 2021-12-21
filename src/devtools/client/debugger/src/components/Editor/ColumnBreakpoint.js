@@ -11,6 +11,7 @@ import actions from "../../actions";
 import { getDocument } from "../../utils/editor";
 import Panel from "./Breakpoints/Panel/index";
 import { features } from "ui/utils/prefs";
+import { isPrintStatement } from "../../utils/breakpoint";
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -115,8 +116,7 @@ class ColumnBreakpoint extends Component {
     const { editor, columnBreakpoint, insertAt } = this.props;
     const { breakpoint } = columnBreakpoint;
 
-    console.log(breakpoint);
-    if (!breakpoint || !("logValue" in breakpoint.options)) {
+    if (!breakpoint || !isPrintStatement(breakpoint)) {
       return null;
     }
 

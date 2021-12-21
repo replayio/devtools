@@ -64,7 +64,7 @@ class Breakpoint extends PureComponent {
   }
 
   render() {
-    const { breakpoint, editor } = this.props;
+    const { breakpoint, editor, type } = this.props;
 
     return (
       <div
@@ -74,7 +74,7 @@ class Breakpoint extends PureComponent {
         })}
         onClick={this.selectBreakpoint}
       >
-        <BreakpointOptions editor={editor} breakpoint={breakpoint} />
+        <BreakpointOptions editor={editor} breakpoint={breakpoint} type={type} />
         {this.renderSourceLocation()}
         <CloseButton
           handleClick={e => this.removeBreakpoint(e)}

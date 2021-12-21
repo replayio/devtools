@@ -47,6 +47,20 @@ export const getBreakpointSources = createSelector(
     return sources
       .map(source => ({
         source,
+        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints),
+      }))
+      .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
+  }
+);
+
+export const getBreakableBreakpointSources = createSelector(
+  getBreakpointsList,
+  findBreakpointSources,
+  getSelectedSource,
+  (breakpoints, sources, selectedSource) => {
+    return sources
+      .map(source => ({
+        source,
         breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints).filter(bp =>
           isBreakable(bp)
         ),
@@ -60,7 +74,7 @@ export const getPrintStatementSources = createSelector(
   findBreakpointSources,
   getSelectedSource,
   (breakpoints, sources, selectedSource) => {
-    const ret = sources
+    return sources
       .map(source => ({
         source,
         breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints).filter(bp =>
@@ -68,7 +82,5 @@ export const getPrintStatementSources = createSelector(
         ),
       }))
       .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
-    console.log({ ret });
-    return ret;
   }
 );

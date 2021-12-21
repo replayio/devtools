@@ -13,7 +13,6 @@ import BreakpointHeading from "./BreakpointHeading";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getSelectedSource } from "../../../selectors";
 
@@ -40,20 +39,13 @@ class Breakpoints extends Component {
   }
 
   renderBreakpoints() {
-    const { breakpointSources, selectedSource, onRemoveBreakpoints, onRemoveBreakpoint } =
+    const { breakpointSources, emptyContent, onRemoveBreakpoints, onRemoveBreakpoint, type } =
       this.props;
 
     if (!breakpointSources.length) {
       return (
-        <div className="onboarding-text p-3 space-y-3 text-gray-500 text-base whitespace-normal">
-          <MaterialIcon className="large-icon">info</MaterialIcon>
-          <p>{`You haven't added any print statements yet.`}</p>
-          {selectedSource ? (
-            <>
-              <p>{`Try clicking on a line number in the editor.`}</p>
-              <img src="/images/comment-onboarding-arrow.svg" className="arrow" />
-            </>
-          ) : null}
+        <div className="p-3 space-y-3 text-gray-500 text-xs whitespace-normal bg-gray-50 rounded-lg mx-2 mb-2 text-center">
+          <p>{emptyContent}</p>
         </div>
       );
     }
@@ -67,6 +59,7 @@ class Breakpoints extends Component {
           const renderedBreakpoints = sortedBreakpoints.map(breakpoint => {
             return (
               <Breakpoint
+                type={type}
                 breakpoint={breakpoint}
                 source={source}
                 sources={sources}

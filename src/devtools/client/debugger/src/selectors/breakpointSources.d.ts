@@ -10,4 +10,4 @@ interface PrintStatementSource {
 type BreakpointSource = PrintStatementSource;
 
 export function getPrintStatementSources(state: UIState): PrintStatementSource[];
-export function getBreakpointSources(state: UIState): PrintStatementSource[];
+export function getBreakableBreakpointSources(state: UIState): PrintStatementSource[];

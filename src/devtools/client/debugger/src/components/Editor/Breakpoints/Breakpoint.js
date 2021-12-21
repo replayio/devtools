@@ -49,7 +49,7 @@ class Breakpoint extends PureComponent {
   }
 
   onClick = event => {
-    const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
+    const { cx, breakpoint, removeBreakableBreakpointsAtLine } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -61,7 +61,7 @@ class Breakpoint extends PureComponent {
 
     const selectedLocation = breakpoint.location;
 
-    return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
+    return removeBreakableBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
   };
 
   onContextMenu = event => {
@@ -86,11 +86,7 @@ class Breakpoint extends PureComponent {
     resizeBreakpointGutter(editor.codeMirror);
     doc.setGutterMarker(line, "breakpoints", this.makeMarker());
 
-    // Don't show the new breakpoint visual if the user just added print statements.
-    // console.log({ breakpoint });
-    // if (!breakpoint.options.logValue || true) {
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
-    // }
     editor.codeMirror.removeLineClass(line, "line", "breakpoint-disabled");
 
     if (breakpoint.disabled) {
@@ -125,5 +121,5 @@ class Breakpoint extends PureComponent {
 }
 
 export default connect(null, {
-  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
+  removeBreakableBreakpointsAtLine: actions.removeBreakableBreakpointsAtLine,
 })(Breakpoint);

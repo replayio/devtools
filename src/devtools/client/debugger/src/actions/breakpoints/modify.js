@@ -4,7 +4,7 @@
 
 import { ThreadFront } from "protocol/thread";
 
-import { getLocationKey, getASTLocation, isPrintStatement } from "../../utils/breakpoint";
+import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
   getBreakpoint,
@@ -171,18 +171,6 @@ export function removeRequestedBreakpoint(location) {
   return { type: "REMOVE_REQUESTED_BREAKPOINT", location };
 }
 
-export function removeBreakableBreakpoint(cx, breakpoint) {
-  return async ({ dispatch }) => {
-    if (isPrintStatement(breakpoint)) {
-      // Keep the breakpoint while removing the log value from its options,
-      // so that the print statement remains.
-      dispatch(removeBreakpointOption(cx, breakpoint, "breakable"));
-    } else {
-      dispatch(removeBreakpoint(cx, breakpoint));
-    }
-  };
-}
-
 export function removeBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
@@ -257,8 +245,6 @@ export function removeBreakpointOption(cx, breakpoint, option) {
   return async ({ dispatch, client }) => {
     const newOptions = { ...breakpoint.options };
     delete newOptions[option];
-
-    console.log({ newOptions });
 
     dispatch({
       type: "SET_BREAKPOINT",

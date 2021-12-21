@@ -5,10 +5,10 @@ import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { togglePrintStatement } from "../../actions/breakpoints";
 import { getBreakpointsForSource } from "../../reducers/breakpoints";
 import { getSelectedSource } from "../../reducers/sources";
 import classNames from "classnames";
+import { togglePrintStatement } from "../../actions/breakpoints/print-statements";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -46,7 +46,7 @@ function ShowWidgetButton({
       return;
     }
 
-    togglePrintStatement(cx, bp, hoveredLineNumber);
+    togglePrintStatement(cx, hoveredLineNumber, bp);
   };
 
   useEffect(() => {

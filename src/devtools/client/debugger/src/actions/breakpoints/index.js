@@ -15,7 +15,6 @@ import {
   getSelectedSource,
   getBreakpointAtLocation,
   getBreakpointsForSource,
-  getPrintStatementsForSource,
   getFirstBreakpointPosition,
   getSymbols,
   getThreadContext,
@@ -24,8 +23,6 @@ import { findClosestEnclosedSymbol } from "../../utils/ast";
 import {
   addBreakpoint,
   removeBreakpoint,
-  removeBreakpointOption,
-  removeBreakableBreakpoint,
   removeRequestedBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
@@ -37,8 +34,6 @@ import { selectors } from "ui/reducers";
 import remapLocations from "./remapLocations";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import { trackEvent } from "ui/utils/telemetry";
-import { isBreakable, isPrintStatement } from "../../utils/breakpoint";
-import { getBreakpointsForSourceId } from "../../reducers/breakpoints";
 
 // this will need to be changed so that addCLientBreakpoint is removed
 
@@ -110,18 +105,6 @@ export function removeBreakpoints(cx, breakpoints) {
 }
 
 /**
- * Removes breakpoints
- *
- * @memberof actions/breakpoints
- * @static
- */
-function removeBreakableBreakpoints(cx, breakpoints) {
-  return async ({ dispatch }) => {
-    return Promise.all(breakpoints.map(bp => dispatch(removeBreakableBreakpoint(cx, bp))));
-  };
-}
-
-/**
  * Removes all breakpoints in a source
  *
  * @memberof actions/breakpoints
@@ -132,49 +115,6 @@ export function removeBreakpointsInSource(cx, source) {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       dispatch(removeBreakpoint(cx, breakpoint));
-    }
-    const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
-    for (const location of Object.values(requestedBreakpointLocations)) {
-      if (location.sourceId === source.id) {
-        dispatch(removeRequestedBreakpoint(location));
-      }
-    }
-  };
-}
-
-/**
- * Removes all breakable breakpoints in a source
- *
- * @memberof actions/breakpoints
- * @static
- */
-export function removeBreakableBreakpointsInSource(cx, source) {
-  return async ({ dispatch, getState }) => {
-    const breakpoints = getBreakpointsForSource(getState(), source.id);
-    for (const breakpoint of breakpoints) {
-      dispatch(removeBreakableBreakpoint(cx, breakpoint));
-    }
-
-    const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
-    for (const location of Object.values(requestedBreakpointLocations)) {
-      if (location.sourceId === source.id) {
-        dispatch(removeRequestedBreakpoint(location));
-      }
-    }
-  };
-}
-
-/**
- * Removes all print statements in a source
- *
- * @memberof actions/breakpoints
- * @static
- */
-export function removePrintStatementsInSource(cx, source) {
-  return async ({ dispatch, getState }) => {
-    const breakpoints = getPrintStatementsForSource(getState(), source.id);
-    for (const breakpoint of breakpoints) {
-      dispatch(removePrintStatement(cx, breakpoint));
     }
     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
     for (const location of Object.values(requestedBreakpointLocations)) {
@@ -278,56 +218,8 @@ export function updateHoveredLineNumber(line) {
   };
 }
 
-export function togglePrintStatement(cx, bp, line) {
-  return ({ dispatch }) => {
-    if (bp?.options.logValue) {
-      trackEvent("breakpoint.minus_click");
-      return dispatch(removePrintStatement(cx, bp));
-    }
-
-    trackEvent("breakpoint.plus_click");
-    return dispatch(addPrintStatement(cx, line));
-  };
-}
-
-function addPrintStatement(cx, line) {
-  return ({ dispatch, getState }) => {
-    const printStatements = getBreakpointsForSourceId(getState());
-    const breakpoint = printStatements.find(ps => ps.location.line === line);
-    const breakable = !!isBreakable(breakpoint);
-    console.log({ breakpoint, breakable });
-
-    dispatch(addBreakpointAtLine(cx, line, true, false, breakable));
-  };
-}
-
-export function removePrintStatement(cx, bp) {
-  return ({ dispatch }) => {
-    if (isBreakable(bp)) {
-      console.log(">>breakable");
-      // Keep the breakpoint while removing the log value from its options,
-      // so that the breakable breakpoint remains.
-      dispatch(removeBreakpointOption(cx, bp, "logValue"));
-    } else {
-      console.log(">>non-breakable");
-      dispatch(removeBreakpoint(cx, bp));
-    }
-  };
-}
-
-export function addBreakableBreakpointAtLine(cx, line) {
-  return ({ dispatch, getState }) => {
-    const printStatements = getBreakpointsForSourceId(getState());
-    const breakpoint = printStatements.find(ps => ps.location.line === line);
-    const logValue = isPrintStatement(breakpoint);
-
-    dispatch(addBreakpointAtLine(cx, line, logValue, false, true));
-  };
-}
-
 export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = false, breakable) {
   return ({ dispatch, getState }) => {
-    console.log({ breakable });
     const state = getState();
     const source = getSelectedSource(state);
 
@@ -380,16 +272,6 @@ export function addBreakpointAtColumn(cx, location) {
   };
 }
 
-export function removeBreakpointsAtLine(cx, sourceId, line) {
-  return ({ dispatch, getState }) => {
-    trackEvent("breakpoint.remove");
-
-    dispatch(removeRequestedBreakpoint({ sourceId, line }));
-    const breakpointsAtLine = getBreakpointsForSource(getState(), sourceId, line);
-    return dispatch(removeBreakableBreakpoints(cx, breakpointsAtLine));
-  };
-}
-
 function getLogValue(source, state, location) {
   const file = getFilename(source);
   const symbols = getSymbols(state, source);
@@ -406,3 +288,6 @@ function getLogValue(source, state, location) {
 
   return logValue;
 }
+
+export * from "./breakable-breakpoints";
+export * from "./print-statements";
