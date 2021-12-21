@@ -72,9 +72,3 @@ export function onViewSourceInDebugger(frame) {
     toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.sourceId);
   };
 }
-
-export function closeSplitConsole() {
-  return ({ toolbox }) => {
-    toolbox.toggleSplitConsole(false);
-  };
-}

@@ -16,7 +16,6 @@ const syncInitialAppState: AppState = {
   unexpectedError: null,
   trialExpired: false,
   theme: "theme-light",
-  splitConsoleOpen: prefs.splitConsole as boolean,
   selectedPanel: prefs.selectedPanel as PanelName,
   selectedPrimaryPanel: "comments",
   initializedPanels: [],
@@ -132,10 +131,6 @@ export default function update(
 
     case "set_initialized_panels": {
       return { ...state, initializedPanels: [...state.initializedPanels, action.panel] };
-    }
-
-    case "set_split_console": {
-      return { ...state, splitConsoleOpen: action.splitConsole };
     }
 
     case "loading": {
@@ -266,7 +261,6 @@ export default function update(
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
-export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";

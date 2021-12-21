@@ -98,7 +98,6 @@ export interface AppState {
   sessionId: SessionId | null;
   showEditor: boolean;
   showVideoPanel: boolean;
-  splitConsoleOpen: boolean;
   theme: string;
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;

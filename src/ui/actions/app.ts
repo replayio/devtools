@@ -47,7 +47,6 @@ export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finish
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
-export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
 export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
@@ -114,7 +113,6 @@ export type AppActions =
   | IndexingAction
   | SetSessionIdAction
   | UpdateThemeAction
-  | SetSplitConsoleAction
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetInitializedPanelsAction
@@ -256,10 +254,6 @@ function setIndexing(indexing: number): IndexingAction {
 
 export function updateTheme(theme: string): UpdateThemeAction {
   return { type: "update_theme", theme };
-}
-
-export function setSplitConsole(open: boolean): SetSplitConsoleAction {
-  return { type: "set_split_console", splitConsole: open };
 }
 
 export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {

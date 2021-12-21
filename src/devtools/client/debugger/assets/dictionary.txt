@@ -101,7 +101,6 @@ HighlightLine
 isMinified
 setInScopeLines
 updateScopeBindings
-getSplitConsole
 wasmparser
 getSymbols
 codefolding
