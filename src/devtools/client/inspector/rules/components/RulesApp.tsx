@@ -10,8 +10,6 @@ import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useSelector } from "react-redux";
 import { RulesState, RuleState } from "../state/rules";
 import { RuleInheritance } from "../models/rule";
-import _ from "lodash";
-import { declaration } from "../types";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
