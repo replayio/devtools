@@ -179,9 +179,9 @@ export const RulesApp: FC<RulesAppProps> = ({
 
     return (
       <>
-        {pseudoElementRules.length && renderPseudoElementRules(pseudoElementRules)}
-        {styleRules.length && renderStyleRules(styleRules)}
-        {inheritedRules.length && renderInheritedRules(inheritedRules)}
+        {pseudoElementRules.length !== 0 && renderPseudoElementRules(pseudoElementRules)}
+        {styleRules.length !== 0 && renderStyleRules(styleRules)}
+        {inheritedRules.length !== 0 && renderInheritedRules(inheritedRules)}
       </>
     );
   }, [rules, rulesQuery, renderInheritedRules, renderStyleRules, renderPseudoElementRules]);
