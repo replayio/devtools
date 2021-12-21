@@ -2,7 +2,7 @@ import SplitBox from "devtools/packages/devtools-splitter";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { getEvents, getFormattedFrames, getRequests } from "ui/reducers/network";
+import { getEvents, getFormattedFrames, getRequests, getResponseBodies } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import RequestDetails from "./RequestDetails";
@@ -10,7 +10,7 @@ import RequestTable from "./RequestTable";
 import { RequestSummary, RequestType } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
-import { fetchFrames } from "ui/actions/network";
+import { fetchFrames, fetchResponseBody } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 
 export const NetworkMonitor = ({
@@ -20,6 +20,7 @@ export const NetworkMonitor = ({
   fetchFrames,
   frames,
   requests,
+  responseBodies,
   seek,
   selectFrame,
 }: PropsFromRedux) => {
@@ -67,6 +68,7 @@ export const NetworkMonitor = ({
                     closePanel={closePanel}
                     cx={cx}
                     request={selectedRequest}
+                    responseBody={responseBodies[selectedRequest.id]}
                     frames={frames[selectedRequest?.point.point]}
                     selectFrame={selectFrame}
                   />
@@ -81,6 +83,9 @@ export const NetworkMonitor = ({
                   currentTime={currentTime}
                   onRowSelect={row => {
                     fetchFrames(row.point);
+                    if (row.hasResponseBody) {
+                      fetchResponseBody(row.id);
+                    }
                     setSelectedRequest(row);
                   }}
                   seek={seek}
@@ -104,6 +109,7 @@ const connector = connect(
     events: getEvents(state),
     frames: getFormattedFrames(state),
     requests: getRequests(state),
+    responseBodies: getResponseBodies(state),
   }),
   {
     fetchFrames: fetchFrames,

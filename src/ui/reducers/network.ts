@@ -1,14 +1,18 @@
-import { RequestEventInfo, RequestInfo } from "@recordreplay/protocol";
+import { RequestEventInfo, RequestInfo, ResponseBodyData } from "@recordreplay/protocol";
+
 import { UIState } from "ui/state";
 import { NetworkAction } from "ui/actions/network";
 import { WiredFrame } from "protocol/thread/pause";
 import { createSelector } from "reselect";
 import { getSources } from "devtools/client/debugger/src/reducers/sources";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
+import sortBy from "lodash/sortBy";
+import sortedUniqBy from "lodash/sortedUniqBy";
 
 export type NetworkState = {
   events: RequestEventInfo[];
   frames: Record<string, WiredFrame[]>;
+  responses: Record<string, ResponseBodyData[]>;
   requests: RequestInfo[];
 };
 
@@ -16,6 +20,7 @@ const initialState = (): NetworkState => ({
   events: [],
   frames: {},
   requests: [],
+  responses: {},
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -25,6 +30,21 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
         ...state,
         events: [...action.payload.events, ...state.events],
         requests: [...action.payload.requests, ...state.requests],
+      };
+    case "NEW_RESPONSE_BODY_PARTS":
+      action.payload.responseBodyParts;
+      return {
+        ...state,
+        responses: {
+          ...state.responses,
+          [action.payload.responseBodyParts.id]: sortedUniqBy(
+            sortBy([
+              ...(state.responses[action.payload.responseBodyParts.id] || []),
+              ...action.payload.responseBodyParts.parts,
+            ]),
+            (x: ResponseBodyData) => x.offset
+          ),
+        },
       };
     case "SET_FRAMES":
       return {
@@ -48,5 +68,7 @@ export const getFormattedFrames = createSelector(getFrames, getSources, (frames,
     return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources) };
   }, {});
 });
+
+export const getResponseBodies = (state: UIState) => state.network.responses;
 
 export default update;

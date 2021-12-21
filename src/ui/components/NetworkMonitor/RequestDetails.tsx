@@ -8,6 +8,10 @@ import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 import { WiredFrame } from "protocol/thread/pause";
+import { ResponseBodyData } from "@recordreplay/protocol";
+import ResponseBody from "./ResponseBody";
+import { features } from "ui/utils/prefs";
+import { useFeature } from "ui/hooks/settings";
 
 interface Detail {
   name: string;
@@ -48,7 +52,7 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
   );
 };
 
-const TriangleToggle = ({ open }: { open: boolean }) => (
+export const TriangleToggle = ({ open }: { open: boolean }) => (
   <span
     className={classNames("p-3 select-none img arrow", { expanded: open })}
     style={{ marginInlineEnd: "4px" }}
@@ -193,20 +197,24 @@ const RequestDetails = ({
   cx,
   frames,
   request,
+  responseBody,
   selectFrame,
 }: {
   closePanel: () => void;
   cx: any;
   frames: WiredFrame[];
   request: RequestSummary;
+  responseBody: ResponseBodyData[] | undefined;
   selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
+  const { value: httpBodies } = useFeature("httpBodies");
+
   const tabs = [
     { id: "headers", title: "Headers", visible: true },
     { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
-    { id: "response", title: "Response", visible: true },
+    { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
     { id: "request", title: "Request", visible: true },
     { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
     { id: "timings", title: "Timings", visible: true },
@@ -234,7 +242,9 @@ const RequestDetails = ({
         <div className="overflow-auto">
           {activeTab == "headers" && <HeadersPanel request={request} />}
           {activeTab == "cookies" && <Cookies request={request} />}
-          {activeTab == "response" && <ComingSoon />}
+          {activeTab == "response" && (
+            <ResponseBody request={request} responseBodyParts={responseBody} />
+          )}
           {activeTab == "request" && <ComingSoon />}
           {activeTab == "stackTrace" && (
             <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />

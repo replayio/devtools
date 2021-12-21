@@ -4,6 +4,7 @@ import { CheckboxRow } from "./CheckboxRow";
 import { CombinedUserSettings } from "ui/types";
 import { updateEnableRepaint } from "protocol/enable-repaint";
 import { features } from "ui/utils/prefs";
+import { useFeature } from "ui/hooks/settings";
 
 type ExperimentalKey = keyof CombinedUserSettings;
 interface ExperimentalSetting {
@@ -48,6 +49,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Add Loom video comments ",
     key: "enableCommentAttachments",
   },
+  {
+    // I'm going to change this to include requests once they are in.
+    // description: "Allow JSON response and request bodies to be inspected",
+    // label: "Http Request & Response Bodies",
+    label: "Http Response Bodies",
+    description: "Allow JSON response bodies to be inspected",
+    key: "enableHttpBodies",
+  },
 ];
 
 function Experiment({
@@ -86,6 +95,8 @@ export default function ExperimentalSettings({}) {
     !!features.commentAttachments
   );
 
+  const { value: enableHttpBodies, update: updateHttpBodies } = useFeature("httpBodies");
+
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableRepaint") {
       updateRepaint({ variables: { newValue: value } });
@@ -103,10 +114,12 @@ export default function ExperimentalSettings({}) {
     } else if (key === "enableCommentAttachments") {
       features.commentAttachments = value;
       setEnableCommentAttachments(!!features.commentAttachments);
+    } else if (key === "enableHttpBodies") {
+      updateHttpBodies(Boolean(value));
     }
   };
 
-  const localSettings = { enableCommentAttachments };
+  const localSettings = { enableCommentAttachments, enableHttpBodies };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {

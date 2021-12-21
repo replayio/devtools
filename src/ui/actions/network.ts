@@ -1,4 +1,10 @@
-import { RequestInfo, RequestEventInfo, TimeStampedPoint } from "@recordreplay/protocol";
+import {
+  RequestInfo,
+  RequestEventInfo,
+  TimeStampedPoint,
+  responseBodyData,
+  RequestId,
+} from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
 import { createFrame } from "devtools/client/debugger/src/client/create";
@@ -10,12 +16,24 @@ type NewNetworkRequestsAction = {
   payload: { requests: RequestInfo[]; events: RequestEventInfo[] };
 };
 
+type NewResponseBodyPartsAction = {
+  type: "NEW_RESPONSE_BODY_PARTS";
+  payload: { responseBodyParts: responseBodyData };
+};
+
 type SetFramesAction = {
   type: "SET_FRAMES";
   payload: { frames: any[]; point: string };
 };
 
-export type NetworkAction = NewNetworkRequestsAction | SetFramesAction;
+export type NetworkAction = NewNetworkRequestsAction | SetFramesAction | NewResponseBodyPartsAction;
+
+export const newResponseBodyParts = (
+  responseBodyParts: responseBodyData
+): NewResponseBodyPartsAction => ({
+  type: "NEW_RESPONSE_BODY_PARTS",
+  payload: { responseBodyParts },
+});
 
 export const newNetworkRequests = ({
   requests,
@@ -27,6 +45,10 @@ export const newNetworkRequests = ({
   type: "NEW_NETWORK_REQUESTS",
   payload: { requests, events },
 });
+
+export function fetchResponseBody(requestId: RequestId) {
+  ThreadFront.fetchResponseBody(requestId);
+}
 
 export function fetchFrames(tsPoint: TimeStampedPoint) {
   return async ({ dispatch }: { dispatch: AppDispatch }) => {

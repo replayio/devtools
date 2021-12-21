@@ -23,6 +23,7 @@ Basic.args = {
     documentType: "application/octet-stream",
     domain: "assets.website-files.com",
     end: 984,
+    hasResponseBody: true,
     id: "1",
     requestHeaders: [
       { name: "Host", value: "assets.website-files.com" },

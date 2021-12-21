@@ -20,6 +20,7 @@ export type UserSettings = {
 
 export type LocalUserSettings = {
   enableCommentAttachments: boolean;
+  enableHttpBodies: boolean;
 };
 
 export type CombinedUserSettings = UserSettings & LocalUserSettings;

@@ -75,12 +75,14 @@ export const requestSummary = (
   id: string,
   url: string,
   status: number,
-  method: string = "GET"
+  method: string = "GET",
+  contentType: string = "application/json"
 ): RequestSummary => {
   return {
     domain: "replay.io",
     documentType: "html",
     end: 1600,
+    hasResponseBody: true,
     id,
     method,
     name: "replay.io",
@@ -88,7 +90,7 @@ export const requestSummary = (
     queryParams: [["foo", "bar"]],
     triggerPoint: { point: "0", time: 0 },
     requestHeaders: [{ name: "foo", value: "bar" }],
-    responseHeaders: [{ name: "foo", value: "bar" }],
+    responseHeaders: [{ name: "content-type", value: contentType }],
     start: 0,
     status,
     time: 1600,

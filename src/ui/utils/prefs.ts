@@ -29,6 +29,7 @@ pref("devtools.features.commentMentions", false);
 pref("devtools.features.comments", true);
 pref("devtools.features.consoleHover", false);
 pref("devtools.features.eventCount", true);
+pref("devtools.features.httpBodies", false);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
@@ -67,6 +68,7 @@ export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   consoleHover: ["Bool", "consoleHover"],
   eventCount: ["Bool", "eventCount"],
+  httpBodies: ["Bool", "httpBodies"],
   launchBrowser: ["Bool", "launchBrowser"],
   private: ["Bool", "private"],
   reactDevtools: ["Bool", "reactDevtools"],

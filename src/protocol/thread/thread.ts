@@ -33,6 +33,7 @@ import {
   RequestInfo,
   SearchSourceContentsMatch,
   FunctionMatch,
+  responseBodyData,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -834,11 +835,20 @@ class _ThreadFront {
   }
 
   async findNetworkRequests(
-    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void
+    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
+    onResponseBodyData: (parameters: responseBodyData) => void
   ) {
     const sessionId = await this.waitForSession();
     client.Network.addRequestsListener(onRequestsReceived);
+    client.Network.addResponseBodyDataListener(onResponseBodyData);
     client.Network.findRequests({}, sessionId);
+  }
+
+  fetchResponseBody(requestId: string) {
+    return client.Network.getResponseBody(
+      { id: requestId, range: { end: 5e9 } },
+      ThreadFront.sessionId!
+    );
   }
 
   async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {

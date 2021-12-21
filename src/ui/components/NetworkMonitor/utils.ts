@@ -4,15 +4,19 @@ import {
   RequestInfo,
   RequestOpenEvent,
   RequestResponseEvent,
+  RequestResponseBody,
   TimeStampedPoint,
 } from "@recordreplay/protocol";
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
 
+export type ContentType = "json" | "text" | "other";
+
 export type RequestSummary = {
   domain: string;
   documentType: string;
   end: number;
+  hasResponseBody: boolean;
   id: string;
   method: string;
   name: string;
@@ -41,6 +45,9 @@ export const REQUEST_TYPES = {
   websocket: "Websocket",
 };
 
+export const findHeader = (headers: Header[], key: string): string | undefined =>
+  headers.find(h => h.name.toLowerCase() === key)?.value;
+
 export const REQUEST_ICONS: Record<string, string> = {
   xhr: "description",
   javascript: "code",
@@ -59,6 +66,7 @@ export type RequestType = keyof typeof REQUEST_TYPES;
 
 export type RequestEventMap = {
   request: { time: number; event: RequestOpenEvent };
+  "response-body": { time: number; event: RequestResponseBody };
   response: { time: number; event: RequestResponseEvent };
 };
 
@@ -87,8 +95,7 @@ const queryParams = (url: string): [string, string][] => {
   return Array.from(new URL(url).searchParams.entries() as [string, string][]);
 };
 const getDocumentType = (headers: Header[]): string => {
-  const contentType =
-    headers.find(h => h.name.toLowerCase() === "content-type")?.value || "unknown";
+  const contentType = findHeader(headers, "content-type") || "unknown";
   // chop off any charset or other extra data
   return contentType.match(/^(.*)[,;]/)?.[1] || contentType;
 };
@@ -111,13 +118,11 @@ export const partialRequestsToCompleteSummaries = (
       const documentType = getDocumentType(response.event.responseHeaders);
       const type: RequestType = (documentType?.split("/")?.[1] || documentType) as RequestType;
       return {
-        domain: host(request.event.requestUrl),
         documentType,
-        type,
+        domain: host(request.event.requestUrl),
         end: response.time,
+        hasResponseBody: Boolean(r.events["response-body"]),
         id: r.id,
-        requestHeaders: request.event.requestHeaders,
-        responseHeaders: response.event.responseHeaders,
         method: request.event.requestMethod,
         name: name(request.event.requestUrl),
         point: {
@@ -125,10 +130,13 @@ export const partialRequestsToCompleteSummaries = (
           time: r.time,
         },
         queryParams: queryParams(request.event.requestUrl),
-        status: response.event.responseStatus,
+        requestHeaders: request.event.requestHeaders,
+        responseHeaders: response.event.responseHeaders,
         start: request.time,
+        status: response.event.responseStatus,
         time: response.time - request.time,
         triggerPoint: r.triggerPoint,
+        type,
         url: request.event.requestUrl,
       };
     })
@@ -156,4 +164,25 @@ export const partialRequestsToCompleteSummaries = (
 
   summaries.sort((a, b) => compareNumericStrings(a.point.point, b.point.point));
   return summaries;
+};
+
+export function base64ToArrayBuffer(base64: string) {
+  var binaryString = window.atob(base64);
+  var len = binaryString.length;
+  var bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+export const contentType = (headers: Header[]): ContentType => {
+  const contentType = getDocumentType(headers);
+  if (contentType?.startsWith("application/json")) {
+    return "json";
+  }
+  if (contentType?.startsWith("text/")) {
+    return "text";
+  }
+  return "other";
 };
