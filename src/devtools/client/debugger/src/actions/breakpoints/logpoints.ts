@@ -35,7 +35,7 @@ export function toggleLogpoint(cx: Context, line: number, bp?: Breakpoint): UITh
   };
 }
 
-function addLogpoint(cx: Context, line: number): UIThunkAction {
+export function addLogpoint(cx: Context, line: number): UIThunkAction {
   return ({ dispatch, getState }) => {
     const logpoints = getBreakpointsForSourceId(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
