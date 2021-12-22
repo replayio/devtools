@@ -16,4 +16,3 @@ export function _addBreakpointAtLine(
   disabled: boolean,
   breakable: boolean
 ): UIThunkAction;
-export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction;
