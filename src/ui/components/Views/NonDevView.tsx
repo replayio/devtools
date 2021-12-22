@@ -9,7 +9,6 @@ import SidePanel from "ui/components/SidePanel";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import Dropdown from "ui/components/shared/Dropdown";
 
-import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 import { UIState } from "ui/state";
@@ -33,7 +32,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromRedux) {
+function NonDevView({ sidePanelCollapsed }: PropsFromRedux) {
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -41,7 +40,6 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
   );
 
   const handleMove = (size: number) => {
-    updateTimelineDimensions();
     prefs.sidePanelSize = `${size}px`;
   };
 
@@ -66,15 +64,10 @@ function NonDevView({ updateTimelineDimensions, sidePanelCollapsed }: PropsFromR
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
-    sidePanelCollapsed: selectors.getPaneCollapse(state),
-  }),
-  {
-    updateTimelineDimensions,
-  }
-);
+const connector = connect((state: UIState) => ({
+  selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
+  sidePanelCollapsed: selectors.getPaneCollapse(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(NonDevView);
