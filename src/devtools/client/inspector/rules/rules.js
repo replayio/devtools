@@ -21,7 +21,6 @@ const {
   updateClasses,
   updateClassPanelExpanded,
 } = require("devtools/client/inspector/rules/actions/class-list");
-const { togglePseudoClass } = require("devtools/client/inspector/rules/actions/pseudo-classes");
 const {
   updateHighlightedSelector,
   updateRules,
@@ -51,7 +50,6 @@ class RulesView {
     this.onSetClassState = this.onSetClassState.bind(this);
     this.onToggleClassPanelExpanded = this.onToggleClassPanelExpanded.bind(this);
     this.onToggleDeclaration = this.onToggleDeclaration.bind(this);
-    this.onTogglePseudoClass = this.onTogglePseudoClass.bind(this);
     this.onToggleSelectorHighlighter = this.onToggleSelectorHighlighter.bind(this);
     this.showContextMenu = this.showContextMenu.bind(this);
     this.showDeclarationNameEditor = this.showDeclarationNameEditor.bind(this);
@@ -77,7 +75,6 @@ class RulesView {
       onSetClassState: this.onSetClassState,
       onToggleClassPanelExpanded: this.onToggleClassPanelExpanded,
       onToggleDeclaration: this.onToggleDeclaration,
-      onTogglePseudoClass: this.onTogglePseudoClass,
       onToggleSelectorHighlighter: this.onToggleSelectorHighlighter,
       showContextMenu: this.showContextMenu,
       showDeclarationNameEditor: this.showDeclarationNameEditor,
@@ -336,18 +333,6 @@ class RulesView {
    */
   onToggleDeclaration(ruleId, declarationId) {
     this.elementStyle.toggleDeclaration(ruleId, declarationId);
-  }
-
-  /**
-   * Handler for toggling a pseudo class in the pseudo class panel. Toggles on and off
-   * a given pseudo class value.
-   *
-   * @param  {String} value
-   *         The pseudo class to toggle on or off.
-   */
-  onTogglePseudoClass(value) {
-    this.store.dispatch(togglePseudoClass(value));
-    this.inspector.togglePseudoClass(value);
   }
 
   /**

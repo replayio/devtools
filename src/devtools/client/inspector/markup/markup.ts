@@ -1,18 +1,29 @@
-const { ThreadFront } = require("protocol/thread");
-const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
-const Highlighter = require("highlighter/highlighter").default;
-const { selectors } = require("ui/reducers");
+import Selection, { NodeSelectionReason } from "devtools/client/framework/selection";
+import { Inspector } from "../inspector";
 
-const {
-  reset,
-  newRoot,
-  expandNode,
-  updateNodeExpanded,
-  selectionChanged,
-} = require("./actions/markup");
+import { ThreadFront } from "protocol/thread";
+import { HTMLTooltip } from "devtools/client/shared/widgets/tooltip/HTMLTooltip";
+import Highlighter from "highlighter/highlighter";
+import { selectors } from "ui/reducers";
+import { UIStore } from "ui/actions";
+import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
+
+import { reset, newRoot, expandNode, updateNodeExpanded, selectionChanged } from "./actions/markup";
+import { assert } from "protocol/utils";
 
 class MarkupView {
-  constructor(inspector) {
+  inspector: Inspector | null;
+  selection: Selection | null;
+  store: UIStore | null;
+  toolbox: DevToolsToolbox | null;
+  isInspectorVisible: boolean;
+  isLoadingPostponed: boolean;
+  hoveredNodeId: string | undefined;
+  _eventTooltip: HTMLTooltip | null;
+
+  constructor(inspector: Inspector) {
+    assert(inspector.selection);
+
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
@@ -20,6 +31,7 @@ class MarkupView {
     this.isInspectorVisible = false;
     this.isLoadingPostponed = false;
     this.hoveredNodeId = undefined;
+    this._eventTooltip = null;
 
     this.onSelectNode = this.onSelectNode.bind(this);
     this.onToggleNodeExpanded = this.onToggleNodeExpanded.bind(this);
@@ -37,9 +49,7 @@ class MarkupView {
   }
 
   async init() {
-    if (!this.inspector) {
-      return;
-    }
+    assert(this.inspector);
 
     this.updateIsInspectorVisible();
     this.store?.subscribe(this.updateIsInspectorVisible);
@@ -52,6 +62,10 @@ class MarkupView {
   }
 
   updateIsInspectorVisible = () => {
+    if (!this.store) {
+      return;
+    }
+
     const visible = selectors.isInspectorSelected(this.store.getState());
     if (visible !== this.isInspectorVisible) {
       this.isInspectorVisible = visible;
@@ -71,6 +85,8 @@ class MarkupView {
   }
 
   async onPaused() {
+    assert(this.store);
+
     this.store.dispatch(reset());
     if (this.isInspectorVisible) {
       this.loadNewDocument();
@@ -80,6 +96,9 @@ class MarkupView {
   }
 
   async loadNewDocument() {
+    assert(this.store);
+    assert(this.selection);
+
     this.isLoadingPostponed = false;
 
     await ThreadFront.ensureAllSources();
@@ -98,6 +117,11 @@ class MarkupView {
       this.store.dispatch(selectionChanged(this.selection, false));
     } else {
       const rootNode = await ThreadFront.getRootDOMNode();
+
+      if (!rootNode) {
+        return;
+      }
+
       const defaultNode = await rootNode.querySelector("body");
       if (defaultNode && !this.selection.nodeFront && ThreadFront.currentPause === pause) {
         this.selection.setNodeFront(defaultNode, { reason: "navigateaway" });
@@ -106,11 +130,16 @@ class MarkupView {
   }
 
   onResumed() {
+    assert(this.store);
+    assert(this.selection);
+
     this.selection.setNodeFront(null);
     this.store.dispatch(reset());
   }
 
   destroy() {
+    assert(this.selection);
+
     // this.inspector.sidebar.off("markupview-selected", this.update);
     this.selection.off("new-node-front", this.update);
 
@@ -127,7 +156,8 @@ class MarkupView {
 
   get eventTooltip() {
     if (!this._eventTooltip) {
-      this._eventTooltip = new HTMLTooltip(this.toolbox.doc, {
+      this._eventTooltip = new HTMLTooltip(window.document, {
+        // @ts-ignore
         type: "arrow",
         consumeOutsideClicks: false,
       });
@@ -142,8 +172,8 @@ class MarkupView {
    * @param  {String} nodeId
    *         The NodeFront object id to collapse.
    */
-  collapseNode(nodeId) {
-    this.store.dispatch(updateNodeExpanded(nodeId, false));
+  collapseNode(nodeId: string) {
+    this.store?.dispatch(updateNodeExpanded(nodeId, false));
   }
 
   /**
@@ -152,7 +182,7 @@ class MarkupView {
    * @param  {String} nodeId
    *         The NodeFront object id to expand.
    */
-  async expandNode(nodeId) {
+  async expandNode(nodeId: string) {
     this.store?.dispatch(expandNode(nodeId));
   }
 
@@ -162,8 +192,10 @@ class MarkupView {
    * @param  {String} nodeId
    *         The NodeFront object id to select.
    */
-  onSelectNode(nodeId) {
-    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
+  onSelectNode(nodeId: string) {
+    assert(ThreadFront.currentPause);
+
+    this.selection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
       reason: "markup",
     });
   }
@@ -177,24 +209,28 @@ class MarkupView {
    * @param  {Boolean} isExpanded
    *         Whether or not the node is expanded.
    */
-  onToggleNodeExpanded(nodeId, isExpanded) {
+  onToggleNodeExpanded(nodeId: string, isExpanded: boolean) {
+    assert(ThreadFront.currentPause);
+
     if (isExpanded) {
       this.collapseNode(nodeId);
     } else {
       this.expandNode(nodeId);
     }
 
-    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
+    this.selection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
   }
 
-  onMouseEnterNode(nodeId) {
+  onMouseEnterNode(nodeId: string) {
+    assert(ThreadFront.currentPause);
+
     if (this.hoveredNodeId !== nodeId) {
       this.hoveredNodeId = nodeId;
       Highlighter.highlight(ThreadFront.currentPause.getNodeFront(nodeId));
     }
   }
 
-  onMouseLeaveNode(nodeId) {
+  onMouseLeaveNode(nodeId: string) {
     if (this.hoveredNodeId === nodeId) {
       this.hoveredNodeId = undefined;
       Highlighter.unhighlight();
@@ -204,8 +240,8 @@ class MarkupView {
   /**
    * Updates the markup tree based on the current node selection.
    */
-  async update(_, reason) {
-    if (!this.isInspectorVisible || !this.selection.isNode()) {
+  async update(_: any, reason: NodeSelectionReason) {
+    if (!this.isInspectorVisible || !this.selection || !this.selection.isNode()) {
       return;
     }
 
@@ -215,4 +251,4 @@ class MarkupView {
   }
 }
 
-module.exports = MarkupView;
+export default MarkupView;

@@ -20,7 +20,6 @@ import {
   getFramesLoading,
 } from "../../selectors";
 
-import AccessibleImage from "../shared/AccessibleImage";
 import { prefs } from "../../utils/prefs";
 
 import LogpointsPane from "./LogpointsPane";
@@ -31,14 +30,6 @@ import CommandBar from "./CommandBar";
 import FrameTimeline from "./FrameTimeline";
 
 import Scopes from "./Scopes";
-
-function debugBtn(onClick, type, className, tooltip) {
-  return (
-    <button onClick={onClick} className={`${type} ${className}`} key={type} title={tooltip}>
-      <AccessibleImage className={type} title={tooltip} aria-label={tooltip} />
-    </button>
-  );
-}
 
 const mdnLink =
   "https://developer.mozilla.org/docs/Tools/Debugger/Using_the_Debugger_map_scopes_feature?utm_source=devtools&utm_medium=debugger-map-scopes";
