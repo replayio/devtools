@@ -1,6 +1,6 @@
 import React from "react";
 import SecondaryToolbox from "./SecondaryToolbox";
-import SplitBox from "devtools-splitter";
+import SplitBox from "devtools/packages/devtools-splitter";
 import { prefs } from "ui/utils/prefs";
 import Video from "ui/components/Video";
 
