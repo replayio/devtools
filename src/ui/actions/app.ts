@@ -105,6 +105,10 @@ export type SetLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> 
   index: number;
 };
 
+export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
+  loading: boolean;
+};
+
 export type AppActions =
   | SetRecordingDurationAction
   | LoadingAction
@@ -125,6 +129,7 @@ export type AppActions =
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
   | SetCanvas
+  | SetMouseTargetsLoading
   | SetVideoUrl
   | SetVideoNode
   | SetWorkspaceId
@@ -379,6 +384,21 @@ export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAct
 
 export function setShowEditor(showEditor: boolean): SetShowEditorAction {
   return { type: "set_show_editor", showEditor };
+}
+
+function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading {
+  return { type: "mouse_targets_loading", loading };
+}
+
+export function loadMouseTargets(): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch(setMouseTargetsLoading(true));
+    const resp = await ThreadFront.loadMouseTargets();
+    dispatch(setMouseTargetsLoading(false));
+    if (resp) {
+      dispatch(setIsNodePickerActive(true));
+    }
+  };
 }
 
 export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {

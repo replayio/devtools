@@ -1,5 +1,5 @@
 import { AppState, EventCategory, EventKind, PanelName, ReplayEvent, ViewMode } from "ui/state/app";
-import { AppActions } from "ui/actions/app";
+import { AppActions, loadMouseTargets } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
 import { asyncStore, prefs, features } from "../utils/prefs";
@@ -45,6 +45,7 @@ const syncInitialAppState: AppState = {
   showVideoPanel: true,
   showEditor: true,
   loadingPageTipIndex: 0,
+  mouseTargetsLoading: false,
 };
 
 export async function getInitialAppState(): Promise<AppState> {
@@ -81,6 +82,9 @@ export default function update(
   action: AppActions | SessionActions
 ): AppState {
   switch (action.type) {
+    case "mouse_targets_loading": {
+      return { ...state, mouseTargetsLoading: action.loading };
+    }
     case "set_recording_duration": {
       return { ...state, recordingDuration: action.duration };
     }
@@ -365,3 +369,4 @@ export const isFinishedLoadingRegions = (state: UIState) => {
 };
 export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
 export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
+export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
