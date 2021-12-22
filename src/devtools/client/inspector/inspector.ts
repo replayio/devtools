@@ -5,20 +5,22 @@
 // "use strict";
 
 // const Services = require("Services");
-const EventEmitter = require("devtools/shared/event-emitter");
+import EventEmitter from "devtools/shared/event-emitter";
 // const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
 // const { log } = require("protocol/socket");
 import { NodeFront } from "protocol/thread/node";
+import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 
 import MarkupView from "devtools/client/inspector/markup/markup";
-const BoxModel = require("devtools/client/inspector/boxmodel/box-model");
-const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
+import BoxModel from "devtools/client/inspector/boxmodel/box-model";
+import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
 
 import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";
+import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
 /**
  * Represents an open instance of the Inspector for a tab.
@@ -62,9 +64,9 @@ export class Inspector {
 
   markup: MarkupView;
   rules: RulesView;
-  boxModel: any;
+  boxModel: BoxModel;
 
-  private _toolbox: any;
+  private _toolbox: DevToolsToolbox | null;
   private _highlighters?: any;
   private _destroyed?: boolean;
 
@@ -74,7 +76,7 @@ export class Inspector {
   off!: (name: string, handler: (value?: any) => void) => void;
   emit!: (name: string, value?: any) => void;
 
-  constructor(toolbox: any) {
+  constructor(toolbox: DevToolsToolbox) {
     EventEmitter.decorate(this);
 
     this._toolbox = toolbox;
@@ -103,7 +105,7 @@ export class Inspector {
   }
 
   get selection() {
-    return this.toolbox.selection;
+    return this.toolbox ? this.toolbox.selection : null;
   }
 
   get cssProperties() {
@@ -136,30 +138,12 @@ export class Inspector {
   }
 
   /**
-   * Toggle a pseudo class.
-   */
-  togglePseudoClass(pseudo: any) {
-    if (this.selection.isElementNode()) {
-      const node = this.selection.nodeFront;
-      if (node.hasPseudoClassLock(pseudo)) {
-        return node.walkerFront.removePseudoClassLock(node, pseudo, {
-          parents: true,
-        });
-      }
-
-      const hierarchical = pseudo == ":hover" || pseudo == ":active";
-      return node.walkerFront.addPseudoClassLock(node, pseudo, {
-        parents: hierarchical,
-      });
-    }
-    // return promise.resolve();
-  }
-
-  /**
    * Returns an object containing the shared handler functions used in the box
    * model and grid React components.
    */
   getCommonComponentProps() {
+    assert(this.selection);
+
     return {
       setSelectedNode: this.selection.setNodeFront,
       onShowBoxModelHighlighterForNode: this.onShowBoxModelHighlighterForNode,
