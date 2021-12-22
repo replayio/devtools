@@ -25,3 +25,4 @@ export type Source = {
 export function getSelectedSourceWithContent(state: UIState): Source;
 export function getIsSourceMappedSource(state: UIState): boolean;
 export function getSources(state: UIState): Source[];
+export function getSelectedSource(state: UIState): Source;

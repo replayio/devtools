@@ -21,6 +21,10 @@
   margin-right: -7px;
 }
 
+.editor-wrapper .CodeMirror-lines {
+  cursor: default;
+}
+
 .editor-wrapper {
   min-width: 0 !important;
 }

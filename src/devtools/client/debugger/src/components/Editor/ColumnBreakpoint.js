@@ -11,6 +11,7 @@ import actions from "../../actions";
 import { getDocument } from "../../utils/editor";
 import Panel from "./Breakpoints/Panel/index";
 import { features } from "ui/utils/prefs";
+import { isLogpoint } from "../../utils/breakpoint";
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -113,8 +114,9 @@ class ColumnBreakpoint extends Component {
 
   render() {
     const { editor, columnBreakpoint, insertAt } = this.props;
+    const { breakpoint } = columnBreakpoint;
 
-    if (!columnBreakpoint.breakpoint) {
+    if (!breakpoint || !isLogpoint(breakpoint)) {
       return null;
     }
 
@@ -124,5 +126,5 @@ class ColumnBreakpoint extends Component {
 
 export default connect(null, {
   addBreakpointAtColumn: actions.addBreakpointAtColumn,
-  removeBreakpoint: actions.removeBreakpoint,
+  removeBreakpoint: actions._removeBreakpoint,
 })(ColumnBreakpoint);
