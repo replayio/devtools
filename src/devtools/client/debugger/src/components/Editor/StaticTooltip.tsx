@@ -1,32 +1,22 @@
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
-import { getPaneCollapse } from "../../selectors";
 
-type StaticTooltipProps = PropsFromRedux & {
+type StaticTooltipProps = {
   targetNode: HTMLElement;
   children: JSX.Element | string;
   className?: string;
 };
 
-function StaticTooltip({
-  targetNode,
-  children,
-  className,
-  startPanelCollapsed,
-}: StaticTooltipProps) {
+export default function StaticTooltip({ targetNode, children, className }: StaticTooltipProps) {
   const { top, left } = targetNode.getBoundingClientRect();
   let style = { top: `${top}px`, left: `${left}px` };
 
   return ReactDOM.createPortal(
-    <div className={`static-tooltip text-sm z-10 -mt-7 ml-1 ${className}`} style={style}>
-      {children}
+    <div className={`static-tooltip text-sm z-10 ml-1 -mt-1 ${className}`} style={style}>
+      <div className="transform -translate-y-full">
+        <div className="static-tooltip-content">{children}</div>
+      </div>
     </div>,
     document.body
   );
 }
-
-const connector = connect((state: UIState) => ({ startPanelCollapsed: getPaneCollapse(state) }));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(StaticTooltip);

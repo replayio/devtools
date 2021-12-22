@@ -25,14 +25,11 @@ export function removePrintStatementsInSource(cx: Context, source: Source): UITh
 
 export function togglePrintStatement(cx: Context, line: number, bp?: Breakpoint): UIThunkAction {
   return ({ dispatch }) => {
-    console.log("1");
     if (bp?.options.logValue) {
-      console.log("2");
       trackEvent("breakpoint.minus_click");
       return dispatch(removePrintStatement(cx, bp));
     }
 
-    console.log("3");
     trackEvent("breakpoint.plus_click");
     return dispatch(addPrintStatement(cx, line));
   };

@@ -1,28 +1,68 @@
 import ReactDOM from "react-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, MouseEventHandler } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { getBreakpointsForSource } from "../../reducers/breakpoints";
+import { Breakpoint, getBreakpointsForSource } from "../../reducers/breakpoints";
 import { getSelectedSource } from "../../reducers/sources";
 import classNames from "classnames";
 import { togglePrintStatement } from "../../actions/breakpoints/print-statements";
+import hooks from "ui/hooks";
+import { shouldShowNag } from "ui/utils/user";
+import { Nag } from "ui/hooks/users";
+import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
   updateHoveredLineNumber,
 } = require("devtools/client/debugger/src/actions/breakpoints/index");
 
-type ShowWidgetButtonProps = PropsFromRedux & { editor: any };
+function ToggleButton({
+  onClick,
+  onMouseDown,
+  targetNode,
+  breakpoint,
+}: {
+  onClick: MouseEventHandler;
+  onMouseDown: MouseEventHandler;
+  targetNode: HTMLElement;
+  breakpoint?: Breakpoint;
+}) {
+  const { nags } = hooks.useGetUserInfo();
+  const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
-function ShowWidgetButton({
+  const icon = breakpoint?.options.logValue ? "remove" : "add";
+  const { height } = targetNode.getBoundingClientRect();
+  const style = {
+    top: `${(1 / 2) * height}px`,
+    background: showNag ? AWESOME_BACKGROUND : "",
+  };
+
+  return (
+    <button
+      className={classNames(
+        "bg-primaryAccent",
+        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 transition hover:scale-125 shadow-lg"
+      )}
+      style={style}
+      onClick={onClick}
+      onMouseDown={onMouseDown}
+    >
+      <MaterialIcon>{icon}</MaterialIcon>
+    </button>
+  );
+}
+
+type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
+
+function ToggleWidgetButton({
   editor,
   togglePrintStatement,
   cx,
   breakpoints,
-}: ShowWidgetButtonProps) {
+}: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
@@ -60,23 +100,13 @@ function ShowWidgetButton({
     return null;
   }
 
-  const { height } = targetNode.getBoundingClientRect();
-  const style = {
-    top: `${(1 / 2) * height}px`,
-  };
-
   return ReactDOM.createPortal(
-    <button
-      className={classNames(
-        "bg-primaryAccent",
-        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 transition hover:scale-125 shadow-lg"
-      )}
-      style={style}
+    <ToggleButton
       onClick={onClick}
       onMouseDown={onMouseDown}
-    >
-      <MaterialIcon>{bp?.options.logValue ? "remove" : "add"}</MaterialIcon>
-    </button>,
+      targetNode={targetNode}
+      breakpoint={bp}
+    />,
     targetNode
   );
 }
@@ -96,4 +126,4 @@ const connector = connect(
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(ShowWidgetButton);
+export default connector(ToggleWidgetButton);
