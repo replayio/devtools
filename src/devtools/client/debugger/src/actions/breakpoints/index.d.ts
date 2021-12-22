@@ -9,11 +9,11 @@ export interface Context {
 
 export function runAnalysisOnLine(cx: Context, line: number): UIThunkAction;
 export function updateHoveredLineNumber(line: number): UIThunkAction;
-export function addBreakpointAtLine(
+export function _addBreakpointAtLine(
   cx: Context,
   line: number,
   shouldLog: boolean,
   disabled: boolean,
   breakable: boolean
 ): UIThunkAction;
-export function addBreakableBreakpointAtLine(cx: Context, line: number): UIThunkAction;
+export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction;

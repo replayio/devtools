@@ -256,7 +256,7 @@ class Editor extends PureComponent {
   };
 
   onGutterClick = (cm, line, gutter, ev) => {
-    const { cx, selectedSource, addBreakableBreakpointAtLine, toggleBlackBox } = this.props;
+    const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
     const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
 
     // Open the context menu then bail if the user clicks on a non-breakable line
@@ -299,7 +299,7 @@ class Editor extends PureComponent {
       return;
     }
 
-    return addBreakableBreakpointAtLine(cx, sourceLine);
+    return addBreakpointAtLine(cx, sourceLine);
   };
 
   onGutterContextMenu = event => {
@@ -501,7 +501,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(
     {
-      addBreakableBreakpointAtLine: actions.addBreakableBreakpointAtLine,
+      addBreakpointAtLine: actions.addBreakpointAtLine,
       closeContextMenu,
       closeTab: actions.closeTab,
       jumpToMappedLocation: actions.jumpToMappedLocation,

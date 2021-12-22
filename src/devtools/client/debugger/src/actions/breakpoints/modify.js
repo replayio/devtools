@@ -171,7 +171,7 @@ export function removeRequestedBreakpoint(location) {
   return { type: "REMOVE_REQUESTED_BREAKPOINT", location };
 }
 
-export function removeBreakpoint(cx, initialBreakpoint) {
+export function _removeBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint) {

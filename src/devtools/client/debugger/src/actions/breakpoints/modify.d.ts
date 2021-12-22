@@ -3,7 +3,7 @@ import { Location } from "@recordreplay/protocol";
 import { UIThunkAction } from "ui/actions";
 import { Breakpoint } from ".";
 
-export function removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAction;
+export function _removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAction;
 export function removeBreakpointOption(
   cx: Context,
   breakpoint: Breakpoint,

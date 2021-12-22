@@ -142,6 +142,7 @@ function setBreakpoint(location, options) {
   return Promise.all(promises);
 }
 
+// jvv
 function removeBreakpoint(location) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];

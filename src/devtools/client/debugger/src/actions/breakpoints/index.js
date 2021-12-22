@@ -10,7 +10,6 @@
  */
 
 import {
-  getRequestedBreakpointLocations,
   getBreakpointsList,
   getSelectedSource,
   getBreakpointAtLocation,
@@ -22,8 +21,7 @@ import {
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import {
   addBreakpoint,
-  removeBreakpoint,
-  removeRequestedBreakpoint,
+  _removeBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
   runAnalysis,
@@ -87,7 +85,7 @@ export function removeAllBreakpoints(cx) {
     trackEvent("breakpoints.remove_all");
 
     const breakpointList = getBreakpointsList(getState());
-    await Promise.all(breakpointList.map(bp => dispatch(removeBreakpoint(cx, bp))));
+    await Promise.all(breakpointList.map(bp => dispatch(_removeBreakpoint(cx, bp))));
     dispatch({ type: "REMOVE_BREAKPOINTS" });
   };
 }
@@ -100,28 +98,7 @@ export function removeAllBreakpoints(cx) {
  */
 export function removeBreakpoints(cx, breakpoints) {
   return async ({ dispatch }) => {
-    return Promise.all(breakpoints.map(bp => dispatch(removeBreakpoint(cx, bp))));
-  };
-}
-
-/**
- * Removes all breakpoints in a source
- *
- * @memberof actions/breakpoints
- * @static
- */
-export function removeBreakpointsInSource(cx, source) {
-  return async ({ dispatch, getState }) => {
-    const breakpoints = getBreakpointsForSource(getState(), source.id);
-    for (const breakpoint of breakpoints) {
-      dispatch(removeBreakpoint(cx, breakpoint));
-    }
-    const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
-    for (const location of Object.values(requestedBreakpointLocations)) {
-      if (location.sourceId === source.id) {
-        dispatch(removeRequestedBreakpoint(location));
-      }
-    }
+    return Promise.all(breakpoints.map(bp => dispatch(_removeBreakpoint(cx, bp))));
   };
 }
 
@@ -135,7 +112,7 @@ export function remapBreakpoints(cx, sourceId) {
     // have different locations than the new ones. Manually remove the
     // old breakpoints before adding the new ones.
     for (const bp of breakpoints) {
-      dispatch(removeBreakpoint(cx, bp));
+      dispatch(_removeBreakpoint(cx, bp));
     }
 
     for (const bp of newBreakpoints) {
@@ -145,7 +122,7 @@ export function remapBreakpoints(cx, sourceId) {
 }
 
 export function toggleBreakpointAtLine(cx, line) {
-  return ({ dispatch, getState, client, sourceMaps }) => {
+  return ({ dispatch, getState }) => {
     const state = getState();
     const selectedSource = getSelectedSource(state);
 
@@ -155,7 +132,7 @@ export function toggleBreakpointAtLine(cx, line) {
 
     const bp = getBreakpointAtLocation(state, { line, column: undefined });
     if (bp) {
-      return dispatch(removeBreakpoint(cx, bp));
+      return dispatch(_removeBreakpoint(cx, bp));
     }
     return dispatch(
       addBreakpoint(cx, {
@@ -218,7 +195,7 @@ export function updateHoveredLineNumber(line) {
   };
 }
 
-export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = false, breakable) {
+export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = false, breakable) {
   return ({ dispatch, getState }) => {
     const state = getState();
     const source = getSelectedSource(state);
@@ -289,5 +266,5 @@ function getLogValue(source, state, location) {
   return logValue;
 }
 
-export * from "./breakable-breakpoints";
+export * from "./breakpoints";
 export * from "./logpoints";

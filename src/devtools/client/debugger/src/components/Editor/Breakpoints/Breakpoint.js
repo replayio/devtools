@@ -49,7 +49,7 @@ class Breakpoint extends PureComponent {
   }
 
   onClick = event => {
-    const { cx, breakpoint, removeBreakableBreakpointsAtLine } = this.props;
+    const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -61,7 +61,7 @@ class Breakpoint extends PureComponent {
 
     const selectedLocation = breakpoint.location;
 
-    return removeBreakableBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
+    return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
   };
 
   onContextMenu = event => {
@@ -121,5 +121,5 @@ class Breakpoint extends PureComponent {
 }
 
 export default connect(null, {
-  removeBreakableBreakpointsAtLine: actions.removeBreakableBreakpointsAtLine,
+  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
 })(Breakpoint);

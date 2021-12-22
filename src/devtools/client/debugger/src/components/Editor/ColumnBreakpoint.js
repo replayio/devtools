@@ -126,5 +126,5 @@ class ColumnBreakpoint extends Component {
 
 export default connect(null, {
   addBreakpointAtColumn: actions.addBreakpointAtColumn,
-  removeBreakpoint: actions.removeBreakpoint,
+  removeBreakpoint: actions._removeBreakpoint,
 })(ColumnBreakpoint);

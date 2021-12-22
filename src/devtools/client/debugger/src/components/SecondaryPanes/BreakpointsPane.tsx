@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { getBreakableBreakpointSources } from "../../selectors/breakpointSources";
+import { getBreakpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
 import actions from "../../actions";
 
@@ -11,8 +11,8 @@ type LogpointsProps = PropsFromRedux & {
 
 function BreakpointsPane({
   breakpointSources,
-  removeBreakableBreakpoint,
-  removeBreakableBreakpointsInSource,
+  removeBreakpoint,
+  removeBreakpointsInSource,
 }: LogpointsProps) {
   const emptyContent = "Click on a line number in the editor to add a breakpoint";
 
@@ -21,19 +21,19 @@ function BreakpointsPane({
       type="breakpoint"
       emptyContent={emptyContent}
       breakpointSources={breakpointSources}
-      onRemoveBreakpoint={removeBreakableBreakpoint}
-      onRemoveBreakpoints={removeBreakableBreakpointsInSource}
+      onRemoveBreakpoint={removeBreakpoint}
+      onRemoveBreakpoints={removeBreakpointsInSource}
     />
   );
 }
 
 const connector = connect(
   (state: UIState) => ({
-    breakpointSources: getBreakableBreakpointSources(state),
+    breakpointSources: getBreakpointSources(state),
   }),
   {
-    removeBreakableBreakpoint: actions.removeBreakableBreakpoint,
-    removeBreakableBreakpointsInSource: actions.removeBreakableBreakpointsInSource,
+    removeBreakpoint: actions.removeBreakpoint,
+    removeBreakpointsInSource: actions.removeBreakpointsInSource,
   }
 );
 

@@ -153,7 +153,7 @@ async function addBreakpoint(url, line, column, options) {
     // as if the user clicked on the line.
     assert(!column);
     await selectSource(url);
-    await dbg.actions.addBreakpointAtLine(getContext(), line);
+    await dbg.actions._addBreakpointAtLine(getContext(), line);
   }
 
   await waitUntil(

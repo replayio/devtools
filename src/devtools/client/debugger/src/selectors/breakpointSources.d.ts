@@ -10,4 +10,4 @@ interface LogpointSource {
 type BreakpointSource = LogpointSource;
 
 export function getLogpointSources(state: UIState): LogpointSource[];
-export function getBreakableBreakpointSources(state: UIState): LogpointSource[];
+export function getBreakpointSources(state: UIState): LogpointSource[];
