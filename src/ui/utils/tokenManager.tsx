@@ -87,7 +87,7 @@ class TokenManager {
             setTimeout(() => {
               if (apiKey) {
                 this.setExternalAuth(apiKey);
-              } else {
+              } else if (!this.currentState) {
                 this.update(false);
               }
             }, 0);
