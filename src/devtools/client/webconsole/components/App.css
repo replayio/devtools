@@ -75,9 +75,7 @@
   );
   padding-top: var(--jsterm-padding-top);
   padding-bottom: var(--jsterm-padding-bottom);
-  border-top-color: var(--theme-splitter-color);
-  border-top-width: var(--jsterm-border-width);
-  border-top-style: solid;
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .webconsole-app .webconsole-output:not(:empty) ~ .jsterm-input-container {
