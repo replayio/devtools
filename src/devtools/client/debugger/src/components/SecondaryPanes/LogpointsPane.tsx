@@ -1,20 +1,20 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { getPrintStatementSources } from "../../selectors/breakpointSources";
+import { getLogpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
 import actions from "../../actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-type PrintStatementsProps = PropsFromRedux & {
+type LogpointsProps = PropsFromRedux & {
   logExceptions: boolean;
 };
 
-function PrintStatements({
-  printStatementSources,
-  removePrintStatement,
-  removePrintStatementsInSource,
-}: PrintStatementsProps) {
+function LogpointsPane({
+  logpointSources,
+  removeLogpoint,
+  removeLogpointsInSource,
+}: LogpointsProps) {
   const emptyContent = (
     <>
       {`Hover over a line in the editor and click on `}
@@ -29,23 +29,23 @@ function PrintStatements({
     <Breakpoints
       type="print-statement"
       emptyContent={emptyContent}
-      breakpointSources={printStatementSources}
-      onRemoveBreakpoint={removePrintStatement}
-      onRemoveBreakpoints={removePrintStatementsInSource}
+      breakpointSources={logpointSources}
+      onRemoveBreakpoint={removeLogpoint}
+      onRemoveBreakpoints={removeLogpointsInSource}
     />
   );
 }
 
 const connector = connect(
   (state: UIState) => ({
-    printStatementSources: getPrintStatementSources(state),
+    logpointSources: getLogpointSources(state),
   }),
   {
-    removePrintStatement: actions.removePrintStatement,
-    removePrintStatementsInSource: actions.removePrintStatementsInSource,
+    removeLogpoint: actions.removeLogpoint,
+    removeLogpointsInSource: actions.removeLogpointsInSource,
   }
 );
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connector(PrintStatements);
+export default connector(LogpointsPane);

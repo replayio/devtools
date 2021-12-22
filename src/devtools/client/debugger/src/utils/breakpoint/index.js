@@ -164,4 +164,4 @@ export function sortSelectedBreakpoints(breakpoints) {
 }
 
 export const isBreakable = bp => bp?.options.breakable;
-export const isPrintStatement = bp => bp?.options.logValue;
+export const isLogpoint = bp => bp?.options.logValue;

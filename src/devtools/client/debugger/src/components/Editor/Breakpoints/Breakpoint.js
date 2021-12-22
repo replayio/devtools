@@ -11,7 +11,7 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
-import { isBreakable, isPrintStatement } from "../../../utils/breakpoint";
+import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =

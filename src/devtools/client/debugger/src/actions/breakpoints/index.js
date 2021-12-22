@@ -290,4 +290,4 @@ function getLogValue(source, state, location) {
 }
 
 export * from "./breakable-breakpoints";
-export * from "./print-statements";
+export * from "./logpoints";

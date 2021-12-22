@@ -5,7 +5,7 @@ import { getBreakableBreakpointSources } from "../../selectors/breakpointSources
 import Breakpoints from "./Breakpoints";
 import actions from "../../actions";
 
-type PrintStatementsProps = PropsFromRedux & {
+type LogpointsProps = PropsFromRedux & {
   logExceptions: boolean;
 };
 
@@ -13,7 +13,7 @@ function BreakpointsPane({
   breakpointSources,
   removeBreakableBreakpoint,
   removeBreakableBreakpointsInSource,
-}: PrintStatementsProps) {
+}: LogpointsProps) {
   const emptyContent = "Click on a line number in the editor to add a breakpoint";
 
   return (

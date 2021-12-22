@@ -31,7 +31,7 @@ export { getBreakpointAtLocation, getBreakpointsAtLine } from "./breakpointAtLoc
 export { getVisibleBreakpoints, getFirstVisibleBreakpoints } from "./visibleBreakpoints";
 export { isSelectedFrameVisible } from "./isSelectedFrameVisible";
 export { getCallStackFrames } from "./getCallStackFrames";
-export { getBreakableBreakpointSources, getPrintStatementSources } from "./breakpointSources";
+export { getBreakableBreakpointSources, getLogpointSources } from "./breakpointSources";
 export * from "./visibleColumnBreakpoints";
 export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
 export * from "./debugLine";

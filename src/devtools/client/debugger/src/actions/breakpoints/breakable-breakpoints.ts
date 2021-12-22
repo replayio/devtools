@@ -9,14 +9,14 @@ import {
 } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
-import { isPrintStatement } from "../../utils/breakpoint";
+import { isLogpoint } from "../../utils/breakpoint";
 import { removeBreakpoint, removeBreakpointOption, removeRequestedBreakpoint } from "./modify";
 
 export function addBreakableBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const printStatements = getBreakpointsForSourceId(getState());
-    const breakpoint = printStatements.find(ps => ps.location.line === line);
-    const logValue = isPrintStatement(breakpoint);
+    const logpoints = getBreakpointsForSourceId(getState());
+    const breakpoint = logpoints.find(ps => ps.location.line === line);
+    const logValue = isLogpoint(breakpoint);
 
     dispatch(addBreakpointAtLine(cx, line, logValue, false, true));
   };
@@ -39,7 +39,7 @@ export function removeBreakableBreakpointsAtLine(
 
 export function removeBreakableBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAction {
   return async ({ dispatch }) => {
-    if (isPrintStatement(breakpoint)) {
+    if (isLogpoint(breakpoint)) {
       // Keep the breakpoint while removing the log value from its options,
       // so that the print statement remains.
       dispatch(removeBreakpointOption(cx, breakpoint, "breakable"));

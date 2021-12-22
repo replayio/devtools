@@ -2,17 +2,17 @@ import { UIThunkAction } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
 import { addBreakpointAtLine, Context } from ".";
 import { Breakpoint, getBreakpointsForSourceId } from "../../reducers/breakpoints";
-import { getPrintStatementsForSource } from "../../reducers/breakpoints/print-statements";
+import { getLogpointsForSource } from "../../reducers/breakpoints/logpoints";
 import { Source } from "../../reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isBreakable } from "../../utils/breakpoint";
 import { removeBreakpoint, removeBreakpointOption, removeRequestedBreakpoint } from "./modify";
 
-export function removePrintStatementsInSource(cx: Context, source: Source): UIThunkAction {
+export function removeLogpointsInSource(cx: Context, source: Source): UIThunkAction {
   return async ({ dispatch, getState }) => {
-    const breakpoints = getPrintStatementsForSource(getState(), source.id);
+    const breakpoints = getLogpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
-      dispatch(removePrintStatement(cx, breakpoint));
+      dispatch(removeLogpoint(cx, breakpoint));
     }
     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
     for (const location of Object.values(requestedBreakpointLocations)) {
@@ -23,29 +23,29 @@ export function removePrintStatementsInSource(cx: Context, source: Source): UITh
   };
 }
 
-export function togglePrintStatement(cx: Context, line: number, bp?: Breakpoint): UIThunkAction {
+export function toggleLogpoint(cx: Context, line: number, bp?: Breakpoint): UIThunkAction {
   return ({ dispatch }) => {
     if (bp?.options.logValue) {
       trackEvent("breakpoint.minus_click");
-      return dispatch(removePrintStatement(cx, bp));
+      return dispatch(removeLogpoint(cx, bp));
     }
 
     trackEvent("breakpoint.plus_click");
-    return dispatch(addPrintStatement(cx, line));
+    return dispatch(addLogpoint(cx, line));
   };
 }
 
-function addPrintStatement(cx: Context, line: number): UIThunkAction {
+function addLogpoint(cx: Context, line: number): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const printStatements = getBreakpointsForSourceId(getState());
-    const breakpoint = printStatements.find(ps => ps.location.line === line);
+    const logpoints = getBreakpointsForSourceId(getState());
+    const breakpoint = logpoints.find(ps => ps.location.line === line);
     const breakable = !!isBreakable(breakpoint);
 
     dispatch(addBreakpointAtLine(cx, line, true, false, breakable));
   };
 }
 
-export function removePrintStatement(cx: Context, bp: Breakpoint): UIThunkAction {
+export function removeLogpoint(cx: Context, bp: Breakpoint): UIThunkAction {
   return ({ dispatch }) => {
     if (isBreakable(bp)) {
       // Keep the breakpoint while removing the log value from its options,

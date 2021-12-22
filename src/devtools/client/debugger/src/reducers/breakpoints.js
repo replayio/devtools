@@ -166,5 +166,5 @@ export function hasLogpoint(state, location) {
 }
 
 export * from "./breakpoints/breakable-breakpoints";
-export * from "./breakpoints/print-statements";
+export * from "./breakpoints/logpoints";
 export default update;

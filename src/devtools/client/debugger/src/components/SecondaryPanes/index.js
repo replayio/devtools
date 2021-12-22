@@ -23,7 +23,7 @@ import {
 import AccessibleImage from "../shared/AccessibleImage";
 import { prefs } from "../../utils/prefs";
 
-import PrintStatements from "./PrintStatements";
+import LogpointsPane from "./LogpointsPane";
 import BreakpointsPane from "./BreakpointsPane";
 import Frames from "./Frames";
 import Accordion from "../shared/Accordion";
@@ -68,11 +68,11 @@ class SecondaryPanes extends Component {
     };
   }
 
-  getPrintStatementItems() {
+  getLogpointItems() {
     return {
       header: "Print Statements",
       className: "breakpoints-pane",
-      component: <PrintStatements />,
+      component: <LogpointsPane />,
       opened: prefs.breakpointsVisible,
       onToggle: opened => {
         prefs.breakpointsVisible = opened;
@@ -96,7 +96,7 @@ class SecondaryPanes extends Component {
     const items = [];
     const { horizontal, hasFrames, framesLoading } = this.props;
 
-    items.push(this.getBreakpointItems(), this.getPrintStatementItems());
+    items.push(this.getBreakpointItems(), this.getLogpointItems());
 
     if (hasFrames) {
       items.push(this.getCallStackItem());

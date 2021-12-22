@@ -8,7 +8,7 @@ import { UIState } from "ui/state";
 import { Breakpoint, getBreakpointsForSource } from "../../reducers/breakpoints";
 import { getSelectedSource } from "../../reducers/sources";
 import classNames from "classnames";
-import { togglePrintStatement } from "../../actions/breakpoints/print-statements";
+import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
 import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { Nag } from "ui/hooks/users";
@@ -59,7 +59,7 @@ type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
 
 function ToggleWidgetButton({
   editor,
-  togglePrintStatement,
+  toggleLogpoint,
   cx,
   breakpoints,
 }: ToggleWidgetButtonProps) {
@@ -84,7 +84,7 @@ function ToggleWidgetButton({
       return;
     }
 
-    togglePrintStatement(cx, hoveredLineNumber, bp);
+    toggleLogpoint(cx, hoveredLineNumber, bp);
   };
 
   useEffect(() => {
@@ -122,7 +122,7 @@ const connector = connect(
     runAnalysisOnLine: runAnalysisOnLine,
     setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
     updateHoveredLineNumber: updateHoveredLineNumber,
-    togglePrintStatement,
+    toggleLogpoint,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

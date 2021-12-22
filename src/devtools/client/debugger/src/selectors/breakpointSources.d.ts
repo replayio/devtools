@@ -2,12 +2,12 @@ import { UIState } from "ui/state";
 import { Breakpoint } from "../reducers/breakpoints";
 import { Source } from "../reducers/sources";
 
-interface PrintStatementSource {
+interface LogpointSource {
   source: Source;
   breakpoints: Breakpoint[];
 }
 // Do this properly. -jvv
-type BreakpointSource = PrintStatementSource;
+type BreakpointSource = LogpointSource;
 
-export function getPrintStatementSources(state: UIState): PrintStatementSource[];
-export function getBreakableBreakpointSources(state: UIState): PrintStatementSource[];
+export function getLogpointSources(state: UIState): LogpointSource[];
+export function getBreakableBreakpointSources(state: UIState): LogpointSource[];
