@@ -9,6 +9,7 @@ import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
+import { showDurationWarning } from "ui/utils/recording";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
   const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
@@ -59,8 +60,18 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
+        {showDurationWarning(recording) ? <WarningRow /> : null}
       </div>
     </div>
+  );
+}
+
+function WarningRow() {
+  return (
+    <Row>
+      <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+      <div>This replay is over two minutes, which can cause delays</div>
+    </Row>
   );
 }
 
