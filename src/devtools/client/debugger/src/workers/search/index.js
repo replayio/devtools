@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { WorkerDispatcher } from "devtools-utils/src/worker-utils";
+import { WorkerDispatcher } from "devtools/packages/devtools-utils/src/worker-utils";
 
 let startArgs;
 let dispatcher;

@@ -4,4 +4,4 @@ All the files in this folder are copied from the debugger.html github repository
 should not be modified here.
 
 For any issue or feature request on Reps, please log an issue at
-https://github.com/firefox-devtools/debugger.html/issues with the label "devtools-reps".
+https://github.com/firefox-devtools/debugger.html/issues with the label "devtools/packages/devtools-reps".

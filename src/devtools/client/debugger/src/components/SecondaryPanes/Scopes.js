@@ -21,7 +21,7 @@ import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
 
-const { objectInspector } = require("devtools-reps");
+const { objectInspector } = require("devtools/packages/devtools-reps");
 
 const ObjectInspector = objectInspector.ObjectInspector.default;
 

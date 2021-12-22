@@ -13,17 +13,14 @@ let {
   Grip,
   MODE,
   ObjectInspector,
-  ObjectInspectorUtils
-} = require("devtools-reps");
+  ObjectInspectorUtils,
+} = require("devtools/packages/devtools-reps");
 
 function renderRep({ object, mode }) {
   return Rep({ object, defaultRep: Grip, mode });
 }
 
-ReactDOM.render(
-  Rep({ object, defaultRep: Grip, mode }),
-  document.createElement("div")
-);
+ReactDOM.render(Rep({ object, defaultRep: Grip, mode }), document.createElement("div"));
 ```
 
 ## What is what?
@@ -55,10 +52,8 @@ git log --before "2017-1-17" devtools/client/shared/components/reps
 They were first moved to the [devtools-reps][gh-devtools-reps] repository, then to the [devtools-core][gh-devtools-core] one, before being migrated to this repository.
 
 [history]: https://github.com/mozilla/gecko-dev/commits/master/devtools/client/shared/components/reps
-[gh-devtools-reps]:
-https://github.com/firefox-devtools/reps/commits/master
-[gh-devtools-core]:
-https://github.com/firefox-devtools/devtools-core/commits/5ba3d6f6a44def9978a983edd6f2f89747dca2c7/packages/devtools-reps
+[gh-devtools-reps]: https://github.com/firefox-devtools/reps/commits/master
+[gh-devtools-core]: https://github.com/firefox-devtools/devtools-core/commits/5ba3d6f6a44def9978a983edd6f2f89747dca2c7/packages/devtools-reps
 
 ## License
 

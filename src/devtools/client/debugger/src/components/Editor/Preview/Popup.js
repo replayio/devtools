@@ -7,7 +7,7 @@
 import React, { Component } from "react";
 import { connect } from "../../../utils/connect";
 
-import Reps from "devtools-reps";
+import Reps from "devtools/packages/devtools-reps";
 const {
   REPS: { Rep },
   MODE,
