@@ -8,7 +8,6 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
-
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -43,7 +42,6 @@ function Panel({
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const dismissNag = hooks.useDismissNag();
-  const { nags } = hooks.useGetUserInfo();
   const error = analysisPoints === "error";
   const pausedOnHit =
     !error &&

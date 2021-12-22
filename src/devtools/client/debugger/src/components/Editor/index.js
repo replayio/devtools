@@ -27,6 +27,7 @@ import DebugLine from "./DebugLine";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
 import LineNumberTooltip from "./LineNumberTooltip";
+import ToggleWidgetButton from "./ToggleWidgetButton";
 import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
@@ -49,6 +50,7 @@ import {
   hasDocument,
   onTokenMouseOver,
   onLineMouseOver,
+  onGutterMouseOver,
   startOperation,
   endOperation,
   clearDocuments,
@@ -129,6 +131,7 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
     codeMirrorWrapper.addEventListener("mouseover", onLineMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", onGutterMouseOver(codeMirror));
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
@@ -296,7 +299,7 @@ class Editor extends PureComponent {
       return;
     }
 
-    return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
+    return addBreakpointAtLine(cx, sourceLine);
   };
 
   onGutterContextMenu = event => {
@@ -432,6 +435,7 @@ class Editor extends PureComponent {
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
         <LineNumberTooltip editor={editor} />
+        <ToggleWidgetButton editor={editor} />
         <HighlightLines editor={editor} />
         {
           <EditorMenu

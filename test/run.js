@@ -342,7 +342,14 @@ async function runTestViewer(path, local, timeout, env) {
       }
     }
 
-    sendTelemetryEvent("E2EFinished", { success: 0, local, why: why.replace(/ts=[\d]+/, "") });
+    sendTelemetryEvent("E2EFinished", {
+      action: process.env.GITHUB_ACTION,
+      branch: process.env.GITHUB_REF_NAME,
+      local,
+      sha: process.env.GITHUB_SHA,
+      success: 0,
+      why: why.replace(/ts=[\d]+/, ""),
+    });
 
     failures.push(`Failed test: ${local} ${why}`);
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
@@ -372,7 +379,13 @@ async function runTestViewer(path, local, timeout, env) {
       } else if (!passed) {
         logFailure("Exited without passing test");
       } else {
-        sendTelemetryEvent("E2EFinished", { success: 1, local });
+        sendTelemetryEvent("E2EFinished", {
+          action: process.env.GITHUB_ACTION,
+          branch: process.env.GITHUB_REF_NAME,
+          local,
+          sha: process.env.GITHUB_SHA,
+          success: 1,
+        });
       }
     }
     resolve();

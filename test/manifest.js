@@ -185,6 +185,11 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
+    example: "doc_rr_basic.html",
+    script: "logpoint-05.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/basic.js",
     script: "node_logpoint-01.js",
     targets: ["node"],

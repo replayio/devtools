@@ -6,6 +6,10 @@
   overflow-x: auto;
 }
 
+.breakpoints-pane > ._header {
+  border-top-width: 1px;
+}
+
 .breakpoints-list *:focus:not(:focus-visible) {
   outline: none;
   background: inherit;

@@ -28,6 +28,7 @@ function Video({
   recordingTarget,
   setVideoNode,
   stalled,
+  mouseTargetsLoading,
   videoUrl,
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
@@ -68,7 +69,7 @@ function Video({
       {showCommentTool ? (
         <CommentsOverlay>
           <CommentLoader recordingId={recordingId} />
-          {stalled && (
+          {(mouseTargetsLoading || stalled) && (
             <div className="absolute bottom-5 flex right-5 opacity-50 z-20">
               <Spinner className="animate-spin w-4" />
             </div>
@@ -89,6 +90,7 @@ const connector = connect(
     recordingTarget: selectors.getRecordingTarget(state),
     videoUrl: selectors.getVideoUrl(state),
     stalled: selectors.isPlaybackStalled(state),
+    mouseTargetsLoading: selectors.areMouseTargetsLoading(state),
   }),
   {
     setVideoNode: actions.setVideoNode,

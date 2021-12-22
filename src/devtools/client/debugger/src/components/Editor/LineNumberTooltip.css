@@ -1,27 +1,29 @@
 .static-tooltip {
   position: fixed;
   line-height: 16px;
-  margin-top: -5px;
   animation: static-tooltip 200ms ease;
   opacity: 0;
   animation-fill-mode: forwards;
   min-width: 42px; /* Reduces jitter between loading state (...) and non-loading state (3 hits) */
+  pointer-events: none;
 }
 
-.static-tooltip:not(.awesome-tooltip) {
+.static-tooltip .static-tooltip-content {
+  border-radius: 6px;
+}
+
+.static-tooltip:not(.awesome-tooltip) .static-tooltip-content {
   padding: 4px 8px;
-  border-radius: 4px;
   background: var(--theme-popup-color);
   color: var(--theme-popup-background);
-  opacity: 0;
-  animation-fill-mode: forwards;
+  opacity: 100;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.static-tooltip.hot {
+.static-tooltip.hot .static-tooltip-content {
   background: var(--theme-errant-popup-color);
 }
 

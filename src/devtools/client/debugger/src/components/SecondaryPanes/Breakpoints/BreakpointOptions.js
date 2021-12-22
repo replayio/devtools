@@ -18,13 +18,16 @@ function Highlighted({ expression, editor }) {
   return <RedactedSpan dangerouslySetInnerHTML={highlightText(expression, editor)} />;
 }
 
-function BreakpointOptions({ breakpoint, editor }) {
+function BreakpointOptions({ breakpoint, editor, type }) {
   const { logValue, condition } = breakpoint.options;
 
   if (!condition) {
     return (
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-        <Highlighted expression={logValue} editor={editor} />
+        <Highlighted
+          expression={type === "print-statement" ? logValue : breakpoint.text}
+          editor={editor}
+        />
       </span>
     );
   }

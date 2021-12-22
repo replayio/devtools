@@ -14,9 +14,6 @@ Test.describe(`catch, finally, generators, and async/await.`, async () => {
   await resumeToBreakpoint(54);
   await resumeToBreakpoint(65);
   await resumeToBreakpoint(72);
-  await Test.addBreakpoint("doc_control_flow.html", 88);
-  await Test.warpToMessage("throw2");
-  await Test.stepOutToLine(93);
 
   async function rewindToBreakpoint(line) {
     await Test.addBreakpoint("doc_control_flow.html", line);

@@ -28,6 +28,7 @@
   user-select: none;
   cursor: default;
   background-color: var(--theme-accordion-header-background);
+  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .accordion-header:hover {
@@ -56,8 +57,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 15px;
-  padding: 8px;
+  font-size: 12px;
+  padding: 2px;
   color: var(--theme-toolbar-color);
 }
 

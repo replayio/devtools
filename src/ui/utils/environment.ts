@@ -129,3 +129,12 @@ export function launchAndRecordUrl(url: string) {
 
   window.open(autoRecordUrl);
 }
+
+// Strip the URL of any query parameters
+export function getDisplayedUrl(url: string) {
+  if (!url) return "";
+
+  const urlObj = new URL(url);
+  const { hostname, pathname } = urlObj;
+  return `${hostname}${pathname}`;
+}

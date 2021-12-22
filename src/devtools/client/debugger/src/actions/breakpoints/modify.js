@@ -171,7 +171,7 @@ export function removeRequestedBreakpoint(location) {
   return { type: "REMOVE_REQUESTED_BREAKPOINT", location };
 }
 
-export function removeBreakpoint(cx, initialBreakpoint) {
+export function _removeBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint) {
@@ -238,6 +238,21 @@ export function disableBreakpoint(cx, initialBreakpoint) {
     });
 
     await client.removeBreakpoint(breakpoint.location);
+  };
+}
+
+export function removeBreakpointOption(cx, breakpoint, option) {
+  return async ({ dispatch, client }) => {
+    const newOptions = { ...breakpoint.options };
+    delete newOptions[option];
+
+    dispatch({
+      type: "SET_BREAKPOINT",
+      cx,
+      breakpoint: { ...breakpoint, options: newOptions },
+    });
+
+    await client.setBreakpoint(breakpoint.location, newOptions);
   };
 }
 
