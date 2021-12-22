@@ -4,7 +4,7 @@
 
 //
 
-const { getValue, nodeHasFullText } = require("../utils/node");
+const { getValue, nodeHasFullText } = require("./node");
 
 async function enumIndexedProperties(objectFront, start, end) {
   try {

@@ -4,7 +4,7 @@
 
 //
 import React, { PureComponent } from "react";
-import { showMenu } from "devtools-contextmenu";
+import { showMenu } from "devtools/shared/contextmenu";
 import { connect } from "../../utils/connect";
 import actions from "../../actions";
 import { features } from "../../utils/prefs";
@@ -21,7 +21,7 @@ import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
 
-const { objectInspector } = require("devtools-reps");
+const { objectInspector } = require("devtools/packages/devtools-reps");
 
 const ObjectInspector = objectInspector.ObjectInspector.default;
 

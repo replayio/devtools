@@ -2,7 +2,7 @@ import { assert } from "protocol/utils";
 import { createReducer, ReducerObject } from "../../shared/reducer-object";
 import { MarkupAction } from "../actions/markup";
 import { MarkupState, MarkupTree } from "../state/markup";
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
 const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";

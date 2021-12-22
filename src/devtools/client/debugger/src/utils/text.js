@@ -8,7 +8,7 @@
  * Utils for keyboard command strings
  * @module utils/text
  */
-import Services from "devtools-services";
+import Services from "devtools/shared/services";
 const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";

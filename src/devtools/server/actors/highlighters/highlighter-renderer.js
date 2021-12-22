@@ -4,7 +4,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 const { HighlighterEnvironment } = require("devtools/server/actors/highlighters");
 

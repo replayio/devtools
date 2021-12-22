@@ -16,12 +16,12 @@ const {
 } = require("./reps/rep-utils");
 
 module.exports = {
-  REPS,
-  getRep,
   MODE,
+  REPS,
+  getGripPreviewItems,
+  getRep,
   maybeEscapePropertyName,
+  objectInspector,
   parseURLEncodedText,
   parseURLParams,
-  getGripPreviewItems,
-  objectInspector,
 };

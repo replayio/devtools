@@ -25,8 +25,8 @@ import "devtools/client/themes/variables.css";
 
 /////////////////// here be dragons ... ////////////////////
 import "codemirror/lib/codemirror.css";
-import "devtools/client/debugger/packages/devtools-reps/src/object-inspector/components/ObjectInspector.css";
-import "devtools/client/debugger/packages/devtools-reps/src/reps/reps.css";
+import "devtools/packages/devtools-reps/object-inspector/components/ObjectInspector.css";
+import "devtools/packages/devtools-reps/reps/reps.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
 import "devtools/client/debugger/src/components/App.css";
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css";

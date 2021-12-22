@@ -7,7 +7,7 @@ const constants = require("devtools/client/webconsole/constants");
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
 
 const { pointEquals } = require("protocol/execution-point-utils");
-const { getGripPreviewItems } = require("devtools/client/debugger/packages/devtools-reps/src");
+const { getGripPreviewItems } = require("devtools/packages/devtools-reps");
 const { getUnicodeUrlPath } = require("devtools/client/shared/unicode-url");
 const { getSourceNames } = require("devtools/client/shared/source-utils");
 

@@ -13,7 +13,7 @@ import CSSProperties from "../../css-properties";
 import { parseNamedDeclarations } from "devtools/shared/css/parsing-utils";
 import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");

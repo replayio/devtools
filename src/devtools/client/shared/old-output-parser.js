@@ -12,7 +12,7 @@
  * new OutputParser is ready for production.
  */
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const { angleUtils } = require("devtools/client/shared/css-angle");
 const { colorUtils } = require("devtools/shared/css/color");
 const { getCSSLexer } = require("devtools/shared/css/lexer");

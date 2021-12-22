@@ -4,9 +4,9 @@
 
 const PropTypes = require("prop-types");
 
-const { wrapRender } = require("../reps/rep-utils");
-const { MODE } = require("../reps/constants");
-const { ModePropType } = require("../reps/array");
+const { wrapRender } = require("devtools/packages/devtools-reps/reps/rep-utils");
+const { MODE } = require("devtools/packages/devtools-reps/reps/constants");
+const { ModePropType } = require("devtools/packages/devtools-reps/reps/array");
 
 const dom = require("react-dom-factories");
 const { span } = dom;

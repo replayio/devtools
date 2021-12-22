@@ -1,4 +1,4 @@
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 import React, { FC, useCallback, useMemo, useState } from "react";
 
 import Accordion from "devtools/client/shared/components/Accordion";

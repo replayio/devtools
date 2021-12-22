@@ -5,9 +5,8 @@
 // Dependencies
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
-const { isGrip, cropString, cropMultipleLines, wrapRender } = require("./rep-utils");
+const { cropString, cropMultipleLines, wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
-const nodeConstants = require("../shared/dom-node-constants");
 
 /**
  * Renders DOM comment node.

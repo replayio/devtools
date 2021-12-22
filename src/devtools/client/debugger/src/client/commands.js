@@ -7,7 +7,7 @@
 import { prepareSourcePayload, createFrame } from "./create";
 import { clientEvents } from "./events";
 
-import Reps from "devtools-reps";
+import Reps from "devtools/packages/devtools-reps";
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { fetchEventTypePoints } = require("protocol/logpoint");

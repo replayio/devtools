@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { ValueFront } from "protocol/thread";
 import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
 import { actions } from "ui/actions";
-const reps = require("devtools/client/debugger/packages/devtools-reps/src");
+const reps = require("devtools/packages/devtools-reps");
 const { REPS, MODE } = reps;
 const ObjectInspector = reps.objectInspector.ObjectInspector.default;
 import SmartTrace from "devtools/client/webconsole/utils/connected-smart-trace";

@@ -6,7 +6,7 @@
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
-const { lengthBubble } = require("../shared/grip-length-bubble");
+const { lengthBubble } = require("devtools/shared/grip-length-bubble");
 const { interleave, isGrip, wrapRender, ellipsisElement } = require("./rep-utils");
 const PropRep = require("./prop-rep");
 const { MODE } = require("./constants");
