@@ -1,6 +1,9 @@
 import React from "react";
 import crypto from "crypto";
-import Document, { Html, Head, Main, NextScript } from "next/document";
+import { Html, Head, Main, NextScript } from "next/document";
+// per https://gitanswer.com/next-js-eslint-config-next-12-0-5-gives-type-any-is-not-a-constructor-function-type-error-in-document-tsx-javascript-1071098025
+// this will/is likely fixed in newer versions
+import Document from "next/dist/pages/_document";
 
 const cspHashOf = (text: string) => {
   const hash = crypto.createHash("sha256");
