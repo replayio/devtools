@@ -43,7 +43,7 @@ function ToggleButton({
   return (
     <button
       className={classNames(
-        "bg-primaryAccent",
+        "toggle-widget bg-primaryAccent",
         "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 transition hover:scale-125 shadow-lg"
       )}
       style={style}
