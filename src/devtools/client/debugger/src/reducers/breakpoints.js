@@ -9,7 +9,7 @@
  * @module reducers/breakpoints
  */
 
-import { getLocationKey, isMatchingLocation } from "../utils/breakpoint";
+import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 import { getSelectedSource } from "../selectors";
 
 // eslint-disable-next-line max-len
@@ -165,6 +165,13 @@ export function hasLogpoint(state, location) {
   return breakpoint && breakpoint.options.logValue;
 }
 
-export * from "./breakpoints/breakpoints";
-export * from "./breakpoints/logpoints";
+export function getLogpointsForSource(state, sourceId) {
+  if (!sourceId) {
+    return [];
+  }
+
+  const breakpoints = getBreakpointsList(state);
+  return breakpoints.filter(bp => bp.location.sourceId === sourceId).filter(bp => isLogpoint(bp));
+}
+
 export default update;

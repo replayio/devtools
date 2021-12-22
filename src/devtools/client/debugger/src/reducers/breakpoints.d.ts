@@ -16,4 +16,9 @@ export function getBreakpointsForSource(
   sourceId: SourceId,
   line?: number
 ): Breakpoint[];
+export function getLogpointsForSource(
+  state: UIState,
+  sourceId: SourceId,
+  line?: number
+): Breakpoint[];
 export function getBreakpointsForSourceId(state: UIState, line?: number): Breakpoint[];

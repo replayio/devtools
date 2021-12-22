@@ -2,7 +2,7 @@ import { UIThunkAction } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
 import { _addBreakpointAtLine, Context } from ".";
 import { Breakpoint, getBreakpointsForSourceId } from "../../reducers/breakpoints";
-import { getLogpointsForSource } from "../../reducers/breakpoints/logpoints";
+import { getLogpointsForSource } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isBreakable } from "../../utils/breakpoint";
