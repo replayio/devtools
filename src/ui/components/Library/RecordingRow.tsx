@@ -9,7 +9,7 @@ import { RecordingId } from "@recordreplay/protocol";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { useRouter } from "next/dist/client/router";
+import { getDisplayedUrl } from "ui/utils/environment";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -27,14 +27,6 @@ export function getRelativeDate(date: string) {
   }
 
   return content;
-}
-
-export function getDisplayedUrl(url: string) {
-  if (!url) return "";
-
-  const urlObj = new URL(url);
-  const { hostname, pathname } = urlObj;
-  return `${hostname}${pathname}`;
 }
 
 type RecordingRowProps = PropsFromRedux & {
