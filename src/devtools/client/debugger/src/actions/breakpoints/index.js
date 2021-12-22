@@ -195,7 +195,7 @@ export function updateHoveredLineNumber(line) {
   };
 }
 
-export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = false, breakable) {
+export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = false, shouldPause) {
   return ({ dispatch, getState }) => {
     const state = getState();
     const source = getSelectedSource(state);
@@ -213,7 +213,7 @@ export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = fal
       line,
     };
 
-    const options = { breakable };
+    const options = { shouldPause };
 
     if (shouldLog) {
       options.logValue = getLogValue(source, state, breakpointLocation);

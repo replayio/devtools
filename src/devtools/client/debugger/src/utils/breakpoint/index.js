@@ -163,5 +163,5 @@ export function sortSelectedBreakpoints(breakpoints) {
   ]);
 }
 
-export const isBreakable = bp => bp?.options.breakable;
+export const isBreakable = bp => bp?.options.shouldPause;
 export const isLogpoint = bp => bp?.options.logValue;

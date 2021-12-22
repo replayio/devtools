@@ -119,19 +119,19 @@ function setBreakpoint(location, options) {
   options = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options };
 
-  const { condition, logValue, logGroupId, breakable } = options;
+  const { condition, logValue, logGroupId, shouldPause } = options;
   const { line, column, sourceUrl, sourceId } = location;
   const promises = [];
 
   if (sourceId) {
-    if (breakable) {
+    if (shouldPause) {
       promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
     }
     if (logValue) {
       promises.push(setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition));
     }
   } else {
-    if (breakable) {
+    if (shouldPause) {
       promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
     }
     if (logValue) {

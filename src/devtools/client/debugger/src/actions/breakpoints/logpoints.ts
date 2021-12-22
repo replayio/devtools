@@ -39,9 +39,9 @@ function addLogpoint(cx: Context, line: number): UIThunkAction {
   return ({ dispatch, getState }) => {
     const logpoints = getBreakpointsForSourceId(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
-    const breakable = !!isBreakable(breakpoint);
+    const shouldPause = isBreakable(breakpoint);
 
-    dispatch(_addBreakpointAtLine(cx, line, true, false, breakable));
+    dispatch(_addBreakpointAtLine(cx, line, true, false, shouldPause));
   };
 }
 

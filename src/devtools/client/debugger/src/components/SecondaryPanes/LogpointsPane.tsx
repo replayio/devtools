@@ -17,11 +17,11 @@ function LogpointsPane({
 }: LogpointsProps) {
   const emptyContent = (
     <>
-      {`Hover over a line in the editor and click on `}
-      <span className="bg-primaryAccent inline-flex rounded-sm text-white">
+      {`Click on the `}
+      <span className="bg-gray-400 inline-flex rounded-sm text-white">
         <MaterialIcon iconSize="xs">add</MaterialIcon>
       </span>
-      {` to add a print statement`}
+      {` in the editor to add a print statement`}
     </>
   );
 
