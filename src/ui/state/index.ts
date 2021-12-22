@@ -7,7 +7,6 @@ import { InspectorState } from "devtools/client/inspector/state";
 import { MarkupState } from "devtools/client/inspector/markup/state/markup";
 import { EventTooltipState } from "devtools/client/inspector/markup/state/eventTooltip";
 import { ClassListState } from "devtools/client/inspector/rules/state/class-list";
-import { PseudoClassesState } from "devtools/client/inspector/rules/state/pseudo-classes";
 import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
@@ -27,7 +26,6 @@ export interface UIState {
   markup: MarkupState;
   messages: MessageState;
   network: NetworkState;
-  pseudoClasses: PseudoClassesState;
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
   timeline: TimelineState;

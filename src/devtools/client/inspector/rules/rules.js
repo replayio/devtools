@@ -21,7 +21,6 @@ const {
   updateClasses,
   updateClassPanelExpanded,
 } = require("devtools/client/inspector/rules/actions/class-list");
-const { togglePseudoClass } = require("devtools/client/inspector/rules/actions/pseudo-classes");
 const {
   updateHighlightedSelector,
   updateRules,

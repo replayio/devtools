@@ -138,27 +138,6 @@ export class Inspector {
   }
 
   /**
-   * Toggle a pseudo class.
-   */
-  // togglePseudoClass(pseudo: any) {
-  //   if (this.selection.isElementNode()) {
-  //     const node = this.selection.nodeFront;
-
-  //     if (node.hasPseudoClassLock(pseudo)) {
-  //       return node.walkerFront.removePseudoClassLock(node, pseudo, {
-  //         parents: true,
-  //       });
-  //     }
-
-  //     const hierarchical = pseudo == ":hover" || pseudo == ":active";
-  //     return node.walkerFront.addPseudoClassLock(node, pseudo, {
-  //       parents: hierarchical,
-  //     });
-  //   }
-  //   // return promise.resolve();
-  // }
-
-  /**
    * Returns an object containing the shared handler functions used in the box
    * model and grid React components.
    */
