@@ -219,3 +219,11 @@ export function refreshCodeMirror() {
     codeMirror.on("refresh", handler);
   };
 }
+
+export function setFullTextQuery(query) {
+  return { type: "SET_FULLTEXT_SEARCH", query };
+}
+
+export function focusFullTextInput(focus) {
+  return { type: "FOCUS_FULLTEXT_SEARCH", focus };
+}
