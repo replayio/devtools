@@ -36,7 +36,6 @@ export async function bootstrapApp() {
   if (typeof window === "undefined") return store;
 
   setupTelemetry();
-
   setupDOMHelpers();
 
   window.store = store;

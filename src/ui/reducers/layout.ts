@@ -4,6 +4,8 @@ import { LayoutAction } from "ui/actions/layout";
 import { getRecordingId } from "ui/utils/environment";
 import { asyncStore } from "../utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+import { Recording } from "ui/types";
+import { getRecording } from "ui/hooks/recordings";
 
 const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
@@ -11,6 +13,17 @@ const syncInitialLayoutState: LayoutState = {
   viewMode: "non-dev",
   showVideoPanel: true,
   showEditor: true,
+};
+
+const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => {
+  if (session) {
+    return session.selectedPrimaryPanel;
+  }
+  if (!recording) {
+    return syncInitialLayoutState.selectedPrimaryPanel;
+  }
+
+  return recording.comments.length ? "comments" : syncInitialLayoutState.selectedPrimaryPanel;
 };
 
 export async function getInitialLayoutState(): Promise<LayoutState> {
@@ -22,21 +35,24 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
   }
 
   const replaySessions = await asyncStore.replaySessions;
+  const recording = await getRecording(recordingId);
   const session = replaySessions[recordingId!];
 
   if (!session) {
-    return syncInitialLayoutState;
+    return {
+      ...syncInitialLayoutState,
+      selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
+    };
   }
 
-  const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = syncInitialLayoutState;
-
+  const { viewMode, showVideoPanel, showEditor } = syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
 
   return {
     ...syncInitialLayoutState,
     viewMode: initialViewMode,
-    selectedPrimaryPanel: session.selectedPrimaryPanel || selectedPrimaryPanel,
+    selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     showEditor: "showEditor" in session ? session.showEditor : showEditor,
   };
