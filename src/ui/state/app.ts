@@ -21,8 +21,6 @@ export type PanelName =
   | "network"
   | "react-components"
   | "viewer";
-export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events" | "search";
-export type ViewMode = "dev" | "non-dev";
 export type ModalOptionsType = {
   recordingId?: string;
   view?: string;
@@ -94,17 +92,13 @@ export interface AppState {
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
   selectedPanel: PanelName;
-  selectedPrimaryPanel: PrimaryPanelName;
   sessionId: SessionId | null;
-  showEditor: boolean;
-  showVideoPanel: boolean;
   theme: string;
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
   videoNode: HTMLVideoElement | null;
   videoUrl: string | null;
-  viewMode: ViewMode;
   workspaceId: WorkspaceId | null;
   mouseTargetsLoading: boolean;
 }
