@@ -18,6 +18,7 @@ export const getAllMessagesUiById = state => state.messages.messagesUiById;
 export const getAllRepeatById = state => state.messages.repeatById;
 export const getCommandHistory = state => state.messages.commandHistory;
 export const getFilteredMessagesCount = state => state.messages.filteredMessagesCount;
+export const getMessagesLoaded = state => state.messages.messagesLoaded;
 
 function messageTime(msg) {
   const { executionPointTime, lastExecutionPoint } = msg;

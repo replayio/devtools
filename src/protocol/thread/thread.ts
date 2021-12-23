@@ -879,7 +879,7 @@ class _ThreadFront {
   ) {
     const sessionId = await this.waitForSession();
 
-    client.Console.findMessages({}, sessionId).then(({ overflow }) => {
+    const messagesLoaded = client.Console.findMessages({}, sessionId).then(({ overflow }) => {
       if (overflow) {
         console.warn("Too many console messages, not all will be shown");
         onConsoleOverflow();
@@ -906,6 +906,8 @@ class _ThreadFront {
       }
       onConsoleMessage(pause, message);
     });
+
+    return messagesLoaded;
   }
 
   async getRootDOMNode() {
