@@ -15,6 +15,7 @@ import AccessibleImage from "../shared/AccessibleImage";
 import { features, prefs } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import Spinner from "ui/components/shared/Spinner";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 
 class EventListeners extends Component {
   state = {
@@ -113,7 +114,7 @@ class EventListeners extends Component {
     return (
       <form className="event-search-form" onSubmit={e => e.preventDefault()}>
         <input
-          className={classnames("event-search-input", { focused })}
+          className={classnames("event-search-input px-2 py-1 bg-gray-100", { focused })}
           placeholder={placeholder}
           value={searchText}
           onChange={this.onInputChange}
@@ -160,9 +161,11 @@ class EventListeners extends Component {
     }
 
     return (
-      <li className="event-listener-group" key={index}>
+      <li className="event-listener-group space-y-1" key={index}>
         {this.renderCategoryHeadingWithCount(category, categoryCount)}
-        <ul>{events.map(event => this.renderListenerEvent(event, category.name))}</ul>
+        <ul className="space-y-1">
+          {events.map(event => this.renderListenerEvent(event, category.name))}
+        </ul>
       </li>
     );
   }
@@ -189,8 +192,8 @@ class EventListeners extends Component {
   renderCategoriesSection(label, isLoading, categories) {
     return (
       <div className="flex flex-col space-y-1">
-        <div className="text-sm font-semibold">{label}</div>
-        <ul className="event-listeners-list">
+        <div className="">{label}</div>
+        <ul className="event-listeners-list space-y-1">
           {isLoading ? (
             <div className="flex items-center justify-center h-12">
               <Spinner className="animate-spin h-4 w-4" />
@@ -212,7 +215,7 @@ class EventListeners extends Component {
     }
 
     return (
-      <ul>
+      <ul className="space-y-1">
         {category.events.map(event => {
           return this.renderListenerEvent(event, category.name);
         })}
@@ -225,13 +228,11 @@ class EventListeners extends Component {
     const searchResultsCount = Object.values(searchResults).flat().length;
 
     if (searchResultsCount == 0) {
-      return (
-        <div className="status no-results">{`No search results for "${this.state.searchText}"`}</div>
-      );
+      return <div className="status no-results">{`0 search results`}</div>;
     }
 
     return (
-      <ul className="event-search-results-list">
+      <ul className="event-search-results-list space-y-1">
         {Object.keys(searchResults).map(category => {
           return searchResults[category].map(event => {
             return this.renderListenerEvent(event, category);
@@ -248,20 +249,22 @@ class EventListeners extends Component {
 
     return (
       <div
-        className="event-listener-header flex flex-row justify-between w-full px-0 mb-1 pr-3"
+        className="event-listener-header flex flex-row justify-between w-full px-0"
         onClick={() => this.onCategoryToggle(category.name)}
       >
-        <div className="event-listener-header-label">
-          <button className="event-listener-expand">
+        <div className="event-listener-header-label space-x-2 flex flex-row items-center">
+          <button className="event-listener-expand pb-px">
             <AccessibleImage className={classnames("arrow", { expanded })} />
           </button>
           <label className="event-listener-label flex-grow">
             <span className="event-listener-category">{category.name}</span>
           </label>
         </div>
-        <div className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">
-          {count}
-        </div>
+        {!expanded ? (
+          <div className="event-listener-count font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
+            {count}
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -299,25 +302,21 @@ class EventListeners extends Component {
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (
-      <li
-        className="px-2 pl-5 mb-1 mr-1 flex flex-row items-center hover:bg-gray-100 rounded-md"
-        key={event.id}
-      >
+      <li className="pl-2 flex flex-row items-center hover:bg-gray-100 rounded-md" key={event.id}>
         <div className="flex flex-row justify-between w-full">
-          <label title={title} className="w-full flex flex-row items-center">
-            <input
-              type="checkbox"
+          <label title={title} className="w-full flex flex-row items-center space-x-2">
+            <Checkbox
               value={event.id}
               disabled={isHot}
               onChange={e => this.onEventTypeClick(event.id, e.target.checked)}
               checked={activeEventListeners.includes(event.id)}
-              className="focus:primaryAccentHover h-4 w-4 mr-1 text-primaryAccent border-gray-300 rounded flex-shrink-0"
+              className="m-0"
             />
-            <span className="event-listener-name flex-grow">
+            <span className="event-listener-name flex-grow overflow-hidden whitespace-pre overflow-ellipsis">
               {searchText ? this.renderCategory(category) : null}
               {event.name}
             </span>
-            <span className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">
+            <span className="event-listener-count font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
               {points.length}
             </span>
           </label>
@@ -326,21 +325,16 @@ class EventListeners extends Component {
     );
   }
 
-  renderAdvanced() {
+  render() {
     const { searchText } = this.state;
-
     return (
-      <>
+      <div className="event-listeners overflow-y-auto space-y-2">
         <div className="event-search-container">{this.renderSearchInput()}</div>
         <div className="event-listeners-content">
           {searchText ? this.renderSearchResultsList() : this.renderCategories()}
         </div>
-      </>
+      </div>
     );
-  }
-
-  render() {
-    return <div className="event-listeners">{this.renderAdvanced()}</div>;
   }
 }
 

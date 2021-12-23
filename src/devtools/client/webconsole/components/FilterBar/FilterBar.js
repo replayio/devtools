@@ -14,7 +14,6 @@ const actions = require("devtools/client/webconsole/actions/index");
 
 // Selectors
 const { getFilteredMessagesCount } = require("devtools/client/webconsole/selectors/messages");
-const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 const { getAllMessagesById } = require("devtools/client/webconsole/selectors/messages");
 
 // Utilities
@@ -24,10 +23,11 @@ const { FILTERBAR_DISPLAY_MODES, MESSAGE_TYPE } = require("devtools/client/webco
 
 // Additional Components
 const { Events } = require("devtools/client/webconsole/components/FilterBar/Events");
-const ConsoleSettings =
-  require("devtools/client/webconsole/components/FilterBar/ConsoleSettings").default;
 
 const SearchBox = createFactory(require("devtools/client/shared/components/SearchBox"));
+const FilterSearchBox = require("./FilterSearchBox").default;
+const ClearButton = require("./ClearButton").default;
+const FilterDrawerToggle = require("./FilterDrawerToggle").default;
 const { isDemo } = require("ui/utils/environment");
 const { trackEvent } = require("ui/utils/telemetry");
 
@@ -38,7 +38,6 @@ class FilterBar extends Component {
     return {
       displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
-      timestampsVisible: PropTypes.bool.isRequired,
       allMessagesById: PropTypes.object,
     };
   }
@@ -55,7 +54,8 @@ class FilterBar extends Component {
     }
     this.filterInputMinWidth = 150;
     try {
-      const filterInput = this.wrapperNode.querySelector(".devtools-searchbox");
+      const filterInput = this.wrapperNode.querySelector(".devtools-searchbox input");
+      console.log(">1", { filterInput });
       this.filterInputMinWidth = Number(
         window.getComputedStyle(filterInput)["min-width"].replace("px", "")
       );
@@ -70,12 +70,9 @@ class FilterBar extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { displayMode, filteredMessagesCount, timestampsVisible, allMessagesById } = this.props;
+    const { displayMode, filteredMessagesCount, allMessagesById } = this.props;
 
-    if (
-      nextProps.displayMode !== displayMode ||
-      nextProps.timestampsVisible !== timestampsVisible
-    ) {
+    if (nextProps.displayMode !== displayMode) {
       return true;
     }
 
@@ -109,7 +106,7 @@ class FilterBar extends Component {
       return;
     }
 
-    const filterInput = this.wrapperNode.querySelector(".devtools-searchbox");
+    const filterInput = this.wrapperNode.querySelector(".devtools-searchbox input");
     const { width: filterInputWidth } = filterInput.getBoundingClientRect();
 
     if (displayMode === FILTERBAR_DISPLAY_MODES.WIDE) {
@@ -189,39 +186,25 @@ class FilterBar extends Component {
       ).replace("#1", filteredMessagesCount.text);
     }
 
-    return SearchBox({
-      type: "filter",
-      placeholder: "Filter Output",
-      keyShortcut: "CmdOrCtrl+F",
-      onChange: text => filterTextSet(text),
-      summary: searchBoxSummary,
-      summaryTooltip: searchBoxSummaryTooltip,
-    });
-  }
-
-  renderSettingsButton() {
-    const { timestampsVisible } = this.props;
-
-    return <ConsoleSettings timestampsVisible={timestampsVisible}></ConsoleSettings>;
+    return <FilterSearchBox />;
   }
 
   render() {
     const { displayMode } = this.props;
 
-    const clearButton = this.renderClearButton();
+    const clearButton = <ClearButton />;
     const searchBox = this.renderSearchBox();
-    const settingsButton = this.renderSettingsButton();
 
     const children = [
       dom.div(
         {
-          className: "devtools-toolbar devtools-input-toolbar webconsole-filterbar-primary",
+          className:
+            "devtools-toolbar devtools-input-toolbar webconsole-filterbar-primary space-x-2 px-2 py-1",
           key: "primary-bar",
         },
-        clearButton,
+        <FilterDrawerToggle />,
         searchBox,
-        <Events />,
-        settingsButton
+        clearButton
       ),
     ];
 
@@ -243,10 +226,8 @@ class FilterBar extends Component {
 }
 
 function mapStateToProps(state) {
-  const uiState = getAllUi(state);
   return {
     filteredMessagesCount: getFilteredMessagesCount(state),
-    timestampsVisible: uiState.timestampsVisible,
     allMessagesById: getAllMessagesById(state),
   };
 }

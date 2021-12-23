@@ -13,6 +13,7 @@ const ConsoleOutput = require("devtools/client/webconsole/components/Output/Cons
 const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar").default;
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
+const FilterDrawer = require("./FilterDrawer").default;
 
 /**
  * Console root Application component.
@@ -62,18 +63,23 @@ class App extends React.Component {
     const { filterBarDisplayMode } = this.props;
 
     return (
-      <div
-        className="webconsole-app"
-        onClick={this.onClick}
-        ref={node => {
-          this.node = node;
-        }}
-      >
+      <div className="flex flex-col w-full">
         <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
-        <ConsoleNag />
-        <div className="flexible-output-input" key="in-out-container">
-          <ConsoleOutput key="console-output" />
-          <JSTerm key="jsterm" />
+        <div className="flex flex-grow overflow-hidden">
+          <FilterDrawer />
+          <div
+            className="webconsole-app"
+            onClick={this.onClick}
+            ref={node => {
+              this.node = node;
+            }}
+          >
+            <ConsoleNag />
+            <div className="flexible-output-input" key="in-out-container">
+              <ConsoleOutput key="console-output" />
+              <JSTerm key="jsterm" />
+            </div>
+          </div>
         </div>
       </div>
     );
