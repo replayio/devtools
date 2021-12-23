@@ -10,11 +10,12 @@ Feel free to file any issues you see while recording or replaying.
 
 ### Setup instructions:
 
-Replay's DevTools is a React app built on top of the Replay [protocol](https://www.notion.so/replayio/Protocol-d8e7b5f428594589ab60c42afad782c1). Getting started is as simple as:
+Replay's DevTools is a React app built on top of the Replay [protocol](https://www.notion.so/replayio/Protocol-d8e7b5f428594589ab60c42afad782c1). Make sure to install [nvm](https://github.com/nvm-sh/nvm#installing-and-updating). Getting started is as simple as:
 
 ```
 git clone git@github.com:RecordReplay/devtools.git
 cd devtools
+nvm use
 npm install
 cp .env.sample .env
 npm run dev
