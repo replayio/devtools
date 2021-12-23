@@ -4,14 +4,14 @@ import "ui/utils/whatwg-url-fix";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
-import LoadingScreen, { LoadingScreenTemplate } from "ui/components/shared/LoadingScreen";
+import LoadingScreen, { StaticLoadingScreen } from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
-import App from "ui/components/App";
+import _App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
@@ -130,10 +130,25 @@ import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 
+interface AuthProps {
+  apiKey?: string;
+}
+
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
+function AppUtilities({ children, apiKey }: { children: ReactNode } & AuthProps) {
+  return (
+    <tokenManager.Auth0Provider apiKey={apiKey}>
+      <ApolloWrapper>
+        <IntercomProvider appId={"k7f741xx"} autoBoot>
+          <ConfirmProvider>{children}</ConfirmProvider>
+        </IntercomProvider>
+      </ApolloWrapper>
+    </tokenManager.Auth0Provider>
+  );
+}
+function Routing({ Component, pageProps }: AppProps) {
   const [store, setStore] = useState<Store | null>(null);
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
@@ -142,11 +157,7 @@ const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
   if (!store) {
     // We hide the tips here since we don't have the store ready yet, which
     // the tips need to work properly.
-    return (
-      <LoadingScreenTemplate>
-        <div className="w-56 h-1"></div>
-      </LoadingScreenTemplate>
-    );
+    return <StaticLoadingScreen />;
   }
 
   if (maintenanceMode) {
@@ -155,37 +166,30 @@ const AppRouting = ({ apiKey, Component, pageProps }: AppProps & AuthProps) => {
 
   return (
     <Provider store={store}>
-      <tokenManager.Auth0Provider apiKey={apiKey}>
-        <ApolloWrapper>
-          <IntercomProvider appId={"k7f741xx"} autoBoot>
-            <ConfirmProvider>
-              <Head>
-                <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-                <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-                <title>Replay</title>
-                <link rel="stylesheet" href="/fonts/inter/inter.css" />
-                <link rel="stylesheet" href="/fonts/material_icons/material_icons.css" />
-              </Head>
-              <App>
-                <InstallRouteListener />
-                <ErrorBoundary>
-                  <React.Suspense fallback={<LoadingScreen />}>
-                    <Component {...pageProps} />
-                  </React.Suspense>
-                </ErrorBoundary>
-              </App>
-            </ConfirmProvider>
-          </IntercomProvider>
-        </ApolloWrapper>
-      </tokenManager.Auth0Provider>
+      <Head>
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+        <title>Replay</title>
+        <link rel="stylesheet" href="/fonts/inter/inter.css" />
+        <link rel="stylesheet" href="/fonts/material_icons/material_icons.css" />
+      </Head>
+      <_App>
+        <InstallRouteListener />
+        <ErrorBoundary>
+          <React.Suspense fallback={<LoadingScreen />}>
+            <Component {...pageProps} />
+          </React.Suspense>
+        </ErrorBoundary>
+      </_App>
     </Provider>
   );
+}
+
+const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
+  return <AppUtilities apiKey={apiKey}>{<Routing {...props} />}</AppUtilities>;
 };
 
-interface AuthProps {
-  apiKey?: string;
-}
-AppRouting.getInitialProps = (appContext: AppContext) => {
+App.getInitialProps = (appContext: AppContext) => {
   const props = NextApp.getInitialProps(appContext);
   const authHeader = appContext.ctx.req?.headers.authorization;
   const authProps: AuthProps = { apiKey: undefined };
@@ -202,4 +206,4 @@ AppRouting.getInitialProps = (appContext: AppContext) => {
   return { ...props, ...authProps };
 };
 
-export default AppRouting;
+export default App;

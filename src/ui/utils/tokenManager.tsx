@@ -62,7 +62,7 @@ class TokenManager {
         domain={domain}
         clientId={clientId}
         audience={audience}
-        redirectUri={window.location.origin}
+        redirectUri={typeof window === "undefined" ? undefined : window.location.origin}
         onRedirectCallback={onRedirectCallback}
         cacheLocation="localstorage"
         prompt="select_account"
