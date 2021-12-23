@@ -1,4 +1,4 @@
-import SplitBox from "devtools-splitter";
+import SplitBox from "devtools/packages/devtools-splitter";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
