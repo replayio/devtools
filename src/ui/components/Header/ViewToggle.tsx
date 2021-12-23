@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
-import { setViewMode } from "../../actions/app";
 import { actions } from "ui/actions";
-import { getSelectedPrimaryPanel, getViewMode } from "../../reducers/app";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
-import { ViewMode } from "ui/state/app";
+import { getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
+import { setViewMode } from "ui/actions/layout";
+import { ViewMode } from "ui/state/layout";
 
 const TOGGLE_DELAY = 300;
 

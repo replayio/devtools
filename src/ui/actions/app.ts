@@ -14,8 +14,6 @@ import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import {
   PanelName,
-  PrimaryPanelName,
-  ViewMode,
   ModalType,
   ModalOptionsType,
   UploadInfo,
@@ -27,15 +25,19 @@ import {
   ReplayNavigationEvent,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
-import { trackEvent } from "ui/utils/telemetry";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
 import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
-import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { hideCommandPalette } from "./layout";
+import {
+  hideCommandPalette,
+  setSelectedPrimaryPanel,
+  setShowEditor,
+  setShowVideoPanel,
+  setViewMode,
+} from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
@@ -48,9 +50,6 @@ export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
-export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
-  panel: PrimaryPanelName;
-};
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
@@ -74,7 +73,6 @@ export type SetEventsForType = Action<"set_events"> & {
   events: (MouseEvent | KeyboardEvent | ReplayNavigationEvent)[];
   eventType: EventKind;
 };
-export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
   location: Location | null;
 };
@@ -95,12 +93,6 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
   parameters: loadedRegions;
 };
-export type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
-  showVideoPanel: boolean;
-};
-export type SetShowEditorAction = Action<"set_show_editor"> & {
-  showEditor: boolean;
-};
 export type SetLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
   index: number;
 };
@@ -118,14 +110,12 @@ export type AppActions =
   | SetSessionIdAction
   | UpdateThemeAction
   | SetSelectedPanelAction
-  | SetSelectedPrimaryPanelAction
   | SetInitializedPanelsAction
   | SetUploadingAction
   | SetModalAction
   | SetAnalysisPointsAction
   | SetAnalysisErrorAction
   | SetEventsForType
-  | SetViewMode
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
   | SetCanvas
@@ -137,8 +127,6 @@ export type AppActions =
   | SetRecordingTargetAction
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
-  | SetShowVideoPanelAction
-  | SetShowEditorAction
   | SetAwaitingSourcemapsAction
   | SetLoadingPageTipIndexAction;
 
@@ -265,10 +253,6 @@ export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
 }
 
-export function setSelectedPrimaryPanel(panel: PrimaryPanelName): SetSelectedPrimaryPanelAction {
-  return { type: "set_selected_primary_panel", panel };
-}
-
 export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
   return { type: "set_initialized_panels", panel };
 }
@@ -326,20 +310,6 @@ export function setEventsForType(events: ReplayEvent[], eventType: EventKind): S
   };
 }
 
-export function setViewMode(viewMode: ViewMode): UIThunkAction {
-  return async ({ dispatch }) => {
-    // There's a possible race condition here so it's important to handle the nag logic first.
-    // Otherwise, it's possible for the nag to not be properly dismissed.
-    if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
-      await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
-      dispatch(setSelectedPrimaryPanel("explorer"));
-    }
-
-    dispatch({ type: "set_view_mode", viewMode });
-    trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
-  };
-}
-
 export function setHoveredLineNumberLocation(
   location: Location | null
 ): SetHoveredLineNumberLocation {
@@ -378,14 +348,6 @@ export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspa
   return { type: "set_recording_workspace", workspace };
 }
 
-export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
-  return { type: "set_show_video_panel", showVideoPanel };
-}
-
-export function setShowEditor(showEditor: boolean): SetShowEditorAction {
-  return { type: "set_show_editor", showEditor };
-}
-
 function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading {
   return { type: "mouse_targets_loading", loading };
 }
@@ -397,22 +359,6 @@ export function loadMouseTargets(): UIThunkAction {
     dispatch(setMouseTargetsLoading(false));
     if (resp) {
       dispatch(setIsNodePickerActive(true));
-    }
-  };
-}
-
-export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
-  return async ({ dispatch }) => {
-    const replaySessions = await asyncStore.replaySessions;
-    const session = replaySessions[recordingId];
-
-    if (recordingId && session) {
-      const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = session;
-
-      dispatch(setViewMode(viewMode));
-      dispatch(setShowEditor(showEditor));
-      dispatch(setShowVideoPanel(showVideoPanel));
-      dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
     }
   };
 }

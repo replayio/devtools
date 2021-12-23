@@ -1,15 +1,15 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/environment";
 import {
-  getSelectedPanel,
   getSelectedPrimaryPanel,
   getShowEditor,
   getShowVideoPanel,
   getViewMode,
-} from "ui/reducers/app";
-import { getRecordingId } from "ui/utils/environment";
-import { ViewMode } from "ui/state/app";
+} from "ui/reducers/layout";
+import { ViewMode } from "ui/state/layout";
+import { getSelectedPanel } from "ui/reducers/app";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;

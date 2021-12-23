@@ -1,17 +1,19 @@
-import { combineReducers, applyMiddleware, Reducer, Store } from "redux";
+import { combineReducers, applyMiddleware, Store } from "redux";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { sanityCheckMiddleware } from "ui/utils/sanitize";
 const configureStore = require("devtools/client/debugger/src/actions/utils/create-store").default;
-import reducer from "ui/reducers/app";
+import appReducer from "ui/reducers/app";
+import layoutReducer from "ui/reducers/layout";
 import { AppState } from "ui/state/app";
+import { LayoutState } from "ui/state/layout";
 
-let reducers: Record<string, any> = { app: reducer };
+let reducers: Record<string, any> = { app: appReducer, layout: layoutReducer };
 let thunkArgs: Record<string, any> = {};
 
-export function bootstrapStore(initialState: { app: AppState }) {
+export function bootstrapStore(initialState: { app: AppState; layout: LayoutState }) {
   // TODO; manage panels outside of the Toolbox componenet
   const panels = {};
 
