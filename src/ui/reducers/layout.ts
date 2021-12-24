@@ -34,9 +34,14 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     return syncInitialLayoutState;
   }
 
-  const replaySessions = await asyncStore.replaySessions;
-  const recording = await getRecording(recordingId);
-  const session = replaySessions[recordingId!];
+  let recording;
+  try {
+    recording = await getRecording(recordingId);
+  } catch (e) {
+    return syncInitialLayoutState;
+  }
+
+  const session = (await asyncStore.replaySessions)[recordingId];
 
   if (!session) {
     return {

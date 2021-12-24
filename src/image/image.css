@@ -71,9 +71,6 @@
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton::before {
   background-image: url(~devtools/client/themes/images/close.svg) !important;
 }
-.devtools-button.devtools-clear-icon::before {
-  background-image: url(~devtools/client/themes/images/clear.svg) !important;
-}
 .devtools-searchinput {
   background-image: url(~devtools/client/themes/images/search.svg) !important;
 }
@@ -510,9 +507,6 @@ button.open-inspector {
 }
 .devtools-button.devtools-feature-callout::after {
   content: url(~devtools/client/themes/images/badge-blue.svg);
-}
-.devtools-toolbarbutton.devtools-clear-icon {
-  list-style-image: url(~devtools/client/themes/images/clear.svg);
 }
 .devtools-option-toolbarbutton {
   list-style-image: url(~devtools/client/themes/images/settings.svg);

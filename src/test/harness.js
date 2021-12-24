@@ -60,12 +60,8 @@ function start() {
 }
 
 function finish() {
-  console.log("TestFinished");
+  console.log("TestFinished", { success: true });
   localStorage.clear();
-
-  // This is pretty goofy but this is recognized during automated tests and sent
-  // to the UI process to indicate the test has finished.
-  dump?.(`RecReplaySendAsyncMessage TestFinished`);
 }
 
 function isFullyLoaded() {
@@ -401,7 +397,7 @@ function checkAllMessages(expected, opts) {
     () => {
       return isEqual(getAllMessages(opts), expected);
     },
-    { waitingFor: `messages with ${opts} to match ${expected}` }
+    { waitingFor: `messages with ${JSON.stringify(opts)} to match ${JSON.stringify(expected)}` }
   );
 }
 
@@ -900,9 +896,13 @@ const commands = mapValues(testCommands, (command, name) => {
 
 async function describe(description, cbk) {
   console.log(`# Test ${description}`);
-  await start();
-  await cbk();
-  finish();
+  try {
+    await start();
+    await cbk();
+    finish();
+  } catch (e) {
+    console.log("TestFinished", { success: false, why: e.message });
+  }
 }
 
 async function it(description, cbk) {

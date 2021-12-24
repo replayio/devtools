@@ -28,7 +28,7 @@ function App() {
       console.error(new Error("Baz"));
 
       // eslint-disable-next-line no-undef
-      dump(`RecReplaySendAsyncMessage Example__Finished`);
+      console.log("ExampleFinished");
     }
     update();
   }, []);

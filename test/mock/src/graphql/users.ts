@@ -20,6 +20,15 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
       data: { viewer: userInfo },
     },
   };
+  const dismissNag = {
+    request: {
+      query: DISMISS_NAG,
+      variables: { nag: "first_log_in" },
+    },
+    result: {
+      data: { viewer: {} },
+    },
+  };
   const getUserId = {
     request: {
       query: GET_USER_ID,
@@ -32,5 +41,9 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
       },
     },
   };
-  return [...cloneResponse(getUser, 8), ...cloneResponse(getUserId, 8)];
+  return [
+    ...cloneResponse(getUser, 8),
+    ...cloneResponse(getUserId, 8),
+    ...cloneResponse(dismissNag, 8),
+  ];
 }

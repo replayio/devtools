@@ -116,7 +116,7 @@ function update(obj, arr) {
   arr.push("new");
 }
 function recordingFinished() {
-  dump(`RecReplaySendAsyncMessage Example__Finished`);
+  console.log("ExampleFinished");
 }
 
 

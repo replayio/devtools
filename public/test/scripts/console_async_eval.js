@@ -33,6 +33,7 @@ Test.describe(`Test global console evaluation in async frames.`, async () => {
       { type: "logPoint", content: ["qux", "1"] },
       { type: "console-api", content: ["baz", "0"] },
       { type: "logPoint", content: ["qux", "0"] },
+      { type: "console-api", content: ["ExampleFinished"] },
     ],
     {
       // ignore error messages, see issue #2056

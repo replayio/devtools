@@ -46,17 +46,17 @@ module.exports = [
     targets: ["gecko"],
   },
   {
+    // This test is pretty darn broken. The sources are different when recording
+    // the example in CI vs. locally
     example: "doc_navigate.html",
     script: "breakpoints-07.js",
-    targets: ["gecko", "chromium"],
-    // This test is the most failing test in our suite. I am not sure why
     pending: true,
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/control_flow.js",
     script: "node_control_flow.js",
     targets: ["node"],
-    pending: true,
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,6 @@ module.exports = [
     example: "doc_rr_objects.html",
     script: "object_preview-02.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
   {
     example: "doc_rr_preview.html",
@@ -254,7 +253,6 @@ module.exports = [
     example: "doc_inspector_styles.html",
     script: "inspector-03.js",
     targets: ["gecko"],
-    pending: true,
   },
   {
     example: "doc_inspector_styles.html",
@@ -306,7 +304,6 @@ module.exports = [
     example: "doc_rr_basic.html",
     script: "settings.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
   {
     example: "doc_rr_worker.html",

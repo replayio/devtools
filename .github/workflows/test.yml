@@ -1,34 +1,19 @@
-# It would be nice if this could be commoned up with deploy.yml
 name: Run test suites
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  build-server:
-    name: Build the Development Server
-    runs-on: macos-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/npm-install
-      - name: Tar up output files
-        run: tar -czf node_modules.tgz node_modules
-      - name: "Create artifact: node_modules"
-        uses: actions/upload-artifact@v2
-        with:
-          name: node_modules
-          path: node_modules.tgz
   download-browser:
     name: Download Replay browser
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: Download
-        run: wget https://static.replay.io/downloads/replay.dmg
+        run: wget https://static.replay.io/downloads/macOS-replay-playwright.tar.xz
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
-          name: replay
-          path: replay.dmg
+          name: macOS-replay-playwright
+          path: macOS-replay-playwright.tar.xz
   download-node:
     name: Download node
     runs-on: ubuntu-latest
@@ -53,129 +38,106 @@ jobs:
         with:
           name: replay-driver
           path: macOS-recordreplay.so
-  test0:
-    name: End-to-end tests (0)
-    runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
-    timeout-minutes: 20
+  preview-branch:
+    name: Wait for Vercel Preview Branch
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
-      - uses: ./.github/actions/test
+      - name: Waiting for 200 from the Vercel Preview
+        uses: patrickedqvist/wait-for-vercel-preview@v1.1.1
+        id: waitFor200
         with:
-          stripe: 0/9
-  test1:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 300
+          check_interval: 10
+      - run: echo ${{steps.waitFor200.outputs.url}}
+    outputs:
+      url: ${{ steps.waitFor200.outputs.url }}
+  test0:
     name: End-to-end tests (1)
     runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
+    needs: [download-browser, download-node, download-driver, preview-branch]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
-        with:
-          stripe: 1/9
-  test2:
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: 1/5
+  test1:
     name: End-to-end tests (2)
     runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
+    needs: [download-browser, download-node, download-driver, preview-branch]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
-        with:
-          stripe: 2/9
-  test3:
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: 2/5
+  test2:
     name: End-to-end tests (3)
     runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
+    needs: [download-browser, download-node, download-driver, preview-branch]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
-        with:
-          stripe: 3/9
-  test4:
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: 3/5
+  test3:
     name: End-to-end tests (4)
     runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
+    needs: [download-browser, download-node, download-driver, preview-branch]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
-        with:
-          stripe: 4/9
-  test5:
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: 4/5
+  test4:
     name: End-to-end tests (5)
     runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
+    needs: [download-browser, download-node, download-driver, preview-branch]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
       - uses: ./.github/actions/test
-        with:
-          stripe: 5/9
-  test6:
-    name: End-to-end tests (6)
-    runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
-      - uses: ./.github/actions/test
-        with:
-          stripe: 6/9
-  test7:
-    name: End-to-end tests (7)
-    runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
-      - uses: ./.github/actions/test
-        with:
-          stripe: 7/9
-  test8:
-    name: End-to-end tests (8)
-    runs-on: macos-latest
-    needs: [build-server, download-browser, download-node, download-driver]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/setup-next
-      - uses: ./.github/actions/test
-        with:
-          stripe: 8/9
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: 5/5
   mock-test:
     name: Mock Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 15
+    needs: [download-browser, preview-branch]
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/npm-install
-      - uses: ./.github/actions/setup-next
+      - uses: actions/download-artifact@v2
       - uses: ./.github/actions/mockTest
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          RECORD_REPLAY_PATH: ./firefox/Nightly.app/Contents/MacOS/firefox
+          DEBUG: pw:browser*
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/npm-install
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+        shell: bash
       - name: Run tests
         run: npm test
