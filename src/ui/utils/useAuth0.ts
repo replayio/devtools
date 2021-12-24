@@ -1,5 +1,6 @@
-import { useAuth0 as useOrigAuth0, Auth0ContextInterface } from "@auth0/auth0-react";
+import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
 import { useGetUserInfo } from "ui/hooks/users";
+import { setAccessTokenInBrowserPrefs } from "./browser";
 import { isTest, isMock } from "./environment";
 import useToken from "./useToken";
 
@@ -39,7 +40,15 @@ export default function useAuth0() {
             email,
           },
       loginWithRedirect: () => {},
-      logout: () => {},
+      logout: (options: LogoutOptions) => {
+        if (window.__IS_RECORD_REPLAY_RUNTIME__) {
+          setAccessTokenInBrowserPrefs(null);
+        }
+        if (options.returnTo) {
+          // Forcing a full page reload in this case to clean up any local state
+          window.location.href = options.returnTo;
+        }
+      },
       getAccessTokenSilently: () => Promise.resolve(),
     };
   }
