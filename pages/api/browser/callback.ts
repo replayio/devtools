@@ -63,7 +63,7 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
       scope: "openid profile offline_access",
       code_verifier: verifier,
       code,
-      redirect_uri: (process.env.VERCEL_URL || "http://localhost:8080") + "/api/browser/callback",
+      redirect_uri: `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/browser/callback`,
     }),
   });
 
