@@ -32,7 +32,7 @@ async function fulfillAuthRequest(id: string, token: string) {
         }
       `,
       variables: {
-        secret: "SERVER SECRET",
+        secret: process.env.FRONTEND_API_SECRET,
         id,
         token,
       },
