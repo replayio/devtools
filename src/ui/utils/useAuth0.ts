@@ -39,15 +39,12 @@ export default function useAuth0() {
             sub: "external-auth",
             email,
           },
-      loginWithRedirect: () => {},
+      loginWithRedirect: auth.loginWithRedirect,
       logout: (options: LogoutOptions) => {
         if (window.__IS_RECORD_REPLAY_RUNTIME__) {
           setAccessTokenInBrowserPrefs(null);
         }
-        if (options.returnTo) {
-          // Forcing a full page reload in this case to clean up any local state
-          window.location.href = options.returnTo;
-        }
+        auth.logout(options);
       },
       getAccessTokenSilently: () => Promise.resolve(),
     };
