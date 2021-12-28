@@ -141,6 +141,21 @@ async function selectSource(url) {
   return waitForSelectedSource(url);
 }
 
+async function addLogpoint(url, line) {
+  const bpCount = dbgSelectors.getBreakpointCount();
+
+  await selectSource(url);
+  await dbg.actions.addLogpoint(getContext(), line);
+
+  await waitUntil(
+    () => {
+      return dbgSelectors.getBreakpointCount() == bpCount + 1;
+    },
+    { waitingFor: "logpoint to be set" }
+  );
+  await ThreadFront.waitForInvalidateCommandsToFinish();
+}
+
 async function addBreakpoint(url, line, column, options) {
   const bpCount = dbgSelectors.getBreakpointCount();
 
@@ -728,7 +743,11 @@ async function checkAppliedRules(expected) {
       const json = getAppliedRulesJSON();
       return JSON.stringify(json) == JSON.stringify(expected);
     },
-    { waitingFor: `applied rules to be: ${expected}` }
+    {
+      waitingFor: `applied rules to be: ${JSON.stringify(expected)}, found: ${JSON.stringify(
+        getAppliedRulesJSON()
+      )}`,
+    }
   );
 }
 
@@ -795,6 +814,7 @@ const testCommands = {
   waitForElapsedTime,
   waitUntil,
   selectSource,
+  addLogpoint,
   addBreakpoint,
   setBreakpointOptions,
   disableBreakpoint,

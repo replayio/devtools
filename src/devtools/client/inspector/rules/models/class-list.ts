@@ -74,11 +74,12 @@ export default class ClassList {
    * since that's the only type this model can work with.)
    */
   get currentNode() {
-    if (
-      this.inspector.selection.isElementNode() &&
-      !this.inspector.selection.isPseudoElementNode()
-    ) {
-      return this.inspector.selection.nodeFront;
+    const selection = this.inspector.selection;
+    if (!selection) {
+      return null;
+    }
+    if (selection.isElementNode() && !selection.isPseudoElementNode()) {
+      return selection.nodeFront;
     }
     return null;
   }

@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { DeclarationValue } from "devtools/client/inspector/rules/components/DeclarationValue";
+const DeclarationValue = require("../../rules/components/DeclarationValue");
 import { DeclarationState } from "../state/rules";
 import classnames from "classnames";
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";

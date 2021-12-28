@@ -16,7 +16,7 @@ import { EventKindKey, getReplayEvent } from "./Event";
 const TIME_WINDOW = 100;
 
 function getPointsForEvent(key: EventKindKey, time: number, points: EventTypePoints) {
-  const eventPoints = points[key];
+  const eventPoints = points[key] || [];
   return eventPoints.filter((p: any) => Math.abs(time - p.time) < TIME_WINDOW / 2);
 }
 

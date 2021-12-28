@@ -7,7 +7,7 @@
 import { prepareSourcePayload, createFrame } from "./create";
 import { clientEvents } from "./events";
 
-import Reps from "devtools-reps";
+import Reps from "devtools/packages/devtools-reps";
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { fetchEventTypePoints } = require("protocol/logpoint");
@@ -119,23 +119,30 @@ function setBreakpoint(location, options) {
   options = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options };
 
-  const { condition, logValue, logGroupId } = options;
+  const { condition, logValue, logGroupId, shouldPause } = options;
   const { line, column, sourceUrl, sourceId } = location;
   const promises = [];
+
   if (sourceId) {
-    promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
+    if (shouldPause) {
+      promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
+    }
     if (logValue) {
       promises.push(setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition));
     }
   } else {
-    promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
+    if (shouldPause) {
+      promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
+    }
     if (logValue) {
       promises.push(setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition));
     }
   }
+
   return Promise.all(promises);
 }
 
+// jvv
 function removeBreakpoint(location) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];

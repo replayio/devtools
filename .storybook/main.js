@@ -19,8 +19,6 @@ module.exports = {
   webpackFinal: async (config, { configType }) => {
     config.resolve.modules = [
       "src",
-      "src/devtools/client/debugger/dist",
-      "src/devtools/client/debugger/packages",
       "src/devtools/client/shared/vendor",
       ...config.resolve.modules,
     ];

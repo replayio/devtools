@@ -4,12 +4,12 @@
 
 //
 
-import { objectInspector } from "devtools-reps";
+import { objectInspector } from "devtools/packages/devtools-reps";
 import { getBindingVariables } from "./getVariables";
 import { getFramePopVariables, getThisVariable } from "./utils";
 import { simplifyDisplayName } from "../../pause/frames";
 
-import { ThreadFront, createElementsFront } from "protocol/thread";
+import { createElementsFront } from "protocol/thread";
 
 const {
   utils: {

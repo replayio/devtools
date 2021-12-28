@@ -4,7 +4,7 @@ import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
-import { getInitialAppState, getTheme, getWorkspaceId } from "ui/reducers/app";
+import { getTheme, getWorkspaceId, initialAppState } from "ui/reducers/app";
 import { setWorkspaceId } from "ui/actions/app";
 import tokenManager from "ui/utils/tokenManager";
 import { bootIntercom } from "ui/utils/intercom";
@@ -13,6 +13,7 @@ import { getUserInfo } from "ui/hooks/users";
 import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
+import { getInitialLayoutState } from "ui/reducers/layout";
 
 declare global {
   interface Window {
@@ -26,7 +27,8 @@ export type AppDispatch = typeof store.dispatch;
 
 export async function bootstrapApp() {
   const initialState = {
-    app: await getInitialAppState(),
+    app: initialAppState,
+    layout: await getInitialLayoutState(),
   };
 
   const store = bootstrapStore(initialState);
@@ -34,7 +36,6 @@ export async function bootstrapApp() {
   if (typeof window === "undefined") return store;
 
   setupTelemetry();
-
   setupDOMHelpers();
 
   window.store = store;

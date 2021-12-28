@@ -9,11 +9,13 @@
  * @module reducers/ui
  */
 
-import { prefs, features } from "../utils/prefs";
+import { prefs } from "../utils/prefs";
 
 export const createUIState = () => ({
   selectedPrimaryPaneTab: "sources",
   activeSearch: null,
+  fullTextSearchQuery: "",
+  fullTextSearchFocus: false,
   shownSource: null,
   startPanelCollapsed: prefs.startPanelCollapsed,
   endPanelCollapsed: prefs.endPanelCollapsed,
@@ -71,6 +73,14 @@ function update(state = createUIState(), action) {
     case "SET_PRIMARY_PANE_TAB":
       return { ...state, selectedPrimaryPaneTab: action.tabName };
 
+    case "SET_FULLTEXT_SEARCH": {
+      return { ...state, fullTextSearchQuery: action.query };
+    }
+
+    case "FOCUS_FULLTEXT_SEARCH": {
+      return { ...state, fullTextSearchFocus: action.focus };
+    }
+
     case "CLOSE_PROJECT_SEARCH": {
       if (state.activeSearch === "project") {
         return { ...state, activeSearch: null };
@@ -96,47 +106,17 @@ function update(state = createUIState(), action) {
   }
 }
 
-// NOTE: we'd like to have the app state fully typed
-// https://github.com/firefox-devtools/debugger/blob/master/src/reducers/sources.js#L179-L185
-
-export function getSelectedPrimaryPaneTab(state) {
-  return state.ui.selectedPrimaryPaneTab;
-}
-
-export function getActiveSearch(state) {
-  return state.ui.activeSearch;
-}
-
-export function getFrameworkGroupingState(state) {
-  return state.ui.frameworkGroupingOn;
-}
-
-export function getShownSource(state) {
-  return state.ui.shownSource;
-}
-
-export function getPaneCollapse(state) {
-  return state.ui.startPanelCollapsed;
-}
-
-export function getSourcesCollapsed(state) {
-  return state.ui.sourcesCollapsed;
-}
-
-export function getHighlightedLineRange(state) {
-  return state.ui.highlightedLineRange;
-}
-
-export function getOrientation(state) {
-  return state.ui.orientation;
-}
-
-export function getViewport(state) {
-  return state.ui.viewport;
-}
-
-export function getCursorPosition(state) {
-  return state.ui.cursorPosition;
-}
+export const getSelectedPrimaryPaneTab = state => state.ui.selectedPrimaryPaneTab;
+export const getActiveSearch = state => state.ui.activeSearch;
+export const getFrameworkGroupingState = state => state.ui.frameworkGroupingOn;
+export const getShownSource = state => state.ui.shownSource;
+export const getPaneCollapse = state => state.ui.startPanelCollapsed;
+export const getSourcesCollapsed = state => state.ui.sourcesCollapsed;
+export const getHighlightedLineRange = state => state.ui.highlightedLineRange;
+export const getOrientation = state => state.ui.orientation;
+export const getViewport = state => state.ui.viewport;
+export const getCursorPosition = state => state.ui.cursorPosition;
+export const getFullTextSearchQuery = state => state.ui.fullTextSearchQuery;
+export const getFullTextSearchFocus = state => state.ui.fullTextSearchFocus;
 
 export default update;

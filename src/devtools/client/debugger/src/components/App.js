@@ -23,11 +23,12 @@ import {
   getSelectedSource,
 } from "../selectors";
 
-import { getSelectedPanel, getShowEditor } from "ui/reducers/app.ts";
+import { getSelectedPanel } from "ui/reducers/app";
+import { getShowEditor } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import Services from "devtools-services";
+import Services from "devtools/shared/services";
 
 const globalShortcuts = new KeyShortcuts({ window, target: document });
 
@@ -241,7 +242,7 @@ class Debugger extends Component {
           endPanel={this.renderEndPane()}
           initialSize={prefs.sidePanelSize}
           maxSize={this.props.showEditor ? "80%" : "100%"}
-          minSize={this.props.showEditor ? "240px" : "100%"}
+          minSize={this.props.showEditor ? "200px" : "100%"}
           onControlledPanelResized={onResize}
           splitterSize={8}
           style={{ width: "100%", overflow: "hidden" }}

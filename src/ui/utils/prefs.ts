@@ -1,7 +1,7 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
-import { pref } from "devtools-services";
+import { pref } from "devtools/shared/services";
 
 // app prefs.
 pref("devtools.split-console", false);
@@ -9,7 +9,7 @@ pref("devtools.selected-panel", "console");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
-pref("devtools.toolbox-height", "50%");
+pref("devtools.toolbox-size", "50%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
 pref("devtools.sidePanelSize", "240px");
@@ -42,12 +42,11 @@ pref("devtools.features.widgetHover", false);
 pref("devtools.features.commentAttachments", false);
 
 export const prefs = new PrefsHelper("devtools", {
-  splitConsole: ["Bool", "split-console"],
   selectedPanel: ["String", "selected-panel"],
   user: ["Json", "user"],
   recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
-  toolboxHeight: ["String", "toolbox-height"],
+  toolboxSize: ["String", "toolbox-size"],
   viewMode: ["String", "view-mode"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],

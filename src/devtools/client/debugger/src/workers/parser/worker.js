@@ -9,7 +9,7 @@ import { clearASTs } from "./utils/ast";
 import { setSource, clearSources } from "./sources";
 import { hasSyntaxError } from "./validate";
 
-import { workerHandler } from "devtools-utils/src/worker-utils";
+import { workerHandler } from "devtools/shared/worker-utils";
 
 function clearState() {
   clearASTs();

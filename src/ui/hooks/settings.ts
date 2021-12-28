@@ -1,4 +1,4 @@
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { mutate, query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
@@ -7,7 +7,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import type { UserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 import { features } from "ui/utils/prefs";
-import { prefs as prefsService } from "devtools-services";
+import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
 
 const emptySettings: UserSettings = {
@@ -80,7 +80,7 @@ export const useFeature = (prefKey: keyof typeof features) => {
     };
 
     prefsService.addObserver(fullKey, onUpdate, false);
-    return () => prefsService.removeObserver(fullKey, onUpdate, false);
+    return () => prefsService.removeObserver(fullKey, onUpdate);
   }, [fullKey]);
 
   return pref;

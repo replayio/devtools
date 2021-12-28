@@ -20,6 +20,7 @@ import ElementNode from "./ElementNode";
 import ReadOnlyNode from "./ReadOnlyNode";
 import TextNode from "./TextNode";
 import EventTooltip from "./EventTooltip";
+import classnames from "classnames";
 
 interface NodeProps {
   nodeId: string;
@@ -178,12 +179,11 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
 
     return (
       <li
-        className={
-          "child" +
-          (!node.isExpanded || node.isInlineTextChild ? " collapsed" : "") +
-          (!node.isDisplayed ? " not-displayed" : "") +
-          (showExpander ? " expandable" : "")
-        }
+        className={classnames("child", {
+          collapsed: !node.isExpanded || node.isInlineTextChild,
+          "not-displayed": !node.isDisplayed,
+          expandable: showExpander,
+        })}
         role="presentation"
         onClick={this.onSelectNodeClick}
       >

@@ -1,6 +1,6 @@
 import { SessionId } from "@recordreplay/protocol";
 import mixpanel, { Dict } from "mixpanel-browser";
-import { ViewMode } from "ui/state/app";
+import { ViewMode } from "ui/state/layout";
 import { getRecordingId, isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";

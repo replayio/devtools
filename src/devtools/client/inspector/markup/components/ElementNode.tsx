@@ -10,12 +10,10 @@ const { HTML_VOID_ELEMENTS } = require("../constants");
 // Contains only valid computed display property types of the node to display in the
 // element markup and their respective title tooltip text.
 const DISPLAY_TYPES: { [key: string]: string | undefined } = {
-  flex:
-    "This element behaves like a block element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
+  flex: "This element behaves like a block element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
   "inline-flex":
     "This element behaves like an inline element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
-  grid:
-    "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
+  grid: "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
   "inline-grid":
     "This element behaves like an inline element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
   subgrid:

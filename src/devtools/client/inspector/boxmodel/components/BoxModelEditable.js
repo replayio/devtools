@@ -4,7 +4,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");

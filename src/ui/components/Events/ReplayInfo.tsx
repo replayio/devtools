@@ -2,16 +2,14 @@ import React, { ReactNode } from "react";
 import hooks from "ui/hooks";
 import { OperationsData } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
-import { getRecordingId } from "ui/utils/environment";
+import { getDisplayedUrl, getRecordingId } from "ui/utils/environment";
 import { AvatarImage } from "../Avatar";
 import MaterialIcon from "../shared/MaterialIcon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
-import Spinner from "../shared/Spinner";
+import { showDurationWarning } from "ui/utils/recording";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
   const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
@@ -53,11 +51,27 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <div>{summary}</div>
         </Row>
+        <Row>
+          <MaterialIcon iconSize="xl">language</MaterialIcon>
+          <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
+            {getDisplayedUrl(recording.url)}
+          </div>
+        </Row>
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
+        {showDurationWarning(recording) ? <WarningRow /> : null}
       </div>
     </div>
+  );
+}
+
+function WarningRow() {
+  return (
+    <Row>
+      <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+      <div>This replay is over two minutes, which can cause delays</div>
+    </Row>
   );
 }
 

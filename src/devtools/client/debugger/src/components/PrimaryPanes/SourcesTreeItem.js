@@ -7,7 +7,7 @@
 import React, { Component } from "react";
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
-import { showMenu } from "devtools-contextmenu";
+import { showMenu } from "devtools/shared/contextmenu";
 
 import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
@@ -198,14 +198,8 @@ class SourceTreeItem extends Component {
   }
 
   render() {
-    const {
-      item,
-      depth,
-      source,
-      focused,
-      hasMatchingGeneratedSource,
-      hasSiblingOfSameName,
-    } = this.props;
+    const { item, depth, source, focused, hasMatchingGeneratedSource, hasSiblingOfSameName } =
+      this.props;
 
     const suffix = null;
 

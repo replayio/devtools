@@ -18,6 +18,8 @@ const {
   updateHoveredLineNumber,
 } = require("devtools/client/debugger/src/actions/breakpoints/index");
 
+export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
+
 type LineNumberTooltipProps = PropsFromRedux & { editor: any };
 
 function LineNumberTooltip({
@@ -29,15 +31,15 @@ function LineNumberTooltip({
   updateHoveredLineNumber,
 }: LineNumberTooltipProps) {
   const { nags } = hooks.useGetUserInfo();
-  const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
+  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
 
   const setHoveredLineNumber = ({
-    lineNumberNode: targetNode,
     lineNumber,
+    lineNode,
   }: {
-    lineNumberNode: HTMLElement;
     lineNumber: number;
+    lineNode: HTMLElement;
   }) => {
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
@@ -53,10 +55,10 @@ function LineNumberTooltip({
     }
 
     updateHoveredLineNumber(lineNumber);
-    setLineNumberNode(targetNode);
+    setTargetNode(lineNode);
   };
   const clearHoveredLineNumber = () => {
-    setLineNumberNode(null);
+    setTargetNode(null);
     setHoveredLineNumberLocation(null);
   };
 
@@ -78,16 +80,13 @@ function LineNumberTooltip({
 
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
-  if (!lineNumberNode) {
+  if (!targetNode) {
     return null;
   }
 
   if (!indexed) {
     return (
-      <StaticTooltip
-        targetNode={lineNumberNode}
-        className={classNames({ "awesome-tooltip": showNag })}
-      >
+      <StaticTooltip targetNode={targetNode} className={classNames({ "awesome-tooltip": showNag })}>
         <AwesomeTooltip isAwesome={showNag}>Indexing</AwesomeTooltip>
       </StaticTooltip>
     );
@@ -97,17 +96,14 @@ function LineNumberTooltip({
   // to be generated.
   if (!analysisPoints) {
     return (
-      <StaticTooltip
-        targetNode={lineNumberNode}
-        className={classNames({ "awesome-tooltip": showNag })}
-      >
+      <StaticTooltip targetNode={targetNode} className={classNames({ "awesome-tooltip": showNag })}>
         <AwesomeTooltip isAwesome={showNag}>Loading…</AwesomeTooltip>
       </StaticTooltip>
     );
   }
 
   if (analysisPoints === "error") {
-    return <StaticTooltip targetNode={lineNumberNode}>Failed</StaticTooltip>;
+    return <StaticTooltip targetNode={targetNode}>Failed</StaticTooltip>;
   }
 
   const points = analysisPoints.length;
@@ -116,10 +112,10 @@ function LineNumberTooltip({
   if (showNag) {
     return (
       <StaticTooltip
-        targetNode={lineNumberNode}
+        targetNode={targetNode}
         className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
       >
-        <AwesomeTooltip isAwesome={showNag}>
+        <AwesomeTooltip isAwesome={true}>
           <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
           <div className="text-xs flex flex-col">
             <div>{`This line was hit ${points} time${points == 1 ? "" : "s"}`}</div>
@@ -132,7 +128,7 @@ function LineNumberTooltip({
 
   return (
     <StaticTooltip
-      targetNode={lineNumberNode}
+      targetNode={targetNode}
       className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
     >
       <>
@@ -152,8 +148,7 @@ function AwesomeTooltip({ children, isAwesome }: { children: ReactNode; isAwesom
     <div
       className="bg-secondaryAccent text-white py-1 px-2 flex space-x-2 items-center leading-tight rounded-md text-left"
       style={{
-        background:
-          "linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF",
+        background: AWESOME_BACKGROUND,
       }}
     >
       {children}
