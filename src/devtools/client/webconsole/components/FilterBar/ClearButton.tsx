@@ -14,12 +14,11 @@ type Message = {
 
 const getIsEnabled = (messages: Map<string, Message>) => {
   const evalTypes = [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT];
-  return [...messages].find(([id, message]) => evalTypes.includes(message.type));
+  return [...messages].find(([_, message]) => evalTypes.includes(message.type));
 };
 
 function ClearButton(props: PropsFromRedux) {
   const { messagesClearEvaluations, allMessagesById } = props;
-  console.log(props);
   const isEnabled = getIsEnabled(allMessagesById);
 
   const onClick = () => {
