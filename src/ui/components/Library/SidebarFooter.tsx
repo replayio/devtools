@@ -1,12 +1,11 @@
 import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { AvatarImage } from "../Avatar";
+import { useGetUserInfo } from "ui/hooks/users";
 
 function SidebarFooter({ setModal }: PropsFromRedux) {
-  const { user } = useAuth0();
-  const { name, picture } = user || { name: "", picture: "" };
+  const { name, picture } = useGetUserInfo();
 
   const handleSettingsClick = () => {
     setModal("settings");

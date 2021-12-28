@@ -40,6 +40,8 @@ export function useUserIsAuthor() {
 export type UserInfo = {
   motd: string | null;
   acceptedTOSVersion: number | null;
+  name: string;
+  picture: string;
   email: string;
   id: string;
   internal: boolean;
@@ -86,6 +88,8 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
     return undefined;
   }
   return {
+    name: viewer.user.name,
+    picture: viewer.user.picture,
     motd: viewer.motd,
     acceptedTOSVersion: viewer.acceptedTOSVersion,
     email: viewer.email,
@@ -105,6 +109,8 @@ export function useGetUserInfo(): UserInfo & { loading: boolean } {
   }
 
   const id: string = data?.viewer?.user.id;
+  const picture: string = data?.viewer?.user.picture;
+  const name: string = data?.viewer?.user.name;
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
@@ -117,6 +123,8 @@ export function useGetUserInfo(): UserInfo & { loading: boolean } {
     loading,
     id,
     email,
+    picture,
+    name,
     internal,
     nags,
     acceptedTOSVersion,
