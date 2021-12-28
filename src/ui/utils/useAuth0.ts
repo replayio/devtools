@@ -40,7 +40,7 @@ export default function useAuth0() {
             email,
           },
       loginWithRedirect: auth.loginWithRedirect,
-      logout: (options: LogoutOptions) => {
+      logout: (options?: LogoutOptions) => {
         if (window.__IS_RECORD_REPLAY_RUNTIME__) {
           setAccessTokenInBrowserPrefs(null);
         }
