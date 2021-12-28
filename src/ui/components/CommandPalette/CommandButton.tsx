@@ -1,5 +1,5 @@
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { Command } from "./CommandPalette";
@@ -7,6 +7,7 @@ import { Command } from "./CommandPalette";
 type CommandButtonProps = PropsFromRedux & { command: Command; active: boolean };
 
 function CommandButton({ command, executeCommand, active }: CommandButtonProps) {
+  const buttonNode = useRef<HTMLButtonElement | null>(null);
   const { label, shortcut, key } = command;
   const onClick = () => {
     executeCommand(key);
@@ -14,11 +15,18 @@ function CommandButton({ command, executeCommand, active }: CommandButtonProps) 
 
   const bgColors = active ? "bg-primaryAccent text-white" : "hover:bg-gray-200";
 
+  useEffect(() => {
+    if (active && buttonNode.current) {
+      buttonNode.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [active]);
+
   return (
     <button
       key={label}
       onClick={onClick}
       className={`${bgColors} px-4 py-1 flex  justify-between transition`}
+      ref={buttonNode}
     >
       <div>{label}</div>
       {shortcut ? (
