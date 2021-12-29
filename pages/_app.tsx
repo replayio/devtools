@@ -72,6 +72,7 @@ import "devtools/client/debugger/src/utils/editor/source-editor.css";
 import "devtools/client/inspector/components/InspectorTabPanel.css";
 import "devtools/client/inspector/markup/components/EventTooltip.css";
 import "devtools/client/shared/components/Accordion.css";
+import "devtools/client/shared/components/NewAccordion/Accordion.css";
 import "devtools/client/shared/components/menu/MenuList.css";
 import "devtools/client/shared/components/SidebarToggle.css";
 import "devtools/client/shared/components/splitter/SplitBox.css";
