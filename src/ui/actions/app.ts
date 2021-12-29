@@ -28,7 +28,7 @@ import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import { isTest } from "ui/utils/environment";
+import { getRecordingId, isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import { asyncStore } from "ui/utils/prefs";
 import {
@@ -369,6 +369,8 @@ export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAct
 
 export function executeCommand(key: CommandKey): UIThunkAction {
   return ({ dispatch }) => {
+    const recordingId = getRecordingId();
+
     if (key === "open_viewer") {
       dispatch(setViewMode("non-dev"));
     } else if (key === "open_devtools") {
@@ -385,10 +387,11 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_console") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
+      window.jsterm.focus();
     } else if (key === "show_privacy") {
       dispatch(setModal("privacy"));
     } else if (key === "show_sharing") {
-      dispatch(setModal("sharing"));
+      dispatch(setModal("sharing", { recordingId }));
     }
 
     dispatch(hideCommandPalette());
