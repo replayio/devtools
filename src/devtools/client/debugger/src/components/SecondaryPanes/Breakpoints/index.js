@@ -44,8 +44,8 @@ class Breakpoints extends Component {
 
     if (!breakpointSources.length) {
       return (
-        <div className="p-3 space-y-3 text-gray-500 text-xs whitespace-normal bg-gray-50 rounded-lg mx-2 mb-2 text-center">
-          <p>{emptyContent}</p>
+        <div className="p-3 space-y-3 text-gray-500 text-xs whitespace-normal bg-gray-50 rounded-lg mx-2 mt-2 mb-4 text-center">
+          {emptyContent}
         </div>
       );
     }
