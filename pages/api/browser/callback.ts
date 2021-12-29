@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 interface Token {
   access_token: string;
@@ -101,8 +102,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.redirect("/browser/auth");
   } catch (e: any) {
+    console.error(e);
+
+    pingTelemetry("devtools-api-browser-callback", { error: e.message });
+
     res.statusCode = 500;
-    res.statusMessage = e.message;
     res.send("");
   }
 };
