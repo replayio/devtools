@@ -2,6 +2,8 @@ import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
+const getAppUrl = (path: string) =>
+  `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
 
 async function initAuthRequest(key: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;
@@ -52,7 +54,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
-    const redirectUri = `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/browser/callback`;
+    const redirectUri = getAppUrl("/api/browser/callback");
     const { id, challenge, serverKey } = await initAuthRequest(key);
     const url = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid profile offline_access&state=${id}&audience=https://api.replay.io`;
 
