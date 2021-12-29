@@ -1,4 +1,3 @@
-import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 interface Token {
@@ -10,6 +9,8 @@ interface Token {
 }
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
+const getAppUrl = (path: string) =>
+  `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
 
 async function fulfillAuthRequest(id: string, token: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;
@@ -63,7 +64,7 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
       scope: "openid profile offline_access",
       code_verifier: verifier,
       code,
-      redirect_uri: `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/browser/callback`,
+      redirect_uri: getAppUrl("/api/browser/callback"),
     }),
   });
 
