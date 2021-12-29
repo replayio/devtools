@@ -1,5 +1,6 @@
-import { useAuth0 as useOrigAuth0, Auth0ContextInterface } from "@auth0/auth0-react";
+import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
 import { useGetUserInfo } from "ui/hooks/users";
+import { setAccessTokenInBrowserPrefs } from "./browser";
 import { isTest, isMock } from "./environment";
 import useToken from "./useToken";
 
@@ -26,20 +27,25 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
 export default function useAuth0() {
   const auth = useOrigAuth0();
   const { loading, email } = useGetUserInfo();
-  const { token, apiKey } = useToken();
+  const { token, external } = useToken();
 
-  if (apiKey && token) {
+  if (external && token) {
     return {
       isLoading: loading,
       isAuthenticated: true,
       user: loading
         ? undefined
         : {
-            sub: "api-key",
+            sub: "external-auth",
             email,
           },
-      loginWithRedirect: () => {},
-      logout: () => {},
+      loginWithRedirect: auth.loginWithRedirect,
+      logout: (options?: LogoutOptions) => {
+        if (window.__IS_RECORD_REPLAY_RUNTIME__) {
+          setAccessTokenInBrowserPrefs(null);
+        }
+        auth.logout(options);
+      },
       getAccessTokenSilently: () => Promise.resolve(),
     };
   }

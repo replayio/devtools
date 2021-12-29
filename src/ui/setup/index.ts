@@ -51,7 +51,9 @@ export async function bootstrapApp() {
       return;
     }
 
-    setAccessTokenInBrowserPrefs(typeof tokenState.token === "string" ? tokenState.token : null);
+    if (typeof tokenState.token === "string") {
+      setAccessTokenInBrowserPrefs(tokenState.token);
+    }
 
     const auth0User = tokenManager.auth0Client?.user;
     setUserInBrowserPrefs(auth0User);
