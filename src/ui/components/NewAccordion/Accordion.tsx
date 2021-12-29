@@ -65,6 +65,33 @@ const embiggenSection = (index: number, creases: CreasesState, collapsed: Collap
   return newCreases;
 };
 
+function maybeRedistributeSpace(
+  index: number,
+  collapsed: CollapsedState,
+  newCreases: CreasesState
+) {
+  let adjustedCreases = [...newCreases];
+  const lastExpandedIndex = collapsed.lastIndexOf(false);
+  const firstExpandedIndex = collapsed.indexOf(false);
+
+  // Collapsing a section frees up vertical space in the accordion. This puts in
+  // some logic to figure out which section should be free to take the new space.
+  // The specific heuristics are lifted from VSCode's accordion.
+  if (lastExpandedIndex !== index) {
+    // If there's one (or many) expanded sections after the just-collapsed section,
+    // this attempts to preserve the height of expanded sections closest to the
+    // just-collapsed section by only embiggening the very last expanded section.
+    adjustedCreases = embiggenSection(lastExpandedIndex, newCreases, collapsed);
+  } else if (firstExpandedIndex !== index) {
+    // If there's one (or many) expanded sections before the just-collapsed section,
+    // this attempts to preserve the height of expanded sections closest to the
+    // just-collapsed section by only embiggening the very first expanded section.
+    adjustedCreases = embiggenSection(firstExpandedIndex, newCreases, collapsed);
+  }
+
+  return adjustedCreases;
+}
+
 function Section({
   children,
   collapsed,
@@ -93,36 +120,6 @@ function Section({
   );
 }
 
-// Yeah there are two collapsed arguments. Something something stale props. This shouldn't
-// look like this but I'm hungry so I'll refactor it later.
-function maybeRedistributeSpace(
-  index: number,
-  collapsed: CollapsedState,
-  newCollapsed: CollapsedState,
-  newCreases: CreasesState
-) {
-  let adjustedCreases = [...newCreases];
-  const lastExpandedIndex = collapsed.lastIndexOf(false);
-  const firstExpandedIndex = collapsed.indexOf(false);
-
-  // Collapsing a section frees up vertical space in the accordion. This puts in
-  // some logic to figure out which section should be free to take the new space.
-  // The specific heuristics are lifted from VSCode's accordion.
-  if (lastExpandedIndex !== index) {
-    // If there's one (or many) expanded sections after the just-collapsed section,
-    // this attempts to preserve the height of expanded sections closest to the
-    // just-collapsed section by only embiggening the very last expanded section.
-    adjustedCreases = embiggenSection(lastExpandedIndex, newCreases, newCollapsed);
-  } else if (firstExpandedIndex !== index) {
-    // If there's one (or many) expanded sections before the just-collapsed section,
-    // this attempts to preserve the height of expanded sections closest to the
-    // just-collapsed section by only embiggening the very first expanded section.
-    adjustedCreases = embiggenSection(firstExpandedIndex, newCreases, newCollapsed);
-  }
-
-  return adjustedCreases;
-}
-
 export default function Accordion({ items }: any) {
   // This is fine for prototyping but there's a cleaner way to do this.
   const [collapsed, setCollapsed] = useState<CollapsedState>(new Array(items.length).fill(true));
@@ -135,7 +132,7 @@ export default function Accordion({ items }: any) {
   const collapseSection = (index: number, newCollapsed: CollapsedState) => {
     let newCreases = [...creases];
     newCreases[index] = HEADER_HEIGHT;
-    newCreases = maybeRedistributeSpace(index, collapsed, newCollapsed, newCreases);
+    newCreases = maybeRedistributeSpace(index, newCollapsed, newCreases);
 
     setCreases(newCreases);
   };
