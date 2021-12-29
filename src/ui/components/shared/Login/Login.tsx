@@ -20,6 +20,10 @@ export default function Login() {
     return null;
   }
 
+  useEffect(() => {
+    setUserInBrowserPrefs(null);
+  }, []);
+
   return (
     <OnboardingModalContainer theme="light">
       <OnboardingContentWrapper overlay>
