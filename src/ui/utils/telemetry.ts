@@ -4,6 +4,7 @@ import { skipTelemetry } from "./environment";
 import { Recording, Workspace } from "ui/types";
 import { prefs } from "./prefs";
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
+import { pingTelemetry } from "./replay-telemetry";
 
 const timings: Record<string, number> = {};
 
@@ -75,20 +76,7 @@ export async function sendTelemetryEvent(event: string, tags: any = {}) {
     return;
   }
 
-  try {
-    const response = await fetch("https://telemetry.replay.io/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ event, ...tags, user: telemetryUser }),
-    });
-    if (!response.ok) {
-      console.error(`Sent telemetry event ${event} but got status code ${response.status}`);
-    }
-  } catch (e) {
-    console.error(`Couldn't send telemetry event ${event}`, e);
-  }
+  pingTelemetry(event, { ...tags, user: telemetryUser });
 }
 
 export function trackTiming(event: string, properties: any = {}) {

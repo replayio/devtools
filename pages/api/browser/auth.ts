@@ -1,5 +1,6 @@
 import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
 const getAppUrl = (path: string) =>
@@ -46,7 +47,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const key = getQueryValue(req.query.key);
   if (!key) {
     res.statusCode = 400;
-    res.statusMessage = "Missing key parameter";
+    res.statusMessage = "Missing parameter";
     res.send("");
 
     return;
@@ -69,8 +70,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     );
     res.redirect(url);
   } catch (e: any) {
+    console.error(e);
+
+    pingTelemetry("devtools-api-browser-auth", { error: e.message });
+
     res.statusCode = 500;
-    res.statusMessage = e.message;
     res.send("");
   }
 };
