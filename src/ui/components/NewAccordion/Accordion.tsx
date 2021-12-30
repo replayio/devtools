@@ -22,8 +22,19 @@ const MIN_HEIGHT = 150;
 // that functions as the resize handle.
 const HEADER_HEIGHT = 24 + 1;
 
-const getLastExpandedIndex = (collapsed: CollapsedState) => collapsed.lastIndexOf(false);
-const getFirstExpandedIndex = (collapsed: CollapsedState) => collapsed.indexOf(false);
+const getLastExpandedIndex = (collapsed: CollapsedState, endIndex?: number) => {
+  return collapsed.slice(0, endIndex).lastIndexOf(false);
+};
+const getFirstExpandedIndex = (collapsed: CollapsedState, startIndex: number = 0) => {
+  const segment = collapsed.slice(startIndex);
+  const index = segment.indexOf(false);
+
+  return index > -1 ? startIndex + index : index;
+};
+const getClosestPrecedingExpandedIndex = (collapsed: CollapsedState, index: number) => {
+  return collapsed.slice(0, index).lastIndexOf(false);
+};
+
 const getSpaceBefore = (index: number, creases: CreasesState) => {
   return creases.slice(0, index).reduce((a, b) => a + b, 0) || 0;
 };
@@ -59,15 +70,17 @@ const embiggenSection = (index: number, creases: CreasesState, collapsed: Collap
   newCreases = newCreases.map((c, i) => {
     if (i <= index) return c;
     const isCollapsed = collapsed[i];
-    return isCollapsed ? HEADER_HEIGHT : MIN_HEIGHT;
+    return isCollapsed ? HEADER_HEIGHT : Math.min(MIN_HEIGHT, c);
   });
 
   // Adjust the sections BEFORE this index.
   newCreases = newCreases.map((c, i) => {
     if (i >= index) return c;
     const isCollapsed = collapsed[i];
-    return isCollapsed ? HEADER_HEIGHT : MIN_HEIGHT;
+    return isCollapsed ? HEADER_HEIGHT : Math.min(MIN_HEIGHT, c);
   });
+
+  console.log({ newCreases, creases });
 
   // Now that sections before and after are properly positioned,
   // distribute the remaining space to the selected section.
@@ -85,6 +98,7 @@ function maybeRedistributeSpace(
   let adjustedCreases = [...newCreases];
   const lastExpandedIndex = getLastExpandedIndex(collapsed);
   const firstExpandedIndex = getFirstExpandedIndex(collapsed);
+  const closestPrecedingExpandedIndex = getClosestPrecedingExpandedIndex(collapsed, index);
 
   // Collapsing a section frees up vertical space in the accordion. This puts in
   // some logic to figure out which section should be free to take the new space.
@@ -94,11 +108,11 @@ function maybeRedistributeSpace(
     // this attempts to preserve the height of expanded sections closest to the
     // just-collapsed section by only embiggening the very last expanded section.
     adjustedCreases = embiggenSection(lastExpandedIndex, newCreases, collapsed);
-  } else if (firstExpandedIndex !== index) {
+  } else if (closestPrecedingExpandedIndex !== index) {
     // If there's one (or many) expanded sections before the just-collapsed section,
     // this attempts to preserve the height of expanded sections closest to the
     // just-collapsed section by only embiggening the very first expanded section.
-    adjustedCreases = embiggenSection(firstExpandedIndex, newCreases, collapsed);
+    adjustedCreases = embiggenSection(closestPrecedingExpandedIndex, newCreases, collapsed);
   }
 
   return adjustedCreases;
@@ -171,6 +185,7 @@ export default function Accordion({ items }: any) {
     index: number;
     initialY: number;
     originalHeight: number;
+    originalCreases: CreasesState;
   } | null>(null);
 
   const expandSection = (index: number, newCollapsed: CollapsedState) => {
@@ -206,15 +221,67 @@ export default function Accordion({ items }: any) {
       index,
       initialY: e.screenY,
       originalHeight: creases[index],
+      originalCreases: creases,
     });
   };
   const onResize = (e: React.MouseEvent) => {
     if (!resizingParams) return;
-    const { index, initialY, originalHeight } = resizingParams;
+
+    const { index, initialY, originalHeight, originalCreases } = resizingParams;
 
     const newCreases = [...creases];
-    const delta = e.screenY - initialY;
-    newCreases[index] = originalHeight + delta;
+    const originalDelta = e.screenY - initialY;
+    let remainingDelta = originalDelta;
+
+    // if delta is positive, we're squeezing the proceeding sections.
+    // need to make sure we're allowed to in the first place, and as we
+    // make the selected section smaller, that we embiggen the preceding
+    // sections accordingly.
+    if (remainingDelta > 0) {
+      let nextIndex = getLastExpandedIndex(collapsed);
+
+      // Walk back from the last expanded index until you reach the current index.
+      while (nextIndex > 0 && nextIndex > index) {
+        const originalCrease = originalCreases[nextIndex];
+        const receivableDelta = Math.min(originalCrease - MIN_HEIGHT, remainingDelta);
+
+        if (receivableDelta) {
+          newCreases[nextIndex] = originalCreases[nextIndex] - receivableDelta;
+          remainingDelta -= receivableDelta;
+        }
+
+        nextIndex = getLastExpandedIndex(collapsed, nextIndex);
+      }
+
+      newCreases[index] = originalHeight + originalDelta - remainingDelta;
+    } else if (remainingDelta < 0) {
+      // if delta is negative, we're squeezing the preceding sections.
+      // need to make sure we're allowed to in the first place. The selected
+      // section will get larger, and we need to embiggen the proceeding sections
+      // accordingly.
+      let nextIndex = getFirstExpandedIndex(collapsed);
+
+      // Walk forward from the first expanded index until you reach the current index.
+      while (nextIndex >= 0 && nextIndex <= index) {
+        const originalCrease = originalCreases[nextIndex];
+        const receivableDelta = Math.max(MIN_HEIGHT - originalCrease, remainingDelta);
+
+        if (receivableDelta) {
+          newCreases[nextIndex] = originalCreases[nextIndex] + receivableDelta;
+          remainingDelta -= receivableDelta;
+        }
+
+        nextIndex = getFirstExpandedIndex(collapsed, nextIndex + 1);
+      }
+
+      const lastExpandedIndex = getLastExpandedIndex(collapsed);
+      // Because there's extra space after the current index, we need to
+      // redistribute it to the last expanded index.
+      if (lastExpandedIndex !== index) {
+        newCreases[lastExpandedIndex] =
+          originalCreases[lastExpandedIndex] - (originalDelta - remainingDelta);
+      }
+    }
 
     setCreases(newCreases);
   };
