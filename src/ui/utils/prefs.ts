@@ -1,7 +1,7 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
-import { pref } from "devtools-services";
+import { pref } from "devtools/shared/services";
 
 // app prefs.
 pref("devtools.split-console", false);

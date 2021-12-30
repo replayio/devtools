@@ -4,10 +4,7 @@
 
 // "use strict";
 
-// const Services = require("Services");
 import EventEmitter from "devtools/shared/event-emitter";
-// const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
-// const { log } = require("protocol/socket");
 import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";

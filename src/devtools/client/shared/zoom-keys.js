@@ -4,7 +4,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 const ZOOM_PREF = "devtools.toolbox.zoomValue";
 const MIN_ZOOM = 0.5;

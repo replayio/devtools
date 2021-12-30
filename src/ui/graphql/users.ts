@@ -12,6 +12,8 @@ export const GET_USER_INFO = gql`
   query GetUser {
     viewer {
       user {
+        name
+        picture
         id
       }
       motd

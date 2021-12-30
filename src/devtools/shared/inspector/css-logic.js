@@ -15,7 +15,7 @@ const MAX_DATA_URL_LENGTH = 40;
  * @constructor
  */
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const styleInspectorL10N = new LocalizationHelper(

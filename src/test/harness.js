@@ -743,7 +743,11 @@ async function checkAppliedRules(expected) {
       const json = getAppliedRulesJSON();
       return JSON.stringify(json) == JSON.stringify(expected);
     },
-    { waitingFor: `applied rules to be: ${expected}` }
+    {
+      waitingFor: `applied rules to be: ${JSON.stringify(expected)}, found: ${JSON.stringify(
+        getAppliedRulesJSON()
+      )}`,
+    }
   );
 }
 

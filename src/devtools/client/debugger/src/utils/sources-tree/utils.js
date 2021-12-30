@@ -148,6 +148,11 @@ export function getRelativePath(url) {
   return index !== -1 ? pathname.slice(index + 1) : "";
 }
 
+export function getRelativePathWithoutFile(url) {
+  const path = getRelativePath(url);
+  return path.slice(0, path.lastIndexOf("/"));
+}
+
 export function getPathWithoutThread(path) {
   const pathParts = path.split(/(context\d+?\/)/).splice(2);
   if (pathParts && pathParts.length > 0) {

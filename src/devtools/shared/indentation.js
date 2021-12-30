@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 const EXPAND_TAB = "devtools.editor.expandtab";
 const TAB_SIZE = "devtools.editor.tabsize";

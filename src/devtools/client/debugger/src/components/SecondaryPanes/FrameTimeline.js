@@ -87,6 +87,10 @@ class FrameTimeline extends Component {
   }
 
   onMouseDown = event => {
+    if (!this.props.framePositions) {
+      return null;
+    }
+
     const progress = this.getProgress(event.clientX);
     trackEvent("frame_timeline.start");
     this.setState({ scrubbing: true, scrubbingProgress: progress });
@@ -150,15 +154,11 @@ class FrameTimeline extends Component {
     const { framePositions } = this.props;
     const progress = this.getVisibleProgress();
 
-    if (!framePositions) {
-      return null;
-    }
-
     return (
       <div
         data-tip="Frame Progress"
         data-for="frame-timeline-tooltip"
-        className={classnames("frame-timeline-container", { scrubbing })}
+        className={classnames("frame-timeline-container", { scrubbing, paused: framePositions })}
       >
         <div
           className="frame-timeline-bar"
@@ -170,7 +170,9 @@ class FrameTimeline extends Component {
             style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
           />
         </div>
-        <ReactTooltip id="frame-timeline-tooltip" delayHide={200} delayShow={200} place={"top"} />
+        {framePositions && (
+          <ReactTooltip id="frame-timeline-tooltip" delayHide={200} delayShow={200} place={"top"} />
+        )}
       </div>
     );
   }

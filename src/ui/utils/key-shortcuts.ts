@@ -1,4 +1,4 @@
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const isOSX = Services.appinfo.OS === "Darwin";
 const EventEmitter = require("devtools/shared/event-emitter");
 const { KeyCodes } = require("devtools/client/shared/keycodes");

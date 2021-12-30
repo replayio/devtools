@@ -4,7 +4,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
 const { OutputParser } = require("devtools/client/shared/output-parser");
 const { createFactory, createElement } = require("react");

@@ -66,11 +66,6 @@ export function shouldBlackbox(source) {
  * Returns true if the specified url and/or content type are specific to
  * javascript files.
  *
- * @return boolean
- *         True if the source is likely javascript.
- *
- * @memberof utils/source
- * @static
  */
 export function isJavaScript(source, content) {
   const extension = getFileExtension(source).toLowerCase();
@@ -81,10 +76,6 @@ export function isJavaScript(source, content) {
   );
 }
 
-/**
- * @memberof utils/source
- * @static
- */
 export function isPretty(source) {
   return isPrettyURL(source.url);
 }
@@ -102,10 +93,6 @@ export function isThirdParty(source) {
   return url.includes("node_modules") || url.includes("bower_components");
 }
 
-/**
- * @memberof utils/source
- * @static
- */
 export function getPrettySourceURL(url) {
   if (!url) {
     url = "";
@@ -113,10 +100,6 @@ export function getPrettySourceURL(url) {
   return `${url}:formatted`;
 }
 
-/**
- * @memberof utils/source
- * @static
- */
 export function getRawSourceURL(url) {
   return url && url.endsWith(":formatted") ? url.slice(0, -":formatted".length) : url;
 }
@@ -137,9 +120,6 @@ export function getFormattedSourceId(id) {
 /**
  * Gets a readable filename from a source URL for display purposes.
  * If the source does not have a URL, the source ID will be returned instead.
- *
- * @memberof utils/source
- * @static
  */
 export function getFilename(source, rawSourceURL = getRawSourceURL(source.url)) {
   const { id } = source;
@@ -153,9 +133,6 @@ export function getFilename(source, rawSourceURL = getRawSourceURL(source.url)) 
 
 /**
  * Provides a middle-trunated filename
- *
- * @memberof utils/source
- * @static
  */
 export function getTruncatedFileName(source, querystring = "", length = 30) {
   return truncateMiddleText(`${getFilename(source)}${querystring}`, length);
@@ -163,11 +140,7 @@ export function getTruncatedFileName(source, querystring = "", length = 30) {
 
 /* Gets path for files with same filename for editor tabs, breakpoints, etc.
  * Pass the source, and list of other sources
- *
- * @memberof utils/source
- * @static
  */
-
 export function getDisplayPath(mySource, sources) {
   const rawSourceURL = getRawSourceURL(mySource.url);
   const filename = getFilename(mySource, rawSourceURL);
@@ -217,9 +190,6 @@ export function getDisplayPath(mySource, sources) {
 /**
  * Gets a readable source URL for display purposes.
  * If the source does not have a URL, the source ID will be returned instead.
- *
- * @memberof utils/source
- * @static
  */
 export function getFileURL(source, truncate = true) {
   const { url, id } = source;
@@ -271,24 +241,6 @@ export function getSourceLineCount(content) {
   return count + 1;
 }
 
-/**
- *
- * Checks if a source is minified based on some heuristics
- * @param key
- * @param text
- * @return boolean
- * @memberof utils/source
- * @static
- */
-
-/**
- *
- * Returns Code Mirror mode for source content type
- * @param contentType
- * @return String
- * @memberof utils/source
- * @static
- */
 // eslint-disable-next-line complexity
 export function getMode(source, content, symbols) {
   const extension = getFileExtension(source);

@@ -4,6 +4,8 @@
 
 //
 import React, { Component } from "react";
+import ReactDOM from "react-dom";
+
 import classNames from "classnames";
 import BracketArrow from "./BracketArrow";
 import SmartGap from "./SmartGap";
@@ -258,7 +260,7 @@ class Popover extends Component {
     return (
       <div
         className={classNames("tooltip", `orientation-${orientation}`)}
-        style={{ top, left }}
+        style={{ top, left, zIndex: 20 }}
         ref={c => (this.$tooltip = c)}
       >
         {this.getChildren()}
@@ -269,11 +271,10 @@ class Popover extends Component {
   render() {
     const { type } = this.props;
 
-    if (type === "tooltip") {
-      return this.renderTooltip();
-    }
-
-    return this.renderPopover();
+    return ReactDOM.createPortal(
+      type === "tooltip" ? this.renderTooltip() : this.renderPopover(),
+      document.body
+    );
   }
 }
 

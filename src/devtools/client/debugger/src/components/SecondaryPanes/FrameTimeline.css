@@ -24,7 +24,7 @@ body.scrubbing {
   padding: 12px 10px;
 }
 
-.frame-timeline-container:hover {
+.paused .frame-timeline-container:hover {
   cursor: pointer;
 }
 
@@ -36,7 +36,7 @@ body.scrubbing {
   border-radius: 4px;
 }
 
-.frame-timeline-progress::after {
+.paused .frame-timeline-progress::after {
   content: " ";
   background-color: var(--replaying-marker-future-fill);
   display: inline-block;
@@ -52,9 +52,9 @@ body.scrubbing {
   display: block;
 }
 
-.scrubbing .frame-timeline-bar,
-.scrubbing .frame-timeline-container,
-.frame-timeline-marker:hover {
+.paused.scrubbing .frame-timeline-bar,
+.paused.scrubbing .frame-timeline-container,
+.paused .frame-timeline-marker:hover {
   cursor: grabbing;
 }
 

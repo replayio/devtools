@@ -7,7 +7,12 @@ import { connect } from "../../utils/connect";
 import actions from "../../actions";
 
 import { getEditor } from "../../utils/editor";
-import { getContext, getSources } from "../../selectors";
+import {
+  getContext,
+  getSources,
+  getFullTextSearchQuery,
+  getFullTextSearchFocus,
+} from "../../selectors";
 
 import { trackEvent } from "ui/utils/telemetry";
 import { FullTextFilter } from "./FullTextFilter";
@@ -22,7 +27,6 @@ function sanitizeQuery(query) {
 export class FullTextSearch extends Component {
   state = {
     focusedItem: null,
-    inputValue: "",
     results: {
       status: "DONE",
       query: "",
@@ -35,28 +39,23 @@ export class FullTextSearch extends Component {
   }
 
   selectMatchItem = matchItem => {
+    const { query, cx, doSearchForHighlight, selectSpecificLocation } = this.props;
     trackEvent("project_search.select");
 
-    this.props.selectSpecificLocation(this.props.cx, {
+    selectSpecificLocation(cx, {
       sourceId: matchItem.sourceId,
       line: matchItem.line,
       column: matchItem.column,
     });
 
     setTimeout(
-      () =>
-        this.props.doSearchForHighlight(
-          this.state.inputValue,
-          getEditor(),
-          matchItem.line,
-          matchItem.column
-        ),
+      () => doSearchForHighlight(query, getEditor(), matchItem.line, matchItem.column),
       20
     );
   };
 
   onKeyDown = e => {
-    const { sourcesById } = this.props;
+    const { sourcesById, setFullTextQuery, query } = this.props;
 
     if (e.key === "ArrowDown") {
       trackEvent("project_search.go_to_first_result");
@@ -69,7 +68,7 @@ export class FullTextSearch extends Component {
       return;
     }
 
-    const query = sanitizeQuery(e.target.value);
+    const sanitizedQuery = sanitizeQuery(e.target.value);
     const updateResults = getNextResults => {
       this.setState(prevState => ({
         results: {
@@ -79,10 +78,11 @@ export class FullTextSearch extends Component {
       }));
     };
 
-    this.setState({ focusedItem: null, inputValue: query });
-    if (query && query !== this.state.query && query.length >= 3) {
-      search(query, sourcesById, updateResults);
-      return query;
+    setFullTextQuery(sanitizedQuery);
+    this.setState({ focusedItem: null });
+    if (sanitizedQuery && query !== this.state.query && sanitizedQuery.length >= 3) {
+      search(sanitizedQuery, sourcesById, updateResults);
+      return sanitizedQuery;
     }
 
     return null;
@@ -99,15 +99,20 @@ export class FullTextSearch extends Component {
   };
 
   render() {
+    const { query, setFullTextQuery, focused, focusFullTextInput } = this.props;
     const { results, focusedItem } = this.state;
     return (
       <div ref={this.searchRef} className="search-container">
         <div className="project-text-search">
           <div className="header">
             <FullTextFilter
+              value={query}
+              focused={focused}
+              setValue={setFullTextQuery}
               results={this.state.results}
               onKeyDown={this.onKeyDown}
               onSearch={this.onSearch}
+              focusFullTextInput={focusFullTextInput}
             />
           </div>
           <FullTextResults
@@ -125,9 +130,13 @@ export class FullTextSearch extends Component {
 const mapStateToProps = state => ({
   cx: getContext(state),
   sourcesById: getSources(state).values,
+  query: getFullTextSearchQuery(state),
+  focused: getFullTextSearchFocus(state),
 });
 
 export default connect(mapStateToProps, {
+  focusFullTextInput: actions.focusFullTextInput,
+  setFullTextQuery: actions.setFullTextQuery,
   selectSpecificLocation: actions.selectSpecificLocation,
   doSearchForHighlight: actions.doSearchForHighlight,
 })(FullTextSearch);

@@ -21,7 +21,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const focusManager = Services.focus;
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 const EventEmitter = require("devtools/shared/event-emitter");
@@ -666,7 +666,8 @@ InplaceEditor.prototype = {
    */
   _parseCSSValue: function (value, offset) {
     /* eslint-disable max-len */
-    const reSplitCSS = /(url\("?[^"\)]+"?\)?)|(rgba?\([^)]*\)?)|(hsla?\([^)]*\)?)|(#[\dA-Fa-f]+)|(-?\d*\.?\d+(%|[a-z]{1,4})?)|"([^"]*)"?|'([^']*)'?|([^,\s\/!\(\)]+)|(!(.*)?)/;
+    const reSplitCSS =
+      /(url\("?[^"\)]+"?\)?)|(rgba?\([^)]*\)?)|(hsla?\([^)]*\)?)|(#[\dA-Fa-f]+)|(-?\d*\.?\d+(%|[a-z]{1,4})?)|"([^"]*)"?|'([^']*)'?|([^,\s\/!\(\)]+)|(!(.*)?)/;
     /* eslint-enable */
     let start = 0;
     let m;

@@ -13,7 +13,7 @@ const {
   CanvasFrameAnonymousContentHelper,
   createNode,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { rgbToHsl, rgbToColorName } = require("devtools/shared/css/color").colorUtils;
 const { getCurrentZoom, getFrameOffsets } = require("devtools/shared/layout/utils");

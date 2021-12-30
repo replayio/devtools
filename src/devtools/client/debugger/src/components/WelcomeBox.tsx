@@ -6,7 +6,7 @@ import React from "react";
 import { connect } from "../utils/connect";
 import actions from "../actions";
 import { useGetUserSettings } from "ui/hooks/settings";
-import { setSelectedPrimaryPanel } from "ui/actions/app";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { actions as appActions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { ConnectedProps } from "react-redux";

@@ -11,6 +11,7 @@ declare global {
   var __IS_RECORD_REPLAY_RUNTIME__: boolean;
   interface Window {
     mockEnvironment?: MockEnvironment;
+    jsterm: any;
   }
 }
 

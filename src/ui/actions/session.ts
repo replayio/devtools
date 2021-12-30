@@ -23,6 +23,7 @@ import { Recording } from "ui/types";
 import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
 import { getUserSettings } from "ui/hooks/settings";
+import { setViewMode } from "./layout";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -151,7 +152,7 @@ export function createSession(recordingId: string): UIThunkAction {
 
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
-        dispatch(actions.setViewMode("dev"));
+        dispatch(setViewMode("dev"));
       }
 
       dispatch(actions.setUploading(null));

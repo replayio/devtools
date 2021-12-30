@@ -7,7 +7,7 @@
 
 // A button that toggles a doorhanger menu.
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 const flags = require("devtools/shared/flags");
 const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
