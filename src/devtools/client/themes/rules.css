@@ -49,11 +49,6 @@
   height: auto;
 }
 
-#ruleview-toolbar .devtools-searchbox {
-  flex-basis: 7em;
-  height: var(--theme-toolbar-height);
-}
-
 #ruleview-command-toolbar {
   display: flex;
 }

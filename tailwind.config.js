@@ -33,6 +33,7 @@ module.exports = {
     width: ["hover", "group-hover"],
     extend: {
       borderWidth: ["last"],
+      textColor: ["disabled"],
     },
   },
   plugins: [require("@tailwindcss/forms")],

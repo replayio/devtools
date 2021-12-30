@@ -33,7 +33,6 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
     events.map(e => e.time),
     currentTime
   );
-
   return (
     <div className="py-1.5 text-xs bg-white">
       {events.map((e, i) => {

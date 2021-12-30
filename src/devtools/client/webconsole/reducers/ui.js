@@ -6,17 +6,11 @@
 const {
   MESSAGES_CLEAR,
   PERSIST_TOGGLE,
-  REVERSE_SEARCH_INPUT_TOGGLE,
-  SHOW_OBJECT_IN_SIDEBAR,
-  SIDEBAR_CLOSE,
-  SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE,
   TIMESTAMPS_TOGGLE,
   FILTERBAR_DISPLAY_MODE_SET,
   FILTERBAR_DISPLAY_MODES,
-  EDITOR_ONBOARDING_DISMISS,
-  EDITOR_TOGGLE,
-  EDITOR_SET_WIDTH,
   SET_ZOOMED_REGION,
+  TOGGLE_FILTER_DRAWER,
 } = require("devtools/client/webconsole/constants");
 
 const UiState = overrides =>
@@ -33,6 +27,7 @@ const UiState = overrides =>
         zoomEndTime: Number.POSITIVE_INFINITY,
         showEditorOnboarding: false,
         filterBarDisplayMode: FILTERBAR_DISPLAY_MODES.WIDE,
+        collapseFilterDrawer: true,
       },
       overrides
     )
@@ -56,6 +51,11 @@ function ui(state = UiState(), action) {
         ...state,
         zoomStartTime: action.zoomStartTime,
         zoomEndTime: action.zoomEndTime,
+      };
+    case TOGGLE_FILTER_DRAWER:
+      return {
+        ...state,
+        collapseFilterDrawer: !state.collapseFilterDrawer,
       };
   }
 

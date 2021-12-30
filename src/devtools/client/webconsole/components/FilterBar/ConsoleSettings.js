@@ -4,143 +4,62 @@
 
 "use strict";
 
-import React, { useState } from "react";
+import React from "react";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 const { connect } = require("react-redux");
-import classNames from "classnames";
+const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 
 const { actions } = require("ui/actions");
 const { selectors } = require("ui/reducers");
 const { trackEvent } = require("ui/utils/telemetry");
 
-import PortalDropdown from "ui/components/shared/PortalDropdown";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownDivider,
-  DropdownItemContent,
-} from "ui/components/Library/LibraryDropdown";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-
 const { FILTERS } = require("devtools/client/webconsole/constants");
 
-function _ConsoleSettings({
-  filters,
-  filteredMessagesCount,
-  shouldLogExceptions,
-  filterToggle,
-  timestampsToggle,
-  timestampsVisible,
-  logExceptions,
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  function getLabel(baseLabel, filterKey) {
-    const count = filteredMessagesCount[filterKey];
-    if (count === 0) {
-      return baseLabel;
-    }
-    return `${baseLabel} (${count})`;
-  }
-
-  const button = (
-    <MaterialIcon outlined className="h-4 w-4 text-gray-600 hover:text-primaryAccentHover">
-      more_vert
-    </MaterialIcon>
-  );
-
+export const ToggleRow = ({ children, selected, onClick, id }) => {
   return (
-    <PortalDropdown
-      buttonContent={button}
-      setExpanded={setExpanded}
-      expanded={expanded}
-      buttonStyle=""
-      distance={0}
-      position="bottom-left"
-    >
-      <Dropdown>
-        {/* Show Error */}
-        <DropdownItem
-          onClick={() => {
-            trackEvent("console.settings.toggle_log_exceptions");
-            logExceptions(!shouldLogExceptions);
-          }}
-        >
-          <DropdownItemContent selected={shouldLogExceptions} icon="bug_report">
-            Show Exceptions
-          </DropdownItemContent>
-        </DropdownItem>
+    <label className="flex py-1 items-center select-none" htmlFor={id}>
+      <div className="flex flex-row space-x-2 items-center">
+        <Checkbox id={id} checked={selected} className="m-0" onChange={onClick} />
+        <span className="whitespace-pre overflow-hidden overflow-ellipsis">{children}</span>
+      </div>
+    </label>
+  );
+};
 
-        {/* Error */}
-        <DropdownItem
-          onClick={() => {
-            trackEvent("console.settings.toggle_error");
-            filterToggle(FILTERS.ERROR);
-          }}
-        >
-          <DropdownItemContent selected={filters[FILTERS.ERROR]} icon="error_outline">
-            {getLabel("Show Errors", FILTERS.ERROR)}
-          </DropdownItemContent>
-        </DropdownItem>
-
-        {/* Warning */}
-        <DropdownItem
-          onClick={() => {
-            trackEvent("console.settings.toggle_warn");
-            filterToggle(FILTERS.WARN);
-          }}
-        >
-          <DropdownItemContent selected={filters[FILTERS.WARN]} icon="report_problem">
-            {getLabel("Show Warnings", FILTERS.WARN)}
-          </DropdownItemContent>
-        </DropdownItem>
-
-        {/* Logs */}
-        <DropdownItem
-          onClick={() => {
-            trackEvent("console.settings.toggle_logs");
-            filterToggle(FILTERS.LOG);
-          }}
-        >
-          <DropdownItemContent selected={filters[FILTERS.LOG]} icon="article">
-            {getLabel("Show Logs", FILTERS.LOG)}
-          </DropdownItemContent>
-        </DropdownItem>
-        <DropdownDivider />
-
-        <DropdownItem
-          onClick={() => {
-            trackEvent("console.settings.toggle_node_modules");
-            filterToggle(FILTERS.NODEMODULES);
-          }}
-        >
-          <DropdownItemContent selected={!filters[FILTERS.NODEMODULES]} icon="book">
-            Hide Node Modules
-          </DropdownItemContent>
-        </DropdownItem>
-        <DropdownItem
-          onClick={() => {
-            trackEvent("console.settings.toggle_timestamp");
-            timestampsToggle();
-          }}
-        >
-          <DropdownItemContent selected={timestampsVisible} icon="schedule">
-            Show Timestamps
-          </DropdownItemContent>
-        </DropdownItem>
-      </Dropdown>
-    </PortalDropdown>
+function ConsoleSettings({ filters, filterToggle, timestampsToggle, timestampsVisible }) {
+  return (
+    <div className="flex flex-col">
+      <ToggleRow
+        onClick={() => {
+          trackEvent("console.settings.toggle_node_modules");
+          filterToggle(FILTERS.NODEMODULES);
+        }}
+        selected={!filters[FILTERS.NODEMODULES]}
+        id="hide-node-modules"
+      >
+        Hide Node Modules
+      </ToggleRow>
+      <ToggleRow
+        onClick={() => {
+          trackEvent("console.settings.toggle_timestamp");
+          timestampsToggle();
+        }}
+        selected={timestampsVisible}
+        id="show-timestamps"
+      >
+        Show Timestamps
+      </ToggleRow>
+    </div>
   );
 }
 
 export default connect(
   state => ({
     filters: selectors.getAllFilters(state),
-    filteredMessagesCount: selectors.getFilteredMessagesCount(state),
-    shouldLogExceptions: selectors.getShouldLogExceptions(state),
+    timestampsVisible: getAllUi(state).timestampsVisible,
   }),
   {
     filterToggle: actions.filterToggle,
     timestampsToggle: actions.timestampsToggle,
-    logExceptions: actions.logExceptions,
   }
-)(_ConsoleSettings);
+)(ConsoleSettings);
