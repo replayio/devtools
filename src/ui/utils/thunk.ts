@@ -1,4 +1,7 @@
 import { Action } from "redux";
+import { getPrefsService } from "devtools/client/webconsole/utils/prefs";
+import { DevToolsToolbox } from "./devtools-toolbox";
+import { ProtocolClient } from "@recordreplay/protocol";
 
 /**
  * The following type definitions have been taken from the redux-thunk package
@@ -51,12 +54,9 @@ export type ThunkAction<TReturnType, TState, TExtraThunkArg, TBasicAction extend
 ) => TReturnType;
 
 export interface ThunkExtraArgs {
-  client: any;
-  panels: any;
-  prefsService: any;
-  toolbox: any;
-  parser: any;
-  search: any;
+  client: ProtocolClient;
+  prefsService: ReturnType<typeof getPrefsService>;
+  toolbox: DevToolsToolbox;
 }
 
 /**

@@ -1,5 +1,5 @@
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import React, { useState } from "react";
+import SplitBox from "devtools/packages/devtools-splitter";
+import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { getEvents, getFormattedFrames, getRequests } from "ui/reducers/network";
@@ -25,6 +25,9 @@ export const NetworkMonitor = ({
 }: PropsFromRedux) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
   const [types, setTypes] = useState<Set<RequestType>>(new Set(["xhr"]));
+  const [vert, setVert] = useState<boolean>(false);
+
+  const container = useRef<HTMLDivElement>(null);
 
   const closePanel = () => setSelectedRequest(undefined);
 
@@ -37,8 +40,18 @@ export const NetworkMonitor = ({
     setTypes(new Set(types));
   };
 
+  let resizeObserver = useRef(
+    new ResizeObserver(() => setVert((container.current?.offsetWidth || 0) > 700))
+  );
+
+  useEffect(() => {
+    if (container.current) {
+      resizeObserver.current.observe(container.current);
+    }
+  }, [container.current]);
+
   return (
-    <div className="overflow-hidden h-full">
+    <div className="overflow-hidden h-full" ref={container}>
       <Table events={events} requests={requests} types={types}>
         {({ table, data }: { table: any; data: RequestSummary[] }) => (
           <>
@@ -74,8 +87,8 @@ export const NetworkMonitor = ({
                   selectedRequest={selectedRequest}
                 />
               }
-              vert={true}
-              splitterSize={2}
+              vert={vert}
+              splitterSize={4}
             />
           </>
         )}

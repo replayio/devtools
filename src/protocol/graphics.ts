@@ -243,35 +243,41 @@ export function setupGraphics(store: UIStore) {
       return;
     }
 
-    await ThreadFront.ensureAllSources();
-    if (point !== ThreadFront.currentPoint) {
-      return;
-    }
-    ThreadFront.ensureCurrentPause();
-    const pause = ThreadFront.currentPause;
-    assert(pause);
-
-    let graphicsFetched = false;
-    // Show a stalled message if the graphics have not fetched after half a second
-    setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
-    const rv = await pause.repaintGraphics();
-    graphicsFetched = true;
-    store.dispatch(setPlaybackStalled(false));
-    if (!rv || pause !== ThreadFront.currentPause) {
-      return;
-    }
-    let { description, screenShot } = rv;
-    if (screenShot) {
-      repaintedScreenshots.set(description.hash, screenShot);
-    } else {
-      screenShot = repaintedScreenshots.get(description.hash);
-      if (!screenShot) {
-        console.error("Missing repainted screenshot", description);
-        return;
-      }
-    }
-    paintGraphics(screenShot, mouse);
+    await repaint();
   });
+}
+
+export async function repaint(force = false) {
+  const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+  const point = ThreadFront.currentPoint;
+  await ThreadFront.ensureAllSources();
+  if (point !== ThreadFront.currentPoint) {
+    return;
+  }
+  ThreadFront.ensureCurrentPause();
+  const pause = ThreadFront.currentPause;
+  assert(pause);
+
+  let graphicsFetched = false;
+  // Show a stalled message if the graphics have not fetched after half a second
+  setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
+  const rv = await pause.repaintGraphics(force);
+  graphicsFetched = true;
+  store.dispatch(setPlaybackStalled(false));
+  if (!rv || pause !== ThreadFront.currentPause) {
+    return;
+  }
+  let { description, screenShot } = rv;
+  if (screenShot) {
+    repaintedScreenshots.set(description.hash, screenShot);
+  } else {
+    screenShot = repaintedScreenshots.get(description.hash);
+    if (!screenShot) {
+      console.error("Missing repainted screenshot", description);
+      return;
+    }
+  }
+  paintGraphics(screenShot, mouse);
 }
 
 export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {

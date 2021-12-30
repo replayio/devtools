@@ -44,13 +44,13 @@ export function ToggleShowPrivacyButton({
 
 function FavIcon({ url }: { url: string }) {
   return (
-    <div className="h-5 w-5 relative">
-      <MaterialIcon className="leading-5 relative" iconSize="xl">
-        public
-      </MaterialIcon>
+    <div className="relative">
+      <div className="flex">
+        <MaterialIcon>public</MaterialIcon>
+      </div>
       <img
-        className="h-5 w-5 absolute top-0 left-0 bg-white"
-        src={`https://api.faviconkit.com/${url}`}
+        className="h-4 w-4 absolute top-0 left-0 bg-white"
+        src={`https://www.google.com/s2/favicons?domain=${url}`}
       />
     </div>
   );

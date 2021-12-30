@@ -1,24 +1,21 @@
-import { AppState, EventCategory, EventKind, PanelName, ReplayEvent, ViewMode } from "ui/state/app";
+import { AppState, EventKind, PanelName, ReplayEvent } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-import { asyncStore, prefs, features } from "../utils/prefs";
+import { prefs, features } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
-import { getRecordingId } from "ui/utils/environment";
 import { getTrimRegion } from "ui/reducers/timeline";
-import { trackEvent } from "ui/utils/telemetry";
+import { getViewMode } from "./layout";
 
-const syncInitialAppState: AppState = {
+export const initialAppState: AppState = {
   expectedError: null,
   unexpectedError: null,
   trialExpired: false,
   theme: "theme-light",
-  splitConsoleOpen: prefs.splitConsole as boolean,
   selectedPanel: prefs.selectedPanel as PanelName,
-  selectedPrimaryPanel: "comments",
   initializedPanels: [],
   recordingDuration: 0,
   indexing: 0,
@@ -32,7 +29,6 @@ const syncInitialAppState: AppState = {
   modalOptions: null,
   analysisPoints: {},
   events: {},
-  viewMode: "non-dev",
   hoveredLineNumberLocation: null,
   isNodePickerActive: false,
   canvas: null,
@@ -43,45 +39,18 @@ const syncInitialAppState: AppState = {
   recordingTarget: null,
   recordingWorkspace: null,
   loadedRegions: null,
-  showVideoPanel: true,
-  showEditor: true,
   loadingPageTipIndex: 0,
+  mouseTargetsLoading: false,
 };
 
-export async function getInitialAppState(): Promise<AppState> {
-  const recordingId = getRecordingId();
-
-  // If we're in the library, there are no preferences to fetch.
-  if (!recordingId) {
-    return syncInitialAppState;
-  }
-
-  const replaySessions = await asyncStore.replaySessions;
-  const session = replaySessions[recordingId!];
-
-  if (!session) {
-    return syncInitialAppState;
-  }
-
-  const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = syncInitialAppState;
-
-  const initialViewMode = session.viewMode || viewMode;
-  trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
-
-  return {
-    ...syncInitialAppState,
-    viewMode: initialViewMode,
-    selectedPrimaryPanel: session.selectedPrimaryPanel || selectedPrimaryPanel,
-    showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
-    showEditor: "showEditor" in session ? session.showEditor : showEditor,
-  };
-}
-
 export default function update(
-  state: AppState = syncInitialAppState,
+  state: AppState = initialAppState,
   action: AppActions | SessionActions
 ): AppState {
   switch (action.type) {
+    case "mouse_targets_loading": {
+      return { ...state, mouseTargetsLoading: action.loading };
+    }
     case "set_recording_duration": {
       return { ...state, recordingDuration: action.duration };
     }
@@ -126,16 +95,8 @@ export default function update(
       return { ...state, selectedPanel: action.panel };
     }
 
-    case "set_selected_primary_panel": {
-      return { ...state, selectedPrimaryPanel: action.panel };
-    }
-
     case "set_initialized_panels": {
       return { ...state, initializedPanels: [...state.initializedPanels, action.panel] };
-    }
-
-    case "set_split_console": {
-      return { ...state, splitConsoleOpen: action.splitConsole };
     }
 
     case "loading": {
@@ -192,10 +153,6 @@ export default function update(
       };
     }
 
-    case "set_view_mode": {
-      return { ...state, viewMode: action.viewMode };
-    }
-
     case "set_hovered_line_number_location": {
       return {
         ...state,
@@ -247,14 +204,6 @@ export default function update(
       return { ...state, recordingWorkspace: action.workspace };
     }
 
-    case "set_show_video_panel": {
-      return { ...state, showVideoPanel: action.showVideoPanel };
-    }
-
-    case "set_show_editor": {
-      return { ...state, showEditor: action.showEditor };
-    }
-
     case "set_loading_page_tip_index": {
       return { ...state, loadingPageTipIndex: action.index };
     }
@@ -266,11 +215,9 @@ export default function update(
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
-export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
-export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPrimaryPanel;
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
 export const getIndexing = (state: UIState) => state.app.indexing;
@@ -304,7 +251,6 @@ export const getAnalysisPointsForLocation = (
 
   return points;
 };
-export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
@@ -344,8 +290,6 @@ export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
-export const getShowVideoPanel = (state: UIState) => state.app.showVideoPanel;
-export const getShowEditor = (state: UIState) => state.app.showEditor;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
   typeof time !== "number" ||
   !!getLoadedRegions(state)?.loaded.some(
@@ -371,3 +315,4 @@ export const isFinishedLoadingRegions = (state: UIState) => {
 };
 export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
 export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
+export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;

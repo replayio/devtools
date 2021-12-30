@@ -4,7 +4,7 @@
 
 //
 
-import { WorkerDispatcher } from "devtools-utils/src/worker-utils";
+import { WorkerDispatcher } from "devtools/shared/worker-utils";
 
 const { log } = require("protocol/socket");
 

@@ -7,11 +7,11 @@ import { selectors } from "../reducers";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
-import { PrimaryPanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
+import { PrimaryPanelName } from "ui/state/layout";
 
 function Toolbar({
   selectedPrimaryPanel,

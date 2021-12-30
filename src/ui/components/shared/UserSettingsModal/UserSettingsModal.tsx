@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 
-import { updateEnableRepaint } from "protocol/enable-repaint";
+import { AvatarImage } from "ui/components/Avatar";
 import { handleIntercomLogout } from "ui/utils/intercom";
 import useAuth0 from "ui/utils/useAuth0";
 import hooks from "ui/hooks";
@@ -9,17 +9,16 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
-import { ApiKey, CombinedUserSettings, UserSettings } from "ui/types";
+import { useGetUserInfo } from "ui/hooks/users";
+import { getFeatureFlag } from "ui/utils/launchdarkly";
 
 import APIKeys from "../APIKeys";
+import ExternalLink from "../ExternalLink";
 import SettingsModal from "../SettingsModal";
 import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 
-import { getFeatureFlag } from "ui/utils/launchdarkly";
-import { AvatarImage } from "ui/components/Avatar";
 import PreferencesSettings from "./PreferencesSettings";
-import ExternalLink from "../ExternalLink";
 import ExperimentalSettings from "./ExperimentalSettings";
 
 function Support() {
@@ -49,8 +48,8 @@ function Support() {
 }
 
 function Personal() {
-  const { logout, user } = useAuth0();
-  const { name, picture, email } = user || {};
+  const { logout } = useAuth0();
+  const { name, email, picture } = useGetUserInfo();
 
   return (
     <div className="space-y-12">

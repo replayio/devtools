@@ -14,6 +14,7 @@ import PortalTooltip from "../shared/PortalTooltip";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";
+import { showDurationWarning } from "ui/utils/recording";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
@@ -200,7 +201,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                 <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
                 <ReplayScreenshot
                   screenData={screenData!}
-                  showLimitWarning={recording.duration > 120 * 1000}
+                  showLimitWarning={showDurationWarning(recording)}
                 />
               </div>
               <div className="py-9 space-y-6 px-8 border-t border-gray-300 relative">

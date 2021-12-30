@@ -5,6 +5,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { trackEvent } from "ui/utils/telemetry";
 
 function setupShortcuts() {
@@ -18,6 +19,7 @@ const globalShortcuts = setupShortcuts();
 
 function KeyboardShortcuts({
   setSelectedPrimaryPanel,
+  focusFullTextInput,
   setViewMode,
   toggleCommandPalette,
   togglePaneCollapse,
@@ -39,6 +41,7 @@ function KeyboardShortcuts({
     }
     trackEvent("key_shortcut.full_text_search");
     setSelectedPrimaryPanel("search");
+    focusFullTextInput(true);
   };
   const toggleLeftSidebar = (e: KeyboardEvent) => {
     e.preventDefault();
@@ -75,6 +78,7 @@ const connector = connect(
     viewMode: selectors.getViewMode(state),
   }),
   {
+    focusFullTextInput: dbgActions.focusFullTextInput,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
     setViewMode: actions.setViewMode,
     togglePaneCollapse: actions.togglePaneCollapse,

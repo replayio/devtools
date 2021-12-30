@@ -15,31 +15,21 @@ import {
   getIsWaitingOnBreak,
   getPauseCommand,
   getSelectedFrame,
-  getShouldLogExceptions,
   getThreadContext,
   getSourceFromId,
   getFramesLoading,
 } from "../../selectors";
 
-import AccessibleImage from "../shared/AccessibleImage";
 import { prefs } from "../../utils/prefs";
 
-import Breakpoints from "./Breakpoints";
-import SplitBox from "devtools-splitter";
+import LogpointsPane from "./LogpointsPane";
+import BreakpointsPane from "./BreakpointsPane";
 import Frames from "./Frames";
 import Accordion from "../shared/Accordion";
 import CommandBar from "./CommandBar";
 import FrameTimeline from "./FrameTimeline";
 
 import Scopes from "./Scopes";
-
-function debugBtn(onClick, type, className, tooltip) {
-  return (
-    <button onClick={onClick} className={`${type} ${className}`} key={type} title={tooltip}>
-      <AccessibleImage className={type} title={tooltip} aria-label={tooltip} />
-    </button>
-  );
-}
 
 const mdnLink =
   "https://developer.mozilla.org/docs/Tools/Debugger/Using_the_Debugger_map_scopes_feature?utm_source=devtools&utm_medium=debugger-map-scopes";
@@ -69,15 +59,23 @@ class SecondaryPanes extends Component {
     };
   }
 
-  getBreakpointsItem() {
-    const { shouldLogExceptions, logExceptions } = this.props;
-
+  getLogpointItems() {
     return {
       header: "Print Statements",
       className: "breakpoints-pane",
-      component: (
-        <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />
-      ),
+      component: <LogpointsPane />,
+      opened: prefs.breakpointsVisible,
+      onToggle: opened => {
+        prefs.breakpointsVisible = opened;
+      },
+    };
+  }
+
+  getBreakpointItems() {
+    return {
+      header: "Breakpoints",
+      className: "breakpoints-pane",
+      component: <BreakpointsPane />,
       opened: prefs.breakpointsVisible,
       onToggle: opened => {
         prefs.breakpointsVisible = opened;
@@ -89,7 +87,7 @@ class SecondaryPanes extends Component {
     const items = [];
     const { horizontal, hasFrames, framesLoading } = this.props;
 
-    items.push(this.getBreakpointsItem());
+    items.push(this.getBreakpointItems(), this.getLogpointItems());
 
     if (hasFrames) {
       items.push(this.getCallStackItem());
@@ -158,7 +156,6 @@ const mapStateToProps = state => {
     isWaitingOnBreak: getIsWaitingOnBreak(state),
     renderWhyPauseDelay: getRenderWhyPauseDelay(state),
     selectedFrame,
-    shouldLogExceptions: getShouldLogExceptions(state),
     source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };
 };

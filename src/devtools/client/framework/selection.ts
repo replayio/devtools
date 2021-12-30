@@ -7,7 +7,17 @@ const EventEmitter = require("devtools/shared/event-emitter");
 const nodeConstants = require("devtools/shared/dom-node-constants");
 
 import { NodeFront } from "protocol/thread/node";
-import { assert } from "protocol/utils";
+
+export type NodeSelectionReason =
+  | "navigateaway"
+  | "markup"
+  | "debugger"
+  | "unknown"
+  | "breadcrumbs"
+  | "inspectorsearch"
+  | "box-model"
+  | "console"
+  | "keyboard";
 
 /**
  * Selection is a singleton belonging to the Toolbox that manages the current selected
@@ -55,7 +65,7 @@ import { assert } from "protocol/utils";
 class Selection {
   private _nodeFront: NodeFront | undefined | null;
   private _isSlotted: boolean;
-  reason: string | undefined;
+  reason: NodeSelectionReason | undefined;
 
   constructor() {
     EventEmitter.decorate(this);
@@ -81,7 +91,16 @@ class Selection {
    *        - {Boolean} isSlotted: Is the selection representing the slotted version of
    *          the node.
    */
-  setNodeFront(nodeFront: NodeFront | null, { reason = "unknown", isSlotted = false } = {}) {
+  setNodeFront(
+    nodeFront: NodeFront | null,
+    {
+      reason = "unknown",
+      isSlotted = false,
+    }: Partial<{
+      reason: NodeSelectionReason | undefined;
+      isSlotted: boolean;
+    }> = {}
+  ) {
     this.reason = reason;
 
     // If an inlineTextChild text node is being set, then set it's parent instead.

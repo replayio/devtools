@@ -194,7 +194,7 @@ class InspectorApp extends Component<PropsFromRedux> {
             minSize="20%"
             maxSize="80%"
             onMove={this.onSplitboxResize}
-            splitterSize={8}
+            splitterSize={2}
             endPanelControl={true}
             startPanel={markupView}
             endPanel={

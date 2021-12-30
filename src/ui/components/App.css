@@ -66,7 +66,7 @@
 }
 
 #command-button-pick.active::before {
-  background-color: var(--theme-selection-background);
+  background-color: var(--primary-accent);
 }
 
 #command-button-pick:hover {
@@ -107,7 +107,6 @@
 @import url("devtools/client/themes/components-frame.css");
 @import url("devtools/client/themes/markup.css");
 @import url("devtools/client/themes/common.css");
-@import url("devtools/client/debugger/dist/vendors.css");
 @import url("devtools/client/themes/splitters.css");
 @import url("devtools/client/themes/dark-theme.css");
 @import url("devtools/client/themes/light-theme.css");

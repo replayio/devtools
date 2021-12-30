@@ -38,6 +38,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
   }
 
   async clickNodePickerButton() {
+    const { loadMouseTargets } = this.props;
     const { nodePickerActive } = this.state;
     if (nodePickerActive) {
       // The node picker mousedown listener will take care of deactivation.
@@ -52,10 +53,8 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     }
 
     this.setState({ nodePickerActive: true });
-
-    ThreadFront.loadMouseTargets();
+    loadMouseTargets();
     this.addNodePickerListeners();
-    this.props.setIsNodePickerActive(true);
     this.props.setSelectedPanel("inspector");
   }
 
@@ -150,6 +149,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 }
 
 const connector = connect(null, {
+  loadMouseTargets: actions.loadMouseTargets,
   setIsNodePickerActive: actions.setIsNodePickerActive,
   setSelectedPanel: actions.setSelectedPanel,
 });

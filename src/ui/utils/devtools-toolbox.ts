@@ -117,10 +117,6 @@ export class DevToolsToolbox {
     return panel;
   }
 
-  toggleSplitConsole(open: boolean) {
-    store.dispatch(actions.setSplitConsole(open));
-  }
-
   async viewSourceInDebugger(
     url: string | undefined,
     line: number | undefined,

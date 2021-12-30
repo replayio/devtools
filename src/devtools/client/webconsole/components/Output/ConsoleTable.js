@@ -11,7 +11,7 @@ const {
   getDescriptorValue,
 } = require("devtools/client/webconsole/utils/messages");
 
-const { MODE } = require("devtools/client/debugger/packages/devtools-reps/src");
+const { MODE } = require("devtools/packages/devtools-reps");
 
 const GripMessageBody = createFactory(
   require("devtools/client/webconsole/components/Output/GripMessageBody")

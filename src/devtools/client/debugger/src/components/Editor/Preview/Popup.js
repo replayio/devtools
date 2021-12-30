@@ -5,9 +5,13 @@
 //
 
 import React, { Component } from "react";
-import { connect } from "../../../utils/connect";
+import { connect } from "devtools/client/debugger/src/utils/connect";
+import Reps from "devtools/packages/devtools-reps";
+import actions from "devtools/client/debugger/src/actions";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import Popover from "../../shared/Popover";
+import PreviewFunction from "../../shared/PreviewFunction";
 
-import Reps from "devtools-reps";
 const {
   REPS: { Rep },
   MODE,
@@ -21,20 +25,7 @@ const {
   node: { nodeIsPrimitive, nodeIsFunction, nodeIsObject },
 } = utils;
 
-import actions from "../../../actions";
-import { getThreadContext } from "../../../selectors";
-import Popover from "../../shared/Popover";
-import PreviewFunction from "../../shared/PreviewFunction";
-
 export class Popup extends Component {
-  marker;
-  pos;
-  popover;
-
-  constructor(props) {
-    super(props);
-  }
-
   calculateMaxHeight = () => {
     const { editorRef } = this.props;
     if (!editorRef) {

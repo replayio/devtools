@@ -15,7 +15,7 @@ import actions from "../../actions";
 import { debugBtn } from "../shared/Button/CommandBarButton";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { appinfo } from "devtools-services";
+import { appinfo } from "devtools/shared/services";
 
 const isMacOS = appinfo.OS === "Darwin";
 

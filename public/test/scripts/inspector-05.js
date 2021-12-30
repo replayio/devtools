@@ -5,7 +5,6 @@ Test.describe(`Test showing rules in source mapped style sheets.`, async () => {
   await Test.selectMarkupNode(node);
 
   await Test.checkAppliedRules([
-    { selector: "element", source: "inline", properties: [] },
     {
       selector: "div",
       source: "styles.css:2",

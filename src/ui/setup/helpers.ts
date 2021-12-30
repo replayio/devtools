@@ -13,6 +13,7 @@ declare global {
     dumpPrefs: () => string;
     local: () => void;
     prod: () => void;
+    clearIndexedDB: () => void;
   }
 }
 
@@ -39,6 +40,10 @@ export function setupAppHelper(store: UIStore) {
       } else {
         window.location.href = "https://app.replay.io/";
       }
+    },
+    clearIndexedDB: async () => {
+      const databases = await indexedDB.databases();
+      databases.map(db => db.name && indexedDB.deleteDatabase(db.name));
     },
   };
 }

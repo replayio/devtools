@@ -24,6 +24,9 @@ export const GET_RECORDING = gql`
       ownerNeedsInvite
       userRole
       operations
+      comments {
+        id
+      }
       owner {
         id
         name

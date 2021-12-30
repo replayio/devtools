@@ -6,7 +6,7 @@
 :root {
   --rule-highlight-background-color: var(--theme-highlight-yellow);
   --rule-header-background-color: var(--theme-toolbar-background);
-  --rule-pseudo-class-text-color: var(--yellow-70) ;
+  --rule-pseudo-class-text-color: var(--yellow-70);
   --rule-unused-name-text-color: var(--grey-50);
   --rule-unused-value-text-color: var(--grey-45);
   --rule-overridden-name-text-color: var(--grey-50);
@@ -14,7 +14,7 @@
 }
 
 :root.theme-dark {
-  --rule-highlight-background-color: #521C76;
+  --rule-highlight-background-color: #521c76;
   --rule-header-background-color: #222225;
   --rule-pseudo-class-text-color: var(--yellow-50);
 
@@ -161,7 +161,7 @@
 }
 
 .ruleview-namecontainer {
-  cursor: text;
+  cursor: default;
   margin-left: -15px;
 }
 
@@ -170,13 +170,13 @@
 }
 
 .ruleview-propertyvaluecontainer {
-  cursor: text;
+  cursor: default;
   padding-right: 5px;
 }
 
 .ruleview-propertyvaluecontainer a {
   color: var(--theme-highlight-purple);
-  cursor: pointer;
+  cursor: default;
 }
 
 .ruleview-computedlist,
@@ -214,12 +214,12 @@
 .ruleview-rule-source-label {
   white-space: nowrap;
   margin: 0;
-  cursor: pointer;
+  /* cursor: pointer; */
 
   /* Create an LTR embed to avoid special characters being shifted to the start due to the
      parent node direction: rtl; */
   direction: ltr;
-  unicode-bidi: embed
+  unicode-bidi: embed;
 }
 
 .ruleview-rule-source.disabled > .ruleview-rule-source-label,
@@ -227,10 +227,12 @@
   cursor: default;
 }
 
+/* 
 .ruleview-rule-source:not(.unselectable):hover,
 .ruleview-rule-source:not([unselectable]):hover {
   text-decoration: underline;
-}
+} 
+*/
 
 .ruleview-header {
   background: var(--rule-header-background-color);
@@ -278,42 +280,40 @@
  */
 .ruleview-rule.unmatched,
 .ruleview-rule.uneditable,
-.ruleview-rule[unmatched=true],
-.ruleview-rule[uneditable=true] {
+.ruleview-rule[unmatched="true"],
+.ruleview-rule[uneditable="true"] {
   background: var(--theme-tab-toolbar-background);
 }
 
 .ruleview-rule.unmatched,
-.ruleview-rule[unmatched=true] {
+.ruleview-rule[unmatched="true"] {
   opacity: 0.5;
 }
 
 .ruleview-rule.uneditable :focus,
-.ruleview-rule[uneditable=true] :focus {
+.ruleview-rule[uneditable="true"] :focus {
   outline: none;
 }
 
 .ruleview-rule.uneditable .theme-link,
-.ruleview-rule[uneditable=true] .theme-link {
+.ruleview-rule[uneditable="true"] .theme-link {
   color: var(--theme-highlight-bluegrey);
 }
 
 .ruleview-rule.uneditable .ruleview-enableproperty,
-.ruleview-rule[uneditable=true] .ruleview-enableproperty {
+.ruleview-rule[uneditable="true"] .ruleview-enableproperty {
   visibility: hidden;
 }
 
 .ruleview-rule.uneditable .ruleview-swatch,
-.ruleview-rule[uneditable=true] .ruleview-swatch {
+.ruleview-rule[uneditable="true"] .ruleview-swatch {
   cursor: default;
 }
 
 .ruleview-rule.uneditable .ruleview-namecontainer > .ruleview-propertyname,
-.ruleview-rule.uneditable .ruleview-propertyvaluecontainer >
-.ruleview-propertyvalue,
-.ruleview-rule[uneditable=true] .ruleview-namecontainer > .ruleview-propertyname,
-.ruleview-rule[uneditable=true] .ruleview-propertyvaluecontainer >
-.ruleview-propertyvalue {
+.ruleview-rule.uneditable .ruleview-propertyvaluecontainer > .ruleview-propertyvalue,
+.ruleview-rule[uneditable="true"] .ruleview-namecontainer > .ruleview-propertyname,
+.ruleview-rule[uneditable="true"] .ruleview-propertyvaluecontainer > .ruleview-propertyvalue {
   border-bottom-color: transparent;
 }
 
@@ -348,7 +348,7 @@
 
 .ruleview-ruleclose {
   clear: both;
-  cursor: text;
+  cursor: default;
   padding-right: 20px;
 }
 
@@ -391,23 +391,23 @@
   background: url("chrome://devtools/skin/images/checkbox.svg") center no-repeat content-box;
   /* Using fill to paint the border, and stroke for the tick */
   -moz-context-properties: fill, stroke;
-  fill: rgba(0,0,0,.3);
+  fill: rgba(0, 0, 0, 0.3);
   stroke: transparent;
 }
 
 :root[platform="win"].theme-dark .ruleview-enableproperty,
 :root[platform="linux"].theme-dark .ruleview-enableproperty {
-  fill: rgba(255,255,255,.4);
+  fill: rgba(255, 255, 255, 0.4);
 }
 
 :root[platform="win"] .ruleview-enableproperty:checked,
 :root[platform="linux"] .ruleview-enableproperty:checked {
-  stroke: rgba(0,0,0,.6);
+  stroke: rgba(0, 0, 0, 0.6);
 }
 
 :root[platform="win"].theme-dark .ruleview-enableproperty:checked,
 :root[platform="linux"].theme-dark .ruleview-enableproperty:checked {
-  stroke: rgba(255,255,255,.8);
+  stroke: rgba(255, 255, 255, 0.8);
 }
 
 :root[platform="mac"] .ruleview-enableproperty {
@@ -522,7 +522,7 @@
 .ruleview-grid,
 .ruleview-shapeswatch,
 .ruleview-swatch {
-  cursor: pointer;
+  cursor: default;
   width: 1em;
   height: 1em;
   vertical-align: middle;
@@ -585,10 +585,17 @@
 }
 
 .ruleview-colorswatch::before {
-  content: '';
+  content: "";
   background-color: #eee;
-  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
-                    linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+  background-image: linear-gradient(
+      45deg,
+      #ccc 25%,
+      transparent 25%,
+      transparent 75%,
+      #ccc 75%,
+      #ccc
+    ),
+    linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
   background-size: 12px 12px;
   background-position: 0 0, 6px 6px;
   position: absolute;
@@ -646,7 +653,7 @@
 }
 
 .styleinspector-propertyeditor {
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
   padding: 0;
   margin: -1px -3px -1px -1px;
 }
@@ -658,7 +665,7 @@
   overflow-wrap: break-word;
 }
 
-.ruleview-propertycontainer  > * {
+.ruleview-propertycontainer > * {
   vertical-align: middle;
 }
 
@@ -680,14 +687,14 @@
   border-bottom: 1px dashed transparent;
 }
 
-.ruleview-namecontainer:hover > .ruleview-propertyname,
+/* .ruleview-namecontainer:hover > .ruleview-propertyname,
 .ruleview-propertyvaluecontainer:hover > .ruleview-propertyvalue {
-  border-bottom-color: hsl(0,0%,50%);
-}
+  border-bottom-color: hsl(0, 0%, 50%);
+} */
 
 .ruleview-selectorcontainer {
   word-wrap: break-word;
-  cursor: text;
+  cursor: default;
 }
 
 .ruleview-selector-matched {

@@ -7,10 +7,10 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const ObjectInspector = require("devtools/client/webconsole/utils/connected-object-inspector")
-  .default;
+const ObjectInspector =
+  require("devtools/client/webconsole/utils/connected-object-inspector").default;
 
-const reps = require("devtools/client/debugger/packages/devtools-reps/src");
+const reps = require("devtools/packages/devtools-reps");
 const { MODE } = reps;
 
 GripMessageBody.displayName = "GripMessageBody";

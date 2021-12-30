@@ -1,16 +1,15 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/environment";
 import {
-  getSelectedPanel,
   getSelectedPrimaryPanel,
   getShowEditor,
   getShowVideoPanel,
   getViewMode,
-  isSplitConsoleOpen,
-} from "ui/reducers/app";
-import { getRecordingId } from "ui/utils/environment";
-import { ViewMode } from "ui/state/app";
+} from "ui/reducers/layout";
+import { ViewMode } from "ui/state/layout";
+import { getSelectedPanel } from "ui/reducers/app";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -46,7 +45,6 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   }
 
   updatePref("viewMode", getViewMode);
-  updatePref("splitConsole", isSplitConsoleOpen);
   updatePref("selectedPanel", getSelectedPanel);
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);

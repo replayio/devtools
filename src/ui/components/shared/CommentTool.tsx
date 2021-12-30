@@ -71,6 +71,7 @@ function CommentTool({
   currentTime,
   executionPoint,
   comments,
+  areMouseTargetsLoading,
   canvas,
   createFrameComment,
   setPendingComment,
@@ -145,6 +146,7 @@ function CommentTool({
       setSelectedPrimaryPanel("comments");
     }
   };
+
   const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
   const onMouseLeave = () => {
     setMousePosition(null);
@@ -166,6 +168,12 @@ function CommentTool({
   }
 
   const { parentStyle, childStyle } = getStyles(mousePosition, canvas!, captionNode.current);
+  let label = "Add comment";
+  if (areMouseTargetsLoading) {
+    label = "Targets loading...";
+  } else if (pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment") {
+    label = "Move the marker";
+  }
 
   return (
     <div style={parentStyle} className="absolute">
@@ -177,11 +185,7 @@ function CommentTool({
         style={childStyle}
         ref={captionNode}
       >
-        {pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment" ? (
-          <span>{"Move the marker"}</span>
-        ) : (
-          "Add comment"
-        )}
+        <span>{label}</span>
       </div>
     </div>
   );
@@ -194,6 +198,7 @@ const connector = connect(
     executionPoint: getExecutionPoint(state),
     currentTime: selectors.getCurrentTime(state),
     canvas: selectors.getCanvas(state),
+    areMouseTargetsLoading: selectors.areMouseTargetsLoading(state),
   }),
   {
     setPendingComment: actions.setPendingComment,

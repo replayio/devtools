@@ -5,7 +5,7 @@
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { PrefsHelper } from "devtools/client/shared/prefs";
 
-import Services from "devtools-services";
+import Services from "devtools/shared/services";
 
 // Schema version to bump when the async store format has changed incompatibly
 // and old stores should be cleared.

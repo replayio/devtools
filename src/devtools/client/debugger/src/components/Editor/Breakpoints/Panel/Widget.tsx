@@ -37,5 +37,5 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
     return null;
   }
 
-  return ReactDOM.createPortal(<>{children}</>, node);
+  return ReactDOM.createPortal(children, node);
 }

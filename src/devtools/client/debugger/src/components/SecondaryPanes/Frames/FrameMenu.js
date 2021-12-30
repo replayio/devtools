@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { showMenu } from "devtools-contextmenu";
+import { showMenu } from "devtools/shared/contextmenu";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import kebabCase from "lodash/kebabCase";
 

@@ -12,7 +12,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
-import { features } from "ui/utils/prefs";
+import { features, prefs } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import Spinner from "ui/components/shared/Spinner";
 
@@ -295,16 +295,20 @@ class EventListeners extends Component {
       return null;
     }
 
+    const isHot = points.length > prefs.maxHitsEditable;
+    const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
+
     return (
       <li
-        className="px-2 pl-5 mb-1 mr-1 flex flex-row items-center hover:bg-gray-200 rounded-md"
+        className="px-2 pl-5 mb-1 mr-1 flex flex-row items-center hover:bg-gray-100 rounded-md"
         key={event.id}
       >
         <div className="flex flex-row justify-between w-full">
-          <label className="w-full flex flex-row items-center">
+          <label title={title} className="w-full flex flex-row items-center">
             <input
               type="checkbox"
               value={event.id}
+              disabled={isHot}
               onChange={e => this.onEventTypeClick(event.id, e.target.checked)}
               checked={activeEventListeners.includes(event.id)}
               className="focus:primaryAccentHover h-4 w-4 mr-1 text-primaryAccent border-gray-300 rounded flex-shrink-0"
@@ -313,11 +317,9 @@ class EventListeners extends Component {
               {searchText ? this.renderCategory(category) : null}
               {event.name}
             </span>
-            {features.eventCount ? (
-              <span className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">
-                {points.length}
-              </span>
-            ) : null}
+            <span className="event-listener-count flex-shrink-0 bg-gray-200 py-1 px-2 rounded-md">
+              {points.length}
+            </span>
           </label>
         </div>
       </li>

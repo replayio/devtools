@@ -20,3 +20,21 @@ export function setAccessTokenInBrowserPrefs(token: string | null) {
     })
   );
 }
+
+export function listenForAccessToken(callback: (accessToken: string) => void) {
+  window.addEventListener("WebChannelMessageToContent", (ev: any) => {
+    const token = ev.detail?.message?.token;
+    if (token) {
+      callback(token);
+    }
+  });
+
+  window.dispatchEvent(
+    new window.CustomEvent("WebChannelMessageToChrome", {
+      detail: JSON.stringify({
+        id: "record-replay-token",
+        message: { type: "connect" },
+      }),
+    })
+  );
+}

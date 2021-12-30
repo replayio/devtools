@@ -4,7 +4,7 @@
 
 "use strict";
 
-const Services = require("Services");
+const Services = require("devtools/shared/services");
 
 function generalEvent(groupID, eventType) {
   return {

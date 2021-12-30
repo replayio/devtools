@@ -14,11 +14,9 @@ export const Declarations: FC<DeclarationsProps> = ({ declarations, query }) => 
 
   return (
     <ul className="ruleview-propertylist">
-      {declarations
-        .filter(declaration => !declaration.isInvisible)
-        .map(declaration => (
-          <Declaration key={declaration.id} declaration={declaration} query={query} />
-        ))}
+      {declarations.map(declaration => (
+        <Declaration key={declaration.id} declaration={declaration} query={query} />
+      ))}
     </ul>
   );
 };

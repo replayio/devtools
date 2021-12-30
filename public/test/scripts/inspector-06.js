@@ -5,7 +5,6 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
   await Test.selectMarkupNode(node);
 
   await Test.checkAppliedRules([
-    { selector: "element", source: "inline", properties: [] },
     {
       selector: ".parent",
       source: "shorthand_styles.css:1",
@@ -19,7 +18,6 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
   Test.setLonghandsExpanded(true);
 
   await Test.checkAppliedRules([
-    { selector: "element", source: "inline", properties: [] },
     {
       selector: ".parent",
       source: "shorthand_styles.css:1",
