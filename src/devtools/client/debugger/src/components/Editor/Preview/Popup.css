@@ -10,6 +10,7 @@
   height: auto;
   overflow: auto;
   box-shadow: 1px 2px 3px var(--popup-shadow-color);
+  font-size: var(--theme-body-font-size);
 }
 
 .gap svg {
