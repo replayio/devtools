@@ -19,7 +19,7 @@ export function formatRelativeTime(date: Date) {
     return `${years}y`;
   }
   if (months > 0) {
-    return `${months}m`;
+    return `${months}mo`;
   }
   if (weeks > 0) {
     return `${weeks}w`;
