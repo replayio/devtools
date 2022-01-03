@@ -65,7 +65,7 @@ export default function Event({
       onKeyDown={onKeyDown}
       className={classNames(
         "event flex flex-row justify-between items-center space-x-2 user-select-none",
-        "group block p-3 w-full rounded-lg hover:bg-gray-100 focus:outline-none",
+        "group block p-3 w-full rounded-lg hover:bg-gray-100 focus:outline-none cursor-pointer",
         {
           "text-lightGrey": currentTime < time,
           "text-primaryAccent font-semibold": isPaused,
