@@ -93,9 +93,8 @@ export function SourceOutline({
 
   if (!selectedSource || !symbols) {
     return (
-      <div className="onboarding-text p-3 space-y-3 text-gray-500 text-base whitespace-normal">
-        <MaterialIcon className="large-icon">info</MaterialIcon>
-        <p>{`Select a source to see available function.`}</p>
+      <div className="p-3 space-y-3 text-gray-500 text-xs whitespace-normal bg-gray-50 rounded-lg mx-2 mt-2 mb-4 text-center">
+        {`Select a source to see available functions.`}
       </div>
     );
   }
