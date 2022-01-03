@@ -94,7 +94,7 @@ export function SourceOutline({
   if (!selectedSource || !symbols) {
     return (
       <div className="p-3 space-y-3 text-gray-500 text-xs whitespace-normal bg-gray-50 rounded-lg mx-2 mt-2 mb-4 text-center">
-        {`Select a source to see available functions.`}
+        {`Select a source to see available functions`}
       </div>
     );
   }
