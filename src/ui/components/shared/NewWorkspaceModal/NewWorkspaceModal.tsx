@@ -255,6 +255,10 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
   };
   const didUserConfirm = () => {
+    if (!inputValue) {
+      return Promise.resolve(true);
+    }
+
     return confirmDestructive({
       message: "Continue without sending invitations?",
       description:
