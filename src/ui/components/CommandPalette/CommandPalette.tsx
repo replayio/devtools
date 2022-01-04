@@ -62,14 +62,18 @@ function CommandPalette({ hideCommandPalette, executeCommand }: PropsFromRedux) 
       options={{ maskTransparency: "translucent" }}
       onMaskClick={() => hideCommandPalette()}
     >
-      <div className="w-96 h-64 flex flex-col overflow-hidden rounded-md bg-gray-100 shadow-xl ">
-        <div className="p-2 border-b border-gray-300">
+      <div
+        className="h-64 flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+        style={{ width: "480px" }}
+      >
+        <div className="p-3 border-b border-gray-300">
           <TextInput
             value={searchString}
             onChange={onChange}
             onKeyDown={onKeyDown}
             autoFocus
             placeholder="What would you like to do?"
+            textSize="lg"
           />
         </div>
         <div className="flex-grow text-sm flex flex-col overflow-auto">
