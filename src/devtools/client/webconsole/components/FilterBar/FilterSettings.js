@@ -14,6 +14,23 @@ const { trackEvent } = require("ui/utils/telemetry");
 const { FILTERS } = require("devtools/client/webconsole/constants");
 const { ToggleRow } = require("./ConsoleSettings");
 
+function FilterToggle({ children, count, onClick, selected, id }) {
+  return (
+    <ToggleRow onClick={onClick} selected={selected} id={id}>
+      <div className="flex justify-between justify items-center">
+        <span className="whitespace-pre overflow-hidden overflow-ellipsis flex-grow py-0.5">
+          {children}
+        </span>
+        {count ? (
+          <span className="event-listener-count font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
+            {count}
+          </span>
+        ) : null}
+      </div>
+    </ToggleRow>
+  );
+}
+
 function FilterSettings({
   filters,
   filteredMessagesCount,
@@ -21,18 +38,13 @@ function FilterSettings({
   filterToggle,
   logExceptions,
 }) {
-  function getLabel(baseLabel, filterKey) {
-    const count = filteredMessagesCount[filterKey];
-    if (count === 0) {
-      return baseLabel;
-    }
-    return `${baseLabel} (${count})`;
+  function getLabel(filterKey) {
+    return filteredMessagesCount[filterKey];
   }
 
   return (
     <div className="flex flex-col">
-      {/* Show Error */}
-      <ToggleRow
+      <FilterToggle
         onClick={() => {
           trackEvent("console.settings.toggle_log_exceptions");
           logExceptions(!shouldLogExceptions);
@@ -40,11 +52,10 @@ function FilterSettings({
         selected={shouldLogExceptions}
         id="show-exceptions"
       >
-        Show Exceptions
-      </ToggleRow>
-
-      {/* Error */}
-      <ToggleRow
+        Exceptions
+      </FilterToggle>
+      <FilterToggle
+        count={getLabel(FILTERS.ERROR)}
         onClick={() => {
           trackEvent("console.settings.toggle_error");
           filterToggle(FILTERS.ERROR);
@@ -52,11 +63,10 @@ function FilterSettings({
         selected={filters[FILTERS.ERROR]}
         id="show-errors"
       >
-        {getLabel("Show Errors", FILTERS.ERROR)}
-      </ToggleRow>
-
-      {/* Warning */}
-      <ToggleRow
+        Errors
+      </FilterToggle>
+      <FilterToggle
+        count={getLabel(FILTERS.WARN)}
         onClick={() => {
           trackEvent("console.settings.toggle_warn");
           filterToggle(FILTERS.WARN);
@@ -64,11 +74,10 @@ function FilterSettings({
         selected={filters[FILTERS.WARN]}
         id="show-warnings"
       >
-        {getLabel("Show Warnings", FILTERS.WARN)}
-      </ToggleRow>
-
-      {/* Logs */}
-      <ToggleRow
+        Warnings
+      </FilterToggle>
+      <FilterToggle
+        count={getLabel(FILTERS.LOG)}
         onClick={() => {
           trackEvent("console.settings.toggle_logs");
           filterToggle(FILTERS.LOG);
@@ -76,8 +85,8 @@ function FilterSettings({
         selected={filters[FILTERS.LOG]}
         id="show-logs"
       >
-        {getLabel("Show Logs", FILTERS.LOG)}
-      </ToggleRow>
+        Logs
+      </FilterToggle>
     </div>
   );
 }
