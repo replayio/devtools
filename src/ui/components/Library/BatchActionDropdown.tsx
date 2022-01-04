@@ -6,7 +6,7 @@ import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
 import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
-import { getButtonClasses } from "../shared/Button";
+import { DisabledButton, getButtonClasses } from "../shared/Button";
 import MaterialIcon from "../shared/MaterialIcon";
 import classNames from "classnames";
 import PortalDropdown from "../shared/PortalDropdown";
@@ -65,29 +65,26 @@ function BatchActionDropdown({
     setExpanded(false);
   };
 
-  let button, buttonClasses;
-
-  if (selectedIds.length > 0) {
-    button = (
-      <span className={"space-x-1 flex flex-row items-center leading-4 text-primaryAccent"}>
+  if (!selectedIds.length) {
+    return (
+      <DisabledButton>
         <MaterialIcon outlined className="font-bold" iconSize="sm">
           expand_more
         </MaterialIcon>
         <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
-      </span>
+      </DisabledButton>
     );
-    buttonClasses = classNames("bg-white", getButtonClasses("blue", "secondary", "md"));
-  } else {
-    button = (
-      <span className={classNames("space-x-1 flex flex-row items-center leading-4")}>
-        <MaterialIcon outlined className="font-bold" iconSize="sm">
-          expand_more
-        </MaterialIcon>
-        <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
-      </span>
-    );
-    buttonClasses = classNames("cursor-default", getButtonClasses("blue", "disabled", "md"));
   }
+
+  const buttonClasses = classNames("bg-white", getButtonClasses("blue", "secondary", "md"));
+  const button = (
+    <span className={"space-x-1 flex flex-row items-center leading-4 text-primaryAccent"}>
+      <MaterialIcon outlined className="font-bold" iconSize="sm">
+        expand_more
+      </MaterialIcon>
+      <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
+    </span>
+  );
 
   return (
     <PortalDropdown
