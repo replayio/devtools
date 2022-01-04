@@ -103,7 +103,7 @@ function sendTelemetryEvent(telemetryEvent, tags) {
   try {
     const request = https.request(options, () => {});
     request.on("error", e => {
-      log(`Error sending telemetry ping: ${e}`);
+      throw e;
     });
     request.write(
       JSON.stringify({
