@@ -1,5 +1,15 @@
 import classNames from "classnames";
-import React, { MouseEvent, MouseEventHandler, useState } from "react";
+import React, { MouseEventHandler, useState, useReducer } from "react";
+import {
+  AccordionState,
+  collapseSection,
+  expandSection,
+  getInitialState,
+  getIsCollapsed,
+  getPosition,
+  getSectionDisplayedHeight,
+  reducer,
+} from "./reducer";
 
 export interface AccordionItem {
   className?: string;
@@ -23,7 +33,11 @@ const MIN_HEIGHT = 150;
 const HEADER_HEIGHT = 24 + 1;
 
 const getLastExpandedIndex = (collapsed: CollapsedState, endIndex?: number) => {
-  return collapsed.slice(0, endIndex).lastIndexOf(false);
+  const lastIndex = collapsed.slice(0, endIndex).lastIndexOf(false);
+
+  if (lastIndex === -1) return null;
+
+  return lastIndex;
 };
 const getFirstExpandedIndex = (collapsed: CollapsedState, startIndex: number = 0) => {
   const segment = collapsed.slice(startIndex);
@@ -32,21 +46,23 @@ const getFirstExpandedIndex = (collapsed: CollapsedState, startIndex: number = 0
   return index > -1 ? startIndex + index : index;
 };
 const getClosestPrecedingExpandedIndex = (collapsed: CollapsedState, index: number) => {
-  return collapsed.slice(0, index).lastIndexOf(false);
+  const closestIndex = collapsed.slice(0, index).lastIndexOf(false);
+
+  if (closestIndex === -1) return null;
+
+  return closestIndex;
 };
 
-const getSpaceBefore = (index: number, creases: CreasesState) => {
-  return creases.slice(0, index).reduce((a, b) => a + b, 0) || 0;
-};
-const getSpaceAfter = (index: number, creases: CreasesState) => {
-  return creases.slice(index + 1).reduce((a, b) => a + b, 0);
-};
+const getSpaceAfter = (index: number, creases: CreasesState, collapsed: CollapsedState) => {
+  return creases.reduce((a, b, i) => {
+    if (i <= index) {
+      return a;
+    }
 
-const getPosition = (creases: CreasesState, index: number) => {
-  const top = getSpaceBefore(index, creases);
-  const height = creases[index];
+    const increment = collapsed[i] ? HEADER_HEIGHT : b;
 
-  return { top, height };
+    return a + increment;
+  }, 0);
 };
 
 const getIsResizable = (index: number, collapsed: CollapsedState) => {
@@ -57,6 +73,27 @@ const getIsResizable = (index: number, collapsed: CollapsedState) => {
   return isExpanded && index !== isLastExpandedIndex && !isLastIndex;
 };
 
+const ensmallenEverythingButIndex = (
+  index: number,
+  creases: CreasesState,
+  collapsed: CollapsedState
+) => {
+  // This currently makes everything else min height
+  const displayedCreases = creases.map((c, i) => {
+    if (i === index) {
+      return c;
+    }
+
+    if (collapsed[i]) {
+      return HEADER_HEIGHT;
+    }
+
+    return Math.min(MIN_HEIGHT, c);
+  });
+
+  return displayedCreases;
+};
+
 // This allows the selected (expanded) session to gobble up as much vertical space as
 // it's allowed to. Right now this works under the assumption that when you expand a
 // section, it should take up as much height as possible, and all other currently
@@ -64,30 +101,16 @@ const getIsResizable = (index: number, collapsed: CollapsedState) => {
 // TODO: If a user resizes a section, we should shrink not to that minimum height, but to
 // the most recent resized height instead.
 const embiggenSection = (index: number, creases: CreasesState, collapsed: CollapsedState) => {
-  let newCreases = [...creases];
-
-  // Adjust the sections AFTER this index.
-  newCreases = newCreases.map((c, i) => {
-    if (i <= index) return c;
-    const isCollapsed = collapsed[i];
-    return isCollapsed ? HEADER_HEIGHT : Math.min(MIN_HEIGHT, c);
-  });
-
-  // Adjust the sections BEFORE this index.
-  newCreases = newCreases.map((c, i) => {
-    if (i >= index) return c;
-    const isCollapsed = collapsed[i];
-    return isCollapsed ? HEADER_HEIGHT : Math.min(MIN_HEIGHT, c);
-  });
-
-  console.log({ newCreases, creases });
+  const displayedCreases = ensmallenEverythingButIndex(index, creases, collapsed);
 
   // Now that sections before and after are properly positioned,
   // distribute the remaining space to the selected section.
-  newCreases[index] =
-    ACCORDION_HEIGHT - getSpaceBefore(index, newCreases) - getSpaceAfter(index, newCreases);
+  displayedCreases[index] =
+    ACCORDION_HEIGHT -
+    getSpaceBefore(index, displayedCreases, collapsed) -
+    getSpaceAfter(index, displayedCreases, collapsed);
 
-  return newCreases;
+  return displayedCreases;
 };
 
 function maybeRedistributeSpace(
@@ -103,12 +126,12 @@ function maybeRedistributeSpace(
   // Collapsing a section frees up vertical space in the accordion. This puts in
   // some logic to figure out which section should be free to take the new space.
   // The specific heuristics are lifted from VSCode's accordion.
-  if (lastExpandedIndex !== index) {
+  if (lastExpandedIndex && lastExpandedIndex !== index) {
     // If there's one (or many) expanded sections after the just-collapsed section,
     // this attempts to preserve the height of expanded sections closest to the
     // just-collapsed section by only embiggening the very last expanded section.
     adjustedCreases = embiggenSection(lastExpandedIndex, newCreases, collapsed);
-  } else if (closestPrecedingExpandedIndex !== index) {
+  } else if (closestPrecedingExpandedIndex && closestPrecedingExpandedIndex !== index) {
     // If there's one (or many) expanded sections before the just-collapsed section,
     // this attempts to preserve the height of expanded sections closest to the
     // just-collapsed section by only embiggening the very first expanded section.
@@ -139,28 +162,28 @@ function ResizeHandle({
 
 function Section({
   children,
-  collapsed,
+  isCollapsed,
   index,
-  isResizing,
+  // isResizing,
   position,
   toggleCollapsed,
-  onResizeStart,
-}: {
+}: // onResizeStart,
+{
   children: React.ReactNode;
-  collapsed: CollapsedState;
+  isCollapsed: boolean;
   index: number;
-  isResizing: boolean;
+  // isResizing: boolean;
   position: SectionPosition;
   toggleCollapsed: (index: number) => void;
-  onResizeStart: (e: React.MouseEvent) => void;
+  // onResizeStart: (e: React.MouseEvent) => void;
 }) {
-  const isCollapsed = collapsed[index];
-  const isResizable = getIsResizable(index, collapsed);
+  // const isResizable = getIsResizable(index, collapsed);
 
   return (
     <div
       className="overflow-hidden flex flex-col absolute w-full transition"
-      style={{ ...position, transition: isResizing ? "" : "all 0.15s ease-in-out" }}
+      // style={{ ...position, transition: isResizing ? "" : "all 0.15s ease-in-out" }}
+      style={{ ...position }}
     >
       <button
         className="font-bold flex space-x-2 bg-gray-200 w-full px-2"
@@ -171,7 +194,7 @@ function Section({
       </button>
       <div className="overflow-auto flex-grow">{!isCollapsed && children}</div>
       <div className="border-b border-black" />
-      {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isResizing} />}
+      {/* {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isResizing} />} */}
     </div>
   );
 }
@@ -180,6 +203,7 @@ export default function Accordion({ items }: any) {
   // This is fine for prototyping but there's a cleaner way to do this.
   const [collapsed, setCollapsed] = useState<CollapsedState>(new Array(items.length).fill(true));
   const [creases, setCreases] = useState<CreasesState>(new Array(items.length).fill(HEADER_HEIGHT));
+  const [state, dispatch] = useReducer(reducer, getInitialState(items.length));
 
   const [resizingParams, setResizingParams] = useState<{
     index: number;
@@ -188,28 +212,30 @@ export default function Accordion({ items }: any) {
     originalCreases: CreasesState;
   } | null>(null);
 
-  const expandSection = (index: number, newCollapsed: CollapsedState) => {
-    let newCreases = embiggenSection(index, creases, newCollapsed);
-    setCreases(newCreases);
-  };
-  const collapseSection = (index: number, newCollapsed: CollapsedState) => {
-    let newCreases = [...creases];
-    newCreases[index] = HEADER_HEIGHT;
-    newCreases = maybeRedistributeSpace(index, newCollapsed, newCreases);
+  // const expandSection = (index: number, newCollapsed: CollapsedState) => {
+  //   let newCreases = embiggenSection(index, creases, newCollapsed);
+  //   setCreases(newCreases);
+  // };
+  // const collapseSection = (index: number, newCollapsed: CollapsedState) => {
+  //   let newCreases = [...creases];
+  //   newCreases[index] = HEADER_HEIGHT;
+  //   newCreases = maybeRedistributeSpace(index, newCollapsed, newCreases);
 
-    setCreases(newCreases);
-  };
+  //   setCreases(newCreases);
+  // };
   const toggleCollapsed = (index: number) => {
-    const isCollapsed = collapsed[index];
+    const isCollapsed = getIsCollapsed(state, index);
 
-    const newCollapsed = [...collapsed];
-    newCollapsed[index] = !isCollapsed;
-    setCollapsed(newCollapsed);
+    // const newCollapsed = [...collapsed];
+    // newCollapsed[index] = !isCollapsed;
+    // setCollapsed(newCollapsed);
 
     if (isCollapsed) {
-      expandSection(index, newCollapsed);
+      console.log(1);
+      dispatch(expandSection(index));
     } else {
-      collapseSection(index, newCollapsed);
+      console.log(2);
+      dispatch(collapseSection(index));
     }
   };
 
@@ -241,7 +267,7 @@ export default function Accordion({ items }: any) {
       let nextIndex = getLastExpandedIndex(collapsed);
 
       // Walk back from the last expanded index until you reach the current index.
-      while (nextIndex > 0 && nextIndex > index) {
+      while (nextIndex && nextIndex > index) {
         const originalCrease = originalCreases[nextIndex];
         const receivableDelta = Math.min(originalCrease - MIN_HEIGHT, remainingDelta);
 
@@ -277,7 +303,7 @@ export default function Accordion({ items }: any) {
       const lastExpandedIndex = getLastExpandedIndex(collapsed);
       // Because there's extra space after the current index, we need to
       // redistribute it to the last expanded index.
-      if (lastExpandedIndex !== index) {
+      if (lastExpandedIndex && lastExpandedIndex !== index) {
         newCreases[lastExpandedIndex] =
           originalCreases[lastExpandedIndex] - (originalDelta - remainingDelta);
       }
@@ -293,17 +319,19 @@ export default function Accordion({ items }: any) {
 
   const isResizing = !!resizingParams;
 
+  console.log(state, getPosition(state, 0), getPosition(state, 1));
+
   return (
     <div className={classNames("h-full overflow-auto flex flex-col relative")}>
       {items.map((item: any, index: number) => (
         <Section
           key={item}
           index={index}
-          collapsed={collapsed}
+          isCollapsed={getIsCollapsed(state, index)}
           toggleCollapsed={toggleCollapsed}
-          position={getPosition(creases, index)}
-          onResizeStart={e => onResizeStart(e, index)}
-          isResizing={isResizing}
+          position={getPosition(state, index)}
+          // onResizeStart={e => onResizeStart(e, index)}
+          // isResizing={isResizing}
         >
           {item.component}
         </Section>
