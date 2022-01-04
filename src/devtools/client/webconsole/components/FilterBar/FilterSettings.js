@@ -14,6 +14,14 @@ const { trackEvent } = require("ui/utils/telemetry");
 const { FILTERS } = require("devtools/client/webconsole/constants");
 const { ToggleRow } = require("./ConsoleSettings");
 
+export function CountPill({ children }) {
+  return (
+    <span className="font-mono text-red-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
+      {children}
+    </span>
+  );
+}
+
 function FilterToggle({ children, count, onClick, selected, id }) {
   return (
     <ToggleRow onClick={onClick} selected={selected} id={id}>
@@ -21,11 +29,7 @@ function FilterToggle({ children, count, onClick, selected, id }) {
         <span className="whitespace-pre overflow-hidden overflow-ellipsis flex-grow py-0.5">
           {children}
         </span>
-        {count ? (
-          <span className="event-listener-count font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
-            {count}
-          </span>
-        ) : null}
+        {count ? <CountPill>{count}</CountPill> : null}
       </div>
     </ToggleRow>
   );
@@ -38,7 +42,7 @@ function FilterSettings({
   filterToggle,
   logExceptions,
 }) {
-  function getLabel(filterKey) {
+  function getCount(filterKey) {
     return filteredMessagesCount[filterKey];
   }
 
@@ -55,7 +59,7 @@ function FilterSettings({
         Exceptions
       </FilterToggle>
       <FilterToggle
-        count={getLabel(FILTERS.ERROR)}
+        count={getCount(FILTERS.ERROR)}
         onClick={() => {
           trackEvent("console.settings.toggle_error");
           filterToggle(FILTERS.ERROR);
@@ -66,7 +70,7 @@ function FilterSettings({
         Errors
       </FilterToggle>
       <FilterToggle
-        count={getLabel(FILTERS.WARN)}
+        count={getCount(FILTERS.WARN)}
         onClick={() => {
           trackEvent("console.settings.toggle_warn");
           filterToggle(FILTERS.WARN);
@@ -77,7 +81,7 @@ function FilterSettings({
         Warnings
       </FilterToggle>
       <FilterToggle
-        count={getLabel(FILTERS.LOG)}
+        count={getCount(FILTERS.LOG)}
         onClick={() => {
           trackEvent("console.settings.toggle_logs");
           filterToggle(FILTERS.LOG);

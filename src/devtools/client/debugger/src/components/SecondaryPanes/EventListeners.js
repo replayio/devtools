@@ -16,6 +16,7 @@ import { features, prefs } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import Spinner from "ui/components/shared/Spinner";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
+import { CountPill } from "devtools/client/webconsole/components/FilterBar/FilterSettings";
 
 class EventListeners extends Component {
   state = {
@@ -260,11 +261,7 @@ class EventListeners extends Component {
             <span className="event-listener-category">{category.name}</span>
           </label>
         </div>
-        {!expanded ? (
-          <div className="event-listener-count font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
-            {count}
-          </div>
-        ) : null}
+        {!expanded ? <CountPill>{count}</CountPill> : null}
       </div>
     );
   }
@@ -316,9 +313,7 @@ class EventListeners extends Component {
               {searchText ? this.renderCategory(category) : null}
               {event.name}
             </span>
-            <span className="event-listener-count font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
-              {points.length}
-            </span>
+            <CountPill>{points.length}</CountPill>
           </label>
         </div>
       </li>
