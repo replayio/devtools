@@ -10,7 +10,6 @@ import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
-import { useRouter } from "next/router";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -33,29 +32,18 @@ export function getRelativeDate(date: string) {
 function RowWrapper({
   children,
   isEditing,
-  isOwner,
   recording,
-  toggleChecked,
+  onClick,
 }: {
   children: React.ReactNode;
   isEditing: boolean;
-  isOwner: boolean;
   recording: Recording;
-  toggleChecked: () => void;
+  onClick: () => void;
 }) {
-  const onClick = (e: MouseEvent) => {
-    if (isEditing && isOwner) {
-      e.preventDefault();
-      toggleChecked();
-    }
-  };
-
-  return (
-    <a
-      href={`/recording/${recording.id}`}
-      onClick={onClick}
-      style={{ color: "inherit", textDecoration: "inherit" }}
-    >
+  return isEditing ? (
+    <div onClick={onClick}> {children}</div>
+  ) : (
+    <a href={`/recording/${recording.id}`} style={{ color: "inherit", textDecoration: "inherit" }}>
       {children}
     </a>
   );
@@ -92,12 +80,7 @@ function RecordingRow({
   }
 
   return (
-    <RowWrapper
-      recording={recording}
-      isEditing={isEditing}
-      isOwner={isOwner}
-      toggleChecked={toggleChecked}
-    >
+    <RowWrapper recording={recording} isEditing={isEditing} onClick={toggleChecked}>
       <div className="group border-b border-gray-200 hover:bg-gray-50 cursor-pointer flex flex-row">
         <div className="py-3 px-4 overflow-hidden whitespace-pre overflow-ellipsis w-12 flex-shrink-0 flex flex-row items-center">
           {isEditing && isOwner ? (
