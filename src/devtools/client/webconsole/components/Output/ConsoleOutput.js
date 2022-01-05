@@ -5,7 +5,7 @@
 
 const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
-const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
+const { connect } = require("react-redux");
 const { actions } = require("ui/actions");
 const { isVisible } = require("ui/utils/dom");
 const ReactDOM = require("react-dom");
