@@ -4,7 +4,7 @@
 
 //
 
-import { PROMISE } from "../utils/middleware/promise";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 import {
   getSource,
   getSourceFromId,

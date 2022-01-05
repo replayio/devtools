@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { selectors } from "ui/reducers";
-import { PROMISE } from "../utils/middleware/promise";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { loadSourceText } from "./loadSourceText";
 
 import { memoizeableAction } from "../../utils/memoizableAction";

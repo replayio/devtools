@@ -4,7 +4,10 @@
 
 //
 
-import { validateNavigateContext, validateContext } from "../../../utils/context";
+import {
+  validateNavigateContext,
+  validateContext,
+} from "../../../../devtools/client/debugger/src/utils/context";
 
 const { log } = require("protocol/socket");
 

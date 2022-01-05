@@ -6,9 +6,13 @@
 
 import fromPairs from "lodash/fromPairs";
 import toPairs from "lodash/toPairs";
-import { executeSoon } from "../../../utils/DevToolsUtils";
+import { executeSoon } from "../../../../devtools/client/debugger/src/utils/DevToolsUtils";
 
-import { pending, rejected, fulfilled } from "../../../utils/async-value";
+import {
+  pending,
+  rejected,
+  fulfilled,
+} from "../../../../devtools/client/debugger/src/utils/async-value";
 export function asyncActionAsValue(action) {
   if (action.status === "start") {
     return pending();
