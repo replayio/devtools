@@ -3,12 +3,16 @@ import React, { MouseEventHandler, useState, useReducer } from "react";
 import {
   AccordionState,
   collapseSection,
+  endResizing,
   expandSection,
   getInitialState,
   getIsCollapsed,
+  getIsIndexResizable,
+  getIsResizing,
   getPosition,
   getSectionDisplayedHeight,
   reducer,
+  startResizing,
 } from "./reducer";
 
 export interface AccordionItem {
@@ -63,14 +67,6 @@ const getSpaceAfter = (index: number, creases: CreasesState, collapsed: Collapse
 
     return a + increment;
   }, 0);
-};
-
-const getIsResizable = (index: number, collapsed: CollapsedState) => {
-  const isLastExpandedIndex = getLastExpandedIndex(collapsed);
-  const isExpanded = !collapsed[index];
-  const isLastIndex = index === collapsed.length - 1;
-
-  return isExpanded && index !== isLastExpandedIndex && !isLastIndex;
 };
 
 const ensmallenEverythingButIndex = (
@@ -164,26 +160,25 @@ function Section({
   children,
   isCollapsed,
   index,
-  // isResizing,
+  isResizable,
+  isResizing,
   position,
   toggleCollapsed,
-}: // onResizeStart,
-{
+  onResizeStart,
+}: {
   children: React.ReactNode;
   isCollapsed: boolean;
   index: number;
-  // isResizing: boolean;
+  isResizable: boolean;
+  isResizing: boolean;
   position: SectionPosition;
   toggleCollapsed: (index: number) => void;
-  // onResizeStart: (e: React.MouseEvent) => void;
+  onResizeStart: (e: React.MouseEvent) => void;
 }) {
-  // const isResizable = getIsResizable(index, collapsed);
-
   return (
     <div
       className="overflow-hidden flex flex-col absolute w-full transition"
-      // style={{ ...position, transition: isResizing ? "" : "all 0.15s ease-in-out" }}
-      style={{ ...position }}
+      style={{ ...position, transition: isResizing ? "" : "all 0.15s ease-in-out" }}
     >
       <button
         className="font-bold flex space-x-2 bg-gray-200 w-full px-2"
@@ -194,7 +189,7 @@ function Section({
       </button>
       <div className="overflow-auto flex-grow">{!isCollapsed && children}</div>
       <div className="border-b border-black" />
-      {/* {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isResizing} />} */}
+      {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isResizing} />}
     </div>
   );
 }
@@ -204,6 +199,7 @@ export default function Accordion({ items }: any) {
   const [collapsed, setCollapsed] = useState<CollapsedState>(new Array(items.length).fill(true));
   const [creases, setCreases] = useState<CreasesState>(new Array(items.length).fill(HEADER_HEIGHT));
   const [state, dispatch] = useReducer(reducer, getInitialState(items.length));
+  const isResizing = getIsResizing(state);
 
   const [resizingParams, setResizingParams] = useState<{
     index: number;
@@ -225,13 +221,7 @@ export default function Accordion({ items }: any) {
   const onResizeStart = (e: React.MouseEvent, index: number) => {
     // Need this otherwise scroll behavior happens in containers with overflow.
     e.preventDefault();
-
-    setResizingParams({
-      index,
-      initialY: e.screenY,
-      originalHeight: creases[index],
-      originalCreases: creases,
-    });
+    dispatch(startResizing(index, e.screenY));
   };
   const onResize = (e: React.MouseEvent) => {
     if (!resizingParams) return;
@@ -295,12 +285,8 @@ export default function Accordion({ items }: any) {
     setCreases(newCreases);
   };
   const onResizeEnd = (e: React.MouseEvent) => {
-    if (!resizingParams) return;
-
-    setResizingParams(null);
+    dispatch(endResizing());
   };
-
-  const isResizing = !!resizingParams;
 
   console.log(state, getPosition(state, 0), getPosition(state, 1));
 
@@ -313,13 +299,14 @@ export default function Accordion({ items }: any) {
           isCollapsed={getIsCollapsed(state, index)}
           toggleCollapsed={toggleCollapsed}
           position={getPosition(state, index)}
-          // onResizeStart={e => onResizeStart(e, index)}
-          // isResizing={isResizing}
+          isResizable={getIsIndexResizable(state, index)}
+          onResizeStart={e => onResizeStart(e, index)}
+          isResizing={isResizing}
         >
           {item.component}
         </Section>
       ))}
-      {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={onResize} /> : null}
+      {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={() => {}} /> : null}
     </div>
   );
 }
@@ -335,7 +322,7 @@ function ResizeMask({
     <div
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      className="h-full w-full fixed top-0 left-0"
+      className="h-full w-full fixed top-0 left-0 bg-black opacity-50"
       style={{ cursor: "ns-resize" }}
     />
   );
