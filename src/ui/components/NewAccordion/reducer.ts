@@ -1,5 +1,6 @@
+import { findLastIndex } from "lodash";
+
 type Section = {
-  idealHeight: number;
   displayedHeight: number;
   expanded: boolean;
 };
@@ -16,8 +17,7 @@ const HEADER_HEIGHT = 24 + 1;
 const createDefaultSection = () => {
   return {
     expanded: false,
-    idealHeight: 0,
-    displayedHeight: HEADER_HEIGHT,
+    displayedHeight: 0,
   };
 };
 
@@ -41,7 +41,7 @@ export const getPosition = (state: AccordionState, index: number) => {
 
   const top = sections.slice(0, index).reduce((a, section) => {
     const increment = section.expanded ? section.displayedHeight : HEADER_HEIGHT;
-    return a + increment;
+    return a + (increment || 0);
   }, 0);
   const height = getIsCollapsed(state, index)
     ? HEADER_HEIGHT
@@ -69,7 +69,6 @@ export function reducer(state: AccordionState, action: AccordionAction) {
 
       let newSections = [...state.sections];
       newSections[index].expanded = false;
-      console.log("ensmallen", index);
       newSections = ensmallenSection(newSections, index);
 
       return { ...state, sections: newSections };
@@ -78,8 +77,8 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       const { index } = action;
 
       let newSections = [...state.sections];
-      newSections[index].expanded = true;
       newSections = embiggenSection(newSections, index);
+      newSections[index].expanded = true;
 
       return { ...state, sections: newSections };
     }
@@ -91,67 +90,70 @@ export function reducer(state: AccordionState, action: AccordionAction) {
 
 // Utils
 
-const minimizeSections = (sections: Section[]) => {
-  return sections.map((section, i) => {
-    let newHeight = Math.min(section.displayedHeight, MIN_HEIGHT);
-
-    if (!section.expanded) {
-      newHeight = HEADER_HEIGHT;
-    }
-
-    return { ...section, displayedHeight: newHeight };
-  });
-};
 const getSectionsTotalHeight = (sections: Section[]) => {
-  return sections.reduce((a, section) => a + section.displayedHeight, 0);
+  return sections.reduce((a, section) => {
+    return a + getActualHeight(section);
+  }, 0);
 };
-const getLastExpandedIndex = (sections: Section[], endIndex?: number) => {
-  const lastIndex = sections
-    .slice(0, endIndex)
-    .map(s => s.expanded)
-    .lastIndexOf(true);
-
-  if (lastIndex === -1) return null;
-
-  return lastIndex;
+const getUnoccupiedHeight = (sections: Section[]) => {
+  const occupiedHeight = getSectionsTotalHeight(sections);
+  return ACCORDION_HEIGHT - occupiedHeight;
 };
-const getReceiverIndex = (sections: Section[], index: number) => {
-  const i = sections.findIndex((s, i) => s.expanded && i !== index);
-
-  if (i < 0) return null;
-
-  return i;
+const getNextTargetIndex = (sections: Section[], index: number, endIndex?: number) => {
+  const sec = sections.slice(0, endIndex);
+  return findLastIndex(sec, (s, i) => s.expanded && i !== index);
+};
+const getActualHeight = (section: Section) => {
+  return section.expanded ? section.displayedHeight || 0 : HEADER_HEIGHT;
 };
 
+// This takes the original sections and the index of section we're trying to "embiggen".
+// It then tries to accommodate that sections height, and allows it to be greedy
+// (i.e. shrink other sections up to min-height).
 const embiggenSection = (sections: Section[], index: number) => {
-  const beforeSections = minimizeSections(sections.slice(0, index));
-  const afterSections = minimizeSections(sections.slice(index + 1));
+  const newSections = [...sections];
 
-  console.log({ beforeSections, afterSections });
+  // If the displayedHeight is 0, then the section should be greedy and take up
+  // as much space as possible.
+  if (!newSections[index].displayedHeight) {
+    newSections[index] = { ...newSections[index], displayedHeight: ACCORDION_HEIGHT };
+  }
 
-  const selectedSectionHeight =
-    ACCORDION_HEIGHT -
-    (getSectionsTotalHeight(beforeSections) + getSectionsTotalHeight(afterSections));
-  const selectedSection = { ...sections[index], displayedHeight: selectedSectionHeight };
+  const idealHeight = newSections[index].displayedHeight || 0;
+  let displayedHeight = getUnoccupiedHeight(newSections) + getActualHeight(newSections[index]);
+  let nextDonorIndex = getNextTargetIndex(newSections, index);
 
-  return [...beforeSections, selectedSection, ...afterSections];
+  while (displayedHeight !== idealHeight && nextDonorIndex > -1) {
+    const donor = newSections[nextDonorIndex];
+    const donorHeight = donor.displayedHeight || 0; // could be cleaner
+
+    const availableHeightToGive = donorHeight - MIN_HEIGHT;
+    const heightRemaining = idealHeight - displayedHeight;
+    const heightDonated = Math.min(availableHeightToGive, heightRemaining);
+
+    newSections[nextDonorIndex] = {
+      ...newSections[nextDonorIndex],
+      displayedHeight: donorHeight - heightDonated,
+    };
+
+    displayedHeight = displayedHeight + heightDonated;
+    nextDonorIndex = getNextTargetIndex(newSections, index, nextDonorIndex);
+  }
+
+  newSections[index] = { ...newSections[index], displayedHeight };
+  return newSections;
 };
-const ensmallenSection = (sections: Section[], index: number) => {
-  // need to get the index of the section that will grab all the space
-  // which is essentially the last expanded section that's not the current index.
-  // const lastExpandedIndex = getLastExpandedIndex(sections);
-  const receiverIndex = getReceiverIndex(sections, index);
 
-  if (receiverIndex && receiverIndex !== index) {
-    console.log("a");
+// This reallocates the space freed up by collapsing a section to the
+// last expanded section, if it exists.
+const ensmallenSection = (sections: Section[], index: number) => {
+  const newSections = [...sections];
+  const receiverIndex = getNextTargetIndex(sections, index);
+
+  if (receiverIndex > -1) {
+    newSections[receiverIndex] = { ...newSections[receiverIndex], displayedHeight: 0 };
     return embiggenSection(sections, receiverIndex);
   }
-  // } else if (closestPrecedingExpandedIndex && closestPrecedingExpandedIndex !== index) {
-  //   console.log("b", { closestPrecedingExpandedIndex });
-  //   return embiggenSection(sections, closestPrecedingExpandedIndex);
-  // }
 
-  console.log("c", { lastExpandedIndex, closestPrecedingExpandedIndex });
-  // sections[index] = { ...sections[index], displayedHeight: HEADER_HEIGHT };
   return sections;
 };
