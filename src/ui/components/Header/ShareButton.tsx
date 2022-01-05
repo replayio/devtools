@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
+import JonIcon from "../shared/JonIcon";
 import MaterialIcon from "../shared/MaterialIcon";
 
 function ShareButton({ setModal }: PropsFromRedux) {
@@ -21,6 +22,7 @@ function ShareButton({ setModal }: PropsFromRedux) {
     >
       <MaterialIcon style={{ fontSize: "16px" }}>ios_share</MaterialIcon>
       <div>Share</div>
+      <JonIcon iconName="info" />
     </button>
   );
 }
