@@ -212,29 +212,12 @@ export default function Accordion({ items }: any) {
     originalCreases: CreasesState;
   } | null>(null);
 
-  // const expandSection = (index: number, newCollapsed: CollapsedState) => {
-  //   let newCreases = embiggenSection(index, creases, newCollapsed);
-  //   setCreases(newCreases);
-  // };
-  // const collapseSection = (index: number, newCollapsed: CollapsedState) => {
-  //   let newCreases = [...creases];
-  //   newCreases[index] = HEADER_HEIGHT;
-  //   newCreases = maybeRedistributeSpace(index, newCollapsed, newCreases);
-
-  //   setCreases(newCreases);
-  // };
   const toggleCollapsed = (index: number) => {
     const isCollapsed = getIsCollapsed(state, index);
 
-    // const newCollapsed = [...collapsed];
-    // newCollapsed[index] = !isCollapsed;
-    // setCollapsed(newCollapsed);
-
     if (isCollapsed) {
-      console.log(1);
       dispatch(expandSection(index));
     } else {
-      console.log(2);
       dispatch(collapseSection(index));
     }
   };
