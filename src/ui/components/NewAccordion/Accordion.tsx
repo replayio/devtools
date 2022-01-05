@@ -10,8 +10,10 @@ import {
   getIsIndexResizable,
   getIsResizing,
   getPosition,
+  getResizingParams,
   getSectionDisplayedHeight,
   reducer,
+  resize,
   startResizing,
 } from "./reducer";
 
@@ -32,9 +34,11 @@ export type CreasesState = number[];
 
 const ACCORDION_HEIGHT = 600;
 const MIN_HEIGHT = 150;
+const HANDLE_WIDTH = 4;
+const BORDER_WIDTH = 1;
 // 24px is arbitrary based on how the header was styled. The 1px is the bottom border
 // that functions as the resize handle.
-const HEADER_HEIGHT = 24 + 1;
+const HEADER_HEIGHT = 24 + BORDER_WIDTH;
 
 const getLastExpandedIndex = (collapsed: CollapsedState, endIndex?: number) => {
   const lastIndex = collapsed.slice(0, endIndex).lastIndexOf(false);
@@ -147,10 +151,14 @@ function ResizeHandle({
   return (
     <div
       className={classNames(
-        "absolute bottom-px w-full border-b-4 border-gray-300 hover:border-blue-400 transition",
+        "absolute w-full border-transparent hover:border-blue-400 transition de",
         isResizing ? "border-blue-400" : ""
       )}
-      style={{ cursor: "ns-resize" }}
+      style={{
+        cursor: "ns-resize",
+        borderBottomWidth: `${HANDLE_WIDTH}px`,
+        top: `${BORDER_WIDTH - HANDLE_WIDTH}px`,
+      }}
       onMouseDown={onResizeStart}
     />
   );
@@ -177,19 +185,21 @@ function Section({
 }) {
   return (
     <div
-      className="overflow-hidden flex flex-col absolute w-full transition"
-      style={{ ...position, transition: isResizing ? "" : "all 0.15s ease-in-out" }}
+      className="absolute w-full h-full transition"
+      style={{ ...position, transition: isResizing ? "" : "all 0.1s ease-in-out" }}
     >
-      <button
-        className="font-bold flex space-x-2 bg-gray-200 w-full px-2"
-        onClick={() => toggleCollapsed(index)}
-      >
-        <div className="font-mono">{isCollapsed ? `>` : `v`}</div>
-        <div>{`Section ${index + 1} `}</div>
-      </button>
-      <div className="overflow-auto flex-grow">{!isCollapsed && children}</div>
-      <div className="border-b border-black" />
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isResizing} />}
+      <div className="overflow-hidden flex flex-col w-full h-full">
+        <div className={classNames("border-b", index > 0 ? "border-black" : "border-gray-200")} />
+        <button
+          className="font-bold flex space-x-2 bg-gray-200 w-full px-2"
+          onClick={() => toggleCollapsed(index)}
+        >
+          <div className="font-mono">{isCollapsed ? `>` : `v`}</div>
+          <div>{`Section ${index + 1} `}</div>
+        </button>
+        <div className="overflow-auto flex-grow">{!isCollapsed && children}</div>
+      </div>
     </div>
   );
 }
@@ -200,13 +210,7 @@ export default function Accordion({ items }: any) {
   const [creases, setCreases] = useState<CreasesState>(new Array(items.length).fill(HEADER_HEIGHT));
   const [state, dispatch] = useReducer(reducer, getInitialState(items.length));
   const isResizing = getIsResizing(state);
-
-  const [resizingParams, setResizingParams] = useState<{
-    index: number;
-    initialY: number;
-    originalHeight: number;
-    originalCreases: CreasesState;
-  } | null>(null);
+  const resizingParams = getResizingParams(state);
 
   const toggleCollapsed = (index: number) => {
     const isCollapsed = getIsCollapsed(state, index);
@@ -224,65 +228,7 @@ export default function Accordion({ items }: any) {
     dispatch(startResizing(index, e.screenY));
   };
   const onResize = (e: React.MouseEvent) => {
-    if (!resizingParams) return;
-
-    const { index, initialY, originalHeight, originalCreases } = resizingParams;
-
-    const newCreases = [...creases];
-    const originalDelta = e.screenY - initialY;
-    let remainingDelta = originalDelta;
-
-    // if delta is positive, we're squeezing the proceeding sections.
-    // need to make sure we're allowed to in the first place, and as we
-    // make the selected section smaller, that we embiggen the preceding
-    // sections accordingly.
-    if (remainingDelta > 0) {
-      let nextIndex = getLastExpandedIndex(collapsed);
-
-      // Walk back from the last expanded index until you reach the current index.
-      while (nextIndex && nextIndex > index) {
-        const originalCrease = originalCreases[nextIndex];
-        const receivableDelta = Math.min(originalCrease - MIN_HEIGHT, remainingDelta);
-
-        if (receivableDelta) {
-          newCreases[nextIndex] = originalCreases[nextIndex] - receivableDelta;
-          remainingDelta -= receivableDelta;
-        }
-
-        nextIndex = getLastExpandedIndex(collapsed, nextIndex);
-      }
-
-      newCreases[index] = originalHeight + originalDelta - remainingDelta;
-    } else if (remainingDelta < 0) {
-      // if delta is negative, we're squeezing the preceding sections.
-      // need to make sure we're allowed to in the first place. The selected
-      // section will get larger, and we need to embiggen the proceeding sections
-      // accordingly.
-      let nextIndex = getFirstExpandedIndex(collapsed);
-
-      // Walk forward from the first expanded index until you reach the current index.
-      while (nextIndex >= 0 && nextIndex <= index) {
-        const originalCrease = originalCreases[nextIndex];
-        const receivableDelta = Math.max(MIN_HEIGHT - originalCrease, remainingDelta);
-
-        if (receivableDelta) {
-          newCreases[nextIndex] = originalCreases[nextIndex] + receivableDelta;
-          remainingDelta -= receivableDelta;
-        }
-
-        nextIndex = getFirstExpandedIndex(collapsed, nextIndex + 1);
-      }
-
-      const lastExpandedIndex = getLastExpandedIndex(collapsed);
-      // Because there's extra space after the current index, we need to
-      // redistribute it to the last expanded index.
-      if (lastExpandedIndex && lastExpandedIndex !== index) {
-        newCreases[lastExpandedIndex] =
-          originalCreases[lastExpandedIndex] - (originalDelta - remainingDelta);
-      }
-    }
-
-    setCreases(newCreases);
+    dispatch(resize(e.screenY));
   };
   const onResizeEnd = (e: React.MouseEvent) => {
     dispatch(endResizing());
@@ -301,12 +247,12 @@ export default function Accordion({ items }: any) {
           position={getPosition(state, index)}
           isResizable={getIsIndexResizable(state, index)}
           onResizeStart={e => onResizeStart(e, index)}
-          isResizing={isResizing}
+          isResizing={isResizing && resizingParams?.index === index}
         >
           {item.component}
         </Section>
       ))}
-      {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={() => {}} /> : null}
+      {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={onResize} /> : null}
     </div>
   );
 }
