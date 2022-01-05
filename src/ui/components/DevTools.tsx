@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { clearTrialExpired, createSession } from "ui/actions/session";
-import { useGetRecordingId } from "ui/hooks/recordings";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
 import NonDevView from "./Views/NonDevView";
@@ -51,6 +51,7 @@ function _DevTools({
   viewMode,
 }: _DevToolsProps) {
   const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
   const { userIsAuthor, loading } = useUserIsAuthor();
 
   useEffect(() => {
@@ -75,6 +76,12 @@ function _DevTools({
       endUploadWaitTracking(sessionId!);
     }
   }, [uploadComplete, loadingFinished]);
+
+  useEffect(() => {
+    if (recording && document.title !== recording.title) {
+      document.title = recording.title;
+    }
+  }, [recording]);
 
   if (!loadingFinished) {
     return <LoadingScreen />;
