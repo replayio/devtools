@@ -5,7 +5,7 @@
 //
 
 import { getSelectedFrame, getFrameScope } from "../../selectors";
-import { PROMISE } from "../utils/middleware/promise";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 export function fetchScopes(cx) {
   return async function ({ dispatch, getState, client }) {

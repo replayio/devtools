@@ -2,24 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-/* global window */
-
-/**
- * Redux store utils
- * @module utils/create-store
- */
-
 import { createStore, applyMiddleware } from "redux";
 import { promise } from "./middleware/promise";
 import { thunk } from "./middleware/thunk";
 import { context } from "./middleware/context";
-
-/**
- * @memberof utils/create-store
- * @static
- */
 
 /**
  * This creates a dispatcher with all the standard middleware in place

@@ -4,7 +4,7 @@
 
 //
 
-import { PROMISE } from "./utils/middleware/promise";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 const { getShouldLogExceptions } = require("../reducers/pause");
 const { clientCommands } = require("../client/commands");
 

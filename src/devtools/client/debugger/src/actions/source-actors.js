@@ -10,7 +10,7 @@ import {
   getSourceActorBreakpointColumns,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
-import { PROMISE } from "./utils/middleware/promise";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 export function insertSourceActor(item) {
   return insertSourceActors([item]);
