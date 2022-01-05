@@ -4,12 +4,26 @@ type Section = {
   displayedHeight: number;
   expanded: boolean;
 };
+type ResizingParams = {
+  index: number;
+  initialY: number;
+  originalSections: Section[];
+};
 export type AccordionState = {
   sections: Section[];
+  resizingParams: ResizingParams | null;
 };
 type ExpandSectionAction = { type: "expand_section"; index: number };
 type CollapseSectionAction = { type: "collapse_section"; index: number };
-type AccordionAction = ExpandSectionAction | CollapseSectionAction;
+type StartResizingAction = { type: "start_resizing"; index: number; initialY: number };
+type EndResizingAction = { type: "end_resizing" };
+type ResizeAction = { type: "resize" };
+type AccordionAction =
+  | ExpandSectionAction
+  | CollapseSectionAction
+  | StartResizingAction
+  | EndResizingAction
+  | ResizeAction;
 
 const MIN_HEIGHT = 150;
 const ACCORDION_HEIGHT = 600;
@@ -28,6 +42,15 @@ export function expandSection(index: number): ExpandSectionAction {
 }
 export function collapseSection(index: number): CollapseSectionAction {
   return { type: "collapse_section", index };
+}
+export function startResizing(index: number, initialY: number): StartResizingAction {
+  return { type: "start_resizing", index, initialY };
+}
+export function endResizing(): EndResizingAction {
+  return { type: "end_resizing" };
+}
+export function resize(): ResizeAction {
+  return { type: "resize" };
 }
 
 // Selectors
@@ -49,6 +72,17 @@ export const getPosition = (state: AccordionState, index: number) => {
 
   return { top, height };
 };
+export const getIsIndexResizable = (state: AccordionState, index: number) => {
+  const { sections } = state;
+  const hasTargetIndex = getNextTargetIndex(sections, index);
+  const isExpanded = state.sections[index].expanded;
+  const isLastIndex = index === state.sections.length - 1;
+
+  return !!(hasTargetIndex && isExpanded && !isLastIndex);
+};
+export const getIsResizing = (state: AccordionState) => {
+  return !!state.resizingParams;
+};
 
 // Reducer
 
@@ -59,7 +93,7 @@ export function getInitialState(count: number): AccordionState {
     sections.push(createDefaultSection());
   }
 
-  return { sections };
+  return { sections, resizingParams: null };
 }
 
 export function reducer(state: AccordionState, action: AccordionAction) {
@@ -81,6 +115,20 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       newSections[index].expanded = true;
 
       return { ...state, sections: newSections };
+    }
+    case "start_resizing": {
+      const { index, initialY } = action;
+      const originalSections = { ...state.sections };
+
+      console.log("start");
+      return { ...state, resizingParams: { index, initialY, originalSections } };
+    }
+    case "end_resizing": {
+      console.log("end");
+      return { ...state, resizingParams: null };
+    }
+    case "resize": {
+      return { ...state };
     }
     default: {
       throw new Error("unknown Accordion action");
