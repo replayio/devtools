@@ -88,6 +88,11 @@
   color: white;
 }
 
+.frames [role="list"] [role="listitem"] .frame-description .title,
+.frames [role="list"] [role="listitem"] .frame-description .frame-link-source {
+  flex-basis: 50%
+}
+
 .frames [role="list"] [role="listitem"].selected i.annotation-logo svg path {
   fill: white;
 }
