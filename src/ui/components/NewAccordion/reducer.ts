@@ -163,6 +163,11 @@ export function reducer(state: AccordionState, action: AccordionAction) {
           ACCORDION_HEIGHT -
           getHeightBeforeIndex(sections, i) -
           getMinHeightAfterIndex(sections, i);
+        console.log({
+          maxHeight,
+          before: getHeightBeforeIndex(sections, i),
+          after: getMinHeightAfterIndex(sections, i),
+        });
         const idealHeight = Math.min(newSections[i].displayedHeight - delta, maxHeight);
         let startIndex = getNextTargetIndex(sections, i);
 

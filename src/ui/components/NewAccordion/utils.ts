@@ -21,7 +21,9 @@ export const getHeightBeforeIndex = (sections: Section[], index: number) => {
 };
 export const getMinHeightAfterIndex = (sections: Section[], index: number) => {
   const sec = sections.slice(index + 1);
-  return sec.length * MIN_HEIGHT;
+  return sec.reduce((a, section) => {
+    return a + getMinHeight(section);
+  }, 0);
 };
 const getUnoccupiedHeight = (sections: Section[]) => {
   const occupiedHeight = getSectionsTotalHeight(sections);
@@ -35,8 +37,11 @@ export const getClosestPreviousExpandedIndex = (sections: Section[], index: numb
   const sec = sections.slice(0, index);
   return findLastIndex(sec, s => s.expanded);
 };
+const getMinHeight = (section: Section) => {
+  return section.expanded ? MIN_HEIGHT : HEADER_HEIGHT;
+};
 const getActualHeight = (section: Section) => {
-  return section.expanded ? section.displayedHeight || 0 : HEADER_HEIGHT;
+  return section.expanded ? section.displayedHeight : HEADER_HEIGHT;
 };
 
 export const embiggenSection = (s: Section[], index: number) => {
