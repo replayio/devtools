@@ -134,7 +134,7 @@ export default function Accordion({ items }: any) {
           isResizable={getIsIndexResizable(state, index)}
           onResizeStart={e => onResizeStart(e, index)}
           isResizing={isResizing}
-          isBeingResized={isResizing && resizingParams?.index === index}
+          isBeingResized={isResizing && resizingParams?.initialIndex === index}
         >
           {item.component}
         </Section>
