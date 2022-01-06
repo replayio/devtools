@@ -1,7 +1,6 @@
 import classNames from "classnames";
-import React, { MouseEventHandler, useState, useReducer } from "react";
+import React, { MouseEventHandler, useReducer } from "react";
 import {
-  AccordionState,
   collapseSection,
   endResizing,
   expandSection,
@@ -11,11 +10,11 @@ import {
   getIsResizing,
   getPosition,
   getResizingParams,
-  getSectionDisplayedHeight,
   reducer,
   resize,
   startResizing,
 } from "./reducer";
+import { BORDER_HEIGHT, HANDLE_HEIGHT } from "./utils";
 
 export interface AccordionItem {
   className?: string;
@@ -32,115 +31,6 @@ export interface SectionPosition {
 export type CollapsedState = boolean[];
 export type CreasesState = number[];
 
-const ACCORDION_HEIGHT = 600;
-const MIN_HEIGHT = 150;
-const HANDLE_WIDTH = 4;
-const BORDER_WIDTH = 1;
-// 24px is arbitrary based on how the header was styled. The 1px is the bottom border
-// that functions as the resize handle.
-const HEADER_HEIGHT = 24 + BORDER_WIDTH;
-
-const getLastExpandedIndex = (collapsed: CollapsedState, endIndex?: number) => {
-  const lastIndex = collapsed.slice(0, endIndex).lastIndexOf(false);
-
-  if (lastIndex === -1) return null;
-
-  return lastIndex;
-};
-const getFirstExpandedIndex = (collapsed: CollapsedState, startIndex: number = 0) => {
-  const segment = collapsed.slice(startIndex);
-  const index = segment.indexOf(false);
-
-  return index > -1 ? startIndex + index : index;
-};
-const getClosestPrecedingExpandedIndex = (collapsed: CollapsedState, index: number) => {
-  const closestIndex = collapsed.slice(0, index).lastIndexOf(false);
-
-  if (closestIndex === -1) return null;
-
-  return closestIndex;
-};
-
-const getSpaceAfter = (index: number, creases: CreasesState, collapsed: CollapsedState) => {
-  return creases.reduce((a, b, i) => {
-    if (i <= index) {
-      return a;
-    }
-
-    const increment = collapsed[i] ? HEADER_HEIGHT : b;
-
-    return a + increment;
-  }, 0);
-};
-
-const ensmallenEverythingButIndex = (
-  index: number,
-  creases: CreasesState,
-  collapsed: CollapsedState
-) => {
-  // This currently makes everything else min height
-  const displayedCreases = creases.map((c, i) => {
-    if (i === index) {
-      return c;
-    }
-
-    if (collapsed[i]) {
-      return HEADER_HEIGHT;
-    }
-
-    return Math.min(MIN_HEIGHT, c);
-  });
-
-  return displayedCreases;
-};
-
-// This allows the selected (expanded) session to gobble up as much vertical space as
-// it's allowed to. Right now this works under the assumption that when you expand a
-// section, it should take up as much height as possible, and all other currently
-// expanded sections will be resized and shrink to the minimum height.
-// TODO: If a user resizes a section, we should shrink not to that minimum height, but to
-// the most recent resized height instead.
-const embiggenSection = (index: number, creases: CreasesState, collapsed: CollapsedState) => {
-  const displayedCreases = ensmallenEverythingButIndex(index, creases, collapsed);
-
-  // Now that sections before and after are properly positioned,
-  // distribute the remaining space to the selected section.
-  displayedCreases[index] =
-    ACCORDION_HEIGHT -
-    getSpaceBefore(index, displayedCreases, collapsed) -
-    getSpaceAfter(index, displayedCreases, collapsed);
-
-  return displayedCreases;
-};
-
-function maybeRedistributeSpace(
-  index: number,
-  collapsed: CollapsedState,
-  newCreases: CreasesState
-) {
-  let adjustedCreases = [...newCreases];
-  const lastExpandedIndex = getLastExpandedIndex(collapsed);
-  const firstExpandedIndex = getFirstExpandedIndex(collapsed);
-  const closestPrecedingExpandedIndex = getClosestPrecedingExpandedIndex(collapsed, index);
-
-  // Collapsing a section frees up vertical space in the accordion. This puts in
-  // some logic to figure out which section should be free to take the new space.
-  // The specific heuristics are lifted from VSCode's accordion.
-  if (lastExpandedIndex && lastExpandedIndex !== index) {
-    // If there's one (or many) expanded sections after the just-collapsed section,
-    // this attempts to preserve the height of expanded sections closest to the
-    // just-collapsed section by only embiggening the very last expanded section.
-    adjustedCreases = embiggenSection(lastExpandedIndex, newCreases, collapsed);
-  } else if (closestPrecedingExpandedIndex && closestPrecedingExpandedIndex !== index) {
-    // If there's one (or many) expanded sections before the just-collapsed section,
-    // this attempts to preserve the height of expanded sections closest to the
-    // just-collapsed section by only embiggening the very first expanded section.
-    adjustedCreases = embiggenSection(closestPrecedingExpandedIndex, newCreases, collapsed);
-  }
-
-  return adjustedCreases;
-}
-
 function ResizeHandle({
   onResizeStart,
   isResizing,
@@ -151,13 +41,13 @@ function ResizeHandle({
   return (
     <div
       className={classNames(
-        "absolute w-full border-transparent hover:border-blue-400 transition de",
+        "absolute w-full border-transparent hover:border-blue-400",
         isResizing ? "border-blue-400" : ""
       )}
       style={{
         cursor: "ns-resize",
-        borderBottomWidth: `${HANDLE_WIDTH}px`,
-        top: `${BORDER_WIDTH - HANDLE_WIDTH}px`,
+        borderBottomWidth: `${HANDLE_HEIGHT}px`,
+        top: `${BORDER_HEIGHT - HANDLE_HEIGHT}px`,
       }}
       onMouseDown={onResizeStart}
     />
@@ -166,8 +56,9 @@ function ResizeHandle({
 
 function Section({
   children,
-  isCollapsed,
   index,
+  isCollapsed,
+  isBeingResized,
   isResizable,
   isResizing,
   position,
@@ -175,8 +66,9 @@ function Section({
   onResizeStart,
 }: {
   children: React.ReactNode;
-  isCollapsed: boolean;
   index: number;
+  isBeingResized: boolean;
+  isCollapsed: boolean;
   isResizable: boolean;
   isResizing: boolean;
   position: SectionPosition;
@@ -185,10 +77,10 @@ function Section({
 }) {
   return (
     <div
-      className="absolute w-full h-full transition"
+      className="absolute w-full h-full"
       style={{ ...position, transition: isResizing ? "" : "all 0.1s ease-in-out" }}
     >
-      {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isResizing} />}
+      {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
       <div className="overflow-hidden flex flex-col w-full h-full">
         <div className={classNames("border-b", index > 0 ? "border-black" : "border-gray-200")} />
         <button
@@ -205,9 +97,6 @@ function Section({
 }
 
 export default function Accordion({ items }: any) {
-  // This is fine for prototyping but there's a cleaner way to do this.
-  const [collapsed, setCollapsed] = useState<CollapsedState>(new Array(items.length).fill(true));
-  const [creases, setCreases] = useState<CreasesState>(new Array(items.length).fill(HEADER_HEIGHT));
   const [state, dispatch] = useReducer(reducer, getInitialState(items.length));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
@@ -221,7 +110,6 @@ export default function Accordion({ items }: any) {
       dispatch(collapseSection(index));
     }
   };
-
   const onResizeStart = (e: React.MouseEvent, index: number) => {
     // Need this otherwise scroll behavior happens in containers with overflow.
     e.preventDefault();
@@ -234,8 +122,6 @@ export default function Accordion({ items }: any) {
     dispatch(endResizing());
   };
 
-  console.log(state, getPosition(state, 0), getPosition(state, 1));
-
   return (
     <div className={classNames("h-full overflow-auto flex flex-col relative")}>
       {items.map((item: any, index: number) => (
@@ -247,7 +133,8 @@ export default function Accordion({ items }: any) {
           position={getPosition(state, index)}
           isResizable={getIsIndexResizable(state, index)}
           onResizeStart={e => onResizeStart(e, index)}
-          isResizing={isResizing && resizingParams?.index === index}
+          isResizing={isResizing}
+          isBeingResized={isResizing && resizingParams?.index === index}
         >
           {item.component}
         </Section>
