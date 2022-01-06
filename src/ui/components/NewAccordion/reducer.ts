@@ -1,6 +1,16 @@
-import { findLastIndex } from "lodash";
+import {
+  accomodateSectionIdealHeight,
+  ACCORDION_HEIGHT,
+  embiggenSection,
+  ensmallenSection,
+  getClosestPreviousExpandedIndex,
+  getHeightBeforeIndex,
+  getMinHeightAfterIndex,
+  getNextTargetIndex,
+  HEADER_HEIGHT,
+} from "./utils";
 
-type Section = {
+export type Section = {
   displayedHeight: number;
   expanded: boolean;
 };
@@ -25,9 +35,6 @@ type AccordionAction =
   | EndResizingAction
   | ResizeAction;
 
-const MIN_HEIGHT = 150;
-const ACCORDION_HEIGHT = 600;
-const HEADER_HEIGHT = 24 + 1;
 const createDefaultSection = () => {
   return {
     expanded: false,
@@ -121,13 +128,11 @@ export function reducer(state: AccordionState, action: AccordionAction) {
     }
     case "start_resizing": {
       const { index, initialY } = action;
-      const originalSections = { ...state.sections };
+      const originalSections = [...state.sections];
 
-      console.log("start");
       return { ...state, resizingParams: { index, initialY, originalSections } };
     }
     case "end_resizing": {
-      console.log("end");
       return { ...state, resizingParams: null };
     }
     case "resize": {
@@ -136,19 +141,33 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       if (!resizingParams) return { ...state };
 
       const { currentY } = action;
-      const { initialY, index } = resizingParams;
+      const { initialY, index, originalSections } = resizingParams;
 
-      const delta = currentY - initialY;
-      let newSections = [...sections];
+      const delta = initialY - currentY;
+      let newSections = [...originalSections];
 
-      console.log({ delta });
-      if (delta < 0) {
-        // moving up:
-        // - section height keeps expanding by annexing its immediate preceding section(s)
-        // bottom stays where itis
+      if (delta > 0) {
+        // Negative delta means the user resized upwards, so the section should get bigger.
+        const idealHeight = newSections[index].displayedHeight + delta;
+        let startIndex = getNextTargetIndex(sections, index, index);
+        newSections = accomodateSectionIdealHeight(newSections, index, idealHeight, startIndex);
       } else {
-        // moving down:
-        // - section height keeps expanding by annexing the
+        // Positive means the user resized downwards, so the section should get smaller.
+        // Making a section smaller is equivalent to making the closest expanded previous section it
+        // smaller, so this does that.
+        const i = getClosestPreviousExpandedIndex(sections, index);
+
+        // Need to cap the maxHeight here ahead of time. The previous index doesn't
+        // know when the original index has already hit its minimum height. Without this,
+        // it'll start expanding upwards when it runs out of downward space.
+        const maxHeight =
+          ACCORDION_HEIGHT -
+          getHeightBeforeIndex(sections, i) -
+          getMinHeightAfterIndex(sections, i);
+        const idealHeight = Math.min(newSections[i].displayedHeight - delta, maxHeight);
+        let startIndex = getNextTargetIndex(sections, i);
+
+        newSections = accomodateSectionIdealHeight(newSections, i, idealHeight, startIndex);
       }
 
       return { ...state, sections: newSections };
@@ -158,136 +177,3 @@ export function reducer(state: AccordionState, action: AccordionAction) {
     }
   }
 }
-
-// Utils
-
-const getSectionsTotalHeight = (sections: Section[]) => {
-  return sections.reduce((a, section) => {
-    return a + getActualHeight(section);
-  }, 0);
-};
-const getUnoccupiedHeight = (sections: Section[]) => {
-  const occupiedHeight = getSectionsTotalHeight(sections);
-  return ACCORDION_HEIGHT - occupiedHeight;
-};
-const getNextTargetIndex = (sections: Section[], index: number, endIndex?: number) => {
-  const sec = sections.slice(0, endIndex);
-  return findLastIndex(sec, (s, i) => s.expanded && i !== index);
-};
-const getActualHeight = (section: Section) => {
-  return section.expanded ? section.displayedHeight || 0 : HEADER_HEIGHT;
-};
-
-// This takes the original sections and the index of section we're trying to "embiggen".
-// It then tries to accommodate that sections height, and allows it to be greedy
-// (i.e. shrink other sections up to min-height).
-const embiggenSection = (sections: Section[], index: number) => {
-  const newSections = [...sections];
-
-  // If the displayedHeight is 0, then the section should be greedy and take up
-  // as much space as possible.
-  if (!newSections[index].displayedHeight) {
-    newSections[index] = { ...newSections[index], displayedHeight: ACCORDION_HEIGHT };
-  }
-
-  const idealHeight = newSections[index].displayedHeight || 0;
-  let displayedHeight = getUnoccupiedHeight(newSections) + getActualHeight(newSections[index]);
-  let nextDonorIndex = getNextTargetIndex(newSections, index);
-
-  while (displayedHeight !== idealHeight && nextDonorIndex > -1) {
-    const donor = newSections[nextDonorIndex];
-    const donorHeight = donor.displayedHeight || 0; // could be cleaner
-
-    const availableHeightToGive = donorHeight - MIN_HEIGHT;
-    const heightRemaining = idealHeight - displayedHeight;
-    const heightDonated = Math.min(availableHeightToGive, heightRemaining);
-
-    newSections[nextDonorIndex] = {
-      ...newSections[nextDonorIndex],
-      displayedHeight: donorHeight - heightDonated,
-    };
-
-    displayedHeight = displayedHeight + heightDonated;
-    nextDonorIndex = getNextTargetIndex(newSections, index, nextDonorIndex);
-  }
-
-  newSections[index] = { ...newSections[index], displayedHeight };
-  return newSections;
-};
-
-// This reallocates the space freed up by collapsing a section to the
-// last expanded section, if it exists.
-const ensmallenSection = (sections: Section[], index: number) => {
-  const newSections = [...sections];
-  const receiverIndex = getNextTargetIndex(sections, index);
-
-  if (receiverIndex > -1) {
-    newSections[receiverIndex] = { ...newSections[receiverIndex], displayedHeight: 0 };
-    return embiggenSection(sections, receiverIndex);
-  }
-
-  return sections;
-};
-
-// const resizeHandler = () => {
-//   const { index, initialY, originalSections } = resizingParams;
-//   const originalHeight = originalSections[index];
-
-//   const newSections = [...originalSections];
-
-//   const originalDelta = e.screenY - initialY;
-//   let remainingDelta = originalDelta;
-
-//   // if delta is positive, we're squeezing the proceeding sections.
-//   // need to make sure we're allowed to in the first place, and as we
-//   // make the selected section smaller, that we embiggen the preceding
-//   // sections accordingly.
-//   if (remainingDelta > 0) {
-//     let nextIndex = getLastExpandedIndex(collapsed);
-
-//     // Walk back from the last expanded index until you reach the current index.
-//     while (nextIndex && nextIndex > index) {
-//       const originalCrease = originalCreases[nextIndex];
-//       const receivableDelta = Math.min(originalCrease - MIN_HEIGHT, remainingDelta);
-
-//       if (receivableDelta) {
-//         newCreases[nextIndex] = originalCreases[nextIndex] - receivableDelta;
-//         remainingDelta -= receivableDelta;
-//       }
-
-//       nextIndex = getLastExpandedIndex(collapsed, nextIndex);
-//     }
-
-//     newCreases[index] = originalHeight + originalDelta - remainingDelta;
-//   } else if (remainingDelta < 0) {
-//     // if delta is negative, we're squeezing the preceding sections.
-//     // need to make sure we're allowed to in the first place. The selected
-//     // section will get larger, and we need to embiggen the proceeding sections
-//     // accordingly.
-//     let nextIndex = getFirstExpandedIndex(collapsed);
-
-//     // Walk forward from the first expanded index until you reach the current index.
-//     while (nextIndex >= 0 && nextIndex <= index) {
-//       const originalCrease = originalCreases[nextIndex];
-//       const receivableDelta = Math.max(MIN_HEIGHT - originalCrease, remainingDelta);
-
-//       if (receivableDelta) {
-//         newCreases[nextIndex] = originalCreases[nextIndex] + receivableDelta;
-//         remainingDelta -= receivableDelta;
-//       }
-
-//       nextIndex = getFirstExpandedIndex(collapsed, nextIndex + 1);
-//     }
-
-//     const lastExpandedIndex = getLastExpandedIndex(collapsed);
-//     // Because there's extra space after the current index, we need to
-//     // redistribute it to the last expanded index.
-//     if (lastExpandedIndex && lastExpandedIndex !== index) {
-//       newCreases[lastExpandedIndex] =
-//         originalCreases[lastExpandedIndex] - (originalDelta - remainingDelta);
-//     }
-//   }
-
-//   setCreases(newCreases);
-
-// }
