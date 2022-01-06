@@ -120,7 +120,7 @@ export async function getStaticPaths() {
 
 interface SSRProps {
   ssrLoading?: boolean;
-  metadata: {
+  metadata?: {
     title?: string;
     url?: string;
     duration?: number;
@@ -129,7 +129,6 @@ interface SSRProps {
 }
 
 export default function SSRRecordingPage({ metadata, ssrLoading }: SSRProps) {
-  console.log(">>>> metadata");
   const head = metadata ? (
     <Head>
       <meta property="og:title" content={metadata.title} />
@@ -150,7 +149,6 @@ export default function SSRRecordingPage({ metadata, ssrLoading }: SSRProps) {
   ) : null;
 
   if (ssrLoading) {
-    console.log("ssr head", metadata.title);
     return head;
   }
 
