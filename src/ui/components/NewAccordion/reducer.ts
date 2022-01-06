@@ -15,6 +15,7 @@ export type Section = {
   expanded: boolean;
 };
 type ResizingParams = {
+  initialIndex: number;
   index: number;
   initialY: number;
   originalSections: Section[];
@@ -82,7 +83,7 @@ export const getPosition = (state: AccordionState, index: number) => {
 export const getIsIndexResizable = (state: AccordionState, index: number) => {
   const { sections } = state;
   const previousExpandedIndex = sections.slice(0, index).find(s => s.expanded);
-  const nextExpandedIndex = sections.slice(0, index).find(s => s.expanded);
+  const nextExpandedIndex = sections.slice(index).find(s => s.expanded);
 
   return !!(previousExpandedIndex && nextExpandedIndex);
 };
@@ -129,7 +130,21 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       const { index, initialY } = action;
       const originalSections = [...state.sections];
 
-      return { ...state, resizingParams: { index, initialY, originalSections } };
+      let indexToResize = index;
+      const nextExpandedIndex = originalSections.findIndex((s, i) => {
+        if (i <= index) return false;
+        return s.expanded;
+      });
+
+      // If the section is not expanded, resize the next expanded section.
+      if (!originalSections[indexToResize].expanded && nextExpandedIndex > -1) {
+        indexToResize = nextExpandedIndex;
+      }
+
+      return {
+        ...state,
+        resizingParams: { initialIndex: index, index: indexToResize, initialY, originalSections },
+      };
     }
     case "end_resizing": {
       return { ...state, resizingParams: null };
