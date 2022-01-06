@@ -43,7 +43,13 @@ function RecordingPage({ getAccessibleRecording, metadata }: PropsFromRedux & Me
       />
       <meta property="og:image" content={metadata.image} />
       <meta name="twitter:card" content={metadata.image ? "summary_large_image" : "summary"} />
+      <meta property="twitter:image" content={metadata.image} />
+      <meta property="twitter:title" content={metadata.title} />
       <meta name="twitter:site" content="@replayio" />
+      <meta
+        property="twitter:description"
+        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
+      />
     </Head>
   ) : null;
 
