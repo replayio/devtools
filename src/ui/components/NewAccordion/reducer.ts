@@ -81,11 +81,10 @@ export const getPosition = (state: AccordionState, index: number) => {
 };
 export const getIsIndexResizable = (state: AccordionState, index: number) => {
   const { sections } = state;
+  const previousExpandedIndex = sections.slice(0, index).find(s => s.expanded);
+  const nextExpandedIndex = sections.slice(0, index).find(s => s.expanded);
 
-  const hasTargetIndex = getNextTargetIndex(sections, index, index);
-  const isFirstIndex = index === 0;
-
-  return !!(!isFirstIndex && hasTargetIndex > -1);
+  return !!(previousExpandedIndex && nextExpandedIndex);
 };
 export const getIsResizing = (state: AccordionState) => {
   return !!state.resizingParams;
