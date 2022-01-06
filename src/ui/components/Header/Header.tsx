@@ -11,6 +11,7 @@ import { isDemo } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
+import Icon from "ui/components/shared/Icon";
 import { RecordingId } from "@recordreplay/protocol";
 import { Recording } from "ui/types";
 import { UIState } from "ui/state";
