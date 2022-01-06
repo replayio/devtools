@@ -10,10 +10,11 @@ import { UIState } from "ui/state";
 import LoadingTip from "./LoadingTip";
 import { BubbleViewportWrapper } from "./Viewport";
 
-export function StaticLoadingScreen() {
+export function StaticLoadingScreen({ children }: { children?: React.ReactNode }) {
   return (
     <LoadingScreenTemplate>
       <div className="w-56 h-1"></div>
+      {children}
     </LoadingScreenTemplate>
   );
 }

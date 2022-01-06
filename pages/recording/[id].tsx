@@ -1,3 +1,5 @@
+/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */
+
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
@@ -10,16 +12,10 @@ import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
 import Head from "next/head";
 
-interface MetadataProps {
-  metadata: {
-    title?: string;
-    url?: string;
-    duration?: number;
-    image?: string;
-  };
-}
-
-function RecordingPage({ getAccessibleRecording, metadata }: PropsFromRedux & MetadataProps) {
+function RecordingPage({
+  getAccessibleRecording,
+  head,
+}: PropsFromRedux & { head?: React.ReactNode }) {
   const store = useStore();
   const recordingId = useGetRecordingId();
   const [recording, setRecording] = useState<RecordingInfo | null>();
@@ -33,25 +29,6 @@ function RecordingPage({ getAccessibleRecording, metadata }: PropsFromRedux & Me
     }
     getRecording();
   }, [recordingId, store]);
-
-  const head = metadata ? (
-    <Head>
-      <meta property="og:title" content={metadata.title} />
-      <meta
-        property="og:description"
-        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
-      />
-      <meta property="og:image" content={metadata.image} />
-      <meta name="twitter:card" content={metadata.image ? "summary_large_image" : "summary"} />
-      <meta property="twitter:image" content={metadata.image} />
-      <meta property="twitter:title" content={metadata.title} />
-      <meta name="twitter:site" content="@replayio" />
-      <meta
-        property="twitter:description"
-        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
-      />
-    </Head>
-  ) : null;
 
   if (!recording || typeof window === "undefined") {
     return (
@@ -76,6 +53,11 @@ function RecordingPage({ getAccessibleRecording, metadata }: PropsFromRedux & Me
     );
   }
 }
+
+const connector = connect(null, { getAccessibleRecording });
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+const ConnectedRecordingPage = connector(RecordingPage);
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
   const resp = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
@@ -115,6 +97,7 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
   if (json.error || !json.data.recording) {
     return {
       props: {},
+      revalidate: 360,
     };
   }
 
@@ -127,14 +110,49 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
         image: json.data.recording.thumbnail,
       },
     },
+    revalidate: 360,
   };
 }
 
 export async function getStaticPaths() {
-  return { paths: [], fallback: true };
+  return { paths: [{ params: { id: "cf2da81f-3a74-45ba-9241-f6d4361a52f5" } }], fallback: true };
 }
 
-const connector = connect(null, { getAccessibleRecording });
-type PropsFromRedux = ConnectedProps<typeof connector>;
+interface SSRProps {
+  ssrLoading?: boolean;
+  metadata: {
+    title?: string;
+    url?: string;
+    duration?: number;
+    image?: string;
+  };
+}
 
-export default connector(RecordingPage);
+export default function SSRRecordingPage({ metadata, ssrLoading }: SSRProps) {
+  console.log(">>>> metadata");
+  const head = metadata ? (
+    <Head>
+      <meta property="og:title" content={metadata.title} />
+      <meta
+        property="og:description"
+        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
+      />
+      <meta property="og:image" content={metadata.image} />
+      <meta name="twitter:card" content={metadata.image ? "summary_large_image" : "summary"} />
+      <meta property="twitter:image" content={metadata.image} />
+      <meta property="twitter:title" content={metadata.title} />
+      <meta name="twitter:site" content="@replayio" />
+      <meta
+        property="twitter:description"
+        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
+      />
+    </Head>
+  ) : null;
+
+  if (ssrLoading) {
+    console.log("ssr head", metadata.title);
+    return head;
+  }
+
+  return <ConnectedRecordingPage head={head} />;
+}

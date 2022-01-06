@@ -186,7 +186,12 @@ function Routing({ Component, pageProps }: AppProps) {
 }
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
-  return <AppUtilities apiKey={apiKey}>{<Routing {...props} />}</AppUtilities>;
+  return (
+    <AppUtilities apiKey={apiKey}>
+      {props.__N_SSG ? <props.Component ssrLoading {...props.pageProps} /> : null}
+      <Routing {...props} />
+    </AppUtilities>
+  );
 };
 
 App.getInitialProps = (appContext: AppContext) => {

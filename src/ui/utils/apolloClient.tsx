@@ -53,9 +53,9 @@ export function ApolloWrapper({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!isTest() && loading) {
-    return <StaticLoadingScreen />;
-  }
+  // if (!isTest() && loading) {
+  //   return <StaticLoadingScreen />;
+  // }
 
   if (error) {
     if (error.message === "Could not open popup") {
