@@ -95,7 +95,7 @@ function WelcomeBox({
         ))}
       </div>
       <div className="absolute z-0">
-        <img src="/images/bubble.svg" className=" " style={{ transform: "scale(2.4)" }} />
+        <img src="/images/bubble.svg" className="editor-bg" style={{ transform: "scale(2.4)" }} />
       </div>
     </div>
   );

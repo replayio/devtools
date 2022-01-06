@@ -498,6 +498,16 @@ checkbox:-moz-focusring {
   right: 0;
 }
 
+/* Images */
+
+.editor-bg {
+  transform: scale(2.4);
+  position: relative;
+  max-width: none;
+  left: -340px;
+  top: 400px;
+}
+
 /* Text input */
 
 .devtools-textinput,
