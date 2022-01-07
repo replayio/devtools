@@ -7,6 +7,8 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { trackEvent } from "ui/utils/telemetry";
+import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
+import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 
 function setupShortcuts() {
   return usesWindow(win => {
@@ -18,6 +20,7 @@ function setupShortcuts() {
 const globalShortcuts = setupShortcuts();
 
 function KeyboardShortcuts({
+  showCommandPalette,
   setSelectedPrimaryPanel,
   focusFullTextInput,
   setViewMode,
@@ -52,7 +55,18 @@ function KeyboardShortcuts({
   const togglePalette = (e: KeyboardEvent) => {
     e.preventDefault();
     trackEvent("key_shortcut.show_command_palette");
-    toggleCommandPalette();
+
+    if (viewMode === "dev") {
+      // Show the command palette in the editor
+      showCommandPalette();
+    } else {
+      toggleCommandPalette();
+    }
+
+    const paletteInput = getCommandPaletteInput();
+    if (paletteInput) {
+      paletteInput.focus();
+    }
   };
 
   // The shortcuts have to be reassigned every time the dependencies change,
@@ -83,6 +97,7 @@ const connector = connect(
     setViewMode: actions.setViewMode,
     togglePaneCollapse: actions.togglePaneCollapse,
     toggleCommandPalette: actions.toggleCommandPalette,
+    showCommandPalette: deselectSource,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

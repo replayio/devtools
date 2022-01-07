@@ -49,6 +49,14 @@
   vertical-align: bottom;
 }
 
+.source-header button.command-palette {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  height: var(--editor-header-height);
+  font-size: var(--theme-tab-font-size);
+}
+
 .source-tab .filename {
   display: block;
   white-space: nowrap;
@@ -61,7 +69,8 @@
   color: var(--tab-standard-color);
 }
 
-.source-tab.active {
+.source-tab.active,
+.source-header button.command-palette.active {
   --tab-line-color: var(--theme-body-color);
   color: var(--primary-accent);
   border-bottom-color: transparent;
