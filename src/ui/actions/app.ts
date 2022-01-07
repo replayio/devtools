@@ -8,7 +8,6 @@ import {
   MouseEvent,
   loadedRegions,
   KeyboardEvent,
-  RecordingId,
 } from "@recordreplay/protocol";
 import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
@@ -28,17 +27,12 @@ import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import { getRecordingId, isTest } from "ui/utils/environment";
+import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
-import { asyncStore } from "ui/utils/prefs";
-import {
-  hideCommandPalette,
-  setSelectedPrimaryPanel,
-  setShowEditor,
-  setShowVideoPanel,
-  setViewMode,
-} from "./layout";
+import { hideCommandPalette, setSelectedPrimaryPanel, setViewMode } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
+import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
+import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -369,9 +363,15 @@ export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAct
 
 export function executeCommand(key: CommandKey): UIThunkAction {
   return ({ dispatch }) => {
-    const recordingId = getRecordingId();
-
-    if (key === "open_viewer") {
+    if (key === "show_console_filters") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPanel("console"));
+      dispatch(setFilterDrawer(false));
+    } else if (key === "open_file_search") {
+      dispatch(openQuickOpen());
+    } else if (key === "open_function_search") {
+      dispatch(openQuickOpen("@", true));
+    } else if (key === "open_viewer") {
       dispatch(setViewMode("non-dev"));
     } else if (key === "open_devtools") {
       dispatch(setViewMode("dev"));
@@ -387,11 +387,22 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_console") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
-      window.jsterm.focus();
+      window.jsterm?.focus();
+    } else if (key === "open_react_devtools") {
+      dispatch(setSelectedPanel("react-components"));
+    } else if (key === "open_elements") {
+      dispatch(setSelectedPanel("inspector"));
+      gToolbox.selectTool("inspector");
+    } else if (key === "open_network_monitor") {
+      dispatch(setSelectedPanel("network"));
     } else if (key === "show_privacy") {
       dispatch(setModal("privacy"));
-    } else if (key === "show_sharing") {
-      dispatch(setModal("sharing", { recordingId }));
+    } else if (key === "show_comments") {
+      dispatch(setSelectedPrimaryPanel("comments"));
+    } else if (key === "show_replay_info") {
+      dispatch(setSelectedPrimaryPanel("events"));
+    } else if (key === "show_events") {
+      dispatch(setSelectedPrimaryPanel("events"));
     }
 
     dispatch(hideCommandPalette());
