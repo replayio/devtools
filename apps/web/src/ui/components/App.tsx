@@ -85,9 +85,9 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-// Let's say I change something small like adding a single comment?
-
 function App({ children, modal, theme }: AppProps) {
+  const foo = "bar";
+  console.log(foo);
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
