@@ -5,6 +5,7 @@ import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
 import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import { features } from "ui/utils/prefs";
@@ -79,21 +80,21 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         orientation="bottom"
       >
         <button className="row" onClick={onDocsClick}>
-          <MaterialIcon iconSize="xl">menu_book</MaterialIcon>
+          <Icon iconName="docs" />
           <span>Docs</span>
         </button>
         <button className="row" onClick={onChatClick}>
-          <MaterialIcon iconSize="xl">help_outline</MaterialIcon>
+          <Icon iconName="help" />
           <span>Chat with us</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
-          <MaterialIcon iconSize="xl">settings</MaterialIcon>
+          <Icon iconName="settings" />
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
             <button className="row" onClick={onLaunchClick}>
-              <MaterialIcon iconSize="xl">launch</MaterialIcon>
+              <Icon iconName="replay" />
               <span>Launch Replay</span>
             </button>
           )

@@ -4,6 +4,7 @@ import * as actions from "ui/actions/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
 import MaterialIcon from "../shared/MaterialIcon";
+import Icon from "../shared/Icon";
 
 function ShareButton({ setModal }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
