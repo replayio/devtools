@@ -363,46 +363,44 @@ export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAct
 
 export function executeCommand(key: CommandKey): UIThunkAction {
   return ({ dispatch }) => {
-    if (key === "show_console_filters") {
-      dispatch(setViewMode("dev"));
-      dispatch(setSelectedPanel("console"));
-      dispatch(setFilterDrawer(false));
-    } else if (key === "open_file_search") {
-      dispatch(openQuickOpen());
-    } else if (key === "open_function_search") {
-      dispatch(openQuickOpen("@", true));
-    } else if (key === "open_viewer") {
-      dispatch(setViewMode("non-dev"));
-    } else if (key === "open_devtools") {
-      dispatch(setViewMode("dev"));
-    } else if (key === "open_full_text_search") {
-      dispatch(setViewMode("dev"));
-      dispatch(setSelectedPrimaryPanel("search"));
-    } else if (key === "open_sources" || key === "open_outline") {
-      dispatch(setViewMode("dev"));
-      dispatch(setSelectedPrimaryPanel("explorer"));
-    } else if (key === "open_print_statements") {
-      dispatch(setViewMode("dev"));
-      dispatch(setSelectedPrimaryPanel("debug"));
-    } else if (key === "open_console") {
+    if (key === "open_console") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
       window.jsterm?.focus();
-    } else if (key === "open_react_devtools") {
-      dispatch(setSelectedPanel("react-components"));
+    } else if (key === "open_devtools") {
+      dispatch(setViewMode("dev"));
     } else if (key === "open_elements") {
       dispatch(setSelectedPanel("inspector"));
       gToolbox.selectTool("inspector");
+    } else if (key === "open_file_search") {
+      dispatch(openQuickOpen());
+    } else if (key === "open_full_text_search") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("search"));
+    } else if (key === "open_function_search") {
+      dispatch(openQuickOpen("@", true));
     } else if (key === "open_network_monitor") {
       dispatch(setSelectedPanel("network"));
-    } else if (key === "show_privacy") {
-      dispatch(setModal("privacy"));
+    } else if (key === "open_print_statements") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("debug"));
+    } else if (key === "open_react_devtools") {
+      dispatch(setSelectedPanel("react-components"));
+    } else if (key === "open_sources" || key === "open_outline") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("explorer"));
+    } else if (key === "open_viewer") {
+      dispatch(setViewMode("non-dev"));
     } else if (key === "show_comments") {
       dispatch(setSelectedPrimaryPanel("comments"));
-    } else if (key === "show_replay_info") {
+    } else if (key === "show_console_filters") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPanel("console"));
+      dispatch(setFilterDrawer(false));
+    } else if (key === "show_events" || key === "show_replay_info") {
       dispatch(setSelectedPrimaryPanel("events"));
-    } else if (key === "show_events") {
-      dispatch(setSelectedPrimaryPanel("events"));
+    } else if (key === "show_privacy") {
+      dispatch(setModal("privacy"));
     }
 
     dispatch(hideCommandPalette());

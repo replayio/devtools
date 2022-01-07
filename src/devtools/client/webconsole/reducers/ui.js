@@ -13,7 +13,6 @@ const {
   TOGGLE_FILTER_DRAWER,
   SET_FILTER_DRAWER,
 } = require("devtools/client/webconsole/constants");
-const { actions } = require("react-table");
 
 const UiState = overrides =>
   Object.freeze(
@@ -62,7 +61,7 @@ function ui(state = UiState(), action) {
     case SET_FILTER_DRAWER:
       return {
         ...state,
-        collapseFilterDrawer: actions.collapsed,
+        collapseFilterDrawer: action.collapsed,
       };
   }
 

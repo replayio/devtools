@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions, UIStore } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
-import { hasReactComponents } from "ui/reducers/reactDevTools";
 import { UIState } from "ui/state";
 import { UserSettings } from "ui/types";
 import { TextInput } from "../shared/Forms";
@@ -18,58 +17,73 @@ export type Command = {
   settingKey?: keyof UserSettings;
 };
 export type CommandKey =
-  | "show_console_filters"
-  | "open_viewer"
+  | "open_console"
   | "open_devtools"
+  | "open_elements"
+  | "open_network_monitor"
+  | "open_viewer"
   | "open_file_search"
   | "open_function_search"
   | "open_full_text_search"
-  | "open_sources"
   | "open_outline"
   | "open_print_statements"
-  | "open_console"
   | "open_react_devtools"
-  | "show_privacy"
+  | "open_sources"
   | "show_comments"
-  | "show_replay_info"
+  | "show_console_filters"
   | "show_events"
-  | "open_network_monitor"
-  | "open_elements"
+  | "show_privacy"
+  | "show_replay_info"
   | "show_sharing";
 
 const COMMANDS: Command[] = [
-  { key: "open_viewer", label: "Open Viewer" },
-  { key: "open_devtools", label: "Open DevTools" },
-  { key: "open_file_search", label: "Search for file", shortcut: "CmdOrCtrl+P" },
-  { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+P" },
-  { key: "open_full_text_search", label: "Open Full Text Search", shortcut: "CmdOrCtrl+Shift+F" },
-  { key: "open_sources", label: "Open Sources" },
-  { key: "open_outline", label: "Open Outline" },
-  { key: "open_print_statements", label: "Open Print Statements" },
   { key: "open_console", label: "Open Console" },
+  { key: "open_devtools", label: "Open DevTools" },
+  { key: "open_elements", label: "Open Elements", settingKey: "showElements" },
   {
     key: "open_network_monitor",
     label: "Open Network Monitor",
     settingKey: "enableNetworkMonitor",
   },
-  { key: "open_elements", label: "Open Elements", settingKey: "showElements" },
+  { key: "open_viewer", label: "Open Viewer" },
+  { key: "open_file_search", label: "Search for file", shortcut: "CmdOrCtrl+P" },
+  { key: "open_full_text_search", label: "Search full text", shortcut: "CmdOrCtrl+Shift+F" },
+  { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+P" },
+  { key: "open_outline", label: "Open Outline" },
+  { key: "open_print_statements", label: "Open Print Statements" },
   { key: "open_react_devtools", label: "Open React DevTools", settingKey: "showReact" },
+  { key: "open_sources", label: "Open Sources" },
   { key: "show_comments", label: "Show Comments" },
+  { key: "show_console_filters", label: "Show Console Filters" },
+  { key: "show_events", label: "Show Events" },
   { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
-  { key: "show_events", label: "Show Events" },
   { key: "show_sharing", label: "Show Sharing Options" },
-  { key: "show_console_filters", label: "Show Console Filters" },
 ];
+
+const DEFAULT_COMMANDS: CommandKey[] = [
+  "open_file_search",
+  "open_function_search",
+  "open_full_text_search",
+  "open_sources",
+];
+
+function getDefaultCommands() {
+  return DEFAULT_COMMANDS.map(key => COMMANDS.find(c => c.key === key));
+}
 
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
+
+  if (!searchString) {
+    return getDefaultCommands();
+  }
 
   const enabledCommands = COMMANDS.filter(command => {
     if (command.settingKey) {
       const isEnabled = userSettings[command.settingKey];
 
-      if (command.key === "open_react") {
+      if (command.key === "open_react_devtools") {
         return isEnabled && hasReactComponents;
       }
 
@@ -79,7 +93,16 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
     return true;
   });
 
-  return searchString ? filter(enabledCommands, searchString, { key: "label" }) : enabledCommands;
+  return filter(enabledCommands, searchString, { key: "label" });
+}
+
+function PaletteShortcut() {
+  return (
+    <div className="absolute right-4 text-primaryAccent select-none">
+      <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
+      <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
+    </div>
+  );
 }
 
 function CommandPalette({
@@ -122,14 +145,17 @@ function CommandPalette({
         style={{ width: "480px" }}
       >
         <div className="p-3 border-b border-gray-300">
-          <TextInput
-            value={searchString}
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-            autoFocus
-            placeholder="What would you like to do?"
-            textSize="lg"
-          />
+          <div className="relative flex items-center text-primaryAccent">
+            <TextInput
+              value={searchString}
+              onChange={onChange}
+              onKeyDown={onKeyDown}
+              autoFocus
+              placeholder="What would you like to do?"
+              textSize="lg"
+            />
+            <PaletteShortcut />
+          </div>
         </div>
         <div className="flex-grow text-sm flex flex-col overflow-auto">
           {shownCommands.map((command: Command, index: number) => (
