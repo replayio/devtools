@@ -490,6 +490,12 @@ button.open-inspector {
 .img.loom {
   -webkit-mask-image: url(/images/Loom.svg);
 }
+.img.k-icon {
+  -webkit-mask-image: url(/images/k-icon.svg);
+}
+.img.cmd-icon {
+  -webkit-mask-image: url(/images/cmd-icon.svg);
+}
 
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
