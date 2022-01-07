@@ -26,7 +26,7 @@ declare global {
 let store: UIStore;
 export type AppDispatch = typeof store.dispatch;
 
-export function initStore() {
+export function initStore(): Store {
   return bootstrapStore({
     app: initialAppState,
     layout: getDefaultLayoutState(),
