@@ -139,7 +139,9 @@ export default function SSRRecordingPage({ metadata }: MetadataProps) {
     let description = "Replay";
     try {
       const url = new URL(metadata.url || "");
-      description += ` of ${url.origin}`;
+      if (url.protocol !== "file:") {
+        description += ` of ${url.hostname}`;
+      }
     } finally {
       if (metadata.owner) {
         description += ` by ${metadata.owner}`;
