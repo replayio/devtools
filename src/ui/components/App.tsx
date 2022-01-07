@@ -117,9 +117,9 @@ function App({ children, modal, theme }: AppProps) {
     }
   }, [auth.isAuthenticated]);
 
-  if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
-    return <LoadingScreen />;
-  }
+  // if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
+  //   return <LoadingScreen />;
+  // }
 
   if (
     !isTest() &&

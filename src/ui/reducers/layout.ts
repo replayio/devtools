@@ -26,6 +26,10 @@ const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => 
   return recording.comments.length ? "comments" : syncInitialLayoutState.selectedPrimaryPanel;
 };
 
+export function getDefaultLayoutState() {
+  return syncInitialLayoutState;
+}
+
 export async function getInitialLayoutState(): Promise<LayoutState> {
   const recordingId = getRecordingId();
 

@@ -75,7 +75,6 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
             duration
             private
             isInitialized
-            thumbnail
             owner {
               name
             }
@@ -109,10 +108,10 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
   return {
     props: {
       metadata: {
+        id: params.id,
         title: json.data.recording.title,
         url: json.data.recording.url,
         duration: json.data.recording.duration,
-        image: json.data.recording.thumbnail,
         owner: json.data.recording.owner?.name,
       },
     },
@@ -121,50 +120,53 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
 }
 
 export async function getStaticPaths() {
-  return { paths: [{ params: { id: "cf2da81f-3a74-45ba-9241-f6d4361a52f5" } }], fallback: true };
+  return { paths: [], fallback: "blocking" };
 }
 
-interface SSRProps {
-  ssrLoading?: boolean;
+interface MetadataProps {
   metadata?: {
+    id: string;
     title?: string;
     url?: string;
     duration?: number;
-    image?: string;
     owner?: string;
   };
 }
 
-export default function SSRRecordingPage({ metadata, ssrLoading }: SSRProps) {
+export default function SSRRecordingPage({ metadata }: MetadataProps) {
   let head: React.ReactNode | null = null;
 
   if (metadata) {
     let title = metadata.title;
-    if (!metadata.title && metadata.url) {
-      title = `Replay of ${metadata.url}`;
+    let description = "Replay";
+    try {
+      const url = new URL(metadata.url || "");
+      description += ` of ${url.origin}`;
+    } finally {
+      if (metadata.owner) {
+        description += ` by ${metadata.owner}`;
+      }
     }
 
-    let description = metadata.url ? `Replay of ${metadata.url}` : "Replay";
-    if (metadata.owner) {
-      description += ` by ${metadata.owner}`;
+    if (!title && description) {
+      title = description;
+      description = "";
     }
+
+    const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
 
     head = (
       <Head>
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={metadata.image} />
-        <meta name="twitter:card" content={metadata.image ? "summary_large_image" : "summary"} />
-        <meta property="twitter:image" content={metadata.image} />
+        <meta property="og:image" content={image} />
+        <meta name="twitter:card" content={"summary_large_image"} />
+        <meta property="twitter:image" content={image} />
         <meta property="twitter:title" content={title} />
         <meta name="twitter:site" content="@replayio" />
         <meta property="twitter:description" content={description} />
       </Head>
     );
-  }
-
-  if (ssrLoading) {
-    return head;
   }
 
   return <ConnectedRecordingPage head={head} />;

@@ -13,7 +13,7 @@ import { getUserInfo } from "ui/hooks/users";
 import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
-import { getInitialLayoutState } from "ui/reducers/layout";
+import { getDefaultLayoutState, getInitialLayoutState } from "ui/reducers/layout";
 
 declare global {
   interface Window {
@@ -24,6 +24,13 @@ declare global {
 // Just to grab the type of Dispatch
 let store: UIStore;
 export type AppDispatch = typeof store.dispatch;
+
+export function bootstrapDefaultStore() {
+  return bootstrapStore({
+    app: initialAppState,
+    layout: getDefaultLayoutState(),
+  });
+}
 
 export async function bootstrapApp() {
   const initialState = {

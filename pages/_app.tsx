@@ -12,7 +12,7 @@ import { ApolloWrapper } from "ui/utils/apolloClient";
 import LoadingScreen, { StaticLoadingScreen } from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
-import { bootstrapApp } from "ui/setup";
+import { bootstrapApp, bootstrapDefaultStore } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
@@ -149,20 +149,16 @@ function AppUtilities({ children, apiKey }: { children: ReactNode } & AuthProps)
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
-  const [store, setStore] = useState<Store | null>(null);
+  const [store, setStore] = useState<Store>(bootstrapDefaultStore());
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
   }, []);
 
-  if (!store) {
-    // We hide the tips here since we don't have the store ready yet, which
-    // the tips need to work properly.
-    return <StaticLoadingScreen />;
-  }
-
   if (maintenanceMode) {
     return <MaintenanceModeScreen />;
   }
+
+  console.log(">>> app");
 
   return (
     <Provider store={store}>
@@ -188,7 +184,6 @@ function Routing({ Component, pageProps }: AppProps) {
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   return (
     <AppUtilities apiKey={apiKey}>
-      {props.__N_SSG ? <props.Component ssrLoading {...props.pageProps} /> : null}
       <Routing {...props} />
     </AppUtilities>
   );

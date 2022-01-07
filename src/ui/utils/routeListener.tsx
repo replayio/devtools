@@ -5,7 +5,7 @@ let currentRoute: string | undefined;
 
 export function InstallRouteListener() {
   const router = useRouter();
-  if (!listenerInstalled) {
+  if (!listenerInstalled && typeof window !== "undefined") {
     currentRoute = window.location.pathname;
 
     router.events.on("routeChangeComplete", () => {
