@@ -85,6 +85,8 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
+// Let's say I change something small like adding a single comment?
+
 function App({ children, modal, theme }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
