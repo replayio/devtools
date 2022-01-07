@@ -1,9 +1,5 @@
 import classNames from "classnames";
-import React, { useEffect, useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { setLoadingPageTipIndex } from "ui/actions/app";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
+import React, { useEffect, useRef, useState } from "react";
 
 const TIPS = [
   {
@@ -31,8 +27,9 @@ const TIPS = [
   },
 ];
 
-function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRedux) {
-  const { title, description, icon } = TIPS[loadingPageTipIndex || 0];
+export default function LoadingTip() {
+  const [loadingPageTipIndex, setLoadingPageTipIndex] = useState(0);
+  const { title, description, icon } = TIPS[loadingPageTipIndex];
   const key = useRef<any>();
 
   const resetAutoNext = () => clearTimeout(key.current);
@@ -75,15 +72,3 @@ function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRe
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    loadingPageTipIndex: selectors.getLoadingPageTipIndex(state),
-  }),
-  {
-    setLoadingPageTipIndex,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(LoadingTip);

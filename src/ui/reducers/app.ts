@@ -39,7 +39,6 @@ export const initialAppState: AppState = {
   recordingTarget: null,
   recordingWorkspace: null,
   loadedRegions: null,
-  loadingPageTipIndex: 0,
   mouseTargetsLoading: false,
 };
 
@@ -204,10 +203,6 @@ export default function update(
       return { ...state, recordingWorkspace: action.workspace };
     }
 
-    case "set_loading_page_tip_index": {
-      return { ...state, loadingPageTipIndex: action.index };
-    }
-
     default: {
       return state;
     }
@@ -314,5 +309,4 @@ export const isFinishedLoadingRegions = (state: UIState) => {
   return isSameTimeStampedPointRange(loading, loaded);
 };
 export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
-export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;

@@ -85,7 +85,6 @@ export interface AppState {
   loadedRegions: loadedRegions | null;
   loading: number;
   loadingFinished: boolean;
-  loadingPageTipIndex: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   recordingDuration: number;
