@@ -1,5 +1,3 @@
-/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */
-
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
@@ -157,13 +155,19 @@ export default function SSRRecordingPage({ metadata }: MetadataProps) {
 
     head = (
       <Head>
+        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
         <meta property="og:title" content={title} />
+        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
         <meta property="og:description" content={description} />
+        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
         <meta property="og:image" content={image} />
         <meta name="twitter:card" content={"summary_large_image"} />
+        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
         <meta property="twitter:image" content={image} />
+        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
         <meta property="twitter:title" content={title} />
         <meta name="twitter:site" content="@replayio" />
+        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
         <meta property="twitter:description" content={description} />
       </Head>
     );
