@@ -4,7 +4,7 @@ import "ui/utils/whatwg-url-fix";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
@@ -12,7 +12,7 @@ import { ApolloWrapper } from "ui/utils/apolloClient";
 import LoadingScreen, { StaticLoadingScreen } from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
-import { bootstrapApp, bootstrapDefaultStore } from "ui/setup";
+import { bootstrapApp, initStore } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
@@ -149,16 +149,16 @@ function AppUtilities({ children, apiKey }: { children: ReactNode } & AuthProps)
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
-  const [store, setStore] = useState<Store>(bootstrapDefaultStore());
-  useEffect(() => {
-    bootstrapApp().then((store: Store) => setStore(store));
+  const store = useMemo(() => {
+    const s = initStore();
+    bootstrapApp(s);
+
+    return s;
   }, []);
 
   if (maintenanceMode) {
     return <MaintenanceModeScreen />;
   }
-
-  console.log(">>> app");
 
   return (
     <Provider store={store}>

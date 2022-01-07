@@ -39,9 +39,9 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
 
 export function extendStore(
   store: Store,
-  newInitialState: Record<string, any> | undefined,
-  newReducers: Record<string, any>,
-  newThunkArgs: Record<string, any>
+  newInitialState?: Record<string, any>,
+  newReducers?: Record<string, any>,
+  newThunkArgs?: Record<string, any>
 ) {
   reducers = { ...reducers, ...newReducers };
   thunkArgs = { ...thunkArgs, ...newThunkArgs };

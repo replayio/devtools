@@ -1,4 +1,4 @@
-import { bootstrapStore } from "./store";
+import { bootstrapStore, extendStore } from "./store";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
@@ -14,6 +14,7 @@ import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getDefaultLayoutState, getInitialLayoutState } from "ui/reducers/layout";
+import { Store } from "redux";
 
 declare global {
   interface Window {
@@ -25,22 +26,22 @@ declare global {
 let store: UIStore;
 export type AppDispatch = typeof store.dispatch;
 
-export function bootstrapDefaultStore() {
+export function initStore() {
   return bootstrapStore({
     app: initialAppState,
     layout: getDefaultLayoutState(),
   });
 }
 
-export async function bootstrapApp() {
+export async function bootstrapApp(store: Store) {
   const initialState = {
     app: initialAppState,
     layout: await getInitialLayoutState(),
   };
 
-  const store = bootstrapStore(initialState);
+  extendStore(store, initialState);
 
-  if (typeof window === "undefined") return store;
+  if (typeof window === "undefined") return;
 
   setupTelemetry();
   setupDOMHelpers();
@@ -83,6 +84,4 @@ export async function bootstrapApp() {
 
     initLaunchDarkly();
   });
-
-  return store;
 }
