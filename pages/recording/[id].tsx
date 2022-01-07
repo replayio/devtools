@@ -76,6 +76,9 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
             private
             isInitialized
             thumbnail
+            owner {
+              name
+            }
             comments {
               id
             }
@@ -91,8 +94,10 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
     }),
   });
 
-  const json: { data: { recording: Recording & { thumbnail?: string } }; error: any } =
-    await resp.json();
+  const json: {
+    data: { recording: Recording & { thumbnail?: string; owner?: { name: string } } };
+    error: any;
+  } = await resp.json();
 
   if (json.error || !json.data.recording) {
     return {
@@ -108,6 +113,7 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
         url: json.data.recording.url,
         duration: json.data.recording.duration,
         image: json.data.recording.thumbnail,
+        owner: json.data.recording.owner?.name,
       },
     },
     revalidate: 360,
@@ -125,28 +131,37 @@ interface SSRProps {
     url?: string;
     duration?: number;
     image?: string;
+    owner?: string;
   };
 }
 
 export default function SSRRecordingPage({ metadata, ssrLoading }: SSRProps) {
-  const head = metadata ? (
-    <Head>
-      <meta property="og:title" content={metadata.title} />
-      <meta
-        property="og:description"
-        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
-      />
-      <meta property="og:image" content={metadata.image} />
-      <meta name="twitter:card" content={metadata.image ? "summary_large_image" : "summary"} />
-      <meta property="twitter:image" content={metadata.image} />
-      <meta property="twitter:title" content={metadata.title} />
-      <meta name="twitter:site" content="@replayio" />
-      <meta
-        property="twitter:description"
-        content={`${Math.round((metadata.duration || 0) / 1000)} second replay`}
-      />
-    </Head>
-  ) : null;
+  let head: React.ReactNode | null = null;
+
+  if (metadata) {
+    let title = metadata.title;
+    if (!metadata.title && metadata.url) {
+      title = `Replay of ${metadata.url}`;
+    }
+
+    let description = metadata.url ? `Replay of ${metadata.url}` : "Replay";
+    if (metadata.owner) {
+      description += ` by ${metadata.owner}`;
+    }
+
+    head = (
+      <Head>
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={metadata.image} />
+        <meta name="twitter:card" content={metadata.image ? "summary_large_image" : "summary"} />
+        <meta property="twitter:image" content={metadata.image} />
+        <meta property="twitter:title" content={title} />
+        <meta name="twitter:site" content="@replayio" />
+        <meta property="twitter:description" content={description} />
+      </Head>
+    );
+  }
 
   if (ssrLoading) {
     return head;
