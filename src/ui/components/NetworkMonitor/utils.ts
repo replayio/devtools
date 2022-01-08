@@ -30,9 +30,9 @@ export type RequestSummary = {
 export const REQUEST_TYPES = {
   xhr: "Fetch/XHR",
   javascript: "Javascript",
+  html: "HTML",
   css: "CSS",
   font: "Font",
-  html: "HTML",
   img: "Image",
   manifest: "Manifest",
   media: "Media",

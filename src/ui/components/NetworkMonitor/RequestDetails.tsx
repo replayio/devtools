@@ -11,15 +11,37 @@ import { WiredFrame } from "protocol/thread/pause";
 
 interface Detail {
   name: string;
-  value: string;
+  value: string | React.ReactChild;
+}
+
+function FormattedUrl({ url }: { url: string }) {
+  const parsedUrl = new URL(url);
+  const params = [...parsedUrl.searchParams.entries()];
+  return (
+    <span className="text-gray-600">
+      <span className="">{parsedUrl.origin}</span>
+      <span className="">{parsedUrl.pathname}</span>
+      {params.length > 0 ? (
+        <>
+          {params.map(([key, value], index) => (
+            <span key={key}>
+              <span className="">{index == 0 ? "?" : "&"}</span>
+              <span className="text-primaryAccent">{key}</span>
+              <span>={value}</span>
+            </span>
+          ))}
+        </>
+      ) : null}
+    </span>
+  );
 }
 
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
     <div className={classNames(className, "flex flex-col")}>
       {details.map(h => (
-        <div className={classNames(styles.row)} key={h.name}>
-          <span className="font-bold text-gray-500">{h.name}:</span> {h.value}
+        <div className={classNames(styles.row, "hover:bg-gray-100 py-1")} key={h.name}>
+          <span className="font-bold ">{h.name}:</span> {h.value}
         </div>
       ))}
     </div>
@@ -111,7 +133,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <DetailTable
           className={styles.request}
           details={[
-            { name: "URL", value: request.url },
+            { name: "URL", value: <FormattedUrl url={request.url} /> },
             { name: "Request Method", value: request.method },
             { name: "Status Code", value: String(request.status) },
             { name: "Type", value: request.documentType },
