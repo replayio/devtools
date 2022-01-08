@@ -16,7 +16,7 @@ import {
   getSelectedLocation,
   getContext,
 } from "../selectors";
-import { getSelectedPrimaryPanel } from "ui/reducers/app";
+import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { selectSource, selectLocation } from "../actions/sources/select";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { searchContents } from "./file-search";
