@@ -68,18 +68,14 @@ const DEFAULT_COMMANDS: CommandKey[] = [
   "open_sources",
 ];
 
-function getDefaultCommands() {
-  return DEFAULT_COMMANDS.map(key => COMMANDS.find(c => c.key === key));
-}
-
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
 
-  if (!searchString) {
-    return getDefaultCommands();
-  }
+  const commands: Command[] = searchString
+    ? filter(COMMANDS, searchString, { key: "label" })
+    : COMMANDS;
 
-  const enabledCommands = COMMANDS.filter(command => {
+  const enabledCommands = commands.filter(command => {
     if (command.settingKey) {
       const isEnabled = userSettings[command.settingKey];
 
@@ -93,7 +89,12 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
     return true;
   });
 
-  return filter(enabledCommands, searchString, { key: "label" });
+  // This puts the default commands at the top of the list.
+  const sortedCommands = [...enabledCommands].sort(
+    (a, b) => DEFAULT_COMMANDS.indexOf(b.key) - DEFAULT_COMMANDS.indexOf(a.key)
+  );
+
+  return sortedCommands;
 }
 
 function PaletteShortcut() {
