@@ -4,7 +4,7 @@ import React from "react";
 export default React.forwardRef<
   HTMLInputElement,
   Omit<React.HTMLProps<HTMLInputElement>, "type" | "className"> & {
-    textSize?: "base" | "lg" | "2xl";
+    textSize?: "base" | "md" | "lg" | "2xl";
     center?: boolean;
   }
 >(function TextInput(props, ref) {

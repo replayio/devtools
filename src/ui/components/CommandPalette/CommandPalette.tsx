@@ -152,7 +152,7 @@ function CommandPalette({
               onKeyDown={onKeyDown}
               autoFocus
               placeholder="What would you like to do?"
-              textSize="lg"
+              textSize="md"
             />
             <PaletteShortcut />
           </div>
