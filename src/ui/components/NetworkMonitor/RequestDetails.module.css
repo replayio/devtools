@@ -32,4 +32,5 @@ h2.title {
 .row {
   padding-left: 1rem;
   word-break: break-all;
+  cursor: default;
 }

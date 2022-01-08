@@ -27,16 +27,16 @@ export default function Table({
   const columns = useMemo(
     () => [
       {
-        Header: "Name",
-        accessor: "name" as const,
-      },
-      {
         Header: "Status",
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
         className: "m-auto",
         width: 50,
         maxWidth: 100,
+      },
+      {
+        Header: "Name",
+        accessor: "name" as const,
       },
       {
         Header: "Method",

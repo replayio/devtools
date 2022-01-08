@@ -24,7 +24,7 @@ export const NetworkMonitor = ({
   selectFrame,
 }: PropsFromRedux) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
-  const [types, setTypes] = useState<Set<RequestType>>(new Set(["xhr"]));
+  const [types, setTypes] = useState<Set<RequestType>>(new Set(["xhr", "javascript", "html"]));
   const [vert, setVert] = useState<boolean>(false);
 
   const container = useRef<HTMLDivElement>(null);
