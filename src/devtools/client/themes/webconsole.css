@@ -19,6 +19,7 @@
    * edge than to message text. This value pushes them slightly to the right. */
   --console-icon-horizontal-offset: 1px;
   --console-warning-background: var(--theme-warning-background);
+
   --console-warning-border: var(--theme-warning-border);
   --console-warning-color: var(--theme-warning-color);
   --console-drawer-width: 180px;
@@ -50,6 +51,8 @@
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(344, 73%, 97%);
   --console-error-border: rgba(215, 0, 34, 0.12); /* Red 60 + opacity */
+  --console-error-hover-background: hsl(344, 73%, 95%);
+
   --console-error-color: var(--red-70);
   --console-navigation-color: var(--theme-highlight-blue);
   --console-navigation-border: var(--blue-30);

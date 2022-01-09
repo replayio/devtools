@@ -51,7 +51,7 @@ export const NetworkMonitor = ({
   }, [container.current]);
 
   return (
-    <div className="overflow-hidden h-full" ref={container}>
+    <div className="network-monitor overflow-hidden h-full" ref={container}>
       <Table events={events} requests={requests} types={types}>
         {({ table, data }: { table: any; data: RequestSummary[] }) => (
           <>
