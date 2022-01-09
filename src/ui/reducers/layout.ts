@@ -19,6 +19,7 @@ const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => 
   if (session) {
     return session.selectedPrimaryPanel;
   }
+
   if (!recording) {
     return syncInitialLayoutState.selectedPrimaryPanel;
   }

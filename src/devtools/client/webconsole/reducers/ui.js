@@ -11,6 +11,7 @@ const {
   FILTERBAR_DISPLAY_MODES,
   SET_ZOOMED_REGION,
   TOGGLE_FILTER_DRAWER,
+  SET_FILTER_DRAWER,
 } = require("devtools/client/webconsole/constants");
 
 const UiState = overrides =>
@@ -56,6 +57,11 @@ function ui(state = UiState(), action) {
       return {
         ...state,
         collapseFilterDrawer: !state.collapseFilterDrawer,
+      };
+    case SET_FILTER_DRAWER:
+      return {
+        ...state,
+        collapseFilterDrawer: action.collapsed,
       };
   }
 

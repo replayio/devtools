@@ -8,13 +8,6 @@ import { loadSourceText } from "./loadSourceText";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
-import { ThreadFront } from "protocol/thread";
-import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
-import { formatProjectFunctions } from "../../utils/quick-open";
-import {
-  getGlobalFunctions,
-  isGlobalFunctionsLoading,
-} from "devtools/client/debugger/src/reducers/ast";
 
 async function doSetSymbols(source, { dispatch, parser }) {
   const sourceId = source.id;
@@ -39,34 +32,3 @@ export const setSymbols = memoizeableAction("setSymbols", {
   createKey: ({ source }) => source.id,
   action: ({ source }, thunkArgs) => doSetSymbols(source, thunkArgs),
 });
-
-export function loadGlobalFunctions() {
-  return async ({ dispatch, getState }) => {
-    // Only load global functions once.
-    if (getGlobalFunctions(getState()) !== null || isGlobalFunctionsLoading(getState())) {
-      return;
-    }
-
-    dispatch({
-      type: "LOADING_GLOBAL_FUNCTIONS",
-    });
-
-    await ThreadFront.ensureAllSources();
-
-    const sourceById = selectors.getSources(getState()).values;
-    // Empty query to grab all of the functions, which we can easily filter later.
-    const query = "";
-    const sourceIds = getSourceIDsToSearch(sourceById);
-
-    const globalFns = [];
-
-    await ThreadFront.searchFunctions({ query, sourceIds }, matches => {
-      globalFns.push(...formatProjectFunctions(matches, sourceById));
-    });
-
-    dispatch({
-      type: "SET_GLOBAL_FUNCTIONS",
-      globalFns,
-    });
-  };
-}
