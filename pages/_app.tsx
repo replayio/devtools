@@ -4,15 +4,15 @@ import "ui/utils/whatwg-url-fix";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
+import LoadingScreen, { StaticLoadingScreen } from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
-import { bootstrapApp, initStore } from "ui/setup";
+import { bootstrapApp } from "ui/setup";
 import "image/image.css";
 import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
@@ -149,17 +149,23 @@ function AppUtilities({ children, apiKey }: { children: ReactNode } & AuthProps)
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
-  const storeRef = useRef(initStore());
+  const [store, setStore] = useState<Store | null>(null);
   useEffect(() => {
-    bootstrapApp(storeRef.current);
-  }, [storeRef]);
+    bootstrapApp().then((store: Store) => setStore(store));
+  }, []);
+
+  if (!store) {
+    // We hide the tips here since we don't have the store ready yet, which
+    // the tips need to work properly.
+    return <StaticLoadingScreen />;
+  }
 
   if (maintenanceMode) {
     return <MaintenanceModeScreen />;
   }
 
   return (
-    <Provider store={storeRef.current}>
+    <Provider store={store}>
       <Head>
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
@@ -180,11 +186,7 @@ function Routing({ Component, pageProps }: AppProps) {
 }
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
-  return (
-    <AppUtilities apiKey={apiKey}>
-      <Routing {...props} />
-    </AppUtilities>
-  );
+  return <AppUtilities apiKey={apiKey}>{<Routing {...props} />}</AppUtilities>;
 };
 
 App.getInitialProps = (appContext: AppContext) => {
