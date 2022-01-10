@@ -10,6 +10,61 @@ import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
 
+interface MetadataProps {
+  metadata?: {
+    id: string;
+    title?: string;
+    url?: string;
+    duration?: number;
+    owner?: string;
+  };
+}
+
+function RecordingHead({ metadata }: MetadataProps) {
+  if (!metadata) {
+    return null;
+  }
+
+  let title = metadata.title;
+  let description = "Replay";
+  try {
+    const url = new URL(metadata.url || "");
+    if (url.protocol !== "file:") {
+      description += ` of ${url.hostname}`;
+    }
+  } finally {
+    if (metadata.owner) {
+      description += ` by ${metadata.owner}`;
+    }
+  }
+
+  if (!title && description) {
+    title = description;
+    description = "";
+  }
+
+  const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
+
+  return (
+    <Head>
+      {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
+      <meta property="og:title" content={title} />
+      {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
+      <meta property="og:description" content={description} />
+      {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
+      <meta property="og:image" content={image} />
+      <meta name="twitter:card" content={"summary_large_image"} />
+      {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
+      <meta property="twitter:image" content={image} />
+      {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
+      <meta property="twitter:title" content={title} />
+      <meta name="twitter:site" content="@replayio" />
+      {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
+      <meta property="twitter:description" content={description} />
+    </Head>
+  );
+}
+
 function RecordingPage({
   getAccessibleRecording,
   head,
@@ -70,60 +125,10 @@ export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
 }
 
-interface MetadataProps {
-  headOnly?: boolean;
-  metadata?: {
-    id: string;
-    title?: string;
-    url?: string;
-    duration?: number;
-    owner?: string;
-  };
-}
+type SSRProps = MetadataProps & { headOnly?: boolean };
 
-export default function SSRRecordingPage({ headOnly, metadata }: MetadataProps) {
-  let head: React.ReactNode | null = null;
-
-  if (metadata) {
-    let title = metadata.title;
-    let description = "Replay";
-    try {
-      const url = new URL(metadata.url || "");
-      if (url.protocol !== "file:") {
-        description += ` of ${url.hostname}`;
-      }
-    } finally {
-      if (metadata.owner) {
-        description += ` by ${metadata.owner}`;
-      }
-    }
-
-    if (!title && description) {
-      title = description;
-      description = "";
-    }
-
-    const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
-
-    head = (
-      <Head>
-        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
-        <meta property="og:title" content={title} />
-        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
-        <meta property="og:description" content={description} />
-        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
-        <meta property="og:image" content={image} />
-        <meta name="twitter:card" content={"summary_large_image"} />
-        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
-        <meta property="twitter:image" content={image} />
-        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
-        <meta property="twitter:title" content={title} />
-        <meta name="twitter:site" content="@replayio" />
-        {/* nosemgrep typescript.react.security.audit.reac-http-leak.react-http-leak */}
-        <meta property="twitter:description" content={description} />
-      </Head>
-    );
-  }
+export default function SSRRecordingPage({ headOnly, metadata }: SSRProps) {
+  let head: React.ReactNode = <RecordingHead metadata={metadata} />;
 
   if (headOnly) {
     return head;
