@@ -4,7 +4,7 @@ import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
-import { useGetRecordingId } from "ui/hooks/recordings";
+import { getRecordingMetadata, useGetRecordingId } from "ui/hooks/recordings";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
@@ -58,57 +58,9 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const ConnectedRecordingPage = connector(RecordingPage);
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
-  const resp = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: `
-        query GetRecording($recordingId: UUID!) {
-          recording(uuid: $recordingId) {
-            uuid
-            url
-            title
-            duration
-            private
-            isInitialized
-            owner {
-              name
-            }
-            workspace {
-              name
-            }
-          }
-        }
-      `,
-      variables: {
-        recordingId: params.id,
-      },
-    }),
-  });
-
-  const json: {
-    data: { recording: RecordingInfo & { thumbnail?: string; owner?: { name: string } } };
-    error: any;
-  } = await resp.json();
-
-  if (json.error || !json.data.recording) {
-    return {
-      props: {},
-      revalidate: 360,
-    };
-  }
-
   return {
     props: {
-      metadata: {
-        id: params.id,
-        title: json.data.recording.title,
-        url: json.data.recording.url,
-        duration: json.data.recording.duration,
-        owner: json.data.recording.owner?.name,
-      },
+      metadata: await getRecordingMetadata(params.id),
     },
     revalidate: 360,
   };
