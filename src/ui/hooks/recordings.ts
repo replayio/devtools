@@ -734,3 +734,52 @@ export function useUpdateRecordingTitle() {
 
   return updateRecordingTitle;
 }
+
+export async function getRecordingMetadata(id: string) {
+  const resp = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: `
+        query GetRecording($recordingId: UUID!) {
+          recording(uuid: $recordingId) {
+            uuid
+            url
+            title
+            duration
+            private
+            isInitialized
+            owner {
+              name
+            }
+            workspace {
+              name
+            }
+          }
+        }
+      `,
+      variables: {
+        recordingId: id,
+      },
+    }),
+  });
+
+  const json: {
+    data: { recording: Recording & { owner?: { name: string } } };
+    error: any;
+  } = await resp.json();
+
+  if (json.error || !json.data.recording) {
+    return null;
+  }
+
+  return {
+    id,
+    title: json.data.recording.title,
+    url: json.data.recording.url,
+    duration: json.data.recording.duration,
+    owner: json.data.recording.owner?.name || null,
+  };
+}
