@@ -780,6 +780,6 @@ export async function getRecordingMetadata(id: string) {
     title: json.data.recording.title,
     url: json.data.recording.url,
     duration: json.data.recording.duration,
-    owner: json.data.recording.owner?.name,
+    owner: json.data.recording.owner?.name || null,
   };
 }

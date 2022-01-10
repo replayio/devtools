@@ -33,6 +33,8 @@ function RecordingHead({ metadata }: MetadataProps) {
     if (url.protocol !== "file:") {
       description += ` of ${url.hostname}`;
     }
+  } catch {
+    // ignore invalid URLs
   } finally {
     if (metadata.owner) {
       description += ` by ${metadata.owner}`;
