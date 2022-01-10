@@ -9,6 +9,7 @@ import {
 import { UIState } from "ui/state";
 import LoadingTip from "./LoadingTip";
 import { BubbleViewportWrapper } from "./Viewport";
+import ReplayLogo from "./ReplayLogo";
 
 export function StaticLoadingScreen() {
   return (
@@ -26,13 +27,14 @@ export function LoadingScreenTemplate({
   showTips?: boolean;
 }) {
   return (
-    <BubbleViewportWrapper footer={showTips ? <LoadingTip /> : null}>
-      <div className="m-auto text-lg">
+    <BubbleViewportWrapper>
+      <div className="p-9 text-2xl relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-80">
         <div className="flex flex-col items-center space-y-10">
-          <Logo />
+          <ReplayLogo wide="true" size="md" />
           {children}
         </div>
       </div>
+      <div className="mt-4 p-9 relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-80"></div>
     </BubbleViewportWrapper>
   );
 }
@@ -65,7 +67,7 @@ function Logo() {
 // White progress screen used for showing the scanning progress of a replay
 export function ProgressBar({ progress }: { progress: number }) {
   return (
-    <div className="bg-gray-200 rounded-lg overflow-hidden w-56 relative h-1">
+    <div className="bg-gray-200 rounded-lg overflow-hidden w-56 relative h-1.5">
       <div
         className="absolute t-0 h-full bg-primaryAccent"
         style={{ width: `${progress}%`, transitionDuration: "200ms" }}
