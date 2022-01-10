@@ -1,9 +1,5 @@
 import classNames from "classnames";
-import React, { useEffect, useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { setLoadingPageTipIndex } from "ui/actions/app";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
+import React, { useEffect, useRef, useState } from "react";
 
 const TIPS = [
   {
@@ -31,8 +27,9 @@ const TIPS = [
   },
 ];
 
-function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRedux) {
-  const { title, description, icon } = TIPS[loadingPageTipIndex || 0];
+export default function LoadingTip() {
+  const [loadingPageTipIndex, setLoadingPageTipIndex] = useState(0);
+  const { title, description, icon } = TIPS[loadingPageTipIndex];
   const key = useRef<any>();
 
   const resetAutoNext = () => clearTimeout(key.current);
@@ -48,42 +45,12 @@ function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRe
   }, [loadingPageTipIndex]);
 
   return (
-    <div className="bottom-6 absolute left-1/2 transform -translate-x-1/2">
-      <div className="flex flex-col space-y-4 invisible md:visible">
-        <div className="p-4 bg-jellyfish shadow-lg rounded-lg space-x-4 flex items-center max-w-lg">
-          <img className="h-16 w-16 p-2" src={`/images/${icon}`} />
-          <div className="flex flex-col space-y-2">
-            <div className="font-bold">{title}</div>
-            <div className="text-sm">{description}</div>
-          </div>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="flex flex-row space-x-1">
-            {TIPS.map((t, i) => (
-              <button
-                className={classNames(
-                  "rounded-full h-2 w-2",
-                  loadingPageTipIndex === i ? "bg-gray-500" : "bg-gray-300"
-                )}
-                key={i}
-                onClick={() => setLoadingPageTipIndex(i)}
-              />
-            ))}
-          </div>
-        </div>
+    <div className="bg-jellyfish space-x-4 inline-block align-middle flex items-center max-w-lg">
+      <img className="h-16 w-18 p-2" src={`/images/${icon}`} />
+      <div className="flex flex-col space-y-2">
+        <div className="font-bold text-sm">{title}</div>
+        <div className="text-xs">{description}</div>
       </div>
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    loadingPageTipIndex: selectors.getLoadingPageTipIndex(state),
-  }),
-  {
-    setLoadingPageTipIndex,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(LoadingTip);
