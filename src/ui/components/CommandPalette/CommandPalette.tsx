@@ -137,8 +137,8 @@ function CommandPalette({
 
   return (
     <div
-      className="h-64 flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
-      style={{ width: "480px" }}
+      className="h-52 w-full flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+      style={{ maxWidth: "400px", minWidth: "320px" }}
     >
       <div className="p-3 border-b border-gray-300">
         <div className="relative flex items-center text-primaryAccent">
@@ -151,7 +151,7 @@ function CommandPalette({
           <PaletteShortcut />
         </div>
       </div>
-      <div className="flex-grow text-sm flex flex-col overflow-auto">
+      <div className="flex-grow text-sm flex flex-col overflow-auto mb-2">
         {shownCommands.map((command: Command, index: number) => (
           <CommandButton active={index == activeIndex} command={command} key={command.label} />
         ))}

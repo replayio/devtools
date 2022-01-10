@@ -12,7 +12,7 @@ export default function WelcomeBox() {
         <div className="absolute pointer-events-none">
           <img src="/images/bubble.svg" className="editor-bg" style={{ transform: "scale(2.4)" }} />
         </div>
-        <div className="relative">
+        <div className="relative w-full flex flex-col items-center">
           <CommandPalette />
         </div>
       </div>

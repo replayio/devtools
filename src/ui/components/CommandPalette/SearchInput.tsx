@@ -26,7 +26,6 @@ export default function SearchInput({
         onKeyDown={onKeyDown}
         autoFocus={autoFocus}
         placeholder="What would you like to do?"
-        textSize="lg"
       />
     </div>
   );
