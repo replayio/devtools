@@ -129,7 +129,6 @@ import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
-import { useRouter } from "next/router";
 
 interface AuthProps {
   apiKey?: string;
@@ -138,14 +137,9 @@ interface AuthProps {
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-function AppUtilities({
-  children,
-  apiKey,
-  head,
-}: { children: ReactNode; head: ReactNode } & AuthProps) {
+function AppUtilities({ children, apiKey }: { children: ReactNode } & AuthProps) {
   return (
     <tokenManager.Auth0Provider apiKey={apiKey}>
-      {head}
       <ApolloWrapper>
         <IntercomProvider appId={"k7f741xx"} autoBoot>
           <ConfirmProvider>{children}</ConfirmProvider>
@@ -198,23 +192,7 @@ function Routing({ Component, pageProps }: AppProps) {
 }
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
-  const router = useRouter();
-  let head: React.ReactNode;
-
-  // HACK: Coordinates with the recording page to render its <head> contents for
-  // social meta tags. This can be removed once we are able to handle SSR
-  // properly all the way to the pages. __N_SSG is a very private
-  // (https://github.com/vercel/next.js/discussions/12558) Next.js prop to
-  // indicate server-side rendering. It works for now but likely will be removed
-  // or replaced so we need to fix our SSR and stop using it.
-  if (props.__N_SSG && router.pathname.match(/^\/recording\//)) {
-    head = <props.Component {...props.pageProps} headOnly />;
-  }
-  return (
-    <AppUtilities apiKey={apiKey} head={head}>
-      <Routing {...props} />
-    </AppUtilities>
-  );
+  return <AppUtilities apiKey={apiKey}>{<Routing {...props} />}</AppUtilities>;
 };
 
 App.getInitialProps = (appContext: AppContext) => {
