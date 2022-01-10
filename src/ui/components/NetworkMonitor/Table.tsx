@@ -30,7 +30,6 @@ export default function Table({
         Header: "Status",
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
-        className: "m-auto",
         width: 50,
         maxWidth: 100,
       },
@@ -41,7 +40,6 @@ export default function Table({
       {
         Header: "Method",
         accessor: "method" as const,
-        className: "m-auto",
         width: 50,
         maxWidth: 100,
       },
@@ -66,7 +64,7 @@ export default function Table({
 
   const defaultColumn = useMemo(
     () => ({
-      minWidth: 50,
+      minWidth: 60,
       width: 200,
       maxWidth: 1000,
     }),

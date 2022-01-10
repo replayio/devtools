@@ -25,7 +25,6 @@ export function HeaderGroups({
         ev.preventDefault();
         setMenuLocation({ x: ev.pageX, y: ev.pageY });
       }}
-      className="border-b"
     >
       {menuLocation ? (
         <ContextMenu x={menuLocation.x} y={menuLocation.y} close={() => setMenuLocation(undefined)}>
@@ -35,7 +34,10 @@ export function HeaderGroups({
         ""
       )}
       {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => (
-        <div className="flex font-normal items-center" {...headerGroup.getHeaderGroupProps()}>
+        <div
+          className="flex font-normal items-center divide-x bg-toolbarBackground"
+          {...headerGroup.getHeaderGroupProps()}
+        >
           {headerGroup.headers.map(column => (
             <div className={classNames("p-1", styles[column.id])} {...column.getHeaderProps()}>
               {column.render("Header")}

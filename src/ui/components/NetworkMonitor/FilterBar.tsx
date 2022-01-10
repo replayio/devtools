@@ -13,7 +13,7 @@ export default function FilterBar({
   types: Set<RequestType>;
 }) {
   return (
-    <div className="bg-white border-1 border-b border-bottom flex items-center px-1 py-1">
+    <div className="bg-white flex items-center px-1 py-1">
       <TypesDropdown toggleType={toggleType} types={types} />
 
       <MaterialIcon iconSize="lg">search</MaterialIcon>

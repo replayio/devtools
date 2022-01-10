@@ -26,18 +26,13 @@ table.requests {
 }
 
 .resizer {
-  display: inline-block;
+  cursor: ew-resize;
   height: 100%;
   position: absolute;
   top: 0;
-  right: 0;
-  transform: translateX(-50%);
+  right: -4px;
   width: 8px;
-}
-
-.resizer:hover,
-.resizer:active {
-  background: var(--primary-accent);
+  z-index: 50;
 }
 
 .seekBadge {
