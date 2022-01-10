@@ -771,6 +771,10 @@ export async function getRecordingMetadata(id: string) {
     error: any;
   } = await resp.json();
 
+  if (json.error || !json.data.recording) {
+    return null;
+  }
+
   return {
     id,
     title: json.data.recording.title,

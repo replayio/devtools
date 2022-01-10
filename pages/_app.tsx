@@ -197,7 +197,10 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
 
   // HACK: Coordinates with the recording page to render its <head> contents for
   // social meta tags. This can be removed once we are able to handle SSR
-  // properly all the way to the pages.
+  // properly all the way to the pages. __N_SSG is a very private
+  // (https://github.com/vercel/next.js/discussions/12558) Next.js prop to
+  // indicate server-side rendering. It works for now but likely will be removed
+  // or replaced so we need to fix our SSR and stop using it.
   if (props.__N_SSG && router.pathname.match(/^\/recording\//)) {
     head = <props.Component {...props.pageProps} headOnly />;
   }
