@@ -1,14 +1,14 @@
+import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording } from "ui/actions/session";
-import { Recording, Recording as RecordingInfo } from "ui/types";
+import { Recording as RecordingInfo } from "ui/types";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
-import Head from "next/head";
 
 function RecordingPage({
   getAccessibleRecording,
@@ -76,9 +76,6 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
             owner {
               name
             }
-            comments {
-              id
-            }
             workspace {
               name
             }
@@ -92,7 +89,7 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
   });
 
   const json: {
-    data: { recording: Recording & { thumbnail?: string; owner?: { name: string } } };
+    data: { recording: RecordingInfo & { thumbnail?: string; owner?: { name: string } } };
     error: any;
   } = await resp.json();
 
@@ -122,6 +119,7 @@ export async function getStaticPaths() {
 }
 
 interface MetadataProps {
+  headOnly?: boolean;
   metadata?: {
     id: string;
     title?: string;
@@ -131,7 +129,7 @@ interface MetadataProps {
   };
 }
 
-export default function SSRRecordingPage({ metadata }: MetadataProps) {
+export default function SSRRecordingPage({ headOnly, metadata }: MetadataProps) {
   let head: React.ReactNode | null = null;
 
   if (metadata) {
@@ -173,6 +171,10 @@ export default function SSRRecordingPage({ metadata }: MetadataProps) {
         <meta property="twitter:description" content={description} />
       </Head>
     );
+  }
+
+  if (headOnly) {
+    return head;
   }
 
   return <ConnectedRecordingPage head={head} />;
