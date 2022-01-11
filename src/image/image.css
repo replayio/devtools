@@ -496,6 +496,9 @@ button.open-inspector {
 .img.cmd-icon {
   -webkit-mask-image: url(/images/cmd-icon.svg);
 }
+.img.palette {
+  -webkit-mask-image: url(/images/palette.svg);
+}
 
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);

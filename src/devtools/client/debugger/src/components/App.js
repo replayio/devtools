@@ -180,15 +180,21 @@ class Debugger extends Component {
   };
 
   renderEditor() {
+    const { selectedSource } = this.props;
     const horizontal = this.isHorizontal();
+    const showFooter = !isDemo() && selectedSource;
 
     return (
       <EditorPane>
         {!isDemo() && <EditorTabs horizontal={horizontal} />}
-        <Redacted>
-          <Editor />
-        </Redacted>
-        {!isDemo() && <EditorFooter horizontal={horizontal} />}
+        {selectedSource ? (
+          <Redacted>
+            <Editor />
+          </Redacted>
+        ) : (
+          <WelcomeBox />
+        )}
+        {showFooter && <EditorFooter horizontal={horizontal} />}
       </EditorPane>
     );
   }
@@ -209,23 +215,13 @@ class Debugger extends Component {
   }
 
   renderEndPane() {
-    const { selectedSource } = this.props;
-    const horizontal = this.isHorizontal();
+    const { showEditor } = this.props;
 
-    if (!selectedSource) {
-      return (
-        <EditorPane>
-          <WelcomeBox
-            horizontal={horizontal}
-            toggleShortcutsModal={() => this.toggleShortcutsModal()}
-          />
-        </EditorPane>
-      );
+    if (!showEditor) {
+      return null;
     }
 
-    if (this.props.showEditor) {
-      return this.renderEditor();
-    }
+    return this.renderEditor();
   }
 
   renderLayout = () => {

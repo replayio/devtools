@@ -28,6 +28,7 @@ import {
   getActiveSearch,
   getSelectedSource,
   getExecutionPoint,
+  getThreadContext,
 } from "../../selectors";
 
 export const setSelectedLocation = (cx, source, location) => ({
@@ -83,6 +84,13 @@ export function selectSource(cx, sourceId, options = {}) {
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location));
+  };
+}
+
+export function deselectSource() {
+  return ({ dispatch, getState }) => {
+    const cx = getThreadContext(getState());
+    dispatch(clearSelectedLocation(cx));
   };
 }
 

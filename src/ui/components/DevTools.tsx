@@ -13,7 +13,7 @@ import ReplayLogo from "./shared/ReplayLogo";
 import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
-import CommandPalette from "./CommandPalette";
+import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -97,7 +97,7 @@ function _DevTools({
       ) : (
         <NonDevView />
       )}
-      {showCommandPalette ? <CommandPalette /> : null}
+      {showCommandPalette ? <CommandPaletteModal /> : null}
       <KeyboardShortcuts />
     </>
   );

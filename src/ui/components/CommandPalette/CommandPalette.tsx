@@ -1,13 +1,12 @@
 import React, { ChangeEvent, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions, UIStore } from "ui/actions";
+import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { UserSettings } from "ui/types";
-import { TextInput } from "../shared/Forms";
-import Modal from "../shared/NewModal";
 import CommandButton from "./CommandButton";
+import SearchInput from "./SearchInput";
 const { filter } = require("fuzzaldrin-plus");
 
 export type Command = {
@@ -107,10 +106,11 @@ function PaletteShortcut() {
 }
 
 function CommandPalette({
+  autoFocus = false,
   hideCommandPalette,
   executeCommand,
   hasReactComponents,
-}: PropsFromRedux) {
+}: { autoFocus?: boolean } & PropsFromRedux) {
   const [searchString, setSearchString] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const shownCommands = getShownCommands(searchString, hasReactComponents);
@@ -136,35 +136,27 @@ function CommandPalette({
   };
 
   return (
-    <Modal
-      blurMask={false}
-      options={{ maskTransparency: "translucent" }}
-      onMaskClick={() => hideCommandPalette()}
+    <div
+      className="h-52 w-full flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+      style={{ maxWidth: "400px", minWidth: "320px" }}
     >
-      <div
-        className="h-64 flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
-        style={{ width: "480px" }}
-      >
-        <div className="p-3 border-b border-gray-300">
-          <div className="relative flex items-center text-primaryAccent">
-            <TextInput
-              value={searchString}
-              onChange={onChange}
-              onKeyDown={onKeyDown}
-              autoFocus
-              placeholder="What would you like to do?"
-              textSize="lg"
-            />
-            <PaletteShortcut />
-          </div>
-        </div>
-        <div className="flex-grow text-sm flex flex-col overflow-auto">
-          {shownCommands.map((command: Command, index: number) => (
-            <CommandButton active={index == activeIndex} command={command} key={command.label} />
-          ))}
+      <div className="p-3 border-b border-gray-300">
+        <div className="relative flex items-center text-primaryAccent">
+          <SearchInput
+            value={searchString}
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            autoFocus={autoFocus}
+          />
+          <PaletteShortcut />
         </div>
       </div>
-    </Modal>
+      <div className="flex-grow text-sm flex flex-col overflow-auto mb-2">
+        {shownCommands.map((command: Command, index: number) => (
+          <CommandButton active={index == activeIndex} command={command} key={command.label} />
+        ))}
+      </div>
+    </div>
   );
 }
 

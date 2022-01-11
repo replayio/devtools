@@ -14,6 +14,7 @@ import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from ".
 import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
+import CommandPaletteButton from "./CommandPaletteButton";
 
 class Tabs extends PureComponent {
   _draggedSource;
@@ -136,12 +137,10 @@ class Tabs extends PureComponent {
 
   renderTabs() {
     const { tabSources } = this.props;
-    if (!tabSources) {
-      return;
-    }
 
     return (
       <div className="source-tabs" ref="sourceTabs">
+        <CommandPaletteButton />
         {tabSources.map((source, index) => {
           return (
             <Tab
