@@ -1,3 +1,4 @@
+import clamp from "lodash/clamp";
 import React, { ChangeEvent, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
@@ -127,10 +128,11 @@ function CommandPalette({
       const direction = e.key === "ArrowUp" ? -1 : 1;
       const index = activeIndex + direction;
       const resultCount = shownCommands.length;
-      const nextIndex = (index + resultCount) % resultCount || 0;
+      const nextIndex = clamp(index, 0, resultCount - 1);
       setActiveIndex(nextIndex);
     } else if (e.key === "Enter") {
       e.preventDefault();
+      setSearchString("");
       executeCommand(shownCommands[activeIndex].key);
     }
   };
