@@ -1,5 +1,7 @@
-import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoadingPageTipIndex } from "ui/actions/app";
+import { selectors } from "ui/reducers";
 
 const TIPS = [
   {
@@ -28,8 +30,9 @@ const TIPS = [
 ];
 
 export default function LoadingTip() {
-  const [loadingPageTipIndex, setLoadingPageTipIndex] = useState(0);
-  const { title, description, icon } = TIPS[loadingPageTipIndex];
+  const loadingPageTipIndex = useSelector(selectors.getLoadingPageTipIndex);
+  const dispatch = useDispatch();
+  const { title, description, icon } = TIPS[loadingPageTipIndex || 0];
   const key = useRef<any>();
 
   const resetAutoNext = () => clearTimeout(key.current);
@@ -40,16 +43,18 @@ export default function LoadingTip() {
     key.current = setTimeout(() => {
       const nextIndex = loadingPageTipIndex === TIPS.length - 1 ? 0 : loadingPageTipIndex + 1;
 
-      setLoadingPageTipIndex(nextIndex);
+      dispatch(setLoadingPageTipIndex(nextIndex));
     }, 5000);
   }, [loadingPageTipIndex]);
 
   return (
-    <div className="bg-jellyfish space-x-4 inline-block align-middle flex items-center max-w-lg">
-      <img className="h-16 w-18 p-2" src={`/images/${icon}`} />
-      <div className="flex flex-col space-y-2">
-        <div className="font-bold text-sm">{title}</div>
-        <div className="text-xs">{description}</div>
+    <div className="space-y-8 w-96 h-32">
+      <div className="px-8 py-4 space-x-4 align-middle flex items-center max-w-lg rounded-lg bg-jellyfish">
+        <img className="h-16 p-2" src={`/images/${icon}`} />
+        <div className="flex flex-col space-y-2">
+          <div className="font-bold text-sm">{title}</div>
+          <div className="text-xs">{description}</div>
+        </div>
       </div>
     </div>
   );

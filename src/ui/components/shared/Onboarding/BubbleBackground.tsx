@@ -2,7 +2,7 @@ import React from "react";
 
 export default function BubbleBackground() {
   return (
-    <div className="w-full h-full absolute">
+    <div className="w-full h-full absolute pointer-events-none">
       <div className="absolute top-bubble">
         <img
           src="/images/bubble.svg"

@@ -32,7 +32,7 @@ export function BubbleViewportWrapper({
   return (
     <FullViewportWrapper style={{ background: "#f3f3f4" }}>
       <BubbleBackground />
-      <div className="relative">{children}</div>
+      <div className="relative space-y-4">{children}</div>
       {footer}
     </FullViewportWrapper>
   );

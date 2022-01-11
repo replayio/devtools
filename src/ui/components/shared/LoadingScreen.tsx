@@ -12,11 +12,7 @@ import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
 
 export function StaticLoadingScreen() {
-  return (
-    <LoadingScreenTemplate>
-      <div className="w-56 h-1"></div>
-    </LoadingScreenTemplate>
-  );
+  return <LoadingScreenTemplate />;
 }
 
 export function LoadingScreenTemplate({
@@ -28,15 +24,13 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="p-9 pt-4 text-2xl relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
+      <div className="p-8 py-4 text-2xl relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
         <div className="flex-col items-center space-y-2">
-          <ReplayLogo wide="true" size="lg" />
+          <ReplayLogo wide size="lg" />
           {children}
         </div>
       </div>
-      <div className="mt-4 pt-4 pl-6 pr-8 relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96 h-32 min-h-full">
-        <LoadingTip />
-      </div>
+      {showTips ? <LoadingTip /> : null}
     </BubbleViewportWrapper>
   );
 }
@@ -74,7 +68,7 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
 
   return (
     <LoadingScreenTemplate showTips={!!progress}>
-      <div className="w-full h-1">{progress ? <ProgressBar progress={progress} /> : null}</div>
+      {progress ? <ProgressBar progress={progress} /> : null}
     </LoadingScreenTemplate>
   );
 }
