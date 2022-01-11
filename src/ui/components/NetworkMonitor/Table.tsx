@@ -7,7 +7,7 @@ import {
   useTable,
   TableInstance,
 } from "react-table";
-import { partialRequestsToCompleteSummaries, RequestSummary, RequestType } from "./utils";
+import { CanonicalRequestType, partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 
 export default function Table({
   children,
@@ -22,7 +22,7 @@ export default function Table({
   }) => JSX.Element;
   events: RequestEventInfo[];
   requests: RequestInfo[];
-  types: Set<RequestType>;
+  types: Set<CanonicalRequestType>;
 }) {
   const columns = useMemo(
     () => [

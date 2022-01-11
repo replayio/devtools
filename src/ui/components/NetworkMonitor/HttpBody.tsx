@@ -1,7 +1,7 @@
 import { BodyData, RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
 import { useMemo } from "react";
 import ReactJson from "react-json-view";
-import { base64ToArrayBuffer, ContentType } from "./utils";
+import { base64ToArrayBuffer } from "./utils";
 
 const FIVE_MEGABYTES = 5e6;
 
@@ -14,7 +14,7 @@ const HttpBody = ({
 }: {
   bodyParts: BodyData[];
   contentLength?: string;
-  contentType: ContentType;
+  contentType: "json" | "text" | "other";
 }) => {
   const content = useMemo(
     () =>

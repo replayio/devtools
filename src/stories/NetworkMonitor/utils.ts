@@ -1,5 +1,5 @@
 import { RequestInfo, RequestEventInfo } from "@recordreplay/protocol";
-import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { CanonicalRequestType, RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 export const eventsFor = (
   id: string,
@@ -95,6 +95,7 @@ export const requestSummary = (
     start: 0,
     status,
     time: 1600,
+    type: CanonicalRequestType.FETCH_XHR,
     url,
   };
 };

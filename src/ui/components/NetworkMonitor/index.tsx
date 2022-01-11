@@ -13,7 +13,7 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
-import { RequestSummary, RequestType } from "./utils";
+import { CanonicalRequestType, RequestSummary } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
 import { fetchFrames, fetchResponseBody, fetchRequestBody } from "ui/actions/network";
@@ -32,20 +32,21 @@ export const NetworkMonitor = ({
   selectFrame,
 }: PropsFromRedux) => {
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
-  const [types, setTypes] = useState<Set<RequestType>>(new Set(["xhr", "javascript", "html"]));
+  const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
 
   const container = useRef<HTMLDivElement>(null);
 
   const closePanel = () => setSelectedRequest(undefined);
 
-  const toggleType = (type: RequestType) => {
-    if (types.has(type)) {
-      types.delete(type);
+  const toggleType = (type: CanonicalRequestType) => {
+    const newTypes = new Set(types);
+    if (newTypes.has(type)) {
+      newTypes.delete(type);
     } else {
-      types.add(type);
+      newTypes.add(type);
     }
-    setTypes(new Set(types));
+    setTypes(newTypes);
   };
 
   let resizeObserver = useRef(

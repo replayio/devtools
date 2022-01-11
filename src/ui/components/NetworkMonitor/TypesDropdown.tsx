@@ -3,14 +3,14 @@ import React, { useState } from "react";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { RequestType, REQUEST_ICONS, REQUEST_TYPES } from "./utils";
+import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
 export default function TypesDropdown({
   types,
   toggleType,
 }: {
-  types: Set<RequestType>;
-  toggleType: (type: RequestType) => void;
+  types: Set<CanonicalRequestType>;
+  toggleType: (type: CanonicalRequestType) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -20,7 +20,15 @@ export default function TypesDropdown({
     </MaterialIcon>
   );
 
-  const TypeItem = ({ icon, label, type }: { icon: string; label: string; type: RequestType }) => {
+  const TypeItem = ({
+    icon,
+    label,
+    type,
+  }: {
+    icon: string;
+    type: CanonicalRequestType;
+    label: string;
+  }) => {
     return (
       <DropdownItem onClick={() => toggleType(type)}>
         <DropdownItemContent selected={types.has(type)} icon={icon}>
@@ -40,12 +48,12 @@ export default function TypesDropdown({
       position="bottom-right"
     >
       <Dropdown>
-        {Object.entries(REQUEST_TYPES).map((pair: string[]) => (
+        {RequestTypeOptions.map(canonicalType => (
           <TypeItem
-            key={pair[0]}
-            icon={REQUEST_ICONS[pair[0]] || "description"}
-            type={pair[0] as RequestType}
-            label={pair[1]}
+            key={canonicalType.type}
+            label={canonicalType.label}
+            icon={canonicalType.icon}
+            type={canonicalType.type}
           />
         ))}
       </Dropdown>

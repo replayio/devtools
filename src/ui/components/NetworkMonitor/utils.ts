@@ -11,7 +11,19 @@ import {
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
 
-export type ContentType = "json" | "text" | "other";
+export enum CanonicalRequestType {
+  CSS,
+  FETCH_XHR,
+  FONT,
+  HTML,
+  IMAGE,
+  JAVASCRIPT,
+  MANIFEST,
+  MEDIA,
+  OTHER,
+  WASM,
+  WEBSOCKET,
+}
 
 export type RequestSummary = {
   domain: string;
@@ -30,41 +42,55 @@ export type RequestSummary = {
   start: number;
   status: number;
   time: number;
+  type: CanonicalRequestType;
   url: string;
 };
 
-export const REQUEST_TYPES = {
-  xhr: "Fetch/XHR",
-  javascript: "Javascript",
-  html: "HTML",
-  css: "CSS",
-  font: "Font",
-  img: "Image",
-  manifest: "Manifest",
-  media: "Media",
-  other: "Other",
-  wasm: "WASM",
-  websocket: "Websocket",
+export const RequestTypeOptions: { type: CanonicalRequestType; icon: string; label: string }[] = [
+  { type: CanonicalRequestType.CSS, icon: "color_lens", label: "CSS" },
+  { type: CanonicalRequestType.FETCH_XHR, icon: "description", label: "Fetch/XHR" },
+  { type: CanonicalRequestType.FONT, icon: "text_fields", label: "Font" },
+  { type: CanonicalRequestType.HTML, icon: "description", label: "HTML" },
+  { type: CanonicalRequestType.IMAGE, icon: "perm_media", label: "Image" },
+  { type: CanonicalRequestType.JAVASCRIPT, icon: "code", label: "Javascript" },
+  { type: CanonicalRequestType.MANIFEST, icon: "description", label: "Manifest" },
+  { type: CanonicalRequestType.MEDIA, icon: "perm_media", label: "Media" },
+  { type: CanonicalRequestType.OTHER, icon: "question_mark", label: "Other" },
+  { type: CanonicalRequestType.WASM, icon: "handyman", label: "WASM" },
+  { type: CanonicalRequestType.WEBSOCKET, icon: "autorenew", label: "Websocket" },
+];
+
+// From https://github.com/RecordReplay/gecko-dev/blob/webreplay-release/devtools/server/actors/replay/network-helpers.jsm#L14
+export const REQUEST_TYPES: Record<string, CanonicalRequestType> = {
+  subdocument: CanonicalRequestType.HTML,
+  objectSubdoc: CanonicalRequestType.HTML,
+
+  fetch: CanonicalRequestType.FETCH_XHR,
+  xhr: CanonicalRequestType.FETCH_XHR,
+
+  beacon: CanonicalRequestType.OTHER,
+  csp: CanonicalRequestType.OTHER,
+  dtd: CanonicalRequestType.OTHER,
+  invalid: CanonicalRequestType.OTHER,
+  object: CanonicalRequestType.OTHER,
+  other: CanonicalRequestType.OTHER,
+  ping: CanonicalRequestType.OTHER,
+  xslt: CanonicalRequestType.OTHER,
+
+  img: CanonicalRequestType.IMAGE,
+  imageset: CanonicalRequestType.IMAGE,
+
+  font: CanonicalRequestType.FONT,
+  webManifest: CanonicalRequestType.MANIFEST,
+  media: CanonicalRequestType.MEDIA,
+  script: CanonicalRequestType.JAVASCRIPT,
+  stylesheet: CanonicalRequestType.CSS,
+  wasm: CanonicalRequestType.WASM,
+  websocket: CanonicalRequestType.WEBSOCKET,
 };
 
 export const findHeader = (headers: Header[] | undefined, key: string): string | undefined =>
   headers?.find(h => h.name.toLowerCase() === key)?.value;
-
-export const REQUEST_ICONS: Record<string, string> = {
-  xhr: "description",
-  javascript: "code",
-  css: "color_lens",
-  font: "text_fields",
-  html: "description",
-  img: "perm_media",
-  manifest: "description",
-  media: "perm_media",
-  other: "question_mark",
-  wasm: "handyman",
-  websocket: "autorenew",
-};
-
-export type RequestType = keyof typeof REQUEST_TYPES;
 
 export type RequestEventMap = {
   request: { time: number; event: RequestOpenEvent };
@@ -106,7 +132,7 @@ const getDocumentType = (headers: Header[]): string => {
 export const partialRequestsToCompleteSummaries = (
   requests: RequestInfo[],
   events: RequestEventInfo[],
-  types: Set<RequestType>
+  types: Set<CanonicalRequestType>
 ): RequestSummary[] => {
   const eventsMap = eventsByRequestId(events);
   const summaries = requests
@@ -119,7 +145,6 @@ export const partialRequestsToCompleteSummaries = (
       const request = r.events.request;
       const response = r.events.response;
       const documentType = getDocumentType(response.event.responseHeaders);
-      const type: RequestType = (documentType?.split("/")?.[1] || documentType) as RequestType;
       return {
         documentType,
         domain: host(request.event.requestUrl),
@@ -140,33 +165,14 @@ export const partialRequestsToCompleteSummaries = (
         status: response.event.responseStatus,
         time: response.time - request.time,
         triggerPoint: r.triggerPoint,
-        type,
+        type: REQUEST_TYPES[request.event.requestCause || ""] || CanonicalRequestType.OTHER,
         url: request.event.requestUrl,
       };
     })
-    .filter(row => {
-      if (types.size === 0) {
-        return true;
-      }
-
-      if (types.has(row.type)) {
-        return true;
-      }
-      if (types.has("xhr") && row.type.match(/json/)) {
-        return true;
-      }
-
-      if (types.has("font") && row.type.match(/(woff|ttf)/)) {
-        return true;
-      }
-
-      if (types.has("img") && row.type.match(/(svg|jpeg|png|gif)/)) {
-        return true;
-      }
-      return false;
-    });
+    .filter(row => types.size === 0 || types.has(row.type));
 
   summaries.sort((a, b) => compareNumericStrings(a.point.point, b.point.point));
+
   return summaries;
 };
 
@@ -180,12 +186,15 @@ export function base64ToArrayBuffer(base64: string) {
   return bytes.buffer;
 }
 
-export const contentType = (headers: Header[]): ContentType => {
+export const contentType = (headers: Header[]): "json" | "text" | "other" => {
   const contentType = getDocumentType(headers);
   if (contentType?.startsWith("application/json")) {
     return "json";
   }
   if (contentType?.startsWith("text/")) {
+    return "text";
+  }
+  if (contentType?.startsWith("application/x-www-form-urlencoded")) {
     return "text";
   }
   return "other";
