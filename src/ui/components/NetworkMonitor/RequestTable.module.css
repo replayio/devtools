@@ -16,8 +16,8 @@ table.requests {
 }
 
 .row.selected {
-  background: var(--primary-accent);
-  border-color: var(--primary-accent);
+  background: var(--primary-accent-hover);
+  border-color: var(--primary-accent-hover);
   color: white;
 }
 
@@ -47,6 +47,7 @@ table.requests {
   padding-left: 6px;
   padding-right: 6px;
   position: absolute;
+  left: -2px;
   z-index: 1;
 }
 
