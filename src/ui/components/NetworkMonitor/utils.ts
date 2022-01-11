@@ -4,8 +4,9 @@ import {
   RequestInfo,
   RequestOpenEvent,
   RequestResponseEvent,
-  RequestResponseBody,
   TimeStampedPoint,
+  RequestBodyEvent,
+  RequestResponseBodyEvent,
 } from "@recordreplay/protocol";
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
@@ -17,6 +18,7 @@ export type RequestSummary = {
   documentType: string;
   end: number;
   hasResponseBody: boolean;
+  hasRequestBody: boolean;
   id: string;
   method: string;
   name: string;
@@ -45,8 +47,8 @@ export const REQUEST_TYPES = {
   websocket: "Websocket",
 };
 
-export const findHeader = (headers: Header[], key: string): string | undefined =>
-  headers.find(h => h.name.toLowerCase() === key)?.value;
+export const findHeader = (headers: Header[] | undefined, key: string): string | undefined =>
+  headers?.find(h => h.name.toLowerCase() === key)?.value;
 
 export const REQUEST_ICONS: Record<string, string> = {
   xhr: "description",
@@ -66,7 +68,8 @@ export type RequestType = keyof typeof REQUEST_TYPES;
 
 export type RequestEventMap = {
   request: { time: number; event: RequestOpenEvent };
-  "response-body": { time: number; event: RequestResponseBody };
+  "response-body": { time: number; event: RequestResponseBodyEvent };
+  "request-body": { time: number; event: RequestBodyEvent };
   response: { time: number; event: RequestResponseEvent };
 };
 
@@ -122,6 +125,7 @@ export const partialRequestsToCompleteSummaries = (
         domain: host(request.event.requestUrl),
         end: response.time,
         hasResponseBody: Boolean(r.events["response-body"]),
+        hasRequestBody: Boolean(r.events["request-body"]),
         id: r.id,
         method: request.event.requestMethod,
         name: name(request.event.requestUrl),

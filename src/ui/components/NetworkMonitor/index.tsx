@@ -2,7 +2,13 @@ import SplitBox from "devtools/packages/devtools-splitter";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { getEvents, getFormattedFrames, getRequests, getResponseBodies } from "ui/reducers/network";
+import {
+  getEvents,
+  getFormattedFrames,
+  getRequests,
+  getResponseBodies,
+  getRequestBodies,
+} from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import RequestDetails from "./RequestDetails";
@@ -10,7 +16,7 @@ import RequestTable from "./RequestTable";
 import { RequestSummary, RequestType } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
-import { fetchFrames, fetchResponseBody } from "ui/actions/network";
+import { fetchFrames, fetchResponseBody, fetchRequestBody } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 
 export const NetworkMonitor = ({
@@ -19,6 +25,7 @@ export const NetworkMonitor = ({
   events,
   fetchFrames,
   frames,
+  requestBodies,
   requests,
   responseBodies,
   seek,
@@ -69,12 +76,11 @@ export const NetworkMonitor = ({
                     cx={cx}
                     request={selectedRequest}
                     responseBody={responseBodies[selectedRequest.id]}
+                    requestBody={requestBodies[selectedRequest.id]}
                     frames={frames[selectedRequest?.point.point]}
                     selectFrame={selectFrame}
                   />
-                ) : (
-                  <div />
-                )
+                ) : null
               }
               startPanel={
                 <RequestTable
@@ -85,6 +91,9 @@ export const NetworkMonitor = ({
                     fetchFrames(row.point);
                     if (row.hasResponseBody) {
                       fetchResponseBody(row.id);
+                    }
+                    if (row.hasRequestBody) {
+                      fetchRequestBody(row.id);
                     }
                     setSelectedRequest(row);
                   }}
@@ -108,6 +117,7 @@ const connector = connect(
     cx: getThreadContext(state),
     events: getEvents(state),
     frames: getFormattedFrames(state),
+    requestBodies: getRequestBodies(state),
     requests: getRequests(state),
     responseBodies: getResponseBodies(state),
   }),

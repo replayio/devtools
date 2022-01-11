@@ -22,7 +22,7 @@
     "@auth0/auth0-react": "^1.2.0",
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.1",
-    "@recordreplay/protocol": "^0.16.0",
+    "@recordreplay/protocol": "^0.17.0",
     "@sentry/react": "^6.8.0",
     "@sentry/tracing": "^6.8.0",
     "@stripe/react-stripe-js": "^1.4.1",

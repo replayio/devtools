@@ -50,11 +50,8 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableCommentAttachments",
   },
   {
-    // I'm going to change this to include requests once they are in.
-    // description: "Allow JSON response and request bodies to be inspected",
-    // label: "Http Request & Response Bodies",
-    label: "Http Response Bodies",
-    description: "Allow JSON response bodies to be inspected",
+    label: "Http Request & Response Bodies",
+    description: "Allow JSON response and request bodies to be inspected",
     key: "enableHttpBodies",
   },
 ];

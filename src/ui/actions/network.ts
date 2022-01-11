@@ -4,6 +4,7 @@ import {
   TimeStampedPoint,
   responseBodyData,
   RequestId,
+  requestBodyData,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
@@ -21,18 +22,34 @@ type NewResponseBodyPartsAction = {
   payload: { responseBodyParts: responseBodyData };
 };
 
+type NewRequestBodyPartsAction = {
+  type: "NEW_REQUEST_BODY_PARTS";
+  payload: { requestBodyParts: requestBodyData };
+};
+
 type SetFramesAction = {
   type: "SET_FRAMES";
   payload: { frames: any[]; point: string };
 };
 
-export type NetworkAction = NewNetworkRequestsAction | SetFramesAction | NewResponseBodyPartsAction;
+export type NetworkAction =
+  | NewNetworkRequestsAction
+  | SetFramesAction
+  | NewResponseBodyPartsAction
+  | NewRequestBodyPartsAction;
 
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData
 ): NewResponseBodyPartsAction => ({
   type: "NEW_RESPONSE_BODY_PARTS",
   payload: { responseBodyParts },
+});
+
+export const newRequestBodyParts = (
+  requestBodyParts: requestBodyData
+): NewRequestBodyPartsAction => ({
+  type: "NEW_REQUEST_BODY_PARTS",
+  payload: { requestBodyParts },
 });
 
 export const newNetworkRequests = ({
@@ -48,6 +65,10 @@ export const newNetworkRequests = ({
 
 export function fetchResponseBody(requestId: RequestId) {
   ThreadFront.fetchResponseBody(requestId);
+}
+
+export function fetchRequestBody(requestId: RequestId) {
+  ThreadFront.fetchRequestBody(requestId);
 }
 
 export function fetchFrames(tsPoint: TimeStampedPoint) {

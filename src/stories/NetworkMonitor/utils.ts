@@ -83,6 +83,7 @@ export const requestSummary = (
     documentType: "html",
     end: 1600,
     hasResponseBody: true,
+    hasRequestBody: true,
     id,
     method,
     name: "replay.io",

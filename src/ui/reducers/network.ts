@@ -1,4 +1,9 @@
-import { RequestEventInfo, RequestInfo, ResponseBodyData } from "@recordreplay/protocol";
+import {
+  RequestBodyData,
+  RequestEventInfo,
+  RequestInfo,
+  ResponseBodyData,
+} from "@recordreplay/protocol";
 
 import { UIState } from "ui/state";
 import { NetworkAction } from "ui/actions/network";
@@ -12,7 +17,8 @@ import sortedUniqBy from "lodash/sortedUniqBy";
 export type NetworkState = {
   events: RequestEventInfo[];
   frames: Record<string, WiredFrame[]>;
-  responses: Record<string, ResponseBodyData[]>;
+  responseBodies: Record<string, ResponseBodyData[]>;
+  requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
 };
 
@@ -20,7 +26,8 @@ const initialState = (): NetworkState => ({
   events: [],
   frames: {},
   requests: [],
-  responses: {},
+  responseBodies: {},
+  requestBodies: {},
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -32,17 +39,30 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
         requests: [...action.payload.requests, ...state.requests],
       };
     case "NEW_RESPONSE_BODY_PARTS":
-      action.payload.responseBodyParts;
       return {
         ...state,
-        responses: {
-          ...state.responses,
+        responseBodies: {
+          ...state.responseBodies,
           [action.payload.responseBodyParts.id]: sortedUniqBy(
             sortBy([
-              ...(state.responses[action.payload.responseBodyParts.id] || []),
+              ...(state.responseBodies[action.payload.responseBodyParts.id] || []),
               ...action.payload.responseBodyParts.parts,
             ]),
             (x: ResponseBodyData) => x.offset
+          ),
+        },
+      };
+    case "NEW_REQUEST_BODY_PARTS":
+      return {
+        ...state,
+        requestBodies: {
+          ...state.responseBodies,
+          [action.payload.requestBodyParts.id]: sortedUniqBy(
+            sortBy([
+              ...(state.responseBodies[action.payload.requestBodyParts.id] || []),
+              ...action.payload.requestBodyParts.parts,
+            ]),
+            (x: RequestBodyData) => x.offset
           ),
         },
       };
@@ -69,6 +89,7 @@ export const getFormattedFrames = createSelector(getFrames, getSources, (frames,
   }, {});
 });
 
-export const getResponseBodies = (state: UIState) => state.network.responses;
+export const getResponseBodies = (state: UIState) => state.network.responseBodies;
+export const getRequestBodies = (state: UIState) => state.network.requestBodies;
 
 export default update;

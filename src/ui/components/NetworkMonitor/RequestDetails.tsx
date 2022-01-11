@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { RequestSummary } from "./utils";
+import { findHeader, RequestSummary } from "./utils";
 import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
 import sortBy from "lodash/sortBy";
@@ -8,10 +8,10 @@ import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 import { WiredFrame } from "protocol/thread/pause";
-import { ResponseBodyData } from "@recordreplay/protocol";
+import { RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
 import ResponseBody from "./ResponseBody";
-import { features } from "ui/utils/prefs";
 import { useFeature } from "ui/hooks/settings";
+import RequestBody from "./RequestBody";
 
 interface Detail {
   name: string;
@@ -69,10 +69,6 @@ const parseCookie = (str: string): Record<string, string> => {
     }, {});
 };
 
-const cookieHeader = (request: RequestSummary): string | undefined => {
-  return request.requestHeaders.find(r => r.name.toLowerCase() === "cookie")?.value;
-};
-
 const Cookies = ({ request }: { request: RequestSummary }) => {
   return (
     <div>
@@ -81,11 +77,11 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
       </h2>
       <DetailTable
         className={styles.request}
-        details={Object.entries(parseCookie(cookieHeader(request) || "")).map(
-          (value: [string, string]) => {
-            return { name: value[0], value: value[1] };
-          }
-        )}
+        details={Object.entries(
+          parseCookie(findHeader(request?.requestHeaders, "cookie") || "")
+        ).map((value: [string, string]) => {
+          return { name: value[0], value: value[1] };
+        })}
       />
     </div>
   );
@@ -197,6 +193,7 @@ const RequestDetails = ({
   cx,
   frames,
   request,
+  requestBody,
   responseBody,
   selectFrame,
 }: {
@@ -205,6 +202,7 @@ const RequestDetails = ({
   frames: WiredFrame[];
   request: RequestSummary;
   responseBody: ResponseBodyData[] | undefined;
+  requestBody: RequestBodyData[] | undefined;
   selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
@@ -213,9 +211,13 @@ const RequestDetails = ({
 
   const tabs = [
     { id: "headers", title: "Headers", visible: true },
-    { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
+    {
+      id: "cookies",
+      title: "Cookies",
+      visible: Boolean(findHeader(request.requestHeaders, "cookie")),
+    },
     { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
-    { id: "request", title: "Request", visible: true },
+    { id: "request", title: "Request", visible: request.hasRequestBody && httpBodies },
     { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
     { id: "timings", title: "Timings", visible: true },
   ];
@@ -227,10 +229,6 @@ const RequestDetails = ({
       setActiveTab(DEFAULT_TAB);
     }
   }, [activeTab, activeTabs]);
-
-  if (!request) {
-    return null;
-  }
 
   return (
     <div className="h-full w-full overflow-hidden">
@@ -245,7 +243,9 @@ const RequestDetails = ({
           {activeTab == "response" && (
             <ResponseBody request={request} responseBodyParts={responseBody} />
           )}
-          {activeTab == "request" && <ComingSoon />}
+          {activeTab == "request" && (
+            <RequestBody request={request} requestBodyParts={requestBody} />
+          )}
           {activeTab == "stackTrace" && (
             <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
           )}

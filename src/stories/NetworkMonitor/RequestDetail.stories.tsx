@@ -3,7 +3,6 @@ import React, { ComponentProps } from "react";
 import { Story, Meta } from "@storybook/react";
 
 import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
-import { requestProps } from "./utils";
 
 export default {
   title: "Network Monitor/Request Details",
@@ -24,6 +23,7 @@ Basic.args = {
     domain: "assets.website-files.com",
     end: 984,
     hasResponseBody: true,
+    hasRequestBody: true,
     id: "1",
     requestHeaders: [
       { name: "Host", value: "assets.website-files.com" },
