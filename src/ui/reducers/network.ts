@@ -56,10 +56,10 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
       return {
         ...state,
         requestBodies: {
-          ...state.responseBodies,
+          ...state.requestBodies,
           [action.payload.requestBodyParts.id]: sortedUniqBy(
             sortBy([
-              ...(state.responseBodies[action.payload.requestBodyParts.id] || []),
+              ...(state.requestBodies[action.payload.requestBodyParts.id] || []),
               ...action.payload.requestBodyParts.parts,
             ]),
             (x: RequestBodyData) => x.offset
