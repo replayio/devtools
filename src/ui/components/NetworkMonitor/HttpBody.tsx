@@ -41,7 +41,7 @@ const HttpBody = ({
     );
   }
 
-  if (contentType === "json") {
+  if (json) {
     return <ReactJson src={json} shouldCollapse={() => true} />;
   }
 
