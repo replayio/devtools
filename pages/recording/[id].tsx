@@ -84,7 +84,7 @@ function RecordingPage({
       setRecording(await getAccessibleRecording(recordingId));
     }
     getRecording();
-  }, [recordingId, store]);
+  }, [recordingId, store, getAccessibleRecording]);
 
   if (!recording || typeof window === "undefined") {
     return (
