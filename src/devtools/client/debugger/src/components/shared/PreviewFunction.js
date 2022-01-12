@@ -10,6 +10,7 @@ import PropTypes from "prop-types";
 import times from "lodash/times";
 import zip from "lodash/zip";
 import flatten from "lodash/flatten";
+import { RedactedSpan } from "ui/components/Redacted";
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
@@ -65,13 +66,13 @@ export default class PreviewFunction extends Component {
   render() {
     const { func } = this.props;
     return (
-      <span className="function-signature">
+      <RedactedSpan className="function-signature">
         {this.renderFunctionName(func)}
         <span className="paren">(</span>
         {this.renderParams(func)}
         <span className="paren">)</span>
         {this.jumpToDefinitionButton(func)}
-      </span>
+      </RedactedSpan>
     );
   }
 }
