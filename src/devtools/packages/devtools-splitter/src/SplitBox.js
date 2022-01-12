@@ -40,6 +40,8 @@ class SplitBox extends Component {
       endPanelControl: PropTypes.bool,
       // Size of the splitter handle bar.
       splitterSize: PropTypes.number,
+      // Class for the splitter handle bar.
+      splitterClass: PropTypes.string,
       // True if the splitter bar is vertical (default is vertical).
       vert: PropTypes.bool,
       // Optional style properties passed into the splitbox
@@ -208,6 +210,7 @@ class SplitBox extends Component {
       endPanel,
       endPanelControl,
       splitterSize,
+      splitterClass,
       endPanelCollapsed,
     } = this.props;
 
@@ -247,7 +250,7 @@ class SplitBox extends Component {
     const draggable =
       startPanelDiv && endPanelDiv
         ? Draggable({
-            className: "splitter",
+            className: `splitter ${splitterClass}`,
             style: splitterStyle,
             onStart: this.onStartMove,
             onStop: this.onStopMove,

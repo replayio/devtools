@@ -43,8 +43,8 @@ function FormattedUrl({ url }: { url: string }) {
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
     <div className={classNames(className, "flex flex-col")}>
-      {details.map(h => (
-        <div className={classNames(styles.row, "hover:bg-gray-100 py-1")} key={h.name}>
+      {details.map((h, i) => (
+        <div className={classNames(styles.row, "hover:bg-gray-100 py-1")} key={`${h.name}-${i}`}>
           <span className="font-bold ">{h.name}:</span> {h.value}
         </div>
       ))}
@@ -231,13 +231,16 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="h-full w-full overflow-hidden">
-      <div className={classNames("", styles.requestDetails)}>
-        <div className="flex justify-between bg-toolbarBackground items-center">
-          <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-          <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
-        </div>
-        <div className="overflow-auto">
+    <div className="bg-white border-l min-w-full overflow-scroll">
+      <div
+        className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0"
+        style={{ height: 25 }}
+      >
+        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <CloseButton buttonClass="mr-1" handleClick={closePanel} tooltip={"Close tab"} />
+      </div>
+      <div className={classNames("requestDetails", styles.requestDetails)}>
+        <div>
           {activeTab == "headers" && <HeadersPanel request={request} />}
           {activeTab == "cookies" && <Cookies request={request} />}
           {activeTab == "response" && (

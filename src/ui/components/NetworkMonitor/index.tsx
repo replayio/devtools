@@ -54,61 +54,61 @@ export const NetworkMonitor = ({
   );
 
   useEffect(() => {
+    console.log({ current: container.current?.offsetWidth });
     if (container.current) {
       resizeObserver.current.observe(container.current);
     }
   }, [container.current]);
 
   return (
-    <div className="network-monitor overflow-hidden h-full" ref={container}>
-      <Table events={events} requests={requests} types={types}>
-        {({ table, data }: { table: any; data: RequestSummary[] }) => (
-          <>
-            <FilterBar types={types} toggleType={toggleType} table={table} />
-            <SplitBox
-              className="max-h-full"
-              initialSize="50%"
-              minSize={selectedRequest ? "20%" : "100%"}
-              maxSize={selectedRequest ? "80%" : "100%"}
-              endPanel={
-                selectedRequest ? (
-                  <RequestDetails
-                    closePanel={closePanel}
-                    cx={cx}
-                    request={selectedRequest}
-                    responseBody={responseBodies[selectedRequest.id]}
-                    requestBody={requestBodies[selectedRequest.id]}
-                    frames={frames[selectedRequest?.point.point]}
-                    selectFrame={selectFrame}
-                  />
-                ) : null
-              }
-              startPanel={
-                <RequestTable
-                  table={table}
-                  data={data}
-                  currentTime={currentTime}
-                  onRowSelect={row => {
-                    fetchFrames(row.point);
-                    if (row.hasResponseBody) {
-                      fetchResponseBody(row.id);
-                    }
-                    if (row.hasRequestBody) {
-                      fetchRequestBody(row.id);
-                    }
-                    setSelectedRequest(row);
-                  }}
-                  seek={seek}
-                  selectedRequest={selectedRequest}
+    <Table events={events} requests={requests} types={types}>
+      {({ table, data }: { table: any; data: RequestSummary[] }) => (
+        <div className="flex flex-col min-h-0 h-full" ref={container}>
+          <FilterBar types={types} toggleType={toggleType} table={table} />
+          <SplitBox
+            className="border-t min-h-0"
+            initialSize="350"
+            minSize={selectedRequest ? "20%" : "100%"}
+            maxSize={selectedRequest ? "80%" : "100%"}
+            startPanel={
+              <RequestTable
+                table={table}
+                data={data}
+                currentTime={currentTime}
+                onRowSelect={row => {
+                  fetchFrames(row.point);
+                  if (row.hasResponseBody) {
+                    fetchResponseBody(row.id);
+                  }
+                  if (row.hasRequestBody) {
+                    fetchRequestBody(row.id);
+                  }
+                  setSelectedRequest(row);
+                }}
+                seek={seek}
+                selectedRequest={selectedRequest}
+              />
+            }
+            endPanel={
+              selectedRequest && (
+                <RequestDetails
+                  closePanel={closePanel}
+                  cx={cx}
+                  request={selectedRequest}
+                  responseBody={responseBodies[selectedRequest.id]}
+                  requestBody={requestBodies[selectedRequest.id]}
+                  frames={frames[selectedRequest?.point.point]}
+                  selectFrame={selectFrame}
                 />
-              }
-              vert={vert}
-              splitterSize={4}
-            />
-          </>
-        )}
-      </Table>
-    </div>
+              )
+            }
+            splitterClass="-m-1 bg-clip-padding box-border border-4 z-10"
+            splitterSize={1}
+            vert={vert}
+          />
+        </div>
+      )}
+    </Table>
   );
 };
 

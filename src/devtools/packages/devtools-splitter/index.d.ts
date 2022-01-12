@@ -13,6 +13,7 @@ interface SplitBoxProps {
   endPanelCollapsed?: boolean;
   endPanelControl?: boolean;
   splitterSize?: number;
+  splitterClass?: string;
   vert?: boolean;
   style?: object;
   onResizeEnd?: Function;

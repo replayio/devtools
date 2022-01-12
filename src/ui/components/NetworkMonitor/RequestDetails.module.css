@@ -1,10 +1,7 @@
 .requestDetails {
-  background: white;
   display: flex;
   flex-direction: column;
-  overflow-x: auto;
   font-size: 12px;
-  height: 100%;
 }
 
 .requestDetails .request {

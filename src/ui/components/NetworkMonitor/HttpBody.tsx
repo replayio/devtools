@@ -34,11 +34,7 @@ const HttpBody = ({
   }, [content, contentType]);
 
   if (Number(contentLength) > FIVE_MEGABYTES) {
-    return (
-      <div className="bg-white w-full overflow-y-auto">
-        <div>This response is larger than 5MB, so it will only be partially displayed</div>
-      </div>
-    );
+    return <div>This response is larger than 5MB, so it will only be partially displayed</div>;
   }
 
   if (json) {

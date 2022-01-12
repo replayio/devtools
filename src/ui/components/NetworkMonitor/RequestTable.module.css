@@ -3,9 +3,11 @@ table.requests {
 }
 
 .row {
-  position: relative;
-  border: 2px solid transparent;
+  background: white;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
   min-width: fit-content;
+  position: relative;
   width: 100%;
 }
 
@@ -25,6 +27,14 @@ table.requests {
 
 .row.current {
   border-top: 2px solid var(--secondary-accent);
+}
+
+.current.end {
+  background: var(--secondary-accent);
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
 }
 
 .resizer {

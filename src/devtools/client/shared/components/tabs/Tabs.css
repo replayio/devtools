@@ -12,7 +12,7 @@
 }
 
 /* Hides the tab strip in the TabBar */
-div[hidetabs=true] .tabs .tabs-navigation {
+div[hidetabs="true"] .tabs .tabs-navigation {
   display: none;
 }
 
@@ -24,6 +24,14 @@ div[hidetabs=true] .tabs .tabs-navigation {
   position: relative;
   border-bottom: 1px solid var(--theme-splitter-color);
   background: var(--theme-tab-toolbar-background);
+}
+
+.requestDetails .tabs .tabs-navigation {
+  border-bottom: none;
+}
+
+.requestDetails .tabs .tabs-menu-item a {
+  border-bottom: none;
 }
 
 .tabs .tabs-menu {
