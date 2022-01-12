@@ -1,11 +1,7 @@
 /* Copyright 2020 Record Replay Inc. */
 
-const fs = require("fs");
 const os = require("os");
 const https = require("https");
-const { inspect } = require("util");
-
-const { spawnSync } = require("child_process");
 
 function tmpFile() {
   return os.tmpdir() + "/" + ((Math.random() * 1e9) | 0);
@@ -18,7 +14,8 @@ async function waitUntilMessage(page, message, timeout = 30_000) {
       try {
         const firstArg = await msg.args()[0]?.jsonValue();
         if (firstArg === message) {
-          resolve(firstArg);
+          const secondArg = await msg.args()[1]?.jsonValue();
+          resolve(secondArg);
         }
       } catch (e) {
         console.log("Unserializable value");
