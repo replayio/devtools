@@ -216,8 +216,8 @@ const RequestDetails = ({
       title: "Cookies",
       visible: Boolean(findHeader(request.requestHeaders, "cookie")),
     },
-    { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
     { id: "request", title: "Request", visible: request.hasRequestBody && httpBodies },
+    { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
     { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
     { id: "timings", title: "Timings", visible: true },
   ];
