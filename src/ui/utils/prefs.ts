@@ -29,7 +29,7 @@ pref("devtools.features.commentMentions", false);
 pref("devtools.features.comments", true);
 pref("devtools.features.consoleHover", false);
 pref("devtools.features.eventCount", true);
-pref("devtools.features.httpBodies", false);
+pref("devtools.features.httpBodies", true);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
