@@ -193,7 +193,6 @@ JIT
 checkboxes
 objectProperties
 addons
-debugBtn
 P1s
 pausePoints
 DocSearch

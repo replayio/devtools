@@ -56,7 +56,6 @@ import "devtools/client/debugger/src/components/shared/Badge.css";
 import "devtools/client/debugger/src/components/shared/BracketArrow.css";
 import "devtools/client/debugger/src/components/shared/Button/styles/CloseButton.css";
 import "devtools/client/debugger/src/components/shared/Button/styles/CommandBarButton.css";
-import "devtools/client/debugger/src/components/shared/Button/styles/PaneToggleButton.css";
 import "devtools/client/debugger/src/components/shared/Dropdown.css";
 import "devtools/client/debugger/src/components/shared/ManagedTree.css";
 import "devtools/client/debugger/src/components/shared/menu.css";
