@@ -280,7 +280,6 @@ export function setAnalysisPoints(
   location: Location,
   condition = ""
 ): SetAnalysisPointsAction {
-  console.log({ points });
   return {
     type: "set_analysis_points",
     analysisPoints: points,

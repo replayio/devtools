@@ -103,7 +103,14 @@ function LineNumberTooltip({
   }
 
   if (analysisPoints === "error") {
-    return <StaticTooltip targetNode={targetNode}>Failed</StaticTooltip>;
+    return (
+      <StaticTooltip targetNode={targetNode} className="hot">
+        <div className="flex items-center">
+          <MaterialIcon className="mr-1">warning_amber</MaterialIcon>
+          <div>10k+ hits</div>
+        </div>
+      </StaticTooltip>
+    );
   }
 
   const points = analysisPoints.length;
@@ -131,10 +138,10 @@ function LineNumberTooltip({
       targetNode={targetNode}
       className={classNames({ hot: isHot, "awesome-tooltip": showNag })}
     >
-      <>
+      <div className="flex items-center">
         {isHot ? <MaterialIcon className="mr-1">warning_amber</MaterialIcon> : null}
         <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
-      </>
+      </div>
     </StaticTooltip>
   );
 }
