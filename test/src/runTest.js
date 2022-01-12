@@ -21,7 +21,7 @@ async function recordBrowser(state, test, testPath, browserName) {
   try {
     await page.goto(testPath);
     page.on("console", async msg => console.log(`${test}:`, msg.text()));
-    const [result] = await waitUntilMessage(page, "TestFinished", state.testTimeout * 1000);
+    const result = await waitUntilMessage(page, "TestFinished", state.testTimeout * 1000);
     success = result.success;
     why = result.why;
   } catch (e) {
