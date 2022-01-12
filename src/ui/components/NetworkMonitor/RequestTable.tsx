@@ -33,7 +33,10 @@ const RequestTable = ({
   return (
     <div className="bg-white w-full overflow-y-auto">
       <div className={classNames(styles.request)} {...getTableProps()}>
-        <div className="sticky z-10 top-0 bg-toolbarBackground border-b border-t">
+        <div
+          className="sticky z-10 top-0 bg-toolbarBackground border-b border-t w-full"
+          style={{ minWidth: "fit-content" }}
+        >
           <HeaderGroups columns={columns} headerGroups={headerGroups} />
         </div>
         <div {...getTableBodyProps()}>

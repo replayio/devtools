@@ -5,6 +5,8 @@ table.requests {
 .row {
   position: relative;
   border: 2px solid transparent;
+  min-width: fit-content;
+  width: 100%;
 }
 
 .row:hover {
