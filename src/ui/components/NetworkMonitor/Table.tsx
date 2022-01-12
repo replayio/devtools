@@ -45,10 +45,9 @@ export default function Table({
       },
       {
         Header: "Type",
-        accessor: "type" as const,
+        accessor: "documentType" as const,
         className: "",
-        width: 50,
-        maxWidth: 100,
+        width: 125,
       },
       {
         Header: "Domain",
