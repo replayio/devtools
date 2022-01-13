@@ -779,7 +779,7 @@ async function checkHighlighterShape(svgPath) {
   const highlighterPath = await waitUntil(
     () => {
       const highlighterNode = document.getElementById("box-model-content");
-      return (highlighterPath = highlighterNode?.attributes["d"].textContent);
+      return highlighterNode?.attributes["d"].textContent;
     },
     { waitingFor: "highlighter to appear" }
   );

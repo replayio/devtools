@@ -1,4 +1,7 @@
 Test.describe(`Test that the element highlighter works everywhere.`, async () => {
+  await Test.selectConsole();
+  await Test.warpToMessage("ExampleFinished");
+
   await Test.selectInspector();
   await Test.searchMarkup("iframediv");
   await Test.waitForSelectedMarkupNode(`div id="iframediv"`);

@@ -1,4 +1,7 @@
 Test.describe(`Test the rule view`, async () => {
+  await Test.selectConsole();
+  await Test.warpToMessage("ExampleFinished");
+
   await Test.selectInspector();
 
   Test.it(`Check rules for "maindiv" node`, async () => {
