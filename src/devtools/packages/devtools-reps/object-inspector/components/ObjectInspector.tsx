@@ -6,7 +6,7 @@ import { createUnavailableValueFront, ValueFront } from "protocol/thread";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { isRegionLoaded } from "ui/reducers/app";
-import { Redacted } from "ui/components/Redacted";
+import { RedactedSpan } from "ui/components/Redacted";
 const Utils = require("../utils");
 const { renderRep, shouldRenderRootsInReps } = Utils;
 const {
@@ -253,13 +253,13 @@ function ObjectInspector(props: ObjectInspectorProps) {
   }
 
   if (shouldRenderRootsInReps(roots)) {
-    return <Redacted>{renderRep(roots[0], props)}</Redacted>;
+    return <RedactedSpan>{renderRep(roots[0], props)}</RedactedSpan>;
   }
 
   return (
-    <Redacted>
+    <RedactedSpan>
       <OI {...props} />
-    </Redacted>
+    </RedactedSpan>
   );
 }
 
