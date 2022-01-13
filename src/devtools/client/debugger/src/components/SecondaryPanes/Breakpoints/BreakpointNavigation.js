@@ -7,7 +7,6 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-const { prefs } = require("ui/utils/prefs");
 const { trackEvent } = require("ui/utils/telemetry");
 
 import BreakpointTimeline from "./BreakpointTimeline";

@@ -5,7 +5,6 @@ import { actions as UIActions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const BreakpointTimelinePoint = require("./BreakpointTimelinePoint").default;
-const { isMatchingLocation } = require("devtools/client/debugger/src/utils/breakpoint");
 const { prefs } = require("ui/utils/prefs");
 import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
@@ -13,7 +12,8 @@ import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { PointDescription } from "@recordreplay/protocol";
 import { HoveredItem } from "ui/state/timeline";
 
@@ -26,11 +26,20 @@ function Points({
   analysisPoints: PointDescription[];
   hoveredItem: HoveredItem | null;
 }) {
-  if (analysisPoints.length > prefs.maxHitsDisplayed) return null;
+  const executionPoint = useSelector(getExecutionPoint);
+  let displayedPoints = [...analysisPoints];
+
+  // Even if we're over maxHitsDisplayed, we should still display a single paused
+  // point if the user happens to be paused on that this breakpoint.
+  if (analysisPoints.length > prefs.maxHitsDisplayed && executionPoint) {
+    displayedPoints = displayedPoints.filter(
+      point => BigInt(point.point) == BigInt(executionPoint)
+    );
+  }
 
   return (
     <>
-      {analysisPoints.map((p, i) => (
+      {displayedPoints.map((p, i) => (
         <BreakpointTimelinePoint
           breakpoint={breakpoint}
           point={p}
