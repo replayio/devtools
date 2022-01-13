@@ -1,7 +1,6 @@
 import { RequestBodyData } from "@recordreplay/protocol";
 import React, { useState } from "react";
 import HttpBody from "./HttpBody";
-import { TriangleToggle } from "./RequestDetails";
 import { contentType, findHeader, RequestSummary } from "./utils";
 
 const RequestBody = ({
@@ -11,30 +10,20 @@ const RequestBody = ({
   request: RequestSummary | undefined;
   requestBodyParts: RequestBodyData[] | undefined;
 }) => {
-  const [expanded, setExpanded] = useState(true);
-
   if (!request || !requestBodyParts) {
     return null;
   }
 
   return (
     <>
-      <div
-        className="flex items-center py-1 cursor-pointer font-bold"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <TriangleToggle open={expanded} />
-        Request body:
+      <div className="flex items-center pl-4 py-2 font-bold">Request body:</div>
+      <div className="pl-6">
+        <HttpBody
+          bodyParts={requestBodyParts}
+          contentType={findHeader(request.responseHeaders, "content-type") || "unknown"}
+          filename={request.name}
+        />
       </div>
-      {expanded && (
-        <div className="pl-6">
-          <HttpBody
-            bodyParts={requestBodyParts}
-            contentLength={findHeader(request.requestHeaders, "content-length")}
-            contentType={contentType(request.requestHeaders)}
-          />
-        </div>
-      )}
     </>
   );
 };

@@ -1,56 +1,49 @@
-import { BodyData, RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
+import { BodyData } from "@recordreplay/protocol";
 import { useMemo } from "react";
 import ReactJson from "react-json-view";
-import { base64ToArrayBuffer } from "./utils";
-
-const FIVE_MEGABYTES = 5e6;
-
-let utf8decoder = new TextDecoder();
+import BodyDownload from "./BodyDownload";
+import {
+  BodyPartsToArrayBuffer,
+  Displayable,
+  RawToUTF8,
+  StringToObjectMaybe,
+  URLEncodedToPlaintext,
+} from "./content";
 
 const HttpBody = ({
   bodyParts,
-  contentLength,
   contentType,
+  filename,
 }: {
   bodyParts: BodyData[];
-  contentLength?: string;
-  contentType: "json" | "text" | "other";
+  contentType: string;
+  filename: string;
 }) => {
-  const content = useMemo(
-    () =>
-      bodyParts
-        .map(x => base64ToArrayBuffer(x.value))
-        .map(x => utf8decoder.decode(x))
-        .join(""),
-    [bodyParts]
-  );
-  const json = useMemo(() => {
-    if (contentType === "json") {
-      try {
-        return JSON.parse(content);
-      } catch {}
-    }
-    return null;
-  }, [content, contentType]);
+  const raw = useMemo(() => {
+    return BodyPartsToArrayBuffer(bodyParts, contentType);
+  }, [bodyParts]);
 
-  if (Number(contentLength) > FIVE_MEGABYTES) {
-    return <div>This response is larger than 5MB, so it will only be partially displayed</div>;
+  const displayable = useMemo(() => {
+    return StringToObjectMaybe(URLEncodedToPlaintext(RawToUTF8(raw)));
+  }, [raw]);
+
+  if (displayable.as === Displayable.JSON) {
+    return <ReactJson src={displayable.content} shouldCollapse={() => true} />;
   }
-
-  if (json) {
-    return <ReactJson src={json} shouldCollapse={() => true} />;
+  if (displayable.as === Displayable.Text) {
+    return <pre className="max-w-full overflow-scroll">{displayable.content}</pre>;
   }
-
-  if (contentType === "text") {
-    return <pre>{content}</pre>;
+  if (displayable.as === Displayable.Raw) {
+    return (
+      <>
+        <p>
+          This content-type ({contentType}) cannot be displayed, but you can download the response.
+        </p>
+        <BodyDownload raw={raw} filename={filename} />
+      </>
+    );
   }
-
-  return (
-    <span>
-      This format of response cannot de displayed yet. We only support text and JSON responses right
-      now.
-    </span>
-  );
+  return null;
 };
 
 export default HttpBody;
