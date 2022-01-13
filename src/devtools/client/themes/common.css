@@ -508,6 +508,19 @@ checkbox:-moz-focusring {
   top: 400px;
 }
 
+.top-bubble {
+  left: 100px;
+  position: absolute;
+  width: 75vw;
+}
+
+.bottom-bubble {
+  right: 100px;
+  bottom: -70px;
+  position: absolute;
+  width: 45vw;
+}
+
 /* Text input */
 
 .devtools-textinput,
