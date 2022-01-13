@@ -1,6 +1,9 @@
 Test.describe(
   `Test that the element highlighter selects the correct element when they overlap.`,
   async () => {
+    await Test.selectConsole();
+    await Test.warpToMessage("ExampleFinished");
+
     await Test.selectInspector();
 
     // elements are stacked in the order in which they appear in the DOM (from back to front)

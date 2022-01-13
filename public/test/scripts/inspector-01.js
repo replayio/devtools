@@ -1,5 +1,8 @@
 // Test basic inspector functionality: the inspector is able to
 Test.describe(`show contents when paused according to the child's current position.`, async () => {
+  await Test.selectConsole();
+  await Test.warpToMessage("ExampleFinished");
+
   await Test.selectInspector();
 
   let node;
