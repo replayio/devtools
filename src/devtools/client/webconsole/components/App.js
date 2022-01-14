@@ -14,6 +14,7 @@ const FilterBar = require("devtools/client/webconsole/components/FilterBar/Filte
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
 const FilterDrawer = require("./FilterDrawer").default;
+const Warning = require("ui/components/shared/Warning").default;
 
 /**
  * Console root Application component.
@@ -60,7 +61,7 @@ class App extends React.Component {
   };
 
   render() {
-    const { filterBarDisplayMode } = this.props;
+    const { filterBarDisplayMode, consoleOverflow } = this.props;
 
     return (
       <div className="flex flex-col w-full">
@@ -75,6 +76,11 @@ class App extends React.Component {
             }}
           >
             <ConsoleNag />
+            {consoleOverflow ? (
+              <Warning link="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#8d72d62414a7490586ee5ac3adef09fb">
+                There are too many console messages so not all are being displayed
+              </Warning>
+            ) : null}
             <div className="flexible-output-input" key="in-out-container">
               <ConsoleOutput key="console-output" />
               <JSTerm key="jsterm" />
@@ -88,6 +94,7 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
   return {
+    consoleOverflow: state.messages.overflow,
     filterBarDisplayMode: state.consoleUI.filterBarDisplayMode,
   };
 };

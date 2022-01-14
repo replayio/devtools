@@ -249,7 +249,11 @@ class Timeline extends Component<PropsFromRedux> {
   renderPreviewMarkers() {
     const { pointsForHoveredLineNumber, currentTime, hoveredItem, zoomRegion } = this.props;
 
-    if (!pointsForHoveredLineNumber || pointsForHoveredLineNumber === "error") {
+    if (
+      !pointsForHoveredLineNumber ||
+      pointsForHoveredLineNumber === "error" ||
+      pointsForHoveredLineNumber.length > prefs.maxHitsDisplayed
+    ) {
       return [];
     }
 
