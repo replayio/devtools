@@ -117,11 +117,12 @@ const ConnectedRecordingPage = connector(RecordingPage);
 
 export const getStaticProps: GetStaticProps = async function ({ params }) {
   const id = Array.isArray(params?.id) ? params?.id[0] : params?.id;
+  const metadata = id ? await getRecordingMetadata(id) : null;
   return {
     props: {
-      metadata: id ? await getRecordingMetadata(id) : null,
+      metadata: metadata,
     },
-    revalidate: 360,
+    revalidate: !metadata?.initialized ? 1 : 360,
   };
 };
 
