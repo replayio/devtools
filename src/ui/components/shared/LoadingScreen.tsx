@@ -24,8 +24,8 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="p-8 py-4 text-2xl relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
-        <div className="flex-col items-center space-y-2">
+      <div className="p-8 py-4 relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
+        <div className="flex flex-col items-center space-y-2">
           <ReplayLogo wide size="lg" />
           {children}
         </div>
@@ -52,7 +52,7 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
   if (awaitingSourcemaps) {
     return (
       <LoadingScreenTemplate>
-        <div>Uploading sourcemaps</div>
+        <span>Uploading sourcemaps</span>
       </LoadingScreenTemplate>
     );
   } else if (uploading) {
@@ -61,7 +61,7 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
 
     return (
       <LoadingScreenTemplate>
-        <div>{message}</div>
+        <span>{message}</span>
       </LoadingScreenTemplate>
     );
   }
