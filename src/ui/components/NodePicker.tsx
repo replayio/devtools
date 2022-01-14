@@ -110,6 +110,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 
   nodePickerMouseClick = (e: MouseEvent) => {
     this.props.setIsNodePickerActive(false);
+    this.props.setMouseTargetsLoading(false);
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
     gToolbox.selectTool("inspector");
   };
@@ -151,6 +152,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 const connector = connect(null, {
   loadMouseTargets: actions.loadMouseTargets,
   setIsNodePickerActive: actions.setIsNodePickerActive,
+  setMouseTargetsLoading: actions.setMouseTargetsLoading,
   setSelectedPanel: actions.setSelectedPanel,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
