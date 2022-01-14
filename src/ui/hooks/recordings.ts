@@ -1,3 +1,4 @@
+import slugify from "slugify";
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
@@ -8,6 +9,7 @@ import { useGetUserId } from "./users";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
 import { getRecordingId } from "ui/utils/environment";
 import { useRouter } from "next/dist/client/router";
+import { extractIdAndSlug } from "ui/utils/helpers";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -105,7 +107,16 @@ const GET_MY_RECORDINGS = gql`
 
 export function useGetRecordingId() {
   const { id } = useRouter().query;
-  return Array.isArray(id) ? id[0] : id!;
+  return extractIdAndSlug(id).id!;
+}
+
+export function getRecordingURL(recording: Recording) {
+  let slug = "";
+  if (recording.title) {
+    slug = `${slugify(recording.title).toLowerCase()}/`;
+  }
+
+  return `/recording/${slug}${recording.id}`;
 }
 
 export async function getRecording(recordingId: RecordingId) {
@@ -743,9 +754,8 @@ export async function getRecordingMetadata(id: string) {
     },
     body: JSON.stringify({
       query: `
-        query GetRecording($recordingId: UUID!) {
+        query GetRecordingMetadata($recordingId: UUID!) {
           recording(uuid: $recordingId) {
-            uuid
             url
             title
             duration

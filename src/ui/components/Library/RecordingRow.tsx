@@ -10,6 +10,7 @@ import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
+import { getRecordingURL } from "ui/hooks/recordings";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -43,7 +44,7 @@ function RowWrapper({
   return isEditing ? (
     <div onClick={onClick}> {children}</div>
   ) : (
-    <a href={`/recording/${recording.id}`} style={{ color: "inherit", textDecoration: "inherit" }}>
+    <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
       {children}
     </a>
   );

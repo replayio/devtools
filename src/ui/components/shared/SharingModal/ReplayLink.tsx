@@ -1,11 +1,12 @@
 import React, { useRef, useState } from "react";
-import { RecordingId } from "@recordreplay/protocol";
 import { trackEvent } from "ui/utils/telemetry";
+import { getRecordingURL } from "ui/hooks/recordings";
+import { Recording } from "ui/types";
 
-export function CopyButton({ recordingId }: { recordingId: RecordingId }) {
+export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const url = `https://app.replay.io/recording/${recordingId}`;
+  const url = window?.location.origin + getRecordingURL(recording);
 
   const onClick = () => {
     navigator.clipboard.writeText(url);
@@ -68,8 +69,4 @@ export function UrlCopy({ url }: { url: string }) {
       ) : null}
     </div>
   );
-}
-
-export default function ReplayLink({ recordingId }: { recordingId: RecordingId }) {
-  return <UrlCopy url={`https://app.replay.io/recording/${recordingId}`} />;
 }

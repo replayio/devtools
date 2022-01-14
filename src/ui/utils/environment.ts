@@ -1,5 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { usesWindow } from "ssr";
+import { extractIdAndSlug } from "./helpers";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
@@ -94,8 +95,12 @@ export function getRecordingId() {
   return usesWindow(win => {
     if (!win) return undefined;
 
-    const match = window.location.pathname.match(/^\/recording\/([^\/]+)/);
-    return match ? match[1] : undefined;
+    const parts = window.location.pathname.split("/");
+    if (parts[0] === "recording") {
+      return extractIdAndSlug(parts.slice(1)).id;
+    }
+
+    return undefined;
   });
 }
 

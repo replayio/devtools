@@ -1,15 +1,17 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
-import { getRecordingMetadata, useGetRecordingId } from "ui/hooks/recordings";
+import { getRecordingMetadata, getRecordingURL, useGetRecordingId } from "ui/hooks/recordings";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
 import { GetStaticProps } from "next/types";
+import { extractIdAndSlug } from "ui/utils/helpers";
 
 interface MetadataProps {
   metadata?: {
@@ -72,6 +74,7 @@ function RecordingPage({
   getAccessibleRecording,
   head,
 }: PropsFromRedux & { head?: React.ReactNode }) {
+  const router = useRouter();
   const store = useStore();
   const recordingId = useGetRecordingId();
   const [recording, setRecording] = useState<RecordingInfo | null>();
@@ -85,6 +88,23 @@ function RecordingPage({
     }
     getRecording();
   }, [recordingId, store, getAccessibleRecording]);
+
+  useEffect(() => {
+    if (recording?.title) {
+      const url = getRecordingURL(recording);
+      const currentURL = new URL(window.location.origin + router.asPath).pathname;
+      if (url !== currentURL) {
+        router.replace(
+          {
+            pathname: url,
+            query: router.query,
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+    }
+  }, [router, recording]);
 
   if (!recording || typeof window === "undefined") {
     return (
@@ -116,7 +136,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const ConnectedRecordingPage = connector(RecordingPage);
 
 export const getStaticProps: GetStaticProps = async function ({ params }) {
-  const id = Array.isArray(params?.id) ? params?.id[0] : params?.id;
+  const { id } = extractIdAndSlug(params?.id);
   return {
     props: {
       metadata: id ? await getRecordingMetadata(id) : null,
