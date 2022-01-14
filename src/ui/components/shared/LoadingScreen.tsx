@@ -24,8 +24,8 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="p-8 py-4 text-2xl relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
-        <div className="flex-col items-center space-y-2">
+      <div className="p-8 py-4 relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
+        <div className="flex flex-col items-center space-y-2">
           <ReplayLogo wide size="lg" />
           {children}
         </div>
@@ -38,7 +38,7 @@ export function LoadingScreenTemplate({
 // White progress screen used for showing the scanning progress of a replay
 export function ProgressBar({ progress }: { progress: number }) {
   return (
-    <div className="bg-gray-200 rounded-lg overflow-hidden w-86 relative h-1.5 p-0">
+    <div className="bg-gray-200 rounded-lg overflow-hidden w-full relative h-1.5 p-0">
       <div
         className="absolute t-0 h-full bg-primaryAccent"
         style={{ width: `${progress}%`, transitionDuration: "400ms" }}
@@ -52,7 +52,7 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
   if (awaitingSourcemaps) {
     return (
       <LoadingScreenTemplate>
-        <div>Uploading sourcemaps</div>
+        <span>Uploading sourcemaps</span>
       </LoadingScreenTemplate>
     );
   } else if (uploading) {
@@ -61,7 +61,7 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
 
     return (
       <LoadingScreenTemplate>
-        <div>{message}</div>
+        <span>{message}</span>
       </LoadingScreenTemplate>
     );
   }
