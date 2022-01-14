@@ -342,7 +342,7 @@ export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspa
   return { type: "set_recording_workspace", workspace };
 }
 
-function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading {
+export function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading {
   return { type: "mouse_targets_loading", loading };
 }
 
