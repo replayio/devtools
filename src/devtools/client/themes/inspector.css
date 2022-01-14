@@ -204,3 +204,7 @@ iframe {
   height: 100%;
   overflow-y: auto;
 }
+
+#inspector-breadcrumbs-toolbar {
+  height: calc(var(--theme-toolbar-height) + 1px);
+}
