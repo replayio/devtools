@@ -9,29 +9,13 @@
   pointer-events: none;
 }
 
-.static-tooltip .static-tooltip-content {
+.static-tooltip-content {
   border-radius: 6px;
-}
-
-.static-tooltip:not(.awesome-tooltip) .static-tooltip-content {
   padding: 4px 8px;
-  background: var(--theme-popup-color);
-  color: var(--theme-popup-background);
-  opacity: 100;
-  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.static-tooltip.hot .static-tooltip-content {
-  background: var(--theme-errant-popup-color);
-}
-
-.static-tooltip.hot .material-icons {
-  font-size: var(--theme-body-font-size);
   color: white;
-  margin-right: 4px;
 }
 
 @keyframes static-tooltip {
