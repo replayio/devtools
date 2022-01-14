@@ -861,12 +861,16 @@ class _ThreadFront {
     );
   }
 
-  async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {
+  async findConsoleMessages(
+    onConsoleMessage: (pause: Pause, message: Message) => void,
+    onConsoleOverflow: () => void
+  ) {
     const sessionId = await this.waitForSession();
 
     client.Console.findMessages({}, sessionId).then(({ overflow }) => {
       if (overflow) {
         console.warn("Too many console messages, not all will be shown");
+        onConsoleOverflow();
       }
     });
     client.Console.addNewMessageListener(async ({ message }) => {
