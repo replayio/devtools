@@ -41,6 +41,7 @@ export type DisplayableBody = JSONBody | RawBody | TextBody;
 const TEXTISH_CONTENT_TYPES = [
   "application/javascript",
   "application/json",
+  "application/octet-stream",
   "application/xhtml+xml",
   "application/xml",
   "image/svg+xml",
