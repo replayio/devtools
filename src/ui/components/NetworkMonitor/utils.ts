@@ -28,7 +28,7 @@ export enum CanonicalRequestType {
 export type RequestSummary = {
   domain: string;
   documentType: string;
-  end: number;
+  end: number | undefined;
   hasResponseBody: boolean;
   hasRequestBody: boolean;
   id: string;
@@ -40,7 +40,7 @@ export type RequestSummary = {
   requestHeaders: Header[];
   responseHeaders: Header[];
   start: number;
-  status: number;
+  status: number | undefined;
   time: number;
   type: CanonicalRequestType;
   url: string;
@@ -96,7 +96,7 @@ export type RequestEventMap = {
   request: { time: number; event: RequestOpenEvent };
   "response-body": { time: number; event: RequestResponseBodyEvent };
   "request-body": { time: number; event: RequestBodyEvent };
-  response: { time: number; event: RequestResponseEvent };
+  response: { time: number; event: RequestResponseEvent } | null;
 };
 
 export const eventsToMap = (events: RequestEventInfo[]): Partial<RequestEventMap> => {
@@ -117,7 +117,7 @@ const name = (url: string): string =>
   new URL(url).pathname
     .split("/")
     .filter(f => f.length)
-    .pop() || "";
+    .pop() || "/";
 
 const queryParams = (url: string): [string, string][] => {
   //@ts-ignore
@@ -137,19 +137,16 @@ export const partialRequestsToCompleteSummaries = (
   const eventsMap = eventsByRequestId(events);
   const summaries = requests
     .map((r: RequestInfo) => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
-    .filter(
-      (r): r is RequestInfo & { events: RequestEventMap } =>
-        !!r.events.request && !!r.events.response
-    )
+    .filter((r): r is RequestInfo & { events: RequestEventMap } => !!r.events.request)
     .map((r: RequestInfo & { events: RequestEventMap }) => {
       const request = r.events.request;
       const response = r.events.response;
-      const documentType = getDocumentType(response.event.responseHeaders);
+      const documentType = response ? getDocumentType(response.event.responseHeaders) : "unknown";
       return {
         documentType,
         domain: host(request.event.requestUrl),
-        end: response.time,
-        hasResponseBody: Boolean(r.events["response-body"]),
+        end: response?.time,
+        hasResponseBody: Boolean(response && r.events["response-body"]),
         hasRequestBody: Boolean(r.events["request-body"]),
         id: r.id,
         method: request.event.requestMethod,
@@ -160,10 +157,10 @@ export const partialRequestsToCompleteSummaries = (
         },
         queryParams: queryParams(request.event.requestUrl),
         requestHeaders: request.event.requestHeaders,
-        responseHeaders: response.event.responseHeaders,
+        responseHeaders: response?.event.responseHeaders || [],
         start: request.time,
-        status: response.event.responseStatus,
-        time: response.time - request.time,
+        status: response?.event.responseStatus,
+        time: response ? response.time - request.time : 0,
         triggerPoint: r.triggerPoint,
         type: REQUEST_TYPES[request.event.requestCause || ""] || CanonicalRequestType.OTHER,
         url: request.event.requestUrl,

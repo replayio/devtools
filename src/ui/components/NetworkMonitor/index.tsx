@@ -54,7 +54,6 @@ export const NetworkMonitor = ({
   );
 
   useEffect(() => {
-    console.log({ current: container.current?.offsetWidth });
     if (container.current) {
       resizeObserver.current.observe(container.current);
     }

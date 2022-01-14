@@ -152,35 +152,39 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       {requestHeadersExpanded && (
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
-      <h2
-        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
-        onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
-      >
-        <TriangleToggle open={responseHeadersExpanded} />
-        Response Headers
-      </h2>
-      {responseHeadersExpanded && (
-        <DetailTable className={styles.headerTable} details={responseHeaders} />
-      )}
-      {request.queryParams.length > 0 && (
-        <div>
+      {request.responseHeaders.length > 0 && (
+        <>
           <h2
             className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
-            onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
+            onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
           >
-            <TriangleToggle open={queryParametersExpanded} />
-            Query Parameters
+            <TriangleToggle open={responseHeadersExpanded} />
+            Response Headers
           </h2>
-          {queryParametersExpanded && (
-            <DetailTable
-              className={classNames("py-1", styles.request)}
-              details={request.queryParams.map(x => ({
-                name: x[0],
-                value: x[1],
-              }))}
-            />
+          {responseHeadersExpanded && (
+            <DetailTable className={styles.headerTable} details={responseHeaders} />
           )}
-        </div>
+          {request.queryParams.length && (
+            <div>
+              <h2
+                className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
+                onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
+              >
+                <TriangleToggle open={queryParametersExpanded} />
+                Query Parameters
+              </h2>
+              {queryParametersExpanded && (
+                <DetailTable
+                  className={classNames("py-1", styles.request)}
+                  details={request.queryParams.map(x => ({
+                    name: x[0],
+                    value: x[1],
+                  }))}
+                />
+              )}
+            </div>
+          )}
+        </>
       )}
     </>
   );
@@ -237,7 +241,7 @@ const RequestDetails = ({
         style={{ height: 25 }}
       >
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CloseButton buttonClass="mr-1" handleClick={closePanel} tooltip={"Close tab"} />
+        <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
       </div>
       <div className={classNames("requestDetails", styles.requestDetails)}>
         <div>
