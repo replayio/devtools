@@ -15,6 +15,7 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
+import Warning from "./Warning";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
@@ -100,6 +101,7 @@ function Panel({
         onMouseLeave={onMouseLeave}
       >
         {showNag && <FirstEditNag editing={editing} />}
+        <Warning breakpoint={breakpoint} />
         <div className={classnames("breakpoint-panel", { editing })}>
           {editing ? (
             <PanelEditor
