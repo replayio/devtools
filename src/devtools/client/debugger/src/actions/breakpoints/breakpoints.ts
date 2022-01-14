@@ -42,7 +42,7 @@ export function removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAc
     if (isLogpoint(breakpoint)) {
       // Keep the breakpoint while removing the log value from its options,
       // so that the print statement remains.
-      dispatch(removeBreakpointOption(cx, breakpoint, "breakable"));
+      dispatch(removeBreakpointOption(cx, breakpoint, "shouldPause"));
     } else {
       dispatch(_removeBreakpoint(cx, breakpoint));
     }

@@ -4,7 +4,7 @@ import { UIState } from "ui/state";
 type Breakpoint = {
   location: any;
   options: {
-    breakable?: boolean;
+    shouldPause?: boolean;
     logValue?: string;
     condition?: string;
   };
