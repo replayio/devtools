@@ -7,7 +7,7 @@ export function _removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkA
 export function removeBreakpointOption(
   cx: Context,
   breakpoint: Breakpoint,
-  option: "logValue" | "breakable"
+  option: "logValue" | "shouldPause"
 ): UIThunkAction;
 export function removeRequestedBreakpoint(
   location: Omit<Location, "column">
