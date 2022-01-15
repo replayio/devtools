@@ -15,7 +15,6 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
-import HitsWarning from "./HitsWarning";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
@@ -47,8 +46,7 @@ function Panel({
   const pausedOnHit =
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
-  const isHot = !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
-  const showNag = analysisPoints && !error && !isHot;
+  const isHot = analysisPoints && !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
@@ -100,8 +98,7 @@ function Panel({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        {showNag && <FirstEditNag editing={editing} />}
-        <HitsWarning breakpoint={breakpoint} />
+        <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           {editing ? (
             <PanelEditor
