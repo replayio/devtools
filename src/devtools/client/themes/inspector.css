@@ -208,3 +208,19 @@ iframe {
 #inspector-breadcrumbs-toolbar {
   height: calc(var(--theme-toolbar-height) + 1px);
 }
+
+#inspector-search,
+#ruleview-search,
+#computed-search {
+  flex-grow: 1;
+}
+
+#inspector-searchbox,
+#ruleview-searchbox,
+#computed-searchbox {
+  width: 100%;
+}
+
+#inspector-searchlabel {
+  white-space: nowrap;
+}

@@ -21,7 +21,7 @@ function ComputedToolbar(props: PropsFromRedux) {
 
   return (
     <div id="computed-toolbar" className="devtools-toolbar devtools-input-toolbar">
-      <div className="devtools-searchbox">
+      <div id="computed-search" className="devtools-searchbox">
         <input
           id="computed-searchbox"
           className="devtools-filterinput"
