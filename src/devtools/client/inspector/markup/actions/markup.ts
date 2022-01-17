@@ -25,6 +25,10 @@ export type UpdateNodeExpandedAction = Action<"UPDATE_NODE_EXPANDED"> & {
   nodeId: string;
   isExpanded: boolean;
 };
+export type UpdateChildrenLoadingAction = Action<"UPDATE_CHILDREN_LOADING"> & {
+  nodeId: string;
+  isLoadingChildren: boolean;
+};
 export type UpdateSelectedNodeAction = Action<"UPDATE_SELECTED_NODE"> & {
   selectedNode: string | null;
 };
@@ -36,6 +40,7 @@ export type MarkupAction =
   | NewRootAction
   | AddChildrenAction
   | UpdateNodeExpandedAction
+  | UpdateChildrenLoadingAction
   | UpdateSelectedNodeAction
   | UpdateScrollIntoViewNodeAction;
 
@@ -105,6 +110,17 @@ export function updateNodeExpanded(nodeId: string, isExpanded: boolean): UpdateN
   };
 }
 
+export function updateChildrenLoading(
+  nodeId: string,
+  isLoadingChildren: boolean
+): UpdateChildrenLoadingAction {
+  return {
+    type: "UPDATE_CHILDREN_LOADING",
+    nodeId,
+    isLoadingChildren,
+  };
+}
+
 /**
  * Updates the selected node to display in the markup tree.
  */
@@ -135,11 +151,14 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
     const node = tree[nodeId];
     assert(node);
 
-    if (node.isExpanded) {
+    if (node.isExpanded && !node.isLoadingChildren) {
       return;
     }
 
+    dispatch(updateNodeExpanded(nodeId, true));
+
     if (node.hasChildren && node.children.length === 0) {
+      dispatch(updateChildrenLoading(nodeId, true));
       if (shouldScrollIntoView) {
         dispatch(scrollIntoView(node.id));
       }
@@ -150,9 +169,8 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       const childNodes = await nodeFront.childNodes();
       if (ThreadFront.currentPause !== pause) return;
       await dispatch(addChildren(nodeFront, childNodes));
+      dispatch(updateChildrenLoading(nodeId, false));
     }
-
-    dispatch(updateNodeExpanded(nodeId, true));
   };
 }
 
@@ -312,7 +330,7 @@ export function onRightKey(): UIThunkAction {
 
     const selectedNodeInfo = getNodeInfo(state, selectedNodeId);
     assert(selectedNodeInfo);
-    if (!selectedNodeInfo.isExpanded) {
+    if (!selectedNodeInfo.isExpanded || selectedNodeInfo.isLoadingChildren) {
       dispatch(expandNode(selectedNodeId, true));
     } else {
       const firstChildId = selectedNodeInfo.children[0];
@@ -414,5 +432,6 @@ async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promis
     tagName: node.tagName,
     type: node.nodeType,
     value: node.getNodeValue(),
+    isLoadingChildren: false,
   };
 }

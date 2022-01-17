@@ -79,6 +79,22 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
     };
   },
 
+  ["UPDATE_CHILDREN_LOADING"](markup, { nodeId, isLoadingChildren }) {
+    const nodeInfo = markup.tree[nodeId];
+    assert(nodeInfo);
+
+    return {
+      ...markup,
+      tree: {
+        ...markup.tree,
+        [nodeId]: {
+          ...nodeInfo,
+          isLoadingChildren,
+        },
+      },
+    };
+  },
+
   ["UPDATE_SELECTED_NODE"](markup, { selectedNode }) {
     return {
       ...markup,
