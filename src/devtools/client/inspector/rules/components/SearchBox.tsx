@@ -7,7 +7,7 @@ type SearchBoxProps = {
 
 export const SearchBox: FC<SearchBoxProps> = ({ query, onQueryChange }) => {
   return (
-    <div className="devtools-searchbox">
+    <div id="ruleview-search" className="devtools-searchbox">
       <input
         id="ruleview-searchbox"
         type="text"
