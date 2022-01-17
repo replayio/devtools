@@ -442,6 +442,11 @@ ul.children + .tag-line::before {
 
   overflow: auto;
   height: 100%;
+  border: 1px solid transparent;
+}
+
+#markup-box:focus-within {
+  border-color: var(--blue-50);
 }
 
 #markup-loading {
