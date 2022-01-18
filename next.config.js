@@ -3,6 +3,22 @@ const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 module.exports = {
   productionBrowserSourceMaps: true,
 
+  async redirects() {
+    return [
+      {
+        source: "/view",
+        has: [
+          {
+            type: "query",
+            key: "id",
+          },
+        ],
+        destination: "/recording/:id",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
