@@ -77,8 +77,8 @@ export const NetworkMonitor = ({
           <SplitBox
             className="border-t min-h-0"
             initialSize="350"
-            minSize={selectedRequest ? "20%" : "100%"}
-            maxSize={selectedRequest ? "80%" : "100%"}
+            minSize={selectedRequest ? "30%" : "100%"}
+            maxSize={selectedRequest ? "70%" : "100%"}
             startPanel={
               <RequestTable
                 table={table}

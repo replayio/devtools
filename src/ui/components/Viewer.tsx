@@ -18,8 +18,8 @@ const Vertical = ({ showVideo }: ViewerProps) => {
       onResizeEnd={(num: number) => {
         prefs.secondaryPanelHeight = `${num}px`;
       }}
-      minSize={showVideo ? "20%" : "100%"}
-      maxSize={showVideo ? "80%" : "100%"}
+      minSize={showVideo ? "30%" : "100%"}
+      maxSize={showVideo ? "70%" : "100%"}
       vert={true}
       startPanel={<SecondaryToolbox />}
       endPanel={showVideo && <Video />}
@@ -37,8 +37,8 @@ const Horizontal = ({ showVideo }: ViewerProps) => {
       onResizeEnd={(num: number) => {
         prefs.secondaryPanelHeight = `${num}px`;
       }}
-      minSize={showVideo ? "100px" : "0"}
-      maxSize={showVideo ? "80%" : "0"}
+      minSize={showVideo ? "30%" : "0"}
+      maxSize={showVideo ? "70%" : "0"}
       vert={false}
       startPanel={showVideo && <Video />}
       endPanel={<SecondaryToolbox />}
