@@ -97,7 +97,11 @@ function RecordingPage({
         router.replace(
           {
             pathname: url,
-            query: router.query,
+            query: {
+              ...router.query,
+              // remove the id from the query params
+              id: undefined,
+            },
           },
           undefined,
           { shallow: true }
