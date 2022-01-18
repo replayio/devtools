@@ -29,13 +29,10 @@
 
 .devtools-input-toolbar {
   display: flex;
+  align-items: center;
   /* @TODO: Remove the !important in bug 1535956 */
   background-color: var(--theme-body-background) !important;
   color: inherit;
-}
-
-.devtools-input-toolbar > .devtools-searchbox:first-child {
-  margin-inline-start: -3px; /* This needs to match .devtools-toolbar's padding */
 }
 
 /* Expected space around a separator:
@@ -122,7 +119,13 @@
 }
 
 .devtools-sidebar-tabs tabs > tab {
-  border-image: linear-gradient(transparent 15%, var(--theme-splitter-color) 15%, var(--theme-splitter-color) 85%, transparent 85%) 1 1;
+  border-image: linear-gradient(
+      transparent 15%,
+      var(--theme-splitter-color) 15%,
+      var(--theme-splitter-color) 85%,
+      transparent 85%
+    )
+    1 1;
 }
 
 .devtools-sidebar-tabs tabs > tab[selected],
