@@ -11,36 +11,36 @@ import { getTrimRegion } from "ui/reducers/timeline";
 import { getViewMode } from "./layout";
 
 export const initialAppState: AppState = {
-  expectedError: null,
-  unexpectedError: null,
-  trialExpired: false,
-  theme: "theme-light",
-  selectedPanel: prefs.selectedPanel as PanelName,
-  initializedPanels: [],
-  recordingDuration: 0,
-  indexing: 0,
-  loading: 4,
-  displayedLoadingProgress: null,
-  loadingFinished: false,
-  uploading: null,
+  analysisPoints: {},
   awaitingSourcemaps: false,
-  sessionId: null,
+  canvas: null,
+  defaultSettingsTab: "Personal",
+  displayedLoadingProgress: null,
+  events: {},
+  expectedError: null,
+  hoveredLineNumberLocation: null,
+  indexing: 0,
+  initializedPanels: [],
+  isNodePickerActive: false,
+  loadedRegions: null,
+  loading: 4,
+  loadingFinished: false,
+  loadingPageTipIndex: 0,
   modal: null,
   modalOptions: null,
-  analysisPoints: {},
-  events: {},
-  hoveredLineNumberLocation: null,
-  isNodePickerActive: false,
-  canvas: null,
-  videoUrl: null,
-  videoNode: null,
-  workspaceId: null,
-  defaultSettingsTab: "Personal",
+  mouseTargetsLoading: false,
+  recordingDuration: 0,
   recordingTarget: null,
   recordingWorkspace: null,
-  loadedRegions: null,
-  loadingPageTipIndex: 0,
-  mouseTargetsLoading: false,
+  selectedPanel: prefs.selectedPanel as PanelName,
+  sessionId: null,
+  theme: "theme-light",
+  trialExpired: false,
+  unexpectedError: null,
+  uploading: null,
+  videoNode: null,
+  videoUrl: null,
+  workspaceId: null,
 };
 
 export default function update(
@@ -76,11 +76,11 @@ export default function update(
     }
 
     case "set_expected_error": {
-      return { ...state, expectedError: action.error };
+      return { ...state, expectedError: action.error, modal: null, modalOptions: null };
     }
 
     case "set_unexpected_error": {
-      return { ...state, unexpectedError: action.error };
+      return { ...state, unexpectedError: action.error, modal: null, modalOptions: null };
     }
 
     case "set_trial_expired": {
