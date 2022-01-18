@@ -97,7 +97,7 @@ html|input {
 }
 
 /* Devtools rely on the old Gecko/HTML4 button hit testing */
-html|button > * {
+button > * {
   pointer-events: none;
 }
 
