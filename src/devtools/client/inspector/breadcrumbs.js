@@ -532,7 +532,7 @@ HTMLBreadcrumbs.prototype = {
    * @param {DOMEvent} event.
    */
   handleClick: function (event) {
-    const target = event.target.parentElement;
+    const target = event.target;
     if (target.tagName == "BUTTON") {
       target.onBreadcrumbsClick();
     }
