@@ -126,6 +126,16 @@ export interface Recording {
   operations: OperationsData;
 }
 
+export interface RecordingMetadata {
+  id: string;
+  url: string;
+  title: string;
+  duration: number;
+  private: boolean;
+  ownerName: string;
+  isInitialized: boolean;
+}
+
 export interface OperationsData {
   scriptDomains: string[];
   cookies?: string[];

@@ -118,11 +118,16 @@ const ConnectedRecordingPage = connector(RecordingPage);
 export const getStaticProps: GetStaticProps = async function ({ params }) {
   const id = Array.isArray(params?.id) ? params?.id[0] : params?.id;
   const metadata = id ? await getRecordingMetadata(id) : null;
+
+  const initialized = metadata?.initialized;
+  const canRenderMetadata = initialized && !metadata.private;
+
   return {
     props: {
-      metadata: metadata,
+      metadata: canRenderMetadata ? metadata : null,
     },
-    revalidate: !metadata?.initialized ? 1 : 360,
+    // revalidate immediately if the recording exists and hasn't been initialized
+    revalidate: !initialized ? 1 : 360,
   };
 };
 

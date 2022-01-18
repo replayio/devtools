@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { Recording } from "ui/types";
+import { Recording, RecordingMetadata } from "ui/types";
 import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
@@ -743,44 +743,43 @@ export async function getRecordingMetadata(id: string) {
     },
     body: JSON.stringify({
       query: `
-        query GetRecording($recordingId: UUID!) {
-          recording(uuid: $recordingId) {
+        query GetRecordingMetadata($secret: String!, $recordingId: UUID!) {
+          recordingMetadata(secret: $secret, uuid: $recordingId) {
             uuid
             url
             title
             duration
             private
             isInitialized
-            owner {
-              name
-            }
-            workspace {
-              name
-            }
+            ownerName
           }
         }
       `,
       variables: {
         recordingId: id,
+        secret: process.env.FRONTEND_API_SECRET,
       },
     }),
   });
 
   const json: {
-    data: { recording: Recording & { owner?: { name: string } } };
-    error: any;
+    data: { recordingMetadata: RecordingMetadata };
+    errors: any;
   } = await resp.json();
 
-  if (json.error || !json.data.recording) {
+  console.log(json);
+
+  if (json.errors || !json.data.recordingMetadata) {
     return null;
   }
 
   return {
     id,
-    title: json.data.recording.title,
-    url: json.data.recording.url,
-    duration: json.data.recording.duration,
-    owner: json.data.recording.owner?.name || null,
-    initialized: json.data.recording.isInitialized,
+    title: json.data.recordingMetadata.title,
+    url: json.data.recordingMetadata.url,
+    duration: json.data.recordingMetadata.duration,
+    owner: json.data.recordingMetadata.ownerName,
+    private: json.data.recordingMetadata.private,
+    initialized: json.data.recordingMetadata.isInitialized,
   };
 }
