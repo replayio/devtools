@@ -200,7 +200,14 @@ function CommentCard({
           >
             <NewCommentEditor
               key={PENDING_COMMENT_ID}
-              comment={{ ...comment, content: "", parentId: comment.id, id: PENDING_COMMENT_ID }}
+              comment={{
+                ...comment,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                content: "",
+                parentId: comment.id,
+                id: PENDING_COMMENT_ID,
+              }}
               type={"new_reply"}
             />
           </FocusContext.Provider>
