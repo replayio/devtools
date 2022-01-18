@@ -23,18 +23,8 @@
   margin: var(--icon-margin);
 }
 
-.icon-with-tooltip .icon-tooltip {
-  width: max-content;
-  background: var(--theme-popup-color);
-  color: var(--theme-popup-background);
-  border-radius: 4px;
-  padding: 4px 8px;
-  line-height: 16px;
-  position: absolute;
-  display: inline-block;
-  margin-left: 8px;
+.icon-tooltip {
   animation: tooltip-pop-up 200ms ease;
-  z-index: var(--z-index-1--icon-tooltip);
 }
 
 @keyframes tooltip-pop-up {
