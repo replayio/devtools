@@ -290,6 +290,12 @@ class Timeline extends Component<PropsFromRedux> {
       return null;
     }
 
+    // An empty loadedRegions array after we've finished loading regions means that
+    // the whole recording has been unloaded.
+    if (loadedRegions.length === 0) {
+      return <div className="unloaded-regions w-full" />;
+    }
+
     const { begin, end } = loadedRegions[0];
     const { endTime } = zoomRegion;
     const loadedRegionStart = getVisiblePosition({ time: begin.time, zoom: zoomRegion }) * 100;

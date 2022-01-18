@@ -299,13 +299,14 @@ export const isFinishedLoadingRegions = (state: UIState) => {
   const loadedRegions = getLoadedRegions(state)?.loaded;
   const loadingRegions = getLoadedRegions(state)?.loading;
 
-  if (
-    !loadingRegions ||
-    !loadedRegions ||
-    loadingRegions.length === 0 ||
-    loadedRegions.length === 0
-  ) {
+  if (!loadingRegions || !loadedRegions) {
     return false;
+  }
+
+  // If the empty loaded/loading region arrays, that means that the entire
+  // recording has been unloaded. We consider that as having finished loading.
+  if (loadingRegions.length === 0 && loadedRegions.length === 0) {
+    return true;
   }
 
   const loading = loadingRegions[0];
