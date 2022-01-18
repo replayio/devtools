@@ -18,6 +18,7 @@ import FilterBar from "./FilterBar";
 import Table from "./Table";
 import { fetchFrames, fetchResponseBody, fetchRequestBody } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import LoadingProgressBar from "../shared/LoadingProgressBar";
 
 export const NetworkMonitor = ({
   currentTime,
@@ -25,6 +26,7 @@ export const NetworkMonitor = ({
   events,
   fetchFrames,
   frames,
+  loading,
   requestBodies,
   requests,
   responseBodies,
@@ -58,6 +60,14 @@ export const NetworkMonitor = ({
       resizeObserver.current.observe(container.current);
     }
   }, [container.current]);
+
+  if (loading) {
+    return (
+      <div className="relative">
+        <LoadingProgressBar />
+      </div>
+    );
+  }
 
   return (
     <Table events={events} requests={requests} types={types}>
@@ -117,6 +127,7 @@ const connector = connect(
     cx: getThreadContext(state),
     events: getEvents(state),
     frames: getFormattedFrames(state),
+    loading: state.network.loading,
     requestBodies: getRequestBodies(state),
     requests: getRequests(state),
     responseBodies: getResponseBodies(state),

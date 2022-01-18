@@ -10,8 +10,6 @@ import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 
-export const NEW_NETWORK_REQUESTS = "NEW_NETWORK_REQUESTS";
-
 type NewNetworkRequestsAction = {
   type: "NEW_NETWORK_REQUESTS";
   payload: { requests: RequestInfo[]; events: RequestEventInfo[] };
@@ -32,11 +30,14 @@ type SetFramesAction = {
   payload: { frames: any[]; point: string };
 };
 
+type NetworkRequestsLoadedAction = { type: "NETWORK_REQUESTS_LOADED" };
+
 export type NetworkAction =
+  | NetworkRequestsLoadedAction
   | NewNetworkRequestsAction
-  | SetFramesAction
+  | NewRequestBodyPartsAction
   | NewResponseBodyPartsAction
-  | NewRequestBodyPartsAction;
+  | SetFramesAction;
 
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData
@@ -61,6 +62,10 @@ export const newNetworkRequests = ({
 }): NewNetworkRequestsAction => ({
   type: "NEW_NETWORK_REQUESTS",
   payload: { requests, events },
+});
+
+export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
+  type: "NETWORK_REQUESTS_LOADED",
 });
 
 export function fetchResponseBody(requestId: RequestId) {

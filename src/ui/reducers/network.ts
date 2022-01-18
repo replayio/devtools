@@ -17,6 +17,7 @@ import sortedUniqBy from "lodash/sortedUniqBy";
 export type NetworkState = {
   events: RequestEventInfo[];
   frames: Record<string, WiredFrame[]>;
+  loading: boolean;
   responseBodies: Record<string, ResponseBodyData[]>;
   requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
@@ -25,6 +26,7 @@ export type NetworkState = {
 const initialState = (): NetworkState => ({
   events: [],
   frames: {},
+  loading: true,
   requests: [],
   responseBodies: {},
   requestBodies: {},
@@ -32,6 +34,11 @@ const initialState = (): NetworkState => ({
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
   switch (action.type) {
+    case "NETWORK_REQUESTS_LOADED":
+      return {
+        ...state,
+        loading: false,
+      };
     case "NEW_NETWORK_REQUESTS":
       return {
         ...state,
