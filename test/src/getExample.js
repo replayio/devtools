@@ -11,7 +11,7 @@ async function record(state, browserName, example) {
   console.log(`Recording Example:`, example, browserName);
 
   const browser = await playwright[browserName].launch({
-    executablePath: state.executablePath,
+    executablePath: state.browserPath,
     headless: state.headless,
   });
 

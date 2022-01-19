@@ -19,7 +19,8 @@ const defaultState = {
   headless: false,
   shouldRecordExamples: !!process.env.SHOULD_RECORD_EXAMPLES,
 
-  executablePath: process.env.RECORD_REPLAY_PATH,
+  browserPath: process.env.RECORD_REPLAY_PATH,
+  driverPath: process.env.RECORD_REPLAY_DRIVER,
   onlyTarget: process.env.onlyTarget,
   skippedTests: process.env.SKIPPED_TESTS,
   testTimeout: 240,
@@ -40,6 +41,8 @@ const usage = `
     --count N: Run tests N times
     --pattern PAT: Only run tests matching PAT
     --record-examples: Record the example and save the recordings locally for testing
+    --browserPath: Path to the local version of the replay browser to use
+    --driverPath: Path to the local version of the linker to use for recording examples
     --timeout N: Use a timeout of N seconds for tests (default 240).
     --target TARGET: Only run tests using given TARGET
     --server ADDRESS: Set server to connect to (default wss://dispatch.replay.io).
@@ -50,6 +53,12 @@ function processArgs(state, argv) {
     switch (arg) {
       case "--count":
         state.count = +argv[++i];
+        break;
+      case "--driverPath":
+        state.driverPath = argv[++i];
+        break;
+      case "--browserPath":
+        state.browserPath = argv[++i];
         break;
       case "--pattern":
         state.patterns.push(argv[++i]);
@@ -86,10 +95,25 @@ function processEnvironmentVariables(state) {
   }
 }
 
+function validateState(state) {
+  if (state.browserPath && !fs.existsSync(state.browserPath)) {
+    throw new Error(
+      `supplied browserPath (or $RECORD_REPLAY_PATH): ${state.browserPath} does not exist`
+    );
+  }
+  if (state.driverPath && !fs.existsSync(state.driverPath)) {
+    throw new Error(
+      `supplied driverPath (or $RECORD_REPLAY_DRIVER): ${state.driverPath} does not exist`
+    );
+  }
+}
+
 function bootstrap(argv) {
   let state = { ...defaultState };
   processArgs(state, argv);
   processEnvironmentVariables(state);
+  validateState(state);
+  console.log(state);
   return state;
 }
 
