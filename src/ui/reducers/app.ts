@@ -303,10 +303,10 @@ export const isFinishedLoadingRegions = (state: UIState) => {
     return false;
   }
 
-  // If the empty loaded/loading region arrays, that means that the entire
-  // recording has been unloaded. We consider that as having finished loading.
-  if (loadingRegions.length === 0 && loadedRegions.length === 0) {
-    return true;
+  if (loadedRegions.length === 0) {
+    // If the empty loaded/loading region arrays, that means that the entire
+    // recording has been unloaded. We consider that as having finished loading.
+    return loadingRegions.length === 0;
   }
 
   const loading = loadingRegions[0];
