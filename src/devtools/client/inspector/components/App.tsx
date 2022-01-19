@@ -1,8 +1,8 @@
 import React, { FC, ReactNode, useMemo, useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import { UIState } from "ui/state";
-import * as InspectorActions from "../actions";
+import { setActiveTab } from "../actions";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { prefs } from "devtools/client/inspector/prefs";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
@@ -29,16 +29,22 @@ const availableTabs: readonly InspectorActiveTab[] = [
   "eventlistenersview",
 ] as const;
 
-const InspectorApp: FC<PropsFromRedux> = ({ initializedPanels, activeTab, setActiveTab }) => {
+const InspectorApp: FC = () => {
+  const dispatch = useDispatch();
+  const { initializedPanels, activeTab } = useSelector((state: UIState) => ({
+    initializedPanels: selectors.getInitializedPanels(state),
+    activeTab: state.inspector.activeTab,
+  }));
+
+  const inspector = gToolbox.getPanel("inspector");
+  const inspectorInited = inspector && initializedPanels.includes("inspector");
+
   const sidebarContainerRef = useRef<HTMLDivElement>(null);
   const splitBoxRef = useRef<SplitBox>(null);
 
   const onSplitboxResize = (width: number) => {
     prefs.splitSidebarSize = width;
   };
-
-  const inspector = gToolbox.getPanel("inspector");
-  const inspectorInited = inspector && initializedPanels.includes("inspector");
 
   const markupView: JSX.Element | undefined = useMemo(() => {
     if (!inspectorInited) {
@@ -114,7 +120,7 @@ const InspectorApp: FC<PropsFromRedux> = ({ initializedPanels, activeTab, setAct
                                   tabIndex={isPanelSelected ? 0 : -1}
                                   title={INSPECTOR_TAB_TITLES[panelId]}
                                   role="tab"
-                                  onClick={() => setActiveTab(panelId)}
+                                  onClick={() => dispatch(setActiveTab(panelId))}
                                 >
                                   {INSPECTOR_TAB_TITLES[panelId]}
                                 </a>
@@ -136,14 +142,4 @@ const InspectorApp: FC<PropsFromRedux> = ({ initializedPanels, activeTab, setAct
   );
 };
 
-const connector = connect(
-  (state: UIState) => ({
-    initializedPanels: selectors.getInitializedPanels(state),
-    activeTab: state.inspector.activeTab,
-  }),
-  InspectorActions
-);
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(InspectorApp);
+export default InspectorApp;
