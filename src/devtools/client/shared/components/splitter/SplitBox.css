@@ -60,9 +60,24 @@
   pointer-events: none;
 }
 
-/* This disables splitter bar dragging when the user is 
+/* This disables splitter bar dragging when the user is
 in the console. Dragging/resizing should only work in the debugger
 or the inspector where the split console can be displayed.  */
 #toolbox.console .split-box.horz > .splitter {
   pointer-events: none;
+}
+
+.inspector-sidebar-splitter > .splitter {
+  position: relative;
+}
+
+.inspector-sidebar-splitter > .splitter:after {
+  position: absolute;
+  content: '';
+  width: 1px;
+  height: 100%;
+  background: var(--theme-splitter-color);
+  left: 0;
+  /* left: 50%;
+  transform: translateX(-50%); */
 }
