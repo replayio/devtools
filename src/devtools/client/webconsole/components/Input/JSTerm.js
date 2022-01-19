@@ -12,10 +12,10 @@ import actions from "devtools/client/webconsole/actions/index";
 import { getRecordingId } from "ui/utils/environment";
 import { getRecording } from "ui/hooks/recordings";
 import { getCommandHistory } from "../../selectors/messages";
-
+import Autocomplete from "./Autocomplete";
 import clamp from "lodash/clamp";
 
-async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
+async function createEditor({ execute, onArrowPress }) {
   await gToolbox.startPanel("debugger");
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
 
@@ -41,8 +41,8 @@ async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
       Esc: false,
       "Cmd-F": false,
       "Ctrl-F": false,
-      Up: historyCursorUp,
-      Down: historyCursorDown,
+      Up: () => onArrowPress("up"),
+      Down: () => onArrowPress("down"),
     },
   });
   return editor;
@@ -57,23 +57,27 @@ class JSTerm extends React.Component {
     };
   }
 
+  autocompleteShown = true;
+
   constructor(props) {
     super(props);
     window.jsterm = this;
     this.state = {
       canEval: true,
       historyIndex: 0,
+      value: "",
+      matchIndex: 0,
     };
   }
 
   async componentDidMount() {
     this.editorWaiter = createEditor({
       execute: this.execute,
-      historyCursorUp: this.historyCursorUp,
-      historyCursorDown: this.historyCursorDown,
+      onArrowPress: this.onArrowPress,
     });
     this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
+    this.editor.codeMirror.on("change", this.onChange);
 
     const recordingId = getRecordingId();
     const recording = await getRecording(recordingId);
@@ -85,8 +89,33 @@ class JSTerm extends React.Component {
     this.editor?.focus();
   }
 
-  historyCursorUp = () => this.moveHistoryCursor(1);
-  historyCursorDown = () => this.moveHistoryCursor(-1);
+  onArrowPress = arrow => {
+    if (arrow === "up") {
+      if (this.autocompleteShown) {
+        console.log(">> Navigate the selected autocomplete index up");
+        this.moveAutocompleteCursor(1);
+      } else {
+        this.moveHistoryCursor(1);
+      }
+    } else {
+      if (this.autocompleteShown) {
+        this.moveAutocompleteCursor(-1);
+      } else {
+        this.moveHistoryCursor(-1);
+      }
+    }
+  };
+
+  moveAutocompleteCursor(difference) {
+    const { matchIndex } = this.state;
+    if (difference > 0) {
+      this.setState({ matchIndex: Math.max(matchIndex - 1, 0) });
+      console.log(">> Navigate the selected autocomplete index up");
+    } else {
+      this.setState({ matchIndex: matchIndex + 1 });
+      console.log(">> Navigate the selected autocomplete index down");
+    }
+  }
 
   moveHistoryCursor(difference) {
     const { commandHistory } = this.props;
@@ -106,6 +135,8 @@ class JSTerm extends React.Component {
     if (!executeString) {
       return;
     }
+
+    console.log({ executeString });
 
     if (this.state.canEval) {
       this.props.evaluateExpression(executeString);
@@ -157,17 +188,29 @@ class JSTerm extends React.Component {
     return this.editor.getSelection();
   }
 
+  onChange = cm => {
+    const newValue = cm.getValue();
+    this.setState({ value: newValue });
+  };
+
   render() {
+    const { value, matchIndex } = this.state;
+
+    console.log({ matchIndex });
+
     return (
-      <div
-        className="jsterm-input-container devtools-input"
-        key="jsterm-container"
-        aria-live="off"
-        tabIndex={-1}
-        ref={node => {
-          this.node = node;
-        }}
-      />
+      <div className="relative">
+        <div
+          className="jsterm-input-container devtools-input"
+          key="jsterm-container"
+          aria-live="off"
+          tabIndex={-1}
+          ref={node => {
+            this.node = node;
+          }}
+        />
+        {value || true ? <Autocomplete input={value} selectedIndex={matchIndex} /> : null}
+      </div>
     );
   }
 }
