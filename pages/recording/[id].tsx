@@ -94,14 +94,16 @@ function RecordingPage({
       const url = getRecordingURL(recording);
       const currentURL = new URL(window.location.origin + router.asPath).pathname;
       if (url !== currentURL) {
+        // clone the query object to remove the id parameter
+        const query = {
+          ...router.query,
+        };
+        delete query.id;
+
         router.replace(
           {
             pathname: url,
-            query: {
-              ...router.query,
-              // remove the id from the query params
-              id: undefined,
-            },
+            query,
           },
           undefined,
           { shallow: true }

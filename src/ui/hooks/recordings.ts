@@ -113,7 +113,7 @@ export function useGetRecordingId() {
 export function getRecordingURL(recording: Recording) {
   let slug = "";
   if (recording.title) {
-    slug = `${slugify(recording.title).toLowerCase()}/`;
+    slug = `${slugify(recording.title).toLowerCase()}--`;
   }
 
   return `/recording/${slug}${recording.id}`;

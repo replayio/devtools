@@ -32,27 +32,20 @@ export function isValidTeamName(name: string) {
   return true;
 }
 
-export function toArray<T>(arg: T | T[] | undefined) {
-  if (Array.isArray(arg)) {
-    return arg;
-  } else if (typeof arg !== "undefined") {
-    return [arg];
-  }
-
-  return [];
-}
-
 export function extractIdAndSlug(params: string | string[] | undefined) {
-  const asArray = toArray(params);
+  const joined = Array.isArray(params) ? params[0] : params;
 
   let id: string | undefined;
   let slug: string | undefined;
-  if (asArray[0]) {
-    if (validateUUID(asArray[0])) {
-      id = asArray[0];
-    } else if (asArray[1] && validateUUID(asArray[1])) {
-      slug = asArray[0];
-      id = asArray[1];
+  if (joined) {
+    if (validateUUID(joined)) {
+      id = joined;
+    } else {
+      const parts = joined.split("--");
+      if (validateUUID(parts[1])) {
+        slug = parts[0];
+        id = parts[1];
+      }
     }
   }
 
