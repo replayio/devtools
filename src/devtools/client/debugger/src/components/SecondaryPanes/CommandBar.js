@@ -8,11 +8,17 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 
 import { connect } from "../../utils/connect";
-import classnames from "classnames";
-import { getIsWaitingOnBreak, getSkipPausing, getThreadContext } from "../../selectors";
+import {
+  getIsWaitingOnBreak,
+  getSkipPausing,
+  getThreadContext,
+  getBreakpointSources,
+  getFramePositions,
+  hasFrames,
+} from "../../selectors";
 import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
-import { debugBtn } from "../shared/Button/CommandBarButton";
+import CommandBarButton from "../shared/Button/CommandBarButton";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { appinfo } from "devtools/shared/services";
@@ -98,91 +104,131 @@ class CommandBar extends Component {
     }
   }
 
+  onRewind = () => {
+    const { cx } = this.props;
+    trackEvent("debugger.rewind");
+    this.props.rewind(cx);
+  };
+  onResume = () => {
+    const { cx } = this.props;
+    trackEvent("debugger.resume");
+    this.props.resume(cx);
+  };
+  onReverseStepOver = () => {
+    const { cx } = this.props;
+    trackEvent("debugger.reverse_step_over");
+    this.props.reverseStepOver(cx);
+  };
+  onStepOver = () => {
+    const { cx } = this.props;
+    trackEvent("debugger.step_over");
+    this.props.stepOver(cx);
+  };
+  onStepIn = () => {
+    const { cx } = this.props;
+    trackEvent("debugger.step_in");
+    this.props.stepIn(cx);
+  };
+  onStepOut = () => {
+    const { cx } = this.props;
+    trackEvent("debugger.step_out");
+    this.props.stepOut(cx);
+  };
+
   resume() {
     this.props.resume(this.props.cx);
+  }
+
+  renderRewindButton() {
+    const { hasBreakpoints } = this.props;
+    const disabled = !hasBreakpoints;
+
+    const disabledTooltip = "Rewinding is disabled until you add a breakpoint";
+    const tooltip = "Rewind Execution";
+
+    return (
+      <CommandBarButton
+        disabled={disabled}
+        key="rewind"
+        onClick={this.onRewind}
+        tooltip={tooltip}
+        disabledTooltip={disabledTooltip}
+        type="rewind"
+      />
+    );
+  }
+  renderResumeButton() {
+    const { hasBreakpoints } = this.props;
+    const disabled = !hasBreakpoints;
+
+    const disabledTooltip = "Resuming is disabled until you add a breakpoint";
+    const tooltip = L10N.getFormatStr("resumeButtonTooltip", formatKey("resume"));
+
+    return (
+      <CommandBarButton
+        disabled={disabled}
+        key="resume"
+        onClick={this.onResume}
+        tooltip={tooltip}
+        disabledTooltip={disabledTooltip}
+        type="resume"
+      />
+    );
+  }
+
+  renderStepButtons() {
+    const { isPaused, hasFramePositions } = this.props;
+    const disabled = !isPaused || !hasFramePositions;
+    const disabledTooltip = !isPaused
+      ? "Stepping is disabled until you're pause at a point"
+      : "Stepping is disabled because there are too many steps in the current frame";
+
+    return [
+      <div key="divider-2" className="divider" />,
+      <CommandBarButton
+        disabled={disabled}
+        key="reverseStepOver"
+        onClick={this.onReverseStepOver}
+        tooltip="Reverse Step Over"
+        disabledTooltip={disabledTooltip}
+        type="reverseStepOver"
+      />,
+      <CommandBarButton
+        disabled={disabled}
+        key="stepOver"
+        onClick={this.onStepOver}
+        tooltip="Step Over"
+        disabledTooltip={disabledTooltip}
+        type="stepOver"
+      />,
+      <div key="divider-3" className="divider" />,
+      <CommandBarButton
+        disabled={disabled}
+        key="stepIn"
+        onClick={this.onStepIn}
+        tooltip="Step In"
+        disabledTooltip={disabledTooltip}
+        type="stepIn"
+      />,
+      <CommandBarButton
+        disabled={disabled}
+        key="stepOut"
+        onClick={this.onStepOut}
+        tooltip="Step Out"
+        disabledTooltip={disabledTooltip}
+        type="stepOut"
+      />,
+    ];
   }
 
   renderReplayButtons() {
     const { cx } = this.props;
 
-    const className = cx.isPaused ? "active" : "disabled";
-
-    return [
-      debugBtn(
-        () => {
-          trackEvent("debugger.rewind");
-          this.props.rewind(cx);
-        },
-        "rewind",
-        className,
-        "Rewind Execution",
-        !cx.isPaused
-      ),
-      debugBtn(
-        () => {
-          trackEvent("debugger.resume");
-          this.props.resume(cx);
-        },
-        "resume",
-        className,
-        L10N.getFormatStr("resumeButtonTooltip", formatKey("resume")),
-        !cx.isPaused
-      ),
-      <div key="divider-2" className="divider" />,
-      debugBtn(
-        () => {
-          trackEvent("debugger.reverse_step_over");
-          this.props.reverseStepOver(cx);
-        },
-        "reverseStepOver",
-        className,
-        "Reverse step over",
-        !cx.isPaused
-      ),
-      debugBtn(
-        () => {
-          trackEvent("debugger.step_over");
-          this.props.stepOver(cx);
-        },
-        "stepOver",
-        className,
-        L10N.getFormatStr("stepOverTooltip", formatKey("stepOver")),
-        !cx.isPaused
-      ),
-      <div key="divider-3" className="divider" />,
-      debugBtn(
-        () => {
-          trackEvent("debugger.step_in");
-          this.props.stepIn(cx);
-        },
-        "stepIn",
-        className,
-        L10N.getFormatStr("stepInTooltip", formatKey("stepIn")),
-        !cx.isPaused
-      ),
-      debugBtn(
-        () => {
-          trackEvent("debugger.step_out");
-          this.props.stepOut(cx);
-        },
-        "stepOut",
-        className,
-        L10N.getFormatStr("stepOutTooltip", formatKey("stepOut")),
-        !cx.isPaused
-      ),
-    ];
+    return [this.renderRewindButton(), this.renderResumeButton(), this.renderStepButtons()];
   }
 
   render() {
-    return (
-      <div
-        className={classnames("command-bar", {
-          vertical: !this.props.horizontal,
-        })}
-      >
-        {this.renderReplayButtons()}
-      </div>
-    );
+    return <div className="command-bar">{this.renderReplayButtons()}</div>;
   }
 }
 
@@ -192,6 +238,9 @@ CommandBar.contextTypes = {
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
+  hasBreakpoints: getBreakpointSources(state).length,
+  hasFramePositions: getFramePositions(state)?.positions.length,
+  isPaused: hasFrames(state),
   isWaitingOnBreak: getIsWaitingOnBreak(state),
   skipPausing: getSkipPausing(state),
 });

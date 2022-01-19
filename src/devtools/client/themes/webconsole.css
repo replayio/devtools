@@ -19,8 +19,10 @@
    * edge than to message text. This value pushes them slightly to the right. */
   --console-icon-horizontal-offset: 1px;
   --console-warning-background: var(--theme-warning-background);
+
   --console-warning-border: var(--theme-warning-border);
   --console-warning-color: var(--theme-warning-color);
+  --console-drawer-width: 180px;
 }
 
 .theme-dark {
@@ -49,6 +51,8 @@
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(344, 73%, 97%);
   --console-error-border: rgba(215, 0, 34, 0.12); /* Red 60 + opacity */
+  --console-error-hover-background: hsl(344, 73%, 95%);
+
   --console-error-color: var(--red-70);
   --console-navigation-color: var(--theme-highlight-blue);
   --console-navigation-border: var(--blue-30);
@@ -546,7 +550,6 @@ a.learn-more-link.webconsole-learn-more-link {
 .webconsole-filteringbar-wrapper {
   display: flex;
   grid-template-columns: 1fr auto;
-  --primary-toolbar-height: 29px;
 }
 
 .webconsole-filteringbar-wrapper .devtools-toolbar {
@@ -559,7 +562,6 @@ a.learn-more-link.webconsole-learn-more-link {
   the content, we don't allow to shrink/overlap it */
   flex: 100 0 -moz-fit-content;
   align-items: center;
-  min-height: var(--primary-toolbar-height);
   flex-grow: 1;
 }
 
@@ -569,19 +571,10 @@ a.learn-more-link.webconsole-learn-more-link {
   align-self: stretch;
   user-select: none;
   grid-column: 1 / -1;
-  min-height: var(--primary-toolbar-height);
 }
 
 .devtools-toolbar.webconsole-filterbar-secondary .devtools-separator {
   margin-inline: 5px;
-}
-
-.split-console-close-button-wrapper {
-  min-height: var(--primary-toolbar-height);
-  /* We will need to display the close button in the right-top always. */
-  grid-column: -1 / -2;
-  grid-row: 1 / 2;
-  padding-inline-end: 0;
 }
 
 /* On OSX the cursor turns into a window-resizing cursor at the edges of the
@@ -595,18 +588,6 @@ a.learn-more-link.webconsole-learn-more-link {
   height: 100%;
   margin: 0;
 }
-
-/* It's important to keep this in px as it's used in JS to control the display mode
-   * of the filter toolbar. */
-/* Prevent the filter height from devtools-searchbox */
-
-/*.webconsole-filterbar-primary .devtools-searchbox {
-  align-self: stretch;
-  height: unset;
-  flex: 1 1 100%;
-  margin-inline-start: 1px;
-  min-width: 150px;
-}*/
 
 .webconsole-filterbar-primary .filter-checkbox {
   flex-shrink: 0;

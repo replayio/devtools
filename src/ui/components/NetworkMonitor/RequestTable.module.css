@@ -3,8 +3,12 @@ table.requests {
 }
 
 .row {
+  background: white;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  min-width: fit-content;
   position: relative;
-  border: 2px solid transparent;
+  width: 100%;
 }
 
 .row:hover {
@@ -16,8 +20,8 @@ table.requests {
 }
 
 .row.selected {
-  background: var(--primary-accent);
-  border-color: var(--primary-accent);
+  background: var(--primary-accent-hover);
+  border-color: var(--primary-accent-hover);
   color: white;
 }
 
@@ -25,19 +29,22 @@ table.requests {
   border-top: 2px solid var(--secondary-accent);
 }
 
+.current.end {
+  background: var(--secondary-accent);
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
 .resizer {
-  display: inline-block;
+  cursor: ew-resize;
   height: 100%;
   position: absolute;
   top: 0;
-  right: 0;
-  transform: translateX(-50%);
+  right: -4px;
   width: 8px;
-}
-
-.resizer:hover,
-.resizer:active {
-  background: var(--primary-accent);
+  z-index: 50;
 }
 
 .seekBadge {
@@ -52,6 +59,7 @@ table.requests {
   padding-left: 6px;
   padding-right: 6px;
   position: absolute;
+  left: -2px;
   z-index: 1;
 }
 

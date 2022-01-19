@@ -1,7 +1,7 @@
 import React from "react";
 import MaterialIcon from "../shared/MaterialIcon";
 import TypesDropdown from "./TypesDropdown";
-import { RequestType } from "./utils";
+import { CanonicalRequestType } from "./utils";
 
 export default function FilterBar({
   table,
@@ -9,11 +9,11 @@ export default function FilterBar({
   types,
 }: {
   table: any;
-  toggleType: (type: RequestType) => void;
-  types: Set<RequestType>;
+  toggleType: (type: CanonicalRequestType) => void;
+  types: Set<CanonicalRequestType>;
 }) {
   return (
-    <div className="bg-white border-1 border-b border-bottom flex items-center px-1 py-1">
+    <div className="bg-white flex items-center px-1 py-1">
       <TypesDropdown toggleType={toggleType} types={types} />
 
       <MaterialIcon iconSize="lg">search</MaterialIcon>

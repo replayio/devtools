@@ -4,7 +4,7 @@ import { UIState } from "ui/state";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { sanityCheckMiddleware } from "ui/utils/sanitize";
-const configureStore = require("devtools/client/debugger/src/actions/utils/create-store").default;
+const configureStore = require("./redux/create-store").default;
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
 import { AppState } from "ui/state/app";

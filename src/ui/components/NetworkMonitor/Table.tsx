@@ -7,7 +7,7 @@ import {
   useTable,
   TableInstance,
 } from "react-table";
-import { partialRequestsToCompleteSummaries, RequestSummary, RequestType } from "./utils";
+import { CanonicalRequestType, partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 
 export default function Table({
   children,
@@ -22,35 +22,32 @@ export default function Table({
   }) => JSX.Element;
   events: RequestEventInfo[];
   requests: RequestInfo[];
-  types: Set<RequestType>;
+  types: Set<CanonicalRequestType>;
 }) {
   const columns = useMemo(
     () => [
+      {
+        Header: "Status",
+        // https://github.com/tannerlinsley/react-table/discussions/2664
+        accessor: "status" as const,
+        width: 50,
+        maxWidth: 100,
+      },
       {
         Header: "Name",
         accessor: "name" as const,
       },
       {
-        Header: "Status",
-        // https://github.com/tannerlinsley/react-table/discussions/2664
-        accessor: "status" as const,
-        className: "m-auto",
-        width: 50,
-        maxWidth: 100,
-      },
-      {
         Header: "Method",
         accessor: "method" as const,
-        className: "m-auto",
         width: 50,
         maxWidth: 100,
       },
       {
         Header: "Type",
-        accessor: "type" as const,
+        accessor: "documentType" as const,
         className: "",
-        width: 50,
-        maxWidth: 100,
+        width: 125,
       },
       {
         Header: "Domain",
@@ -66,7 +63,7 @@ export default function Table({
 
   const defaultColumn = useMemo(
     () => ({
-      minWidth: 50,
+      minWidth: 60,
       width: 200,
       maxWidth: 1000,
     }),

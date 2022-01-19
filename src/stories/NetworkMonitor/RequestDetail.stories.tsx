@@ -3,7 +3,7 @@ import React, { ComponentProps } from "react";
 import { Story, Meta } from "@storybook/react";
 
 import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
-import { requestProps } from "./utils";
+import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 
 export default {
   title: "Network Monitor/Request Details",
@@ -23,6 +23,8 @@ Basic.args = {
     documentType: "application/octet-stream",
     domain: "assets.website-files.com",
     end: 984,
+    hasResponseBody: true,
+    hasRequestBody: true,
     id: "1",
     requestHeaders: [
       { name: "Host", value: "assets.website-files.com" },
@@ -77,6 +79,7 @@ Basic.args = {
     status: 200,
     start: 984,
     time: 166,
+    type: CanonicalRequestType.FETCH_XHR,
     url: "https://assets.website-files.com/613b96978e0f483f60fbb8c0/613b96978e0f48b736fbb935_SpaceGrotesk-Bold.woff2",
   },
 };

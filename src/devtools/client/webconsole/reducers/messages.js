@@ -45,6 +45,8 @@ const MessageState = overrides =>
         hasExecutionPoints: false,
         // Id of the last messages that was added.
         lastMessageId: null,
+        // Flag that indicates if not all console messages will be displayed.
+        overflow: false,
       },
       overrides
     )
@@ -64,6 +66,7 @@ function cloneState(state) {
     pausedExecutionPointTime: state.pausedExecutionPointTime,
     hasExecutionPoints: state.hasExecutionPoints,
     lastMessageId: state.lastMessageId,
+    overflow: state.overflow,
   };
 }
 
@@ -299,6 +302,10 @@ function messages(state = MessageState(), action) {
         messagesState: state,
         filtersState,
       });
+
+    case "CONSOLE_OVERFLOW": {
+      return { ...state, overflow: true };
+    }
   }
 
   return state;

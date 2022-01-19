@@ -1,9 +1,7 @@
-import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLoadingPageTipIndex } from "ui/actions/app";
 import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 
 const TIPS = [
   {
@@ -31,7 +29,9 @@ const TIPS = [
   },
 ];
 
-function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRedux) {
+export default function LoadingTip() {
+  const loadingPageTipIndex = useSelector(selectors.getLoadingPageTipIndex);
+  const dispatch = useDispatch();
   const { title, description, icon } = TIPS[loadingPageTipIndex || 0];
   const key = useRef<any>();
 
@@ -43,47 +43,19 @@ function LoadingTip({ loadingPageTipIndex, setLoadingPageTipIndex }: PropsFromRe
     key.current = setTimeout(() => {
       const nextIndex = loadingPageTipIndex === TIPS.length - 1 ? 0 : loadingPageTipIndex + 1;
 
-      setLoadingPageTipIndex(nextIndex);
+      dispatch(setLoadingPageTipIndex(nextIndex));
     }, 5000);
   }, [loadingPageTipIndex]);
 
   return (
-    <div className="bottom-6 absolute left-1/2 transform -translate-x-1/2">
-      <div className="flex flex-col space-y-4 invisible md:visible">
-        <div className="p-4 bg-jellyfish shadow-lg rounded-lg space-x-4 flex items-center max-w-lg">
-          <img className="h-16 w-16 p-2" src={`/images/${icon}`} />
-          <div className="flex flex-col space-y-2">
-            <div className="font-bold">{title}</div>
-            <div className="text-sm">{description}</div>
-          </div>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="flex flex-row space-x-1">
-            {TIPS.map((t, i) => (
-              <button
-                className={classNames(
-                  "rounded-full h-2 w-2",
-                  loadingPageTipIndex === i ? "bg-gray-500" : "bg-gray-300"
-                )}
-                key={i}
-                onClick={() => setLoadingPageTipIndex(i)}
-              />
-            ))}
-          </div>
+    <div className="space-y-8 w-96 h-32">
+      <div className="px-8 py-4 space-x-4 align-middle flex items-center max-w-lg rounded-lg bg-jellyfish">
+        <img className="h-16 p-2" src={`/images/${icon}`} />
+        <div className="flex flex-col space-y-2">
+          <div className="font-bold text-sm">{title}</div>
+          <div className="text-xs">{description}</div>
         </div>
       </div>
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    loadingPageTipIndex: selectors.getLoadingPageTipIndex(state),
-  }),
-  {
-    setLoadingPageTipIndex,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(LoadingTip);

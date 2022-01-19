@@ -36,7 +36,10 @@ export function setupMessages(store) {
     store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
   LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
 
-  ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));
+  ThreadFront.findConsoleMessages(
+    (_, msg) => store.dispatch(onConsoleMessage(msg)),
+    () => store.dispatch(onConsoleOverflow())
+  );
 }
 
 function convertStack(stack, { frames }) {
@@ -120,6 +123,10 @@ function onConsoleMessage(msg) {
 
     dispatch(dispatchMessageAdd(packet));
   };
+}
+
+function onConsoleOverflow() {
+  return { type: "CONSOLE_OVERFLOW" };
 }
 
 function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) {

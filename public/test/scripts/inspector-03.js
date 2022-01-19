@@ -1,4 +1,7 @@
 Test.describe(`Test that styles for elements can be viewed.`, async () => {
+  await Test.selectConsole();
+  await Test.warpToMessage("ExampleFinished");
+
   await Test.selectInspector();
 
   let node;

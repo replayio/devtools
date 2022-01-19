@@ -38,6 +38,8 @@ export interface NodeInfo {
   type: number;
   // The node's `nodeValue` which identifies the value of the current node.
   value: string | undefined;
+  // Whether this node's children are being loaded
+  isLoadingChildren: boolean;
 }
 
 export type MarkupTree = { [key: string]: NodeInfo | undefined };

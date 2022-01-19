@@ -16,7 +16,7 @@ function ProfilePage({ setModal }: PropsFromRedux) {
       setModal("settings", { view: "preferences" });
       replace("/");
     }
-  }, [modal]);
+  }, [isAuthenticated, modal, setModal, replace]);
 
   return <Account />;
 }

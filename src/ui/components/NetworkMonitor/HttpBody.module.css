@@ -1,0 +1,8 @@
+.copy-container .copy-icon {
+  display: none;
+}
+
+.copy-container:hover .copy-icon {
+  display: inline-block;
+  cursor: pointer;
+}

@@ -4,7 +4,7 @@
     window.location.href = `doc_navigate.html?navigated=true`;
   }
   function recordingFinished() {
-    dump(`RecReplaySendAsyncMessage Example__Finished`);
+    console.log("ExampleFinished");
   }
   const navigated = new URL(window.location.href).searchParams.get("navigated");
   if (!navigated) {

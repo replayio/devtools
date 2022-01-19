@@ -93,7 +93,7 @@ function startNextCallback() {
       try { await callback() } catch (e) {}
     });
   } else {
-    process.exit(0); // dump(`RecReplaySendAsyncMessage Example__Finished`);
+    process.exit(0); // dump(`RecReplaySendAsyncMessage ExampleFinished`);
   }
 }
 

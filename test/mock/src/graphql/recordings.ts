@@ -5,6 +5,7 @@ import { cloneResponse } from "./utils";
 
 const mockRecording = {
   collaborators: [],
+  comments: [],
   createdAt: "2021-07-05T10:03:13.466Z",
   duration: 10,
   id: "mock-recording-id",
@@ -46,7 +47,7 @@ export function createRecordingOwnerUserIdMock(opts: {
         : null,
     },
   };
-  return cloneResponse(rv, 10);
+  return cloneResponse(rv, 100);
 }
 
 export function createGetRecordingMock(opts: {
@@ -70,5 +71,5 @@ export function createGetRecordingMock(opts: {
         : null,
     },
   };
-  return cloneResponse(rv, 5);
+  return cloneResponse(rv, 100);
 }

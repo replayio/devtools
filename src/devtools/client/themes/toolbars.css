@@ -6,20 +6,13 @@
 .devtools-toolbar,
 .devtools-sidebar-tabs tabs {
   -moz-appearance: none;
-  padding: 0;
   border-width: 0;
   border-bottom-width: 1px;
   border-style: solid;
-  /* Reserve 1px for the border */
-  height: calc(var(--theme-toolbar-height) + 1px);
   /* Line-height based vertical centering technique used in panels
      which don't use Flexbox (mostly XUL panels). */
   line-height: var(--theme-toolbar-height);
   box-sizing: border-box;
-}
-
-.devtools-toolbar {
-  padding: 0 3px;
 }
 
 /* <thead> nor <tr> support border, we have to style the <td> */
@@ -36,13 +29,10 @@
 
 .devtools-input-toolbar {
   display: flex;
+  align-items: center;
   /* @TODO: Remove the !important in bug 1535956 */
   background-color: var(--theme-body-background) !important;
   color: inherit;
-}
-
-.devtools-input-toolbar > .devtools-searchbox:first-child {
-  margin-inline-start: -3px; /* This needs to match .devtools-toolbar's padding */
 }
 
 /* Expected space around a separator:
@@ -129,7 +119,13 @@
 }
 
 .devtools-sidebar-tabs tabs > tab {
-  border-image: linear-gradient(transparent 15%, var(--theme-splitter-color) 15%, var(--theme-splitter-color) 85%, transparent 85%) 1 1;
+  border-image: linear-gradient(
+      transparent 15%,
+      var(--theme-splitter-color) 15%,
+      var(--theme-splitter-color) 85%,
+      transparent 85%
+    )
+    1 1;
 }
 
 .devtools-sidebar-tabs tabs > tab[selected],

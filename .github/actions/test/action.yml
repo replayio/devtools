@@ -1,23 +1,24 @@
 name: "Test"
 description: "Run end-to-end tests. Note that this action assumes that Node and Next.js have already been properly setup. See the setup-next task for details."
-inputs:
-  stripe:
-    description: "Stripe to run, in the form INDEX/TOTAL"
-    required: true
 runs:
   using: "composite"
   steps:
-    - run: mv node_modules/node_modules.tgz ./
+    - name: Install dependencies
+      run: npm install
+      working-directory: test
       shell: bash
-    - run: tar -xzf node_modules.tgz
+    - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
-    - name: Copy .env file
-      run: cp .env.sample .env
+    - run: tar xf ./macOS-replay-playwright.tar.xz
       shell: bash
-    - name: Start Next.js development server
-      run: ./node_modules/.bin/next dev -p 8080 &
+    - run: chmod +x ./firefox/Nightly.app/Contents/MacOS/firefox
       shell: bash
-    - run: node ${{ github.action_path }}/main.js
+    - run: chmod +x ./replay-node/macOS-replay-node
+      shell: bash
+    - run: node ${{ github.action_path }}/../../../test/run.js
       shell: bash
       env:
-        INPUT_STRIPE: ${{ inputs.stripe }}
+        RECORD_REPLAY_NODE: replay-node/macOS-replay-node
+        RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
+        RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
+        SHOULD_RECORD_EXAMPLES: true

@@ -62,6 +62,13 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         seatPrice: 75,
         trial: isTrial(subscription),
       };
+    case "ent-v1":
+      return {
+        billingSchedule: "contract",
+        displayName: "Enterprise Contract",
+        seatPrice: 0,
+        trial: false,
+      };
   }
 };
 

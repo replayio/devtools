@@ -40,6 +40,8 @@ class SplitBox extends Component {
       endPanelControl: PropTypes.bool,
       // Size of the splitter handle bar.
       splitterSize: PropTypes.number,
+      // Class for the splitter handle bar.
+      splitterClass: PropTypes.string,
       // True if the splitter bar is vertical (default is vertical).
       vert: PropTypes.bool,
       // Optional style properties passed into the splitbox
@@ -162,13 +164,8 @@ class SplitBox extends Component {
   // Rendering
   preparePanelStyles() {
     const vert = this.state.vert;
-    const {
-      minSize,
-      maxSize,
-      startPanelCollapsed,
-      endPanelControl,
-      endPanelCollapsed,
-    } = this.props;
+    const { minSize, maxSize, startPanelCollapsed, endPanelControl, endPanelCollapsed } =
+      this.props;
     let leftPanelStyle, rightPanelStyle;
 
     // Set proper size for panels depending on the current state.
@@ -213,6 +210,7 @@ class SplitBox extends Component {
       endPanel,
       endPanelControl,
       splitterSize,
+      splitterClass,
       endPanelCollapsed,
     } = this.props;
 
@@ -232,12 +230,8 @@ class SplitBox extends Component {
       flex: `0 0 ${splitterSize}px`,
     };
 
-    return dom.div(
-      {
-        className: classNames.join(" "),
-        style: style,
-      },
-      !startPanelCollapsed
+    const startPanelDiv =
+      startPanel && !startPanelCollapsed
         ? dom.div(
             {
               className: endPanelControl ? "uncontrolled" : "controlled",
@@ -245,23 +239,33 @@ class SplitBox extends Component {
             },
             startPanel
           )
-        : null,
-      Draggable({
-        className: "splitter",
-        style: splitterStyle,
-        onStart: this.onStartMove,
-        onStop: this.onStopMove,
-        onMove: this.onMove,
-      }),
-      !endPanelCollapsed
+        : null;
+    const endPanelDiv =
+      endPanel && !endPanelCollapsed
         ? dom.div(
-            {
-              className: endPanelControl ? "controlled" : "uncontrolled",
-              style: rightPanelStyle,
-            },
+            { className: endPanelControl ? "controlled" : "uncontrolled", style: rightPanelStyle },
             endPanel
           )
-        : null
+        : null;
+    const draggable =
+      startPanelDiv && endPanelDiv
+        ? Draggable({
+            className: `splitter ${splitterClass}`,
+            style: splitterStyle,
+            onStart: this.onStartMove,
+            onStop: this.onStopMove,
+            onMove: this.onMove,
+          })
+        : null;
+
+    return dom.div(
+      {
+        className: classNames.join(" "),
+        style: style,
+      },
+      startPanelDiv,
+      draggable,
+      endPanelDiv
     );
   }
 }

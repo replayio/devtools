@@ -7,7 +7,6 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-const { prefs } = require("ui/utils/prefs");
 const { trackEvent } = require("ui/utils/telemetry");
 
 import BreakpointTimeline from "./BreakpointTimeline";
@@ -97,13 +96,15 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
     <div className="breakpoint-navigation-commands">
       <button
         className={`breakpoint-navigation-command-prev ${prevDisabled ? " disabled" : ""}`}
+        title={prev ? "Jump Back (to previous hit)" : "No previous hit to jump to"}
         disabled={prevDisabled}
         onClick={() => navigateToPoint(prev)}
       >
         <div className="img rewind" />
-      </button>{" "}
+      </button>
       <button
         className={`breakpoint-navigation-command-next ${nextDisabled || !next ? " disabled" : ""}`}
+        title={next ? "Jump Forward (to next hit)" : "No next hit to jump to"}
         disabled={nextDisabled}
         onClick={() => navigateToPoint(next)}
       >
@@ -121,7 +122,9 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
   } else if (!analysisPoints || !executionPoint) {
     status = "Loading";
   } else if (analysisPoints === "error") {
-    status = "Failed";
+    // This error is currently caused by how the backend limits the returned
+    // hits to 10k. Lines with more than 10k hits don't get returned.
+    status = "10k+ hits";
   } else if (analysisPoints.length == 0) {
     status = "No hits";
   } else {

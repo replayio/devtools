@@ -20,6 +20,7 @@ export type UserSettings = {
 
 export type LocalUserSettings = {
   enableCommentAttachments: boolean;
+  enableHttpBodies: boolean;
 };
 
 export type CombinedUserSettings = UserSettings & LocalUserSettings;
@@ -61,7 +62,7 @@ export interface PaymentMethod {
   };
 }
 
-type PlanKey = "org-v1" | "team-v1" | "test-team-v1" | "beta-v1" | "test-beta-v1";
+type PlanKey = "org-v1" | "team-v1" | "test-team-v1" | "beta-v1" | "test-beta-v1" | "ent-v1";
 
 export interface Subscription {
   id: string;
@@ -81,7 +82,7 @@ export interface Subscription {
   paymentMethods: PaymentMethod[];
 }
 
-export type BillingSchedule = "annual" | "monthly";
+export type BillingSchedule = "annual" | "monthly" | "contract";
 
 export interface PlanPricing {
   billingSchedule: BillingSchedule | null;

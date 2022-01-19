@@ -115,7 +115,7 @@ function TeamNamePage({
         <TextInput
           value={inputValue}
           onChange={onChange}
-          textSize={"xl"}
+          textSize="2xl"
           center={true}
           ref={textInputRef}
         />
@@ -190,7 +190,7 @@ function TeamMemberInvitationPage({
               placeholder="Email address"
               value={inputValue}
               onChange={onChange}
-              textSize={"lg"}
+              textSize="base"
             />
             <OnboardingButton onClick={handleAddMember} disabled={isLoading}>
               {isLoading ? "Loading" : "Invite"}

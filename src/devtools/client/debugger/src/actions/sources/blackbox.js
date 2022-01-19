@@ -13,7 +13,7 @@ import { recordEvent } from "../../utils/telemetry";
 import { features } from "../../utils/prefs";
 import { getSourceActorsForSource } from "../../selectors";
 
-import { PROMISE } from "../utils/middleware/promise";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 async function blackboxActors(state, client, sourceId, isBlackBoxed, range) {
   for (const actor of getSourceActorsForSource(state, sourceId)) {

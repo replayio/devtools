@@ -7,6 +7,7 @@ import { RequestRow } from "./RequestRow";
 import { Row, TableInstance } from "react-table";
 
 const RequestTable = ({
+  className,
   currentTime,
   data,
   onRowSelect,
@@ -14,6 +15,7 @@ const RequestTable = ({
   selectedRequest,
   table,
 }: {
+  className?: string;
   currentTime: number;
   data: RequestSummary[];
   onRowSelect: (request: RequestSummary) => void;
@@ -31,15 +33,17 @@ const RequestTable = ({
   let inPast = true;
 
   return (
-    <div className="bg-white w-full overflow-y-auto">
-      <div className={classNames(styles.request)} {...getTableProps()}>
-        <div
-          className="sticky z-10 top-0"
-          style={{ background: "var(--theme-tab-toolbar-background)" }}
-        >
+    <div className={classNames("no-scrollbar bg-white min-w-full overflow-scroll", className)}>
+      {/* Relative here helps with when the timeline goes past the last request*/}
+      <div
+        style={{ minWidth: "fit-content" }}
+        className={classNames(styles.request, "relative")}
+        {...getTableProps()}
+      >
+        <div className="sticky z-10 top-0 bg-toolbarBackground border-b">
           <HeaderGroups columns={columns} headerGroups={headerGroups} />
         </div>
-        <div {...getTableBodyProps()}>
+        <div style={{ minWidth: "fit-content" }} {...getTableBodyProps()}>
           {rows.map((row: Row<RequestSummary>) => {
             let firstInFuture = false;
             if (inPast && row.original.point.time >= currentTime) {
@@ -62,12 +66,13 @@ const RequestTable = ({
               />
             );
           })}
+          <div
+            className={classNames({
+              [styles.current]: data.every(r => (r.point?.time || 0) < currentTime),
+              [styles.end]: data.every(r => (r.point?.time || 0) < currentTime),
+            })}
+          />
         </div>
-        <div
-          className={classNames(styles.row, {
-            [styles.current]: data.every(r => (r.point?.time || 0) <= currentTime),
-          })}
-        />
       </div>
     </div>
   );

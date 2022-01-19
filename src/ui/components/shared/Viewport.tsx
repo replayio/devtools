@@ -13,7 +13,7 @@ function FullViewportWrapper({
   return (
     <main
       className={classNames(
-        "w-full fixed h-full z-50 flex items-center justify-center",
+        "w-full fixed h-full z-50 flex items-center justify-center bg-chrome",
         classnames
       )}
     >
@@ -32,7 +32,7 @@ export function BubbleViewportWrapper({
   return (
     <FullViewportWrapper style={{ background: "#f3f3f4" }}>
       <BubbleBackground />
-      <div className="relative">{children}</div>
+      <div className="relative space-y-4">{children}</div>
       {footer}
     </FullViewportWrapper>
   );

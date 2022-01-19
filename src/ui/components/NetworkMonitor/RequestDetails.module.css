@@ -1,10 +1,7 @@
 .requestDetails {
-  background: white;
   display: flex;
   flex-direction: column;
-  overflow-x: auto;
   font-size: 12px;
-  height: 100%;
 }
 
 .requestDetails .request {
@@ -32,4 +29,5 @@ h2.title {
 .row {
   padding-left: 1rem;
   word-break: break-all;
+  cursor: default;
 }

@@ -80,7 +80,6 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  height: 100%;
 }
 
 .secondary-toolbox .toolbox-bottom-panels {
@@ -98,5 +97,5 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
 }
 
 .secondary-toolbox .splitter {
-  background: var(--chrome);
+  background-clip: padding-box;
 }

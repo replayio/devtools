@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { clearTrialExpired, createSession } from "ui/actions/session";
-import { useGetRecordingId } from "ui/hooks/recordings";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
 import NonDevView from "./Views/NonDevView";
@@ -13,7 +13,7 @@ import ReplayLogo from "./shared/ReplayLogo";
 import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
-import CommandPalette from "./CommandPalette";
+import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -51,6 +51,7 @@ function _DevTools({
   viewMode,
 }: _DevToolsProps) {
   const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
   const { userIsAuthor, loading } = useUserIsAuthor();
 
   useEffect(() => {
@@ -76,6 +77,12 @@ function _DevTools({
     }
   }, [uploadComplete, loadingFinished]);
 
+  useEffect(() => {
+    if (recording && document.title !== recording.title) {
+      document.title = recording.title;
+    }
+  }, [recording]);
+
   if (!loadingFinished) {
     return <LoadingScreen />;
   }
@@ -90,7 +97,7 @@ function _DevTools({
       ) : (
         <NonDevView />
       )}
-      {showCommandPalette ? <CommandPalette /> : null}
+      {showCommandPalette ? <CommandPaletteModal /> : null}
       <KeyboardShortcuts />
     </>
   );

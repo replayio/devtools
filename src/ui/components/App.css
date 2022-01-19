@@ -102,6 +102,10 @@
   width: 100%;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  width: 0px;
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/components-frame.css");

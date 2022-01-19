@@ -44,7 +44,6 @@
 }
 
 .toolbar-panel-button {
-  float: left;
   display: flex;
   cursor: default;
   color: var(--theme-toolbar-color);

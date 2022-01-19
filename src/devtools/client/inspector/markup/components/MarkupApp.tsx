@@ -39,8 +39,11 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
             />
           </div>
           <div id="inspector-searchlabel-container" hidden={true}>
-            <div className="devtools-separator"></div>
-            <span id="inspector-searchlabel"></span>
+            <div
+              className="devtools-separator"
+              style={{ height: "calc(var(--theme-toolbar-height) - 8px" }}
+            ></div>
+            <span id="inspector-searchlabel" className="whitespace-nowrap"></span>
           </div>
           <div className="devtools-separator" hidden={true}></div>
           <button

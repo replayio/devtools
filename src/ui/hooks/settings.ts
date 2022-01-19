@@ -72,7 +72,7 @@ export function useGetUserSettings() {
 
 export const useFeature = (prefKey: keyof typeof features) => {
   const fullKey = `devtools.features.${prefKey}`;
-  const [pref, setPref] = useState(Boolean(features[prefKey]));
+  const [pref, setPref] = useState(prefsService.getBoolPref(fullKey));
 
   useEffect(() => {
     const onUpdate = (prefs: any) => {
@@ -83,7 +83,12 @@ export const useFeature = (prefKey: keyof typeof features) => {
     return () => prefsService.removeObserver(fullKey, onUpdate);
   }, [fullKey]);
 
-  return pref;
+  return {
+    value: pref,
+    update: (newValue: boolean) => {
+      prefsService.setBoolPref(fullKey, newValue);
+    },
+  };
 };
 
 function convertUserSettings(data: any): UserSettings {
