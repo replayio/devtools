@@ -44,18 +44,18 @@ type Scope = {
   scopeKind: string;
   type: "block" | string;
 };
-type Scopes = {
+type FrameScope = {
   scope: Scope;
   pending: boolean;
   originalScopesUnavailable: boolean;
 };
 
-export function getBindingNames(scopes: Scopes): string[] {
-  if (!scopes?.scope) {
+export function getBindingNames(scope: FrameScope): string[] {
+  if (!scope?.scope) {
     return [];
   }
 
-  return scopes.scope.bindings.map(b => b.name);
+  return scope.scope.bindings.map(b => b.name);
 }
 
 export function getPropertiesForObject(object: ObjectFront): string[] {
@@ -82,7 +82,7 @@ export function getPropertiesForObject(object: ObjectFront): string[] {
   const prototype = preview?.prototypeValue;
 
   // Recursively gather the properties through the prototype chain.
-  if (prototype) {
+  if (prototype?._object) {
     const prototypeProperties = getPropertiesForObject(prototype._object);
     properties.unshift(...prototypeProperties);
   }
@@ -104,6 +104,46 @@ export function getGlobalVariables(scopes: Scope) {
 export function shouldVariableAutocomplete(input: string) {
   return !input.includes(".");
 }
-export function getBinding(name: string, scopes: Scopes) {
-  return scopes.scope.bindings.find(b => b.name === name);
+export function getBinding(name: string, frameScope: FrameScope) {
+  return frameScope.scope.bindings.find(b => b.name === name);
+}
+export function getLastExpression(input: string) {
+  const expressions = input.split(".");
+  return expressions[expressions.length - 1];
+}
+export function getParentExpression(input: string) {
+  const expressions = input.split(".");
+  return expressions.slice(0, expressions.length - 1).join(".");
+}
+
+export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
+  if (!frameScope?.scope) {
+    return [];
+  }
+
+  const bindingNames = getBindingNames(frameScope);
+
+  if (shouldVariableAutocomplete(input)) {
+    const variableNames = [...bindingNames, ...getGlobalVariables(frameScope.scope)];
+    return variableNames.filter(name => name.toLowerCase().includes(input.toLowerCase()));
+  } else {
+    const lastExpression = getLastExpression(input);
+    const parentExpression = getParentExpression(input);
+
+    const binding = getBinding(parentExpression, frameScope);
+
+    if (!binding) {
+      return [];
+    }
+
+    const object = binding.value._object;
+
+    if (!object) {
+      return [];
+    }
+
+    const properties = getPropertiesForObject(object);
+
+    return properties.filter(p => p.toLowerCase().includes(lastExpression.toLowerCase()));
+  }
 }

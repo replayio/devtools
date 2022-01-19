@@ -8,14 +8,17 @@ import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import actions from "devtools/client/webconsole/actions/index";
+import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 
 import { getRecordingId } from "ui/utils/environment";
 import { getRecording } from "ui/hooks/recordings";
 import { getCommandHistory } from "../../selectors/messages";
 import Autocomplete from "./Autocomplete";
 import clamp from "lodash/clamp";
+import { getAutocompleteMatches, getParentExpression } from "../../utils/autocomplete";
+import { b } from "react-dom-factories";
 
-async function createEditor({ execute, onArrowPress }) {
+async function createEditor({ onArrowPress, onEnter }) {
   await gToolbox.startPanel("debugger");
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
 
@@ -35,9 +38,9 @@ async function createEditor({ execute, onArrowPress }) {
     viewportMargin: Infinity,
     disableSearchAddon: true,
     extraKeys: {
-      Enter: execute,
-      "Cmd-Enter": execute,
-      "Ctrl-Enter": execute,
+      Enter: onEnter,
+      "Cmd-Enter": onEnter,
+      "Ctrl-Enter": onEnter,
       Esc: false,
       "Cmd-F": false,
       "Ctrl-F": false,
@@ -57,32 +60,37 @@ class JSTerm extends React.Component {
     };
   }
 
-  autocompleteShown = true;
-
   constructor(props) {
     super(props);
     window.jsterm = this;
     this.state = {
       canEval: true,
       historyIndex: 0,
+      autocompleteIndex: 0,
+      hideAutocomplete: false,
       value: "",
-      matchIndex: 0,
     };
   }
 
   async componentDidMount() {
     this.editorWaiter = createEditor({
-      execute: this.execute,
       onArrowPress: this.onArrowPress,
+      onEnter: this.onEnter,
     });
     this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
+
     this.editor.codeMirror.on("change", this.onChange);
+    this.editor.codeMirror.on("keydown", this.onKeyDown);
 
     const recordingId = getRecordingId();
     const recording = await getRecording(recordingId);
 
     this.setState({ canEval: recording.userRole !== "team-user" });
+  }
+
+  showAutocomplete() {
+    return !this.state.hideAutocomplete && this.getMatches().length;
   }
 
   focus() {
@@ -91,14 +99,13 @@ class JSTerm extends React.Component {
 
   onArrowPress = arrow => {
     if (arrow === "up") {
-      if (this.autocompleteShown) {
-        console.log(">> Navigate the selected autocomplete index up");
+      if (this.showAutocomplete()) {
         this.moveAutocompleteCursor(1);
       } else {
         this.moveHistoryCursor(1);
       }
     } else {
-      if (this.autocompleteShown) {
+      if (this.showAutocomplete()) {
         this.moveAutocompleteCursor(-1);
       } else {
         this.moveHistoryCursor(-1);
@@ -106,15 +113,32 @@ class JSTerm extends React.Component {
     }
   };
 
-  moveAutocompleteCursor(difference) {
-    const { matchIndex } = this.state;
-    if (difference > 0) {
-      this.setState({ matchIndex: Math.max(matchIndex - 1, 0) });
-      console.log(">> Navigate the selected autocomplete index up");
+  onEnter = () => {
+    console.log("onEnter", this.showAutocomplete());
+    if (!this.showAutocomplete()) {
+      this.execute();
     } else {
-      this.setState({ matchIndex: matchIndex + 1 });
-      console.log(">> Navigate the selected autocomplete index down");
+      this.selectAutocompleteMatch();
     }
+  };
+
+  selectAutocompleteMatch() {
+    const { autocompleteIndex } = this.state;
+    const { value } = this.state;
+
+    const match = this.getMatches()[autocompleteIndex];
+    const parentExpression = getParentExpression(value);
+    const newValue = [parentExpression, match].filter(Boolean).join(".");
+
+    this.setValue(newValue);
+  }
+
+  moveAutocompleteCursor(difference) {
+    const { autocompleteIndex } = this.state;
+    const matchesCount = this.getMatches().length;
+
+    const newIndex = (matchesCount + autocompleteIndex - difference) % matchesCount;
+    this.setState({ autocompleteIndex: newIndex });
   }
 
   moveHistoryCursor(difference) {
@@ -135,8 +159,6 @@ class JSTerm extends React.Component {
     if (!executeString) {
       return;
     }
-
-    console.log({ executeString });
 
     if (this.state.canEval) {
       this.props.evaluateExpression(executeString);
@@ -188,15 +210,33 @@ class JSTerm extends React.Component {
     return this.editor.getSelection();
   }
 
-  onChange = cm => {
-    const newValue = cm.getValue();
-    this.setState({ value: newValue });
+  onKeyDown = (_, event) => {
+    if (event.code === "Enter") {
+      this.setState({ hideAutocomplete: true, autocompleteIndex: 0 });
+    } else {
+      this.setState({ hideAutocomplete: false, autocompleteIndex: 0 });
+    }
   };
 
-  render() {
-    const { value, matchIndex } = this.state;
+  onChange = (cm, event) => {
+    const value = cm.getValue();
+    this.setState({ value });
+  };
 
-    console.log({ matchIndex });
+  getMatches() {
+    const { frameScope } = this.props;
+    const { value } = this.state;
+
+    if (!value) {
+      return [];
+    }
+
+    return getAutocompleteMatches(value, frameScope);
+  }
+
+  render() {
+    const { autocompleteIndex } = this.state;
+    const matches = this.getMatches();
 
     return (
       <div className="relative">
@@ -209,7 +249,9 @@ class JSTerm extends React.Component {
             this.node = node;
           }}
         />
-        {value || true ? <Autocomplete input={value} selectedIndex={matchIndex} /> : null}
+        {this.showAutocomplete() ? (
+          <Autocomplete matches={matches} selectedIndex={autocompleteIndex} />
+        ) : null}
       </div>
     );
   }
@@ -218,6 +260,7 @@ class JSTerm extends React.Component {
 function mapStateToProps(state) {
   return {
     commandHistory: getCommandHistory(state),
+    frameScope: getFrameScope(state, "0:0"),
   };
 }
 
