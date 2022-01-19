@@ -10,7 +10,7 @@ import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
-import { getRecordingURL } from "ui/hooks/recordings";
+import { getRecordingURL } from "ui/utils/recording";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);

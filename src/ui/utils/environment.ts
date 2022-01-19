@@ -1,6 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { usesWindow } from "ssr";
-import { extractIdAndSlug } from "./helpers";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
@@ -89,19 +88,6 @@ export function isDeployPreview() {
 // such as sourcemaps to load
 export function hasLoadingParam() {
   return url.searchParams.get("loading") != null;
-}
-
-export function getRecordingId() {
-  return usesWindow(win => {
-    if (!win) return undefined;
-
-    const parts = window.location.pathname.split("/");
-    if (parts[0] === "recording") {
-      return extractIdAndSlug(parts.slice(1)).id;
-    }
-
-    return undefined;
-  });
 }
 
 export function getPausePointParams() {

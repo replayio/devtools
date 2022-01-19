@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { trackEvent } from "ui/utils/telemetry";
-import { getRecordingURL } from "ui/hooks/recordings";
+import { getRecordingURL } from "ui/utils/recording";
 import { Recording } from "ui/types";
 
 export function CopyButton({ recording }: { recording: Recording }) {

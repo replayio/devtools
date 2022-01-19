@@ -10,13 +10,14 @@ import { ThreadFront } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
 import { validateUUID } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
-import { getTest, isDevelopment, getRecordingId, isTest, isMock } from "ui/utils/environment";
+import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 
 import { ExpectedError, UnexpectedError } from "ui/state/app";
 import { getRecording } from "ui/hooks/recordings";
+import { getRecordingId } from "ui/utils/recording";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { jumpToInitialPausePoint } from "./timeline";
 import { Recording } from "ui/types";

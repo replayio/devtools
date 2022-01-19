@@ -1,11 +1,11 @@
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
 import { LayoutAction } from "ui/actions/layout";
-import { getRecordingId } from "ui/utils/environment";
 import { asyncStore } from "../utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { Recording } from "ui/types";
 import { getRecording } from "ui/hooks/recordings";
+import { getRecordingId } from "ui/utils/recording";
 
 const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
