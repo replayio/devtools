@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useMemo, useRef, useEffect } from "react";
+import React, { FC, ReactNode, useMemo, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { UIState } from "ui/state";
@@ -27,7 +27,7 @@ const availableTabs: readonly InspectorActiveTab[] = [
   "computedview",
   "layoutview",
   "eventlistenersview",
-];
+] as const;
 
 const InspectorApp: FC<PropsFromRedux> = ({ initializedPanels, activeTab, setActiveTab }) => {
   const sidebarContainerRef = useRef<HTMLDivElement>(null);
