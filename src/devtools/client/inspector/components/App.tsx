@@ -1,4 +1,4 @@
-import React, { Component, ReactElement, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { UIState } from "ui/state";
@@ -25,13 +25,8 @@ const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
 class InspectorApp extends Component<PropsFromRedux> {
   private sidebarContainerRef = React.createRef<HTMLDivElement>();
   private splitBoxRef = React.createRef<SplitBox>();
-  private sidebarSplitboxRef = React.createRef<SplitBox>();
 
   private onSplitboxResize = (width: number) => {
-    prefs.splitSidebarSize = width;
-  };
-
-  private onSidebarSplitboxResize = (width: number) => {
     prefs.splitSidebarSize = width;
   };
 
@@ -72,6 +67,7 @@ class InspectorApp extends Component<PropsFromRedux> {
 
         case "eventlistenersview": {
           activePanel = <EventListenersApp />;
+          break;
         }
       }
     }
