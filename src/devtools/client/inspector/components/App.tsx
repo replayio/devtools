@@ -38,13 +38,6 @@ const InspectorApp: FC<PropsFromRedux> = ({ initializedPanels, activeTab, setAct
   };
 
   const inspector = gToolbox.getPanel("inspector");
-
-  console.log("Inspector render");
-
-  useEffect(() => {
-    console.log("inspector change");
-  }, [inspector]);
-
   const inspectorInited = inspector && initializedPanels.includes("inspector");
 
   const markupView: JSX.Element | undefined = useMemo(() => {
