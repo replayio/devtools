@@ -1,4 +1,7 @@
 Test.describe(`Test showing both longhand and shorthand properties in rules.`, async () => {
+  await Test.selectConsole();
+  await Test.warpToMessage("ExampleFinished");
+
   await Test.selectInspector();
 
   let node = await Test.findMarkupNode('<div id="first" class="parent">');

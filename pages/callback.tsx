@@ -23,7 +23,7 @@ export default function Connection() {
         redirectUri: home,
       })
     );
-  }, []);
+  }, [auth0, connection, router]);
 
   return <LoadingScreen />;
 }

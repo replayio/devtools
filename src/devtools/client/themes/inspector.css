@@ -80,7 +80,7 @@ window {
 }
 
 #inspector-searchlabel {
-  padding: 0 3px;
+  padding: 0 5px;
 }
 
 /* Add element toolbar button */
@@ -203,4 +203,24 @@ iframe {
 .inspector-tabpanel.extension-sidebar {
   height: 100%;
   overflow-y: auto;
+}
+
+#inspector-breadcrumbs-toolbar {
+  height: calc(var(--theme-toolbar-height) + 1px);
+}
+
+#inspector-search,
+#ruleview-search,
+#computed-search {
+  flex-grow: 1;
+}
+
+#inspector-searchbox,
+#ruleview-searchbox,
+#computed-searchbox {
+  width: 100%;
+}
+
+#inspector-searchlabel {
+  white-space: nowrap;
 }

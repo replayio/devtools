@@ -1,38 +1,120 @@
+import clamp from "lodash/clamp";
 import React, { ChangeEvent, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { TextInput } from "../shared/Forms";
-import Modal from "../shared/NewModal";
+import hooks from "ui/hooks";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
+import { UserSettings } from "ui/types";
 import CommandButton from "./CommandButton";
+import SearchInput from "./SearchInput";
 const { filter } = require("fuzzaldrin-plus");
 
-export type Command = { key: CommandKey; label: string; shortcut?: string };
+export type Command = {
+  key: CommandKey;
+  label: string;
+  shortcut?: string;
+  settingKey?: keyof UserSettings;
+};
 export type CommandKey =
-  | "open_viewer"
+  | "open_console"
   | "open_devtools"
+  | "open_elements"
+  | "open_network_monitor"
+  | "open_viewer"
+  | "open_file_search"
+  | "open_function_search"
   | "open_full_text_search"
-  | "open_sources"
   | "open_outline"
   | "open_print_statements"
-  | "open_console"
+  | "open_react_devtools"
+  | "open_sources"
+  | "show_comments"
+  | "show_console_filters"
+  | "show_events"
   | "show_privacy"
+  | "show_replay_info"
   | "show_sharing";
 
 const COMMANDS: Command[] = [
-  { key: "open_viewer", label: "Open Viewer" },
+  { key: "open_console", label: "Open Console" },
   { key: "open_devtools", label: "Open DevTools" },
-  { key: "open_full_text_search", label: "Open Full Text Search", shortcut: "CmdOrCtrl+Shift+F" },
-  { key: "open_sources", label: "Open Sources" },
+  { key: "open_elements", label: "Open Elements", settingKey: "showElements" },
+  {
+    key: "open_network_monitor",
+    label: "Open Network Monitor",
+    settingKey: "enableNetworkMonitor",
+  },
+  { key: "open_viewer", label: "Open Viewer" },
+  { key: "open_file_search", label: "Search for file", shortcut: "CmdOrCtrl+P" },
+  { key: "open_full_text_search", label: "Search full text", shortcut: "CmdOrCtrl+Shift+F" },
+  { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+P" },
   { key: "open_outline", label: "Open Outline" },
   { key: "open_print_statements", label: "Open Print Statements" },
-  { key: "open_console", label: "Open Console" },
-  { key: "show_privacy", label: "Show Privacy Information" },
+  { key: "open_react_devtools", label: "Open React DevTools", settingKey: "showReact" },
+  { key: "open_sources", label: "Open Sources" },
+  { key: "show_comments", label: "Show Comments" },
+  { key: "show_console_filters", label: "Show Console Filters" },
+  { key: "show_events", label: "Show Events" },
+  { key: "show_privacy", label: "Show Privacy" },
+  { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
 ];
 
-function CommandPalette({ hideCommandPalette, executeCommand }: PropsFromRedux) {
+const DEFAULT_COMMANDS: CommandKey[] = [
+  "open_file_search",
+  "open_function_search",
+  "open_full_text_search",
+  "open_sources",
+];
+
+function getShownCommands(searchString: string, hasReactComponents: boolean) {
+  const { userSettings } = hooks.useGetUserSettings();
+
+  const commands: Command[] = searchString
+    ? filter(COMMANDS, searchString, { key: "label" })
+    : COMMANDS;
+
+  const enabledCommands = commands.filter(command => {
+    if (command.settingKey) {
+      const isEnabled = userSettings[command.settingKey];
+
+      if (command.key === "open_react_devtools") {
+        return isEnabled && hasReactComponents;
+      }
+
+      return isEnabled;
+    }
+
+    return true;
+  });
+
+  // This puts the default commands at the top of the list.
+  const sortedCommands = [...enabledCommands].sort(
+    (a, b) => DEFAULT_COMMANDS.indexOf(b.key) - DEFAULT_COMMANDS.indexOf(a.key)
+  );
+
+  return sortedCommands;
+}
+
+function PaletteShortcut() {
+  return (
+    <div className="absolute right-4 text-primaryAccent select-none">
+      <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
+      <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
+    </div>
+  );
+}
+
+function CommandPalette({
+  autoFocus = false,
+  hideCommandPalette,
+  executeCommand,
+  hasReactComponents,
+}: { autoFocus?: boolean } & PropsFromRedux) {
   const [searchString, setSearchString] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const shownCommands = getShownCommands(searchString, hasReactComponents);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
@@ -46,45 +128,48 @@ function CommandPalette({ hideCommandPalette, executeCommand }: PropsFromRedux) 
       const direction = e.key === "ArrowUp" ? -1 : 1;
       const index = activeIndex + direction;
       const resultCount = shownCommands.length;
-      const nextIndex = (index + resultCount) % resultCount || 0;
+      const nextIndex = clamp(index, 0, resultCount - 1);
       setActiveIndex(nextIndex);
     } else if (e.key === "Enter") {
       e.preventDefault();
+      setSearchString("");
       executeCommand(shownCommands[activeIndex].key);
     }
   };
 
-  const shownCommands = searchString ? filter(COMMANDS, searchString, { key: "label" }) : COMMANDS;
-
   return (
-    <Modal
-      blurMask={false}
-      options={{ maskTransparency: "translucent" }}
-      onMaskClick={() => hideCommandPalette()}
+    <div
+      className="h-52 w-full flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+      style={{ maxWidth: "400px", minWidth: "320px" }}
     >
-      <div className="w-96 h-64 flex flex-col overflow-hidden rounded-md bg-gray-100 shadow-xl ">
-        <div className="p-2 border-b border-gray-300">
-          <TextInput
+      <div className="p-3 border-b border-gray-300">
+        <div className="relative flex items-center text-primaryAccent">
+          <SearchInput
             value={searchString}
             onChange={onChange}
             onKeyDown={onKeyDown}
-            autoFocus
-            placeholder="What would you like to do?"
+            autoFocus={autoFocus}
           />
-        </div>
-        <div className="flex-grow text-sm flex flex-col overflow-auto">
-          {shownCommands.map((command: Command, index: number) => (
-            <CommandButton active={index == activeIndex} command={command} key={command.label} />
-          ))}
+          <PaletteShortcut />
         </div>
       </div>
-    </Modal>
+      <div className="flex-grow text-sm flex flex-col overflow-auto mb-2">
+        {shownCommands.map((command: Command, index: number) => (
+          <CommandButton active={index == activeIndex} command={command} key={command.label} />
+        ))}
+      </div>
+    </div>
   );
 }
 
-const connector = connect(null, {
-  hideCommandPalette: actions.hideCommandPalette,
-  executeCommand: actions.executeCommand,
-});
+const connector = connect(
+  (state: UIState) => ({
+    hasReactComponents: selectors.hasReactComponents(state),
+  }),
+  {
+    hideCommandPalette: actions.hideCommandPalette,
+    executeCommand: actions.executeCommand,
+  }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommandPalette);

@@ -46,7 +46,7 @@ function PanelButtons({
   };
 
   return (
-    <div className="flex flex-row items-center overflow-hidden text-sm">
+    <div className="flex flex-row items-center overflow-hidden theme-tab-font-size">
       {showElements && !isNode && <NodePicker />}
       <button
         className={classnames("console-panel-button", {
@@ -155,7 +155,7 @@ function SecondaryToolbox({
           <ToolboxOptions />
         </header>
       )}
-      <Redacted className="secondary-toolbox-content text-xs">
+      <Redacted className="secondary-toolbox-content bg-white text-xs">
         {selectedPanel === "network" && <NetworkMonitor />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}

@@ -12,6 +12,8 @@ const {
   TIMESTAMPS_TOGGLE,
   FILTERBAR_DISPLAY_MODE_SET,
   SET_ZOOMED_REGION,
+  TOGGLE_FILTER_DRAWER,
+  SET_FILTER_DRAWER,
 } = require("devtools/client/webconsole/constants");
 
 function persistToggle() {
@@ -50,9 +52,19 @@ function setZoomedRegion(zoomStartTime, zoomEndTime, scale) {
   };
 }
 
+function toggleFilterDrawer() {
+  return { type: TOGGLE_FILTER_DRAWER };
+}
+
+function setFilterDrawer(collapsed) {
+  return { type: SET_FILTER_DRAWER, collapsed };
+}
+
 module.exports = {
   filterBarDisplayModeSet,
   persistToggle,
   timestampsToggle,
+  toggleFilterDrawer,
+  setFilterDrawer,
   setZoomedRegion,
 };

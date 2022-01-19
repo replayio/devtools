@@ -5,36 +5,17 @@
 //
 import classnames from "classnames";
 import React from "react";
-
 import AccessibleImage from "../AccessibleImage";
 
-export function debugBtn(onClick, type, className, tooltip, disabled = false, ariaPressed = false) {
-  return (
-    <CommandBarButton
-      className={classnames(type, className)}
-      disabled={disabled}
-      key={type}
-      onClick={onClick}
-      pressed={ariaPressed}
-      title={tooltip}
-    >
-      <AccessibleImage className={type} />
-    </CommandBarButton>
-  );
-}
-
-const CommandBarButton = props => {
-  const { children, className, pressed = false, ...rest } = props;
-
+export default function CommandBarButton({ disabled, disabledTooltip, onClick, tooltip, type }) {
   return (
     <button
-      aria-pressed={pressed}
-      className={classnames("command-bar-button", className)}
-      {...rest}
+      className={classnames("command-bar-button")}
+      title={disabled ? disabledTooltip : tooltip}
+      onClick={onClick}
+      disabled={disabled}
     >
-      {children}
+      <AccessibleImage className={type} />
     </button>
   );
-};
-
-export default CommandBarButton;
+}

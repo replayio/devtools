@@ -15,9 +15,14 @@ const getAppUrl = (path: string) =>
 
 async function fulfillAuthRequest(id: string, token: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;
+  const secret = process.env.FRONTEND_API_SECRET;
 
   if (!api) {
     throw new Error("API Server is not configured");
+  }
+
+  if (!secret) {
+    throw new Error("Secret is not configured");
   }
 
   const resp = await fetch(api, {
@@ -34,7 +39,7 @@ async function fulfillAuthRequest(id: string, token: string) {
         }
       `,
       variables: {
-        secret: process.env.FRONTEND_API_SECRET,
+        secret,
         id,
         token,
       },

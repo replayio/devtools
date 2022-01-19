@@ -91,16 +91,15 @@ function getRecordingNotAccessibleError(
   if (isAuthenticated) {
     trackEvent("error.unauthorized_viewer");
     return {
-      message: "You don't have permission to view this replay",
-      content:
-        "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+      message: "Sorry, you don't have permission!",
+      content: "Maybe you haven't been invited to this replay yet?",
       action: "library",
     };
   }
 
   trackEvent("error.unauthenticated_viewer");
   return {
-    message: "Almost there",
+    message: "Almost there!",
     content: "This is a private replay. Please sign in.",
     action: "sign-in",
   };

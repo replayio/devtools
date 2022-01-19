@@ -89,12 +89,18 @@ function PanelSummary({
 
   if (isHot) {
     return (
-      <div className="summary flex items-center">
+      <div className="summary flex items-center text-red-700 bg-red-100">
         <Popup
           trigger={
             <div className="flex items-center overflow-hidden space-x-2">
-              <MaterialIcon className="text-xl pl-2">warning</MaterialIcon>
-              <span className="warning-content overflow-hidden overflow-ellipsis whitespace-pre">{`This breakpoint was hit ${analysisPoints.length} times`}</span>
+              <MaterialIcon className="text-xl pl-2">error</MaterialIcon>
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre hover:underline">
+                <a
+                  href="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#1e6ed519f3f849458a7aa88b7be497b6"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >{`Disabled because it was hit ${prefs.maxHitsDisplayed}+ times`}</a>
+              </span>
             </div>
           }
         >
@@ -109,7 +115,7 @@ function PanelSummary({
   }
 
   return (
-    <div className={classNames("summary flex items-center", { enabled: isLoaded })}>
+    <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
       <div className="statements-container flex flex-col flex-grow">
         {conditionValue && (
           <Condition

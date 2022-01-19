@@ -3,13 +3,17 @@ description: "Run mock tests"
 runs:
   using: "composite"
   steps:
-    - name: Copy .env file
-      run: cp .env.sample .env
+    - name: Install dependencies
+      run: npm install
+      working-directory: test
       shell: bash
-    - name: Start Next.js development server
-      run: ./node_modules/.bin/next dev -p 8080 &
+    - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
-    - run: node ${{ github.action_path }}/main.js
+    - run: tar xf ./macOS-replay-playwright.tar.xz
+      shell: bash
+    - run: chmod +x ./firefox/Nightly.app/Contents/MacOS/firefox
+      shell: bash
+    - run: node ${{ github.action_path }}/../../../test/mock/run.js
       shell: bash
       env:
         DEBUG: "pw:api"

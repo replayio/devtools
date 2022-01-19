@@ -44,7 +44,7 @@ export default function Login() {
           )}
         </div>
         <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
-          {isTeamMemberInvite() ? "Sign in with Google" : "Login"}
+          {isTeamMemberInvite() ? "Sign in with Google" : "Log in"}
         </PrimaryLgButton>
       </OnboardingContentWrapper>
     </OnboardingModalContainer>

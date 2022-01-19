@@ -13,7 +13,6 @@ import timeline from "ui/reducers/timeline";
 import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import reactDevTools from "ui/reducers/reactDevTools";
-import layout from "ui/reducers/layout";
 import { selectors } from "ui/reducers";
 import { actions, UIStore } from "ui/actions";
 const { setupApp, setupTimeline, setupReactDevTools, createSession } = actions;
@@ -67,7 +66,7 @@ declare global {
 
 const bootstrap = (store: UIStore) => {};
 
-export default async (store: Store) => {
+export default async function DevTools(store: Store) {
   if (window.hasAlreadyBootstrapped) {
     return;
   } else {
@@ -158,7 +157,7 @@ export default async (store: Store) => {
   updateEnableRepaint(settings.enableRepaint);
 
   setupDemo();
-};
+}
 
 function bindSelectors(obj: any) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {

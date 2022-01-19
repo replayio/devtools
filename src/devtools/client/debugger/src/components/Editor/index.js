@@ -32,6 +32,7 @@ import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
 import { EditorNag } from "ui/components/shared/Nags/Nags";
+import WelcomeBox from "../WelcomeBox";
 
 import {
   showSourceText,
@@ -462,6 +463,7 @@ class Editor extends PureComponent {
 
   render() {
     const { selectedSource } = this.props;
+
     return (
       <div
         className={classnames("editor-wrapper", {

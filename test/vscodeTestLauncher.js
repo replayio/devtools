@@ -39,11 +39,12 @@ function loadTests() {
   const onlyTarget = process.env.TEST_ONLY_TARGET;
   const e2eTests = e2eManifest
     .filter(({ targets }) => !onlyTarget || targets.includes(onlyTarget))
-    .map(({ script }) => ({
+    .map(({ script, pending }) => ({
       type: "test",
       id: e2eTestPrefix + script,
       label: script,
       debuggable: false,
+      skipped: !!pending,
     }));
 
   const mockManifest = require("./mock/manifest");
@@ -76,33 +77,38 @@ function loadTests() {
 }
 
 function runE2ETests(tests) {
+  const args = [].concat(...tests.map(test => ["--pattern", test]));
+  const onlyTarget = process.env.TEST_ONLY_TARGET;
+  if (onlyTarget) {
+    args.push("--target", onlyTarget);
+  }
   return runTests(
     path.join(__dirname, "run.js"),
-    [].concat(...tests.map(test => ["--pattern", test])),
+    args,
     e2eTestPrefix,
-    /Starting test (.*) target/,
-    /TestPassed/
+    /Recording Test: ([^ ]*) /,
+    /Finished test:([^ ]*) success:([^ ]*)/
   );
 }
 
 function runMockTests(tests) {
   return runTests(
     path.join(__dirname, "mock/run.js"),
-    [].concat(...tests.map(test => ["--script", test])),
+    [].concat(...tests.map(test => ["--pattern", test])),
     mockTestPrefix,
     /Starting test (.*)/,
     /Test succeeded/
   );
 }
 
-function runTests(runScript, runArgs, testPrefix, startRegex, successRegex) {
+function runTests(runScript, runArgs, testPrefix, startRegex, finishRegex) {
   return new Promise(resolve => {
     let currentTest = "";
 
     const childProc = fork(runScript, runArgs, { stdio: "pipe" });
 
     const processOutput = output => {
-      const match = startRegex.exec(output);
+      let match = startRegex.exec(output);
       if (match) {
         if (currentTest) {
           process.send({ type: "test", test: currentTest, state: "failed" });
@@ -110,8 +116,10 @@ function runTests(runScript, runArgs, testPrefix, startRegex, successRegex) {
         currentTest = testPrefix + match[1];
         process.send({ type: "test", test: currentTest, state: "running" });
       }
-      if (successRegex.test(output) && currentTest) {
-        process.send({ type: "test", test: currentTest, state: "passed" });
+      match = finishRegex.exec(output);
+      if (match && currentTest) {
+        const success = match[2] !== "false";
+        process.send({ type: "test", test: currentTest, state: success ? "passed" : "failed" });
         currentTest = "";
       }
     };

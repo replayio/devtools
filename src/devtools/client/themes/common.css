@@ -36,6 +36,18 @@
   font-family: Inter, sans-serif;
 }
 
+.theme-body-font-size {
+  font-size: var(--theme-body-font-size);
+}
+
+.theme-code-font-size {
+  font-size: var(--theme-code-font-size);
+}
+
+.theme-tab-font-size {
+  font-size: var(--theme-tab-font-size);
+}
+
 /**
   * Customize the dark theme's scrollbar colors to avoid excessive contrast.
   */
@@ -85,7 +97,7 @@ html|input {
 }
 
 /* Devtools rely on the old Gecko/HTML4 button hit testing */
-html|button > * {
+button > * {
   pointer-events: none;
 }
 
@@ -486,19 +498,29 @@ checkbox:-moz-focusring {
   right: 0;
 }
 
-.devtools-clear-icon {
-  cursor: pointer;
-  padding-left: 5px;
+/* Images */
+
+.editor-bg {
+  transform: scale(2.4);
+  position: relative;
+  max-width: none;
+  left: -340px;
+  top: 400px;
 }
 
-.devtools-clear-icon[disabled] {
-  cursor: auto;
+.top-bubble {
+  left: 100px;
+  position: absolute;
+  width: 75vw;
 }
 
-.devtools-clear-icon[disabled]:hover {
-  cursor: auto;
-  background-color: transparent;
+.bottom-bubble {
+  right: 100px;
+  bottom: -70px;
+  position: absolute;
+  width: 45vw;
 }
+
 /* Text input */
 
 .devtools-textinput,
@@ -536,37 +558,11 @@ checkbox:-moz-focusring {
   font-style: normal;
 }
 
-/* Searchbox with extra button(s) (MDN help or clear button) */
-.devtools-searchbox {
-  display: inline-flex;
-  flex-grow: 1;
-  position: relative;
-  border: 1px solid transparent;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.devtools-searchbox > .devtools-searchinput,
-.devtools-searchbox > .devtools-filterinput {
-  /* Let .devtools-searchbox handle the background and border */
-  background-color: transparent;
-  border: none;
-  flex-grow: 1;
-  min-width: 0;
-  width: 100%;
-}
-
-.devtools-searchbox:focus-within,
 .devtools-textinput:focus,
 .devtools-searchinput:focus,
 .devtools-filterinput:focus {
   border-color: var(--blue-50);
   outline: none;
-}
-
-.devtools-searchbox-no-match {
-  background-color: var(--searchbox-no-match-background-color);
-  border-color: var(--searchbox-no-match-stroke-color);
 }
 
 /* Clear icon within the searchbox */
@@ -584,41 +580,8 @@ checkbox:-moz-focusring {
   fill-opacity: 0.8;
 }
 
-.devtools-searchbox-no-match > .devtools-searchinput-clear {
-  fill: var(--searchbox-no-match-stroke-color);
-}
-
 .devtools-searchinput-clear:hover {
   fill-opacity: 1;
-}
-
-/* MDN link within the searchbox */
-.devtools-searchbox .learn-more-link::before {
-  opacity: 0.6;
-}
-
-.devtools-searchbox:not(:hover) .learn-more-link {
-  visibility: hidden;
-}
-
-.devtools-searchbox .devtools-searchinput-summary {
-  flex-basis: auto;
-  flex-grow: 0;
-  flex-shrink: 0;
-  color: var(--theme-comment);
-  align-self: center;
-}
-
-/* Autocomplete popup within the searchbox */
-.devtools-searchbox .devtools-autocomplete-popup {
-  position: absolute;
-  left: 0;
-  top: 100%;
-  width: 100%;
-  line-height: initial !important;
-  /* See bug - 1414609. z-index is greater than 1000 so that searchbox's z-index
-   is more than z-index of requests-list-headers-wrapper in netmonitor */
-  z-index: 1001;
 }
 
 /* Twisty and checkbox controls */

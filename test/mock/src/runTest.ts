@@ -6,6 +6,7 @@ dotenv.config();
 type BrowserName = "chromium" | "firefox";
 let browserName: BrowserName = process.env.PLAYWRIGHT_CHROMIUM ? "chromium" : "firefox";
 const launchOptions = {
+  executablePath: process.env.RECORD_REPLAY_PATH,
   headless: !!process.env.PLAYWRIGHT_HEADLESS,
 };
 
@@ -110,7 +111,7 @@ export const runTest = wrapped(async cbk => {
 });
 
 export function devtoolsURL({ id }: { id: string }) {
-  let url = "http://localhost:8080/";
+  let url = (process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080") + "/";
   if (id) {
     url += `recording/${id}/`;
   }

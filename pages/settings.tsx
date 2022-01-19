@@ -7,7 +7,7 @@ export default function SettingsRedirectPage() {
   useEffect(() => {
     // This is the existing route that should be deprecated
     replace("/profile/settings");
-  }, []);
+  }, [replace]);
 
   return null;
 }

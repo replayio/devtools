@@ -24,13 +24,13 @@ function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
 
       replace("/");
     }
-  }, [isAuthenticated, workspaceId]);
+  }, [isAuthenticated, workspaceId, replace, setWorkspaceId, updateDefaultWorkspace]);
 
   useEffect(() => {
     if (isAuthenticated && workspaceId && modal === "settings") {
       setModal("workspace-settings", view ? { view } : null);
     }
-  }, [isAuthenticated, workspaceId, modal, view]);
+  }, [isAuthenticated, workspaceId, modal, view, setModal]);
 
   return <Account />;
 }

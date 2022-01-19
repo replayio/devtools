@@ -88,6 +88,10 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
     const { node } = this.props;
     const children = node.children || [];
 
+    if (node.isLoadingChildren) {
+      return <span>Loading...</span>;
+    }
+
     if (!children.length || node.isInlineTextChild) {
       return null;
     }

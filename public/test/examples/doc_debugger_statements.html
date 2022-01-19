@@ -10,7 +10,7 @@ function foo() {
   setTimeout(recordingFinished, 0);
 }
 function recordingFinished() {
-  dump(`RecReplaySendAsyncMessage Example__Finished`);
+  console.log("ExampleFinished");
 }
 setTimeout(foo, 0);
 </script>

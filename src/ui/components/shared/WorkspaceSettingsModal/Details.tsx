@@ -81,7 +81,8 @@ function SubscriptionDetails({
         <span>Number of seats</span>
         <span>{subscription.seatCount}</span>
       </div>
-      {isSubscriptionCancelled(subscription) ? null : (
+      {isSubscriptionCancelled(subscription) ||
+      subscription.billingSchedule === "contract" ? null : (
         <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">

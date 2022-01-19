@@ -48,7 +48,6 @@
 
 .breakpoint-panel .summary {
   border-bottom: 1px solid var(--theme-splitter-color);
-  color: var(--grey-50);
   display: flex;
   justify-content: space-between;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { RequestSummary } from "./utils";
+import { findHeader, RequestSummary } from "./utils";
 import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
 import sortBy from "lodash/sortBy";
@@ -8,25 +8,51 @@ import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 import { WiredFrame } from "protocol/thread/pause";
+import { RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
+import ResponseBody from "./ResponseBody";
+import { useFeature } from "ui/hooks/settings";
+import RequestBody from "./RequestBody";
 
 interface Detail {
   name: string;
-  value: string;
+  value: string | React.ReactChild;
+}
+
+function FormattedUrl({ url }: { url: string }) {
+  const parsedUrl = new URL(url);
+  const params = [...parsedUrl.searchParams.entries()];
+  return (
+    <span className="text-gray-600">
+      <span className="">{parsedUrl.origin}</span>
+      <span className="">{parsedUrl.pathname}</span>
+      {params.length > 0 ? (
+        <>
+          {params.map(([key, value], index) => (
+            <span key={key}>
+              <span className="">{index == 0 ? "?" : "&"}</span>
+              <span className="text-primaryAccent">{key}</span>
+              <span>={value}</span>
+            </span>
+          ))}
+        </>
+      ) : null}
+    </span>
+  );
 }
 
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
   return (
     <div className={classNames(className, "flex flex-col")}>
-      {details.map(h => (
-        <div className={classNames(styles.row)} key={h.name}>
-          <span className="font-bold text-gray-500">{h.name}:</span> {h.value}
+      {details.map((h, i) => (
+        <div className={classNames(styles.row, "hover:bg-gray-100 py-1")} key={`${h.name}-${i}`}>
+          <span className="font-bold ">{h.name}:</span> {h.value}
         </div>
       ))}
     </div>
   );
 };
 
-const TriangleToggle = ({ open }: { open: boolean }) => (
+export const TriangleToggle = ({ open }: { open: boolean }) => (
   <span
     className={classNames("p-3 select-none img arrow", { expanded: open })}
     style={{ marginInlineEnd: "4px" }}
@@ -43,10 +69,6 @@ const parseCookie = (str: string): Record<string, string> => {
     }, {});
 };
 
-const cookieHeader = (request: RequestSummary): string | undefined => {
-  return request.requestHeaders.find(r => r.name.toLowerCase() === "cookie")?.value;
-};
-
 const Cookies = ({ request }: { request: RequestSummary }) => {
   return (
     <div>
@@ -55,11 +77,11 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
       </h2>
       <DetailTable
         className={styles.request}
-        details={Object.entries(parseCookie(cookieHeader(request) || "")).map(
-          (value: [string, string]) => {
-            return { name: value[0], value: value[1] };
-          }
-        )}
+        details={Object.entries(
+          parseCookie(findHeader(request?.requestHeaders, "cookie") || "")
+        ).map((value: [string, string]) => {
+          return { name: value[0], value: value[1] };
+        })}
       />
     </div>
   );
@@ -111,7 +133,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <DetailTable
           className={styles.request}
           details={[
-            { name: "URL", value: request.url },
+            { name: "URL", value: <FormattedUrl url={request.url} /> },
             { name: "Request Method", value: request.method },
             { name: "Status Code", value: String(request.status) },
             { name: "Type", value: request.documentType },
@@ -130,35 +152,39 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       {requestHeadersExpanded && (
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
-      <h2
-        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
-        onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
-      >
-        <TriangleToggle open={responseHeadersExpanded} />
-        Response Headers
-      </h2>
-      {responseHeadersExpanded && (
-        <DetailTable className={styles.headerTable} details={responseHeaders} />
-      )}
-      {request.queryParams.length > 0 && (
-        <div>
+      {request.responseHeaders.length > 0 && (
+        <>
           <h2
             className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
-            onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
+            onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
           >
-            <TriangleToggle open={queryParametersExpanded} />
-            Query Parameters
+            <TriangleToggle open={responseHeadersExpanded} />
+            Response Headers
           </h2>
-          {queryParametersExpanded && (
-            <DetailTable
-              className={classNames("py-1", styles.request)}
-              details={request.queryParams.map(x => ({
-                name: x[0],
-                value: x[1],
-              }))}
-            />
+          {responseHeadersExpanded && (
+            <DetailTable className={styles.headerTable} details={responseHeaders} />
           )}
-        </div>
+          {request.queryParams.length && (
+            <div>
+              <h2
+                className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
+                onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
+              >
+                <TriangleToggle open={queryParametersExpanded} />
+                Query Parameters
+              </h2>
+              {queryParametersExpanded && (
+                <DetailTable
+                  className={classNames("py-1", styles.request)}
+                  details={request.queryParams.map(x => ({
+                    name: x[0],
+                    value: x[1],
+                  }))}
+                />
+              )}
+            </div>
+          )}
+        </>
       )}
     </>
   );
@@ -171,21 +197,31 @@ const RequestDetails = ({
   cx,
   frames,
   request,
+  requestBody,
+  responseBody,
   selectFrame,
 }: {
   closePanel: () => void;
   cx: any;
   frames: WiredFrame[];
   request: RequestSummary;
+  responseBody: ResponseBodyData[] | undefined;
+  requestBody: RequestBodyData[] | undefined;
   selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
+  const { value: httpBodies } = useFeature("httpBodies");
+
   const tabs = [
     { id: "headers", title: "Headers", visible: true },
-    { id: "cookies", title: "Cookies", visible: Boolean(cookieHeader(request)) },
-    { id: "response", title: "Response", visible: true },
-    { id: "request", title: "Request", visible: true },
+    {
+      id: "cookies",
+      title: "Cookies",
+      visible: Boolean(findHeader(request.requestHeaders, "cookie")),
+    },
+    { id: "request", title: "Request", visible: request.hasRequestBody && httpBodies },
+    { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
     { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
     { id: "timings", title: "Timings", visible: true },
   ];
@@ -198,22 +234,25 @@ const RequestDetails = ({
     }
   }, [activeTab, activeTabs]);
 
-  if (!request) {
-    return null;
-  }
-
   return (
-    <div className="h-full w-full overflow-hidden">
-      <div className={classNames("", styles.requestDetails)}>
-        <div className="flex justify-between bg-toolbarBackground items-center">
-          <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-          <CloseButton buttonClass="" handleClick={closePanel} tooltip={"Close tab"} />
-        </div>
-        <div className="overflow-auto">
+    <div className="bg-white border-l min-w-full overflow-scroll">
+      <div
+        className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0"
+        style={{ height: 25 }}
+      >
+        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
+      </div>
+      <div className={classNames("requestDetails", styles.requestDetails)}>
+        <div>
           {activeTab == "headers" && <HeadersPanel request={request} />}
           {activeTab == "cookies" && <Cookies request={request} />}
-          {activeTab == "response" && <ComingSoon />}
-          {activeTab == "request" && <ComingSoon />}
+          {activeTab == "response" && (
+            <ResponseBody request={request} responseBodyParts={responseBody} />
+          )}
+          {activeTab == "request" && (
+            <RequestBody request={request} requestBodyParts={requestBody} />
+          )}
           {activeTab == "stackTrace" && (
             <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
           )}

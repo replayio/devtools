@@ -249,7 +249,11 @@ class Timeline extends Component<PropsFromRedux> {
   renderPreviewMarkers() {
     const { pointsForHoveredLineNumber, currentTime, hoveredItem, zoomRegion } = this.props;
 
-    if (!pointsForHoveredLineNumber || pointsForHoveredLineNumber === "error") {
+    if (
+      !pointsForHoveredLineNumber ||
+      pointsForHoveredLineNumber === "error" ||
+      pointsForHoveredLineNumber.length > prefs.maxHitsDisplayed
+    ) {
       return [];
     }
 
@@ -284,6 +288,12 @@ class Timeline extends Component<PropsFromRedux> {
     // Check loadedRegions to keep typescript happy.
     if (!loadedRegions || !isFinishedLoadingRegions) {
       return null;
+    }
+
+    // An empty loadedRegions array after we've finished loading regions means that
+    // the whole recording has been unloaded.
+    if (loadedRegions.length === 0) {
+      return <div className="unloaded-regions w-full" />;
     }
 
     const { begin, end } = loadedRegions[0];

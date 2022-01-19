@@ -1,5 +1,5 @@
 import { RequestInfo, RequestEventInfo } from "@recordreplay/protocol";
-import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { CanonicalRequestType, RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 export const eventsFor = (
   id: string,
@@ -75,12 +75,15 @@ export const requestSummary = (
   id: string,
   url: string,
   status: number,
-  method: string = "GET"
+  method: string = "GET",
+  contentType: string = "application/json"
 ): RequestSummary => {
   return {
     domain: "replay.io",
     documentType: "html",
     end: 1600,
+    hasResponseBody: true,
+    hasRequestBody: true,
     id,
     method,
     name: "replay.io",
@@ -88,10 +91,11 @@ export const requestSummary = (
     queryParams: [["foo", "bar"]],
     triggerPoint: { point: "0", time: 0 },
     requestHeaders: [{ name: "foo", value: "bar" }],
-    responseHeaders: [{ name: "foo", value: "bar" }],
+    responseHeaders: [{ name: "content-type", value: contentType }],
     start: 0,
     status,
     time: 1600,
+    type: CanonicalRequestType.FETCH_XHR,
     url,
   };
 };

@@ -91,7 +91,7 @@ function PrivacyPreferences() {
             disabled={loading}
             onChange={ev => toggle(ev.currentTarget.checked)}
           />
-          <div>Disable LogRocket Session Replay</div>
+          <div>Disable LogRocket session replay</div>
         </label>
       </div>
     </div>

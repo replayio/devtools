@@ -46,8 +46,7 @@ function Panel({
   const pausedOnHit =
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
-  const isHot = !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
-  const showNag = analysisPoints && !error && !isHot;
+  const isHot = analysisPoints && !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
@@ -99,7 +98,7 @@ function Panel({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        {showNag && <FirstEditNag editing={editing} />}
+        <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           {editing ? (
             <PanelEditor

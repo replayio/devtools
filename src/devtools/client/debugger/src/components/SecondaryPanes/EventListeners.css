@@ -2,12 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-.event-listeners {
-  width: 230px;
-  padding: 20px;
-  overflow-y: auto;
-}
-
 .event-listeners-content {
   padding-block: 4px;
 }
@@ -40,7 +34,6 @@
 .event-listeners button.event-listener-expand {
   border: none;
   background: none;
-  padding: 4px 5px;
   line-height: 12px;
 }
 
@@ -50,11 +43,6 @@
 
 .event-listeners button.event-listener-expand .img {
   background: var(--theme-icon-dimmed-color);
-}
-
-.event-listener-group input[type="checkbox"] {
-  margin: 0;
-  margin-inline-end: 4px;
 }
 
 .event-listener-label {
@@ -94,20 +82,8 @@
   margin-inline-start: 20px;
 }
 
-.event-listener-name {
-  line-height: 13px;
-  padding: 3px 0;
-  font-size: 12px;
-}
-
 .event-listener-event input {
   margin-inline-end: 4px;
-}
-
-.event-search-container {
-  display: flex;
-  margin-bottom: 10px;
-  position: relative;
 }
 
 .event-search-form {
@@ -122,15 +98,10 @@
   border: 0;
   outline: 0;
   line-height: 16px;
-  color: var(--theme-body-color);
   -moz-context-properties: fill;
-  fill: var(--theme-icon-dimmed-color);
   text-align: match-parent;
-  background-color: #eee;
   border-radius: 4px;
-  background-color: #eee;
   line-height: 16px;
-  padding: 8px;
   border-radius: 4px;
 }
 
@@ -139,13 +110,7 @@
 }
 
 .event-search-input::placeholder {
-  font-style: italic;
   color: var(--theme-comment);
-}
-
-.event-search-input:focus {
-  border: 1px solid var(--theme-highlight-blue);
-  padding: 7px;
 }
 
 .devtools-searchinput-clear {
@@ -155,7 +120,6 @@
 }
 
 .event-listeners-content .status {
-  text-align: center;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

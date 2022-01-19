@@ -88,6 +88,11 @@
   color: white;
 }
 
+.frames [role="list"] [role="listitem"] .frame-description .title,
+.frames [role="list"] [role="listitem"] .frame-description .frame-link-source {
+  flex-basis: 50%;
+}
+
 .frames [role="list"] [role="listitem"].selected i.annotation-logo svg path {
   fill: white;
 }
@@ -177,4 +182,16 @@
 .accordion .call-stack-pane ._header,
 .accordion .scopes-pane ._header {
   border-top: 1px solid var(--theme-tab-background);
+}
+
+.frame:hover {
+  cursor: pointer;
+}
+
+.webconsole-app .frame:hover {
+  background: var(--console-error-hover-background);
+}
+
+.network-monitor .frame:hover {
+  background-color: var(--theme-toolbar-background);
 }

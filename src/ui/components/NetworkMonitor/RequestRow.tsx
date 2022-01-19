@@ -34,7 +34,7 @@ export const RequestRow = ({
       <div {...row.getRowProps()}>
         {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
           <div
-            className={classNames(styles.seekBadge)}
+            className={classNames(styles.seekBadge, "shadow-md")}
             onClick={() => {
               if (!row.original.triggerPoint) {
                 return;
