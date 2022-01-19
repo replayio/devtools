@@ -190,18 +190,6 @@ function CssComputedView(inspector, document) {
     );
   }
 
-  if (!this.inspector.is3PaneModeEnabled) {
-    // When the rules view is added in 3 pane mode, refresh the Computed view whenever
-    // the rules are changed.
-    this.inspector.on(
-      "ruleview-added",
-      () => {
-        this.ruleView.on("ruleview-changed", this.refreshPanel);
-      },
-      { once: true }
-    );
-  }
-
   if (this.ruleView) {
     this.ruleView.on("ruleview-changed", this.refreshPanel);
   }

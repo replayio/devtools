@@ -27,61 +27,8 @@ class InspectorApp extends Component<PropsFromRedux> {
   private splitBoxRef = React.createRef<SplitBox>();
   private sidebarSplitboxRef = React.createRef<SplitBox>();
 
-  private toggle3PaneMode = () => {
-    const is3PaneMode = !this.props.is3PaneModeEnabled;
-    const containerElement = this.sidebarContainerRef.current;
-    const splitBox = this.splitBoxRef.current;
-    const sidebarSplitbox = this.sidebarSplitboxRef.current;
-
-    if (containerElement && splitBox && sidebarSplitbox) {
-      if (is3PaneMode) {
-        // In 2 pane mode, the size of the sidebar is stored in splitSidebarSize.
-        // In 3 pane mode, it is stored in sidebarSize and the size of the right-most panel in splitSidebarSize.
-        // The right-most panel's width should be at most 80% of the sidebar width.
-        // The sidebar width should be at most 80% of the toolbar width.
-        // We may have to make some adjustments to satisfy these constraints:
-        if (prefs.splitSidebarSize > prefs.sidebarSize * 0.8) {
-          // The right-most panel would occupy more than 80% of the sidebar...
-          const toolboxWidth = containerElement.clientWidth;
-          if (prefs.splitSidebarSize * 1.25 <= toolboxWidth * 0.8) {
-            // Grow the sidebar so that the right-most panel will occupy exactly 80% of it
-            prefs.sidebarSize = prefs.splitSidebarSize * 1.25;
-          } else {
-            // Growing the sidebar as above would make it bigger than 80% of the toolbar,
-            // so we make it as big as possible and shrink the right-most panel to 80% of the sidebar
-            prefs.sidebarSize = toolboxWidth * 0.8;
-            prefs.splitSidebarSize = prefs.sidebarSize * 0.8;
-          }
-        }
-
-        splitBox.setState({
-          width: prefs.sidebarSize,
-        });
-        sidebarSplitbox.setState({
-          endPanelControl: true,
-          splitterSize: 8,
-          width: prefs.splitSidebarSize,
-        });
-      } else {
-        splitBox.setState({ width: prefs.splitSidebarSize });
-        sidebarSplitbox.setState({
-          endPanelControl: false,
-          splitterSize: 0,
-          width: 0,
-        });
-      }
-
-      this.props.set3PaneMode(is3PaneMode);
-    }
-  };
-
   private onSplitboxResize = (width: number) => {
-    const { is3PaneModeEnabled } = this.props;
-    if (is3PaneModeEnabled) {
-      prefs.sidebarSize = width;
-    } else {
-      prefs.splitSidebarSize = width;
-    }
+    prefs.splitSidebarSize = width;
   };
 
   private onSidebarSplitboxResize = (width: number) => {
@@ -89,21 +36,22 @@ class InspectorApp extends Component<PropsFromRedux> {
   };
 
   renderSidebar() {
-    const { initializedPanels, is3PaneModeEnabled, activeTab, setActiveTab } = this.props;
+    const { initializedPanels, activeTab, setActiveTab } = this.props;
 
     const inspector = gToolbox.getPanel("inspector");
 
-    const availableTabs: readonly InspectorActiveTab[] = !is3PaneModeEnabled
-      ? ["ruleview", "computedview", "layoutview", "eventlistenersview"]
-      : ["computedview", "layoutview", "eventlistenersview"];
+    const availableTabs: readonly InspectorActiveTab[] = [
+      "ruleview",
+      "computedview",
+      "layoutview",
+      "eventlistenersview",
+    ];
 
     let activePanel: ReactNode | null = null;
     if (inspector && initializedPanels.includes("inspector")) {
       switch (activeTab) {
         case "ruleview": {
-          if (!is3PaneModeEnabled) {
-            activePanel = <RulesApp {...inspector.rules.getRulesProps()} />;
-          }
+          activePanel = <RulesApp {...inspector.rules.getRulesProps()} />;
           break;
         }
 
@@ -132,12 +80,6 @@ class InspectorApp extends Component<PropsFromRedux> {
       <div className="devtools-sidebar-tabs">
         <div className="tabs">
           <nav className="tabs-navigation">
-            {/* <SidebarToggle
-              collapsed={!is3PaneModeEnabled}
-              onClick={this.toggle3PaneMode}
-              collapsePaneTitle={"Toggle off the 3-pane inspector"}
-              expandPaneTitle={"Toggle on the 3-pane inspector"}
-            /> */}
             <ul className="tabs-menu" role="tablist">
               {availableTabs.map(panelId => {
                 const isPanelSelected = activeTab === panelId;
@@ -170,15 +112,12 @@ class InspectorApp extends Component<PropsFromRedux> {
   }
 
   render() {
-    const { initializedPanels, is3PaneModeEnabled } = this.props;
+    const { initializedPanels } = this.props;
 
     const inspector = gToolbox.getPanel("inspector");
     let markupView, rulesView;
     if (inspector && initializedPanels.includes("inspector")) {
       markupView = <MarkupApp inspector={inspector} />;
-      if (is3PaneModeEnabled) {
-        rulesView = <RulesApp {...inspector.rules.getRulesProps()} />;
-      }
     }
 
     return (
@@ -190,7 +129,7 @@ class InspectorApp extends Component<PropsFromRedux> {
           <SplitBox
             ref={this.splitBoxRef}
             className="inspector-sidebar-splitter"
-            initialSize={`${is3PaneModeEnabled ? prefs.sidebarSize : prefs.splitSidebarSize}px`}
+            initialSize={`${prefs.splitSidebarSize}px`}
             minSize="20%"
             maxSize="80%"
             onMove={this.onSplitboxResize}
@@ -198,33 +137,13 @@ class InspectorApp extends Component<PropsFromRedux> {
             endPanelControl={true}
             startPanel={markupView}
             endPanel={
-              <SplitBox
-                ref={this.sidebarSplitboxRef}
-                initialSize={`${is3PaneModeEnabled ? prefs.splitSidebarSize : 0}px`}
-                minSize={is3PaneModeEnabled ? "20%" : "0"}
-                maxSize="80%"
-                onMove={this.onSidebarSplitboxResize}
-                splitterSize={is3PaneModeEnabled ? 8 : 0}
-                endPanelControl={is3PaneModeEnabled}
-                startPanel={
-                  <div className="devtools-inspector-tab-panel">
-                    <div id="inspector-rules-container">
-                      <div id="inspector-rules-sidebar" hidden={false}>
-                        {rulesView}
-                      </div>
-                    </div>
+              <div className="devtools-inspector-tab-panel">
+                <div id="inspector-sidebar-container">
+                  <div id="inspector-sidebar" hidden={false}>
+                    {this.renderSidebar()}
                   </div>
-                }
-                endPanel={
-                  <div className="devtools-inspector-tab-panel">
-                    <div id="inspector-sidebar-container">
-                      <div id="inspector-sidebar" hidden={false}>
-                        {this.renderSidebar()}
-                      </div>
-                    </div>
-                  </div>
-                }
-              />
+                </div>
+              </div>
             }
           />
         </div>
@@ -236,7 +155,6 @@ class InspectorApp extends Component<PropsFromRedux> {
 const connector = connect(
   (state: UIState) => ({
     initializedPanels: selectors.getInitializedPanels(state),
-    is3PaneModeEnabled: state.inspector.is3PaneModeEnabled,
     activeTab: state.inspector.activeTab,
     markupRootNode: state.markup.tree[state.markup.rootNode!],
   }),
