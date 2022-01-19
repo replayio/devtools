@@ -19,11 +19,17 @@ function Nodes(props: MarkupProps & PropsFromRedux) {
   const { node, onUpKey, onDownKey, onLeftKey, onRightKey, onPageUpKey, onPageDownKey } = props;
 
   const ref = useRef<HTMLUListElement>(null);
+  function onLeftKeyEnsureFocus() {
+    onLeftKey();
+    // the focused element may have disappeared because its parent was collapsed,
+    // ensure that the markup panel still has focus
+    ref.current?.focus();
+  }
   useKeyShortcuts(
     {
       Up: cancelBubbling(preventDefault(onUpKey)),
       Down: cancelBubbling(preventDefault(onDownKey)),
-      Left: cancelBubbling(preventDefault(onLeftKey)),
+      Left: cancelBubbling(preventDefault(onLeftKeyEnsureFocus)),
       Right: cancelBubbling(preventDefault(onRightKey)),
       PageUp: cancelBubbling(preventDefault(onPageUpKey)),
       PageDown: cancelBubbling(preventDefault(onPageDownKey)),
