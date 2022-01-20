@@ -1,7 +1,7 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
-import { getRecordingId } from "ui/utils/environment";
+import { getRecordingId } from "ui/utils/recording";
 import {
   getSelectedPrimaryPanel,
   getShowEditor,

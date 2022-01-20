@@ -6,13 +6,13 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import classNames from "classnames";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
-import { getRecordingId, isDevelopment } from "ui/utils/environment";
 import hooks from "ui/hooks";
 import { setModal } from "ui/actions/app";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
 import { PrimaryButton } from "./Button";
 import { useRouter } from "next/dist/client/router";
 import { BubbleViewportWrapper } from "./Viewport";
+import { getRecordingId } from "ui/utils/recording";
 
 export function PopupBlockedError() {
   return (

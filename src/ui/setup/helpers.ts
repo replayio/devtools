@@ -1,5 +1,5 @@
 import { UIStore } from "ui/actions";
-import { getRecordingId } from "ui/utils/environment";
+import { getRecordingId } from "ui/utils/recording";
 import { prefs, features } from "ui/utils/prefs";
 
 declare global {
