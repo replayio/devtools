@@ -54,6 +54,9 @@ type FrameScope = {
   originalScopesUnavailable: boolean;
 };
 
+function getMatchString(str: string) {
+  return str.toLowerCase().replace(/['"`]+/g, "");
+}
 function fuzzyFilter(candidates: string[], query: string): string[] {
   if (getMatchString(query) === "") {
     return candidates;
@@ -61,15 +64,39 @@ function fuzzyFilter(candidates: string[], query: string): string[] {
   return filter(candidates, query);
 }
 
-export function getBindingNames(scope: FrameScope): string[] {
-  if (!scope?.scope) {
-    return [];
-  }
+function isIdentifier(expression: string) {
+  try {
+    const parsed = babelParser.parseExpression(expression);
+    const isIdentifier = t.isIdentifier(parsed);
 
-  return scope.scope.bindings.map(b => b.name);
+    return isIdentifier;
+  } catch (e) {
+    return false;
+  }
+}
+function isMemberExpression(expression: string) {
+  try {
+    const parsed = babelParser.parseExpression(expression);
+    const rv = t.isMemberExpression(parsed);
+
+    return rv;
+  } catch (e) {
+    return false;
+  }
 }
 
-export function getPropertiesForObject(object: ObjectFront): string[] {
+function isBracketNotation(input: string) {
+  const expression = input.slice(0, input.lastIndexOf("[") + 1);
+  return isMemberExpression(expression + `"a"]`);
+}
+function isDotNotation(input: string) {
+  return isMemberExpression(input + `a`);
+}
+function isAccessingObjProperty(input: string) {
+  return isBracketNotation(input) || isDotNotation(input);
+}
+
+function getPropertiesForObject(object: ObjectFront): string[] {
   const preview = object.preview;
   const properties = [];
 
@@ -100,17 +127,6 @@ export function getPropertiesForObject(object: ObjectFront): string[] {
 
   return properties;
 }
-export function getGlobalVariables(scopes: Scope) {
-  const variableNames = [];
-  const globalObject = scopes.parent.object;
-
-  if (globalObject) {
-    const properties = getPropertiesForObject(globalObject._object);
-    variableNames.push(...properties);
-  }
-
-  return variableNames;
-}
 
 export function getParentExpression(input: string) {
   if (isBracketNotation(input)) {
@@ -118,37 +134,6 @@ export function getParentExpression(input: string) {
   } else {
     return input.slice(0, input.lastIndexOf("."));
   }
-}
-
-export function isIdentifier(expression: string) {
-  try {
-    const parsed = babelParser.parseExpression(expression);
-    const isIdentifier = t.isIdentifier(parsed);
-
-    return isIdentifier;
-  } catch (e) {
-    return false;
-  }
-}
-export function isMemberExpression(expression: string) {
-  try {
-    const parsed = babelParser.parseExpression(expression);
-    const rv = t.isMemberExpression(parsed);
-
-    return rv;
-  } catch (e) {
-    return false;
-  }
-}
-export function isBracketNotation(input: string) {
-  const expression = input.slice(0, input.lastIndexOf("[") + 1);
-  return isMemberExpression(expression + `"a"]`);
-}
-function isDotNotation(input: string) {
-  return isMemberExpression(input + `a`);
-}
-export function isAccessingObjProperty(input: string) {
-  return isBracketNotation(input) || isDotNotation(input);
 }
 
 export function shouldPropertyAutocomplete(input: string) {
@@ -167,14 +152,32 @@ export function shouldPropertyAutocomplete(input: string) {
   // we don't (yet) have the chained values in the fetched frame scope data.
   return isIdentifier(parentExpression);
 }
-
-export function shouldVariableAutocomplete(input: string) {
+function shouldVariableAutocomplete(input: string) {
   return isIdentifier(input);
 }
 
-export function getBinding(name: string, frameScope: FrameScope) {
+function getBinding(name: string, frameScope: FrameScope) {
   return frameScope.scope.bindings.find(b => b.name === name);
 }
+function getBindingNames(scope: FrameScope): string[] {
+  if (!scope?.scope) {
+    return [];
+  }
+
+  return scope.scope.bindings.map(b => b.name);
+}
+function getGlobalVariables(scopes: Scope) {
+  const variableNames = [];
+  const globalObject = scopes.parent.object;
+
+  if (globalObject) {
+    const properties = getPropertiesForObject(globalObject._object);
+    variableNames.push(...properties);
+  }
+
+  return variableNames;
+}
+
 export function getLastToken(input: string) {
   if (isBracketNotation(input)) {
     return input.slice(input.lastIndexOf("[") + 1);
@@ -183,8 +186,28 @@ export function getLastToken(input: string) {
   }
 }
 
-function getMatchString(str: string) {
-  return str.toLowerCase().replace(/['"`]+/g, "");
+export function getCursorIndex(value: string) {
+  if (shouldPropertyAutocomplete(value)) {
+    // +1 to account for the `.` or `[`
+    return getParentExpression(value).length + 1;
+  } else {
+    return 0;
+  }
+}
+
+export function insertAutocompleteMatch(value: string, match: string) {
+  const parentExpression = getParentExpression(value);
+
+  if (shouldPropertyAutocomplete(value)) {
+    if (isBracketNotation(value)) {
+      return `${parentExpression}[${match}]`;
+    } else {
+      return `${parentExpression}.${match}`;
+    }
+  } else {
+    // For variable autocomplete.
+    return match;
+  }
 }
 
 export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
@@ -224,29 +247,3 @@ export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
 
   return [];
 }
-
-export function getCursorIndex(value: string) {
-  if (shouldPropertyAutocomplete(value)) {
-    // +1 to account for the `.` or `[`
-    return getParentExpression(value).length + 1;
-  } else {
-    return 0;
-  }
-}
-
-export function appendAutocompleteMatch(value: string, match: string) {
-  const parentExpression = getParentExpression(value);
-
-  if (shouldPropertyAutocomplete(value)) {
-    if (isBracketNotation(value)) {
-      return `${parentExpression}[${match}]`;
-    } else {
-      return `${parentExpression}.${match}`;
-    }
-  } else {
-    // For variable autocomplete.
-    return match;
-  }
-}
-
-// used cachedCharWidth to find how out by many px we should move the window to the left

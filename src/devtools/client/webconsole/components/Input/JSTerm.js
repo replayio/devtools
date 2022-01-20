@@ -16,7 +16,7 @@ import { getCommandHistory } from "../../selectors/messages";
 import Autocomplete from "./Autocomplete";
 import clamp from "lodash/clamp";
 import {
-  appendAutocompleteMatch,
+  insertAutocompleteMatch,
   getAutocompleteMatches,
   getCursorIndex,
   getLastToken,
@@ -163,8 +163,7 @@ class JSTerm extends React.Component {
   selectAutocompleteMatch(match) {
     const { value } = this.state;
 
-    const newValue = appendAutocompleteMatch(value, match);
-
+    const newValue = insertAutocompleteMatch(value, match);
     this.setValue(newValue);
   }
 

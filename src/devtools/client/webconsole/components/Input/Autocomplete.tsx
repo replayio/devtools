@@ -48,9 +48,10 @@ export default function Autocomplete({
 }) {
   return (
     <div
-      className="flex flex-col bg-white border py-1 absolute left-7 -mb-1 shadow-sm font-mono overflow-auto"
+      className="flex flex-col bg-white border py-1 absolute left-7 -mb-1 shadow-sm font-mono overflow-x-hidden overflow-y-auto"
       style={{
-        minWidth: "240px",
+        maxWidth: "200px",
+        minWidth: "160px",
         maxHeight: "160px",
         fontSize: "var(--theme-code-font-size)",
         bottom: "var(--editor-footer-height)",
