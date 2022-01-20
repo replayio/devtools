@@ -9,7 +9,7 @@ export const showDurationWarning = (recording: Recording) => recording.duration 
 export function getRecordingURL(recording: Recording) {
   let id = recording.id;
   if (recording.title) {
-    id = slugify(recording.title).toLowerCase() + SLUG_SEPARATOR + recording.id;
+    id = slugify(recording.title, { strict: true }).toLowerCase() + SLUG_SEPARATOR + recording.id;
   }
 
   return `/recording/${id}`;
