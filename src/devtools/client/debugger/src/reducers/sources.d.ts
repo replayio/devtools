@@ -17,7 +17,7 @@ export type Source = {
   isOriginal: boolean;
   isPrettyPrinted: boolean;
   relativeUrl: string;
-  url: string;
+  url?: string;
   extensionName?: string | null;
   introductionType?: "scriptElement";
 };
