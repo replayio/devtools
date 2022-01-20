@@ -86,7 +86,7 @@ const InspectorApp: FC = () => {
           minSize="20%"
           maxSize="80%"
           onMove={onSplitboxResize}
-          splitterSize={1}
+          splitterSize={4}
           endPanelControl={true}
           startPanel={markupView}
           endPanel={
