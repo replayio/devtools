@@ -90,15 +90,6 @@ export function hasLoadingParam() {
   return url.searchParams.get("loading") != null;
 }
 
-export function getRecordingId() {
-  return usesWindow(win => {
-    if (!win) return undefined;
-
-    const match = window.location.pathname.match(/^\/recording\/([^\/]+)/);
-    return match ? match[1] : undefined;
-  });
-}
-
 export function getPausePointParams() {
   const pointParam = url.searchParams.get("point");
   const point = `${pointParam}`;

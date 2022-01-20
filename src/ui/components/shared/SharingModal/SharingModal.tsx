@@ -55,7 +55,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
               <PrivacyDropdown {...{ recording }} />
             </div>
           </div>
-          <CopyButton recordingId={recording.id} />
+          <CopyButton recording={recording} />
         </section>
       </div>
     </Modal>

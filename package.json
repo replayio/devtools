@@ -83,6 +83,7 @@
     "remark-emoji": "^2.1.0",
     "reselect": "^4.0.0",
     "resize-observer-polyfill": "^1.5.1",
+    "slugify": "^1.6.5",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17",
     "utf-8-validate": "^5.0.4",
     "webpack-retry-chunk-load-plugin": "^3.0.0",
