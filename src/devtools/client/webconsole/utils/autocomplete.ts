@@ -239,3 +239,5 @@ export function appendAutocompleteMatch(value: string, match: string) {
     return match;
   }
 }
+
+// used cachedCharWidth to find how out by many px we should move the window to the left

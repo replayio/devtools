@@ -44,18 +44,14 @@ export default function Autocomplete({
   selectedIndex: number;
   onMatchClick: (index: number) => void;
 }) {
-  if (!matches.length) {
-    return null;
-  }
-
   return (
     <div
       className="flex flex-col bg-white border py-1 absolute left-7 -mb-1 shadow-sm font-mono overflow-auto"
       style={{
         minWidth: "240px",
         maxHeight: "160px",
-        fontSize: "11px",
-        bottom: "calc(var(--editor-footer-height))",
+        fontSize: "var(--theme-code-font-size)",
+        bottom: "var(--editor-footer-height)",
       }}
     >
       {matches.map((match, i) => (

@@ -87,6 +87,7 @@ class JSTerm extends React.Component {
 
     this.editor.codeMirror.on("change", this.onChange);
     this.editor.codeMirror.on("keydown", this.onKeyDown);
+    this.editor.codeMirror.on("beforeSelectionChange", this.onBeforeSelectionChange);
 
     const recordingId = getRecordingId();
     const recording = await getRecording(recordingId);
@@ -241,7 +242,7 @@ class JSTerm extends React.Component {
 
   onKeyDown = (_, event) => {
     if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(event.key)) {
-      this.setState({ hideAutocomplete: true, autocompleteIndex: 0 });
+      this.setState({ hideAutocomplete: true });
     } else {
       this.setState({ hideAutocomplete: false, autocompleteIndex: 0 });
     }
@@ -250,6 +251,14 @@ class JSTerm extends React.Component {
   onChange = cm => {
     const value = cm.getValue();
     this.setState({ value });
+  };
+
+  onBeforeSelectionChange = (_, obj) => {
+    const cursorMoved = ["*mouse", "+move"].includes(obj.origin);
+
+    if (cursorMoved) {
+      this.setState({ hideAutocomplete: true });
+    }
   };
 
   getMatches() {
