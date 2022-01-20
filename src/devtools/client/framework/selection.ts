@@ -224,7 +224,7 @@ class Selection {
     return this.isNode() && this.nodeFront!.isShadowRoot;
   }
 
-  // added by EventEmitter.decorate(ThreadFront)
+  // added by EventEmitter.decorate(this) in the constructor
   eventListeners!: Map<string, ((...args: any[]) => void)[]>;
   on!: (name: SelectionEvent, handler: (...args: any[]) => void) => void;
   off!: (name: SelectionEvent, handler: (...args: any[]) => void) => void;
