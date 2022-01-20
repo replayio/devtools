@@ -6,8 +6,9 @@ import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
-import { getRecordingId } from "ui/utils/environment";
-import { useRouter } from "next/dist/client/router";
+import { useRouter } from "next/router";
+import { extractIdAndSlug } from "ui/utils/helpers";
+import { getRecordingId } from "ui/utils/recording";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -105,7 +106,7 @@ const GET_MY_RECORDINGS = gql`
 
 export function useGetRecordingId() {
   const { id } = useRouter().query;
-  return Array.isArray(id) ? id[0] : id!;
+  return extractIdAndSlug(id).id!;
 }
 
 export async function getRecording(recordingId: RecordingId) {
@@ -743,9 +744,8 @@ export async function getRecordingMetadata(id: string) {
     },
     body: JSON.stringify({
       query: `
-        query GetRecording($recordingId: UUID!) {
+        query GetRecordingMetadata($recordingId: UUID!) {
           recording(uuid: $recordingId) {
-            uuid
             url
             title
             duration

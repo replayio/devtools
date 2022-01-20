@@ -1,5 +1,7 @@
+export const SLUG_SEPARATOR = "--";
 export function validateEmail(email: string) {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
 
@@ -29,4 +31,24 @@ export function isValidTeamName(name: string) {
   }
 
   return true;
+}
+
+export function extractIdAndSlug(params: string | string[] | undefined) {
+  const joined = Array.isArray(params) ? params[0] : params;
+
+  let id: string | undefined;
+  let slug: string | undefined;
+  if (joined) {
+    if (validateUUID(joined)) {
+      id = joined;
+    } else {
+      const parts = joined.split(SLUG_SEPARATOR);
+      if (validateUUID(parts[1])) {
+        slug = parts[0];
+        id = parts[1];
+      }
+    }
+  }
+
+  return { id, slug };
 }

@@ -6,7 +6,7 @@
 
 const promise = Promise;
 const flags = require("devtools/shared/flags");
-const { ELLIPSIS } = require("devtools/shared/l10n");
+const ELLIPSIS = "...";
 const EventEmitter = require("devtools/shared/event-emitter");
 
 const MAX_LABEL_LENGTH = 40;
@@ -50,8 +50,7 @@ ArrowScrollBox.prototype = {
     this.onEndBtnClick = this.onEndBtnClick.bind(this);
     this.onStartBtnDblClick = this.onStartBtnDblClick.bind(this);
     this.onEndBtnDblClick = this.onEndBtnDblClick.bind(this);
-    this.onUnderflow = this.onUnderflow.bind(this);
-    this.onOverflow = this.onOverflow.bind(this);
+    this.checkOverflow = this.checkOverflow.bind(this);
 
     this.inner.addEventListener("scroll", this.onScroll);
     this.startBtn.addEventListener("mousedown", this.onStartBtnClick);
@@ -59,9 +58,8 @@ ArrowScrollBox.prototype = {
     this.startBtn.addEventListener("dblclick", this.onStartBtnDblClick);
     this.endBtn.addEventListener("dblclick", this.onEndBtnDblClick);
 
-    // Overflow and underflow are moz specific events
-    this.inner.addEventListener("underflow", this.onUnderflow);
-    this.inner.addEventListener("overflow", this.onOverflow);
+    this.resizeObserver = new ResizeObserver(this.checkOverflow);
+    this.resizeObserver.observe(this.container);
   },
 
   /**
@@ -183,21 +181,18 @@ ArrowScrollBox.prototype = {
   },
 
   /**
-   * On underflow, make the arrow buttons invisible
+   * update the visibility of startBtn/endBtn
    */
-  onUnderflow: function () {
-    this.startBtn.style.visibility = "collapse";
-    this.endBtn.style.visibility = "collapse";
-    this.emit("underflow");
-  },
-
-  /**
-   * On overflow, show the arrow buttons
-   */
-  onOverflow: function () {
-    this.startBtn.style.visibility = "visible";
-    this.endBtn.style.visibility = "visible";
-    this.emit("overflow");
+  checkOverflow: function () {
+    if (this.inner.scrollWidth > this.container.scrollWidth) {
+      this.startBtn.style.display = "flex";
+      this.endBtn.style.display = "flex";
+      this.emit("overflow");
+    } else {
+      this.startBtn.style.display = "none";
+      this.endBtn.style.display = "none";
+      this.emit("underflow");
+    }
   },
 
   /**
@@ -311,9 +306,7 @@ ArrowScrollBox.prototype = {
     this.startBtn.removeEventListener("dblclick", this.onStartBtnDblClick);
     this.endBtn.removeEventListener("dblclick", this.onRightBtnDblClick);
 
-    // Overflow and underflow are moz specific events
-    this.inner.removeEventListener("underflow", this.onUnderflow);
-    this.inner.removeEventListener("overflow", this.onOverflow);
+    this.resizeObserver.disconnect();
   },
 };
 
@@ -631,6 +624,7 @@ HTMLBreadcrumbs.prototype = {
     while (this.container.hasChildNodes()) {
       this.container.firstChild.remove();
     }
+    this.arrowScrollBox.checkOverflow();
   },
 
   /**
@@ -678,6 +672,7 @@ HTMLBreadcrumbs.prototype = {
     if (this.currentIndex >= this.nodeHierarchy.length) {
       this.currentIndex = this.nodeHierarchy.length - 1;
     }
+    this.arrowScrollBox.checkOverflow();
   },
 
   /**
@@ -735,6 +730,7 @@ HTMLBreadcrumbs.prototype = {
       node = node.parentOrHost();
     }
     this.container.appendChild(fragment, this.container.firstChild);
+    this.arrowScrollBox.checkOverflow();
   },
 
   /**
