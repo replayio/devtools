@@ -98,7 +98,7 @@ const InspectorApp: FC = () => {
           endPanel={
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
-                <div id="inspector-sidebar" hidden={false}>
+                <div id="inspector-sidebar">
                   <div className="devtools-sidebar-tabs">
                     <div className="tabs">
                       <nav className="tabs-navigation">
