@@ -1,3 +1,6 @@
+import * as babelParser from "@babel/parser";
+import * as t from "@babel/types";
+
 type ObjectPreviewProperty = {
   value: ValueFront;
   writable: boolean;
@@ -101,19 +104,79 @@ export function getGlobalVariables(scopes: Scope) {
   return variableNames;
 }
 
-export function shouldVariableAutocomplete(input: string) {
-  return !input.includes(".");
+export function getParentExpression(input: string) {
+  if (isBracketNotation(input)) {
+    return input.slice(0, input.lastIndexOf("["));
+  } else {
+    return input.slice(0, input.lastIndexOf("."));
+  }
 }
+
+export function isIdentifier(expression: string) {
+  try {
+    const parsed = babelParser.parseExpression(expression);
+    const isIdentifier = t.isIdentifier(parsed);
+
+    return isIdentifier;
+  } catch (e) {
+    return false;
+  }
+}
+export function isMemberExpression(expression: string) {
+  try {
+    const parsed = babelParser.parseExpression(expression);
+    const rv = t.isMemberExpression(parsed);
+
+    return rv;
+  } catch (e) {
+    return false;
+  }
+}
+export function isBracketNotation(input: string) {
+  const expression = input.slice(0, input.lastIndexOf("[") + 1);
+  return isMemberExpression(expression + `"a"]`);
+}
+function isDotNotation(input: string) {
+  return isMemberExpression(input + `a`);
+}
+export function isAccessingObjProperty(input: string) {
+  return isBracketNotation(input) || isDotNotation(input);
+}
+
+export function shouldPropertyAutocomplete(input: string) {
+  if (!isAccessingObjProperty(input)) {
+    return false;
+  }
+
+  const parentExpression = getParentExpression(input);
+
+  if (!parentExpression) {
+    return false;
+  }
+
+  // Right now, this only works for direct property access (e.g., a.b)
+  // and doesn't support chained expressions (e.g., a.b.c.d). This is because
+  // we don't (yet) have the chained values in the fetched frame scope data.
+  return isIdentifier(parentExpression);
+}
+
+export function shouldVariableAutocomplete(input: string) {
+  return isIdentifier(input);
+}
+
 export function getBinding(name: string, frameScope: FrameScope) {
   return frameScope.scope.bindings.find(b => b.name === name);
 }
-export function getLastExpression(input: string) {
-  const expressions = input.split(".");
-  return expressions[expressions.length - 1];
+export function getLastToken(input: string) {
+  if (isBracketNotation(input)) {
+    return input.slice(input.lastIndexOf("[") + 1);
+  } else {
+    return input.slice(input.lastIndexOf(".") + 1);
+  }
 }
-export function getParentExpression(input: string) {
-  const expressions = input.split(".");
-  return expressions.slice(0, expressions.length - 1).join(".");
+
+function getMatchString(str: string) {
+  return str.toLowerCase().replace(/['"`]+/g, "");
 }
 
 export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
@@ -123,14 +186,12 @@ export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
 
   const bindingNames = getBindingNames(frameScope);
 
-  if (shouldVariableAutocomplete(input)) {
-    const variableNames = [...bindingNames, ...getGlobalVariables(frameScope.scope)];
-    return variableNames.filter(name => name.toLowerCase().includes(input.toLowerCase()));
-  } else {
-    const lastExpression = getLastExpression(input);
-    const parentExpression = getParentExpression(input);
+  if (shouldPropertyAutocomplete(input)) {
+    const computedProperty = isBracketNotation(input);
+    const lastToken = getLastToken(input);
+    const parentToken = getParentExpression(input);
 
-    const binding = getBinding(parentExpression, frameScope);
+    const binding = getBinding(parentToken, frameScope);
 
     if (!binding) {
       return [];
@@ -143,7 +204,30 @@ export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
     }
 
     const properties = getPropertiesForObject(object);
+    const filteredProperties = properties.filter(p =>
+      getMatchString(p).includes(getMatchString(lastToken))
+    );
 
-    return properties.filter(p => p.toLowerCase().includes(lastExpression.toLowerCase()));
+    return filteredProperties.map(p => (computedProperty ? `"${p}"` : p));
+  } else if (shouldVariableAutocomplete(input)) {
+    const variableNames = [...bindingNames, ...getGlobalVariables(frameScope.scope)];
+    return variableNames.filter(name => name.toLowerCase().includes(input.toLowerCase()));
+  }
+
+  return [];
+}
+
+export function appendAutocompleteMatch(value: string, match: string) {
+  const parentExpression = getParentExpression(value);
+
+  if (shouldPropertyAutocomplete(value)) {
+    if (isBracketNotation(value)) {
+      return `${parentExpression}[${match}]`;
+    } else {
+      return `${parentExpression}.${match}`;
+    }
+  } else {
+    // For variable autocomplete.
+    return match;
   }
 }

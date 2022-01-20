@@ -15,10 +15,13 @@ import { getRecording } from "ui/hooks/recordings";
 import { getCommandHistory } from "../../selectors/messages";
 import Autocomplete from "./Autocomplete";
 import clamp from "lodash/clamp";
-import { getAutocompleteMatches, getParentExpression } from "../../utils/autocomplete";
-import { b } from "react-dom-factories";
+import {
+  appendAutocompleteMatch,
+  getAutocompleteMatches,
+  getLastToken,
+} from "../../utils/autocomplete";
 
-async function createEditor({ onArrowPress, onEnter }) {
+async function createEditor({ onArrowPress, onEnter, onTab }) {
   await gToolbox.startPanel("debugger");
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
 
@@ -38,6 +41,7 @@ async function createEditor({ onArrowPress, onEnter }) {
     viewportMargin: Infinity,
     disableSearchAddon: true,
     extraKeys: {
+      Tab: onTab,
       Enter: onEnter,
       "Cmd-Enter": onEnter,
       "Ctrl-Enter": onEnter,
@@ -76,6 +80,7 @@ class JSTerm extends React.Component {
     this.editorWaiter = createEditor({
       onArrowPress: this.onArrowPress,
       onEnter: this.onEnter,
+      onTab: this.onTab,
     });
     this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
@@ -90,7 +95,17 @@ class JSTerm extends React.Component {
   }
 
   showAutocomplete() {
-    return !this.state.hideAutocomplete && this.getMatches().length;
+    const { value } = this.state;
+    const lastToken = getLastToken(value);
+    const matches = this.getMatches();
+    const matchCount = matches.length;
+
+    // Bail if the only suggest autocomplete option is already in the input.
+    if (matchCount === 1 && matches[0] === lastToken) {
+      return false;
+    }
+
+    return !this.state.hideAutocomplete && matchCount;
   }
 
   focus() {
@@ -104,7 +119,7 @@ class JSTerm extends React.Component {
       } else {
         this.moveHistoryCursor(1);
       }
-    } else {
+    } else if (arrow === "down") {
       if (this.showAutocomplete()) {
         this.moveAutocompleteCursor(-1);
       } else {
@@ -114,10 +129,15 @@ class JSTerm extends React.Component {
   };
 
   onEnter = () => {
-    console.log("onEnter", this.showAutocomplete());
     if (!this.showAutocomplete()) {
       this.execute();
     } else {
+      this.selectAutocompleteMatch();
+    }
+  };
+
+  onTab = () => {
+    if (this.showAutocomplete()) {
       this.selectAutocompleteMatch();
     }
   };
@@ -127,8 +147,7 @@ class JSTerm extends React.Component {
     const { value } = this.state;
 
     const match = this.getMatches()[autocompleteIndex];
-    const parentExpression = getParentExpression(value);
-    const newValue = [parentExpression, match].filter(Boolean).join(".");
+    const newValue = appendAutocompleteMatch(value, match);
 
     this.setValue(newValue);
   }
@@ -211,14 +230,14 @@ class JSTerm extends React.Component {
   }
 
   onKeyDown = (_, event) => {
-    if (event.code === "Enter") {
+    if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(event.key)) {
       this.setState({ hideAutocomplete: true, autocompleteIndex: 0 });
     } else {
       this.setState({ hideAutocomplete: false, autocompleteIndex: 0 });
     }
   };
 
-  onChange = (cm, event) => {
+  onChange = cm => {
     const value = cm.getValue();
     this.setState({ value });
   };

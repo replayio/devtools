@@ -45,8 +45,13 @@ export default function Autocomplete({
 
   return (
     <div
-      className="flex flex-col border py-1 absolute left-7 bottom-8 font-mono overflow-auto"
-      style={{ minWidth: "240px", maxHeight: "160px", fontSize: "11px" }}
+      className="flex flex-col bg-white border py-1 absolute left-7 -mb-1 shadow-sm font-mono overflow-auto"
+      style={{
+        minWidth: "240px",
+        maxHeight: "160px",
+        fontSize: "11px",
+        bottom: "calc(var(--editor-footer-height))",
+      }}
     >
       {matches.map((match, i) => (
         <Match label={match} selectedIndex={selectedIndex} index={i} key={i} />
@@ -54,13 +59,3 @@ export default function Autocomplete({
     </div>
   );
 }
-
-// V1
-// it should handle chained objects
-// it should handle computed property syntax
-// it should know what block it's in and suggest stuff for that block based on cursor position
-// it should replace the correct expression with the selected autocompleted expression
-// pressing escape/left/right should close autocomplete
-
-// V2
-// Todo: the dropdown should have a variable X position based on the cursor position
