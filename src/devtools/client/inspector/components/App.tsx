@@ -10,7 +10,6 @@ import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
-import { selectors } from "ui/reducers";
 import { InspectorActiveTab } from "../state";
 
 import "ui/setup/dynamic/inspector";
@@ -39,8 +38,8 @@ const InspectorApp: FC = () => {
   const inspector = gToolbox.getPanel("inspector");
   const inspectorInited = inspector && initializedPanels.includes("inspector");
 
-  const sidebarContainerRef = useRef<HTMLDivElement>(null);
-  const splitBoxRef = useRef<SplitBox>(null);
+  const sidebarContainerRef = useRef<HTMLDivElement>(null); // nosemgrep
+  const splitBoxRef = useRef<SplitBox>(null); // nosemgrep
 
   const onSplitboxResize = (width: number) => {
     prefs.splitSidebarSize = width;
