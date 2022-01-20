@@ -55,11 +55,25 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         seatPrice: 20,
         trial: isTrial(subscription),
       };
+    case "team-annual-v1":
+      return {
+        billingSchedule: "annual",
+        displayName: "Team",
+        seatPrice: 220,
+        trial: isTrial(subscription),
+      };
     case "org-v1":
       return {
         billingSchedule: "monthly",
         displayName: "Organization",
         seatPrice: 75,
+        trial: isTrial(subscription),
+      };
+    case "org-annual-v1":
+      return {
+        billingSchedule: "annual",
+        displayName: "Organization",
+        seatPrice: 825,
         trial: isTrial(subscription),
       };
     case "ent-v1":
@@ -81,9 +95,5 @@ export const cycleCharge = (planPricing: SubscriptionWithPricing): number => {
     return 0;
   }
 
-  let monthsPerCycle = 1;
-  if (planPricing.billingSchedule === "annual") {
-    monthsPerCycle = 12;
-  }
-  return monthsPerCycle * planPricing.seatPrice * planPricing.seatCount;
+  return planPricing.seatPrice * planPricing.seatCount;
 };

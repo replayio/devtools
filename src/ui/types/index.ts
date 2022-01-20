@@ -62,7 +62,15 @@ export interface PaymentMethod {
   };
 }
 
-type PlanKey = "org-v1" | "team-v1" | "test-team-v1" | "beta-v1" | "test-beta-v1" | "ent-v1";
+type PlanKey =
+  | "org-v1"
+  | "team-v1"
+  | "test-team-v1"
+  | "beta-v1"
+  | "test-beta-v1"
+  | "ent-v1"
+  | "team-annual-v1"
+  | "org-annual-v1";
 
 export interface Subscription {
   id: string;
