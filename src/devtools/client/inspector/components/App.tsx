@@ -32,7 +32,7 @@ const availableTabs: readonly InspectorActiveTab[] = [
 const InspectorApp: FC = () => {
   const dispatch = useDispatch();
   const { initializedPanels, activeTab } = useSelector((state: UIState) => ({
-    initializedPanels: selectors.getInitializedPanels(state),
+    initializedPanels: state.app.initializedPanels,
     activeTab: state.inspector.activeTab,
   }));
 

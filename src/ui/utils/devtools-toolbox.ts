@@ -17,11 +17,21 @@ declare global {
   const store: UIStore;
 }
 
+type Panels = {
+  debugger: DebuggerPanel;
+  inspector: Inspector;
+  "react-components": any;
+  console: any;
+  comments: any;
+  viewer: any;
+  network: any;
+};
+
 /**
  * Manages the panels that initialization of the developer tools toolbox.
  */
 export class DevToolsToolbox {
-  panels: Partial<Record<PanelName, any>>;
+  panels: Partial<Panels>;
   panelWaiters: Partial<Record<PanelName, Promise<unknown>>>;
   threadFront: typeof ThreadFront;
   selection: Selection;
@@ -62,11 +72,11 @@ export class DevToolsToolbox {
     return Highlighter;
   }
 
-  getPanel(name: PanelName) {
+  getPanel<T extends PanelName>(name: T): Panels[T] | undefined {
     return this.panels[name];
   }
 
-  getOrStartPanel(name: StartablePanelName) {
+  getOrStartPanel<T extends StartablePanelName>(name: T): Panels[T] | undefined {
     return this.getPanel(name) || this.startPanel(name);
   }
 
@@ -85,15 +95,17 @@ export class DevToolsToolbox {
     const panels = {
       debugger: DebuggerPanel,
       inspector: Inspector,
-    };
+    } as const;
 
     const panel = new panels[name](this);
 
     if (name !== "inspector") {
       await (panel as DebuggerPanel).open();
+      this.panels.debugger = panel as DebuggerPanel;
+    } else {
+      this.panels.inspector = panel as Inspector;
     }
 
-    this.panels[name] = panel;
     store.dispatch(actions.setInitializedPanels(name));
 
     resolve(panel);
