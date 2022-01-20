@@ -68,16 +68,5 @@ or the inspector where the split console can be displayed.  */
 }
 
 .inspector-sidebar-splitter > .splitter {
-  position: relative;
-}
-
-.inspector-sidebar-splitter > .splitter:after {
-  position: absolute;
-  content: '';
-  width: 1px;
-  height: 100%;
   background: var(--theme-splitter-color);
-  left: 0;
-  /* left: 50%;
-  transform: translateX(-50%); */
 }
