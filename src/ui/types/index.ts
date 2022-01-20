@@ -97,6 +97,7 @@ export interface PlanPricing {
   displayName: string;
   seatPrice: number;
   trial: boolean;
+  discount: number;
 }
 
 export interface SubscriptionWithPricing extends Subscription, PlanPricing {}

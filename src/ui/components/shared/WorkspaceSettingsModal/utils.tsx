@@ -45,6 +45,7 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         billingSchedule: null,
         displayName: "Beta Tester Appreciation",
         seatPrice: 0,
+        discount: 0,
         trial: isTrial(subscription),
       };
     case "team-v1":
@@ -53,13 +54,15 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         billingSchedule: "monthly",
         displayName: "Team",
         seatPrice: 20,
+        discount: 0,
         trial: isTrial(subscription),
       };
     case "team-annual-v1":
       return {
         billingSchedule: "annual",
         displayName: "Team",
-        seatPrice: 220,
+        seatPrice: 20,
+        discount: 0.1,
         trial: isTrial(subscription),
       };
     case "org-v1":
@@ -67,13 +70,15 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         billingSchedule: "monthly",
         displayName: "Organization",
         seatPrice: 75,
+        discount: 0,
         trial: isTrial(subscription),
       };
     case "org-annual-v1":
       return {
         billingSchedule: "annual",
         displayName: "Organization",
-        seatPrice: 825,
+        seatPrice: 75,
+        discount: 0.1,
         trial: isTrial(subscription),
       };
     case "ent-v1":
@@ -81,6 +86,7 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         billingSchedule: "contract",
         displayName: "Enterprise Contract",
         seatPrice: 0,
+        discount: 0,
         trial: false,
       };
   }
@@ -90,10 +96,40 @@ export const getSubscriptionWithPricing = (subscription: Subscription): Subscrip
   return { ...subscription, ...pricingDetailsForSubscription(subscription) };
 };
 
-export const cycleCharge = (planPricing: SubscriptionWithPricing): number => {
+const monthsPerCycle = (planPricing: SubscriptionWithPricing): number => {
+  return planPricing.billingSchedule === "annual" ? 12 : 1;
+};
+
+const calcSubtotal = (planPricing: SubscriptionWithPricing): number => {
   if (!planPricing.billingSchedule) {
     return 0;
   }
 
-  return planPricing.seatPrice * planPricing.seatCount;
+  return planPricing.seatPrice * planPricing.seatCount * monthsPerCycle(planPricing);
 };
+
+export const cycleDiscount = (planPricing: SubscriptionWithPricing): string => {
+  if (!planPricing.billingSchedule) {
+    return formatCurrency(0);
+  }
+
+  return formatCurrency(-1 * calcSubtotal(planPricing) * planPricing.discount);
+};
+
+export const cycleSubtotal = (planPricing: SubscriptionWithPricing): string => {
+  return formatCurrency(calcSubtotal(planPricing));
+};
+
+export const cycleCharge = (planPricing: SubscriptionWithPricing): string => {
+  return formatCurrency(calcSubtotal(planPricing) * (1 - planPricing.discount));
+};
+
+export function formatCurrency(amount: number) {
+  const formatter = new Intl.NumberFormat("en-us", { style: "currency", currency: "USD" });
+  return formatter.format(amount);
+}
+
+export function formatPercentage(amount: number) {
+  const formatter = new Intl.NumberFormat("en-us", { style: "percent" });
+  return formatter.format(amount);
+}
