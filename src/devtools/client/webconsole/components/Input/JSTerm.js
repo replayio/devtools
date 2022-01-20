@@ -132,21 +132,31 @@ class JSTerm extends React.Component {
     if (!this.showAutocomplete()) {
       this.execute();
     } else {
-      this.selectAutocompleteMatch();
+      const { autocompleteIndex } = this.state;
+      const match = this.getMatches()[autocompleteIndex];
+
+      this.selectAutocompleteMatch(match);
     }
   };
 
   onTab = () => {
+    const { autocompleteIndex } = this.state;
+    const match = this.getMatches()[autocompleteIndex];
+
     if (this.showAutocomplete()) {
-      this.selectAutocompleteMatch();
+      this.selectAutocompleteMatch(match);
     }
   };
 
-  selectAutocompleteMatch() {
-    const { autocompleteIndex } = this.state;
+  onMatchClick = index => {
+    const match = this.getMatches()[index];
+
+    this.selectAutocompleteMatch(match);
+  };
+
+  selectAutocompleteMatch(match) {
     const { value } = this.state;
 
-    const match = this.getMatches()[autocompleteIndex];
     const newValue = appendAutocompleteMatch(value, match);
 
     this.setValue(newValue);
@@ -269,7 +279,11 @@ class JSTerm extends React.Component {
           }}
         />
         {this.showAutocomplete() ? (
-          <Autocomplete matches={matches} selectedIndex={autocompleteIndex} />
+          <Autocomplete
+            matches={matches}
+            selectedIndex={autocompleteIndex}
+            onMatchClick={this.onMatchClick}
+          />
         ) : null}
       </div>
     );

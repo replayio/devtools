@@ -5,10 +5,12 @@ function Match({
   label,
   selectedIndex,
   index,
+  onClick,
 }: {
   label: string;
   selectedIndex: number;
   index: number;
+  onClick: (index: number) => void;
 }) {
   const buttonNode = useRef<HTMLButtonElement | null>(null);
   const selected = selectedIndex === index;
@@ -26,6 +28,7 @@ function Match({
         selected ? "bg-blue-700 text-white" : "hover:bg-blue-100"
       )}
       ref={buttonNode}
+      onClick={() => onClick(index)}
     >
       {label}
     </button>
@@ -35,9 +38,11 @@ function Match({
 export default function Autocomplete({
   matches,
   selectedIndex,
+  onMatchClick,
 }: {
   matches: string[];
   selectedIndex: number;
+  onMatchClick: (index: number) => void;
 }) {
   if (!matches.length) {
     return null;
@@ -54,7 +59,13 @@ export default function Autocomplete({
       }}
     >
       {matches.map((match, i) => (
-        <Match label={match} selectedIndex={selectedIndex} index={i} key={i} />
+        <Match
+          label={match}
+          selectedIndex={selectedIndex}
+          index={i}
+          key={i}
+          onClick={onMatchClick}
+        />
       ))}
     </div>
   );
