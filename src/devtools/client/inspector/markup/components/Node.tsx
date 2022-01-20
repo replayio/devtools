@@ -7,7 +7,6 @@ const {
   TEXT_NODE,
 } = require("devtools/shared/dom-node-constants");
 import { assert } from "protocol/utils";
-const { features } = require("devtools/client/inspector/prefs");
 import {
   getNode,
   getRootNodeId,
@@ -168,11 +167,6 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
 
   render() {
     const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
-
-    const isWhitespaceTextNode = node.type === TEXT_NODE && !/[^\s]/.exec(node.value!);
-    if (isWhitespaceTextNode && !features.showWhitespaceNodes) {
-      return null;
-    }
 
     // Whether or not the node can be expanded - True if node has children and child is
     // not an inline text node.

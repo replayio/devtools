@@ -13,7 +13,8 @@ import {
 } from "../selectors/markup";
 import { UIState } from "ui/state";
 import Highlighter from "highlighter/highlighter";
-const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
+const { DOCUMENT_TYPE_NODE, TEXT_NODE } = require("devtools/shared/dom-node-constants");
+const { features } = require("devtools/client/inspector/prefs");
 
 export type ResetAction = Action<"RESET">;
 export type NewRootAction = Action<"NEW_ROOT"> & { rootNode: NodeInfo };
@@ -90,6 +91,11 @@ export function newRoot(): UIThunkAction {
  */
 export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): UIThunkAction {
   return async ({ dispatch }) => {
+    if (!features.showWhitespaceNodes) {
+      childFronts = childFronts.filter(
+        node => node.nodeType !== TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
+      );
+    }
     dispatch({
       type: "ADD_CHILDREN",
       parentNodeId: parentFront.objectId(),
