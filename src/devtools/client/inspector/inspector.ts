@@ -19,12 +19,6 @@ import RulesView from "./rules/rules";
 import Highlighter from "highlighter/highlighter";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
-/**
- * Represents an open instance of the Inspector for a tab.
- * The inspector controls the breadcrumbs, the markup view, and the sidebar
- * (computed view, rule view, font view and animation inspector).
- */
-
 type InspectorEvent =
   | "ready" // Fired when the inspector panel is opened for the first time and ready to use
   | "new-root" // Fired after a new root (navigation to a new page) event was fired by the walker, and taken into account by the inspector (after the markup view has been reloaded)
@@ -37,6 +31,12 @@ type InspectorEvent =
   | "computed-view-sourcelinks-updated" // Fired when the stylesheet source links have been updated (when switching to source-mapped files)
   | "rule-view-refreshed" // Fired when the rule view updates to a new node
   | "rule-view-sourcelinks-updated"; // Fired when the stylesheet source links have been updated (when switching to source-mapped files)
+
+/**
+ * Represents an open instance of the Inspector for a tab.
+ * The inspector controls the breadcrumbs, the markup view, and the sidebar
+ * (computed view, rule view, font view and animation inspector).
+ */
 export class Inspector {
   panelDoc: Document | null;
   panelWin: Window | null;
