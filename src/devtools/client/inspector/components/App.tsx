@@ -122,7 +122,11 @@ const InspectorApp: FC = () => {
                           })}
                         </ul>
                       </nav>
-                      <div className="panels">{activePanel}</div>
+                      <div className="panels">
+                        <div className="tab-panel-box" role="tabpanel">
+                          {activePanel}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
