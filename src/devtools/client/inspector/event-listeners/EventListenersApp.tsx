@@ -65,6 +65,10 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
           constructor
         name
         length
+
+
+  Tree or TreeView
+
   */
 
   console.log(groupedListeners);
