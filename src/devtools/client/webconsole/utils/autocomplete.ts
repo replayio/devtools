@@ -1,5 +1,6 @@
 import * as babelParser from "@babel/parser";
 import * as t from "@babel/types";
+const { filter } = require("fuzzaldrin-plus");
 
 type ObjectPreviewProperty = {
   value: ValueFront;
@@ -52,6 +53,13 @@ type FrameScope = {
   pending: boolean;
   originalScopesUnavailable: boolean;
 };
+
+function fuzzyFilter(candidates: string[], query: string): string[] {
+  if (getMatchString(query) === "") {
+    return candidates;
+  }
+  return filter(candidates, query);
+}
 
 export function getBindingNames(scope: FrameScope): string[] {
   if (!scope?.scope) {
@@ -204,14 +212,14 @@ export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
     }
 
     const properties = getPropertiesForObject(object);
-    const filteredProperties = properties.filter(p =>
-      getMatchString(p).includes(getMatchString(lastToken))
-    );
 
+    const filteredProperties = fuzzyFilter(properties, getMatchString(lastToken));
     return filteredProperties.map(p => (computedProperty ? `"${p}"` : p));
   } else if (shouldVariableAutocomplete(input)) {
     const variableNames = [...bindingNames, ...getGlobalVariables(frameScope.scope)];
-    return variableNames.filter(name => name.toLowerCase().includes(input.toLowerCase()));
+    const filteredNames = fuzzyFilter(variableNames, getMatchString(input));
+
+    return filteredNames;
   }
 
   return [];
