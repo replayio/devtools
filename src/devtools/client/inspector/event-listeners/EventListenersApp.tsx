@@ -13,6 +13,7 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
 
     const handler = async (node: NodeFront | null) => {
       if (!node) {
+        setListeners([]);
         return;
       }
       const listeners = await node.getEventListeners();
@@ -30,9 +31,13 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
 
   return (
     <div>
-      {listeners.map(listener => (
-        <div key={listener.handler.id()}>{listener.handler.functionName()}</div>
-      ))}
+      {listeners.length === 0 ? (
+        <div className="devtools-sidepanel-no-result">No event listeners</div>
+      ) : (
+        listeners.map(listener => (
+          <div key={listener.handler.id()}>{listener.handler.functionName()}</div>
+        ))
+      )}
     </div>
   );
 };

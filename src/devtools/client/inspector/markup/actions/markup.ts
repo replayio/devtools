@@ -2,7 +2,7 @@ import { Action } from "redux";
 import { assert, defer, Deferred } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
-import Selection, { NodeSelectionReason } from "devtools/client/framework/selection";
+import Selection, { SelectionReason } from "devtools/client/framework/selection";
 import { NodeInfo } from "../state/markup";
 import { UIThunkAction } from "ui/actions";
 import {
@@ -221,7 +221,7 @@ export function selectionChanged(
   };
 }
 
-export function selectNode(nodeId: string, reason?: NodeSelectionReason): UIThunkAction {
+export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
   return ({ toolbox }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {

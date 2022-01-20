@@ -1,9 +1,4 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
-
-module.exports = {
+const NODE_TYPE = {
   ELEMENT_NODE: 1,
   ATTRIBUTE_NODE: 2,
   TEXT_NODE: 3,
@@ -24,4 +19,6 @@ module.exports = {
   DOCUMENT_POSITION_CONTAINS: 0x08,
   DOCUMENT_POSITION_CONTAINED_BY: 0x10,
   DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: 0x20,
-};
+} as const;
+
+export default NODE_TYPE;
