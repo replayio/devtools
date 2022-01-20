@@ -235,11 +235,8 @@ export class NodeFront {
 
   // Whether or not the node has event listeners.
   async hasEventListeners() {
-    if (!this._waiters.listeners?.promise) {
-      await this.getEventListeners();
-    }
-    const listeners = await this._waiters.listeners?.promise;
-    return listeners?.length !== 0;
+    const listeners = await this.getEventListeners();
+    return !!listeners && listeners.length != 0;
   }
 
   async getEventListeners() {
