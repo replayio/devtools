@@ -18,6 +18,7 @@ import clamp from "lodash/clamp";
 import {
   appendAutocompleteMatch,
   getAutocompleteMatches,
+  getCursorIndex,
   getLastToken,
 } from "../../utils/autocomplete";
 
@@ -72,6 +73,7 @@ class JSTerm extends React.Component {
       historyIndex: 0,
       autocompleteIndex: 0,
       hideAutocomplete: false,
+      charWidth: 0,
       value: "",
     };
   }
@@ -92,7 +94,10 @@ class JSTerm extends React.Component {
     const recordingId = getRecordingId();
     const recording = await getRecording(recordingId);
 
-    this.setState({ canEval: recording.userRole !== "team-user" });
+    this.setState({
+      canEval: recording.userRole !== "team-user",
+      charWidth: this.editor.editor.display.cachedCharWidth,
+    });
   }
 
   showAutocomplete() {
@@ -255,7 +260,6 @@ class JSTerm extends React.Component {
 
   onBeforeSelectionChange = (_, obj) => {
     const cursorMoved = ["*mouse", "+move"].includes(obj.origin);
-
     if (cursorMoved) {
       this.setState({ hideAutocomplete: true });
     }
@@ -273,7 +277,7 @@ class JSTerm extends React.Component {
   }
 
   render() {
-    const { autocompleteIndex } = this.state;
+    const { autocompleteIndex, value, charWidth } = this.state;
     const matches = this.getMatches();
 
     return (
@@ -289,6 +293,7 @@ class JSTerm extends React.Component {
         />
         {this.showAutocomplete() ? (
           <Autocomplete
+            leftOffset={charWidth * getCursorIndex(value)}
             matches={matches}
             selectedIndex={autocompleteIndex}
             onMatchClick={this.onMatchClick}

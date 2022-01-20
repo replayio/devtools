@@ -225,6 +225,15 @@ export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
   return [];
 }
 
+export function getCursorIndex(value: string) {
+  if (shouldPropertyAutocomplete(value)) {
+    // +1 to account for the `.` or `[`
+    return getParentExpression(value).length + 1;
+  } else {
+    return 0;
+  }
+}
+
 export function appendAutocompleteMatch(value: string, match: string) {
   const parentExpression = getParentExpression(value);
 

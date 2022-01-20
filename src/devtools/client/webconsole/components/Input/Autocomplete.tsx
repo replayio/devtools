@@ -17,7 +17,7 @@ function Match({
 
   useEffect(() => {
     if (selected && buttonNode.current) {
-      buttonNode.current.scrollIntoView({ block: "nearest" });
+      buttonNode.current.scrollIntoView({ block: "nearest", inline: "end" });
     }
   }, [selected]);
 
@@ -36,10 +36,12 @@ function Match({
 }
 
 export default function Autocomplete({
+  leftOffset,
   matches,
   selectedIndex,
   onMatchClick,
 }: {
+  leftOffset: number;
   matches: string[];
   selectedIndex: number;
   onMatchClick: (index: number) => void;
@@ -52,6 +54,7 @@ export default function Autocomplete({
         maxHeight: "160px",
         fontSize: "var(--theme-code-font-size)",
         bottom: "var(--editor-footer-height)",
+        marginLeft: `${leftOffset}px`,
       }}
     >
       {matches.map((match, i) => (
