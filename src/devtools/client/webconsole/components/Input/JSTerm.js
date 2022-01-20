@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import actions from "devtools/client/webconsole/actions/index";
 
-import { getRecordingId } from "ui/utils/environment";
+import { getRecordingId } from "ui/utils/recording";
 import { getRecording } from "ui/hooks/recordings";
 import { getCommandHistory } from "../../selectors/messages";
 
