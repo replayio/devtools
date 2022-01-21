@@ -24,8 +24,8 @@ const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
 
 const availableTabs: readonly InspectorActiveTab[] = [
   "ruleview",
-  "computedview",
   "layoutview",
+  "computedview",
   "eventsview",
 ] as const;
 
