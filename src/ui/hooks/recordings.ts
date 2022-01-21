@@ -730,7 +730,10 @@ export function useUpdateRecordingTitle() {
           }
         }
       }
-    `
+    `,
+    {
+      refetchQueries: ["GetRecording"],
+    }
   );
 
   return updateRecordingTitle;
