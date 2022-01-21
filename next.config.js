@@ -16,6 +16,17 @@ module.exports = {
         destination: "/recording/:id",
         permanent: true,
       },
+      {
+        source: "/",
+        has: [
+          {
+            type: "query",
+            key: "id",
+          },
+        ],
+        destination: "/recording/:id",
+        permanent: true,
+      },
     ];
   },
 
