@@ -50,13 +50,19 @@ export const maybeTrackTeamChange = (newWorkspaceId: string | null) => {
   }
 };
 
+const NULL_NAMESPACE = "no_namespace";
+const namespaceFromEventName = (event: string): string => {
+  const namespace = event.slice(0, event.indexOf("."));
+  return namespace.length ? namespace : NULL_NAMESPACE;
+};
+
 export async function trackMixpanelEvent(event: string, properties?: Dict) {
   if (prefs.logTelemetryEvent) {
     console.log("🔴", event, properties);
   }
 
   if (!mixpanelDisabled) {
-    mixpanel.track(event, properties);
+    mixpanel.track(event, { ...properties, namespace: namespaceFromEventName(event) });
   }
 }
 
