@@ -154,9 +154,7 @@ class JSTerm extends React.Component {
     }
   };
 
-  onMatchClick = index => {
-    const match = this.getMatches()[index];
-
+  onMatchClick = match => {
     this.selectAutocompleteMatch(match);
   };
 
@@ -268,11 +266,11 @@ class JSTerm extends React.Component {
     const { frameScope } = this.props;
     const { value } = this.state;
 
-    if (!value) {
+    if (!value || !frameScope) {
       return [];
     }
 
-    return getAutocompleteMatches(value, frameScope);
+    return getAutocompleteMatches(value, frameScope.scope);
   }
 
   render() {
@@ -294,6 +292,7 @@ class JSTerm extends React.Component {
           <Autocomplete
             leftOffset={charWidth * getCursorIndex(value)}
             matches={matches}
+            value={value}
             selectedIndex={autocompleteIndex}
             onMatchClick={this.onMatchClick}
           />

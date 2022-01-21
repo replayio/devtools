@@ -1,5 +1,8 @@
-import * as babelParser from "@babel/parser";
-import * as t from "@babel/types";
+import { parseExpression } from "@babel/parser";
+import {
+  isIdentifier as _isIdentifier,
+  isMemberExpression as _isMemberExpression,
+} from "@babel/types";
 const { filter } = require("fuzzaldrin-plus");
 
 type ObjectPreviewProperty = {
@@ -11,6 +14,7 @@ type ObjectPreviewProperty = {
   get?: any;
   set?: any;
 };
+
 type ObjectPreview = {
   containerEntries: any[];
   getterValues: any[];
@@ -18,11 +22,13 @@ type ObjectPreview = {
   prototypeId: any;
   prototypeValue: ValueFront;
 };
+
 type ObjectFront = {
   className: string;
   objectId: string;
   preview?: ObjectPreview;
 };
+
 type ValueFront = {
   _pause: any;
   _hasPrimitive: false;
@@ -35,10 +41,12 @@ type ValueFront = {
   _elements: null;
   _isMapEntry: null;
 };
+
 type Binding = {
   name: string;
   value: ValueFront;
 };
+
 type Scope = {
   bindings: Binding[];
   actor: string;
@@ -48,17 +56,20 @@ type Scope = {
   scopeKind: string;
   type: "block" | string;
 };
-type FrameScope = {
-  scope: Scope;
-  pending: boolean;
-  originalScopesUnavailable: boolean;
-};
 
-function getMatchString(str: string) {
+// This is used as a property name placeholder for what they user could
+//  be trying to type or find the autocomplete match to.
+const PROPERTY_PLACEHOLDER = "fakeProperty";
+
+// Trims quotation marks from the string. This allows us to match
+// bracket notation properties regardless of whether the user has quotation
+// marks or not. i.e., `foo["ba` vs `foo[ba` will both show "bar" as
+// an autocomplete match.
+function normalizeString(str: string) {
   return str.toLowerCase().replace(/['"`]+/g, "");
 }
 function fuzzyFilter(candidates: string[], query: string): string[] {
-  if (getMatchString(query) === "") {
+  if (normalizeString(query) === "") {
     return candidates;
   }
   return filter(candidates, query);
@@ -66,44 +77,47 @@ function fuzzyFilter(candidates: string[], query: string): string[] {
 
 function isIdentifier(expression: string) {
   try {
-    const parsed = babelParser.parseExpression(expression);
-    const isIdentifier = t.isIdentifier(parsed);
-
-    return isIdentifier;
+    return _isIdentifier(parseExpression(expression));
   } catch (e) {
     return false;
   }
 }
 function isMemberExpression(expression: string) {
   try {
-    const parsed = babelParser.parseExpression(expression);
-    const rv = t.isMemberExpression(parsed);
-
-    return rv;
+    return _isMemberExpression(parseExpression(expression));
   } catch (e) {
     return false;
   }
 }
 
+// This tries to fill the rest of the input as if it were using bracket notation.
+// If the isMemberExpression() call throws, or returns false, then we know it's
+// not bracket notation.
 function isBracketNotation(input: string) {
-  const expression = input.slice(0, input.lastIndexOf("[") + 1);
-  return isMemberExpression(expression + `"a"]`);
+  const expressionUpToLastOpenBracket = input.slice(0, input.lastIndexOf("[") + 1);
+  return isMemberExpression(expressionUpToLastOpenBracket + `"${PROPERTY_PLACEHOLDER}"]`);
 }
+// This tries to fill the rest of the input as if it were using dot notation.
+// If the isMemberExpression() call throws, or returns false, then we know it's
+// bracket notation.
 function isDotNotation(input: string) {
-  return isMemberExpression(input + `a`);
+  return isMemberExpression(input + PROPERTY_PLACEHOLDER);
 }
 function isAccessingObjProperty(input: string) {
   return isBracketNotation(input) || isDotNotation(input);
 }
 
-function getPropertiesForObject(object: ObjectFront): string[] {
-  const preview = object.preview;
+function getPropertiesForObject(object?: ObjectFront): string[] {
   const properties = [];
+
+  if (!object) {
+    return [];
+  }
 
   // The object preview may be undefined until the user expands the object
   // in the scopes panel. This applies primarily to prototype objects.
-  if (preview) {
-    const objectProperties = preview.properties.map(b => b.name);
+  if (object.preview) {
+    const objectProperties = object.preview.properties.map(b => b.name);
     properties.unshift(...objectProperties);
   } else {
     if (["Object", "Array"].includes(object.className)) {
@@ -117,7 +131,7 @@ function getPropertiesForObject(object: ObjectFront): string[] {
     }
   }
 
-  const prototype = preview?.prototypeValue;
+  const prototype = object.preview?.prototypeValue;
 
   // Recursively gather the properties through the prototype chain.
   if (prototype?._object) {
@@ -149,33 +163,22 @@ export function shouldPropertyAutocomplete(input: string) {
 
   // Right now, this only works for direct property access (e.g., a.b)
   // and doesn't support chained expressions (e.g., a.b.c.d). This is because
-  // we don't (yet) have the chained values in the fetched frame scope data.
+  // we don't (yet) immediately have the chained values in the fetched frame
+  // scope data.
   return isIdentifier(parentExpression);
 }
 function shouldVariableAutocomplete(input: string) {
   return isIdentifier(input);
 }
 
-function getBinding(name: string, frameScope: FrameScope) {
-  return frameScope.scope.bindings.find(b => b.name === name);
+function getBinding(name: string, scope: Scope) {
+  return scope.bindings.find(b => b.name === name);
 }
-function getBindingNames(scope: FrameScope): string[] {
-  if (!scope?.scope) {
-    return [];
-  }
-
-  return scope.scope.bindings.map(b => b.name);
+function getBindingNames(scope: Scope): string[] {
+  return scope.bindings.map(b => b.name);
 }
 function getGlobalVariables(scopes: Scope) {
-  const variableNames = [];
-  const globalObject = scopes.parent.object;
-
-  if (globalObject) {
-    const properties = getPropertiesForObject(globalObject._object);
-    variableNames.push(...properties);
-  }
-
-  return variableNames;
+  return getPropertiesForObject(scopes.parent.object?._object);
 }
 
 export function getLastToken(input: string) {
@@ -186,6 +189,7 @@ export function getLastToken(input: string) {
   }
 }
 
+// Used to figure out the earliest cursor position of the current autocomplete target.
 export function getCursorIndex(value: string) {
   if (shouldPropertyAutocomplete(value)) {
     // +1 to account for the `.` or `[`
@@ -210,19 +214,13 @@ export function insertAutocompleteMatch(value: string, match: string) {
   }
 }
 
-export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
-  if (!frameScope?.scope) {
-    return [];
-  }
-
-  const bindingNames = getBindingNames(frameScope);
-
+export function getAutocompleteMatches(input: string, scope: Scope) {
   if (shouldPropertyAutocomplete(input)) {
     const computedProperty = isBracketNotation(input);
     const lastToken = getLastToken(input);
     const parentToken = getParentExpression(input);
 
-    const binding = getBinding(parentToken, frameScope);
+    const binding = getBinding(parentToken, scope);
 
     if (!binding) {
       return [];
@@ -236,13 +234,11 @@ export function getAutocompleteMatches(input: string, frameScope: FrameScope) {
 
     const properties = getPropertiesForObject(object);
 
-    const filteredProperties = fuzzyFilter(properties, getMatchString(lastToken));
+    const filteredProperties = fuzzyFilter(properties, normalizeString(lastToken));
     return filteredProperties.map(p => (computedProperty ? `"${p}"` : p));
   } else if (shouldVariableAutocomplete(input)) {
-    const variableNames = [...bindingNames, ...getGlobalVariables(frameScope.scope)];
-    const filteredNames = fuzzyFilter(variableNames, getMatchString(input));
-
-    return filteredNames;
+    const variableNames = [...getBindingNames(scope), ...getGlobalVariables(scope)];
+    return fuzzyFilter(variableNames, normalizeString(input));
   }
 
   return [];

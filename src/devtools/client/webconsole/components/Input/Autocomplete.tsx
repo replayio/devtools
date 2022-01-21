@@ -3,32 +3,29 @@ import classNames from "classnames";
 
 function Match({
   label,
-  selectedIndex,
-  index,
+  isSelected,
   onClick,
 }: {
   label: string;
-  selectedIndex: number;
-  index: number;
-  onClick: (index: number) => void;
+  isSelected: boolean;
+  onClick: (match: string) => void;
 }) {
-  const buttonNode = useRef<HTMLButtonElement | null>(null);
-  const selected = selectedIndex === index;
+  const buttonNode = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (selected && buttonNode.current) {
+    if (isSelected && buttonNode.current) {
       buttonNode.current.scrollIntoView({ block: "nearest", inline: "end" });
     }
-  }, [selected]);
+  }, [isSelected]);
 
   return (
     <button
       className={classNames(
         "text-left px-1 cursor-default",
-        selected ? "bg-blue-700 text-white" : "hover:bg-blue-100"
+        isSelected ? "bg-blue-700 text-white" : "hover:bg-blue-100"
       )}
       ref={buttonNode}
-      onClick={() => onClick(index)}
+      onClick={() => onClick(label)}
     >
       {label}
     </button>
@@ -44,7 +41,7 @@ export default function Autocomplete({
   leftOffset: number;
   matches: string[];
   selectedIndex: number;
-  onMatchClick: (index: number) => void;
+  onMatchClick: (match: string) => void;
 }) {
   return (
     <div
@@ -59,13 +56,7 @@ export default function Autocomplete({
       }}
     >
       {matches.map((match, i) => (
-        <Match
-          label={match}
-          selectedIndex={selectedIndex}
-          index={i}
-          key={i}
-          onClick={onMatchClick}
-        />
+        <Match label={match} isSelected={i === selectedIndex} key={i} onClick={onMatchClick} />
       ))}
     </div>
   );
