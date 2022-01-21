@@ -79,7 +79,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   line-height: 16px;
   text-decoration: none;
   white-space: nowrap;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
   text-align: center;
 }

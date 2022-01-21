@@ -9,4 +9,7 @@ export class DebuggerPanel {
   highlightDomElement(gripOrFront: DOMFront): void;
   unHighlightDomElement(): void;
   destroy(): void;
+  getSourceByActorId(id?: string): any;
+  getSourceByURL(url?: string): any;
+  selectSource(sourceId: string, line?: number, column?: number): any;
 }

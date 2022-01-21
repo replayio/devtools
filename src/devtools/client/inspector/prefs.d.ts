@@ -1,5 +1,4 @@
 export const prefs: {
-  is3PaneModeEnabled: boolean;
   sidebarSize: number;
   splitSidebarSize: number;
   activeTab: string;

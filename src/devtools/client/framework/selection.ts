@@ -2,22 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const EventEmitter = require("devtools/shared/event-emitter");
-
-const nodeConstants = require("devtools/shared/dom-node-constants");
-
+import EventEmitter from "devtools/shared/event-emitter";
+import nodeConstants from "devtools/shared/dom-node-constants";
 import { NodeFront } from "protocol/thread/node";
 
-export type NodeSelectionReason =
+export type SelectionReason =
   | "navigateaway"
   | "markup"
   | "debugger"
-  | "unknown"
   | "breadcrumbs"
   | "inspectorsearch"
   | "box-model"
   | "console"
-  | "keyboard";
+  | "keyboard"
+  | "unknown";
+
+type SelectionEvent =
+  | "new-node-front" // when the inner node changed
+  | "attribute-changed" // when an attribute is changed
+  | "detached-front" // when the node (or one of its parents) is removed from the document
+  | "reparented" // when the node (or one of its parents) is moved under a different node
+  | "pseudoclass"; // (unsure);
 
 /**
  * Selection is a singleton belonging to the Toolbox that manages the current selected
@@ -53,19 +58,11 @@ export type NodeSelectionReason =
  *   isDocumentTypeNode()
  *   isDocumentFragmentNode()
  *   isNotationNode()
- *
- * Events:
- *   "new-node-front" when the inner node changed
- *   "attribute-changed" when an attribute is changed
- *   "detached-front" when the node (or one of its parents) is removed from
- *   the document
- *   "reparented" when the node (or one of its parents) is moved under
- *   a different node
  */
 class Selection {
   private _nodeFront: NodeFront | undefined | null;
   private _isSlotted: boolean;
-  reason: NodeSelectionReason | undefined;
+  reason: SelectionReason | undefined;
 
   constructor() {
     EventEmitter.decorate(this);
@@ -97,7 +94,7 @@ class Selection {
       reason = "unknown",
       isSlotted = false,
     }: Partial<{
-      reason: NodeSelectionReason | undefined;
+      reason: SelectionReason | undefined;
       isSlotted: boolean;
     }> = {}
   ) {
@@ -227,11 +224,11 @@ class Selection {
     return this.isNode() && this.nodeFront!.isShadowRoot;
   }
 
-  // added by EventEmitter.decorate(ThreadFront)
+  // added by EventEmitter.decorate(this) in the constructor
   eventListeners!: Map<string, ((...args: any[]) => void)[]>;
-  on!: (name: string, handler: (...args: any[]) => void) => void;
-  off!: (name: string, handler: (...args: any[]) => void) => void;
-  emit!: (name: string, ...args: any[]) => void;
+  on!: (name: SelectionEvent, handler: (...args: any[]) => void) => void;
+  off!: (name: SelectionEvent, handler: (...args: any[]) => void) => void;
+  emit!: (name: SelectionEvent, ...args: any[]) => void;
 }
 
 export default Selection;
