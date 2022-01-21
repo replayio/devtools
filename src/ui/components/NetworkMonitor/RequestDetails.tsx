@@ -4,7 +4,6 @@ import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
 import sortBy from "lodash/sortBy";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
-import ComingSoon from "./ComingSoon";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 import { WiredFrame } from "protocol/thread/pause";
@@ -29,7 +28,7 @@ function FormattedUrl({ url }: { url: string }) {
         <>
           {params.map(([key, value], index) => (
             <span key={key}>
-              <span className="">{index == 0 ? "?" : "&"}</span>
+              <span className="">{index === 0 ? "?" : "&"}</span>
               <span className="text-primaryAccent">{key}</span>
               <span>={value}</span>
             </span>
@@ -98,11 +97,26 @@ const StackTrace = ({
 }) => {
   return (
     <div>
-      <h1 className="p-3 font-bold">Stack Trace</h1>
+      <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
       <div className="px-2">
         <Frames cx={cx} framesLoading={true} frames={frames} selectFrame={selectFrame} />
       </div>
     </div>
+  );
+};
+
+const Timing = ({ request }: { request: RequestSummary }) => {
+  return (
+    <>
+      <div className="flex justify-between items-center px-4 py-2 font-bold">Timings:</div>
+      <DetailTable
+        details={[
+          { name: "Initiated at", value: `${request.start}ms` },
+          { name: "Returned at (first byte)", value: `${request.end!}ms` },
+          { name: "Time waiting for response", value: `${request.end! - request.start!}ms` },
+        ]}
+      />
+    </>
   );
 };
 
@@ -164,7 +178,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
           {responseHeadersExpanded && (
             <DetailTable className={styles.headerTable} details={responseHeaders} />
           )}
-          {request.queryParams.length && (
+          {request.queryParams.length > 0 && (
             <div>
               <h2
                 className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
@@ -223,7 +237,11 @@ const RequestDetails = ({
     { id: "request", title: "Request", visible: request.hasRequestBody && httpBodies },
     { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
     { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
-    { id: "timings", title: "Timings", visible: true },
+    {
+      id: "timings",
+      title: "Timings",
+      visible: typeof request.start === "number" && typeof request.end === "number",
+    },
   ];
 
   const activeTabs = tabs.filter(t => t.visible);
@@ -245,18 +263,18 @@ const RequestDetails = ({
       </div>
       <div className={classNames("requestDetails", styles.requestDetails)}>
         <div>
-          {activeTab == "headers" && <HeadersPanel request={request} />}
-          {activeTab == "cookies" && <Cookies request={request} />}
-          {activeTab == "response" && (
+          {activeTab === "headers" && <HeadersPanel request={request} />}
+          {activeTab === "cookies" && <Cookies request={request} />}
+          {activeTab === "response" && (
             <ResponseBody request={request} responseBodyParts={responseBody} />
           )}
-          {activeTab == "request" && (
+          {activeTab === "request" && (
             <RequestBody request={request} requestBodyParts={requestBody} />
           )}
-          {activeTab == "stackTrace" && (
+          {activeTab === "stackTrace" && (
             <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
           )}
-          {activeTab == "timings" && <ComingSoon />}
+          {activeTab === "timings" && <Timing request={request} />}
         </div>
       </div>
     </div>

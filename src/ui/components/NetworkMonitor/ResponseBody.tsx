@@ -16,7 +16,7 @@ const ResponseBody = ({
   return (
     <>
       <div className="flex justify-between items-center px-4 py-2 font-bold">Response body:</div>
-      <div className="pl-6">
+      <div className="pl-4">
         <HttpBody
           bodyParts={responseBodyParts}
           contentType={findHeader(request.responseHeaders, "content-type") || "unknown"}
