@@ -66,7 +66,3 @@ or the inspector where the split console can be displayed.  */
 #toolbox.console .split-box.horz > .splitter {
   pointer-events: none;
 }
-
-.inspector-sidebar-splitter > .splitter {
-  background: var(--theme-splitter-color);
-}

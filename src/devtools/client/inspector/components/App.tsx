@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useMemo, useRef } from "react";
+import React, { FC, ReactNode, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import { UIState } from "ui/state";
@@ -34,9 +34,6 @@ const InspectorApp: FC = () => {
 
   const inspector = gToolbox.getPanel("inspector");
   const inspectorInited = inspector && initializedPanels.includes("inspector");
-
-  const sidebarContainerRef = useRef<HTMLDivElement>(null); // nosemgrep
-  const splitBoxRef = useRef<SplitBox>(null); // nosemgrep
 
   const onSplitboxResize = (width: number) => {
     prefs.splitSidebarSize = width;
@@ -78,9 +75,8 @@ const InspectorApp: FC = () => {
       className="inspector-responsive-container theme-body inspector"
       data-localization-bundle="devtools/client/locales/inspector.properties"
     >
-      <div id="inspector-splitter-box" ref={sidebarContainerRef}>
+      <div id="inspector-splitter-box">
         <SplitBox
-          ref={splitBoxRef}
           className="inspector-sidebar-splitter"
           initialSize={`${prefs.splitSidebarSize}px`}
           minSize="20%"
