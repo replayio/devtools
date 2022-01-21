@@ -12,17 +12,21 @@ import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import { InspectorActiveTab } from "../state";
 
 import "ui/setup/dynamic/inspector";
+import { EventListenersApp } from "../event-listeners/EventListenersApp";
+import { assert } from "protocol/utils";
 
 const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
   ruleview: "Rules",
   computedview: "Computed",
   layoutview: "Layout",
+  eventsview: "Event Listeners",
 } as const;
 
 const availableTabs: readonly InspectorActiveTab[] = [
   "ruleview",
   "computedview",
   "layoutview",
+  "eventsview",
 ] as const;
 
 const InspectorApp: FC = () => {
@@ -50,6 +54,7 @@ const InspectorApp: FC = () => {
     if (!inspectorInited) {
       return null;
     }
+
     switch (activeTab) {
       case "ruleview": {
         return <RulesApp {...inspector.rules.getRulesProps()} />;
@@ -65,9 +70,14 @@ const InspectorApp: FC = () => {
         };
         return <LayoutApp {...layoutProps} />;
       }
-      default:
-        return null;
+      case "eventsview": {
+        return <EventListenersApp />;
+      }
     }
+    assert(
+      false,
+      "This code should be unreachable (handle all cases within the switch statement)."
+    );
   }, [inspector, inspectorInited, activeTab]);
 
   return (
