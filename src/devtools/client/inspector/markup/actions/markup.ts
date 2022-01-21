@@ -2,7 +2,7 @@ import { Action } from "redux";
 import { assert, defer, Deferred } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
-import Selection, { NodeSelectionReason } from "devtools/client/framework/selection";
+import Selection, { SelectionReason } from "devtools/client/framework/selection";
 import { NodeInfo } from "../state/markup";
 import { UIThunkAction } from "ui/actions";
 import {
@@ -13,7 +13,8 @@ import {
 } from "../selectors/markup";
 import { UIState } from "ui/state";
 import Highlighter from "highlighter/highlighter";
-const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
+const { DOCUMENT_TYPE_NODE, TEXT_NODE } = require("devtools/shared/dom-node-constants");
+const { features } = require("devtools/client/inspector/prefs");
 
 export type ResetAction = Action<"RESET">;
 export type NewRootAction = Action<"NEW_ROOT"> & { rootNode: NodeInfo };
@@ -90,6 +91,11 @@ export function newRoot(): UIThunkAction {
  */
 export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): UIThunkAction {
   return async ({ dispatch }) => {
+    if (!features.showWhitespaceNodes) {
+      childFronts = childFronts.filter(
+        node => node.nodeType !== TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
+      );
+    }
     dispatch({
       type: "ADD_CHILDREN",
       parentNodeId: parentFront.objectId(),
@@ -221,7 +227,7 @@ export function selectionChanged(
   };
 }
 
-export function selectNode(nodeId: string, reason?: NodeSelectionReason): UIThunkAction {
+export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
   return ({ toolbox }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
@@ -402,14 +408,6 @@ export function onPageDownKey(): UIThunkAction {
   };
 }
 
-/**
- * Given a NodeFront, return the representation for the markup tree.
- *
- * @param  {NodeFront} node
- *         The NodeFront of the node to add to the markup tree.
- * @param  {Boolean} isExpanded
- *         Whether or not the node is expanded.
- */
 async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promise<NodeInfo> {
   const parentNode = node.parentNode();
   const id = node.objectId();

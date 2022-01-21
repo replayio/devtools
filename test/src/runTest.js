@@ -11,8 +11,8 @@ async function recordBrowser(state, test, testPath, browserName) {
 
   let success, why;
   const browser = await playwright[browserName].launch({
+    executablePath: state.browserPath,
     headless: state.headless,
-    executablePath: state.executablePath,
   });
 
   const context = await browser.newContext();

@@ -23,10 +23,9 @@ pref("devtools.defaultColorUnit", "authored");
 pref("devtools.inspector.show_pseudo_elements", false);
 
 // features
-pref("devtools.inspector.features.show-whitespace-nodes", true);
+pref("devtools.inspector.features.show-whitespace-nodes", false);
 
 export const prefs = new PrefsHelper("devtools.inspector", {
-  is3PaneModeEnabled: ["Bool", "is-three-pane-mode-enabled"],
   sidebarSize: ["Int", "sidebar-size"],
   splitSidebarSize: ["Int", "split-sidebar-size"],
   activeTab: ["String", "active-tab"],

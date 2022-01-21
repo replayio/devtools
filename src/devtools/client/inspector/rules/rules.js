@@ -252,9 +252,6 @@ class RulesView {
    */
   isPanelVisible() {
     return this.inspector?.toolbox?.currentTool === "inspector";
-    // return this.inspector.is3PaneModeEnabled
-    //   ? true
-    //   : this.inspector?.sidebar?.getCurrentTabID() === "newruleview";
   }
 
   /**

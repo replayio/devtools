@@ -24,8 +24,8 @@ async function recordNode(state, scriptPath) {
     console.log(`Skipping test: RECORD_REPLAY_NODE not set`);
     return;
   }
-  if (!process.env.RECORD_REPLAY_DRIVER) {
-    console.log(`Skipping test: RECORD_REPLAY_DRIVER not set`);
+  if (!state.driverPath) {
+    console.log(`Skipping test: RECORD_REPLAY_DRIVER not set and no --driverPath flag was passed`);
     return;
   }
 
@@ -34,9 +34,10 @@ async function recordNode(state, scriptPath) {
   spawnSync(process.env.RECORD_REPLAY_NODE, [scriptPath], {
     env: {
       ...process.env,
-      RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
-      RECORD_REPLAY_DISPATCH: state.dispatchServer,
       RECORD_REPLAY_API_KEY: state.replayApiKey,
+      RECORD_REPLAY_DISPATCH: state.dispatchServer,
+      RECORD_REPLAY_DRIVER: state.driverPath,
+      RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
     },
     stdio: "inherit",
   });

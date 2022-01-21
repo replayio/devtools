@@ -1,4 +1,4 @@
-import Selection, { NodeSelectionReason } from "devtools/client/framework/selection";
+import Selection, { SelectionReason } from "devtools/client/framework/selection";
 import { Inspector } from "../inspector";
 
 import { ThreadFront } from "protocol/thread";
@@ -240,7 +240,7 @@ class MarkupView {
   /**
    * Updates the markup tree based on the current node selection.
    */
-  async update(_: any, reason: NodeSelectionReason) {
+  async update(_: any, reason: SelectionReason) {
     if (!this.isInspectorVisible || !this.selection || !this.selection.isNode()) {
       return;
     }

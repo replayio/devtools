@@ -82,7 +82,7 @@ class Timeline extends Component<PropsFromRedux> {
     if (!isHovered) {
       window.clearInterval(this.hoverInterval);
       this.hoverInterval = undefined;
-      setTimelineToTime(null);
+      setTimelineToTime(null, false);
     }
   };
 
