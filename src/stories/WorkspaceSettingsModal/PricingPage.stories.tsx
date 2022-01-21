@@ -17,6 +17,7 @@ export const Team = Template.bind({});
 Team.args = {
   subscription: {
     billingSchedule: "monthly",
+    discount: 0,
     createdAt: new Date().toISOString(),
     createdBy: { name: "test", id: "test", internal: false, picture: "" },
     displayName: "Team",
@@ -43,6 +44,7 @@ export const Organization = Template.bind({});
 Organization.args = {
   subscription: {
     billingSchedule: "monthly",
+    discount: 0,
     createdAt: new Date().toISOString(),
     createdBy: { name: "test", id: "test", internal: false, picture: "" },
     displayName: "Organization",
@@ -69,6 +71,7 @@ export const BetaTester = Template.bind({});
 BetaTester.args = {
   subscription: {
     billingSchedule: null,
+    discount: 0,
     createdAt: new Date().toISOString(),
     createdBy: { name: "test", id: "test", internal: false, picture: "" },
     displayName: "Beta Tester Appreciation",
