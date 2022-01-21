@@ -5,6 +5,10 @@ import { ViewMode } from "ui/state/layout";
 import { isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
+import { UIState } from "ui/state";
+import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
+import { getSelectedPanel } from "ui/reducers/app";
+import { getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
 
 const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
@@ -24,6 +28,23 @@ export function initializeMixpanel() {
   mixpanel.register({ recordingId: getRecordingId() });
 }
 
+const kickOffMixpanelTimer = () => {
+  if (!window.app) {
+    return;
+  }
+  const state = window.app.store.getState();
+  mixpanel.track("time_spent", {
+    selectedPrimaryPanel: getSelectedPrimaryPanel(state),
+    selectedSecondaryPanel: getSelectedPanel(state),
+    startPanelCollapsed: getPaneCollapse(state),
+    viewMode: getViewMode(state),
+  });
+
+  setTimeout(() => {
+    kickOffMixpanelTimer();
+  }, 15000);
+};
+
 export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId: string | null }) {
   const { email, internal } = userInfo;
   const isQAUser = email && QA_EMAIL_ADDRESSES.includes(email);
@@ -37,6 +58,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
     setMixpanelContext(userInfo);
     enableMixpanel();
     trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
+    kickOffMixpanelTimer();
     setupSessionEndListener();
   } else {
     disableMixpanel();
