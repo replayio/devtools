@@ -19,7 +19,6 @@ import {
   insertAutocompleteMatch,
   getAutocompleteMatches,
   getCursorIndex,
-  getLastToken,
 } from "../../utils/autocomplete";
 
 async function createEditor({ onArrowPress, onEnter, onTab }) {
@@ -101,17 +100,16 @@ class JSTerm extends React.Component {
   }
 
   showAutocomplete() {
-    const { value } = this.state;
-    const lastToken = getLastToken(value);
+    const { value, hideAutocomplete } = this.state;
     const matches = this.getMatches();
     const matchCount = matches.length;
 
-    // Bail if the only suggest autocomplete option is already in the input.
-    if (matchCount === 1 && matches[0] === lastToken) {
+    // Bail if the only suggested autocomplete option has already been applied to the input.
+    if (matchCount === 1 && insertAutocompleteMatch(value, matches[0]) === value) {
       return false;
     }
 
-    return !this.state.hideAutocomplete && matchCount;
+    return !hideAutocomplete && matchCount;
   }
 
   focus() {

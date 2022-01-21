@@ -13,8 +13,8 @@ function Match({
   const buttonNode = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (isSelected && buttonNode.current) {
-      buttonNode.current.scrollIntoView({ block: "nearest", inline: "end" });
+    if (isSelected) {
+      buttonNode.current?.scrollIntoView({ block: "nearest", inline: "end" });
     }
   }, [isSelected]);
 
@@ -47,12 +47,12 @@ export default function Autocomplete({
     <div
       className="flex flex-col bg-white border py-1 absolute left-7 -mb-1 shadow-sm font-mono overflow-x-hidden overflow-y-auto"
       style={{
+        bottom: "var(--editor-footer-height)",
+        fontSize: "var(--theme-code-font-size)",
+        marginLeft: `${leftOffset}px`,
+        maxHeight: "160px",
         maxWidth: "200px",
         minWidth: "160px",
-        maxHeight: "160px",
-        fontSize: "var(--theme-code-font-size)",
-        bottom: "var(--editor-footer-height)",
-        marginLeft: `${leftOffset}px`,
       }}
     >
       {matches.map((match, i) => (
