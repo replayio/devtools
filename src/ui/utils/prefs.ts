@@ -19,6 +19,8 @@ pref("devtools.libraryFilterAssociation", "all");
 pref("devtools.logTelemetryEvent", false);
 pref("devtools.showRedactions", false);
 pref("devtools.disableLogRocket", false);
+pref("devtools.listenForMetrics", false);
+pref("devtools.disableCache", false);
 
 // app features
 pref("devtools.features.auth0", true);
@@ -56,6 +58,8 @@ export const prefs = new PrefsHelper("devtools", {
   showRedactions: ["Bool", "showRedactions"],
   disableLogRocket: ["Bool", "disableLogRocket"],
   sidePanelSize: ["String", "sidePanelSize"],
+  listenForMetrics: ["Bool", "listenForMetrics"],
+  disableCache: ["Bool", "disableCache"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
