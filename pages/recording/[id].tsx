@@ -5,7 +5,7 @@ import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
-import { getRecordingMetadata, useGetRecordingId } from "ui/hooks/recordings";
+import { getRecordingMetadata, useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getRecordingURL } from "ui/utils/recording";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
@@ -71,24 +71,9 @@ function RecordingHead({ metadata }: MetadataProps) {
   );
 }
 
-function RecordingPage({
-  getAccessibleRecording,
-  head,
-}: PropsFromRedux & { head?: React.ReactNode }) {
+function useRecordingSlug(recordingId: string) {
   const router = useRouter();
-  const store = useStore();
-  const recordingId = useGetRecordingId();
-  const [recording, setRecording] = useState<RecordingInfo | null>();
-  const [uploadComplete, setUploadComplete] = useState(false);
-  useEffect(() => {
-    if (!store || !recordingId) return;
-
-    async function getRecording() {
-      await setup(store);
-      setRecording(await getAccessibleRecording(recordingId));
-    }
-    getRecording();
-  }, [recordingId, store, getAccessibleRecording]);
+  const { recording } = useGetRecording(recordingId);
 
   useEffect(() => {
     if (recording?.title) {
@@ -111,7 +96,29 @@ function RecordingPage({
         );
       }
     }
-  }, [router, recording]);
+  }, [router, recording, recording?.title]);
+
+  return { recording };
+}
+
+function RecordingPage({
+  getAccessibleRecording,
+  head,
+}: PropsFromRedux & { head?: React.ReactNode }) {
+  const store = useStore();
+  const recordingId = useGetRecordingId();
+  useRecordingSlug(recordingId);
+  const [recording, setRecording] = useState<RecordingInfo | null>();
+  const [uploadComplete, setUploadComplete] = useState(false);
+  useEffect(() => {
+    if (!store || !recordingId) return;
+
+    async function getRecording() {
+      await setup(store);
+      setRecording(await getAccessibleRecording(recordingId));
+    }
+    getRecording();
+  }, [recordingId, store, getAccessibleRecording]);
 
   if (!recording || typeof window === "undefined") {
     return (
