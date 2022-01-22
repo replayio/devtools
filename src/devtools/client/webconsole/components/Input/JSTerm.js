@@ -8,14 +8,20 @@ import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import actions from "devtools/client/webconsole/actions/index";
+import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 
 import { getRecordingId } from "ui/utils/recording";
 import { getRecording } from "ui/hooks/recordings";
 import { getCommandHistory } from "../../selectors/messages";
-
+import Autocomplete from "./Autocomplete";
 import clamp from "lodash/clamp";
+import {
+  insertAutocompleteMatch,
+  getAutocompleteMatches,
+  getCursorIndex,
+} from "../../utils/autocomplete";
 
-async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
+async function createEditor({ onArrowPress, onEnter, onTab }) {
   await gToolbox.startPanel("debugger");
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
 
@@ -35,14 +41,15 @@ async function createEditor({ execute, historyCursorUp, historyCursorDown }) {
     viewportMargin: Infinity,
     disableSearchAddon: true,
     extraKeys: {
-      Enter: execute,
-      "Cmd-Enter": execute,
-      "Ctrl-Enter": execute,
+      Tab: onTab,
+      Enter: onEnter,
+      "Cmd-Enter": onEnter,
+      "Ctrl-Enter": onEnter,
       Esc: false,
       "Cmd-F": false,
       "Ctrl-F": false,
-      Up: historyCursorUp,
-      Down: historyCursorDown,
+      Up: () => onArrowPress("up"),
+      Down: () => onArrowPress("down"),
     },
   });
   return editor;
@@ -63,30 +70,106 @@ class JSTerm extends React.Component {
     this.state = {
       canEval: true,
       historyIndex: 0,
+      autocompleteIndex: 0,
+      hideAutocomplete: false,
+      charWidth: 0,
+      value: "",
     };
   }
 
   async componentDidMount() {
     this.editorWaiter = createEditor({
-      execute: this.execute,
-      historyCursorUp: this.historyCursorUp,
-      historyCursorDown: this.historyCursorDown,
+      onArrowPress: this.onArrowPress,
+      onEnter: this.onEnter,
+      onTab: this.onTab,
     });
     this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
 
+    this.editor.codeMirror.on("change", this.onChange);
+    this.editor.codeMirror.on("keydown", this.onKeyDown);
+    this.editor.codeMirror.on("beforeSelectionChange", this.onBeforeSelectionChange);
+
     const recordingId = getRecordingId();
     const recording = await getRecording(recordingId);
 
-    this.setState({ canEval: recording.userRole !== "team-user" });
+    this.setState({
+      canEval: recording.userRole !== "team-user",
+      charWidth: this.editor.editor.display.cachedCharWidth,
+    });
+  }
+
+  showAutocomplete() {
+    const { value, hideAutocomplete } = this.state;
+    const matches = this.getMatches();
+    const matchCount = matches.length;
+
+    // Bail if the only suggested autocomplete option has already been applied to the input.
+    if (matchCount === 1 && insertAutocompleteMatch(value, matches[0]) === value) {
+      return false;
+    }
+
+    return !hideAutocomplete && matchCount;
   }
 
   focus() {
     this.editor?.focus();
   }
 
-  historyCursorUp = () => this.moveHistoryCursor(1);
-  historyCursorDown = () => this.moveHistoryCursor(-1);
+  onArrowPress = arrow => {
+    if (arrow === "up") {
+      if (this.showAutocomplete()) {
+        this.moveAutocompleteCursor(1);
+      } else {
+        this.moveHistoryCursor(1);
+      }
+    } else if (arrow === "down") {
+      if (this.showAutocomplete()) {
+        this.moveAutocompleteCursor(-1);
+      } else {
+        this.moveHistoryCursor(-1);
+      }
+    }
+  };
+
+  onEnter = () => {
+    if (!this.showAutocomplete()) {
+      this.execute();
+    } else {
+      const { autocompleteIndex } = this.state;
+      const match = this.getMatches()[autocompleteIndex];
+
+      this.selectAutocompleteMatch(match);
+    }
+  };
+
+  onTab = () => {
+    const { autocompleteIndex } = this.state;
+    const match = this.getMatches()[autocompleteIndex];
+
+    if (this.showAutocomplete()) {
+      this.selectAutocompleteMatch(match);
+    }
+  };
+
+  onMatchClick = match => {
+    this.selectAutocompleteMatch(match);
+  };
+
+  selectAutocompleteMatch(match) {
+    const { value } = this.state;
+
+    const newValue = insertAutocompleteMatch(value, match);
+    this.setValue(newValue);
+  }
+
+  moveAutocompleteCursor(difference) {
+    const { autocompleteIndex } = this.state;
+    const matchesCount = this.getMatches().length;
+
+    const newIndex = (matchesCount + autocompleteIndex - difference) % matchesCount;
+    this.setState({ autocompleteIndex: newIndex });
+  }
 
   moveHistoryCursor(difference) {
     const { commandHistory } = this.props;
@@ -157,17 +240,62 @@ class JSTerm extends React.Component {
     return this.editor.getSelection();
   }
 
+  onKeyDown = (_, event) => {
+    if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(event.key)) {
+      this.setState({ hideAutocomplete: true });
+    } else {
+      this.setState({ hideAutocomplete: false, autocompleteIndex: 0 });
+    }
+  };
+
+  onChange = cm => {
+    const value = cm.getValue();
+    this.setState({ value });
+  };
+
+  onBeforeSelectionChange = (_, obj) => {
+    const cursorMoved = ["*mouse", "+move"].includes(obj.origin);
+    if (cursorMoved) {
+      this.setState({ hideAutocomplete: true });
+    }
+  };
+
+  getMatches() {
+    const { frameScope } = this.props;
+    const { value } = this.state;
+
+    if (!value || !frameScope) {
+      return [];
+    }
+
+    return getAutocompleteMatches(value, frameScope.scope);
+  }
+
   render() {
+    const { autocompleteIndex, value, charWidth } = this.state;
+    const matches = this.getMatches();
+
     return (
-      <div
-        className="jsterm-input-container devtools-input"
-        key="jsterm-container"
-        aria-live="off"
-        tabIndex={-1}
-        ref={node => {
-          this.node = node;
-        }}
-      />
+      <div className="relative">
+        <div
+          className="jsterm-input-container devtools-input"
+          key="jsterm-container"
+          aria-live="off"
+          tabIndex={-1}
+          ref={node => {
+            this.node = node;
+          }}
+        />
+        {this.showAutocomplete() ? (
+          <Autocomplete
+            leftOffset={charWidth * getCursorIndex(value)}
+            matches={matches}
+            value={value}
+            selectedIndex={autocompleteIndex}
+            onMatchClick={this.onMatchClick}
+          />
+        ) : null}
+      </div>
     );
   }
 }
@@ -175,6 +303,7 @@ class JSTerm extends React.Component {
 function mapStateToProps(state) {
   return {
     commandHistory: getCommandHistory(state),
+    frameScope: getFrameScope(state, "0:0"),
   };
 }
 
