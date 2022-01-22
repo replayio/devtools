@@ -104,7 +104,7 @@ export default async function DevTools(store: Store) {
   window.app.debugger = setupDebuggerHelper();
   window.app.sendMessage = (cmd, args = {}, pauseId) =>
     sendMessage(cmd, args, window.sessionId, pauseId as any);
-  window.app.sendMessage = window.app.sendCommand;
+  window.app.sendCommand = window.app.sendMessage;
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
