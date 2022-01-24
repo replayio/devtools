@@ -165,6 +165,7 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
     return (
       <button
         type="button"
+        title="View event listeners"
         className="inspector-badge interactive inline-block relative py-0 px-0.5 leading-2 w-auto"
         onClick={() => {
           this.props.setActiveTab("eventsview");
