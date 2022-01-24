@@ -51,7 +51,10 @@ export const EventListenersApp: FC = () => {
       if (groups[listener.type] === undefined) {
         groups[listener.type] = [];
       }
-      groups[listener.type].push(listener);
+
+      if (listener.handler.hasPreview()) {
+        groups[listener.type].push(listener);
+      }
     }
 
     // sort groups of listeners by event type name
