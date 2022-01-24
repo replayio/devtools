@@ -1,12 +1,13 @@
+import { FrameworkEventListener } from "protocol/event-listeners";
 import { NodeFront, WiredEventListener } from "protocol/thread/node";
-import React, { Children, FC, useEffect, useMemo, useRef, useState } from "react";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { ExpandableItem } from "./ExpandableItem";
 
-type EventListenersAppProps = {};
+type AnyListener = WiredEventListener | FrameworkEventListener;
 
-export const EventListenersApp: FC<EventListenersAppProps> = () => {
+export const EventListenersApp: FC = () => {
   const selectedNode = useRef<NodeFront | null>(null);
-  const [listeners, setListeners] = useState<WiredEventListener[]>([]);
+  const [listeners, setListeners] = useState<AnyListener[]>([]);
 
   useEffect(() => {
     if (!gToolbox) {
@@ -19,9 +20,9 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
         setListeners([]);
         return;
       }
-      const listeners = await node.getEventListeners();
-      // const fwListeners = await node.getFrameworkEventListeners();
-      setListeners(listeners ?? []);
+      const listeners = (await node.getEventListeners()) ?? [];
+      const fwListeners = await node.getFrameworkEventListeners();
+      setListeners([...listeners, ...fwListeners]);
     };
 
     // try getting listeners of the current selection
@@ -40,8 +41,8 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
     };
   }, []);
 
-  const groupedSortedListeners: [string, WiredEventListener[]][] = useMemo(() => {
-    const groups: Record<string, WiredEventListener[]> = {};
+  const groupedSortedListeners: [string, AnyListener[]][] = useMemo(() => {
+    const groups: Record<string, AnyListener[]> = {};
     for (const listener of listeners) {
       if (groups[listener.type] === undefined) {
         groups[listener.type] = [];
