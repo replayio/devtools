@@ -1,6 +1,6 @@
 import { NodeFront } from "protocol/thread/node";
 import React, { FC } from "react";
-const SHADOW_ROOT_TAGNAME = require("../breadcrumbs").SHADOW_ROOT_TAGNAME;
+import { SHADOW_ROOT_TAGNAME } from "../breadcrumbs";
 
 type XHTMLNodeProps = {
   node: NodeFront;
