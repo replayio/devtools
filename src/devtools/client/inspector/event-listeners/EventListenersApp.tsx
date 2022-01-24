@@ -88,7 +88,7 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
                   );
 
                 const functionName = handler.functionName() ?? "";
-                const paremeterNames = handler.functionParameterNames() ?? [];
+                const paramsNames = handler.functionParameterNames() ?? [];
 
                 return (
                   <ExpandableItem
@@ -116,7 +116,7 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
                           f
                         </span>{" "}
                         <span className="italic">
-                          {functionName}({paremeterNames.join(", ")})
+                          {functionName}({paramsNames.join(", ")})
                         </span>
                       </div>
                     </div>
