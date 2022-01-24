@@ -5,6 +5,14 @@ import { ViewMode } from "ui/state/layout";
 import { isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
+import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
+
+type MixpanelEvent =
+  | ["net_monitor.add_type", { type: CanonicalRequestType }]
+  | ["net_monitor.delete_type", { type: CanonicalRequestType }]
+  | ["net_monitor.open_network_monitor"]
+  | ["net_monitor.seek_to_request"]
+  | ["net_monitor.select_request_row"];
 
 const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
@@ -55,6 +63,10 @@ const namespaceFromEventName = (event: string): string => {
   const namespace = event.slice(0, event.indexOf("."));
   return namespace.length ? namespace : NULL_NAMESPACE;
 };
+
+export function safeTrackEvent(...[event, properties]: [...MixpanelEvent]) {
+  trackMixpanelEvent(event, properties);
+}
 
 export async function trackMixpanelEvent(event: string, properties?: Dict) {
   if (prefs.logTelemetryEvent) {
