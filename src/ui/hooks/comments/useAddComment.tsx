@@ -26,7 +26,7 @@ export default function useAddComment() {
 
   return (comment: Comment) => {
     const temporaryId = new Date().toISOString();
-    trackEvent("create comment");
+    trackEvent("comments.create");
 
     addComment({
       variables: {

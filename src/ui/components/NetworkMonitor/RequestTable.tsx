@@ -5,7 +5,7 @@ import { RequestSummary } from "./utils";
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
 import { Row, TableInstance } from "react-table";
-import { safeTrackEvent } from "ui/utils/mixpanel";
+import { trackEvent } from "ui/utils/telemetry";
 
 const RequestTable = ({
   className,
@@ -27,7 +27,7 @@ const RequestTable = ({
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
   const onSeek = (request: RequestSummary) => {
-    safeTrackEvent("net_monitor.seek_to_request");
+    trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
     onRowSelect(request);
   };

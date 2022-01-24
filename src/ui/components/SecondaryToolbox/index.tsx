@@ -9,7 +9,7 @@ import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
-import { PanelName } from "ui/state/app";
+import { SecondaryPanelName } from "ui/state/app";
 import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
@@ -19,14 +19,15 @@ import "ui/setup/dynamic/inspector";
 import { UserSettings } from "ui/types";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
+import { StartablePanelName } from "ui/utils/devtools-toolbox";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
   hasReactComponents: boolean;
   isNode: boolean;
-  selectedPanel: PanelName;
-  setSelectedPanel: (panel: PanelName) => any;
+  selectedPanel: SecondaryPanelName;
+  setSelectedPanel: (panel: SecondaryPanelName) => any;
 }
 
 function PanelButtons({
@@ -38,11 +39,13 @@ function PanelButtons({
   const { userSettings } = hooks.useGetUserSettings();
   const { enableNetworkMonitor, showReact, showElements } = userSettings;
 
-  const onClick = (panel: PanelName) => {
+  const onClick = (panel: SecondaryPanelName) => {
     setSelectedPanel(panel);
     trackEvent(`toolbox.secondary.${panel}_select`);
 
-    gToolbox.selectTool(panel);
+    if (["debugger", "inspector", "react-components"].includes(panel)) {
+      gToolbox.selectTool(panel as StartablePanelName);
+    }
   };
 
   return (

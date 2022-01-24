@@ -48,7 +48,7 @@ function DownloadReplayModal({ hideModal, children }: PropsFromRedux & { childre
   const onSkipToLibrary = () => {
     removeUrlParameters();
     dismissNag(Nag.DOWNLOAD_REPLAY);
-    trackEvent("skipped-replay-download");
+    trackEvent("onboarding.skipped_replay_download");
     hideModal();
   };
   const onNext = () => {
@@ -57,7 +57,7 @@ function DownloadReplayModal({ hideModal, children }: PropsFromRedux & { childre
   };
   const onFinished = () => {
     removeUrlParameters();
-    trackEvent("finished-onboarding");
+    trackEvent("onboarding.finished_onboarding");
     hideModal();
   };
 

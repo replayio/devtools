@@ -98,7 +98,7 @@ function TeamNamePage({
         planKey: organization ? "org-v1" : "team-v1",
       },
     });
-    trackEvent("created-team");
+    trackEvent("onboarding.created_team");
   };
 
   useEffect(() => {
@@ -174,7 +174,7 @@ function TeamMemberInvitationPage({
     setErrorMessage(null);
     setIsLoading(true);
     inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
-    trackEvent("invited-team-member");
+    trackEvent("onboarding.invited_team_member");
   };
 
   return (
@@ -231,7 +231,7 @@ function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
   const [newWorkspace, setNewWorkspace] = useState<Workspace | null>(null);
 
   useEffect(() => {
-    trackEvent("started-onboarding");
+    trackEvent("onboarding.started_onboarding");
   }, []);
 
   const onNext = () => {
@@ -241,18 +241,18 @@ function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
   const onSkipToDownload = (location?: string) => {
     setCurrent(DOWNLOAD_PAGE_INDEX);
     if (location) {
-      trackEvent("skipped-create-team", { skippedFrom: location });
+      trackEvent("onboarding.skipped_create_team", { skippedFrom: location });
     }
     setRandomNumber(Math.random());
   };
   const onSkipToLibrary = () => {
     removeUrlParameters();
-    trackEvent("skipped-replay-download");
+    trackEvent("onboarding.skipped_replay_download");
     router.push("/");
   };
   const onFinished = () => {
     removeUrlParameters();
-    trackEvent("finished-onboarding");
+    trackEvent("onboarding.finished_onboarding");
     router.push("/");
   };
 

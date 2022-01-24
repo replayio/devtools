@@ -2,7 +2,8 @@ import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
 import { getShowCommandPalette } from "ui/reducers/layout";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { PrimaryPanelName, ViewMode } from "ui/state/layout";
+import { ViewMode } from "ui/state/layout";
+import { PrimaryPanelName } from "ui/state/app";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { UIThunkAction } from ".";
@@ -48,7 +49,7 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     }
 
     dispatch({ type: "set_view_mode", viewMode });
-    trackEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
+    trackEvent(viewMode == "dev" ? "layout.devtools" : "layout.viewer");
   };
 }
 export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {

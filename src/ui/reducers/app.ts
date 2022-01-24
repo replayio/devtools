@@ -1,4 +1,4 @@
-import { AppState, EventKind, PanelName, ReplayEvent } from "ui/state/app";
+import { AppState, EventKind, PanelName, ReplayEvent, SecondaryPanelName } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
@@ -32,7 +32,7 @@ export const initialAppState: AppState = {
   recordingDuration: 0,
   recordingTarget: null,
   recordingWorkspace: null,
-  selectedPanel: prefs.selectedPanel as PanelName,
+  selectedPanel: prefs.selectedPanel as SecondaryPanelName,
   sessionId: null,
   theme: "theme-light",
   trialExpired: false,
@@ -215,7 +215,7 @@ export default function update(
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
-export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
+export const getSelectedPanel = (state: UIState): SecondaryPanelName => state.app.selectedPanel;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;

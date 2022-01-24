@@ -10,7 +10,7 @@ export function CopyButton({ recording }: { recording: Recording }) {
 
   const onClick = () => {
     navigator.clipboard.writeText(url);
-    trackEvent("share.copy_link");
+    trackEvent("share_modal.copy_link");
 
     if (timeoutKey.current) {
       clearTimeout(timeoutKey.current);

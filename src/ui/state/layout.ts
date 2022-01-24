@@ -1,3 +1,5 @@
+import { PrimaryPanelName } from "ui/state/app";
+
 export type LayoutState = {
   showCommandPalette: boolean;
   showEditor: boolean;
@@ -6,5 +8,4 @@ export type LayoutState = {
   viewMode: ViewMode;
 };
 
-export type PrimaryPanelName = "explorer" | "debug" | "comments" | "events" | "search";
 export type ViewMode = "dev" | "non-dev";

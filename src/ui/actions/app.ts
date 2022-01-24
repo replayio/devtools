@@ -22,6 +22,7 @@ import {
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
+  SecondaryPanelName,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -43,7 +44,7 @@ export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finish
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
-export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
+export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
@@ -243,7 +244,7 @@ export function updateTheme(theme: string): UpdateThemeAction {
   return { type: "update_theme", theme };
 }
 
-export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
+export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
 }
 
@@ -387,7 +388,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setSelectedPanel("network"));
     } else if (key === "open_print_statements") {
       dispatch(setViewMode("dev"));
-      dispatch(setSelectedPrimaryPanel("debug"));
+      dispatch(setSelectedPrimaryPanel("debugger"));
     } else if (key === "open_react_devtools") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("react-components"));

@@ -6,13 +6,82 @@ import { isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
+import { PrimaryPanelName, SecondaryPanelName, WorkspaceId } from "ui/state/app";
 
 type MixpanelEvent =
+  | ["breakpoint.minus_click"]
+  | ["breakpoint.plus_click"]
+  | ["breakpoint.preview_has_hits"]
+  | ["breakpoint.preview_no_hits"]
+  | ["breakpoint.remove"]
+  | ["breakpoint.set_condition"]
+  | ["breakpoint.set_log"]
+  | ["comments.create"]
+  | ["comments.delete"]
+  | ["comments.focus"]
+  | ["comments.select_location"]
+  | ["comments.start_edit"]
+  | ["console.clear_messages"]
+  | ["events_timeline.select"]
+  | ["events_timeline.select_source"]
+  | ["error.unauthenticated_viewer"]
+  | ["error.unauthorized_viewer"]
+  | ["header.open_share"]
+  | ["header.edit_title"]
+  | ["gutter.add_comment"]
+  | ["key_shortcut.full_text_search"]
+  | ["key_shortcut.show_command_palette"]
+  | ["key_shortcut.toggle_left_sidebar"]
+  | ["layout.default_devtools"]
+  | ["layout.default_viewer"]
+  | ["layout.devtools"]
+  | ["layout.viewer"]
+  | ["launch.download_replay", { OS: "mac" | "linux" | "windows" }]
+  | ["login.first_log_in"]
   | ["net_monitor.add_type", { type: CanonicalRequestType }]
   | ["net_monitor.delete_type", { type: CanonicalRequestType }]
   | ["net_monitor.open_network_monitor"]
   | ["net_monitor.seek_to_request"]
-  | ["net_monitor.select_request_row"];
+  | ["net_monitor.select_request_row"]
+  | ["object_inspector.label_click"]
+  | ["onboarding.created_team"]
+  | ["onboarding.demo_replay_launch"]
+  | ["onboarding.demo_replay_prompt"]
+  | ["onboarding.download_replay", { OS: "mac" | "linux" | "windows" }]
+  | ["onboarding.download_replay_prompt"]
+  | ["onboarding.finished_onboarding"]
+  | ["onboarding.invited_team_member"]
+  | ["onboarding.launch_replay"]
+  | ["onboarding.skipped_create_team", { skippedFrom: string }]
+  | ["onboarding.skipped_replay_download"]
+  | ["onboarding.started_onboarding"]
+  | ["onboarding.team_invite"]
+  | ["quick_open.open_quick_open"]
+  | ["session.devtools_start", { userIsAuthor: boolean }]
+  | ["session_end", { reason: string }]
+  | ["session_start", { workspaceId: WorkspaceId | null }]
+  | ["share_modal.copy_link"]
+  | ["share_modal.set_private"]
+  | ["share_modal.set_public"]
+  | ["share_modal.set_team"]
+  | ["team_change", { workspaceId: WorkspaceId | null }]
+  | ["timeline.comment_select"]
+  | ["timeline.marker_select"]
+  | ["timeline.pause"]
+  | ["timeline.play"]
+  | ["timeline.progress_select"]
+  | ["timeline.replay"]
+  | [`toolbox.primary.${PrimaryPanelName}_select`]
+  | [`toolbox.secondary.${SecondaryPanelName}_select`]
+  | ["toolbox.secondary.editor_toggle"]
+  | ["toolbox.secondary.video_toggle"]
+  | ["toolbox.toggle_sidebar"]
+  | ["upload.complete", { sessionId: SessionId }]
+  | ["upload.create_replay", { isDemo: boolean }]
+  | ["upload.discard", { isDemo: boolean }]
+  | ["user_options.launch_replay"]
+  | ["user_options.select_docs"]
+  | ["user_options.select_settings"];
 
 const QA_EMAIL_ADDRESSES = ["mock@user.io"];
 
@@ -51,7 +120,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
   }
 }
 
-export const maybeTrackTeamChange = (newWorkspaceId: string | null) => {
+export const maybeTrackTeamChange = (newWorkspaceId: WorkspaceId | null) => {
   if (!mixpanelDisabled) {
     mixpanel.people.set({ workspaceId: newWorkspaceId });
     trackMixpanelEvent("team_change", { workspaceId: newWorkspaceId });
@@ -64,11 +133,7 @@ const namespaceFromEventName = (event: string): string => {
   return namespace.length ? namespace : NULL_NAMESPACE;
 };
 
-export function safeTrackEvent(...[event, properties]: [...MixpanelEvent]) {
-  trackMixpanelEvent(event, properties);
-}
-
-export async function trackMixpanelEvent(event: string, properties?: Dict) {
+export async function trackMixpanelEvent(...[event, properties]: [...MixpanelEvent]) {
   if (prefs.logTelemetryEvent) {
     console.log("🔴", event, properties);
   }
@@ -80,12 +145,13 @@ export async function trackMixpanelEvent(event: string, properties?: Dict) {
 
 const eventsBeingOnlyTrackedOnce = new Set();
 
-export async function trackEventOnce(event: string, properties?: Dict) {
+export async function trackEventOnce(...[event, properties]: [...MixpanelEvent]) {
   if (eventsBeingOnlyTrackedOnce.has(event)) {
     return;
   }
 
   eventsBeingOnlyTrackedOnce.add(event);
+  // @ts-ignore
   trackMixpanelEvent(event, properties);
 }
 
@@ -116,17 +182,17 @@ export function setMixpanelContext({
 export const endMixpanelSession = (reason: string) => () =>
   trackMixpanelEvent("session_end", { reason });
 export const trackViewMode = (viewMode: ViewMode) =>
-  trackMixpanelEvent(viewMode == "dev" ? "visit devtools" : "visit viewer");
+  trackMixpanelEvent(viewMode == "dev" ? "layout.devtools" : "layout.viewer");
 
 export const startUploadWaitTracking = () => {
   // This one gets tracked in Honeycomb.
   trackTiming("kpi-time-to-view-replay");
-  mixpanel.time_event("upload_recording");
+  mixpanel.time_event("upload.complete");
 };
 export const endUploadWaitTracking = (sessionId: SessionId) => {
   // This one gets tracked in Honeycomb.
   trackTiming("kpi-time-to-view-replay", { sessionId });
-  trackMixpanelEvent("upload_recording", { sessionId });
+  trackMixpanelEvent("upload.complete", { sessionId });
 };
 
 function setupSessionEndListener() {

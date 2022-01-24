@@ -13,14 +13,10 @@ import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
 
-export type PanelName =
-  | "comments"
-  | "console"
-  | "debugger"
-  | "inspector"
-  | "network"
-  | "react-components"
-  | "viewer";
+export type PrimaryPanelName = "comments" | "debugger" | "explorer" | "events" | "search";
+export type SecondaryPanelName = "console" | "inspector" | "network" | "react-components";
+export type PanelName = PrimaryPanelName | SecondaryPanelName;
+
 export type ModalOptionsType = {
   recordingId?: string;
   view?: string;
@@ -91,7 +87,7 @@ export interface AppState {
   recordingDuration: number;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
-  selectedPanel: PanelName;
+  selectedPanel: SecondaryPanelName;
   sessionId: SessionId | null;
   theme: string;
   trialExpired: boolean;

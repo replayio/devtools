@@ -20,7 +20,7 @@ import { fetchFrames, fetchResponseBody, fetchRequestBody } from "ui/actions/net
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import mixpanel from "mixpanel-browser";
-import { safeTrackEvent } from "ui/utils/mixpanel";
+import { trackEvent } from "ui/utils/telemetry";
 
 export const NetworkMonitor = ({
   currentTime,
@@ -46,10 +46,10 @@ export const NetworkMonitor = ({
   const toggleType = (type: CanonicalRequestType) => {
     const newTypes = new Set(types);
     if (newTypes.has(type)) {
-      safeTrackEvent("net_monitor.delete_type", { type });
+      trackEvent("net_monitor.delete_type", { type });
       newTypes.delete(type);
     } else {
-      safeTrackEvent("net_monitor.add_type", { type });
+      trackEvent("net_monitor.add_type", { type });
       newTypes.add(type);
     }
     setTypes(newTypes);
@@ -74,7 +74,7 @@ export const NetworkMonitor = ({
     );
   }
 
-  safeTrackEvent("net_monitor.open_network_monitor");
+  trackEvent("net_monitor.open_network_monitor");
 
   return (
     <Table events={events} requests={requests} types={types}>
@@ -92,7 +92,7 @@ export const NetworkMonitor = ({
                 data={data}
                 currentTime={currentTime}
                 onRowSelect={row => {
-                  safeTrackEvent("net_monitor.select_request_row");
+                  trackEvent("net_monitor.select_request_row");
                   fetchFrames(row.point);
                   if (row.hasResponseBody) {
                     fetchResponseBody(row.id);

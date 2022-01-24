@@ -159,7 +159,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     setStatus("saving");
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
-    trackEvent("create replay", { isDemo: isDemoReplay(recording) });
+    trackEvent("upload.create_replay", { isDemo: isDemoReplay(recording) });
     startUploadWaitTracking();
 
     await initializeRecording({

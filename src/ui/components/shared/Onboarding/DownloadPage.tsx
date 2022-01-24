@@ -21,15 +21,15 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
     onNext();
   };
   const handleMac = () => {
-    trackEvent("downloaded-mac");
+    trackEvent("onboarding.download_replay", { OS: "mac" });
     startDownload("https://static.replay.io/downloads/replay.dmg");
   };
   const handleLinux = () => {
-    trackEvent("downloaded-linux");
+    trackEvent("onboarding.download_replay", { OS: "linux" });
     startDownload("https://static.replay.io/downloads/linux-replay.tar.bz2");
   };
   const handleWindows = () => {
-    trackEvent("downloaded-windows");
+    trackEvent("onboarding.download_replay", { OS: "windows" });
     startDownload("https://static.replay.io/downloads/windows-replay.zip");
   };
 

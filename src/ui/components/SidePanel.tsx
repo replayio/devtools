@@ -19,7 +19,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
 
   if (selectedPrimaryPanel === "explorer") {
     sidepanel = <PrimaryPanes />;
-  } else if (selectedPrimaryPanel === "debug") {
+  } else if (selectedPrimaryPanel === "debugger") {
     sidepanel = <SecondaryPanes />;
   } else if (selectedPrimaryPanel === "comments") {
     sidepanel = <Transcript />;

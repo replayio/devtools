@@ -257,7 +257,7 @@ async function waitForPaused(url) {
   const { getSelectedScope, getFrames } = dbgSelectors;
   // Make sure that the debug primary panel is selected so that the test can
   // interact with the pause navigation and info.
-  store.dispatch({ type: "set_selected_primary_panel", panel: "debug" });
+  store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" });
   await waitUntil(() => isPaused() && !!getSelectedScope(), { waitingFor: "execution to pause" });
   await waitUntil(() => getFrames(), { waitingFor: "frames to populate" });
   await waitForLoadedScopes();

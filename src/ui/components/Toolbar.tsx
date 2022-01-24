@@ -11,7 +11,7 @@ import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
-import { PrimaryPanelName } from "ui/state/layout";
+import { PrimaryPanelName } from "ui/state/app";
 import classNames from "classnames";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {
@@ -69,7 +69,7 @@ function ToolbarButton({
           handleClick={() => onClick(name)}
         />
       </div>
-      {isPaused && name == "debug" ? (
+      {isPaused && name == "debugger" ? (
         <div className="absolute bg-secondaryAccent top-1 left-3 rounded-full h-2 w-2 mr-2 mb-1 border-1.5 border-toolbarBackground" />
       ) : null}
     </div>
@@ -90,7 +90,7 @@ function Toolbar({ viewMode }: PropsFromRedux) {
           <>
             <ToolbarButton icon="description" name="explorer" label="Source Explorer" />
             <ToolbarButton icon="search" name="search" label="Search" />
-            <ToolbarButton icon="motion_photos_paused" name="debug" label="Pause Information" />
+            <ToolbarButton icon="motion_photos_paused" name="debugger" label="Pause Information" />
           </>
         ) : null}
       </div>

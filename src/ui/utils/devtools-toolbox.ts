@@ -11,8 +11,6 @@ import Selection from "devtools/client/framework/selection";
 
 export type StartablePanelName = "debugger" | "inspector" | "react-components";
 
-export type PanelName = StartablePanelName | "console" | "comments" | "viewer" | "network";
-
 declare global {
   const store: UIStore;
 }
@@ -32,7 +30,7 @@ type Panels = {
  */
 export class DevToolsToolbox {
   panels: Partial<Panels>;
-  panelWaiters: Partial<Record<PanelName, Promise<unknown>>>;
+  panelWaiters: Partial<Record<StartablePanelName, Promise<unknown>>>;
   threadFront: typeof ThreadFront;
   selection: Selection;
   currentTool: string | null;
@@ -55,7 +53,7 @@ export class DevToolsToolbox {
     EventEmitter.decorate(this);
   }
 
-  async init(selectedPanel: PanelName) {
+  async init(selectedPanel: StartablePanelName) {
     await this.threadFront.initializeToolbox();
 
     // The debugger has to be started immediately on init so that when we click
@@ -72,7 +70,7 @@ export class DevToolsToolbox {
     return Highlighter;
   }
 
-  getPanel<T extends PanelName>(name: T): Panels[T] | undefined {
+  getPanel<T extends StartablePanelName>(name: T): Panels[T] | undefined {
     return this.panels[name];
   }
 
@@ -102,17 +100,17 @@ export class DevToolsToolbox {
     if (name !== "inspector") {
       await (panel as DebuggerPanel).open();
       this.panels.debugger = panel as DebuggerPanel;
+      store.dispatch(actions.setInitializedPanels("debugger"));
     } else {
       this.panels.inspector = panel as Inspector;
+      store.dispatch(actions.setInitializedPanels("inspector"));
     }
-
-    store.dispatch(actions.setInitializedPanels(name));
 
     resolve(panel);
     return panel;
   };
 
-  async selectTool(name: PanelName) {
+  async selectTool(name: StartablePanelName) {
     // See comments at gToolbox.init(selectedPanel) in DevTools.js
     // for more context. The toolbox needs to be initialized on
     // recordingLoaded however if we start at the "Comments"
@@ -122,7 +120,7 @@ export class DevToolsToolbox {
       return;
     }
 
-    let panel = await this.getOrStartPanel(name as StartablePanelName);
+    let panel = await this.getOrStartPanel(name);
     this.emit("select", name);
 
     this.currentTool = name;
