@@ -23,6 +23,7 @@ module.exports = {
       },
       lineHeight: {
         "comment-text": "1.125rem",
+        2: "10px",
       },
       cursor: {
         "ew-resize": "ew-resize",

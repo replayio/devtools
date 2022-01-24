@@ -1,6 +1,6 @@
 const { prefs } = require("devtools/client/inspector/prefs");
 
-export type InspectorActiveTab = "ruleview" | "layoutview" | "computedview";
+export type InspectorActiveTab = "ruleview" | "layoutview" | "computedview" | "eventsview";
 
 export interface InspectorState {
   activeTab: InspectorActiveTab;

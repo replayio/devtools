@@ -2,7 +2,6 @@ import Selection, { SelectionReason } from "devtools/client/framework/selection"
 import { Inspector } from "../inspector";
 
 import { ThreadFront } from "protocol/thread";
-import { HTMLTooltip } from "devtools/client/shared/widgets/tooltip/HTMLTooltip";
 import Highlighter from "highlighter/highlighter";
 import { selectors } from "ui/reducers";
 import { UIStore } from "ui/actions";
@@ -19,7 +18,6 @@ class MarkupView {
   isInspectorVisible: boolean;
   isLoadingPostponed: boolean;
   hoveredNodeId: string | undefined;
-  _eventTooltip: HTMLTooltip | null;
 
   constructor(inspector: Inspector) {
     assert(inspector.selection);
@@ -31,7 +29,6 @@ class MarkupView {
     this.isInspectorVisible = false;
     this.isLoadingPostponed = false;
     this.hoveredNodeId = undefined;
-    this._eventTooltip = null;
 
     this.onSelectNode = this.onSelectNode.bind(this);
     this.onToggleNodeExpanded = this.onToggleNodeExpanded.bind(this);
@@ -143,27 +140,10 @@ class MarkupView {
     // this.inspector.sidebar.off("markupview-selected", this.update);
     this.selection.off("new-node-front", this.update);
 
-    if (this._eventTooltip) {
-      this._eventTooltip.destroy();
-      this._eventTooltip = null;
-    }
-
     this.inspector = null;
     this.selection = null;
     this.store = null;
     this.toolbox = null;
-  }
-
-  get eventTooltip() {
-    if (!this._eventTooltip) {
-      this._eventTooltip = new HTMLTooltip(window.document, {
-        // @ts-ignore
-        type: "arrow",
-        consumeOutsideClicks: false,
-      });
-    }
-
-    return this._eventTooltip;
   }
 
   /**

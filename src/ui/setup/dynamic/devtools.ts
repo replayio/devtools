@@ -1,6 +1,13 @@
 import { bindActionCreators, Store } from "redux";
 
-import { sessionError, uploadedData } from "@recordreplay/protocol";
+import {
+  sessionError,
+  uploadedData,
+  CommandMethods,
+  CommandParams,
+  CommandResult,
+  CommandHasPauseId,
+} from "@recordreplay/protocol";
 import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
@@ -45,6 +52,12 @@ import { sendMessage } from "protocol/socket";
 import network from "ui/reducers/network";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
 
+type SendMessageFn = <M extends CommandMethods>(
+  method: M,
+  params: CommandParams<M>,
+  pauseId: CommandHasPauseId<M>
+) => Promise<CommandResult<M>>;
+
 declare global {
   interface Window {
     gToolbox: DevToolsToolbox;
@@ -55,7 +68,9 @@ declare global {
     threadFront?: typeof ThreadFront;
     actions?: any;
     selectors?: typeof selectors;
-    sendMessage?: typeof sendMessage;
+    // We use 'command' in the backend and 'message' in the frontend so expose both :P
+    sendMessage?: SendMessageFn;
+    sendCommand?: SendMessageFn;
     console?: {
       prefs: typeof consolePrefs;
     };
@@ -87,7 +102,9 @@ export default async function DevTools(store: Store) {
   window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
-  window.app.sendMessage = (cmd, args = {}) => sendMessage(cmd, args, window.sessionId);
+  window.app.sendMessage = (cmd, args = {}, pauseId) =>
+    sendMessage(cmd, args, window.sessionId, pauseId as any);
+  window.app.sendCommand = window.app.sendMessage;
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();

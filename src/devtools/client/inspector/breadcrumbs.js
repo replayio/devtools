@@ -331,6 +331,7 @@ function HTMLBreadcrumbs(inspector) {
 }
 
 exports.HTMLBreadcrumbs = HTMLBreadcrumbs;
+exports.SHADOW_ROOT_TAGNAME = SHADOW_ROOT_TAGNAME;
 
 HTMLBreadcrumbs.prototype = {
   get walker() {
