@@ -16,10 +16,12 @@ export const EventListenersApp: FC = () => {
 
     const handler = async (node: NodeFront | null) => {
       selectedNode.current = node;
+
       if (!node) {
         setListeners([]);
         return;
       }
+
       const listeners = (await node.getEventListeners()) ?? [];
       const fwListeners = await node.getFrameworkEventListeners();
       setListeners([...listeners, ...fwListeners]);
@@ -42,6 +44,7 @@ export const EventListenersApp: FC = () => {
   }, []);
 
   const groupedSortedListeners: [string, AnyListener[]][] = useMemo(() => {
+    // group listenerss by event type
     const groups: Record<string, AnyListener[]> = {};
     for (const listener of listeners) {
       if (groups[listener.type] === undefined) {
@@ -50,6 +53,7 @@ export const EventListenersApp: FC = () => {
       groups[listener.type].push(listener);
     }
 
+    // sort groups of listeners by event type name
     return Object.entries(groups).sort(([eventA], [eventB]) => {
       if (eventA < eventB) {
         return -1;
@@ -76,26 +80,6 @@ export const EventListenersApp: FC = () => {
               {listeners.map(({ handler, capture }) => {
                 const location = handler.functionLocation();
                 const locationUrl = handler.functionLocationURL();
-                const origin =
-                  location && locationUrl ? (
-                    <span
-                      className="underline cursor-pointer hover:text-gray-500"
-                      title="Open in Debugger"
-                      onClick={() => {
-                        gToolbox.viewSourceInDebugger(
-                          locationUrl,
-                          location.line,
-                          location.column,
-                          location.sourceId
-                        );
-                      }}
-                    >
-                      {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:{location.line}
-                    </span>
-                  ) : (
-                    "[native code]"
-                  );
-
                 const functionName = handler.functionName() ?? "";
                 const paramsNames = handler.functionParameterNames() ?? [];
 
@@ -105,7 +89,27 @@ export const EventListenersApp: FC = () => {
                     header={
                       <div className="flex gap-2">
                         <span className="theme-fg-color3">{selectedNode.current?.displayName}</span>
-                        <span>{origin}</span>
+                        <span>
+                          {location && locationUrl ? (
+                            <span
+                              className="underline cursor-pointer hover:text-gray-500"
+                              title="Open in Debugger"
+                              onClick={() => {
+                                gToolbox.viewSourceInDebugger(
+                                  locationUrl,
+                                  location.line,
+                                  location.column,
+                                  location.sourceId
+                                );
+                              }}
+                            >
+                              {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:
+                              {location.line}
+                            </span>
+                          ) : (
+                            "[native code]"
+                          )}
+                        </span>
                       </div>
                     }
                   >
