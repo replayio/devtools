@@ -79,7 +79,14 @@ export const EventListenersApp: FC<EventListenersAppProps> = () => {
                   location && locationUrl ? (
                     <span
                       className="underline cursor-pointer hover:text-gray-500"
-                      onClick={() => {}}
+                      onClick={() => {
+                        gToolbox.viewSourceInDebugger(
+                          locationUrl,
+                          location.line,
+                          location.column,
+                          location.sourceId
+                        );
+                      }}
                     >
                       {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:{location.line}
                     </span>
