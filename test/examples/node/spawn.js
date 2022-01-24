@@ -1,4 +1,3 @@
-
 const { spawnSync, spawn } = require("child_process");
 
 function foo(n) {

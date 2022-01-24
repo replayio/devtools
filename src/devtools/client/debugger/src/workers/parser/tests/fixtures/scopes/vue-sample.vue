@@ -8,14 +8,14 @@
 var moduleVar = "data";
 
 export default {
-  name: 'HelloWorld',
-  data () {
+  name: "HelloWorld",
+  data() {
     var fnVar = 4;
 
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: "Welcome to Your Vue.js App",
     };
-  }
+  },
 };
 </script>
 

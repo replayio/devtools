@@ -1,5 +1,5 @@
 async function foo() {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(resolve, 10);
   });
 }

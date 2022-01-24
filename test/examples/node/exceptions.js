@@ -1,5 +1,3 @@
-
-
 function finished() {
   process.exit(0);
 }

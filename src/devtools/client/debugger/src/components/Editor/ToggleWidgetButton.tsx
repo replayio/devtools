@@ -57,12 +57,7 @@ function ToggleButton({
 
 type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
 
-function ToggleWidgetButton({
-  editor,
-  toggleLogpoint,
-  cx,
-  breakpoints,
-}: ToggleWidgetButtonProps) {
+function ToggleWidgetButton({ editor, toggleLogpoint, cx, breakpoints }: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 

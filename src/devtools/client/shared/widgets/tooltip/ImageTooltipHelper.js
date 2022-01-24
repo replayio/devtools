@@ -60,13 +60,8 @@ function getImageDimensions(doc, imageUrl) {
                       the checkered background
  */
 function setImageTooltip(tooltip, doc, imageUrl, options) {
-  let {
-    naturalWidth,
-    naturalHeight,
-    hideDimensionLabel,
-    hideCheckeredBackground,
-    maxDim,
-  } = options;
+  let { naturalWidth, naturalHeight, hideDimensionLabel, hideCheckeredBackground, maxDim } =
+    options;
   maxDim = maxDim || MAX_DIMENSION;
 
   let imgHeight = naturalHeight;

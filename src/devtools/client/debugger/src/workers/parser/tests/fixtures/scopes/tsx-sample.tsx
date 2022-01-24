@@ -1,4 +1,3 @@
-
 // TSEnumDeclaration
 enum Color {
   // TSEnumMember
@@ -9,9 +8,7 @@ enum Color {
 
 class Example<T> {
   // TSParameterProperty
-  constructor(public foo) {
-
-  }
+  constructor(public foo) {}
 
   method(): never {
     throw new Error();
@@ -22,16 +19,14 @@ class Example<T> {
 var foo = <any>window</any>;
 
 // TSAsExpression
-(window as any);
+window as any;
 
 // TSNonNullExpression
-(window!);
+window!;
 
 // TSModuleDeclaration
 namespace TheSpace {
-  function fn() {
-
-  }
+  function fn() {}
 }
 
 // TSImportEqualsDeclaration

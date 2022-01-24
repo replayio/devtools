@@ -27,8 +27,8 @@ function generator() {
     updateText(`generated ${v}`);
   }
 
-  function *inner() {
-    for (const v of [1,2]) {
+  function* inner() {
+    for (const v of [1, 2]) {
       updateText(`yield ${v}`);
       yield v;
     }
@@ -64,7 +64,7 @@ async function customIterator() {
       yield 2;
       updateText("within iterator");
       yield 3;
-    }
+    },
   };
   for (const a of obj) {
     await new Promise(resolve => setTimeout(resolve, 10));
@@ -72,14 +72,7 @@ async function customIterator() {
   startNextCallback();
 }
 
-const callbacks = [
-  trycatch,
-  tryfinally,
-  generator,
-  asyncer,
-  asyncerThrow,
-  customIterator,
-];
+const callbacks = [trycatch, tryfinally, generator, asyncer, asyncerThrow, customIterator];
 
 debugger;
 startNextCallback();
@@ -90,7 +83,9 @@ function startNextCallback() {
   if (callbacks.length) {
     const callback = callbacks.shift();
     setTimeout(async () => {
-      try { await callback() } catch (e) {}
+      try {
+        await callback();
+      } catch (e) {}
     });
   } else {
     process.exit(0); // dump(`RecReplaySendAsyncMessage ExampleFinished`);

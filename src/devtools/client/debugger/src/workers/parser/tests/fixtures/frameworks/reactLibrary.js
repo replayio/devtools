@@ -13,11 +13,7 @@ function Component(props, context, updater) {
 
 Component.prototype.isReactComponent = {};
 Component.prototype.setState = function (partialState, callback) {
-  !(
-    typeof partialState === "object" ||
-    typeof partialState === "function" ||
-    partialState == null
-  )
+  !(typeof partialState === "object" || typeof partialState === "function" || partialState == null)
     ? invariant(
         false,
         "setState(...): takes an object of state variables to update or a function which returns an object of state variables."

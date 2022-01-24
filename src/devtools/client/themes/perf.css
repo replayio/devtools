@@ -83,7 +83,7 @@
   padding: 5px 10px;
   margin-bottom: 15px;
   background-color: var(--toolbarbutton-background);
-  border: rgba(138,161,180,0.2) 1px solid;
+  border: rgba(138, 161, 180, 0.2) 1px solid;
   font-size: 11px;
   font-weight: normal;
 }
@@ -322,7 +322,7 @@
   padding: 4px 2px;
 }
 
-.perf-settings-dir-list-button-group input[type=button] {
+.perf-settings-dir-list-button-group input[type="button"] {
   margin-left: 0;
 }
 
@@ -383,8 +383,7 @@
 }
 
 button.perf-photon-button:focus {
-  box-shadow: 0 0 0 1px var(--blue-50) inset, 0 0 0 1px var(--blue-50),
-    0 0 0 4px var(--blue-50-a30);
+  box-shadow: 0 0 0 1px var(--blue-50) inset, 0 0 0 1px var(--blue-50), 0 0 0 4px var(--blue-50-a30);
   outline: 0;
 }
 

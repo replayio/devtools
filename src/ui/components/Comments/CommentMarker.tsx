@@ -43,13 +43,8 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
   };
 
   render() {
-    const {
-      comment,
-      currentTime,
-      zoomRegion,
-      setHoveredComment,
-      isPrimaryHighlighted,
-    } = this.props;
+    const { comment, currentTime, zoomRegion, setHoveredComment, isPrimaryHighlighted } =
+      this.props;
 
     // We don't want to show the replies on the timeline
     // just the parent comment.

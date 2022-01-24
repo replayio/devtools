@@ -7,7 +7,7 @@ class Test {
     console.log("bar", a);
   }
 
-  baz = (b) => {
+  baz = b => {
     return b * 2;
   };
 }

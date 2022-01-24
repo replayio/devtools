@@ -71,11 +71,7 @@ var x = function () {};
 
 Button.prototype.createElement = function (color) {
   this.color = color;
-  return html`
-    <button style="background-color: ${color}">
-      Click Me
-    </button>
-  `;
+  return html` <button style="background-color: ${color}">Click Me</button> `;
 };
 
 // Implement conditional rendering
