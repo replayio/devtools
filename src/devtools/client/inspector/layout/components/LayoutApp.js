@@ -81,7 +81,13 @@ class LayoutApp extends PureComponent {
 
   render() {
     const items = [this.getBoxModelSection()];
-    return dom.div({ className: "layout-container", ref: this.containerRef }, Accordion({ items }));
+    return dom.div(
+      {
+        className: "layout-container h-full overflow-y-auto",
+        ref: this.containerRef,
+      },
+      Accordion({ items })
+    );
   }
 }
 
