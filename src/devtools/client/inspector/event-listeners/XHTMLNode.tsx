@@ -16,7 +16,7 @@ export const XHTMLNode: FC<XHTMLNodeProps> = ({ node }) => {
   const classesText = node.classList.length > 0 ? "." + node.classList.join(".") : "";
 
   return (
-    <>
+    <span>
       <span className="theme-fg-color3">{tagText}</span>
       {idText && (
         <span
@@ -28,6 +28,6 @@ export const XHTMLNode: FC<XHTMLNodeProps> = ({ node }) => {
         </span>
       )}
       {classesText && <span className="theme-fg-color3">{classesText}</span>}
-    </>
+    </span>
   );
 };

@@ -91,9 +91,7 @@ export const EventListenersApp: FC = () => {
                     key={handler.id()}
                     header={
                       <div className="flex gap-2">
-                        <span>
-                          <XHTMLNode node={currentNode} />
-                        </span>
+                        <XHTMLNode node={currentNode} />
                         <span>
                           {location && locationUrl ? (
                             <span
