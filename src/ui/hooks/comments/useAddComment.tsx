@@ -25,7 +25,6 @@ export default function useAddComment() {
   }
 
   return (comment: Comment) => {
-    const temporaryId = new Date().toISOString();
     trackEvent("comments.create");
 
     addComment({
@@ -39,7 +38,7 @@ export default function useAddComment() {
         addComment: {
           success: true,
           comment: {
-            id: temporaryId,
+            id: comment["id"],
             __typename: "Comment",
           },
           __typename: "AddComment",
@@ -79,9 +78,7 @@ export default function useAddComment() {
           recording: {
             ...data.recording,
             comments: [
-              ...data.recording.comments.filter(
-                (c: Remark) => c.id !== temporaryId && c.id !== commentId
-              ),
+              ...data.recording.comments.filter((c: Remark) => c.id !== commentId),
               newComment,
             ],
           },

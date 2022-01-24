@@ -22,6 +22,7 @@ const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
 const { trackEvent } = require("ui/utils/telemetry");
 const { dismissNag, Nag } = require("ui/hooks/users");
+import { getRecordingId } from "ui/utils/recording";
 
 class Message extends Component {
   static get propTypes() {
@@ -194,7 +195,7 @@ class Message extends Component {
           true,
           frame,
           { ...this.props.auth0.user, id: userId },
-          this.props.router.query.id
+          getRecordingId(this.props.router.query.id)
         )
       );
     };

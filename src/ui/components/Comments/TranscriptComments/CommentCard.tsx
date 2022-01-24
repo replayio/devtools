@@ -241,7 +241,6 @@ const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
-    hoveredComment: selectors.getHoveredComment(state),
     pendingComment: selectors.getPendingComment(state),
   }),
   {
