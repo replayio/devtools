@@ -1,38 +1,28 @@
 import cx from "classnames";
-import React, { useState, VFC } from "react";
+import React, { ReactNode, useState, FC } from "react";
 
 type ExpandableItemProps = {
-  id: string;
-  children?: ExpandableItemProps[];
+  header: ReactNode;
 };
 
-export const ExpandableItem: VFC<ExpandableItemProps> = ({ id, children }) => {
+export const ExpandableItem: FC<ExpandableItemProps> = ({ header, children }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const hasChildren = children && children.length > 0;
+  const hasChildren = children && React.Children.count(children) > 0;
 
   return (
     <div>
-      <div className="grid auto-cols-max gap-1">
+      <div className="grid grid-flow-col auto-cols-max gap-1 items-center">
         <span
-          className={cx({
+          className={cx("theme-twisty bg-center", {
             "opacity-0": !hasChildren,
             "cursor-pointer": hasChildren,
-            "-rotate-90": isExpanded,
+            open: isExpanded,
           })}
           onClick={() => setIsExpanded(!isExpanded)}
-        >
-          ▶
-        </span>
-        <div>{id}</div>
+        ></span>
+        <div>{header}</div>
       </div>
-      {hasChildren && (
-        <div>
-          {children?.map(child => (
-            <ExpandableItem key={child.id} {...child} />
-          ))}
-        </div>
-      )}
+      {isExpanded && hasChildren && <div className="pl-3">{children}</div>}
     </div>
   );
 };
