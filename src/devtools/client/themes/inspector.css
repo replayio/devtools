@@ -44,7 +44,7 @@ window {
 }
 
 #inspector-splitter-box .splitter {
-  background: var(--theme-splitter-color);
+  background: var(--chrome);
 }
 
 /* Minimum dimensions for the Inspector splitter areas. */
