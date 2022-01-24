@@ -53,15 +53,7 @@ export default class MarkupSearchbox {
       target: this.markupPanel,
     });
     const key = "CmdOrCtrl+F";
-    this.searchboxShortcuts.on(key, (event: any) => {
-      // Prevent overriding same shortcut from the computed/rule views
-      if (
-        event.originalTarget.closest("#sidebar-panel-ruleview") ||
-        event.originalTarget.closest("#sidebar-panel-computedview")
-      ) {
-        return;
-      }
-
+    this.searchboxShortcuts.on(key, (event: KeyboardEvent) => {
       event.preventDefault();
       this.searchBox.focus();
     });
