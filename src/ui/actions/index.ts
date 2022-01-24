@@ -16,7 +16,6 @@ import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
-import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
 import { NetworkAction } from "./network";
@@ -28,7 +27,6 @@ export type UIAction =
   | AppActions
   | CommentsAction
   | DebuggerAction
-  | EventTooltipAction
   | LayoutAction
   | MarkupAction
   | NetworkAction

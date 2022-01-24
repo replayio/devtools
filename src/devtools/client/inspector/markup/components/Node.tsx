@@ -18,8 +18,8 @@ import { UIState } from "ui/state";
 import ElementNode from "./ElementNode";
 import ReadOnlyNode from "./ReadOnlyNode";
 import TextNode from "./TextNode";
-import EventTooltip from "./EventTooltip";
 import classnames from "classnames";
+import { setActiveTab } from "../../actions";
 
 interface NodeProps {
   nodeId: string;
@@ -162,7 +162,17 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
       return null;
     }
 
-    return <EventTooltip nodeId={this.props.node.id} />;
+    return (
+      <button
+        type="button"
+        className="inspector-badge interactive inline-block relative py-0 px-0.5 leading-2 w-auto"
+        onClick={() => {
+          this.props.setActiveTab("eventsview");
+        }}
+      >
+        event
+      </button>
+    );
   }
 
   render() {
@@ -218,7 +228,9 @@ const mapStateToProps = (state: UIState, { nodeId }: NodeProps) => ({
   isSelectedNode: nodeId === getSelectedNodeId(state),
   isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
 });
-const connector = connect(mapStateToProps);
+const connector = connect(mapStateToProps, {
+  setActiveTab,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const Node = connector(_Node);
 

@@ -12,10 +12,9 @@ export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box
 export const changes = require("devtools/client/inspector/changes/reducers/changes");
 import classList from "devtools/client/inspector/rules/reducers/class-list";
 import markup from "devtools/client/inspector/markup/reducers/markup";
-import eventTooltip from "devtools/client/inspector/markup/reducers/eventTooltip";
 import rules from "devtools/client/inspector/rules/reducers/rules";
 import computed from "devtools/client/inspector/computed/reducers";
-export { classList, markup, eventTooltip, rules, computed };
+export { classList, markup, rules, computed };
 
 export function inspector(
   state: InspectorState = initialInspectorState(),
