@@ -2,6 +2,7 @@ import { FrameworkEventListener } from "protocol/event-listeners";
 import { NodeFront, WiredEventListener } from "protocol/thread/node";
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { ExpandableItem } from "./ExpandableItem";
+import { XHTMLNode } from "./XHTMLNode";
 
 type AnyListener = WiredEventListener | FrameworkEventListener;
 
@@ -65,7 +66,9 @@ export const EventListenersApp: FC = () => {
     });
   }, [listeners]);
 
-  if (!selectedNode) {
+  const currentNode = selectedNode.current;
+
+  if (!currentNode) {
     return null;
   }
 
@@ -88,7 +91,9 @@ export const EventListenersApp: FC = () => {
                     key={handler.id()}
                     header={
                       <div className="flex gap-2">
-                        <span className="theme-fg-color3">{selectedNode.current?.displayName}</span>
+                        <span>
+                          <XHTMLNode node={currentNode} />
+                        </span>
                         <span>
                           {location && locationUrl ? (
                             <span
