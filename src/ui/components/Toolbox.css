@@ -74,10 +74,6 @@
   color: #bcbcbc;
 }
 
-.toolbar-panel-button.debug.paused .toolbar-panel-icon {
-  color: var(--secondary-accent);
-}
-
 .toolbar-panel-button.active .toolbar-panel-icon,
 .toolbar-panel-button.active.debug.paused .toolbar-panel-icon {
   color: var(--primary-accent);
