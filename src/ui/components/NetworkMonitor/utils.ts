@@ -1,12 +1,13 @@
 import {
   Header,
+  RequestBodyEvent,
+  RequestDoneEvent,
   RequestEventInfo,
   RequestInfo,
   RequestOpenEvent,
+  RequestResponseBodyEvent,
   RequestResponseEvent,
   TimeStampedPoint,
-  RequestBodyEvent,
-  RequestResponseBodyEvent,
 } from "@recordreplay/protocol";
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
@@ -29,6 +30,7 @@ export type RequestSummary = {
   domain: string;
   documentType: string;
   end: number | undefined;
+  firstByte: number | undefined;
   hasResponseBody: boolean;
   hasRequestBody: boolean;
   id: string;
@@ -41,7 +43,6 @@ export type RequestSummary = {
   responseHeaders: Header[];
   start: number;
   status: number | undefined;
-  time: number;
   type: CanonicalRequestType;
   url: string;
 };
@@ -94,6 +95,7 @@ export const findHeader = (headers: Header[] | undefined, key: string): string |
 
 export type RequestEventMap = {
   request: { time: number; event: RequestOpenEvent };
+  "request-done": { time: number; event: RequestDoneEvent };
   "response-body": { time: number; event: RequestResponseBodyEvent };
   "request-body": { time: number; event: RequestBodyEvent };
   response: { time: number; event: RequestResponseEvent } | null;
@@ -141,11 +143,13 @@ export const partialRequestsToCompleteSummaries = (
     .map((r: RequestInfo & { events: RequestEventMap }) => {
       const request = r.events.request;
       const response = r.events.response;
+      const requestDone = r.events["request-done"];
       const documentType = response ? getDocumentType(response.event.responseHeaders) : "unknown";
       return {
         documentType,
         domain: host(request.event.requestUrl),
-        end: response?.time,
+        firstByte: response?.time,
+        end: requestDone?.time,
         hasResponseBody: Boolean(response && r.events["response-body"]),
         hasRequestBody: Boolean(r.events["request-body"]),
         id: r.id,
@@ -160,7 +164,6 @@ export const partialRequestsToCompleteSummaries = (
         responseHeaders: response?.event.responseHeaders || [],
         start: request.time,
         status: response?.event.responseStatus,
-        time: response ? response.time - request.time : 0,
         triggerPoint: r.triggerPoint,
         type: REQUEST_TYPES[request.event.requestCause || ""] || CanonicalRequestType.OTHER,
         url: request.event.requestUrl,

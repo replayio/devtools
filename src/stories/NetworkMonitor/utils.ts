@@ -81,7 +81,8 @@ export const requestSummary = (
   return {
     domain: "replay.io",
     documentType: "html",
-    end: 1600,
+    end: 1700,
+    firstByte: 1600,
     hasResponseBody: true,
     hasRequestBody: true,
     id,
@@ -94,7 +95,6 @@ export const requestSummary = (
     responseHeaders: [{ name: "content-type", value: contentType }],
     start: 0,
     status,
-    time: 1600,
     type: CanonicalRequestType.FETCH_XHR,
     url,
   };

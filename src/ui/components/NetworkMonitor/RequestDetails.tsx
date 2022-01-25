@@ -106,16 +106,22 @@ const StackTrace = ({
 };
 
 const Timing = ({ request }: { request: RequestSummary }) => {
+  const details = [{ name: "Started at", value: `${request.start}ms` }];
+  if (request.firstByte) {
+    details.push({ name: "Responded at (first byte)", value: `${request.firstByte}ms` });
+    details.push({
+      name: "Wait time to first byte",
+      value: `${request.firstByte - request.start}ms`,
+    });
+  }
+  if (request.end) {
+    details.push({ name: "Ended at", value: `${request.end}ms` });
+    details.push({ name: "Total time", value: `${request.end - request.start}ms` });
+  }
   return (
     <>
       <div className="flex justify-between items-center px-4 py-2 font-bold">Timings:</div>
-      <DetailTable
-        details={[
-          { name: "Initiated at", value: `${request.start}ms` },
-          { name: "Returned at (first byte)", value: `${request.end!}ms` },
-          { name: "Time waiting for response", value: `${request.end! - request.start!}ms` },
-        ]}
-      />
+      <DetailTable details={details} />
     </>
   );
 };
@@ -125,6 +131,20 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   const [requestHeadersExpanded, setRequestHeadersExpanded] = useState(true);
   const [responseHeadersExpanded, setResponseHeadersExpanded] = useState(true);
   const [queryParametersExpanded, setQueryParametersExpanded] = useState(true);
+
+  const details = [
+    { name: "URL", value: <FormattedUrl url={request.url} /> },
+    { name: "Request Method", value: request.method },
+    { name: "Status Code", value: String(request.status) },
+    { name: "Type", value: request.documentType },
+    { name: "Start", value: `${request.start}ms` },
+  ];
+  if (request.firstByte) {
+    details.push({ name: "Time to first byte", value: `${request.firstByte - request.start}ms` });
+  }
+  if (request.end) {
+    details.push({ name: "Total Time", value: `${request.end - request.start}ms` });
+  }
 
   const requestHeaders = useMemo(
     () => sortBy(request.requestHeaders, r => r.name.toLowerCase()),
@@ -143,19 +163,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         <TriangleToggle open={requestExpanded} />
         General
       </div>
-      {requestExpanded && (
-        <DetailTable
-          className={styles.request}
-          details={[
-            { name: "URL", value: <FormattedUrl url={request.url} /> },
-            { name: "Request Method", value: request.method },
-            { name: "Status Code", value: String(request.status) },
-            { name: "Type", value: request.documentType },
-            { name: "Start", value: `${request.start}ms` },
-            { name: "First byte time", value: `${request.end}ms` },
-          ]}
-        />
-      )}
+      {requestExpanded && <DetailTable className={styles.request} details={details} />}
       <h2
         className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
