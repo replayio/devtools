@@ -7,6 +7,10 @@ import React, { PureComponent } from "react";
 import { showMenu } from "devtools/shared/contextmenu";
 import { connect } from "../../utils/connect";
 import actions from "../../actions";
+import {
+  highlightDomElement,
+  unHighlightDomElement,
+} from "devtools/client/webconsole/actions/toolbox";
 import { features } from "../../utils/prefs";
 
 import {
@@ -213,8 +217,8 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   openLink: actions.openLink,
   openElementInInspector: actions.openElementInInspectorCommand,
-  highlightDomElement: actions.highlightDomElement,
-  unHighlightDomElement: actions.unHighlightDomElement,
+  highlightDomElement,
+  unHighlightDomElement,
   setExpandedScope: actions.setExpandedScope,
   addWatchpoint: actions.addWatchpoint,
   removeWatchpoint: actions.removeWatchpoint,

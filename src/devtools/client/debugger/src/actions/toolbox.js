@@ -25,16 +25,3 @@ export function openInspector(grip) {
     toolbox.getPanel("debugger")?.openInspector();
   };
 }
-
-export function highlightDomElement(grip) {
-  return async ({ toolbox }) => {
-    const nodeFront = grip.getNodeFront();
-    toolbox.getPanel("debugger")?.highlightDomElement(nodeFront);
-  };
-}
-
-export function unHighlightDomElement(grip) {
-  return ({ toolbox }) => {
-    toolbox.getPanel("debugger")?.unHighlightDomElement(grip);
-  };
-}
