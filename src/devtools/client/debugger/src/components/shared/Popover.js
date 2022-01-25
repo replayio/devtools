@@ -57,7 +57,7 @@ class Popover extends Component {
   }
 
   onTimeout = () => {
-    const isHoveredOnGap = this.$gap && window.elementIsHovered(this.$gap);
+    const isHoveredOnGap = this.$gap && this.$gap.matches(":hover");
     const isHoveredOnPopover =
       this.$popoverPreview && window.elementIsHovered(this.$popoverPreview);
     const isHoveredOnTooltip = this.$tooltip && window.elementIsHovered(this.$tooltip);
