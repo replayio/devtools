@@ -5,7 +5,7 @@
 import { assert } from "protocol/utils";
 import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
-import { setSelectedPanel } from "ui/actions/app";
+import { setSelectedPanel } from "ui/actions/layout";
 
 export class DebuggerPanel {
   constructor(toolbox) {

@@ -1,12 +1,12 @@
 import { SessionId } from "@recordreplay/protocol";
-import mixpanel, { Dict } from "mixpanel-browser";
+import mixpanel from "mixpanel-browser";
 import { getRecordingId } from "./recording";
-import { ViewMode } from "ui/state/layout";
+import { PrimaryPanelName, SecondaryPanelName, ViewMode } from "ui/state/layout";
 import { isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
-import { PrimaryPanelName, SecondaryPanelName, WorkspaceId } from "ui/state/app";
+import { WorkspaceId } from "ui/state/app";
 
 type MixpanelEvent =
   | ["breakpoint.minus_click"]
