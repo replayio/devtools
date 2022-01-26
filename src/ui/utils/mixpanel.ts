@@ -7,6 +7,7 @@ import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId } from "ui/state/app";
+import { InspectorActiveTab } from "devtools/client/inspector/state";
 
 type MixpanelEvent =
   | ["breakpoint.add_comment"]
@@ -29,9 +30,10 @@ type MixpanelEvent =
   | ["events_timeline.select_source"]
   | ["error.unauthenticated_viewer"]
   | ["error.unauthorized_viewer"]
+  | ["gutter.add_comment"]
   | ["header.open_share"]
   | ["header.edit_title"]
-  | ["gutter.add_comment"]
+  | ["inspector.select_tab", { tab: InspectorActiveTab }]
   | ["key_shortcut.full_text_search"]
   | ["key_shortcut.show_command_palette"]
   | ["key_shortcut.toggle_left_sidebar"]
