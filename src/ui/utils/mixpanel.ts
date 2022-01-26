@@ -9,6 +9,7 @@ import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId } from "ui/state/app";
 
 type MixpanelEvent =
+  | ["breakpoint.add_comment"]
   | ["breakpoint.minus_click"]
   | ["breakpoint.plus_click"]
   | ["breakpoint.preview_has_hits"]
@@ -16,12 +17,14 @@ type MixpanelEvent =
   | ["breakpoint.remove"]
   | ["breakpoint.set_condition"]
   | ["breakpoint.set_log"]
+  | ["breakpoint.too_many_points"]
   | ["comments.create"]
   | ["comments.delete"]
   | ["comments.focus"]
   | ["comments.select_location"]
   | ["comments.start_edit"]
   | ["console.clear_messages"]
+  | ["console.overflow"]
   | ["events_timeline.select"]
   | ["events_timeline.select_source"]
   | ["error.unauthenticated_viewer"]

@@ -10,7 +10,6 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
 const { prefs } = require("ui/utils/prefs");
-const { trackEvent } = require("ui/utils/telemetry");
 
 import "reactjs-popup/dist/index.css";
 import Log from "./Log";
@@ -20,6 +19,7 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
 import { PointDescription } from "@recordreplay/protocol";
 import classNames from "classnames";
+import { trackEvent } from "ui/utils/telemetry";
 
 export type Input = "condition" | "logValue";
 
@@ -88,6 +88,8 @@ function PanelSummary({
   };
 
   if (isHot) {
+    trackEvent("breakpoint.too_many_points");
+
     return (
       <div className="summary flex items-center text-red-700 bg-red-100">
         <Popup
