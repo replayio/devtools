@@ -1,0 +1,23 @@
+--- 
+# This is the block list used for the Replay SOC2 bot.
+#
+# An example:
+# blocklist:
+#  - bad/**
+#  - rootfile
+#
+# Each line maps to a glob expression that gets applied to the list of files
+# that the PR touches. The Replay SOC2 bot will never approve any changes to
+# .github/**. The matching is done by minimatch.
+#
+# For devtools this list will stay empty, which means the bot will approve all
+# changes.
+#
+# The motivation for the empty list is:
+#
+# Security isn't managed by the frontend. The front end enforces security
+# primarily as a UX concern and not a security concern. e.g. We don't want to
+# show actions that a user can't do so they don't see unnecessary errors but
+# the enforcement of the security policy is on the backend.
+#
+blocklist: 
