@@ -24,6 +24,7 @@ const {
   MESSAGES_CLEAR_EVALUATIONS,
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
+import { trackEvent } from "ui/utils/telemetry";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages = [];
@@ -126,6 +127,7 @@ function onConsoleMessage(msg) {
 }
 
 function onConsoleOverflow() {
+  trackEvent("console.overflow");
   return { type: "CONSOLE_OVERFLOW" };
 }
 
