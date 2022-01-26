@@ -1,5 +1,4 @@
-import type { NextPage } from "next";
-import { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 
 type ResponsiveTabsProps = {
   selected: string;
@@ -13,7 +12,7 @@ type ResponsiveTabsProps = {
   dropdownButtonClassName?: string;
   dropdownClassName?: string;
 };
-const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
+export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   selected,
   options,
   onClick,
@@ -29,38 +28,36 @@ const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const ro = useRef<ResizeObserver>(
-    global.ResizeObserver
-      ? new ResizeObserver(() => {
-          const containerWidth = containerRef.current?.clientWidth ?? 0;
+    new ResizeObserver(() => {
+      const containerWidth = containerRef.current?.clientWidth ?? 0;
 
-          // we will always close dropdown when resizing
-          setDropdownOpen(false);
+      // we will always close dropdown when resizing
+      setDropdownOpen(false);
 
-          // check if maybe we don't need a dropdown at all
-          let totalTabsWidth = 0;
-          for (const tab of tabsRef.current) {
-            totalTabsWidth += tab.clientWidth;
-          }
+      // check if maybe we don't need a dropdown at all
+      let totalTabsWidth = 0;
+      for (const tab of tabsRef.current) {
+        totalTabsWidth += tab.clientWidth;
+      }
 
-          if (totalTabsWidth <= containerWidth) {
-            setVisibleItemsCount(tabsRef.current.length);
-            return;
-          }
+      if (totalTabsWidth <= containerWidth) {
+        setVisibleItemsCount(tabsRef.current.length);
+        return;
+      }
 
-          // we will need a dropdown for sure,
-          // so let's calc which items are visible
-          let _runningWidth = dropdownRef.current?.clientWidth ?? 0;
-          for (let idx = 0; idx < tabsRef.current.length; idx++) {
-            const tabWidth = tabsRef.current[idx].clientWidth;
-            _runningWidth += tabsRef.current[idx].clientWidth;
-            if (_runningWidth > containerWidth) {
-              setVisibleItemsCount(idx);
-              return;
-            }
-          }
-          setVisibleItemsCount(tabsRef.current.length);
-        })
-      : null
+      // we will need a dropdown for sure,
+      // so let's calc which items are visible
+      let _runningWidth = dropdownRef.current?.clientWidth ?? 0;
+      for (let idx = 0; idx < tabsRef.current.length; idx++) {
+        const tabWidth = tabsRef.current[idx].clientWidth;
+        _runningWidth += tabsRef.current[idx].clientWidth;
+        if (_runningWidth > containerWidth) {
+          setVisibleItemsCount(idx);
+          return;
+        }
+      }
+      setVisibleItemsCount(tabsRef.current.length);
+    })
   );
 
   useEffect(() => {
@@ -92,7 +89,7 @@ const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
             onClick?.(value);
           }}
           key={value}
-          ref={(ref) => (tabsRef.current[idx] = ref!)}
+          ref={ref => (tabsRef.current[idx] = ref!)}
           style={{
             pointerEvents: idx < visibleItemsCount ? "auto" : "none",
             opacity: idx < visibleItemsCount ? 1 : 0,
@@ -130,9 +127,7 @@ const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
                 onClick={() => {
                   onClick?.(value);
                 }}
-                className={`${tabClassName} ${
-                  value === selected ? "selected" : ""
-                }`}
+                className={`${tabClassName} ${value === selected ? "selected" : ""}`}
               >
                 {label}
               </div>
