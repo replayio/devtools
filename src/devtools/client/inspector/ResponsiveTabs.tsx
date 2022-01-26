@@ -7,6 +7,7 @@ type ResponsiveTabsProps = {
   dropdownClassName?: string;
   dropdownStyle?: CSSProperties;
   children: ReactElement | ReactElement[];
+  activeIdx: number;
 };
 
 export const ResponsiveTabs = ({
@@ -15,6 +16,7 @@ export const ResponsiveTabs = ({
   dropdownClassName,
   dropdownStyle,
   children,
+  activeIdx,
 }: ResponsiveTabsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLSpanElement[]>([]);
@@ -25,13 +27,13 @@ export const ResponsiveTabs = ({
   const [visibleItemsCount, setVisibleItemsCount] = useState(tabs.length);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const ro = useRef<ResizeObserver>(
-    new ResizeObserver(() => {
-      const containerWidth = containerRef.current?.clientWidth ?? 0;
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
 
-      console.log(containerRef.current?.clientWidth);
-      console.log(containerRef.current?.offsetWidth);
-      console.log(containerRef.current?.scrollWidth);
+    const ro = new ResizeObserver(() => {
+      const containerWidth = containerRef.current?.clientWidth ?? 0;
 
       // we will always close dropdown when resizing
       setDropdownOpen(false);
@@ -50,28 +52,25 @@ export const ResponsiveTabs = ({
       // we will need a dropdown for sure,
       // so let's calc which items are visible
       let _runningWidth = dropdownRef.current?.clientWidth ?? 0;
-      for (let idx = 0; idx < tabsRef.current.length; idx++) {
-        const tabWidth = tabsRef.current[idx].clientWidth;
-        _runningWidth += tabsRef.current[idx].clientWidth;
+
+      // let tabIndices = Array.from({ length: tabsRef.current.length }).map((_, idx) => idx);
+      // tabIndices = [activeIdx, ...tabIndices.splice(activeIdx, 1)];
+
+      for (let idx = 0; idx < tabs.length; idx++) {
+        const tab = tabsRef.current[idx];
+        _runningWidth += tab.clientWidth;
         if (_runningWidth > containerWidth) {
           setVisibleItemsCount(idx);
           return;
         }
       }
       setVisibleItemsCount(tabsRef.current.length);
-    })
-  );
+    });
 
-  useEffect(() => {
-    if (!containerRef.current || !ro.current) {
-      return;
-    }
+    ro.observe(containerRef.current);
 
-    ro.current.observe(containerRef.current);
-
-    const _ro = ro.current;
     return () => {
-      _ro.disconnect();
+      ro.disconnect();
     };
   }, []);
 
@@ -116,7 +115,10 @@ export const ResponsiveTabs = ({
             </span>
           )}
           {dropdownOpen && (
-            <div className="absolute right-0 top-full" style={dropdownStyle}>
+            <div
+              className="absolute right-0 top-full responsive-tabs-dropdown"
+              style={dropdownStyle}
+            >
               {tabs.slice(visibleItemsCount).map(tab => (
                 <div key={tab.key}>{tab}</div>
               ))}

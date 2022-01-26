@@ -110,6 +110,7 @@ const InspectorApp: FC = () => {
                             borderRadius: "0 0 5px 5px",
                             boxShadow: "3px 3px 3px 1px var(--popup-shadow-color)",
                           }}
+                          activeIdx={availableTabs.indexOf(activeTab)}
                         >
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
