@@ -264,7 +264,7 @@ class JSTerm extends React.Component {
     const { frameScope } = this.props;
     const { value } = this.state;
 
-    if (!value || !frameScope) {
+    if (!value || !frameScope?.scope) {
       return [];
     }
 
