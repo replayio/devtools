@@ -9,7 +9,7 @@ import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
-import { SecondaryPanelName } from "ui/state/app";
+import { SecondaryPanelName } from "ui/state/layout";
 import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";

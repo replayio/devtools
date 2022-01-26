@@ -25,6 +25,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
 import { getUserSettings } from "ui/hooks/settings";
 import { setViewMode } from "./layout";
+import { getSelectedPanel } from "ui/reducers/layout";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -191,7 +192,7 @@ function showLoadingProgress(): UIThunkAction {
       dispatch(actions.setDisplayedLoadingProgress(displayedProgress));
     }
 
-    const selectedPanel = selectors.getSelectedPanel(getState());
+    const selectedPanel = getSelectedPanel(getState());
     // This shouldn't hit when the selectedPanel is "comments"
     // as that's not dealt with in toolbox, however we still
     // need to init the toolbox so we're not checking for

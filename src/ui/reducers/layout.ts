@@ -13,6 +13,7 @@ const syncInitialLayoutState: LayoutState = {
   viewMode: "non-dev",
   showVideoPanel: true,
   showEditor: true,
+  selectedPanel: "console",
 };
 
 const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => {
@@ -51,13 +52,14 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     };
   }
 
-  const { viewMode, showVideoPanel, showEditor } = syncInitialLayoutState;
+  const { viewMode, showVideoPanel, showEditor, selectedPanel } = syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
 
   return {
     ...syncInitialLayoutState,
     viewMode: initialViewMode,
+    selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     showEditor: "showEditor" in session ? session.showEditor : showEditor,
@@ -71,6 +73,10 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
         ...state,
         showCommandPalette: action.value,
       };
+    }
+
+    case "set_selected_panel": {
+      return { ...state, selectedPanel: action.panel };
     }
 
     case "set_selected_primary_panel": {
@@ -95,8 +101,11 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
   }
 }
 
+export const isInspectorSelected = (state: UIState) =>
+  getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getShowCommandPalette = (state: UIState) => state.layout.showCommandPalette;
 export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selectedPrimaryPanel;
+export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 export const getViewMode = (state: UIState) => state.layout.viewMode;
 export const getShowVideoPanel = (state: UIState) => state.layout.showVideoPanel;
 export const getShowEditor = (state: UIState) => state.layout.showEditor;

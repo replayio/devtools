@@ -5,7 +5,6 @@ import { pref } from "devtools/shared/services";
 
 // app prefs.
 pref("devtools.split-console", false);
-pref("devtools.selected-panel", "console");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
@@ -43,7 +42,6 @@ pref("devtools.features.widgetHover", false);
 pref("devtools.features.commentAttachments", false);
 
 export const prefs = new PrefsHelper("devtools", {
-  selectedPanel: ["String", "selected-panel"],
   user: ["Json", "user"],
   recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],

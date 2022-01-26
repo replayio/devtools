@@ -23,7 +23,7 @@ import {
   getSelectedSource,
 } from "../selectors";
 
-import { getSelectedPanel } from "ui/reducers/app";
+import { getSelectedPanel } from "ui/reducers/layout";
 import { getShowEditor } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 

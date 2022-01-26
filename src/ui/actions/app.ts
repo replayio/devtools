@@ -12,7 +12,6 @@ import {
 import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import {
-  PanelName,
   ModalType,
   ModalOptionsType,
   UploadInfo,
@@ -22,7 +21,6 @@ import {
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
-  SecondaryPanelName,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -30,10 +28,16 @@ import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
 import { isTest } from "ui/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
-import { hideCommandPalette, setSelectedPrimaryPanel, setViewMode } from "./layout";
+import {
+  hideCommandPalette,
+  setSelectedPanel,
+  setSelectedPrimaryPanel,
+  setViewMode,
+} from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
+import { PanelName } from "ui/state/layout";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -44,7 +48,6 @@ export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finish
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
-export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
@@ -104,7 +107,6 @@ export type AppActions =
   | IndexingAction
   | SetSessionIdAction
   | UpdateThemeAction
-  | SetSelectedPanelAction
   | SetInitializedPanelsAction
   | SetUploadingAction
   | SetModalAction
@@ -242,10 +244,6 @@ function setIndexing(indexing: number): IndexingAction {
 
 export function updateTheme(theme: string): UpdateThemeAction {
   return { type: "update_theme", theme };
-}
-
-export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
-  return { type: "set_selected_panel", panel };
 }
 
 export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
