@@ -19,7 +19,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 .tabs .tabs-navigation {
   box-sizing: border-box;
   display: flex;
-  height: 27px;
+  /* height: 27px; */
   position: relative;
   border-bottom: 1px solid var(--theme-splitter-color);
   background: var(--theme-tab-toolbar-background);
@@ -72,9 +72,8 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 
 .tabs .tabs-menu-item a {
   display: flex;
-  justify-content: center;
-  padding: 3px 10px;
-  border: 1px solid transparent;
+  place-items: center;
+  padding: 0 10px;
   font-size: 12px;
   line-height: 16px;
   text-decoration: none;
@@ -82,6 +81,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   cursor: pointer;
   user-select: none;
   text-align: center;
+  height: calc(2px + var(--theme-toolbar-height));
 }
 
 /* Remove the outline focusring from tabs-menu-item. */
