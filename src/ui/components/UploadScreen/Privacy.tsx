@@ -68,11 +68,11 @@ function Source({ url }: { url: string }) {
 function PrivacyData({ icon, name, urls }: { icon: string; name: string; urls: string[] }) {
   return (
     <div className="rounded-lg bg-jellyfish p-3 space-y-3">
-      <div className="space-x-2 flex flex-row font-medium items-center">
+      <div className="space-x-2 flex flex-row font-bold items-center">
         <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
         <div>{name}</div>
       </div>
-      <div className="flex flex-col space-y-1.5">
+      <div className="flex flex-col space-y-1.5 ml-7">
         {urls.map((u, i) => (
           <Source url={u} key={i} />
         ))}
@@ -86,10 +86,10 @@ export function Privacy() {
   const { operations } = recording!;
 
   return (
-    <div className="flex w-full h-full rounded-xl shadow-xl text-lg relative p-8 bg-jellyfish overflow-hidden">
+    <div className="flex w-full h-full rounded-xl shadow-xl relative p-5 bg-jellyfish overflow-hidden">
       <div className="flex flex-col space-y-7 overflow-hidden">
         <div className="flex flex-col space-y-1">
-          <div className="text-2xl font-bold">Privacy</div>
+          <div className="text-lg font-bold">Privacy</div>
           <div className="">
             {`Replays include all of the data needed to replay the browser. `}
             <ExternalLink
