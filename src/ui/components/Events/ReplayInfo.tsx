@@ -39,7 +39,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
 
   return (
     <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white border-splitter">
-      <div className="flex flex-col p-1.5 self-stretch space-y-1.5 w-full text-xs group">
+      <div className="flex flex-col p-1.5 self-stretch space-y-1.5 w-full text-xs">
         {recording.user ? (
           <Row>
             <AvatarImage className="h-5 w-5 rounded-full avatar" src={recording.user.picture} />
@@ -51,12 +51,20 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <div>{summary}</div>
         </Row>
-        <Row>
-          <MaterialIcon iconSize="xl">language</MaterialIcon>
-          <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
-            {getDisplayedUrl(recording.url)}
-          </div>
-        </Row>
+
+        <div className="group">
+          <Row>
+            <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
+              language
+            </MaterialIcon>
+            <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
+              <a href={recording.url} target="_blank" rel="noopener noreferrer">
+                {getDisplayedUrl(recording.url)}
+              </a>
+            </div>
+          </Row>
+        </div>
+
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
@@ -85,10 +93,14 @@ function OperationsRow({
   const uniqueDomains = getUniqueDomains(operations);
 
   return (
-    <Row onClick={onClick}>
-      <MaterialIcon iconSize="xl">info</MaterialIcon>
-      <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
-    </Row>
+    <div className="group">
+      <Row onClick={onClick}>
+        <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
+          info
+        </MaterialIcon>
+        <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
+      </Row>
+    </div>
   );
 }
 
