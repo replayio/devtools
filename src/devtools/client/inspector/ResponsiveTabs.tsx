@@ -12,6 +12,7 @@ type ResponsiveTabsProps = {
   dropdownButtonClassName?: string;
   dropdownClassName?: string;
 };
+
 export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   selected,
   options,
@@ -78,7 +79,6 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
       ref={containerRef}
       style={{
         display: "flex",
-        border: "1px solid green",
         position: "relative",
       }}
       className={className}
