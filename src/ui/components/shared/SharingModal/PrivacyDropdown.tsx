@@ -10,8 +10,7 @@ import { isPublicDisabled } from "ui/utils/org";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>
-    {`Members of `}
-    <span className="underline">{name}</span>
+    <span className="font-bold">{name}</span>
     {` can view`}
   </span>
 );
@@ -35,7 +34,7 @@ export function getPrivacySummaryAndIcon(recording: Recording) {
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
   return (
     <div className="flex flex-row space-x-1">
-      <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
+      <span className="text-xs whitespace-pre">{children}</span>
       {!disabled ? (
         <div style={{ lineHeight: "0px" }}>
           <MaterialIcon>expand_more</MaterialIcon>
@@ -89,7 +88,9 @@ function useGetPrivacyOptions(
     options.push(
       <DropdownItem onClick={setPublic}>
         <DropdownItemContent icon="link" selected={!isPrivate}>
-          Anyone with the link
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+            Anyone with the link
+          </span>
         </DropdownItemContent>
       </DropdownItem>
     );
@@ -101,14 +102,16 @@ function useGetPrivacyOptions(
     options.push(
       <DropdownItem onClick={() => handleMoveToTeam(null)}>
         <DropdownItemContent icon="domain" selected={isPrivate && !workspaceId}>
-          Only people with access
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+            Only people with access
+          </span>
         </DropdownItemContent>
       </DropdownItem>,
       <div>
         {workspaces.map(({ id, name }) => (
           <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
             <DropdownItemContent icon="group" selected={isPrivate && id === workspaceId}>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
                 Members of {name}
               </span>
             </DropdownItemContent>
@@ -122,7 +125,7 @@ function useGetPrivacyOptions(
     options.push(
       <DropdownItem onClick={setPrivate}>
         <DropdownItemContent icon="group" selected={isPrivate}>
-          <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Members of {recording.workspace?.name || "this team"}
           </span>
         </DropdownItemContent>

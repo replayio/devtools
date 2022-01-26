@@ -10,6 +10,7 @@ import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
+import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
   const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
@@ -38,8 +39,8 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white border-splitter">
-      <div className="flex flex-col p-1.5 self-stretch space-y-1.5 w-full text-xs">
+    <div className="flex overflow-hidden flex flex-column items-center bg-white border-splitter">
+      <div className="flex flex-col p-1.5 self-stretch w-full text-xs pb-0 overflow-hidden">
         {recording.user ? (
           <Row>
             <AvatarImage className="h-5 w-5 rounded-full avatar" src={recording.user.picture} />
@@ -47,10 +48,16 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-        <Row>
-          <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
-          <div>{summary}</div>
-        </Row>
+        <div className="group">
+          <Row>
+            <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
+              {icon}
+            </MaterialIcon>
+            <div>
+              <PrivacyDropdown {...{ recording }} />
+            </div>
+          </Row>
+        </div>
 
         <div className="group">
           <Row>
