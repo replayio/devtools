@@ -47,8 +47,8 @@ jobs:
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 300
-          check_interval: 10
+          max_timeout: 500
+          check_interval: 30
       - run: echo ${{steps.waitFor200.outputs.url}}
     outputs:
       url: ${{ steps.waitFor200.outputs.url }}
