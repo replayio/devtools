@@ -58,7 +58,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
               language
             </MaterialIcon>
             <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
-              <a href={recording.url} target="_blank">
+              <a href={recording.url} target="_blank" rel="noopener noreferrer">
                 {getDisplayedUrl(recording.url)}
               </a>
             </div>
