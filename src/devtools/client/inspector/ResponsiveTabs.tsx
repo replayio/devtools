@@ -1,32 +1,26 @@
 import cx from "classnames";
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 
 type ResponsiveTabsProps = {
-  selected: string;
-  options: {
-    label: string;
-    value: string;
-  }[];
-  onChange?: (value: string) => void;
   className?: string;
-  tabClassName?: string;
-  dropdownButtonClassName?: string;
-  dropdownClassName?: string;
+  dropdownButton?: ReactNode;
+  children: ReactElement | ReactElement[];
 };
 
-export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
-  selected,
-  options,
-  onChange,
+export const ResponsiveTabs = ({
   className = "",
-  dropdownButtonClassName = "",
-  dropdownClassName = "",
-  tabClassName = "",
-}) => {
+  dropdownButton,
+  children,
+}: ResponsiveTabsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLSpanElement[]>([]);
   const dropdownRef = useRef<HTMLSpanElement>(null);
-  const [visibleItemsCount, setVisibleItemsCount] = useState(options.length);
+
+  const tabs = (Array.isArray(children) ? children : [children]).map((child, idx) => {
+    return React.cloneElement(child, { ref: tabsRef.current[idx] });
+  });
+
+  const [visibleItemsCount, setVisibleItemsCount] = useState(tabs.length);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const ro = useRef<ResizeObserver>(
@@ -76,49 +70,33 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   }, []);
 
   return (
-    <div ref={containerRef} className={`flex relative ${className}`}>
-      {options.map(({ label, value }, idx) => (
+    <div ref={containerRef} className={cx("flex items-center relative", className)}>
+      {tabs.map((tab, idx) => (
         <span
-          onClick={() => {
-            onChange?.(value);
-          }}
-          key={value}
+          key={tab.key}
           ref={ref => (tabsRef.current[idx] = ref!)}
           style={{
             pointerEvents: idx < visibleItemsCount ? "auto" : "none",
             opacity: idx < visibleItemsCount ? 1 : 0,
           }}
-          className={cx(tabClassName, { selected: value === selected })}
         >
-          {label}
+          {tab}
         </span>
       ))}
       {tabsRef.current.length !== visibleItemsCount && (
         <span
           onClick={() => setDropdownOpen(!dropdownOpen)}
           ref={dropdownRef}
-          className={`absolute right-0 top-0 h-full ${dropdownButtonClassName}`}
+          className="absolute right-0 top-0 h-full flex items-center"
         >
-          ↓
-          <div
-            className={cx(
-              "absolute right-0 top-full",
-              dropdownClassName,
-              dropdownOpen ? "block" : "none"
-            )}
-          >
-            {options.slice(visibleItemsCount).map(({ label, value }) => (
-              <div
-                key={value}
-                onClick={() => {
-                  onChange?.(value);
-                }}
-                className={`${tabClassName} ${value === selected ? "selected" : ""}`}
-              >
-                {label}
-              </div>
-            ))}
-          </div>
+          {dropdownButton ?? <span className="cursor-pointer px-1">···</span>}
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full z-20">
+              {tabs.slice(visibleItemsCount).map(tab => (
+                <div key={tab.key}>{tab}</div>
+              ))}
+            </div>
+          )}
         </span>
       )}
     </div>
