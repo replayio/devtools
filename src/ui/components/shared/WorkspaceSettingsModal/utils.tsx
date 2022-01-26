@@ -84,7 +84,7 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
     case "ent-v1":
       return {
         billingSchedule: "contract",
-        displayName: "Enterprise Contract",
+        displayName: "Enterprise",
         seatPrice: 0,
         discount: 0,
         trial: false,

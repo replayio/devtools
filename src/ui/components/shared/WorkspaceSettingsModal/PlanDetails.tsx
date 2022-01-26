@@ -22,7 +22,7 @@ export function PlanDetails({ subscription }: { subscription: SubscriptionWithPr
         <span>Number of seats</span>
         <span>{subscription.seatCount}</span>
       </div>
-      {subscription.billingSchedule && (
+      {subscription.billingSchedule && subscription.billingSchedule !== "contract" && (
         <>
           <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
             <span>Cost per seat</span>

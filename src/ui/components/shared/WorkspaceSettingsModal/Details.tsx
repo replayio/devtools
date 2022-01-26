@@ -1,9 +1,9 @@
 import React from "react";
-import { Subscription, SubscriptionWithPricing, Workspace } from "ui/types";
+import { SubscriptionWithPricing, Workspace } from "ui/types";
 import { Button } from "../Button";
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
 import { BillingBanners } from "./BillingBanners";
-import { ExpirationRow } from "./ExpirationRow";
+import { PlanDetails } from "./PlanDetails";
 import { isSubscriptionCancelled, formatPaymentMethod, Views } from "./utils";
 import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
@@ -69,20 +69,10 @@ function SubscriptionDetails({
 }) {
   return (
     <section>
-      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
-        <span>Current Plan</span>
-        <span>
-          {subscription.displayName}
-          {subscription.trial ? " (Trial)" : ""}
-        </span>
-      </div>
-      <ExpirationRow subscription={subscription} />
-      <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
-        <span>Number of seats</span>
-        <span>{subscription.seatCount}</span>
-      </div>
+      <PlanDetails subscription={subscription} />
       {isSubscriptionCancelled(subscription) ||
-      subscription.billingSchedule === "contract" ? null : (
+      subscription.billingSchedule === "contract" ||
+      subscription.plan.key === "beta-v1" ? null : (
         <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">
@@ -130,7 +120,7 @@ export function Details({
 
   return (
     <>
-      <SettingsHeader>Billing</SettingsHeader>
+      <SettingsHeader>{`${subscription.displayName} Plan`}</SettingsHeader>
       <BillingBanners subscription={subscription} confirmed={confirmed} />
       <SubscriptionDetails
         subscription={subscription}
