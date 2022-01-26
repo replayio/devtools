@@ -1,3 +1,4 @@
+import cx from "classnames";
 import React, { FC, useEffect, useRef, useState } from "react";
 
 type ResponsiveTabsProps = {
@@ -17,9 +18,9 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   selected,
   options,
   onChange,
-  className,
-  dropdownButtonClassName,
-  dropdownClassName,
+  className = "",
+  dropdownButtonClassName = "",
+  dropdownClassName = "",
   tabClassName = "",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -75,14 +76,7 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        display: "flex",
-        position: "relative",
-      }}
-      className={className}
-    >
+    <div ref={containerRef} className={`flex relative ${className}`}>
       {options.map(({ label, value }, idx) => (
         <span
           onClick={() => {
@@ -94,7 +88,7 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
             pointerEvents: idx < visibleItemsCount ? "auto" : "none",
             opacity: idx < visibleItemsCount ? 1 : 0,
           }}
-          className={`${tabClassName} ${value === selected ? "selected" : ""}`}
+          className={cx(tabClassName, { selected: value === selected })}
         >
           {label}
         </span>
@@ -103,23 +97,15 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
         <span
           onClick={() => setDropdownOpen(!dropdownOpen)}
           ref={dropdownRef}
-          style={{
-            position: "absolute",
-            right: 0,
-            top: 0,
-            height: "100%",
-          }}
-          className={dropdownButtonClassName}
+          className={`absolute right-0 top-0 h-full ${dropdownButtonClassName}`}
         >
           ↓
           <div
-            style={{
-              display: dropdownOpen ? "block" : "none",
-              position: "absolute",
-              right: 0,
-              top: "100%",
-            }}
-            className={dropdownClassName}
+            className={cx(
+              "absolute right-0 top-full",
+              dropdownClassName,
+              dropdownOpen ? "block" : "none"
+            )}
           >
             {options.slice(visibleItemsCount).map(({ label, value }) => (
               <div
