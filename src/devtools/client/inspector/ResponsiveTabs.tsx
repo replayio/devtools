@@ -6,7 +6,7 @@ type ResponsiveTabsProps = {
     label: string;
     value: string;
   }[];
-  onClick?: (value: string) => void;
+  onChange?: (value: string) => void;
   className?: string;
   tabClassName?: string;
   dropdownButtonClassName?: string;
@@ -16,7 +16,7 @@ type ResponsiveTabsProps = {
 export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
   selected,
   options,
-  onClick,
+  onChange,
   className,
   dropdownButtonClassName,
   dropdownClassName,
@@ -86,7 +86,7 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
       {options.map(({ label, value }, idx) => (
         <span
           onClick={() => {
-            onClick?.(value);
+            onChange?.(value);
           }}
           key={value}
           ref={ref => (tabsRef.current[idx] = ref!)}
@@ -125,7 +125,7 @@ export const ResponsiveTabs: FC<ResponsiveTabsProps> = ({
               <div
                 key={value}
                 onClick={() => {
-                  onClick?.(value);
+                  onChange?.(value);
                 }}
                 className={`${tabClassName} ${value === selected ? "selected" : ""}`}
               >
