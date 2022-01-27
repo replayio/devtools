@@ -1,4 +1,5 @@
-import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
+import { Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
+import { useRouter } from "next/router";
 import { useGetUserInfo } from "ui/hooks/users";
 import { setAccessTokenInBrowserPrefs } from "./browser";
 import { isTest, isMock } from "./environment";
@@ -25,34 +26,30 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
  * A wrapper around useAuth0() that returns dummy data in tests
  */
 export default function useAuth0() {
-  const auth = useOrigAuth0();
+  const router = useRouter();
   const { loading, email } = useGetUserInfo();
-  const { token, external } = useToken();
-
-  if (external && token) {
-    return {
-      isLoading: loading,
-      isAuthenticated: true,
-      user: loading
-        ? undefined
-        : {
-            sub: "external-auth",
-            email,
-          },
-      loginWithRedirect: auth.loginWithRedirect,
-      logout: (options?: LogoutOptions) => {
-        if (window.__IS_RECORD_REPLAY_RUNTIME__) {
-          setAccessTokenInBrowserPrefs(null);
-        }
-        auth.logout(options);
-      },
-      getAccessTokenSilently: () => Promise.resolve(),
-    };
-  }
+  const { token } = useToken();
 
   if (isTest() || isMock()) {
     return TEST_AUTH;
   }
 
-  return auth;
+  return {
+    isLoading: loading,
+    isAuthenticated: !!token,
+    user: loading
+      ? undefined
+      : {
+          sub: "external-auth",
+          email,
+        },
+    loginWithRedirect: () => {},
+    logout: (options?: LogoutOptions) => {
+      if (window.__IS_RECORD_REPLAY_RUNTIME__) {
+        setAccessTokenInBrowserPrefs(null);
+      }
+      window.location.href = "/api/logout";
+    },
+    getAccessTokenSilently: () => Promise.resolve(),
+  };
 }

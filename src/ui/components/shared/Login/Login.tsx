@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useEffect } from "react";
 
 import { setUserInBrowserPrefs } from "ui/utils/browser";
@@ -43,9 +44,13 @@ export default function Login() {
             </>
           )}
         </div>
-        <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
-          {isTeamMemberInvite() ? "Sign in with Google" : "Log in"}
-        </PrimaryLgButton>
+        <Link href="/api/login">
+          <a>
+            <PrimaryLgButton color="blue" className="w-full justify-center">
+              {isTeamMemberInvite() ? "Sign in with Google" : "Log in"}
+            </PrimaryLgButton>
+          </a>
+        </Link>
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );

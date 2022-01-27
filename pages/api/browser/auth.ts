@@ -1,6 +1,10 @@
 import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
+import WorkOS from "@workos-inc/node";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
+
+const workos = new WorkOS(process.env.WORKOS_API_KEY);
+const clientID = process.env.WORKOS_CLIENT_ID;
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
 const getAppUrl = (path: string) =>
@@ -54,21 +58,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
-    const redirectUri = getAppUrl("/api/browser/callback");
-    const { id, challenge, serverKey } = await initAuthRequest(key);
-    const url = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid profile offline_access&state=${id}&audience=https://api.replay.io`;
+    // TODO: Check for existing valid session before redirecting
+
+    const launchRedirect = "/browser/auth";
+    const redirectURI = getAppUrl("/api/browser/callback");
+    const { id } = await initAuthRequest(key);
+    const authorizationURL = workos.sso.getAuthorizationURL({
+      provider: "GoogleOAuth",
+      redirectURI,
+      clientID,
+    });
 
     res.setHeader(
       "Set-Cookie",
-      cookie.serialize("replay-browser-auth", JSON.stringify({ id, verifier: serverKey }), {
+      cookie.serialize("__replay_auth__", JSON.stringify({ id, redirect: launchRedirect }), {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         path: "/",
         maxAge: 5 * 60 * 1000,
       })
     );
-    res.redirect(url);
+
+    res.redirect(authorizationURL);
   } catch (e: any) {
     console.error(e);
 

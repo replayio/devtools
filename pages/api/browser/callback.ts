@@ -1,17 +1,59 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
+import WorkOS, { Profile } from "@workos-inc/node";
+import { generateToken, withSessionRoute } from "../../../src/withSession";
 
-interface Token {
-  access_token: string;
-  refresh_token: string;
-  id_token: string;
-  token_type: string;
-  expires_in: number;
-}
+const workos = new WorkOS(process.env.WORKOS_API_KEY);
+const clientID = process.env.WORKOS_CLIENT_ID;
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
-const getAppUrl = (path: string) =>
-  `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
+
+async function ensureUserForAuth(profile: Profile) {
+  const api = process.env.NEXT_PUBLIC_API_URL;
+  const secret = process.env.FRONTEND_API_SECRET;
+
+  if (!api) {
+    throw new Error("API Server is not configured");
+  }
+
+  if (!secret) {
+    throw new Error("Secret is not configured");
+  }
+
+  const resp = await fetch(api, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: `
+        mutation EnsureUserForAuth($secret: String!, $profile: JSONObject!) {
+          ensureUserForAuth(input: {secret: $secret, profile: $profile}) {
+            success
+            id
+          }
+        }
+      `,
+      variables: {
+        secret,
+        profile,
+      },
+    }),
+  });
+
+  const json = await resp.json();
+
+  if (json.errors) {
+    throw new Error(json.errors[0].message);
+  }
+
+  const { success, id } = json.data.ensureUserForAuth;
+  if (!success) {
+    throw new Error("Failed to fulfill authentication request");
+  }
+
+  return { userId: id };
+}
 
 async function fulfillAuthRequest(id: string, token: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;
@@ -59,36 +101,20 @@ async function fulfillAuthRequest(id: string, token: string) {
   return true;
 }
 
-async function fetchToken(code: string, verifier: string): Promise<Token> {
-  const resp = await fetch("https://webreplay.us.auth0.com/oauth/token", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      audience: "https://api.replay.io",
-      grant_type: "authorization_code",
-      client_id: "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo",
-      scope: "openid profile offline_access",
-      code_verifier: verifier,
-      code,
-      redirect_uri: getAppUrl("/api/browser/callback"),
-    }),
+async function fetchProfile(code: string): Promise<Profile> {
+  const { profile } = await workos.sso.getProfileAndToken({
+    code,
+    clientID,
   });
 
-  const token = await resp.json();
-
-  if (token && token.refresh_token) {
-    return token;
-  } else {
-    throw new Error("Failed to retrieve token");
-  }
+  return profile;
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default withSessionRoute(async (req: NextApiRequest, res: NextApiResponse) => {
   const code = getQueryValue(req.query.code);
-  const state = getQueryValue(req.query.state);
-  const browserAuth = req.cookies["replay-browser-auth"];
+  const authCookie = req.cookies["__replay_auth__"];
 
-  if (!code || !state || !browserAuth) {
+  if (!code || !authCookie) {
     res.statusCode = 500;
     res.statusMessage = "Missing parameter";
     res.send("");
@@ -96,16 +122,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const { verifier, id } = JSON.parse(browserAuth);
+    const { id, redirect = "/browser/auth" } = JSON.parse(authCookie);
+    const profile = await fetchProfile(code);
 
-    if (id !== state) {
-      throw new Error("Invalid auth request");
+    req.session.profile = await ensureUserForAuth(profile);
+    const value = await generateToken(req.session);
+
+    if (id) {
+      await fulfillAuthRequest(id, value);
     }
 
-    const token = await fetchToken(code, verifier);
-    await fulfillAuthRequest(state, token.refresh_token);
+    await req.session.save();
 
-    res.redirect("/browser/auth");
+    res.redirect(redirect);
   } catch (e: any) {
     console.error(e);
 
@@ -114,4 +143,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.statusCode = 500;
     res.send("");
   }
-};
+});

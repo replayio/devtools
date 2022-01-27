@@ -7,7 +7,6 @@ import NextApp from "next/app";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
-import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
 import LoadingScreen, { StaticLoadingScreen } from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
@@ -129,6 +128,7 @@ import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import { useRouter } from "next/router";
+import useToken from "ui/utils/useToken";
 
 interface AuthProps {
   apiKey?: string;
@@ -142,15 +142,22 @@ function AppUtilities({
   apiKey,
   head,
 }: { children: ReactNode; head: ReactNode } & AuthProps) {
+  const { setToken } = useToken();
+  useEffect(() => {
+    if (apiKey) {
+      setToken(apiKey);
+    }
+  }, [setToken, apiKey]);
+
   return (
-    <tokenManager.Auth0Provider apiKey={apiKey}>
+    <>
       {head}
       <ApolloWrapper>
         <IntercomProvider appId={"k7f741xx"} autoBoot>
           <ConfirmProvider>{children}</ConfirmProvider>
         </IntercomProvider>
       </ApolloWrapper>
-    </tokenManager.Auth0Provider>
+    </>
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
