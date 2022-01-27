@@ -16,7 +16,7 @@
 }
 
 .settings-modal main > ul > :not(:first-child) {
-  margin-top: 32px
+  margin-top: 32px;
 }
 
 /* Refresh Prompt */

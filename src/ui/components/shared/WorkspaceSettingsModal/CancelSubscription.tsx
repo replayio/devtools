@@ -10,10 +10,8 @@ export function CancelSubscription({
   subscription: Subscription;
   workspaceId: string;
 }) {
-  const {
-    cancelWorkspaceSubscription,
-    loading: cancelLoading,
-  } = hooks.useCancelWorkspaceSubscription();
+  const { cancelWorkspaceSubscription, loading: cancelLoading } =
+    hooks.useCancelWorkspaceSubscription();
 
   const handleCancelSubscription = () => {
     if (cancelLoading) return;

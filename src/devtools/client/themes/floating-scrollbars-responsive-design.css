@@ -40,7 +40,7 @@
 
 *|*:not(html|select) > scrollbar thumb {
   -moz-appearance: none !important;
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border-width: 0px !important;
   border-radius: 3px !important;
 }

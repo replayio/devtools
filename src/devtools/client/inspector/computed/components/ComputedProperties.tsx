@@ -23,13 +23,8 @@ function isHidden(property: ComputedPropertyState, search: string, showBrowserSt
 }
 
 function ComputedProperties(props: PropsFromRedux) {
-  const {
-    properties,
-    expandedProperties,
-    setComputedPropertyExpanded,
-    search,
-    showBrowserStyles,
-  } = props;
+  const { properties, expandedProperties, setComputedPropertyExpanded, search, showBrowserStyles } =
+    props;
 
   let dark = false;
   let allPropertiesHidden = true;

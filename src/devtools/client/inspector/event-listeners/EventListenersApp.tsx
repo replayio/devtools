@@ -76,7 +76,7 @@ export const EventListenersApp: FC = () => {
   }
 
   return (
-    <div>
+    <div className="h-full overflow-auto">
       {listeners.length === 0 ? (
         <div className="devtools-sidepanel-no-result">No event listeners</div>
       ) : (
