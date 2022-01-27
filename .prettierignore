@@ -6,3 +6,4 @@ public
 test/examples
 src/devtools/client/debugger/src/workers/parser/tests/fixtures
 src/ui/utils/intercom.ts
+index.html
