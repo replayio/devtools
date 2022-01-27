@@ -147,6 +147,11 @@ export async function trackMixpanelEvent(...[event, properties]: [...MixpanelEve
     mixpanel.track(event, { ...properties, namespace: namespaceFromEventName(event) });
   }
 }
+export async function timeMixpanelEvent(event: MixpanelEvent[0]) {
+  if (!mixpanelDisabled) {
+    mixpanel.time_event(event);
+  }
+}
 
 const eventsBeingOnlyTrackedOnce = new Set();
 
@@ -192,7 +197,7 @@ export const trackViewMode = (viewMode: ViewMode) =>
 export const startUploadWaitTracking = () => {
   // This one gets tracked in Honeycomb.
   trackTiming("kpi-time-to-view-replay");
-  mixpanel.time_event("upload.complete");
+  timeMixpanelEvent("upload.complete");
 };
 export const endUploadWaitTracking = (sessionId: SessionId) => {
   // This one gets tracked in Honeycomb.

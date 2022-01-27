@@ -3,8 +3,9 @@ import { Integrations } from "@sentry/tracing";
 import { skipTelemetry } from "./environment";
 import { Recording, Workspace } from "ui/types";
 import { prefs } from "./prefs";
-import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
+import { initializeMixpanel, timeMixpanelEvent, trackMixpanelEvent } from "./mixpanel";
 import { pingTelemetry } from "./replay-telemetry";
+import mixpanel from "mixpanel-browser";
 
 const timings: Record<string, number> = {};
 
@@ -17,6 +18,7 @@ export function setupTelemetry() {
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.
   initializeMixpanel();
+  timeMixpanelEvent("session.devtools_start");
 
   if (skipTelemetry()) {
     return;
