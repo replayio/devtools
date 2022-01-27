@@ -8,7 +8,7 @@ interface SettingsBodyProps<T extends string, P extends Record<string, unknown>>
 }
 
 function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)[] }) {
-  return <main className="text-sm">{children}</main>;
+  return <main className="text-default">{children}</main>;
 }
 
 export function SettingsHeader({ children }: { children: React.ReactNode }) {

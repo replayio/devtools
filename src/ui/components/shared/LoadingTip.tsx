@@ -52,7 +52,7 @@ export default function LoadingTip() {
       <div className="px-8 py-4 space-x-4 align-middle flex items-center max-w-lg rounded-lg bg-jellyfish">
         <img className="h-16 p-2" src={`/images/${icon}`} />
         <div className="flex flex-col space-y-2">
-          <div className="font-bold text-sm">{title}</div>
+          <div className="font-bold text-default">{title}</div>
           <div className="text-xs">{description}</div>
         </div>
       </div>

@@ -32,7 +32,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-sm overflow-hidden"
+        className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-default overflow-hidden"
         style={{ width: "460px" }}
       >
         <section className="p-8 space-y-4">

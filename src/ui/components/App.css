@@ -1,3 +1,42 @@
+/*
+working on standardising our fonts
+*/
+
+.text-xs {
+  background-color: #fffe74;
+}
+
+.text-sm {
+  background-color: #87e1ff;
+}
+
+.text-md {
+  background-color: #307991;
+}
+
+.text-lg {
+  background-color: #5f72df;
+}
+
+.text-xl {
+  background-color: #dd3f91;
+}
+
+.text-2xl {
+  background-color: #fb58a9;
+}
+
+.theme-tab-font-size,
+.secondary-toolbox-header,
+.source-tab,
+h2 {
+  font-size: 14px;
+}
+
+/*
+end of font standardise
+*/
+
 #video {
   flex-grow: 1;
   height: 100%;

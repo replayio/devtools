@@ -153,7 +153,7 @@ function CommandPalette({
           <PaletteShortcut />
         </div>
       </div>
-      <div className="flex-grow text-sm flex flex-col overflow-auto mb-2">
+      <div className="flex-grow text-default flex flex-col overflow-auto mb-2">
         {shownCommands.map((command: Command, index: number) => (
           <CommandButton active={index == activeIndex} command={command} key={command.label} />
         ))}

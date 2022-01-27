@@ -98,7 +98,7 @@ export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceIn
         </div>
       </div>
       <div className="relative overflow-hidden">
-        <div className="flex flex-col rounded-md shadow-md bg-white text-sm overflow-y-auto recording-list filter blur-sm">
+        <div className="flex flex-col rounded-md shadow-md bg-white text-default overflow-y-auto recording-list filter blur-sm">
           {MOCK_DATA.map((r, i) => (
             <MockRecordingRow date={r.date} key={i} name={r.user.name} />
           ))}

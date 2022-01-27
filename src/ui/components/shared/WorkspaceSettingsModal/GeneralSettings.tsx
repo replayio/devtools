@@ -83,7 +83,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label>Name</Label>
         <Input>
           <input
-            className="rounded-md text-sm w-full"
+            className="rounded-md text-default w-full"
             type="text"
             value={name}
             onChange={e => setName(e.currentTarget.value)}
@@ -103,7 +103,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
                 onChange={e => onUpload(e.currentTarget)}
               />
               <span>Upload</span>
-              <span className="text-sm material-icons ml-2">upload</span>
+              <span className="text-default material-icons ml-2">upload</span>
             </label>
             {err ? <div className="text-red-500">{err}</div> : null}
           </div>

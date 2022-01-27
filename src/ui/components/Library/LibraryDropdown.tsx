@@ -18,7 +18,7 @@ export function DropdownButton({
 }) {
   return (
     <Menu.Button
-      className={classNames(className, "flex px-1 py-2 items-center text-sm")}
+      className={classNames(className, "flex px-1 py-2 items-center text-default")}
       disabled={disabled}
     >
       {children}
@@ -30,12 +30,12 @@ export function Dropdown({
   children,
   menuItemsClassName,
   widthClass = "w-56",
-  fontSizeClass = "text-sm",
+  fontSizeClass = "text-default",
 }: {
   children: React.ReactNode;
   menuItemsClassName?: string;
   widthClass?: "w-56" | "w-64" | "w-80";
-  fontSizeClass?: "text-sm" | "text-base";
+  fontSizeClass?: "text-default" | "text-base";
 }) {
   return (
     <Menu as="div" className="inline-block text-left recording-options">
