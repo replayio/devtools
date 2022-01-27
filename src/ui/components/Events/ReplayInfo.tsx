@@ -40,7 +40,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
 
   return (
     <div className="flex overflow-hidden flex flex-column items-center bg-white border-splitter">
-      <div className="flex flex-col p-1.5 self-stretch w-full text-xs pb-0 overflow-hidden">
+      <div className="flex flex-col my-1.5 px-1.5 self-stretch w-full text-xs pb-0 overflow-hidden">
         {recording.user ? (
           <Row>
             <AvatarImage className="h-5 w-5 rounded-full avatar" src={recording.user.picture} />
