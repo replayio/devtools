@@ -6,18 +6,21 @@ https: declare module "react-devtools-inline/frontend" {
   import { ReactElement } from "react";
 
   // https://github.com/facebook/react/blob/main/packages/react-devtools-shared/src/devtools/views/DevTools.js
+
+  type TabID = "components" | "profiler";
+
   export interface ReactDevToolsProps {
     bridge: FrontendBridge;
-    browserTheme?: BrowserTheme;
-    canViewElementSourceFunction?: ?CanViewElementSource;
+    browserTheme?: string;
+    canViewElementSourceFunction?: (inspectedElement: InspectedElement) => boolean;
     defaultTab?: TabID;
     enabledInspectedElementContextMenu?: boolean;
     showTabBar?: boolean;
     store: Store;
     warnIfLegacyBackendDetected?: boolean;
     warnIfUnsupportedVersionDetected?: boolean;
-    viewAttributeSourceFunction?: ?ViewAttributeSource;
-    viewElementSourceFunction?: ?ViewElementSource;
+    viewAttributeSourceFunction?: (id: number, path: Array<string | number>) => void;
+    viewElementSourceFunction?: (id: number, inspectedElement: InspectedElement) => void;
     readOnly?: boolean;
     hideSettings?: boolean;
     hideToggleErrorAction?: boolean;
@@ -40,9 +43,9 @@ https: declare module "react-devtools-inline/frontend" {
     // Loads and parses source maps for function components
     // and extracts hook "names" based on the variables the hook return values get assigned to.
     // Not every DevTools build can load source maps, so this property is optional.
-    fetchFileWithCaching?: ?FetchFileWithCaching;
+    fetchFileWithCaching?: any;
     // TODO (Webpack 5) Hopefully we can remove this prop after the Webpack 5 migration.
-    hookNamesModuleLoaderFunction?: ?HookNamesModuleLoaderFunction;
+    hookNamesModuleLoaderFunction?: Function;
   }
   export type ReactDevTools = ReactElement<ReactDevToolsProps>;
 
@@ -52,6 +55,8 @@ https: declare module "react-devtools-inline/frontend" {
     listen(listener: (msg: any) => void): () => void;
     send(event: string, payload: any, transferable?: Array<any>): void;
   };
+
+  type ElementType = 1 | 2 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 
   // Bridge
   // https://github.com/facebook/react/blob/main/packages/react-devtools-shared/src/bridge.js
