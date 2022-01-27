@@ -786,3 +786,19 @@ export async function getRecordingMetadata(id: string) {
     owner: json.data.recording.owner?.name || null,
   };
 }
+
+export function useRequestRecordingAccess() {
+  const recordingId = useGetRecordingId();
+
+  const [requestRecordingAccess] = useMutation(
+    gql`
+      mutation requestRecordingAccess($recordingId: ID!) {
+        requestRecordingAccess(input: { recordingId: $recordingId }) {
+          success
+        }
+      }
+    `
+  );
+
+  return () => requestRecordingAccess({ variables: { recordingId } });
+}
