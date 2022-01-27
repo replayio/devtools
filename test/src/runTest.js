@@ -65,19 +65,21 @@ async function upload(state, test) {
   }
 }
 
-function onFinish(state, { test, target, success, why, recordingId }) {
+async function onFinish(state, { test, target, success, testPath, why, recordingId }) {
   sendTelemetryEvent("E2EFinished", {
     test,
     action: process.env.GITHUB_ACTION,
     branch: process.env.GITHUB_REF_NAME,
     sha: process.env.GITHUB_SHA,
-    success: 0,
+    success,
     why,
   });
 
-  if (!success) {
+  if (success === false) {
     state.failures.push(`Failed test:${test} target:${target} ${why}`);
     console.log(`[${elapsedTime(state)}] Test failed: ${why}`);
+
+    recordingId = await upload(state, testPath);
 
     // Log an error which github will recognize.
     let msg = `::error ::Failure ${test}`;
@@ -100,10 +102,7 @@ async function runTest(state, test, exampleRecordingId, target) {
     await recordNode(state, path.join(__dirname, "../examples/node", test));
   }
 
-  if (success === false) {
-    recordingId = await upload(state, testPath);
-    onFinish(state, { test, target, success, why, recordingId });
-  }
+  await onFinish(state, { test, target, success, why, testPath, recordingId });
 
   return recordingId;
 }
