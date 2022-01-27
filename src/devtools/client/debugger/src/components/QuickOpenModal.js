@@ -37,7 +37,7 @@ import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 
-const updateResultsThrottle = 100;
+const updateResultsThrottle = 1000;
 const maxResults = 100;
 
 const SIZE_BIG = { size: "big" };
@@ -50,6 +50,7 @@ function filter(values, query) {
     key: "value",
     maxResults,
     preparedQuery,
+    usePathScoring: false,
   });
 }
 
@@ -125,7 +126,6 @@ export class QuickOpenModal extends Component {
     if (query === "@" || query === "#") {
       return this.setResults(fns);
     }
-
     fns = filter(fns, query.slice(1));
     return this.setResults(fns);
   }
