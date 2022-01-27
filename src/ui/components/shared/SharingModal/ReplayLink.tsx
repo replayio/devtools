@@ -55,7 +55,7 @@ export function UrlCopy({ url }: { url: string }) {
   return (
     <div className="copy-link relative flex flex-col items-center">
       <input
-        className="text-sm"
+        className="text-default"
         type="text"
         value={url}
         onKeyPress={e => e.preventDefault()}
