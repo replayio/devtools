@@ -994,9 +994,8 @@ class ShapesHighlighter extends AutoRefreshHighlighter {
    *                 before scaling
    */
   _transformEllipse(transX = null, transY = null) {
-    const { unitX, unitY, unitRX, unitRY, valueX, valueY, ratioX, ratioY, ratioRX, ratioRY } = this[
-      _dragging
-    ];
+    const { unitX, unitY, unitRX, unitRY, valueX, valueY, ratioX, ratioY, ratioRX, ratioRY } =
+      this[_dragging];
     let { rx, ry } = this.coordUnits;
 
     let [newCx, newCy] = apply(this.transformMatrix, [valueX / ratioX, valueY / ratioY]);

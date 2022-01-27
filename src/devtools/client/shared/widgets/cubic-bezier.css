@@ -47,31 +47,38 @@
 }
 
 .cubic-bezier-container .display-wrap {
-  background:
-  repeating-linear-gradient(0deg,
-    transparent,
-    var(--bezier-grid-color) 0,
-    var(--bezier-grid-color) 1px,
-    transparent 1px,
-    transparent 15px) no-repeat,
-  repeating-linear-gradient(90deg,
-    transparent,
-    var(--bezier-grid-color) 0,
-    var(--bezier-grid-color) 1px,
-    transparent 1px,
-    transparent 15px) no-repeat;
+  background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        var(--bezier-grid-color) 0,
+        var(--bezier-grid-color) 1px,
+        transparent 1px,
+        transparent 15px
+      )
+      no-repeat,
+    repeating-linear-gradient(
+        90deg,
+        transparent,
+        var(--bezier-grid-color) 0,
+        var(--bezier-grid-color) 1px,
+        transparent 1px,
+        transparent 15px
+      )
+      no-repeat;
   background-size: 100% 100%, 100% 100%;
   background-position: -2px 5px, -2px 5px;
   user-select: none;
 }
 
 .cubic-bezier-container canvas.curve {
-  background:
-    linear-gradient(-45deg,
+  background: linear-gradient(
+      -45deg,
       transparent 49.7%,
       var(--bezier-diagonal-color) 49.7%,
       var(--bezier-diagonal-color) 50.3%,
-      transparent 50.3%) center no-repeat;
+      transparent 50.3%
+    )
+    center no-repeat;
   background-size: 100% 100%;
   background-position: 0 0;
 }
@@ -108,7 +115,7 @@
 
   border-radius: 50%;
   border: 2px solid white;
-  background: #4C9ED9;
+  background: #4c9ed9;
 }
 
 /* Preset Widget */

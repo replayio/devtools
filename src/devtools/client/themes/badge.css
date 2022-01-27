@@ -4,18 +4,18 @@
 
 :root {
   --badge-active-background-color: var(--blue-50);
-  --badge-active-border-color: #FFFFFFB3;
+  --badge-active-border-color: #ffffffb3;
   --badge-background-color: white;
-  --badge-border-color: #CACAD1;
+  --badge-border-color: #cacad1;
   --badge-color: var(--grey-60);
-  --badge-hover-background-color: #DFDFE8;
+  --badge-hover-background-color: #dfdfe8;
   --badge-interactive-background-color: var(--grey-20);
   --badge-interactive-color: var(--grey-90);
 }
 
 .theme-dark:root {
   --badge-active-background-color: var(--blue-60);
-  --badge-active-border-color: #FFF6;
+  --badge-active-border-color: #fff6;
   --badge-background-color: var(--grey-80);
   --badge-border-color: var(--grey-50);
   --badge-color: var(--grey-40);

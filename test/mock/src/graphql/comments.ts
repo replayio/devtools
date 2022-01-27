@@ -2,9 +2,7 @@ import { MockedResponse } from "@apollo/client/testing";
 import { GET_COMMENTS, GET_COMMENTS_TIME } from "ui/graphql/comments";
 import { cloneResponse } from "./utils";
 
-export function createEmptyCommentsMock(opts: {
-  recordingId: string;
-}): MockedResponse[] {
+export function createEmptyCommentsMock(opts: { recordingId: string }): MockedResponse[] {
   const getComments = {
     request: {
       query: GET_COMMENTS,
