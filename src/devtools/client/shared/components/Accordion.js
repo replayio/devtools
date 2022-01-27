@@ -11,6 +11,7 @@ const { ul, li, h2, div, span } = require("react-dom-factories");
 class Accordion extends Component {
   static get propTypes() {
     return {
+      style: PropTypes.object,
       // A list of all items to be rendered using an Accordion component.
       items: PropTypes.arrayOf(
         PropTypes.shape({
@@ -192,6 +193,7 @@ class Accordion extends Component {
     return ul(
       {
         className: "accordion",
+        style: this.props.style,
         tabIndex: -1,
       },
       this.props.items.map(item => this.renderItem(item))
