@@ -31,14 +31,7 @@
       #ccc 75%,
       #ccc
     ),
-    linear-gradient(
-      45deg,
-      #ccc 25%,
-      transparent 25%,
-      transparent 75%,
-      #ccc 75%,
-      #ccc
-    );
+    linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
   background-size: 12px 12px;
   background-position: 0 0, 6px 6px;
 }
@@ -259,7 +252,7 @@ http://www.briangrinstead.com/blog/keep-aspect-ratio-with-html-and-css */
 }
 
 .spectrum-color-contrast.visible:not(.error) .contrast-ratio-min .accessibility-contrast-value,
-.spectrum-color-contrast.visible:not(.error) .contrast-ratio-max .accessibility-contrast-value{
+.spectrum-color-contrast.visible:not(.error) .contrast-ratio-max .accessibility-contrast-value {
   margin-inline-start: 7px;
 }
 
@@ -277,12 +270,14 @@ http://www.briangrinstead.com/blog/keep-aspect-ratio-with-html-and-css */
   background-color: var(--accessibility-contrast-color);
 }
 
-.spectrum-color-contrast.visible:not(.error):-moz-locale-dir(ltr) .contrast-value-and-swatch:before {
+.spectrum-color-contrast.visible:not(.error):-moz-locale-dir(ltr)
+  .contrast-value-and-swatch:before {
   box-shadow: 0 0 0 1px var(--grey-40), 6px 5px var(--accessibility-contrast-bg),
     6px 5px 0 1px var(--grey-40);
 }
 
-.spectrum-color-contrast.visible:not(.error):-moz-locale-dir(rtl) .contrast-value-and-swatch:before {
+.spectrum-color-contrast.visible:not(.error):-moz-locale-dir(rtl)
+  .contrast-value-and-swatch:before {
   box-shadow: 0 0 0 1px var(--grey-40), -6px 5px var(--accessibility-contrast-bg),
     -6px 5px 0 1px var(--grey-40);
 }

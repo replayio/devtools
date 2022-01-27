@@ -79,13 +79,8 @@ class Marker extends React.Component<MarkerProps> {
   };
 
   render() {
-    const {
-      time,
-      currentTime,
-      isPrimaryHighlighted,
-      isSecondaryHighlighted,
-      zoomRegion,
-    } = this.props;
+    const { time, currentTime, isPrimaryHighlighted, isSecondaryHighlighted, zoomRegion } =
+      this.props;
 
     const offsetPercent = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
     if (offsetPercent < 0 || offsetPercent > 100) {

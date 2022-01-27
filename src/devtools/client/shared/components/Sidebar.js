@@ -40,14 +40,8 @@ class Sidebar extends PureComponent {
       return null;
     }
 
-    const {
-      collapsed,
-      collapsePaneTitle,
-      expandPaneTitle,
-      onClick,
-      alignRight,
-      canVerticalSplit,
-    } = this.props.sidebarToggleButton;
+    const { collapsed, collapsePaneTitle, expandPaneTitle, onClick, alignRight, canVerticalSplit } =
+      this.props.sidebarToggleButton;
 
     return SidebarToggle({
       collapsed,

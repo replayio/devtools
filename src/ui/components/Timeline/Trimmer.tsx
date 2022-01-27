@@ -9,7 +9,6 @@ import { TrimOperation, TrimRegion, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 
-
 type TrimmerProps = PropsFromRedux & { width: number };
 
 const getPosition = (time: number, zoom: ZoomRegion) => {

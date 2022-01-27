@@ -36,16 +36,20 @@ export function basicMessageHandlers(): MockHandlerRecord {
     }),
     "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Session.loadedRegions", {
-        loaded: [{
-          begin: { point: "0", time: 0 },
-          end: h.bindings.endpoint,
-        }],
-        loading: [{
-          begin: { point: "0", time: 0 },
-          end: h.bindings.endpoint,
-        }],
+        loaded: [
+          {
+            begin: { point: "0", time: 0 },
+            end: h.bindings.endpoint,
+          },
+        ],
+        loading: [
+          {
+            begin: { point: "0", time: 0 },
+            end: h.bindings.endpoint,
+          },
+        ],
       });
       return new Promise(resolve => {});
     },
   };
-};
+}

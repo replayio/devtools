@@ -29,12 +29,12 @@
 }
 
 .splitview-nav > li {
-  animation: item-load .5s var(--animation-curve);
+  animation: item-load 0.5s var(--animation-curve);
   padding-inline-end: 8px;
   -moz-box-align: center;
   outline: 0;
   vertical-align: bottom;
-  border-bottom: 1px solid rgba(128,128,128,0.15);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.15);
   background: inherit;
 }
 

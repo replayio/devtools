@@ -3,9 +3,9 @@
 The DevTools client is responsible for managing the communication between the
 client application and JS server.
 
-* When the server sends a notification to the client, the client receives an
+- When the server sends a notification to the client, the client receives an
   "event" and notifies the application via redux actions.
-* When the application, wants to send a command to the server, it invokes
+- When the application, wants to send a command to the server, it invokes
   "commands" in the client.
 
 The Debugger supports a Firefox and a Chrome client, which lets it attach and
@@ -18,9 +18,9 @@ JSON packets. The chrome client debugger adapter is defined in
 [chrome-remote-interface][chrome-remote-interface]. The Firefox client adapters
 are defined in two places:
 
-* The launchpad client adapter is maintained in the package
+- The launchpad client adapter is maintained in the package
   [devtools-connection][dt-connect].
-* The panel client adapter is maintained in
+- The panel client adapter is maintained in
   [devtools-client.js][devtools-client.js].
 
 ## Firefox
