@@ -11,6 +11,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
+import useAuth0 from "ui/utils/useAuth0";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
   const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
@@ -28,6 +29,7 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
 
 function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
+  const { isAuthenticated } = useAuth0();
 
   if (!recording) return null;
 
@@ -48,16 +50,17 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-        <div className="group">
-          <Row>
-            <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
-              {icon}
-            </MaterialIcon>
-            <div>
-              <PrivacyDropdown {...{ recording }} />
-            </div>
-          </Row>
-        </div>
+
+        {isAuthenticated ? (
+          <div className="group">
+            <Row>
+              <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
+                {icon}
+              </MaterialIcon>
+              <div><PrivacyDropdown {...{ recording }} /></div>
+            </Row>
+          </div>
+        ) : null}
 
         <div className="group">
           <Row>
