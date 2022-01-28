@@ -119,6 +119,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
     setMixpanelContext(userInfo);
     enableMixpanel();
     trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
+    timeMixpanelEvent("session.devtools_start");
     setupSessionEndListener();
   } else {
     disableMixpanel();
