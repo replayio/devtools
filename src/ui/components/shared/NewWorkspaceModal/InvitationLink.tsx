@@ -30,7 +30,7 @@ export function TextInputCopy({
     <div className="relative flex flex-col items-center w-full p-0.5">
       <input
         className={classNames(
-          isLarge ? "text-xl" : "text-default",
+          isLarge ? "text-xl" : "text-sm",
           isCenter ? "text-center" : "",
           "focus:ring-primaryAccent focus:border-primaryAccent block w-full border px-2.5 py-1.5 border-textFieldBorder rounded-md"
         )}

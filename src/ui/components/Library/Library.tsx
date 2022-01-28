@@ -52,7 +52,7 @@ function FilterBar({
   };
 
   return (
-    <div className="flex flex-row flex-grow text-gray-500 text-default space-x-3 items-center">
+    <div className="flex flex-row flex-grow text-gray-500 text-sm space-x-3 items-center">
       <div className="material-icons">search</div>
       <TextInput value={searchString} onChange={onChange} placeholder="Search" />
     </div>

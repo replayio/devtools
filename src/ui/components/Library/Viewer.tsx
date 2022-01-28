@@ -38,7 +38,7 @@ function DownloadLinks() {
   }
 
   return (
-    <div className="flex flex-col space-y-6 text-default" style={{ maxWidth: "24rem" }}>
+    <div className="flex flex-col space-y-6 text-sm" style={{ maxWidth: "24rem" }}>
       <div className="text-lg">{`👋 This is where your replays will go!`}</div>
     </div>
   );
@@ -103,7 +103,7 @@ function ViewerContent({
     return (
       <>
         <ViewerHeader>{HeaderLeft}</ViewerHeader>
-        <section className="grid items-center justify-center flex-grow text-default bg-gray-100">
+        <section className="grid items-center justify-center flex-grow text-sm bg-gray-100">
           <span className="text-gray-500">{errorText}</span>
         </section>
       </>
@@ -136,7 +136,7 @@ function ViewerContent({
           )}
         </div>
       </ViewerHeader>
-      <div className="flex flex-col rounded-md shadow-md bg-white text-default overflow-y-auto recording-list">
+      <div className="flex flex-col rounded-md shadow-md bg-white text-sm overflow-y-auto recording-list">
         {sortedRecordings.map((r, i) => (
           <RecordingRow
             key={i}

@@ -23,7 +23,7 @@ export default function IconWithTooltip({ icon, content, handleClick }: IconWith
   };
 
   return (
-    <div className="icon-with-tooltip text-default">
+    <div className="icon-with-tooltip text-sm">
       <button
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -43,7 +43,7 @@ function IconTooltip({ targetNode, children }: { targetNode: HTMLElement; childr
 
   return ReactDOM.createPortal(
     <div className="icon-tooltip absolute z-10 ml-10 mt-1" style={style}>
-      <div className="text-default py-1 px-2 bg-gray-700 text-white rounded-md">{children}</div>
+      <div className="text-sm py-1 px-2 bg-gray-700 text-white rounded-md">{children}</div>
     </div>,
     document.body
   );
