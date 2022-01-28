@@ -133,6 +133,12 @@ export interface Recording {
   comments?: any;
   userRole?: RecordingRole;
   operations: OperationsData;
+  collaboratorRequests: CollaboratorRequest[];
+}
+
+export interface CollaboratorRequest {
+  user: User;
+  uuid: string;
 }
 
 export interface OperationsData {

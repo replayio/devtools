@@ -122,15 +122,15 @@ function RequestRecordingAccessButton() {
 function ActionButton({ action }: { action: string }) {
   let button;
 
-  if (action == "refresh") {
+  if (action === "refresh") {
     button = <RefreshButton />;
-  } else if (action == "sign-in") {
+  } else if (action === "sign-in") {
     button = <SignInButton />;
-  } else if (action == "library") {
+  } else if (action === "library") {
     button = <LibraryButton />;
-  } else if (action == "team-billing") {
+  } else if (action === "team-billing") {
     button = <TeamBillingButton />;
-  } else if (action == "request-access") {
+  } else if (action === "request-access") {
     button = <RequestRecordingAccessButton />;
   }
 
