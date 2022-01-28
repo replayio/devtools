@@ -188,9 +188,9 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
-          <div className="flex flex-row space-x-4 mb-11">
+          <div className="flex flex-row space-x-4 mb-10 short:h-72">
             <div
-              className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium short:h-56"
+              className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
               style={{ width: "620px" }}
             >
               <div className="absolute w-full h-full bg-jellyfish" />
