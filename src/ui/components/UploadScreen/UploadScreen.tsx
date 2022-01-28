@@ -113,7 +113,7 @@ function ReplayScreenshot({
   return (
     <div
       className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish bg-white short:hidden"
-      style={{ height: "280px; display: none;" }}
+      style={{ height: "280px;" }}
     >
       {showLimitWarning ? <LimitWarning /> : null}
       <img src={screenData} className="h-full m-auto" />
