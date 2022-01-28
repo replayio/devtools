@@ -114,6 +114,7 @@ export async function getRecording(recordingId: RecordingId) {
     query: GET_RECORDING,
     variables: { recordingId },
   });
+
   return convertRecording(result.data?.recording);
 }
 
@@ -159,6 +160,7 @@ function convertRecording(rec: any): Recording | undefined {
   const collaborators = rec.collaborators?.edges
     ?.filter((e: any) => e.node.user)
     .map((e: any) => e.node.user.id);
+  const collaboratorRequests = rec.collaboratorRequests?.edges.map((e: any) => e.node);
 
   return {
     id: rec.uuid,
@@ -174,6 +176,7 @@ function convertRecording(rec: any): Recording | undefined {
     workspace: rec.workspace,
     comments: rec.comments,
     collaborators,
+    collaboratorRequests,
     ownerNeedsInvite: rec.ownerNeedsInvite,
     userRole: rec.userRole,
     operations: rec.operations,
@@ -785,4 +788,37 @@ export async function getRecordingMetadata(id: string) {
     duration: json.data.recording.duration,
     owner: json.data.recording.owner?.name || null,
   };
+}
+
+export function useRequestRecordingAccess() {
+  const recordingId = useGetRecordingId();
+
+  const [requestRecordingAccess] = useMutation(
+    gql`
+      mutation RequestRecordingAccess($recordingId: ID!) {
+        requestRecordingAccess(input: { recordingId: $recordingId }) {
+          success
+        }
+      }
+    `
+  );
+
+  return () => requestRecordingAccess({ variables: { recordingId } });
+}
+
+export function useAcceptRecordingRequest() {
+  const [acceptRecordingRequest] = useMutation(
+    gql`
+      mutation AcceptRecordingCollaboratorRequest($requestId: ID!) {
+        acceptRecordingCollaboratorRequest(input: { id: $requestId }) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetRecording"],
+    }
+  );
+
+  return (requestId: string) => acceptRecordingRequest({ variables: { requestId } });
 }

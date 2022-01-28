@@ -95,7 +95,7 @@ function getRecordingNotAccessibleError(
     return {
       message: "Sorry, you don't have permission!",
       content: "Maybe you haven't been invited to this replay yet?",
-      action: "library",
+      action: "request-access",
     };
   }
 

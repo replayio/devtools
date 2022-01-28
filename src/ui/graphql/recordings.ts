@@ -54,6 +54,19 @@ export const GET_RECORDING = gql`
           }
         }
       }
+      collaboratorRequests {
+        edges {
+          node {
+            ... on RecordingCollaboratorRequest {
+              id
+              user {
+                name
+                picture
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;

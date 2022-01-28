@@ -49,7 +49,7 @@ export type SettingsTabTitle =
 export interface ExpectedError {
   message: string;
   content: string;
-  action?: "sign-in" | "refresh" | "library";
+  action?: "sign-in" | "refresh" | "library" | "request-access";
 }
 
 export type UnexpectedError = {
