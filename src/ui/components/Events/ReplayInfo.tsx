@@ -50,8 +50,9 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-        {isAuthenticated ? (
-          <div className="group">
+
+        <div className="group">
+          {isAuthenticated ? (
             <Row>
               <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
                 {icon}
@@ -60,8 +61,8 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
                 <PrivacyDropdown {...{ recording }} />
               </div>
             </Row>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
         <div className="group">
           <Row>
             <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
