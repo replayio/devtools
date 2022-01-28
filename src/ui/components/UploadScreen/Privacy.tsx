@@ -46,10 +46,10 @@ function FavIcon({ url }: { url: string }) {
   return (
     <div className="relative">
       <div className="flex">
-        <MaterialIcon>public</MaterialIcon>
+        <MaterialIcon className="invisible">public</MaterialIcon>
       </div>
       <img
-        className="h-4 w-4 absolute top-0 left-0 bg-white"
+        className="h-4 w-4 absolute top-1 left-1 bg-white"
         src={`https://www.google.com/s2/favicons?domain=${url}`}
       />
     </div>
