@@ -34,7 +34,11 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p {...props} className="mb-2 text-center text-gray-500 text-sm">
+    <p
+      {...props}
+      className="mb-2 text-center text-gray-500 text-sm"
+      style={{ minHeight: "2.5rem" }}
+    >
       {children}
     </p>
   );
