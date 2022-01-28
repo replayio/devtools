@@ -78,7 +78,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-gray-200 transition duration-200 text-default"
+      className="material-icons w-5 text-gray-200 transition duration-200 text-sm"
     >
       settings
     </button>

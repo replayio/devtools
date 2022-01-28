@@ -61,7 +61,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <label className="flex items-center" htmlFor="disable_public_recordings">
             <input
-              className={classNames("rounded-sm ml-0 text-default", {
+              className={classNames("rounded-sm ml-0 text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -79,7 +79,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label>Allow Recordings From</Label>
         <Input>
           <input
-            className={classNames("rounded-md mr-2 w-full text-default", {
+            className={classNames("rounded-md mr-2 w-full text-sm", {
               "bg-toolbarBackground": disabled,
               "border-gray-300": disabled,
             })}
@@ -96,7 +96,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
             disabled={disabled}
             placeholder={`production.${workspace?.domain}`}
             type="text"
-            className={classNames("rounded-md w-full mr-2 text-default", {
+            className={classNames("rounded-md w-full mr-2 text-sm", {
               "bg-toolbarBackground": disabled,
               "border-gray-300": disabled,
             })}
@@ -109,7 +109,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <label className="flex items-center" htmlFor="restrict_users_to_domain">
             <input
-              className={classNames("rounded-sm ml-0 text-default", {
+              className={classNames("rounded-sm ml-0 text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -128,7 +128,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <label className="flex items-center" htmlFor="auto_add_users">
             <select
-              className={classNames("rounded-sm ml-0 text-default", {
+              className={classNames("rounded-sm ml-0 text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -157,7 +157,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <label className="flex items-center" htmlFor="restrict_users_to_domain">
             <input
-              className={classNames("rounded-sm ml-0 text-default", {
+              className={classNames("rounded-sm ml-0 text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -173,7 +173,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label className="self-start">Welcome Message</Label>
         <div>
           <textarea
-            className={classNames("rounded-md w-full h-20 text-default", {
+            className={classNames("rounded-md w-full h-20 text-sm", {
               "bg-toolbarBackground": disabled,
               "border-gray-300": disabled,
             })}

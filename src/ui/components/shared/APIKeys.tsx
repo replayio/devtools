@@ -77,7 +77,7 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
                 <span className="text-gray-500 ml-2">{usage}</span>
               </span>
               <button
-                className="inline-flex items-center p-2.5 text-default shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
+                className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
                 onClick={() => {
                   confirmDestructive({
                     message: "Delete API key?",
@@ -149,7 +149,7 @@ export default function APIKeys({
         <NewApiKey keyValue={keyValue} onDone={() => setKeyValue(undefined)} />
       ) : (
         <>
-          <section className="space-y-2.5 text-default">
+          <section className="space-y-2.5 text-sm">
             <h3 className="uppercase font-semibold text-xs">Create new API Key</h3>
             <form
               className="space-y-3"
@@ -186,7 +186,7 @@ export default function APIKeys({
               </fieldset>
               {scopes && scopes.length > 1 ? (
                 <fieldset className="w-full">
-                  <h4 className="text-default uppercase font-semibold">Permissions</h4>
+                  <h4 className="text-sm uppercase font-semibold">Permissions</h4>
                   {scopes.map(scope => (
                     <label key={scope} className="inline-block space-x-1.5 mx-1.5">
                       <input

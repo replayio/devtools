@@ -17,7 +17,7 @@ function TrimmingModal({ hideModal }: PropsFromRedux) {
         onClick={hideModal}
       />
       <div
-        className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-default overflow-hidden pointer-events-auto"
+        className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-sm overflow-hidden pointer-events-auto"
         style={{ width: "460px" }}
       >
         <div className="p-8 space-y-4">

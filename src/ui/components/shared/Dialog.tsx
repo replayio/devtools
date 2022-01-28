@@ -34,7 +34,7 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p {...props} className="mb-2 text-center text-gray-500 text-default">
+    <p {...props} className="mb-2 text-center text-gray-500 text-sm">
       {children}
     </p>
   );

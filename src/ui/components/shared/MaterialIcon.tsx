@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 
 const SIZE_STYLES = {
   xs: "text-xs",
-  sm: "text-default",
+  sm: "text-sm",
   base: "text-base",
   lg: "text-lg",
   xl: "text-xl",

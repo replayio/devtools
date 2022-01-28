@@ -19,7 +19,7 @@ export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces
         <img className="w-8 h-8" src="/images/logo.svg" />
       </div>
       <div
-        className="library-sidebar flex flex-col flex-grow text-default overflow-auto"
+        className="library-sidebar flex flex-col flex-grow text-sm overflow-auto"
         style={scrollbarStyle}
       >
         {features.library ? (
