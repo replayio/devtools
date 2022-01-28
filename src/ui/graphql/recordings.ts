@@ -58,7 +58,6 @@ export const GET_RECORDING = gql`
         edges {
           node {
             ... on RecordingCollaboratorRequest {
-              uuid
               id
               user {
                 name

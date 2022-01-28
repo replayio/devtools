@@ -62,7 +62,7 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
                 {c.user.name}
               </span>
             </div>
-            <PrimaryButton color="blue" onClick={() => acceptRecordingRequest(c.uuid)}>
+            <PrimaryButton color="blue" onClick={() => acceptRecordingRequest(c.id)}>
               Add
             </PrimaryButton>
           </div>

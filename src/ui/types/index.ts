@@ -138,7 +138,7 @@ export interface Recording {
 
 export interface CollaboratorRequest {
   user: User;
-  uuid: string;
+  id: string;
 }
 
 export interface OperationsData {

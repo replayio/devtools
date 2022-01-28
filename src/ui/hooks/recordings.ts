@@ -809,8 +809,8 @@ export function useRequestRecordingAccess() {
 export function useAcceptRecordingRequest() {
   const [acceptRecordingRequest] = useMutation(
     gql`
-      mutation AcceptRecordingCollaboratorRequest($requestId: UUID!) {
-        acceptRecordingCollaboratorRequest(input: { uuid: $requestId }) {
+      mutation AcceptRecordingCollaboratorRequest($requestId: ID!) {
+        acceptRecordingCollaboratorRequest(input: { id: $requestId }) {
           success
         }
       }
