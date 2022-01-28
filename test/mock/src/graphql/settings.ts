@@ -9,12 +9,7 @@ export function createUserSettingsMock(): MockedResponse[] {
     defaultWorkspaceId: null,
     disableLogRocket: false,
     enableEventLink: false,
-    enableNetworkMonitor: false,
-    enableGlobalSearch: false,
-    enableRepaint: false,
     enableTeams: true,
-    showElements: false,
-    showReact: false,
   };
   const rv = {
     request: {

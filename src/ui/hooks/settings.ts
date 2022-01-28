@@ -16,12 +16,7 @@ const emptySettings: UserSettings = {
   defaultWorkspaceId: null,
   disableLogRocket: false,
   enableEventLink: false,
-  enableGlobalSearch: false,
-  enableNetworkMonitor: false,
-  enableRepaint: false,
   enableTeams: true,
-  showElements: false,
-  showReact: false,
 };
 
 const testSettings: UserSettings = {
@@ -29,12 +24,7 @@ const testSettings: UserSettings = {
   defaultWorkspaceId: null,
   disableLogRocket: false,
   enableEventLink: false,
-  enableGlobalSearch: false,
-  enableNetworkMonitor: false,
-  enableRepaint: false,
   enableTeams: true,
-  showElements: true,
-  showReact: true,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
@@ -103,12 +93,7 @@ function convertUserSettings(data: any): UserSettings {
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
     enableEventLink: settings.enableEventLink,
-    enableGlobalSearch: settings.enableGlobalSearch,
-    enableNetworkMonitor: settings.enableNetworkMonitor,
-    enableRepaint: settings.enableRepaint,
     enableTeams: settings.enableTeams,
-    showElements: settings.showElements,
-    showReact: settings.showReact,
   };
 }
 
