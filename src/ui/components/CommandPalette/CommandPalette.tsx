@@ -133,7 +133,10 @@ function CommandPalette({
     } else if (e.key === "Enter") {
       e.preventDefault();
       setSearchString("");
-      executeCommand(shownCommands[activeIndex].key);
+      const command = shownCommands[activeIndex];
+      if (command) {
+        executeCommand(command.key);
+      }
     }
   };
 
