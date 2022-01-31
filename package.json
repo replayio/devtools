@@ -57,7 +57,7 @@
     "logrocket-react": "^3.0.1",
     "md5": "^2.3.0",
     "mixpanel-browser": "^2.41.0",
-    "next": "^12.0.7",
+    "next": "^12.0.9",
     "parse-script-tags": "^0.1.7",
     "postcss": "^8.2.13",
     "prettier": "^2.1.1",
