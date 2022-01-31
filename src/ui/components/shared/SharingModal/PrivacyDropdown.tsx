@@ -142,7 +142,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   const privacyOptions = useGetPrivacyOptions(recording, setExpanded);
   const { summary } = getPrivacySummaryAndIcon(recording);
 
-  if (!privacyOptions.length) {
+  if (privacyOptions.length <= 1) {
     return (
       <div
         title={
