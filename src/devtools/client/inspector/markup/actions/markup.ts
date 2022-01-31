@@ -96,10 +96,16 @@ export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): U
         node => node.nodeType !== TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
       );
     }
+
+    const children = await Promise.all(childFronts.map(node => convertNode(node)));
+    if (ThreadFront.currentPause !== parentFront.pause) {
+      return;
+    }
+
     dispatch({
       type: "ADD_CHILDREN",
       parentNodeId: parentFront.objectId(),
-      children: await Promise.all(childFronts.map(node => convertNode(node))),
+      children,
     });
   };
 }
