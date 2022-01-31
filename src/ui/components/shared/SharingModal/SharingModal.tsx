@@ -12,6 +12,7 @@ import MaterialIcon from "../MaterialIcon";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { AvatarImage } from "ui/components/Avatar";
 import { PrimaryButton } from "../Button";
+import { useHasNoRole } from "ui/hooks/recordings";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -72,6 +73,28 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
   );
 }
 
+function CollaboratorsSection({ recording }: { recording: Recording }) {
+  const { hasNoRole, loading } = useHasNoRole();
+
+  if (hasNoRole || loading) {
+    return null;
+  }
+
+  return (
+    <section className="p-8 space-y-4">
+      <div className="w-full justify-between flex flex-col space-y-3">
+        <div className="w-full space-y-4">
+          <div className="space-y-1.5">
+            <div className="font-bold">Add People</div>
+            <Collaborators recordingId={recording.id} />
+          </div>
+          <CollaboratorRequests recording={recording} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SharingModal({ recording, hideModal }: SharingModalProps) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
@@ -79,17 +102,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-sm overflow-hidden"
         style={{ width: "460px" }}
       >
-        <section className="p-8 space-y-4">
-          <div className="w-full justify-between flex flex-col space-y-3">
-            <div className="w-full space-y-4">
-              <div className="space-y-1.5">
-                <div className="font-bold">Add People</div>
-                <Collaborators recordingId={recording.id} />
-              </div>
-              <CollaboratorRequests recording={recording} />
-            </div>
-          </div>
-        </section>
+        <CollaboratorsSection recording={recording} />
         <section className="p-8 flex flex-row space-x-2 bg-gray-100 items-center justify-between">
           <div className="flex flex-row space-x-3 items-center overflow-hidden">
             <div className="h-8 w-8 bg-purple-200 rounded-full font-bold flex-shrink-0 flex items-center justify-center">

@@ -51,7 +51,7 @@ function useGetPrivacyOptions(
   const isPrivate = recording.private;
   const workspaceId = recording.workspace?.id || null;
   const { workspaces } = hooks.useGetNonPendingWorkspaces();
-  const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
+  const isOwner = hooks.useIsOwner();
 
   const userBelongsToTeam = workspaceId && workspaces.find(w => w.id === workspaceId);
 
