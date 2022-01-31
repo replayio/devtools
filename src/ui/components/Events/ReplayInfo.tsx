@@ -11,6 +11,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
+import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
@@ -43,6 +44,10 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   return (
     <div className="flex overflow-hidden flex flex-column items-center bg-white border-splitter">
       <div className="flex flex-col my-1.5 px-1.5 self-stretch w-full text-xs pb-0 overflow-hidden">
+        <Row>
+          <StatusDropdown {...{ recording }} />
+        </Row>
+
         {recording.user ? (
           <Row>
             <AvatarImage className="h-5 w-5 rounded-full avatar" src={recording.user.picture} />

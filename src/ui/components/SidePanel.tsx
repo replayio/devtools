@@ -30,7 +30,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
       <Accordion
         items={[
           {
-            header: "Replay Info",
+            header: "Info",
             className: "replay-info",
             component: <ReplayInfo />,
             opened: !replayInfoCollapsed,
