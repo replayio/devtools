@@ -165,7 +165,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     await initializeRecording({
       variables: { recordingId, title: inputValue, workspaceId },
     });
-    updateIsPrivate({ variables: { recordingId, isPrivate: !isPublic } });
+    updateIsPrivate(recordingId, !isPublic);
     onUpload();
   };
   const onDiscard = () => {

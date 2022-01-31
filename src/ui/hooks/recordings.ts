@@ -319,47 +319,20 @@ export function useGetIsPrivate(recordingId: RecordingId) {
   return { isPrivate, loading, error };
 }
 
-export function useToggleIsPrivate(recordingId: RecordingId, isPrivate: boolean) {
-  const [toggleIsPrivate] = useMutation(
-    gql`
-      mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
-        updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
-          success
-          recording {
-            uuid
-            private
-          }
-        }
-      }
-    `,
-    {
-      variables: { recordingId, isPrivate: !isPrivate },
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
-  );
-
-  return toggleIsPrivate;
-}
-
 export function useUpdateIsPrivate() {
   const [updateIsPrivate] = useMutation(
     gql`
       mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
         updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
           success
-          recording {
-            uuid
-            private
-          }
         }
       }
     `,
-    {
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
+    { refetchQueries: ["GetRecording"] }
   );
 
-  return updateIsPrivate;
+  return (recordingId: string, isPrivate: boolean) =>
+    updateIsPrivate({ variables: { recordingId, isPrivate } });
 }
 
 export function useIsOwner(recordingId: RecordingId) {
