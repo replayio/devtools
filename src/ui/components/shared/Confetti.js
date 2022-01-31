@@ -65,6 +65,10 @@ export default class Realistic extends React.Component {
     this.animationInstance = instance;
   };
 
+  componentDidMount() {
+    console.log("mounted this component");
+  }
+
   render() {
     return (
       <>
@@ -74,3 +78,6 @@ export default class Realistic extends React.Component {
     );
   }
 }
+
+// component didmount
+// this.fire

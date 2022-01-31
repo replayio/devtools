@@ -8,6 +8,7 @@ import hooks from "ui/hooks";
 import MaterialIcon from "./MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
 import { isPublicDisabled } from "ui/utils/org";
+import Confetti from "./Confetti";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>
@@ -49,10 +50,24 @@ function useGetPrivacyOptions(
 
   const options: ReactNode[] = [];
 
-  const click = () => {
-    console.log("click");
+  const changeStatus = status => {
+    console.log(status);
     setExpanded(false);
+
+    if (status == "resolved") {
+      // quasi-code:
+      // if we set the status to resolved, we need to launch confetti (see confetti.js)
+      // And hook it up to the back-end
+      // And it belongs on the top row of the accordian
+    }
   };
+
+  // setState = renderConfetti
+  // then the component knows what to do
+
+  // if status.fixed => <Confetti />
+  // {status === "fixed" ? <Confetti /> : null}
+
   const handleMoveToTeam = (targetWorkspaceId: WorkspaceId | null) => {
     if (targetWorkspaceId !== workspaceId) {
       trackEvent("share_modal.set_team");
@@ -71,17 +86,17 @@ function useGetPrivacyOptions(
   };
 
   options.push(
-    <DropdownItem onClick={() => click(null)}>
+    <DropdownItem onClick={() => changeStatus("active")}>
       <DropdownItemContent icon="manage_search" selected={isPrivate && !workspaceId}>
         <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">Active</span>
       </DropdownItemContent>
     </DropdownItem>,
-    <DropdownItem onClick={() => click(null)}>
+    <DropdownItem onClick={() => changeStatus("resolved")}>
       <DropdownItemContent icon="thumb_up_alt" selected={isPrivate && !workspaceId}>
         <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">Resolved</span>
       </DropdownItemContent>
     </DropdownItem>,
-    <DropdownItem onClick={() => click(null)}>
+    <DropdownItem onClick={() => changeStatus("couldntresolve")}>
       <DropdownItemContent icon="thumb_down_off_alt" selected={isPrivate && !workspaceId}>
         <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
           Couldn't resolve
