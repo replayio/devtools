@@ -91,10 +91,10 @@ function HeaderTitle({
   };
   const onBlur = () => {
     if (editing !== EditState.Active) return;
-    const currentValue = inputNode.current!.textContent;
+    const currentValue = inputNode.current!.textContent || "";
 
     setEditing(EditState.Saving);
-    updateRecordingTitle({ variables: { recordingId, title: currentValue } }).then(() => {
+    updateRecordingTitle(recordingId, currentValue).then(() => {
       setEditing(EditState.Inactive);
     });
   };
