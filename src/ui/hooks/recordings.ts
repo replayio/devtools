@@ -739,7 +739,8 @@ export function useUpdateRecordingTitle() {
     }
   );
 
-  return updateRecordingTitle;
+  return (recordingId: string, title: string) =>
+    updateRecordingTitle({ variables: { recordingId, title } });
 }
 
 export async function getRecordingMetadata(id: string) {

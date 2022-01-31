@@ -31,6 +31,7 @@ import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
+import RenameReplayModal from "./shared/Modals/RenameReplayModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -78,6 +79,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "sourcemap-setup": {
       return <SourcemapSetupModal />;
+    }
+    case "rename-replay": {
+      return <RenameReplayModal />;
     }
     default: {
       return null;

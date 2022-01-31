@@ -16,6 +16,7 @@ import { PanelName } from "./layout";
 
 export type ModalOptionsType = {
   recordingId?: string;
+  title?: string;
   view?: string;
   loom?: string;
   comment?: Reply;
@@ -35,7 +36,8 @@ export type ModalType =
   | "privacy"
   | "loom"
   | "attachment"
-  | "sourcemap-setup";
+  | "sourcemap-setup"
+  | "rename-replay";
 export type WorkspaceId = string;
 export type SettingsTabTitle =
   | "Experimental"

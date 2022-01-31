@@ -29,6 +29,7 @@ function RecordingOptionsDropdown({
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
+  const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
   const recordingId = recording.id;
   const { confirmDestructive } = useConfirm();
@@ -50,6 +51,10 @@ function RecordingOptionsDropdown({
       }
       setExpanded(false);
     });
+  };
+  const onRename = () => {
+    setModal("rename-replay", { recordingId: recording.id, title: recording.title || "" });
+    setExpanded(false);
   };
   const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
     updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId);
@@ -81,6 +86,9 @@ function RecordingOptionsDropdown({
       distance={0}
     >
       <Dropdown>
+        {isPublicDisabled(workspaces, currentWorkspaceId) ? null : (
+          <DropdownItem onClick={() => onRename()}>Rename</DropdownItem>
+        )}
         <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
         {isPublicDisabled(workspaces, currentWorkspaceId) ? null : (
           <DropdownItem onClick={toggleIsPrivate}>{`Make ${
