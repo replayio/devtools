@@ -7,7 +7,7 @@ import React, { Component } from "react";
 import { connect } from "../utils/connect";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
-import throttle from "lodash/throttle";
+import debounce from "lodash/debounce";
 import actions from "../actions";
 import {
   getSourceList,
@@ -50,7 +50,6 @@ function filter(values, query) {
     key: "value",
     maxResults,
     preparedQuery,
-    usePathScoring: false,
   });
 }
 
@@ -155,7 +154,7 @@ export class QuickOpenModal extends Component {
     }
   };
 
-  updateResults = throttle(query => {
+  updateResults = debounce(query => {
     if (this.isGotoQuery()) {
       return;
     }
