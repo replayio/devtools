@@ -16,7 +16,7 @@ const { ToggleRow } = require("./ConsoleSettings");
 
 export function CountPill({ children }) {
   return (
-    <span className="font-mono text-red-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
+    <span className="font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
       {children}
     </span>
   );
