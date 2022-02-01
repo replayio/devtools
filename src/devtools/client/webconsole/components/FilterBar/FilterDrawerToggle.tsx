@@ -14,7 +14,6 @@ function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsF
       className="flex flex-row justify-start items-center"
       style={!collapseFilterDrawer ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
     >
-      <Butt />
       <button className="flex border border-bodyColor rounded-md" onClick={onClick}>
         <MaterialIcon>{collapseFilterDrawer ? "chevron_right" : "chevron_left"}</MaterialIcon>
       </button>
