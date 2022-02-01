@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
 import { getAllUi } from "../../selectors/ui";
-import { ReactComponent as Butt } from "/public/images/palette.svg";
 const actions = require("devtools/client/webconsole/actions/index");
 
 function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsFromRedux) {
