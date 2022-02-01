@@ -113,6 +113,31 @@ function evaluateExpression(expression) {
   };
 }
 
+function eagerEvalExpression(expression) {
+  return async ({ _, toolbox }) => {
+    if (!expression) {
+      return null;
+    }
+
+    const { asyncIndex, frameId } = toolbox.getPanel("debugger").getFrameId();
+
+    try {
+      const response = await evaluateJSAsync(expression, {
+        asyncIndex,
+        frameId,
+        pure: true,
+      });
+      console.log(">>", { response });
+    } catch (err) {
+      let msg = "Error: Eager Evaluation failed";
+      if (err.message) {
+        msg += ` - ${err.message}`;
+      }
+      console.error(msg);
+    }
+  };
+}
+
 /**
  * Evaluate a JavaScript expression asynchronously.
  *
@@ -121,8 +146,9 @@ function evaluateExpression(expression) {
  *                          devtools/shared/fronts/webconsole.js
  */
 async function evaluateJSAsync(expression, options = {}) {
-  const { asyncIndex, frameId } = options;
-  const rv = await ThreadFront.evaluate(asyncIndex, frameId, expression);
+  const { asyncIndex, frameId, pure } = options;
+  //reminder that there would be no results if the function were impure -logan
+  const rv = await ThreadFront.evaluate(asyncIndex, frameId, expression, pure);
   const { returned, exception, failed } = rv;
 
   let v;
@@ -167,4 +193,5 @@ function onExpressionEvaluated(response) {
 module.exports = {
   evaluateExpression,
   paywallExpression,
+  eagerEvalExpression,
 };
