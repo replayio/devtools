@@ -94,15 +94,6 @@ function ViewToggle({
 
     await delayPromise;
 
-    // We switch to viewing comments only if the current view is something that
-    // wouldn't be visible in Viewer Mode normally (like debug or explorer)
-    if (
-      mode === "non-dev" &&
-      selectedPrimaryPanel !== "comments" &&
-      selectedPrimaryPanel !== "events"
-    ) {
-      setSelectedPrimaryPanel("comments");
-    }
     setViewMode(mode);
   };
 

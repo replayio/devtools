@@ -1,6 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
-import { getShowCommandPalette } from "ui/reducers/layout";
+import { getSelectedPrimaryPanel, getShowCommandPalette } from "ui/reducers/layout";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
 import { ViewMode, PrimaryPanelName, SecondaryPanelName } from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
@@ -41,12 +41,19 @@ export function toggleCommandPalette(): UIThunkAction {
   };
 }
 export function setViewMode(viewMode: ViewMode): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async ({ dispatch, getState }) => {
     // There's a possible race condition here so it's important to handle the nag logic first.
     // Otherwise, it's possible for the nag to not be properly dismissed.
     if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
       await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
       dispatch(setSelectedPrimaryPanel("explorer"));
+    }
+    // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
+    // if selectedPrimaryPanel is one that should only be visible in dev mode.
+    const selectedPrimaryPanel = getSelectedPrimaryPanel(getState());
+    const viewerPanels = ["comments", "events"]
+    if (viewMode === "non-dev" && !viewerPanels.includes(selectedPrimaryPanel)) {
+      dispatch(setSelectedPrimaryPanel("comments"));
     }
 
     dispatch({ type: "set_view_mode", viewMode });
