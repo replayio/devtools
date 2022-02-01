@@ -6,8 +6,9 @@ import { isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
-import { WorkspaceId } from "ui/state/app";
+import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
 import { InspectorActiveTab } from "devtools/client/inspector/state";
+import { decodeWorkspaceId } from "./workspace";
 
 type MixpanelEvent =
   | ["breakpoint.add_comment"]
@@ -70,6 +71,7 @@ type MixpanelEvent =
   | ["share_modal.set_public"]
   | ["share_modal.set_team"]
   | ["team_change", { workspaceId: WorkspaceId | null }]
+  | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
   | ["timeline.comment_select"]
   | ["timeline.marker_select"]
   | ["timeline.pause"]
@@ -82,7 +84,7 @@ type MixpanelEvent =
   | ["toolbox.secondary.video_toggle"]
   | ["toolbox.toggle_sidebar"]
   | ["upload.complete", { sessionId: SessionId }]
-  | ["upload.create_replay", { isDemo: boolean }]
+  | ["upload.create_replay", { isDemo: boolean; workspaceUuid: WorkspaceUuid }]
   | ["upload.discard", { isDemo: boolean }]
   | ["user_options.launch_replay"]
   | ["user_options.select_docs"]
@@ -128,8 +130,13 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
 
 export const maybeTrackTeamChange = (newWorkspaceId: WorkspaceId | null) => {
   if (!mixpanelDisabled) {
-    mixpanel.people.set({ workspaceId: newWorkspaceId });
-    trackMixpanelEvent("team_change", { workspaceId: newWorkspaceId });
+    // We use the uuid here so it's easy to cross reference the id
+    // to the team record in the database.
+    const uuid = decodeWorkspaceId(newWorkspaceId);
+    // Leaving the workspaceId here temporarily while we migrate to
+    // the new Uuid way. Delete this by the end of 2/22.
+    mixpanel.people.set({ workspaceId: newWorkspaceId, workspaceUuid: uuid });
+    trackMixpanelEvent("team.change_default", { workspaceUuid: uuid });
   }
 };
 

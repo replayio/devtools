@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { Workspace } from "ui/types";
 import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
+import { trackEvent } from "ui/utils/telemetry";
 
 function TeamButton({
   text,
@@ -32,11 +33,10 @@ function TeamButton({
     e.preventDefault();
     setWorkspaceId(id);
 
-    maybeTrackTeamChange(id);
-
     // We only set the new team as the default team if this is a non-pending team.
     // Otherwise, it would be possible to set pending teams as a default team.
     if (!isNew) {
+      trackEvent("team_change", { workspaceId: id });
       updateDefaultWorkspace({
         variables: { workspaceId: id },
       });
