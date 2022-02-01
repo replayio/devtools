@@ -8,6 +8,7 @@ const canvasStyles = {
   height: "100%",
   top: 0,
   left: 0,
+  zIndex: 100,
 };
 
 export default class Realistic extends React.Component {
@@ -20,7 +21,7 @@ export default class Realistic extends React.Component {
     this.animationInstance &&
       this.animationInstance({
         ...opts,
-        origin: { y: 0.15, x: 0.2 },
+        origin: { y: 0.1, x: 0.3 },
         particleCount: Math.floor(200 * particleRatio),
         colors: ["#01ACFD", "#F02D5E"],
       });
@@ -57,26 +58,15 @@ export default class Realistic extends React.Component {
     });
   };
 
-  handlerFire = () => {
-    this.fire();
-  };
-
   getInstance = instance => {
     this.animationInstance = instance;
   };
 
   componentDidMount() {
-    console.log("mounted this component");
+    this.fire();
   }
 
-  render() {
-    return (
-      <>
-        <button onClick={this.handlerFire}>Resolved</button>
-        <ReactCanvasConfetti refConfetti={this.getInstance} style={canvasStyles} />
-      </>
-    );
-  }
+  render = () => <ReactCanvasConfetti refConfetti={this.getInstance} style={canvasStyles} />;
 }
 
 // component didmount
