@@ -15,6 +15,7 @@ import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
+import { decodeWorkspaceId } from "ui/utils/workspace";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
@@ -159,7 +160,10 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     setStatus("saving");
     const workspaceId = selectedWorkspaceId == MY_LIBRARY ? null : selectedWorkspaceId;
 
-    trackEvent("upload.create_replay", { isDemo: isDemoReplay(recording) });
+    trackEvent("upload.create_replay", {
+      isDemo: isDemoReplay(recording),
+      workspaceUuid: decodeWorkspaceId(workspaceId),
+    });
     startUploadWaitTracking();
 
     await initializeRecording({
