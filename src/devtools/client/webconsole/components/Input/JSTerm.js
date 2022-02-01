@@ -132,9 +132,10 @@ class JSTerm extends React.Component {
     }
   };
 
-  onEnter = () => {
+  onEnter = async () => {
     if (!this.showAutocomplete()) {
-      this.execute();
+      // this.execute();
+      this.props.eagerEvalExpression(this.state.value);
     } else {
       const { autocompleteIndex } = this.state;
       const match = this.getMatches()[autocompleteIndex];
@@ -309,6 +310,7 @@ function mapStateToProps(state) {
 
 const mapDispatchToProp = {
   evaluateExpression: actions.evaluateExpression,
+  eagerEvalExpression: actions.eagerEvalExpression,
   paywallExpression: actions.paywallExpression,
 };
 
