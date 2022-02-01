@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
-import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
-import { getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
+import { getViewMode } from "ui/reducers/layout";
 import { setViewMode } from "ui/actions/layout";
 import { ViewMode } from "ui/state/layout";
 
@@ -49,9 +48,7 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps
 
 function ViewToggle({
   viewMode,
-  setViewMode,
-  setSelectedPrimaryPanel,
-  selectedPrimaryPanel,
+  setViewMode
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
@@ -129,12 +126,10 @@ function ViewToggle({
 
 const connector = connect(
   (state: UIState) => ({
-    viewMode: getViewMode(state),
-    selectedPrimaryPanel: getSelectedPrimaryPanel(state),
+    viewMode: getViewMode(state)
   }),
   {
-    setViewMode,
-    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
+    setViewMode
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
