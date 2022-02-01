@@ -3,6 +3,8 @@ import { connect, ConnectedProps } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
 import { getAllUi } from "../../selectors/ui";
+import DrawerCollapsed from "./drawer-collapsed.svg";
+import Drawer from "./drawer.svg";
 const actions = require("devtools/client/webconsole/actions/index");
 
 function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsFromRedux) {
@@ -14,8 +16,8 @@ function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsF
       className="flex flex-row justify-start items-center"
       style={!collapseFilterDrawer ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
     >
-      <button className="flex border border-bodyColor rounded-md" onClick={onClick}>
-        <MaterialIcon>{collapseFilterDrawer ? "chevron_right" : "chevron_left"}</MaterialIcon>
+      <button onClick={onClick}>
+        {collapseFilterDrawer ? <DrawerCollapsed className="mr-1.5" /> : <Drawer />}
       </button>
     </div>
   );
