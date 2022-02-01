@@ -9,6 +9,7 @@ import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
 import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
+import { ColorSwatchIcon } from "@heroicons/react/solid";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -150,6 +151,21 @@ export function useIsTeamDeveloper() {
   }
 
   return { isTeamDeveloper: data?.recording.userRole !== "team-user", loading };
+}
+
+// If the user has no role, then they're either viewing a non-team recording they
+// don't own, or a team recording for a team that they don't belong to.
+export function useHasNoRole() {
+  const recordingId = getRecordingId();
+  const { data, error, loading } = useQuery(GET_RECORDING, {
+    variables: { recordingId },
+  });
+
+  if (error) {
+    console.error("Apollo error while getting the user's role", error);
+  }
+
+  return { hasNoRole: data?.recording.userRole === "none", loading };
 }
 
 function convertRecording(rec: any): Recording | undefined {
@@ -319,50 +335,24 @@ export function useGetIsPrivate(recordingId: RecordingId) {
   return { isPrivate, loading, error };
 }
 
-export function useToggleIsPrivate(recordingId: RecordingId, isPrivate: boolean) {
-  const [toggleIsPrivate] = useMutation(
-    gql`
-      mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
-        updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
-          success
-          recording {
-            uuid
-            private
-          }
-        }
-      }
-    `,
-    {
-      variables: { recordingId, isPrivate: !isPrivate },
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
-  );
-
-  return toggleIsPrivate;
-}
-
 export function useUpdateIsPrivate() {
   const [updateIsPrivate] = useMutation(
     gql`
       mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
         updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
           success
-          recording {
-            uuid
-            private
-          }
         }
       }
     `,
-    {
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
+    { refetchQueries: ["GetRecording"] }
   );
 
-  return updateIsPrivate;
+  return (recordingId: string, isPrivate: boolean) =>
+    updateIsPrivate({ variables: { recordingId, isPrivate } });
 }
 
-export function useIsOwner(recordingId: RecordingId) {
+export function useIsOwner() {
+  const recordingId = useGetRecordingId();
   const { userId } = useGetUserId();
   const { data, loading, error } = useQuery(GET_RECORDING_USER_ID, {
     variables: { recordingId },

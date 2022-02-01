@@ -36,7 +36,7 @@ function RecordingOptionsDropdown({
 
   const toggleIsPrivate = () => {
     setIsPrivate(!isPrivate);
-    updateIsPrivate({ variables: { recordingId: recording.id, isPrivate: !isPrivate } });
+    updateIsPrivate(recording.id, !isPrivate);
     setExpanded(false);
   };
   const onDeleteRecording = (recordingId: RecordingId) => {

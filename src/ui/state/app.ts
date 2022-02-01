@@ -39,6 +39,7 @@ export type ModalType =
   | "sourcemap-setup"
   | "rename-replay";
 export type WorkspaceId = string;
+export type WorkspaceUuid = string;
 export type SettingsTabTitle =
   | "Experimental"
   | "Invitations"

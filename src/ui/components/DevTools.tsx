@@ -14,6 +14,7 @@ import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
+import { decodeWorkspaceId } from "ui/utils/workspace";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -63,7 +64,10 @@ function _DevTools({
       return;
     }
 
-    trackEventOnce("session.devtools_start", { userIsAuthor });
+    trackEventOnce("session.devtools_start", {
+      userIsAuthor,
+      workspaceUuid: recording?.workspace?.id || null,
+    });
   }, [loading]);
 
   useEffect(() => {
