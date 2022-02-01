@@ -10,7 +10,7 @@ import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import UserSettingsModal from "./shared/UserSettingsModal";
 import OnboardingModal from "./shared/OnboardingModal/index";
-import { isDeployPreview, isTest } from "ui/utils/environment";
+import { isTest } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
@@ -121,7 +121,7 @@ function App({ children, modal, theme }: AppProps) {
     }
   }, [auth.isAuthenticated]);
 
-  if (!isDeployPreview() && (auth.isLoading || userInfo.loading)) {
+  if (auth.isLoading || userInfo.loading) {
     return <LoadingScreen />;
   }
 

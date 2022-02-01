@@ -6,7 +6,6 @@ import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Icon from "ui/components/shared/Icon";
-import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -26,11 +25,6 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const isCollaborator =
     hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
     isAuthenticated;
-  const showShare = isOwner || isCollaborator;
-
-  if (isDeployPreview()) {
-    return null;
-  }
 
   if (!isAuthenticated) {
     return <LoginButton />;
