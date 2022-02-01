@@ -55,11 +55,12 @@ function useGetPrivacyOptions(
 
   const userBelongsToTeam = workspaceId && workspaces.find(w => w.id === workspaceId);
 
-  const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
+  const updateIsPrivate = hooks.useUpdateIsPrivate();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace(false);
 
   const options: ReactNode[] = [];
 
+  const toggleIsPrivate = () => updateIsPrivate(recording.id, !isPrivate);
   const setPublic = () => {
     trackEvent("share_modal.set_public");
     if (isPrivate) {
@@ -86,7 +87,7 @@ function useGetPrivacyOptions(
 
   if (!isPublicDisabled(workspaces, workspaceId)) {
     options.push(
-      <DropdownItem onClick={setPublic}>
+      <DropdownItem onClick={setPublic} key="option-public">
         <DropdownItemContent icon="link" selected={!isPrivate}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Anyone with the link
@@ -100,14 +101,14 @@ function useGetPrivacyOptions(
     // This gives the user who owns the recording the option to move the recording
     // to their library, or any team they belong to.
     options.push(
-      <DropdownItem onClick={() => handleMoveToTeam(null)}>
+      <DropdownItem onClick={() => handleMoveToTeam(null)} key="option-private">
         <DropdownItemContent icon="domain" selected={isPrivate && !workspaceId}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Only people with access
           </span>
         </DropdownItemContent>
       </DropdownItem>,
-      <div>
+      <div key="option-team">
         {workspaces.map(({ id, name }) => (
           <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
             <DropdownItemContent icon="group" selected={isPrivate && id === workspaceId}>
@@ -123,7 +124,7 @@ function useGetPrivacyOptions(
     // This gives a user who belongs to the replay's team an option to set it to private
     // without moving the replay's team.
     options.push(
-      <DropdownItem onClick={setPrivate}>
+      <DropdownItem onClick={setPrivate} key="option-private">
         <DropdownItemContent icon="group" selected={isPrivate}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Members of {recording.workspace?.name || "this team"}
