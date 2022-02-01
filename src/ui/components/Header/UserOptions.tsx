@@ -22,7 +22,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const { show } = useIntercom();
   const { isAuthenticated } = useAuth0();
 
-  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isOwner = hooks.useIsOwner();
   const isCollaborator =
     hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
     isAuthenticated;
