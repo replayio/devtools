@@ -2,7 +2,7 @@ import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
 import { getSelectedPrimaryPanel, getShowCommandPalette } from "ui/reducers/layout";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { ViewMode, PrimaryPanelName, SecondaryPanelName } from "ui/state/layout";
+import { ViewMode, PrimaryPanelName, SecondaryPanelName, VIEWER_PANELS } from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { UIThunkAction } from ".";
@@ -51,8 +51,7 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
     // if selectedPrimaryPanel is one that should only be visible in dev mode.
     const selectedPrimaryPanel = getSelectedPrimaryPanel(getState());
-    const viewerPanels = ["comments", "events"]
-    if (viewMode === "non-dev" && !viewerPanels.includes(selectedPrimaryPanel)) {
+    if (viewMode === "non-dev" && !VIEWER_PANELS.includes(selectedPrimaryPanel as any)) {
       dispatch(setSelectedPrimaryPanel("comments"));
     }
 
