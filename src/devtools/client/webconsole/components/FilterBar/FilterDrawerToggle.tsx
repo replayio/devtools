@@ -16,7 +16,7 @@ function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsF
       className="flex flex-row justify-start items-center"
       style={!collapseFilterDrawer ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
     >
-      <button onClick={onClick}>
+      <button className="console-filter-toggle" onClick={onClick}>
         {collapseFilterDrawer ? <DrawerCollapsed className="mr-1.5" /> : <Drawer />}
       </button>
     </div>
