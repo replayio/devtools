@@ -9,10 +9,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { useIntercom } from "react-use-intercom";
-import IconDocs from "./docs.svg";
-import IconHelp from "./help.svg";
-import IconSettings from "./settings.svg";
-import IconReplayLogo from "./replay-logo.svg";
+import Icon from "ui/components/shared/icon";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
@@ -77,21 +74,21 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         orientation="bottom"
       >
         <button className="row" onClick={onDocsClick}>
-          <IconDocs />
+          <Icon filename="docs" />
           <span>Docs</span>
         </button>
         <button className="row" onClick={onChatClick}>
-          <IconHelp />
+          <Icon filename="help" />
           <span>Chat with us</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
-          <IconSettings />
+          <Icon filename="settings" className="text-red-400 bg-black" />
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
             <button className="row" onClick={onLaunchClick}>
-              <IconReplayLogo />
+              <Icon filename="replay-logo" />
               <span>Launch Replay</span>
             </button>
           )
