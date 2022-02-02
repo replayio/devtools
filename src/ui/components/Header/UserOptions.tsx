@@ -5,11 +5,14 @@ import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import Icon from "ui/components/shared/Icon";
 import useAuth0 from "ui/utils/useAuth0";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { useIntercom } from "react-use-intercom";
+import IconDocs from "./docs.svg";
+import IconHelp from "./help.svg";
+import IconSettings from "./settings.svg";
+import IconReplayLogo from "./replay-logo.svg";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
@@ -74,21 +77,21 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         orientation="bottom"
       >
         <button className="row" onClick={onDocsClick}>
-          <Icon iconName="docs" />
+          <IconDocs />
           <span>Docs</span>
         </button>
         <button className="row" onClick={onChatClick}>
-          <Icon iconName="help" />
+          <IconHelp />
           <span>Chat with us</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
-          <Icon iconName="settings" />
+          <IconSettings />
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
             <button className="row" onClick={onLaunchClick}>
-              <Icon iconName="replay" />
+              <IconReplayLogo />
               <span>Launch Replay</span>
             </button>
           )
