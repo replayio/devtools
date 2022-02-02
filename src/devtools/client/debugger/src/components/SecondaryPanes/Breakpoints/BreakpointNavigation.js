@@ -8,6 +8,7 @@ import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 const { trackEvent } = require("ui/utils/telemetry");
+import { AnalysisPointError } from "ui/state/app";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 
@@ -114,14 +115,15 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
   );
 }
 
-function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed }) {
+function BreakpointNavigationStatus({ executionPoint, analysisPoint, indexed }) {
   let status = "";
+  const { points, errors } = analysisPoint;
   let maxStatusLength = 0;
   if (!indexed) {
     status = "Indexing";
-  } else if (!analysisPoints || !executionPoint) {
+  } else if (!points || !executionPoint) {
     status = "Loading";
-  } else if (analysisPoints === "error") {
+  } else if (errors.includes(AnalysisPointError.HITS_ERROR)) {
     // This error is currently caused by how the backend limits the returned
     // hits to 10k. Lines with more than 10k hits don't get returned.
     status = "10k+ hits";
@@ -147,7 +149,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
 }
 
 const mapStateToProps = (state, { breakpoint }) => ({
-  analysisPoints: selectors.getAnalysisPointsForLocation(
+  analysisPoint: selectors.getAnalysisPointForLocation(
     state,
     breakpoint.location,
     breakpoint.options.condition

@@ -21,6 +21,7 @@ import {
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
+  AnalysisPointError,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -66,6 +67,7 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
 export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
   location: Location;
   condition: string;
+  error: AnalysisPointError;
 };
 export type SetEventsForType = Action<"set_events"> & {
   events: (MouseEvent | KeyboardEvent | ReplayNavigationEvent)[];
@@ -287,11 +289,16 @@ export function setAnalysisPoints(
   };
 }
 
-export function setAnalysisError(location: Location, condition = ""): SetAnalysisErrorAction {
+export function setAnalysisError(
+  location: Location,
+  condition = "",
+  error: AnalysisPointError
+): SetAnalysisErrorAction {
   return {
     type: "set_analysis_error",
     location,
     condition,
+    error,
   };
 }
 

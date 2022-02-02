@@ -109,7 +109,6 @@ function ToggleWidgetButton({ editor, toggleLogpoint, cx, breakpoints }: ToggleW
 const connector = connect(
   (state: UIState) => ({
     indexed: selectors.getIndexed(state),
-    analysisPoints: selectors.getPointsForHoveredLineNumber(state),
     cx: selectors.getThreadContext(state),
     breakpoints: getBreakpointsForSource(state, getSelectedSource(state).id),
   }),

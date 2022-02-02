@@ -14,8 +14,9 @@ import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
-import { getAnalysisPointsForLocation } from "ui/reducers/app";
+import { getAnalysisPointForLocation } from "ui/reducers/app";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
+import { AnalysisPointError } from "ui/state/app";
 const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.
@@ -117,9 +118,9 @@ function saveLogpointHits(
   }
 }
 
-function saveAnalysisError(locations: Location[], condition: string) {
+function saveAnalysisError(locations: Location[], condition: string, error: AnalysisPointError) {
   for (const location of locations) {
-    store.dispatch(setAnalysisError(location, condition));
+    store.dispatch(setAnalysisError(location, condition, error));
   }
 }
 
@@ -238,12 +239,14 @@ async function setMultiSourceLogpoint(
   const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
 
   if (showInConsole && primitiveFronts) {
-    const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
-    if (points) {
-      if (points !== "error") {
-        showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
-      }
-      return;
+    const { points, errors } = getAnalysisPointForLocation(
+      store.getState(),
+      locations[0],
+      condition
+    );
+
+    if (points && !errors.length) {
+      showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
     }
   }
 
@@ -286,7 +289,10 @@ async function setMultiSourceLogpoint(
   try {
     await analysisManager.runAnalysis(params, handler);
   } catch {
-    saveAnalysisError(locations, condition);
+    const error = handler.onAnalysisResult
+      ? AnalysisPointError.RESULTS_ERROR
+      : AnalysisPointError.HITS_ERROR;
+    saveAnalysisError(locations, condition, error);
     return;
   }
 

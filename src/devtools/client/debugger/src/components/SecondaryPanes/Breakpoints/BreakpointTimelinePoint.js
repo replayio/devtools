@@ -3,7 +3,6 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
-const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
@@ -30,7 +29,7 @@ function BreakpointTimelinePoint({
   breakpoint,
   point,
   index,
-  analysisPoints,
+  analysisPoint,
   executionPoint,
   zoomRegion,
   seek,
@@ -68,7 +67,7 @@ function BreakpointTimelinePoint({
         "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
         "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
-      title={`${index + 1}/${analysisPoints.length}`}
+      title={`${index + 1}/${analysisPoint.points.length}`}
       onClick={onClick}
       style={{ left: `calc(${leftPercentOffset}% - ${pointWidth / 2}px)` }}
       onMouseEnter={onMouseEnter}
@@ -106,7 +105,7 @@ const MemoizedBreakpointTimelinePoint = React.memo(
 
 export default connect(
   (state, { breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(
+    analysisPoint: getAnalysisPointForLocation(
       state,
       breakpoint.location,
       breakpoint.options.condition

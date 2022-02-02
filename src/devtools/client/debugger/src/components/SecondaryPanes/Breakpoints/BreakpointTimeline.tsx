@@ -62,7 +62,7 @@ type Coordinates = {
 
 function BreakpointTimeline({
   breakpoint,
-  analysisPoints,
+  analysisPoint,
   zoomRegion,
   currentTime,
   hoveredItem,
@@ -70,6 +70,7 @@ function BreakpointTimeline({
 }: BreakpointTimelineProps) {
   const [hoveredTime, setHoveredTime] = useState<number | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
+  const { points, errors } = analysisPoint;
   const onClick = (e: React.MouseEvent) => {
     if (!hoveredTime) return;
 
@@ -108,12 +109,8 @@ function BreakpointTimeline({
           <div className="progress-line full" />
           <div className="progress-line preview-min" style={{ width: hoverPercent }} />
           <div className="progress-line" style={{ width: `${percent}%` }} />
-          {analysisPoints && analysisPoints !== "error" ? (
-            <Points
-              analysisPoints={analysisPoints}
-              breakpoint={breakpoint}
-              hoveredItem={hoveredItem}
-            />
+          {points && !errors.length ? (
+            <Points analysisPoints={points} breakpoint={breakpoint} hoveredItem={hoveredItem} />
           ) : null}
         </div>
       </PortalTooltip>
@@ -123,7 +120,7 @@ function BreakpointTimeline({
 
 const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: any }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(
+    analysisPoint: selectors.getAnalysisPointForLocation(
       state,
       breakpoint.location,
       breakpoint.options.condition

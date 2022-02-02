@@ -99,7 +99,15 @@ export interface AppState {
 }
 
 export interface AnalysisPoints {
-  [key: string]: PointDescription[] | "error";
+  [key: string]: AnalysisPoint;
+}
+interface AnalysisPoint {
+  points: PointDescription[];
+  errors: AnalysisPointError[];
+}
+export enum AnalysisPointError {
+  HITS_ERROR = "hits-error",
+  RESULTS_ERROR = "results-error",
 }
 
 interface Events {

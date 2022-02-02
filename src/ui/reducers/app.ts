@@ -116,24 +116,31 @@ export default function update(
 
     case "set_analysis_points": {
       const id = getLocationAndConditionKey(action.location, action.condition);
+      const currentPoint = state.analysisPoints[id] || { points: [], errors: [] };
+      const newPoint = { ...currentPoint, points: action.analysisPoints };
 
       return {
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: action.analysisPoints,
+          [id]: newPoint,
         },
       };
     }
 
     case "set_analysis_error": {
       const id = getLocationAndConditionKey(action.location, action.condition);
+      const currentPoint = state.analysisPoints[id] || { points: [], errors: [] };
+      const newErrors = currentPoint.errors.includes(action.error)
+        ? currentPoint.errors
+        : [...currentPoint.errors, action.error];
+      const newPoint = { ...currentPoint, errors: newErrors };
 
       return {
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: "error",
+          [id]: newPoint,
         },
       };
     }
@@ -229,33 +236,30 @@ export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
-export const getAnalysisPointsForLocation = (
+export const getAnalysisPointForLocation = (
   state: UIState,
   location: Location | null,
   condition = ""
 ) => {
-  if (!location) return;
+  if (!location) return { points: [], errors: [] };
+
   const trimRegion = getTrimRegion(state);
   const key = getLocationAndConditionKey(location, condition);
-  const points = state.app.analysisPoints[key];
+  const point = state.app.analysisPoints[key];
 
-  if (features.trimming && trimRegion && points && points !== "error") {
-    return points.filter(p => isInTrimSpan(p.time, trimRegion));
+  if (features.trimming && trimRegion && point?.points && !point?.errors.length) {
+    return {
+      points: point.points.filter(p => isInTrimSpan(p.time, trimRegion)),
+      errors: point.errors,
+    };
   }
 
-  return points;
+  return point;
 };
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
-export const getPointsForHoveredLineNumber = (state: UIState) => {
+export const getPointForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
-  const points = getAnalysisPointsForLocation(state, location);
-  const trimRegion = getTrimRegion(state);
-
-  if (features.trimming && trimRegion && points && points !== "error") {
-    return points.filter(p => isInTrimSpan(p.time, trimRegion));
-  }
-
-  return points;
+  return getAnalysisPointForLocation(state, location);
 };
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>

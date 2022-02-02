@@ -28,7 +28,7 @@ function getPanelWidth({ editor }) {
 }
 
 function Panel({
-  analysisPoints,
+  analysisPoint,
   breakpoint,
   currentTime,
   editor,
@@ -42,7 +42,7 @@ function Panel({
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const dismissNag = hooks.useDismissNag();
-  const error = analysisPoints === "error";
+  const { points, errors } = analysisPoint;
   const pausedOnHit =
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
@@ -129,7 +129,7 @@ function Panel({
 
 export default connect(
   (state, { breakpoint }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(
+    analysisPoints: selectors.getAnalysisPointForLocation(
       state,
       breakpoint.location,
       breakpoint.options.condition

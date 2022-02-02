@@ -69,7 +69,7 @@ export default function LineNumberTooltip({ editor }: { editor: any }) {
   const lastHoveredLineNumber = useRef<number | null>(null);
 
   const indexed = useSelector(selectors.getIndexed);
-  const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
+  const { points: analysisPoints } = useSelector(selectors.getPointForHoveredLineNumber);
 
   const setHoveredLineNumber = ({
     lineNumber,

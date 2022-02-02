@@ -247,19 +247,16 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderPreviewMarkers() {
-    const { pointsForHoveredLineNumber, currentTime, hoveredItem, zoomRegion } = this.props;
+    const { pointForHoveredLineNumber, currentTime, hoveredItem, zoomRegion } = this.props;
+    const { points, errors } = pointForHoveredLineNumber;
 
-    if (
-      !pointsForHoveredLineNumber ||
-      pointsForHoveredLineNumber === "error" ||
-      pointsForHoveredLineNumber.length > prefs.maxHitsDisplayed
-    ) {
+    if (!points || errors.length || points.length > prefs.maxHitsDisplayed) {
       return [];
     }
 
     return (
       <div className="preview-markers-container">
-        {pointsForHoveredLineNumber.map((point: PointDescription, index: number) => {
+        {points.map((point: PointDescription, index: number) => {
           const isPrimaryHighlighted = hoveredItem?.point === point.point;
           const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
 
@@ -412,7 +409,7 @@ const connector = connect(
     messages: selectors.getMessagesForTimeline(state),
     viewMode: selectors.getViewMode(state),
     selectedPanel: selectors.getSelectedPanel(state),
-    pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
+    pointForHoveredLineNumber: selectors.getPointForHoveredLineNumber(state),
     hoveredItem: selectors.getHoveredItem(state),
     hoveredComment: selectors.getHoveredComment(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),

@@ -152,14 +152,14 @@ export function runAnalysis(cx, initialLocation, options) {
       return;
     }
 
-    // Don't run the analysis if we already have the analysis points for that
+    // Don't run the analysis if we already have the analysis point for that
     // location.
-    const analysisPoints = selectors.getAnalysisPointsForLocation(
+    const analysisPoint = selectors.getAnalysisPointForLocation(
       getState(),
       location,
       options.condition
     );
-    if (analysisPoints) {
+    if (analysisPoint) {
       return;
     }
 
