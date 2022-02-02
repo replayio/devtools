@@ -82,7 +82,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
           <span>Chat with us</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
-          <Icon filename="settings" className="text-red-400 bg-black" />
+          <Icon filename="settings" />
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
