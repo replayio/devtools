@@ -1,5 +1,4 @@
 import "../src/test-prep";
-import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
