@@ -1,0 +1,36 @@
+/*
+This is an exact copy of .image (set in AccessibleImage.css)
+but without a background color so we can use hover effects
+*/
+
+.icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  /* multicolor icons use background-image */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  /* do not let images shrink when used as flex children */
+  flex-shrink: 0;
+}
+
+.icon.docs {
+  -webkit-mask-image: url(/icons/docs.svg);
+}
+
+.icon.help {
+  -webkit-mask-image: url(/icons/help.svg);
+}
+
+.icon.settings {
+  -webkit-mask-image: url(/icons/settings.svg);
+}
+
+.icon.replay-logo {
+  -webkit-mask-image: url(/icons/replay-logo.svg);
+}

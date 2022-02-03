@@ -1,10 +1,4 @@
 import React from "react";
-
-export default function Icon(props) {
-  const iconStyle = {
-    height: props.height,
-    width: props.width,
-  };
-
-  return <div className={`img ${props.filename}`} style={iconStyle} />;
+export default function Icon({ filename, className = "bg-gray-800", height = 20, width = 20 }) {
+  return <div className={`icon ${filename} ${className}`} style={{ height, width }} />;
 }
