@@ -500,6 +500,30 @@ button.open-inspector {
   -webkit-mask-image: url(/images/palette.svg);
 }
 
+.img.docs {
+  -webkit-mask-image: url(/images/docs.svg);
+  width: 20px;
+  height: 20px;
+}
+
+.img.help {
+  -webkit-mask-image: url(/images/help.svg);
+  width: 20px;
+  height: 20px;
+}
+
+.img.settings {
+  -webkit-mask-image: url(/images/settings.svg);
+  width: 20px;
+  height: 20px;
+}
+
+.img.replay-logo {
+  -webkit-mask-image: url(/images/replay-logo.svg);
+  width: 20px;
+  height: 20px;
+}
+
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }

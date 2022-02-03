@@ -30,7 +30,7 @@ export default function Dropdown({
         {buttonContent}
       </button>
       {expanded ? (
-        <div className="dropdown-container">
+        <div className="dropdown-container z-30">
           <div className="mask" onClick={() => setExpanded(false)} />
           <div className={`content ${position}`} style={orientations[orientation]}>
             {children}
