@@ -138,14 +138,14 @@ async function selectSource(url) {
 }
 
 async function addLogpoint(url, line) {
-  const bpCount = dbgSelectors.getBreakpointCount();
+  const bpCount = dbgSelectors.getLogpointCount();
 
   await selectSource(url);
   await dbg.actions.addLogpoint(getContext(), line);
 
   await waitUntil(
     () => {
-      return dbgSelectors.getBreakpointCount() == bpCount + 1;
+      return dbgSelectors.getLogpointCount() == bpCount + 1;
     },
     { waitingFor: "logpoint to be set" }
   );

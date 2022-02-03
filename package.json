@@ -13,7 +13,11 @@
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "build-cra-e2e-test": "node test/examples/cra/build",
+    "build-e2e-cra-test": "node public/test/examples/cra/build",
+    "build-e2e-prod-bundle": "webpack --config public/test/examples/bundles/prod_bundle/webpack.config.js",
+    "build-e2e-exceptions-bundle": "webpack --config public/test/examples/bundles/exceptions_bundle/webpack.config.js",
+    "build-e2e-mapped-styles-bundle": "webpack --config public/test/examples/bundles/mapped_styles/webpack.config.js",
+    "build-e2e-mapped-minified-bundle": "webpack --config public/test/examples/bundles/mapped_minified/webpack.config.js",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -127,6 +131,7 @@
     "@typescript-eslint/parser": "^5.8.0",
     "autoprefixer": "^10.4.2",
     "babel-jest": "^27.3.1",
+    "css-loader": "^6.6.0",
     "eslint": "^8.5.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",
@@ -150,7 +155,9 @@
     "tailwindcss": "^3.0.19",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   },
   "optionalDependencies": {
     "@recordreplay/playwright": "^1.10.6"

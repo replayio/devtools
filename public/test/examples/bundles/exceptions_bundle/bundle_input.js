@@ -1,8 +1,3 @@
-/******/ (function() { // webpackBootstrap
-var __webpack_exports__ = {};
-/*!*************************!*\
-  !*** ./bundle_input.js ***!
-  \*************************/
 // webpack input for exceptions_bundle.js
 function recordingFinished() {
   console.log("ExampleFinished");
@@ -32,7 +27,3 @@ function followup() {
 function uncaughtPrimitive() {
   throw { number: 12 };
 }
-
-/******/ })()
-;
-//# sourceMappingURL=exceptions_bundle.js.map

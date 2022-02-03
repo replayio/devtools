@@ -44,7 +44,6 @@ module.exports = [
     // Not supported on chromium, needs source maps.
     // https://github.com/RecordReplay/chromium/issues/5
     targets: ["gecko"],
-    pending: true,
   },
   {
     // This test is pretty darn broken. The sources are different when recording
@@ -90,7 +89,6 @@ module.exports = [
     // Not supported on chromium, needs event listener support.
     // https://github.com/RecordReplay/chromium/issues/7
     targets: ["gecko"],
-    pending: true,
   },
   {
     example: "doc_async.html",
@@ -121,7 +119,6 @@ module.exports = [
     example: "doc_rr_basic.html",
     script: "console_eval.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
   {
     example: "doc_async.html",
@@ -149,7 +146,6 @@ module.exports = [
     example: "cra/dist/index.html",
     script: "sourcemap_stacktrace.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
   {
     example: "node/basic.js",
@@ -217,7 +213,6 @@ module.exports = [
     example: "doc_rr_objects.html",
     script: "object_preview-02.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
   {
     example: "doc_rr_preview.html",
@@ -269,7 +264,6 @@ module.exports = [
     example: "doc_inspector_sourcemapped.html",
     script: "inspector-05.js",
     targets: ["gecko"],
-    pending: true,
   },
   {
     example: "doc_inspector_shorthand.html",
@@ -280,7 +274,6 @@ module.exports = [
     example: "doc_inspector_shorthand.html",
     script: "inspector-07.js",
     targets: ["gecko"],
-    pending: true,
   },
   {
     example: "doc_inspector_basic.html",
@@ -301,7 +294,6 @@ module.exports = [
     example: "doc_rr_region_loading.html",
     script: "region_loading-01.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -313,7 +305,6 @@ module.exports = [
     example: "doc_rr_basic.html",
     script: "settings.js",
     targets: ["gecko", "chromium"],
-    pending: true,
   },
   {
     example: "doc_rr_worker.html",

@@ -1,3 +1,5 @@
+const os = require("os");
+const path = require("path");
 const fs = require("fs");
 
 console.log(process.env);
@@ -18,6 +20,7 @@ const defaultState = {
     : {},
   headless: false,
   shouldRecordExamples: !!process.env.SHOULD_RECORD_EXAMPLES,
+  exampleRecordingIdFile: path.join(os.tmpdir(), "record-replay-example-recording-id"),
 
   browserPath: process.env.RECORD_REPLAY_PATH,
   driverPath: process.env.RECORD_REPLAY_DRIVER,
