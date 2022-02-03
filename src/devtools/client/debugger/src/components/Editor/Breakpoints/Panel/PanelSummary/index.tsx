@@ -57,6 +57,7 @@ function PanelSummary({
 
   const focusInput = (input: Input) => {
     if (isEditable) {
+      trackEvent("breakpoint.start_edit", { input, hitsCount: analysisPoints?.length || null });
       toggleEditingOn();
       setInputToFocus(input);
     }

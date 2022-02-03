@@ -9,16 +9,19 @@ import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
 import { InspectorActiveTab } from "devtools/client/inspector/state";
 import { decodeWorkspaceId } from "./workspace";
+import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/PanelSummary";
 
 type MixpanelEvent =
   | ["breakpoint.add_comment"]
   | ["breakpoint.minus_click"]
   | ["breakpoint.plus_click"]
+  | ["breakpoint.preview_hits", { hitsCount: number | null }]
   | ["breakpoint.preview_has_hits"]
   | ["breakpoint.preview_no_hits"]
   | ["breakpoint.remove"]
   | ["breakpoint.set_condition"]
   | ["breakpoint.set_log"]
+  | ["breakpoint.start_edit", { input: Input; hitsCount: number | null }]
   | ["breakpoint.too_many_points"]
   | ["comments.create"]
   | ["comments.delete"]
