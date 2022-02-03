@@ -5,11 +5,11 @@ import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
 import useAuth0 from "ui/utils/useAuth0";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { useIntercom } from "react-use-intercom";
-import Icon from "ui/components/shared/icon";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
