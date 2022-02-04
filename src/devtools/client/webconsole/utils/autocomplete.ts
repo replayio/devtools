@@ -7,6 +7,9 @@ import {
   Identifier,
 } from "@babel/types";
 import generate from "@babel/generator";
+import { ThreadFront } from "protocol/thread";
+import Error from "next/error";
+import { createConsoleLogger } from "launchdarkly-js-client-sdk";
 const { filter } = require("fuzzaldrin-plus");
 
 type PropertyExpression = {
@@ -108,10 +111,10 @@ function tryToAutocompleteComputedProperty(str: string) {
 
   return ending ? str + ending : "";
 }
-function isBracketNotation(str: string) {
+export function isBracketNotation(str: string) {
   return !!tryToAutocompleteComputedProperty(str);
 }
-function isDotNotation(str: string) {
+export function isDotNotation(str: string) {
   return isMemberExpression(str + PROPERTY_PLACEHOLDER);
 }
 
@@ -171,7 +174,7 @@ function getPropertyValue(property: StringLiteral | Identifier) {
 
   return property.name;
 }
-function getPropertyExpression(str: string): PropertyExpression | null {
+export function getPropertyExpression(str: string): PropertyExpression | null {
   if (isDotNotation(str)) {
     const parsed = parseExpression(str + PROPERTY_PLACEHOLDER);
 
@@ -238,14 +241,14 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
   const propertyExpression = getPropertyExpression(input);
 
   if (propertyExpression) {
-    const { left, right, computed } = propertyExpression;
-    const object = getBinding(left, scope)?.value._object;
+    const properties = [];
+    const { left, right } = propertyExpression;
 
-    if (!object) {
-      return [];
+    const object = getBinding(left, scope)?.value._object;
+    if (object) {
+      properties.push(...getPropertiesForObject(object));
     }
 
-    const properties = getPropertiesForObject(object);
     return fuzzyFilter(properties, normalizeString(right));
   } else if (shouldVariableAutocomplete(input)) {
     const variableNames = [...getBindingNames(scope), ...getGlobalVariables(scope)];
@@ -253,4 +256,56 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
   }
 
   return [];
+}
+// export async function getAutocompleteMatches(input: string, scope: Scope) {
+//   const propertyExpression = getPropertyExpression(input);
+
+//   if (propertyExpression) {
+//     const properties = [];
+//     const { left, right } = propertyExpression;
+
+//     const object = getBinding(left, scope)?.value._object;
+//     if (object) {
+//       properties.push(...getPropertiesForObject(object));
+//     }
+
+//     console.log("1");
+
+//     const evaluatedProperties = await getEvaluatedProperties(left);
+
+//     return fuzzyFilter([...evaluatedProperties], normalizeString(right));
+//   } else if (shouldVariableAutocomplete(input)) {
+//     const variableNames = [...getBindingNames(scope), ...getGlobalVariables(scope)];
+//     return fuzzyFilter(variableNames, normalizeString(input));
+//   }
+
+//   return [];
+// }
+
+// Use eager eval to get the properties of the last complete object in the expression.
+async function getEvaluatedProperties(expression: string): Promise<string[]> {
+  const { asyncIndex, frameId } = gToolbox.getPanel("debugger")!.getFrameId();
+  let properties: string[] = [];
+
+  try {
+    const { returned, exception, failed } = await ThreadFront.evaluate(
+      asyncIndex,
+      frameId,
+      expression,
+      true
+    );
+    if (returned && !(failed || exception)) {
+      const evaluatedProperties = getPropertiesForObject(returned._object);
+      console.log({ evaluatedProperties });
+      properties.push(...evaluatedProperties);
+    }
+  } catch (err: any) {
+    let msg = "Error: Eager Evaluation failed";
+    if (err.message) {
+      msg += ` - ${err.message}`;
+    }
+    console.error(msg);
+  }
+
+  return properties;
 }

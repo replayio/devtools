@@ -132,10 +132,9 @@ class JSTerm extends React.Component {
     }
   };
 
-  onEnter = async () => {
+  onEnter = () => {
     if (!this.showAutocomplete()) {
-      // this.execute();
-      this.props.eagerEvalExpression(this.state.value);
+      this.execute();
     } else {
       const { autocompleteIndex } = this.state;
       const match = this.getMatches()[autocompleteIndex];
@@ -252,6 +251,11 @@ class JSTerm extends React.Component {
   onChange = cm => {
     const value = cm.getValue();
     this.setState({ value });
+    // if (getPropertyExpression(value)) {
+    //   const { left } = getPropertyExpression(value);
+    //   console.log(left);
+    //   this.props.eagerEvalExpression(left);
+    // }
   };
 
   onBeforeSelectionChange = (_, obj) => {
