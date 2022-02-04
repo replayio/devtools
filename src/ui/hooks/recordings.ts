@@ -105,6 +105,10 @@ const GET_MY_RECORDINGS = gql`
   }
 `;
 
+export function useGetRawRecordingIdWithSlug() {
+  return useRouter().query.id;
+}
+
 export function useGetRecordingId() {
   const { id } = useRouter().query;
   return extractIdAndSlug(id).id!;

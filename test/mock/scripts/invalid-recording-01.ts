@@ -27,5 +27,5 @@ const bindings = basicBindings();
 runTest("invalidRecordingID", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
   await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
-  await page.textContent("text=You don't have permission to view this replay");
+  await page.textContent("text=Sorry, you don't have permission!");
 });
