@@ -1,11 +1,15 @@
+let CodeMirror = null;
+if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
+  CodeMirror = require("codemirror");
+}
+
 export function initOutputSyntaxHighlighting() {
   // Given a DOM node, we syntax highlight identically to how the input field
   // looks. See https://codemirror.net/demo/runmode.html;
   const syntaxHighlightNode = node => {
-    const editor = window.jsterm.editor;
-    if (node && editor) {
+    if (node) {
       node.classList.add("cm-s-mozilla");
-      editor.CodeMirror.runMode(node.textContent, "application/javascript", node);
+      CodeMirror.runMode(node.textContent, "application/javascript", node);
     }
   };
 

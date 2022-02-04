@@ -22,7 +22,7 @@ function Match({
     <button
       className={classNames(
         "text-left px-1 cursor-default",
-        isSelected ? "bg-blue-700 text-white" : "hover:bg-blue-100"
+        isSelected ? "bg-primaryAccent text-white" : "hover:bg-blue-100"
       )}
       ref={buttonNode}
       onClick={() => onClick(label)}
@@ -49,7 +49,7 @@ export default function Autocomplete({
       style={{
         bottom: "var(--editor-footer-height)",
         fontSize: "var(--theme-code-font-size)",
-        marginLeft: `${leftOffset}px`,
+        marginLeft: `${leftOffset}ch`,
         maxHeight: "160px",
         maxWidth: "200px",
         minWidth: "160px",

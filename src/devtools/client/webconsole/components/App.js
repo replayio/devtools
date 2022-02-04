@@ -83,24 +83,7 @@ class App extends React.Component {
             ) : null}
             <div className="flexible-output-input" key="in-out-container">
               <ConsoleOutput key="console-output" />
-              <JSTerm
-                options={{
-                  autofocus: true,
-                  enableCodeFolding: false,
-                  lineNumbers: false,
-                  lineWrapping: true,
-                  mode: {
-                    name: "javascript",
-                    globalVars: true,
-                  },
-                  theme: "mozilla",
-                  styleActiveLine: false,
-                  tabIndex: "0",
-                  readOnly: false,
-                  viewportMargin: Infinity,
-                  disableSearchAddon: true,
-                }}
-              />
+              <JSTerm />
             </div>
           </div>
         </div>
