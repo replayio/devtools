@@ -1,112 +1,112 @@
-import React from "react";
-import { Menu } from "@headlessui/react";
-import classNames from "classnames";
-import MaterialIcon from "../shared/MaterialIcon";
+import React, { useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import * as actions from "ui/actions/app";
+import hooks from "ui/hooks";
+import LoginButton from "ui/components/LoginButton";
+import Dropdown from "ui/components/shared/Dropdown";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
+import useAuth0 from "ui/utils/useAuth0";
+import { features } from "ui/utils/prefs";
+import { trackEvent } from "ui/utils/telemetry";
+import { useIntercom } from "react-use-intercom";
 
-// This should be the standard dropdown component for the Library
-// but then we should slowly make it even more general purpose
-// so that all dropdowns look the same.
-
-export function DropdownButton({
-  className,
-  children,
-  disabled,
-}: {
-  className?: string;
-  children: React.ReactElement;
-  disabled?: boolean;
-}) {
-  return (
-    <Menu.Button
-      className={classNames(className, "flex px-1 py-2 items-center text-sm")}
-      disabled={disabled}
-    >
-      {children}
-    </Menu.Button>
-  );
+interface UserOptionsProps extends PropsFromRedux {
+  noBrowserItem?: boolean;
 }
 
-export function Dropdown({
-  children,
-  menuItemsClassName,
-  widthClass = "w-56",
-  fontSizeClass = "text-sm",
-}: {
-  children: React.ReactNode;
-  menuItemsClassName?: string;
-  widthClass?: "w-56" | "w-64" | "w-80";
-  fontSizeClass?: "text-sm" | "text-base";
-}) {
-  return (
-    <Menu as="div" className="inline-block text-left recording-options">
-      {({ open }) => (
-        <Menu.Items
-          static
-          className={classNames(
-            menuItemsClassName,
-            widthClass,
-            fontSizeClass,
-            "origin-top-right right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-          )}
-        >
-          <div className="py-1">{children}</div>
-        </Menu.Items>
-      )}
-    </Menu>
-  );
-}
+function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
+  const recordingId = hooks.useGetRecordingId();
+  const [expanded, setExpanded] = useState(false);
+  const { show } = useIntercom();
+  const { isAuthenticated } = useAuth0();
 
-export function DropdownItem({
-  children,
-  onClick,
-}: {
-  children: string | React.ReactElement;
-  onClick: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <Menu.Item>
-      {({ active }) => (
-        <a
-          href="#"
-          className={classNames(
-            active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-            "block px-4 py-2"
-          )}
-          onClick={onClick}
-        >
-          {children}
-        </a>
-      )}
-    </Menu.Item>
-  );
-}
+  const isOwner = hooks.useIsOwner();
+  const isCollaborator =
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
+    isAuthenticated;
 
-export function DropdownItemContent({
-  children,
-  icon,
-  selected,
-}: {
-  children: string | React.ReactElement;
-  icon: string;
-  selected: boolean;
-}) {
+  if (!isAuthenticated) {
+    return <LoginButton />;
+  }
+
+  const onDocsClick: React.MouseEventHandler = event => {
+    trackEvent("user_options.select_docs");
+    const docsUrl = `https://docs.replay.io`;
+
+    if (event.metaKey) {
+      return window.open(docsUrl, "replaydocs");
+    }
+    window.open(docsUrl, "replaydocs");
+  };
+  const onLaunchClick: React.MouseEventHandler = event => {
+    setExpanded(false);
+    trackEvent("user_options.launch_replay");
+
+    if (features.launchBrowser) {
+      setModal("browser-launch");
+    } else {
+      const launchUrl = `${window.location.origin}/welcome`;
+      if (event.metaKey) {
+        return window.open(launchUrl);
+      }
+      // right now we just send you to the download screen, but eventually this will launch Replay
+      window.location.href = launchUrl;
+    }
+  };
+  const onSettingsClick = () => {
+    setExpanded(false);
+    trackEvent("user_options.select_settings");
+
+    setModal("settings");
+  };
+  const onChatClick = () => {
+    setExpanded(false);
+    show();
+  };
+
   return (
-    <div className="flex flex-row space-x-4">
-      <div
-        className={classNames(
-          "w-4 flex flex-row items-center",
-          selected ? "text-primaryAccent" : "text-gray-400"
-        )}
+    <div className="user-options text-blue-400">
+      <Dropdown
+        buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        orientation="bottom"
       >
-        <MaterialIcon outlined={true} style={{ fontSize: "20px" }}>
-          {icon}
-        </MaterialIcon>
-      </div>
-      <span className="whitespace-pre overflow-hidden overflow-ellipsis">{children}</span>
+        <button className="row group" onClick={onDocsClick}>
+          <Icon filename="docs" className="bg-gray-800 group-hover:bg-primaryAccent" />
+          <span>Docs</span>
+        </button>
+        <button className="row group" onClick={onChatClick}>
+          <Icon filename="help" className="bg-gray-800 group-hover:bg-primaryAccent" />
+          <span>Chat with us</span>
+        </button>
+        <button className="row group" onClick={onSettingsClick}>
+          <Icon filename="settings" className="bg-gray-800 group-hover:bg-primaryAccent" />
+          <span>Settings</span>
+        </button>
+        {features.launchBrowser ? (
+          window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
+            <button className="row group" onClick={onLaunchClick}>
+              <Icon filename="replay-logo" className="bg-gray-800 group-hover:bg-primaryAccent" />
+              <span>Launch Replay</span>
+            </button>
+          )
+        ) : (
+          <button className="row" onClick={onLaunchClick}>
+            <MaterialIcon iconSize="xl">download</MaterialIcon>
+            <span>Download Replay</span>
+          </button>
+        )}
+        <LoginButton />
+      </Dropdown>
     </div>
   );
 }
 
-export function DropdownDivider() {
-  return <div className="border-b border-gray-200 w-full" />;
-}
+const connector = connect(null, {
+  setModal: actions.setModal,
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(UserOptions);
