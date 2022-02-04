@@ -14,6 +14,34 @@ import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
 import { Controlled as CodeMirror } from "react-codemirror2";
 
+const CODEMIRROR_OPTIONS = {
+  autofocus: true,
+  enableCodeFolding: false,
+  lineNumbers: false,
+  lineWrapping: true,
+  mode: {
+    name: "javascript",
+    globalVars: true,
+  },
+  theme: "mozilla",
+  styleActiveLine: false,
+  tabIndex: "0",
+  readOnly: false,
+  viewportMargin: Infinity,
+  disableSearchAddon: true,
+  // extraKeys: {
+  //   Tab: onTab,
+  //   Enter: onEnter,
+  //   "Cmd-Enter": onEnter,
+  //   "Ctrl-Enter": onEnter,
+  //   Esc: false,
+  //   "Cmd-F": false,
+  //   "Ctrl-F": false,
+  //   Up: () => onArrowPress("up"),
+  //   Down: () => onArrowPress("down"),
+  // },
+};
+
 async function createEditor({
   onArrowPress,
   onEnter,
@@ -26,33 +54,7 @@ async function createEditor({
   await gToolbox.startPanel("debugger");
   const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
 
-  const editor = new Editor({
-    autofocus: true,
-    enableCodeFolding: false,
-    lineNumbers: false,
-    lineWrapping: true,
-    mode: {
-      name: "javascript",
-      globalVars: true,
-    },
-    theme: "mozilla",
-    styleActiveLine: false,
-    tabIndex: "0",
-    readOnly: false,
-    viewportMargin: Infinity,
-    disableSearchAddon: true,
-    extraKeys: {
-      Tab: onTab,
-      Enter: onEnter,
-      "Cmd-Enter": onEnter,
-      "Ctrl-Enter": onEnter,
-      Esc: false,
-      "Cmd-F": false,
-      "Ctrl-F": false,
-      Up: () => onArrowPress("up"),
-      Down: () => onArrowPress("down"),
-    },
-  });
+  const editor = new Editor();
   return editor;
 }
 
@@ -121,7 +123,7 @@ function useAutocomplete(expression: string) {
   };
 }
 
-function JSTerm() {
+export default function JSTerm() {
   // export default function JSTerm() {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
@@ -142,25 +144,25 @@ function JSTerm() {
     showAutocomplete,
   } = useAutocomplete(value);
 
-  useEffect(function () {
-    async function initializeEditor() {
-      const editor = await createEditor({
-        onArrowPress: onArrowPress,
-        onEnter: onEnter,
-        onTab: onTab,
-      });
-      editor.appendToLocalElement(inputNode);
-      editor.codeMirror.on("change", onChange);
-      editor.codeMirror.on("keydown", onKeyDown);
-      editor.codeMirror.on("beforeSelectionChange", onBeforeSelectionChange);
-      setCharWidth(editor.editor.display.cachedCharWidth);
+  // useEffect(function () {
+  //   async function initializeEditor() {
+  //     const editor = await createEditor({
+  //       onArrowPress: onArrowPress,
+  //       onEnter: onEnter,
+  //       onTab: onTab,
+  //     });
+  //     editor.appendToLocalElement(inputNode);
+  //     editor.codeMirror.on("change", onChange);
+  //     editor.codeMirror.on("keydown", onKeyDown);
+  //     editor.codeMirror.on("beforeSelectionChange", onBeforeSelectionChange);
+  //     setCharWidth(editor.editor.display.cachedCharWidth);
 
-      // this might need other things since we use jsterm
-      // this will 100% break tests fix it
-      window.jsterm = { editor };
-    }
-    initializeEditor();
-  }, []);
+  //     // this might need other things since we use jsterm
+  //     // this will 100% break tests fix it
+  //     window.jsterm = { editor };
+  //   }
+  //   initializeEditor();
+  // }, []);
 
   const onArrowPress = (arrow: "up" | "down") => {
     if (arrow === "up") {
@@ -178,6 +180,7 @@ function JSTerm() {
     }
   };
   const onEnter = () => {
+    console.log("stuff");
     if (!showAutocomplete) {
       execute();
     } else {
@@ -189,11 +192,14 @@ function JSTerm() {
       autocomplete();
     }
   };
-  const onChange = (cm: any) => {
-    const value = cm.getValue();
-    setValue(value);
-  };
   const onKeyDown = (_: any, event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      debugger;
+      onEnter();
+    } else if (event.key === "Tab") {
+      onTab();
+    }
+
     if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(event.key)) {
       setHideAutocomplete(true);
     } else {
@@ -227,6 +233,8 @@ function JSTerm() {
     return null;
   };
 
+  console.log({ value });
+
   return (
     <div className="relative">
       <div
@@ -235,7 +243,17 @@ function JSTerm() {
         aria-live="off"
         tabIndex={-1}
         ref={inputNode}
-      />
+      >
+        <CodeMirror
+          options={CODEMIRROR_OPTIONS}
+          value={value}
+          onBeforeChange={(_, __, value) => {
+            setValue(value);
+          }}
+          onKeyDown={onKeyDown}
+          onSelection={onBeforeSelectionChange}
+        />
+      </div>
       {showAutocomplete ? (
         <Autocomplete
           leftOffset={charWidth * getCursorIndex(value)}
@@ -248,7 +266,7 @@ function JSTerm() {
   );
 }
 
-export default function _JSTerm({ options }: any) {
+function _JSTerm({ options }: any) {
   const [value, setValue] = useState("test");
   const inputElement = useRef<HTMLTextAreaElement | null>(null);
 

@@ -435,7 +435,7 @@ html #webconsole-notificationbox {
 }
 
 /* CodeMirror-powered JsTerm */
-.jsterm-input-container > .CodeMirror {
+.jsterm-input-container .CodeMirror {
   /* aim for a 32px left space (a descendent has 4px padding) */
   padding-inline-start: calc(var(--console-inline-start-gutter) - 4px);
   /* Create a new stacking context */
@@ -453,7 +453,7 @@ html #webconsole-notificationbox {
   fill: var(--theme-icon-dimmed-color);
 }
 
-.jsterm-input-container > .CodeMirror-focused {
+.jsterm-input-container .CodeMirror-focused {
   fill: var(--theme-icon-checked-color);
 }
 
