@@ -13,6 +13,7 @@ import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
+import "image/icon.css";
 import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";

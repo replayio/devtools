@@ -73,22 +73,22 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         expanded={expanded}
         orientation="bottom"
       >
-        <button className="row" onClick={onDocsClick}>
-          <Icon iconName="docs" />
+        <button className="row group" onClick={onDocsClick}>
+          <Icon filename="docs" className="bg-gray-800 group-hover:bg-primaryAccent" />
           <span>Docs</span>
         </button>
-        <button className="row" onClick={onChatClick}>
-          <Icon iconName="help" />
+        <button className="row group" onClick={onChatClick}>
+          <Icon filename="help" className="bg-gray-800 group-hover:bg-primaryAccent" />
           <span>Chat with us</span>
         </button>
-        <button className="row" onClick={onSettingsClick}>
-          <Icon iconName="settings" />
+        <button className="row group" onClick={onSettingsClick}>
+          <Icon filename="settings" className="bg-gray-800 group-hover:bg-primaryAccent" />
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
-            <button className="row" onClick={onLaunchClick}>
-              <Icon iconName="replay" />
+            <button className="row group" onClick={onLaunchClick}>
+              <Icon filename="replay-logo" className="bg-gray-800 group-hover:bg-primaryAccent" />
               <span>Launch Replay</span>
             </button>
           )
