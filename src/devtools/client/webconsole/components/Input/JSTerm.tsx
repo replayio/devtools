@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import actions from "devtools/client/webconsole/actions/index";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -76,28 +76,10 @@ function useShowAutocomplete(expression: string, hideAutocomplete: boolean) {
   return !hideAutocomplete && matchCount;
 }
 
-export default function JSTerm() {
-  const dispatch = useDispatch();
-  const recordingId = useGetRecordingId();
-  const { recording } = useGetRecording(recordingId);
+function useHistory(setValue: Dispatch<SetStateAction<string>>) {
   const commandHistory = useSelector(getCommandHistory);
-
   const [historyIndex, setHistoryIndex] = useState<number>(0);
-  const [hideAutocomplete, setHideAutocomplete] = useState(true);
-  const [autocompleteIndex, setAutocompleteIndex] = useState<number>(0);
-  const [value, setValue] = useState<string>("");
-  const [charWidth, setCharWidth] = useState<number>(0);
-  const inputNode = useRef<HTMLDivElement | null>(null);
 
-  const matches = useGetMatches(value);
-  const showAutocomplete = useShowAutocomplete(value, hideAutocomplete);
-
-  const moveAutocompleteCursor = (difference: number) => {
-    const matchesCount = matches.length;
-
-    const newIndex = (matchesCount + autocompleteIndex - difference) % matchesCount;
-    setAutocompleteIndex(newIndex);
-  };
   const moveHistoryCursor = (difference: number) => {
     if (commandHistory.length > 0) {
       const newIndex = clamp(historyIndex + difference, 0, commandHistory.length);
@@ -107,78 +89,56 @@ export default function JSTerm() {
     }
   };
 
-  const onArrowPress = (arrow: "up" | "down") => {
-    if (arrow === "up") {
-      if (showAutocomplete) {
-        moveAutocompleteCursor(1);
-      } else {
-        moveHistoryCursor(1);
-      }
-    } else if (arrow === "down") {
-      if (showAutocomplete) {
-        moveAutocompleteCursor(-1);
-      } else {
-        moveHistoryCursor(-1);
-      }
-    }
-  };
-  const onEnter = () => {
-    if (!showAutocomplete) {
-      execute();
-    } else {
-      const match = matches[autocompleteIndex];
+  return { moveHistoryCursor, setHistoryIndex };
+}
 
-      selectAutocompleteMatch(match);
-    }
-  };
-  const onTab = () => {
-    if (showAutocomplete) {
-      const match = matches[autocompleteIndex];
-      selectAutocompleteMatch(match);
-    }
-  };
-  const onChange = (cm: any) => {
-    const value = cm.getValue();
-    setValue(value);
-  };
-  const onKeyDown = (_: any, event: KeyboardEvent) => {
-    if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(event.key)) {
-      setHideAutocomplete(true);
-    } else {
-      setHideAutocomplete(false);
-      setAutocompleteIndex(0);
-    }
-  };
-  const onBeforeSelectionChange = (_: any, obj: { origin: string }) => {
-    const cursorMoved = ["*mouse", "+move"].includes(obj.origin);
+function useAutocomplete(expression: string) {
+  const [hideAutocomplete, setHideAutocomplete] = useState<boolean>(true);
+  const [autocompleteIndex, setAutocompleteIndex] = useState<number>(0);
+  const showAutocomplete = useShowAutocomplete(expression, hideAutocomplete);
+  const matches = useGetMatches(expression);
 
-    if (cursorMoved) {
-      setHideAutocomplete(true);
-    }
+  const moveAutocompleteCursor = (difference: number) => {
+    const matchesCount = matches.length;
+
+    const newIndex = (matchesCount + autocompleteIndex - difference) % matchesCount;
+    setAutocompleteIndex(newIndex);
+  };
+  const applySelectedMatch = () => {
+    const match = matches[autocompleteIndex];
+    return insertAutocompleteMatch(expression, match);
   };
 
-  const selectAutocompleteMatch = (match: string) => {
-    const newValue = insertAutocompleteMatch(value, match);
-    setValue(newValue);
+  return {
+    applySelectedMatch,
+    autocompleteIndex,
+    matches,
+    moveAutocompleteCursor,
+    setAutocompleteIndex,
+    setHideAutocomplete,
+    showAutocomplete,
   };
+}
 
-  const execute = () => {
-    if (!value) {
-      return;
-    }
+export default function JSTerm() {
+  const dispatch = useDispatch();
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
 
-    const canEval = recording!.userRole !== "team-user";
-    if (canEval) {
-      dispatch(actions.evaluateExpression(value));
-    } else {
-      dispatch(actions.paywallExpression(value));
-    }
+  const [value, setValue] = useState<string>("");
+  const [charWidth, setCharWidth] = useState<number>(0);
+  const inputNode = useRef<HTMLDivElement | null>(null);
 
-    setValue("");
-    setHistoryIndex(0);
-
-    return null;
-  };
+  const { moveHistoryCursor, setHistoryIndex } = useHistory(setValue);
+  const {
+    applySelectedMatch,
+    autocompleteIndex,
+    matches,
+    moveAutocompleteCursor,
+    setAutocompleteIndex,
+    setHideAutocomplete,
+    showAutocomplete,
+  } = useAutocomplete(value);
 
   useEffect(function () {
     async function initializeEditor() {
@@ -200,6 +160,71 @@ export default function JSTerm() {
     initializeEditor();
   }, []);
 
+  const onArrowPress = (arrow: "up" | "down") => {
+    if (arrow === "up") {
+      if (showAutocomplete) {
+        moveAutocompleteCursor(1);
+      } else {
+        moveHistoryCursor(1);
+      }
+    } else if (arrow === "down") {
+      if (showAutocomplete) {
+        moveAutocompleteCursor(-1);
+      } else {
+        moveHistoryCursor(-1);
+      }
+    }
+  };
+  const onEnter = () => {
+    if (!showAutocomplete) {
+      execute();
+    } else {
+      autocomplete();
+    }
+  };
+  const onTab = () => {
+    if (showAutocomplete) {
+      autocomplete();
+    }
+  };
+  const onChange = (cm: any) => {
+    const value = cm.getValue();
+    setValue(value);
+  };
+  const onKeyDown = (_: any, event: KeyboardEvent) => {
+    if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(event.key)) {
+      setHideAutocomplete(true);
+    } else {
+      setHideAutocomplete(false);
+      setAutocompleteIndex(0);
+    }
+  };
+  const onBeforeSelectionChange = (_: any, obj: { origin: string }) => {
+    const cursorMoved = ["*mouse", "+move"].includes(obj.origin);
+
+    if (cursorMoved) {
+      setHideAutocomplete(true);
+    }
+  };
+  const autocomplete = () => setValue(applySelectedMatch());
+  const execute = () => {
+    if (!value) {
+      return;
+    }
+
+    const canEval = recording!.userRole !== "team-user";
+    if (canEval) {
+      dispatch(actions.evaluateExpression(value));
+    } else {
+      dispatch(actions.paywallExpression(value));
+    }
+
+    setValue("");
+    setHistoryIndex(0);
+
+    return null;
+  };
+
   return (
     <div className="relative">
       <div
@@ -214,7 +239,7 @@ export default function JSTerm() {
           leftOffset={charWidth * getCursorIndex(value)}
           matches={matches}
           selectedIndex={autocompleteIndex}
-          onMatchClick={selectAutocompleteMatch}
+          onMatchClick={autocomplete}
         />
       ) : null}
     </div>
