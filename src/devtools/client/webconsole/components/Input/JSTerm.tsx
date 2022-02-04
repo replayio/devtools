@@ -12,6 +12,7 @@ import {
 import Autocomplete from "./Autocomplete";
 import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
+import { Controlled as CodeMirror } from "react-codemirror2";
 
 async function createEditor({
   onArrowPress,
@@ -120,7 +121,8 @@ function useAutocomplete(expression: string) {
   };
 }
 
-export default function JSTerm() {
+function JSTerm() {
+  // export default function JSTerm() {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -242,6 +244,27 @@ export default function JSTerm() {
           onMatchClick={autocomplete}
         />
       ) : null}
+    </div>
+  );
+}
+
+export default function _JSTerm({ options }: any) {
+  const [value, setValue] = useState("test");
+  const inputElement = useRef<HTMLTextAreaElement | null>(null);
+
+  const onChange = () => console.log("change", new Date());
+  useEffect(() => console.log({ options }), []);
+
+  return (
+    <div className="jsterm-input-container devtools-input">
+      <CodeMirror
+        options={options}
+        value={value}
+        onBeforeChange={(_, __, value) => {
+          setValue(value);
+        }}
+        onChange={onChange}
+      />
     </div>
   );
 }

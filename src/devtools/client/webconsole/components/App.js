@@ -57,7 +57,7 @@ class App extends React.Component {
       return;
     }
 
-    window.jsterm.focus();
+    // window.jsterm.focus();
   };
 
   render() {
@@ -83,7 +83,24 @@ class App extends React.Component {
             ) : null}
             <div className="flexible-output-input" key="in-out-container">
               <ConsoleOutput key="console-output" />
-              <JSTerm key="jsterm" />
+              <JSTerm
+                options={{
+                  autofocus: true,
+                  enableCodeFolding: false,
+                  lineNumbers: false,
+                  lineWrapping: true,
+                  mode: {
+                    name: "javascript",
+                    globalVars: true,
+                  },
+                  theme: "mozilla",
+                  styleActiveLine: false,
+                  tabIndex: "0",
+                  readOnly: false,
+                  viewportMargin: Infinity,
+                  disableSearchAddon: true,
+                }}
+              />
             </div>
           </div>
         </div>
