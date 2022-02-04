@@ -14,3 +14,5 @@ export function openNodeInInspector(valueFront: ValueFront): UIThunkAction;
 export function openLink(url: string): UIThunkAction;
 export function highlightDomElement(valueFront: ValueFront): UIThunkAction;
 export function unHighlightDomElement(valueFront: ValueFront): UIThunkAction;
+export function evaluateExpression(expression: string): UIThunkAction;
+export function paywallExpression(expression: string): UIThunkAction;
