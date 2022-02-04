@@ -5,6 +5,7 @@ import { formatRelativeTime } from "ui/utils/comments";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { AvatarImage } from "../Avatar";
 import MaterialIcon from "../shared/MaterialIcon";
+import Icon from "../shared/Icon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
@@ -54,9 +55,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         <div className="group">
           {isAuthenticated ? (
             <Row>
-              <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
-                {icon}
-              </MaterialIcon>
+              <Icon filename={icon} className="bg-gray-800 group-hover:bg-primaryAccent" />
               <div>
                 <PrivacyDropdown {...{ recording }} />
               </div>
@@ -65,9 +64,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         </div>
         <div className="group">
           <Row>
-            <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
-              language
-            </MaterialIcon>
+            <Icon filename="external" className="bg-gray-800 group-hover:bg-primaryAccent" />
             <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
               <a href={recording.url} target="_blank" rel="noopener noreferrer">
                 {getDisplayedUrl(recording.url)}
@@ -106,9 +103,7 @@ function OperationsRow({
   return (
     <div className="group">
       <Row onClick={onClick}>
-        <MaterialIcon iconSize="xl" className="group-hover:text-primaryAccent">
-          info
-        </MaterialIcon>
+        <Icon filename="shield-check" className="bg-gray-800 group-hover:bg-primaryAccent" />
         <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
       </Row>
     </div>

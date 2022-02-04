@@ -17,18 +17,18 @@ const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace
 
 export function getPrivacySummaryAndIcon(recording: Recording) {
   if (!recording.private) {
-    return { icon: "link", summary: "Anyone with the link can view" };
+    return { icon: "globe", summary: "Anyone with the link can view" };
   }
 
   if (recording.workspace) {
     return {
-      icon: "domain",
+      icon: "group",
       summary: <WorkspacePrivacySummary workspace={recording.workspace} />,
     };
   }
 
   // If the recording is private and in an individual's library.
-  return { icon: "group", summary: "Only people with access can view" };
+  return { icon: "lock", summary: "Only people with access can view" };
 }
 
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
@@ -88,7 +88,7 @@ function useGetPrivacyOptions(
   if (!isPublicDisabled(workspaces, workspaceId)) {
     options.push(
       <DropdownItem onClick={setPublic} key="option-public">
-        <DropdownItemContent icon="link" selected={!isPrivate}>
+        <DropdownItemContent icon="globe" selected={!isPrivate}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Anyone with the link
           </span>
@@ -102,7 +102,7 @@ function useGetPrivacyOptions(
     // to their library, or any team they belong to.
     options.push(
       <DropdownItem onClick={() => handleMoveToTeam(null)} key="option-private">
-        <DropdownItemContent icon="domain" selected={isPrivate && !workspaceId}>
+        <DropdownItemContent icon="lock" selected={isPrivate && !workspaceId}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Only people with access
           </span>
