@@ -3,9 +3,14 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
-import { getAccessibleRecording } from "ui/actions/session";
+import { getAccessibleRecording, setExpectedError } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
-import { getRecordingMetadata, useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import {
+  getRecordingMetadata,
+  useGetRecording,
+  useGetRecordingId,
+  useGetRawRecordingIdWithSlug,
+} from "ui/hooks/recordings";
 import { getRecordingURL } from "ui/utils/recording";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
@@ -103,22 +108,31 @@ function useRecordingSlug(recordingId: string) {
 
 function RecordingPage({
   getAccessibleRecording,
+  setExpectedError,
   head,
 }: PropsFromRedux & { head?: React.ReactNode }) {
   const store = useStore();
   const recordingId = useGetRecordingId();
+  const rawRecordingId = useGetRawRecordingIdWithSlug();
   useRecordingSlug(recordingId);
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {
-    if (!store || !recordingId) return;
+    if (!store) return;
+    if (!recordingId) {
+      setExpectedError({
+        message: "Invalid ID",
+        content: `"${rawRecordingId}" is not a valid recording ID`,
+      });
+      return;
+    }
 
     async function getRecording() {
       await setup(store);
       setRecording(await getAccessibleRecording(recordingId));
     }
     getRecording();
-  }, [recordingId, store, getAccessibleRecording]);
+  }, [recordingId, rawRecordingId, store, getAccessibleRecording, setExpectedError]);
 
   if (!recording || typeof window === "undefined") {
     return (
@@ -144,7 +158,7 @@ function RecordingPage({
   }
 }
 
-const connector = connect(null, { getAccessibleRecording });
+const connector = connect(null, { getAccessibleRecording, setExpectedError });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const ConnectedRecordingPage = connector(RecordingPage);

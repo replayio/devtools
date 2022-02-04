@@ -43,11 +43,14 @@ async function main() {
         },
       }
     );
-    if (rv.status) {
+    if (rv.status || rv.signal || rv.error) {
+      console.log(`Failed with status ${rv.status}, signal ${rv.signal} and error ${rv.error}`);
       const recordings = listAllRecordings();
       let url = "<recording unavailable";
       if (recordings.length) {
-        const recordingId = await uploadRecording(recordings[recordings.length - 1].id);
+        const recordingId = await uploadRecording(recordings[recordings.length - 1].id, {
+          apiKey: "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ",
+        });
         if (recordingId) {
           url = `https://app.replay.io/recording/${recordingId}`;
         }

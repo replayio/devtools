@@ -47,16 +47,6 @@ export function getAccessibleRecording(
   recordingId: string
 ): UIThunkAction<Promise<Recording | null>> {
   return async ({ dispatch }) => {
-    if (!validateUUID(recordingId)) {
-      dispatch(
-        setExpectedError({
-          message: "Invalid ID",
-          content: `"${recordingId}" is not a valid recording ID`,
-        })
-      );
-      return null;
-    }
-
     try {
       const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
       if (!recording || recording.isInitialized) {
