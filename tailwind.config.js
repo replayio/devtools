@@ -4,6 +4,9 @@ module.exports = {
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
+    screens: {
+      short: { raw: "(max-height: 615px)" },
+    },
     extend: {
       colors: {
         lightGrey: "var(--light-grey)",

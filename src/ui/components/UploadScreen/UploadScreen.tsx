@@ -113,7 +113,7 @@ function ReplayScreenshot({
 }) {
   return (
     <div
-      className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish"
+      className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish short:hidden"
       style={{ height: "280px" }}
     >
       {showLimitWarning ? <LimitWarning /> : null}
@@ -192,10 +192,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
-          <div
-            className="flex flex-row space-x-4 mb-11"
-            style={{ height: isPublic ? "620px" : "" }}
-          >
+          <div className="flex flex-row space-x-4 mb-10 short:h-72">
             <div
               className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
               style={{ width: "620px" }}
