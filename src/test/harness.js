@@ -323,7 +323,7 @@ const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
 async function checkEvaluateInTopFrame(text, expected) {
   selectConsole();
-  executeInConsole(text);
+  await executeInConsole(text);
 
   await waitUntil(
     () => {
@@ -526,6 +526,7 @@ async function toggleScopeNode(text) {
 
 async function executeInConsole(value) {
   window.jsterm.setValue(value);
+  await waitUntil(() => window.jsterm.editor.getValue() === value);
   window.jsterm.execute();
   await new Promise(resolve => setTimeout(resolve, 1));
 }

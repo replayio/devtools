@@ -110,6 +110,7 @@ export default function JSTerm() {
 
   const onRegularKeyPress = (e: KeyboardEvent) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       execute();
     } else if (e.key === "ArrowUp") {
       moveHistoryCursor(1);
