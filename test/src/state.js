@@ -18,13 +18,13 @@ const defaultState = {
   exampleRecordings: fs.existsSync("./test/example-recordings.json")
     ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
     : {},
-  headless: false,
+  headless: !!process.env.RECORD_REPLAY_PLAYWRIGHT_HEADLESS,
   shouldRecordExamples: !!process.env.SHOULD_RECORD_EXAMPLES,
   exampleRecordingIdFile: path.join(os.tmpdir(), "record-replay-example-recording-id"),
 
   browserPath: process.env.RECORD_REPLAY_PATH,
   driverPath: process.env.RECORD_REPLAY_DRIVER,
-  onlyTarget: process.env.onlyTarget,
+  onlyTarget: ["gecko"],
   skippedTests: process.env.SKIPPED_TESTS,
   testTimeout: 240,
 

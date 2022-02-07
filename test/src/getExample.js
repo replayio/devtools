@@ -38,7 +38,7 @@ async function recordToCloud(state, browserName, exampleUrl) {
     await context.close();
     // this is currently necessary to ensure that the recording contains sourcemaps,
     // see https://github.com/RecordReplay/gecko-dev/issues/717
-    await new Promise(res => setTimeout(res, 1000));
+    await new Promise(res => setTimeout(res, 2000));
     await browser.close();
   }
 }
