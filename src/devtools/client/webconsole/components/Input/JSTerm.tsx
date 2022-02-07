@@ -120,13 +120,14 @@ export default function JSTerm() {
   };
 
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
-    e.preventDefault();
-
     if (e.key === Keys.ENTER || e.key === Keys.TAB) {
+      e.preventDefault();
       autocomplete();
     } else if (e.key === Keys.ARROW_DOWN) {
+      e.preventDefault();
       moveAutocompleteCursor(-1);
     } else if (e.key === Keys.ARROW_UP) {
+      e.preventDefault();
       moveAutocompleteCursor(1);
     }
 
@@ -134,9 +135,6 @@ export default function JSTerm() {
       [Keys.ENTER, Keys.TAB, Keys.ESCAPE, Keys.ARROW_RIGHT, Keys.ARROW_LEFT].includes(e.key as Keys)
     ) {
       setHideAutocomplete(true);
-    } else if (![Keys.ARROW_DOWN, Keys.ARROW_UP].includes(e.key as Keys)) {
-      setHideAutocomplete(false);
-      setAutocompleteIndex(0);
     }
   };
   const onKeyPress = (e: KeyboardEvent) => {
@@ -144,6 +142,11 @@ export default function JSTerm() {
       onAutocompleteKeyPress(e);
     } else {
       onRegularKeyPress(e);
+    }
+
+    if (![Keys.ARROW_DOWN, Keys.ARROW_UP, Keys.ESCAPE].includes(e.key as Keys)) {
+      setHideAutocomplete(false);
+      setAutocompleteIndex(0);
     }
   };
   const onSelection = (obj?: any) => {
