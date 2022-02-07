@@ -368,7 +368,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     if (key === "open_console") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
-      window.jsterm?.focus();
+      window.jsterm?.editor.focus();
     } else if (key === "open_devtools") {
       dispatch(setViewMode("dev"));
     } else if (key === "open_elements") {
