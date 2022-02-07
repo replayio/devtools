@@ -1,6 +1,6 @@
 let CodeMirror = null;
 if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
-  CodeMirror = require("codemirror");
+  CodeMirror = import("codemirror");
 }
 
 export function initOutputSyntaxHighlighting() {

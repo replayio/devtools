@@ -12,7 +12,17 @@ import {
 import Autocomplete from "./Autocomplete";
 import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
-import { WrappedCodeMirror } from "./CodeMirror";
+import CodeMirror from "./CodeMirror";
+
+enum Keys {
+  ENTER = "Enter",
+  ESCAPE = "Escape",
+  TAB = "Tab",
+  ARROW_DOWN = "ArrowDown",
+  ARROW_UP = "ArrowUp",
+  ARROW_RIGHT = "ArrowRight",
+  ARROW_LEFT = "ArrowLeft",
+}
 
 function useGetMatches(expression: string) {
   const frameScope = useSelector((state: UIState) => getFrameScope(state, "0:0"));
@@ -39,7 +49,7 @@ function useHistory(setValue: Dispatch<SetStateAction<string>>) {
   const commandHistory = useSelector(getCommandHistory);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
-  const moveHistoryCursor = (difference: number) => {
+  const moveHistoryCursor = (difference: -1 | 1) => {
     if (commandHistory.length > 0) {
       const newIndex = clamp(historyIndex + difference, 0, commandHistory.length);
 
@@ -52,8 +62,8 @@ function useHistory(setValue: Dispatch<SetStateAction<string>>) {
 }
 
 function useAutocomplete(expression: string) {
-  const [hideAutocomplete, setHideAutocomplete] = useState<boolean>(true);
-  const [autocompleteIndex, setAutocompleteIndex] = useState<number>(0);
+  const [hideAutocomplete, setHideAutocomplete] = useState(true);
+  const [autocompleteIndex, setAutocompleteIndex] = useState(0);
   const showAutocomplete = useShowAutocomplete(expression, hideAutocomplete);
   const matches = useGetMatches(expression);
 
@@ -84,7 +94,7 @@ export default function JSTerm() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
 
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState("");
   const inputNode = useRef<HTMLDivElement | null>(null);
 
   const { moveHistoryCursor, setHistoryIndex } = useHistory(setValue);
@@ -107,20 +117,23 @@ export default function JSTerm() {
       moveHistoryCursor(-1);
     }
   };
+
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
     e.preventDefault();
 
-    if (e.key === "Enter" || e.key === "Tab") {
+    if (e.key === Keys.ENTER || e.key === Keys.TAB) {
       autocomplete();
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === Keys.ARROW_DOWN) {
       moveAutocompleteCursor(-1);
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === Keys.ARROW_UP) {
       moveAutocompleteCursor(1);
     }
 
-    if (["Enter", "Tab", "Escape", "ArrowRight", "ArrowLeft"].includes(e.key)) {
+    if (
+      [Keys.ENTER, Keys.TAB, Keys.ESCAPE, Keys.ARROW_RIGHT, Keys.ARROW_LEFT].includes(e.key as Keys)
+    ) {
       setHideAutocomplete(true);
-    } else if (!["ArrowDown", "ArrowUp"].includes(e.key)) {
+    } else if (![Keys.ARROW_DOWN, Keys.ARROW_UP].includes(e.key as Keys)) {
       setHideAutocomplete(false);
       setAutocompleteIndex(0);
     }
@@ -165,7 +178,7 @@ export default function JSTerm() {
         tabIndex={-1}
         ref={inputNode}
       >
-        <WrappedCodeMirror
+        <CodeMirror
           onKeyPress={onKeyPress}
           value={value}
           onSelection={onSelection}

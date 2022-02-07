@@ -1,18 +1,18 @@
 import { Editor, EditorChange } from "codemirror";
-import React, { useRef } from "react";
+import React, { FC, useRef } from "react";
 import { Controlled as CodeMirror } from "react-codemirror2";
 
-require("codemirror/mode/javascript/javascript");
-require("codemirror/mode/htmlmixed/htmlmixed");
-require("codemirror/mode/coffeescript/coffeescript");
-require("codemirror/mode/jsx/jsx");
-require("codemirror/mode/elm/elm");
-require("codemirror/mode/clojure/clojure");
-require("codemirror/mode/haxe/haxe");
-require("codemirror/addon/search/searchcursor");
-require("codemirror/addon/runmode/runmode");
-require("codemirror/addon/selection/active-line");
-require("codemirror/addon/edit/matchbrackets");
+import "codemirror/mode/javascript/javascript";
+import "codemirror/mode/htmlmixed/htmlmixed";
+import "codemirror/mode/coffeescript/coffeescript";
+import "codemirror/mode/jsx/jsx";
+import "codemirror/mode/elm/elm";
+import "codemirror/mode/clojure/clojure";
+import "codemirror/mode/haxe/haxe";
+import "codemirror/addon/search/searchcursor";
+import "codemirror/addon/runmode/runmode";
+import "codemirror/addon/selection/active-line";
+import "codemirror/addon/edit/matchbrackets";
 
 const CODEMIRROR_OPTIONS = {
   autofocus: true,
@@ -29,7 +29,7 @@ const CODEMIRROR_OPTIONS = {
   readOnly: false,
   viewportMargin: Infinity,
   disableSearchAddon: true,
-};
+} as const;
 
 // CodeMirror does not refresh its event handlers once it's initialized,
 // making it difficult to work with using React functional components
@@ -38,17 +38,12 @@ const CODEMIRROR_OPTIONS = {
 // This wrapper works around that by passing in callbacks that reference
 // refs, so that CodeMirror always ends up using the latest callback.
 
-export function WrappedCodeMirror({
-  value,
-  onKeyPress,
-  setValue,
-  onSelection,
-}: {
+const WrappedCodeMirror: FC<{
   value: string;
   onKeyPress: (e: KeyboardEvent) => void;
   setValue: (value: string) => void;
   onSelection: (obj: any) => void;
-}) {
+}> = ({ value, onKeyPress, setValue, onSelection }) => {
   const onKeyPressRef = useRef(onKeyPress);
   onKeyPressRef.current = onKeyPress;
   const setValueRef = useRef(setValue);
@@ -78,4 +73,6 @@ export function WrappedCodeMirror({
       onSelection={_onSelection}
     />
   );
-}
+};
+
+export default WrappedCodeMirror;
