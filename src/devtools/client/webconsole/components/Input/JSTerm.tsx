@@ -183,6 +183,7 @@ export default function JSTerm() {
           value={value}
           onSelection={onSelection}
           setValue={setValue}
+          execute={execute}
         />
       </div>
       {showAutocomplete ? (

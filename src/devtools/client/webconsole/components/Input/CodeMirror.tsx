@@ -31,6 +31,29 @@ const CODEMIRROR_OPTIONS = {
   disableSearchAddon: true,
 } as const;
 
+const getJsTermApi = (editor: Editor, execute: () => void) => {
+  return {
+    editor,
+    setValue: (newValue = "") => {
+      // In order to get the autocomplete popup to work properly, we need to set the
+      // editor text and the cursor in the same operation. If we don't, the text change
+      // is done before the cursor is moved, and the autocompletion call to the server
+      // sends an erroneous query.
+      editor.operation(() => {
+        editor.setValue(newValue);
+
+        // Set the cursor at the end of the input.
+        const lines = newValue.split("\n");
+        editor.setCursor({
+          line: lines.length - 1,
+          ch: lines[lines.length - 1].length,
+        });
+      });
+    },
+    execute,
+  };
+};
+
 // CodeMirror does not refresh its event handlers once it's initialized,
 // making it difficult to work with using React functional components
 // whose function references change on each render cycle.
@@ -43,13 +66,16 @@ const WrappedCodeMirror: FC<{
   onKeyPress: (e: KeyboardEvent) => void;
   setValue: (value: string) => void;
   onSelection: (obj: any) => void;
-}> = ({ value, onKeyPress, setValue, onSelection }) => {
+  execute: () => void;
+}> = ({ value, onKeyPress, setValue, onSelection, execute }) => {
   const onKeyPressRef = useRef(onKeyPress);
   onKeyPressRef.current = onKeyPress;
   const setValueRef = useRef(setValue);
   setValueRef.current = setValue;
   const onSelectionRef = useRef(onSelection);
   onSelectionRef.current = onSelection;
+  const executeRef = useRef(execute);
+  executeRef.current = execute;
 
   const _onKeyPress = (_: Editor, event: any) => {
     onKeyPressRef.current(event);
@@ -60,13 +86,14 @@ const WrappedCodeMirror: FC<{
   const _onSelection = (_: Editor, obj: any) => {
     onSelectionRef.current(obj);
   };
+  const _execute = () => executeRef.current();
 
   return (
     <CodeMirror
       options={CODEMIRROR_OPTIONS}
       value={value}
       editorDidMount={editor => {
-        window.jsterm = { editor };
+        window.jsterm = getJsTermApi(editor, _execute);
       }}
       onBeforeChange={_onBeforeChange}
       onKeyDown={_onKeyPress}
