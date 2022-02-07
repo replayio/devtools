@@ -47,6 +47,7 @@
   font-size: var(--theme-tab-font-size);
   background-color: transparent;
   vertical-align: bottom;
+  cursor: pointer;
 }
 
 .source-header button.command-palette {
@@ -55,6 +56,7 @@
   padding: 0.5rem;
   height: var(--editor-header-height);
   font-size: var(--theme-tab-font-size);
+  cursor: pointer;
 }
 
 .source-tab .filename {

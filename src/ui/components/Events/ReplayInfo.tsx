@@ -55,7 +55,10 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         <div className="group">
           {isAuthenticated ? (
             <Row>
-              <Icon filename={icon} className="bg-gray-800 group-hover:bg-primaryAccent" />
+              <Icon
+                filename={icon}
+                className="bg-gray-800 group-hover:bg-primaryAccent cursor-pointer"
+              />
               <div>
                 <PrivacyDropdown {...{ recording }} />
               </div>
@@ -64,7 +67,10 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         </div>
         <div className="group">
           <Row>
-            <Icon filename="external" className="bg-gray-800 group-hover:bg-primaryAccent" />
+            <Icon
+              filename="external"
+              className="bg-gray-800 group-hover:bg-primaryAccent cursor-pointer"
+            />
             <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
               <a href={recording.url} target="_blank" rel="noopener noreferrer">
                 {getDisplayedUrl(recording.url)}
