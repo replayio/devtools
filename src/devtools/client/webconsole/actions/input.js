@@ -164,13 +164,7 @@ function onExpressionEvaluated(response) {
   };
 }
 
-function setInputValue(value) {
-  return () => {
-    window.jsterm.setValue(newValue);
-  };
-}
 module.exports = {
   evaluateExpression,
   paywallExpression,
-  setInputValue,
 };
