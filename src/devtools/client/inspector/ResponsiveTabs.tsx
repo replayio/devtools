@@ -25,7 +25,61 @@ export const ResponsiveTabs = ({
   const tabs = Array.isArray(children) ? children : [children];
 
   const [visibleItemsCount, setVisibleItemsCount] = useState(tabs.length);
+  const [indicesOrder, setIndicesOrder] = useState<number[]>(
+    Array.from({ length: tabs.length }).map((_, idx) => idx)
+  );
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const recalcTabsVisibilityAndOrder = () => {
+    const containerWidth = containerRef.current?.clientWidth ?? 0;
+
+    // we will always close dropdown when resizing
+    setDropdownOpen(false);
+
+    // check if maybe we don't need a dropdown at all
+    let totalTabsWidth = 0;
+    for (const tab of tabsRef.current) {
+      totalTabsWidth += tab.clientWidth;
+    }
+
+    if (totalTabsWidth <= containerWidth) {
+      setVisibleItemsCount(tabsRef.current.length);
+      return;
+    }
+
+    // we will need a dropdown for sure,
+    // so let's calc which items are visible
+    const dropdownButtonWidth = dropdownRef.current?.clientWidth ?? 0;
+    const activeTabWidth = tabsRef.current[activeIdx].clientWidth ?? 0;
+
+    let visibleCount = 1;
+    let tabIndices: number[] = [activeIdx];
+
+    let runningWidth = dropdownButtonWidth + activeTabWidth;
+    for (let idx = 0; idx < tabs.length; idx++) {
+      if (idx === activeIdx) {
+        continue;
+      }
+
+      const tab = tabsRef.current[idx];
+
+      if (runningWidth + tab.clientWidth <= containerWidth) {
+        if (idx < activeIdx) {
+          tabIndices.pop();
+          tabIndices = [...tabIndices, idx, activeIdx];
+        } else {
+          tabIndices = [...tabIndices, idx];
+        }
+        visibleCount++;
+      } else {
+        tabIndices = [...tabIndices, idx];
+      }
+      runningWidth += tab.clientWidth;
+    }
+
+    setVisibleItemsCount(visibleCount);
+    setIndicesOrder(tabIndices);
+  };
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -33,38 +87,7 @@ export const ResponsiveTabs = ({
     }
 
     const ro = new ResizeObserver(() => {
-      const containerWidth = containerRef.current?.clientWidth ?? 0;
-
-      // we will always close dropdown when resizing
-      setDropdownOpen(false);
-
-      // check if maybe we don't need a dropdown at all
-      let totalTabsWidth = 0;
-      for (const tab of tabsRef.current) {
-        totalTabsWidth += tab.clientWidth;
-      }
-
-      if (totalTabsWidth <= containerWidth) {
-        setVisibleItemsCount(tabsRef.current.length);
-        return;
-      }
-
-      // we will need a dropdown for sure,
-      // so let's calc which items are visible
-      let _runningWidth = dropdownRef.current?.clientWidth ?? 0;
-
-      // let tabIndices = Array.from({ length: tabsRef.current.length }).map((_, idx) => idx);
-      // tabIndices = [activeIdx, ...tabIndices.splice(activeIdx, 1)];
-
-      for (let idx = 0; idx < tabs.length; idx++) {
-        const tab = tabsRef.current[idx];
-        _runningWidth += tab.clientWidth;
-        if (_runningWidth > containerWidth) {
-          setVisibleItemsCount(idx);
-          return;
-        }
-      }
-      setVisibleItemsCount(tabsRef.current.length);
+      recalcTabsVisibilityAndOrder();
     });
 
     ro.observe(containerRef.current);
@@ -73,6 +96,10 @@ export const ResponsiveTabs = ({
       ro.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    recalcTabsVisibilityAndOrder();
+  }, [activeIdx]);
 
   useEffect(() => {
     const handleClick = (e: any) => {
@@ -87,23 +114,26 @@ export const ResponsiveTabs = ({
     };
   }, []);
 
+  const orderedTabs = indicesOrder.map(idx => tabs[idx]);
+  const hasDropdown = visibleItemsCount < tabs.length;
+
   return (
     <div className="relative max-w-full">
       <div className={cx("flex overflow-hidden", className)} ref={containerRef}>
-        {tabs.map((tab, idx) => (
+        {orderedTabs.map((tab, idx) => (
           <span
             key={tab.key}
-            ref={ref => (tabsRef.current[idx] = ref!)}
+            ref={ref => (tabsRef.current[indicesOrder[idx]] = ref!)}
             style={{
-              pointerEvents: idx === 0 || idx < visibleItemsCount ? "auto" : "none",
-              opacity: idx === 0 || idx < visibleItemsCount ? 1 : 0,
+              pointerEvents: idx < visibleItemsCount ? "auto" : "none",
+              opacity: idx < visibleItemsCount ? 1 : 0,
             }}
           >
             {tab}
           </span>
         ))}
       </div>
-      {tabsRef.current.length !== visibleItemsCount && (
+      {hasDropdown && (
         <span
           onClick={() => setDropdownOpen(!dropdownOpen)}
           ref={dropdownRef}
@@ -119,7 +149,7 @@ export const ResponsiveTabs = ({
               className="absolute right-0 top-full responsive-tabs-dropdown"
               style={dropdownStyle}
             >
-              {tabs.slice(visibleItemsCount).map(tab => (
+              {orderedTabs.slice(visibleItemsCount).map(tab => (
                 <div key={tab.key}>{tab}</div>
               ))}
             </div>
