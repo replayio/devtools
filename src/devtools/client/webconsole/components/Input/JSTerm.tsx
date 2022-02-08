@@ -20,9 +20,8 @@ import uniq from "lodash/uniq";
 import { eagerEvaluateExpression, getEvaluatedProperties } from "../../utils/autocomplete-eager";
 
 import { evaluateExpression, paywallExpression } from "../../actions/input";
-const ObjectInspector =
-  require("devtools/client/webconsole/utils/connected-object-inspector").default;
 import { ValueFront } from "protocol/thread";
+import EagerEvalFooter from "./EagerEvalFooter";
 
 enum Keys {
   BACKSPACE = "Backspace",
@@ -89,7 +88,7 @@ function useShowAutocomplete(expression: string, hideAutocomplete: boolean) {
   return !hideAutocomplete && !!matchCount;
 }
 
-function useHistory(setValue: Dispatch<SetStateAction<string>>) {
+function useHistory(setValue: (newValue: string) => void) {
   const commandHistory = useSelector(getCommandHistory);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
@@ -135,11 +134,18 @@ function useAutocomplete(expression: string) {
 
 function useEagerEvalPreview() {
   const [grip, setGrip] = useState<ValueFront | null>(null);
+  const evalIdRef = useRef(0);
 
   const refreshEagerEval = async (expression: string) => {
+    setGrip(null);
+    evalIdRef.current++;
+    const evalId = evalIdRef.current;
     const rv = await eagerEvaluateExpression(expression);
-    console.log(rv);
-    setGrip(rv);
+    const isUndefined = rv?._hasPrimitive && !rv._primitive;
+
+    if (evalIdRef.current === evalId && !isUndefined) {
+      setGrip(rv);
+    }
   };
 
   return { refreshEagerEval, grip };
@@ -149,8 +155,13 @@ export default function JSTerm() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
 
-  const [value, setValue] = useState("");
+  const [value, _setValue] = useState("");
   const inputNode = useRef<HTMLDivElement | null>(null);
+
+  const setValue = (newValue: string) => {
+    _setValue(newValue);
+    refreshEagerEval(newValue);
+  };
 
   const { moveHistoryCursor, setHistoryIndex } = useHistory(setValue);
   const {
@@ -163,11 +174,6 @@ export default function JSTerm() {
     showAutocomplete,
   } = useAutocomplete(value);
   const { refreshEagerEval, grip } = useEagerEvalPreview();
-
-  const onChange = (val: string) => {
-    setValue(val);
-    refreshEagerEval(val);
-  };
 
   const onRegularKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER) {
@@ -253,30 +259,32 @@ export default function JSTerm() {
 
   return (
     <div className="relative">
-      <div
-        className="jsterm-input-container devtools-input"
-        key="jsterm-container"
-        aria-live="off"
-        tabIndex={-1}
-        ref={inputNode}
-      >
-        <CodeMirror
-          onKeyPress={onKeyPress}
-          value={value}
-          onSelection={onSelection}
-          setValue={onChange}
-          execute={execute}
-        />
+      <div className="relative">
+        <div
+          className="jsterm-input-container devtools-input"
+          key="jsterm-container"
+          aria-live="off"
+          tabIndex={-1}
+          ref={inputNode}
+        >
+          <CodeMirror
+            onKeyPress={onKeyPress}
+            value={value}
+            onSelection={onSelection}
+            setValue={setValue}
+            execute={execute}
+          />
+        </div>
+        {showAutocomplete ? (
+          <Autocomplete
+            leftOffset={getCursorIndex(value)}
+            matches={matches}
+            selectedIndex={autocompleteIndex}
+            onMatchClick={autocomplete}
+          />
+        ) : null}
       </div>
-      {grip ? <ObjectInspector value={grip} /> : null}
-      {showAutocomplete ? (
-        <Autocomplete
-          leftOffset={getCursorIndex(value)}
-          matches={matches}
-          selectedIndex={autocompleteIndex}
-          onMatchClick={autocomplete}
-        />
-      ) : null}
+      <EagerEvalFooter value={value} grip={grip} />
     </div>
   );
 }

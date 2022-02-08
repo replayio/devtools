@@ -30,12 +30,12 @@ export async function eagerEvaluateExpression(expression: string): Promise<Value
   const { asyncIndex, frameId } = gToolbox.getPanel("debugger")!.getFrameId();
 
   try {
-    const { returned, exception, failed } = await ThreadFront.evaluate(
+    const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
       frameId,
-      expression,
-      true
-    );
+      text: expression,
+      pure: true,
+    });
     if (returned && !(failed || exception)) {
       return returned;
     }
