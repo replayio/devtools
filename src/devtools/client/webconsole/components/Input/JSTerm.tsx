@@ -7,7 +7,6 @@ import { getCommandHistory } from "../../selectors/messages";
 import {
   getAutocompleteMatches,
   getCursorIndex,
-  getEvaluatedProperties,
   getPropertyExpression,
   insertAutocompleteMatch,
 } from "../../utils/autocomplete";
@@ -16,6 +15,7 @@ import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
 import CodeMirror from "./CodeMirror";
 import uniq from "lodash/uniq";
+import { getEvaluatedProperties } from "../../utils/autocomplete-eager";
 
 enum Keys {
   BACKSPACE = "Backspace",

@@ -127,7 +127,6 @@ function eagerEvalExpression(expression) {
         frameId,
         pure: true,
       });
-      console.log(">>", { response });
     } catch (err) {
       let msg = "Error: Eager Evaluation failed";
       if (err.message) {

@@ -7,9 +7,7 @@ import {
   Identifier,
 } from "@babel/types";
 import generate from "@babel/generator";
-import { ThreadFront, ValueFront } from "protocol/thread";
-import Error from "next/error";
-import { createConsoleLogger } from "launchdarkly-js-client-sdk";
+import { ValueFront } from "protocol/thread";
 import { WiredObject } from "protocol/thread/pause";
 const { filter } = require("fuzzaldrin-plus");
 
@@ -106,7 +104,7 @@ export function isDotNotation(str: string) {
   return isMemberExpression(str + PROPERTY_PLACEHOLDER);
 }
 
-function getPropertiesForObject(object?: ObjectFront | WiredObject | null): string[] {
+export function getPropertiesForObject(object?: ObjectFront | WiredObject | null): string[] {
   const properties = [];
 
   if (!object) {
@@ -244,31 +242,4 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
   }
 
   return [];
-}
-
-// Use eager eval to get the properties of the last complete object in the expression.
-export async function getEvaluatedProperties(expression: string): Promise<string[]> {
-  const { asyncIndex, frameId } = gToolbox.getPanel("debugger")!.getFrameId();
-  let properties: string[] = [];
-
-  try {
-    const { returned, exception, failed } = await ThreadFront.evaluate(
-      asyncIndex,
-      frameId,
-      expression,
-      true
-    );
-    if (returned && !(failed || exception)) {
-      const evaluatedProperties = getPropertiesForObject(returned.getObject());
-      properties.push(...evaluatedProperties);
-    }
-  } catch (err: any) {
-    let msg = "Error: Eager Evaluation failed";
-    if (err.message) {
-      msg += ` - ${err.message}`;
-    }
-    console.error(msg);
-  }
-
-  return properties;
 }
