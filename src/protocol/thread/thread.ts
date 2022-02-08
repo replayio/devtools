@@ -620,11 +620,21 @@ class _ThreadFront {
     return await pause.getScopes(frameId);
   }
 
-  async evaluate(asyncIndex: number, frameId: FrameId | undefined, text: string) {
+  async evaluate({
+    asyncIndex,
+    text,
+    frameId,
+    pure = false,
+  }: {
+    asyncIndex: number;
+    text: string;
+    frameId?: FrameId;
+    pure?: boolean;
+  }) {
     await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause);
-    const rv = await pause.evaluate(frameId, text);
+    const rv = await pause.evaluate(frameId, text, pure);
     if (rv.returned) {
       rv.returned = new ValueFront(pause, rv.returned);
     } else if (rv.exception) {

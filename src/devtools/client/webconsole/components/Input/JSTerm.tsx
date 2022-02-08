@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useRef, useState, useEffect } from "react";
 import actions from "devtools/client/webconsole/actions/index";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -7,14 +7,19 @@ import { getCommandHistory } from "../../selectors/messages";
 import {
   getAutocompleteMatches,
   getCursorIndex,
+  getPropertyExpression,
   insertAutocompleteMatch,
 } from "../../utils/autocomplete";
 import Autocomplete from "./Autocomplete";
 import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
 import CodeMirror from "./CodeMirror";
+import uniq from "lodash/uniq";
+import { getEvaluatedProperties } from "../../utils/autocomplete-eager";
+import { evaluateExpression, paywallExpression } from "../../actions/input";
 
 enum Keys {
+  BACKSPACE = "Backspace",
   ENTER = "Enter",
   ESCAPE = "Escape",
   TAB = "Tab",
@@ -24,7 +29,7 @@ enum Keys {
   ARROW_LEFT = "ArrowLeft",
 }
 
-function useGetMatches(expression: string) {
+function useGetScopeMatches(expression: string) {
   const frameScope = useSelector((state: UIState) => getFrameScope(state, "0:0"));
 
   if (!expression || !frameScope?.scope) {
@@ -32,6 +37,30 @@ function useGetMatches(expression: string) {
   }
 
   return getAutocompleteMatches(expression, frameScope.scope);
+}
+function useGetEvalMatches(value: string) {
+  const [matches, setMatches] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function updateMatches() {
+      const propertyExpression = getPropertyExpression(value);
+
+      if (propertyExpression) {
+        const evaluatedProperties = await getEvaluatedProperties(propertyExpression.left);
+        setMatches(evaluatedProperties);
+      }
+    }
+
+    updateMatches();
+  }, [value]);
+
+  return matches;
+}
+function useGetMatches(expression: string) {
+  const scopeMatches = useGetScopeMatches(expression);
+  const evalMatches = useGetEvalMatches(expression);
+
+  return uniq([...scopeMatches, ...evalMatches]);
 }
 function useShowAutocomplete(expression: string, hideAutocomplete: boolean) {
   const matches = useGetMatches(expression);
@@ -42,7 +71,7 @@ function useShowAutocomplete(expression: string, hideAutocomplete: boolean) {
     return false;
   }
 
-  return !hideAutocomplete && matchCount;
+  return !hideAutocomplete && !!matchCount;
 }
 
 function useHistory(setValue: Dispatch<SetStateAction<string>>) {
@@ -88,7 +117,6 @@ function useAutocomplete(expression: string) {
     showAutocomplete,
   };
 }
-
 export default function JSTerm() {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
@@ -109,12 +137,12 @@ export default function JSTerm() {
   } = useAutocomplete(value);
 
   const onRegularKeyPress = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === Keys.ENTER) {
       e.preventDefault();
       execute();
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === Keys.ARROW_UP) {
       moveHistoryCursor(1);
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === Keys.ARROW_DOWN) {
       moveHistoryCursor(-1);
     }
   };
@@ -132,7 +160,16 @@ export default function JSTerm() {
     }
 
     if (
-      [Keys.ENTER, Keys.TAB, Keys.ESCAPE, Keys.ARROW_RIGHT, Keys.ARROW_LEFT].includes(e.key as Keys)
+      (
+        [
+          Keys.BACKSPACE,
+          Keys.ENTER,
+          Keys.TAB,
+          Keys.ESCAPE,
+          Keys.ARROW_RIGHT,
+          Keys.ARROW_LEFT,
+        ] as string[]
+      ).includes(e.key)
     ) {
       setHideAutocomplete(true);
     }
@@ -164,9 +201,9 @@ export default function JSTerm() {
 
     const canEval = recording!.userRole !== "team-user";
     if (canEval) {
-      dispatch(actions.evaluateExpression(value));
+      dispatch(evaluateExpression(value));
     } else {
-      dispatch(actions.paywallExpression(value));
+      dispatch(paywallExpression(value));
     }
 
     setValue("");

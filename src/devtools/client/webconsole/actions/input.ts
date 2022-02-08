@@ -4,6 +4,12 @@
 
 "use strict";
 
+import { Pause } from "protocol/thread";
+import { UIAction, UIThunkAction } from "ui/actions";
+import { UIState } from "ui/state";
+import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
+import { ThunkDispatch, ThunkExtraArgs } from "ui/utils/thunk";
+
 const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { assert } = require("protocol/utils");
@@ -12,8 +18,22 @@ const messagesActions = require("devtools/client/webconsole/actions/messages");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
 
-async function getPause(toolbox) {
-  const { asyncIndex } = toolbox.getPanel("debugger").getFrameId();
+type EvaluateJSAsyncOptions = {
+  asyncIndex?: number;
+  pure?: boolean;
+  forConsoleMessage?: boolean;
+  frameId?: string;
+};
+type EvaluationResponse = {
+  type: string;
+  result: EvaluationResponseResult;
+  evalId?: number;
+  topLevelAwaitRejected?: boolean;
+};
+type EvaluationResponseResult = any;
+
+async function getPause(toolbox: DevToolsToolbox) {
+  const { asyncIndex } = toolbox.getPanel("debugger")!.getFrameId();
   await ThreadFront.ensureAllSources();
   const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
   assert(pause);
@@ -21,7 +41,11 @@ async function getPause(toolbox) {
   return pause;
 }
 
-async function dispatchExpression(dispatch, pause, expression) {
+async function dispatchExpression(
+  dispatch: ThunkDispatch<UIState, ThunkExtraArgs, UIAction>,
+  pause: Pause,
+  expression: string
+) {
   // We use the messages action as it's doing additional transformation on the message.
   let evalId = nextEvalId++;
   dispatch(
@@ -40,7 +64,7 @@ async function dispatchExpression(dispatch, pause, expression) {
   return evalId;
 }
 
-function paywallExpression(expression, reason = "team-user") {
+export function paywallExpression(expression: string, reason = "team-user"): UIThunkAction {
   return async ({ dispatch, toolbox }) => {
     const pause = await getPause(toolbox);
     const evalId = await dispatchExpression(dispatch, pause, expression);
@@ -63,7 +87,7 @@ function paywallExpression(expression, reason = "team-user") {
 }
 
 let nextEvalId = 1;
-function evaluateExpression(expression) {
+export function evaluateExpression(expression: string): UIThunkAction {
   return async ({ dispatch, toolbox }) => {
     if (!expression) {
       const inputSelection = window.jsterm?.editor.getSelection();
@@ -74,7 +98,7 @@ function evaluateExpression(expression) {
       return null;
     }
 
-    const { asyncIndex, frameId } = toolbox.getPanel("debugger").getFrameId();
+    const { asyncIndex, frameId } = toolbox.getPanel("debugger")!.getFrameId();
     const pause = await getPause(toolbox);
     const evalId = await dispatchExpression(dispatch, pause, expression);
     dispatch(
@@ -88,7 +112,7 @@ function evaluateExpression(expression) {
     );
 
     try {
-      const response = await evaluateJSAsync(expression, {
+      const response: EvaluationResponse = await evaluateJSAsync(expression, {
         asyncIndex,
         frameId,
         forConsoleMessage: true,
@@ -96,7 +120,7 @@ function evaluateExpression(expression) {
       response.evalId = evalId;
 
       return dispatch(onExpressionEvaluated(response));
-    } catch (err) {
+    } catch (err: any) {
       let msg = "Error: Evaluation failed";
       if (err.message) {
         msg += ` - ${err.message}`;
@@ -113,6 +137,30 @@ function evaluateExpression(expression) {
   };
 }
 
+export function eagerEvalExpression(expression: string): UIThunkAction {
+  return async ({ toolbox }) => {
+    if (!expression) {
+      return null;
+    }
+
+    const { asyncIndex, frameId } = toolbox.getPanel("debugger")!.getFrameId();
+
+    try {
+      const response = await evaluateJSAsync(expression, {
+        asyncIndex,
+        frameId,
+        pure: true,
+      });
+    } catch (err: any) {
+      let msg = "Error: Eager Evaluation failed";
+      if (err.message) {
+        msg += ` - ${err.message}`;
+      }
+      console.error(msg);
+    }
+  };
+}
+
 /**
  * Evaluate a JavaScript expression asynchronously.
  *
@@ -120,10 +168,15 @@ function evaluateExpression(expression) {
  * @param {Object} options: Options for evaluation. See evaluateJSAsync method on
  *                          devtools/shared/fronts/webconsole.js
  */
-async function evaluateJSAsync(expression, options = {}) {
-  const { asyncIndex, frameId } = options;
-  const rv = await ThreadFront.evaluate(asyncIndex, frameId, expression);
-  const { returned, exception, failed } = rv;
+async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptions = {}) {
+  const { asyncIndex, frameId, pure } = options;
+  //reminder that there would be no results if the function were impure -logan
+  const { returned, exception, failed } = await ThreadFront.evaluate({
+    asyncIndex,
+    frameId,
+    text: expression,
+    pure,
+  });
 
   let v;
   if (failed || !(returned || exception)) {
@@ -150,7 +203,7 @@ async function evaluateJSAsync(expression, options = {}) {
  * @param {Object} response
  *        The message received from the server.
  */
-function onExpressionEvaluated(response) {
+function onExpressionEvaluated(response: EvaluationResponse): UIThunkAction {
   return async ({ dispatch }) => {
     // If the evaluation was a top-level await expression that was rejected, there will
     // be an uncaught exception reported, so we don't need to do anything.
@@ -167,4 +220,5 @@ function onExpressionEvaluated(response) {
 module.exports = {
   evaluateExpression,
   paywallExpression,
+  eagerEvalExpression,
 };

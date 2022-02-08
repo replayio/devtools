@@ -5,10 +5,10 @@ const MOCK_SCOPE = {
     {
       name: "foo",
       value: {
-        _object: {
+        getObject: () => ({
           className: "Object",
           preview: { properties: [{ name: "bar" }, { name: "baz" }] },
-        },
+        }),
       },
     },
   ],

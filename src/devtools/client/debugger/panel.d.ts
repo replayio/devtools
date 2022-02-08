@@ -12,4 +12,5 @@ export class DebuggerPanel {
   getSourceByActorId(id?: string): any;
   getSourceByURL(url?: string): any;
   selectSource(sourceId: string, line?: number, column?: number): any;
+  getFrameId(): { asyncIndex: number; frameId?: string };
 }
