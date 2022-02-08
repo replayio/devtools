@@ -61,13 +61,6 @@ export const ResponsiveTabs = ({
     const dropdownButtonWidth = dropdownRef.current?.clientWidth ?? 0;
     const activeTabWidth = tabsRef.current[activeIdx].clientWidth ?? 0;
 
-    console.table(
-      tabsRef.current.map(t => ({
-        text: t.querySelector("a")!.innerText,
-        width: t.clientWidth,
-      }))
-    );
-
     let visibleCount = 1;
     let tabIndices: number[] = [activeIdx];
 
@@ -137,16 +130,6 @@ export const ResponsiveTabs = ({
 
   const orderedTabs = indicesOrder.map(idx => tabs[idx]);
   const hasDropdown = visibleItemsCount < tabs.length;
-
-  console.log(`active idx: ${activeIdx}`);
-
-  console.log("order: " + indicesOrder.join(", "));
-
-  console.log("visible: " + visibleItemsCount);
-
-  console.log(
-    indicesOrder.map(idx => tabsRef.current[idx]?.querySelector("a")!.innerText).join(", ")
-  );
 
   return (
     <div className="relative max-w-full">
