@@ -47,14 +47,14 @@ export function Toggle({
         onChange={onChange}
         className={classNames(
           enabled ? "bg-primaryAccent" : "bg-gray-200",
-          "relative inline-flex flex-shrink-0 h-4 w-7 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          "relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         )}
       >
         <span
           aria-hidden="true"
           className={classNames(
             enabled ? "translate-x-3" : "translate-x-0",
-            "pointer-events-none inline-block h-3 w-3 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
+            "pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
           )}
         />
       </Switch>
@@ -80,7 +80,7 @@ export function SourcemapToggle({
   };
 
   return (
-    <div className="flex items-center pl-3 space-x-1 mapped-source">
+    <div className="mapped-source flex items-center space-x-1 pl-3">
       <Toggle
         enabled={selectedSource.isOriginal}
         setEnabled={setEnabled}

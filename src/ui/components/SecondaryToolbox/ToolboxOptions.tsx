@@ -16,12 +16,12 @@ function ToolboxOptions({
   setShowEditor,
 }: PropsFromRedux) {
   return (
-    <Menu as="div" className="relative inline-block text-left secondary-toolbox-options">
+    <Menu as="div" className="secondary-toolbox-options relative inline-block text-left">
       <div>
         <Menu.Button className="toolbox-options flex items-center text-gray-400 hover:text-gray-600">
           <MaterialIcon
             outlined
-            className="leading-none hover:text-primaryAccentHover text-gray-800 text-xl material-icons-outlined"
+            className="material-icons-outlined text-xl leading-none text-gray-800 hover:text-primaryAccentHover"
           >
             view_compact
           </MaterialIcon>
@@ -37,7 +37,7 @@ function ToolboxOptions({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="origin-top-right text-sm absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             <Menu.Item>
               {({ active }) => (

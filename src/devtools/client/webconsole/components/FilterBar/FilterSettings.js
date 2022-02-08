@@ -16,7 +16,7 @@ const { ToggleRow } = require("./ConsoleSettings");
 
 export function CountPill({ children }) {
   return (
-    <span className="font-mono text-gray-500 flex-shrink-0 bg-gray-200 py-0.5 px-2 rounded-md">
+    <span className="flex-shrink-0 rounded-md bg-gray-200 py-0.5 px-2 font-mono text-gray-500">
       {children}
     </span>
   );
@@ -25,8 +25,8 @@ export function CountPill({ children }) {
 function FilterToggle({ children, count, onClick, selected, id }) {
   return (
     <ToggleRow onClick={onClick} selected={selected} id={id}>
-      <div className="flex justify-between justify items-center">
-        <span className="whitespace-pre overflow-hidden overflow-ellipsis flex-grow py-0.5">
+      <div className="justify flex items-center justify-between">
+        <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre py-0.5">
           {children}
         </span>
         {count ? <CountPill>{count}</CountPill> : null}

@@ -30,7 +30,7 @@ export function CancelSubscription({
   return (
     <section className="space-y-4">
       <h3 className="border-b py-2 text-lg font-bold">Danger Zone</h3>
-      <div className="border border-red-300 flex flex-row items-center justify-between rounded-lg p-3 space-x-3">
+      <div className="flex flex-row items-center justify-between space-x-3 rounded-lg border border-red-300 p-3">
         <div className="flex flex-col">
           <div className="font-semibold">Cancel Subscription</div>
           <div className="">
@@ -40,7 +40,7 @@ export function CancelSubscription({
         <button
           onClick={handleCancelSubscription}
           className={classNames(
-            "max-w-max items-center px-4 py-2 flex-shrink-0 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-red-600 hover:bg-red-700",
+            "max-w-max flex-shrink-0 items-center rounded-md border border-transparent bg-red-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2",
             { "opacity-60": cancelLoading }
           )}
         >

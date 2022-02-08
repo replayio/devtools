@@ -48,7 +48,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
     );
   }
 
-  return <div className="rounded-lg overflow-hidden w-full bg-white">{sidepanel}</div>;
+  return <div className="w-full overflow-hidden rounded-lg bg-white">{sidepanel}</div>;
 }
 
 const connector = connect((state: UIState) => ({

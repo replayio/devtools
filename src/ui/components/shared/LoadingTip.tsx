@@ -48,11 +48,11 @@ export default function LoadingTip() {
   }, [loadingPageTipIndex]);
 
   return (
-    <div className="space-y-8 w-96 h-32">
-      <div className="px-8 py-4 space-x-4 align-middle flex items-center max-w-lg rounded-lg bg-jellyfish">
+    <div className="h-32 w-96 space-y-8">
+      <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-jellyfish px-8 py-4 align-middle">
         <img className="h-16 p-2" src={`/images/${icon}`} />
         <div className="flex flex-col space-y-2">
-          <div className="font-bold text-sm">{title}</div>
+          <div className="text-sm font-bold">{title}</div>
           <div className="text-xs">{description}</div>
         </div>
       </div>

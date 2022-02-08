@@ -181,7 +181,7 @@ class Timeline extends Component<PropsFromRedux> {
           <button className="relative" onClick={replay} disabled={disabled}>
             <IndexingLoader />
             <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-              <img className="w-6 h-6 m-auto" src="/images/playback-refresh.svg" />
+              <img className="m-auto h-6 w-6" src="/images/playback-refresh.svg" />
             </div>
           </button>
         </div>
@@ -194,11 +194,11 @@ class Timeline extends Component<PropsFromRedux> {
           <IndexingLoader />
           {playback ? (
             <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-              <img className="w-6 h-6 m-auto" src="/images/playback-pause.svg" />
+              <img className="m-auto h-6 w-6" src="/images/playback-pause.svg" />
             </div>
           ) : (
             <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-              <img className="w-6 h-6 m-auto" src="/images/playback-play.svg" />
+              <img className="m-auto h-6 w-6" src="/images/playback-play.svg" />
             </div>
           )}
         </button>

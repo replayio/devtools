@@ -64,7 +64,7 @@ class App extends React.Component {
     const { filterBarDisplayMode, consoleOverflow } = this.props;
 
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
         <div className="flex flex-grow overflow-hidden">
           <FilterDrawer />

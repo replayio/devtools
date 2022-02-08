@@ -98,7 +98,7 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
 
 function PaletteShortcut() {
   return (
-    <div className="absolute right-4 text-primaryAccent select-none">
+    <div className="absolute right-4 select-none text-primaryAccent">
       <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
       <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
     </div>
@@ -141,10 +141,10 @@ function CommandPalette({
 
   return (
     <div
-      className="h-52 w-full flex flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+      className="flex h-52 w-full flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
       style={{ maxWidth: "400px", minWidth: "320px" }}
     >
-      <div className="p-3 border-b border-gray-300">
+      <div className="border-b border-gray-300 p-3">
         <div className="relative flex items-center text-primaryAccent">
           <SearchInput
             value={searchString}
@@ -155,7 +155,7 @@ function CommandPalette({
           <PaletteShortcut />
         </div>
       </div>
-      <div className="flex-grow text-sm flex flex-col overflow-auto mb-2">
+      <div className="mb-2 flex flex-grow flex-col overflow-auto text-sm">
         {shownCommands.map((command: Command, index: number) => (
           <CommandButton active={index == activeIndex} command={command} key={command.label} />
         ))}

@@ -46,8 +46,8 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
   }
 
   return (
-    <div className="absolute w-full h-full top-0 left-0 grid items-center">
-      <div className="flex flex-col max-w-lg mx-auto bg-white shadow-lg rounded-md space-y-4 py-8 px-12">
+    <div className="absolute top-0 left-0 grid h-full w-full items-center">
+      <div className="mx-auto flex max-w-lg flex-col space-y-4 rounded-md bg-white py-8 px-12 shadow-lg">
         <div className="flex flex-col space-y-1">
           <div className="text-lg">
             You were invited to <strong>{name}</strong>

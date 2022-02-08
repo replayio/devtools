@@ -14,13 +14,13 @@ export default function TOSScreen() {
   return (
     <BubbleViewportWrapper>
       <div
-        className="p-9 bg-white rounded-lg text-base shadow-xl space-y-6 relative flex flex-col items-center"
+        className="relative flex flex-col items-center space-y-6 rounded-lg bg-white p-9 text-base shadow-xl"
         style={{ width: "520px" }}
       >
-        <div className="space-y-4 place-content-center">
-          <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+        <div className="place-content-center space-y-4">
+          <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
         </div>
-        <div className="font-bold text-2xl">Terms of Use</div>
+        <div className="text-2xl font-bold">Terms of Use</div>
         <div>
           Our{" "}
           <a
@@ -34,7 +34,7 @@ export default function TOSScreen() {
           help define Replay’s relationship with you as you interact with our services. This
           includes:
         </div>
-        <ul className="list-disc pl-6 space-y-1.5">
+        <ul className="list-disc space-y-1.5 pl-6">
           <li>
             <span className="font-medium">What you can expect from us</span>, which describes how we
             provide and develop our services

@@ -78,7 +78,7 @@ function BatchActionDropdown({
 
   const buttonClasses = classNames("bg-white", getButtonClasses("blue", "secondary", "md"));
   const button = (
-    <span className={"space-x-1 flex flex-row items-center leading-4 text-primaryAccent"}>
+    <span className={"flex flex-row items-center space-x-1 leading-4 text-primaryAccent"}>
       <MaterialIcon outlined className="font-bold" iconSize="sm">
         expand_more
       </MaterialIcon>

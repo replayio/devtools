@@ -179,7 +179,7 @@ function CommentTool({
     <div style={parentStyle} className="absolute">
       <div
         className={classNames(
-          "px-2.5 py-1 absolute text-xs text-white rounded-2xl w-max space-x-1.5 flex items-center bg-black bg-opacity-70",
+          "absolute flex w-max items-center space-x-1.5 rounded-2xl bg-black bg-opacity-70 px-2.5 py-1 text-xs text-white",
           !captionNode.current ? "invisible" : ""
         )}
         style={childStyle}

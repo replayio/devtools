@@ -55,13 +55,13 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           in touch!
         </p>
       ) : null}
-      <div className="text-xs uppercase font-semibold">Recordings</div>
+      <div className="text-xs font-semibold uppercase">Recordings</div>
       <Row>
         <Label>Disable Public Recordings</Label>
         <Input>
           <label className="flex items-center" htmlFor="disable_public_recordings">
             <input
-              className={classNames("rounded-sm ml-0 text-sm", {
+              className={classNames("ml-0 rounded-sm text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -103,13 +103,13 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           />
         </Input>
       </Row> */}
-      <div className="text-xs uppercase font-semibold">Members</div>
+      <div className="text-xs font-semibold uppercase">Members</div>
       <Row>
         <Label>Disable My Library</Label>
         <Input>
           <label className="flex items-center" htmlFor="restrict_users_to_domain">
             <input
-              className={classNames("rounded-sm ml-0 text-sm", {
+              className={classNames("ml-0 rounded-sm text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -128,7 +128,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <label className="flex items-center" htmlFor="auto_add_users">
             <select
-              className={classNames("rounded-sm ml-0 text-sm", {
+              className={classNames("ml-0 rounded-sm text-sm", {
                 "bg-toolbarBackground": disabled,
                 "border-gray-300": disabled,
               })}
@@ -173,7 +173,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label className="self-start">Welcome Message</Label>
         <div>
           <textarea
-            className={classNames("rounded-md w-full h-20 text-sm", {
+            className={classNames("h-20 w-full rounded-md text-sm", {
               "bg-toolbarBackground": disabled,
               "border-gray-300": disabled,
             })}

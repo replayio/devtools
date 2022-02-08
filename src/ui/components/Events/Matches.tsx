@@ -35,7 +35,7 @@ function Matches({ eventTypePoints, simpleEvent }: PropsFromRedux & { simpleEven
   }
 
   return (
-    <div className="flex flex-col space-y-1 items-start w-full">
+    <div className="flex w-full flex-col items-start space-y-1">
       <div className="w-full">
         {relatedPoints.slice(0, 1).map((point, i) => (
           <Match eventPoint={point} key={i} />

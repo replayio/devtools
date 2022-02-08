@@ -11,7 +11,7 @@ export default function Checkbox({
     <input
       type="checkbox"
       className={classNames(
-        "focus:ring-primaryAccent h-4 w-4 text-primaryAccent border-gray-300 rounded",
+        "h-4 w-4 rounded border-gray-300 text-primaryAccent focus:ring-primaryAccent",
         className
       )}
       {...{ id, checked, onChange }}
