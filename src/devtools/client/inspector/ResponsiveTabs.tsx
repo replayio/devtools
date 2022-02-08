@@ -38,7 +38,7 @@ export const ResponsiveTabs = ({
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const recalcTabsVisibilityAndOrder = useCallback(() => {
+  const calcTabsVisibilityAndOrder = useCallback(() => {
     const containerWidth = containerRef.current?.clientWidth ?? 0;
 
     // we will always close dropdown when resizing
@@ -51,7 +51,7 @@ export const ResponsiveTabs = ({
     }
 
     if (totalTabsWidth <= containerWidth) {
-      setVisibleItemsCount(tabsRef.current.length);
+      setVisibleItemsCount(tabs.length);
       setIndicesOrder(Array.from({ length: tabs.length }).map((_, idx) => idx));
       return;
     }
@@ -74,8 +74,7 @@ export const ResponsiveTabs = ({
 
       if (runningWidth <= containerWidth) {
         if (idx < activeIdx) {
-          tabIndices.pop();
-          tabIndices = [...tabIndices, idx, activeIdx];
+          tabIndices.splice(tabIndices.length - 1, 0, idx);
         } else {
           tabIndices.push(idx);
         }
@@ -90,30 +89,20 @@ export const ResponsiveTabs = ({
   }, [activeIdx, tabs.length]);
 
   useEffect(() => {
-    if (!containerRef.current) {
+    calcTabsVisibilityAndOrder();
+
+    const container = containerRef.current;
+    if (!container) {
       return;
     }
 
-    const ro = new ResizeObserver(() => {
-      recalcTabsVisibilityAndOrder();
-    });
-
-    ro.observe(containerRef.current);
-
-    const container = containerRef.current;
+    const ro = new ResizeObserver(calcTabsVisibilityAndOrder);
+    ro.observe(container);
 
     return () => {
       ro.unobserve(container);
     };
-  }, [recalcTabsVisibilityAndOrder]);
-
-  useEffect(() => {
-    recalcTabsVisibilityAndOrder();
-  }, [activeIdx, recalcTabsVisibilityAndOrder]);
-
-  useEffect(() => {
-    recalcTabsVisibilityAndOrder();
-  }, []);
+  }, [calcTabsVisibilityAndOrder]);
 
   useEffect(() => {
     const handleClick = (e: any) => {

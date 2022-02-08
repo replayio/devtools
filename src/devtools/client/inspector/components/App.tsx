@@ -107,7 +107,7 @@ const InspectorApp: FC = () => {
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
                             return (
-                              <li
+                              <span
                                 key={panelId}
                                 className={classnames("tabs-menu-item", {
                                   "is-active": isPanelSelected,
@@ -124,7 +124,7 @@ const InspectorApp: FC = () => {
                                 >
                                   {INSPECTOR_TAB_TITLES[panelId]}
                                 </a>
-                              </li>
+                              </span>
                             );
                           })}
                         </ResponsiveTabs>
