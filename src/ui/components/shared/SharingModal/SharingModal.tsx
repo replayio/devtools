@@ -49,17 +49,17 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
   return (
     <section className="space-y-1.5">
       <div className="font-bold">Requests to access this replay</div>
-      <div className="overflow-auto space-y-1.5" style={{ maxHeight: "160px" }}>
+      <div className="space-y-1.5 overflow-auto" style={{ maxHeight: "160px" }}>
         {displayedRequests.map((c, i) => (
           <div
-            className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg justify-between"
+            className="flex items-center justify-between space-x-2 rounded-lg p-2 hover:bg-gray-100"
             key={i}
           >
             <div className="flex items-center space-x-2">
-              <div className="w-8 flex-shrink-0 rounded-full overflow-hidden">
+              <div className="w-8 flex-shrink-0 overflow-hidden rounded-full">
                 <AvatarImage src={c.user.picture} />
               </div>
-              <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
                 {c.user.name}
               </span>
             </div>
@@ -81,8 +81,8 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="p-8 space-y-4">
-      <div className="w-full justify-between flex flex-col space-y-3">
+    <section className="space-y-4 p-8">
+      <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
           <div className="space-y-1.5">
             <div className="font-bold">Add People</div>
@@ -99,13 +99,13 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-sm overflow-hidden"
+        className="sharing-modal relative flex flex-col space-y-0 overflow-hidden rounded-lg bg-white text-sm"
         style={{ width: "460px" }}
       >
         <CollaboratorsSection recording={recording} />
-        <section className="p-8 flex flex-row space-x-2 bg-gray-100 items-center justify-between">
-          <div className="flex flex-row space-x-3 items-center overflow-hidden">
-            <div className="h-8 w-8 bg-purple-200 rounded-full font-bold flex-shrink-0 flex items-center justify-center">
+        <section className="flex flex-row items-center justify-between space-x-2 bg-gray-100 p-8">
+          <div className="flex flex-row items-center space-x-3 overflow-hidden">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-200 font-bold">
               <MaterialIcon className="text-purple-600" iconSize="xl">
                 people
               </MaterialIcon>

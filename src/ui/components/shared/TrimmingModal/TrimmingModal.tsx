@@ -10,19 +10,19 @@ function TrimmingModal({ hideModal }: PropsFromRedux) {
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
   return (
-    <div className="fixed w-full h-full grid justify-center items-center z-50 pointer-events-none">
+    <div className="pointer-events-none fixed z-50 grid h-full w-full items-center justify-center">
       <div
-        className={"bg-black w-full h-full absolute opacity-50 top-0 pointer-events-auto"}
+        className={"pointer-events-auto absolute top-0 h-full w-full bg-black opacity-50"}
         style={{ height: `calc(100% - ${timelineHeight}px)` }}
         onClick={hideModal}
       />
       <div
-        className="sharing-modal space-y-0 relative flex flex-col bg-white rounded-lg text-sm overflow-hidden pointer-events-auto"
+        className="sharing-modal pointer-events-auto relative flex flex-col space-y-0 overflow-hidden rounded-lg bg-white text-sm"
         style={{ width: "460px" }}
       >
-        <div className="p-8 space-y-4">
-          <div className="flex flex-row space-x-2 items-center">
-            <div className="text-white rounded-full bg-primaryAccent w-6 h-6 p-1">
+        <div className="space-y-4 p-8">
+          <div className="flex flex-row items-center space-x-2">
+            <div className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white">
               <MaterialIcon>center_focus_strong</MaterialIcon>
             </div>
             <div className="text-lg">Replay trimming</div>

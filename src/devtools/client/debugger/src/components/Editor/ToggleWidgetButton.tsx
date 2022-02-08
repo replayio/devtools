@@ -44,7 +44,7 @@ function ToggleButton({
     <button
       className={classNames(
         "toggle-widget bg-primaryAccent",
-        "flex p-px absolute z-50 rounded-md text-white transform -translate-y-1/2 leading-3 transition hover:scale-125 shadow-lg"
+        "absolute z-50 flex -translate-y-1/2 transform rounded-md p-px leading-3 text-white shadow-lg transition hover:scale-125"
       )}
       style={style}
       onClick={onClick}

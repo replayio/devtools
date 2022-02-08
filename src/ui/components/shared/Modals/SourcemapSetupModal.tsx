@@ -35,7 +35,7 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
         <DialogTitle>Replay is better with sourcemaps</DialogTitle>
         <DialogDescription>{msg}</DialogDescription>
         <DialogActions>
-          <div className="w-full flex flex-col items-center">
+          <div className="flex w-full flex-col items-center">
             <PrimaryButton color="blue" onClick={onClick}>{`Show me how`}</PrimaryButton>
           </div>
         </DialogActions>

@@ -52,7 +52,7 @@ function FilterBar({
   };
 
   return (
-    <div className="flex flex-row flex-grow text-gray-500 text-sm space-x-3 items-center">
+    <div className="flex flex-grow flex-row items-center space-x-3 text-sm text-gray-500">
       <div className="material-icons">search</div>
       <TextInput value={searchString} onChange={onChange} placeholder="Search" />
     </div>
@@ -179,10 +179,10 @@ function Library({
   }
 
   return (
-    <main className="flex flex-row w-full h-full">
+    <main className="flex h-full w-full flex-row">
       <Sidebar nonPendingWorkspaces={workspaces} />
-      <div className="flex flex-col flex-grow overflow-x-hidden">
-        <div className="flex flex-row h-16 border-b border-gray-300 items-center p-5 bg-white space-x-3">
+      <div className="flex flex-grow flex-col overflow-x-hidden">
+        <div className="flex h-16 flex-row items-center space-x-3 border-b border-gray-300 bg-white p-5">
           <FilterBar searchString={searchString} setSearchString={setSearchString} />
           <LaunchButton />
         </div>

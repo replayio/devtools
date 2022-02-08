@@ -39,13 +39,13 @@ const Accordion = ({ items }: { items: AccordionItem[] }) => {
                 setState(newState);
               }}
             >
-              <h2 className="flex justify-between items-center">
+              <h2 className="flex items-center justify-between">
                 <span
                   className={classNames("img arrow", { expanded: !collapsed })}
                   style={{ marginInlineEnd: "4px" }}
                 />
                 <div className="flex flex-grow justify-between overflow-hidden">
-                  <div className="overflow-hidden whitespace-pre overflow-ellipsis">{header}</div>
+                  <div className="overflow-hidden overflow-ellipsis whitespace-pre">{header}</div>
                   {button}
                 </div>
               </h2>

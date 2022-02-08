@@ -70,7 +70,7 @@ function RecordingOptionsDropdown({
       outlined
       className={classNames(
         expanded ? "opacity-100" : "",
-        "h-4 w-4 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-primaryAccentHover"
+        "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
       )}
     >
       more_vert

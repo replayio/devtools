@@ -45,7 +45,7 @@ function NonDevView({ sidePanelCollapsed }: PropsFromRedux) {
 
   return (
     <div className="vertical-panels pr-2">
-      <div className="flex flex-row h-full overflow-hidden bg-chrome">
+      <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar />
         <SplitBox
           startPanel={<SidePanel />}

@@ -13,7 +13,7 @@ export default function FilterBar({
   types: Set<CanonicalRequestType>;
 }) {
   return (
-    <div className="bg-white flex items-center px-1 py-1">
+    <div className="flex items-center bg-white px-1 py-1">
       <TypesDropdown toggleType={toggleType} types={types} />
 
       <MaterialIcon iconSize="lg">search</MaterialIcon>
@@ -21,7 +21,7 @@ export default function FilterBar({
       <input
         placeholder="Filter requests"
         onChange={e => table.setGlobalFilter(e.target.value)}
-        className="px-1 bg-transparent w-full  focus:outline-none"
+        className="w-full bg-transparent px-1  focus:outline-none"
       />
     </div>
   );

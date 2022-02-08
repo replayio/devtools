@@ -13,7 +13,7 @@ export default {
 } as Meta;
 
 const Template: Story<ComponentProps<typeof SourceOutline>> = args => (
-  <div className="border-2 p-2 h-80 w-80">
+  <div className="h-80 w-80 border-2 p-2">
     <SourceOutline {...args} />
   </div>
 );

@@ -15,7 +15,7 @@ function ShareButton({ setModal }: PropsFromRedux) {
 
   return (
     <PrimaryButton color="blue" onClick={onClick}>
-      <div className="space-x-2 flex flex-row items-center">
+      <div className="flex flex-row items-center space-x-2">
         <div className="material-icons" style={{ fontSize: "1rem" }}>
           open_in_new
         </div>

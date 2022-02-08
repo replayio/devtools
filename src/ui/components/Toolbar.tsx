@@ -17,7 +17,7 @@ import classNames from "classnames";
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
     <div
-      className={classnames("h-full w-1 bg-primaryAccent absolute left-0", {
+      className={classnames("absolute left-0 h-full w-1 bg-primaryAccent", {
         invisible: !active,
       })}
       style={{ borderRadius: "0 4px 4px 0" }}
@@ -51,7 +51,7 @@ function ToolbarButton({
   };
 
   return (
-    <div className="px-2 relative">
+    <div className="relative px-2">
       <ToolbarButtonTab active={selectedPrimaryPanel == name} />
       <div
         className={classnames("toolbar-panel-button", name, {
@@ -70,7 +70,7 @@ function ToolbarButton({
         />
       </div>
       {isPaused && name == "debugger" ? (
-        <div className="absolute bg-secondaryAccent top-1 left-3 rounded-full h-2 w-2 mr-2 mb-1 border-1.5 border-toolbarBackground" />
+        <div className="border-1.5 absolute top-1 left-3 mr-2 mb-1 h-2 w-2 rounded-full border-toolbarBackground bg-secondaryAccent" />
       ) : null}
     </div>
   );

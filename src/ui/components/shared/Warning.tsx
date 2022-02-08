@@ -9,10 +9,10 @@ export default function Warning({ children, link }: { children: React.ReactNode;
   }
 
   return (
-    <div className="bg-red-100 text-red-700 py-1 px-2 flex flex-col leading-tight font-sans">
-      <div className="flex space-x-1 items-center">
+    <div className="flex flex-col bg-red-100 py-1 px-2 font-sans leading-tight text-red-700">
+      <div className="flex items-center space-x-1">
         <MaterialIcon>error</MaterialIcon>
-        <span className="whitespace-pre overflow-ellipsis overflow-hidden flex-grow">
+        <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
           {children}
         </span>
         {link ? (

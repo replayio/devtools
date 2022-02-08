@@ -120,7 +120,7 @@ function HeaderTitle({
 
   return (
     <span
-      className={cx(className, "input focus:ring-primaryAccent focus:border-blue-500", {
+      className={cx(className, "input focus:border-blue-500 focus:ring-primaryAccent", {
         italic: !hasTitle && !editing,
       })}
       role="textbox"
@@ -158,7 +158,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div className={css.header}>
-      <div className="flex flex-row items-center relative overflow-hidden flex-grow">
+      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}

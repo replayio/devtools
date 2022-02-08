@@ -38,17 +38,17 @@ function VideoComment({
         style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
       >
         {isHighlighted ? (
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondaryAccent opacity-75 pointer-events-none" />
+          <span className="pointer-events-none absolute inline-flex h-full w-full animate-ping rounded-full bg-secondaryAccent opacity-75" />
         ) : null}
         <span
           className={classnames(
-            "rounded-full relative inline-flex transition duration-300 ease-in-out bg-secondaryAccent cursor-pointer"
+            "relative inline-flex cursor-pointer rounded-full bg-secondaryAccent transition duration-300 ease-in-out"
           )}
           onMouseEnter={() => setHoveredComment(comment.id)}
           onMouseLeave={() => setHoveredComment(null)}
           style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
         />
-        <ChatAltIcon className="w-3.5 h-3.5 absolute text-white pointer-events-none	" />
+        <ChatAltIcon className="pointer-events-none absolute h-3.5 w-3.5 text-white	" />
       </div>
     </div>
   );

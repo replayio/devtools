@@ -32,14 +32,14 @@ function DeletedScreen({ url }: { url: string }) {
   });
 
   return (
-    <div className="w-full h-full" style={{ background: "white" }}>
+    <div className="h-full w-full" style={{ background: "white" }}>
       <Modal>
         <div
-          className="p-9 bg-white rounded-md shadow-xl text-base space-y-9 relative flex flex-col justify-between overflow-y-auto"
+          className="relative flex flex-col justify-between space-y-9 overflow-y-auto rounded-md bg-white p-9 text-base shadow-xl"
           style={{ width: "300px", maxHeight: "90vh" }}
         >
-          <h2 className="font-bold text-2xl ">{`Redirecting...`}</h2>
-          <div className="text-gray-500 space-y-5 text-lg">
+          <h2 className="text-2xl font-bold ">{`Redirecting...`}</h2>
+          <div className="space-y-5 text-lg text-gray-500">
             <div>{`Sit tight! We'll take you back to the library in a few seconds.`}</div>
           </div>
           <div className="space-y-1">
@@ -47,8 +47,8 @@ function DeletedScreen({ url }: { url: string }) {
               type="button"
               onClick={navigateToUrl}
               className={classNames(
-                "inline-flex items-center px-3 py-1.5 border border-transparent text-base font-medium rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccentHover justify-center",
-                "text-white bg-primaryAccent hover:bg-primaryAccentHover"
+                "inline-flex items-center justify-center rounded border border-transparent px-3 py-1.5 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccentHover focus:ring-offset-2",
+                "bg-primaryAccent text-white hover:bg-primaryAccentHover"
               )}
             >
               Go now
@@ -71,7 +71,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         type="button"
         onClick={onDiscard}
         disabled={shouldDisableActions}
-        className="text-secondaryAccent underline py-3.5 px-8"
+        className="py-3.5 px-8 text-secondaryAccent underline"
       >
         {isDeleting ? `Discarding…` : `Discard`}
       </button>
@@ -79,7 +79,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         type="submit"
         disabled={shouldDisableActions}
         value={isSaving ? `Uploading…` : `Save`}
-        className="text-white py-3.5 px-16 rounded-xl font-bold cursor-pointer bg-primaryAccent"
+        className="cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-white"
       />
     </div>
   );
@@ -87,11 +87,11 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 
 function LimitWarning() {
   return (
-    <div className="absolute bottom-4 right-4 flex p-2 rounded-full bg-gray-500 text-white shadow-lg">
+    <div className="absolute bottom-4 right-4 flex rounded-full bg-gray-500 p-2 text-white shadow-lg">
       <PortalTooltip
         tooltip={
           <div
-            className="text-base bg-toolbarBackground p-2 px-3 rounded-md shadow-lg mb-4"
+            className="mb-4 rounded-md bg-toolbarBackground p-2 px-3 text-base shadow-lg"
             style={{ width: "200px" }}
           >
             {`Replays work best when under 2 minutes`}
@@ -113,11 +113,11 @@ function ReplayScreenshot({
 }) {
   return (
     <div
-      className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish short:hidden"
+      className="short:hidden relative h-64 rounded-lg bg-jellyfish px-6 pt-6 shadow-xl"
       style={{ height: "280px" }}
     >
       {showLimitWarning ? <LimitWarning /> : null}
-      <img src={screenData} className="h-full m-auto" />
+      <img src={screenData} className="m-auto h-full" />
     </div>
   );
 }
@@ -192,20 +192,20 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
-          <div className="flex flex-row space-x-4 mb-10 short:h-72">
+          <div className="short:h-72 mb-10 flex flex-row space-x-4">
             <div
-              className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
+              className="relative flex flex-col overflow-hidden rounded-xl text-lg font-medium shadow-xl"
               style={{ width: "620px" }}
             >
-              <div className="absolute w-full h-full bg-jellyfish" />
-              <div className="py-9 px-8 space-y-6 relative">
+              <div className="absolute h-full w-full bg-jellyfish" />
+              <div className="relative space-y-6 py-9 px-8">
                 <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
                 <ReplayScreenshot
                   screenData={screenData!}
                   showLimitWarning={showDurationWarning(recording)}
                 />
               </div>
-              <div className="py-9 space-y-6 px-8 border-t border-gray-300 relative">
+              <div className="relative space-y-6 border-t border-gray-300 py-9 px-8">
                 <Sharing
                   workspaces={workspaces}
                   selectedWorkspaceId={selectedWorkspaceId}

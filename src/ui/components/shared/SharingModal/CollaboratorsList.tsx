@@ -27,8 +27,8 @@ function Collaborator({
   if (collaborator.email) {
     iconAndName = (
       <>
-        <div className="bg-gray-300 rounded-full" style={{ padding: "5px", marginRight: "8px" }}>
-          <MaterialIcon className="text-white align-middle" iconSize="xl">
+        <div className="rounded-full bg-gray-300" style={{ padding: "5px", marginRight: "8px" }}>
+          <MaterialIcon className="align-middle text-white" iconSize="xl">
             mail_outline
           </MaterialIcon>
         </div>

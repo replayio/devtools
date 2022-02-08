@@ -42,17 +42,17 @@ function CommentSource({
   return (
     <div
       onClick={onSelectSource}
-      className="group px-2 py-0.5 bg-gray-100 hover:bg-gray-200 rounded-md border-gray-200 cursor-pointer"
+      className="group cursor-pointer rounded-md border-gray-200 bg-gray-100 px-2 py-0.5 hover:bg-gray-200"
     >
-      <div className="font-medium flex flex-col mono">
-        <div className="w-full flex flex-row justify-between space-x-1">
+      <div className="mono flex flex-col font-medium">
+        <div className="flex w-full flex-row justify-between space-x-1">
           <div
-            className="cm-s-mozilla font-mono overflow-hidden whitespace-pre text-xs"
+            className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs"
             style={{ fontSize: "11px" }}
             dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
           />
           <div
-            className="flex flex-shrink-0 opacity-0 group-hover:opacity-100 transition"
+            className="flex flex-shrink-0 opacity-0 transition group-hover:opacity-100"
             // className="flex-shrink-0 p-px w-4 h-4 opacity-0 group-hover:opacity-100"
             title="Show in the Editor"
           >

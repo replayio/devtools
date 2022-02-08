@@ -13,7 +13,7 @@ function FullViewportWrapper({
   return (
     <main
       className={classNames(
-        "w-full fixed h-full z-50 flex items-center justify-center bg-chrome",
+        "fixed z-50 flex h-full w-full items-center justify-center bg-chrome",
         classnames
       )}
     >

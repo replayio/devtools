@@ -10,10 +10,10 @@ const slides = [
     header: "Welcome to Replay! 👋",
     content: (
       <>
-        <div className="text-lg pb-6">{`We're glad you're here! This is how to get started:`}</div>
-        <li className="text-lg pb-1.5">{`In the Replay browser, open a website in a new tab`}</li>
-        <li className="text-lg pb-1.5">{`Press the blue record button to record, press again to stop`}</li>
-        <li className="text-lg pb-1.5">{`And with that, you'll have recorded your first replay :)`}</li>
+        <div className="pb-6 text-lg">{`We're glad you're here! This is how to get started:`}</div>
+        <li className="pb-1.5 text-lg">{`In the Replay browser, open a website in a new tab`}</li>
+        <li className="pb-1.5 text-lg">{`Press the blue record button to record, press again to stop`}</li>
+        <li className="pb-1.5 text-lg">{`And with that, you'll have recorded your first replay :)`}</li>
       </>
     ),
   },
@@ -28,7 +28,7 @@ function SlideContent({
 }) {
   return (
     <div className="space-y-9">
-      <h2 className="font-bold text-2xl ">{headerText}</h2>
+      <h2 className="text-2xl font-bold ">{headerText}</h2>
       <div className="text-gray-500">{children}</div>
     </div>
   );
@@ -53,7 +53,7 @@ function Navigation({
   };
 
   return (
-    <div className="text-base items-right">
+    <div className="items-right text-base">
       {/* <div className="flex flex-row items-center space-x-2">
         <input
           type="checkbox"
@@ -69,7 +69,7 @@ function Navigation({
         <button
           onClick={onSkipOrDone}
           type="button"
-          className="float-right inline-flex items-center px-3 py-1.5 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+          className="float-right inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-base font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         >
           {current == total ? "Got it!" : "Skip"}
         </button>
@@ -86,7 +86,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
       <div
-        className="p-9 bg-white rounded-lg shadow-xl text-lg space-y-6 relative flex flex-col justify-between"
+        className="relative flex flex-col justify-between space-y-6 rounded-lg bg-white p-9 text-lg shadow-xl"
         style={{ width: "520px" }}
       >
         <SlideContent headerText={header}>{content}</SlideContent>
@@ -97,7 +97,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
           hideModal={hideModal}
         />
         <div
-          className="h-1.5 bg-white absolute bottom-0 left-0 rounded-md"
+          className="absolute bottom-0 left-0 h-1.5 rounded-md bg-white"
           style={{ width: `${(current / slides.length) * 100}%` }}
         />
       </div>

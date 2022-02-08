@@ -111,7 +111,7 @@ function TeamNamePage({
         <OnboardingHeader>What should we call you?</OnboardingHeader>
         <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
       </OnboardingContent>
-      <div className="py-3 flex flex-col w-full">
+      <div className="flex w-full flex-col py-3">
         <TextInput
           value={inputValue}
           onChange={onChange}
@@ -183,9 +183,9 @@ function TeamMemberInvitationPage({
         <OnboardingHeader>Smells like team spirit</OnboardingHeader>
         <OnboardingBody>{`Replay is for your whole team. Invite anyone you’d like to record and discuss replays with`}</OnboardingBody>
       </OnboardingContent>
-      <div className="text-xl space-y-3 w-9/12">
-        <form className="flex flex-col w-full space-y-3 text-xl" onSubmit={handleAddMember}>
-          <div className="flex-grow flex flex-row space-x-3 text-black">
+      <div className="w-9/12 space-y-3 text-xl">
+        <form className="flex w-full flex-col space-y-3 text-xl" onSubmit={handleAddMember}>
+          <div className="flex flex-grow flex-row space-x-3 text-black">
             <TextInput
               placeholder="Email address"
               value={inputValue}
@@ -199,7 +199,7 @@ function TeamMemberInvitationPage({
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
         {!loading && sortedMembers ? (
-          <div className="overflow-auto w-full text-xl " style={{ maxHeight: "180px" }}>
+          <div className="w-full overflow-auto text-xl " style={{ maxHeight: "180px" }}>
             <WorkspaceMembers members={sortedMembers} isAdmin />
           </div>
         ) : null}

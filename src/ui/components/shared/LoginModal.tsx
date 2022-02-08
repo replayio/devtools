@@ -14,19 +14,19 @@ function LoginModal() {
   return (
     <div className="login-modal">
       <Modal showClose={false}>
-        <div className="px-6 py-3 space-y-5">
+        <div className="space-y-5 px-6 py-3">
           <div className="place-content-center">
-            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+            <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
           </div>
-          <div className="text-center space-y-1.5">
-            <div className="font-bold text-xl">Sign in required</div>
+          <div className="space-y-1.5 text-center">
+            <div className="text-xl font-bold">Sign in required</div>
             <div className="text-lg">You need to be signed in to leave a comment</div>
           </div>
-          <div className="flex items-center flex-col">
+          <div className="flex flex-col items-center">
             <button
               type="button"
               onClick={onClick}
-              className="inline-flex items-center px-3 py-1.5 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent"
+              className="inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-lg font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
             >
               Sign In
             </button>

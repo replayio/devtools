@@ -115,7 +115,7 @@ class EventListeners extends Component {
     return (
       <form className="event-search-form" onSubmit={e => e.preventDefault()}>
         <input
-          className={classnames("event-search-input px-2 py-1 bg-gray-100", { focused })}
+          className={classnames("event-search-input bg-gray-100 px-2 py-1", { focused })}
           placeholder={placeholder}
           value={searchText}
           onChange={this.onInputChange}
@@ -196,8 +196,8 @@ class EventListeners extends Component {
         <div className="">{label}</div>
         <ul className="event-listeners-list space-y-1">
           {isLoading ? (
-            <div className="flex items-center justify-center h-12">
-              <Spinner className="animate-spin h-4 w-4" />
+            <div className="flex h-12 items-center justify-center">
+              <Spinner className="h-4 w-4 animate-spin" />
             </div>
           ) : categories.length > 0 ? (
             categories.map((category, index) => this.renderCategoryItem(category, index))
@@ -250,10 +250,10 @@ class EventListeners extends Component {
 
     return (
       <div
-        className="event-listener-header flex flex-row justify-between w-full px-0"
+        className="event-listener-header flex w-full flex-row justify-between px-0"
         onClick={() => this.onCategoryToggle(category.name)}
       >
-        <div className="event-listener-header-label space-x-2 flex flex-row items-center">
+        <div className="event-listener-header-label flex flex-row items-center space-x-2">
           <button className="event-listener-expand pb-px">
             <AccessibleImage className={classnames("arrow", { expanded })} />
           </button>
@@ -299,9 +299,9 @@ class EventListeners extends Component {
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (
-      <li className="pl-2 flex flex-row items-center hover:bg-gray-100 rounded-md" key={event.id}>
-        <div className="flex flex-row justify-between w-full">
-          <label title={title} className="w-full flex flex-row items-center space-x-2">
+      <li className="flex flex-row items-center rounded-md pl-2 hover:bg-gray-100" key={event.id}>
+        <div className="flex w-full flex-row justify-between">
+          <label title={title} className="flex w-full flex-row items-center space-x-2">
             <Checkbox
               value={event.id}
               disabled={isHot}
@@ -309,7 +309,7 @@ class EventListeners extends Component {
               checked={activeEventListeners.includes(event.id)}
               className="m-0"
             />
-            <span className="event-listener-name flex-grow overflow-hidden whitespace-pre overflow-ellipsis">
+            <span className="event-listener-name flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
               {searchText ? this.renderCategory(category) : null}
               {event.name}
             </span>
@@ -323,7 +323,7 @@ class EventListeners extends Component {
   render() {
     const { searchText } = this.state;
     return (
-      <div className="event-listeners overflow-y-auto space-y-2">
+      <div className="event-listeners space-y-2 overflow-y-auto">
         <div className="event-search-container">{this.renderSearchInput()}</div>
         <div className="event-listeners-content">
           {searchText ? this.renderSearchResultsList() : this.renderCategories()}

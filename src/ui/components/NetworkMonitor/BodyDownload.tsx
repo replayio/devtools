@@ -16,7 +16,7 @@ const BodyDownload = ({ raw, filename }: { raw: RawBody; filename: string }) => 
 
   return (
     <a
-      className="block flex items-center ml-1"
+      className="ml-1 block flex items-center"
       href={dataURL}
       download={filename}
       target="_blank"

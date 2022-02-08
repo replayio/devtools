@@ -25,7 +25,7 @@ function CommandButton({ command, executeCommand, active }: CommandButtonProps) 
     <button
       key={label}
       onClick={onClick}
-      className={`${bgColors} px-6 py-2 flex justify-between transition`}
+      className={`${bgColors} flex justify-between px-6 py-2 transition`}
       ref={buttonNode}
     >
       <div>{label}</div>
