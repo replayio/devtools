@@ -4,7 +4,6 @@
 
 "use strict";
 
-import { Message } from "@recordreplay/protocol";
 import { Pause } from "protocol/thread";
 import { UIAction, UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -172,8 +171,12 @@ export function eagerEvalExpression(expression: string): UIThunkAction {
 async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptions = {}) {
   const { asyncIndex, frameId, pure } = options;
   //reminder that there would be no results if the function were impure -logan
-  const rv = await ThreadFront.evaluate(asyncIndex, frameId, expression, pure);
-  const { returned, exception, failed } = rv;
+  const { returned, exception, failed } = await ThreadFront.evaluate({
+    asyncIndex,
+    frameId,
+    text: expression,
+    pure,
+  });
 
   let v;
   if (failed || !(returned || exception)) {

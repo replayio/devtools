@@ -88,11 +88,10 @@ class ReplayWall implements Wall {
         }
         this.highlightedElementId = id;
 
-        const response = await ThreadFront.evaluate(
-          0,
-          undefined,
-          `${getDOMNodes}(${rendererID}, ${id})[0]`
-        );
+        const response = await ThreadFront.evaluate({
+          asyncIndex: 0,
+          text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
+        });
         if (!response.returned || this.highlightedElementId !== id) {
           return;
         }
@@ -147,11 +146,13 @@ class ReplayWall implements Wall {
 
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
-    const response = await ThreadFront.evaluate(
-      0,
-      undefined,
-      ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(payload)})`
-    );
+    const response = await ThreadFront.evaluate({
+      asyncIndex: 0,
+      text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
+        payload
+      )})`,
+    });
+
     if (response.returned) {
       const result: any = await response.returned.getJSON();
       this._listener?.({ event: result.event, payload: result.data });
@@ -167,7 +168,7 @@ class ReplayWall implements Wall {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id)) { map.set(node, id); } return map; }, new Map())`;
-      const response = await ThreadFront.evaluate(0, undefined, expr);
+      const response = await ThreadFront.evaluate({ asyncIndex: 0, text: expr });
       if (response.returned) {
         const entries = response.returned.previewContainerEntries();
         for (const { key, value } of entries) {

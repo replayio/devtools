@@ -16,6 +16,7 @@ import clamp from "lodash/clamp";
 import CodeMirror from "./CodeMirror";
 import uniq from "lodash/uniq";
 import { getEvaluatedProperties } from "../../utils/autocomplete-eager";
+import { evaluateExpression, paywallExpression } from "../../actions/input";
 
 enum Keys {
   BACKSPACE = "Backspace",
@@ -136,12 +137,12 @@ export default function JSTerm() {
   } = useAutocomplete(value);
 
   const onRegularKeyPress = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === Keys.ENTER) {
       e.preventDefault();
       execute();
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === Keys.ARROW_UP) {
       moveHistoryCursor(1);
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === Keys.ARROW_DOWN) {
       moveHistoryCursor(-1);
     }
   };
@@ -159,14 +160,16 @@ export default function JSTerm() {
     }
 
     if (
-      [
-        Keys.BACKSPACE,
-        Keys.ENTER,
-        Keys.TAB,
-        Keys.ESCAPE,
-        Keys.ARROW_RIGHT,
-        Keys.ARROW_LEFT,
-      ].includes(e.key as Keys)
+      (
+        [
+          Keys.BACKSPACE,
+          Keys.ENTER,
+          Keys.TAB,
+          Keys.ESCAPE,
+          Keys.ARROW_RIGHT,
+          Keys.ARROW_LEFT,
+        ] as string[]
+      ).includes(e.key)
     ) {
       setHideAutocomplete(true);
     }
@@ -198,9 +201,9 @@ export default function JSTerm() {
 
     const canEval = recording!.userRole !== "team-user";
     if (canEval) {
-      dispatch(actions.evaluateExpression(value));
+      dispatch(evaluateExpression(value));
     } else {
-      dispatch(actions.paywallExpression(value));
+      dispatch(paywallExpression(value));
     }
 
     setValue("");
