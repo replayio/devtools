@@ -103,15 +103,7 @@ const InspectorApp: FC = () => {
                   <div className="devtools-sidebar-tabs">
                     <div className="tabs">
                       <nav className="tabs-navigation">
-                        <ResponsiveTabs
-                          dropdownStyle={{
-                            background: "var(--theme-tab-toolbar-background)",
-                            border: "1px solid var(--theme-splitter-color)",
-                            borderRadius: "0 0 5px 5px",
-                            boxShadow: "3px 3px 3px 1px var(--popup-shadow-color)",
-                          }}
-                          activeIdx={availableTabs.indexOf(activeTab)}
-                        >
+                        <ResponsiveTabs activeIdx={availableTabs.indexOf(activeTab)}>
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
                             return (

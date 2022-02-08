@@ -57,6 +57,14 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   color: var(--theme-toolbar-color);
 }
 
+.tabs .responsive-tabs-dropdown {
+  background: var(--theme-tab-toolbar-background);
+  border: 1px solid var(--theme-splitter-color);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 3px 3px 3px 1px var(--popup-shadow-color);
+  z-index: 5;
+}
+
 .tabs .responsive-tabs-dropdown .tabs-menu-item {
   display: block;
 }
