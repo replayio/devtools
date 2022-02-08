@@ -40,13 +40,22 @@ function useGetScopeMatches(expression: string) {
 }
 function useGetEvalMatches(value: string) {
   const [matches, setMatches] = useState<string[]>([]);
+  const evalIdRef = useRef(0);
 
   useEffect(() => {
     async function updateMatches() {
+      setMatches([]);
       const propertyExpression = getPropertyExpression(value);
 
-      if (propertyExpression) {
-        const evaluatedProperties = await getEvaluatedProperties(propertyExpression.left);
+      if (!propertyExpression) {
+        return;
+      }
+
+      evalIdRef.current++;
+      const evalId = evalIdRef.current;
+
+      const evaluatedProperties = await getEvaluatedProperties(propertyExpression.left);
+      if (evalIdRef.current === evalId) {
         setMatches(evaluatedProperties);
       }
     }
