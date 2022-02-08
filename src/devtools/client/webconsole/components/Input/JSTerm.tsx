@@ -17,8 +17,12 @@ import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
 import CodeMirror from "./CodeMirror";
 import uniq from "lodash/uniq";
-import { getEvaluatedProperties } from "../../utils/autocomplete-eager";
+import { eagerEvaluateExpression, getEvaluatedProperties } from "../../utils/autocomplete-eager";
+
 import { evaluateExpression, paywallExpression } from "../../actions/input";
+const ObjectInspector =
+  require("devtools/client/webconsole/utils/connected-object-inspector").default;
+import { ValueFront } from "protocol/thread";
 
 enum Keys {
   BACKSPACE = "Backspace",
@@ -128,6 +132,18 @@ function useAutocomplete(expression: string) {
     showAutocomplete,
   };
 }
+
+function useEagerEvalPreview() {
+  const [grip, setGrip] = useState<ValueFront | null>(null);
+
+  const refreshEagerEval = async (expression: string) => {
+    const rv = await eagerEvaluateExpression(expression);
+    console.log(rv);
+    setGrip(rv);
+  };
+
+  return { refreshEagerEval, grip };
+}
 export default function JSTerm() {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
@@ -146,6 +162,12 @@ export default function JSTerm() {
     setHideAutocomplete,
     showAutocomplete,
   } = useAutocomplete(value);
+  const { refreshEagerEval, grip } = useEagerEvalPreview();
+
+  const onChange = (val: string) => {
+    setValue(val);
+    refreshEagerEval(val);
+  };
 
   const onRegularKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER) {
@@ -157,7 +179,6 @@ export default function JSTerm() {
       moveHistoryCursor(-1);
     }
   };
-
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER || e.key === Keys.TAB || e.key === Keys.ARROW_RIGHT) {
       e.preventDefault();
@@ -243,10 +264,11 @@ export default function JSTerm() {
           onKeyPress={onKeyPress}
           value={value}
           onSelection={onSelection}
-          setValue={setValue}
+          setValue={onChange}
           execute={execute}
         />
       </div>
+      {grip ? <ObjectInspector value={grip} /> : null}
       {showAutocomplete ? (
         <Autocomplete
           leftOffset={getCursorIndex(value)}

@@ -60,6 +60,8 @@ function GripMessageBody(props) {
     });
   }
 
+  console.log({ grip });
+
   return <ObjectInspector value={grip} {...objectInspectorProps} />;
 }
 
