@@ -10,6 +10,7 @@ export function createUserSettingsMock(): MockedResponse[] {
     disableLogRocket: false,
     enableEventLink: false,
     enableTeams: true,
+    showReact: true,
   };
   const rv = {
     request: {

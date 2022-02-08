@@ -50,7 +50,7 @@ const COMMANDS: Command[] = [
   { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+P" },
   { key: "open_outline", label: "Open Outline" },
   { key: "open_print_statements", label: "Open Print Statements" },
-  { key: "open_react_devtools", label: "Open React DevTools" },
+  { key: "open_react_devtools", label: "Open React DevTools", settingKey: "showReact" },
   { key: "open_sources", label: "Open Sources" },
   { key: "show_comments", label: "Show Comments" },
   { key: "show_console_filters", label: "Show Console Filters" },

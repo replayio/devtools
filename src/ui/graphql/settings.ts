@@ -16,6 +16,7 @@ export const GET_USER_SETTINGS = gql`
         enableEventLink
         enableRepaint
         enableTeams
+        showReact
       }
       defaultWorkspace {
         id

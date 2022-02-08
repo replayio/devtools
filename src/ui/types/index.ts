@@ -11,6 +11,7 @@ export type UserSettings = {
   disableLogRocket: boolean;
   enableEventLink: boolean;
   enableTeams: boolean;
+  showReact: boolean;
 };
 
 export type LocalUserSettings = {
