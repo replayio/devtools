@@ -17,6 +17,7 @@ const emptySettings: UserSettings = {
   disableLogRocket: false,
   enableEventLink: false,
   enableTeams: true,
+  showReact: false,
 };
 
 const testSettings: UserSettings = {
@@ -25,6 +26,7 @@ const testSettings: UserSettings = {
   disableLogRocket: false,
   enableEventLink: false,
   enableTeams: true,
+  showReact: true,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
@@ -94,6 +96,7 @@ function convertUserSettings(data: any): UserSettings {
     disableLogRocket: settings.disableLogRocket,
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
+    showReact: settings.showReact,
   };
 }
 

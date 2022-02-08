@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -35,6 +35,9 @@ function PanelButtons({
   selectedPanel,
   setSelectedPanel,
 }: PanelButtonsProps) {
+  const { userSettings } = hooks.useGetUserSettings();
+  const { showReact } = userSettings;
+
   const onClick = (panel: SecondaryPanelName) => {
     setSelectedPanel(panel);
     trackEvent(`toolbox.secondary.${panel}_select`);
@@ -65,7 +68,7 @@ function PanelButtons({
           <div className="label">Elements</div>
         </button>
       )}
-      {hasReactComponents && (
+      {hasReactComponents && showReact && (
         <button
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
@@ -115,7 +118,12 @@ function SecondaryToolbox({
   recordingTarget,
   hasReactComponents,
 }: PropsFromRedux) {
+  const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
+
+  if (selectedPanel === "react-components" && !(userSettings.showReact && hasReactComponents)) {
+    setSelectedPanel("console");
+  }
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>

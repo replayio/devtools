@@ -13,6 +13,11 @@ interface ExperimentalSetting {
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
+    label: "React DevTools",
+    description: "Inspect the React component tree",
+    key: "showReact",
+  },
+  {
     label: "Event Link",
     description: "Jump from an event to a line of code",
     key: "enableEventLink",
@@ -50,6 +55,7 @@ export default function ExperimentalSettings({}) {
 
   // TODO: This is bad and should be updated with a better generalized hook
   const updateEventLink = hooks.useUpdateUserSetting("enableEventLink", "Boolean");
+  const updateReact = hooks.useUpdateUserSetting("showReact", "Boolean");
 
   const [enableCommentAttachments, setEnableCommentAttachments] = useState(
     !!features.commentAttachments
@@ -61,6 +67,8 @@ export default function ExperimentalSettings({}) {
     } else if (key === "enableCommentAttachments") {
       features.commentAttachments = value;
       setEnableCommentAttachments(!!features.commentAttachments);
+    } else if (key === "showReact") {
+      updateReact({ variables: { newValue: value } });
     }
   };
 
