@@ -1,5 +1,13 @@
 import cx from "classnames";
-import React, { CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
+import React, {
+  CSSProperties,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 type ResponsiveTabsProps = {
   className?: string;
@@ -30,7 +38,7 @@ export const ResponsiveTabs = ({
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const recalcTabsVisibilityAndOrder = () => {
+  const recalcTabsVisibilityAndOrder = useCallback(() => {
     const containerWidth = containerRef.current?.clientWidth ?? 0;
 
     // we will always close dropdown when resizing
@@ -44,6 +52,7 @@ export const ResponsiveTabs = ({
 
     if (totalTabsWidth <= containerWidth) {
       setVisibleItemsCount(tabsRef.current.length);
+      setIndicesOrder(Array.from({ length: tabs.length }).map((_, idx) => idx));
       return;
     }
 
@@ -51,6 +60,13 @@ export const ResponsiveTabs = ({
     // so let's calc which items are visible
     const dropdownButtonWidth = dropdownRef.current?.clientWidth ?? 0;
     const activeTabWidth = tabsRef.current[activeIdx].clientWidth ?? 0;
+
+    console.table(
+      tabsRef.current.map(t => ({
+        text: t.querySelector("a")!.innerText,
+        width: t.clientWidth,
+      }))
+    );
 
     let visibleCount = 1;
     let tabIndices: number[] = [activeIdx];
@@ -61,25 +77,24 @@ export const ResponsiveTabs = ({
         continue;
       }
 
-      const tab = tabsRef.current[idx];
+      runningWidth += tabsRef.current[idx].clientWidth;
 
-      if (runningWidth + tab.clientWidth <= containerWidth) {
+      if (runningWidth <= containerWidth) {
         if (idx < activeIdx) {
           tabIndices.pop();
           tabIndices = [...tabIndices, idx, activeIdx];
         } else {
-          tabIndices = [...tabIndices, idx];
+          tabIndices.push(idx);
         }
         visibleCount++;
       } else {
-        tabIndices = [...tabIndices, idx];
+        tabIndices.push(idx);
       }
-      runningWidth += tab.clientWidth;
     }
 
     setVisibleItemsCount(visibleCount);
     setIndicesOrder(tabIndices);
-  };
+  }, [activeIdx, tabs.length]);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -92,14 +107,20 @@ export const ResponsiveTabs = ({
 
     ro.observe(containerRef.current);
 
+    const container = containerRef.current;
+
     return () => {
-      ro.disconnect();
+      ro.unobserve(container);
     };
-  }, []);
+  }, [recalcTabsVisibilityAndOrder]);
 
   useEffect(() => {
     recalcTabsVisibilityAndOrder();
-  }, [activeIdx]);
+  }, [activeIdx, recalcTabsVisibilityAndOrder]);
+
+  useEffect(() => {
+    recalcTabsVisibilityAndOrder();
+  }, []);
 
   useEffect(() => {
     const handleClick = (e: any) => {
@@ -116,6 +137,16 @@ export const ResponsiveTabs = ({
 
   const orderedTabs = indicesOrder.map(idx => tabs[idx]);
   const hasDropdown = visibleItemsCount < tabs.length;
+
+  console.log(`active idx: ${activeIdx}`);
+
+  console.log("order: " + indicesOrder.join(", "));
+
+  console.log("visible: " + visibleItemsCount);
+
+  console.log(
+    indicesOrder.map(idx => tabsRef.current[idx]?.querySelector("a")!.innerText).join(", ")
+  );
 
   return (
     <div className="relative max-w-full">
