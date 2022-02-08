@@ -214,6 +214,8 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
 
 const DEFAULT_TAB = "headers";
 
+export type NetworkTab = "headers" | "cookies" | "response" | "request" | "stackTrace" | "timings";
+
 const RequestDetails = ({
   closePanel,
   cx,
@@ -231,11 +233,11 @@ const RequestDetails = ({
   requestBody: RequestBodyData[] | undefined;
   selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
-  const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
+  const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
 
   const { value: httpBodies } = useFeature("httpBodies");
 
-  const tabs = [
+  const tabs: readonly { id: NetworkTab; title: string; visible: boolean }[] = [
     { id: "headers", title: "Headers", visible: true },
     {
       id: "cookies",
@@ -262,10 +264,7 @@ const RequestDetails = ({
 
   return (
     <div className="bg-white border-l min-w-full overflow-scroll">
-      <div
-        className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0"
-        style={{ height: 25 }}
-      >
+      <div className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0">
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
       </div>

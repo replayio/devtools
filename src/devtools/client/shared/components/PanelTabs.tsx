@@ -1,36 +1,12 @@
+import React from "react";
+import cx from "classnames";
+import { NetworkTab } from "ui/components/NetworkMonitor/RequestDetails";
+
 type Tab = {
-  id: string;
+  id: NetworkTab;
   title: string;
   visible: boolean;
 };
-
-function PanelTab({
-  activeTab,
-  setActiveTab,
-  tab,
-}: {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  tab: Tab;
-}) {
-  const isActive = activeTab == tab.id;
-
-  const className = `tabs-menu-item ${isActive && "is-active"}`;
-  return (
-    <li key={tab.id} className={className} role="presentation">
-      <span className="devtools-tab-line"></span>
-      <a
-        id={`${tab.id}-tab`}
-        onClick={() => setActiveTab(tab.id)}
-        role="tab"
-        tabIndex={0}
-        title={tab.title}
-      >
-        {tab.title}
-      </a>
-    </li>
-  );
-}
 
 export default function PanelTabs({
   activeTab,
@@ -38,8 +14,8 @@ export default function PanelTabs({
   tabs,
 }: {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
-  tabs: Tab[];
+  setActiveTab: (tab: NetworkTab) => void;
+  tabs: readonly Tab[];
 }) {
   return (
     <div className="devtools-sidebar-tabs">
@@ -49,12 +25,22 @@ export default function PanelTabs({
             {tabs
               .filter(t => t.visible)
               .map((tab: Tab) => (
-                <PanelTab
+                <li
                   key={tab.id}
-                  setActiveTab={setActiveTab}
-                  tab={tab}
-                  activeTab={activeTab}
-                />
+                  className={cx("tabs-menu-item", { "is-active": activeTab == tab.id })}
+                  role="presentation"
+                >
+                  <span className="devtools-tab-line"></span>
+                  <a
+                    id={`${tab.id}-tab`}
+                    onClick={() => setActiveTab(tab.id)}
+                    role="tab"
+                    tabIndex={0}
+                    title={tab.title}
+                  >
+                    {tab.title}
+                  </a>
+                </li>
               ))}
           </ul>
         </nav>

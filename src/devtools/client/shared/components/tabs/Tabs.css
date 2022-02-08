@@ -19,9 +19,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 .tabs .tabs-navigation {
   box-sizing: border-box;
   display: flex;
-  /* height: 27px; */
   position: relative;
-  border-bottom: 1px solid var(--theme-splitter-color);
   background: var(--theme-tab-toolbar-background);
 }
 

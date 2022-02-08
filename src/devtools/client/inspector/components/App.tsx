@@ -14,7 +14,7 @@ import { InspectorActiveTab } from "../state";
 import "ui/setup/dynamic/inspector";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
 import { assert } from "protocol/utils";
-import { ResponsiveTabs } from "../ResponsiveTabs";
+import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
 
 const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
   ruleview: "Rules",
@@ -102,7 +102,12 @@ const InspectorApp: FC = () => {
                 <div id="inspector-sidebar">
                   <div className="devtools-sidebar-tabs">
                     <div className="tabs">
-                      <nav className="tabs-navigation">
+                      <nav
+                        className="tabs-navigation"
+                        style={{
+                          borderBottom: "1px solid var(--theme-splitter-color)",
+                        }}
+                      >
                         <ResponsiveTabs activeIdx={availableTabs.indexOf(activeTab)}>
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
