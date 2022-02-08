@@ -7,9 +7,10 @@ import {
   Identifier,
 } from "@babel/types";
 import generate from "@babel/generator";
-import { ThreadFront } from "protocol/thread";
+import { ThreadFront, ValueFront } from "protocol/thread";
 import Error from "next/error";
 import { createConsoleLogger } from "launchdarkly-js-client-sdk";
+import { WiredObject } from "protocol/thread/pause";
 const { filter } = require("fuzzaldrin-plus");
 
 type PropertyExpression = {
@@ -40,19 +41,6 @@ type ObjectFront = {
   className: string;
   objectId: string;
   preview?: ObjectPreview;
-};
-
-type ValueFront = {
-  _pause: any;
-  _hasPrimitive: false;
-  _primitive?: boolean;
-  _isBigInt: boolean;
-  _isSymbol: boolean;
-  _object: ObjectFront;
-  _uninitialized: boolean;
-  _unavailable: boolean;
-  _elements: null;
-  _isMapEntry: null;
 };
 
 type Binding = {
@@ -118,7 +106,7 @@ export function isDotNotation(str: string) {
   return isMemberExpression(str + PROPERTY_PLACEHOLDER);
 }
 
-function getPropertiesForObject(object?: ObjectFront): string[] {
+function getPropertiesForObject(object?: ObjectFront | WiredObject | null): string[] {
   const properties = [];
 
   if (!object) {
@@ -145,8 +133,8 @@ function getPropertiesForObject(object?: ObjectFront): string[] {
   const prototype = object.preview?.prototypeValue;
 
   // Recursively gather the properties through the prototype chain.
-  if (prototype?._object) {
-    const prototypeProperties = getPropertiesForObject(prototype._object);
+  if (prototype?.getObject()) {
+    const prototypeProperties = getPropertiesForObject(prototype.getObject());
     properties.unshift(...prototypeProperties);
   }
 
@@ -164,7 +152,7 @@ function getBindingNames(scope: Scope): string[] {
   return scope.bindings.map(b => b.name);
 }
 function getGlobalVariables(scopes: Scope) {
-  return getPropertiesForObject(scopes.parent.object?._object);
+  return getPropertiesForObject(scopes.parent.object?.getObject());
 }
 
 function getPropertyValue(property: StringLiteral | Identifier) {
@@ -244,7 +232,7 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
     const properties = [];
     const { left, right } = propertyExpression;
 
-    const object = getBinding(left, scope)?.value._object;
+    const object = getBinding(left, scope)?.value.getObject();
     if (object) {
       properties.push(...getPropertiesForObject(object));
     }
@@ -257,33 +245,9 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
 
   return [];
 }
-// export async function getAutocompleteMatches(input: string, scope: Scope) {
-//   const propertyExpression = getPropertyExpression(input);
-
-//   if (propertyExpression) {
-//     const properties = [];
-//     const { left, right } = propertyExpression;
-
-//     const object = getBinding(left, scope)?.value._object;
-//     if (object) {
-//       properties.push(...getPropertiesForObject(object));
-//     }
-
-//     console.log("1");
-
-//     const evaluatedProperties = await getEvaluatedProperties(left);
-
-//     return fuzzyFilter([...evaluatedProperties], normalizeString(right));
-//   } else if (shouldVariableAutocomplete(input)) {
-//     const variableNames = [...getBindingNames(scope), ...getGlobalVariables(scope)];
-//     return fuzzyFilter(variableNames, normalizeString(input));
-//   }
-
-//   return [];
-// }
 
 // Use eager eval to get the properties of the last complete object in the expression.
-async function getEvaluatedProperties(expression: string): Promise<string[]> {
+export async function getEvaluatedProperties(expression: string): Promise<string[]> {
   const { asyncIndex, frameId } = gToolbox.getPanel("debugger")!.getFrameId();
   let properties: string[] = [];
 
@@ -295,8 +259,7 @@ async function getEvaluatedProperties(expression: string): Promise<string[]> {
       true
     );
     if (returned && !(failed || exception)) {
-      const evaluatedProperties = getPropertiesForObject(returned._object);
-      console.log({ evaluatedProperties });
+      const evaluatedProperties = getPropertiesForObject(returned.getObject());
       properties.push(...evaluatedProperties);
     }
   } catch (err: any) {

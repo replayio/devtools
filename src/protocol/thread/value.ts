@@ -108,6 +108,10 @@ export class ValueFront {
     return !!this._object;
   }
 
+  getObject() {
+    return this._object;
+  }
+
   objectId() {
     return this._object?.objectId;
   }

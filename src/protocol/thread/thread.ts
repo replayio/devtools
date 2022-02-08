@@ -620,7 +620,12 @@ class _ThreadFront {
     return await pause.getScopes(frameId);
   }
 
-  async evaluate(asyncIndex: number, frameId: FrameId | undefined, text: string, pure: boolean) {
+  async evaluate(
+    asyncIndex: number,
+    frameId: FrameId | undefined,
+    text: string,
+    pure: boolean = false
+  ) {
     await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause);
