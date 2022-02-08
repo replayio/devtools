@@ -10,17 +10,11 @@ export type UserSettings = {
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
   enableEventLink: boolean;
-  enableGlobalSearch: boolean;
-  enableNetworkMonitor: boolean;
-  enableRepaint: boolean;
   enableTeams: boolean;
-  showElements: boolean;
-  showReact: boolean;
 };
 
 export type LocalUserSettings = {
   enableCommentAttachments: boolean;
-  enableHttpBodies: boolean;
 };
 
 export type CombinedUserSettings = UserSettings & LocalUserSettings;
@@ -133,6 +127,12 @@ export interface Recording {
   comments?: any;
   userRole?: RecordingRole;
   operations: OperationsData;
+  collaboratorRequests: CollaboratorRequest[];
+}
+
+export interface CollaboratorRequest {
+  user: User;
+  id: string;
 }
 
 export interface OperationsData {

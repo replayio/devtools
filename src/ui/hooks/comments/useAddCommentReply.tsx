@@ -64,6 +64,9 @@ export default function useAddCommentReply() {
         });
 
         const parentComment = data.recording.comments.find((r: any) => r.id === reply.parentId);
+        if (!parentComment) {
+          return;
+        }
         const newReply = {
           id: commentReply.id,
           content: reply.content,

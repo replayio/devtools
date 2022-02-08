@@ -11,7 +11,7 @@ import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
-import { PrimaryPanelName } from "ui/state/app";
+import { PrimaryPanelName } from "ui/state/layout";
 import classNames from "classnames";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {

@@ -8,6 +8,7 @@ import * as actions from "ui/actions/app";
 import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
 import { useConfirm } from "../Confirm";
+import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
 
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
@@ -58,7 +59,15 @@ function WorkspaceMemberRoleOption({
   );
 }
 
-function WorkspaceMemberRoles({ isAdmin, member }: { isAdmin: boolean; member: WorkspaceUser }) {
+function WorkspaceMemberRoles({
+  isAdmin,
+  member,
+  onClick,
+}: {
+  isAdmin: boolean;
+  member: WorkspaceUser;
+  onClick: () => void;
+}) {
   const role: WorkspaceUserRole = getMemberRole(member);
   const { updateWorkspaceMemberRole } = hooks.useUpdateWorkspaceMemberRole();
   const [selectedRole, setSelectedRole] = useState<WorkspaceUserRole>(role);
@@ -66,6 +75,7 @@ function WorkspaceMemberRoles({ isAdmin, member }: { isAdmin: boolean; member: W
   useEffect(() => setSelectedRole(role), [role]);
 
   const selectRole = (updated: WorkspaceUserRole) => {
+    onClick();
     const roles: WorkspaceUserRole[] = ["viewer"];
     if (updated === "admin") {
       roles.push("debugger");
@@ -166,13 +176,15 @@ export function NonRegisteredWorkspaceMember({
         buttonStyle=""
         position="bottom-right"
       >
-        <div className="old-portal">
-          <WorkspaceMemberRoles member={member} isAdmin={isAdmin} />
-          <hr />
-          <div className="permissions-dropdown-item" onClick={handleDelete}>
-            Remove
-          </div>
-        </div>
+        <Dropdown>
+          <WorkspaceMemberRoles
+            member={member}
+            isAdmin={isAdmin}
+            onClick={() => setExpanded(false)}
+          />
+          <DropdownDivider />
+          <DropdownItem onClick={handleDelete}>Remove</DropdownItem>
+        </Dropdown>
       </PortalDropdown>
     </li>
   );
@@ -236,11 +248,21 @@ function Role({
       buttonStyle=""
       position="bottom-right"
     >
-      {localUserId !== userId ? <WorkspaceMemberRoles member={member} isAdmin={isAdmin} /> : null}
-      <hr />
-      <div className="permissions-dropdown-item" onClick={handleDelete}>
-        {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
-      </div>
+      <Dropdown>
+        {localUserId !== userId ? (
+          <>
+            <WorkspaceMemberRoles
+              member={member}
+              isAdmin={isAdmin}
+              onClick={() => setExpanded(false)}
+            />
+            <DropdownDivider />
+          </>
+        ) : null}
+        <DropdownItem onClick={handleDelete}>
+          {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
+        </DropdownItem>
+      </Dropdown>
     </PortalDropdown>
   );
 }

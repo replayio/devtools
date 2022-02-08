@@ -18,20 +18,23 @@
 
   --devtools-splitter-top-width: 2px;
   --devtools-splitter-bottom-width: 2px;
-  --devtools-horizontal-splitter-min-height: calc(var(--devtools-splitter-top-width) +
-                                                  var(--devtools-splitter-bottom-width) +
-                                                  var(--devtools-splitter-element-size));
-  --devtools-emphasized-horizontal-splitter-min-height: calc(var(--devtools-splitter-top-width) +
-                                                             var(--devtools-splitter-bottom-width) +
-                                                             var(--devtools-emphasized-splitter-element-size));
+  --devtools-horizontal-splitter-min-height: calc(
+    var(--devtools-splitter-top-width) + var(--devtools-splitter-bottom-width) +
+      var(--devtools-splitter-element-size)
+  );
+  --devtools-emphasized-horizontal-splitter-min-height: calc(
+    var(--devtools-splitter-top-width) + var(--devtools-splitter-bottom-width) +
+      var(--devtools-emphasized-splitter-element-size)
+  );
 
   /* Small draggable area on inline-start to avoid overlaps on scrollbars.*/
   --devtools-splitter-inline-start-width: 1px;
   --devtools-splitter-inline-end-width: 4px;
 
-  --devtools-vertical-splitter-min-width: calc(var(--devtools-splitter-inline-start-width) +
-                                               var(--devtools-splitter-inline-end-width) +
-                                               var(--devtools-splitter-element-size));
+  --devtools-vertical-splitter-min-width: calc(
+    var(--devtools-splitter-inline-start-width) + var(--devtools-splitter-inline-end-width) +
+      var(--devtools-splitter-element-size)
+  );
 }
 
 #appcontent[devtoolstheme="light"] {

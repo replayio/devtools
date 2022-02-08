@@ -1,34 +1,43 @@
 import { SessionId } from "@recordreplay/protocol";
-import mixpanel, { Dict } from "mixpanel-browser";
+import mixpanel from "mixpanel-browser";
 import { getRecordingId } from "./recording";
-import { ViewMode } from "ui/state/layout";
+import { PrimaryPanelName, SecondaryPanelName, ViewMode } from "ui/state/layout";
 import { isReplayBrowser, skipTelemetry } from "./environment";
 import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
-import { PrimaryPanelName, SecondaryPanelName, WorkspaceId } from "ui/state/app";
+import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
+import { InspectorActiveTab } from "devtools/client/inspector/state";
+import { decodeWorkspaceId } from "./workspace";
+import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/PanelSummary";
 
 type MixpanelEvent =
+  | ["breakpoint.add_comment"]
   | ["breakpoint.minus_click"]
   | ["breakpoint.plus_click"]
+  | ["breakpoint.preview_hits", { hitsCount: number | null }]
   | ["breakpoint.preview_has_hits"]
   | ["breakpoint.preview_no_hits"]
   | ["breakpoint.remove"]
   | ["breakpoint.set_condition"]
   | ["breakpoint.set_log"]
+  | ["breakpoint.start_edit", { input: Input; hitsCount: number | null }]
+  | ["breakpoint.too_many_points"]
   | ["comments.create"]
   | ["comments.delete"]
   | ["comments.focus"]
   | ["comments.select_location"]
   | ["comments.start_edit"]
   | ["console.clear_messages"]
+  | ["console.overflow"]
   | ["events_timeline.select"]
   | ["events_timeline.select_source"]
   | ["error.unauthenticated_viewer"]
   | ["error.unauthorized_viewer"]
+  | ["gutter.add_comment"]
   | ["header.open_share"]
   | ["header.edit_title"]
-  | ["gutter.add_comment"]
+  | ["inspector.select_tab", { tab: InspectorActiveTab }]
   | ["key_shortcut.full_text_search"]
   | ["key_shortcut.show_command_palette"]
   | ["key_shortcut.toggle_left_sidebar"]
@@ -57,7 +66,7 @@ type MixpanelEvent =
   | ["onboarding.started_onboarding"]
   | ["onboarding.team_invite"]
   | ["quick_open.open_quick_open"]
-  | ["session.devtools_start", { userIsAuthor: boolean }]
+  | ["session.devtools_start", { userIsAuthor: boolean; workspaceUuid: WorkspaceUuid | null }]
   | ["session_end", { reason: string }]
   | ["session_start", { workspaceId: WorkspaceId | null }]
   | ["share_modal.copy_link"]
@@ -65,6 +74,7 @@ type MixpanelEvent =
   | ["share_modal.set_public"]
   | ["share_modal.set_team"]
   | ["team_change", { workspaceId: WorkspaceId | null }]
+  | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
   | ["timeline.comment_select"]
   | ["timeline.marker_select"]
   | ["timeline.pause"]
@@ -77,7 +87,7 @@ type MixpanelEvent =
   | ["toolbox.secondary.video_toggle"]
   | ["toolbox.toggle_sidebar"]
   | ["upload.complete", { sessionId: SessionId }]
-  | ["upload.create_replay", { isDemo: boolean }]
+  | ["upload.create_replay", { isDemo: boolean; workspaceUuid: WorkspaceUuid | null }]
   | ["upload.discard", { isDemo: boolean }]
   | ["user_options.launch_replay"]
   | ["user_options.select_docs"]
@@ -114,6 +124,7 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
     setMixpanelContext(userInfo);
     enableMixpanel();
     trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
+    timeMixpanelEvent("session.devtools_start");
     setupSessionEndListener();
   } else {
     disableMixpanel();
@@ -122,8 +133,13 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
 
 export const maybeTrackTeamChange = (newWorkspaceId: WorkspaceId | null) => {
   if (!mixpanelDisabled) {
-    mixpanel.people.set({ workspaceId: newWorkspaceId });
-    trackMixpanelEvent("team_change", { workspaceId: newWorkspaceId });
+    // We use the uuid here so it's easy to cross reference the id
+    // to the team record in the database.
+    const uuid = decodeWorkspaceId(newWorkspaceId);
+    // Leaving the workspaceId here temporarily while we migrate to
+    // the new Uuid way. Delete this by the end of 2/22.
+    mixpanel.people.set({ workspaceId: newWorkspaceId, workspaceUuid: uuid });
+    trackMixpanelEvent("team.change_default", { workspaceUuid: uuid });
   }
 };
 
@@ -140,6 +156,11 @@ export async function trackMixpanelEvent(...[event, properties]: [...MixpanelEve
 
   if (!mixpanelDisabled) {
     mixpanel.track(event, { ...properties, namespace: namespaceFromEventName(event) });
+  }
+}
+export async function timeMixpanelEvent(event: MixpanelEvent[0]) {
+  if (!mixpanelDisabled) {
+    mixpanel.time_event(event);
   }
 }
 
@@ -187,7 +208,7 @@ export const trackViewMode = (viewMode: ViewMode) =>
 export const startUploadWaitTracking = () => {
   // This one gets tracked in Honeycomb.
   trackTiming("kpi-time-to-view-replay");
-  mixpanel.time_event("upload.complete");
+  timeMixpanelEvent("upload.complete");
 };
 export const endUploadWaitTracking = (sessionId: SessionId) => {
   // This one gets tracked in Honeycomb.

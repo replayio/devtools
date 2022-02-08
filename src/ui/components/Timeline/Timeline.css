@@ -128,10 +128,10 @@
 .timeline .progress-line,
 .breakpoint-navigation-timeline .progress-line {
   width: 0%;
-  height: 3px;
+  height: 5px;
   border-radius: 4px;
   /* border-top: 3px dashed var(--primary-accent); */
-  border-top: 3px solid var(--primary-accent);
+  border-top: 5px solid var(--primary-accent);
   position: absolute;
   pointer-events: none;
   margin-top: auto;
@@ -182,13 +182,20 @@
 }
 
 .timeline .progress-line-paused {
-  height: 9px;
-  width: 9px;
+  height: 11px;
+  width: 11px;
   border-radius: 50%;
   background: var(--secondary-accent);
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+  cursor: grab;
+}
+
+.timeline .progress-line-paused:hover {
+  width: 15px;
+  height: 15px;
+  cursor: grab;
 }
 
 /* Timeline timestamp */

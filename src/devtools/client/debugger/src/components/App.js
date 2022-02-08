@@ -23,7 +23,7 @@ import {
   getSelectedSource,
 } from "../selectors";
 
-import { getSelectedPanel } from "ui/reducers/app";
+import { getSelectedPanel } from "ui/reducers/layout";
 import { getShowEditor } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 
@@ -83,9 +83,7 @@ class Debugger extends Component {
     globalShortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
 
-    if (this.props.enableGlobalSearch) {
-      globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
-    }
+    globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
     globalShortcuts.on("Cmd+/", this.onCommandSlash);
 
     this.shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
@@ -99,9 +97,7 @@ class Debugger extends Component {
     globalShortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     globalShortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
 
-    if (this.props.enableGlobalSearch) {
-      globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
-    }
+    globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
     globalShortcuts.off("Cmd+/", this.onCommandSlash);
 
     this.shortcuts.off("Ctrl+G", this.toggleLineQuickOpenModal);
@@ -260,7 +256,6 @@ class Debugger extends Component {
         additionalClass={additionalClass}
         enabled={this.state.shortcutsModalEnabled}
         handleClose={() => this.toggleShortcutsModal()}
-        enableGlobalSearch={this.props.enableGlobalSearch}
       />
     );
   }
@@ -293,7 +288,7 @@ Debugger.childContextTypes = {
 function DebuggerLoader(props) {
   const [loadingEditor, setLoadingEditor] = useState(true);
   const wrapperNode = useRef();
-  const { userSettings, loading: loadingSettings } = useGetUserSettings();
+  const { loading: loadingSettings } = useGetUserSettings();
 
   useEffect(() => {
     (async () => {
@@ -309,11 +304,7 @@ function DebuggerLoader(props) {
   return (
     <div className="debugger" ref={wrapperNode}>
       {loadingEditor || loadingSettings ? null : (
-        <Debugger
-          {...props}
-          wrapper={wrapperNode.current}
-          enableGlobalSearch={userSettings.enableGlobalSearch}
-        />
+        <Debugger {...props} wrapper={wrapperNode.current} />
       )}
     </div>
   );

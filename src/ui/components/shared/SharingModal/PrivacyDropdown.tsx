@@ -10,32 +10,31 @@ import { isPublicDisabled } from "ui/utils/org";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>
-    {`Members of `}
-    <span className="underline">{name}</span>
+    <span className="font-bold">{name}</span>
     {` can view`}
   </span>
 );
 
 export function getPrivacySummaryAndIcon(recording: Recording) {
   if (!recording.private) {
-    return { icon: "link", summary: "Anyone with the link can view" };
+    return { icon: "globe", summary: "Anyone with the link can view" };
   }
 
   if (recording.workspace) {
     return {
-      icon: "domain",
+      icon: "group",
       summary: <WorkspacePrivacySummary workspace={recording.workspace} />,
     };
   }
 
   // If the recording is private and in an individual's library.
-  return { icon: "group", summary: "Only people with access can view" };
+  return { icon: "lock", summary: "Only people with access can view" };
 }
 
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
   return (
     <div className="flex flex-row space-x-1">
-      <span className="text-xs overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
+      <span className="text-xs whitespace-pre">{children}</span>
       {!disabled ? (
         <div style={{ lineHeight: "0px" }}>
           <MaterialIcon>expand_more</MaterialIcon>
@@ -52,15 +51,16 @@ function useGetPrivacyOptions(
   const isPrivate = recording.private;
   const workspaceId = recording.workspace?.id || null;
   const { workspaces } = hooks.useGetNonPendingWorkspaces();
-  const isOwner = hooks.useIsOwner(recording.id || "00000000-0000-0000-0000-000000000000");
+  const isOwner = hooks.useIsOwner();
 
   const userBelongsToTeam = workspaceId && workspaces.find(w => w.id === workspaceId);
 
-  const toggleIsPrivate = hooks.useToggleIsPrivate(recording.id, isPrivate);
+  const updateIsPrivate = hooks.useUpdateIsPrivate();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace(false);
 
   const options: ReactNode[] = [];
 
+  const toggleIsPrivate = () => updateIsPrivate(recording.id, !isPrivate);
   const setPublic = () => {
     trackEvent("share_modal.set_public");
     if (isPrivate) {
@@ -87,9 +87,11 @@ function useGetPrivacyOptions(
 
   if (!isPublicDisabled(workspaces, workspaceId)) {
     options.push(
-      <DropdownItem onClick={setPublic}>
-        <DropdownItemContent icon="link" selected={!isPrivate}>
-          Anyone with the link
+      <DropdownItem onClick={setPublic} key="option-public">
+        <DropdownItemContent icon="globe" selected={!isPrivate}>
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+            Anyone with the link
+          </span>
         </DropdownItemContent>
       </DropdownItem>
     );
@@ -99,16 +101,18 @@ function useGetPrivacyOptions(
     // This gives the user who owns the recording the option to move the recording
     // to their library, or any team they belong to.
     options.push(
-      <DropdownItem onClick={() => handleMoveToTeam(null)}>
-        <DropdownItemContent icon="domain" selected={isPrivate && !workspaceId}>
-          Only people with access
+      <DropdownItem onClick={() => handleMoveToTeam(null)} key="option-private">
+        <DropdownItemContent icon="lock" selected={isPrivate && !workspaceId}>
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+            Only people with access
+          </span>
         </DropdownItemContent>
       </DropdownItem>,
-      <div>
+      <div key="option-team">
         {workspaces.map(({ id, name }) => (
           <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
             <DropdownItemContent icon="group" selected={isPrivate && id === workspaceId}>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
                 Members of {name}
               </span>
             </DropdownItemContent>
@@ -120,9 +124,9 @@ function useGetPrivacyOptions(
     // This gives a user who belongs to the replay's team an option to set it to private
     // without moving the replay's team.
     options.push(
-      <DropdownItem onClick={setPrivate}>
+      <DropdownItem onClick={setPrivate} key="option-private">
         <DropdownItemContent icon="group" selected={isPrivate}>
-          <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Members of {recording.workspace?.name || "this team"}
           </span>
         </DropdownItemContent>
@@ -139,7 +143,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   const privacyOptions = useGetPrivacyOptions(recording, setExpanded);
   const { summary } = getPrivacySummaryAndIcon(recording);
 
-  if (!privacyOptions.length) {
+  if (privacyOptions.length <= 1) {
     return (
       <div
         title={

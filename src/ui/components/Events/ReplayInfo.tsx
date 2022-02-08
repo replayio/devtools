@@ -5,11 +5,14 @@ import { formatRelativeTime } from "ui/utils/comments";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { AvatarImage } from "../Avatar";
 import MaterialIcon from "../shared/MaterialIcon";
+import Icon from "../shared/Icon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
+import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
+import useAuth0 from "ui/utils/useAuth0";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
   const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
@@ -27,6 +30,7 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
 
 function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
+  const { isAuthenticated } = useAuth0();
 
   if (!recording) return null;
 
@@ -38,8 +42,8 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-grow overflow-auto overflow-x-hidden flex flex-column items-center bg-white border-splitter">
-      <div className="flex flex-col p-1.5 self-stretch space-y-1.5 w-full text-xs group">
+    <div className="flex overflow-hidden flex flex-column items-center bg-white border-splitter">
+      <div className="flex flex-col my-1.5 px-1.5 self-stretch w-full text-xs pb-0 overflow-hidden cursor-default">
         {recording.user ? (
           <Row>
             <AvatarImage className="h-5 w-5 rounded-full avatar" src={recording.user.picture} />
@@ -47,16 +51,34 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-        <Row>
-          <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
-          <div>{summary}</div>
-        </Row>
-        <Row>
-          <MaterialIcon iconSize="xl">language</MaterialIcon>
-          <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
-            {getDisplayedUrl(recording.url)}
-          </div>
-        </Row>
+
+        <div className="group">
+          {isAuthenticated ? (
+            <Row>
+              <Icon
+                filename={icon}
+                className="bg-gray-800 group-hover:bg-primaryAccent cursor-pointer"
+              />
+              <div>
+                <PrivacyDropdown {...{ recording }} />
+              </div>
+            </Row>
+          ) : null}
+        </div>
+        <div className="group">
+          <Row>
+            <Icon
+              filename="external"
+              className="bg-gray-800 group-hover:bg-primaryAccent cursor-pointer"
+            />
+            <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
+              <a href={recording.url} target="_blank" rel="noopener noreferrer">
+                {getDisplayedUrl(recording.url)}
+              </a>
+            </div>
+          </Row>
+        </div>
+
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
@@ -85,10 +107,12 @@ function OperationsRow({
   const uniqueDomains = getUniqueDomains(operations);
 
   return (
-    <Row onClick={onClick}>
-      <MaterialIcon iconSize="xl">info</MaterialIcon>
-      <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
-    </Row>
+    <div className="group">
+      <Row onClick={onClick}>
+        <Icon filename="shield-check" className="bg-gray-800 group-hover:bg-primaryAccent" />
+        <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
+      </Row>
+    </div>
   );
 }
 

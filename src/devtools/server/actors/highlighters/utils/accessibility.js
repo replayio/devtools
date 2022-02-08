@@ -622,15 +622,8 @@ class ContrastRatio extends AuditReport {
       return true;
     }
 
-    const {
-      min,
-      max,
-      color,
-      backgroundColorMin,
-      backgroundColorMax,
-      scoreMin,
-      scoreMax,
-    } = contrastRatio;
+    const { min, max, color, backgroundColorMin, backgroundColorMax, scoreMin, scoreMax } =
+      contrastRatio;
     this._fillAndStyleContrastValue(els.min, {
       value: min,
       className: scoreMin,

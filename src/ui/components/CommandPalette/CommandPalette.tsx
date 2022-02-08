@@ -39,11 +39,10 @@ export type CommandKey =
 const COMMANDS: Command[] = [
   { key: "open_console", label: "Open Console" },
   { key: "open_devtools", label: "Open DevTools" },
-  { key: "open_elements", label: "Open Elements", settingKey: "showElements" },
+  { key: "open_elements", label: "Open Elements" },
   {
     key: "open_network_monitor",
     label: "Open Network Monitor",
-    settingKey: "enableNetworkMonitor",
   },
   { key: "open_viewer", label: "Open Viewer" },
   { key: "open_file_search", label: "Search for file", shortcut: "CmdOrCtrl+P" },
@@ -51,7 +50,7 @@ const COMMANDS: Command[] = [
   { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+P" },
   { key: "open_outline", label: "Open Outline" },
   { key: "open_print_statements", label: "Open Print Statements" },
-  { key: "open_react_devtools", label: "Open React DevTools", settingKey: "showReact" },
+  { key: "open_react_devtools", label: "Open React DevTools" },
   { key: "open_sources", label: "Open Sources" },
   { key: "show_comments", label: "Show Comments" },
   { key: "show_console_filters", label: "Show Console Filters" },
@@ -133,7 +132,10 @@ function CommandPalette({
     } else if (e.key === "Enter") {
       e.preventDefault();
       setSearchString("");
-      executeCommand(shownCommands[activeIndex].key);
+      const command = shownCommands[activeIndex];
+      if (command) {
+        executeCommand(command.key);
+      }
     }
   };
 

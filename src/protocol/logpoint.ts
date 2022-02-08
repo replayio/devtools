@@ -274,7 +274,8 @@ async function setMultiSourceLogpoint(
     }
   };
 
-  if (condition || (showInConsole && !primitives)) {
+  const shouldGetResults = condition || (showInConsole && !primitives);
+  if (shouldGetResults) {
     handler.onAnalysisResult = result => {
       results.push(...result);
       if (showInConsole && (condition || !primitives)) {
@@ -286,7 +287,12 @@ async function setMultiSourceLogpoint(
   try {
     await analysisManager.runAnalysis(params, handler);
   } catch {
-    saveAnalysisError(locations, condition);
+    // Only save the error if we're only grabbing the points for a location.
+    // This means that we're not handling cases where the full analysis
+    // throws. We should add that as a follow-up.
+    if (!shouldGetResults) {
+      saveAnalysisError(locations, condition);
+    }
     return;
   }
 

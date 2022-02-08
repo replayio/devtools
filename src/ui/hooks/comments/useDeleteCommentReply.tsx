@@ -20,7 +20,7 @@ export default function useDeleteCommentReply() {
   return (commentReplyId: string, recordingId: RecordingId) => {
     deleteCommentReply({
       variables: { commentReplyId },
-      optimisticResponse: {},
+      optimisticResponse: { deleteCommentReply: { success: true } },
       update: cache => {
         const data: any = cache.readQuery({
           query: GET_COMMENTS,
@@ -30,6 +30,9 @@ export default function useDeleteCommentReply() {
         const parentComment = data.recording.comments.find((c: any) =>
           c.replies.find((r: any) => r.id === commentReplyId)
         );
+        if (!parentComment) {
+          return;
+        }
 
         const newParentComment = {
           ...parentComment,

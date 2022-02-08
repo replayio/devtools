@@ -1,14 +1,14 @@
-import { AppState, EventKind, PanelName, ReplayEvent, SecondaryPanelName } from "ui/state/app";
+import { AppState, EventKind, ReplayEvent } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-import { prefs, features } from "../utils/prefs";
+import { features } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getTrimRegion } from "ui/reducers/timeline";
-import { getViewMode } from "./layout";
+import { getSelectedPanel, getViewMode } from "./layout";
 
 export const initialAppState: AppState = {
   analysisPoints: {},
@@ -32,7 +32,6 @@ export const initialAppState: AppState = {
   recordingDuration: 0,
   recordingTarget: null,
   recordingWorkspace: null,
-  selectedPanel: prefs.selectedPanel as SecondaryPanelName,
   sessionId: null,
   theme: "theme-light",
   trialExpired: false,
@@ -89,10 +88,6 @@ export default function update(
 
     case "update_theme": {
       return { ...state, theme: action.theme };
-    }
-
-    case "set_selected_panel": {
-      return { ...state, selectedPanel: action.panel };
     }
 
     case "set_initialized_panels": {
@@ -215,7 +210,6 @@ export default function update(
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
-export const getSelectedPanel = (state: UIState): SecondaryPanelName => state.app.selectedPanel;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;

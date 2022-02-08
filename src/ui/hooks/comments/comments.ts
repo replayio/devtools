@@ -6,9 +6,11 @@ import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
 
 const NO_COMMENTS: Comment[] = [];
 
-export function useGetComments(
-  recordingId: RecordingId
-): { comments: Comment[]; loading: boolean; error?: ApolloError } {
+export function useGetComments(recordingId: RecordingId): {
+  comments: Comment[];
+  loading: boolean;
+  error?: ApolloError;
+} {
   const { data, loading, error } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
     pollInterval: 5000,

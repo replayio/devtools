@@ -12,7 +12,6 @@ import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
-import { updateEnableRepaint } from "protocol/enable-repaint";
 
 import { extendStore } from "../store";
 import app from "ui/reducers/app";
@@ -171,7 +170,6 @@ export default async function DevTools(store: Store) {
   setupReactDevTools(store);
 
   const settings = await getUserSettings();
-  updateEnableRepaint(settings.enableRepaint);
 
   setupDemo();
 }

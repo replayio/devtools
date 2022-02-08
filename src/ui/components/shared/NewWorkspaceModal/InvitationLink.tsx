@@ -67,7 +67,8 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const emptyWorkspaceLink = "Give access with anyone with a replay.io email address";
   const workspaceLink = (
     <span>
-      Give access to anyone with a <span className="font-medium ">{workspace.domain}</span> email address
+      Give access to anyone with a <span className="font-medium ">{workspace.domain}</span> email
+      address
     </span>
   );
 

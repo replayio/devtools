@@ -25,6 +25,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
 import { getUserSettings } from "ui/hooks/settings";
 import { setViewMode } from "./layout";
+import { getSelectedPanel } from "ui/reducers/layout";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -46,16 +47,6 @@ export function getAccessibleRecording(
   recordingId: string
 ): UIThunkAction<Promise<Recording | null>> {
   return async ({ dispatch }) => {
-    if (!validateUUID(recordingId)) {
-      dispatch(
-        setExpectedError({
-          message: "Invalid ID",
-          content: `"${recordingId}" is not a valid recording ID`,
-        })
-      );
-      return null;
-    }
-
     try {
       const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
       if (!recording || recording.isInitialized) {
@@ -94,7 +85,7 @@ function getRecordingNotAccessibleError(
     return {
       message: "Sorry, you don't have permission!",
       content: "Maybe you haven't been invited to this replay yet?",
-      action: "library",
+      action: "request-access",
     };
   }
 
@@ -191,7 +182,7 @@ function showLoadingProgress(): UIThunkAction {
       dispatch(actions.setDisplayedLoadingProgress(displayedProgress));
     }
 
-    const selectedPanel = selectors.getSelectedPanel(getState());
+    const selectedPanel = getSelectedPanel(getState());
     // This shouldn't hit when the selectedPanel is "comments"
     // as that's not dealt with in toolbox, however we still
     // need to init the toolbox so we're not checking for

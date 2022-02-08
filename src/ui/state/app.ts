@@ -12,13 +12,11 @@ import {
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
-
-export type PrimaryPanelName = "comments" | "debugger" | "explorer" | "events" | "search";
-export type SecondaryPanelName = "console" | "inspector" | "network" | "react-components";
-export type PanelName = PrimaryPanelName | SecondaryPanelName;
+import { PanelName } from "./layout";
 
 export type ModalOptionsType = {
   recordingId?: string;
+  title?: string;
   view?: string;
   loom?: string;
   comment?: Reply;
@@ -38,8 +36,10 @@ export type ModalType =
   | "privacy"
   | "loom"
   | "attachment"
-  | "sourcemap-setup";
+  | "sourcemap-setup"
+  | "rename-replay";
 export type WorkspaceId = string;
+export type WorkspaceUuid = string;
 export type SettingsTabTitle =
   | "Experimental"
   | "Invitations"
@@ -52,7 +52,7 @@ export type SettingsTabTitle =
 export interface ExpectedError {
   message: string;
   content: string;
-  action?: "sign-in" | "refresh" | "library";
+  action?: "sign-in" | "refresh" | "library" | "request-access";
 }
 
 export type UnexpectedError = {
@@ -87,7 +87,6 @@ export interface AppState {
   recordingDuration: number;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
-  selectedPanel: SecondaryPanelName;
   sessionId: SessionId | null;
   theme: string;
   trialExpired: boolean;

@@ -2,6 +2,7 @@ import React from "react";
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
 import MaterialIcon from "../shared/MaterialIcon";
+import Icon from "../shared/Icon";
 
 // This should be the standard dropdown component for the Library
 // but then we should slowly make it even more general purpose
@@ -98,9 +99,7 @@ export function DropdownItemContent({
           selected ? "text-primaryAccent" : "text-gray-400"
         )}
       >
-        <MaterialIcon outlined={true} style={{ fontSize: "20px" }}>
-          {icon}
-        </MaterialIcon>
+        <Icon filename={icon} className="bg-gray-800 group-hover:bg-primaryAccent" />
       </div>
       <span className="whitespace-pre overflow-hidden overflow-ellipsis">{children}</span>
     </div>

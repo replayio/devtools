@@ -9,6 +9,7 @@ import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
 import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
+import { ColorSwatchIcon } from "@heroicons/react/solid";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -104,6 +105,10 @@ const GET_MY_RECORDINGS = gql`
   }
 `;
 
+export function useGetRawRecordingIdWithSlug() {
+  return useRouter().query.id;
+}
+
 export function useGetRecordingId() {
   const { id } = useRouter().query;
   return extractIdAndSlug(id).id!;
@@ -114,6 +119,7 @@ export async function getRecording(recordingId: RecordingId) {
     query: GET_RECORDING,
     variables: { recordingId },
   });
+
   return convertRecording(result.data?.recording);
 }
 
@@ -151,6 +157,21 @@ export function useIsTeamDeveloper() {
   return { isTeamDeveloper: data?.recording.userRole !== "team-user", loading };
 }
 
+// If the user has no role, then they're either viewing a non-team recording they
+// don't own, or a team recording for a team that they don't belong to.
+export function useHasNoRole() {
+  const recordingId = getRecordingId();
+  const { data, error, loading } = useQuery(GET_RECORDING, {
+    variables: { recordingId },
+  });
+
+  if (error) {
+    console.error("Apollo error while getting the user's role", error);
+  }
+
+  return { hasNoRole: data?.recording.userRole === "none", loading };
+}
+
 function convertRecording(rec: any): Recording | undefined {
   if (!rec) {
     return undefined;
@@ -159,6 +180,7 @@ function convertRecording(rec: any): Recording | undefined {
   const collaborators = rec.collaborators?.edges
     ?.filter((e: any) => e.node.user)
     .map((e: any) => e.node.user.id);
+  const collaboratorRequests = rec.collaboratorRequests?.edges.map((e: any) => e.node);
 
   return {
     id: rec.uuid,
@@ -174,6 +196,7 @@ function convertRecording(rec: any): Recording | undefined {
     workspace: rec.workspace,
     comments: rec.comments,
     collaborators,
+    collaboratorRequests,
     ownerNeedsInvite: rec.ownerNeedsInvite,
     userRole: rec.userRole,
     operations: rec.operations,
@@ -316,50 +339,24 @@ export function useGetIsPrivate(recordingId: RecordingId) {
   return { isPrivate, loading, error };
 }
 
-export function useToggleIsPrivate(recordingId: RecordingId, isPrivate: boolean) {
-  const [toggleIsPrivate] = useMutation(
-    gql`
-      mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
-        updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
-          success
-          recording {
-            uuid
-            private
-          }
-        }
-      }
-    `,
-    {
-      variables: { recordingId, isPrivate: !isPrivate },
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
-  );
-
-  return toggleIsPrivate;
-}
-
 export function useUpdateIsPrivate() {
   const [updateIsPrivate] = useMutation(
     gql`
       mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
         updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
           success
-          recording {
-            uuid
-            private
-          }
         }
       }
     `,
-    {
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
+    { refetchQueries: ["GetRecording"] }
   );
 
-  return updateIsPrivate;
+  return (recordingId: string, isPrivate: boolean) =>
+    updateIsPrivate({ variables: { recordingId, isPrivate } });
 }
 
-export function useIsOwner(recordingId: RecordingId) {
+export function useIsOwner() {
+  const recordingId = useGetRecordingId();
   const { userId } = useGetUserId();
   const { data, loading, error } = useQuery(GET_RECORDING_USER_ID, {
     variables: { recordingId },
@@ -736,7 +733,8 @@ export function useUpdateRecordingTitle() {
     }
   );
 
-  return updateRecordingTitle;
+  return (recordingId: string, title: string) =>
+    updateRecordingTitle({ variables: { recordingId, title } });
 }
 
 export async function getRecordingMetadata(id: string) {
@@ -785,4 +783,37 @@ export async function getRecordingMetadata(id: string) {
     duration: json.data.recording.duration,
     owner: json.data.recording.owner?.name || null,
   };
+}
+
+export function useRequestRecordingAccess() {
+  const recordingId = useGetRecordingId();
+
+  const [requestRecordingAccess] = useMutation(
+    gql`
+      mutation RequestRecordingAccess($recordingId: ID!) {
+        requestRecordingAccess(input: { recordingId: $recordingId }) {
+          success
+        }
+      }
+    `
+  );
+
+  return () => requestRecordingAccess({ variables: { recordingId } });
+}
+
+export function useAcceptRecordingRequest() {
+  const [acceptRecordingRequest] = useMutation(
+    gql`
+      mutation AcceptRecordingCollaboratorRequest($requestId: ID!) {
+        acceptRecordingCollaboratorRequest(input: { id: $requestId }) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetRecording"],
+    }
+  );
+
+  return (requestId: string) => acceptRecordingRequest({ variables: { requestId } });
 }

@@ -57,8 +57,7 @@
 }
 
 button.remove-set-watchpoint {
-  mask: url("resource://devtools/client/debugger/images/webconsole-logpoint.svg")
-    no-repeat;
+  mask: url("resource://devtools/client/debugger/images/webconsole-logpoint.svg") no-repeat;
   display: inline-block;
   vertical-align: top;
   height: 13px;
@@ -71,8 +70,7 @@ button.remove-set-watchpoint {
 }
 
 button.remove-get-watchpoint {
-  mask: url("resource://devtools/client/debugger/images/webconsole-logpoint.svg")
-    no-repeat;
+  mask: url("resource://devtools/client/debugger/images/webconsole-logpoint.svg") no-repeat;
   display: inline-block;
   vertical-align: top;
   height: 13px;

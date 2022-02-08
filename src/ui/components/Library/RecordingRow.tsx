@@ -30,6 +30,14 @@ export function getRelativeDate(date: string) {
   return content;
 }
 
+function ReplayTitle({ title }: { title?: string }) {
+  return (
+    <div className="overflow-hidden overflow-ellipsis whitespace-pre">
+      {title || <span className="italic">Untitled</span>}
+    </div>
+  );
+}
+
 function RowWrapper({
   children,
   isEditing,
@@ -103,9 +111,7 @@ function RecordingRow({
             </div>
 
             <div className="flex flex-col overflow-hidden space-y-0.5">
-              <div className="overflow-hidden overflow-ellipsis whitespace-pre">
-                {recording.title || <span className="italic">Untitled</span>}
-              </div>
+              <ReplayTitle title={recording.title} />
               <div className="flex flex-row space-x-4 text-gray-400 font-light">
                 <div
                   className="flex flex-row items-center overflow-hidden whitespace-pre overflow-ellipsis space-x-1"

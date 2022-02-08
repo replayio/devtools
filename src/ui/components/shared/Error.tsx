@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import classNames from "classnames";
@@ -13,6 +13,8 @@ import { PrimaryButton } from "./Button";
 import { useRouter } from "next/dist/client/router";
 import { BubbleViewportWrapper } from "./Viewport";
 import { getRecordingId } from "ui/utils/recording";
+import { setExpectedError } from "ui/actions/session";
+import { useRequestRecordingAccess } from "ui/hooks/recordings";
 
 export function PopupBlockedError() {
   return (
@@ -92,17 +94,44 @@ const billingConnector = connect(
 type BillingPropsFromRedux = ConnectedProps<typeof billingConnector>;
 const TeamBillingButton = billingConnector(TeamBillingButtonBase);
 
+function RequestRecordingAccessButton() {
+  const requestRecordingAccess = useRequestRecordingAccess();
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    requestRecordingAccess();
+
+    // Switch out the current error for one that will bring them back to the library
+    dispatch(
+      setExpectedError({
+        message: "Hang tight!",
+        content:
+          "We've let the owner know about your request. We'll notify you by e-mail once it's been accepted",
+        action: "library",
+      })
+    );
+  };
+
+  return (
+    <PrimaryButton color="blue" onClick={onClick}>
+      Request access
+    </PrimaryButton>
+  );
+}
+
 function ActionButton({ action }: { action: string }) {
   let button;
 
-  if (action == "refresh") {
+  if (action === "refresh") {
     button = <RefreshButton />;
-  } else if (action == "sign-in") {
+  } else if (action === "sign-in") {
     button = <SignInButton />;
-  } else if (action == "library") {
+  } else if (action === "library") {
     button = <LibraryButton />;
-  } else if (action == "team-billing") {
+  } else if (action === "team-billing") {
     button = <TeamBillingButton />;
+  } else if (action === "request-access") {
+    button = <RequestRecordingAccessButton />;
   }
 
   return <div className="m-auto">{button}</div>;

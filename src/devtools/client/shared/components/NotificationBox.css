@@ -40,11 +40,11 @@
 }
 
 .notificationbox.border-top .notification {
-   border-top-width: 1px;
+  border-top-width: 1px;
 }
 
 .notificationbox.border-bottom .notification {
-   border-bottom-width: 1px;
+  border-bottom-width: 1px;
 }
 
 .notificationbox .notification[data-type="info"] {
@@ -54,7 +54,7 @@
 
 .notificationbox .notification[data-type="critical"] {
   color: white;
-  background-image: linear-gradient(rgb(212,0,0), rgb(152,0,0));
+  background-image: linear-gradient(rgb(212, 0, 0), rgb(152, 0, 0));
 }
 
 .notificationbox .messageImage {
@@ -99,7 +99,7 @@
 }
 
 .notificationbox .messageCloseButton:active {
-  background-color: rgba(170, 170, 170, .4); /* --toolbar-tab-hover-active */
+  background-color: rgba(170, 170, 170, 0.4); /* --toolbar-tab-hover-active */
 }
 
 .notificationbox.wrapping .notificationInner .messageText {

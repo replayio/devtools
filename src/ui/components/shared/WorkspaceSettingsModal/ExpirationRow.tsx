@@ -1,6 +1,5 @@
 import React from "react";
 import { Subscription } from "ui/types";
-import { getFeatureFlag } from "ui/utils/launchdarkly";
 import { formatDate } from "./formatDate";
 
 export function ExpirationRow({ subscription }: { subscription: Subscription }) {

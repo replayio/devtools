@@ -15,6 +15,7 @@ import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
+import { decodeWorkspaceId } from "ui/utils/workspace";
 const { isDemoReplay } = require("ui/utils/demo");
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
@@ -112,7 +113,7 @@ function ReplayScreenshot({
 }) {
   return (
     <div
-      className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish"
+      className="relative rounded-lg px-6 pt-6 shadow-xl h-64 bg-jellyfish short:hidden"
       style={{ height: "280px" }}
     >
       {showLimitWarning ? <LimitWarning /> : null}
@@ -157,15 +158,18 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     e.preventDefault();
 
     setStatus("saving");
-    const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
+    const workspaceId = selectedWorkspaceId == MY_LIBRARY ? null : selectedWorkspaceId;
 
-    trackEvent("upload.create_replay", { isDemo: isDemoReplay(recording) });
+    trackEvent("upload.create_replay", {
+      isDemo: isDemoReplay(recording),
+      workspaceUuid: decodeWorkspaceId(workspaceId),
+    });
     startUploadWaitTracking();
 
     await initializeRecording({
       variables: { recordingId, title: inputValue, workspaceId },
     });
-    updateIsPrivate({ variables: { recordingId, isPrivate: !isPublic } });
+    updateIsPrivate(recordingId, !isPublic);
     onUpload();
   };
   const onDiscard = () => {
@@ -188,10 +192,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
-          <div
-            className="flex flex-row space-x-4 mb-11"
-            style={{ height: isPublic ? "620px" : "" }}
-          >
+          <div className="flex flex-row space-x-4 mb-10 short:h-72">
             <div
               className="flex flex-col overflow-hidden relative rounded-xl shadow-xl text-lg font-medium"
               style={{ width: "620px" }}

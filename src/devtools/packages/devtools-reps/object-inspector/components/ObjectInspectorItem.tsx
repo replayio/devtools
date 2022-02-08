@@ -155,15 +155,8 @@ class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
   }
 
   getTreeItemProps() {
-    const {
-      item,
-      depth,
-      focused,
-      expanded,
-      onDoubleClick,
-      dimTopLevelWindow,
-      onContextMenu,
-    } = this.props;
+    const { item, depth, focused, expanded, onDoubleClick, dimTopLevelWindow, onContextMenu } =
+      this.props;
 
     const parentElementProps: HTMLProps<HTMLDivElement> = {
       key: item.path,

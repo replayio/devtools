@@ -1,7 +1,7 @@
 const React = require("react");
 const { useState } = React;
-const EventListeners = require("devtools/client/debugger/src/components/SecondaryPanes/EventListeners")
-  .default;
+const EventListeners =
+  require("devtools/client/debugger/src/components/SecondaryPanes/EventListeners").default;
 const Dropdown = require("ui/components/shared/Dropdown").default;
 const { trackEvent } = require("ui/utils/telemetry");
 

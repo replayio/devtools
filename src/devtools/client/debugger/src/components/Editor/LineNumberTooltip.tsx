@@ -109,10 +109,12 @@ export default function LineNumberTooltip({ editor }: { editor: any }) {
   }, []);
 
   useEffect(() => {
-    if (analysisPoints)
+    if (analysisPoints) {
       trackEvent(
         analysisPoints.length ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits"
       );
+      trackEvent("breakpoint.preview_hits", { hitsCount: analysisPoints?.length || null });
+    }
   }, [analysisPoints]);
 
   if (!targetNode) {

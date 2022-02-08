@@ -76,7 +76,9 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
     assert(container);
     const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
     if (top < containerTop || bottom > containerBottom) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      // Chrome sometimes ignores element.scrollIntoView() here,
+      // calling it with a little delay fixes it
+      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
     }
   }
 

@@ -77,11 +77,11 @@ export function mockEnvironment() {
 }
 
 export function skipTelemetry() {
-  return isTest() || isMock() || isDevelopment();
+  return isTest() || isMock() || isDevelopment() || isDeployPreview();
 }
 
 export function isDeployPreview() {
-  return url.hostname.includes("replay-devtools.netlify.app");
+  return process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
 }
 
 // The loading param is currently used to wait for resources
