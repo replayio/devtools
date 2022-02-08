@@ -44,12 +44,11 @@ function RefreshButton() {
 }
 
 function SignInButton() {
-  const { loginWithRedirect } = useAuth0();
+  const router = useRouter();
 
   const onClick = () => {
-    loginWithRedirect({
-      appState: { returnTo: window.location.pathname + window.location.search },
-    });
+    const returnToPath = window.location.pathname + window.location.search;
+    router.push({ pathname: "/login", query: { returnTo: returnToPath } });
   };
 
   return (

@@ -114,14 +114,14 @@ function SocialLogin({
   );
 }
 
-export default function Login() {
+export default function Login({ returnToPath = "" }: { returnToPath?: string }) {
   const { loginWithRedirect } = useAuth0();
   const [sso, setSSO] = useState(false);
 
   const onLogin = () =>
     loginWithRedirect({
       connection: "google-oauth2",
-      appState: { returnTo: window.location.pathname + window.location.search },
+      appState: { returnTo: returnToPath },
     });
 
   useEffect(() => {
