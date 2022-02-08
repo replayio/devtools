@@ -84,8 +84,8 @@ function Toolbar({ viewMode }: PropsFromRedux) {
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar space-y-1">
+        <ToolbarButton icon="info" label="Replay Info" name="events" />
         <ToolbarButton icon="forum" label="Comments" name="comments" />
-        <ToolbarButton icon="list" label="Events" name="events" />
         {viewMode == "dev" ? (
           <>
             <ToolbarButton icon="description" name="explorer" label="Source Explorer" />
