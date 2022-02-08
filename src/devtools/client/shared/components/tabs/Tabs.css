@@ -19,9 +19,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 .tabs .tabs-navigation {
   box-sizing: border-box;
   display: flex;
-  height: 27px;
   position: relative;
-  border-bottom: 1px solid var(--theme-splitter-color);
   background: var(--theme-tab-toolbar-background);
 }
 
@@ -57,6 +55,18 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   color: var(--theme-toolbar-color);
 }
 
+.tabs .responsive-tabs-dropdown {
+  background: var(--theme-tab-toolbar-background);
+  border: 1px solid var(--theme-splitter-color);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 3px 3px 3px 1px var(--popup-shadow-color);
+  z-index: 5;
+}
+
+.tabs .responsive-tabs-dropdown .tabs-menu-item {
+  display: block;
+}
+
 .tabs .tabs-menu-item.is-active {
   color: var(--theme-toolbar-selected-color);
   background: white;
@@ -72,9 +82,8 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 
 .tabs .tabs-menu-item a {
   display: flex;
-  justify-content: center;
-  padding: 3px 10px;
-  border: 1px solid transparent;
+  place-items: center;
+  padding: 0 10px;
   font-size: 12px;
   line-height: 16px;
   text-decoration: none;
@@ -82,6 +91,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   cursor: pointer;
   user-select: none;
   text-align: center;
+  height: calc(2px + var(--theme-toolbar-height));
 }
 
 /* Remove the outline focusring from tabs-menu-item. */
