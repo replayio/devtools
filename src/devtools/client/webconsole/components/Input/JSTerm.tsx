@@ -159,7 +159,7 @@ export default function JSTerm() {
   };
 
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
-    if (e.key === Keys.ENTER || e.key === Keys.TAB) {
+    if (e.key === Keys.ENTER || e.key === Keys.TAB || e.key === Keys.ARROW_RIGHT) {
       e.preventDefault();
       autocomplete();
     } else if (e.key === Keys.ARROW_DOWN) {
@@ -192,7 +192,16 @@ export default function JSTerm() {
       onRegularKeyPress(e);
     }
 
-    if (![Keys.ARROW_DOWN, Keys.ARROW_UP, Keys.ESCAPE].includes(e.key as Keys)) {
+    if (
+      ![
+        Keys.ARROW_DOWN,
+        Keys.ARROW_UP,
+        Keys.ESCAPE,
+        Keys.ENTER,
+        Keys.TAB,
+        Keys.ARROW_RIGHT,
+      ].includes(e.key as Keys)
+    ) {
       setHideAutocomplete(false);
       setAutocompleteIndex(0);
     }
