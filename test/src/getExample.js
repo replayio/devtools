@@ -55,7 +55,9 @@ async function recordToFile(state, browserName, example) {
 
   const context = await browser.newContext();
   const page = await context.newPage();
+  await new Promise(res => setTimeout(res, 10000));
   try {
+    console.log("Loading Page");
     await page.goto(example);
     console.log("Loaded Page");
     await waitUntilMessage(page, "ExampleFinished");
