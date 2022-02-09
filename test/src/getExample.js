@@ -27,7 +27,7 @@ async function recordToCloud(state, browserName, exampleUrl) {
 
   const context = await browser.newContext();
   const page = await context.newPage();
-  await new Promise(res => setTimeout(res, 5000));
+  await new Promise(res => setTimeout(res, 10000));
   try {
     await page.goto(exampleUrl);
     console.log("Loaded Page");
