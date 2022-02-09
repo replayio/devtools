@@ -7,20 +7,20 @@ runs:
       run: npm install
       working-directory: test
       shell: bash
-    - run: mv linux-replay-playwright/linux-replay-playwright.tar.xz ./
+    - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
-    - run: tar xf ./linux-replay-playwright.tar.xz
+    - run: tar xf ./macOS-replay-playwright.tar.xz
       shell: bash
-    - run: chmod +x ./firefox/firefox
+    - run: chmod +x ./firefox/Nightly.app/Contents/MacOS/firefox
       shell: bash
-    - run: chmod +x ./replay-node/linux-replay-node
+    - run: chmod +x ./replay-node/macOS-replay-node
       shell: bash
     - run: node ${{ github.action_path }}/../../../test/run.js
       shell: bash
       env:
-        RECORD_REPLAY_DRIVER: replay-driver/linux-recordreplay.so
-        RECORD_REPLAY_NODE: replay-node/linux-replay-node
-        RECORD_REPLAY_PATH: firefox/firefox
+        RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
+        RECORD_REPLAY_NODE: replay-node/macOS-replay-node
+        RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
         RECORD_REPLAY_PLAYWRIGHT_HEADLESS: true
         RECORD_REPLAY_VERBOSE: 1
         SHOULD_RECORD_EXAMPLES: true
