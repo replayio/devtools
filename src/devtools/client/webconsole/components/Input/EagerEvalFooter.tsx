@@ -1,8 +1,28 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { ValueFront } from "protocol/thread";
 
 const ObjectInspector =
   require("devtools/client/webconsole/utils/connected-object-inspector").default;
+
+const Preview: FC<{ grip: ValueFront }> = ({ grip }) => {
+  const [text, setText] = useState("");
+  const gripRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (gripRef.current) {
+      setText(gripRef.current.innerText);
+    }
+  }, [grip]);
+
+  return (
+    <div className="pointer-events-none relative">
+      <div className="absolute opacity-0" ref={gripRef}>
+        <ObjectInspector value={grip} />
+      </div>
+      <div className="overflow-ellipsis overflow-hidden whitespace-pre opacity-50">{text}</div>
+    </div>
+  );
+};
 
 const EagerEvalFooter: FC<{ value?: string; grip: ValueFront | null }> = ({ value, grip }) => {
   return (
@@ -25,9 +45,7 @@ const EagerEvalFooter: FC<{ value?: string; grip: ValueFront | null }> = ({ valu
               marginInlineEnd: `calc(4px - var(--console-icon-horizontal-offset))`,
             }}
           />
-          <div className="opacity-50">
-            <ObjectInspector value={grip} />
-          </div>
+          <Preview grip={grip} />
         </>
       ) : null}
     </div>
