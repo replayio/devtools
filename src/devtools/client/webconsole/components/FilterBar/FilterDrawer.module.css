@@ -1,0 +1,11 @@
+.filterdrawer {
+  position: relative;
+  transition: left 0.3s cubic-bezier(0.82, 0.085, 0.395, 0.895);
+  left: 0;
+  width: 190px;
+}
+
+.filterdrawer.collapsed {
+  left: -190px;
+  width: 0;
+}
