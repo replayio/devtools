@@ -1,41 +1,69 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { ValueFront } from "protocol/thread";
+import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
+import { eagerEvaluateExpression } from "../../utils/autocomplete-eager";
 
-const ObjectInspector =
-  require("devtools/client/webconsole/utils/connected-object-inspector").default;
+function useEagerEvalPreview(expression: string) {
+  const [value, setValue] = useState<ValueFront | null>(null);
+  const expressionRef = useRef(expression);
 
-const Preview: FC<{ grip: ValueFront }> = ({ grip }) => {
+  useEffect(() => {
+    expressionRef.current = expression;
+
+    (async function updateValue() {
+      setValue(null);
+      const rv = await eagerEvaluateExpression(expression);
+      const isUndefined = rv?.isPrimitive && !rv.primitive;
+
+      if (expressionRef.current === expression && !isUndefined) {
+        setValue(rv);
+      }
+    })();
+  }, [expression]);
+
+  return value;
+}
+
+const Preview: FC<{ expression: string }> = ({ expression }) => {
   const [text, setText] = useState("");
   const gripRef = useRef<HTMLDivElement | null>(null);
+  const previewValue = useEagerEvalPreview(expression);
 
   useEffect(() => {
     if (gripRef.current) {
       setText(gripRef.current.innerText);
     }
-  }, [grip]);
+  }, [previewValue]);
+
+  if (!previewValue) {
+    return null;
+  }
 
   return (
     <div className="pointer-events-none relative">
       <div className="absolute opacity-0" ref={gripRef}>
-        <ObjectInspector value={grip} />
+        <ObjectInspector value={previewValue} />
       </div>
       <div className="overflow-ellipsis overflow-hidden whitespace-pre opacity-50">{text}</div>
     </div>
   );
 };
 
-const EagerEvalFooter: FC<{ value?: string; grip: ValueFront | null }> = ({ value, grip }) => {
+const EagerEvalFooter: FC<{ expression: string; completedExpression: string | null }> = ({
+  expression,
+  completedExpression,
+}) => {
   return (
     <div
       className="message result flex items-center font-mono"
       style={{
         padding: "4px 8px 4px 4px",
-        borderTop: "1px solid var(--theme-splitter-color)",
+        borderTop: "1px solid var(--theme-background",
         borderBottom: "0px",
         minHeight: "var(--editor-footer-height)",
       }}
     >
-      {value && grip ? (
+      {expression ? (
         <>
           <div
             className="icon"
@@ -45,7 +73,7 @@ const EagerEvalFooter: FC<{ value?: string; grip: ValueFront | null }> = ({ valu
               marginInlineEnd: `calc(4px - var(--console-icon-horizontal-offset))`,
             }}
           />
-          <Preview grip={grip} />
+          <Preview expression={completedExpression || expression} />
         </>
       ) : null}
     </div>

@@ -1,27 +1,13 @@
-import React, { Dispatch, SetStateAction, useRef, useState, useEffect } from "react";
-import actions from "devtools/client/webconsole/actions/index";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
-import { getCommandHistory } from "../../selectors/messages";
-import {
-  fuzzyFilter,
-  getAutocompleteMatches,
-  getCursorIndex,
-  getPropertyExpression,
-  insertAutocompleteMatch,
-  normalizeString,
-} from "../../utils/autocomplete";
-import Autocomplete from "./Autocomplete";
-import { UIState } from "ui/state";
-import clamp from "lodash/clamp";
+import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "../../utils/autocomplete";
+import AutocompleteMatches from "./AutocompleteMatches";
 import CodeMirror from "./CodeMirror";
-import uniq from "lodash/uniq";
-import { eagerEvaluateExpression, getEvaluatedProperties } from "../../utils/autocomplete-eager";
-
 import { evaluateExpression, paywallExpression } from "../../actions/input";
-import { ValueFront } from "protocol/thread";
 import EagerEvalFooter from "./EagerEvalFooter";
+import useAutocomplete from "./useAutocomplete";
+import useEvaluationHistory from "./useEvaluationHistory";
 
 enum Keys {
   BACKSPACE = "Backspace",
@@ -34,146 +20,33 @@ enum Keys {
   ARROW_LEFT = "ArrowLeft",
 }
 
-function useGetScopeMatches(expression: string) {
-  const frameScope = useSelector((state: UIState) => getFrameScope(state, "0:0"));
+const DISMISS_KEYS = [
+  Keys.BACKSPACE,
+  Keys.ENTER,
+  Keys.TAB,
+  Keys.ESCAPE,
+  Keys.ARROW_RIGHT,
+  Keys.ARROW_LEFT,
+];
 
-  if (!expression || !frameScope?.scope) {
-    return [];
-  }
-
-  return getAutocompleteMatches(expression, frameScope.scope);
-}
-function useGetEvalMatches(value: string) {
-  const [matches, setMatches] = useState<string[]>([]);
-  const evalIdRef = useRef(0);
-
-  useEffect(() => {
-    async function updateMatches() {
-      setMatches([]);
-      const propertyExpression = getPropertyExpression(value);
-
-      if (!propertyExpression) {
-        return;
-      }
-
-      evalIdRef.current++;
-      const evalId = evalIdRef.current;
-      const evaluatedProperties = await getEvaluatedProperties(propertyExpression.left);
-
-      if (evalIdRef.current === evalId) {
-        setMatches(fuzzyFilter(evaluatedProperties, normalizeString(propertyExpression.right)));
-      }
-    }
-
-    updateMatches();
-  }, [value]);
-
-  return matches;
-}
-function useGetMatches(expression: string) {
-  const scopeMatches = useGetScopeMatches(expression);
-  const evalMatches = useGetEvalMatches(expression);
-
-  return uniq([...scopeMatches, ...evalMatches]);
-}
-function useShowAutocomplete(expression: string, hideAutocomplete: boolean) {
-  const matches = useGetMatches(expression);
-  const matchCount = matches.length;
-
-  // Bail if the only suggested autocomplete option has already been applied to the input.
-  if (matchCount === 1 && insertAutocompleteMatch(expression, matches[0]) === expression) {
-    return false;
-  }
-
-  return !hideAutocomplete && !!matchCount;
-}
-
-function useHistory(setValue: (newValue: string) => void) {
-  const commandHistory = useSelector(getCommandHistory);
-  const [historyIndex, setHistoryIndex] = useState<number>(0);
-
-  const moveHistoryCursor = (difference: -1 | 1) => {
-    if (commandHistory.length > 0) {
-      const newIndex = clamp(historyIndex + difference, 0, commandHistory.length);
-
-      setValue(["", ...commandHistory][newIndex]);
-      setHistoryIndex(newIndex);
-    }
-  };
-
-  return { moveHistoryCursor, setHistoryIndex };
-}
-
-function useAutocomplete(expression: string) {
-  const [hideAutocomplete, setHideAutocomplete] = useState(true);
-  const [autocompleteIndex, setAutocompleteIndex] = useState(0);
-  const showAutocomplete = useShowAutocomplete(expression, hideAutocomplete);
-  const matches = useGetMatches(expression);
-
-  const moveAutocompleteCursor = (difference: number) => {
-    const matchesCount = matches.length;
-
-    const newIndex = (matchesCount + autocompleteIndex - difference) % matchesCount;
-    setAutocompleteIndex(newIndex);
-  };
-  const applySelectedMatch = () => {
-    const match = matches[autocompleteIndex];
-    return insertAutocompleteMatch(expression, match);
-  };
-
-  return {
-    applySelectedMatch,
-    autocompleteIndex,
-    matches,
-    moveAutocompleteCursor,
-    setAutocompleteIndex,
-    setHideAutocomplete,
-    showAutocomplete,
-  };
-}
-
-function useEagerEvalPreview() {
-  const [grip, setGrip] = useState<ValueFront | null>(null);
-  const evalIdRef = useRef(0);
-
-  const refreshEagerEval = async (expression: string) => {
-    setGrip(null);
-    evalIdRef.current++;
-    const evalId = evalIdRef.current;
-    const rv = await eagerEvaluateExpression(expression);
-    const isUndefined = rv?.isPrimitive && !rv.primitive;
-
-    if (evalIdRef.current === evalId && !isUndefined) {
-      setGrip(rv);
-    }
-  };
-
-  return { refreshEagerEval, grip };
-}
 export default function JSTerm() {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
 
-  const [value, _setValue] = useState("");
+  const [value, setValue] = useState("");
   const inputNode = useRef<HTMLDivElement | null>(null);
 
-  const setValue = (newValue: string) => {
-    _setValue(newValue);
-    refreshEagerEval(newValue);
-  };
-
-  const { moveHistoryCursor, setHistoryIndex } = useHistory(setValue);
+  const { moveHistoryCursor, setHistoryIndex } = useEvaluationHistory(setValue);
   const {
-    applySelectedMatch,
     autocompleteIndex,
     matches,
+    shouldShowAutocomplete,
+    applySelectedMatch,
     moveAutocompleteCursor,
-    setAutocompleteIndex,
+    resetAutocompleteIndex,
     setHideAutocomplete,
-    showAutocomplete,
   } = useAutocomplete(value);
-  const { refreshEagerEval, grip } = useEagerEvalPreview();
 
   const onRegularKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER) {
@@ -197,23 +70,12 @@ export default function JSTerm() {
       moveAutocompleteCursor(1);
     }
 
-    if (
-      (
-        [
-          Keys.BACKSPACE,
-          Keys.ENTER,
-          Keys.TAB,
-          Keys.ESCAPE,
-          Keys.ARROW_RIGHT,
-          Keys.ARROW_LEFT,
-        ] as string[]
-      ).includes(e.key)
-    ) {
+    if ((DISMISS_KEYS as string[]).includes(e.key)) {
       setHideAutocomplete(true);
     }
   };
   const onKeyPress = (e: KeyboardEvent) => {
-    if (showAutocomplete) {
+    if (shouldShowAutocomplete) {
       onAutocompleteKeyPress(e);
     } else {
       onRegularKeyPress(e);
@@ -230,7 +92,7 @@ export default function JSTerm() {
       ].includes(e.key as Keys)
     ) {
       setHideAutocomplete(false);
-      setAutocompleteIndex(0);
+      resetAutocompleteIndex();
     }
   };
   const onSelection = (obj?: any) => {
@@ -258,10 +120,10 @@ export default function JSTerm() {
   };
 
   return (
-    <div className="relative">
+    <div>
       <div className="relative">
         <div
-          className="jsterm-input-container devtools-input"
+          className="jsterm-input-container devtools-input relative"
           key="jsterm-container"
           aria-live="off"
           tabIndex={-1}
@@ -274,9 +136,17 @@ export default function JSTerm() {
             setValue={setValue}
             execute={execute}
           />
+          {shouldShowAutocomplete ? (
+            <div
+              className="absolute ml-8 opacity-50"
+              style={{ left: `${value.length}ch`, top: `5px` }}
+            >
+              {getRemainingCompletedTextAfterCursor(value, matches[autocompleteIndex])}
+            </div>
+          ) : null}
         </div>
-        {showAutocomplete ? (
-          <Autocomplete
+        {shouldShowAutocomplete ? (
+          <AutocompleteMatches
             leftOffset={getCursorIndex(value)}
             matches={matches}
             selectedIndex={autocompleteIndex}
@@ -284,7 +154,10 @@ export default function JSTerm() {
           />
         ) : null}
       </div>
-      <EagerEvalFooter value={value} grip={grip} />
+      <EagerEvalFooter
+        expression={value}
+        completedExpression={shouldShowAutocomplete ? applySelectedMatch() : null}
+      />
     </div>
   );
 }
