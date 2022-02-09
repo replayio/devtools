@@ -5,10 +5,12 @@ import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 import { getCommandHistory } from "../../selectors/messages";
 import {
+  fuzzyFilter,
   getAutocompleteMatches,
   getCursorIndex,
   getPropertyExpression,
   insertAutocompleteMatch,
+  normalizeString,
 } from "../../utils/autocomplete";
 import Autocomplete from "./Autocomplete";
 import { UIState } from "ui/state";
@@ -53,10 +55,10 @@ function useGetEvalMatches(value: string) {
 
       evalIdRef.current++;
       const evalId = evalIdRef.current;
-
       const evaluatedProperties = await getEvaluatedProperties(propertyExpression.left);
+
       if (evalIdRef.current === evalId) {
-        setMatches(evaluatedProperties);
+        setMatches(fuzzyFilter(evaluatedProperties, normalizeString(propertyExpression.right)));
       }
     }
 
