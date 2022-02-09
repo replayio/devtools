@@ -98,14 +98,8 @@ async function recordExample(state, example, target) {
   const exampleUrl = `${state.testingServer}/test/examples/${example}`;
   const browser = target == "gecko" ? "firefox" : "chromium";
   let recordingId;
-  if (target === "gecko") {
-    await recordToCloud(state, browser, exampleUrl);
-    recordingId = fs.readFileSync(state.exampleRecordingIdFile, "utf8").trim();
-    fs.unlinkSync(state.exampleRecordingIdFile);
-  } else {
-    await recordToFile(state, browser, exampleUrl);
-    recordingId = await upload(state, exampleUrl);
-  }
+  await recordToFile(state, browser, exampleUrl);
+  recordingId = await upload(state, exampleUrl);
   if (recordingId) {
     updateExampleFile(state, example, recordingId);
     return recordingId;
