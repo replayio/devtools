@@ -150,7 +150,7 @@ export const partialRequestsToCompleteSummaries = (
         domain: host(request.event.requestUrl),
         firstByte: response?.time,
         end: requestDone?.time,
-        hasResponseBody: Boolean(response && r.events["response-body"]),
+        hasResponseBody: Boolean(r.events["response-body"]),
         hasRequestBody: Boolean(r.events["request-body"]),
         id: r.id,
         method: request.event.requestMethod,
