@@ -58,9 +58,9 @@ async function recordToFile(state, browserName, example) {
   await new Promise(res => setTimeout(res, 10000));
   try {
     console.log("Loading Page");
-    await page.goto(example, { timeout: 120000 });
+    await page.goto(example);
     console.log("Loaded Page");
-    await waitUntilMessage(page, "ExampleFinished");
+    await waitUntilMessage(page, "ExampleFinished", 120_000);
   } catch (e) {
     console.log("Failed to record example:", e);
   } finally {
