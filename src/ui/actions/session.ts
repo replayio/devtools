@@ -32,10 +32,12 @@ export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
 };
 export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boolean };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
+export type ClearExpectedError = Action<"clear_expected_error">;
 export type SessionActions =
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
-  | SetTrialExpiredAction;
+  | SetTrialExpiredAction
+  | ClearExpectedError;
 
 declare global {
   interface Window {
@@ -246,5 +248,11 @@ export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false
     }
 
     dispatch({ type: "set_unexpected_error", error });
+  };
+}
+
+export function clearExpectedError(): UIThunkAction {
+  return ({ dispatch }) => {
+    dispatch({ type: "clear_expected_error", error: null });
   };
 }

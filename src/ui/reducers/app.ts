@@ -82,6 +82,10 @@ export default function update(
       return { ...state, unexpectedError: action.error, modal: null, modalOptions: null };
     }
 
+    case "clear_expected_error": {
+      return { ...state, expectedError: null, modal: null, modalOptions: null };
+    }
+
     case "set_trial_expired": {
       return { ...state, trialExpired: action.expired };
     }
