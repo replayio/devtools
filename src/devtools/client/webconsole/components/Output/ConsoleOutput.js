@@ -144,7 +144,6 @@ class ConsoleOutput extends Component {
         const message = messages.get(messageId);
         const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
         const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
-        console.log({ messageId, message });
 
         return createElement(MessageContainer, {
           dispatch,

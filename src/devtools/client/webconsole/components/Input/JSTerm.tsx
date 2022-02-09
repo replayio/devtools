@@ -141,7 +141,7 @@ function useEagerEvalPreview() {
     evalIdRef.current++;
     const evalId = evalIdRef.current;
     const rv = await eagerEvaluateExpression(expression);
-    const isUndefined = rv?._hasPrimitive && !rv._primitive;
+    const isUndefined = rv?.isPrimitive && !rv.primitive;
 
     if (evalIdRef.current === evalId && !isUndefined) {
       setGrip(rv);

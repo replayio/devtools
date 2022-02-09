@@ -54,7 +54,6 @@ function EvaluationResult(props) {
       messageBody = `${messageText.initial}…`;
     }
   } else {
-    // need this but for the message
     messageBody = GripMessageBody({
       dispatch,
       messageId,
