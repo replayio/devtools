@@ -64,10 +64,10 @@ const PROPERTY_PLACEHOLDER = "fakeProperty";
 // bracket notation properties regardless of whether the user has quotation
 // marks or not. i.e., `foo["ba` vs `foo[ba` will both show "bar" as
 // an autocomplete match.
-function normalizeString(str: string) {
+export function normalizeString(str: string) {
   return str.toLowerCase().replace(/['"`]+/g, "");
 }
-function fuzzyFilter(candidates: string[], query: string): string[] {
+export function fuzzyFilter(candidates: string[], query: string): string[] {
   if (normalizeString(query) === "") {
     return candidates;
   }
