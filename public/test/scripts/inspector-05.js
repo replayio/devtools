@@ -10,7 +10,7 @@ Test.describe(`Test showing rules in source mapped style sheets.`, async () => {
   await Test.checkAppliedRules([
     {
       selector: "div",
-      source: "styles.css:2",
+      source: "inline:2",
       properties: [{ text: "background-color: blue;", overridden: false }],
     },
   ]);
