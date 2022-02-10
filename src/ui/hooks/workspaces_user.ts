@@ -111,7 +111,7 @@ export function useClaimTeamInvitationCode(onCompleted: () => void, onError: () 
         }
       }
     `,
-    { refetchQueries: ["GetPendingWorkspaces"], onCompleted, onError }
+    { onCompleted, onError }
   );
 
   return inviteNewWorkspaceMember;
