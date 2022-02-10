@@ -26,7 +26,7 @@ function waitForElapsedTime(time, ms) {
   }
 }
 
-const WaitTimeout = 1000 * 20;
+const WaitTimeout = 1000 * 10;
 
 export async function waitUntil(fn, options) {
   const { timeout, waitingFor } = { timeout: WaitTimeout, waitingFor: "unknown", ...options };

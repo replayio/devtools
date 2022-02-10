@@ -24,7 +24,7 @@ const defaultState = {
 
   browserPath: process.env.RECORD_REPLAY_PATH,
   driverPath: process.env.RECORD_REPLAY_DRIVER,
-  onlyTarget: ["gecko"],
+  onlyTarget: process.env.onlyTarget,
   skippedTests: process.env.SKIPPED_TESTS,
   testTimeout: 240,
 
