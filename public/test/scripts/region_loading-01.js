@@ -4,9 +4,9 @@ Test.describe(
   async () => {
     const { assert } = Test;
 
-    const loadTimerange = [0, 5000];
-    // Unload 90% of the recording.
-    const unloadTimerange = [0, (loadTimerange[1] * 0.9)|0];
+    const loadedRegions = app.selectors.getLoadedRegions();
+    // Unload all but the last second of the recording.
+    const unloadTimerange = [0, (loadedRegions.loaded[0].end.time) - 1000];
     const totalMessageCount = 50;
 
     await Test.selectSource("doc_rr_region_loading.html");
