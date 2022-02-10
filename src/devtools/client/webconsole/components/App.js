@@ -16,6 +16,9 @@ const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
 const FilterDrawer = require("./FilterDrawer").default;
 const Warning = require("ui/components/shared/Warning").default;
 
+const { getAllUi } = require("../selectors/ui");
+import styles from "./FilterBar/FilterDrawer.module.css";
+
 /**
  * Console root Application component.
  */
@@ -61,29 +64,32 @@ class App extends React.Component {
   };
 
   render() {
-    const { filterBarDisplayMode, consoleOverflow } = this.props;
+    const { filterBarDisplayMode, consoleOverflow, collapseFilterDrawer } = this.props;
 
     return (
       <div className="flex w-full flex-col">
         <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
         <div className="flex flex-grow overflow-hidden">
           <FilterDrawer />
-          <div
-            className="webconsole-app"
-            onClick={this.onClick}
-            ref={node => {
-              this.node = node;
-            }}
-          >
-            <ConsoleNag />
-            {consoleOverflow ? (
-              <Warning link="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#8d72d62414a7490586ee5ac3adef09fb">
-                There are too many console messages so not all are being displayed
-              </Warning>
-            ) : null}
-            <div className="flexible-output-input" key="in-out-container">
-              <ConsoleOutput key="console-output" />
-              <JSTerm />
+
+          <div className={`${styles.webconsoleWrap} ${collapseFilterDrawer ? styles.wide : ""}`}>
+            <div
+              className="webconsole-app"
+              onClick={this.onClick}
+              ref={node => {
+                this.node = node;
+              }}
+            >
+              <ConsoleNag />
+              {consoleOverflow ? (
+                <Warning link="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#8d72d62414a7490586ee5ac3adef09fb">
+                  There are too many console messages so not all are being displayed
+                </Warning>
+              ) : null}
+              <div className="flexible-output-input" key="in-out-container">
+                <ConsoleOutput key="console-output" />
+                <JSTerm />
+              </div>
             </div>
           </div>
         </div>
@@ -96,6 +102,7 @@ const mapStateToProps = state => {
   return {
     consoleOverflow: state.messages.overflow,
     filterBarDisplayMode: state.consoleUI.filterBarDisplayMode,
+    collapseFilterDrawer: getAllUi(state).collapseFilterDrawer,
   };
 };
 
