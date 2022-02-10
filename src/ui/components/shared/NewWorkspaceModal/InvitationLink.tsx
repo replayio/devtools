@@ -107,7 +107,7 @@ export default function InvitationLink({
 
   const inputText = loading
     ? "Loading URL"
-    : `https://app.replay.io/?invitationcode=${workspace.invitationCode}`;
+    : `https://app.replay.io/team/invitation/${workspace.invitationCode}`;
 
   return (
     <div className="flex w-full flex-col space-y-3">
