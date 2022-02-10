@@ -13,6 +13,7 @@ export function setupTelemetry() {
     "Current thread has paused or resumed",
     "Current thread has changed",
     "Failed to load Stripe.js",
+    "Stripe.js not available",
   ];
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.
