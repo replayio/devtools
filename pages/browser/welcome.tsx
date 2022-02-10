@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import Link from "next/link";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
@@ -10,7 +10,7 @@ import {
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
 
-export default function WelcomeToReplay() {
+const WelcomeToReplay: FC = () => {
   const classes = getButtonClasses("blue", "primary", "2xl");
 
   return (
@@ -30,4 +30,6 @@ export default function WelcomeToReplay() {
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
-}
+};
+
+export default WelcomeToReplay;

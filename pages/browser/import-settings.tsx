@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import Link from "next/link";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
@@ -10,7 +10,7 @@ import {
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
 
-function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
+function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>): void {
   e.preventDefault();
   (document.querySelector("#migrationFrame") as HTMLIFrameElement).src = "replay:migrate";
   window.addEventListener("focus", function nav() {
@@ -19,7 +19,7 @@ function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
   });
 }
 
-export default function ImportSettings() {
+const ImportSettings: FC = () => {
   return (
     <OnboardingModalContainer>
       <OnboardingContentWrapper>
@@ -47,4 +47,6 @@ export default function ImportSettings() {
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
-}
+};
+
+export default ImportSettings;

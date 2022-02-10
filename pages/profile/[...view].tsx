@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import Account from "ui/components/Account";
 import useAuth0 from "ui/utils/useAuth0";
 
-function ProfilePage({ setModal }: PropsFromRedux) {
+const ProfilePage: FC<PropsFromRedux> = ({ setModal }) => {
   const { isAuthenticated } = useAuth0();
   const { query, replace } = useRouter();
 
@@ -19,7 +19,7 @@ function ProfilePage({ setModal }: PropsFromRedux) {
   }, [isAuthenticated, modal, setModal, replace]);
 
   return <Account />;
-}
+};
 
 const connector = connect(null, {
   setModal: actions.setModal,

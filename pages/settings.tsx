@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-export default function SettingsRedirectPage() {
+export default function SettingsRedirectPage(): React.ReactNode {
   const { replace } = useRouter();
 
   useEffect(() => {

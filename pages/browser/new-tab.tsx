@@ -1,8 +1,8 @@
-import React from "react";
+import React, { FC } from "react";
 import { LoadingScreenTemplate } from "ui/components/shared/LoadingScreen";
 import { useGetUserInfo } from "ui/hooks/users";
 
-export default function NewTab() {
+const NewTab: FC = () => {
   const { motd } = useGetUserInfo();
 
   return (
@@ -15,4 +15,6 @@ export default function NewTab() {
       </div>
     </LoadingScreenTemplate>
   );
-}
+};
+
+export default NewTab;

@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserSettings } from "ui/hooks/settings";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import UploadScreen from "ui/components/UploadScreen";
 import { BlankViewportWrapper } from "ui/components/shared/Viewport";
 
-function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
+const UploadScreenWrapper: FC<{ onUpload: () => void }> = ({ onUpload }) => {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   // Make sure to get the user's settings before showing the upload screen.
@@ -26,6 +26,6 @@ function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
   ) : (
     <BlankViewportWrapper />
   );
-}
+};
 
 export default UploadScreenWrapper;

@@ -2,14 +2,14 @@ import React from "react";
 import crypto from "crypto";
 import Document, { Html, Head, Main, NextScript } from "next/document";
 
-const cspHashOf = (text: string) => {
+const cspHashOf = (text: string): string => {
   const hash = crypto.createHash("sha256");
   hash.update(text);
   return `'sha256-${hash.digest("base64")}'`;
 };
 
 const isDev = process.env.NODE_ENV !== "production";
-const csp = (props: any) => {
+const csp = (props: any): string => {
   const hash = cspHashOf(NextScript.getInlineScriptSource(props));
   return [
     `default-src 'self'`,
@@ -43,7 +43,7 @@ const csp = (props: any) => {
 };
 
 export default class MyDocument extends Document {
-  render() {
+  render(): JSX.Element {
     return (
       <Html>
         <Head>

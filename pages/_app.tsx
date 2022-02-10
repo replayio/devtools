@@ -3,7 +3,7 @@ import "../src/test-prep";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { FC, ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
@@ -135,11 +135,11 @@ interface AuthProps {
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-function AppUtilities({
+const AppUtilities: FC<{ children: ReactNode; head: ReactNode } & AuthProps> = ({
   children,
   apiKey,
   head,
-}: { children: ReactNode; head: ReactNode } & AuthProps) {
+}) => {
   return (
     <tokenManager.Auth0Provider apiKey={apiKey}>
       {head}
@@ -150,8 +150,8 @@ function AppUtilities({
       </ApolloWrapper>
     </tokenManager.Auth0Provider>
   );
-}
-function Routing({ Component, pageProps }: AppProps) {
+};
+const Routing: FC<AppProps> = ({ Component, pageProps }) => {
   const [store, setStore] = useState<Store | null>(null);
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
@@ -186,9 +186,9 @@ function Routing({ Component, pageProps }: AppProps) {
       </_App>
     </Provider>
   );
-}
+};
 
-const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
+const App = ({ apiKey, ...props }: AppProps & AuthProps): JSX.Element => {
   const router = useRouter();
   let head: React.ReactNode;
 
@@ -208,7 +208,7 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   );
 };
 
-App.getInitialProps = (appContext: AppContext) => {
+App.getInitialProps = (appContext: AppContext): any => {
   const props = NextApp.getInitialProps(appContext);
   const authHeader = appContext.ctx.req?.headers.authorization;
   const authProps: AuthProps = { apiKey: undefined };

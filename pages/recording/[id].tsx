@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { connect, ConnectedProps, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording, setExpectedError } from "ui/actions/session";
@@ -16,7 +16,7 @@ import LoadingScreen from "ui/components/shared/LoadingScreen";
 import Upload from "./upload";
 import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
-import { GetStaticProps } from "next/types";
+import { GetStaticPaths, GetStaticProps } from "next/types";
 import { extractIdAndSlug } from "ui/utils/helpers";
 
 interface MetadataProps {
@@ -29,7 +29,7 @@ interface MetadataProps {
   };
 }
 
-function RecordingHead({ metadata }: MetadataProps) {
+const RecordingHead: FC<MetadataProps> = ({ metadata }) => {
   if (!metadata) {
     return null;
   }
@@ -74,9 +74,9 @@ function RecordingHead({ metadata }: MetadataProps) {
       <meta property="twitter:description" content={description} />
     </Head>
   );
-}
+};
 
-function useRecordingSlug(recordingId: string) {
+const useRecordingSlug = (recordingId: string): { recording: RecordingInfo | undefined } => {
   const router = useRouter();
   const { recording } = useGetRecording(recordingId);
 
@@ -104,13 +104,13 @@ function useRecordingSlug(recordingId: string) {
   }, [router, recording, recording?.title]);
 
   return { recording };
-}
+};
 
-function RecordingPage({
+const RecordingPage: FC<PropsFromRedux & { head?: React.ReactNode }> = ({
   getAccessibleRecording,
   setExpectedError,
   head,
-}: PropsFromRedux & { head?: React.ReactNode }) {
+}) => {
   const store = useStore();
   const recordingId = useGetRecordingId();
   const rawRecordingId = useGetRawRecordingIdWithSlug();
@@ -127,7 +127,7 @@ function RecordingPage({
       return;
     }
 
-    async function getRecording() {
+    async function getRecording(): Promise<void> {
       await setup(store);
       setRecording(await getAccessibleRecording(recordingId));
     }
@@ -156,7 +156,7 @@ function RecordingPage({
       </>
     );
   }
-}
+};
 
 const connector = connect(null, { getAccessibleRecording, setExpectedError });
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -173,18 +173,20 @@ export const getStaticProps: GetStaticProps = async function ({ params }) {
   };
 };
 
-export async function getStaticPaths() {
+export const getStaticPaths: GetStaticPaths = async () => {
   return { paths: [], fallback: "blocking" };
-}
+};
 
 type SSRProps = MetadataProps & { headOnly?: boolean };
 
-export default function SSRRecordingPage({ headOnly, metadata }: SSRProps) {
-  let head: React.ReactNode = <RecordingHead metadata={metadata} />;
+const SSRRecordingPage: FC<SSRProps> = ({ headOnly, metadata }) => {
+  const head = <RecordingHead metadata={metadata} />;
 
   if (headOnly) {
     return head;
   }
 
   return <ConnectedRecordingPage head={head} />;
-}
+};
+
+export default SSRRecordingPage;

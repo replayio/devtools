@@ -1,10 +1,10 @@
-import React from "react";
+import React, { FC } from "react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 
-export default function Connection() {
+const Connection: FC = () => {
   const auth0 = useAuth0();
   const router = useRouter();
   const q = router.query;
@@ -26,4 +26,6 @@ export default function Connection() {
   }, [auth0, connection, router]);
 
   return <LoadingScreen />;
-}
+};
+
+export default Connection;

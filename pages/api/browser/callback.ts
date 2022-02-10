@@ -9,11 +9,12 @@ interface Token {
   expires_in: number;
 }
 
-const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
-const getAppUrl = (path: string) =>
+const getQueryValue = (query: string | string[]): string =>
+  Array.isArray(query) ? query[0] : query;
+const getAppUrl = (path: string): string =>
   `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
 
-async function fulfillAuthRequest(id: string, token: string) {
+async function fulfillAuthRequest(id: string, token: string): Promise<boolean> {
   const api = process.env.NEXT_PUBLIC_API_URL;
   const secret = process.env.FRONTEND_API_SECRET;
 
@@ -83,7 +84,7 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
   }
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const code = getQueryValue(req.query.code);
   const state = getQueryValue(req.query.state);
   const browserAuth = req.cookies["replay-browser-auth"];

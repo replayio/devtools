@@ -1,8 +1,8 @@
 import { useRouter } from "next/dist/client/router";
-import React from "react";
+import React, { FC } from "react";
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
 
-const BrowserError = () => {
+const BrowserError: FC = () => {
   const {
     query: { message = "Please try again" },
   } = useRouter();

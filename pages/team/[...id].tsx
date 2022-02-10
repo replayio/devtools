@@ -1,12 +1,12 @@
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import Account from "ui/components/Account";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import useAuth0 from "ui/utils/useAuth0";
 
-function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
+const TeamPage: FC<PropsFromRedux> = ({ setWorkspaceId, setModal }) => {
   const { isAuthenticated } = useAuth0();
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
   const { query, replace } = useRouter();
@@ -33,7 +33,7 @@ function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
   }, [isAuthenticated, workspaceId, modal, view, setModal]);
 
   return <Account />;
-}
+};
 
 const connector = connect(null, {
   setWorkspaceId: actions.setWorkspaceId,

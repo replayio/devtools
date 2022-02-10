@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 import { query } from "ui/utils/apolloClient";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
@@ -17,12 +17,12 @@ const GET_CONNECTION = gql`
   }
 `;
 
-function SSOLogin({ onLogin }: { onLogin: () => void }) {
+const SSOLogin: FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const { loginWithRedirect } = useAuth0();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | boolean>(false);
 
-  const onEnterpriseLogin = async () => {
+  const onEnterpriseLogin = async (): Promise<void> => {
     const resp = await query({
       query: GET_CONNECTION,
       variables: {
@@ -74,15 +74,12 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
       </button>
     </div>
   );
-}
+};
 
-function SocialLogin({
-  onShowSSOLogin,
-  onLogin,
-}: {
+const SocialLogin: FC<{
   onShowSSOLogin: () => void;
   onLogin: () => void;
-}) {
+}> = ({ onShowSSOLogin, onLogin }) => {
   return (
     <div className="space-y-6">
       {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
@@ -112,13 +109,13 @@ function SocialLogin({
       </button>
     </div>
   );
-}
+};
 
-export default function Login({ returnToPath = "" }: { returnToPath?: string }) {
+const Login: FC<{ returnToPath?: string }> = ({ returnToPath = "" }) => {
   const { loginWithRedirect } = useAuth0();
   const [sso, setSSO] = useState(false);
 
-  const onLogin = () =>
+  const onLogin = (): void | Promise<void> =>
     loginWithRedirect({
       connection: "google-oauth2",
       appState: { returnTo: returnToPath },
@@ -139,4 +136,6 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
-}
+};
+
+export default Login;

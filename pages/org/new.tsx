@@ -1,10 +1,10 @@
-import React from "react";
+import React, { FC } from "react";
 
 import useAuth0 from "ui/utils/useAuth0";
 import Login from "ui/components/shared/Login/Login";
 import TeamOnboarding from "ui/components/shared/TeamOnboarding";
 
-export default function NewTeam() {
+const NewTeam: FC = () => {
   const auth0 = useAuth0();
 
   if (!auth0.isAuthenticated) {
@@ -12,4 +12,6 @@ export default function NewTeam() {
   }
 
   return <TeamOnboarding organization={true} />;
-}
+};
+
+export default Newteam;
