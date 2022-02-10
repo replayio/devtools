@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
 import { getAllUi } from "../../selectors/ui";
-import Drawer from "./drawer.svg";
+import Icon from "ui/components/shared/Icon";
 const actions = require("devtools/client/webconsole/actions/index");
 
 function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsFromRedux) {
@@ -16,7 +16,7 @@ function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsF
       style={!collapseFilterDrawer ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
     >
       <button className="console-filter-toggle" onClick={onClick}>
-        <Drawer />
+        <Icon filename="drawer" className="bg-gray-800 hover:bg-primaryAccent" />
       </button>
     </div>
   );

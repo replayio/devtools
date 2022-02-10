@@ -58,3 +58,11 @@ but without a background color so we can use hover effects
 .icon.shield-check {
   -webkit-mask-image: url(/icons/shield-check.svg);
 }
+
+.icon.drawer {
+  -webkit-mask-image: url(/icons/drawer.svg);
+}
+
+.icon.trash {
+  -webkit-mask-image: url(/icons/trash.svg);
+}
