@@ -11,7 +11,7 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:8080/test/examples/shorthand_styles.css",
+      url: location.origin + "/test/examples/shorthand_styles.css",
       overridden: false,
     },
   ]);
@@ -23,14 +23,14 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
       selector: ".child",
       value: "sans-serif",
       label: "shorthand_styles.css:6",
-      url: "http://localhost:8080/test/examples/shorthand_styles.css",
+      url: location.origin + "/test/examples/shorthand_styles.css",
       overridden: false,
     },
     {
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:8080/test/examples/shorthand_styles.css",
+      url: location.origin + "/test/examples/shorthand_styles.css",
       overridden: true,
     },
   ]);
@@ -43,7 +43,7 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:8080/test/examples/shorthand_styles.css",
+      url: location.origin + "/test/examples/shorthand_styles.css",
       overridden: true,
     },
   ]);
@@ -56,7 +56,7 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
       selector: ".child",
       value: "sans-serif",
       label: "shorthand_styles.css:6",
-      url: "http://localhost:8080/test/examples/shorthand_styles.css",
+      url: location.origin + "/test/examples/shorthand_styles.css",
       overridden: true,
     },
     { selector: "DIV[1].style", value: "serif", label: "element", url: "#", overridden: true },
@@ -64,7 +64,7 @@ Test.describe(`Test showing both longhand and shorthand properties in rules.`, a
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:8080/test/examples/shorthand_styles.css",
+      url: location.origin + "/test/examples/shorthand_styles.css",
       overridden: true,
     },
   ]);

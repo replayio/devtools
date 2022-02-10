@@ -21,6 +21,7 @@
     Test.app.actions.closeQuickOpen();
 
     await Test.addBreakpoint("bundle_input.js", 5);
+    await Test.addLogpoint("bundle_input.js", 5);
 
     await Test.rewindToLine(5);
     await checkBreakpointPanel(2);
@@ -49,8 +50,8 @@
     Test.app.actions.setViewMode("dev");
 
     await Test.waitUntil(
-      () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 1,
-      { waitingFor: "a breakpoint to be present" }
+      () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 2,
+      { waitingFor: "a breakpoint and a logpoint to be present" }
     );
 
     Test.finish();

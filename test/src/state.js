@@ -1,3 +1,5 @@
+const os = require("os");
+const path = require("path");
 const fs = require("fs");
 
 console.log(process.env);
@@ -16,8 +18,9 @@ const defaultState = {
   exampleRecordings: fs.existsSync("./test/example-recordings.json")
     ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
     : {},
-  headless: false,
+  headless: !!process.env.RECORD_REPLAY_PLAYWRIGHT_HEADLESS,
   shouldRecordExamples: !!process.env.SHOULD_RECORD_EXAMPLES,
+  exampleRecordingIdFile: path.join(os.tmpdir(), "record-replay-example-recording-id"),
 
   browserPath: process.env.RECORD_REPLAY_PATH,
   driverPath: process.env.RECORD_REPLAY_DRIVER,
