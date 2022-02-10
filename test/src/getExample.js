@@ -27,7 +27,6 @@ async function recordToCloud(state, browserName, exampleUrl) {
 
   const context = await browser.newContext();
   const page = await context.newPage();
-  await new Promise(res => setTimeout(res, 10000));
   try {
     console.log("Loading Page");
     await page.goto(exampleUrl);
@@ -55,12 +54,11 @@ async function recordToFile(state, browserName, example) {
 
   const context = await browser.newContext();
   const page = await context.newPage();
-  await new Promise(res => setTimeout(res, 10000));
   try {
     console.log("Loading Page");
     await page.goto(example);
     console.log("Loaded Page");
-    await waitUntilMessage(page, "ExampleFinished", 120_000);
+    await waitUntilMessage(page, "ExampleFinished");
   } catch (e) {
     console.log("Failed to record example:", e);
   } finally {
@@ -102,8 +100,14 @@ async function recordExample(state, example, target) {
   const exampleUrl = `${state.testingServer}/test/examples/${example}`;
   const browser = target == "gecko" ? "firefox" : "chromium";
   let recordingId;
-  await recordToFile(state, browser, exampleUrl);
-  recordingId = await upload(state, exampleUrl);
+  if (example !== "cra/dist/index.html") {
+    await recordToFile(state, browser, exampleUrl);
+    recordingId = await upload(state, exampleUrl);
+  } else {
+    await recordToCloud(state, browser, exampleUrl);
+    recordingId = fs.readFileSync(state.exampleRecordingIdFile, "utf8").trim();
+    fs.unlinkSync(state.exampleRecordingIdFile);
+  }
   if (recordingId) {
     updateExampleFile(state, example, recordingId);
     return recordingId;
