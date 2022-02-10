@@ -243,3 +243,15 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
 
   return [];
 }
+export function getRemainingCompletedTextAfterCursor(value: string, match: string) {
+  const propertyExpression = getPropertyExpression(value);
+
+  if (
+    !propertyExpression ||
+    match.slice(0, propertyExpression.right.length) !== propertyExpression.right
+  ) {
+    return null;
+  }
+
+  return match.slice(propertyExpression.right.length);
+}

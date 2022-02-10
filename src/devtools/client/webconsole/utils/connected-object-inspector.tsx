@@ -10,10 +10,10 @@ import SmartTrace from "devtools/client/webconsole/utils/connected-smart-trace";
 
 type ObjectInspectorProps = PropsFromRedux & {
   value: ValueFront;
-  useQuotes: boolean;
-  transformEmptyString: boolean;
-  escapeWhitespace: boolean;
-  style: React.CSSProperties;
+  useQuotes?: boolean;
+  transformEmptyString?: boolean;
+  escapeWhitespace?: boolean;
+  style?: React.CSSProperties;
 };
 
 function OI(props: ObjectInspectorProps) {
