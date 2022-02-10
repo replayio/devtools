@@ -181,6 +181,7 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       const childNodes = await nodeFront.childNodes();
       if (ThreadFront.currentPause !== pause) return;
       await dispatch(addChildren(nodeFront, childNodes));
+      if (ThreadFront.currentPause !== pause) return;
       dispatch(updateChildrenLoading(nodeId, false));
     }
   };
