@@ -14,4 +14,4 @@ const NewTeam: FC = () => {
   return <TeamOnboarding organization={true} />;
 };
 
-export default Newteam;
+export default NewTeam;
