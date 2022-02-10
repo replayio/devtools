@@ -21,6 +21,7 @@ runs:
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
         RECORD_REPLAY_NODE: replay-node/macOS-replay-node
         RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
+        RECORD_REPLAY_PLAYWRIGHT_HEADLESS: true
         RECORD_REPLAY_VERBOSE: 1
         SHOULD_RECORD_EXAMPLES: true
         DEBUG: pw:browser*

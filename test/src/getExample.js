@@ -7,7 +7,43 @@ const _ = require("lodash");
 const { recordNode } = require("./recordNode");
 const { elapsedTime, waitUntilMessage } = require("./utils");
 
-async function record(state, browserName, example) {
+async function recordToCloud(state, browserName, exampleUrl) {
+  console.log(`Recording Example:`, exampleUrl, browserName);
+
+  if (fs.existsSync(state.exampleRecordingIdFile)) {
+    fs.unlinkSync(state.exampleRecordingIdFile);
+  }
+
+  const browser = await playwright[browserName].launch({
+    executablePath: state.browserPath,
+    headless: state.headless,
+    env: {
+      ...process.env,
+      RECORD_REPLAY_SERVER: state.dispatchServer,
+      RECORD_REPLAY_API_KEY: state.replayApiKey,
+      RECORD_REPLAY_RECORDING_ID_FILE: state.exampleRecordingIdFile,
+    },
+  });
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  try {
+    await page.goto(exampleUrl);
+    console.log("Loaded Page");
+    await waitUntilMessage(page, "ExampleFinished");
+  } catch (e) {
+    console.log("Failed to record example:", e);
+  } finally {
+    await page.close();
+    await context.close();
+    // this is currently necessary to ensure that the recording contains sourcemaps,
+    // see https://github.com/RecordReplay/gecko-dev/issues/717
+    await new Promise(res => setTimeout(res, 1000));
+    await browser.close();
+  }
+}
+
+async function recordToFile(state, browserName, example) {
   console.log(`Recording Example:`, example, browserName);
 
   const browser = await playwright[browserName].launch({
@@ -32,7 +68,7 @@ async function record(state, browserName, example) {
 
 async function upload(state, example) {
   const list = cli.listAllRecordings();
-  const id = _.findLast(list, rec => rec.metadata.uri == example)?.id;
+  const id = _.findLast(list, rec => rec.metadata.uri === example)?.id;
 
   if (id) {
     console.log(`Uploading example:${example}`, id);
@@ -51,14 +87,22 @@ async function upload(state, example) {
 }
 
 function updateExampleFile(state, example, recordingId) {
-  const newExampleRecordings = { ...state.exampleRecordings, [example]: recordingId };
-  fs.writeFileSync("./test/example-recordings.json", JSON.stringify(newExampleRecordings, null, 2));
+  state.exampleRecordings = { ...state.exampleRecordings, [example]: recordingId };
+  fs.writeFileSync(
+    "./test/example-recordings.json",
+    JSON.stringify(state.exampleRecordings, null, 2)
+  );
 }
 
 async function recordExample(state, example, target) {
-  const browser = target == "gecko" ? "firefox" : "chromium";
-  await record(state, browser, example);
-  const recordingId = await upload(state, example);
+  const exampleUrl = `${state.testingServer}/test/examples/${example}`;
+  const browser = target === "gecko" ? "firefox" : "chromium";
+  let recordingId;
+  await recordToFile(state, browser, exampleUrl);
+  recordingId = await upload(state, exampleUrl);
+  // await recordToCloud(state, browser, exampleUrl);
+  // recordingId = fs.readFileSync(state.exampleRecordingIdFile, "utf8").trim();
+  // fs.unlinkSync(state.exampleRecordingIdFile);
   if (recordingId) {
     updateExampleFile(state, example, recordingId);
     return recordingId;
@@ -77,8 +121,7 @@ async function getExample(state, example, target) {
         break;
       case "gecko":
       case "chromium": {
-        const exampleUrl = `${state.testingServer}/test/examples/${example}`;
-        exampleRecordingId = await recordExample(state, exampleUrl, target);
+        exampleRecordingId = await recordExample(state, example, target);
         break;
       }
       default:

@@ -12,15 +12,15 @@ const { bootstrap } = require("./src/state");
 async function runMatchingTests(state) {
   for (let i = 0; i < Manifest.length; i++) {
     const log = msg => console.log(msg);
-    const { pending, example, script, targets } = Manifest[i];
+    const { disabled, example, script, targets } = Manifest[i];
     const test = script;
     if (state.stripeCount && (i % state.stripeCount) + 1 != state.stripeIndex) {
       log(`it does not match stripe`);
       continue;
     }
 
-    if (pending) {
-      log(`it is pending`);
+    if (disabled) {
+      log(`it is disabled`);
       continue;
     }
 

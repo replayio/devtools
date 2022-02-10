@@ -2,6 +2,6 @@
   "mochaExplorer.launcherScript": "test/vscodeTestLauncher",
   "mochaExplorer.env": {
     "TEST_ONLY_TARGET": "gecko",
-    "HEADLESS": "true"
+    "RECORD_REPLAY_PLAYWRIGHT_HEADLESS": "true"
   }
 }

@@ -13,7 +13,16 @@
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "build-cra-e2e-test": "node test/examples/cra/build",
+    "build-e2e-cra-test": "node public/test/examples/cra/build",
+    "build-e2e-prod-bundle": "webpack --config public/test/examples/bundles/prod_bundle/webpack.config.js",
+    "build-e2e-exceptions-bundle": "webpack --config public/test/examples/bundles/exceptions_bundle/webpack.config.js",
+    "build-e2e-mapped-styles-bundle": "webpack --config public/test/examples/bundles/mapped_styles/webpack.config.js",
+    "build-e2e-mapped-minified-bundle": "webpack --config public/test/examples/bundles/mapped_minified/webpack.config.js",
+    "upload-e2e-cra-test-sourcemaps": "cd public/test/examples/cra/dist && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ static/js/",
+    "upload-e2e-prod-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ prod_bundle.js*",
+    "upload-e2e-exceptions-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ exceptions_bundle.js*",
+    "upload-e2e-mapped-styles-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_styles.js*",
+    "upload-e2e-mapped-minified-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_minified.js*",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -99,6 +108,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@babel/types": "^7.14.8",
     "@recordreplay/recordings-cli": "^0.4.1",
+    "@recordreplay/sourcemap-upload-cli": "^0.1.1",
     "@storybook/addon-actions": "^6.4.0-beta.26",
     "@storybook/addon-essentials": "^6.3.12",
     "@storybook/addon-links": "^6.4.0-beta.26",
@@ -127,6 +137,7 @@
     "@typescript-eslint/parser": "^5.8.0",
     "autoprefixer": "^10.4.2",
     "babel-jest": "^27.3.1",
+    "css-loader": "^6.6.0",
     "eslint": "^8.5.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",
@@ -150,7 +161,9 @@
     "tailwindcss": "^3.0.19",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   },
   "optionalDependencies": {
     "@recordreplay/playwright": "^1.10.6"

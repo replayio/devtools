@@ -113,6 +113,10 @@ export function getBreakpointCount(state) {
   return getBreakpointsList(state).length;
 }
 
+export function getLogpointCount(state) {
+  return getBreakpointsList(state).filter(bp => isLogpoint(bp)).length;
+}
+
 export function getBreakpoint(state, location) {
   if (!location) {
     return undefined;
