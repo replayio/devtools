@@ -323,7 +323,7 @@ class EventListeners extends Component {
   render() {
     const { searchText } = this.state;
     return (
-      <div className="event-listeners space-y-2 overflow-y-auto">
+      <div className="event-listeners space-y-2 overflow-y-auto overflow-x-hidden">
         <div className="event-search-container">{this.renderSearchInput()}</div>
         <div className="event-listeners-content">
           {searchText ? this.renderSearchResultsList() : this.renderCategories()}
