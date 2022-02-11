@@ -357,8 +357,6 @@ class _ThreadFront {
     });
 
     await this.ensureAllSources();
-    console.log({ ensureAllSources: performance.now() - then, totalTime });
-    const beforeLoop = performance.now();
     const keys = this.sources.keys;
     for (let i = 0; i < keys.length; i++) {
       //@ts-ignore
