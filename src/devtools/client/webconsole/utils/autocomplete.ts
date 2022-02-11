@@ -149,8 +149,31 @@ function getBinding(name: string, scope: Scope) {
 function getBindingNames(scope: Scope): string[] {
   return scope.bindings.map(b => b.name);
 }
+function getGlobalActor(scopes: Scope) {
+  let globalActor = scopes;
+
+  while (globalActor.parent) {
+    globalActor = globalActor.parent;
+  }
+
+  return globalActor;
+}
 function getGlobalVariables(scopes: Scope) {
-  return getPropertiesForObject(scopes.parent.object?.getObject());
+  const globalActor = getGlobalActor(scopes);
+  const globalFront = globalActor.object;
+
+  if (!globalFront) {
+    return [];
+  }
+
+  // This gets the global object's children in the background. This happen
+  // async, but we don't await it so that the loading happens in the background.
+  // Once the children are loaded, they will be available in the globalFront the
+  // next time this function runs and we attempt to get the properties for it.
+  globalFront.loadChildren();
+
+  const rv = getPropertiesForObject(globalFront.getObject());
+  return rv;
 }
 
 function getPropertyValue(property: StringLiteral | Identifier) {
