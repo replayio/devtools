@@ -357,7 +357,12 @@ class _ThreadFront {
     });
 
     await this.ensureAllSources();
-    for (const [sourceId, source] of this.sources) {
+    console.log({ ensureAllSources: performance.now() - then, totalTime });
+    const beforeLoop = performance.now();
+    const keys = this.sources.keys;
+    for (let i = 0; i < keys.length; i++) {
+      //@ts-ignore
+      const [sourceId, source] = this.sources.get(keys[i]);
       if (sourceId === this.getCorrespondingSourceIds(sourceId)[0]) {
         onSource({ sourceId, ...source });
       }
