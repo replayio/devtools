@@ -12,6 +12,7 @@ export type UserSettings = {
   enableEventLink: boolean;
   enableTeams: boolean;
   showReact: boolean;
+  defaultToDevtools: boolean;
 };
 
 export type LocalUserSettings = {

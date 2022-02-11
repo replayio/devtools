@@ -27,6 +27,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Add Loom video comments ",
     key: "enableCommentAttachments",
   },
+  {
+    label: "Default to Devtools",
+    description: "Butt butt",
+    key: "enableDefaultToDevtools",
+  },
 ];
 
 function Experiment({
@@ -61,7 +66,11 @@ export default function ExperimentalSettings({}) {
     !!features.commentAttachments
   );
 
-  const onChange = (key: ExperimentalKey, value: any) => {
+  const [enableDefaultToDevtools, setEnableDefaultToDevtools] = useState(
+    !!features.defaultToDevtools
+  );
+
+  function onChange(key: ExperimentalKey, value: any) {
     if (key === "enableEventLink") {
       updateEventLink({ variables: { newValue: value } });
     } else if (key === "enableCommentAttachments") {
@@ -69,10 +78,12 @@ export default function ExperimentalSettings({}) {
       setEnableCommentAttachments(!!features.commentAttachments);
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
+    } else if (key === "defaultToDevtools") {
+      setEnableDefaultToDevtools(!!features.defaultToDevtools);
     }
-  };
+  }
 
-  const localSettings = { enableCommentAttachments };
+  const localSettings = { enableCommentAttachments, enableDefaultToDevtools };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {
