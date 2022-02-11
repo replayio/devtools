@@ -1,10 +1,13 @@
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setExpectedError } from "ui/actions/session";
+import Login from "ui/components/shared/Login/Login";
 import hooks from "ui/hooks";
+import useAuth0 from "ui/utils/useAuth0";
 
 export default function Share() {
+  const auth0 = useAuth0();
   const { push, query } = useRouter();
   const dispatch = useDispatch();
   const [invitationCode] = Array.isArray(query.id) ? query.id : [query.id];
@@ -25,6 +28,16 @@ export default function Share() {
   }
 
   useEffect(function handleTeamInvitationCode() {
-    claimTeamInvitationCode({ variables: { code: invitationCode } });
+    if (auth0.isAuthenticated) {
+      claimTeamInvitationCode({ variables: { code: invitationCode } });
+    }
   }, []);
+
+  // If the user is not logged in, show them the login screen
+  if (!auth0.isAuthenticated) {
+    const returnToPath = window.location.pathname + window.location.search;
+    push({ pathname: "/login", query: { returnTo: returnToPath } });
+  }
+
+  return null;
 }
