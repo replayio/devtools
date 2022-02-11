@@ -8,6 +8,10 @@ import React, { Component } from "react";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import Reps from "devtools/packages/devtools-reps";
 import actions from "devtools/client/debugger/src/actions";
+import {
+  highlightDomElement,
+  unHighlightDomElement,
+} from "devtools/client/webconsole/actions/toolbox";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
@@ -190,14 +194,7 @@ const mapStateToProps = state => ({
   cx: getThreadContext(state),
 });
 
-const {
-  selectSourceURL,
-  openLink,
-  openElementInInspectorCommand,
-  highlightDomElement,
-  unHighlightDomElement,
-  clearPreview,
-} = actions;
+const { selectSourceURL, openLink, openElementInInspectorCommand, clearPreview } = actions;
 
 const mapDispatchToProps = {
   selectSourceURL,
