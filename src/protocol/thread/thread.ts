@@ -136,6 +136,8 @@ class _ThreadFront {
   // Map sourceId to info about the source.
   sources = new Map<string, Source>();
 
+  alternateSourceIds: Map<SourceId, Set<SourceId>> = new Map();
+
   private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
   private fnSearchWaiters: Map<string, (params: FunctionMatch[]) => void> = new Map();
 
@@ -338,8 +340,8 @@ class _ThreadFront {
     this.onSource = onSource;
 
     client.Debugger.findSources({}, sessionId).then(() => {
-      this.groupSourceIds();
       this.hasAllSources = true;
+      this.groupSourceIds();
       this.allSourcesWaiter.resolve();
     });
     client.Debugger.addNewSourceListener(source => {
@@ -1095,7 +1097,7 @@ class _ThreadFront {
     const groups = [];
     while (sourceIds.length) {
       const id = sourceIds[0];
-      const group = this._getAlternateSourceIds(id).filter(id => sourceIds.includes(id));
+      const group = [...this._getAlternateSourceIds(id)].filter(id => sourceIds.includes(id));
       groups.push(group);
       sourceIds = sourceIds.filter(id => !group.includes(id));
     }
@@ -1104,22 +1106,34 @@ class _ThreadFront {
 
   // Get all original/generated IDs which can represent a location in sourceId.
   private _getAlternateSourceIds(sourceId: SourceId) {
+    if (this.alternateSourceIds.has(sourceId)) {
+      return this.alternateSourceIds.get(sourceId)!;
+    }
+
     const rv = new Set<SourceId>();
-    const worklist = [sourceId];
+    let currentSourceId = sourceId;
+    const worklist = [currentSourceId];
+
     while (worklist.length) {
-      sourceId = worklist.pop()!;
-      if (rv.has(sourceId)) {
+      currentSourceId = worklist.pop()!;
+      if (rv.has(currentSourceId)) {
         continue;
       }
-      rv.add(sourceId);
-      const sources = this.sources.get(sourceId);
+      rv.add(currentSourceId);
+      const sources = this.sources.get(currentSourceId);
       assert(sources);
+
       const { generatedSourceIds } = sources;
       (generatedSourceIds || []).forEach(id => worklist.push(id));
-      const originalSourceIds = this.originalSources.map.get(sourceId);
+
+      const originalSourceIds = this.originalSources.map.get(currentSourceId);
       (originalSourceIds || []).forEach(id => worklist.push(id));
     }
-    return [...rv];
+
+    if (this.hasAllSources) {
+      this.alternateSourceIds.set(sourceId, rv);
+    }
+    return rv;
   }
 
   // Return whether sourceId is minified and has a pretty printed alternate.
