@@ -18,7 +18,6 @@ const emptySettings: UserSettings = {
   enableEventLink: false,
   enableTeams: true,
   showReact: false,
-  defaultToDevtools: false,
 };
 
 const testSettings: UserSettings = {
@@ -28,7 +27,6 @@ const testSettings: UserSettings = {
   enableEventLink: false,
   enableTeams: true,
   showReact: true,
-  defaultToDevtools: false,
 };
 
 export async function getUserSettings(): Promise<UserSettings> {
@@ -99,7 +97,6 @@ function convertUserSettings(data: any): UserSettings {
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
     showReact: settings.showReact,
-    defaultToDevtools: settings.defaultToDevtools,
   };
 }
 

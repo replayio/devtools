@@ -40,7 +40,6 @@ pref("devtools.features.videoComments", false);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.widgetHover", false);
 pref("devtools.features.commentAttachments", false);
-pref("devtools.features.defaultToDevtools", false);
 
 export const prefs = new PrefsHelper("devtools", {
   user: ["Json", "user"],
@@ -80,7 +79,6 @@ export const features = new PrefsHelper("devtools.features", {
   videoPlayback: ["Bool", "videoPlayback"],
   widgetHover: ["Bool", "widgetHover"],
   commentAttachments: ["Bool", "commentAttachments"],
-  defaultToDevtools: ["Bool", "defaultToDevtools"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
