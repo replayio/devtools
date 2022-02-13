@@ -11,7 +11,6 @@ export function createUserSettingsMock(): MockedResponse[] {
     enableEventLink: false,
     enableTeams: true,
     showReact: true,
-    defaultToDevtools: true,
   };
   const rv = {
     request: {
