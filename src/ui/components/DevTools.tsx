@@ -36,7 +36,7 @@ function ViewLoader() {
   }
 
   return (
-    <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
+    <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
       <ReplayLogo size="md" color="gray" />
     </div>
   );

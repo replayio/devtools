@@ -14,8 +14,8 @@ import Base64Image from "../shared/Base64Image";
 
 function ViewerLoader() {
   return (
-    <div className="grid h-full w-full items-center justify-items-center bg-gray-100">
-      <Spinner className="h-6 w-6 animate-spin text-black" />
+    <div className="bg-gray-100 w-full h-full grid items-center justify-items-center">
+      <Spinner className="animate-spin h-6 w-6 text-black" />
     </div>
   );
 }

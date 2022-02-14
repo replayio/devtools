@@ -40,7 +40,7 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
     <TrialEnd
       expiresIn={expiresIn}
       color="yellow"
-      className="cursor-pointer py-2"
+      className="py-2 cursor-pointer"
       onClick={onClick}
     />
   );

@@ -57,14 +57,14 @@ function CommentItemHeader({
   }
 
   return (
-    <div className="flex flex-row items-center space-x-1.5">
-      <AvatarImage className="avatar h-5 w-5 rounded-full" src={comment.user.picture} />
-      <div className="flex flex-grow flex-row space-x-2 overflow-hidden">
-        <span className="overflow-hidden overflow-ellipsis whitespace-pre font-medium">
+    <div className="flex flex-row space-x-1.5 items-center">
+      <AvatarImage className="h-5 w-5 rounded-full avatar" src={comment.user.picture} />
+      <div className="overflow-hidden flex flex-row flex-grow space-x-2">
+        <span className="font-medium overflow-hidden overflow-ellipsis whitespace-pre">
           {comment.user.name}
         </span>
         <span
-          className="flex-shrink-0 overflow-hidden overflow-ellipsis whitespace-pre text-gray-400"
+          className="overflow-hidden overflow-ellipsis whitespace-pre flex-shrink-0 text-gray-400"
           title={relativeDate}
         >
           {relativeDate}
@@ -88,7 +88,7 @@ function CommentItem({
   const showOptions = !isEditing;
 
   return (
-    <div className="group space-y-1.5">
+    <div className="space-y-1.5 group">
       <CommentItemHeader {...{ comment, showOptions }} />
       <ExistingCommentEditor
         comment={comment}
@@ -136,7 +136,7 @@ function CommentCard({
   if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
-        className={`group mx-auto w-full cursor-pointer border-b border-gray-300 bg-gray-50 transition`}
+        className={`mx-auto w-full group border-b border-gray-300 cursor-pointer transition bg-gray-50`}
         onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
         onMouseDown={() => {
@@ -144,8 +144,8 @@ function CommentCard({
           setIsFocused(true);
         }}
       >
-        <div className={classNames("w-full border-l-2 border-secondaryAccent py-2.5")}>
-          <div className={classNames("space-y-2 px-2.5 pl-2")}>
+        <div className={classNames("py-2.5 w-full border-l-2 border-secondaryAccent")}>
+          <div className={classNames("px-2.5 pl-2 space-y-2")}>
             {comment.sourceLocation && <CommentSource comment={comment} />}
             <FocusContext.Provider
               value={{
@@ -166,7 +166,7 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `comment-card relative mx-auto w-full cursor-pointer border-b border-gray-300 bg-white transition`
+        `comment-card mx-auto relative w-full border-b border-gray-300 cursor-pointer transition bg-white`
         // hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-white"
       )}
       onMouseDown={e => {
@@ -177,7 +177,7 @@ function CommentCard({
     >
       <BorderBridge {...{ comments, comment, isPaused }} />
       <div
-        className={classNames(" space-y-2 border-l-2 p-2.5 pl-2", {
+        className={classNames(" p-2.5 pl-2 space-y-2 border-l-2", {
           "border-secondaryAccent": isPaused,
           "border-transparent": !isPaused,
         })}
@@ -212,9 +212,9 @@ function CommentCard({
             />
           </FocusContext.Provider>
         ) : (
-          <div className="flex justify-between border border-transparent pl-1">
+          <div className="border-transparent border pl-1 flex justify-between">
             <button
-              className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:text-primaryAccent focus:outline-none"
+              className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:outline-none focus:text-primaryAccent"
               onClick={() => {
                 setIsEditorOpen(true);
                 setIsFocused(true);
@@ -223,7 +223,7 @@ function CommentCard({
               Reply
             </button>
 
-            <div className="comment-actions mr-2 select-none opacity-0">
+            <div className="comment-actions opacity-0 mr-2 select-none">
               {features.commentAttachments && (
                 <MaterialIcon className="text-gray-400" onClick={onAttachmentClick}>
                   attachment

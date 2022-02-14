@@ -92,7 +92,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
-      <div className="flex flex-grow flex-row space-x-3 p-0.5">
+      <div className="flex-grow flex flex-row space-x-3 p-0.5">
         <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
         {!isLoading ? (
           <PrimaryButton color="blue">Invite</PrimaryButton>
@@ -100,7 +100,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
           <DisabledButton>Loading</DisabledButton>
         )}
       </div>
-      {errorMessage ? <div className="text-xs text-red-500">{errorMessage}</div> : null}
+      {errorMessage ? <div className="text-red-500 text-xs">{errorMessage}</div> : null}
     </form>
   );
 }
@@ -140,11 +140,11 @@ const settings: Settings<
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
-        <div className="flex flex-grow flex-col space-y-3 overflow-hidden">
+        <div className="flex flex-col flex-grow space-y-3 overflow-hidden">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
           <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
-          <div className="text-xs font-semibold uppercase">{`Members`}</div>
-          <div className="flex-grow overflow-auto">
+          <div className="text-xs uppercase font-semibold">{`Members`}</div>
+          <div className="overflow-auto flex-grow">
             <div className="workspace-members-container flex flex-col space-y-1.5">
               <div className="flex flex-col space-y-1.5">
                 {members ? <WorkspaceMembers members={members} isAdmin={isAdmin} /> : null}
@@ -194,8 +194,8 @@ const settings: Settings<
 
       return (
         <div className="flex flex-col space-y-3">
-          <div className=" text-xs font-semibold uppercase">{`Danger Zone`}</div>
-          <div className="flex flex-row justify-between rounded-lg border border-red-300 p-1.5">
+          <div className=" text-xs uppercase font-semibold">{`Danger Zone`}</div>
+          <div className="border border-red-300 flex flex-row justify-between rounded-lg p-1.5">
             <div className="flex flex-col">
               <div className="font-semibold">Delete this team</div>
               <div className="">{`This cannot be reversed.`}</div>

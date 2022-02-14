@@ -5,7 +5,7 @@ export default function ViewerHeader({
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
-  return <div className="flex flex-row items-center justify-between">{children}</div>;
+  return <div className="flex flex-row justify-between items-center">{children}</div>;
 }
 
 export function ViewerHeaderLeft({
@@ -14,6 +14,6 @@ export function ViewerHeaderLeft({
   children: React.ReactChild | React.ReactChild[];
 }) {
   return (
-    <div className="flex flex-row items-center space-x-2 text-2xl font-semibold">{children}</div>
+    <div className="flex flex-row space-x-2 text-2xl font-semibold items-center">{children}</div>
   );
 }

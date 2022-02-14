@@ -80,10 +80,10 @@ export const NetworkMonitor = ({
   return (
     <Table events={events} requests={requests} types={types}>
       {({ table, data }: { table: any; data: RequestSummary[] }) => (
-        <div className="flex h-full min-h-0 flex-col" ref={container}>
+        <div className="flex flex-col min-h-0 h-full" ref={container}>
           <FilterBar types={types} toggleType={toggleType} table={table} />
           <SplitBox
-            className="min-h-0 border-t"
+            className="border-t min-h-0"
             initialSize="350"
             minSize={selectedRequest ? "30%" : "100%"}
             maxSize={selectedRequest ? "70%" : "100%"}

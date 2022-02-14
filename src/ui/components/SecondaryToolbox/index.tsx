@@ -48,7 +48,7 @@ function PanelButtons({
   };
 
   return (
-    <div className="theme-tab-font-size flex flex-row items-center overflow-hidden">
+    <div className="flex flex-row items-center overflow-hidden theme-tab-font-size">
       {!isNode && <NodePicker />}
       <button
         className={classnames("console-panel-button", {

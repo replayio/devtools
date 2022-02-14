@@ -32,13 +32,13 @@ export default function Modal({
       className={classNames("z-50 grid h-full items-center justify-center", className)}
     >
       <div
-        className={classNames("absolute h-full w-full bg-black", {
+        className={classNames("bg-black w-full h-full absolute", {
           "opacity-10": maskTransparency === "translucent",
           "opacity-0": maskTransparency === "transparent",
         })}
         onClick={onMaskClick}
       />
-      <div className="relative z-10">
+      <div className="z-10 relative">
         {children}
         {actions ? <div className="absolute top-4 right-4">{actions}</div> : null}
       </div>
@@ -49,7 +49,7 @@ export default function Modal({
 export function ModalContent({ children }: { children: React.ReactChild | React.ReactChild[] }) {
   return (
     <div
-      className="relative justify-between rounded-lg bg-white p-9 text-lg shadow-xl"
+      className="p-9 bg-white rounded-lg shadow-xl text-lg relative justify-between"
       style={{ width: "520px" }}
     >
       {children}

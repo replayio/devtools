@@ -14,8 +14,8 @@ function Option({ name, id }: { name: string; id: string | null }) {
       key={id}
       className={({ active }) =>
         classnames(
-          active ? "bg-primaryAccent text-white" : "",
-          "relative cursor-default select-none py-1.5 pl-2.5 pr-7"
+          active ? "text-white bg-primaryAccent" : "",
+          "cursor-default select-none relative py-1.5 pl-2.5 pr-7"
         )
       }
       value={id}
@@ -65,9 +65,9 @@ export default function SelectMenu({
           <>
             {label ? <Listbox.Label className="block font-medium ">label</Listbox.Label> : null}
             <div className={`relative z-10 ${className}`}>
-              <Listbox.Button className="relative w-full cursor-default rounded-md border border-textFieldBorder bg-white py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
+              <Listbox.Button className="bg-white relative w-full border border-textFieldBorder rounded-md shadow-sm pl-2.5 pr-8 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover">
                 <span className="block truncate">{selectedName}</span>
-                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
+                <span className="absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none">
                   <SelectorIcon className="h-4 w-4 text-textFieldBorder" aria-hidden="true" />
                 </span>
               </Listbox.Button>
@@ -80,7 +80,7 @@ export default function SelectMenu({
               >
                 <Listbox.Options
                   static
-                  className="absolute mt-1 max-h-48 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  className="absolute mt-1 w-full bg-white shadow-lg max-h-48 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none"
                 >
                   {options.map(({ name, id }) => (
                     <Option name={name} id={id} key={id} />

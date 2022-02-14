@@ -53,7 +53,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
     <div className="portal-dropdown-wrapper">
       <button
         type="button"
-        className={`expand-dropdown flex w-full ${buttonStyle}`}
+        className={`expand-dropdown w-full flex ${buttonStyle}`}
         onMouseDown={expand}
         ref={buttonRef}
       >

@@ -11,7 +11,7 @@ export const ExpandableItem: FC<ExpandableItemProps> = ({ header, children }) =>
 
   return (
     <div>
-      <div className="grid auto-cols-max grid-flow-col items-center gap-1">
+      <div className="grid grid-flow-col auto-cols-max gap-1 items-center">
         <span
           className={cx("theme-twisty bg-center", {
             "opacity-0": !hasChildren,

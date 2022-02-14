@@ -29,7 +29,7 @@ function NagHat({
     <div
       className={classNames(
         NAG_HAT_CLASS,
-        "flex select-none items-center space-x-2 py-1 px-2 leading-tight text-white"
+        "text-white py-1 px-2 flex space-x-2 items-center leading-tight select-none"
       )}
       style={{
         boxShadow: "rgb(184 0 89 / 50%) 0px 0px 4px inset",
@@ -38,9 +38,9 @@ function NagHat({
       }}
     >
       <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
-      <div className="flex flex-col overflow-hidden text-xs">
+      <div className="text-xs flex flex-col overflow-hidden">
         <div className="overflow-hidden overflow-ellipsis whitespace-pre">{mainText}</div>
-        <div className="overflow-hidden overflow-ellipsis whitespace-pre font-bold">{subText}</div>
+        <div className="font-bold overflow-hidden overflow-ellipsis whitespace-pre">{subText}</div>
       </div>
     </div>
   );

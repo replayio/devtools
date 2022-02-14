@@ -6,11 +6,11 @@ import { trackEvent } from "ui/utils/telemetry";
 function DownloadButtonContent({ text, imgUrl }: { text: string; imgUrl: string }) {
   return (
     <div
-      className="flex w-full flex-row items-center justify-between"
+      className="flex flex-row items-center w-full justify-between"
       style={{ minWidth: "120px" }}
     >
       <span>{text}</span>
-      <img className="h-6 w-6" src={imgUrl} />
+      <img className="w-6 h-6" src={imgUrl} />
     </div>
   );
 }
@@ -34,7 +34,7 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
   };
 
   return (
-    <div className="flex w-full flex-row justify-center space-x-3 py-3">
+    <div className="py-3 flex flex-row w-full space-x-3 justify-center">
       <PrimaryLgButton color="blue" onClick={handleMac}>
         <DownloadButtonContent text="Mac" imgUrl="/images/icon-apple.svg" />
       </PrimaryLgButton>

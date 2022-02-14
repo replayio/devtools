@@ -14,12 +14,12 @@ export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces
   const scrollbarStyle = { scrollbarColor: "#6B7280 #1F2937" };
 
   return (
-    <div className="flex w-64 flex-shrink-0 flex-col bg-gray-800 text-gray-300">
+    <div className="flex flex-col bg-gray-800 text-gray-300 w-64 flex-shrink-0">
       <div className="p-4">
-        <img className="h-8 w-8" src="/images/logo.svg" />
+        <img className="w-8 h-8" src="/images/logo.svg" />
       </div>
       <div
-        className="library-sidebar flex flex-grow flex-col overflow-auto text-sm"
+        className="library-sidebar flex flex-col flex-grow text-sm overflow-auto"
         style={scrollbarStyle}
       >
         {features.library ? (

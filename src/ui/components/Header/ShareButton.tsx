@@ -16,7 +16,7 @@ function ShareButton({ setModal }: PropsFromRedux) {
     <button
       type="button"
       onClick={onClick}
-      className="mr-0 flex items-center space-x-1.5 rounded-lg bg-primaryAccent text-white hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+      className="flex items-center space-x-1.5 rounded-lg text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent mr-0"
       style={{ padding: "5px 12px" }}
     >
       <MaterialIcon style={{ fontSize: "16px" }}>ios_share</MaterialIcon>

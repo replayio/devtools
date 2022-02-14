@@ -16,7 +16,7 @@ export function ExpirationRow({ subscription }: { subscription: Subscription }) 
   }
 
   return (
-    <div className="border-color-gray-50 flex flex-row items-center justify-between border-b py-2">
+    <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
       <span>{label}</span>
       <span>{formatDate(subscription.trialEnds, "long")}</span>
     </div>

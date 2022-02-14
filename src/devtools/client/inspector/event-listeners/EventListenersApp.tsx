@@ -98,7 +98,7 @@ export const EventListenersApp: FC = () => {
                         <span>
                           {location && locationUrl ? (
                             <span
-                              className="cursor-pointer underline hover:text-gray-500"
+                              className="underline cursor-pointer hover:text-gray-500"
                               title="Open in Debugger"
                               onClick={() => {
                                 gToolbox.viewSourceInDebugger(

@@ -116,7 +116,7 @@ const TipTapEditor = ({
       }}
     >
       <EditorContent
-        className={classNames("w-full rounded-md border p-1 outline-none transition", {
+        className={classNames("outline-none w-full rounded-md p-1 transition border", {
           "bg-white": editable,
           "border-gray-400": editable,
           "border-transparent": !editable,

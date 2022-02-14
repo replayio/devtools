@@ -67,7 +67,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
         </PrimaryLgButton>
       </div>
       <button
-        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
+        className="w-full justify-center text-primaryAccent underline text-sm font-bold"
         onClick={onLogin}
       >
         Sign in with Google
@@ -86,14 +86,14 @@ function SocialLogin({
   return (
     <div className="space-y-6">
       {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
-      <div className="space-y-4 self-start text-base">
+      <div className="text-base space-y-4 self-start">
         {isTeamMemberInvite() ? (
           <p>In order to join your team, we first need you to sign in.</p>
         ) : (
           <>
             <p className="text-center">
               Replay captures everything you need for the perfect bug report, all in one link.{" "}
-              <a href="https://replay.io" className="pointer-hand underline">
+              <a href="https://replay.io" className="underline pointer-hand">
                 Learn more
               </a>
             </p>
@@ -105,7 +105,7 @@ function SocialLogin({
         Sign in with Google
       </PrimaryLgButton>
       <button
-        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
+        className="w-full justify-center text-primaryAccent underline text-sm font-bold"
         onClick={onShowSSOLogin}
       >
         Enterprise Users: Sign in with SSO

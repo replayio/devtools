@@ -8,7 +8,7 @@ function TextInput(props: React.HTMLProps<HTMLInputElement>) {
     <input
       {...props}
       type="text"
-      className="flex-grow border-0 bg-gray-100 p-0 text-xs focus:ring-transparent"
+      className="flex-grow text-xs focus:ring-transparent p-0 border-0 bg-gray-100"
       spellCheck={false}
     />
   );
@@ -29,8 +29,8 @@ export function FilterSearchBox({ filterTextSet }: { filterTextSet: any }) {
   };
 
   return (
-    <div className="devtools-searchbox relative flex flex-grow items-center">
-      <div className="flex w-full flex-row rounded-md bg-gray-100 px-2 py-1 text-gray-500 focus:ring-primaryAccent">
+    <div className="devtools-searchbox flex items-center flex-grow relative">
+      <div className="flex flex-row focus:ring-primaryAccent w-full px-2 py-1 rounded-md bg-gray-100 text-gray-500">
         <TextInput
           value={searchString}
           onChange={onChange}

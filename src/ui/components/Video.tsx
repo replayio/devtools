@@ -59,8 +59,8 @@ function Video({
 
   const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
   return (
-    <div id="video" className="relative bg-toolbarBackground">
-      <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
+    <div id="video" className="bg-toolbarBackground relative">
+      <div className="absolute w-full h-full flex items-center justify-center bg-chrome">
         <ReplayLogo size="sm" color="gray" />
       </div>
 
@@ -70,8 +70,8 @@ function Video({
         <CommentsOverlay>
           <CommentLoader recordingId={recordingId} />
           {(mouseTargetsLoading || stalled) && (
-            <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
-              <Spinner className="w-4 animate-spin" />
+            <div className="absolute bottom-5 flex right-5 opacity-50 z-20">
+              <Spinner className="animate-spin w-4" />
             </div>
           )}
         </CommentsOverlay>

@@ -81,7 +81,7 @@ function PrivacyPreferences() {
       <div className="text-lg">Privacy Preferences</div>
       <div className="flex flex-col space-y-2 p-1">
         <label
-          className="flex cursor-pointer items-center space-x-2"
+          className="flex items-center space-x-2 cursor-pointer"
           data-private
           htmlFor="disableLogRocket"
         >

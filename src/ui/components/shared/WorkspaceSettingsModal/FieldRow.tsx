@@ -7,7 +7,7 @@ export function FieldRow({ children, className, ...rest }: React.HTMLProps<HTMLD
     <div
       className={classNames(
         className,
-        "grid grid-cols-3 items-center gap-4 border-t border-gray-200 pt-5"
+        "grid grid-cols-3 gap-4 items-center border-t border-gray-200 pt-5"
       )}
     >
       {children}

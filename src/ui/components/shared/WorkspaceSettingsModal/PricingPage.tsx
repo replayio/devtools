@@ -26,7 +26,7 @@ export function PricingPage({
         color="blue"
         size="xl"
         style="primary"
-        className="my-6 w-full justify-center"
+        className="justify-center w-full my-6"
         onClick={onEnterCard}
       >
         Add Payment Method

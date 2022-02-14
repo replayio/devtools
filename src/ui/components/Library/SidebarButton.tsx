@@ -15,9 +15,9 @@ export default function SidebarButton({
   return (
     <a
       className={classNames(
-        `group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:bg-gray-900 hover:text-white focus:outline-none`,
+        `group px-4 py-2 space-x-2 hover:bg-gray-900 hover:text-white transition duration-200 text-left flex flex-row justify-between focus:outline-none`,
         { underline },
-        shouldHighlight ? "cursor-auto bg-gray-900 text-white" : "cursor-pointer"
+        shouldHighlight ? "bg-gray-900 cursor-auto text-white" : "cursor-pointer"
       )}
       onClick={onClick}
     >

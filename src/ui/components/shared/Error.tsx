@@ -37,7 +37,7 @@ function RefreshButton() {
   };
 
   return (
-    <PrimaryButton className="mx-2 flex-1 justify-center" color="blue" onClick={onClick}>
+    <PrimaryButton className="flex-1 mx-2 justify-center" color="blue" onClick={onClick}>
       {clicked ? `Refreshing...` : `Refresh`}
     </PrimaryButton>
   );
@@ -182,14 +182,14 @@ function TrialExpired() {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
-      <section className="m-auto w-full max-w-lg overflow-hidden rounded-lg bg-white text-base shadow-lg">
-        <div className="flex flex-col items-center space-y-12 p-12">
-          <div className="place-content-center space-y-4">
-            <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
+      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
+        <div className="p-12 space-y-12 items-center flex flex-col">
+          <div className="space-y-4 place-content-center">
+            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
           </div>
-          <div className="max-w-lg space-y-3 text-center	">
-            <div className="text-lg font-bold">Free Trial Expired</div>
-            <div className="text-center text-gray-500 ">
+          <div className="text-center space-y-3 max-w-lg	">
+            <div className="font-bold text-lg">Free Trial Expired</div>
+            <div className="text-gray-500 text-center ">
               This replay is unavailable because it was recorded after your team's free trial
               expired.
             </div>

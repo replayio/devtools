@@ -9,13 +9,13 @@ export function InputField({
 }: FieldProps & React.HTMLProps<HTMLInputElement>) {
   return (
     <Field id={id} className={className} label={label}>
-      <div className="flex max-w-lg rounded-md shadow-sm">
+      <div className="max-w-lg flex rounded-md shadow-sm">
         <input
           type="text"
           {...rest}
           name={id}
           id={id}
-          className="block w-full min-w-0 flex-1 rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="flex-1 block w-full focus:ring-indigo-500 focus:border-indigo-500 min-w-0 rounded-md text-sm border-gray-300"
         />
       </div>
     </Field>

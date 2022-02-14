@@ -36,7 +36,7 @@ function RenameReplayModal({
         <DialogTitle>Edit Replay</DialogTitle>
         <TextInput value={title} onChange={onChange} autoFocus />
         <DialogActions>
-          <div className="flex w-full flex-row justify-center space-x-2">
+          <div className="w-full flex flex-row justify-center space-x-2">
             <SecondaryButton color="blue" onClick={dismissModal}>{`Cancel`}</SecondaryButton>
             <PrimaryButton color="blue" onClick={onSave}>{`Save`}</PrimaryButton>
           </div>

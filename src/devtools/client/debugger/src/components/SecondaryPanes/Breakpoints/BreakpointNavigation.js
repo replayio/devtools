@@ -66,7 +66,7 @@ function BreakpointNavigation({
         {editing && (
           <button
             className={classnames(
-              "h-5 w-5 rounded-full border p-px pt-0.5",
+              "rounded-full h-5 w-5 p-px pt-0.5 border",
               showCondition
                 ? "border-primaryAccent text-primaryAccent"
                 : "border-gray-500 text-gray-500"
@@ -138,7 +138,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
 
   return (
     <div className={classnames("breakpoint-navigation-status-container")}>
-      <div className="rounded-2xl bg-gray-200 px-3 py-0.5 text-gray-500">
+      <div className="px-3 py-0.5 rounded-2xl text-gray-500 bg-gray-200">
         <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
         {status}
       </div>

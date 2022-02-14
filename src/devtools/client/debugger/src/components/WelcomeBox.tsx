@@ -7,12 +7,12 @@ import CommandPalette from "ui/components/CommandPalette";
 
 export default function WelcomeBox() {
   return (
-    <div className="flex h-full w-full flex-col items-center overflow-hidden">
-      <div className="relative flex w-full justify-center px-8 pt-14">
-        <div className="pointer-events-none absolute">
+    <div className="flex flex-col items-center h-full w-full overflow-hidden">
+      <div className="relative flex justify-center pt-14 px-8 w-full">
+        <div className="absolute pointer-events-none">
           <img src="/images/bubble.svg" className="editor-bg" style={{ transform: "scale(2.4)" }} />
         </div>
-        <div className="relative flex w-full flex-col items-center">
+        <div className="relative w-full flex flex-col items-center">
           <CommandPalette />
         </div>
       </div>

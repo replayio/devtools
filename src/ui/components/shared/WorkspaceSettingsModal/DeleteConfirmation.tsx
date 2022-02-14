@@ -34,10 +34,10 @@ export function DeleteConfirmation({
         payment method to continue your subscription beyond the current billing cycle.
       </p>
       <p>Are you sure you want to remove {formatPaymentMethod(subscription.paymentMethods[0])}?</p>
-      <div className="flex flex-row justify-center space-x-6">
+      <div className="flex flex-row space-x-6 justify-center">
         <button
           className={classNames(
-            "rounded-md border border-primaryAccent px-6 py-3 text-primaryAccent",
+            "border border-primaryAccent text-primaryAccent px-6 py-3 rounded-md",
             {
               "opacity-60": loading,
             }
@@ -48,7 +48,7 @@ export function DeleteConfirmation({
         </button>
         <button
           disabled={loading}
-          className={classNames("rounded-md bg-red-500 px-6 py-3 text-white", {
+          className={classNames("bg-red-500 text-white px-6 py-3 rounded-md", {
             "opacity-60": loading,
           })}
           onClick={loading ? undefined : handleDeletePaymentMethod}

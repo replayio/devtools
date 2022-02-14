@@ -24,12 +24,12 @@ export function TrialEnd({
 
   return (
     <div
-      className={classNames("flex flex-row items-center space-x-2 rounded-lg p-4 py-1", className)}
+      className={classNames("py-1 p-4 rounded-lg flex flex-row space-x-2 items-center", className)}
       style={style}
       onClick={onClick}
     >
       <MaterialIcon iconSize="xl">timer</MaterialIcon>
-      <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+      <span className="overflow-hidden whitespace-pre overflow-ellipsis">
         {expiresIn > 1 ? (
           <span>Trial expires in {expiresIn} days</span>
         ) : expiresIn == 1 ? (

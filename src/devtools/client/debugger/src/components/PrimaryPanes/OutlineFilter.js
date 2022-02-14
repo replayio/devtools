@@ -32,10 +32,10 @@ export default class OutlineFilter extends Component {
 
   render() {
     return (
-      <div className="outline-filter px-3 pt-1">
+      <div className="outline-filter pt-1 px-3">
         <form>
           <input
-            className="h-full w-full rounded-md border-none bg-chrome px-2 py-1 text-xs focus:ring-gray-300"
+            className="w-full h-full text-xs px-2 py-1 rounded-md focus:ring-gray-300 bg-chrome border-none"
             onFocus={() => this.setFocus(true)}
             onBlur={() => this.setFocus(false)}
             placeholder={"Filter functions"}

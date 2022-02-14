@@ -12,12 +12,12 @@ export default function WelcomeBanner({
   em?: string;
 }) {
   return (
-    <div className="flex h-full w-full items-center justify-center">
+    <div className="w-full h-full flex justify-center items-center">
       <div className="relative overflow-hidden text-center">
         {title || em ? (
           <h1 className="text-5xl font-bold text-gray-800">
             {title}{" "}
-            <div className="relative inline-block">
+            <div className="inline-block relative">
               {em}
               <svg
                 className="absolute w-full"
@@ -55,7 +55,7 @@ export default function WelcomeBanner({
           </h1>
         ) : null}
         {subtitle ? (
-          <h2 style={{ width: "660px" }} className="mt-6 text-xl text-gray-600">
+          <h2 style={{ width: "660px" }} className="text-xl mt-6 text-gray-600">
             {subtitle}
           </h2>
         ) : null}

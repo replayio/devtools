@@ -20,8 +20,8 @@ export function SubmitButton({
       onClick={handleSetBreakpoint}
       title={disabled ? "Syntax error" : "Save expression"}
       className={classnames(
-        "inline-flex flex-shrink-0 items-center rounded-md border border-transparent p-1 font-sans text-xs font-medium leading-4 text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2",
-        disabled ? "cursor-default bg-gray-400" : "bg-primaryAccent hover:bg-primaryAccentHover"
+        "inline-flex items-center p-1 border border-transparent text-xs leading-4 font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent flex-shrink-0 font-sans text-white",
+        disabled ? "bg-gray-400 cursor-default" : "bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       Save
@@ -70,10 +70,10 @@ export default function PanelForm({
   };
 
   return (
-    <form className="flex flex-grow flex-col overflow-hidden pl-2">
+    <form className="pl-2 flex-grow flex flex-col overflow-hidden">
       {showCondition ? (
         <div className={classnames("form-row")}>
-          <div className="mr-1 w-6 flex-shrink-0">if</div>
+          <div className="w-6 flex-shrink-0 mr-1">if</div>
           <PanelInput
             autofocus={inputToFocus == "condition"}
             defaultValue={condition}
@@ -84,7 +84,7 @@ export default function PanelForm({
         </div>
       ) : null}
       <div className={classnames("form-row")}>
-        {showCondition ? <div className="mr-1 w-6 flex-shrink-0">log</div> : null}
+        {showCondition ? <div className="w-6 flex-shrink-0 mr-1">log</div> : null}
         <PanelInput
           autofocus={inputToFocus == "logValue"}
           defaultValue={logValue}

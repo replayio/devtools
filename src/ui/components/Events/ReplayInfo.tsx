@@ -42,11 +42,11 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-white">
-      <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
+    <div className="flex overflow-hidden flex flex-column items-center bg-white border-splitter">
+      <div className="flex flex-col my-1.5 px-1.5 self-stretch w-full text-xs pb-0 overflow-hidden cursor-default">
         {recording.user ? (
           <Row>
-            <AvatarImage className="avatar h-5 w-5 rounded-full" src={recording.user.picture} />
+            <AvatarImage className="h-5 w-5 rounded-full avatar" src={recording.user.picture} />
             <div>{recording.user.name}</div>
             <div className="opacity-50">{time}</div>
           </Row>
@@ -57,7 +57,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <Row>
               <Icon
                 filename={icon}
-                className="cursor-pointer bg-gray-800 group-hover:bg-primaryAccent"
+                className="bg-gray-800 group-hover:bg-primaryAccent cursor-pointer"
               />
               <div>
                 <PrivacyDropdown {...{ recording }} />
@@ -69,7 +69,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           <Row>
             <Icon
               filename="external"
-              className="cursor-pointer bg-gray-800 group-hover:bg-primaryAccent"
+              className="bg-gray-800 group-hover:bg-primaryAccent cursor-pointer"
             />
             <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
               <a href={recording.url} target="_blank" rel="noopener noreferrer">

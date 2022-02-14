@@ -12,8 +12,8 @@ export default function StaticTooltip({ targetNode, children, className }: Stati
   let style = { top: `${top}px`, left: `${left}px` };
 
   return ReactDOM.createPortal(
-    <div className={`static-tooltip z-10 ml-1 -mt-1 text-sm ${className}`} style={style}>
-      <div className="-translate-y-full transform">{children}</div>
+    <div className={`static-tooltip text-sm z-10 ml-1 -mt-1 ${className}`} style={style}>
+      <div className="transform -translate-y-full">{children}</div>
     </div>,
     document.body
   );

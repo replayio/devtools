@@ -83,7 +83,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label>Name</Label>
         <Input>
           <input
-            className="w-full rounded-md text-sm"
+            className="rounded-md text-sm w-full"
             type="text"
             value={name}
             onChange={e => setName(e.currentTarget.value)}
@@ -95,7 +95,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <div className="flex flex-col items-start space-y-4">
             {img ? <img className="block max-h-12" src={`data:image/png;base64,${img}`} /> : null}
-            <label className="flex-inline cursor-pointer items-center justify-center rounded-md border p-2">
+            <label className="cursor-pointer border rounded-md p-2 flex-inline items-center justify-center">
               <input
                 type="file"
                 className="invisible h-1 w-0"
@@ -103,7 +103,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
                 onChange={e => onUpload(e.currentTarget)}
               />
               <span>Upload</span>
-              <span className="material-icons ml-2 text-sm">upload</span>
+              <span className="text-sm material-icons ml-2">upload</span>
             </label>
             {err ? <div className="text-red-500">{err}</div> : null}
           </div>

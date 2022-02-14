@@ -27,12 +27,12 @@ export function TextInputCopy({
   };
 
   return (
-    <div className="relative flex w-full flex-col items-center p-0.5">
+    <div className="relative flex flex-col items-center w-full p-0.5">
       <input
         className={classNames(
           isLarge ? "text-xl" : "text-sm",
           isCenter ? "text-center" : "",
-          "block w-full rounded-md border border-textFieldBorder px-2.5 py-1.5 focus:border-primaryAccent focus:ring-primaryAccent"
+          "focus:ring-primaryAccent focus:border-primaryAccent block w-full border px-2.5 py-1.5 border-textFieldBorder rounded-md"
         )}
         type="text"
         value={text}
@@ -41,7 +41,7 @@ export function TextInputCopy({
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="absolute bottom-full mb-1.5 rounded-lg bg-gray-500 bg-opacity-90 p-1.5 text-base text-gray-200 shadow-2xl">
+        <div className="absolute bottom-full p-1.5 text-gray-200 bg-gray-500 bg-opacity-90 shadow-2xl rounded-lg mb-1.5 text-base">
           Copied
         </div>
       ) : null}
@@ -73,7 +73,7 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   );
 
   return (
-    <div className="flex flex-row items-center space-x-3 px-1.5">
+    <div className="space-x-3 flex flex-row items-center px-1.5">
       <input
         id="domain-limited"
         className="outline-none focus:outline-none"
@@ -110,8 +110,8 @@ export default function InvitationLink({
     : `https://app.replay.io/team/invitation/${workspace.invitationCode}`;
 
   return (
-    <div className="flex w-full flex-col space-y-3">
-      {!hideHeader ? <div className="text-xs font-bold uppercase">{`Invite link`}</div> : null}
+    <div className="flex flex-col space-y-3 w-full">
+      {!hideHeader ? <div className="text-xs uppercase font-bold">{`Invite link`}</div> : null}
       <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
     </div>

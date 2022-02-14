@@ -58,20 +58,20 @@ export default function SettingsPreview({
     <button
       className={classNames(
         !canEdit && "cursor-default",
-        "flex w-full flex-row items-center justify-between focus:outline-none"
+        "w-full flex flex-row justify-between items-center focus:outline-none"
       )}
       type="button"
       onClick={canEdit ? onClick : undefined}
       style={{ minHeight: "38px" }}
     >
-      <div className="flex flex-row items-center space-x-2.5">
+      <div className="space-x-2.5 flex flex-row items-center">
         <span className="material-icons" style={{ fontSize: "24px" }}>
           {icon}
         </span>
         <div className="font-medium">{text}</div>
       </div>
       {canEdit ? (
-        <div className="flex flex-row items-center space-x-2 text-primaryAccent">
+        <div className="space-x-2 flex flex-row items-center text-primaryAccent">
           <div className="font-medium">Edit</div>
           <span className="material-icons" style={{ fontSize: "24px" }}>
             edit

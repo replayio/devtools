@@ -33,7 +33,7 @@ function IndexingLoader({
   }
 
   return (
-    <div className="absolute h-7 w-7" title={`Indexing (${progressPercentage.toFixed()}%)`}>
+    <div className="w-7 h-7 absolute" title={`Indexing (${progressPercentage.toFixed()}%)`}>
       <CircularProgressbar
         value={progressPercentage}
         strokeWidth={14}

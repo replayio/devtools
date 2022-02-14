@@ -43,7 +43,7 @@ function Wrapper({
 
   if (showWarning) {
     return (
-      <div className="static-tooltip-content space-x-2 bg-red-700">
+      <div className="static-tooltip-content bg-red-700 space-x-2">
         <MaterialIcon>warning_amber</MaterialIcon>
         <div>{children}</div>
       </div>

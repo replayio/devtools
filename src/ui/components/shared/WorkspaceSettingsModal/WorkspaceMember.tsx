@@ -118,7 +118,7 @@ function Status({
 }) {
   return (
     <div
-      className={classnames("group flex flex-row items-center", { italic: member.pending })}
+      className={classnames("flex flex-row items-center group", { italic: member.pending })}
       title={title}
     >
       <span className="whitespace-pre">
@@ -163,10 +163,10 @@ export function NonRegisteredWorkspaceMember({
 
   return (
     <li className="flex flex-row items-center space-x-1.5">
-      <div className="grid items-center justify-center" style={{ width: "28px", height: "28px" }}>
+      <div className="grid justify-center items-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon iconSize="xl">mail_outline</MaterialIcon>
       </div>
-      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
+      <div className="flex-grow whitespace-pre overflow-hidden overflow-ellipsis">
         {member.email}
       </div>
       <PortalDropdown
@@ -278,10 +278,10 @@ function WorkspaceMember({
     <li className="flex flex-row items-center space-x-1.5">
       <AvatarImage
         src={member.user!.picture}
-        className="avatar rounded-full"
+        className="rounded-full avatar"
         style={{ width: "28px", height: "28px" }}
       />
-      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre" data-private>
+      <div className="flex-grow overflow-hidden whitespace-pre overflow-ellipsis" data-private>
         {member.user!.name}
       </div>
       <Role

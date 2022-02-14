@@ -35,7 +35,7 @@ export function HeaderGroups({
       )}
       {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => (
         <div
-          className="flex items-center divide-x font-normal"
+          className="flex font-normal items-center divide-x"
           {...headerGroup.getHeaderGroupProps()}
         >
           {headerGroup.headers.map(column => (

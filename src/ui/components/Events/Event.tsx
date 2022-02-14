@@ -64,15 +64,15 @@ export default function Event({
       onClick={onClick}
       onKeyDown={onKeyDown}
       className={classNames(
-        "event user-select-none mb-1 mt-1 flex flex-row items-center justify-between",
-        "group block w-full cursor-pointer rounded-lg py-1 pl-3 pr-2 hover:bg-gray-100 focus:outline-none",
+        "event flex flex-row justify-between items-center mb-1 mt-1 user-select-none",
+        "group block py-1 pl-3 pr-2 w-full rounded-lg hover:bg-gray-100 focus:outline-none cursor-pointer",
         {
           "text-lightGrey": currentTime < time,
-          "font-semibold text-primaryAccent": isPaused,
+          "text-primaryAccent font-semibold": isPaused,
         }
       )}
     >
-      <div className="flex flex-row items-center space-x-2 overflow-hidden">
+      <div className="flex flex-row space-x-2 items-center overflow-hidden">
         <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
           {icon}
         </MaterialIcon>
@@ -87,5 +87,5 @@ export default function Event({
 }
 
 const Label = ({ children }: { children: ReactNode }) => (
-  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
+  <div className="overflow-ellipsis overflow-hidden whitespace-pre font-normal">{children}</div>
 );

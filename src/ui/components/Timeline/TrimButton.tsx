@@ -15,7 +15,7 @@ function TrimButton({ setModal, hideModal, modal }: PropsFromRedux) {
   };
 
   return (
-    <button className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white" onClick={onClick}>
+    <button className="text-white rounded-full bg-primaryAccent w-6 h-6 p-1" onClick={onClick}>
       <MaterialIcon>center_focus_strong</MaterialIcon>
     </button>
   );

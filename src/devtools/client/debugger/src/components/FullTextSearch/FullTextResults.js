@@ -21,7 +21,7 @@ export function FullTextResults({ results, onItemSelect, focusedItem, onFocus })
   }
 
   return (
-    <div className="flex flex-col overflow-hidden px-2">
+    <div className="overflow-hidden px-2 flex flex-col">
       <FullTextSummary results={results} />
       <div className="h-full overflow-y-auto">
         <ManagedTree

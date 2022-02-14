@@ -48,7 +48,7 @@ export function OnboardingContent({
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
-  return <div className="relative flex flex-col items-center space-y-4">{children}</div>;
+  return <div className="space-y-4 relative flex flex-col items-center">{children}</div>;
 }
 
 export function OnboardingHeader({ children }: { children: string }) {
@@ -127,7 +127,7 @@ export function OnboardingButton({
       disabled={disabled}
       className={classNames(
         className,
-        "max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+        "max-w-max items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >
       {children}
@@ -149,7 +149,7 @@ export function OnboardingModalContainer({
     <OnboardingContext.Provider value={{ theme }}>
       <div
         className={classNames(
-          "fixed z-50 grid h-full w-full",
+          "w-full h-full grid fixed z-50",
           theme === "dark" ? "bg-black text-white" : "bg-white text-black"
         )}
       >

@@ -13,14 +13,14 @@ function FilterDrawer({ collapseFilterDrawer }: PropsFromRedux) {
   return (
     <div className="flex flex-col bg-white">
       <div
-        className="flex flex-grow flex-col space-y-2 overflow-y-auto border-r border-gray-300 py-2"
+        className="py-2 space-y-2 flex flex-col flex-grow overflow-y-auto border-r border-gray-300"
         style={{ width: "var(--console-drawer-width)" }}
       >
         <div className="px-2">
           <FilterSettings />
         </div>
         <div className="w-full border-b border-gray-300" />
-        <div className="flex-grow px-2">
+        <div className="px-2 flex-grow">
           <EventListeners />
         </div>
         <div className="w-full border-b border-gray-300" />

@@ -113,7 +113,7 @@ export function EnterPaymentMethod({
       <InputField id="state" required label="State / Province" autoComplete="address-level1" />
       <InputField id="postalCode" required label="Postal Code" autoComplete="postal-code" />
       <CountrySelect />
-      <div className="flex flex-row items-center justify-end space-x-4 border-t border-gray-200 pt-5 pb-2">
+      <div className="space-x-4 flex flex-row items-center justify-end pt-5 border-t border-gray-200 pb-2">
         <Button
           size="sm"
           color="blue"

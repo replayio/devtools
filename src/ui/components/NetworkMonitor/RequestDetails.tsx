@@ -43,7 +43,7 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
   return (
     <div className={classNames(className, "flex flex-col")}>
       {details.map((h, i) => (
-        <div className={classNames(styles.row, "py-1 hover:bg-gray-100")} key={`${h.name}-${i}`}>
+        <div className={classNames(styles.row, "hover:bg-gray-100 py-1")} key={`${h.name}-${i}`}>
           <span className="font-bold ">{h.name}:</span> {h.value}
         </div>
       ))}
@@ -53,7 +53,7 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
 
 export const TriangleToggle = ({ open }: { open: boolean }) => (
   <span
-    className={classNames("img arrow select-none p-3", { expanded: open })}
+    className={classNames("p-3 select-none img arrow", { expanded: open })}
     style={{ marginInlineEnd: "4px" }}
   />
 );
@@ -71,7 +71,7 @@ const parseCookie = (str: string): Record<string, string> => {
 const Cookies = ({ request }: { request: RequestSummary }) => {
   return (
     <div>
-      <h2 className={classNames("cursor-pointer border-t p-4 py-1 font-bold", styles.title)}>
+      <h2 className={classNames("p-4 py-1 border-t cursor-pointer font-bold", styles.title)}>
         Request Cookies
       </h2>
       <DetailTable
@@ -120,7 +120,7 @@ const Timing = ({ request }: { request: RequestSummary }) => {
   }
   return (
     <>
-      <div className="flex items-center justify-between px-4 py-2 font-bold">Timings:</div>
+      <div className="flex justify-between items-center px-4 py-2 font-bold">Timings:</div>
       <DetailTable details={details} />
     </>
   );
@@ -157,7 +157,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   return (
     <>
       <div
-        className={classNames("flex cursor-pointer items-center py-1 font-bold")}
+        className={classNames("flex items-center py-1 cursor-pointer font-bold")}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
         <TriangleToggle open={requestExpanded} />
@@ -165,7 +165,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
       <h2
-        className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
+        className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
       >
         <TriangleToggle open={requestHeadersExpanded} />
@@ -177,7 +177,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       {request.responseHeaders.length > 0 && (
         <>
           <h2
-            className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
+            className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
             onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
           >
             <TriangleToggle open={responseHeadersExpanded} />
@@ -189,7 +189,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
           {request.queryParams.length > 0 && (
             <div>
               <h2
-                className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
+                className={classNames("py-1 border-t cursor-pointer font-bold", styles.title)}
                 onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
               >
                 <TriangleToggle open={queryParametersExpanded} />
@@ -264,10 +264,7 @@ const RequestDetails = ({
 
   return (
     <div className="bg-white border-l min-w-full overflow-scroll">
-      <div
-        className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0"
-        style={{ height: 25 }}
-      >
+      <div className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0">
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
       </div>

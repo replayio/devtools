@@ -158,7 +158,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div className={css.header}>
-      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
+      <div className="flex flex-row items-center relative overflow-hidden flex-grow">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}

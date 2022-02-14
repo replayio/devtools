@@ -21,15 +21,15 @@ export function CopyButton({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
+    <div className="copy-link relative flex flex-col items-center flex-shrink-0">
       <button
-        className="rounded-lg border border-gray-400 p-2 py-1 transition hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
+        className="p-2 py-1 border border-gray-400 rounded-lg hover:bg-primaryAccent hover:border-primaryAccent hover:text-white transition"
         {...{ onClick }}
       >
         Copy Link
       </button>
       {showCopied ? (
-        <div className="bg-opacity-900 absolute bottom-full mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl">
+        <div className="absolute bottom-full p-1.5 bg-black bg-opacity-900 text-white shadow-2xl rounded-lg mb-1.5">
           Copied
         </div>
       ) : null}
@@ -63,7 +63,7 @@ export function UrlCopy({ url }: { url: string }) {
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="bg-opacity-900 absolute bottom-full mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl">
+        <div className="absolute bottom-full p-1.5 bg-black bg-opacity-900 text-white shadow-2xl rounded-lg mb-1.5">
           Copied to Clipboard
         </div>
       ) : null}

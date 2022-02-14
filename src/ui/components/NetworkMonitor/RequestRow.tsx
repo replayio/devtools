@@ -57,7 +57,7 @@ export const RequestRow = ({
           return (
             <div
               className={classNames(
-                "items-center overflow-hidden whitespace-nowrap p-1",
+                "whitespace-nowrap p-1 items-center overflow-hidden",
                 styles[cell.column.id]
               )}
               {...cell.getCellProps()}

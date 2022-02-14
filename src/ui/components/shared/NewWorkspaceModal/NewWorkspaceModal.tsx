@@ -36,7 +36,7 @@ function ModalButton({
       onClick={onClick}
       disabled={disabled}
       className={
-        "max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-4 py-2 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+        "max-w-max items-center px-4 py-2 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
       }
     >
       {children}
@@ -52,9 +52,9 @@ function SlideContent({
   children: React.ReactElement | (React.ReactElement | null)[];
 }) {
   return (
-    <div className="flex flex-grow flex-col space-y-3 overflow-hidden">
+    <div className="space-y-3 flex flex-col flex-grow overflow-hidden">
       <h2 className="text-2xl ">{headerText}</h2>
-      <div className="flex flex-grow flex-col space-y-3 overflow-hidden text-gray-500">
+      <div className="text-gray-500 flex flex-col flex-grow space-y-3 overflow-hidden">
         {children}
       </div>
     </div>
@@ -67,8 +67,8 @@ function DisabledNextButton() {
       disabled={true}
       type="button"
       className={classNames(
-        "items-center rounded-md border border-transparent px-3 py-1.5 font-medium shadow-sm focus:outline-none",
-        "bg-gray-300 text-gray-600"
+        "items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none",
+        "text-gray-600 bg-gray-300"
       )}
     >
       Next
@@ -126,9 +126,9 @@ function NextButton({
       disabled={current == total}
       type="button"
       className={classNames(
-        "items-center rounded-md border border-transparent px-3 py-1.5 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2",
+        "items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent",
         {
-          "bg-primaryAccent text-white hover:bg-primaryAccentHover": current < total,
+          "text-white bg-primaryAccent hover:bg-primaryAccentHover": current < total,
         }
       )}
     >
@@ -192,7 +192,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     <>
       <SlideContent headerText="Team name">
         {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
-        <div className="flex flex-col py-3 px-0.5">
+        <div className="py-3 flex flex-col px-0.5">
           <TextInput value={inputValue} onChange={onChange} ref={textInputRef} />
           {inputError ? <div className="text-red-500">{inputError}</div> : null}
         </div>
@@ -275,7 +275,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     <>
       <SlideContent headerText="Invite team members">
         <form className="flex flex-col" onSubmit={handleAddMember}>
-          <div className="flex flex-grow flex-row space-x-3 px-0.5">
+          <div className="flex-grow flex flex-row space-x-3 px-0.5">
             <TextInput
               placeholder="Email address"
               value={inputValue}
@@ -288,7 +288,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
           </div>
           {errorMessage ? <div>{errorMessage}</div> : null}
         </form>
-        <div className="flex-grow overflow-auto">
+        <div className="overflow-auto flex-grow">
           {!loading && sortedMembers ? <WorkspaceMembers members={sortedMembers} isAdmin /> : null}
         </div>
         <InvitationLink workspaceId={newWorkspace!.id} />
@@ -331,8 +331,8 @@ function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props
         <button
           onClick={onClick}
           className={classNames(
-            "items-center rounded-md border border-transparent px-3 py-1.5 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2",
-            "bg-primaryAccent text-white hover:bg-primaryAccentHover"
+            "items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent",
+            "text-white bg-primaryAccent hover:bg-primaryAccentHover"
           )}
         >
           {`Take me to my team`}
@@ -370,7 +370,7 @@ function OnboardingModal(props: PropsFromRedux) {
     <>
       <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
         <div
-          className="relative flex flex-col justify-between space-y-6 rounded-lg bg-white p-4 text-sm shadow-xl"
+          className="p-4 bg-white rounded-lg shadow-xl text-sm space-y-6 relative flex flex-col justify-between"
           style={{ width: "480px" }}
         >
           {slide}

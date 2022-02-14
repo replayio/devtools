@@ -66,7 +66,7 @@ function TeamButton({
       </div>
       <div className="flex flex-row space-x-1">
         {isNew ? (
-          <div className={"newbadge rounded-lg px-3 py-0.5 text-xs text-white"}>New</div>
+          <div className={"text-xs rounded-lg px-3 py-0.5 text-white newbadge"}>New</div>
         ) : null}
         {showSettingsButton ? <SettingsButton onClick={handleSettingsClick} /> : null}
       </div>
@@ -78,7 +78,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
+      className="material-icons w-5 text-gray-200 transition duration-200 text-sm"
     >
       settings
     </button>

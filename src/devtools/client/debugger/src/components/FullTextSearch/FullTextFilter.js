@@ -46,12 +46,12 @@ export function FullTextFilter({
 
   return (
     <div className="p-2">
-      <div className="flex items-center space-x-2 rounded-md border-0 bg-gray-100 px-2 py-1">
+      <div className="px-2 py-1 border-0 bg-gray-100 rounded-md flex items-center space-x-2">
         <MaterialIcon>search</MaterialIcon>
         <input
           style={{ boxShadow: "unset" }}
           placeholder="Find in files…"
-          className="flex-grow border-0 bg-transparent p-0 text-xs focus:outline-none"
+          className="border-0 bg-transparent p-0 flex-grow text-xs focus:outline-none"
           type="text"
           value={value}
           onChange={e => setValue(e.target.value)}
@@ -60,7 +60,7 @@ export function FullTextFilter({
           ref={inputRef}
           autoFocus
         />
-        {results.status === "LOADING" ? <Spinner className="h-4 w-4 animate-spin" /> : null}
+        {results.status === "LOADING" ? <Spinner className="animate-spin h-4 w-4" /> : null}
       </div>
     </div>
   );

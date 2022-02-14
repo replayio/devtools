@@ -8,7 +8,7 @@ export default function TimeTooltip({ time }: { time: number | null }) {
   const minutes = date.getMinutes();
 
   return (
-    <div className="bottom-1 rounded-md border border-splitter bg-toolbarBackground p-1 py-0.5 text-xs">
+    <div className="text-xs bg-toolbarBackground p-1 py-0.5 border border-splitter rounded-md bottom-1">
       {`${minutes}:${seconds}`}
     </div>
   );

@@ -24,7 +24,7 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="relative flex w-96 flex-col items-center space-y-8 rounded-lg bg-white bg-opacity-80 p-8 py-4">
+      <div className="p-8 py-4 relative flex flex-col items-center space-y-8 rounded-lg bg-opacity-80 bg-white w-96">
         <div className="flex flex-col items-center space-y-2">
           <ReplayLogo wide size="lg" />
           {children}
@@ -38,9 +38,9 @@ export function LoadingScreenTemplate({
 // White progress screen used for showing the scanning progress of a replay
 export function ProgressBar({ progress }: { progress: number }) {
   return (
-    <div className="relative h-1.5 w-full overflow-hidden rounded-lg bg-gray-200 p-0">
+    <div className="bg-gray-200 rounded-lg overflow-hidden w-full relative h-1.5 p-0">
       <div
-        className="t-0 absolute h-full bg-primaryAccent"
+        className="absolute t-0 h-full bg-primaryAccent"
         style={{ width: `${progress}%`, transitionDuration: "400ms" }}
       />
     </div>

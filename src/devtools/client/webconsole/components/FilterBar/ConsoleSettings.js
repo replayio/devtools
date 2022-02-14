@@ -17,10 +17,10 @@ const { FILTERS } = require("devtools/client/webconsole/constants");
 
 export const ToggleRow = ({ children, selected, onClick, id }) => {
   return (
-    <label className="flex select-none items-center py-0.5" htmlFor={id}>
-      <div className="flex flex-grow flex-row items-center space-x-2">
+    <label className="flex py-0.5 items-center select-none" htmlFor={id}>
+      <div className="flex flex-row flex-grow space-x-2 items-center">
         <Checkbox id={id} checked={selected} className="m-0" onChange={onClick} />
-        <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
+        <span className="whitespace-pre overflow-hidden overflow-ellipsis flex-grow">
           {children}
         </span>
       </div>

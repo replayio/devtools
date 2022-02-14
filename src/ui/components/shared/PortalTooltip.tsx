@@ -25,7 +25,7 @@ export default function PortalTooltip({ children, tooltip, followX = false }: Po
   return (
     <>
       <div
-        className="h-full w-full leading-3"
+        className="w-full h-full leading-3"
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         ref={containerRef}
@@ -64,7 +64,7 @@ function PortalChild({
 
   return (
     <div
-      className="animate absolute z-50 -translate-x-1/2 -translate-y-full transform"
+      className="transform -translate-x-1/2 -translate-y-full absolute z-50 animate"
       style={{
         left: followX ? hoveredX : targetX,
         top: containerRect.y,

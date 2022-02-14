@@ -9,7 +9,7 @@ export default function PrivacyToggle({
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
-    <div className="flex flex-row items-center space-x-3">
+    <div className="flex flex-row space-x-3 items-center">
       <input
         type="checkbox"
         checked={isPublic}

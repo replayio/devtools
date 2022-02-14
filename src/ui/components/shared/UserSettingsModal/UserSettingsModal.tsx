@@ -25,7 +25,7 @@ function Support() {
   return (
     <ul>
       <li className="flex flex-row items-center">
-        <label className="flex-grow space-y-1.5 pr-36">
+        <label className="space-y-1.5 pr-36 flex-grow">
           <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
           <div className="description">
             Come chat with us on our{" "}
@@ -34,7 +34,7 @@ function Support() {
         </label>
       </li>
       <li className="flex flex-row items-center">
-        <label className="flex-grow space-y-1.5 pr-36">
+        <label className="space-y-1.5 pr-36 flex-grow">
           <SettingsBodyHeader>Send us an email</SettingsBodyHeader>
           <div className="description">
             You can also send an email at <a href="mailto:support@replay.io">support@replay.io</a>.
@@ -53,8 +53,8 @@ function Personal() {
 
   return (
     <div className="space-y-12">
-      <div className="flex flex-row items-center space-x-3" data-private>
-        <AvatarImage src={picture} className="avatar w-12 rounded-full" />
+      <div className="flex flex-row space-x-3 items-center" data-private>
+        <AvatarImage src={picture} className="rounded-full w-12 avatar" />
         <div>
           <div className="text-base">{name}</div>
           <div className="text-gray-500">{email}</div>
@@ -63,7 +63,7 @@ function Personal() {
       <div>
         <button
           onClick={() => handleIntercomLogout(logout)}
-          className="max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+          className="max-w-max items-center px-3 py-1.5 border border-transparent font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryAccent text-white bg-primaryAccent hover:bg-primaryAccentHover"
         >
           Log Out
         </button>

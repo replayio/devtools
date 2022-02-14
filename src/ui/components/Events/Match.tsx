@@ -35,7 +35,7 @@ function Match({
 
   return (
     <button
-      className="event-match flex text-gray-500 opacity-0 hover:text-gray-700"
+      className="event-match flex opacity-0 text-gray-500 hover:text-gray-700"
       onClick={onClick}
       title={getTimestamp(time)}
     >
