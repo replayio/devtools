@@ -77,7 +77,7 @@ function HeaderTitle({
   const canEditTitle = recording.userRole !== "none";
 
   const className =
-    "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis title-container";
+    "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis";
 
   const onKeyPress: React.KeyboardEventHandler = (e: any) => {
     if (e.code == "Enter" || e.code == "Escape") {
