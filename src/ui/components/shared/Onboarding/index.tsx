@@ -28,14 +28,15 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative flex flex-col items-center p-9 m-4 text-2xl shadow-md",
-        overlay ? "space-y-8 max-w-sm" : "space-y-12 max-w-3xl",
+        "relative flex flex-col items-center p-9 text-2xl",
+        overlay ? "space-y-8" : "space-y-12",
         {
           "rounded-lg bg-opacity-80": overlay,
           "bg-white": overlay && ctx.theme === "light",
           "bg-black": overlay && ctx.theme === "dark",
         }
       )}
+      style={{ width: overlay ? 512 : 800 }}
     >
       <ReplayLogo size={overlay ? "md" : "lg"} wide={overlay} />
       {children}
