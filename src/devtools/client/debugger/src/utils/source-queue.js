@@ -16,7 +16,7 @@ async function dispatchNewSources() {
   currentWork = await newQueuedSources(sources);
 }
 
-const queue = throttle(dispatchNewSources, 100);
+const queue = throttle(dispatchNewSources, 1000);
 
 export default {
   initialize: actions => {
