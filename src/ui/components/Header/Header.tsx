@@ -77,7 +77,7 @@ function HeaderTitle({
   const canEditTitle = recording.userRole !== "none";
 
   const className =
-    "ml-2 text-lg py-0.5 whitespace-pre overflow-hidden overflow-ellipsis title-container";
+    "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis title-container";
 
   const onKeyPress: React.KeyboardEventHandler = (e: any) => {
     if (e.code == "Enter" || e.code == "Escape") {
@@ -121,7 +121,7 @@ function HeaderTitle({
   return (    
     <span
     style={{ outline: "none", background: "inherit" }}
-      className={cx(className, "input m-5 focus:bg-blue-500 title-container", {
+      className={cx(className, "input m-5 focus:bg-blue-500", {
         italic: !hasTitle && !editing,
       })}
       role="textbox"
