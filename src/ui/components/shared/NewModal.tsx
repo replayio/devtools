@@ -29,7 +29,7 @@ export default function Modal({
     <div
       {...props}
       style={modalStyle}
-      className={classNames("fixed z-50 grid h-full w-full items-center justify-center", className)}
+      className={classNames("z-50 grid h-full items-center justify-center", className)}
     >
       <div
         className={classNames("absolute h-full w-full bg-black", {
