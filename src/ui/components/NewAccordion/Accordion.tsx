@@ -1,7 +1,8 @@
 import classNames from "classnames";
-import React, { MouseEventHandler, useReducer } from "react";
+import React, { MouseEventHandler, useEffect, useReducer, useRef } from "react";
 import {
   collapseSection,
+  containerResize,
   endResizing,
   expandSection,
   getInitialState,
@@ -100,6 +101,7 @@ export default function Accordion({ items }: any) {
   const [state, dispatch] = useReducer(reducer, getInitialState(items.length));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const toggleCollapsed = (index: number) => {
     const isCollapsed = getIsCollapsed(state, index);
@@ -122,11 +124,22 @@ export default function Accordion({ items }: any) {
     dispatch(endResizing());
   };
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(entries => {
+      const { height } = entries[0].target.getBoundingClientRect();
+      dispatch(containerResize(height));
+    });
+
+    resizeObserver.observe(containerRef.current!);
+  }, []);
+
+  console.log({ state, items });
+
   return (
-    <div className="relative flex h-full flex-col overflow-auto">
+    <div className="relative flex h-full flex-col overflow-auto" ref={containerRef}>
       {items.map((item: any, index: number) => (
         <Section
-          key={item}
+          key={index}
           index={index}
           isCollapsed={getIsCollapsed(state, index)}
           toggleCollapsed={toggleCollapsed}
@@ -155,7 +168,8 @@ function ResizeMask({
     <div
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      className="fixed top-0 left-0 h-full w-full bg-black opacity-50"
+      className="fixed top-0 left-0 h-full w-full"
+      // className="fixed top-0 left-0 h-full w-full bg-black opacity-50" // display the mask area for debugging
       style={{ cursor: "ns-resize" }}
     />
   );

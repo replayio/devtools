@@ -23,18 +23,22 @@ type ResizingParams = {
 export type AccordionState = {
   sections: Section[];
   resizingParams: ResizingParams | null;
+  containerHeight: number | null;
 };
 type ExpandSectionAction = { type: "expand_section"; index: number };
 type CollapseSectionAction = { type: "collapse_section"; index: number };
 type StartResizingAction = { type: "start_resizing"; index: number; initialY: number };
 type EndResizingAction = { type: "end_resizing" };
 type ResizeAction = { type: "resize"; currentY: number };
+type ContainerResizeAction = { type: "container_resize"; height: number };
+
 type AccordionAction =
   | ExpandSectionAction
   | CollapseSectionAction
   | StartResizingAction
   | EndResizingAction
-  | ResizeAction;
+  | ResizeAction
+  | ContainerResizeAction;
 
 const createDefaultSection = () => {
   return {
@@ -59,6 +63,9 @@ export function endResizing(): EndResizingAction {
 }
 export function resize(currentY: number): ResizeAction {
   return { type: "resize", currentY };
+}
+export function containerResize(height: number): ContainerResizeAction {
+  return { type: "container_resize", height };
 }
 
 // Selectors
@@ -103,7 +110,7 @@ export function getInitialState(count: number): AccordionState {
     sections.push(createDefaultSection());
   }
 
-  return { sections, resizingParams: null };
+  return { sections, resizingParams: null, containerHeight: null };
 }
 
 export function reducer(state: AccordionState, action: AccordionAction) {
@@ -190,6 +197,9 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       }
 
       return { ...state, sections: newSections };
+    }
+    case "container_resize": {
+      return { ...state, containerHeight: action.height };
     }
     default: {
       throw new Error("unknown Accordion action");
