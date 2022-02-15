@@ -19,9 +19,20 @@ const libraryMap = [
     label: "Preact",
     pattern: /preact/i,
   },
+  // React in node_modules
   {
     label: "React",
-    pattern: /(node_modules\/(?:react|react-dom)\/)|(react(-dom)?(\.[a-z]+)*\.js$)/,
+    pattern: /node_modules\/(?:react|react-dom)\//,
+  },
+  // React in a shared library, but not part of a filename
+  {
+    label: "React",
+    pattern: /[^\.]react(\.[a-zA-Z]+)*\.js$/,
+  },
+  // FB's internal ReactDOM filename
+  {
+    label: "React",
+    pattern: /(ReactDOM(-dev)?(\.[a-z]+)*\.js$)/,
   },
   {
     label: "React",
