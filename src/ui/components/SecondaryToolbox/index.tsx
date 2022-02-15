@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { FC } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -19,22 +19,25 @@ import "ui/setup/dynamic/inspector";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
+import { compareNumericStrings } from "protocol/utils";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
+  areReactComponentsReady: boolean;
   hasReactComponents: boolean;
   isNode: boolean;
   selectedPanel: SecondaryPanelName;
   setSelectedPanel: (panel: SecondaryPanelName) => any;
 }
 
-function PanelButtons({
+const PanelButtons: FC<PanelButtonsProps> = ({
+  areReactComponentsReady,
   hasReactComponents,
   isNode,
   selectedPanel,
   setSelectedPanel,
-}: PanelButtonsProps) {
+}) => {
   const { userSettings } = hooks.useGetUserSettings();
   const { showReact } = userSettings;
 
@@ -70,12 +73,16 @@ function PanelButtons({
       )}
       {hasReactComponents && showReact && (
         <button
+          disabled={!areReactComponentsReady}
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
           })}
           onClick={() => onClick("react-components")}
+          title={!areReactComponentsReady ? "React DevTools not yet initialised." : undefined}
         >
-          <div className="label">React</div>
+          <div className={classnames("label", { "line-through": !areReactComponentsReady })}>
+            React
+          </div>
         </button>
       )}
       <button
@@ -88,7 +95,7 @@ function PanelButtons({
       </button>
     </div>
   );
-}
+};
 
 function ConsolePanel() {
   return (
@@ -117,9 +124,16 @@ function SecondaryToolbox({
   setSelectedPanel,
   recordingTarget,
   hasReactComponents,
+  firstAnnotation,
+  currentPoint,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
+
+  const areReactComponentsReady =
+    firstAnnotation !== null &&
+    currentPoint !== null &&
+    compareNumericStrings(firstAnnotation, currentPoint) <= 0;
 
   if (selectedPanel === "react-components" && !(userSettings.showReact && hasReactComponents)) {
     setSelectedPanel("console");
@@ -130,6 +144,7 @@ function SecondaryToolbox({
       {!isDemo() && (
         <header className="secondary-toolbox-header">
           <PanelButtons
+            areReactComponentsReady={areReactComponentsReady}
             selectedPanel={selectedPanel}
             setSelectedPanel={setSelectedPanel}
             isNode={isNode}
@@ -154,6 +169,8 @@ const connector = connect(
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
     hasReactComponents: selectors.hasReactComponents(state),
+    firstAnnotation: selectors.getFirstOpAnnotations(state),
+    currentPoint: selectors.getCurrentPoint(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
 );

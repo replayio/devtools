@@ -10,4 +10,5 @@ export interface ReactDevToolsState {
   annotations: Annotation[];
   currentPoint: ExecutionPoint | null;
   hasReactComponents: boolean;
+  firstOpAnnotationPoint: ExecutionPoint | null;
 }
