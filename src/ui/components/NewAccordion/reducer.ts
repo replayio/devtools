@@ -1,6 +1,5 @@
 import {
   accomodateSectionIdealHeight,
-  ACCORDION_HEIGHT,
   embiggenSection,
   ensmallenSection,
   getClosestPreviousExpandedIndex,
@@ -120,7 +119,7 @@ export function reducer(state: AccordionState, action: AccordionAction) {
 
       let newSections = [...state.sections];
       newSections[index].expanded = false;
-      newSections = ensmallenSection(newSections, index);
+      newSections = ensmallenSection(newSections, index, state.containerHeight!);
 
       return { ...state, sections: newSections };
     }
@@ -128,7 +127,7 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       const { index } = action;
 
       let newSections = [...state.sections];
-      newSections = embiggenSection(newSections, index);
+      newSections = embiggenSection(newSections, index, state.containerHeight!);
       newSections[index].expanded = true;
 
       return { ...state, sections: newSections };
@@ -171,7 +170,13 @@ export function reducer(state: AccordionState, action: AccordionAction) {
         // Negative delta means the user resized upwards, so the section should get bigger.
         const idealHeight = newSections[index].displayedHeight + delta;
         let startIndex = getNextTargetIndex(sections, index, index);
-        newSections = accomodateSectionIdealHeight(newSections, index, idealHeight, startIndex);
+        newSections = accomodateSectionIdealHeight(
+          newSections,
+          index,
+          idealHeight,
+          startIndex,
+          state.containerHeight!
+        );
       } else {
         // Positive means the user resized downwards, so the section should get smaller.
         // Making a section smaller is equivalent to making the closest expanded previous section it
@@ -182,7 +187,7 @@ export function reducer(state: AccordionState, action: AccordionAction) {
         // know when the original index has already hit its minimum height. Without this,
         // it'll start expanding upwards when it runs out of downward space.
         const maxHeight =
-          ACCORDION_HEIGHT -
+          state.containerHeight! -
           getHeightBeforeIndex(sections, i) -
           getMinHeightAfterIndex(sections, i);
         console.log({
@@ -193,7 +198,13 @@ export function reducer(state: AccordionState, action: AccordionAction) {
         const idealHeight = Math.min(newSections[i].displayedHeight - delta, maxHeight);
         let startIndex = getNextTargetIndex(sections, i);
 
-        newSections = accomodateSectionIdealHeight(newSections, i, idealHeight, startIndex);
+        newSections = accomodateSectionIdealHeight(
+          newSections,
+          i,
+          idealHeight,
+          startIndex,
+          state.containerHeight!
+        );
       }
 
       return { ...state, sections: newSections };
