@@ -26,8 +26,8 @@ export interface AccordionItem {
   button?: React.ReactNode;
 }
 export interface SectionPosition {
-  top: number;
-  height: number;
+  top: number | string;
+  height: number | string;
 }
 export type CollapsedState = boolean[];
 export type CreasesState = number[];

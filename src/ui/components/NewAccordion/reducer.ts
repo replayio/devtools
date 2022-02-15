@@ -7,6 +7,7 @@ import {
   getMinHeightAfterIndex,
   getNextTargetIndex,
   HEADER_HEIGHT,
+  scaleSections,
 } from "./utils";
 
 export type Section = {
@@ -69,22 +70,37 @@ export function containerResize(height: number): ContainerResizeAction {
 
 // Selectors
 
-export const getSectionDisplayedHeight = (state: AccordionState, index: number) =>
-  state.sections[index].displayedHeight;
+export const getSectionDisplayedHeight = (
+  state: AccordionState,
+  index: number,
+  totalHeight: number
+) => {
+  return `${(state.sections[index].displayedHeight / totalHeight) * 100}%`;
+
+  return state.sections[index].displayedHeight;
+};
 export const getIsCollapsed = (state: AccordionState, index: number) =>
   !state.sections[index].expanded;
 export const getPosition = (state: AccordionState, index: number) => {
-  const { sections } = state;
+  const { sections, containerHeight } = state;
+
+  const totalHeight = sections.reduce((a, section) => {
+    const increment = section.expanded ? section.displayedHeight : HEADER_HEIGHT;
+    return a + (increment || 0);
+  }, 0);
 
   const top = sections.slice(0, index).reduce((a, section) => {
     const increment = section.expanded ? section.displayedHeight : HEADER_HEIGHT;
     return a + (increment || 0);
   }, 0);
+  const topPercent = `${(top / containerHeight!) * 100}%`;
   const height = getIsCollapsed(state, index)
     ? HEADER_HEIGHT
-    : getSectionDisplayedHeight(state, index);
+    : getSectionDisplayedHeight(state, index, totalHeight);
 
-  return { top, height };
+  const rv = { top: topPercent, height };
+  console.log(rv);
+  return rv;
 };
 export const getIsIndexResizable = (state: AccordionState, index: number) => {
   const { sections } = state;
@@ -210,6 +226,11 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       return { ...state, sections: newSections };
     }
     case "container_resize": {
+      // console.log({ before: state.containerHeight, after: action.height });
+
+      // const difference = action.height - state.containerHeight!;
+      // const newSections = scaleSections(difference, state.sections);
+
       return { ...state, containerHeight: action.height };
     }
     default: {
