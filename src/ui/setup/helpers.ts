@@ -1,6 +1,7 @@
 import { UIStore } from "ui/actions";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs, features } from "ui/utils/prefs";
+import { triggerEvent, sendMessage } from "protocol/socket";
 
 declare global {
   interface Window {
@@ -14,6 +15,8 @@ declare global {
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
+    triggerEvent: typeof triggerEvent;
+    sendMessage: typeof sendMessage;
   }
 }
 
@@ -24,7 +27,9 @@ export function setupAppHelper(store: UIStore) {
     store,
     prefs,
     features,
-
+    triggerEvent,
+    sendMessage: (cmd, args = {}, pauseId) =>
+      sendMessage(cmd, args, window.sessionId, pauseId as any),
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {

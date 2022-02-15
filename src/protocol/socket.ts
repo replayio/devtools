@@ -156,6 +156,12 @@ function onSocketMessage(evt: MessageEvent<any>) {
   }
 }
 
+// Used in the `app` helper for local testing
+export function triggerEvent(method: string, params: any) {
+  const handler = gEventListeners.get(method)!;
+  handler(params);
+}
+
 export function getDisconnectionError(): UnexpectedError {
   endMixpanelSession("disconnected");
   return {
