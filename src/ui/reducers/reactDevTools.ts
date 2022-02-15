@@ -2,7 +2,6 @@ import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { ReactDevToolsState } from "ui/state/reactDevTools";
 import { ReactDevToolsAction } from "ui/actions/reactDevTools";
-import { ExecutionPoint } from "@recordreplay/protocol";
 
 export default function update(
   state = {
