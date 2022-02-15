@@ -6,12 +6,17 @@ import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
-import { getAnnotations, getCurrentPoint } from "ui/reducers/reactDevTools";
+import {
+  getAnnotations,
+  getCurrentPoint,
+  getProtocolCheckFailed,
+  getReactInitPoint,
+} from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive } from "ui/actions/app";
-import { setHasReactComponents } from "ui/actions/reactDevTools";
+import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
+import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -75,7 +80,8 @@ class ReplayWall implements Wall {
       case "getBridgeProtocol": {
         const response = await this.sendRequest(event, payload);
         if (response === undefined) {
-          this.onShutdown();
+          trackEvent("error.reactdevtools.set_protocol_failed");
+          setProtocolCheckFailed();
         }
         break;
       }
@@ -223,6 +229,8 @@ function ReactDevtoolsPanel({
   currentPoint,
   setIsNodePickerActive,
   setHasReactComponents,
+  protocolCheckFailed,
+  reactInitPoint,
 }: PropsFromRedux) {
   if (currentPoint === null) {
     return null;
@@ -240,6 +248,27 @@ function ReactDevtoolsPanel({
   function onShutdown() {
     sendTelemetryEvent("react-devtools-shutdown");
     setHasReactComponents(false);
+  }
+
+  if (protocolCheckFailed) {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <div>React DevTools failed to init.</div>
+        <div>
+          Try picking a different point on the timeline or reloading the page. If the problem
+          persists, try creating a new recording with the latest version of the Replay browser.
+        </div>
+      </div>
+    );
+  }
+
+  const isReady =
+    reactInitPoint !== null &&
+    currentPoint !== null &&
+    compareNumericStrings(reactInitPoint, currentPoint) <= 0;
+
+  if (!isReady) {
+    return <div className="p-4">React DevTools not yet initialised at this point in time.</div>;
   }
 
   const ReactDevTools = createReactDevTools(
@@ -270,6 +299,8 @@ const connector = connect(
   (state: UIState) => ({
     annotations: getAnnotations(state),
     currentPoint: getCurrentPoint(state),
+    protocolCheckFailed: getProtocolCheckFailed(state),
+    reactInitPoint: getReactInitPoint(state),
   }),
   { setIsNodePickerActive, setHasReactComponents }
 );

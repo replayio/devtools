@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { FC } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -29,12 +29,12 @@ interface PanelButtonsProps {
   setSelectedPanel: (panel: SecondaryPanelName) => any;
 }
 
-function PanelButtons({
+const PanelButtons: FC<PanelButtonsProps> = ({
   hasReactComponents,
   isNode,
   selectedPanel,
   setSelectedPanel,
-}: PanelButtonsProps) {
+}) => {
   const { userSettings } = hooks.useGetUserSettings();
   const { showReact } = userSettings;
 
@@ -88,7 +88,7 @@ function PanelButtons({
       </button>
     </div>
   );
-}
+};
 
 function ConsolePanel() {
   return (
