@@ -11,13 +11,13 @@ export type SetHasReactComponentsAction = Action<"set_has_react_components"> & {
 export type SetCurrentPointAction = Action<"set_current_point"> & {
   currentPoint: ExecutionPoint | null;
 };
-export type SetLastProtocolCheckFailedAction = Action<"set_protocol_fail">;
+export type SetProtocolCheckFailedAction = Action<"set_protocol_fail">;
 
 export type ReactDevToolsAction =
   | AddAnnotationsAction
   | SetCurrentPointAction
   | SetHasReactComponentsAction
-  | SetLastProtocolCheckFailedAction;
+  | SetProtocolCheckFailedAction;
 
 export function setupReactDevTools(store: UIStore) {
   store.dispatch(setCurrentPoint(ThreadFront.currentPoint));
@@ -48,7 +48,7 @@ export function setCurrentPoint(currentPoint: ExecutionPoint | null): SetCurrent
   return { type: "set_current_point", currentPoint };
 }
 
-export function setLastProtocolCheckFailed(): UIThunkAction {
+export function setProtocolCheckFailed(): UIThunkAction {
   return async ({ dispatch }) => {
     dispatch({ type: "set_protocol_fail" });
   };

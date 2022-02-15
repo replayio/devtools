@@ -128,20 +128,20 @@ function SecondaryToolbox({
   setSelectedPanel,
   recordingTarget,
   hasReactComponents,
-  firstAnnotation,
+  reactInitPoint,
   currentPoint,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
-  const areReactComponentsReady =
-    firstAnnotation !== null &&
-    currentPoint !== null &&
-    compareNumericStrings(firstAnnotation, currentPoint) <= 0;
-
   if (selectedPanel === "react-components" && !(userSettings.showReact && hasReactComponents)) {
     setSelectedPanel("console");
   }
+
+  const areReactComponentsReady =
+    reactInitPoint !== null &&
+    currentPoint !== null &&
+    compareNumericStrings(reactInitPoint, currentPoint) <= 0;
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
@@ -173,7 +173,7 @@ const connector = connect(
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
     hasReactComponents: selectors.hasReactComponents(state),
-    firstAnnotation: selectors.getFirstOpAnnotations(state),
+    reactInitPoint: selectors.getReactInitPoint(state),
     currentPoint: selectors.getCurrentPoint(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }

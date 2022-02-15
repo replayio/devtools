@@ -9,8 +9,8 @@ export default function update(
     annotations: [],
     currentPoint: null,
     hasReactComponents: false,
-    firstOpAnnotationPoint: null,
-    lastProtocolCheckFailed: false,
+    reactInitPoint: null,
+    protocolCheckFailed: false,
   },
   action: ReactDevToolsAction
 ): ReactDevToolsState {
@@ -19,18 +19,13 @@ export default function update(
       const annotations = [...state.annotations, ...action.annotations];
       annotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
 
-      let firstOpAnnotationPoint: ExecutionPoint | null = null;
-      {
-        for (const { message, point } of annotations) {
-          if (message.event === "operations") {
-            firstOpAnnotationPoint = point;
-            break;
-          }
-        }
-      }
-      const hasReactComponents = firstOpAnnotationPoint !== null;
+      const firstOperation = annotations.find(
+        annotation => annotation.message.event == "operations"
+      );
+      const reactInitPoint = firstOperation?.point ?? null;
+      const hasReactComponents = !!reactInitPoint;
 
-      return { ...state, annotations, hasReactComponents, firstOpAnnotationPoint };
+      return { ...state, annotations, hasReactComponents, reactInitPoint };
     }
 
     case "set_has_react_components": {
@@ -41,14 +36,14 @@ export default function update(
       return {
         ...state,
         currentPoint: action.currentPoint,
-        lastProtocolCheckFailed: false,
+        protocolCheckFailed: false,
       };
     }
 
     case "set_protocol_fail": {
       return {
         ...state,
-        lastProtocolCheckFailed: true,
+        protocolCheckFailed: true,
       };
     }
 
@@ -61,6 +56,5 @@ export default function update(
 export const getAnnotations = (state: UIState) => state.reactDevTools.annotations;
 export const hasReactComponents = (state: UIState) => state.reactDevTools.hasReactComponents;
 export const getCurrentPoint = (state: UIState) => state.reactDevTools.currentPoint;
-export const getFirstOpAnnotations = (state: UIState) => state.reactDevTools.firstOpAnnotationPoint;
-export const getLastProtocolCheckFailed = (state: UIState) =>
-  state.reactDevTools.lastProtocolCheckFailed;
+export const getReactInitPoint = (state: UIState) => state.reactDevTools.reactInitPoint;
+export const getProtocolCheckFailed = (state: UIState) => state.reactDevTools.protocolCheckFailed;

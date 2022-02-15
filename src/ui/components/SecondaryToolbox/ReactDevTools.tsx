@@ -6,13 +6,9 @@ import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
-import {
-  getAnnotations,
-  getCurrentPoint,
-  getLastProtocolCheckFailed,
-} from "ui/reducers/reactDevTools";
+import { getAnnotations, getCurrentPoint, getProtocolCheckFailed } from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive } from "ui/actions/app";
-import { setHasReactComponents, setLastProtocolCheckFailed } from "ui/actions/reactDevTools";
+import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
@@ -80,7 +76,7 @@ class ReplayWall implements Wall {
         const response = await this.sendRequest(event, payload);
         if (response === undefined) {
           trackEvent("error.reactdevtools.get_protocol_fail");
-          setLastProtocolCheckFailed();
+          setProtocolCheckFailed();
         }
         break;
       }
@@ -228,7 +224,7 @@ function ReactDevtoolsPanel({
   currentPoint,
   setIsNodePickerActive,
   setHasReactComponents,
-  lastProtocolCheckFailed,
+  protocolCheckFailed,
 }: PropsFromRedux) {
   if (currentPoint === null) {
     return null;
@@ -256,7 +252,7 @@ function ReactDevtoolsPanel({
     onShutdown
   );
 
-  if (lastProtocolCheckFailed) {
+  if (protocolCheckFailed) {
     return (
       <div className="flex flex-col gap-4 p-4">
         <div>React DevTools failed to init.</div>
@@ -288,7 +284,7 @@ const connector = connect(
   (state: UIState) => ({
     annotations: getAnnotations(state),
     currentPoint: getCurrentPoint(state),
-    lastProtocolCheckFailed: getLastProtocolCheckFailed(state),
+    protocolCheckFailed: getProtocolCheckFailed(state),
   }),
   { setIsNodePickerActive, setHasReactComponents }
 );
