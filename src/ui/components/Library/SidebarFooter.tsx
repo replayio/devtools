@@ -12,15 +12,15 @@ function SidebarFooter({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex flex-row space-x-2 bg-gray-700 p-4">
-      <AvatarImage src={picture} className="avatar h-8 w-8 rounded-full" />
+    <div className="flex flex-row space-x-2 bg-gray-700 p-4 cursor-pointer" onClick={handleSettingsClick}>
+      <AvatarImage src={picture} className="avatar h-8 w-8 rounded-full hover:cursor-pointer" />
       <div className="flex flex-col">
         <div className="overflow-hidden overflow-ellipsis whitespace-pre text-left text-sm text-white">
           {name}
         </div>
-        <button className="text-left text-xs" onClick={handleSettingsClick}>
+        <span className="text-left text-xs">
           View settings
-        </button>
+        </span>
       </div>
     </div>
   );
