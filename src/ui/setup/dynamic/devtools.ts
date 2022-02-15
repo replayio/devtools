@@ -46,15 +46,8 @@ import { initialMessageState } from "devtools/client/webconsole/reducers/message
 import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupDemo } = require("ui/utils/demo");
-import { sendMessage } from "protocol/socket";
 import network from "ui/reducers/network";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
-
-type SendMessageFn = <M extends CommandMethods>(
-  method: M,
-  params: CommandParams<M>,
-  pauseId: CommandHasPauseId<M>
-) => Promise<CommandResult<M>>;
 
 declare global {
   interface Window {
@@ -67,8 +60,6 @@ declare global {
     actions?: any;
     selectors?: typeof selectors;
     // We use 'command' in the backend and 'message' in the frontend so expose both :P
-    sendMessage?: SendMessageFn;
-    sendCommand?: SendMessageFn;
     console?: {
       prefs: typeof consolePrefs;
     };
@@ -76,6 +67,28 @@ declare global {
   }
   const gToolbox: DevToolsToolbox;
 }
+
+enum SessionError {
+  UnexpectedClose = 1,
+  BackendDeploy = 2,
+  NodeTerminated = 3,
+  KnownFatalError = 4,
+  UnknownFatalError = 5,
+  OldBuild = 6,
+  LongRecording = 7,
+}
+
+// Reported reasons why a session can be destroyed.
+const SessionErrorMessages: Record<number, string> = {
+  [SessionError.BackendDeploy]: "Please wait a few minutes and try again.",
+  [SessionError.NodeTerminated]: "Our servers hiccuped but things should be back to normal soon.",
+  [SessionError.KnownFatalError]:
+    "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
+  [SessionError.OldBuild]:
+    "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
+  [SessionError.LongRecording]:
+    "You’ve hit an error that happens with long recordings. Can you try a shorter recording?",
+};
 
 export default async function DevTools(store: Store) {
   if (window.hasAlreadyBootstrapped) {
@@ -98,9 +111,6 @@ export default async function DevTools(store: Store) {
   window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
-  window.app.sendMessage = (cmd, args = {}, pauseId) =>
-    sendMessage(cmd, args, window.sessionId, pauseId as any);
-  window.app.sendCommand = window.app.sendMessage;
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
@@ -144,16 +154,21 @@ export default async function DevTools(store: Store) {
   addEventListener("Recording.awaitingSourcemaps", () =>
     store.dispatch(actions.setAwaitingSourcemaps(true))
   );
-  addEventListener("Recording.sessionError", (error: sessionError) =>
+
+  addEventListener("Recording.sessionError", (error: sessionError) => {
+    const content: string =
+      SessionErrorMessages[error.code] ||
+      "Something went wrong while replaying, we'll look into it as soon as possible.";
+
     store.dispatch(
       actions.setUnexpectedError({
         ...error,
         message: "Our apologies!",
-        content: "Something went wrong while replaying, we'll look into it as soon as possible.",
+        content,
         action: "refresh",
       })
-    )
-  );
+    );
+  });
 
   setupApp(store);
   setupTimeline(store);
