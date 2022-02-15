@@ -6,7 +6,12 @@ import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
-import { getAnnotations, getCurrentPoint, getProtocolCheckFailed } from "ui/reducers/reactDevTools";
+import {
+  getAnnotations,
+  getCurrentPoint,
+  getProtocolCheckFailed,
+  getReactInitPoint,
+} from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive } from "ui/actions/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
@@ -225,6 +230,7 @@ function ReactDevtoolsPanel({
   setIsNodePickerActive,
   setHasReactComponents,
   protocolCheckFailed,
+  reactInitPoint,
 }: PropsFromRedux) {
   if (currentPoint === null) {
     return null;
@@ -244,14 +250,6 @@ function ReactDevtoolsPanel({
     setHasReactComponents(false);
   }
 
-  const ReactDevTools = createReactDevTools(
-    annotations,
-    currentPoint,
-    enablePicker,
-    disablePicker,
-    onShutdown
-  );
-
   if (protocolCheckFailed) {
     return (
       <div className="flex flex-col gap-4 p-4">
@@ -263,6 +261,23 @@ function ReactDevtoolsPanel({
       </div>
     );
   }
+
+  const isReady =
+    reactInitPoint !== null &&
+    currentPoint !== null &&
+    compareNumericStrings(reactInitPoint, currentPoint) <= 0;
+
+  if (!isReady) {
+    return <div className="p-4">React DevTools not yet initialised at this point in time.</div>;
+  }
+
+  const ReactDevTools = createReactDevTools(
+    annotations,
+    currentPoint,
+    enablePicker,
+    disablePicker,
+    onShutdown
+  );
 
   return (
     <ReactDevTools
@@ -285,6 +300,7 @@ const connector = connect(
     annotations: getAnnotations(state),
     currentPoint: getCurrentPoint(state),
     protocolCheckFailed: getProtocolCheckFailed(state),
+    reactInitPoint: getReactInitPoint(state),
   }),
   { setIsNodePickerActive, setHasReactComponents }
 );

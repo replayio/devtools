@@ -19,12 +19,10 @@ import "ui/setup/dynamic/inspector";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
-import { compareNumericStrings } from "protocol/utils";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
-  areReactComponentsReady: boolean;
   hasReactComponents: boolean;
   isNode: boolean;
   selectedPanel: SecondaryPanelName;
@@ -32,7 +30,6 @@ interface PanelButtonsProps {
 }
 
 const PanelButtons: FC<PanelButtonsProps> = ({
-  areReactComponentsReady,
   hasReactComponents,
   isNode,
   selectedPanel,
@@ -73,20 +70,12 @@ const PanelButtons: FC<PanelButtonsProps> = ({
       )}
       {hasReactComponents && showReact && (
         <button
-          disabled={!areReactComponentsReady}
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
           })}
           onClick={() => onClick("react-components")}
-          title={
-            !areReactComponentsReady
-              ? "React DevTools not yet initialised at this point in time."
-              : undefined
-          }
         >
-          <div className={classnames("label", { "line-through": !areReactComponentsReady })}>
-            React
-          </div>
+          <div className="label">React</div>
         </button>
       )}
       <button
@@ -128,8 +117,6 @@ function SecondaryToolbox({
   setSelectedPanel,
   recordingTarget,
   hasReactComponents,
-  reactInitPoint,
-  currentPoint,
 }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
@@ -138,17 +125,11 @@ function SecondaryToolbox({
     setSelectedPanel("console");
   }
 
-  const areReactComponentsReady =
-    reactInitPoint !== null &&
-    currentPoint !== null &&
-    compareNumericStrings(reactInitPoint, currentPoint) <= 0;
-
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
       {!isDemo() && (
         <header className="secondary-toolbox-header">
           <PanelButtons
-            areReactComponentsReady={areReactComponentsReady}
             selectedPanel={selectedPanel}
             setSelectedPanel={setSelectedPanel}
             isNode={isNode}
@@ -173,8 +154,6 @@ const connector = connect(
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
     hasReactComponents: selectors.hasReactComponents(state),
-    reactInitPoint: selectors.getReactInitPoint(state),
-    currentPoint: selectors.getCurrentPoint(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
 );
