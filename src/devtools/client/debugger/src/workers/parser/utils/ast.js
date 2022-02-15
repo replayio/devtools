@@ -25,7 +25,6 @@ const sourceOptions = {
     tokens: true,
     plugins: [
       "jsx",
-      "typescript",
       "doExpressions",
       "optionalChaining",
       "nullishCoaliescingOperator",
@@ -43,7 +42,6 @@ const sourceOptions = {
     tokens: true,
     plugins: [
       "jsx",
-      "typescript",
       "doExpressions",
       "optionalChaining",
       "nullishCoaliescingOperator",
@@ -154,6 +152,13 @@ export function getAst(sourceId) {
   ) {
     const type = source.id.includes("original") ? "original" : "generated";
     const options = sourceOptions[type];
+
+    if (source.text.includes("@flow")) {
+      options.plugins.push("flow");
+    } else {
+      options.plugins.push("typescript");
+    }
+
     ast = parse(source.text, options);
   } else if (contentType && contentType.match(/typescript/)) {
     const options = {
