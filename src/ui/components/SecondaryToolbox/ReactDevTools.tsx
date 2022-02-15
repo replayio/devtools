@@ -11,7 +11,7 @@ import { setIsNodePickerActive } from "ui/actions/app";
 import { setHasReactComponents } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
+import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -74,7 +74,9 @@ class ReplayWall implements Wall {
 
       case "getBridgeProtocol": {
         const response = await this.sendRequest(event, payload);
+        console.log(response);
         if (response === undefined) {
+          trackEvent("error.reactdevtools.get_protocol_fail");
           this.onShutdown();
         }
         break;

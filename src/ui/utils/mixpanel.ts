@@ -34,6 +34,7 @@ type MixpanelEvent =
   | ["events_timeline.select_source"]
   | ["error.unauthenticated_viewer"]
   | ["error.unauthorized_viewer"]
+  | ["error.reactdevtools.get_protocol_fail"]
   | ["gutter.add_comment"]
   | ["header.open_share"]
   | ["header.edit_title"]
