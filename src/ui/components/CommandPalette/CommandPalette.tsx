@@ -36,7 +36,7 @@ export type CommandKey =
   | "show_replay_info"
   | "show_sharing";
 
-const COMMANDS: Command[] = [
+const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
   { key: "open_devtools", label: "Open DevTools" },
   { key: "open_elements", label: "Open Elements" },
@@ -58,9 +58,9 @@ const COMMANDS: Command[] = [
   { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
-];
+] as const;
 
-const DEFAULT_COMMANDS: CommandKey[] = [
+const DEFAULT_COMMANDS: readonly CommandKey[] = [
   "open_file_search",
   "open_function_search",
   "open_full_text_search",
