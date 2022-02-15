@@ -9,6 +9,7 @@
   border: none;
   outline: none !important;
   border-radius: 8px;
+  font-size: 15px;
 }
 
 .view-toggle .inner {

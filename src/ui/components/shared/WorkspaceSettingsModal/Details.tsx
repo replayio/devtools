@@ -24,12 +24,12 @@ function TrialDetails({
       <div className="p-4">
         <div
           style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)" }}
-          className="space-y-6 bg-white pt-8 pb-4 px-6 text-lg rounded"
+          className="space-y-6 rounded bg-white px-6 pt-8 pb-4 text-lg"
         >
           {!expired && (
             <p>
               {workspace?.name} Free Trial will be expiring in{" "}
-              <span className="font-bold whitespace-nowrap">
+              <span className="whitespace-nowrap font-bold">
                 {expiresIn === 1 ? "1 day" : `${expiresIn} days`}
               </span>
               .
@@ -73,7 +73,7 @@ function SubscriptionDetails({
       {isSubscriptionCancelled(subscription) ||
       subscription.billingSchedule === "contract" ||
       subscription.plan.key === "beta-v1" ? null : (
-        <div className="py-2 border-b border-color-gray-50 flex flex-row items-center justify-between">
+        <div className="border-color-gray-50 flex flex-row items-center justify-between border-b py-2">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">
             {subscription.paymentMethods.length > 0 ? (

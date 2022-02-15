@@ -12,7 +12,7 @@ function QuickOpenButton({ openQuickOpen }: PropsFromRedux) {
   };
 
   return (
-    <button className="flex text-xs p-0.5 rounded-full hover:bg-gray-200" onClick={onClick}>
+    <button className="flex rounded-full p-0.5 text-xs hover:bg-gray-200" onClick={onClick}>
       <MaterialIcon>search</MaterialIcon>
     </button>
   );

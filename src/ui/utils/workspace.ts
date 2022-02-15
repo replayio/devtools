@@ -42,3 +42,11 @@ export function subscriptionExpired(workspace: Workspace, date?: Date) {
 
   return expiresIn <= 0;
 }
+
+export function decodeWorkspaceId(workspaceId: string | null) {
+  if (!workspaceId) return workspaceId;
+
+  // The first element will be the prefix, i.e. "w:then-the-uuid"
+  const [_, uuid] = workspaceId.split(":", 2);
+  return uuid;
+}

@@ -38,6 +38,7 @@ import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
 import { PanelName } from "ui/state/layout";
+import { getRecordingId } from "ui/utils/recording";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -362,10 +363,12 @@ export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAct
 
 export function executeCommand(key: CommandKey): UIThunkAction {
   return ({ dispatch }) => {
+    const recordingId = getRecordingId();
+
     if (key === "open_console") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
-      window.jsterm?.focus();
+      window.jsterm?.editor.focus();
     } else if (key === "open_devtools") {
       dispatch(setViewMode("dev"));
     } else if (key === "open_elements") {
@@ -405,6 +408,8 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setSelectedPrimaryPanel("events"));
     } else if (key === "show_privacy") {
       dispatch(setModal("privacy"));
+    } else if (key === "show_sharing") {
+      dispatch(setModal("sharing", { recordingId }));
     }
 
     dispatch(hideCommandPalette());

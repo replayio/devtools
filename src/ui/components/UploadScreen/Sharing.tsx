@@ -7,7 +7,7 @@ import SettingsPreview from "./SettingsPreview";
 import classNames from "classnames";
 import { isPublicDisabled } from "ui/utils/org";
 
-export const MY_LIBRARY = "My Library";
+export const MY_LIBRARY = "Your Library";
 export const personalWorkspace = { id: MY_LIBRARY, name: MY_LIBRARY };
 
 type SharingProps = {
@@ -36,14 +36,14 @@ function EditableSettings({
   };
 
   return (
-    <div className="w-full grid grid-cols-2 gap-5 text-base">
+    <div className="grid w-full grid-cols-2 gap-5 text-base">
       {workspaces.length ? (
         <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
       ) : null}
       <div
         className={classNames(
           publicDisabled ? "opacity-60" : undefined,
-          "space-x-2 select-none flex flex-row items-center justify-between w-full border border-textFieldBorder rounded-md shadow-sm px-2.5 py-1.5 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-primaryAccent focus:border-primaryAccentHover bg-jellyfish"
+          "flex w-full cursor-default select-none flex-row items-center justify-between space-x-2 rounded-md border border-textFieldBorder bg-jellyfish px-2.5 py-1.5 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent"
         )}
         onClick={() => !publicDisabled && setIsPublic(!isPublic)}
       >

@@ -21,6 +21,7 @@ import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import mixpanel from "mixpanel-browser";
 import { trackEvent } from "ui/utils/telemetry";
+import { timeMixpanelEvent } from "ui/utils/mixpanel";
 
 export const NetworkMonitor = ({
   currentTime,
@@ -66,7 +67,7 @@ export const NetworkMonitor = ({
   }, [container.current]);
 
   if (loading) {
-    mixpanel.time_event("net_monitor.open_network_monitor");
+    timeMixpanelEvent("net_monitor.open_network_monitor");
     return (
       <div className="relative">
         <LoadingProgressBar />
@@ -79,10 +80,10 @@ export const NetworkMonitor = ({
   return (
     <Table events={events} requests={requests} types={types}>
       {({ table, data }: { table: any; data: RequestSummary[] }) => (
-        <div className="flex flex-col min-h-0 h-full" ref={container}>
+        <div className="flex h-full min-h-0 flex-col" ref={container}>
           <FilterBar types={types} toggleType={toggleType} table={table} />
           <SplitBox
-            className="border-t min-h-0"
+            className="min-h-0 border-t"
             initialSize="350"
             minSize={selectedRequest ? "30%" : "100%"}
             maxSize={selectedRequest ? "70%" : "100%"}

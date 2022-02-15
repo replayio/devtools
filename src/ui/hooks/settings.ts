@@ -9,17 +9,14 @@ import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/gra
 import { features } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
+import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
   enableEventLink: false,
-  enableGlobalSearch: false,
-  enableNetworkMonitor: false,
-  enableRepaint: false,
   enableTeams: true,
-  showElements: false,
   showReact: false,
 };
 
@@ -28,11 +25,7 @@ const testSettings: UserSettings = {
   defaultWorkspaceId: null,
   disableLogRocket: false,
   enableEventLink: false,
-  enableGlobalSearch: false,
-  enableNetworkMonitor: false,
-  enableRepaint: false,
   enableTeams: true,
-  showElements: true,
   showReact: true,
 };
 
@@ -102,11 +95,7 @@ function convertUserSettings(data: any): UserSettings {
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
     enableEventLink: settings.enableEventLink,
-    enableGlobalSearch: settings.enableGlobalSearch,
-    enableNetworkMonitor: settings.enableNetworkMonitor,
-    enableRepaint: settings.enableRepaint,
     enableTeams: settings.enableTeams,
-    showElements: settings.showElements,
     showReact: settings.showReact,
   };
 }
@@ -154,10 +143,26 @@ export function useUpdateDefaultWorkspace() {
       mutation UpdateUserDefaultWorkspace($workspaceId: ID) {
         updateUserDefaultWorkspace(input: { workspaceId: $workspaceId }) {
           success
+          workspace {
+            id
+          }
         }
       }
     `,
-    { refetchQueries: ["GetUserSettings"] }
+    {
+      refetchQueries: ["GetUserSettings"],
+      onCompleted: data => {
+        const { workspace } = data.updateUserDefaultWorkspace;
+
+        // The workspace will be non-existent if it's just been set to
+        // null (My Library).
+        if (!workspace) {
+          return maybeTrackTeamChange(null);
+        }
+
+        maybeTrackTeamChange(workspace.id);
+      },
+    }
   );
 
   if (error) {

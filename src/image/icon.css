@@ -1,0 +1,78 @@
+/*
+This is an exact copy of .image (set in AccessibleImage.css)
+but without a background color so we can use hover effects
+*/
+
+.icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  /* multicolor icons use background-image */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  /* do not let images shrink when used as flex children */
+  flex-shrink: 0;
+}
+
+/* global menu */
+
+.icon.docs {
+  -webkit-mask-image: url(/icons/docs.svg);
+}
+
+.icon.help {
+  -webkit-mask-image: url(/icons/help.svg);
+}
+
+.icon.settings {
+  -webkit-mask-image: url(/icons/settings.svg);
+}
+
+.icon.replay-logo {
+  -webkit-mask-image: url(/icons/replay-logo.svg);
+}
+
+/* replay info */
+
+.icon.external {
+  -webkit-mask-image: url(/icons/external.svg);
+}
+
+.icon.globe {
+  -webkit-mask-image: url(/icons/globe.svg);
+}
+
+.icon.group {
+  -webkit-mask-image: url(/icons/group.svg);
+}
+
+.icon.lock {
+  -webkit-mask-image: url(/icons/lock.svg);
+}
+
+.icon.shield-check {
+  -webkit-mask-image: url(/icons/shield-check.svg);
+}
+
+.icon.drawer {
+  -webkit-mask-image: url(/icons/drawer.svg);
+}
+
+.icon.trash {
+  -webkit-mask-image: url(/icons/trash.svg);
+}
+
+/* check-in widget */
+
+.icon.active {
+  -webkit-mask-image: url(/icons/active.svg);
+}
+
+.icon.resolved {
+  -webkit-mask-image: url(/icons/resolved.svg);
+}

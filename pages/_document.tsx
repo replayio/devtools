@@ -19,7 +19,7 @@ const csp = (props: any) => {
       // the local backend
       isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : "ws://localhost:8000"
     }`,
-    `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com`,
+    `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com https://www.loom.com/`,
     // unsafe-eval is required by intercom
     `script-src 'self' 'unsafe-eval' https://widget.intercom.io https://js.intercomcdn.com/ https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://webreplay.us.auth0.com`,

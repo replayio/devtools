@@ -16,7 +16,7 @@ const RequestBody = ({
 
   return (
     <>
-      <div className="flex items-center pl-4 py-2 font-bold">Request body:</div>
+      <div className="flex items-center py-2 pl-4 font-bold">Request body:</div>
       <div className="pl-6">
         <HttpBody
           bodyParts={requestBodyParts}

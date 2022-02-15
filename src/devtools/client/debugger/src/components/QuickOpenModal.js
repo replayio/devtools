@@ -7,7 +7,7 @@ import React, { Component } from "react";
 import { connect } from "../utils/connect";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
-import throttle from "lodash/throttle";
+import debounce from "lodash/debounce";
 import actions from "../actions";
 import {
   getSourceList,
@@ -37,7 +37,7 @@ import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 
-const updateResultsThrottle = 100;
+const updateResultsThrottle = 1000;
 const maxResults = 100;
 
 const SIZE_BIG = { size: "big" };
@@ -125,7 +125,6 @@ export class QuickOpenModal extends Component {
     if (query === "@" || query === "#") {
       return this.setResults(fns);
     }
-
     fns = filter(fns, query.slice(1));
     return this.setResults(fns);
   }
@@ -155,7 +154,7 @@ export class QuickOpenModal extends Component {
     }
   };
 
-  updateResults = throttle(query => {
+  updateResults = debounce(query => {
     if (this.isGotoQuery()) {
       return;
     }

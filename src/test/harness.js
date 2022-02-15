@@ -138,14 +138,14 @@ async function selectSource(url) {
 }
 
 async function addLogpoint(url, line) {
-  const bpCount = dbgSelectors.getBreakpointCount();
+  const lpCount = dbgSelectors.getLogpointCount();
 
   await selectSource(url);
   await dbg.actions.addLogpoint(getContext(), line);
 
   await waitUntil(
     () => {
-      return dbgSelectors.getBreakpointCount() == bpCount + 1;
+      return dbgSelectors.getLogpointCount() == lpCount + 1;
     },
     { waitingFor: "logpoint to be set" }
   );
@@ -323,7 +323,7 @@ const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
 async function checkEvaluateInTopFrame(text, expected) {
   selectConsole();
-  executeInConsole(text);
+  await executeInConsole(text);
 
   await waitUntil(
     () => {
@@ -525,8 +525,8 @@ async function toggleScopeNode(text) {
 }
 
 async function executeInConsole(value) {
-  await window.jsterm.editorWaiter;
   window.jsterm.setValue(value);
+  await waitUntil(() => window.jsterm.editor.getValue() === value);
   window.jsterm.execute();
   await new Promise(resolve => setTimeout(resolve, 1));
 }

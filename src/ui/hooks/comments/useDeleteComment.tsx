@@ -20,7 +20,7 @@ export default function useDeleteComment() {
   return (commentId: string, recordingId: RecordingId) => {
     deleteComment({
       variables: { commentId },
-      optimisticResponse: {},
+      optimisticResponse: { deleteComment: { success: true } },
       update: cache => {
         const data: any = cache.readQuery({
           query: GET_COMMENTS,

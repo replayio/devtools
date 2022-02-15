@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { Workspace } from "ui/types";
 import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
+import { trackEvent } from "ui/utils/telemetry";
 
 function TeamButton({
   text,
@@ -32,11 +33,10 @@ function TeamButton({
     e.preventDefault();
     setWorkspaceId(id);
 
-    maybeTrackTeamChange(id);
-
     // We only set the new team as the default team if this is a non-pending team.
     // Otherwise, it would be possible to set pending teams as a default team.
     if (!isNew) {
+      trackEvent("team_change", { workspaceId: id });
       updateDefaultWorkspace({
         variables: { workspaceId: id },
       });
@@ -66,7 +66,7 @@ function TeamButton({
       </div>
       <div className="flex flex-row space-x-1">
         {isNew ? (
-          <div className={"text-xs rounded-lg px-3 py-0.5 text-white newbadge"}>New</div>
+          <div className={"newbadge rounded-lg px-3 py-0.5 text-xs text-white"}>New</div>
         ) : null}
         {showSettingsButton ? <SettingsButton onClick={handleSettingsClick} /> : null}
       </div>
@@ -78,7 +78,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-gray-200 transition duration-200 text-sm"
+      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
     >
       settings
     </button>

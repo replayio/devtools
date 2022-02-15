@@ -11,9 +11,9 @@ export function CommandPaletteModal() {
   };
 
   return (
-    <div className="fixed w-full h-full grid justify-center z-50">
-      <div className="bg-black w-full h-full absolute opacity-10" onClick={onMaskClick} />
-      <div className="z-10 relative mt-24" style={{ width: "400px", height: "fit-content" }}>
+    <div className="fixed z-50 grid h-full w-full justify-center">
+      <div className="absolute h-full w-full bg-black opacity-10" onClick={onMaskClick} />
+      <div className="relative z-10 mt-24" style={{ width: "400px", height: "fit-content" }}>
         <CommandPalette autoFocus />
       </div>
     </div>

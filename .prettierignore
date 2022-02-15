@@ -1,0 +1,9 @@
+.next
+node_modules
+public
+.github
+
+test/examples
+src/devtools/client/debugger/src/workers/parser/tests/fixtures
+src/ui/utils/intercom.ts
+index.html

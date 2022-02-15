@@ -13,7 +13,7 @@ export default function Account() {
   }
 
   if (!isAuthenticated) {
-    return <Login />;
+    return <Login returnToPath={window.location.pathname + window.location.search} />;
   }
 
   return <Library />;

@@ -30,11 +30,11 @@
 }
 
 .theme-dark .pie-chart-slice {
-  stroke: rgba(0,0,0,0.2);
+  stroke: rgba(0, 0, 0, 0.2);
 }
 
 .theme-light .pie-chart-slice {
-  stroke: rgba(255,255,255,0.8);
+  stroke: rgba(255, 255, 255, 0.8);
 }
 
 .theme-dark .pie-chart-slice[largest] {
@@ -96,7 +96,10 @@
 }
 
 .generic-chart-container:hover > .table-chart-grid:hover > .table-chart-row:not(:hover),
-.generic-chart-container:hover ~ .table-chart-container > .table-chart-grid > .table-chart-row:not([focused]) {
+.generic-chart-container:hover
+  ~ .table-chart-container
+  > .table-chart-grid
+  > .table-chart-row:not([focused]) {
   opacity: 0.4;
 }
 

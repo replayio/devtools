@@ -60,7 +60,7 @@ export default function Viewer({
     : recordings;
 
   return (
-    <div className="flex flex-col flex-grow px-8 py-6 bg-gray-100 space-y-5 overflow-hidden">
+    <div className="flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6">
       <ViewerContent {...{ workspaceName, searchString }} recordings={filteredRecordings} />
     </div>
   );
@@ -103,7 +103,7 @@ function ViewerContent({
     return (
       <>
         <ViewerHeader>{HeaderLeft}</ViewerHeader>
-        <section className="grid items-center justify-center flex-grow text-sm bg-gray-100">
+        <section className="grid flex-grow items-center justify-center bg-gray-100 text-sm">
           <span className="text-gray-500">{errorText}</span>
         </section>
       </>
@@ -120,7 +120,7 @@ function ViewerContent({
     <>
       <ViewerHeader>
         {HeaderLeft}
-        <div className="flex flex-row space-x-3 items-center">
+        <div className="flex flex-row items-center space-x-3">
           <TeamTrialEnd />
           {isEditing ? (
             <>
@@ -130,13 +130,13 @@ function ViewerContent({
               </PrimaryButton>
             </>
           ) : (
-            <SecondaryButton className="bg-white" color="blue" onClick={() => setIsEditing(true)}>
+            <SecondaryButton className="bg-white hover:bg-primaryAccentHover hover:text-white" color="blue" onClick={() => setIsEditing(true)}>
               Edit
             </SecondaryButton>
           )}
         </div>
       </ViewerHeader>
-      <div className="flex flex-col rounded-md shadow-md bg-white text-sm overflow-y-auto recording-list">
+      <div className="recording-list flex flex-col overflow-y-auto rounded-md bg-white text-sm shadow-md">
         {sortedRecordings.map((r, i) => (
           <RecordingRow
             key={i}

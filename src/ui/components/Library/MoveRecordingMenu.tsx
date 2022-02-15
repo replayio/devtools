@@ -31,9 +31,9 @@ function MoveRecordingMenu({
 
   return (
     <>
-      <div className="px-4 py-2 text-xs uppercase font-bold">Move to:</div>
+      <div className="px-4 py-2 text-xs font-bold uppercase">Move to:</div>
       <DropdownDivider />
-      <div className="overflow-y-auto max-h-48">
+      <div className="max-h-48 overflow-y-auto">
         {currentWorkspaceId !== null ? (
           <DropdownItem onClick={() => onMoveRecording(null)}>Your library</DropdownItem>
         ) : null}

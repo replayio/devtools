@@ -52,7 +52,7 @@ function FilterBar({
   };
 
   return (
-    <div className="flex flex-row flex-grow text-gray-500 text-sm space-x-3 items-center">
+    <div className="flex flex-grow flex-row items-center space-x-3 text-sm text-gray-500">
       <div className="material-icons">search</div>
       <TextInput value={searchString} onChange={onChange} placeholder="Search" />
     </div>
@@ -60,29 +60,12 @@ function FilterBar({
 }
 
 function LibraryLoader(props: PropsFromRedux) {
-  const [renderLibrary, setRenderLibrary] = useState(false);
-  const [showClaimError, setShowClaimError] = useState(false);
-
   const auth = useAuth0();
   const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
   const userInfo = hooks.useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
-  const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted, onError);
-
-  function onCompleted() {
-    // This allows the server enough time to refresh the pending workspaces
-    // with the new team before we render the Library.
-    setTimeout(() => {
-      removeUrlParameters();
-      setRenderLibrary(true);
-    }, 1000);
-  }
-  function onError() {
-    // If there's an error while claiming a code, don't go ahead and render the library.
-    setShowClaimError(true);
-  }
 
   useEffect(() => {
     if (!userInfo.loading && !userSettingsLoading) {
@@ -90,33 +73,7 @@ function LibraryLoader(props: PropsFromRedux) {
     }
   }, [auth, userInfo, userSettings, userSettingsLoading]);
 
-  useEffect(function handleTeamInvitationCode() {
-    const code = hasTeamInvitationCode();
-
-    if (!code) {
-      setRenderLibrary(true);
-      return;
-    }
-
-    claimTeamInvitationCode({ variables: { code } });
-  }, []);
-  useEffect(
-    function handleInvalidTeamInvitationCode() {
-      if (!showClaimError) {
-        return;
-      }
-
-      props.setExpectedError({
-        message: "This team invitation code is invalid",
-        content:
-          "There seems to be a problem with your team invitation link. Please ask your team administrator to send you an up-to-date link.",
-        action: "library",
-      });
-    },
-    [showClaimError]
-  );
-
-  if (loading1 || loading2 || loading3 || !renderLibrary) {
+  if (loading1 || loading2 || loading3) {
     return <LoadingScreen />;
   }
 
@@ -179,10 +136,10 @@ function Library({
   }
 
   return (
-    <main className="flex flex-row w-full h-full">
+    <main className="flex h-full w-full flex-row">
       <Sidebar nonPendingWorkspaces={workspaces} />
-      <div className="flex flex-col flex-grow overflow-x-hidden">
-        <div className="flex flex-row h-16 border-b border-gray-300 items-center p-5 bg-white space-x-3">
+      <div className="flex flex-grow flex-col overflow-x-hidden">
+        <div className="flex h-16 flex-row items-center space-x-3 border-b border-gray-300 bg-white p-5">
           <FilterBar searchString={searchString} setSearchString={setSearchString} />
           <LaunchButton />
         </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import classNames from "classnames";
@@ -13,6 +13,8 @@ import { PrimaryButton } from "./Button";
 import { useRouter } from "next/dist/client/router";
 import { BubbleViewportWrapper } from "./Viewport";
 import { getRecordingId } from "ui/utils/recording";
+import { setExpectedError } from "ui/actions/session";
+import { useRequestRecordingAccess } from "ui/hooks/recordings";
 
 export function PopupBlockedError() {
   return (
@@ -35,19 +37,18 @@ function RefreshButton() {
   };
 
   return (
-    <PrimaryButton className="flex-1 mx-2 justify-center" color="blue" onClick={onClick}>
+    <PrimaryButton className="mx-2 flex-1 justify-center" color="blue" onClick={onClick}>
       {clicked ? `Refreshing...` : `Refresh`}
     </PrimaryButton>
   );
 }
 
 function SignInButton() {
-  const { loginWithRedirect } = useAuth0();
+  const router = useRouter();
 
   const onClick = () => {
-    loginWithRedirect({
-      appState: { returnTo: window.location.pathname + window.location.search },
-    });
+    const returnToPath = window.location.pathname + window.location.search;
+    router.push({ pathname: "/login", query: { returnTo: returnToPath } });
   };
 
   return (
@@ -92,17 +93,44 @@ const billingConnector = connect(
 type BillingPropsFromRedux = ConnectedProps<typeof billingConnector>;
 const TeamBillingButton = billingConnector(TeamBillingButtonBase);
 
+function RequestRecordingAccessButton() {
+  const requestRecordingAccess = useRequestRecordingAccess();
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    requestRecordingAccess();
+
+    // Switch out the current error for one that will bring them back to the library
+    dispatch(
+      setExpectedError({
+        message: "Hang tight!",
+        content:
+          "We've let the owner know about your request. We'll notify you by e-mail once it's been accepted",
+        action: "library",
+      })
+    );
+  };
+
+  return (
+    <PrimaryButton color="blue" onClick={onClick}>
+      Request access
+    </PrimaryButton>
+  );
+}
+
 function ActionButton({ action }: { action: string }) {
   let button;
 
-  if (action == "refresh") {
+  if (action === "refresh") {
     button = <RefreshButton />;
-  } else if (action == "sign-in") {
+  } else if (action === "sign-in") {
     button = <SignInButton />;
-  } else if (action == "library") {
+  } else if (action === "library") {
     button = <LibraryButton />;
-  } else if (action == "team-billing") {
+  } else if (action === "team-billing") {
     button = <TeamBillingButton />;
+  } else if (action === "request-access") {
+    button = <RequestRecordingAccessButton />;
   }
 
   return <div className="m-auto">{button}</div>;
@@ -154,14 +182,14 @@ function TrialExpired() {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
-      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden text-base">
-        <div className="p-12 space-y-12 items-center flex flex-col">
-          <div className="space-y-4 place-content-center">
-            <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+      <section className="m-auto w-full max-w-lg overflow-hidden rounded-lg bg-white text-base shadow-lg">
+        <div className="flex flex-col items-center space-y-12 p-12">
+          <div className="place-content-center space-y-4">
+            <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
           </div>
-          <div className="text-center space-y-3 max-w-lg	">
-            <div className="font-bold text-lg">Free Trial Expired</div>
-            <div className="text-gray-500 text-center ">
+          <div className="max-w-lg space-y-3 text-center	">
+            <div className="text-lg font-bold">Free Trial Expired</div>
+            <div className="text-center text-gray-500 ">
               This replay is unavailable because it was recorded after your team's free trial
               expired.
             </div>

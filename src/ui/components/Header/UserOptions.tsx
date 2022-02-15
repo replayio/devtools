@@ -6,7 +6,6 @@ import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Icon from "ui/components/shared/Icon";
-import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -22,15 +21,10 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const { show } = useIntercom();
   const { isAuthenticated } = useAuth0();
 
-  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isOwner = hooks.useIsOwner();
   const isCollaborator =
     hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
     isAuthenticated;
-  const showShare = isOwner || isCollaborator;
-
-  if (isDeployPreview()) {
-    return null;
-  }
 
   if (!isAuthenticated) {
     return <LoginButton />;
@@ -38,7 +32,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
-    const docsUrl = `https://replayio.notion.site/Docs-9f8863871e024ea6acc64d6564004a22`;
+    const docsUrl = `https://docs.replay.io`;
 
     if (event.metaKey) {
       return window.open(docsUrl, "replaydocs");
@@ -79,22 +73,22 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         expanded={expanded}
         orientation="bottom"
       >
-        <button className="row" onClick={onDocsClick}>
-          <Icon iconName="docs" />
+        <button className="row group" onClick={onDocsClick}>
+          <Icon filename="docs" className="bg-gray-800 group-hover:bg-primaryAccent" />
           <span>Docs</span>
         </button>
-        <button className="row" onClick={onChatClick}>
-          <Icon iconName="help" />
+        <button className="row group" onClick={onChatClick}>
+          <Icon filename="help" className="bg-gray-800 group-hover:bg-primaryAccent" />
           <span>Chat with us</span>
         </button>
-        <button className="row" onClick={onSettingsClick}>
-          <Icon iconName="settings" />
+        <button className="row group" onClick={onSettingsClick}>
+          <Icon filename="settings" className="bg-gray-800 group-hover:bg-primaryAccent" />
           <span>Settings</span>
         </button>
         {features.launchBrowser ? (
           window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
-            <button className="row" onClick={onLaunchClick}>
-              <Icon iconName="replay" />
+            <button className="row group" onClick={onLaunchClick}>
+              <Icon filename="replay-logo" className="bg-gray-800 group-hover:bg-primaryAccent" />
               <span>Launch Replay</span>
             </button>
           )

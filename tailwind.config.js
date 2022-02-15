@@ -1,10 +1,10 @@
 module.exports = {
-  purge: {
-    content: ["./src/**/*.{js,jsx,ts,tsx}"],
-  },
-  darkMode: false, // or 'media' or 'class'
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      screens: {
+        short: { raw: "(max-height: 615px)" },
+      },
       colors: {
         lightGrey: "var(--light-grey)",
         primaryAccent: "var(--primary-accent)",
@@ -28,13 +28,6 @@ module.exports = {
       cursor: {
         "ew-resize": "ew-resize",
       },
-    },
-  },
-  variants: {
-    width: ["hover", "group-hover"],
-    extend: {
-      borderWidth: ["last"],
-      textColor: ["disabled"],
     },
   },
   plugins: [require("@tailwindcss/forms")],

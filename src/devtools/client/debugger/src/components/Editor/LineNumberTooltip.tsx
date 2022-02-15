@@ -43,7 +43,7 @@ function Wrapper({
 
   if (showWarning) {
     return (
-      <div className="static-tooltip-content bg-red-700 space-x-2">
+      <div className="static-tooltip-content space-x-2 bg-red-700">
         <MaterialIcon>warning_amber</MaterialIcon>
         <div>{children}</div>
       </div>
@@ -109,10 +109,12 @@ export default function LineNumberTooltip({ editor }: { editor: any }) {
   }, []);
 
   useEffect(() => {
-    if (analysisPoints)
+    if (analysisPoints) {
       trackEvent(
         analysisPoints.length ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits"
       );
+      trackEvent("breakpoint.preview_hits", { hitsCount: analysisPoints?.length || null });
+    }
   }, [analysisPoints]);
 
   if (!targetNode) {

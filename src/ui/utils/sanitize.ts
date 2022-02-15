@@ -58,11 +58,8 @@ export function sanitizeAction(action: any, logSanitized: boolean) {
   return sanitize(action, "", `action[${action.type}]`, logSanitized);
 }
 
-export const sanityCheckMiddleware: Middleware<
-  {},
-  UIState,
-  Dispatch<UIAction>
-> = store => next => action => {
-  sanitizeAction(action, true);
-  return next(action);
-};
+export const sanityCheckMiddleware: Middleware<{}, UIState, Dispatch<UIAction>> =
+  store => next => action => {
+    sanitizeAction(action, true);
+    return next(action);
+  };

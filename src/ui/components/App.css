@@ -1,3 +1,10 @@
+.theme-tab-font-size,
+.secondary-toolbox-header,
+.source-tab,
+h2 {
+  font-size: 14px;
+}
+
 #video {
   flex-grow: 1;
   height: 100%;
@@ -53,7 +60,7 @@
 
 #command-button-pick {
   margin-left: 0px;
-  padding: 8px;
+  padding: 8px 5px;
   position: relative;
 }
 

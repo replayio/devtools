@@ -57,14 +57,14 @@ class App extends React.Component {
       return;
     }
 
-    window.jsterm.focus();
+    window.jsterm.editor.focus();
   };
 
   render() {
     const { filterBarDisplayMode, consoleOverflow } = this.props;
 
     return (
-      <div className="flex flex-col w-full">
+      <div className="flex w-full flex-col">
         <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
         <div className="flex flex-grow overflow-hidden">
           <FilterDrawer />
@@ -83,7 +83,7 @@ class App extends React.Component {
             ) : null}
             <div className="flexible-output-input" key="in-out-container">
               <ConsoleOutput key="console-output" />
-              <JSTerm key="jsterm" />
+              <JSTerm />
             </div>
           </div>
         </div>

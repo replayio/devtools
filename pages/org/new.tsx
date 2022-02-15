@@ -8,7 +8,7 @@ export default function NewTeam() {
   const auth0 = useAuth0();
 
   if (!auth0.isAuthenticated) {
-    return <Login />;
+    return <Login returnToPath={window.location.pathname + window.location.search} />;
   }
 
   return <TeamOnboarding organization={true} />;

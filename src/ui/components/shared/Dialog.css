@@ -2,9 +2,7 @@
   border-radius: 8px;
   background: var(--theme-toolbar-background);
   border-radius: 8px;
-  box-shadow:
-    0px 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0px 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04);
   color: var(--theme-toolbar-color);
   height: max-content;
   padding: 24px;

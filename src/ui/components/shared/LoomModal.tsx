@@ -11,7 +11,7 @@ function LoomModal({ hideModal, modalOptions }: PropsFromRedux) {
   }
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <div className="rounded-lg overflow-hidden" style={{ width: "940px", height: "680px" }}>
+      <div className="overflow-hidden rounded-lg" style={{ width: "940px", height: "680px" }}>
         <div style={{ position: "relative", paddingBottom: "62.93706293706294%", height: 0 }}>
           <iframe
             src={`https://www.loom.com/embed/${modalOptions.loom}`}

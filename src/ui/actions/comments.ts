@@ -119,20 +119,23 @@ export function createLabels(sourceLocation: {
   line: number;
 }): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
   return async ({ getState, dispatch }) => {
-    const { sourceUrl, line } = sourceLocation;
+    const { sourceId, sourceUrl, line } = sourceLocation;
     const filename = getFilenameFromURL(sourceUrl);
+    if (!sourceId) {
+      return { primary: `${filename}:${line}`, secondary: "" };
+    }
     const state = getState();
 
-    let symbols = getSymbols(state, { id: sourceLocation.sourceId });
+    let symbols = getSymbols(state, { id: sourceId });
     if (!symbols) {
-      symbols = await dispatch(setSymbols({ source: { id: sourceLocation.sourceId } }));
+      symbols = await dispatch(setSymbols({ source: { id: sourceId } }));
     }
     const closestFunction = findClosestFunction(symbols, sourceLocation);
     const primary = closestFunction?.name || `${filename}:${line}`;
 
-    let snippet = getTextAtLocation(state, sourceLocation.sourceId, sourceLocation) || "";
+    let snippet = getTextAtLocation(state, sourceId, sourceLocation) || "";
     if (!snippet) {
-      const sourceContent = await ThreadFront.getSourceContents(sourceLocation.sourceId);
+      const sourceContent = await ThreadFront.getSourceContents(sourceId);
       const lineText = sourceContent.contents.split("\n")[line - 1];
       snippet = lineText?.slice(0, 100).trim();
     }

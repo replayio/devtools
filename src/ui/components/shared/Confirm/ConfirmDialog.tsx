@@ -61,11 +61,11 @@ export const ConfirmDialog = ({
       <DialogTitle>{message}</DialogTitle>
       {description && <DialogDescription>{description}</DialogDescription>}
       <DialogActions>
-        <SecondaryButton color="blue" className="flex-1 mx-3 justify-center" onClick={onDecline}>
+        <SecondaryButton color="blue" className="mx-3 flex-1 justify-center" onClick={onDecline}>
           {declineLabel}
         </SecondaryButton>
         <Button
-          className="flex-1 mx-2 justify-center"
+          className="mx-2 flex-1 justify-center"
           color={isDestructive ? "pink" : "blue"}
           onClick={onAccept}
           ref={primaryButtonRef}

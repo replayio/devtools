@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -16,7 +16,6 @@ import ToolboxOptions from "./ToolboxOptions";
 import { trackEvent } from "ui/utils/telemetry";
 
 import "ui/setup/dynamic/inspector";
-import { UserSettings } from "ui/types";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
@@ -37,7 +36,7 @@ function PanelButtons({
   setSelectedPanel,
 }: PanelButtonsProps) {
   const { userSettings } = hooks.useGetUserSettings();
-  const { enableNetworkMonitor, showReact, showElements } = userSettings;
+  const { showReact } = userSettings;
 
   const onClick = (panel: SecondaryPanelName) => {
     setSelectedPanel(panel);
@@ -49,8 +48,8 @@ function PanelButtons({
   };
 
   return (
-    <div className="flex flex-row items-center overflow-hidden theme-tab-font-size">
-      {showElements && !isNode && <NodePicker />}
+    <div className="theme-tab-font-size flex flex-row items-center overflow-hidden">
+      {!isNode && <NodePicker />}
       <button
         className={classnames("console-panel-button", {
           expanded: selectedPanel === "console",
@@ -59,7 +58,7 @@ function PanelButtons({
       >
         <div className="label">Console</div>
       </button>
-      {showElements && !isNode && (
+      {!isNode && (
         <button
           className={classnames("inspector-panel-button", {
             expanded: selectedPanel === "inspector",
@@ -79,16 +78,14 @@ function PanelButtons({
           <div className="label">React</div>
         </button>
       )}
-      {enableNetworkMonitor && (
-        <button
-          className={classnames("console-panel-button", {
-            expanded: selectedPanel === "network",
-          })}
-          onClick={() => onClick("network")}
-        >
-          <div className="label">Network</div>
-        </button>
-      )}
+      <button
+        className={classnames("console-panel-button", {
+          expanded: selectedPanel === "network",
+        })}
+        onClick={() => onClick("network")}
+      >
+        <div className="label">Network</div>
+      </button>
     </div>
   );
 }
@@ -115,23 +112,6 @@ function InspectorPanel() {
   );
 }
 
-function getAllowedPanels(settings: UserSettings, hasReactComponents: boolean) {
-  const allowedPanels = ["console"];
-  const { enableNetworkMonitor, showReact, showElements } = settings;
-
-  if (enableNetworkMonitor) {
-    allowedPanels.push("network");
-  }
-  if (showReact && hasReactComponents) {
-    allowedPanels.push("react-components");
-  }
-  if (showElements) {
-    allowedPanels.push("inspector");
-  }
-
-  return allowedPanels;
-}
-
 function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
@@ -141,7 +121,7 @@ function SecondaryToolbox({
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
-  if (!getAllowedPanels(userSettings, hasReactComponents).includes(selectedPanel)) {
+  if (selectedPanel === "react-components" && !(userSettings.showReact && hasReactComponents)) {
     setSelectedPanel("console");
   }
 

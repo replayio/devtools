@@ -7,6 +7,8 @@ import {
   Identifier,
 } from "@babel/types";
 import generate from "@babel/generator";
+import { ValueFront } from "protocol/thread";
+import { WiredObject } from "protocol/thread/pause";
 const { filter } = require("fuzzaldrin-plus");
 
 type PropertyExpression = {
@@ -39,19 +41,6 @@ type ObjectFront = {
   preview?: ObjectPreview;
 };
 
-type ValueFront = {
-  _pause: any;
-  _hasPrimitive: false;
-  _primitive?: boolean;
-  _isBigInt: boolean;
-  _isSymbol: boolean;
-  _object: ObjectFront;
-  _uninitialized: boolean;
-  _unavailable: boolean;
-  _elements: null;
-  _isMapEntry: null;
-};
-
 type Binding = {
   name: string;
   value: ValueFront;
@@ -75,10 +64,10 @@ const PROPERTY_PLACEHOLDER = "fakeProperty";
 // bracket notation properties regardless of whether the user has quotation
 // marks or not. i.e., `foo["ba` vs `foo[ba` will both show "bar" as
 // an autocomplete match.
-function normalizeString(str: string) {
+export function normalizeString(str: string) {
   return str.toLowerCase().replace(/['"`]+/g, "");
 }
-function fuzzyFilter(candidates: string[], query: string): string[] {
+export function fuzzyFilter(candidates: string[], query: string): string[] {
   if (normalizeString(query) === "") {
     return candidates;
   }
@@ -108,14 +97,14 @@ function tryToAutocompleteComputedProperty(str: string) {
 
   return ending ? str + ending : "";
 }
-function isBracketNotation(str: string) {
+export function isBracketNotation(str: string) {
   return !!tryToAutocompleteComputedProperty(str);
 }
-function isDotNotation(str: string) {
+export function isDotNotation(str: string) {
   return isMemberExpression(str + PROPERTY_PLACEHOLDER);
 }
 
-function getPropertiesForObject(object?: ObjectFront): string[] {
+export function getPropertiesForObject(object?: ObjectFront | WiredObject | null): string[] {
   const properties = [];
 
   if (!object) {
@@ -142,8 +131,8 @@ function getPropertiesForObject(object?: ObjectFront): string[] {
   const prototype = object.preview?.prototypeValue;
 
   // Recursively gather the properties through the prototype chain.
-  if (prototype?._object) {
-    const prototypeProperties = getPropertiesForObject(prototype._object);
+  if (prototype?.getObject()) {
+    const prototypeProperties = getPropertiesForObject(prototype.getObject());
     properties.unshift(...prototypeProperties);
   }
 
@@ -161,7 +150,7 @@ function getBindingNames(scope: Scope): string[] {
   return scope.bindings.map(b => b.name);
 }
 function getGlobalVariables(scopes: Scope) {
-  return getPropertiesForObject(scopes.parent.object?._object);
+  return getPropertiesForObject(scopes.parent.object?.getObject());
 }
 
 function getPropertyValue(property: StringLiteral | Identifier) {
@@ -171,7 +160,7 @@ function getPropertyValue(property: StringLiteral | Identifier) {
 
   return property.name;
 }
-function getPropertyExpression(str: string): PropertyExpression | null {
+export function getPropertyExpression(str: string): PropertyExpression | null {
   if (isDotNotation(str)) {
     const parsed = parseExpression(str + PROPERTY_PLACEHOLDER);
 
@@ -238,14 +227,14 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
   const propertyExpression = getPropertyExpression(input);
 
   if (propertyExpression) {
-    const { left, right, computed } = propertyExpression;
-    const object = getBinding(left, scope)?.value._object;
+    const properties = [];
+    const { left, right } = propertyExpression;
 
-    if (!object) {
-      return [];
+    const object = getBinding(left, scope)?.value.getObject();
+    if (object) {
+      properties.push(...getPropertiesForObject(object));
     }
 
-    const properties = getPropertiesForObject(object);
     return fuzzyFilter(properties, normalizeString(right));
   } else if (shouldVariableAutocomplete(input)) {
     const variableNames = [...getBindingNames(scope), ...getGlobalVariables(scope)];
@@ -253,4 +242,16 @@ export function getAutocompleteMatches(input: string, scope: Scope) {
   }
 
   return [];
+}
+export function getRemainingCompletedTextAfterCursor(value: string, match: string) {
+  const propertyExpression = getPropertyExpression(value);
+
+  if (
+    !propertyExpression ||
+    match.slice(0, propertyExpression.right.length) !== propertyExpression.right
+  ) {
+    return null;
+  }
+
+  return match.slice(propertyExpression.right.length);
 }

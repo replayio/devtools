@@ -14,10 +14,10 @@ export function Field({
 }: FieldProps & { children: React.ReactNode }) {
   return (
     <FieldRow className={className}>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mt-px pt-2">
+      <label htmlFor={id} className="mt-px block pt-2 text-sm font-medium text-gray-700">
         {label}
       </label>
-      <div className="mt-1 mt-0 col-span-2">{children}</div>
+      <div className="col-span-2 mt-1 mt-0">{children}</div>
     </FieldRow>
   );
 }

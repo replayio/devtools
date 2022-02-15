@@ -22,12 +22,12 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
   return (
     <>
       <div className="flex items-center justify-between space-x-3">
-        <div className="flex-auto w-0">
-          <div className="flex items-center px-2.5 h-9 w-full border border-textFieldBorder rounded-md bg-blue-100">
+        <div className="w-0 flex-auto">
+          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-blue-100 px-2.5">
             <input
               readOnly
               value={keyValue}
-              className="bg-blue-100 flex-auto truncate focus:outline-none"
+              className="flex-auto truncate bg-blue-100 focus:outline-none"
               onFocus={ev => ev.target.setSelectionRange(0, keyValue.length)}
             />
             {copied ? (
@@ -44,13 +44,13 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
           </div>
         </div>
         <button
-          className="inline-flex items-center px-2.5 py-1.5 h-9 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent hover:bg-primaryAccentHover focus:outline-none focus:bg-primaryAccentHover"
+          className="inline-flex h-9 items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-white shadow-sm hover:bg-primaryAccentHover focus:bg-primaryAccentHover focus:outline-none"
           onClick={onDone}
         >
           Done
         </button>
       </div>
-      <div className="flex items-center p-2.5 border border-textFieldBorder rounded-md bg-red-100">
+      <div className="flex items-center rounded-md border border-textFieldBorder bg-red-100 p-2.5">
         Make sure to copy your API key now. You won{"'"}t be able to see it again!
       </div>
     </>
@@ -62,9 +62,9 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
   if (apiKeys.length === 0) return null;
 
   return (
-    <section className="flex-auto flex flex-col">
-      <h3 className="text-base uppercase font-semibold">API Keys</h3>
-      <div className="flex-auto overflow-auto h-0">
+    <section className="flex flex-auto flex-col">
+      <h3 className="text-base font-semibold uppercase">API Keys</h3>
+      <div className="h-0 flex-auto overflow-auto">
         {apiKeys.map(apiKey => {
           const usage =
             typeof apiKey.maxRecordings === "number"
@@ -74,10 +74,10 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
             <div className="flex flex-row items-center py-1.5" key={apiKey.id}>
               <span className="flex-auto" data-private>
                 {apiKey.label}
-                <span className="text-gray-500 ml-2">{usage}</span>
+                <span className="ml-2 text-gray-500">{usage}</span>
               </span>
               <button
-                className="inline-flex items-center p-2.5 text-sm shadow-sm leading-4 rounded-md bg-gray-100 text-red-500 hover:text-red-700 focus:outline-none focus:text-red-700"
+                className="inline-flex items-center rounded-md bg-gray-100 p-2.5 text-sm leading-4 text-red-500 shadow-sm hover:text-red-700 focus:text-red-700 focus:outline-none"
                 onClick={() => {
                   confirmDestructive({
                     message: "Delete API key?",
@@ -139,7 +139,7 @@ export default function APIKeys({
   }, [labelRef.current, keyValue]);
 
   return (
-    <div className="space-y-8 flex flex-col flex-auto h-0">
+    <div className="flex h-0 flex-auto flex-col space-y-8">
       <label className="setting-item">
         <div className="description">{description}</div>
       </label>
@@ -150,7 +150,7 @@ export default function APIKeys({
       ) : (
         <>
           <section className="space-y-2.5 text-sm">
-            <h3 className="uppercase font-semibold text-xs">Create new API Key</h3>
+            <h3 className="text-xs font-semibold uppercase">Create new API Key</h3>
             <form
               className="space-y-3"
               onSubmit={ev => {
@@ -164,7 +164,7 @@ export default function APIKeys({
                 ev.preventDefault();
               }}
             >
-              <fieldset className="w-full space-x-1.5 flex flex-row">
+              <fieldset className="flex w-full flex-row space-x-1.5">
                 <TextInput
                   disabled={loading}
                   placeholder="API Key Label"
@@ -175,7 +175,7 @@ export default function APIKeys({
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className={`inline-flex items-center px-2.5 py-1.5 border border-transparent leading-4 font-medium rounded-md shadow-sm text-white bg-primaryAccent focus:outline-none ${
+                  className={`inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-white shadow-sm focus:outline-none ${
                     canSubmit
                       ? "hover:bg-primaryAccentHover focus:bg-primaryAccentHover"
                       : "opacity-60"
@@ -186,9 +186,9 @@ export default function APIKeys({
               </fieldset>
               {scopes && scopes.length > 1 ? (
                 <fieldset className="w-full">
-                  <h4 className="text-sm uppercase font-semibold">Permissions</h4>
+                  <h4 className="text-sm font-semibold uppercase">Permissions</h4>
                   {scopes.map(scope => (
-                    <label key={scope} className="inline-block space-x-1.5 mx-1.5">
+                    <label key={scope} className="mx-1.5 inline-block space-x-1.5">
                       <input
                         type="checkbox"
                         onChange={e =>
@@ -206,7 +206,7 @@ export default function APIKeys({
                     </label>
                   ))}
                   {selectedScopes.length === 0 ? (
-                    <div className="mt-2.5 flex items-center p-2.5 border border-textFieldBorder rounded-md bg-red-100">
+                    <div className="mt-2.5 flex items-center rounded-md border border-textFieldBorder bg-red-100 p-2.5">
                       At least one permission must be selected.
                     </div>
                   ) : null}

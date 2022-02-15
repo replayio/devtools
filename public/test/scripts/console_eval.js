@@ -1,5 +1,6 @@
 Test.describe(`Test global console evaluation.`, async () => {
   await Test.selectConsole();
+  await Test.warpToMessage("ExampleFinished");
 
   await Test.executeInConsole("number");
   await Test.waitForMessage("10");

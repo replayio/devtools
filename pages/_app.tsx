@@ -1,5 +1,4 @@
 import "../src/test-prep";
-import "ui/utils/whatwg-url-fix";
 
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
@@ -14,6 +13,7 @@ import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
 import "image/image.css";
+import "image/icon.css";
 import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
@@ -96,7 +96,6 @@ import "ui/components/Comments/Comments.css";
 import "ui/components/Comments/TranscriptComments/CommentActions.css";
 import "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor.css";
 import "ui/components/Comments/VideoComments/CommentsOverlay.css";
-import "ui/components/Header/ShareDropdown.css";
 import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
 import "ui/components/Library/Sidebar.css";

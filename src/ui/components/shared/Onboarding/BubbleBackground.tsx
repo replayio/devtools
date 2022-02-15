@@ -2,17 +2,17 @@ import React from "react";
 
 export default function BubbleBackground() {
   return (
-    <div className="w-full h-full absolute pointer-events-none">
-      <div className="absolute top-bubble">
+    <div className="pointer-events-none absolute h-full w-full">
+      <div className="top-bubble absolute">
         <img
           src="/images/bubble.svg"
-          className="transform rotate-90 -translate-x-1/2 -translate-y-1/2"
+          className="-translate-x-1/2 -translate-y-1/2 rotate-90 transform"
         />
       </div>
-      <div className="absolute bottom-bubble">
+      <div className="bottom-bubble absolute">
         <img
           src="/images/bubble.svg"
-          className="transform -rotate-300 translate-x-1/2 translate-y-1/2"
+          className="-rotate-300 translate-x-1/2 translate-y-1/2 transform"
         />
       </div>
     </div>

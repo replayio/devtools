@@ -33,14 +33,15 @@ You can also search for the package on the [Type Search](https://www.typescriptl
 ### Dealing with nullable values
 
 After converting a file to Typescript you will often see many errors about values that may be `null` or `undefined`. How to fix them should be decided on a case-by-case basis:
-* by checking the value: Typescript usually understands that a value can't be nullable after you have checked it. For example, if you write `if (value) { ... }`, `value` will not be considered nullable in the `if` expression's body.
-* sometimes when you do check a value, Typescript can't infer that it isn't nullable: if you write `if (obj.getValue()) { ... }`,
+
+- by checking the value: Typescript usually understands that a value can't be nullable after you have checked it. For example, if you write `if (value) { ... }`, `value` will not be considered nullable in the `if` expression's body.
+- sometimes when you do check a value, Typescript can't infer that it isn't nullable: if you write `if (obj.getValue()) { ... }`,
   Typescript will still assume that `obj.getValue()` can be `null` or `undefined` in the `if` expression's body.
   This is correct because Typescript can't know that `obj.getValue()` will always return the same value. In this case you could assign `obj.getValue()` to a new variable and work with that.
-* by using the optional chaining operator (`?.`) or the nullish coalescing operator (`??`).
-* if you're sure that the value isn't really nullable, you can tell this to Typescript:
-  * by using `assert(value);` (with `assert` imported from `protocol/utils`): Typescript knows that the value can't be `null` or `undefined` in the code following the assert. Also, the assert will check your assumption at runtime.
-  * by using `value!` - this should only be used when it is obvious from the immediately surrounding code that the value can't be nullable.
+- by using the optional chaining operator (`?.`) or the nullish coalescing operator (`??`).
+- if you're sure that the value isn't really nullable, you can tell this to Typescript:
+  - by using `assert(value);` (with `assert` imported from `protocol/utils`): Typescript knows that the value can't be `null` or `undefined` in the code following the assert. Also, the assert will check your assumption at runtime.
+  - by using `value!` - this should only be used when it is obvious from the immediately surrounding code that the value can't be nullable.
     A typical example is accessing the values of a Map: `if (map.has(key)) { ... map.get(key)! ... }` - Typescript doesn't know about the connection between `map.has(key)` and `map.get(key)` and so it assumes that `map.get(key)` could return `undefined`.
 
 ## Typescript with React/Redux
@@ -56,5 +57,6 @@ The module `ui/actions` contains some central type definitions: `UIStore` is the
 ### Typing return values
 
 In general it is not necessary to specify the return type of a function because Typescript will try to infer it. But sometimes it is useful to specify it anyway:
-* when you want to check that the return value is correct: for example I recommend specifying the return type of all reducer functions.
-* when the type inferred by Typescript is not as precise as it could be: for example if a function returns either the string `"x"` or `"y"`, Typescript will infer the return type to be `string`, but you may want to narrow it to `"x" | "y"`.
+
+- when you want to check that the return value is correct: for example I recommend specifying the return type of all reducer functions.
+- when the type inferred by Typescript is not as precise as it could be: for example if a function returns either the string `"x"` or `"y"`, Typescript will infer the return type to be `string`, but you may want to narrow it to `"x" | "y"`.

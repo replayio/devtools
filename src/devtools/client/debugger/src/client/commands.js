@@ -172,7 +172,11 @@ async function evaluateExpressions(sources, options) {
 }
 
 async function evaluate(source, { asyncIndex, frameId } = {}) {
-  const { returned, exception, failed } = await ThreadFront.evaluate(asyncIndex, frameId, source);
+  const { returned, exception, failed } = await ThreadFront.evaluate({
+    asyncIndex,
+    frameId,
+    text: source,
+  });
   if (failed) {
     return { exception: createPrimitiveValueFront("Evaluation failed") };
   }

@@ -70,7 +70,7 @@ exports.PaywallMessage = function (props) {
       level: MESSAGE_LEVEL.LOG,
       category: null,
       messageText: null,
-      parameters: null,
+      parameters: [],
       repeatId: null,
       stacktrace: null,
       frame: null,

@@ -12,7 +12,7 @@ export function Banner({
 }) {
   return (
     <div
-      className={classNames("rounded-md flex flex-row items-center p-3 space-x-3", {
+      className={classNames("flex flex-row items-center space-x-3 rounded-md p-3", {
         "bg-primaryAccent text-white": type === "primary",
         "bg-yellow-300 text-black": type === "warning",
       })}

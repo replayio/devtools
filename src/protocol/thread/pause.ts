@@ -361,7 +361,7 @@ export class Pause {
     return this.objects.get(object)!;
   }
 
-  async evaluate(frameId: FrameId | undefined, expression: string) {
+  async evaluate(frameId: FrameId | undefined, expression: string, pure: boolean) {
     assert(this.createWaiter);
     await this.createWaiter;
     const { result } = frameId
@@ -369,8 +369,9 @@ export class Pause {
           frameId,
           expression,
           useOriginalScopes: true,
+          pure,
         })
-      : await this.sendMessage(client.Pause.evaluateInGlobal, { expression });
+      : await this.sendMessage(client.Pause.evaluateInGlobal, { expression, pure });
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return { returned, exception, failed } as EvaluationResult;

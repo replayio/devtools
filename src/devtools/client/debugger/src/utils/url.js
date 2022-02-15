@@ -4,11 +4,6 @@
 
 import memoize from "lodash/memoize";
 
-// adds a specific shim so that we can import this module
-// directly from storybook and other test runners
-import "ui/utils/whatwg-url-fix.js";
-import { URL } from "whatwg-url";
-
 const defaultUrl = {
   hash: "",
   host: "",

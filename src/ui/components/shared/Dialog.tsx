@@ -14,7 +14,7 @@ export function Dialog({ children, className, ...props }: DialogPropTypes) {
 
 export const DialogLogo = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   return (
-    <div {...props} className={classNames("flex justify-center mb-5", className)}>
+    <div {...props} className={classNames("mb-5 flex justify-center", className)}>
       <ReplayLogo size="md" />
     </div>
   );
@@ -22,7 +22,7 @@ export const DialogLogo = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
 
 export const DialogTitle = ({ children, className, ...props }: HTMLProps<HTMLHeadingElement>) => {
   return (
-    <h1 {...props} className={classNames("text-center text-lg font-medium mb-2", className)}>
+    <h1 {...props} className={classNames("mb-2 text-center text-lg font-medium", className)}>
       {children}
     </h1>
   );
@@ -34,7 +34,11 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p {...props} className="mb-2 text-center text-gray-500 text-sm">
+    <p
+      {...props}
+      className="mb-2 text-center text-sm text-gray-500"
+      style={{ minHeight: "2.5rem" }}
+    >
       {children}
     </p>
   );
@@ -42,6 +46,6 @@ export const DialogDescription = ({
 
 export const DialogActions = ({ children, className, ...props }: HTMLProps<HTMLDivElement>) => {
   return (
-    <div className={classNames("flex justify-between mt-6 w-full", className)}>{children}</div>
+    <div className={classNames("mt-6 flex w-full justify-between", className)}>{children}</div>
   );
 };

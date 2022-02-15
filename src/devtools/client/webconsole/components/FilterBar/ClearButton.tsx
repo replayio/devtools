@@ -1,6 +1,6 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -28,12 +28,17 @@ function ClearButton(props: PropsFromRedux) {
 
   return (
     <button
-      className="flex disabled:text-gray-400 devtools-clear-icon"
+      className="flex devtools-clear-icon"
       title={isEnabled ? "Clear console evaluations" : "No console evaluations to clear"}
       disabled={!isEnabled}
       onClick={onClick}
     >
-      <MaterialIcon iconSize={"lg"}>delete</MaterialIcon>
+      <Icon
+        filename="trash"
+        className={
+          isEnabled ? "bg-gray-700 hover:bg-primaryAccent" : "bg-gray-300 hover:bg-primaryAccent"
+        }
+      />
     </button>
   );
 }

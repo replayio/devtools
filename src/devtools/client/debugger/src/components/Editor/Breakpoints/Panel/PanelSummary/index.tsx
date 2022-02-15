@@ -57,6 +57,7 @@ function PanelSummary({
 
   const focusInput = (input: Input) => {
     if (isEditable) {
+      trackEvent("breakpoint.start_edit", { input, hitsCount: analysisPoints?.length || null });
       toggleEditingOn();
       setInputToFocus(input);
     }
@@ -91,11 +92,11 @@ function PanelSummary({
     trackEvent("breakpoint.too_many_points");
 
     return (
-      <div className="summary flex items-center text-red-700 bg-red-100">
+      <div className="summary flex items-center bg-red-100 text-red-700">
         <Popup
           trigger={
-            <div className="flex items-center overflow-hidden space-x-2">
-              <MaterialIcon className="text-xl pl-2">error</MaterialIcon>
+            <div className="flex items-center space-x-2 overflow-hidden">
+              <MaterialIcon className="pl-2 text-xl">error</MaterialIcon>
               <span className="overflow-hidden overflow-ellipsis whitespace-pre hover:underline">
                 <a
                   href="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#1e6ed519f3f849458a7aa88b7be497b6"
@@ -118,7 +119,7 @@ function PanelSummary({
 
   return (
     <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
-      <div className="statements-container flex flex-col flex-grow">
+      <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
             isEditable={isEditable}

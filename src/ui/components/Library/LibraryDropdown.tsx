@@ -2,6 +2,7 @@ import React from "react";
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
 import MaterialIcon from "../shared/MaterialIcon";
+import Icon from "../shared/Icon";
 
 // This should be the standard dropdown component for the Library
 // but then we should slowly make it even more general purpose
@@ -18,7 +19,7 @@ export function DropdownButton({
 }) {
   return (
     <Menu.Button
-      className={classNames(className, "flex px-1 py-2 items-center text-sm")}
+      className={classNames(className, "flex items-center px-1 py-2 text-sm")}
       disabled={disabled}
     >
       {children}
@@ -38,7 +39,7 @@ export function Dropdown({
   fontSizeClass?: "text-sm" | "text-base";
 }) {
   return (
-    <Menu as="div" className="inline-block text-left recording-options">
+    <Menu as="div" className="recording-options inline-block text-left">
       {({ open }) => (
         <Menu.Items
           static
@@ -46,7 +47,7 @@ export function Dropdown({
             menuItemsClassName,
             widthClass,
             fontSizeClass,
-            "origin-top-right right-0 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+            "right-0 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           )}
         >
           <div className="py-1">{children}</div>
@@ -94,19 +95,17 @@ export function DropdownItemContent({
     <div className="flex flex-row space-x-4">
       <div
         className={classNames(
-          "w-4 flex flex-row items-center",
+          "flex w-4 flex-row items-center",
           selected ? "text-primaryAccent" : "text-gray-400"
         )}
       >
-        <MaterialIcon outlined={true} style={{ fontSize: "20px" }}>
-          {icon}
-        </MaterialIcon>
+        <Icon filename={icon} className="bg-gray-800 group-hover:bg-primaryAccent" />
       </div>
-      <span className="whitespace-pre overflow-hidden overflow-ellipsis">{children}</span>
+      <span className="overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
     </div>
   );
 }
 
 export function DropdownDivider() {
-  return <div className="border-b border-gray-200 w-full" />;
+  return <div className="w-full border-b border-gray-200" />;
 }

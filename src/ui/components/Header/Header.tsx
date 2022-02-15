@@ -76,8 +76,7 @@ function HeaderTitle({
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const canEditTitle = recording.userRole !== "none";
 
-  const className =
-    "ml-2 text-lg p-0.5 bg-transparent border-black whitespace-pre overflow-hidden overflow-ellipsis";
+  const className = "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis";
 
   const onKeyPress: React.KeyboardEventHandler = (e: any) => {
     if (e.code == "Enter" || e.code == "Escape") {
@@ -91,10 +90,10 @@ function HeaderTitle({
   };
   const onBlur = () => {
     if (editing !== EditState.Active) return;
-    const currentValue = inputNode.current!.textContent;
+    const currentValue = inputNode.current!.textContent || "";
 
     setEditing(EditState.Saving);
-    updateRecordingTitle({ variables: { recordingId, title: currentValue } }).then(() => {
+    updateRecordingTitle(recordingId, currentValue).then(() => {
       setEditing(EditState.Inactive);
     });
   };
@@ -120,7 +119,8 @@ function HeaderTitle({
 
   return (
     <span
-      className={cx(className, "input focus:ring-primaryAccent focus:border-blue-500", {
+      style={{ outline: "none", background: "inherit" }}
+      className={cx(className, "input m-5 focus:bg-blue-500", {
         italic: !hasTitle && !editing,
       })}
       role="textbox"
@@ -158,7 +158,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div className={css.header}>
-      <div className="flex flex-row items-center relative overflow-hidden flex-grow">
+      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}

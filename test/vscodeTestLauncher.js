@@ -39,12 +39,12 @@ function loadTests() {
   const onlyTarget = process.env.TEST_ONLY_TARGET;
   const e2eTests = e2eManifest
     .filter(({ targets }) => !onlyTarget || targets.includes(onlyTarget))
-    .map(({ script, pending }) => ({
+    .map(({ script, disabled }) => ({
       type: "test",
       id: e2eTestPrefix + script,
       label: script,
       debuggable: false,
-      skipped: !!pending,
+      skipped: !!disabled,
     }));
 
   const mockManifest = require("./mock/manifest");

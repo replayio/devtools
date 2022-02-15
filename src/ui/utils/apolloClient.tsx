@@ -46,7 +46,7 @@ export function ApolloWrapper({ children }: { children: ReactNode }) {
       <MockedProvider
         link={from([retryLink, errorLink, mockLink])}
         cache={createApolloCache()}
-        ref={mockRef => clientWaiter.resolve(mockRef!.state.client)}
+        ref={mockRef => mockRef && clientWaiter.resolve(mockRef!.state.client)}
       >
         <>{children}</>
       </MockedProvider>

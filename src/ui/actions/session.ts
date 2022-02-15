@@ -32,10 +32,12 @@ export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
 };
 export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boolean };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
+export type ClearExpectedError = Action<"clear_expected_error">;
 export type SessionActions =
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
-  | SetTrialExpiredAction;
+  | SetTrialExpiredAction
+  | ClearExpectedError;
 
 declare global {
   interface Window {
@@ -47,16 +49,6 @@ export function getAccessibleRecording(
   recordingId: string
 ): UIThunkAction<Promise<Recording | null>> {
   return async ({ dispatch }) => {
-    if (!validateUUID(recordingId)) {
-      dispatch(
-        setExpectedError({
-          message: "Invalid ID",
-          content: `"${recordingId}" is not a valid recording ID`,
-        })
-      );
-      return null;
-    }
-
     try {
       const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
       if (!recording || recording.isInitialized) {
@@ -95,7 +87,7 @@ function getRecordingNotAccessibleError(
     return {
       message: "Sorry, you don't have permission!",
       content: "Maybe you haven't been invited to this replay yet?",
-      action: "library",
+      action: "request-access",
     };
   }
 
@@ -256,5 +248,11 @@ export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false
     }
 
     dispatch({ type: "set_unexpected_error", error });
+  };
+}
+
+export function clearExpectedError(): UIThunkAction {
+  return ({ dispatch }) => {
+    dispatch({ type: "clear_expected_error", error: null });
   };
 }

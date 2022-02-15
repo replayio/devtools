@@ -47,8 +47,7 @@ export class ShortcutsModal extends Component {
         {this.renderShorcutItem("Find next", formatKeyShortcut("Cmd+G"))}
         {this.renderShorcutItem("Find in files", formatKeyShortcut("CmdOrCtrl+Shift+F"))}
         {this.renderShorcutItem("Find function", formatKeyShortcut("CmdOrCtrl+Shift+O"))}
-        {this.props.enableGlobalSearch &&
-          this.renderShorcutItem("Find all functions", formatKeyShortcut("CmdOrCtrl+O"))}
+        {this.renderShorcutItem("Find all functions", formatKeyShortcut("CmdOrCtrl+O"))}
         {this.renderShorcutItem("Go to line", formatKeyShortcut("Ctrl+G"))}
       </ul>
     );

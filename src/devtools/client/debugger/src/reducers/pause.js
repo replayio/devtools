@@ -50,6 +50,9 @@ const resumedPauseState = {
 };
 
 function update(state = createPauseState(), action) {
+  if (action.cx && action.cx.pauseCounter !== state.threadcx.pauseCounter) {
+    return state;
+  }
   switch (action.type) {
     case "PAUSED": {
       const { frame, why, executionPoint } = action;

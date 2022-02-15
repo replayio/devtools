@@ -18,7 +18,6 @@ import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
-import { isRepaintEnabled } from "./enable-repaint";
 
 const { features } = require("ui/utils/prefs");
 
@@ -238,10 +237,6 @@ export function setupGraphics(store: UIStore) {
     }
 
     store.dispatch(precacheScreenshots(time));
-
-    if (!isRepaintEnabled()) {
-      return;
-    }
 
     await repaint();
   });
