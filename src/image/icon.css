@@ -66,3 +66,13 @@ but without a background color so we can use hover effects
 .icon.trash {
   -webkit-mask-image: url(/icons/trash.svg);
 }
+
+/* check-in widget */
+
+.icon.active {
+  -webkit-mask-image: url(/icons/active.svg);
+}
+
+.icon.resolved {
+  -webkit-mask-image: url(/icons/resolved.svg);
+}
