@@ -125,7 +125,7 @@
 
 .frames .img.annotation-logo {
   margin-inline-end: 4px;
-  background-color: currentColor;
+  background-color: var(--theme-tab-toolbar-background);
 }
 
 /*

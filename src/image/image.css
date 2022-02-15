@@ -22,6 +22,10 @@
 .img.ember {
   background-image: url(~devtools/client/debugger/images/sources/ember.svg) !important;
 }
+.img.meta {
+  background-image: url(~devtools/client/debugger/images/sources/meta.svg) !important;
+  margin-top: -3px;
+}
 .img.marko {
   background-image: url(~devtools/client/debugger/images/sources/marko.svg) !important;
 }
