@@ -160,9 +160,8 @@
 }
 
 .timeline .unloaded-regions {
-  height: 3px;
-  border-radius: 4px;
-  height: 3px;
+  height: 4px;
+  border-radius: 5px;
   background-image: url("/images/dotted-mask.svg");
   position: absolute;
   pointer-events: none;
