@@ -77,20 +77,20 @@ function Section({
 }) {
   return (
     <div
-      className="absolute w-full h-full"
+      className="absolute h-full w-full"
       style={{ ...position, transition: isResizing ? "" : "all 0.1s ease-in-out" }}
     >
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
-      <div className="overflow-hidden flex flex-col w-full h-full">
+      <div className="flex h-full w-full flex-col overflow-hidden">
         <div className={classNames("border-b", index > 0 ? "border-black" : "border-gray-200")} />
         <button
-          className="font-bold flex space-x-2 bg-gray-200 w-full px-2"
+          className="flex w-full space-x-2 bg-gray-200 px-2 font-bold"
           onClick={() => toggleCollapsed(index)}
         >
           <div className="font-mono">{isCollapsed ? `>` : `v`}</div>
           <div>{`Section ${index + 1} `}</div>
         </button>
-        <div className="overflow-auto flex-grow">{!isCollapsed && children}</div>
+        <div className="flex-grow overflow-auto">{!isCollapsed && children}</div>
       </div>
     </div>
   );
@@ -123,7 +123,7 @@ export default function Accordion({ items }: any) {
   };
 
   return (
-    <div className={classNames("h-full overflow-auto flex flex-col relative")}>
+    <div className="relative flex h-full flex-col overflow-auto">
       {items.map((item: any, index: number) => (
         <Section
           key={item}
@@ -155,7 +155,7 @@ function ResizeMask({
     <div
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      className="h-full w-full fixed top-0 left-0 bg-black opacity-50"
+      className="fixed top-0 left-0 h-full w-full bg-black opacity-50"
       style={{ cursor: "ns-resize" }}
     />
   );
