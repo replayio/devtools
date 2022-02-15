@@ -65,7 +65,7 @@ const DEFAULT_COMMANDS: readonly CommandKey[] = [
   "open_function_search",
   "open_full_text_search",
   "open_sources",
-];
+] as const;
 
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
