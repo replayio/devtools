@@ -73,12 +73,12 @@ const PanelButtons: FC<PanelButtonsProps> = ({
       )}
       {hasReactComponents && showReact && (
         <button
-          disabled={!areReactComponentsReady}
+          // disabled={!areReactComponentsReady}
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
           })}
           onClick={() => onClick("react-components")}
-          title={!areReactComponentsReady ? "React DevTools not yet initialised." : undefined}
+          // title={!areReactComponentsReady ? "React DevTools not yet initialised." : undefined}
         >
           <div className={classnames("label", { "line-through": !areReactComponentsReady })}>
             React

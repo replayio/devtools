@@ -2,7 +2,7 @@ import { Action } from "redux";
 import { ExecutionPoint } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { Annotation } from "ui/state/reactDevTools";
-import { UIStore } from ".";
+import { UIStore, UIThunkAction } from ".";
 
 export type AddAnnotationsAction = Action<"add_annotations"> & { annotations: Annotation[] };
 export type SetHasReactComponentsAction = Action<"set_has_react_components"> & {
@@ -11,11 +11,13 @@ export type SetHasReactComponentsAction = Action<"set_has_react_components"> & {
 export type SetCurrentPointAction = Action<"set_current_point"> & {
   currentPoint: ExecutionPoint | null;
 };
+export type SetLastProtocolCheckFailedAction = Action<"set_protocol_fail">;
 
 export type ReactDevToolsAction =
   | AddAnnotationsAction
   | SetCurrentPointAction
-  | SetHasReactComponentsAction;
+  | SetHasReactComponentsAction
+  | SetLastProtocolCheckFailedAction;
 
 export function setupReactDevTools(store: UIStore) {
   store.dispatch(setCurrentPoint(ThreadFront.currentPoint));
@@ -44,4 +46,10 @@ export function addAnnotations(annotations: Annotation[]): AddAnnotationsAction 
 
 export function setCurrentPoint(currentPoint: ExecutionPoint | null): SetCurrentPointAction {
   return { type: "set_current_point", currentPoint };
+}
+
+export function setLastProtocolCheckFailed(): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch({ type: "set_protocol_fail" });
+  };
 }

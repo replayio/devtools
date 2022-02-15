@@ -6,9 +6,13 @@ import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
-import { getAnnotations, getCurrentPoint } from "ui/reducers/reactDevTools";
+import {
+  getAnnotations,
+  getCurrentPoint,
+  getLastProtocolCheckFailed,
+} from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive } from "ui/actions/app";
-import { setHasReactComponents } from "ui/actions/reactDevTools";
+import { setHasReactComponents, setLastProtocolCheckFailed } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
@@ -74,10 +78,9 @@ class ReplayWall implements Wall {
 
       case "getBridgeProtocol": {
         const response = await this.sendRequest(event, payload);
-        console.log(response);
         if (response === undefined) {
           trackEvent("error.reactdevtools.get_protocol_fail");
-          this.onShutdown();
+          setLastProtocolCheckFailed();
         }
         break;
       }
@@ -225,6 +228,7 @@ function ReactDevtoolsPanel({
   currentPoint,
   setIsNodePickerActive,
   setHasReactComponents,
+  lastProtocolCheckFailed,
 }: PropsFromRedux) {
   if (currentPoint === null) {
     return null;
@@ -252,6 +256,18 @@ function ReactDevtoolsPanel({
     onShutdown
   );
 
+  if (lastProtocolCheckFailed) {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <div>React DevTools failed to init.</div>
+        <div>
+          Try picking a different point on the timeline or reloading the page. If the problem
+          persists, try creating a new recording with the latest version of the Replay browser.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ReactDevTools
       browserTheme="light"
@@ -272,6 +288,7 @@ const connector = connect(
   (state: UIState) => ({
     annotations: getAnnotations(state),
     currentPoint: getCurrentPoint(state),
+    lastProtocolCheckFailed: getLastProtocolCheckFailed(state),
   }),
   { setIsNodePickerActive, setHasReactComponents }
 );

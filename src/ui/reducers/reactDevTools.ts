@@ -10,6 +10,7 @@ export default function update(
     currentPoint: null,
     hasReactComponents: false,
     firstOpAnnotationPoint: null,
+    lastProtocolCheckFailed: false,
   },
   action: ReactDevToolsAction
 ): ReactDevToolsState {
@@ -37,7 +38,18 @@ export default function update(
     }
 
     case "set_current_point": {
-      return { ...state, currentPoint: action.currentPoint };
+      return {
+        ...state,
+        currentPoint: action.currentPoint,
+        lastProtocolCheckFailed: false,
+      };
+    }
+
+    case "set_protocol_fail": {
+      return {
+        ...state,
+        lastProtocolCheckFailed: true,
+      };
     }
 
     default: {
@@ -50,3 +62,5 @@ export const getAnnotations = (state: UIState) => state.reactDevTools.annotation
 export const hasReactComponents = (state: UIState) => state.reactDevTools.hasReactComponents;
 export const getCurrentPoint = (state: UIState) => state.reactDevTools.currentPoint;
 export const getFirstOpAnnotations = (state: UIState) => state.reactDevTools.firstOpAnnotationPoint;
+export const getLastProtocolCheckFailed = (state: UIState) =>
+  state.reactDevTools.lastProtocolCheckFailed;

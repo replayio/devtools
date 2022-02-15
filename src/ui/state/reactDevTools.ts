@@ -11,4 +11,5 @@ export interface ReactDevToolsState {
   currentPoint: ExecutionPoint | null;
   hasReactComponents: boolean;
   firstOpAnnotationPoint: ExecutionPoint | null;
+  lastProtocolCheckFailed: boolean;
 }
