@@ -20,8 +20,8 @@ import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import reactDevTools from "ui/reducers/reactDevTools";
 import { selectors } from "ui/reducers";
-import { actions, UIStore } from "ui/actions";
-const { setupApp, setupTimeline, setupReactDevTools, createSession } = actions;
+import { actions } from "ui/actions";
+const { setupApp, setupTimeline, setupReactDevTools } = actions;
 
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
@@ -42,7 +42,6 @@ const {
 
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
-import { getUserSettings } from "ui/hooks/settings";
 import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -77,8 +76,6 @@ declare global {
   }
   const gToolbox: DevToolsToolbox;
 }
-
-const bootstrap = (store: UIStore) => {};
 
 export default async function DevTools(store: Store) {
   if (window.hasAlreadyBootstrapped) {
@@ -168,8 +165,6 @@ export default async function DevTools(store: Store) {
   setupLogpoints(store);
   setupExceptions(store);
   setupReactDevTools(store);
-
-  const settings = await getUserSettings();
 
   setupDemo();
 }
