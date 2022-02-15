@@ -75,7 +75,7 @@ class ReplayWall implements Wall {
       case "getBridgeProtocol": {
         const response = await this.sendRequest(event, payload);
         if (response === undefined) {
-          trackEvent("error.reactdevtools.get_protocol_fail");
+          trackEvent("error.reactdevtools.set_protocol_failed");
           setProtocolCheckFailed();
         }
         break;
