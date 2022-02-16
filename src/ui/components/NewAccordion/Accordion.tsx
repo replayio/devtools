@@ -9,15 +9,19 @@ import {
   getIsCollapsed,
   getIsIndexResizable,
   getIsResizing,
-  getPosition,
+  getHeight,
   getResizingParams,
   reducer,
   resize,
   startResizing,
 } from "./reducer";
-import { BORDER_HEIGHT, HANDLE_HEIGHT } from "./utils";
 
-// When I wrote this code God and I knew what we were doing. Now only God knows.
+export const MIN_HEIGHT = 150;
+export const BORDER_HEIGHT = 1;
+export const HANDLE_HEIGHT = 4;
+export const HEADER_HEIGHT = 24 + BORDER_HEIGHT;
+
+// When I wrote this code God and I knew what I was doing. Now only God knows.
 
 export interface AccordionItem {
   className?: string;
@@ -27,10 +31,7 @@ export interface AccordionItem {
   collapsed?: boolean;
   button?: React.ReactNode;
 }
-export interface SectionPosition {
-  // top: number | string;
-  height: number | string;
-}
+export type SectionHeight = string | number;
 export type CollapsedState = boolean[];
 export type CreasesState = number[];
 
@@ -63,8 +64,7 @@ function Section({
   isCollapsed,
   isBeingResized,
   isResizable,
-  isResizing,
-  position,
+  height,
   toggleCollapsed,
   onResizeStart,
 }: {
@@ -73,19 +73,16 @@ function Section({
   isBeingResized: boolean;
   isCollapsed: boolean;
   isResizable: boolean;
-  isResizing: boolean;
-  position: SectionPosition;
+  height: SectionHeight;
   toggleCollapsed: (index: number) => void;
   onResizeStart: (e: React.MouseEvent) => void;
 }) {
-  console.log({ isResizing });
   return (
     <div
       className="relative h-full w-full"
       style={{
-        ...position,
-        transition: "",
-        minHeight: isCollapsed ? "auto" : 150,
+        height,
+        minHeight: isCollapsed ? "auto" : MIN_HEIGHT,
       }}
     >
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
@@ -120,8 +117,10 @@ export default function Accordion({ items }: any) {
     }
   };
   const onResizeStart = (e: React.MouseEvent, index: number) => {
-    // Need this otherwise scroll behavior happens in containers with overflow.
+    // This is here because otherwise, the mouse click that initiates onResizeStart
+    // will trigger some scroll behavior happens in containers with overflow
     e.preventDefault();
+
     dispatch(startResizing(index, e.screenY));
   };
   const onResize = (e: React.MouseEvent) => {
@@ -140,8 +139,6 @@ export default function Accordion({ items }: any) {
     resizeObserver.observe(containerRef.current!);
   }, []);
 
-  console.log({ state, items });
-
   return (
     <div className="relative flex h-full flex-col overflow-auto" ref={containerRef}>
       {items.map((item: any, index: number) => (
@@ -150,10 +147,9 @@ export default function Accordion({ items }: any) {
           index={index}
           isCollapsed={getIsCollapsed(state, index)}
           toggleCollapsed={toggleCollapsed}
-          position={getPosition(state, index)}
+          height={getHeight(state, index)}
           isResizable={getIsIndexResizable(state, index)}
           onResizeStart={e => onResizeStart(e, index)}
-          isResizing={isResizing}
           isBeingResized={isResizing && resizingParams?.initialIndex === index}
         >
           {item.component}
@@ -163,6 +159,10 @@ export default function Accordion({ items }: any) {
     </div>
   );
 }
+
+// We render this full screen mask while an Accordion pane is being resized so that we can
+// track the user's mouse position across the entire screen. Otherwise, the Accordion is
+// non-reactive to any mouse events outside its bounds.
 
 function ResizeMask({
   onMouseUp,
@@ -176,7 +176,6 @@ function ResizeMask({
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
       className="fixed top-0 left-0 h-full w-full"
-      // className="fixed top-0 left-0 h-full w-full bg-black opacity-50" // display the mask area for debugging
       style={{ cursor: "ns-resize" }}
     />
   );

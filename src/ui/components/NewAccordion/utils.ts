@@ -1,10 +1,6 @@
 import { findLastIndex } from "lodash";
+import { HEADER_HEIGHT, MIN_HEIGHT } from "./Accordion";
 import { Section } from "./reducer";
-
-export const MIN_HEIGHT = 150;
-export const BORDER_HEIGHT = 1;
-export const HANDLE_HEIGHT = 4;
-export const HEADER_HEIGHT = 24 + BORDER_HEIGHT;
 
 // Utils
 const getSectionsTotalHeight = (sections: Section[]) => {
@@ -110,19 +106,4 @@ export function accomodateSectionIdealHeight(
 
   sections[index] = { ...sections[index], displayedHeight: currentHeight };
   return sections;
-}
-
-export function scaleSections(difference: number, s: Section[]) {
-  const totalDisplayedHeight = s.reduce((a, section) => a + section.displayedHeight, 0);
-
-  console.log({ totalDisplayedHeight, difference });
-
-  return [...s].map(section => {
-    const height = section.displayedHeight;
-    const displayedHeight = height
-      ? Math.max(height + (height / totalDisplayedHeight) * difference, MIN_HEIGHT)
-      : height;
-
-    return { ...section, displayedHeight };
-  });
 }

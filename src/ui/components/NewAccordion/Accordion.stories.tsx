@@ -101,27 +101,22 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
   );
 };
 
-export const UnderflowOverflow = Template.bind({});
-UnderflowOverflow.args = {
+export const UnderOver = Template.bind({});
+UnderOver.args = {
   items: [{ size: 10 }, { size: 50 }],
 };
 
-export const OverflowOverflow = Template.bind({});
-OverflowOverflow.args = {
+export const OverOver = Template.bind({});
+OverOver.args = {
   items: [{ size: 25 }, { size: 50 }],
 };
 
-export const OverflowOverflowOverflow = Template.bind({});
-OverflowOverflowOverflow.args = {
+export const OverOverOver = Template.bind({});
+OverOverOver.args = {
   items: [{ size: 25 }, { size: 50 }, { size: 50 }],
 };
 
-export const OverflowOverflowOverflowOverflow = Template.bind({});
-OverflowOverflowOverflowOverflow.args = {
+export const OverOverOverOver = Template.bind({});
+OverOverOverOver.args = {
   items: [{ size: 25 }, { size: 50 }, { size: 50 }, { size: 50 }],
 };
-
-// export const LotsOfOverflow = Template.bind({});
-// LotsOfOverflow.args = {
-//   items: [{ size: 100 }, { size: 100 }, { size: 100 }, { size: 100 }, { size: 100 }, { size: 100 }],
-// };
