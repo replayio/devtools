@@ -54,99 +54,104 @@ class ReplayWall implements Wall {
 
   // called by the frontend to send a request to the backend
   async send(event: string, payload: any) {
-    switch (event) {
-      case "inspectElement": {
-        if (this.inspectedElements.has(payload.id) && !payload.path) {
-          // this element has been inspected before, the frontend asks to inspect it again
-          // to see if there are any changes - in Replay there won't be any so we can send
-          // the response immediately without asking the backend
-          this._listener?.({
-            event: "inspectedElement",
-            payload: {
-              responseID: payload.requestID,
-              id: payload.id,
-              type: "no-change",
-            },
-          });
-        } else {
-          if (!payload.path) {
-            this.inspectedElements.add(payload.id);
+    try {
+      switch (event) {
+        case "inspectElement": {
+          if (this.inspectedElements.has(payload.id) && !payload.path) {
+            // this element has been inspected before, the frontend asks to inspect it again
+            // to see if there are any changes - in Replay there won't be any so we can send
+            // the response immediately without asking the backend
+            this._listener?.({
+              event: "inspectedElement",
+              payload: {
+                responseID: payload.requestID,
+                id: payload.id,
+                type: "no-change",
+              },
+            });
+          } else {
+            if (!payload.path) {
+              this.inspectedElements.add(payload.id);
+            }
+            this.sendRequest(event, payload);
           }
-          this.sendRequest(event, payload);
-        }
-        break;
-      }
-
-      case "getBridgeProtocol": {
-        const response = await this.sendRequest(event, payload);
-        if (response === undefined) {
-          trackEvent("error.reactdevtools.set_protocol_failed");
-          setProtocolCheckFailed();
-        }
-        break;
-      }
-
-      case "highlightNativeElement": {
-        const { rendererID, id } = payload;
-
-        if (this.highlightedElementId) {
-          Highlighter.unhighlight();
-        }
-        this.highlightedElementId = id;
-
-        const response = await ThreadFront.evaluate({
-          asyncIndex: 0,
-          text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
-        });
-        if (!response.returned || this.highlightedElementId !== id) {
-          return;
-        }
-
-        const nodeFront = response.returned.getNodeFront();
-        if (!nodeFront || this.highlightedElementId !== id) {
-          return;
-        }
-
-        Highlighter.highlight(nodeFront);
-        break;
-      }
-
-      case "clearNativeElementHighlight": {
-        Highlighter.unhighlight();
-        this.highlightedElementId = undefined;
-        break;
-      }
-
-      case "startInspectingNative": {
-        ThreadFront.ensureCurrentPause();
-        await ThreadFront.currentPause!.createWaiter;
-        const rv = await ThreadFront.currentPause!.loadMouseTargets();
-
-        if (!rv) {
-          this._listener?.({ event: "stopInspectingNative", payload: true });
           break;
         }
 
-        const nodeToElementId = await this.mapNodesToElements();
+        case "getBridgeProtocol": {
+          const response = await this.sendRequest(event, payload);
+          if (response === undefined) {
+            trackEvent("error.reactdevtools.set_protocol_failed");
+            setProtocolCheckFailed();
+          }
+          break;
+        }
 
-        this.enablePicker({
-          onHovering: nodeId => {
-            const elementId = nodeId && nodeToElementId.get(nodeId);
-            elementId && this._listener?.({ event: "selectFiber", payload: elementId });
-          },
-          onPicked: _ => {
+        case "highlightNativeElement": {
+          const { rendererID, id } = payload;
+
+          if (this.highlightedElementId) {
+            Highlighter.unhighlight();
+          }
+          this.highlightedElementId = id;
+
+          const response = await ThreadFront.evaluate({
+            asyncIndex: 0,
+            text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
+          });
+          if (!response.returned || this.highlightedElementId !== id) {
+            return;
+          }
+
+          const nodeFront = response.returned.getNodeFront();
+          if (!nodeFront || this.highlightedElementId !== id) {
+            return;
+          }
+
+          Highlighter.highlight(nodeFront);
+          break;
+        }
+
+        case "clearNativeElementHighlight": {
+          Highlighter.unhighlight();
+          this.highlightedElementId = undefined;
+          break;
+        }
+
+        case "startInspectingNative": {
+          ThreadFront.ensureCurrentPause();
+          await ThreadFront.currentPause!.createWaiter;
+          const rv = await ThreadFront.currentPause!.loadMouseTargets();
+
+          if (!rv) {
             this._listener?.({ event: "stopInspectingNative", payload: true });
-          },
-          enabledNodeIds: [...nodeToElementId.keys()],
-        });
+            break;
+          }
 
-        break;
-      }
+          const nodeToElementId = await this.mapNodesToElements();
 
-      case "stopInspectingNative": {
-        this.disablePicker();
-        break;
+          this.enablePicker({
+            onHovering: nodeId => {
+              const elementId = nodeId && nodeToElementId.get(nodeId);
+              elementId && this._listener?.({ event: "selectFiber", payload: elementId });
+            },
+            onPicked: _ => {
+              this._listener?.({ event: "stopInspectingNative", payload: true });
+            },
+            enabledNodeIds: [...nodeToElementId.keys()],
+          });
+
+          break;
+        }
+
+        case "stopInspectingNative": {
+          this.disablePicker();
+          break;
+        }
       }
+    } catch (err) {
+      // we catch for the case where a region is unloaded and ThreadFront fails
+      console.warn(err);
     }
   }
 
