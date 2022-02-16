@@ -7,6 +7,7 @@ import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
 import { getSelectedSourceWithContent } from "../../selectors";
 import SourcemapToggle from "./SourcemapToggle";
+import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
 
 class SourceFooter extends PureComponent {
   constructor() {
@@ -68,6 +69,7 @@ class SourceFooter extends PureComponent {
     return (
       <div className="source-footer">
         <SourcemapToggle />
+        <SourcemapVisualizerLink />
         <div className="source-footer-end">{this.renderCursorPosition()}</div>
       </div>
     );

@@ -133,7 +133,10 @@ export function createSession(recordingId: string): UIThunkAction {
       ThreadFront.setTest(getTest() || undefined);
       ThreadFront.recordingId = recordingId;
 
-      dispatch(showLoadingProgress());
+      dispatch(showLoadingProgress()).then(() => {
+        dispatch(onLoadingFinished());
+      });
+
       const { sessionId } = await sendMessage("Recording.createSession", {
         recordingId,
       });
@@ -170,7 +173,7 @@ export function createSession(recordingId: string): UIThunkAction {
   };
 }
 
-function showLoadingProgress(): UIThunkAction {
+export function showLoadingProgress(): UIThunkAction<Promise<void>> {
   return async ({ dispatch, getState }) => {
     let displayedProgress = selectors.getLoading(getState());
     while (displayedProgress < 100) {
@@ -183,7 +186,11 @@ function showLoadingProgress(): UIThunkAction {
 
       dispatch(actions.setDisplayedLoadingProgress(displayedProgress));
     }
+  };
+}
 
+function onLoadingFinished(): UIThunkAction {
+  return async ({ dispatch, getState }) => {
     const selectedPanel = getSelectedPanel(getState());
     // This shouldn't hit when the selectedPanel is "comments"
     // as that's not dealt with in toolbox, however we still
