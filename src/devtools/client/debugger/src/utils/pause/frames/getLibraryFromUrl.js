@@ -29,11 +29,6 @@ const libraryMap = [
     label: "React",
     pattern: /[^\.]react(\.[a-zA-Z]+)*\.js$/,
   },
-  // FB's internal ReactDOM filename
-  {
-    label: "React",
-    pattern: /(ReactDOM(-dev)?(\.[a-z]+)*\.js$)/,
-  },
   {
     label: "React",
     pattern: /(node_modules\/scheduler)/,
@@ -114,6 +109,15 @@ const libraryMap = [
   {
     label: "NextJS",
     pattern: /[\._]next/i,
+  },
+  // FB's internal ReactDOM filename
+  {
+    label: "React",
+    pattern: /(ReactDOM(-dev)?(\.[a-z]+)*\.js$)/,
+  },
+  {
+    label: "Meta",
+    pattern: /plugin_core|(shared\/core)|(shared\/page)|shared_core/,
   },
 ];
 
