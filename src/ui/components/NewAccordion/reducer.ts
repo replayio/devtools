@@ -24,6 +24,8 @@ export type AccordionState = {
   sections: Section[];
   resizingParams: ResizingParams | null;
   containerHeight: number | null;
+  // This really is the DOM container height.
+  domHeight: number | null;
 };
 type ExpandSectionAction = { type: "expand_section"; index: number };
 type CollapseSectionAction = { type: "collapse_section"; index: number };
@@ -75,33 +77,33 @@ export const getSectionDisplayedHeight = (
   index: number,
   totalHeight: number
 ) => {
-  return `${(state.sections[index].displayedHeight / totalHeight) * 100}%`;
-
-  return state.sections[index].displayedHeight;
+  return state.sections[index].displayedHeight / totalHeight;
 };
 export const getIsCollapsed = (state: AccordionState, index: number) =>
   !state.sections[index].expanded;
+
 export const getPosition = (state: AccordionState, index: number) => {
-  const { sections, containerHeight } = state;
+  const { sections, containerHeight, domHeight } = state;
 
   const totalHeight = sections.reduce((a, section) => {
-    const increment = section.expanded ? section.displayedHeight : HEADER_HEIGHT;
+    const increment = section.expanded ? section.displayedHeight : 0;
     return a + (increment || 0);
   }, 0);
+  // const totalHeight = sections.reduce((a, section) => {
+  //   const increment = section.expanded ? section.displayedHeight : HEADER_HEIGHT;
+  //   return a + (increment || 0);
+  // }, 0);
 
-  const top = sections.slice(0, index).reduce((a, section) => {
-    const increment = section.expanded ? section.displayedHeight : HEADER_HEIGHT;
-    return a + (increment || 0);
-  }, 0);
-  const topPercent = `${(top / containerHeight!) * 100}%`;
   const height = getIsCollapsed(state, index)
     ? HEADER_HEIGHT
-    : getSectionDisplayedHeight(state, index, totalHeight);
+    : getSectionDisplayedHeight(state, index, totalHeight) *
+      (domHeight! - sections.filter(s => !s.expanded).length * HEADER_HEIGHT);
 
-  const rv = { top: topPercent, height };
-  console.log(rv);
+  const rv = { height };
+  console.log(">>>", { containerHeight, domHeight });
   return rv;
 };
+
 export const getIsIndexResizable = (state: AccordionState, index: number) => {
   const { sections } = state;
   const previousExpandedIndex = sections.slice(0, index).find(s => s.expanded);
@@ -125,7 +127,7 @@ export function getInitialState(count: number): AccordionState {
     sections.push(createDefaultSection());
   }
 
-  return { sections, resizingParams: null, containerHeight: null };
+  return { sections, resizingParams: null, containerHeight: null, domHeight: null };
 }
 
 export function reducer(state: AccordionState, action: AccordionAction) {
@@ -134,19 +136,21 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       const { index } = action;
 
       let newSections = [...state.sections];
+      const containerHeight = state.domHeight!;
       newSections[index].expanded = false;
-      newSections = ensmallenSection(newSections, index, state.containerHeight!);
+      newSections = ensmallenSection(newSections, index, containerHeight);
 
-      return { ...state, sections: newSections };
+      return { ...state, containerHeight, sections: newSections };
     }
     case "expand_section": {
       const { index } = action;
 
       let newSections = [...state.sections];
-      newSections = embiggenSection(newSections, index, state.containerHeight!);
+      const containerHeight = state.domHeight!;
+      newSections = embiggenSection(newSections, index, containerHeight);
       newSections[index].expanded = true;
 
-      return { ...state, sections: newSections };
+      return { ...state, containerHeight, sections: newSections };
     }
     case "start_resizing": {
       const { index, initialY } = action;
@@ -165,6 +169,7 @@ export function reducer(state: AccordionState, action: AccordionAction) {
 
       return {
         ...state,
+        containerHeight: state.domHeight,
         resizingParams: { initialIndex: index, index: indexToResize, initialY, originalSections },
       };
     }
@@ -226,12 +231,11 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       return { ...state, sections: newSections };
     }
     case "container_resize": {
-      // console.log({ before: state.containerHeight, after: action.height });
-
-      // const difference = action.height - state.containerHeight!;
-      // const newSections = scaleSections(difference, state.sections);
-
-      return { ...state, containerHeight: action.height };
+      return {
+        ...state,
+        domHeight: action.height,
+        containerHeight: state.containerHeight || action.height,
+      };
     }
     default: {
       throw new Error("unknown Accordion action");
