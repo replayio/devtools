@@ -55,7 +55,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
       <div className="flex flex-row space-x-3">
         <input
           type="email"
-          className="flex-grow rounded-md"
+          className="w-48 flex-grow rounded-md"
           placeholder="user@company.com"
           value={email}
           onKeyPress={e => (e.key === "Enter" ? onEnterpriseLogin() : null)}
