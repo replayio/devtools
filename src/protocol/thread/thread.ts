@@ -442,6 +442,14 @@ class _ThreadFront {
     });
   }
 
+  getGeneratedSourceIds(originalSourceId: SourceId) {
+    return this.sources.get(originalSourceId)?.generatedSourceIds;
+  }
+
+  getOriginalSourceIds(generatedSourceId: SourceId) {
+    return this.originalSources.map.get(generatedSourceId);
+  }
+
   async getSourceContents(sourceId: SourceId) {
     assert(this.sessionId);
     const { contents, contentType } = await client.Debugger.getSourceContents(
