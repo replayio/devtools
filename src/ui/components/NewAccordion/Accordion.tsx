@@ -1,5 +1,13 @@
 import classNames from "classnames";
-import React, { MouseEventHandler, useEffect, useReducer, useRef } from "react";
+import React, {
+  MouseEventHandler,
+  ReactChild,
+  Children,
+  ReactElement,
+  useEffect,
+  useReducer,
+  useRef,
+} from "react";
 import {
   collapseSection,
   containerResize,
@@ -58,28 +66,30 @@ function ResizeHandle({
   );
 }
 
-function Section({
+export function AccordionPane({
   children,
+  header,
   index,
-  isCollapsed,
-  isBeingResized,
-  isResizable,
-  height,
-  toggleCollapsed,
-  onResizeStart,
+  isBeingResized = false,
+  isCollapsed = true,
+  isResizable = false,
+  height = 0,
+  toggleCollapsed = () => ({}),
+  onResizeStart = () => ({}),
 }: {
   children: React.ReactNode;
-  index: number;
-  isBeingResized: boolean;
-  isCollapsed: boolean;
-  isResizable: boolean;
-  height: SectionHeight;
-  toggleCollapsed: (index: number) => void;
-  onResizeStart: (e: React.MouseEvent) => void;
+  header: string;
+  index?: number;
+  isBeingResized?: boolean;
+  isCollapsed?: boolean;
+  isResizable?: boolean;
+  height?: SectionHeight;
+  toggleCollapsed?: () => void;
+  onResizeStart?: (e: React.MouseEvent) => void;
 }) {
   return (
     <div
-      className="relative h-full w-full"
+      className="group relative h-full w-full"
       style={{
         height,
         minHeight: isCollapsed ? "auto" : MIN_HEIGHT,
@@ -87,13 +97,13 @@ function Section({
     >
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
       <div className="flex h-full w-full flex-col overflow-hidden">
-        <div className={classNames("border-b", index > 0 ? "border-black" : "border-gray-200")} />
+        <div className={classNames("border-b", index! > 0 ? "border-black" : "border-gray-200")} />
         <button
           className="flex w-full space-x-2 bg-gray-200 px-2 font-bold"
-          onClick={() => toggleCollapsed(index)}
+          onClick={() => toggleCollapsed()}
         >
           <div className="font-mono">{isCollapsed ? `>` : `v`}</div>
-          <div>{`Section ${index + 1} `}</div>
+          <div>{header}</div>
         </button>
         <div className="flex-grow overflow-auto">{!isCollapsed && children}</div>
       </div>
@@ -101,8 +111,12 @@ function Section({
   );
 }
 
-export default function Accordion({ items }: any) {
-  const [state, dispatch] = useReducer(reducer, getInitialState(items.length));
+export default function Accordion({
+  children,
+}: {
+  children: ReactElement<typeof AccordionPane>[] | ReactElement<typeof AccordionPane>;
+}) {
+  const [state, dispatch] = useReducer(reducer, getInitialState(Children.count(children)));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -141,20 +155,19 @@ export default function Accordion({ items }: any) {
 
   return (
     <div className="relative flex h-full flex-col overflow-auto" ref={containerRef}>
-      {items.map((item: any, index: number) => (
-        <Section
-          key={index}
-          index={index}
-          isCollapsed={getIsCollapsed(state, index)}
-          toggleCollapsed={toggleCollapsed}
-          height={getHeight(state, index)}
-          isResizable={getIsIndexResizable(state, index)}
-          onResizeStart={e => onResizeStart(e, index)}
-          isBeingResized={isResizing && resizingParams?.initialIndex === index}
-        >
-          {item.component}
-        </Section>
-      ))}
+      {React.Children.map(children, (child, index) => {
+        const childProps = {
+          index,
+          isCollapsed: getIsCollapsed(state, index),
+          toggleCollapsed: () => toggleCollapsed(index),
+          height: getHeight(state, index),
+          isResizable: getIsIndexResizable(state, index),
+          onResizeStart: (e: React.MouseEvent) => onResizeStart(e, index),
+          isBeingResized: isResizing && resizingParams?.initialIndex === index,
+        };
+
+        return React.cloneElement(child, childProps);
+      })}
       {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={onResize} /> : null}
     </div>
   );
