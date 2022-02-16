@@ -2,7 +2,6 @@ import { findLastIndex } from "lodash";
 import { Section } from "./reducer";
 
 export const MIN_HEIGHT = 150;
-export const ACCORDION_HEIGHT = 600;
 export const BORDER_HEIGHT = 1;
 export const HANDLE_HEIGHT = 4;
 export const HEADER_HEIGHT = 24 + BORDER_HEIGHT;
@@ -25,9 +24,9 @@ export const getMinHeightAfterIndex = (sections: Section[], index: number) => {
     return a + getMinHeight(section);
   }, 0);
 };
-const getUnoccupiedHeight = (sections: Section[]) => {
+const getUnoccupiedHeight = (sections: Section[], containerHeight: number) => {
   const occupiedHeight = getSectionsTotalHeight(sections);
-  return ACCORDION_HEIGHT - occupiedHeight;
+  return containerHeight - occupiedHeight;
 };
 export const getNextTargetIndex = (sections: Section[], index: number, endIndex?: number) => {
   const sec = sections.slice(0, endIndex);
@@ -44,30 +43,30 @@ const getActualHeight = (section: Section) => {
   return section.expanded ? section.displayedHeight : HEADER_HEIGHT;
 };
 
-export const embiggenSection = (s: Section[], index: number) => {
+export const embiggenSection = (s: Section[], index: number, containerHeight: number) => {
   const sections = [...s];
 
   // If the displayedHeight is 0, then the section should be greedy and take up
   // as much space as possible.
   if (!sections[index].displayedHeight) {
-    sections[index] = { ...sections[index], displayedHeight: ACCORDION_HEIGHT };
+    sections[index] = { ...sections[index], displayedHeight: containerHeight };
   }
 
   const idealHeight = sections[index].displayedHeight;
   const firstIndex = getNextTargetIndex(sections, index);
 
-  return accomodateSectionIdealHeight(sections, index, idealHeight, firstIndex);
+  return accomodateSectionIdealHeight(sections, index, idealHeight, firstIndex, containerHeight);
 };
 
 // This reallocates the space freed up by collapsing a section to the
 // last expanded section, if it exists.
-export const ensmallenSection = (sections: Section[], index: number) => {
+export const ensmallenSection = (sections: Section[], index: number, containerHeight: number) => {
   const newSections = [...sections];
   const receiverIndex = getNextTargetIndex(sections, index);
 
   if (receiverIndex > -1) {
     newSections[receiverIndex] = { ...newSections[receiverIndex], displayedHeight: 0 };
-    return embiggenSection(sections, receiverIndex);
+    return embiggenSection(sections, receiverIndex, containerHeight);
   }
 
   return sections;
@@ -80,15 +79,16 @@ export function accomodateSectionIdealHeight(
   s: Section[],
   index: number,
   idealHeight: number,
-  firstIndex: number
+  firstIndex: number,
+  containerHeight: number
 ) {
   const sections = [...s];
 
   let currentHeight = getActualHeight(sections[index]);
   let nextDonorIndex = firstIndex;
 
-  if (getUnoccupiedHeight(sections)) {
-    currentHeight += getUnoccupiedHeight(sections);
+  if (getUnoccupiedHeight(sections, containerHeight)) {
+    currentHeight += getUnoccupiedHeight(sections, containerHeight);
   }
 
   while (currentHeight !== idealHeight && nextDonorIndex > -1) {
@@ -110,4 +110,19 @@ export function accomodateSectionIdealHeight(
 
   sections[index] = { ...sections[index], displayedHeight: currentHeight };
   return sections;
+}
+
+export function scaleSections(difference: number, s: Section[]) {
+  const totalDisplayedHeight = s.reduce((a, section) => a + section.displayedHeight, 0);
+
+  console.log({ totalDisplayedHeight, difference });
+
+  return [...s].map(section => {
+    const height = section.displayedHeight;
+    const displayedHeight = height
+      ? Math.max(height + (height / totalDisplayedHeight) * difference, MIN_HEIGHT)
+      : height;
+
+    return { ...section, displayedHeight };
+  });
 }

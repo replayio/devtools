@@ -17,6 +17,8 @@ import {
 } from "./reducer";
 import { BORDER_HEIGHT, HANDLE_HEIGHT } from "./utils";
 
+// When I wrote this code God and I knew what we were doing. Now only God knows.
+
 export interface AccordionItem {
   className?: string;
   component: React.ReactNode;
@@ -26,8 +28,8 @@ export interface AccordionItem {
   button?: React.ReactNode;
 }
 export interface SectionPosition {
-  top: number;
-  height: number;
+  // top: number | string;
+  height: number | string;
 }
 export type CollapsedState = boolean[];
 export type CreasesState = number[];
@@ -76,10 +78,15 @@ function Section({
   toggleCollapsed: (index: number) => void;
   onResizeStart: (e: React.MouseEvent) => void;
 }) {
+  console.log({ isResizing });
   return (
     <div
-      className="absolute h-full w-full"
-      style={{ ...position, transition: isResizing ? "" : "all 0.1s ease-in-out" }}
+      className="relative h-full w-full"
+      style={{
+        ...position,
+        transition: "",
+        minHeight: isCollapsed ? "auto" : 150,
+      }}
     >
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
       <div className="flex h-full w-full flex-col overflow-hidden">
