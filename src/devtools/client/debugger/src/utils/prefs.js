@@ -4,10 +4,9 @@
 
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { PrefsHelper } from "devtools/client/shared/prefs";
-import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
 
-import Services from "devtools/shared/services";
+import Services, { prefs as prefsService } from "devtools/shared/services";
 
 // Schema version to bump when the async store format has changed incompatibly
 // and old stores should be cleared.

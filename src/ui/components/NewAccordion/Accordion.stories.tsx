@@ -80,7 +80,7 @@ function MockAccordionContent({ size }: { size: number }) {
 }
 
 const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = args => {
-  const initialExpandedState = args.items!.map(i => i.expanded);
+  const initialExpandedState = args.items.map(i => i.expanded);
   const [expandedState, setExpandedState] = useState(initialExpandedState);
 
   const toggleExpandedStateForIndex = (index: number) => {
@@ -91,21 +91,15 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
     setExpandedState(newState);
   };
 
-  const panes = args.items?.map(({ size }, i) => {
-    return {
-      header: `Section ${i + 1}`,
-      component: <MockAccordionContent size={size!} key={i} />,
-      onToggle: () => toggleExpandedStateForIndex(i),
-      expanded: expandedState[i],
-    };
-  });
-
-  const i = panes.map((pane, index) => {
-    const { header, component, onToggle, expanded } = pane;
-
+  const panes = args.items.map(({ size }, i) => {
     return (
-      <AccordionPane key={index} header={header} onToggle={onToggle} expanded={expanded}>
-        {component}
+      <AccordionPane
+        key={i}
+        header={`Section ${i + 1}`}
+        onToggle={() => toggleExpandedStateForIndex(i)}
+        expanded={expandedState[i]}
+      >
+        <MockAccordionContent size={size!} key={i} />
       </AccordionPane>
     );
   });
@@ -122,7 +116,7 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
           "0.2px 0px 2.2px rgba(0, 0, 0, 0.02), 0.5px 0px 5.3px rgba(0, 0, 0, 0.028), 0.9px 0px 10px rgba(0, 0, 0, 0.035), 1.6px 0px 17.9px rgba(0, 0, 0, 0.042), 2.9px 0px 33.4px rgba(0, 0, 0, 0.05), 7px 0px 80px rgba(0, 0, 0, 0.07)",
       }}
     >
-      <Accordion>{i}</Accordion>
+      <Accordion>{panes}</Accordion>
     </div>
   );
 };

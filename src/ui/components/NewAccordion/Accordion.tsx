@@ -122,7 +122,7 @@ export function AccordionPane({
           style={{ fontSize: "15px" }}
           onClick={() => onToggle()}
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex select-none items-center space-x-2">
             <div className={classNames("img arrow", { expanded: _expanded })} />
             <span className="overflow-hidden overflow-ellipsis whitespace-pre">{header}</span>
           </div>
