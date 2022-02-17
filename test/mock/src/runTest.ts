@@ -72,16 +72,17 @@ function bindPageActions(page: Page) {
 const action = wrapped(async cbk => await cbk());
 
 export const runTest = wrapped(async cbk => {
+  // @ts-ignore
   const browser = await playwright[browserName].launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
   const pageLog = (...args: string[]) => {
     log(...args);
     page
-      .evaluate(extArgs => {
+      .evaluate((...extArgs: any[]) => {
         console.log("Test Step:", ...extArgs);
       }, args)
-      .catch(e => {});
+      .catch(() => {});
   };
 
   pageLog("Browser launched");
