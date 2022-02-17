@@ -1,12 +1,14 @@
 import classNames from "classnames";
 import React, {
   MouseEventHandler,
-  ReactChild,
   Children,
   ReactElement,
   useEffect,
   useReducer,
   useRef,
+  FC,
+  ReactChild,
+  JSXElementConstructor,
 } from "react";
 import {
   collapseSection,
@@ -36,7 +38,7 @@ export interface AccordionItem {
   component: React.ReactNode;
   header: string;
   onToggle?: (open: boolean) => void;
-  collapsed?: boolean;
+  expanded?: boolean;
   button?: React.ReactNode;
 }
 export type SectionHeight = string | number;
@@ -70,26 +72,36 @@ export function AccordionPane({
   children,
   header,
   index,
+  expanded,
+  className,
   isBeingResized = false,
   isCollapsed = true,
   isResizable = false,
   height = 0,
   toggleCollapsed = () => ({}),
+  onToggle = () => ({}),
   onResizeStart = () => ({}),
 }: {
   children: React.ReactNode;
   header: string;
+  expanded?: boolean;
   index?: number;
+  className?: string;
   isBeingResized?: boolean;
   isCollapsed?: boolean;
   isResizable?: boolean;
   height?: SectionHeight;
+  onToggle: () => void;
   toggleCollapsed?: () => void;
   onResizeStart?: (e: React.MouseEvent) => void;
 }) {
+  useEffect(() => {
+    toggleCollapsed();
+  }, [expanded]);
+
   return (
     <div
-      className="group relative h-full w-full"
+      className={classNames("group relative h-full w-full", { className })}
       style={{
         height,
         minHeight: isCollapsed ? "auto" : MIN_HEIGHT,
@@ -100,7 +112,7 @@ export function AccordionPane({
         <div className={classNames("border-b", index! > 0 ? "border-black" : "border-gray-200")} />
         <button
           className="flex w-full space-x-2 bg-gray-200 px-2 font-bold"
-          onClick={() => toggleCollapsed()}
+          onClick={() => onToggle()}
         >
           <div className="font-mono">{isCollapsed ? `>` : `v`}</div>
           <div>{header}</div>
@@ -111,11 +123,14 @@ export function AccordionPane({
   );
 }
 
-export default function Accordion({
-  children,
-}: {
-  children: ReactElement<typeof AccordionPane>[] | ReactElement<typeof AccordionPane>;
-}) {
+export const Accordion: FC<{
+  children: ReactElement<typeof AccordionPane>[];
+  // children: ReactElement<typeof AccordionPane>[] | ReactElement<typeof AccordionPane>;
+}> = ({ children }) => {
+  console.log(
+    "children123",
+    Children.toArray(children).map(c => "expanded:" + c.props.expanded)
+  );
   const [state, dispatch] = useReducer(reducer, getInitialState(Children.count(children)));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
@@ -153,25 +168,27 @@ export default function Accordion({
     resizeObserver.observe(containerRef.current!);
   }, []);
 
+  const newChildren = React.Children.map(children, (child, index) => {
+    const childProps = {
+      index,
+      isCollapsed: getIsCollapsed(state, index),
+      toggleCollapsed: () => toggleCollapsed(index),
+      height: getHeight(state, index),
+      isResizable: getIsIndexResizable(state, index),
+      onResizeStart: (e: React.MouseEvent) => onResizeStart(e, index),
+      isBeingResized: isResizing && resizingParams?.initialIndex === index,
+    };
+
+    return React.cloneElement(child, childProps);
+  });
+
   return (
     <div className="relative flex h-full flex-col overflow-auto" ref={containerRef}>
-      {React.Children.map(children, (child, index) => {
-        const childProps = {
-          index,
-          isCollapsed: getIsCollapsed(state, index),
-          toggleCollapsed: () => toggleCollapsed(index),
-          height: getHeight(state, index),
-          isResizable: getIsIndexResizable(state, index),
-          onResizeStart: (e: React.MouseEvent) => onResizeStart(e, index),
-          isBeingResized: isResizing && resizingParams?.initialIndex === index,
-        };
-
-        return React.cloneElement(child, childProps);
-      })}
+      {newChildren}
       {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={onResize} /> : null}
     </div>
   );
-}
+};
 
 // We render this full screen mask while an Accordion pane is being resized so that we can
 // track the user's mouse position across the entire screen. Otherwise, the Accordion is

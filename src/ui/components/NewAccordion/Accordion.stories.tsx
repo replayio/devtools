@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Story, Meta } from "@storybook/react";
-import Accordion, { AccordionItem, AccordionPane } from "./Accordion";
+import { Accordion, AccordionItem, AccordionPane } from "./Accordion";
 
 const lorem = [
   "Sed ut perspiciatis",
@@ -84,6 +84,12 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
     };
   });
 
+  const i = items.map((item, index) => (
+    <AccordionPane key={index} header={item.header} onToggle={() => ({})} expanded={item.expanded}>
+      {item.component}
+    </AccordionPane>
+  ));
+
   return (
     <div
       style={{
@@ -96,20 +102,17 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
           "0.2px 0px 2.2px rgba(0, 0, 0, 0.02), 0.5px 0px 5.3px rgba(0, 0, 0, 0.028), 0.9px 0px 10px rgba(0, 0, 0, 0.035), 1.6px 0px 17.9px rgba(0, 0, 0, 0.042), 2.9px 0px 33.4px rgba(0, 0, 0, 0.05), 7px 0px 80px rgba(0, 0, 0, 0.07)",
       }}
     >
-      <Accordion>
-        {items.map((item, index) => (
-          <AccordionPane key={index} header={item.header}>
-            {item.component}
-          </AccordionPane>
-        ))}
-      </Accordion>
+      <Accordion>{i}</Accordion>
     </div>
   );
 };
 
 export const UnderOver = Template.bind({});
 UnderOver.args = {
-  items: [{ size: 10 }, { size: 50 }],
+  items: [
+    { size: 10, expanded: false },
+    { size: 50, expanded: false },
+  ],
 };
 
 export const OverOver = Template.bind({});
