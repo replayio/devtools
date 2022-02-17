@@ -39,6 +39,7 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
 import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
+import { prefs } from "devtools/client/debugger/src/utils/prefs";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -393,9 +394,16 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_react_devtools") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("react-components"));
-    } else if (key === "open_sources" || key === "open_outline") {
+    } else if (key === "open_sources") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
+      // Someday we'll fix circular dependencies. Today is not that day.
+      const { expandSourcesPane } = require("devtools/client/debugger/src/actions/ui");
+      dispatch(expandSourcesPane());
+    } else if (key === "open_outline") {
+      dispatch(setViewMode("dev"));
+      dispatch(setSelectedPrimaryPanel("explorer"));
+      prefs.outlineExpanded = true;
     } else if (key === "open_viewer") {
       dispatch(setViewMode("non-dev"));
     } else if (key === "show_comments") {

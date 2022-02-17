@@ -55,7 +55,7 @@ export default function MaterialIcon({
     <div
       {...rest}
       className={classnames(
-        "leading-none",
+        "select-none leading-none",
         className,
         outlined ? "material-icons-outlined" : "material-icons",
         SIZE_STYLES[iconSize]
