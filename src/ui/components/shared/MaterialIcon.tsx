@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const SIZE_STYLES = {
   xs: "text-xs",
@@ -19,14 +19,28 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   iconSize?: keyof typeof SIZE_STYLES;
 };
 
-const useMaterialIconCheck = () => {
+export const useMaterialIconCheck = () => {
+  const [appNode, setAppNode] = useState<HTMLElement | null>(null);
+
   useEffect(() => {
-    (document as any).fonts.ready.then(() => {
-      if (typeof document === "object" && (document as any).fonts.check("12px Material Icons")) {
-        document.body.classList.add("material-icon-loaded");
-      }
-    });
-  }, []);
+    if (appNode && appNode.classList.contains("material-icon-loading")) {
+      (document as any).fonts.ready.then(async () => {
+        let retries = 10;
+        while (retries-- > 0) {
+          if (
+            typeof document === "object" &&
+            (document as any).fonts.check("12px Material Icons")
+          ) {
+            appNode.classList.remove("material-icon-loading");
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      });
+    }
+  }, [appNode]);
+
+  return { setAppNode };
 };
 
 export default function MaterialIcon({
@@ -37,13 +51,11 @@ export default function MaterialIcon({
   iconSize = "base",
   ...rest
 }: MaterialIconProps) {
-  useMaterialIconCheck();
-
   return (
     <div
       {...rest}
       className={classnames(
-        "leading-none",
+        "select-none leading-none",
         className,
         outlined ? "material-icons-outlined" : "material-icons",
         SIZE_STYLES[iconSize]
