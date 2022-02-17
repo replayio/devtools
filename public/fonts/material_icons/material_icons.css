@@ -17,12 +17,6 @@
     url(/fonts/material_icons/MaterialIconsOutlined-Regular.otf) format("opentype");
 }
 
-.material-icon-loaded .material-icons,
-.material-icon-loaded .material-icons-outlined {
-  opacity: 1;
-  width: unset;
-}
-
 .material-icons,
 .material-icons-outlined {
   font-weight: normal;
@@ -35,8 +29,6 @@
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
-  opacity: 0;
-  width: 1rem;
 
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
@@ -58,12 +50,8 @@
   font-family: "Material Icons Outlined";
 }
 
-.material-icons,
-.material-icons-outlined {
-  visibility: hidden;
-}
-
-.material-icons,
-.material-icons-outlined {
-  visibility: visible;
+.material-icon-loading .material-icons,
+.material-icon-loading .material-icons-outlined {
+  opacity: 0;
+  width: 1rem;
 }
