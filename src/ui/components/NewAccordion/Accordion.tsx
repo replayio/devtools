@@ -118,7 +118,8 @@ export function AccordionPane({
       <div className="flex h-full w-full flex-col overflow-hidden">
         <div className={classNames("border-b", index! > 0 ? "" : "border-transparent")} />
         <div
-          className="flex w-full cursor-pointer items-center justify-between space-x-2 p-2 px-2 text-sm"
+          className="flex w-full cursor-pointer items-center justify-between space-x-2 p-2 px-2"
+          style={{ fontSize: "15px" }}
           onClick={() => onToggle()}
         >
           <div className="flex items-center space-x-2">
@@ -132,15 +133,6 @@ export function AccordionPane({
     </div>
   );
 }
-
-// Accordion component -> throw error
-// AccordionImpl -> AccordionProps & ... {privateOne: null}
-// clone (React.createElement(AccordionImpl, accordionImplProps))
-// A
-// Alternative: __
-
-// Approach 2: React context
-// One layer deep context, pane to reset it to null
 
 export const Accordion: FC<{
   children: ReactElement<typeof AccordionPane>[];

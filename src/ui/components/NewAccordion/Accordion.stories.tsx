@@ -110,8 +110,6 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
     );
   });
 
-  console.log("story", expandedState);
-
   return (
     <div
       style={{

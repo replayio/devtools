@@ -40,7 +40,7 @@ function PrimaryPanes(props: PropsFromRedux) {
       </AccordionPane>
       <AccordionPane
         header="Outline"
-        className="outline-pane"
+        className="outlines-pane"
         expanded={!!outlineExpanded}
         onToggle={() => updateOutlineExpanded(!outlineExpanded)}
       >

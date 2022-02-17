@@ -6,9 +6,9 @@ import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
-const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
+const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 
 type SidePanelProps = PropsFromRedux;
 

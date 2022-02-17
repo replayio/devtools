@@ -141,6 +141,12 @@ export function toggleSourcesCollapse() {
   };
 }
 
+export function expandSourcesPane() {
+  return ({ dispatch }) => {
+    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: false });
+  };
+}
+
 export function highlightLineRange(location) {
   return {
     type: "HIGHLIGHT_LINES",
