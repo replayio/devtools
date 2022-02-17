@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import { Story, Meta } from "@storybook/react";
 import { Accordion, AccordionItem, AccordionPane } from "./Accordion";
-import { constant } from "lodash";
 
 const lorem = [
   "Sed ut perspiciatis",
@@ -68,11 +67,23 @@ export default {
   component: Accordion,
 } as Meta;
 
+function MockAccordionContent({ size }: { size: number }) {
+  return (
+    <ul>
+      {lorem.slice(0, size).map(sentence => (
+        <li className="px-4" key={sentence}>
+          {sentence}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = args => {
   const initialExpandedState = args.items!.map(i => i.expanded);
   const [expandedState, setExpandedState] = useState(initialExpandedState);
 
-  const toggleExpandedState = (index: number) => {
+  const toggleExpandedStateForIndex = (index: number) => {
     const newState = [...expandedState];
     const newExpanded = !expandedState[index];
     newState[index] = newExpanded;
@@ -80,20 +91,11 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
     setExpandedState(newState);
   };
 
-  const panes = args.items?.map((item, i) => {
-    console.log("panerender", expandedState[i]);
+  const panes = args.items?.map(({ size }, i) => {
     return {
       header: `Section ${i + 1}`,
-      component: (
-        <ul>
-          {lorem.slice(0, item.size).map(sentence => (
-            <li className="px-4" key={sentence}>
-              {sentence}
-            </li>
-          ))}
-        </ul>
-      ),
-      onToggle: () => toggleExpandedState(i),
+      component: <MockAccordionContent size={size!} key={i} />,
+      onToggle: () => toggleExpandedStateForIndex(i),
       expanded: expandedState[i],
     };
   });
@@ -101,7 +103,6 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
   const i = panes.map((pane, index) => {
     const { header, component, onToggle, expanded } = pane;
 
-    console.log("pane", index, expanded);
     return (
       <AccordionPane key={index} header={header} onToggle={onToggle} expanded={expanded}>
         {component}
@@ -131,7 +132,7 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
 export const UnderOver = Template.bind({});
 UnderOver.args = {
   items: [
-    { size: 10, expanded: true },
+    { size: 10, expanded: false },
     { size: 50, expanded: false },
   ],
 };
@@ -160,5 +161,22 @@ OverOverOverOver.args = {
     { size: 50, expanded: false },
     { size: 50, expanded: false },
     { size: 50, expanded: false },
+  ],
+};
+
+export const OverExpandedOver = Template.bind({});
+OverExpandedOver.args = {
+  items: [
+    { size: 10, expanded: true },
+    { size: 50, expanded: false },
+  ],
+};
+
+export const OverOverOverExpanded = Template.bind({});
+OverOverOverExpanded.args = {
+  items: [
+    { size: 25, expanded: false },
+    { size: 50, expanded: false },
+    { size: 50, expanded: true },
   ],
 };

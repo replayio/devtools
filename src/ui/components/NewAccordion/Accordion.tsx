@@ -7,8 +7,6 @@ import React, {
   useReducer,
   useRef,
   FC,
-  ReactChild,
-  JSXElementConstructor,
 } from "react";
 import { Dispatch } from "react";
 import {
@@ -76,9 +74,9 @@ export function AccordionPane({
   index,
   expanded,
   className,
-  dispatch,
+  dispatch = () => ({}),
   isBeingResized = false,
-  isCollapsed = true,
+  _expanded = false,
   isResizable = false,
   height = 0,
   onToggle = () => ({}),
@@ -86,32 +84,29 @@ export function AccordionPane({
 }: {
   children: React.ReactNode;
   header: string;
-  dispatch: Dispatch<AccordionAction>;
+  dispatch?: Dispatch<AccordionAction>;
   expanded?: boolean;
   index?: number;
   className?: string;
   isBeingResized?: boolean;
-  isCollapsed?: boolean;
+  _expanded?: boolean;
   isResizable?: boolean;
   height?: SectionHeight;
   onToggle: () => void;
   onResizeStart?: (e: React.MouseEvent) => void;
 }) {
-  // Whenever the true expanded state changes, make sure we update the internal
-  // expanded state to reflect the change.
+  // Whenever the real `expanded` state changes, make sure we update the Accordion's
+  // internal `_expanded` state to reflect the change.
   useEffect(() => {
-    console.log("expanded changes", index, expanded);
     dispatch(expanded ? expandSection(index!) : collapseSection(index!));
   }, [expanded]);
-
-  console.log("render pane", expanded);
 
   return (
     <div
       className={classNames("group relative h-full w-full", { className })}
       style={{
         height,
-        minHeight: isCollapsed ? "auto" : MIN_HEIGHT,
+        minHeight: _expanded ? MIN_HEIGHT : "auto",
       }}
     >
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
@@ -121,10 +116,10 @@ export function AccordionPane({
           className="flex w-full space-x-2 bg-gray-200 px-2 font-bold"
           onClick={() => onToggle()}
         >
-          <div className="font-mono">{isCollapsed ? `>` : `v`}</div>
+          <div className="font-mono">{_expanded ? `v` : `>`}</div>
           <div>{header}</div>
         </button>
-        <div className="flex-grow overflow-auto">{!isCollapsed && children}</div>
+        <div className="flex-grow overflow-auto">{_expanded && children}</div>
       </div>
     </div>
   );
@@ -141,9 +136,8 @@ export function AccordionPane({
 
 export const Accordion: FC<{
   children: ReactElement<typeof AccordionPane>[];
-  // children: ReactElement<typeof AccordionPane>[] | ReactElement<typeof AccordionPane>;
 }> = ({ children }) => {
-  const initialExpandedState = Children.toArray(children).map(c => c.props.expanded);
+  const initialExpandedState = Children.map(children, c => c.props.expanded);
   const [state, dispatch] = useReducer(reducer, getInitialState(initialExpandedState));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
@@ -181,12 +175,11 @@ export const Accordion: FC<{
     resizeObserver.observe(containerRef.current!);
   }, []);
 
-  console.log(initialExpandedState, state, children);
   const newChildren = React.Children.map(children, (child, index) => {
     const childProps = {
       index,
       dispatch,
-      isCollapsed: getIsCollapsed(state, index),
+      _expanded: !getIsCollapsed(state, index),
       toggleCollapsed: () => toggleCollapsed(index),
       height: getHeight(state, index),
       isResizable: getIsIndexResizable(state, index),
