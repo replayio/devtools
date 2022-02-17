@@ -6,7 +6,7 @@ import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
-import Accordion, { AccordionPane } from "./NewAccordion/Accordion";
+const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 
@@ -27,34 +27,24 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
     sidepanel = <FullTextSearch />;
   } else if (selectedPrimaryPanel === "events") {
     sidepanel = (
-      <Accordion>
-        <AccordionPane
-          header="Replay Info"
-          className="replay-info"
-          expanded={!replayInfoCollapsed}
-          onToggle={() => setReplayInfoCollapsed(!replayInfoCollapsed)}
-        >
-          <ReplayInfo />
-        </AccordionPane>
-      </Accordion>
-      // <Accordion
-      //   items={[
-      //     {
-      //       header: "Replay Info",
-      //       className: "replay-info",
-      //       component: <ReplayInfo />,
-      //       opened: !replayInfoCollapsed,
-      //       onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
-      //     },
-      //     {
-      //       header: "Events",
-      //       className: "events-info flex-1 border-t overflow-hidden",
-      //       component: <Events />,
-      //       opened: !eventsCollapsed,
-      //       onToggle: () => setEventsCollapsed(!eventsCollapsed),
-      //     },
-      //   ]}
-      // />
+      <Accordion
+        items={[
+          {
+            header: "Replay Info",
+            className: "replay-info",
+            component: <ReplayInfo />,
+            opened: !replayInfoCollapsed,
+            onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+          },
+          {
+            header: "Events",
+            className: "events-info flex-1 border-t overflow-hidden",
+            component: <Events />,
+            opened: !eventsCollapsed,
+            onToggle: () => setEventsCollapsed(!eventsCollapsed),
+          },
+        ]}
+      />
     );
   }
 

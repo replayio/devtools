@@ -4,6 +4,8 @@
 
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { PrefsHelper } from "devtools/client/shared/prefs";
+import { prefs as prefsService } from "devtools/shared/services";
+import { useEffect, useState } from "react";
 
 import Services from "devtools/shared/services";
 
@@ -105,6 +107,27 @@ export const prefs = new PrefsHelper("devtools", {
   logEventBreakpoints: ["Bool", "debugger.log-event-breakpoints"],
   indentSize: ["Int", "editor.tabsize"],
 });
+
+export const useDebuggerPrefs = prefKey => {
+  const fullKey = `devtools.debugger.${prefKey}`;
+  const [preference, setPreference] = useState(prefsService.getBoolPref(fullKey));
+
+  useEffect(() => {
+    const onUpdate = prefs => {
+      setPreference(prefs.getBoolPref(fullKey));
+    };
+
+    prefsService.addObserver(fullKey, onUpdate, false);
+    return () => prefsService.removeObserver(fullKey, onUpdate);
+  }, [fullKey]);
+
+  return {
+    value: preference,
+    update: newValue => {
+      prefsService.setBoolPref(fullKey, newValue);
+    },
+  };
+};
 
 export const javascriptPrefs = new PrefsHelper("javascript", {
   enableJavaScript: ["Bool", "enabled"],
