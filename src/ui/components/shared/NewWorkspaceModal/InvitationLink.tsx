@@ -27,7 +27,7 @@ export function TextInputCopy({
   };
 
   return (
-    <div className="relative flex w-full flex-col items-center p-0.5">
+    <div className="relative flex w-full flex-col items-center">
       <input
         className={classNames(
           isLarge ? "text-xl" : "text-sm",
@@ -41,15 +41,15 @@ export function TextInputCopy({
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="absolute bottom-full mb-1.5 rounded-lg bg-gray-500 bg-opacity-90 p-1.5 text-base text-gray-200 shadow-2xl">
-          Copied
+        <div className="absolute bottom-full mb-1.5 rounded-lg bg-gray-500 bg-opacity-90 px-2 py-0.5 text-base text-gray-200 shadow-2xl">
+          Copied!
         </div>
       ) : null}
     </div>
   );
 }
 
-function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
+function InvitationDomainCheck({ workspace }: { workspace: Workspace }) {
   const updateWorkspaceCodeDomainLimitations = hooks.useUpdateWorkspaceCodeDomainLimitations();
   const handleToggle = () => {
     if (!workspace) {
@@ -73,10 +73,39 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   );
 
   return (
-    <div className="flex flex-row items-center space-x-3 px-1.5">
+    <div className="flex flex-row items-center space-x-3">
       <input
         id="domain-limited"
-        className="outline-none focus:outline-none"
+        className="outline-none focus:outline-none border-primaryAccent text-primaryAccent focus:ring-primaryAccent"
+        type="checkbox"
+        disabled={!workspace}
+        checked={!!workspace?.isDomainLimitedCode}
+        onChange={handleToggle}
+      />
+      <label htmlFor="domain-limited">{workspace ? workspaceLink : emptyWorkspaceLink}</label>
+    </div>
+  );
+}
+
+function PubliclyAvailableCheck({ workspace }: { workspace: Workspace }) {
+  const updateWorkspaceCodeDomainLimitations = hooks.useUpdateWorkspaceCodeDomainLimitations();
+  const handleToggle = () => {
+    if (!workspace) {
+      return;
+    }
+    updateWorkspaceCodeDomainLimitations({
+      variables: { workspaceId: workspace.id, isLimited: !workspace.isDomainLimitedCode },
+    });
+  };
+
+  const emptyWorkspaceLink = "Anyone with an invite link can join this team";
+  const workspaceLink = <span>Anyone with an invite link can join this team</span>;
+
+  return (
+    <div className="flex flex-row items-center space-x-3">
+      <input
+        id="domain-limited"
+        className="outline-none focus:outline-none border-primaryAccent text-primaryAccent focus:ring-primaryAccent"
         type="checkbox"
         disabled={!workspace}
         checked={!!workspace?.isDomainLimitedCode}
@@ -111,9 +140,19 @@ export default function InvitationLink({
 
   return (
     <div className="flex w-full flex-col space-y-3">
-      {!hideHeader ? <div className="text-xs font-bold uppercase">{`Invite link`}</div> : null}
-      <TextInputCopy text={inputText} isLarge={isLarge} />
-      {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
+      {showDomainCheck ? <InvitationDomainCheck workspace={workspace} /> : null}
+      {!hideHeader ? (
+        <div className="text-xs font-bold uppercase pt-3">{`Invite links`}</div>
+      ) : null}
+      <div className="flex flex-grow flex-row space-x-3 p-0">
+        <TextInputCopy text={inputText} isLarge={isLarge} />{" "}
+        <span className="w-24 align-middle flex flex-col justify-center">Developer</span>
+      </div>
+      <div className="flex flex-grow flex-row space-x-3 p-0">
+        <TextInputCopy text={inputText} isLarge={isLarge} />{" "}
+        <span className="w-24 align-middle flex flex-col justify-center">User</span>
+      </div>
+      {PubliclyAvailableCheck ? <PubliclyAvailableCheck workspace={workspace} /> : null}
     </div>
   );
 }
