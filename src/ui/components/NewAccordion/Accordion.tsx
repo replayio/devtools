@@ -10,6 +10,7 @@ import React, {
   ReactChild,
   JSXElementConstructor,
 } from "react";
+import { Dispatch } from "react";
 import {
   collapseSection,
   containerResize,
@@ -24,6 +25,7 @@ import {
   reducer,
   resize,
   startResizing,
+  AccordionAction,
 } from "./reducer";
 
 export const MIN_HEIGHT = 150;
@@ -34,11 +36,11 @@ export const HEADER_HEIGHT = 24 + BORDER_HEIGHT;
 // When I wrote this code God and I knew what I was doing. Now only God knows.
 
 export interface AccordionItem {
-  className?: string;
   component: React.ReactNode;
   header: string;
-  onToggle?: (open: boolean) => void;
-  expanded?: boolean;
+  expanded: boolean;
+  className?: string;
+  onToggle?: () => void;
   button?: React.ReactNode;
 }
 export type SectionHeight = string | number;
@@ -74,16 +76,17 @@ export function AccordionPane({
   index,
   expanded,
   className,
+  dispatch,
   isBeingResized = false,
   isCollapsed = true,
   isResizable = false,
   height = 0,
-  toggleCollapsed = () => ({}),
   onToggle = () => ({}),
   onResizeStart = () => ({}),
 }: {
   children: React.ReactNode;
   header: string;
+  dispatch: Dispatch<AccordionAction>;
   expanded?: boolean;
   index?: number;
   className?: string;
@@ -92,12 +95,16 @@ export function AccordionPane({
   isResizable?: boolean;
   height?: SectionHeight;
   onToggle: () => void;
-  toggleCollapsed?: () => void;
   onResizeStart?: (e: React.MouseEvent) => void;
 }) {
+  // Whenever the true expanded state changes, make sure we update the internal
+  // expanded state to reflect the change.
   useEffect(() => {
-    toggleCollapsed();
+    console.log("expanded changes", index, expanded);
+    dispatch(expanded ? expandSection(index!) : collapseSection(index!));
   }, [expanded]);
+
+  console.log("render pane", expanded);
 
   return (
     <div
@@ -123,15 +130,21 @@ export function AccordionPane({
   );
 }
 
+// Accordion component -> throw error
+// AccordionImpl -> AccordionProps & ... {privateOne: null}
+// clone (React.createElement(AccordionImpl, accordionImplProps))
+// A
+// Alternative: __
+
+// Approach 2: React context
+// One layer deep context, pane to reset it to null
+
 export const Accordion: FC<{
   children: ReactElement<typeof AccordionPane>[];
   // children: ReactElement<typeof AccordionPane>[] | ReactElement<typeof AccordionPane>;
 }> = ({ children }) => {
-  console.log(
-    "children123",
-    Children.toArray(children).map(c => "expanded:" + c.props.expanded)
-  );
-  const [state, dispatch] = useReducer(reducer, getInitialState(Children.count(children)));
+  const initialExpandedState = Children.toArray(children).map(c => c.props.expanded);
+  const [state, dispatch] = useReducer(reducer, getInitialState(initialExpandedState));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -168,9 +181,11 @@ export const Accordion: FC<{
     resizeObserver.observe(containerRef.current!);
   }, []);
 
+  console.log(initialExpandedState, state, children);
   const newChildren = React.Children.map(children, (child, index) => {
     const childProps = {
       index,
+      dispatch,
       isCollapsed: getIsCollapsed(state, index),
       toggleCollapsed: () => toggleCollapsed(index),
       height: getHeight(state, index),

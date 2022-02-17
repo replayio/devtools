@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Story, Meta } from "@storybook/react";
 import { Accordion, AccordionItem, AccordionPane } from "./Accordion";
+import { constant } from "lodash";
 
 const lorem = [
   "Sed ut perspiciatis",
@@ -68,7 +69,19 @@ export default {
 } as Meta;
 
 const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = args => {
-  let items = args.items?.map((item, i) => {
+  const initialExpandedState = args.items!.map(i => i.expanded);
+  const [expandedState, setExpandedState] = useState(initialExpandedState);
+
+  const toggleExpandedState = (index: number) => {
+    const newState = [...expandedState];
+    const newExpanded = !expandedState[index];
+    newState[index] = newExpanded;
+
+    setExpandedState(newState);
+  };
+
+  const panes = args.items?.map((item, i) => {
+    console.log("panerender", expandedState[i]);
     return {
       header: `Section ${i + 1}`,
       component: (
@@ -80,15 +93,23 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
           ))}
         </ul>
       ),
-      ...item,
+      onToggle: () => toggleExpandedState(i),
+      expanded: expandedState[i],
     };
   });
 
-  const i = items.map((item, index) => (
-    <AccordionPane key={index} header={item.header} onToggle={() => ({})} expanded={item.expanded}>
-      {item.component}
-    </AccordionPane>
-  ));
+  const i = panes.map((pane, index) => {
+    const { header, component, onToggle, expanded } = pane;
+
+    console.log("pane", index, expanded);
+    return (
+      <AccordionPane key={index} header={header} onToggle={onToggle} expanded={expanded}>
+        {component}
+      </AccordionPane>
+    );
+  });
+
+  console.log("story", expandedState);
 
   return (
     <div
@@ -110,22 +131,34 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
 export const UnderOver = Template.bind({});
 UnderOver.args = {
   items: [
-    { size: 10, expanded: false },
+    { size: 10, expanded: true },
     { size: 50, expanded: false },
   ],
 };
 
 export const OverOver = Template.bind({});
 OverOver.args = {
-  items: [{ size: 25 }, { size: 50 }],
+  items: [
+    { size: 25, expanded: false },
+    { size: 50, expanded: false },
+  ],
 };
 
 export const OverOverOver = Template.bind({});
 OverOverOver.args = {
-  items: [{ size: 25 }, { size: 50 }, { size: 50 }],
+  items: [
+    { size: 25, expanded: false },
+    { size: 50, expanded: false },
+    { size: 50, expanded: false },
+  ],
 };
 
 export const OverOverOverOver = Template.bind({});
 OverOverOverOver.args = {
-  items: [{ size: 25 }, { size: 50 }, { size: 50 }, { size: 50 }],
+  items: [
+    { size: 25 },
+    { size: 50, expanded: false },
+    { size: 50, expanded: false },
+    { size: 50, expanded: false },
+  ],
 };
