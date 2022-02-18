@@ -34,7 +34,7 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
     currentTime
   );
   return (
-    <div className="bg-white py-1.5 text-xs">
+    <div className="bg-themeBodyBackground py-1.5 text-xs">
       {events.map((e, i) => {
         return (
           <div key={e.point}>

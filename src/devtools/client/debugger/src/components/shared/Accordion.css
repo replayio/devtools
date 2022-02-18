@@ -19,7 +19,6 @@
 }
 
 .accordion ._header {
-  background-color: #fff;
   display: flex;
   font-size: 15px;
   line-height: calc(16 / 12);

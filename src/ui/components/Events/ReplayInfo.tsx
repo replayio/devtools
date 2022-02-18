@@ -42,7 +42,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-white">
+    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-themeBodyBackground">
       <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>

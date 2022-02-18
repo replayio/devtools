@@ -20,6 +20,7 @@ module.exports = {
         jellyfish: "rgba(255,255,255,0.8)",
         splitter: "var(--theme-splitter-color)",
         chrome: "var(--chrome)",
+        themeBodyBackground: "var(--theme-body-background)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

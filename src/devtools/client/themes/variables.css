@@ -147,7 +147,7 @@
   /* Jon's new tab work */
   --tab-selected-color: var(--theme-body-color);
   --tab-standard-color: #9c9c9e;
-  --tab-standard-hover-color: #6e6e78;
+  --tab-standard-hover-bgcolor: #6e6e78;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
@@ -279,6 +279,14 @@
 :root.theme-dark {
   --theme-body-background: #232327;
   --theme-sidebar-background: #18181a;
+
+  /* Jon tweaks */
+  --chrome: #18181a;
+  --theme-tab-background: black;
+  --tab-selected-color: white;
+  --tab-standard-color: #9c9c9e;
+  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
+  --tab-standard-hover-textcolor: white;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);

@@ -56,7 +56,7 @@
 }
 
 .secondary-toolbox-header button:hover .label {
-  color: var(--tab-standard-hover-color);
+  color: var(--tab-standard-hover-textcolor);
 }
 
 .secondary-toolbox-header .expanded .label {
@@ -65,7 +65,7 @@
 
 .secondary-toolbox-header button.expanded {
   background: inherit;
-  background: white;
+  background: var(--tab-standard-hover-bgcolor);
 }
 
 .secondary-toolbox-header .action-buttons button {
