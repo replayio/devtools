@@ -20,7 +20,7 @@ const errorMock = {
     variables: { recordingId },
   },
   result: {
-    errors: [new GraphQLError(errorMessage)],
+    errors: [new GraphQLError(errorMessage, {})],
   },
 };
 const graphqlMocks = [
