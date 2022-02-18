@@ -51,8 +51,10 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
     <div className={classNames("space-y-4", { "text-gray-500": disabled })}>
       {disabled ? (
         <p>
-          These features are only available to teams on our Organization Plan. Want to upgrade? Get
-          in touch!
+          These features are only available to teams on our Organization Plan. Want to upgrade?{" "}
+          <a href="mailto:sales@replay.io" rel="noreferrer" target="_blank" className="underline">
+            Get in touch!
+          </a>
         </p>
       ) : null}
       <div className="text-xs font-semibold uppercase">Recordings</div>
