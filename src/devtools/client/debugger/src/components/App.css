@@ -21,7 +21,7 @@ button {
 }
 
 .editor-pane {
-  background: white;
+  background: var(--theme-body-background);
   display: flex;
   flex: 1;
   height: 100%;
