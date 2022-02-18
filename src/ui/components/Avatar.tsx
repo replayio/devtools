@@ -31,7 +31,6 @@ export default function Avatar({ player, isFirstPlayer, index }: AvatarProps) {
   let auth = useAuth0();
 
   if (auth.isAuthenticated && isFirstPlayer) {
-    // @ts-ignore
     return <AuthAvatar user={auth.user} />;
   }
 

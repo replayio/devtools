@@ -131,7 +131,6 @@ function CommentTool({
         currentTime,
         executionPoint,
         mouseEventCanvasPosition(e),
-        // @ts-ignore
         { ...user, id: userId },
         recordingId
       );
