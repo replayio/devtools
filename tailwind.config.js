@@ -21,6 +21,8 @@ module.exports = {
         splitter: "var(--theme-splitter-color)",
         chrome: "var(--chrome)",
         themeBodyBackground: "var(--theme-body-background)",
+        themeMenuHighlight: "var(--theme-menu-highlight)",
+        iconColor: "var(--theme-body-color)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

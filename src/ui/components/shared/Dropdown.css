@@ -76,5 +76,5 @@
 }
 
 .dropdown-container .row:hover {
-  background-color: #eee;
+  background-color: var(--theme-menu-highlight);
 }

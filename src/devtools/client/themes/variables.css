@@ -148,6 +148,7 @@
   --tab-selected-color: var(--theme-body-color);
   --tab-standard-color: #9c9c9e;
   --tab-standard-hover-bgcolor: #6e6e78;
+  --theme-menu-highlight: #f3f4f6;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
@@ -287,6 +288,8 @@
   --tab-standard-color: #9c9c9e;
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --tab-standard-hover-textcolor: white;
+  --theme-menu-highlight: #4b4747;
+  --icon-color: yellow;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);

@@ -99,7 +99,7 @@ export function DropdownItemContent({
           selected ? "text-primaryAccent" : "text-gray-400"
         )}
       >
-        <Icon filename={icon} className="bg-gray-800 group-hover:bg-primaryAccent" />
+        <Icon filename={icon} className="bg-iconColor group-hover:bg-primaryAccent" />
       </div>
       <span className="overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
     </div>
