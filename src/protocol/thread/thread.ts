@@ -168,8 +168,6 @@ class _ThreadFront {
 
   mappedLocations = new MappedLocationCache();
 
-  skipPausing = false;
-
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
 
@@ -479,10 +477,6 @@ class _ThreadFront {
       this.sessionId
     );
     return lineLocations;
-  }
-
-  setSkipPausing(skip: boolean) {
-    this.skipPausing = skip;
   }
 
   async setBreakpoint(initialSourceId: SourceId, line: number, column: number, condition?: string) {

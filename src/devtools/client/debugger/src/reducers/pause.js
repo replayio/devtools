@@ -35,7 +35,6 @@ function createPauseState() {
     previousLocation: null,
     expandedScopes: new Set(),
     lastExpandedScopes: [],
-    skipPausing: prefs.skipPausing,
     shouldLogExceptions: prefs.logExceptions,
   };
 }
@@ -204,13 +203,6 @@ function update(state = createPauseState(), action) {
       };
     }
 
-    case "TOGGLE_SKIP_PAUSING": {
-      const { skipPausing } = action;
-      prefs.skipPausing = skipPausing;
-
-      return { ...state, skipPausing };
-    }
-
     case "SET_EXPANDED_SCOPE": {
       const { path, expanded } = action;
       const expandedScopes = new Set(state.expandedScopes);
@@ -338,10 +330,6 @@ export function isTopFrame(state) {
 
 export function getExecutionPoint(state) {
   return state.pause.executionPoint;
-}
-
-export function getSkipPausing(state) {
-  return state.pause.skipPausing;
 }
 
 export function getLastExpandedScopes(state) {

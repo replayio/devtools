@@ -21,7 +21,6 @@ import {
 import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
-import { setSkipPausing } from "../pause/skipPausing";
 
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
@@ -52,13 +51,12 @@ import { trackEvent } from "ui/utils/telemetry";
 // See syncBreakpoint.js for more.
 
 export function enableBreakpoint(cx, initialBreakpoint) {
-  return async ({ dispatch, getState, client, sourceMaps }) => {
+  return async ({ dispatch, getState, client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || !breakpoint.disabled) {
       return;
     }
 
-    dispatch(setSkipPausing(false));
     dispatch({
       type: "SET_BREAKPOINT",
       cx,
@@ -127,7 +125,6 @@ export function addBreakpoint(
       return;
     }
 
-    dispatch(setSkipPausing(false));
     dispatch({
       type: "SET_BREAKPOINT",
       cx,
@@ -178,7 +175,6 @@ export function _removeBreakpoint(cx, initialBreakpoint) {
       return;
     }
 
-    dispatch(setSkipPausing(false));
     dispatch({
       type: "REMOVE_BREAKPOINT",
       cx,
@@ -230,7 +226,6 @@ export function disableBreakpoint(cx, initialBreakpoint) {
       return;
     }
 
-    dispatch(setSkipPausing(false));
     dispatch({
       type: "SET_BREAKPOINT",
       cx,

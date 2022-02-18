@@ -10,7 +10,6 @@ import React, { Component } from "react";
 import { connect } from "../../utils/connect";
 import {
   getIsWaitingOnBreak,
-  getSkipPausing,
   getThreadContext,
   getBreakpointSources,
   getFramePositions,
@@ -242,7 +241,6 @@ const mapStateToProps = state => ({
   hasFramePositions: getFramePositions(state)?.positions.length,
   isPaused: hasFrames(state),
   isWaitingOnBreak: getIsWaitingOnBreak(state),
-  skipPausing: getSkipPausing(state),
 });
 
 export default connect(mapStateToProps, {
