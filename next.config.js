@@ -1,6 +1,7 @@
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
 module.exports = {
+  experimental: {},
   productionBrowserSourceMaps: true,
 
   async redirects() {
