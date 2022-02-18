@@ -28,8 +28,8 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative flex flex-col items-center p-9 m-4 text-2xl shadow-md",
-        overlay ? "space-y-8 max-w-sm" : "space-y-12 max-w-3xl",
+        "relative m-4 flex flex-col items-center p-9 text-2xl shadow-md",
+        overlay ? "max-w-sm space-y-8" : "max-w-3xl space-y-12",
         {
           "rounded-lg bg-opacity-80": overlay,
           "bg-white": overlay && ctx.theme === "light",
@@ -150,7 +150,7 @@ export function OnboardingModalContainer({
       <div
         className={classNames(
           "fixed z-50 grid h-full w-full",
-          theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+          theme === "dark" ? "bg-black text-white" : "bg-chrome text-black"
         )}
       >
         <BubbleBackground />
