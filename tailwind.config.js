@@ -24,6 +24,7 @@ module.exports = {
         themeMenuHighlight: "var(--theme-menu-highlight)",
         themeTabBackground: "var(--theme-tab-background)",
         iconColor: "var(--theme-body-color)",
+        themeBorder: "var(--theme-border)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
