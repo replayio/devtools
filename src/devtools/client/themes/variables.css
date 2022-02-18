@@ -289,7 +289,7 @@
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --tab-standard-hover-textcolor: white;
   --theme-menu-highlight: #4b4747;
-  --icon-color: yellow;
+  --icon-color: var(--theme-body-color);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);

@@ -22,6 +22,7 @@ module.exports = {
         chrome: "var(--chrome)",
         themeBodyBackground: "var(--theme-body-background)",
         themeMenuHighlight: "var(--theme-menu-highlight)",
+        themeTabBackground: "var(--theme-tab-background)",
         iconColor: "var(--theme-body-color)",
       },
       lineHeight: {

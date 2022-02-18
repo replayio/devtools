@@ -42,7 +42,7 @@ class Accordion extends Component {
         key={i}
       >
         <h2
-          className="_header"
+          className="_header bg-themeTabBackground"
           tabIndex="0"
           onKeyDown={e => this.onHandleHeaderKeyDown(e, i)}
           onClick={() => this.handleHeaderClick(i)}
