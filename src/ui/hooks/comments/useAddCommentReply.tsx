@@ -74,7 +74,9 @@ export default function useAddCommentReply() {
           updatedAt: reply.updatedAt,
           user: {
             id: userId,
+            // @ts-ignore
             name: user.name,
+            // @ts-ignore
             picture: user.picture,
             __typename: "User",
           },

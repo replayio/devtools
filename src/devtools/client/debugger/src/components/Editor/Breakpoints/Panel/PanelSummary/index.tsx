@@ -73,6 +73,7 @@ function PanelSummary({
         currentTime,
         executionPoint,
         null,
+        // @ts-ignore
         { ...user, userId },
         recordingId,
         breakpoint
@@ -81,6 +82,7 @@ function PanelSummary({
       createFloatingCodeComment(
         currentTime,
         executionPoint,
+        // @ts-ignore
         { ...user, id: userId },
         recordingId,
         breakpoint
