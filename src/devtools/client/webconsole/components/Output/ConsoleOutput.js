@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+const React = require("react");
 const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("react-redux");
@@ -16,6 +17,7 @@ const PropTypes = require("prop-types");
 const {
   MessageContainer,
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
+const ConsoleLoadingBar = require("./ConsoleLoadingBar").default;
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
@@ -170,6 +172,7 @@ class ConsoleOutput extends Component {
           this.outputNode = node;
         },
       },
+      <ConsoleLoadingBar />,
       messageNodes
     );
   }

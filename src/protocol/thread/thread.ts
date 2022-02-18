@@ -442,6 +442,14 @@ class _ThreadFront {
     });
   }
 
+  getGeneratedSourceIds(originalSourceId: SourceId) {
+    return this.sources.get(originalSourceId)?.generatedSourceIds;
+  }
+
+  getOriginalSourceIds(generatedSourceId: SourceId) {
+    return this.originalSources.map.get(generatedSourceId);
+  }
+
   async getSourceContents(sourceId: SourceId) {
     assert(this.sessionId);
     const { contents, contentType } = await client.Debugger.getSourceContents(
@@ -873,7 +881,7 @@ class _ThreadFront {
   ) {
     const sessionId = await this.waitForSession();
 
-    client.Console.findMessages({}, sessionId).then(({ overflow }) => {
+    const messagesLoaded = client.Console.findMessages({}, sessionId).then(({ overflow }) => {
       if (overflow) {
         console.warn("Too many console messages, not all will be shown");
         onConsoleOverflow();
@@ -900,6 +908,8 @@ class _ThreadFront {
       }
       onConsoleMessage(pause, message);
     });
+
+    return messagesLoaded;
   }
 
   async getRootDOMNode() {

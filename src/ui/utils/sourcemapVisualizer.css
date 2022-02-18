@@ -1,0 +1,181 @@
+body.sourcemap-visualizer {
+  font: 14px/150% sans-serif;
+  overflow: hidden;
+}
+
+.sourcemap-visualizer canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.sourcemap-visualizer #toolbar {
+  display: none;
+  position: fixed;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 32px;
+  line-height: 32px;
+  background: rgba(127, 127, 127, 0.2);
+  z-index: 1;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.5);
+}
+
+.sourcemap-visualizer #toolbar section {
+  flex: 1;
+  display: flex;
+}
+
+.sourcemap-visualizer #toolbar section:first-child {
+  padding-left: 8px;
+}
+
+.sourcemap-visualizer #toolbar section > * {
+  vertical-align: middle;
+  margin-right: 20px;
+}
+
+.sourcemap-visualizer #theme {
+  position: fixed;
+  right: 0;
+  top: 0;
+  padding: 3px 5px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.sourcemap-visualizer #theme svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+}
+
+.sourcemap-visualizer #statusBar {
+  display: none;
+  position: fixed;
+  box-sizing: border-box;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 32px;
+  line-height: 32px;
+  background: rgba(127, 127, 127, 0.2);
+  z-index: 1;
+  border-top: 1px solid rgba(127, 127, 127, 0.5);
+}
+
+.sourcemap-visualizer #statusBar section {
+  flex: 1;
+  display: flex;
+  width: 50%;
+}
+
+.sourcemap-visualizer #statusBar section:first-child {
+  padding-left: 8px;
+}
+
+.sourcemap-visualizer #statusBar section > * {
+  vertical-align: middle;
+  margin-right: 20px;
+  opacity: 0.7;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sourcemap-visualizer #fileListParent {
+  width: 80%;
+}
+
+.sourcemap-visualizer select {
+  padding: 0;
+  width: 100%;
+}
+
+.sourcemap-visualizer h1 {
+  font-size: 40px;
+  line-height: 120%;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.sourcemap-visualizer h2 {
+  font-size: 18px;
+  margin: 0;
+  display: inline-block;
+}
+
+.sourcemap-visualizer noscript {
+  display: block;
+}
+
+.sourcemap-visualizer noscript {
+  margin-top: 50px;
+  color: #f33;
+  background: rgba(255, 0, 0, 0.1);
+  padding: 15px 15px 15px 50px;
+  border: 1px solid #f33;
+  border-radius: 10px;
+}
+
+.sourcemap-visualizer noscript:before {
+  content: '🚫';
+  display: block;
+  width: 50px;
+  line-height: 22px;
+  text-align: center;
+  font-size: 28px;
+  float: left;
+  margin-left: -50px;
+}
+
+/* ---------- Light colors ---------- */
+
+body.sourcemap-visualizer:not([data-theme=dark]) {
+  color: #222;
+  fill: #222;
+  stroke: #222;
+  background: white;
+}
+
+body.sourcemap-visualizer:not([data-theme=dark]) #theme-dark {
+  display: none;
+}
+
+/* ---------- Dark colors ---------- */
+
+body.sourcemap-visualizer[data-theme=dark] {
+  color: #eee;
+  fill: #eee;
+  stroke: #eee;
+  background: #333;
+}
+
+body.sourcemap-visualizer[data-theme=dark] #theme-light {
+  display: none;
+}
+
+body.sourcemap-visualizer[data-theme=dark] #theme-dark {
+  display: block;
+}
+
+/* ---------- Dark colors without JavaScript ---------- */
+
+@media (prefers-color-scheme: dark) {
+  body.sourcemap-visualizer:not([data-theme=light]) {
+    color: #eee;
+    fill: #eee;
+    stroke: #eee;
+    background: #333;
+  }
+
+  body.sourcemap-visualizer:not([data-theme=light]) #theme-light {
+    display: none;
+  }
+
+  body.sourcemap-visualizer:not([data-theme=light]) #theme-dark {
+    display: block;
+  }
+}

@@ -47,6 +47,8 @@ const MessageState = overrides =>
         lastMessageId: null,
         // Flag that indicates if not all console messages will be displayed.
         overflow: false,
+
+        messagesLoaded: false,
       },
       overrides
     )
@@ -150,6 +152,8 @@ function messages(state = MessageState(), action) {
 
   let newState;
   switch (action.type) {
+    case "MESSAGES_LOADED":
+      return { ...state, messagesLoaded: true };
     case "PAUSED":
       if (
         state.pausedExecutionPoint &&

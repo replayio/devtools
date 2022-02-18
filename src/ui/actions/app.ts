@@ -167,7 +167,7 @@ export function setupApp(store: UIStore) {
   });
 }
 
-function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
+export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return ({ dispatch, getState }) => {
     let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {

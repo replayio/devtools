@@ -116,86 +116,13 @@ function restoreBlackBoxedSources(cx, sources) {
   };
 }
 
-export function newQueuedSources(sourceInfo) {
-  return async ({ dispatch }) => {
-    const generated = [];
-    const original = [];
-    for (const source of sourceInfo) {
-      if (source.type === "generated") {
-        generated.push(source.data);
-      } else {
-        original.push(source.data);
-      }
-    }
-
-    if (generated.length > 0) {
-      await dispatch(newGeneratedSources(generated));
-    }
-    if (original.length > 0) {
-      await dispatch(newOriginalSources(original));
-    }
-  };
-}
-
-export function newOriginalSource(sourceInfo) {
-  return async ({ dispatch }) => {
-    const sources = await dispatch(newOriginalSources([sourceInfo]));
-    return sources[0];
-  };
-}
-export function newOriginalSources(sourceInfo) {
-  return async ({ dispatch, getState }) => {
-    const state = getState();
-    const seen = new Set();
-    const sources = [];
-
-    for (const { id, url } of sourceInfo) {
-      if (seen.has(id) || getSource(state, id)) {
-        continue;
-      }
-
-      seen.add(id);
-
-      sources.push({
-        id,
-        url,
-        relativeUrl: url,
-        isPrettyPrinted: false,
-        isBlackBoxed: false,
-        introductionUrl: null,
-        introductionType: undefined,
-        isExtension: false,
-        extensionName: null,
-        isOriginal: true,
-      });
-    }
-
-    const cx = getContext(state);
-    dispatch(addSources(cx, sources));
-
-    await dispatch(checkNewSources(cx, sources));
-
-    for (const source of sources) {
-      dispatch(checkPendingBreakpoints(cx, source.id));
-    }
-
-    return sources;
-  };
-}
-
-export function newGeneratedSource(sourceInfo) {
-  return async ({ dispatch }) => {
-    const sources = await dispatch(newGeneratedSources([sourceInfo]));
-    return sources[0];
-  };
-}
-export function newGeneratedSources(sourceInfo) {
+export function newSources(sources) {
   return async ({ dispatch, getState, client }) => {
     const resultIds = [];
     const newSourcesObj = {};
     const newSourceActors = [];
 
-    for (const { thread, isServiceWorker, source, id } of sourceInfo) {
+    for (const { thread, isServiceWorker, source, id } of sources) {
       const newId = id || makeSourceId(source, isServiceWorker);
 
       const kind = ThreadFront.getSourceKind(source.actor);
