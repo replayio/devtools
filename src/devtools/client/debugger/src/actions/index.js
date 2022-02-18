@@ -5,7 +5,6 @@
 import * as breakpoints from "./breakpoints";
 import * as logExceptions from "./logExceptions";
 import * as pause from "./pause";
-import * as navigation from "./navigation";
 import * as ui from "./ui";
 import * as fileSearch from "./file-search";
 import * as quickOpen from "./quick-open";
@@ -20,7 +19,6 @@ import * as preview from "./preview";
 import { objectInspector } from "devtools/packages/devtools-reps";
 
 export default {
-  ...navigation,
   ...breakpoints,
   ...logExceptions,
   ...sources,

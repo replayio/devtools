@@ -267,10 +267,6 @@ async function blackBox(sourceActor, isBlackBoxed, range) {
   }
 }
 
-function setSkipPausing(shouldSkip) {
-  return ThreadFront.setSkipPausing(shouldSkip);
-}
-
 function interrupt(thread) {
   return ThreadFront.interrupt();
 }
@@ -397,7 +393,6 @@ const clientCommands = {
   checkIfAlreadyPaused,
   registerSourceActor,
   getMainThread,
-  setSkipPausing,
   fetchEventTypePoints,
   setEventListenerBreakpoints,
   getFrontByID,

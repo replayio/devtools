@@ -494,7 +494,6 @@ const mapStateToProps = state => {
     selectedSource,
     searchOn: selectors.getActiveSearch(state) === "file",
     symbols: selectors.getSymbols(state, selectedSource),
-    skipPausing: selectors.getSkipPausing(state),
     selectedFrame: selectors.getSelectedFrame(state),
     mode: selectors.getViewMode(state),
   };
