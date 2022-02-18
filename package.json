@@ -165,7 +165,7 @@
     "webpack-cli": "^4.9.2"
   },
   "optionalDependencies": {
-    "@recordreplay/playwright": "^1.10.6"
+    "@recordreplay/playwright": "^1.18.3"
   },
   "browserslist": [
     "defaults"
