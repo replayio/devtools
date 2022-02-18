@@ -1,5 +1,6 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
+  ACTIVATE_WORKSPACE_SUBSCRIPTION,
   ADD_WORKSPACE_API_KEY,
   CANCEL_WORKSPACE_SUBSCRIPTION,
   DELETE_WORKSPACE_API_KEY,
@@ -178,6 +179,9 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                   status
                   trialEnds
                   effectiveUntil
+                  plan {
+                    key
+                  }
                 }
                 settings {
                   motd
@@ -296,6 +300,18 @@ export function useUpdateWorkspaceMemberRole() {
   });
 
   return { updateWorkspaceMemberRole, loading, error };
+}
+
+export function useActivateWorkspaceSubscription(workspaceId: string) {
+  const [activateWorkspaceSubscription, { loading, error }] = useMutation<{
+    activateWorkspaceSubscription: {
+      subscription: Pick<Subscription, "status" | "effectiveUntil">;
+    };
+  }>(ACTIVATE_WORKSPACE_SUBSCRIPTION, {
+    variables: { workspaceId },
+  });
+
+  return { activateWorkspaceSubscription, loading, error };
 }
 
 export function useGetWorkspaceSubscription(workspaceId: string) {

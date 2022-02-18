@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
+import { assert } from "protocol/utils";
 import hooks from "ui/hooks";
 import { isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
@@ -24,10 +25,13 @@ export const stripePromise = loadStripe(
 );
 
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [view, setView] = useState<Views>("details");
   const [confirmed, setConfirmed] = useState(false);
+  const [resubscribe, setResubscribe] = useState(false);
   const { workspace, loading: wsLoading } = hooks.useGetWorkspace(workspaceId);
   const { data, loading, error, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
+  const { activateWorkspaceSubscription } = hooks.useActivateWorkspaceSubscription(workspaceId);
 
   // clear the confirmed state if changing views
   useEffect(() => {
@@ -51,15 +55,78 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     return null;
   }
 
+  const handleResubscribe = async () => {
+    try {
+      const planKey = workspace.subscription?.plan.key;
+      assert(planKey, "Workspace does not have a planKey");
+
+      if (workspace.hasPaymentMethod) {
+        await activateWorkspaceSubscription({
+          variables: {
+            planKey,
+          },
+        });
+      } else {
+        setResubscribe(true);
+        setView("add-payment-method");
+      }
+    } catch (e: any) {
+      sendTelemetryEvent("devtools-billing", {
+        workspaceId: workspace.id,
+        errorMessage: e.message,
+      });
+
+      setErrorMessage(
+        "We had a problem resubscribing your team. We'll be in touch with you soon with more details."
+      );
+    }
+  };
+
+  const handleSave = async ({
+    paymentMethodBillingId,
+  }: {
+    paymentMethodBillingId: string | null;
+  }) => {
+    try {
+      const planKey = workspace.subscription?.plan.key;
+      assert(planKey === "beta-v1", "Workspace does not have a planKey");
+
+      setView("details");
+      setConfirmed(true);
+      await refetch();
+
+      if (resubscribe) {
+        await activateWorkspaceSubscription({
+          variables: {
+            planKey,
+            paymentMethodBillingId,
+          },
+        });
+      }
+    } catch (e: any) {
+      sendTelemetryEvent("devtools-billing", {
+        workspaceId: workspace.id,
+        errorMessage: e.message,
+      });
+
+      setErrorMessage(
+        resubscribe
+          ? "We had a problem resubscribing your team."
+          : "We had a problem saving your payment method."
+      );
+    }
+  };
+
   const { subscription } = data.node;
 
-  if (error) {
+  if (error || errorMessage) {
     return (
       <section className="space-y-8">
+        <SettingsHeader>Eek!</SettingsHeader>
         <p>
-          Unable to load the subscription at this time. We are looking into it on our end and feel
-          free to email us at <a href="mailto:support@replay.io">support@replay.io</a> if this
-          problem persists.
+          {errorMessage || "Unable to load the subscription at this time."} We are looking into it
+          on our end and feel free to email us at{" "}
+          <a href="mailto:support@replay.io">support@replay.io</a> if this problem persists.
         </p>
       </section>
     );
@@ -79,10 +146,12 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>
       {view === "details" && (
         <Details
-          workspace={workspace}
-          subscription={subscriptionWithPricing}
-          setView={setView}
           confirmed={confirmed}
+          onAddPaymentMethod={() => setView("add-payment-method")}
+          onDeletePaymentMethod={() => setView("delete-payment-method")}
+          onResubscribe={handleResubscribe}
+          subscription={subscriptionWithPricing}
+          workspace={workspace}
         />
       )}
       {view === "add-payment-method" && (
@@ -99,12 +168,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
           <SettingsHeader>Add Payment Method</SettingsHeader>
           <EnterPaymentMethod
             onCancel={() => setView("details")}
-            onSave={() => {
-              refetch().then(() => {
-                setView("details");
-                setConfirmed(true);
-              });
-            }}
+            onSave={handleSave}
             workspaceId={workspaceId}
             // TODO: handle the error at this level...
             stripePromise={stripePromise}

@@ -3,7 +3,7 @@ import { Subscription } from "ui/types";
 import { formatDate } from "./formatDate";
 
 export function ExpirationRow({ subscription }: { subscription: Subscription }) {
-  if (subscription.plan.key.includes("beta") || !subscription.trialEnds) {
+  if (subscription.plan.key.includes("beta") || !subscription.effectiveUntil) {
     return null;
   }
 
@@ -18,7 +18,7 @@ export function ExpirationRow({ subscription }: { subscription: Subscription }) 
   return (
     <div className="border-color-gray-50 flex flex-row items-center justify-between border-b py-2">
       <span>{label}</span>
-      <span>{formatDate(subscription.trialEnds, "long")}</span>
+      <span>{formatDate(subscription.effectiveUntil, "long")}</span>
     </div>
   );
 }
