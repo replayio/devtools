@@ -150,7 +150,7 @@ export function OnboardingModalContainer({
       <div
         className={classNames(
           "fixed z-50 grid h-full w-full",
-          theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+          theme === "dark" ? "bg-black text-white" : "bg-chrome text-black"
         )}
       >
         <BubbleBackground />
