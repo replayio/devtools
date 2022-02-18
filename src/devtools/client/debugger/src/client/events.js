@@ -31,7 +31,10 @@ function resumed() {
 }
 
 function newSource(_, { source }) {
-  sourceQueue.queue(prepareSourcePayload(source));
+  sourceQueue.queue({
+    type: "generated",
+    data: prepareSourcePayload(source),
+  });
 }
 
 const clientEvents = {

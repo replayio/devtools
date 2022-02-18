@@ -6,21 +6,21 @@
 
 import throttle from "lodash/throttle";
 
-let newSources;
+let newQueuedSources;
 let queuedSources;
 let currentWork;
 
 async function dispatchNewSources() {
   const sources = queuedSources;
   queuedSources = [];
-  currentWork = await newSources(sources);
+  currentWork = await newQueuedSources(sources);
 }
 
 const queue = throttle(dispatchNewSources, 1000);
 
 export default {
   initialize: actions => {
-    newSources = actions.newSources;
+    newQueuedSources = actions.newQueuedSources;
     queuedSources = [];
   },
   queue: source => {
