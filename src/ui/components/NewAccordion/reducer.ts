@@ -76,7 +76,14 @@ export const getSectionDisplayedHeight = (
   index: number,
   totalHeight: number
 ) => {
-  return state.sections[index].displayedHeight / totalHeight;
+  const displayedHeight = state.sections[index].displayedHeight;
+
+  // In the case that the accordion is still initializing and none
+  // of the sections have assigned heights, this defaults to returning 0.
+  if (!totalHeight && !displayedHeight) {
+    return 0;
+  }
+  return displayedHeight / totalHeight;
 };
 
 export const getIsCollapsed = (state: AccordionState, index: number) =>
