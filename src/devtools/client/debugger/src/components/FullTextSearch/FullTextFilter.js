@@ -46,12 +46,12 @@ export function FullTextFilter({
 
   return (
     <div className="p-2">
-      <div className="flex items-center space-x-2 rounded-md border-0 bg-gray-100 px-2 py-1">
+      <div className="flex items-center space-x-2 rounded-md border-0 bg-themeTextField px-2 py-1">
         <MaterialIcon>search</MaterialIcon>
         <input
           style={{ boxShadow: "unset" }}
           placeholder="Find in files…"
-          className="flex-grow border-0 bg-transparent p-0 text-xs focus:outline-none"
+          className="flex-grow border-0 bg-themeTextField p-0 text-xs focus:outline-none"
           type="text"
           value={value}
           onChange={e => setValue(e.target.value)}
