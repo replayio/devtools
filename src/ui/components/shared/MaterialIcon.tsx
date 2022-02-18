@@ -1,5 +1,6 @@
 import classnames from "classnames";
 import React, { useEffect, useState } from "react";
+import { trackEvent } from "ui/utils/telemetry";
 
 const SIZE_STYLES = {
   xs: "text-xs",
@@ -36,6 +37,8 @@ export const useMaterialIconCheck = () => {
           }
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
+
+        trackEvent("error.font_loading_timeout");
       });
     }
   }, [appNode]);

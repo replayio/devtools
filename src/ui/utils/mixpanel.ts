@@ -32,6 +32,7 @@ type MixpanelEvent =
   | ["console.overflow"]
   | ["events_timeline.select"]
   | ["events_timeline.select_source"]
+  | ["error.font_loading_timeout"]
   | ["error.unauthenticated_viewer"]
   | ["error.unauthorized_viewer"]
   | ["error.reactdevtools.set_protocol_failed"]
