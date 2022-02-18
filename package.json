@@ -71,7 +71,7 @@
     "react": "^0.0.0-experimental-edfe50510-20210823",
     "react-circular-progressbar": "^2.0.4",
     "react-codemirror2": "^7.2.1",
-    "react-devtools-inline": "^4.17.0",
+    "react-devtools-inline": "^4.23.0",
     "react-dom": "^0.0.0-experimental-edfe50510-20210823",
     "react-dom-factories": "^1.0.2",
     "react-json-view": "^1.21.3",
