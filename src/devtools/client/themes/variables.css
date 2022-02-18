@@ -150,6 +150,7 @@
   --tab-standard-hover-bgcolor: #6e6e78;
   --theme-menu-highlight: #f3f4f6;
   --theme-border: #d2d5da;
+  --theme-text-field: #f3f4f6;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
@@ -292,6 +293,7 @@
   --theme-menu-highlight: #4b4747;
   --icon-color: var(--theme-body-color);
   --theme-border: var(--console-message-border);
+  --theme-text-field: #363b3b;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);

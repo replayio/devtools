@@ -25,6 +25,7 @@ module.exports = {
         themeTabBackground: "var(--theme-tab-background)",
         iconColor: "var(--theme-body-color)",
         themeBorder: "var(--theme-border)",
+        themeTextField: "var(--theme-text-field)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
