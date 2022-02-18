@@ -195,7 +195,7 @@ export const Accordion: FC<{
 
   return (
     <div className="relative flex h-full flex-col overflow-auto" ref={containerRef}>
-      {newChildren}
+      {state.domHeight ? newChildren : null}
       {isResizing ? <ResizeMask onMouseUp={onResizeEnd} onMouseMove={onResize} /> : null}
     </div>
   );
