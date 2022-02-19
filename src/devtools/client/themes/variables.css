@@ -151,8 +151,8 @@
   --theme-menu-highlight: #f3f4f6;
   --theme-border: #d2d5da;
   --theme-text-field: #f3f4f6;
-  --theme-toggle-inner: yellow;
-  --theme-toggle-selected: orange;
+  --theme-toggle-inner: var(--cool-gray-200);
+  --theme-toggle-selected: white;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
