@@ -52,7 +52,12 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
       {disabled ? (
         <p>
           These features are only available to teams on our Organization Plan. Want to upgrade?{" "}
-          <a href="mailto:sales@replay.io" rel="noreferrer" target="_blank" className="underline">
+          <a
+            href="mailto:sales@replay.io"
+            rel="noreferrer noopener"
+            target="_blank"
+            className="underline"
+          >
             Get in touch!
           </a>
         </p>
