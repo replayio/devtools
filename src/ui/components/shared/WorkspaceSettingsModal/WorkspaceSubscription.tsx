@@ -89,7 +89,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   }) => {
     try {
       const planKey = workspace.subscription?.plan.key;
-      assert(planKey === "beta-v1", "Workspace does not have a planKey");
+      assert(planKey, "Workspace does not have a planKey");
 
       setView("details");
       setConfirmed(true);

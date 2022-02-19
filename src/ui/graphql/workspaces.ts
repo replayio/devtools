@@ -120,15 +120,14 @@ export const ACTIVATE_WORKSPACE_SUBSCRIPTION = gql`
   mutation ActivateWorkspaceSubscription(
     $workspaceId: ID!
     $planKey: String!
-    $paymentMethodBillingId: String
+    $paymentMethodBillingId: String!
   ) {
-    activateWorkspaceSubscription(
-      input: {
-        workspaceId: $workspaceId
-        planKey: $planKey
-        paymentMethodBillingId: $paymentMethodBillingId
-      }
+    setWorkspaceDefaultPaymentMethod(
+      input: { workspaceId: $workspaceId, paymentMethodId: $paymentMethodBillingId }
     ) {
+      success
+    }
+    activateWorkspaceSubscription(input: { workspaceId: $workspaceId, planKey: $planKey }) {
       success
       subscription {
         effectiveUntil
