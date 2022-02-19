@@ -13,8 +13,8 @@
 }
 
 .view-toggle .inner {
-  background: var(--cool-gray-200);
-  border: 2px solid var(--cool-gray-200);
+  background: var(--theme-toggle-inner);
+  border: 2px solid var(--theme-toggle-inner);
   display: flex;
   align-items: stretch;
   border-radius: 8px;
@@ -31,13 +31,13 @@
   text-align: center;
   padding: 3px 36px;
   white-space: nowrap;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--tab-standard-color);
   position: relative;
   z-index: 1;
   transition: ease-in-out 80ms color;
 }
 .view-toggle .active {
-  color: #000;
+  color: var(--tab-selected-color);
   font-weight: 400;
 }
 
@@ -48,6 +48,6 @@
   left: 0;
   right: 0;
   top: 0;
-  background-color: white;
+  background-color: var(--theme-toggle-selected);
   border-radius: 6px;
 }

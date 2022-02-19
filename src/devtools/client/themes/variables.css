@@ -151,6 +151,8 @@
   --theme-menu-highlight: #f3f4f6;
   --theme-border: #d2d5da;
   --theme-text-field: #f3f4f6;
+  --theme-toggle-inner: yellow;
+  --theme-toggle-selected: orange;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
@@ -292,8 +294,11 @@
   --tab-standard-hover-textcolor: white;
   --theme-menu-highlight: #4b4747;
   --icon-color: var(--theme-body-color);
+  --icon-color-disabled: blue;
   --theme-border: var(--console-message-border);
   --theme-text-field: #363b3b;
+  --theme-toggle-inner: #4b4747;
+  --theme-toggle-selected: var(--chrome);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);
