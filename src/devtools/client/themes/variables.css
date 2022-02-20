@@ -160,6 +160,7 @@
   --theme-tab-toolbar-background: var(--grey-10);
   --theme-toolbar-background: var(--grey-10);
   --theme-tab-background: #ececec;
+  --theme-tab-background-alt-subtle: var(--theme-sidebar-background);
   --theme-toolbar-selected-color: var(--tab-selected-color);
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);

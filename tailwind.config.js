@@ -23,6 +23,7 @@ module.exports = {
         themeBodyBackground: "var(--theme-body-background)",
         themeMenuHighlight: "var(--theme-menu-highlight)",
         themeTabBackground: "var(--theme-tab-background)",
+        themeTabBackgroundAltSubtle: "var(--theme-tab-background-alt-subtle)",
         iconColor: "var(--icon-color)",
         iconColorDisabled: "var(--theme-text-field)",
         themeBorder: "var(--theme-border)",
