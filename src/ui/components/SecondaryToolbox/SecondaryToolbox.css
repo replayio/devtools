@@ -60,7 +60,7 @@
 }
 
 .secondary-toolbox-header .expanded .label {
-  color: var(--tab-selected-color);
+  color: var(--theme-body-color);
 }
 
 .secondary-toolbox-header button.expanded {
