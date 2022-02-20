@@ -146,9 +146,11 @@
 
   /* Jon's new tab work */
   --tab-selected-color: var(--theme-body-color);
-  --tab-standard-color: #9c9c9e;
-  --tab-standard-hover-bgcolor: #6e6e78;
+  --tab-standard-color: rgba(0, 0, 0, 0.5);
+  --tab-standard-hover-bgcolor: #fff;
   --theme-menu-highlight: #f3f4f6;
+  --icon-color: var(--theme-body-color);
+  --icon-color-disabled: red;
   --theme-border: #d2d5da;
   --theme-text-field: #f3f4f6;
   --theme-toggle-inner: var(--cool-gray-200);

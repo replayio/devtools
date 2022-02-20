@@ -76,7 +76,7 @@
   --tab-line-color: var(--theme-body-color);
   color: var(--primary-accent);
   border-bottom-color: transparent;
-  background-color: var(--theme-toolbar-hover);
+  background-color: #fff;
 }
 
 .source-tab:not(.active):hover {
