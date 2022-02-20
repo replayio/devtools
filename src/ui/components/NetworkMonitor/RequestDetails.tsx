@@ -263,7 +263,7 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="bg-white border-l min-w-full overflow-scroll">
+    <div className="bg-themeBodyBackground border-l min-w-full overflow-scroll">
       <div
         className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0"
         style={{ height: 25 }}

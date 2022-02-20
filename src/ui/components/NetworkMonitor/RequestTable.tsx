@@ -35,7 +35,12 @@ const RequestTable = ({
   let inPast = true;
 
   return (
-    <div className={classNames("no-scrollbar min-w-full overflow-scroll bg-white", className)}>
+    <div
+      className={classNames(
+        "no-scrollbar min-w-full overflow-scroll bg-themeBodyBackground",
+        className
+      )}
+    >
       {/* Relative here helps with when the timeline goes past the last request*/}
       <div
         style={{ minWidth: "fit-content" }}
