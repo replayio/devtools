@@ -4,8 +4,9 @@
 
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { PrefsHelper } from "devtools/client/shared/prefs";
+import { useEffect, useState } from "react";
 
-import Services from "devtools/shared/services";
+import Services, { prefs as prefsService } from "devtools/shared/services";
 
 // Schema version to bump when the async store format has changed incompatibly
 // and old stores should be cleared.
@@ -105,6 +106,27 @@ export const prefs = new PrefsHelper("devtools", {
   logEventBreakpoints: ["Bool", "debugger.log-event-breakpoints"],
   indentSize: ["Int", "editor.tabsize"],
 });
+
+export const useDebuggerPrefs = prefKey => {
+  const fullKey = `devtools.debugger.${prefKey}`;
+  const [preference, setPreference] = useState(prefsService.getBoolPref(fullKey));
+
+  useEffect(() => {
+    const onUpdate = prefs => {
+      setPreference(prefs.getBoolPref(fullKey));
+    };
+
+    prefsService.addObserver(fullKey, onUpdate, false);
+    return () => prefsService.removeObserver(fullKey, onUpdate);
+  }, [fullKey]);
+
+  return {
+    value: preference,
+    update: newValue => {
+      prefsService.setBoolPref(fullKey, newValue);
+    },
+  };
+};
 
 export const javascriptPrefs = new PrefsHelper("javascript", {
   enableJavaScript: ["Bool", "enabled"],

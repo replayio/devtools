@@ -60,8 +60,6 @@
 }
 
 .outline-list {
-  margin-top: 10px;
-  padding-bottom: 10px;
   list-style-type: none;
   overflow: auto;
   overflow-x: hidden;

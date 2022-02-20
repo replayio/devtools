@@ -40,7 +40,7 @@ export function setupMessages(store) {
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),
     () => store.dispatch(onConsoleOverflow())
-  );
+  ).then(() => store.dispatch({ type: "MESSAGES_LOADED" }));
 }
 
 function convertStack(stack, { frames }) {

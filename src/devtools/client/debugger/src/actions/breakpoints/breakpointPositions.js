@@ -60,7 +60,7 @@ function groupByLine(results, sourceId, line) {
 }
 
 async function _setBreakpointPositions(sourceId, line, thunkArgs) {
-  const { client, dispatch, getState, sourceMaps } = thunkArgs;
+  const { dispatch, getState } = thunkArgs;
   let generatedSource = getSource(getState(), sourceId);
   if (!generatedSource) {
     return;

@@ -33,7 +33,7 @@ type EndResizingAction = { type: "end_resizing" };
 type ResizeAction = { type: "resize"; currentY: number };
 type ContainerResizeAction = { type: "container_resize"; height: number };
 
-type AccordionAction =
+export type AccordionAction =
   | ExpandSectionAction
   | CollapseSectionAction
   | StartResizingAction
@@ -41,9 +41,9 @@ type AccordionAction =
   | ResizeAction
   | ContainerResizeAction;
 
-const createDefaultSection = () => {
+const createDefaultSection = (expanded: boolean) => {
   return {
-    expanded: false,
+    expanded,
     displayedHeight: 0,
   };
 };
@@ -76,7 +76,14 @@ export const getSectionDisplayedHeight = (
   index: number,
   totalHeight: number
 ) => {
-  return state.sections[index].displayedHeight / totalHeight;
+  const displayedHeight = state.sections[index].displayedHeight;
+
+  // In the case that the accordion is still initializing and none
+  // of the sections have assigned heights, this defaults to returning 0.
+  if (!totalHeight && !displayedHeight) {
+    return 0;
+  }
+  return displayedHeight / totalHeight;
 };
 
 export const getIsCollapsed = (state: AccordionState, index: number) =>
@@ -116,11 +123,11 @@ export const getResizingParams = (state: AccordionState) => {
 
 // Reducer
 
-export function getInitialState(count: number): AccordionState {
+export function getInitialState(expandedState: boolean[]): AccordionState {
   const sections: Section[] = [];
 
-  for (let i = 0; i < count; i++) {
-    sections.push(createDefaultSection());
+  for (let i = 0; i < expandedState.length; i++) {
+    sections.push(createDefaultSection(expandedState[i]));
   }
 
   return { sections, resizingParams: null, containerHeight: null, domHeight: null };

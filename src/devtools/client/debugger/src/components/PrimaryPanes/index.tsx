@@ -4,7 +4,7 @@
 
 //
 
-import React, { Component } from "react";
+import React from "react";
 
 import actions from "../../actions";
 import {
@@ -18,42 +18,36 @@ import Outline from "../SourceOutline/SourceOutline";
 import SourcesTree from "./SourcesTree";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { prefs } from "devtools/client/debugger/src/utils/prefs";
-import Accordion from "ui/components/Accordion";
 import QuickOpenButton from "./QuickOpenButton";
+import { Accordion, AccordionPane } from "ui/components/NewAccordion/Accordion";
+import { useDebuggerPrefs } from "../../utils/prefs";
 
-class PrimaryPanes extends Component<PropsFromRedux> {
-  renderOutline() {
-    return {
-      className: "outlines-pane h-full border-t",
-      component: <Outline />,
-      header: "Outline",
-      onToggle: (opened: boolean) => {
-        prefs.outlineExpanded = opened;
-      },
-      collapsed: !prefs.outlineExpanded,
-    };
-  }
+function PrimaryPanes(props: PropsFromRedux) {
+  const { value: outlineExpanded, update: updateOutlineExpanded } =
+    useDebuggerPrefs("outline-expanded");
+  const { value: sourcesCollapsed } = useDebuggerPrefs("sources-collapsed");
 
-  renderSources() {
-    return {
-      className: "sources-pane",
-      component: <SourcesTree />,
-      header: "Sources",
-      onToggle: () => {
-        this.props.toggleSourcesCollapse();
-      },
-      collapsed: !!prefs.sourcesCollapsed,
-      button: <QuickOpenButton />,
-    };
-  }
-
-  getItems() {
-    return [this.renderSources(), this.renderOutline()];
-  }
-  render() {
-    return <Accordion items={this.getItems()} />;
-  }
+  return (
+    <Accordion>
+      <AccordionPane
+        header="Sources"
+        className="sources-pane"
+        expanded={!sourcesCollapsed}
+        onToggle={() => props.toggleSourcesCollapse()}
+        button={<QuickOpenButton />}
+      >
+        <SourcesTree />
+      </AccordionPane>
+      <AccordionPane
+        header="Outline"
+        className="outlines-pane"
+        expanded={!!outlineExpanded}
+        onToggle={() => updateOutlineExpanded(!outlineExpanded)}
+      >
+        <Outline />
+      </AccordionPane>
+    </Accordion>
+  );
 }
 
 const mapStateToProps = (state: UIState) => {
