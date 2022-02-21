@@ -152,7 +152,6 @@
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
   --icon-color: var(--theme-body-color);
-  --icon-color-disabled: red;
   --theme-border: #d2d5da;
   --theme-text-field: #f3f4f6;
   --theme-toggle-inner: var(--cool-gray-200);
@@ -299,7 +298,6 @@
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #4b4747;
   --icon-color: var(--theme-body-color);
-  --icon-color-disabled: blue;
   --theme-border: var(--console-message-border);
   --theme-text-field: #363b3b;
   --theme-toggle-inner: #4b4747;
