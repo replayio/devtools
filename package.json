@@ -41,7 +41,6 @@
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "@tiptap/react": "^2.0.0-beta.108",
     "@tiptap/starter-kit": "^2.0.0-beta.183",
-    "babel-plugin-add-react-displayname": "0.0.5",
     "base64-arraybuffer": "^1.0.2",
     "classnames": "^2.3.1",
     "codemirror": "^5.65.1",
@@ -59,7 +58,6 @@
     "lodash-move": "^1.1.1",
     "logrocket": "^2.2.0",
     "logrocket-react": "^5.0.1",
-    "md5": "^2.3.0",
     "mixpanel-browser": "^2.43.0",
     "next": "^12.1.0",
     "parse-script-tags": "^0.1.7",
@@ -84,9 +82,7 @@
     "redux": "^4.1.2",
     "reselect": "^4.1.5",
     "resize-observer-polyfill": "^1.5.1",
-    "slugify": "^1.6.5",
-    "utf-8-validate": "^5.0.8",
-    "webpack-retry-chunk-load-plugin": "^3.0.0"
+    "slugify": "^1.6.5"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
@@ -133,6 +129,7 @@
     "autoprefixer": "^10.4.2",
     "babel-jest": "^27.3.1",
     "babel-loader": "^8.2.3",
+    "babel-plugin-add-react-displayname": "^0.0.5",
     "bufferutil": "^4.0.6",
     "css-loader": "^6.6.0",
     "eslint": "^8.9.0",
@@ -159,8 +156,10 @@
     "ts-node": "^10.5.0",
     "tsconfig-paths": "^3.12.0",
     "typescript": "^4.5.5",
+    "utf-8-validate": "^5.0.8",
     "webpack": "^5.68.0",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.9.2",
+    "webpack-retry-chunk-load-plugin": "^3.0.0"
   },
   "optionalDependencies": {
     "@recordreplay/playwright": "^1.10.6"
