@@ -10,55 +10,24 @@ import { ViewMode } from "ui/state/layout";
 
 const TOGGLE_DELAY = 300;
 
-interface HandleProps {
-  text: string;
-  mode: ViewMode;
-  localViewMode: ViewMode;
-  handleToggle(mode: ViewMode): void;
-  motion: typeof import("framer-motion")["motion"];
-}
-
-function Handle({ text, mode, localViewMode, handleToggle, motion }: HandleProps) {
-  const isActive = mode == localViewMode;
-
-  const onClick = () => {
-    if (!isActive) {
-      handleToggle(mode);
-    }
-  };
-
-  return (
-    <div className="option" onClick={onClick}>
-      <div className={classnames("text", isActive && "active")}>{text}</div>
-
-      {isActive && (
-        <motion.div
-          className="handle"
-          layoutId="handle"
-          transition={{
-            type: "spring",
-            stiffness: 600,
-            damping: 50,
-          }}
-        />
-      )}
-    </div>
-  );
-}
+const MODES = [
+  {
+    mode: "non-dev",
+    label: "Viewer",
+  },
+  {
+    mode: "dev",
+    label: "DevTools",
+  },
+] as const;
 
 function ViewToggle({ viewMode, setViewMode }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
-  const [framerMotion, setFramerMotion] = useState<typeof import("framer-motion") | null>(null);
   const [localViewMode, setLocalViewMode] = useState(viewMode);
   const toggleTimeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const preloadPromise = useRef<Promise<typeof import("../Views/DevView")> | null>(null);
-
-  useEffect(() => {
-    import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
-  }, []);
 
   useEffect(() => {
     // It's possible for the view to be toggled by something else apart from this component.
@@ -68,13 +37,6 @@ function ViewToggle({ viewMode, setViewMode }: PropsFromRedux) {
       setLocalViewMode(viewMode);
     }
   }, [viewMode]);
-
-  // Don't show anything while waiting for framer-motion to be imported.
-  if (!framerMotion) {
-    return null;
-  }
-
-  const { motion, AnimateSharedLayout } = framerMotion;
 
   const handleToggle = async (mode: ViewMode) => {
     setLocalViewMode(mode);
@@ -98,26 +60,19 @@ function ViewToggle({ viewMode, setViewMode }: PropsFromRedux) {
   }
 
   return (
-    <AnimateSharedLayout type="crossfade">
-      <div className="view-toggle" role="button">
-        <div className="inner">
-          <Handle
-            text="Viewer"
-            mode="non-dev"
-            localViewMode={localViewMode}
-            handleToggle={handleToggle}
-            motion={motion}
-          />
-          <Handle
-            text="DevTools"
-            mode="dev"
-            localViewMode={localViewMode}
-            handleToggle={handleToggle}
-            motion={motion}
-          />
+    <div className="view-toggle" role="button">
+      <div
+        className="handle"
+        style={{
+          left: `${(MODES.findIndex(({ mode }) => mode === localViewMode) / MODES.length) * 100}%`,
+        }}
+      ></div>
+      {MODES.map(({ mode, label }, idx) => (
+        <div key={mode} className="option" onClick={() => handleToggle(mode)}>
+          <div className={classnames("text", { active: localViewMode === mode })}>{label}</div>
         </div>
-      </div>
-    </AnimateSharedLayout>
+      ))}
+    </div>
   );
 }
 
