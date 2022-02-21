@@ -118,7 +118,9 @@ function RecordingPage({
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {
-    if (!store) return;
+    if (!store) {
+      return;
+    }
     if (!recordingId) {
       setExpectedError({
         message: "Invalid ID",

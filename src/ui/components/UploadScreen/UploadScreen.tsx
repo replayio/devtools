@@ -79,7 +79,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         type="submit"
         disabled={shouldDisableActions}
         value={isSaving ? `Uploading…` : `Save`}
-        className="cursor-pointer rounded-xl bg-primaryAccent hover:bg-primaryAccentHover py-3.5 px-16 font-bold text-white"
+        className="cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-white hover:bg-primaryAccentHover"
       />
     </div>
   );
@@ -112,7 +112,7 @@ function ReplayScreenshot({
   showLimitWarning: boolean;
 }) {
   return (
-    <div className="short:hidden relative h-64 rounded-lg bg-jellyfish px-6 pt-6 shadow-xl">
+    <div className="relative h-64 rounded-lg bg-jellyfish px-6 pt-6 shadow-xl short:hidden">
       {showLimitWarning ? <LimitWarning /> : null}
       <img src={screenData} className="m-auto h-full" />
     </div>
@@ -189,7 +189,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
-          <div className="short:h-auto mb-10 flex flex-row space-x-4">
+          <div className="mb-10 flex flex-row space-x-4 short:h-auto">
             <div
               className="relative flex flex-col overflow-hidden rounded-xl text-lg font-medium shadow-xl"
               style={{ width: "620px" }}

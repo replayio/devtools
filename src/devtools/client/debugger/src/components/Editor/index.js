@@ -361,7 +361,9 @@ class Editor extends PureComponent {
 
   setText(props, editor) {
     const { selectedSource, symbols } = props;
-    if (!editor) return;
+    if (!editor) {
+      return;
+    }
 
     // check if we previously had a selected source
     if (!selectedSource) {

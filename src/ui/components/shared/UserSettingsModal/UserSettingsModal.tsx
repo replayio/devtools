@@ -102,7 +102,9 @@ function UserAPIKeys() {
   const { addUserApiKey, loading: addLoading, error: addError } = hooks.useAddUserApiKey();
   const { deleteUserApiKey } = hooks.useDeleteUserApiKey();
 
-  if (loading) return null;
+  if (loading) {
+    return null;
+  }
 
   return (
     <APIKeys

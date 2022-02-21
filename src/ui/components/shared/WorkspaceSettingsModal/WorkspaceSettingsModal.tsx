@@ -227,7 +227,9 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
     }
   }, [view]);
 
-  if (!(workspaceId && workspace)) return null;
+  if (!(workspaceId && workspace)) {
+    return null;
+  }
 
   const tab =
     selectedTab || workspace.subscription?.status === "canceled" ? "Billing" : "Team Members";

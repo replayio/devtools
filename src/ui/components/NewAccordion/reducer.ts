@@ -161,7 +161,9 @@ export function reducer(state: AccordionState, action: AccordionAction) {
 
       let indexToResize = index;
       const nextExpandedIndex = originalSections.findIndex((s, i) => {
-        if (i <= index) return false;
+        if (i <= index) {
+          return false;
+        }
         return s.expanded;
       });
 
@@ -182,7 +184,9 @@ export function reducer(state: AccordionState, action: AccordionAction) {
     case "resize": {
       const { sections, resizingParams } = state;
 
-      if (!resizingParams) return { ...state };
+      if (!resizingParams) {
+        return { ...state };
+      }
 
       const { currentY } = action;
       const { initialY, index, originalSections } = resizingParams;

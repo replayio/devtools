@@ -44,7 +44,7 @@ const Preview: FC<{ expression: string }> = ({ expression }) => {
       <div className="absolute opacity-0" ref={gripRef}>
         <ObjectInspector value={previewValue} />
       </div>
-      <div className="overflow-ellipsis overflow-hidden whitespace-pre opacity-50">{text}</div>
+      <div className="overflow-hidden overflow-ellipsis whitespace-pre opacity-50">{text}</div>
     </div>
   );
 };

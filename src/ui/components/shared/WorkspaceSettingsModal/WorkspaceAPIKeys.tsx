@@ -12,7 +12,9 @@ export default function WorkspaceAPIKeys({ workspaceId }: { workspaceId: string 
   const { deleteWorkspaceApiKey } = hooks.useDeleteWorkspaceApiKey();
   const { data } = hooks.useGetWorkspaceApiKeys(workspaceId);
 
-  if (!data) return null;
+  if (!data) {
+    return null;
+  }
 
   return (
     <APIKeys

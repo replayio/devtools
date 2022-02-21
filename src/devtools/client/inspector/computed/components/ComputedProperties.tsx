@@ -30,7 +30,9 @@ function ComputedProperties(props: PropsFromRedux) {
   let allPropertiesHidden = true;
   const renderedProperties = properties.map(property => {
     const hidden = isHidden(property, search, showBrowserStyles);
-    if (hidden) return null;
+    if (hidden) {
+      return null;
+    }
     dark = !dark;
     allPropertiesHidden = false;
     const isExpanded = expandedProperties.has(property.name);

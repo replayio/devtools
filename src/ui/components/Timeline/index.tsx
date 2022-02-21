@@ -157,13 +157,17 @@ class Timeline extends Component<PropsFromRedux> {
     } = this.props;
     const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
-      if (disabled) return;
+      if (disabled) {
+        return;
+      }
       trackEvent("timeline.replay");
       clearPendingComment();
       replayPlayback();
     };
     const togglePlayback = () => {
-      if (disabled) return;
+      if (disabled) {
+        return;
+      }
 
       clearPendingComment();
       if (playback) {
@@ -319,7 +323,9 @@ class Timeline extends Component<PropsFromRedux> {
   renderTrimmedRegion() {
     const { trimRegion, zoomRegion } = this.props;
 
-    if (!trimRegion) return null;
+    if (!trimRegion) {
+      return null;
+    }
 
     const { startTime, endTime } = trimRegion;
     const { endTime: duration } = zoomRegion;

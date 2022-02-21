@@ -130,7 +130,11 @@ function ViewerContent({
               </PrimaryButton>
             </>
           ) : (
-            <SecondaryButton className="bg-white hover:bg-primaryAccentHover hover:text-white" color="blue" onClick={() => setIsEditing(true)}>
+            <SecondaryButton
+              className="bg-white hover:bg-primaryAccentHover hover:text-white"
+              color="blue"
+              onClick={() => setIsEditing(true)}
+            >
               Edit
             </SecondaryButton>
           )}

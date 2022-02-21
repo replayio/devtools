@@ -22,7 +22,9 @@ export class ElementPageStyle {
 
     const rules = getRules(this.store.getState()) || [];
     for (const rule of rules) {
-      if (rule.isUnmatched) continue;
+      if (rule.isUnmatched) {
+        continue;
+      }
 
       for (const declaration of rule.declarations) {
         if (declaration.name === property) {

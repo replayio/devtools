@@ -179,9 +179,13 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       assert(pause);
       const nodeFront = pause.getNodeFront(nodeId);
       const childNodes = await nodeFront.childNodes();
-      if (ThreadFront.currentPause !== pause) return;
+      if (ThreadFront.currentPause !== pause) {
+        return;
+      }
       await dispatch(addChildren(nodeFront, childNodes));
-      if (ThreadFront.currentPause !== pause) return;
+      if (ThreadFront.currentPause !== pause) {
+        return;
+      }
       dispatch(updateChildrenLoading(nodeId, false));
     }
   };
@@ -225,7 +229,9 @@ export function selectionChanged(
     // expand each ancestor, loading its children if necessary
     for (const ancestor of ancestors) {
       await dispatch(expandNode(ancestor.objectId(), shouldScrollIntoView));
-      if (selection.nodeFront !== selectedNode) return;
+      if (selection.nodeFront !== selectedNode) {
+        return;
+      }
     }
 
     if (shouldScrollIntoView) {

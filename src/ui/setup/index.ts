@@ -33,7 +33,9 @@ export async function bootstrapApp() {
 
   const store = bootstrapStore(initialState);
 
-  if (typeof window === "undefined") return store;
+  if (typeof window === "undefined") {
+    return store;
+  }
 
   setupTelemetry();
   setupDOMHelpers();

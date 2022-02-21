@@ -43,7 +43,9 @@ function wrapped<T>(cbk: (...args: any[]) => Promise<T>, pageLog = log, inline =
       throw e;
     } finally {
       depth -= i;
-      if (!inline) await pageLog(`< ${name}`);
+      if (!inline) {
+        await pageLog(`< ${name}`);
+      }
     }
   };
 }
