@@ -50,7 +50,6 @@
     "devtools-sprintf-js": "^1.0.3",
     "dotenv": "^16.0.0",
     "escape-html": "^1.0.3",
-    "framer-motion": "^3.10.0",
     "fuzzaldrin-plus": "^0.6.0",
     "graphql": "^15.3.0",
     "jest": "^27.5.1",
