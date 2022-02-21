@@ -265,7 +265,7 @@ const RequestDetails = ({
   return (
     <div className="bg-themeBodyBackground border-l min-w-full overflow-scroll">
       <div
-        className="flex border-b justify-between bg-toolbarBackground items-center sticky z-10 top-0"
+        className="flex justify-between bg-toolbarBackground items-center sticky z-10 top-0"
         style={{ height: 25 }}
       >
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
