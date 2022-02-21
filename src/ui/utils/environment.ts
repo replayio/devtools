@@ -16,7 +16,9 @@ declare global {
 }
 
 export const url = usesWindow(win => {
-  if (!win) return new URL("https://app.replay.io");
+  if (!win) {
+    return new URL("https://app.replay.io");
+  }
 
   return new URL(win.location.href);
 });
@@ -124,7 +126,9 @@ export function launchAndRecordUrl(url: string) {
 
 // Strip the URL of any query parameters
 export function getDisplayedUrl(url: string) {
-  if (!url) return "";
+  if (!url) {
+    return "";
+  }
 
   const urlObj = new URL(url);
   const { hostname, pathname } = urlObj;

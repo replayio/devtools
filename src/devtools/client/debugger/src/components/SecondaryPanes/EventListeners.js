@@ -115,7 +115,7 @@ class EventListeners extends Component {
     return (
       <form className="event-search-form" onSubmit={e => e.preventDefault()}>
         <input
-          className={classnames("w-full event-search-input bg-gray-100 px-2 py-1", { focused })}
+          className={classnames("event-search-input w-full bg-gray-100 px-2 py-1", { focused })}
           placeholder={placeholder}
           value={searchText}
           onChange={this.onInputChange}

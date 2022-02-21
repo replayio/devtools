@@ -28,7 +28,7 @@ function ClearButton(props: PropsFromRedux) {
 
   return (
     <button
-      className="flex devtools-clear-icon"
+      className="devtools-clear-icon flex"
       title={isEnabled ? "Clear console evaluations" : "No console evaluations to clear"}
       disabled={!isEnabled}
       onClick={onClick}

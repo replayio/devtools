@@ -28,7 +28,9 @@ const useImageUpload = (
   const [img, setImg] = useState(image);
 
   const onUpload = (input: HTMLInputElement) => {
-    if (!input.files?.[0]) return;
+    if (!input.files?.[0]) {
+      return;
+    }
 
     input.files[0].arrayBuffer().then(b => {
       if (maxSize && b.byteLength > maxSize * 1024) {

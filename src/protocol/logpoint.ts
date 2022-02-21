@@ -49,7 +49,9 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
   }
 
   points.forEach(async ({ point, time, frame }) => {
-    if (!frame) return;
+    if (!frame) {
+      return;
+    }
     const location = await ThreadFront.getPreferredLocation(frame);
     assert(location);
     LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
