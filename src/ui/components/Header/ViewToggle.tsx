@@ -67,7 +67,7 @@ function ViewToggle({ viewMode, setViewMode }: PropsFromRedux) {
           left: `${(MODES.findIndex(({ mode }) => mode === localViewMode) / MODES.length) * 100}%`,
         }}
       ></div>
-      {MODES.map(({ mode, label }, idx) => (
+      {MODES.map(({ mode, label }) => (
         <div key={mode} className="option" onClick={() => handleToggle(mode)}>
           <div className={classnames("text", { active: localViewMode === mode })}>{label}</div>
         </div>

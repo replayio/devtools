@@ -23,7 +23,6 @@
   background: white;
   width: calc(50% - 2px);
   top: 0;
-  left: 0;
   margin: 1px;
   transition: left 200ms ease-out;
 }
