@@ -55,7 +55,9 @@ async function createComputedProperties(
   elementStyle: ElementStyle
 ): Promise<ComputedPropertyState[]> {
   const computed = await elementStyle.element.getComputedStyle();
-  if (!computed) return [];
+  if (!computed) {
+    return [];
+  }
 
   const outputParser = new OutputParser(document, CSSProperties);
 
@@ -63,12 +65,16 @@ async function createComputedProperties(
   for (const [name, value] of computed) {
     // the computed style also contains CSS variables, which we don't want to show
     // as properties in the computed view
-    if (name.startsWith("--")) continue;
+    if (name.startsWith("--")) {
+      continue;
+    }
 
     let inheritanceCounter = 1;
     const selectors: MatchedSelectorState[] = [];
     for (const rule of elementStyle.rules || []) {
-      if (rule.isUnmatched) continue;
+      if (rule.isUnmatched) {
+        continue;
+      }
 
       let selector: string;
       let stylesheet: string;

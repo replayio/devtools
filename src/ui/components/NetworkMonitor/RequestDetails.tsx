@@ -263,9 +263,9 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="bg-themeBodyBackground border-l min-w-full overflow-scroll">
+    <div className="min-w-full overflow-scroll border-l bg-themeBodyBackground">
       <div
-        className="flex justify-between bg-toolbarBackground items-center sticky z-10 top-0"
+        className="sticky top-0 z-10 flex items-center justify-between border-b bg-toolbarBackground"
         style={{ height: 25 }}
       >
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />

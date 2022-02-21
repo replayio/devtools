@@ -89,7 +89,9 @@ function HeaderTitle({
     return editing === EditState.Inactive && setEditing(EditState.Active);
   };
   const onBlur = () => {
-    if (editing !== EditState.Active) return;
+    if (editing !== EditState.Active) {
+      return;
+    }
     const currentValue = inputNode.current!.textContent || "";
 
     setEditing(EditState.Saving);
@@ -102,7 +104,9 @@ function HeaderTitle({
   const displayTitle = hasTitle ? recording.title : "Untitled";
 
   useLayoutEffect(() => {
-    if (!inputNode.current) return;
+    if (!inputNode.current) {
+      return;
+    }
 
     if (!editing) {
       inputNode.current.innerText = hasTitle ? recording.title : "Untitled";

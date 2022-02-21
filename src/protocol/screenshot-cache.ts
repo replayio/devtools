@@ -97,7 +97,9 @@ export class ScreenshotCache {
   }
 
   private async downloadQueued() {
-    if (!this.queuedDownloadForPreview) return;
+    if (!this.queuedDownloadForPreview) {
+      return;
+    }
 
     const { point, paintHash, promise, resolve, reject } = this.queuedDownloadForPreview;
 

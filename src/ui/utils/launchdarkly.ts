@@ -18,7 +18,9 @@ function initLaunchDarkly(user?: UserInfo) {
 }
 
 function getFeatureFlag(name: string, defaultValue: any) {
-  if (!ready) return defaultValue;
+  if (!ready) {
+    return defaultValue;
+  }
 
   return client.variation(name, defaultValue);
 }

@@ -140,16 +140,16 @@ export const ResponsiveTabs = ({
         <span
           onClick={() => setDropdownOpen(!dropdownOpen)}
           ref={dropdownRef}
-          className={cx("absolute right-0 top-0 h-full flex items-center", dropdownClassName)}
+          className={cx("absolute right-0 top-0 flex h-full items-center", dropdownClassName)}
         >
           {dropdownButton ?? (
-            <span className="h-full select-none cursor-pointer px-1 flex items-center hover:bg-[color:var(--theme-tab-background)]">
+            <span className="flex h-full cursor-pointer select-none items-center px-1 hover:bg-[color:var(--theme-tab-background)]">
               ···
             </span>
           )}
           {dropdownOpen && (
             <div
-              className="absolute right-0 top-full responsive-tabs-dropdown"
+              className="responsive-tabs-dropdown absolute right-0 top-full"
               style={dropdownStyle}
             >
               {orderedTabs.slice(visibleItemsCount).map(tab => (

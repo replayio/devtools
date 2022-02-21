@@ -32,7 +32,9 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
   const { isAuthenticated } = useAuth0();
 
-  if (!recording) return null;
+  if (!recording) {
+    return null;
+  }
 
   const time = formatRelativeTime(new Date(recording.date));
   const { summary, icon } = getPrivacySummaryAndIcon(recording);

@@ -17,7 +17,9 @@ export function getRecordingURL(recording: Recording): string {
 
 export function getRecordingId(): string | undefined {
   return usesWindow(win => {
-    if (!win) return undefined;
+    if (!win) {
+      return undefined;
+    }
 
     const parts = window.location.pathname.split("/");
     if (parts[1] === "recording") {

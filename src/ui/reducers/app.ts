@@ -238,7 +238,9 @@ export const getAnalysisPointsForLocation = (
   location: Location | null,
   condition = ""
 ) => {
-  if (!location) return;
+  if (!location) {
+    return;
+  }
   const trimRegion = getTrimRegion(state);
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
