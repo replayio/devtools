@@ -33,7 +33,7 @@ export const initialAppState: AppState = {
   recordingTarget: null,
   recordingWorkspace: null,
   sessionId: null,
-  theme: "theme-dark",
+  theme: "theme-light",
   trialExpired: false,
   unexpectedError: null,
   uploading: null,

@@ -145,14 +145,11 @@
   /* Jon's new tab work */
 
   --chrome: #f6f7f7;
+  --theme-toolbar-hover: #fff;
   --tab-standard-color: rgba(0, 0, 0, 0.5);
   --theme-tab-background: #ececec;
-  --tab-standard-hover-textcolor: white;
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
-  --theme-toolbar-hover: var(--grey-20);
-
-  --tab-standard-hover-bgcolor: #fff;
   --theme-menu-highlight: #f3f4f6;
   --icon-color: var(--theme-body-color);
   --icon-color-disabled: red;

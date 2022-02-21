@@ -68,7 +68,6 @@
 }
 
 .source-tab .filename:hover {
-  color: var(--tab-standard-hover-textcolor);
 }
 
 .source-tab {
@@ -85,7 +84,6 @@
 
 .source-tab:not(.active):hover {
   --tab-line-color: var(--tab-line-hover-color);
-  background-color: var(--theme-toolbar-hover);
 }
 
 .source-tab .img.prettyPrint,
