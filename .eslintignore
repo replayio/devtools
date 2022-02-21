@@ -2,3 +2,4 @@ src/devtools/client/debugger/**/fixtures/**
 node_modules
 src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
+sourcemapVisualizer.js
