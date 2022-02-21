@@ -36,8 +36,9 @@
   z-index: 1;
   transition: ease-in-out 80ms color;
 }
+
 .view-toggle .active {
-  color: var(--tab-selected-color);
+  color: var(--theme-body-color);
   font-weight: 400;
 }
 
