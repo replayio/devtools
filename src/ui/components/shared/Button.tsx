@@ -7,14 +7,14 @@ type ColorScale = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 type Colors = "gray" | "blue" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "white";
 
 const STANDARD_CLASSES = {
-  sm: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded",
-  md: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md",
-  lg: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md",
-  xl: "inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
+  sm: "flex-shrink-0 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded",
+  md: "flex-shrink-0 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md",
+  lg: "flex-shrink-0 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md",
+  xl: "flex-shrink-0 items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
   "2xl":
-    "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
+    "flex-shrink-0 items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
   "3xl":
-    "inline-flex items-center px-6 py-3 border border-transparent text-2xl font-medium rounded-md",
+    "flex-shrink-0 items-center px-6 py-3 border border-transparent text-2xl font-medium rounded-md",
 };
 
 function getColorCode(color: Colors, num: ColorScale) {
