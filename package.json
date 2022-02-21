@@ -50,7 +50,7 @@
     "date-fns": "^2.19.0",
     "debug": "^4.2.0",
     "devtools-sprintf-js": "^1.0.3",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.0.0",
     "escape-html": "^1.0.3",
     "framer-motion": "^3.10.0",
     "fuzzaldrin-plus": "^0.6.0",
