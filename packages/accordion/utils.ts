@@ -1,5 +1,5 @@
-import { findLastIndex } from "lodash";
-import { HEADER_HEIGHT, MIN_HEIGHT } from ".";
+import findLastIndex from "lodash/findLastIndex";
+import { HEADER_HEIGHT, MIN_HEIGHT } from "./constants";
 import { Section } from "./reducer";
 
 // Utils

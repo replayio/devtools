@@ -9,6 +9,7 @@ import React, {
   useRef,
   FC,
 } from "react";
+import { HANDLE_HEIGHT, BORDER_HEIGHT, MIN_HEIGHT } from "./constants";
 
 import {
   collapseSection,
@@ -26,11 +27,6 @@ import {
   startResizing,
   AccordionAction,
 } from "./reducer";
-
-export const MIN_HEIGHT = 150;
-export const BORDER_HEIGHT = 1;
-export const HANDLE_HEIGHT = 4;
-export const HEADER_HEIGHT = 36 + BORDER_HEIGHT;
 
 // When I wrote this code God and I knew what I was doing. Now only God knows.
 
