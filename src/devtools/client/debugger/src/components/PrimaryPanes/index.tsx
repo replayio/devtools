@@ -19,7 +19,7 @@ import SourcesTree from "./SourcesTree";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import QuickOpenButton from "./QuickOpenButton";
-import { Accordion, AccordionPane } from "ui/components/NewAccordion/Accordion";
+import { Accordion, AccordionPane } from "@recordreplay/accordion";
 import { useDebuggerPrefs } from "../../utils/prefs";
 
 function PrimaryPanes(props: PropsFromRedux) {

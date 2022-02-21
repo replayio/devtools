@@ -2,13 +2,14 @@ import classNames from "classnames";
 import React, {
   MouseEventHandler,
   Children,
+  Dispatch,
   ReactElement,
   useEffect,
   useReducer,
   useRef,
   FC,
 } from "react";
-import { Dispatch } from "react";
+
 import {
   collapseSection,
   containerResize,
