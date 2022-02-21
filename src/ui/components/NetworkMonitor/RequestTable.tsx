@@ -47,7 +47,7 @@ const RequestTable = ({
         className={classNames(styles.request, "relative")}
         {...getTableProps()}
       >
-        <div className="sticky top-0 z-10 border-b bg-toolbarBackground">
+        <div className="sticky top-0 z-10 border-b border-splitter bg-toolbarBackground">
           <HeaderGroups columns={columns} headerGroups={headerGroups} />
         </div>
         <div style={{ minWidth: "fit-content" }} {...getTableBodyProps()}>
