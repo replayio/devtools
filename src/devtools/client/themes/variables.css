@@ -340,7 +340,7 @@
   --theme-selection-color: #ffffff;
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: var(--grey-70);
+  --theme-splitter-color: black;
   --theme-emphasized-splitter-color: var(--grey-60);
   --theme-emphasized-splitter-color-hover: var(--grey-50);
 
