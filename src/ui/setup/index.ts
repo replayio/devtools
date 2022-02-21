@@ -56,7 +56,7 @@ export async function bootstrapApp() {
     }
 
     const auth0User = tokenManager.auth0Client?.user;
-    setUserInBrowserPrefs(auth0User);
+    setUserInBrowserPrefs(auth0User ?? null);
     if (auth0User?.email) {
       bootIntercom({ email: auth0User.email });
     }

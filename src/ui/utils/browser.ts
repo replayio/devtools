@@ -1,4 +1,6 @@
-export function setUserInBrowserPrefs(user: { sub: string } | null) {
+import { User } from "@auth0/auth0-react";
+
+export function setUserInBrowserPrefs(user: User | null) {
   const _user = user === null ? "" : user;
   window.dispatchEvent(
     new window.CustomEvent("WebChannelMessageToChrome", {
