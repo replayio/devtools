@@ -176,5 +176,8 @@
   "bugs": {
     "url": "https://github.com/RecordReplay/devtools/issues"
   },
-  "homepage": "https://github.com/RecordReplay/devtools#readme"
+  "homepage": "https://github.com/RecordReplay/devtools#readme",
+  "workspaces": [
+    "packages/accordion"
+  ]
 }
