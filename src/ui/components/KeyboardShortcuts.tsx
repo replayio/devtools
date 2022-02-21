@@ -13,7 +13,9 @@ import { getSelectedSource } from "devtools/client/debugger/src/reducers/sources
 
 function setupShortcuts() {
   return usesWindow(win => {
-    if (!win) return null;
+    if (!win) {
+      return null;
+    }
     return new KeyShortcuts({ window: win, target: win.document });
   });
 }
@@ -32,11 +34,15 @@ function KeyboardShortcuts({
   viewMode,
 }: PropsFromRedux) {
   const addShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
-    if (!globalShortcuts) return;
+    if (!globalShortcuts) {
+      return;
+    }
     globalShortcuts.on(key, callback);
   };
   const removeShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
-    if (!globalShortcuts) return;
+    if (!globalShortcuts) {
+      return;
+    }
     globalShortcuts.off(key, callback);
   };
 

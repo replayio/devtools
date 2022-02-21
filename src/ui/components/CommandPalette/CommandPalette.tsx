@@ -67,6 +67,9 @@ const DEFAULT_COMMANDS: readonly CommandKey[] = [
   "open_sources",
 ] as const;
 
+const COMMAND_HEIGHT = 36;
+const ITEMS_TO_SHOW = 4;
+
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
 
@@ -141,8 +144,8 @@ function CommandPalette({
 
   return (
     <div
-      className="flex h-52 w-full flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
-      style={{ maxWidth: "400px", minWidth: "320px" }}
+      className="flex w-full flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+      style={{ maxWidth: 400, minWidth: 320 }}
     >
       <div className="border-b border-gray-300 p-3">
         <div className="relative flex items-center text-primaryAccent">
@@ -155,7 +158,12 @@ function CommandPalette({
           <PaletteShortcut />
         </div>
       </div>
-      <div className="mb-2 flex flex-grow flex-col overflow-auto text-sm">
+      <div
+        className="flex flex-grow flex-col overflow-auto text-sm"
+        // By making sure there is always a fraction of an item showing we show
+        // that there is more to scroll to "beyond the fold"
+        style={{ maxHeight: COMMAND_HEIGHT * ITEMS_TO_SHOW }}
+      >
         {shownCommands.map((command: Command, index: number) => (
           <CommandButton active={index == activeIndex} command={command} key={command.label} />
         ))}

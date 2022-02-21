@@ -71,7 +71,9 @@ function BreakpointTimeline({
   const [hoveredTime, setHoveredTime] = useState<number | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const onClick = (e: React.MouseEvent) => {
-    if (!hoveredTime) return;
+    if (!hoveredTime) {
+      return;
+    }
 
     const event = mostRecentPaintOrMouseEvent(hoveredTime);
     if (event && event.point) {

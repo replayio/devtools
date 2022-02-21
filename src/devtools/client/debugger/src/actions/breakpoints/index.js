@@ -29,7 +29,6 @@ import {
 import { setBreakpointPositions } from "./breakpointPositions";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
-import remapLocations from "./remapLocations";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -99,25 +98,6 @@ export function removeAllBreakpoints(cx) {
 export function removeBreakpoints(cx, breakpoints) {
   return async ({ dispatch }) => {
     return Promise.all(breakpoints.map(bp => dispatch(_removeBreakpoint(cx, bp))));
-  };
-}
-
-export function remapBreakpoints(cx, sourceId) {
-  return async ({ dispatch, getState, sourceMaps }) => {
-    const breakpoints = getBreakpointsForSource(getState(), sourceId);
-    const newBreakpoints = await remapLocations(breakpoints, sourceId, sourceMaps);
-
-    // Normally old breakpoints will be clobbered if we re-add them, but when
-    // remapping we have changed the source maps and the old breakpoints will
-    // have different locations than the new ones. Manually remove the
-    // old breakpoints before adding the new ones.
-    for (const bp of breakpoints) {
-      dispatch(_removeBreakpoint(cx, bp));
-    }
-
-    for (const bp of newBreakpoints) {
-      await dispatch(addBreakpoint(cx, bp.location, bp.options, bp.disabled));
-    }
   };
 }
 

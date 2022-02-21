@@ -119,9 +119,9 @@ export function SourceOutline({
   }
 
   return (
-    <div className={classnames("flex h-full flex-col")}>
+    <div className={classnames("flex h-full flex-col space-y-2")}>
       <OutlineFilter filter={filter} updateFilter={setFilter} />
-      <div className="outline-list my-1 flex-grow">
+      <div className="outline-list flex-grow">
         <AutoSizer>
           {({ height, width }) => {
             const list = (

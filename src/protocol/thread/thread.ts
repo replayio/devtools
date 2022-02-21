@@ -168,8 +168,6 @@ class _ThreadFront {
 
   mappedLocations = new MappedLocationCache();
 
-  skipPausing = false;
-
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
 
@@ -444,6 +442,14 @@ class _ThreadFront {
     });
   }
 
+  getGeneratedSourceIds(originalSourceId: SourceId) {
+    return this.sources.get(originalSourceId)?.generatedSourceIds;
+  }
+
+  getOriginalSourceIds(generatedSourceId: SourceId) {
+    return this.originalSources.map.get(generatedSourceId);
+  }
+
   async getSourceContents(sourceId: SourceId) {
     assert(this.sessionId);
     const { contents, contentType } = await client.Debugger.getSourceContents(
@@ -479,10 +485,6 @@ class _ThreadFront {
       this.sessionId
     );
     return lineLocations;
-  }
-
-  setSkipPausing(skip: boolean) {
-    this.skipPausing = skip;
   }
 
   async setBreakpoint(initialSourceId: SourceId, line: number, column: number, condition?: string) {
@@ -879,7 +881,7 @@ class _ThreadFront {
   ) {
     const sessionId = await this.waitForSession();
 
-    client.Console.findMessages({}, sessionId).then(({ overflow }) => {
+    const messagesLoaded = client.Console.findMessages({}, sessionId).then(({ overflow }) => {
       if (overflow) {
         console.warn("Too many console messages, not all will be shown");
         onConsoleOverflow();
@@ -906,6 +908,8 @@ class _ThreadFront {
       }
       onConsoleMessage(pause, message);
     });
+
+    return messagesLoaded;
   }
 
   async getRootDOMNode() {

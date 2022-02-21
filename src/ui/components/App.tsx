@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -32,6 +32,7 @@ import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
+import { useMaterialIconCheck } from "./shared/MaterialIcon";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -93,6 +94,7 @@ function App({ children, modal, theme }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
+  const { setAppNode } = useMaterialIconCheck();
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
@@ -135,7 +137,7 @@ function App({ children, modal, theme }: AppProps) {
   }
 
   return (
-    <div id="app-container">
+    <div id="app-container" className="material-icon-loading" ref={setAppNode}>
       {children}
       {modal ? <AppModal modal={modal} /> : null}
       <ConfirmRenderer />

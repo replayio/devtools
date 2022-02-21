@@ -40,8 +40,9 @@ function BreakpointNavigation({
   }
 
   useEffect(() => {
-    if (executionPoint && lastExecutionPoint !== executionPoint)
+    if (executionPoint && lastExecutionPoint !== executionPoint) {
       setLastExecutionPoint(executionPoint);
+    }
   }, [executionPoint]);
 
   useEffect(() => {

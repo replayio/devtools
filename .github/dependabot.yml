@@ -1,0 +1,12 @@
+# configuration documentation
+# https://docs.github.com/en/code-security/supply-chain-security/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 15
+    pull-request-branch-name:
+      separator: "-"

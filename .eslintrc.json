@@ -36,7 +36,8 @@
     "react/no-string-refs": 0,
     "react/no-find-dom-node": 0,
     "react/no-children-prop": 0,
-    "react/no-render-return-value": 0
+    "react/no-render-return-value": 0,
+    "curly": "error"
   },
   "settings": {
     "react": {

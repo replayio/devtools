@@ -361,7 +361,9 @@ class Editor extends PureComponent {
 
   setText(props, editor) {
     const { selectedSource, symbols } = props;
-    if (!editor) return;
+    if (!editor) {
+      return;
+    }
 
     // check if we previously had a selected source
     if (!selectedSource) {
@@ -494,7 +496,6 @@ const mapStateToProps = state => {
     selectedSource,
     searchOn: selectors.getActiveSearch(state) === "file",
     symbols: selectors.getSymbols(state, selectedSource),
-    skipPausing: selectors.getSkipPausing(state),
     selectedFrame: selectors.getSelectedFrame(state),
     mode: selectors.getViewMode(state),
   };

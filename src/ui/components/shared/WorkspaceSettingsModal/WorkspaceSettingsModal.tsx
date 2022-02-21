@@ -211,7 +211,7 @@ const settings: Settings<
 ];
 
 function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) {
-  const [tab, setTab] = useState<string>("Team Members");
+  const [selectedTab, setTab] = useState<string>();
   const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
   const { workspace } = hooks.useGetWorkspace(workspaceId!);
   const { userId: localUserId } = hooks.useGetUserId();
@@ -223,12 +223,16 @@ function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) 
         members: "Team Members",
         api: "API Keys",
       };
-      setTab(views[view] || "Team Members");
+      setTab(views[view]);
     }
   }, [view]);
 
-  if (!(workspaceId && workspace)) return null;
+  if (!(workspaceId && workspace)) {
+    return null;
+  }
 
+  const tab =
+    selectedTab || workspace.subscription?.status === "canceled" ? "Billing" : "Team Members";
   const roles = members?.find(m => m.userId === localUserId)?.roles;
   const isAdmin = roles?.includes("admin") || false;
   const isDebugger = roles?.includes("debugger") || false;

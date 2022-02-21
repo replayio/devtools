@@ -8,7 +8,9 @@ export default function useWidthObserver(node: HTMLElement) {
   const [width, setWidth] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     resizeObserver = new ResizeObserver(() => {
       const newWidth = node.getBoundingClientRect().width;

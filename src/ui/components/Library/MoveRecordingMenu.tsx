@@ -26,8 +26,9 @@ function MoveRecordingMenu({
     availableWorkspaces.length === 0 ||
     loading ||
     (workspace && (!workspace?.subscription || subscriptionExpired(workspace)))
-  )
+  ) {
     return null;
+  }
 
   return (
     <>

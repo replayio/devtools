@@ -125,6 +125,7 @@ import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
+import "ui/utils/sourcemapVisualizer.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import { useRouter } from "next/router";
 

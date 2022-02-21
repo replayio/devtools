@@ -500,14 +500,6 @@ checkbox:-moz-focusring {
 
 /* Images */
 
-.editor-bg {
-  transform: scale(2.4);
-  position: relative;
-  max-width: none;
-  left: -340px;
-  top: 400px;
-}
-
 .top-bubble {
   left: 100px;
   position: absolute;

@@ -59,7 +59,9 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
 
 function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: string) => void }) {
   const { confirmDestructive } = useConfirm();
-  if (apiKeys.length === 0) return null;
+  if (apiKeys.length === 0) {
+    return null;
+  }
 
   return (
     <section className="flex flex-auto flex-col">

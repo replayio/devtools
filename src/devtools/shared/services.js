@@ -475,7 +475,9 @@ PrefBranch.prototype = {
    * Helper function to initialize the root PrefBranch.
    */
   _initializeRoot: function () {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
     if (Services._defaultPrefsEnabled) {
       /* eslint-disable no-eval */

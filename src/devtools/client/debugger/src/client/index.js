@@ -35,8 +35,6 @@ let boundActions;
 let store;
 
 async function setupDebugger() {
-  store.dispatch(actions.connect("", ThreadFront.actor, {}, false));
-
   await ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
     clientEvents.newSource(ThreadFront, {
       source: {

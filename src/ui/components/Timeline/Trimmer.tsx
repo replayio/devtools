@@ -125,7 +125,9 @@ function Trimmer({
     // Only resize/shift the trimRegion if it exists in the first place, and we're
     // hovered on the timeline. We don't need to do those until the user clicks and set
     // the initial trimRegion by clicking on the timeline while in trimming mode.
-    if (!(trimRegion && hoverTime)) return;
+    if (!(trimRegion && hoverTime)) {
+      return;
+    }
 
     setDraggingTarget(target);
     const spanMidpoint = (trimRegion.endTime + trimRegion.startTime) / 2;
@@ -136,7 +138,9 @@ function Trimmer({
     setRelativeShift(null);
   };
   const onMouseMove = () => {
-    if (!(draggingTarget && relativeShift)) return;
+    if (!(draggingTarget && relativeShift)) {
+      return;
+    }
     updateTrimRegion(draggingTarget, relativeShift);
   };
   const onClick = (e: React.MouseEvent) => {

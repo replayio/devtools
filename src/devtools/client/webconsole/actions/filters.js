@@ -53,35 +53,3 @@ export function filterToggle(filter) {
     updatePrefs(filter, newValue);
   };
 }
-
-export function filterUpdate(filter, value) {
-  return ({ dispatch, getState, prefsService }) => {
-    const filters = getAllFilters(getState());
-    const filtersState = { ...filters, [filter]: value };
-
-    dispatch({
-      type: FILTER_TOGGLE,
-      filtersState,
-      filter,
-    });
-
-    prefsService.setBoolPref(PREFS.FILTER[filter.toUpperCase()], filtersState[filter]);
-  };
-}
-
-export function filtersClear() {
-  return ({ dispatch, getState, prefsService }) => {
-    const filtersState = getAllFilters(getState());
-
-    dispatch({
-      type: FILTERS_CLEAR,
-      filtersState,
-    });
-
-    for (const filter in filtersState) {
-      if (filter !== FILTERS.TEXT) {
-        prefsService.clearUserPref(PREFS.FILTER[filter.toUpperCase()]);
-      }
-    }
-  };
-}
