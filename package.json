@@ -24,7 +24,8 @@
     "upload-e2e-mapped-styles-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_styles.js*",
     "upload-e2e-mapped-minified-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_minified.js*",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@apollo/client": "^3.4.16",
@@ -141,6 +142,8 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "fs-extra": "^10.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
     "mini-css-extract-plugin": "^2.5.3",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^8.4.6",
@@ -176,5 +179,11 @@
   "bugs": {
     "url": "https://github.com/RecordReplay/devtools/issues"
   },
-  "homepage": "https://github.com/RecordReplay/devtools#readme"
+  "homepage": "https://github.com/RecordReplay/devtools#readme",
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.ts": "eslint --cache --fix",
+    "*.jsx": "eslint --cache --fix",
+    "*.tsx": "eslint --cache --fix"
+  }
 }

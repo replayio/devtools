@@ -37,7 +37,8 @@
     "react/no-find-dom-node": 0,
     "react/no-children-prop": 0,
     "react/no-render-return-value": 0,
-    "curly": "error"
+    "curly": "error",
+    "@typescript-eslint/explicit-function-return-type": "off"
   },
   "settings": {
     "react": {
@@ -46,7 +47,15 @@
   },
   "overrides": [
     {
-      "files": ["*.ts"]
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": [
+          "error",
+          {
+            "allowExpressions": true
+          }
+        ]
+      }
     }
   ]
 }
