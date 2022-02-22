@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { actions } from "ui/actions";
@@ -16,14 +16,26 @@ const getPosition = (time: number, zoom: ZoomRegion) => {
   return clamp(position, 0, 100);
 };
 
-const initializeTrimRegion = (hoverTime: number, zoom: ZoomRegion) => {
-  const duration = zoom.endTime;
+function ResizeMask({
+  onMouseUp,
+  onMouseMove,
+}: {
+  onMouseUp: ()=> void;
+  onMouseMove: ()=> void;
+}) {
+  // This is so that the mask would overlay the mask overlay and we can detect
+  // mouse movement throughout the entire screen.
+  const zIndex = 100;
 
-  return {
-    startTime: clamp(hoverTime - duration * 0.1, 0, duration),
-    endTime: clamp(hoverTime + duration * 0.1, 0, duration),
-  };
-};
+  return (
+    <div
+      onMouseUp={onMouseUp}
+      onMouseMove={onMouseMove}
+      className="fixed top-0 left-0 h-full w-full opacity-50"
+      style={{ cursor: "ew-resize", zIndex }}
+    />
+  );
+}
 
 function Draggers({
   dragging,
@@ -122,16 +134,9 @@ function Trimmer({
   const onDragStart = (e: React.MouseEvent, target: TrimOperation) => {
     e.stopPropagation();
 
-    // Only resize/shift the trimRegion if it exists in the first place, and we're
-    // hovered on the timeline. We don't need to do those until the user clicks and set
-    // the initial trimRegion by clicking on the timeline while in trimming mode.
-    if (!(trimRegion && hoverTime)) {
-      return;
-    }
-
     setDraggingTarget(target);
-    const spanMidpoint = (trimRegion.endTime + trimRegion.startTime) / 2;
-    setRelativeShift(spanMidpoint - hoverTime);
+    const spanMidpoint = (trimRegion!.endTime + trimRegion!.startTime) / 2;
+    setRelativeShift(spanMidpoint - hoverTime!);
   };
   const onMouseUp = () => {
     setDraggingTarget(null);
@@ -143,33 +148,27 @@ function Trimmer({
     }
     updateTrimRegion(draggingTarget, relativeShift);
   };
-  const onClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
 
-    if (!trimRegion && hoverTime) {
-      const trim = initializeTrimRegion(hoverTime, zoomRegion);
-      setTrimRegion(trim);
+  useEffect(() => {
+    if (!trimRegion) {
+      setTrimRegion({startTime: 0, endTime: zoomRegion.endTime});
     }
-  };
+  }, []);
 
   return (
-    <div
-      className="relative top-0 left-0 h-full w-full"
-      onClick={onClick}
-      {...{ onMouseUp, onMouseMove }}
-    >
-      {hoverTime && !trimRegion ? <TemporarySpan {...{ hoverTime, zoomRegion }} /> : null}
+    <div className="relative top-0 left-0 h-full w-full" >
       {trimRegion ? (
         <TrimSpan
-          {...{
-            trimRegion,
-            zoomRegion,
-            updateTrimRegion,
-            onDragStart,
-          }}
-          dragging={!!draggingTarget}
+        {...{
+          trimRegion,
+          zoomRegion,
+          updateTrimRegion,
+          onDragStart,
+        }}
+        dragging={!!draggingTarget}
         />
-      ) : null}
+        ) : null}
+      {draggingTarget ? <ResizeMask onMouseMove={onMouseMove} onMouseUp={onMouseUp} /> : null}
     </div>
   );
 }
