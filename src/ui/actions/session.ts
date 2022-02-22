@@ -8,7 +8,6 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
-import { validateUUID } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
@@ -19,13 +18,14 @@ import { ExpectedError, UnexpectedError } from "ui/state/app";
 import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
 import { getUserId, getUserInfo } from "ui/hooks/users";
-import { jumpToInitialPausePoint } from "./timeline";
+import { jumpToInitialPausePoint, seekToTime, startPlayback } from "./timeline";
 import { Recording } from "ui/types";
 import { subscriptionExpired } from "ui/utils/workspace";
 import { ApolloError } from "@apollo/client";
 import { getUserSettings } from "ui/hooks/settings";
 import { setViewMode } from "./layout";
 import { getSelectedPanel } from "ui/reducers/layout";
+import { videoReady } from "protocol/graphics";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -133,7 +133,8 @@ export function createSession(recordingId: string): UIThunkAction {
       ThreadFront.setTest(getTest() || undefined);
       ThreadFront.recordingId = recordingId;
 
-      dispatch(showLoadingProgress()).then(() => {
+      dispatch(showLoadingProgress());
+      videoReady.promise.then(() => {
         dispatch(onLoadingFinished());
       });
 

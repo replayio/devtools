@@ -1,7 +1,7 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 
 import { ThreadFront } from "./thread";
-import { assert, binarySearch } from "./utils";
+import { assert, binarySearch, defer, Deferred } from "./utils";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import {
@@ -18,6 +18,9 @@ import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
+import { max } from "lodash";
+
+const FIVE_SECONDS = 5000;
 
 const { features } = require("ui/utils/prefs");
 
@@ -110,10 +113,32 @@ const gMouseClickEvents: MouseEvent[] = [];
 // Device pixel ratio used by the current screenshot.
 let gDevicePixelRatio = 1;
 
+let gAllNecessaryPointsReceived = false;
+
+export const videoReady = defer();
+
+const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
+
 function onPaints({ paints }: paintPoints) {
-  paints.forEach(({ point, time, screenShots }) => {
+  paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
+
+    if (gAllNecessaryPointsReceived) {
+      // We are all set on the loading front, no need to practively grab these
+      // paints
+      return;
+    }
+
+    if (time < FIVE_SECONDS) {
+      const screenShotPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
+      gPaintPromises.push(screenShotPromise);
+    }
+    if (time > FIVE_SECONDS) {
+      gAllNecessaryPointsReceived = true;
+      await Promise.all(gPaintPromises);
+      videoReady.resolve(undefined);
+    }
   });
 }
 
@@ -193,7 +218,11 @@ class VideoPlayer {
 export const Video = new VideoPlayer();
 
 let onRefreshGraphics: (canvas: Canvas) => void;
-let paintPointsWaiter: Promise<findPaintsResult>;
+let paintPointsWaiter: Deferred<void> = defer();
+let hasAllPaintPoints = false;
+paintPointsWaiter.promise.then(() => {
+  hasAllPaintPoints = true;
+});
 
 export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
@@ -203,7 +232,7 @@ export function setupGraphics(store: UIStore) {
   Video.init(store);
 
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
-    paintPointsWaiter = client.Graphics.findPaints({}, sessionId);
+    client.Graphics.findPaints({}, sessionId);
     client.Graphics.addPaintPointsListener(onPaints);
 
     client.Session.findMouseEvents({}, sessionId);
@@ -289,14 +318,23 @@ export function mostRecentPaintOrMouseEvent(time: number) {
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
-export function nextPaintOrMouseEvent(time: number) {
-  const paintEntry = nextEntry(gPaintPoints, time);
-  const mouseEntry = nextEntry(gMouseEvents, time);
-  return closerEntry(time, paintEntry, mouseEntry);
+export function nextPaintEvent(time: number) {
+  if (hasAllPaintPoints) {
+    return nextEntry(gPaintPoints, time);
+  } else {
+    // We don't actually *have* all of the paintPoints yet, so we can't play
+    // past the end of the points that we have.
+    const lastLoadedPoint = max(gPaintPoints.map(p => p.time)) || 0;
+    return lastLoadedPoint < time
+      ? gPaintPoints[gPaintPoints.length - 1]
+      : nextEntry(gPaintPoints, time);
+  }
 }
 
-export function nextPaintEvent(time: number) {
-  return nextEntry(gPaintPoints, time);
+export function nextPaintOrMouseEvent(time: number) {
+  const paintEntry = nextPaintEvent(time);
+  const mouseEntry = nextEntry(gMouseEvents, time);
+  return closerEntry(time, paintEntry, mouseEntry);
 }
 
 export function previousPaintEvent(time: number) {
@@ -343,7 +381,6 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
-  await paintPointsWaiter;
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.
@@ -570,7 +607,7 @@ async function getScreenshotDimensions(screen: ScreenShot) {
 }
 
 export async function getFirstMeaningfulPaint(limit: number = 10) {
-  await paintPointsWaiter;
+  await videoReady.promise;
   for (const paintPoint of gPaintPoints.slice(0, limit)) {
     const { screen } = await getGraphicsAtTime(paintPoint.time);
     if (!screen) {
@@ -585,14 +622,12 @@ export async function getFirstMeaningfulPaint(limit: number = 10) {
 }
 
 // precache this many milliseconds
-const precacheTime = 5000;
+const precacheTime = FIVE_SECONDS;
 // startTime of the currently running precacheScreenshots() call
 let precacheStartTime = -1;
 
 export function precacheScreenshots(startTime: number): UIThunkAction {
   return async ({ dispatch, getState }) => {
-    await paintPointsWaiter;
-
     const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;
