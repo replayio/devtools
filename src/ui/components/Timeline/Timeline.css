@@ -160,7 +160,7 @@
 }
 
 .timeline .unloaded-regions {
-  height: 4px;
+  height: 5px;
   border-radius: 5px;
   background-image: url("/images/dotted-mask.svg");
   position: absolute;
@@ -173,6 +173,7 @@
 
 .timeline .unloaded-regions.end {
   right: 0;
+  transform: scaleX(-1);
 }
 
 .timeline .zoomboundary {

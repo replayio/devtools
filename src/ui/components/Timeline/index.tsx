@@ -386,7 +386,7 @@ class Timeline extends Component<PropsFromRedux> {
             ) : null}
             {this.renderPreviewMarkers()}
             <Comments />
-            {isTrimming ? <Trimmer width={this.overlayWidth} /> : null}
+            {isTrimming ? <Trimmer /> : null}
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>
