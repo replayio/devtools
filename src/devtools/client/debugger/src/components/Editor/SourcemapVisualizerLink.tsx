@@ -1,45 +1,26 @@
-import { ThreadFront } from "protocol/thread";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
-
-function getSourceToVisualize(selectedSource: Source | null, alternateSource: Source | null) {
-  if (!selectedSource) {
-    return undefined;
-  }
-  if (selectedSource.isOriginal) {
-    return selectedSource.id;
-  }
-  if (alternateSource?.isOriginal) {
-    return alternateSource.id;
-  }
-  if (ThreadFront.getSourceKind(selectedSource.id) === "prettyPrinted") {
-    // for pretty-printed sources we show the sourcemap of the non-pretty-printed version
-    return ThreadFront.getGeneratedSourceIds(selectedSource.id)?.[0];
-  } else if (ThreadFront.getOriginalSourceIds(selectedSource.id)?.length) {
-    return selectedSource.id;
-  }
-  return undefined;
-}
+import Icon from "ui/components/shared/Icon";
+import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/source";
 
 function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromRedux) {
-  const sourceId = getSourceToVisualize(selectedSource, alternateSource);
-  if (!sourceId) {
+  const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
+  if (!href) {
     return null;
-  }
-
-  let href = `/recording/${ThreadFront.recordingId}/sourcemap/${sourceId}`;
-  const dispatchUrl = new URL(location.href).searchParams.get("dispatch");
-  if (dispatchUrl) {
-    href += `?dispatch=${dispatchUrl}`;
   }
 
   return (
     <div className="flex items-center pl-4">
-      <a target="_blank" rel="noreferrer noopener" className="underline" href={href}>
-        Visualize sourcemap
+      <a target="_blank" rel="noreferrer noopener hover:underline" href={href}>
+        <Icon
+          size="small"
+          filename="external"
+          className="cursor-pointer bg-gray-800 group-hover:bg-primaryAccent"
+        />{" "}
+        Source Map
       </a>
     </div>
   );
