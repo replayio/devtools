@@ -330,7 +330,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     let initialSelectedIndex = -1;
     for (let sources = sm.sources, i = 0, n = sources.length; i < n; i++) {
       const option = document.createElement('option');
-      option.textContent = `${i}: ${sources[i].name}`;
+      option.textContent = sources[i].name;
       fileList.appendChild(option);
       if (sources[i].name === url) {
         initialSelectedIndex = i;

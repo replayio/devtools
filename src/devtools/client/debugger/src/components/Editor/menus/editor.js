@@ -6,7 +6,7 @@
 import { bindActionCreators } from "redux";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
-import { getRawSourceURL, shouldBlackbox } from "../../../utils/source";
+import { getRawSourceURL, getSourcemapVisualizerURL, shouldBlackbox } from "../../../utils/source";
 
 // menu items
 
@@ -51,14 +51,28 @@ const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
-export function editorMenuItems({ cx, editorActions, selectedSource }) {
+const sourceMapItem = (cx, selectedSource, alternateSource, editorActions) => ({
+  id: "node-menu-source-map",
+  label: "Visualize source map",
+  accesskey: selectedSource.isBlackBoxed ? "U" : "B",
+  disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource),
+  click: () => {
+    const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
+    if (href) {
+      window.open(href, "_blank");
+    }
+  },
+});
+
+export function editorMenuItems({ cx, editorActions, selectedSource, alternateSource }) {
   const items = [];
 
   items.push(
     copySourceUri2Item(selectedSource, editorActions),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
-    blackBoxMenuItem(cx, selectedSource, editorActions)
+    blackBoxMenuItem(cx, selectedSource, editorActions),
+    sourceMapItem(cx, selectedSource, alternateSource, editorActions)
   );
 
   return items;
