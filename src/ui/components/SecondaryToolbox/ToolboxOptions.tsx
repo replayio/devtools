@@ -18,10 +18,10 @@ function ToolboxOptions({
   return (
     <Menu as="div" className="secondary-toolbox-options relative inline-block text-left">
       <div>
-        <Menu.Button className="toolbox-options flex items-center text-gray-400 hover:text-gray-600">
+        <Menu.Button className="toolbox-options flex items-center text-iconColor hover:text-gray-600">
           <MaterialIcon
             outlined
-            className="material-icons-outlined text-xl leading-none text-gray-800 hover:text-primaryAccentHover"
+            className="material-icons-outlined text-xl leading-none text-iconColor hover:text-primaryAccentHover"
           >
             view_compact
           </MaterialIcon>

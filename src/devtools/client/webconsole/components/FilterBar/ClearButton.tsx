@@ -36,7 +36,9 @@ function ClearButton(props: PropsFromRedux) {
       <Icon
         filename="trash"
         className={
-          isEnabled ? "bg-gray-700 hover:bg-primaryAccent" : "bg-gray-300 hover:bg-primaryAccent"
+          isEnabled
+            ? "bg-iconColor hover:bg-primaryAccent"
+            : "bg-iconColorDisabled hover:bg-primaryAccent"
         }
       />
     </button>

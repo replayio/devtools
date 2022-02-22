@@ -44,7 +44,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-white">
+    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-themeBodyBackground">
       <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
@@ -59,7 +59,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <Row>
               <Icon
                 filename={icon}
-                className="cursor-pointer bg-gray-800 group-hover:bg-primaryAccent"
+                className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
               />
               <div>
                 <PrivacyDropdown {...{ recording }} />
@@ -71,7 +71,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           <Row>
             <Icon
               filename="external"
-              className="cursor-pointer bg-gray-800 group-hover:bg-primaryAccent"
+              className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
             />
             <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
               <a href={recording.url} target="_blank" rel="noopener noreferrer">
@@ -111,7 +111,7 @@ function OperationsRow({
   return (
     <div className="group">
       <Row onClick={onClick}>
-        <Icon filename="shield-check" className="bg-gray-800 group-hover:bg-primaryAccent" />
+        <Icon filename="shield-check" className="bg-iconColor group-hover:bg-primaryAccent" />
         <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
       </Row>
     </div>

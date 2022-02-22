@@ -83,7 +83,7 @@ export const NetworkMonitor = ({
         <div className="flex h-full min-h-0 flex-col" ref={container}>
           <FilterBar types={types} toggleType={toggleType} table={table} />
           <SplitBox
-            className="min-h-0 border-t"
+            className="min-h-0 border-t border-splitter"
             initialSize="350"
             minSize={selectedRequest ? "30%" : "100%"}
             maxSize={selectedRequest ? "70%" : "100%"}

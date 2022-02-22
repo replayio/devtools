@@ -7,7 +7,7 @@
 }
 
 .breakpoints-pane > ._header {
-  border-top-width: 1px;
+  border-top-width: none;
 }
 
 .breakpoints-list *:focus:not(:focus-visible) {

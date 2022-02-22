@@ -38,12 +38,13 @@
   text-align: center;
   padding: 3px 36px;
   white-space: nowrap;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--tab-standard-color);
   position: relative;
   z-index: 1;
   transition: ease-in-out 80ms color;
 }
+
 .view-toggle .active {
-  color: #000;
+  color: var(--theme-body-color);
   font-weight: 400;
 }

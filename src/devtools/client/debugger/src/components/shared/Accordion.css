@@ -19,7 +19,6 @@
 }
 
 .accordion ._header {
-  background-color: #fff;
   display: flex;
   font-size: 15px;
   line-height: calc(16 / 12);
@@ -73,7 +72,7 @@
 .accordion ._content {
   font-size: var(--theme-body-font-size);
   overflow-y: auto;
-  background-color: white;
+  background-color: var(--theme-body-background);
 }
 
 .accordion li {

@@ -13,7 +13,7 @@ export default function FilterBar({
   types: Set<CanonicalRequestType>;
 }) {
   return (
-    <div className="flex items-center bg-white px-1 py-1">
+    <div className="flex items-center bg-themeTextField px-1 py-1">
       <TypesDropdown toggleType={toggleType} types={types} />
 
       <MaterialIcon iconSize="lg">search</MaterialIcon>

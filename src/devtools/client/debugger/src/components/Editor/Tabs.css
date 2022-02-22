@@ -67,6 +67,9 @@
   padding-inline-end: 4px;
 }
 
+.source-tab .filename:hover {
+}
+
 .source-tab {
   color: var(--tab-standard-color);
 }
@@ -76,12 +79,11 @@
   --tab-line-color: var(--theme-body-color);
   color: var(--primary-accent);
   border-bottom-color: transparent;
-  background-color: white;
+  background-color: var(--tab-selected-color);
 }
 
 .source-tab:not(.active):hover {
   --tab-line-color: var(--tab-line-hover-color);
-  background-color: var(--theme-toolbar-hover);
 }
 
 .source-tab .img.prettyPrint,

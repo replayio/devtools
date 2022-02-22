@@ -1,5 +1,5 @@
 .right-sidebar {
-  background: var(--theme-body-background);
+  background: var(--theme-tab-background-alt-subtle);
   display: flex;
   flex-direction: column;
   height: 100%;

@@ -35,14 +35,19 @@ const RequestTable = ({
   let inPast = true;
 
   return (
-    <div className={classNames("no-scrollbar min-w-full overflow-scroll bg-white", className)}>
+    <div
+      className={classNames(
+        "no-scrollbar min-w-full overflow-scroll bg-themeBodyBackground",
+        className
+      )}
+    >
       {/* Relative here helps with when the timeline goes past the last request*/}
       <div
         style={{ minWidth: "fit-content" }}
         className={classNames(styles.request, "relative")}
         {...getTableProps()}
       >
-        <div className="sticky top-0 z-10 border-b bg-toolbarBackground">
+        <div className="sticky top-0 z-10 border-b border-splitter bg-toolbarBackground">
           <HeaderGroups columns={columns} headerGroups={headerGroups} />
         </div>
         <div style={{ minWidth: "fit-content" }} {...getTableBodyProps()}>

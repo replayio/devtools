@@ -55,8 +55,6 @@
   --that-dark-color: #1f2937;
   --text-field-border: var(--cool-gray-300);
 
-  --chrome: #f6f7f7;
-
   --new-blue-50: #eff7ff;
   --new-blue-100: #dbedff;
   --new-blue-200: #b9dbfd;
@@ -145,19 +143,30 @@
   --theme-sidebar-background: white;
 
   /* Jon's new tab work */
-  --tab-selected-color: var(--theme-body-color);
-  --tab-standard-color: #9c9c9e;
-  --tab-standard-hover-color: #6e6e78;
+
+  --chrome: #f6f7f7;
+  --theme-toolbar-hover: #fff;
+  --tab-standard-color: rgba(0, 0, 0, 0.5);
+  --theme-tab-background: #ececec;
+  --tab-selected-color: var(--tab-standard-hover-bgcolor);
+  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
+  --theme-menu-highlight: #f3f4f6;
+  --icon-color: var(--theme-body-color);
+  --theme-border: #d2d5da;
+  --theme-text-field: #f3f4f6;
+  --theme-toggle-inner: var(--cool-gray-200);
+  --theme-toggle-selected: white;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-10);
   --theme-toolbar-background: var(--grey-10);
-  --theme-tab-background: #ececec;
+
+  --theme-tab-background-alt-subtle: var(--theme-sidebar-background);
   --theme-toolbar-selected-color: var(--tab-selected-color);
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
   --theme-toolbar-background-alt: #f5f5f5;
-  --theme-toolbar-hover: var(--grey-20);
+
   --theme-toolbar-hover-active: var(--grey-20);
   --theme-toolbar-separator: var(--grey-90-a10);
 
@@ -280,6 +289,20 @@
   --theme-body-background: #232327;
   --theme-sidebar-background: #18181a;
 
+  /* Jon tweaks */
+  --chrome: #18181a;
+  --tab-standard-color: var(--theme-body-color);
+  --theme-tab-background: black;
+  --tab-standard-hover-textcolor: white;
+  --tab-selected-color: var(--tab-standard-hover-bgcolor);
+  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
+  --theme-menu-highlight: #4b4747;
+  --icon-color: var(--theme-body-color);
+  --theme-border: var(--console-message-border);
+  --theme-text-field: #363b3b;
+  --theme-toggle-inner: #4b4747;
+  --theme-toggle-selected: var(--chrome);
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);
   --theme-toolbar-background: #18181a;
@@ -312,7 +335,7 @@
   --theme-selection-color: #ffffff;
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: var(--grey-70);
+  --theme-splitter-color: black;
   --theme-emphasized-splitter-color: var(--grey-60);
   --theme-emphasized-splitter-color-hover: var(--grey-50);
 

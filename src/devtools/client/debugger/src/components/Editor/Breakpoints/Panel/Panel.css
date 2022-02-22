@@ -157,7 +157,7 @@ non-editing markup */
 }
 
 .breakpoint-panel .summary.enabled:hover {
-  background: hsl(240, 8%, 99%);
+  background: var(--theme-text-field);
 }
 
 .breakpoint-panel .summary .statement:hover {
