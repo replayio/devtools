@@ -512,12 +512,13 @@ export function updateTrimRegion(
     const hoverTime = getHoverTime(state)!;
     const trimRegion = getTrimRegion(state)!;
     const zoomRegion = getZoomRegion(state);
+    const duration = zoomRegion.endTime;
+    const minRegion = duration * 0.1;
+    const { startTime, endTime } = trimRegion;
 
     if (operation === TrimOperation.moveSpan) {
-      const { startTime, endTime } = trimRegion;
       const oldSpanMidpoint = (endTime + startTime) / 2;
       const newMidpoint = hoverTime;
-      const duration = zoomRegion.endTime;
       const translateX = newMidpoint - oldSpanMidpoint;
 
       const newStart = clamp(startTime + translateX + relativeShift, 0, duration);
@@ -526,9 +527,17 @@ export function updateTrimRegion(
 
       dispatch(setTrimRegion(newTrimRegion));
     } else {
-      const type = operation === TrimOperation.resizeStart ? "startTime" : "endTime";
+      let value: number, type;
 
-      dispatch(setTrimRegion({ ...trimRegion, [type]: hoverTime }));
+      if (operation === TrimOperation.resizeStart) {
+        type = "startTime";
+        value = clamp(hoverTime, 0, endTime - minRegion);
+      } else {
+        type = "endTime";
+        value = clamp(hoverTime, startTime + minRegion, zoomRegion.endTime);
+      }
+
+      dispatch(setTrimRegion({ ...trimRegion, [type]: value }));
     }
   };
 }
