@@ -1,4 +1,4 @@
-import { HEADER_HEIGHT } from "./Accordion";
+import { HEADER_HEIGHT } from "./constants";
 import {
   accomodateSectionIdealHeight,
   embiggenSection,

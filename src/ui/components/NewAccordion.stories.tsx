@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Story, Meta } from "@storybook/react";
-import { Accordion, AccordionItem, AccordionPane } from "./Accordion";
+import { Accordion, AccordionItem, AccordionPane } from "@recordreplay/accordion";
 
 const lorem = [
   "Sed ut perspiciatis",

@@ -38,7 +38,10 @@ export const useMaterialIconCheck = () => {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        trackEvent("error.font_loading_timeout");
+        if (retries === 0) {
+          console.error("There was an error while loading Material Icons");
+          trackEvent("error.font_loading_timeout");
+        }
       });
     }
   }, [appNode]);
