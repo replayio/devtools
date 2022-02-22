@@ -145,7 +145,7 @@
   /* Jon's new tab work */
 
   --chrome: #f6f7f7;
-  --theme-toolbar-hover: var(--grey-20);
+  --theme-toolbar-hover: #fff;
   --tab-standard-color: rgba(0, 0, 0, 0.5);
   --theme-tab-background: #ececec;
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
@@ -156,6 +156,7 @@
   --theme-text-field: #f3f4f6;
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
+  --toolbarbutton-focus-background: var(--grey-20);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -302,6 +303,7 @@
   --theme-text-field: #363b3b;
   --theme-toggle-inner: #4b4747;
   --theme-toggle-selected: var(--chrome);
+  --toolbarbutton-focus-background: black;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);
