@@ -32,7 +32,7 @@ import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
-import Trimmer from "./Trimmer";
+import { Trimmer } from "./Trimmer";
 import TrimButton from "./TrimButton";
 import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";

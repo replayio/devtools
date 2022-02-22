@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import clamp from "lodash/clamp";
-import { TrimOperation, TrimRegion, ZoomRegion } from "ui/state/timeline";
+import { TrimOperation, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
-
-type TrimmerProps = PropsFromRedux & { width: number };
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
   const position = getVisiblePosition({ time, zoom }) * 100;
@@ -20,10 +16,10 @@ function ResizeMask({
   onMouseUp,
   onMouseMove,
 }: {
-  onMouseUp: ()=> void;
-  onMouseMove: ()=> void;
+  onMouseUp: () => void;
+  onMouseMove: () => void;
 }) {
-  // This is so that the mask would overlay the mask overlay and we can detect
+  // This is so that the mask would overlay the modal's mask and we can detect
   // mouse movement throughout the entire screen.
   const zIndex = 100;
 
@@ -91,26 +87,22 @@ function Span({
   );
 }
 
-function TemporarySpan({ hoverTime, zoomRegion }: { hoverTime: number; zoomRegion: ZoomRegion }) {
-  const startTime = hoverTime - zoomRegion.endTime * 0.1;
-  const endTime = hoverTime + zoomRegion.endTime * 0.1;
-
-  return <Span {...{ startTime, endTime, zoomRegion }} />;
-}
-
 function TrimSpan({
-  trimRegion,
-  zoomRegion,
   dragging,
   onDragStart,
 }: {
-  trimRegion: TrimRegion;
-  zoomRegion: ZoomRegion;
   dragging: boolean;
   onDragStart: (e: React.MouseEvent, target: TrimOperation) => void;
 }) {
-  const { startTime, endTime } = trimRegion;
+  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const trimRegion = useSelector(selectors.getTrimRegion);
+
+  if (!trimRegion) {
+    return null;
+  }
+
   const draggers = <Draggers {...{ dragging, onDragStart }} />;
+  const { startTime, endTime } = trimRegion;
 
   return (
     <Span
@@ -120,14 +112,11 @@ function TrimSpan({
   );
 }
 
-function Trimmer({
-  width,
-  hoverTime,
-  trimRegion,
-  setTrimRegion,
-  zoomRegion,
-  updateTrimRegion,
-}: TrimmerProps) {
+export const Trimmer: React.FC = () => {
+  const dispatch = useDispatch();
+  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const hoverTime = useSelector(selectors.getHoverTime);
+  const trimRegion = useSelector(selectors.getTrimRegion);
   const [relativeShift, setRelativeShift] = useState<number | null>(null);
   const [draggingTarget, setDraggingTarget] = useState<TrimOperation | null>(null);
 
@@ -146,44 +135,29 @@ function Trimmer({
     if (!(draggingTarget && relativeShift)) {
       return;
     }
-    updateTrimRegion(draggingTarget, relativeShift);
+    dispatch(actions.updateTrimRegion(draggingTarget, relativeShift));
   };
 
   useEffect(() => {
     if (!trimRegion) {
-      setTrimRegion({startTime: 0, endTime: zoomRegion.endTime});
+      const trimRegion = { startTime: 0, endTime: zoomRegion.endTime };
+      dispatch(actions.setTrimRegion(trimRegion));
     }
   }, []);
 
   return (
-    <div className="relative top-0 left-0 h-full w-full" >
+    <div className="relative top-0 left-0 h-full w-full">
       {trimRegion ? (
         <TrimSpan
-        {...{
-          trimRegion,
-          zoomRegion,
-          updateTrimRegion,
-          onDragStart,
-        }}
-        dragging={!!draggingTarget}
+          {...{
+            trimRegion,
+            zoomRegion,
+            onDragStart,
+          }}
+          dragging={!!draggingTarget}
         />
-        ) : null}
+      ) : null}
       {draggingTarget ? <ResizeMask onMouseMove={onMouseMove} onMouseUp={onMouseUp} /> : null}
     </div>
   );
-}
-
-const connector = connect(
-  (state: UIState) => ({
-    zoomRegion: selectors.getZoomRegion(state),
-    hoverTime: selectors.getHoverTime(state),
-    trimRegion: selectors.getTrimRegion(state),
-  }),
-  {
-    setTrimRegion: actions.setTrimRegion,
-    updateTrimRegion: actions.updateTrimRegion,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Trimmer);
+};
