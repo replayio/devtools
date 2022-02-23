@@ -33,26 +33,33 @@ export function HeaderGroups({
       ) : (
         ""
       )}
-      {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => (
-        <div
-          className="flex items-center divide-x divide-themeTextField font-normal"
-          {...headerGroup.getHeaderGroupProps()}
-        >
-          {headerGroup.headers.map(column => (
-            <div className={classNames("p-1", styles[column.id])} {...column.getHeaderProps()}>
-              {column.render("Header")}
-              <div
-                //@ts-ignore
-                {...column.getResizerProps()}
-                className={classNames("select-none", styles.resizer, {
-                  //@ts-ignore typescript freaking *hates* react-table
-                  isResizing: column.isResizing,
-                })}
-              />
-            </div>
-          ))}
-        </div>
-      ))}
+      {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => {
+        const { key, ...headerProps } = headerGroup.getHeaderGroupProps();
+        return (
+          <div
+            key={key}
+            className="flex items-center divide-x divide-themeTextField font-normal"
+            {...headerProps}
+          >
+            {headerGroup.headers.map(column => {
+              const { key, ...columnProps } = column.getHeaderProps();
+              return (
+                <div className={classNames("p-1", styles[column.id])} {...columnProps} key={key}>
+                  {column.render("Header")}
+                  <div
+                    //@ts-ignore
+                    {...column.getResizerProps()}
+                    className={classNames("select-none", styles.resizer, {
+                      //@ts-ignore typescript freaking *hates* react-table
+                      isResizing: column.isResizing,
+                    })}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }

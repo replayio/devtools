@@ -37,16 +37,13 @@
     "react/no-find-dom-node": 0,
     "react/no-children-prop": 0,
     "react/no-render-return-value": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/no-unescaped-entities": 0,
     "curly": "error"
   },
   "settings": {
     "react": {
       "version": "16.8"
     }
-  },
-  "overrides": [
-    {
-      "files": ["*.ts"]
-    }
-  ]
+  }
 }
