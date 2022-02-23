@@ -303,7 +303,6 @@ define(function (require, exports, module) {
               ref,
               role: "presentation",
             },
-            dom.span({ className: "devtools-tab-line" }),
             dom.a(
               {
                 id: id ? id + "-tab" : "tab-" + index,
