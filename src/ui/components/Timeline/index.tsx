@@ -354,6 +354,8 @@ class Timeline extends Component<PropsFromRedux> {
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
     const formattedTime = getFormattedTime(currentTime);
+    const showCurrentPauseMarker =
+      (this.isHovering() && percent >= 0 && percent <= 100) || isTrimming;
 
     return (
       <div className="timeline">
@@ -378,7 +380,7 @@ class Timeline extends Component<PropsFromRedux> {
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {this.renderUnloadedRegions()}
             {features.trimming ? this.renderTrimmedRegion() : null}
-            {this.isHovering() && percent >= 0 && percent <= 100 ? (
+            {showCurrentPauseMarker ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
             {this.renderPreviewMarkers()}
