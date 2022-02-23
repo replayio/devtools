@@ -74,8 +74,10 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
       header: `Section ${i + 1}`,
       component: (
         <ul>
-          {lorem.slice(item.size).map(sentence => (
-            <li className="px-4">{sentence}</li>
+          {lorem.slice(item.size).map((sentence, idx) => (
+            <li key={idx} className="px-4">
+              {sentence}
+            </li>
           ))}
         </ul>
       ),

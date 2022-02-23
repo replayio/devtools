@@ -83,10 +83,6 @@ function ViewerRouter(props: ViewerRouterProps) {
   const { features, loading } = hooks.useGetUserInfo();
   const { currentWorkspaceId } = props;
 
-  if (loading) {
-    return <BlankViewportWrapper />;
-  }
-
   useEffect(() => {
     if (currentWorkspaceId === null && !features.library && !nonPendingLoading) {
       if (!workspaces.length) {
@@ -103,6 +99,10 @@ function ViewerRouter(props: ViewerRouterProps) {
       props.setWorkspaceId(workspaces[0].id);
     }
   });
+
+  if (loading) {
+    return <BlankViewportWrapper />;
+  }
 
   if (currentWorkspaceId === null && features.library) {
     return <MyLibrary {...props} />;

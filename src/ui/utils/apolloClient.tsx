@@ -24,16 +24,19 @@ const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 export function ApolloWrapper({ children }: { children: ReactNode }) {
   const { loading, token, error } = useToken();
 
-  if (isMock()) {
-    const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
-    useEffect(() => {
-      async function waitForMocks() {
-        const mockEnvironment = await waitForMockEnvironment();
-        setMocks(mockEnvironment!.graphqlMocks);
-      }
-      waitForMocks();
-    }, []);
+  const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
 
+  useEffect(() => {
+    async function waitForMocks() {
+      const mockEnvironment = await waitForMockEnvironment();
+      setMocks(mockEnvironment!.graphqlMocks);
+    }
+    if (isMock()) {
+      waitForMocks();
+    }
+  }, []);
+
+  if (isMock()) {
     if (!mocks) {
       return null;
     }
