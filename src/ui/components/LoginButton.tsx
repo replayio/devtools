@@ -2,9 +2,10 @@ import React from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Avatar from "ui/components/Avatar";
 import { handleIntercomLogout } from "ui/utils/intercom";
+import { useRouter } from "next/router";
 
 const LoginButton = () => {
-  const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
+  const { loginAndReturn, isAuthenticated, logout, user } = useAuth0();
 
   if (isAuthenticated) {
     return (
@@ -18,11 +19,7 @@ const LoginButton = () => {
   return (
     <button
       className="inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-white hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      onClick={() =>
-        loginWithRedirect({
-          appState: { returnTo: window.location.pathname + window.location.search },
-        })
-      }
+      onClick={() => loginAndReturn()}
       color="blue"
     >
       Sign In

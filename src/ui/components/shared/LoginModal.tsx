@@ -3,13 +3,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/Modal";
 
 function LoginModal() {
-  const { loginWithRedirect } = useAuth0();
-
-  const onClick: React.MouseEventHandler = e => {
-    loginWithRedirect({
-      appState: { returnTo: window.location.pathname + window.location.search },
-    });
-  };
+  const { loginAndReturn } = useAuth0();
 
   return (
     <div className="login-modal">
@@ -25,7 +19,7 @@ function LoginModal() {
           <div className="flex flex-col items-center">
             <button
               type="button"
-              onClick={onClick}
+              onClick={() => loginAndReturn()}
               className="inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-lg font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
             >
               Sign In
