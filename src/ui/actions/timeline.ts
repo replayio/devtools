@@ -508,10 +508,12 @@ export function updateTrimRegion(operation: TrimOperation): UIThunkAction {
     const zoomRegion = getZoomRegion(state);
 
     const duration = zoomRegion.endTime;
+    // To get around a handful of selection UI bugs, this limits the allowable trimmed
+    // region to 10% of the full duration of the replay.
     const minRegion = duration * 0.1;
     const { startTime, endTime } = trimRegion;
 
-    let value: number, type;
+    let value, type;
 
     if (operation === TrimOperation.resizeStart) {
       type = "startTime";

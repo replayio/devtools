@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -17,7 +17,7 @@ function ResizeMask({
   onMouseUp,
   onMouseMove,
 }: {
-  onMouseUp: () => void;
+  onMouseUp: MouseEventHandler;
   onMouseMove: () => void;
 }) {
   // This is so that the mask would overlay the modal's mask and we can detect
@@ -117,7 +117,7 @@ export const Trimmer: React.FC = () => {
     e.stopPropagation();
     setDraggingTarget(target);
   };
-  const onMouseUp = (e: MouseEvent) => {
+  const onMouseUp: MouseEventHandler = e => {
     e.stopPropagation();
     setDraggingTarget(null);
     if (
