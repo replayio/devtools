@@ -1,4 +1,5 @@
 import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
+import { useRouter } from "next/router";
 import { useGetUserInfo } from "ui/hooks/users";
 import { setAccessTokenInBrowserPrefs } from "./browser";
 import { isTest, isMock } from "./environment";
@@ -14,6 +15,7 @@ const TEST_AUTH = {
     picture:
       "https://s.gravatar.com/avatar/579464588a2bb4fb0bc1bae7d2df22ae?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fe2.png",
   },
+  loginAndReturn: () => {},
   loginWithRedirect: () => {},
   logout: () => {},
   getAccessTokenSilently: () => Promise.resolve(),
@@ -25,9 +27,19 @@ export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
  * A wrapper around useAuth0() that returns dummy data in tests
  */
 export default function useAuth0() {
+  const router = useRouter();
   const auth = useOrigAuth0();
   const { loading, email } = useGetUserInfo();
   const { token, external } = useToken();
+
+  const loginAndReturn = () => {
+    router.push({
+      pathname: "/login",
+      query: {
+        returnTo: window.location.pathname + window.location.search,
+      },
+    });
+  };
 
   if (external && token) {
     return {
@@ -39,6 +51,7 @@ export default function useAuth0() {
             sub: "external-auth",
             email,
           },
+      loginAndReturn,
       loginWithRedirect: auth.loginWithRedirect,
       logout: (options?: LogoutOptions) => {
         if (window.__IS_RECORD_REPLAY_RUNTIME__) {
@@ -54,5 +67,5 @@ export default function useAuth0() {
     return TEST_AUTH;
   }
 
-  return auth;
+  return { ...auth, loginAndReturn };
 }
