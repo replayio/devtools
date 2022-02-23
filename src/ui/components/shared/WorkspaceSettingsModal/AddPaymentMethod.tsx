@@ -20,7 +20,7 @@ export function EnterPaymentMethod({
   stripePromise,
 }: {
   onCancel: () => void;
-  onSave: () => void;
+  onSave: (billingDetails: { paymentMethodBillingId: string | null }) => void;
   workspaceId: string;
   stripePromise: Promise<any>;
 }) {
@@ -88,7 +88,7 @@ export function EnterPaymentMethod({
         throw confirm.error;
       }
 
-      onSave();
+      onSave({ paymentMethodBillingId: confirm.setupIntent.payment_method });
     } catch (e) {
       console.error(e);
       setError("Failed to create payment method. Please try again later.");

@@ -19,11 +19,11 @@ export function DeleteConfirmation({
     deleteWorkspacePaymentMethod({
       variables: {
         workspaceId,
-        paymentMethodId: subscription.paymentMethods[0].id,
+        paymentMethodId: subscription.paymentMethods![0].id,
       },
     }).then(onDone);
 
-  if (error) {
+  if (error || subscription.paymentMethods == null) {
     return <section className="text-red">Unable to remove a payment method at this time.</section>;
   }
 
