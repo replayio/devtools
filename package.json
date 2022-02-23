@@ -27,7 +27,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.16",
+    "@apollo/client": "^3.4.17",
     "@auth0/auth0-react": "^1.2.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
@@ -50,7 +50,7 @@
     "dotenv": "^16.0.0",
     "escape-html": "^1.0.3",
     "fuzzaldrin-plus": "^0.6.0",
-    "graphql": "^15.3.0",
+    "graphql": "^16.3.0",
     "jest": "^27.5.1",
     "jwt-decode": "^3.1.2",
     "launchdarkly-js-client-sdk": "^2.20.1",
