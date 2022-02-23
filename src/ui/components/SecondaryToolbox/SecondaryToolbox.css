@@ -65,7 +65,7 @@
 
 .secondary-toolbox-header button.expanded {
   background: inherit;
-  background: var(--theme-bg-90);
+  background: var(--theme-base-90);
 }
 
 .secondary-toolbox-header .action-buttons button {

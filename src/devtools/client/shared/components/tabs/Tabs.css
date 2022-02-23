@@ -20,7 +20,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   box-sizing: border-box;
   display: flex;
   position: relative;
-  background: var(--theme-bg-95);
+  background: var(--theme-base-95);
 }
 
 .requestDetails .tabs .tabs-navigation {
@@ -69,15 +69,15 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 
 .tabs .tabs-menu-item.is-active {
   color: var(--theme-toolbar-selected-color);
-  background: var(--theme-bg-90);
+  background: var(--theme-base-90);
 }
 
 .tabs .tabs-menu-item:hover {
-  background-color: var(--theme-bg-90);
+  background-color: var(--theme-base-90);
 }
 
 .tabs .tabs-menu-item:hover:active:not(.is-active) {
-  background-color: var(--theme-bg-90);
+  background-color: var(--theme-base-90);
 }
 
 .tabs .tabs-menu-item a {

@@ -139,6 +139,24 @@
 }
 
 :root.theme-light {
+  /* TOP LEVEL STYLES */
+  --theme-base-100: #000000; /* background chrome */
+  --theme-base-95: #252525; /* tab bars */
+  --theme-base-90: #303030; /* editor and selected tab */
+  --theme-base-85: #3c3c3c; /* textfields */
+  --theme-base-80: #5c5c5c;
+  --theme-base-70: #828282;
+  --theme-base-60: #a3a3a3;
+
+  /* TOP LEVEL STYLES (DEBUG) */
+  --theme-base-100: #ff0000; /* background chrome */
+  --theme-base-95: #ff2525; /* tab bars */
+  --theme-base-90: #ff5c5c; /* editor and selected tab */
+  --theme-base-85: #ff3c3c; /* textfields */
+  --theme-base-80: #ff5c5c;
+  --theme-base-70: #ff8282;
+  --theme-base-60: #ffa3a3;
+
   --theme-body-background: white;
   --theme-sidebar-background: white;
 
@@ -288,30 +306,30 @@
 
 :root.theme-dark {
   /* TOP LEVEL STYLES */
-  --theme-bg-100: #000000; /* background chrome */
-  --theme-bg-95: #252525; /* tab bars */
-  --theme-bg-90: #303030; /* editor and selected tab */
-  --theme-bg-85: #3c3c3c; /* textfields */
-  --theme-bg-80: #5c5c5c;
-  --theme-bg-70: #828282;
-  --theme-bg-60: #a3a3a3;
+  --theme-base-100: #000000; /* background chrome */
+  --theme-base-95: #252525; /* tab bars */
+  --theme-base-90: #303030; /* editor and selected tab */
+  --theme-base-85: #3c3c3c; /* textfields */
+  --theme-base-80: #5c5c5c;
+  --theme-base-70: #828282;
+  --theme-base-60: #a3a3a3;
 
   /* TOP LEVEL STYLES (DEBUG) */
-  --theme-bg-100: #ff0000; /* background chrome */
-  --theme-bg-95: #ff2525; /* tab bars */
-  --theme-bg-90: #ff5c5c; /* editor and selected tab */
-  --theme-bg-85: #ff3c3c; /* textfields */
-  --theme-bg-80: #ff5c5c;
-  --theme-bg-70: #ff8282;
-  --theme-bg-60: #ffa3a3;
+  --theme-base-100: #ff0000; /* background chrome */
+  --theme-base-95: #ff2525; /* tab bars */
+  --theme-base-90: #ff5c5c; /* editor and selected tab */
+  --theme-base-85: #ff3c3c; /* textfields */
+  --theme-base-80: #ff5c5c;
+  --theme-base-70: #ff8282;
+  --theme-base-60: #ffa3a3;
 
-  --theme-body-background: var(--theme-bg-90);
-  --theme-sidebar-background: var(--theme-bg-90);
+  --theme-body-background: var(--theme-base-90);
+  --theme-sidebar-background: var(--theme-base-90);
 
   /* Jon tweaks */
-  --chrome: var(--theme-bg-100);
-  --theme-tab-background: var(--theme-bg-95);
-  --tab-standard-color: var(--theme-bg-90);
+  --chrome: var(--theme-base-100);
+  --theme-tab-background: var(--theme-base-95);
+  --tab-standard-color: var(--theme-base-90);
 
   --tab-standard-hover-textcolor: white;
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
