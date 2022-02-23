@@ -6,7 +6,7 @@ module.exports = {
   experimental: {},
 
   eslint: {
-    // which folders to run ESLint onduring production builds (next build)
+    // which folders to run ESLint on during production builds (next build)
     dirs: ["src", "pages", "packages"],
   },
 
