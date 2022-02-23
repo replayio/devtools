@@ -61,7 +61,10 @@ function ToolbarButton({
       >
         <IconWithTooltip
           icon={
-            <MaterialIcon className={classNames("toolbar-panel-icon", name)} iconSize="2xl">
+            <MaterialIcon
+              className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
+              iconSize="2xl"
+            >
               {icon}
             </MaterialIcon>
           }

@@ -22,13 +22,13 @@ export const TrimButton = () => {
   return (
     <button
       className={classNames(
-        "h-6 w-6 rounded-full p-1",
-        isTrimming ? "bg-primaryAccent  text-white" : "bg-white text-primaryAccent"
+        "flex",
+        isTrimming ? "text-primaryAccent" : "text-themeToolbarPanelIconColor"
       )}
       onClick={onClick}
       title={isTrimming ? "Exit trimming mode" : "Enter trimming mode"}
     >
-      <MaterialIcon>center_focus_strong</MaterialIcon>
+      <MaterialIcon iconSize="2xl">center_focus_strong</MaterialIcon>
     </button>
   );
 };
