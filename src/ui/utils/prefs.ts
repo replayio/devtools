@@ -85,4 +85,5 @@ export const asyncStore = asyncStoreHelper("devtools", {
   eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
   replaySessions: ["replay-sessions", {}],
   commandHistory: ["command-history", []],
+  tabs: ["tabs", []],
 });

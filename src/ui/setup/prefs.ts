@@ -10,6 +10,9 @@ import {
   getViewMode,
 } from "ui/reducers/layout";
 import { ViewMode } from "ui/state/layout";
+import { persistTabs, Tab } from "devtools/client/debugger/src/utils/tabs";
+import { selectors } from "ui/reducers";
+import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -48,6 +51,7 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);
 
+  console.log("maybe update replay sessions");
   maybeUpdateReplaySessions(state);
 }
 
@@ -116,6 +120,8 @@ async function maybeUpdateReplaySessions(state: UIState) {
   const previousReplaySessions = await getReplaySessions();
   const previousReplaySession = previousReplaySessions[recordingId];
 
+  console.log("maybeupdatereplay");
+
   const currentReplaySession = {
     viewMode: getViewMode(state),
     showEditor: getShowEditor(state),
@@ -123,7 +129,10 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
     selectedPanel: getSelectedPanel(state),
     localNags: [...(previousReplaySession?.localNags || [])],
+    tabs: persistTabs(getTabs(state)) || [],
   };
+
+  console.log("tabs: ", getTabs(state));
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
 }

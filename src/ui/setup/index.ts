@@ -42,6 +42,7 @@ export async function bootstrapApp() {
 
   window.store = store;
 
+  console.log("registering store observer");
   registerStoreObserver(store, updatePrefs);
   setupAppHelper(store);
 

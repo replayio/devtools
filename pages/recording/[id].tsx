@@ -130,6 +130,7 @@ function RecordingPage({
     }
 
     async function getRecording() {
+      console.log("setting up app");
       await setup(store);
       setRecording(await getAccessibleRecording(recordingId));
     }

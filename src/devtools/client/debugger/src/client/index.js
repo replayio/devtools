@@ -12,6 +12,8 @@ import { setupCommands, clientCommands } from "./commands";
 import { setupEvents, clientEvents } from "./events";
 
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
+import { asyncStore as uiAsyncStore } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/recording";
 import actions from "../actions";
 import * as selectors from "../selectors";
 
@@ -19,8 +21,13 @@ import { updatePrefs } from "../utils/bootstrap";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
 export async function loadInitialState() {
+  const replaySessions = await uiAsyncStore.replaySessions;
+  const session = replaySessions[getRecordingId()];
+
+  console.log(getRecordingId(), replaySessions);
+
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
-  const tabs = { tabs: await asyncStore.tabs };
+  const tabs = { tabs: session.tabs };
 
   const breakpoints = initialBreakpointsState();
 

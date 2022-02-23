@@ -217,7 +217,7 @@ function moveTabInListBySourceId(state, { sourceId, tabIndex: newIndex }) {
 
 // Selectors
 
-export const getTabs = state => state.tabs.tabs;
+export const getTabs = state => state?.tabs.tabs || [];
 
 export const getSourceTabs = createSelector(
   state => state.tabs,
