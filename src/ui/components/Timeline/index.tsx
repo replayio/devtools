@@ -122,9 +122,6 @@ class Timeline extends Component<PropsFromRedux> {
     const mouseTime = this.getMouseTime(e);
 
     trackEvent("timeline.progress_select");
-    if (isTrimming) {
-      return;
-    }
 
     if (hoverTime != null && !clickedOnCommentMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);

@@ -201,9 +201,8 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
     const stateBeforeScreenshot = getState();
-    const isTrimming = getModal(stateBeforeScreenshot) === "trimming";
 
-    if (!updateGraphics || isTrimming) {
+    if (!updateGraphics) {
       return;
     }
 
@@ -501,43 +500,27 @@ export function setTrimRegion(trimRegion: {
   return { type: "set_trim_region", trimRegion };
 }
 
-export function updateTrimRegion(
-  operation: TrimOperation,
-  // Calculate the shift here so we can use it to compensate
-  // for how off-center the mouse is while dragging the span.
-  relativeShift: number
-): UIThunkAction {
+export function updateTrimRegion(operation: TrimOperation): UIThunkAction {
   return ({ dispatch, getState }) => {
     const state = getState();
     const hoverTime = getHoverTime(state)!;
     const trimRegion = getTrimRegion(state)!;
     const zoomRegion = getZoomRegion(state);
+
     const duration = zoomRegion.endTime;
     const minRegion = duration * 0.1;
     const { startTime, endTime } = trimRegion;
 
-    if (operation === TrimOperation.moveSpan) {
-      const oldSpanMidpoint = (endTime + startTime) / 2;
-      const newMidpoint = hoverTime;
-      const translateX = newMidpoint - oldSpanMidpoint;
+    let value: number, type;
 
-      const newStart = clamp(startTime + translateX + relativeShift, 0, duration);
-      const newEnd = clamp(endTime + translateX + relativeShift, newStart, duration);
-      const newTrimRegion = { startTime: newStart, endTime: newEnd };
-
-      dispatch(setTrimRegion(newTrimRegion));
+    if (operation === TrimOperation.resizeStart) {
+      type = "startTime";
+      value = clamp(hoverTime, 0, endTime - minRegion);
     } else {
-      let value: number, type;
-
-      if (operation === TrimOperation.resizeStart) {
-        type = "startTime";
-        value = clamp(hoverTime, 0, endTime - minRegion);
-      } else {
-        type = "endTime";
-        value = clamp(hoverTime, startTime + minRegion, zoomRegion.endTime);
-      }
-
-      dispatch(setTrimRegion({ ...trimRegion, [type]: value }));
+      type = "endTime";
+      value = clamp(hoverTime, startTime + minRegion, duration);
     }
+
+    dispatch(setTrimRegion({ ...trimRegion, [type]: value }));
   };
 }

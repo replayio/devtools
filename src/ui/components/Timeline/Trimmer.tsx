@@ -6,6 +6,7 @@ import clamp from "lodash/clamp";
 import { TrimOperation, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
+import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
   const position = getVisiblePosition({ time, zoom }) * 100;
@@ -77,10 +78,7 @@ function Span({
   const right = getPosition(endTime, zoomRegion);
 
   return (
-    <div
-      className={classNames("group absolute h-full", draggers ? "cursor-move" : "")}
-      style={{ left: `${left}%`, width: `${right - left}%` }}
-    >
+    <div className="group absolute h-full" style={{ left: `${left}%`, width: `${right - left}%` }}>
       <div className="h-full w-full bg-blue-300 opacity-50" onMouseDown={onMouseDown} />
       {draggers}
     </div>
@@ -104,40 +102,38 @@ function TrimSpan({
   const draggers = <Draggers {...{ dragging, onDragStart }} />;
   const { startTime, endTime } = trimRegion;
 
-  return (
-    <Span
-      {...{ startTime, endTime, zoomRegion, draggers }}
-      onMouseDown={e => onDragStart(e, TrimOperation.moveSpan)}
-    />
-  );
+  return <Span {...{ startTime, endTime, zoomRegion, draggers }} />;
 }
 
 export const Trimmer: React.FC = () => {
   const dispatch = useDispatch();
   const zoomRegion = useSelector(selectors.getZoomRegion);
   const hoverTime = useSelector(selectors.getHoverTime);
+  const currentTime = useSelector(selectors.getCurrentTime);
   const trimRegion = useSelector(selectors.getTrimRegion);
-  const [relativeShift, setRelativeShift] = useState<number | null>(null);
   const [draggingTarget, setDraggingTarget] = useState<TrimOperation | null>(null);
 
   const onDragStart = (e: React.MouseEvent, target: TrimOperation) => {
     e.stopPropagation();
-
     setDraggingTarget(target);
-    const spanMidpoint = (trimRegion!.endTime + trimRegion!.startTime) / 2;
-    setRelativeShift(spanMidpoint - hoverTime!);
   };
-  const onMouseUp = () => {
+  const onMouseUp = (e: MouseEvent) => {
+    e.stopPropagation();
     setDraggingTarget(null);
-    setRelativeShift(null);
+    if (
+      (draggingTarget === TrimOperation.resizeStart && currentTime < trimRegion!.startTime) ||
+      (draggingTarget === TrimOperation.resizeEnd && currentTime > trimRegion!.endTime)
+    ) {
+      dispatch(setTimelineState({ currentTime: hoverTime! }));
+      dispatch(setTimelineToTime(hoverTime, true));
+    }
   };
   const onMouseMove = () => {
-    if (!(draggingTarget && relativeShift)) {
+    if (!draggingTarget) {
       return;
     }
-    dispatch(actions.updateTrimRegion(draggingTarget, relativeShift));
+    dispatch(actions.updateTrimRegion(draggingTarget));
   };
-
   useEffect(() => {
     if (!trimRegion) {
       const trimRegion = { startTime: 0, endTime: zoomRegion.endTime };
