@@ -13,7 +13,11 @@ export function isSubscriptionCancelled(subscription: Subscription) {
 }
 
 export const isTrial = (subscription: Subscription): boolean => {
-  return subscription.status === "trialing" && subscription.paymentMethods.length === 0;
+  return (
+    subscription.status === "trialing" &&
+    subscription.paymentMethods != null &&
+    subscription.paymentMethods.length === 0
+  );
 };
 
 export function formatPaymentMethod(paymentMethod: PaymentMethod) {

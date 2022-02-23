@@ -1,6 +1,7 @@
 import React from "react";
 import { Subscription } from "ui/types";
 import { formatDate } from "./formatDate";
+import { isTrial } from "./utils";
 
 export function ExpirationRow({ subscription }: { subscription: Subscription }) {
   if (subscription.plan.key.includes("beta") || !subscription.effectiveUntil) {
@@ -9,7 +10,7 @@ export function ExpirationRow({ subscription }: { subscription: Subscription }) 
 
   let label = "Renewal date";
 
-  if (subscription.status === "trialing" && subscription.paymentMethods.length === 0) {
+  if (isTrial(subscription)) {
     label = "Your team’s start date";
   } else if (subscription.status === "canceled") {
     label = "Subscription end date";
