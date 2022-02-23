@@ -11,7 +11,7 @@
   left: 0;
   right: 0;
   opacity: 1;
-  width: calc(100% - 1px);
+  width: 100%;
   user-select: none;
   height: var(--editor-footer-height);
   box-sizing: border-box;
