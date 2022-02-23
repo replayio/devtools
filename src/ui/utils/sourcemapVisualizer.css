@@ -159,10 +159,10 @@ body.sourcemap-visualizer[data-theme="dark"] #theme-dark {
 
 @media (prefers-color-scheme: dark) {
   body.sourcemap-visualizer:not([data-theme="light"]) {
-    color: #eee;
+    color: #333;
     fill: #eee;
     stroke: #eee;
-    background: #333;
+    background: #eee;
   }
 
   body.sourcemap-visualizer:not([data-theme="light"]) #theme-light {
