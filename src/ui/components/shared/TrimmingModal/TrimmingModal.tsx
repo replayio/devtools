@@ -32,8 +32,8 @@ function TrimmingModal({ hideModal }: PropsFromRedux) {
             It also helps us helps us make your debugging experience more performant.
           </p>
           <p>
-            Use the <strong>left and right draggers</strong> in the timeline to indicate which part
-            of the replay you would like to focus on.
+            Use the <strong>left and right handlebars</strong> in the timeline to indicate which
+            part of the replay you would like to focus on.
           </p>
           <p>
             Your changes are saved automatically. Once you are finished, click anywhere to exit
