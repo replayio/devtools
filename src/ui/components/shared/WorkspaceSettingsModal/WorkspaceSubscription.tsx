@@ -57,13 +57,16 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
 
   const handleResubscribe = async () => {
     try {
-      const planKey = workspace.subscription?.plan.key;
+      const subscription = data.node.subscription;
+      const planKey = subscription.plan.key;
       assert(planKey, "Workspace does not have a planKey");
 
-      if (workspace.hasPaymentMethod) {
+      if (subscription.paymentMethods?.length) {
+        assert(subscription.paymentMethods?.[0]?.id, "Payment method was not found");
         await activateWorkspaceSubscription({
           variables: {
             planKey,
+            paymentMethodBillingId: subscription.paymentMethods[0].id,
           },
         });
       } else {

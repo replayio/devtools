@@ -82,7 +82,7 @@ export interface Subscription {
     key: PlanKey;
     createdAt: string;
   };
-  paymentMethods: PaymentMethod[];
+  paymentMethods?: PaymentMethod[];
 }
 
 export type BillingSchedule = "annual" | "monthly" | "contract";

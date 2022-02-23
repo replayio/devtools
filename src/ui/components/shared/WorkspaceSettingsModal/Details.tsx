@@ -76,7 +76,7 @@ function SubscriptionDetails({
         <div className="border-color-gray-50 flex flex-row items-center justify-between border-b py-2">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">
-            {subscription.paymentMethods.length > 0 ? (
+            {subscription.paymentMethods && subscription.paymentMethods.length > 0 ? (
               <button
                 className="text-primaryAccent hover:underline"
                 onClick={onDeletePaymentMethod}
