@@ -45,5 +45,4 @@ interface HoveredLocation extends Location {
 export enum TrimOperation {
   resizeStart = "resizeStart",
   resizeEnd = "resizeEnd",
-  moveSpan = "moveSpan",
 }

@@ -70,10 +70,6 @@
   color: var(--theme-toolbar-selected-color);
 }
 
-.toolbar-panel-icon {
-  color: #bcbcbc;
-}
-
 .toolbar-panel-button.active .toolbar-panel-icon,
 .toolbar-panel-button.active.debug.paused .toolbar-panel-icon {
   color: var(--primary-accent);

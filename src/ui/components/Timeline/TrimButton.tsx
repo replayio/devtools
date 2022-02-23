@@ -1,25 +1,37 @@
+import classNames from "classnames";
 import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import * as actions from "ui/actions/app";
 import { selectors } from "ui/reducers";
+import { getIsTrimming } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import MaterialIcon from "../shared/MaterialIcon";
 
-function TrimButton({ setModal, hideModal, modal }: PropsFromRedux) {
+export const TrimButton = () => {
+  const dispatch = useDispatch();
+  const isTrimming = useSelector(getIsTrimming);
+
   const onClick = () => {
-    if (modal === "trimming") {
-      hideModal();
+    if (isTrimming) {
+      dispatch(actions.hideModal());
     } else {
-      setModal("trimming");
+      dispatch(actions.setModal("trimming"));
     }
   };
 
   return (
-    <button className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white" onClick={onClick}>
-      <MaterialIcon>center_focus_strong</MaterialIcon>
+    <button
+      className={classNames(
+        "flex",
+        isTrimming ? "text-primaryAccent" : "text-themeToolbarPanelIconColor"
+      )}
+      onClick={onClick}
+      title={isTrimming ? "Exit trimming mode" : "Enter trimming mode"}
+    >
+      <MaterialIcon iconSize="2xl">center_focus_strong</MaterialIcon>
     </button>
   );
-}
+};
 
 const connector = connect(
   (state: UIState) => ({
