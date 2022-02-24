@@ -21,7 +21,7 @@ import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import TrimmingModal from "./shared/TrimmingModal/TrimmingModal";
-import { migratePrefToSettings } from "ui/hooks/settings";
+import { migratePrefToSettings, useFeature } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
@@ -90,11 +90,12 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-function App({ children, modal, theme }: AppProps) {
+function App({ children, modal }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
   const { setAppNode } = useMaterialIconCheck();
+  const { value: enableDarkMode } = useFeature("darkMode");
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
@@ -114,8 +115,8 @@ function App({ children, modal, theme }: AppProps) {
   });
 
   useEffect(() => {
-    document.body.parentElement!.className = theme || "";
-  }, [theme]);
+    document.body.parentElement!.className = enableDarkMode ? "theme-dark" : "theme-light";
+  }, [enableDarkMode]);
 
   useEffect(() => {
     if (!isTest() && auth.isAuthenticated) {
@@ -148,7 +149,6 @@ function App({ children, modal, theme }: AppProps) {
 
 const connector = connect((state: UIState) => ({
   modal: selectors.getModal(state),
-  theme: selectors.getTheme(state),
 }));
 export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
 

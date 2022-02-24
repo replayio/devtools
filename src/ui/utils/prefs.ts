@@ -26,6 +26,7 @@ pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentEmojis", false);
 pref("devtools.features.commentMentions", false);
 pref("devtools.features.comments", true);
+pref("devtools.features.darkMode", false);
 pref("devtools.features.consoleHover", false);
 pref("devtools.features.eventCount", true);
 pref("devtools.features.httpBodies", true);
@@ -64,6 +65,7 @@ export const features = new PrefsHelper("devtools.features", {
   commentEmojis: ["Bool", "commentEmojis"],
   commentMentions: ["Bool", "commentMentions"],
   comments: ["Bool", "comments"],
+  darkMode: ["Bool", "darkMode"],
   consoleHover: ["Bool", "consoleHover"],
   eventCount: ["Bool", "eventCount"],
   httpBodies: ["Bool", "httpBodies"],

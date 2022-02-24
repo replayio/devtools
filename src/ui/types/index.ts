@@ -18,6 +18,7 @@ export type LocalUserSettings = {
   enableCommentAttachments: boolean;
   enableTrimming: boolean;
   enableColumnBreakpoints: boolean;
+  enableDarkMode: boolean;
 };
 
 export type CombinedUserSettings = UserSettings & LocalUserSettings;
