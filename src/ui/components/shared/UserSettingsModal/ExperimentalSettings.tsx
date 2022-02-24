@@ -33,6 +33,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
   },
+  {
+    label: "Dark Mode",
+    description: "Enable Dark mode",
+    key: "enableDarkMode",
+  },
 ];
 
 function Experiment({
@@ -70,6 +75,7 @@ export default function ExperimentalSettings({}) {
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
   const { value: enableTrimming, update: updateEnableTrimming } = useFeature("trimming");
+  const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -80,15 +86,20 @@ export default function ExperimentalSettings({}) {
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
-      features.columnBreakpoints = value;
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableTrimming") {
-      features.trimming = value;
       updateEnableTrimming(!enableTrimming);
+    } else if (key == "enableDarkMode") {
+      updateEnableDarkMode(!enableDarkMode);
     }
   };
 
-  const localSettings = { enableCommentAttachments, enableColumnBreakpoints, enableTrimming };
+  const localSettings = {
+    enableCommentAttachments,
+    enableColumnBreakpoints,
+    enableTrimming,
+    enableDarkMode,
+  };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {
