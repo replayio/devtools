@@ -132,7 +132,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     tabs: persistTabs(getTabs(state)) || [],
   };
 
-  console.log("tabs: ", getTabs(state));
+  console.log("tabs: ", persistTabs(getTabs(state)));
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
 }

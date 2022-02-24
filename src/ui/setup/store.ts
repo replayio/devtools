@@ -34,7 +34,7 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
       ? applyMiddleware(sanityCheckMiddleware)
       : undefined
     : applyMiddleware(LogRocket.reduxMiddleware());
-
+  console.log("initialstate", { initialState });
   return createStore(combineReducers(reducers), initialState, middleware);
 }
 
