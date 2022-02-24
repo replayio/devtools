@@ -17,6 +17,7 @@ import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
 import { decodeWorkspaceId } from "ui/utils/workspace";
 const { isDemoReplay } = require("ui/utils/demo");
+import Icon from "../shared/Icon";
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
 type Status = "saving" | "deleting" | "deleted" | null;
@@ -88,7 +89,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 function LimitWarning() {
   return (
     <div className="absolute place-content-center bottom-2 right-2 flex rounded-md bg-gray-500 p-2 text-white shadow-lg text-xs">
-      <MaterialIcon className="select-none">warning</MaterialIcon>{" "}
+      <Icon filename="warning" size="small" className="bg-white" />
       <span className="px-1">Replays work best under 2 minutes</span>
     </div>
   );
