@@ -10,6 +10,10 @@
   user-select: none;
 }
 
+.sources-list {
+  height: 100%;
+}
+
 .sources-list .img.blackBox {
   mask-size: 13px;
   background-color: var(--theme-icon-checked-color);
@@ -19,6 +23,7 @@
   flex: 1;
   display: flex;
   overflow-y: auto;
+  height: 100%;
 }
 
 .sources-list .managed-tree .tree {
@@ -84,7 +89,12 @@
 }
 
 .sources-pane {
+  height: 100%;
   border-radius: 8px 8px 0 0;
+}
+
+.sources-pane .managed-tree {
+  height: 100%;
 }
 
 .accordion .sources-pane ._content {
