@@ -17,6 +17,7 @@ import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
 import { decodeWorkspaceId } from "ui/utils/workspace";
 const { isDemoReplay } = require("ui/utils/demo");
+import Icon from "../shared/Icon";
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
 type Status = "saving" | "deleting" | "deleted" | null;
@@ -35,7 +36,7 @@ function DeletedScreen({ url }: { url: string }) {
     <div className="h-full w-full" style={{ background: "white" }}>
       <Modal>
         <div
-          className="relative flex flex-col justify-between space-y-9 overflow-y-auto rounded-md bg-white p-9 text-base shadow-xl"
+          className="relative flex flex-col justify-between space-y-9 overflow-y-auto rounded-md bg-white p-9 text-base shadow-lg"
           style={{ width: "300px", maxHeight: "90vh" }}
         >
           <h2 className="text-2xl font-bold ">{`Redirecting...`}</h2>
@@ -87,19 +88,9 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 
 function LimitWarning() {
   return (
-    <div className="absolute bottom-4 right-4 flex rounded-full bg-gray-500 p-2 text-white shadow-lg">
-      <PortalTooltip
-        tooltip={
-          <div
-            className="mb-4 rounded-md bg-toolbarBackground p-2 px-3 text-base shadow-lg"
-            style={{ width: "200px" }}
-          >
-            {`Replays work best when under 2 minutes`}
-          </div>
-        }
-      >
-        <MaterialIcon className="select-none">warning</MaterialIcon>
-      </PortalTooltip>
+    <div className="absolute place-content-center bottom-2 right-2 flex rounded-md bg-gray-500 p-2 text-white shadow-lg text-xs">
+      <Icon filename="warning" size="small" className="bg-white" />
+      <span className="px-1">Replays work best under 2 minutes</span>
     </div>
   );
 }
@@ -112,7 +103,7 @@ function ReplayScreenshot({
   showLimitWarning: boolean;
 }) {
   return (
-    <div className="relative h-64 rounded-lg bg-jellyfish px-6 pt-6 shadow-xl short:hidden">
+    <div className="relative h-64 rounded-lg bg-jellyfish px-6 pt-6 shadow-lg short:hidden">
       {showLimitWarning ? <LimitWarning /> : null}
       <img src={screenData} className="m-auto h-full" />
     </div>
@@ -191,7 +182,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
           <div className="mb-10 flex flex-row space-x-4 short:h-auto">
             <div
-              className="relative flex flex-col overflow-hidden rounded-xl text-lg font-medium shadow-xl"
+              className="relative flex flex-col overflow-hidden rounded-xl text-lg font-medium shadow-lg"
               style={{ width: "620px" }}
             >
               <div className="absolute h-full w-full bg-jellyfish" />
