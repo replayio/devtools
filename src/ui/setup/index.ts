@@ -14,8 +14,7 @@ import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getInitialLayoutState } from "ui/reducers/layout";
-import { asyncStore as uiAsyncStore } from "ui/utils/prefs";
-import { getRecordingId } from "ui/utils/recording";
+import { getInitialTabs } from "devtools/client/debugger/src/reducers/tabs";
 
 declare global {
   interface Window {
@@ -27,12 +26,6 @@ declare global {
 let store: UIStore;
 export type AppDispatch = typeof store.dispatch;
 
-const getInitialTabs = async () => {
-  const sessions = await uiAsyncStore.replaySessions;
-  const session = sessions[getRecordingId()!];
-
-  return session.tabs;
-};
 export async function bootstrapApp() {
   const initialState = {
     app: initialAppState,
@@ -51,7 +44,6 @@ export async function bootstrapApp() {
 
   window.store = store;
 
-  console.log("registering store observer");
   registerStoreObserver(store, updatePrefs);
   setupAppHelper(store);
 

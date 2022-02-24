@@ -16,6 +16,15 @@ import { isSimilarTab, persistTabs } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
+import { asyncStore } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/recording";
+
+export const getInitialTabs = async () => {
+  const sessions = await asyncStore.replaySessions;
+  const session = sessions[getRecordingId()];
+
+  return session.tabs;
+};
 
 function initialTabState() {
   return { tabs: [] };

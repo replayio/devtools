@@ -51,7 +51,6 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);
 
-  console.log("maybe update replay sessions");
   maybeUpdateReplaySessions(state);
 }
 
@@ -120,8 +119,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
   const previousReplaySessions = await getReplaySessions();
   const previousReplaySession = previousReplaySessions[recordingId];
 
-  console.log("maybeupdatereplay");
-
   const currentReplaySession = {
     viewMode: getViewMode(state),
     showEditor: getShowEditor(state),
@@ -131,8 +128,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
     localNags: [...(previousReplaySession?.localNags || [])],
     tabs: persistTabs(getTabs(state)) || [],
   };
-
-  console.log("tabs: ", persistTabs(getTabs(state)));
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
 }
