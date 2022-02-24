@@ -46,7 +46,7 @@ export function FullTextFilter({
 
   return (
     <div className="p-2">
-      <div className="flex items-center space-x-2 rounded-md border-0 bg-white px-2 py-1">
+      <div className="flex items-center space-x-2 rounded-md border-0 bg-themeTextField px-2 py-1">
         <MaterialIcon>search</MaterialIcon>
         <input
           style={{ boxShadow: "unset" }}
