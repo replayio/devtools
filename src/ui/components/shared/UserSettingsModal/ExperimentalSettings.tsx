@@ -3,6 +3,7 @@ import hooks from "ui/hooks";
 import { CheckboxRow } from "./CheckboxRow";
 import { CombinedUserSettings } from "ui/types";
 import { features } from "ui/utils/prefs";
+import { useFeature } from "ui/hooks/settings";
 
 type ExperimentalKey = keyof CombinedUserSettings;
 interface ExperimentalSetting {
@@ -66,10 +67,9 @@ export default function ExperimentalSettings({}) {
     !!features.commentAttachments
   );
 
-  const [enableColumnBreakpoints, setEnableColumnBreakpoints] = useState(
-    !!features.columnBreakpoints
-  );
-  const [enableTrimming, setEnableTrimming] = useState(!!features.trimming);
+  const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
+    useFeature("columnBreakpoints");
+  const { value: enableTrimming, update: updateEnableTrimming } = useFeature("trimming");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -81,10 +81,10 @@ export default function ExperimentalSettings({}) {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
       features.columnBreakpoints = value;
-      setEnableColumnBreakpoints(!!features.columnBreakpoints);
+      updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableTrimming") {
       features.trimming = value;
-      setEnableTrimming(!!features.trimming);
+      updateEnableTrimming(!enableTrimming);
     }
   };
 
