@@ -1,7 +1,7 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 
 import { ThreadFront } from "./thread";
-import { assert, binarySearch } from "./utils";
+import { assert, binarySearch, defer, Deferred } from "./utils";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import {
@@ -18,6 +18,8 @@ import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
+
+const MINIMUM_VIDEO_CONTENT = 5000;
 
 const { features } = require("ui/utils/prefs");
 
@@ -110,10 +112,40 @@ const gMouseClickEvents: MouseEvent[] = [];
 // Device pixel ratio used by the current screenshot.
 let gDevicePixelRatio = 1;
 
+let gAllNecessaryPaintDataReceived = false;
+
+export const videoReady: Deferred<void> = defer();
+
+const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
+
 function onPaints({ paints }: paintPoints) {
-  paints.forEach(({ point, time, screenShots }) => {
+  paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
+
+    if (gAllNecessaryPaintDataReceived) {
+      // We are all set on the loading front, no need to proactively grab these
+      // paints
+      return;
+    }
+
+    let loadTarget = MINIMUM_VIDEO_CONTENT;
+    if (hasAllPaintPoints) {
+      const lastPaintTime = gPaintPoints[gPaintPoints.length - 1].time;
+      // if we have all of the paints, and the last one happens before the 5
+      // second mark, make that the new goal for considering the video ready
+      if (lastPaintTime < MINIMUM_VIDEO_CONTENT) loadTarget = lastPaintTime;
+    }
+
+    if (time < loadTarget) {
+      const screenShotPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
+      gPaintPromises.push(screenShotPromise);
+    }
+    if (time >= loadTarget) {
+      gAllNecessaryPaintDataReceived = true;
+      await Promise.all(gPaintPromises);
+      videoReady.resolve();
+    }
   });
 }
 
@@ -193,7 +225,7 @@ class VideoPlayer {
 export const Video = new VideoPlayer();
 
 let onRefreshGraphics: (canvas: Canvas) => void;
-let paintPointsWaiter: Promise<findPaintsResult>;
+let hasAllPaintPoints = false;
 
 export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
@@ -203,7 +235,11 @@ export function setupGraphics(store: UIStore) {
   Video.init(store);
 
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
-    paintPointsWaiter = client.Graphics.findPaints({}, sessionId);
+    client.Graphics.findPaints({}, sessionId).then(async () => {
+      hasAllPaintPoints = true;
+      await Promise.all(gPaintPromises);
+      videoReady.resolve();
+    });
     client.Graphics.addPaintPointsListener(onPaints);
 
     client.Session.findMouseEvents({}, sessionId);
@@ -343,7 +379,6 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
-  await paintPointsWaiter;
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.
@@ -570,7 +605,6 @@ async function getScreenshotDimensions(screen: ScreenShot) {
 }
 
 export async function getFirstMeaningfulPaint(limit: number = 10) {
-  await paintPointsWaiter;
   for (const paintPoint of gPaintPoints.slice(0, limit)) {
     const { screen } = await getGraphicsAtTime(paintPoint.time);
     if (!screen) {
@@ -591,8 +625,6 @@ let precacheStartTime = -1;
 
 export function precacheScreenshots(startTime: number): UIThunkAction {
   return async ({ dispatch, getState }) => {
-    await paintPointsWaiter;
-
     const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;

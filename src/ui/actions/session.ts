@@ -26,6 +26,7 @@ import { ApolloError } from "@apollo/client";
 import { getUserSettings } from "ui/hooks/settings";
 import { setViewMode } from "./layout";
 import { getSelectedPanel } from "ui/reducers/layout";
+import { videoReady } from "protocol/graphics";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -133,9 +134,7 @@ export function createSession(recordingId: string): UIThunkAction {
       ThreadFront.setTest(getTest() || undefined);
       ThreadFront.recordingId = recordingId;
 
-      dispatch(showLoadingProgress()).then(() => {
-        dispatch(onLoadingFinished());
-      });
+      dispatch(showLoadingProgress());
 
       const { sessionId } = await sendMessage("Recording.createSession", {
         recordingId,
@@ -149,6 +148,11 @@ export function createSession(recordingId: string): UIThunkAction {
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
         dispatch(setViewMode("dev"));
+        await dispatch(showLoadingProgress());
+        dispatch(onLoadingFinished());
+      } else {
+        await videoReady.promise;
+        dispatch(onLoadingFinished());
       }
 
       dispatch(actions.setUploading(null));
