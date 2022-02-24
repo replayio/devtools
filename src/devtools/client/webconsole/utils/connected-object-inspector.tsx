@@ -3,9 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { ValueFront } from "protocol/thread";
 import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
 import { actions } from "ui/actions";
-const reps = require("devtools/packages/devtools-reps");
-const { REPS, MODE } = reps;
-const ObjectInspector = reps.objectInspector.ObjectInspector.default;
+import { ObjectInspector, ValueItem, REPS, MODE } from "devtools/packages/devtools-reps";
 import SmartTrace from "devtools/client/webconsole/utils/connected-smart-trace";
 
 type ObjectInspectorProps = PropsFromRedux & {
@@ -19,7 +17,7 @@ type ObjectInspectorProps = PropsFromRedux & {
 function OI(props: ObjectInspectorProps) {
   const { value } = props;
   const path = value.id();
-  const roots = [{ path, contents: value }];
+  const roots = [new ValueItem({ path, contents: value })];
 
   return (
     <ObjectInspector

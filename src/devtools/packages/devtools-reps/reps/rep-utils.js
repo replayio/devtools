@@ -346,19 +346,34 @@ function getGripPreviewItems(grip) {
 
   const rv = [];
 
-  const children = grip.getChildren();
-  for (const { name, contents } of children) {
-    if (name == "<entries>" || grip.isMapEntry()) {
-      rv.push(...getGripPreviewItems(contents));
-    } else {
-      rv.push(createPrimitiveValueFront(name), contents);
+  const properties = grip.previewValueMap();
+  for (const name in properties) {
+    rv.push(createPrimitiveValueFront(name), properties[name]);
+  }
+
+  const containerEntries = grip.previewContainerEntries();
+  for (const { key, value } of containerEntries) {
+    if (key) {
+      rv.push(key);
     }
+    rv.push(value);
   }
 
   // Promise resolved value Grip
-  //if (grip.promiseState && grip.promiseState.value) {
-  //  return [grip.promiseState.value];
-  //}
+  const promiseState = grip.previewPromiseState();
+  if (promiseState && promiseState.value) {
+    rv.push(promiseState.value);
+  }
+
+  const proxyState = grip.previewProxyState();
+  if (proxyState) {
+    rv.push(proxyState.target, proxyState.handler);
+  } else {
+    const prototypeValue = grip.previewPrototypeValue();
+    if (prototypeValue) {
+      rv.push(prototypeValue);
+    }
+  }
 
   // RegEx Grip
   if (grip.className() == "RegExp") {

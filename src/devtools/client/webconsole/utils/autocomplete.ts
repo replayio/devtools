@@ -166,11 +166,11 @@ function getGlobalVariables(scopes: Scope) {
     return [];
   }
 
-  // This gets the global object's children in the background. This happen
+  // This gets the global object's properties in the background. This happen
   // async, but we don't await it so that the loading happens in the background.
-  // Once the children are loaded, they will be available in the globalFront the
+  // Once the properties are loaded, they will be available in the globalFront the
   // next time this function runs and we attempt to get the properties for it.
-  globalFront.loadDirectChildren();
+  globalFront.loadIfNecessary();
 
   const rv = getPropertiesForObject(globalFront.getObject());
   return rv;

@@ -4,18 +4,10 @@
 
 //
 
-import { objectInspector } from "devtools/packages/devtools-reps";
 import { getBindingVariables } from "./getVariables";
 import { getFramePopVariables, getThisVariable } from "./utils";
 import { simplifyDisplayName } from "../../pause/frames";
-
-import { createElementsFront } from "protocol/thread";
-
-const {
-  utils: {
-    node: { NODE_TYPES },
-  },
-} = objectInspector;
+import { ValueItem, ContainerItem } from "devtools/packages/devtools-reps";
 
 function getScopeTitle(type, scope) {
   if (type === "block" && scope.block && scope.block.displayName) {
@@ -67,12 +59,11 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
     if (vars && vars.length) {
       const title = getScopeTitle(type, scope) || "";
       vars.sort((a, b) => a.name.localeCompare(b.name));
-      return {
+      return new ContainerItem({
         name: title,
         path: key,
-        contents: createElementsFront(vars),
-        type: NODE_TYPES.BLOCK,
-      };
+        contents: vars,
+      });
     }
   } else if (scope.object) {
     let value = scope.object;
@@ -83,11 +74,11 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
       value = { ...scope.object, displayClass: "Global" };
     }
     */
-    return {
+    return new ValueItem({
       name: value.className(),
       path: key,
       contents: value,
-    };
+    });
   }
 
   return null;
@@ -95,14 +86,13 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
 
 export function mergeScopes(scope, parentScope, item, parentItem) {
   if (scope.scopeKind == "function lexical" && parentScope.type == "function") {
-    const contents = item.contents.getChildren().concat(parentItem.contents.getChildren());
+    const contents = item.getChildren().concat(parentItem.getChildren());
     contents.sort((a, b) => a.name.localeCompare(b.name));
 
-    return {
+    return new ContainerItem({
       name: parentItem.name,
       path: parentItem.path,
-      contents: createElementsFront(contents),
-      type: NODE_TYPES.BLOCK,
-    };
+      contents,
+    });
   }
 }

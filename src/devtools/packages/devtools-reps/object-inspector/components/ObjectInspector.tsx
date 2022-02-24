@@ -1,34 +1,25 @@
-import React, { PureComponent } from "react";
+import React, { FC, PureComponent, ReactNode } from "react";
 import classnames from "classnames";
 import { Tree } from "devtools/client/debugger/src/components/shared/tree";
 import ObjectInspectorItem from "./ObjectInspectorItem";
-import { createUnavailableValueFront, ValueFront } from "protocol/thread";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { isRegionLoaded } from "ui/reducers/app";
 import { RedactedSpan } from "ui/components/Redacted";
-const Utils = require("../utils");
-const { renderRep, shouldRenderRootsInReps } = Utils;
-const {
-  needsToLoad,
-  needsToLoadChildren,
-  getChildren,
-  getParent,
-  getValue,
-  nodeIsPrimitive,
-  nodeHasGetter,
-  nodeHasSetter,
-} = Utils.node;
-
-export interface Item {
-  name?: string;
-  path: string;
-  contents: ValueFront;
-  childrenLoaded?: boolean;
-}
+import {
+  Item,
+  ValueItem,
+  renderRep,
+  shouldRenderRootsInReps,
+  loadChildren,
+  findPause,
+} from "../utils";
+import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
+import { assert } from "protocol/utils";
 
 interface PropsFromParent {
   roots: Item[];
+  defaultRep?: { rep: FC };
   focusable?: boolean;
   disableWrap?: boolean;
   inline?: boolean;
@@ -41,6 +32,7 @@ interface PropsFromParent {
   onActivate?: (item: Item | undefined) => void;
   onFocus?: (item: Item | undefined) => void;
   rootsChanged?: () => void;
+  renderStacktrace?: (stacktrace: SmartTraceStackFrame[]) => ReactNode;
 }
 
 type ObjectInspectorProps = PropsFromRedux & PropsFromParent;
@@ -86,50 +78,25 @@ class OI extends PureComponent<ObjectInspectorProps> {
     this.activeItem = this.props.activeItem;
   }
 
-  getRoots = () => this.props.roots;
+  getRoots = (): Item[] => this.props.roots;
 
-  getItemChildren = (item: Item) => {
-    if (needsToLoad(item)) {
-      const name = "Loading…";
-      return [
-        {
-          name,
-          contents: createUnavailableValueFront(),
-          path: `${item.path}/${name}`,
-        },
-      ];
-    }
+  getItemChildren = (item: Item): Item[] => item.getChildren();
 
-    return getChildren({ item });
-  };
+  areItemsEqual = (item1: Item, item2: Item): boolean => item1.path === item2.path;
 
-  areItemsEqual = (item1: Item, item2: Item) => item1.path === item2.path;
+  shouldItemUpdate = (prevItem: Item, nextItem: Item): boolean =>
+    prevItem.type === "value" &&
+    nextItem.type === "value" &&
+    prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren();
 
-  shouldItemUpdate = (prevItem: Item, nextItem: Item) =>
-    prevItem.childrenLoaded !== nextItem.childrenLoaded;
+  getItemKey = (item: Item): string => item.path;
 
-  getNodeKey = (item: Item) => {
-    return item.path && typeof item.path.toString === "function"
-      ? item.path.toString()
-      : item.contents.id();
-  };
+  isExpanded = (item: Item): boolean => this.expandedPaths.has(item.path);
 
-  isExpanded = (item: Item) => this.expandedPaths.has(item.path);
+  isItemExpandable = (item: Item): boolean => !item.isPrimitive();
 
-  isNodeExpandable = (item: Item) => {
-    if (nodeIsPrimitive(item)) {
-      return false;
-    }
-
-    if (nodeHasSetter(item) || nodeHasGetter(item)) {
-      return false;
-    }
-
-    return true;
-  };
-
-  setExpanded = async (item: Item, expand: boolean) => {
-    if (!this.isNodeExpandable(item) || !this.props.isRegionLoaded) {
+  setExpanded = async (item: Item, expand: boolean): Promise<void> => {
+    if (!this.isItemExpandable(item) || !this.props.isRegionLoaded) {
       return;
     }
     if (expand) {
@@ -139,9 +106,9 @@ class OI extends PureComponent<ObjectInspectorProps> {
     }
     this.forceUpdate();
 
-    if (expand && needsToLoadChildren(item)) {
+    if (expand && item.type === "value" && item.needsToLoadChildren()) {
       try {
-        await getValue(item).loadChildren();
+        await loadChildren(item);
       } catch {
         this.expandedPaths.delete(item.path);
       }
@@ -149,11 +116,11 @@ class OI extends PureComponent<ObjectInspectorProps> {
     }
   };
 
-  expand = (item: Item) => this.setExpanded(item, true);
+  expand = (item: Item): Promise<void> => this.setExpanded(item, true);
 
-  collapse = (item: Item) => this.setExpanded(item, false);
+  collapse = (item: Item): Promise<void> => this.setExpanded(item, false);
 
-  focusItem = (item: Item | undefined) => {
+  focusItem = (item: Item | undefined): void => {
     const { focusable = true, onFocus } = this.props;
 
     if (focusable && this.focusedItem?.path !== item?.path) {
@@ -166,7 +133,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
     }
   };
 
-  activateItem = (item: Item | undefined) => {
+  activateItem = (item: Item | undefined): void => {
     const { focusable = true, onActivate } = this.props;
 
     if (focusable && this.activeItem?.path !== item?.path) {
@@ -214,15 +181,15 @@ class OI extends PureComponent<ObjectInspectorProps> {
         autoExpandDepth={autoExpandDepth}
         initiallyExpanded={initiallyExpanded}
         isExpanded={this.isExpanded}
-        isExpandable={this.isNodeExpandable}
+        isExpandable={this.isItemExpandable}
         focused={this.focusedItem}
         active={this.activeItem}
         getRoots={this.getRoots}
-        getParent={getParent}
+        getParent={() => undefined}
         getChildren={this.getItemChildren}
         areItemsEqual={this.areItemsEqual}
         shouldItemUpdate={this.shouldItemUpdate}
-        getKey={this.getNodeKey}
+        getKey={this.getItemKey}
         onExpand={this.expand}
         onCollapse={this.collapse}
         onFocus={focusable ? this.focusItem : undefined}
@@ -253,7 +220,9 @@ function ObjectInspector(props: ObjectInspectorProps) {
   }
 
   if (shouldRenderRootsInReps(roots)) {
-    return <RedactedSpan>{renderRep(roots[0], props)}</RedactedSpan>;
+    const root = roots[0];
+    assert(root instanceof ValueItem);
+    return <RedactedSpan>{renderRep(root, props)}</RedactedSpan>;
   }
 
   return (
@@ -264,7 +233,7 @@ function ObjectInspector(props: ObjectInspectorProps) {
 }
 
 const connector = connect((state: UIState, { roots }: PropsFromParent) => ({
-  isRegionLoaded: isRegionLoaded(state, roots[0]?.contents.getPause()?.time),
+  isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ObjectInspector);

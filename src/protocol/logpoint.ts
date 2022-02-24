@@ -477,10 +477,11 @@ async function findFrameworkListeners(
   frameworkListeners: ValueFront
 ) {
   const locations = [];
-  const children = await frameworkListeners.loadChildren();
-  for (const { contents } of children) {
-    if (contents.isObject() && contents.className() == "Function") {
-      locations.push(contents.functionLocationFromLogpoint()!);
+  await frameworkListeners.loadProperties();
+  const propertyValues = Object.values(frameworkListeners.previewValueMap());
+  for (const value of propertyValues) {
+    if (value.isObject() && value.className() == "Function") {
+      locations.push(value.functionLocationFromLogpoint()!);
     }
   }
   if (!locations.length) {
