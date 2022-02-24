@@ -88,7 +88,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 
 function LimitWarning() {
   return (
-    <div className="absolute place-content-center bottom-2 right-2 flex rounded-md bg-gray-500 p-2 text-white shadow-lg text-xs">
+    <div className="absolute bottom-2 right-2 flex place-content-center rounded-md bg-gray-500 p-2 text-xs text-white shadow-lg">
       <Icon filename="warning" size="small" className="bg-white" />
       <span className="px-1">Replays work best under 2 minutes</span>
     </div>

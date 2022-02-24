@@ -30,6 +30,7 @@ type MixpanelEvent =
   | ["comments.start_edit"]
   | ["console.clear_messages"]
   | ["console.overflow"]
+  | ["editor.open_sourcemap_visualizer"]
   | ["events_timeline.select"]
   | ["events_timeline.select_source"]
   | ["error.font_loading_timeout"]

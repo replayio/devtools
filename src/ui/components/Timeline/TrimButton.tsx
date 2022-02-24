@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { useState } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import * as actions from "ui/actions/app";
+import { useFeature } from "ui/hooks/settings";
 import { selectors } from "ui/reducers";
 import { getIsTrimming } from "ui/reducers/app";
 import { UIState } from "ui/state";
@@ -10,6 +11,7 @@ import MaterialIcon from "../shared/MaterialIcon";
 export const TrimButton = () => {
   const dispatch = useDispatch();
   const isTrimming = useSelector(getIsTrimming);
+  const { value: enableTrimming } = useFeature("trimming");
 
   const onClick = () => {
     if (isTrimming) {
@@ -18,6 +20,10 @@ export const TrimButton = () => {
       dispatch(actions.setModal("trimming"));
     }
   };
+
+  if (!enableTrimming) {
+    return null;
+  }
 
   return (
     <button
