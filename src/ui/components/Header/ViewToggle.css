@@ -10,8 +10,8 @@
   outline: none !important;
   border-radius: 8px;
   font-size: 15px;
-  background: var(--cool-gray-200);
-  border: 1px solid var(--cool-gray-200);
+  background: var(--theme-base-100);
+  border: 1px solid var(--theme-base-90);
   position: relative;
 }
 
@@ -20,11 +20,11 @@
   content: "";
   height: calc(100% - 2px);
   border-radius: 6px;
-  background: white;
+  background: var(--theme-base-90);
   width: calc(50% - 2px);
   top: 0;
   margin: 1px;
-  transition: left 200ms ease-out;
+  transition: left 140ms ease-in;
 }
 
 .view-toggle .option {
