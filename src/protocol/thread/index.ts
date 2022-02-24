@@ -1,8 +1,3 @@
 export { ThreadFront } from "./thread";
-export {
-  ValueFront,
-  createPrimitiveValueFront,
-  createUnavailableValueFront,
-  createElementsFront,
-} from "./value";
+export { ValueFront, createPrimitiveValueFront, createUnavailableValueFront } from "./value";
 export { Pause } from "./pause";

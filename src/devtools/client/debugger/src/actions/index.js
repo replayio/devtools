@@ -15,9 +15,6 @@ import * as tabs from "./tabs";
 import * as toolbox from "./toolbox";
 import * as preview from "./preview";
 
-// import { objectInspector } from "../devtools/packages/devtools-reps";
-import { objectInspector } from "devtools/packages/devtools-reps";
-
 export default {
   ...breakpoints,
   ...logExceptions,
@@ -27,7 +24,6 @@ export default {
   ...pause,
   ...ui,
   ...fileSearch,
-  ...objectInspector.actions,
   ...quickOpen,
   ...sourceTree,
   ...toolbox,

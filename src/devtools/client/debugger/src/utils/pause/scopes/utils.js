@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import { ValueItem } from "devtools/packages/devtools-reps";
 
 export function getFramePopVariables(why, path) {
   const vars = [];
@@ -12,11 +12,13 @@ export function getFramePopVariables(why, path) {
 
     // Always display a `throw` property if present, even if it is falsy.
     if (Object.prototype.hasOwnProperty.call(frameFinished, "throw")) {
-      vars.push({
-        name: "<exception>",
-        path: `${path}/<exception>`,
-        contents: frameFinished.throw,
-      });
+      vars.push(
+        new ValueItem({
+          name: "<exception>",
+          path: `${path}/<exception>`,
+          contents: frameFinished.throw,
+        })
+      );
     }
 
     if (Object.prototype.hasOwnProperty.call(frameFinished, "return")) {
@@ -25,11 +27,13 @@ export function getFramePopVariables(why, path) {
       // Do not display undefined. Do display falsy values like 0 and false. The
       // protocol grip for undefined is a JSON object: { type: "undefined" }.
       if (typeof returned !== "object" || returned.type !== "undefined") {
-        vars.push({
-          name: "<return>",
-          path: `${path}/<return>`,
-          contents: returned,
-        });
+        vars.push(
+          new ValueItem({
+            name: "<return>",
+            path: `${path}/<return>`,
+            contents: returned,
+          })
+        );
       }
     }
   }
@@ -42,11 +46,11 @@ export function getThisVariable(this_, path) {
     return null;
   }
 
-  return {
+  return new ValueItem({
     name: "<this>",
     path: `${path}/<this>`,
     contents: this_,
-  };
+  });
 }
 
 // Get a string path for an scope item which can be used in different pauses for
