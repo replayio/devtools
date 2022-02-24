@@ -18,11 +18,14 @@ import { getSubscriptionWithPricing, Views } from "./utils";
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
 // usage of the live key.
+
+// trunk-ignore-begin(gitleaks/stripe-access-token)
 export const stripePromise = loadStripe(
   !isDevelopment()
     ? "pk_live_51IxKTQEfKucJn4vkdJyNElRNGAACWDbCZN5DEts1AwxLyO0XyKlkdktz3meLLBQCp63zmuozrnsVlzwIC9yhFPSM00UXegj4R1"
     : "pk_test_51IxKTQEfKucJn4vkBYgiHf8dIZPlzC96neLXfRmOKhEI0tmFwe21aRegxJLUntV8UoETbPj2XNuA3KSayIR4nWXt00Vd4mZq4Z"
 );
+// trunk-ignore-end(gitleaks/stripe-access-token)
 
 export default function WorkspaceSubscription({ workspaceId }: { workspaceId: string }) {
   const [errorMessage, setErrorMessage] = useState<string>();

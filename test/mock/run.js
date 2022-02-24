@@ -49,6 +49,7 @@ async function main() {
       let url = "<recording unavailable";
       if (recordings.length) {
         const recordingId = await uploadRecording(recordings[recordings.length - 1].id, {
+          // trunk-ignore(gitleaks/generic-api-key)
           apiKey: "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ",
         });
         if (recordingId) {

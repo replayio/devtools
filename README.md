@@ -85,3 +85,15 @@ RECORD_REPLAY_SERVER=ws://localhost:8000 RECORD_REPLAY_DRIVER=~/devel/backend/ou
 ```
 
 Replace the paths with the appropriate paths within the `backend` repo as appropriate in your environment.
+
+#### Installing the trunk launcher
+
+This project uses [trunk](https://trunk.io) to lint and format its code.
+
+You can [install](https://docs.trunk.io/getting-started) the trunk launcher using the command `curl https://get.trunk.io -fsSL | bash`. This will place `trunk` in your PATH.
+
+#### Linting your changes
+
+In most cases you can simply run `trunk check` which will autodetect the changes you have made and lint them.
+If you would like to only autoformat your changes, you can run `trunk fmt`.
+More information on using trunk can be found [here](https://docs.trunk.io/getting-started/usage).

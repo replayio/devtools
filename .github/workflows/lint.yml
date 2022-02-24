@@ -3,11 +3,17 @@ name: Lint
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  eslint:
+  trunk_check_runner:
+    name: Trunk Check runner
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Cache Linters/Formatters
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/trunk
+          key: trunk-${{ runner.os }}
       - name: Install Deps
         run: npm install
-      - name: Run eslint
-        run: npm run lint
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@v0.4.0-beta
