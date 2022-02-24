@@ -5,6 +5,7 @@ import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
 import Icon from "ui/components/shared/Icon";
 import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/source";
+import { trackEvent } from "ui/utils/telemetry";
 
 function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromRedux) {
   const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
@@ -14,7 +15,13 @@ function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromR
 
   return (
     <div className="flex items-center pl-4">
-      <a target="_blank" rel="noreferrer noopener hover:underline" href={href}>
+      <a
+        className="hover:underline"
+        target="_blank"
+        rel="noreferrer noopener"
+        href={href}
+        onClick={() => trackEvent("editor.open_sourcemap_visualizer")}
+      >
         <Icon
           size="small"
           filename="external"
