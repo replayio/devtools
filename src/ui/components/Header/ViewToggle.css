@@ -10,7 +10,7 @@
   outline: none !important;
   border-radius: 8px;
   font-size: 15px;
-  background: var(--theme-base-100);
+  background: var(--theme-base-90);
   border: 1px solid var(--theme-base-90);
   position: relative;
 }
@@ -20,7 +20,7 @@
   content: "";
   height: calc(100% - 2px);
   border-radius: 6px;
-  background: var(--theme-base-90);
+  background: var(--theme-base-100);
   width: calc(50% - 2px);
   top: 0;
   margin: 1px;
