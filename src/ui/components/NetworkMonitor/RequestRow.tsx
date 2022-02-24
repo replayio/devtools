@@ -54,13 +54,15 @@ export const RequestRow = ({
           </div>
         )}
         {row.cells.map(cell => {
+          const { key, ...cellProps } = cell.getCellProps();
           return (
             <div
+              key={key}
               className={classNames(
                 "items-center overflow-hidden whitespace-nowrap p-1",
                 styles[cell.column.id]
               )}
-              {...cell.getCellProps()}
+              {...cellProps}
               style={{ ...cell.getCellProps().style, display: "flex" }}
             >
               <div className={(cell.column as any).className}>{cell.render("Cell")}</div>

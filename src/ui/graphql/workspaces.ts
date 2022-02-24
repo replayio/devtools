@@ -115,3 +115,24 @@ export const CANCEL_WORKSPACE_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const ACTIVATE_WORKSPACE_SUBSCRIPTION = gql`
+  mutation ActivateWorkspaceSubscription(
+    $workspaceId: ID!
+    $planKey: String!
+    $paymentMethodBillingId: String!
+  ) {
+    setWorkspaceDefaultPaymentMethod(
+      input: { workspaceId: $workspaceId, paymentMethodId: $paymentMethodBillingId }
+    ) {
+      success
+    }
+    activateWorkspaceSubscription(input: { workspaceId: $workspaceId, planKey: $planKey }) {
+      success
+      subscription {
+        effectiveUntil
+        status
+      }
+    }
+  }
+`;

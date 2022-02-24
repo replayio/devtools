@@ -23,20 +23,6 @@ body.sourcemap-visualizer {
   border-bottom: 1px solid rgba(127, 127, 127, 0.5);
 }
 
-.sourcemap-visualizer #toolbar section {
-  flex: 1;
-  display: flex;
-}
-
-.sourcemap-visualizer #toolbar section:first-child {
-  padding-left: 8px;
-}
-
-.sourcemap-visualizer #toolbar section > * {
-  vertical-align: middle;
-  margin-right: 20px;
-}
-
 .sourcemap-visualizer #theme {
   position: fixed;
   right: 0;
@@ -85,13 +71,21 @@ body.sourcemap-visualizer {
   text-overflow: ellipsis;
 }
 
-.sourcemap-visualizer #fileListParent {
-  width: 80%;
-}
-
 .sourcemap-visualizer select {
   padding: 0;
-  width: 100%;
+  background: none;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  color: #626262;
+}
+.sourcemap-visualizer select:focus {
+  outline: none;
+}
+
+#toolbar {
+  display: flex;
+  justify-content: center;
 }
 
 .sourcemap-visualizer h1 {
@@ -121,7 +115,7 @@ body.sourcemap-visualizer {
 }
 
 .sourcemap-visualizer noscript:before {
-  content: '🚫';
+  content: "🚫";
   display: block;
   width: 50px;
   line-height: 22px;
@@ -133,49 +127,49 @@ body.sourcemap-visualizer {
 
 /* ---------- Light colors ---------- */
 
-body.sourcemap-visualizer:not([data-theme=dark]) {
+body.sourcemap-visualizer:not([data-theme="dark"]) {
   color: #222;
   fill: #222;
   stroke: #222;
   background: white;
 }
 
-body.sourcemap-visualizer:not([data-theme=dark]) #theme-dark {
+body.sourcemap-visualizer:not([data-theme="dark"]) #theme-dark {
   display: none;
 }
 
 /* ---------- Dark colors ---------- */
 
-body.sourcemap-visualizer[data-theme=dark] {
+body.sourcemap-visualizer[data-theme="dark"] {
   color: #eee;
   fill: #eee;
   stroke: #eee;
   background: #333;
 }
 
-body.sourcemap-visualizer[data-theme=dark] #theme-light {
+body.sourcemap-visualizer[data-theme="dark"] #theme-light {
   display: none;
 }
 
-body.sourcemap-visualizer[data-theme=dark] #theme-dark {
+body.sourcemap-visualizer[data-theme="dark"] #theme-dark {
   display: block;
 }
 
 /* ---------- Dark colors without JavaScript ---------- */
 
 @media (prefers-color-scheme: dark) {
-  body.sourcemap-visualizer:not([data-theme=light]) {
-    color: #eee;
+  body.sourcemap-visualizer:not([data-theme="light"]) {
+    color: #333;
     fill: #eee;
     stroke: #eee;
-    background: #333;
+    background: #eee;
   }
 
-  body.sourcemap-visualizer:not([data-theme=light]) #theme-light {
+  body.sourcemap-visualizer:not([data-theme="light"]) #theme-light {
     display: none;
   }
 
-  body.sourcemap-visualizer:not([data-theme=light]) #theme-dark {
+  body.sourcemap-visualizer:not([data-theme="light"]) #theme-dark {
     display: block;
   }
 }

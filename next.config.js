@@ -5,6 +5,11 @@ module.exports = {
   // (see https://github.com/vercel/next.js/pull/34500)
   experimental: {},
 
+  eslint: {
+    // which folders to run ESLint on during production builds (next build)
+    dirs: ["src", "pages", "packages"],
+  },
+
   productionBrowserSourceMaps: true,
 
   async redirects() {

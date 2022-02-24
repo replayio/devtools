@@ -57,12 +57,6 @@ function Panel({
     };
   }, []);
 
-  useEffect(() => {
-    // Force CodeMirror to refresh when changing the size of the breakpoint
-    // panel so that code selection works properly.
-    window.dispatchEvent(new Event("resize"));
-  });
-
   const toggleEditingOn = () => {
     dismissNag(Nag.FIRST_BREAKPOINT_EDIT);
     setEditing(true);

@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import LoadingScreen from "./shared/LoadingScreen";
 
 interface PropsFromParent {
-  slice: string;
+  slice: "inspector" | "messages";
   children: ReactNode;
 }
 

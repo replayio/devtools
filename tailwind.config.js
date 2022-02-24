@@ -20,6 +20,7 @@ module.exports = {
         jellyfish: "rgba(255,255,255,0.8)",
         splitter: "var(--theme-splitter-color)",
         chrome: "var(--chrome)",
+        themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
         themeBodyBackground: "var(--theme-body-background)",
         themeMenuHighlight: "var(--theme-menu-highlight)",
         themeTabBackground: "var(--theme-tab-background)",

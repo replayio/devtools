@@ -192,6 +192,7 @@
   --theme-toolbar-background: var(--grey-10);
 
   --theme-toolbar-selected-color: var(--theme-body-color);
+  --theme-toolbar-panel-icon-color: #bcbcbc;
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
   --theme-toolbar-background-alt: #f5f5f5;

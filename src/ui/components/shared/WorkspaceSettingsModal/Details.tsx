@@ -76,7 +76,7 @@ function SubscriptionDetails({
         <div className="border-color-gray-50 flex flex-row items-center justify-between border-b py-2">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">
-            {subscription.paymentMethods.length > 0 ? (
+            {subscription.paymentMethods && subscription.paymentMethods.length > 0 ? (
               <button
                 className="text-primaryAccent hover:underline"
                 onClick={onDeletePaymentMethod}
@@ -97,14 +97,18 @@ function SubscriptionDetails({
 
 export function Details({
   subscription,
-  setView,
+  onAddPaymentMethod,
+  onDeletePaymentMethod,
+  onResubscribe,
   workspace,
   confirmed,
 }: {
   confirmed?: boolean;
   subscription: SubscriptionWithPricing;
   workspace: Workspace;
-  setView: (view: Views) => void;
+  onAddPaymentMethod: () => void;
+  onDeletePaymentMethod: () => void;
+  onResubscribe: () => void;
 }) {
   if (inUnpaidFreeTrial(workspace)) {
     const expiresIn = subscriptionEndsIn(workspace);
@@ -113,7 +117,7 @@ export function Details({
       <TrialDetails
         workspace={workspace}
         expiresIn={expiresIn}
-        onSelectPricing={() => setView("add-payment-method")}
+        onSelectPricing={onAddPaymentMethod}
       />
     );
   }
@@ -121,11 +125,11 @@ export function Details({
   return (
     <>
       <SettingsHeader>{`${subscription.displayName} Plan`}</SettingsHeader>
-      <BillingBanners subscription={subscription} confirmed={confirmed} />
+      <BillingBanners workspace={workspace} confirmed={confirmed} onResubscribe={onResubscribe} />
       <SubscriptionDetails
         subscription={subscription}
-        onAddPaymentMethod={() => setView("add-payment-method")}
-        onDeletePaymentMethod={() => setView("delete-payment-method")}
+        onAddPaymentMethod={onAddPaymentMethod}
+        onDeletePaymentMethod={onDeletePaymentMethod}
       />
     </>
   );

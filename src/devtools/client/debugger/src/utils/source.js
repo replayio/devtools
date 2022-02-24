@@ -431,3 +431,37 @@ export function getSourceIDsToSearch(sourcesById) {
     return [source.isOriginal ? 0 : 1, source.url];
   });
 }
+
+function getSourceToVisualize(selectedSource, alternateSource) {
+  if (!selectedSource) {
+    return undefined;
+  }
+  if (selectedSource.isOriginal) {
+    return selectedSource.id;
+  }
+  if (alternateSource?.isOriginal) {
+    return alternateSource.id;
+  }
+  if (ThreadFront.getSourceKind(selectedSource.id) === "prettyPrinted") {
+    // for pretty-printed sources we show the sourcemap of the non-pretty-printed version
+    return ThreadFront.getGeneratedSourceIds(selectedSource.id)?.[0];
+  } else if (ThreadFront.getOriginalSourceIds(selectedSource.id)?.length) {
+    return selectedSource.id;
+  }
+  return undefined;
+}
+
+export function getSourcemapVisualizerURL(selectedSource, alternateSource) {
+  const sourceId = getSourceToVisualize(selectedSource, alternateSource);
+  if (!sourceId) {
+    return null;
+  }
+
+  let href = `/recording/${ThreadFront.recordingId}/sourcemap/${sourceId}`;
+  const dispatchUrl = new URL(location.href).searchParams.get("dispatch");
+  if (dispatchUrl) {
+    href += `?dispatch=${dispatchUrl}`;
+  }
+
+  return href;
+}

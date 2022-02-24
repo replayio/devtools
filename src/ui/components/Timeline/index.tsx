@@ -32,7 +32,7 @@ import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
-import Trimmer from "./Trimmer";
+import { Trimmer } from "./Trimmer";
 import TrimButton from "./TrimButton";
 import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
@@ -122,9 +122,6 @@ class Timeline extends Component<PropsFromRedux> {
     const mouseTime = this.getMouseTime(e);
 
     trackEvent("timeline.progress_select");
-    if (isTrimming) {
-      return;
-    }
 
     if (hoverTime != null && !clickedOnCommentMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
@@ -357,6 +354,8 @@ class Timeline extends Component<PropsFromRedux> {
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
     const formattedTime = getFormattedTime(currentTime);
+    const showCurrentPauseMarker =
+      (this.isHovering() && percent >= 0 && percent <= 100) || isTrimming;
 
     return (
       <div className="timeline">
@@ -381,12 +380,12 @@ class Timeline extends Component<PropsFromRedux> {
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {this.renderUnloadedRegions()}
             {features.trimming ? this.renderTrimmedRegion() : null}
-            {this.isHovering() && percent >= 0 && percent <= 100 ? (
+            {showCurrentPauseMarker ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
             {this.renderPreviewMarkers()}
             <Comments />
-            {isTrimming ? <Trimmer width={this.overlayWidth} /> : null}
+            {isTrimming ? <Trimmer /> : null}
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>

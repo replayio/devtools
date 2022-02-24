@@ -76,3 +76,9 @@ but without a background color so we can use hover effects
 .icon.resolved {
   -webkit-mask-image: url(/icons/resolved.svg);
 }
+
+/* upload screen */
+
+.icon.warning {
+  -webkit-mask-image: url(/icons/warning.svg);
+}

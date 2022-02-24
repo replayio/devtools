@@ -104,15 +104,9 @@ function SourcemapVisualizer({
   return (
     <>
       <div id="toolbar">
-        <section>
-          <h2>Original&nbsp;code</h2>
-          <div id="fileListParent">
-            <select id="fileList"></select>
-          </div>
-        </section>
-        <section>
-          <h2>Generated&nbsp;code</h2>
-        </section>
+        <div id="fileListParent">
+          <select id="fileList"></select>
+        </div>
       </div>
       <div id="statusBar">
         <section>
