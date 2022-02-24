@@ -3,6 +3,7 @@ import hooks from "ui/hooks";
 import { CheckboxRow } from "./CheckboxRow";
 import { CombinedUserSettings } from "ui/types";
 import { features } from "ui/utils/prefs";
+import { useFeature } from "ui/hooks/settings";
 
 type ExperimentalKey = keyof CombinedUserSettings;
 interface ExperimentalSetting {
@@ -23,9 +24,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableEventLink",
   },
   {
-    label: "Comment Attachments",
-    description: "Add Loom video comments ",
-    key: "enableCommentAttachments",
+    label: "Trim Timeline",
+    description: "Crop the replay to a smaller window",
+    key: "enableTrimming",
+  },
+  {
+    label: "Column Breakpoints",
+    description: "Add breakpoints within a line",
+    key: "enableColumnBreakpoints",
   },
 ];
 
@@ -61,6 +67,10 @@ export default function ExperimentalSettings({}) {
     !!features.commentAttachments
   );
 
+  const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
+    useFeature("columnBreakpoints");
+  const { value: enableTrimming, update: updateEnableTrimming } = useFeature("trimming");
+
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
       updateEventLink({ variables: { newValue: value } });
@@ -69,10 +79,16 @@ export default function ExperimentalSettings({}) {
       setEnableCommentAttachments(!!features.commentAttachments);
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
+    } else if (key == "enableColumnBreakpoints") {
+      features.columnBreakpoints = value;
+      updateEnableColumnBreakpoints(!enableColumnBreakpoints);
+    } else if (key == "enableTrimming") {
+      features.trimming = value;
+      updateEnableTrimming(!enableTrimming);
     }
   };
 
-  const localSettings = { enableCommentAttachments };
+  const localSettings = { enableCommentAttachments, enableColumnBreakpoints, enableTrimming };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {
