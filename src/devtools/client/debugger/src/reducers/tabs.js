@@ -19,11 +19,11 @@ import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } f
 import { asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 
-export const getInitialTabs = async () => {
+export const getInitialTabsState = async () => {
   const sessions = await asyncStore.replaySessions;
   const session = sessions[getRecordingId()];
 
-  return session.tabs;
+  return { tabs: session?.tabs || [] };
 };
 
 function initialTabState() {

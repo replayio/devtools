@@ -14,7 +14,7 @@ import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getInitialLayoutState } from "ui/reducers/layout";
-import { getInitialTabs } from "devtools/client/debugger/src/reducers/tabs";
+import { getInitialTabsState } from "devtools/client/debugger/src/reducers/tabs";
 
 declare global {
   interface Window {
@@ -30,7 +30,7 @@ export async function bootstrapApp() {
   const initialState = {
     app: initialAppState,
     layout: await getInitialLayoutState(),
-    tabs: { tabs: await getInitialTabs() },
+    tabs: await getInitialTabsState(),
   };
 
   const store = bootstrapStore(initialState);
