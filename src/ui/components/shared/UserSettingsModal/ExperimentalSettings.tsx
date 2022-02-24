@@ -23,9 +23,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableEventLink",
   },
   {
-    label: "Comment Attachments",
-    description: "Add Loom video comments ",
-    key: "enableCommentAttachments",
+    label: "Trim Timeline",
+    description: "Crop the replay to a smaller window",
+    key: "enableTrimming",
+  },
+  {
+    label: "Column Breakpoints",
+    description: "Add breakpoints within a line",
+    key: "enableColumnBreakpoints",
   },
 ];
 
@@ -61,6 +66,11 @@ export default function ExperimentalSettings({}) {
     !!features.commentAttachments
   );
 
+  const [enableColumnBreakpoints, setEnableColumnBreakpoints] = useState(
+    !!features.columnBreakpoints
+  );
+  const [enableTrimming, setEnableTrimming] = useState(!!features.trimming);
+
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
       updateEventLink({ variables: { newValue: value } });
@@ -69,10 +79,16 @@ export default function ExperimentalSettings({}) {
       setEnableCommentAttachments(!!features.commentAttachments);
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
+    } else if (key == "enableColumnBreakpoints") {
+      features.columnBreakpoints = value;
+      setEnableColumnBreakpoints(!!features.columnBreakpoints);
+    } else if (key == "enableTrimming") {
+      features.trimming = value;
+      setEnableTrimming(!!features.trimming);
     }
   };
 
-  const localSettings = { enableCommentAttachments };
+  const localSettings = { enableCommentAttachments, enableColumnBreakpoints, enableTrimming };
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {
