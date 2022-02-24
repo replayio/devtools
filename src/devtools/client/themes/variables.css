@@ -167,6 +167,8 @@
   --theme-toggle: var(--theme-base-90);
   --theme-toggle-handle: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
+  --theme-text-field: var(--theme-base-95);
+  --theme-console-input: var(--theme-body-background);
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -177,7 +179,7 @@
   --theme-menu-highlight: #f3f4f6;
 
   --theme-border: #d2d5da;
-  --theme-text-field: var(--theme-base-95);
+
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --toolbarbutton-focus-background: var(--grey-20);
@@ -339,6 +341,7 @@
   --theme-toggle: var(--theme-base-80);
   --theme-toggle-handle: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
+  --theme-console-input: #efefef;
 
   /* TO AUDIT NEXT */
 
