@@ -79,7 +79,7 @@
   --tab-line-color: var(--theme-body-color);
   color: var(--primary-accent);
   border-bottom-color: transparent;
-  background-color: var(--theme-base-90);
+  background-color: var(--tab-selected-bgcolor);
 }
 
 .source-tab:not(.active):hover {

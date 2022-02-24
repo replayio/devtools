@@ -140,32 +140,33 @@
 
 :root.theme-light {
   /* TOP LEVEL STYLES */
-  --theme-base-100: #000000; /* background chrome */
-  --theme-base-95: #252525; /* tab bars */
-  --theme-base-90: #303030; /* editor and selected tab */
-  --theme-base-85: #3c3c3c; /* textfields */
-  --theme-base-80: #5c5c5c;
-  --theme-base-70: #828282;
-  --theme-base-60: #a3a3a3;
+  --theme-base-100: hsl(0, 0%, 100%);
+  --theme-base-95: hsl(0, 0%, 95%);
+  --theme-base-90: hsl(0, 0%, 90%);
+  --theme-base-85: hsl(0, 0%, 85%);
+  --theme-base-80: hsl(0, 0%, 80%);
+  --theme-base-70: hsl(0, 0%, 70%);
+  --theme-base-60: hsl(0, 0%, 60%);
 
   /* TOP LEVEL STYLES (DEBUG) */
-  --theme-base-100: #ff0000; /* background chrome */
-  --theme-base-95: #ff2525; /* tab bars */
-  --theme-base-90: #ff5c5c; /* editor and selected tab */
-  --theme-base-85: #ff3c3c; /* textfields */
-  --theme-base-80: #ff5c5c;
-  --theme-base-70: #ff8282;
-  --theme-base-60: #ffa3a3;
+  --theme-base-100: hsl(140, 50%, 96%);
+  --theme-base-95: hsl(140, 50%, 95%);
+  --theme-base-90: hsl(140, 50%, 90%);
+  --theme-base-85: hsl(140, 50%, 85%);
+  --theme-base-80: hsl(140, 50%, 80%);
+  --theme-base-70: hsl(140, 50%, 70%);
+  --theme-base-60: hsl(140, 50%, 60%);
 
-  --theme-body-background: white;
-  --theme-sidebar-background: white;
+  --theme-body-background: var(--theme-base-100);
+  --theme-sidebar-background: var(--theme-base-90);
+  --theme-tab-background-alt-subtle: var(--theme-base-100);
 
-  /* Jon's new tab work */
+  --chrome: var(--theme-base-90);
+  --theme-tab-background: var(--theme-base-80);
+  --tab-standard-color: var(--theme-base-100);
 
-  --chrome: #f6f7f7;
   --theme-toolbar-hover: #fff;
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --theme-tab-background: #ececec;
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
@@ -176,11 +177,20 @@
   --theme-toggle-selected: white;
   --toolbarbutton-focus-background: var(--grey-20);
 
+  /* new */
+  --tab-selected-bgcolor: var(--theme-base-100);
+
+  /* Jon's new tab work */
+  /*
+  --chrome: var(--theme-base-95);
+  --theme-tab-background: var(--theme-base-95);
+  --tab-standard-color: var(--theme-base-90);
+  */
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
   --theme-toolbar-background: var(--grey-10);
 
-  --theme-tab-background-alt-subtle: var(--theme-sidebar-background);
   --theme-toolbar-selected-color: var(--theme-body-color);
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
@@ -325,10 +335,10 @@
 
   --theme-body-background: var(--theme-base-90);
   --theme-sidebar-background: var(--theme-base-90);
+  --theme-tab-background-alt-subtle: var(--theme-base-100);
 
-  /* Jon tweaks */
-  --chrome: var(--theme-base-100);
-  --theme-tab-background: var(--theme-base-95);
+  --chrome: var(--theme-base-95);
+  --theme-tab-background: var(--theme-base-100);
   --tab-standard-color: var(--theme-base-90);
 
   --tab-standard-hover-textcolor: white;
@@ -342,8 +352,12 @@
   --theme-toggle-selected: var(--chrome);
   --toolbarbutton-focus-background: black;
 
+  /* new */
+  --tab-selected-bgcolor: var(--theme-base-90);
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);
+
   --theme-toolbar-background: #18181a;
   --theme-toolbar-color: var(--grey-20);
   --theme-toolbar-selected-color: white;
