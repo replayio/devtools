@@ -28,16 +28,7 @@ function TrimmingModal({ hideModal }: PropsFromRedux) {
             <div className="text-lg">Trimming mode</div>
           </div>
           <p>
-            Trimming allows you to focus on specific parts of the replay that are relevant to you.
-            It also helps us helps us make your debugging experience more performant.
-          </p>
-          <p>
-            Use the <strong>left and right handlebars</strong> in the timeline to indicate which
-            part of the replay you would like to focus on.
-          </p>
-          <p>
-            Your changes are saved automatically. Once you are finished, click anywhere to exit
-            trimming mode.
+            Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
           </p>
         </div>
       </div>
