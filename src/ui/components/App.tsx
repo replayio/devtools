@@ -107,12 +107,24 @@ function App({ children, modal }: AppProps) {
   useEffect(() => {
     // Stop space bar from being used as a universal "scroll down" operator
     // We have a big play/pause interface, so space makes way more sense for that.
-    window.addEventListener("keydown", function (e) {
-      if (e.code === "Space" && e.target === document.body) {
+
+    const stopCodeMirrorScroll = (e: KeyboardEvent) => {
+      if (e.code !== "Space") {
+        return;
+      }
+
+      if (
+        e.target === document.body ||
+        (e.target?.hasOwnProperty("classList") &&
+          (e.target as Element).classList.contains(".CodeMirror-scroll"))
+      ) {
         e.preventDefault();
       }
-    });
-  });
+    };
+
+    window.addEventListener("keydown", stopCodeMirrorScroll);
+    return () => window.removeEventListener("keydown", stopCodeMirrorScroll);
+  }, []);
 
   useEffect(() => {
     document.body.parentElement!.className = enableDarkMode ? "theme-dark" : "theme-light";
