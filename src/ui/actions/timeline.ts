@@ -537,12 +537,17 @@ export function syncTrimmedRegion(): UIThunkAction {
       return;
     }
 
-    await sendMessage(
+    sendMessage(
       "Session.unloadRegion",
-      { region: { begin: 0, end: zoomRegion.endTime } },
+      { region: { begin: 0, end: trimRegion.startTime } },
       window.sessionId
     );
-    await sendMessage(
+    sendMessage(
+      "Session.unloadRegion",
+      { region: { begin: trimRegion.endTime, end: zoomRegion.endTime } },
+      window.sessionId
+    );
+    sendMessage(
       "Session.loadRegion",
       {
         region: { begin: trimRegion.startTime, end: trimRegion.endTime },
