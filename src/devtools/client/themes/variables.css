@@ -164,6 +164,9 @@
   --theme-body-background: var(--theme-base-100); /* bg text */
   --theme-tab-background-alt-subtle: var(--theme-base-100); /* info, events */
   --theme-sidebar-background: var(--theme-base-100);
+  --theme-toggle: var(--theme-base-90);
+  --theme-toggle-handle: var(--theme-base-100);
+  --icon-color: var(--theme-body-color);
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -172,7 +175,7 @@
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
-  --icon-color: var(--theme-body-color);
+
   --theme-border: #d2d5da;
   --theme-text-field: var(--theme-base-95);
   --theme-toggle-inner: var(--cool-gray-200);
@@ -333,6 +336,9 @@
   --theme-body-background: var(--theme-base-90); /* bg text */
   --theme-tab-background-alt-subtle: var(--theme-base-100); /* info, events */
   --theme-sidebar-background: var(--theme-base-100);
+  --theme-toggle: var(--theme-base-80);
+  --theme-toggle-handle: var(--theme-base-100);
+  --icon-color: var(--theme-body-color);
 
   /* TO AUDIT NEXT */
 
