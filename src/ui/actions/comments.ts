@@ -180,6 +180,7 @@ export function seekToComment(item: Comment | Reply | PendingComment["comment"])
 
     let cx = selectors.getThreadContext(getState());
     dispatch(actions.seek(item.point, item.time, item.hasFrames));
+    dispatch(actions.setSelectedPrimaryPanel("comments"));
     if (item.sourceLocation) {
       cx = selectors.getThreadContext(getState());
       dispatch(actions.selectLocation(cx, item.sourceLocation));
