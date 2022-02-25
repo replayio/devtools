@@ -135,6 +135,18 @@ export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId:
   }
 }
 
+export function maybeSetGuestMixpanelContext() {
+  // This gives us an option to log telemetry events in development.
+  const forceEnableMixpanel = prefs.logTelemetryEvent;
+
+  if (skipTelemetry() && !forceEnableMixpanel) {
+    return;
+  }
+
+  mixpanel.identify();
+  enableMixpanel();
+}
+
 export const maybeTrackTeamChange = (newWorkspaceId: WorkspaceId | null) => {
   if (!mixpanelDisabled) {
     // We use the uuid here so it's easy to cross reference the id
