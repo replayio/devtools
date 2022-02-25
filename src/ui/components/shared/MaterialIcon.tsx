@@ -1,6 +1,5 @@
 import classnames from "classnames";
-import React, { useEffect, useState } from "react";
-import { trackEvent } from "ui/utils/telemetry";
+import React from "react";
 
 const SIZE_STYLES = {
   xs: "text-xs",
@@ -10,7 +9,7 @@ const SIZE_STYLES = {
   xl: "text-xl",
   "2xl": "text-2xl",
   "4xl": "text-4xl",
-};
+} as const;
 
 type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   children: string;
