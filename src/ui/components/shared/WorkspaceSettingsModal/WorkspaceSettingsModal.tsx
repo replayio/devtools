@@ -18,6 +18,7 @@ import { useConfirm } from "../Confirm";
 import GeneralSettings from "./GeneralSettings";
 import OrganizationSettings from "./OrganizationSettings";
 import Base64Image from "../Base64Image";
+import { trackEvent } from "ui/utils/telemetry";
 
 export function WorkspaceMembers({
   members,
@@ -72,7 +73,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
-  const handleAddMember = (e: React.FormEvent | React.MouseEvent) => {
+  const handleAddMember = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
 
     if (!validateEmail(inputValue)) {
@@ -85,9 +86,16 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
 
     setErrorMessage(null);
     setIsLoading(true);
-    inviteNewWorkspaceMember({
+    const resp = await inviteNewWorkspaceMember({
       variables: { workspaceId, email: inputValue, roles: ["viewer", "debugger"] },
     });
+
+    if (resp.errors) {
+      trackEvent("error.add_member_error");
+      setErrorMessage(
+        "We're unable to add a member to your team at this time. We're looking into this and will be in touch soon."
+      );
+    }
   };
 
   return (
@@ -100,7 +108,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
           <DisabledButton>Loading</DisabledButton>
         )}
       </div>
-      {errorMessage ? <div className="text-xs text-red-500">{errorMessage}</div> : null}
+      {errorMessage ? <div className="py-3 text-xs text-red-500">{errorMessage}</div> : null}
     </form>
   );
 }

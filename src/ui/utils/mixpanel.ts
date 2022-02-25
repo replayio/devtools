@@ -37,6 +37,7 @@ type MixpanelEvent =
   | ["error.unauthenticated_viewer"]
   | ["error.unauthorized_viewer"]
   | ["error.reactdevtools.set_protocol_failed"]
+  | ["error.add_member_error"]
   | ["gutter.add_comment"]
   | ["header.open_share"]
   | ["header.edit_title"]
