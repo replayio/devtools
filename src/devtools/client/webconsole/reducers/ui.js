@@ -28,7 +28,7 @@ const UiState = overrides =>
         zoomEndTime: Number.POSITIVE_INFINITY,
         showEditorOnboarding: false,
         filterBarDisplayMode: FILTERBAR_DISPLAY_MODES.WIDE,
-        collapseFilterDrawer: true,
+        collapseFilterDrawer: false,
       },
       overrides
     )
