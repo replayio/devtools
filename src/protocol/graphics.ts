@@ -134,7 +134,9 @@ function onPaints({ paints }: paintPoints) {
       const lastPaintTime = gPaintPoints[gPaintPoints.length - 1].time;
       // if we have all of the paints, and the last one happens before the 5
       // second mark, make that the new goal for considering the video ready
-      if (lastPaintTime < MINIMUM_VIDEO_CONTENT) loadTarget = lastPaintTime;
+      if (lastPaintTime < MINIMUM_VIDEO_CONTENT) {
+        loadTarget = lastPaintTime;
+      }
     }
 
     if (time < loadTarget) {
