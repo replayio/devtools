@@ -1,6 +1,13 @@
 import { bindActionCreators, Store } from "redux";
 
-import { sessionError, uploadedData } from "@recordreplay/protocol";
+import {
+  sessionError,
+  uploadedData,
+  CommandMethods,
+  CommandParams,
+  CommandResult,
+  CommandHasPauseId,
+} from "@recordreplay/protocol";
 import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
