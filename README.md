@@ -27,9 +27,7 @@ Once you see `Compiled succesfully` in your terminal, open your browser and go t
 
 ### Next steps
 
-You can now debug recordings, but you can't make them. _Yet._
-
-To get started with recordings, say hi to us [on Discord 👋](https://replay.io/discord/) and request recording instructions. We're happy to get you set up with a recording account from there!
+Next, download and install the [Replay browser](https://www.replay.io/). The browser will allow you to start recording your own replays.
 
 ### Community
 
