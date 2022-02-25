@@ -20,35 +20,6 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   iconSize?: keyof typeof SIZE_STYLES;
 };
 
-export const useMaterialIconCheck = () => {
-  const [appNode, setAppNode] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (appNode && appNode.classList.contains("material-icon-loading")) {
-      (document as any).fonts.ready.then(async () => {
-        let retries = 10;
-        while (retries-- > 0) {
-          if (
-            typeof document === "object" &&
-            (document as any).fonts.check("12px Material Icons")
-          ) {
-            appNode.classList.remove("material-icon-loading");
-            break;
-          }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-
-        if (retries === 0) {
-          console.error("There was an error while loading Material Icons");
-          trackEvent("error.font_loading_timeout");
-        }
-      });
-    }
-  }, [appNode]);
-
-  return { setAppNode };
-};
-
 export default function MaterialIcon({
   children,
   className,

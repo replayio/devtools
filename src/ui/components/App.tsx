@@ -32,7 +32,6 @@ import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
-import { useMaterialIconCheck } from "./shared/MaterialIcon";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -94,7 +93,6 @@ function App({ children, modal }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const { setAppNode } = useMaterialIconCheck();
   const { value: enableDarkMode } = useFeature("darkMode");
 
   useEffect(() => {
@@ -150,7 +148,7 @@ function App({ children, modal }: AppProps) {
   }
 
   return (
-    <div id="app-container" className="material-icon-loading" ref={setAppNode}>
+    <div id="app-container">
       {children}
       {modal ? <AppModal modal={modal} /> : null}
       <ConfirmRenderer />

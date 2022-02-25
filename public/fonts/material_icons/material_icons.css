@@ -2,7 +2,7 @@
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
   src: local("Material Icons"), local("MaterialIcons-Regular"),
     url(/fonts/material_icons/MaterialIcons-Regular.woff2) format("woff2"),
     url(/fonts/material_icons/MaterialIcons-Regular.ttf) format("truetype");
@@ -12,7 +12,7 @@
   font-family: "Material Icons Outlined";
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
   src: url(/fonts/material_icons/MaterialIconsOutlined-Regular.woff2) format("woff2"),
     url(/fonts/material_icons/MaterialIconsOutlined-Regular.otf) format("opentype");
 }
@@ -22,6 +22,8 @@
   font-weight: normal;
   font-style: normal;
   font-size: 24px; /* Preferred icon size */
+  width: 1em;
+  overflow: hidden;
   display: inline-block;
   line-height: 1;
   text-transform: none;
@@ -48,9 +50,4 @@
 
 .material-icons-outlined {
   font-family: "Material Icons Outlined";
-}
-
-.material-icon-loading .material-icons,
-.material-icon-loading .material-icons-outlined {
-  opacity: 0;
 }
