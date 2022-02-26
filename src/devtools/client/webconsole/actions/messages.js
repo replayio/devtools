@@ -13,6 +13,7 @@ const {
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
 const { ThreadFront } = require("protocol/thread");
 const { LogpointHandlers } = require("protocol/logpoint");
+const { TestMessageHandlers } = require("protocol/find-tests");
 
 const {
   MESSAGES_ADD,
@@ -36,6 +37,7 @@ export function setupMessages(store) {
   LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
     store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
   LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
+  TestMessageHandlers.onTestMessage = msg => store.dispatch(onConsoleMessage(msg));
 
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),
