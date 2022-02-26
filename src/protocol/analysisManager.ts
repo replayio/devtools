@@ -7,6 +7,7 @@ import {
   AnalysisId,
   analysisPoints,
   analysisResult,
+  ExecutionPoint,
   PointDescription,
   SessionId,
 } from "@recordreplay/protocol";
@@ -22,6 +23,7 @@ export interface AnalysisParams {
   eventHandlerEntryPoints?: EventHandlerEntryPoint[];
   exceptionPoints?: boolean;
   randomPoints?: number;
+  points?: ExecutionPoint[];
   sessionId: SessionId;
 }
 
@@ -94,6 +96,14 @@ class AnalysisManager {
         await sendMessage(
           "Analysis.addRandomPoints",
           { analysisId, numPoints: params.randomPoints },
+          params.sessionId
+        );
+      }
+
+      if (params.points) {
+        await sendMessage(
+          "Analysis.addPoints",
+          { analysisId, points: params.points },
           params.sessionId
         );
       }
