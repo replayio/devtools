@@ -12,7 +12,7 @@ import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/br
 import { getUserInfo } from "ui/hooks/users";
 import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
-import { maybeSetGuestMixpanelContext, maybeSetMixpanelContext } from "ui/utils/mixpanel";
+import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getInitialLayoutState } from "ui/reducers/layout";
 
 declare global {
@@ -74,8 +74,6 @@ export async function bootstrapApp() {
 
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext({ ...userInfo, workspaceId });
-    } else {
-      maybeSetGuestMixpanelContext();
     }
 
     initLaunchDarkly();
