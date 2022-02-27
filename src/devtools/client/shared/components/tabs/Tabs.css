@@ -65,7 +65,6 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 
 .tabs .responsive-tabs-dropdown .tabs-menu-item {
   display: block;
-  color: red;
 }
 
 .tabs .tabs-menu-item.is-active {
@@ -84,14 +83,6 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 .tabs .tabs-menu-item:hover:not(.is-active) {
   background-color: var(--tab-hover-bgcolor);
   color: var(--tab-hover-color);
-}
-
-.tabs .tabs-menu-item .is-active {
-  color: brown;
-}
-
-.tabs .tabs-menu-item a(.is-active) {
-  color: orange;
 }
 
 .tabs .tabs-menu-item a {
