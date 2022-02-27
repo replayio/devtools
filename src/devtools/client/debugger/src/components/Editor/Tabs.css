@@ -45,7 +45,8 @@
   cursor: default;
   height: var(--editor-header-height);
   font-size: var(--theme-tab-font-size);
-  background-color: transparent;
+  background-color: var(--tab-bgcolor);
+  color: var(--tab-color);
   vertical-align: bottom;
   cursor: pointer;
 }
@@ -67,17 +68,15 @@
   padding-inline-end: 4px;
 }
 
-.source-tab .filename:hover {
-}
-
-.source-tab {
-  color: var(--tab-standard-color);
+.source-tab:hover {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
 }
 
 .source-tab.active,
 .source-header button.command-palette.active {
   --tab-line-color: var(--theme-body-color);
-  color: var(--primary-accent);
+  color: var(--tab-selected-color);
   border-bottom-color: transparent;
   background-color: var(--tab-selected-bgcolor);
 }
@@ -98,7 +97,11 @@
   text-overflow: ellipsis;
   overflow: hidden;
   padding-inline-end: 4px;
-  color: var(--theme-body-color);
+  color: var(--tab-color);
+}
+
+.active .filename {
+  color: var(--tab-selected-color);
 }
 
 .source-tab .filename span {
@@ -127,6 +130,5 @@
 .source-tab .close-btn:hover,
 .source-tab .close-btn:focus {
   color: var(--theme-selection-color);
-  background-color: var(--tab-standard-color);
   background-color: var(--primary-accent);
 }

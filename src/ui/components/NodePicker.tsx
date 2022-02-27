@@ -139,7 +139,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     return (
       <div
         id="command-button-pick"
-        className={classnames("devtools-button toolbar-panel-button", {
+        className={classnames("devtools-button toolbar-panel-button tab", {
           active: nodePickerActive,
         })}
         onClick={() => this.clickNodePickerButton()}

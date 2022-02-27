@@ -156,11 +156,21 @@
   --theme-base-80: hsl(0, 0%, 80%);
   --theme-base-70: hsl(0, 0%, 70%);
   --theme-base-60: hsl(0, 0%, 60%);
+  --theme-base-50: hsl(0, 0%, 50%);
+  --theme-base-40: hsl(0, 0%, 40%);
 
   /* AUDITED */
   --chrome: var(--theme-base-95); /* bg app */
   --theme-tab-background: var(--theme-base-90); /* bg tabs */
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+
+  --tab-bgcolor: var(--theme-base-90);
+  --tab-color: var(--theme-base-40);
+  --tab-selected-bgcolor: var(--theme-base-100);
+  --tab-selected-color: var(--theme-body-color);
+  --tab-hover-bgcolor: var(--theme-base-85);
+  --tab-hover-color: var(--tab-selected-color);
+
   --theme-body-background: var(--theme-base-100); /* bg text */
   --theme-tab-background-alt-subtle: var(--theme-base-100); /* info, events */
   --theme-sidebar-background: var(--theme-base-100);
@@ -174,7 +184,6 @@
   --tab-standard-color: var(--theme-base-100);
   --theme-toolbar-hover: #fff;
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-selected-color: var(--tab-standard-hover-bgcolor);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
 
@@ -334,7 +343,14 @@
   /* AUDITED */
   --chrome: var(--theme-base-95); /* bg app */
   --theme-tab-background: var(--theme-base-100); /* bg tabs */
-  --tab-selected-bgcolor: var(--theme-base-90); /* current tab */
+
+  --tab-bgcolor: var(--theme-base-100);
+  --tab-color: var(--theme-base-40);
+  --tab-selected-bgcolor: var(--theme-base-90);
+  --tab-selected-color: #fff;
+  --tab-hover-bgcolor: var(--theme-base-85);
+  --tab-hover-color: var(--tab-selected-color);
+
   --theme-body-background: var(--theme-base-90); /* bg text */
   --theme-tab-background-alt-subtle: var(--theme-base-90); /* info, events */
   --theme-sidebar-background: var(--theme-body-background);
@@ -350,7 +366,7 @@
   --tab-standard-color: var(--theme-base-90);
   --theme-toolbar-hover: #fff;
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-selected-color: var(--tab-standard-hover-bgcolor);
+  
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
   --icon-color: var(--theme-body-color);

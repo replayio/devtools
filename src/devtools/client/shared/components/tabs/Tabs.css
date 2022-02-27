@@ -65,19 +65,33 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 
 .tabs .responsive-tabs-dropdown .tabs-menu-item {
   display: block;
+  color: red;
 }
 
 .tabs .tabs-menu-item.is-active {
-  color: var(--theme-toolbar-selected-color);
+  color: var(--tab-selected-color);
   background: var(--tab-selected-bgcolor);
 }
 
-.tabs .tabs-menu-item:hover {
-  background-color: var(--theme-base-90);
+.tabs .tabs-menu-item {
+  color: var(--tab-color);
+  background: var(--tab-bgcolor);
 }
 
-.tabs .tabs-menu-item:hover:active:not(.is-active) {
-  background-color: var(--theme-base-90);
+.tabs .tabs-menu-item:hover {
+}
+
+.tabs .tabs-menu-item:hover:not(.is-active) {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
+}
+
+.tabs .tabs-menu-item .is-active {
+  color: brown;
+}
+
+.tabs .tabs-menu-item a(.is-active) {
+  color: orange;
 }
 
 .tabs .tabs-menu-item a {

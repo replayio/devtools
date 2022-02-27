@@ -34,6 +34,7 @@
   flex-direction: row;
   align-items: flex-end;
   overflow: hidden;
+  background-color: var(--tab-bgcolor);
 }
 
 .secondary-toolbox-header button .label {
@@ -52,20 +53,22 @@
 }
 
 .secondary-toolbox-header .label {
-  color: var(--tab-standard-color);
+  color: var(--tab-color);
 }
 
-.secondary-toolbox-header button:hover .label {
-  color: var(--tab-standard-hover-textcolor);
+.secondary-toolbox-header button:hover {
+  color: var(--tab-hover-color);
+  background-color: var(--tab-hover-bgcolor);
 }
 
 .secondary-toolbox-header .expanded .label {
-  color: var(--theme-body-color);
+  color: var(--tab-selected-color);
 }
 
 .secondary-toolbox-header button.expanded {
   background: inherit;
   background: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
 }
 
 .secondary-toolbox-header .action-buttons button {

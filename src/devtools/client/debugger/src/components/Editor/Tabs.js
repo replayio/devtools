@@ -139,7 +139,7 @@ class Tabs extends PureComponent {
     const { tabSources } = this.props;
 
     return (
-      <div className="source-tabs" ref="sourceTabs">
+      <div className="source-tabs tab" ref="sourceTabs">
         <CommandPaletteButton />
         {tabSources.map((source, index) => {
           return (
