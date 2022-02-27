@@ -65,7 +65,7 @@
 
 .secondary-toolbox-header button.expanded {
   background: inherit;
-  background: var(--tab-standard-hover-bgcolor);
+  background: var(--tab-selected-bgcolor);
 }
 
 .secondary-toolbox-header .action-buttons button {

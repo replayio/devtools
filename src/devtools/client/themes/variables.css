@@ -139,21 +139,47 @@
 }
 
 :root.theme-light {
-  --theme-body-background: white;
-  --theme-sidebar-background: white;
+  /* TOP LEVEL STYLES (DEBUG) */
+  --theme-base-100: hsl(40, 50%, 95%);
+  --theme-base-95: hsl(140, 50%, 95%);
+  --theme-base-90: hsl(140, 50%, 90%);
+  --theme-base-85: hsl(140, 50%, 85%);
+  --theme-base-80: hsl(140, 50%, 80%);
+  --theme-base-70: hsl(140, 50%, 70%);
+  --theme-base-60: hsl(140, 50%, 60%);
 
-  /* Jon's new tab work */
+  /* TOP LEVEL STYLES */
+  --theme-base-100: hsl(0, 0%, 100%);
+  --theme-base-95: hsl(0, 0%, 95%);
+  --theme-base-90: hsl(0, 0%, 90%);
+  --theme-base-85: hsl(0, 0%, 85%);
+  --theme-base-80: hsl(0, 0%, 80%);
+  --theme-base-70: hsl(0, 0%, 70%);
+  --theme-base-60: hsl(0, 0%, 60%);
 
-  --chrome: #f6f7f7;
+  /* AUDITED */
+  --chrome: var(--theme-base-95); /* bg app */
+  --theme-tab-background: var(--theme-base-90); /* bg tabs */
+  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+  --theme-body-background: var(--theme-base-100); /* bg text */
+  --theme-tab-background-alt-subtle: var(--theme-base-100); /* info, events */
+  --theme-sidebar-background: var(--theme-base-100);
+  --theme-toggle: var(--theme-base-90);
+  --theme-toggle-handle: var(--theme-base-100);
+  --icon-color: var(--theme-body-color);
+  --theme-text-field: var(--theme-base-95);
+  --theme-console-input: var(--theme-body-background);
+
+  /* TO AUDIT NEXT */
+  --tab-standard-color: var(--theme-base-100);
   --theme-toolbar-hover: #fff;
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --theme-tab-background: #ececec;
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
-  --icon-color: var(--theme-body-color);
+
   --theme-border: #d2d5da;
-  --theme-text-field: #f3f4f6;
+
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --toolbarbutton-focus-background: var(--grey-20);
@@ -162,7 +188,6 @@
   --theme-tab-toolbar-background: var(--grey-20);
   --theme-toolbar-background: var(--grey-10);
 
-  --theme-tab-background-alt-subtle: var(--theme-sidebar-background);
   --theme-toolbar-selected-color: var(--theme-body-color);
   --theme-toolbar-panel-icon-color: #bcbcbc;
   --theme-toolbar-highlighted-color: var(--green-60);
@@ -288,13 +313,53 @@
 }
 
 :root.theme-dark {
-  --theme-body-background: #232327;
-  --theme-sidebar-background: #18181a;
+  /* TOP LEVEL STYLES (DEBUG) */
+  --theme-base-100: #ff0000; /* background chrome */
+  --theme-base-95: #ff2525; /* tab bars */
+  --theme-base-90: #ff5c5c; /* editor and selected tab */
+  --theme-base-85: #ff3c3c; /* textfields */
+  --theme-base-80: #ff5c5c;
+  --theme-base-70: #ff8282;
+  --theme-base-60: #ffa3a3;
 
-  /* Jon tweaks */
-  --chrome: #18181a;
-  --tab-standard-color: var(--theme-body-color);
-  --theme-tab-background: black;
+  /* TOP LEVEL STYLES */
+  --theme-base-100: #000000; /* background chrome */
+  --theme-base-95: #252525; /* tab bars */
+  --theme-base-90: #303030; /* editor and selected tab */
+  --theme-base-85: #3c3c3c; /* textfields */
+  --theme-base-80: #5c5c5c;
+  --theme-base-70: #828282;
+  --theme-base-60: #a3a3a3;
+
+  /* AUDITED */
+  --chrome: var(--theme-base-95); /* bg app */
+  --theme-tab-background: var(--theme-base-100); /* bg tabs */
+  --tab-selected-bgcolor: var(--theme-base-90); /* current tab */
+  --theme-body-background: var(--theme-base-90); /* bg text */
+  --theme-tab-background-alt-subtle: var(--theme-base-90); /* info, events */
+  --theme-sidebar-background: var(--theme-body-background);
+  --theme-toggle: var(--theme-base-80);
+  --theme-toggle-handle: var(--theme-base-100);
+  --icon-color: var(--theme-body-color);
+  --theme-text-field: var(--theme-base-95);
+  --theme-console-input: var(--theme-text-field);
+
+  /* TO AUDIT NEXT */
+
+  /*
+  --tab-standard-color: var(--theme-base-90);
+  --theme-toolbar-hover: #fff;
+  --tab-standard-color: rgba(0, 0, 0, 0.5);
+  --tab-selected-color: var(--tab-standard-hover-bgcolor);
+  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
+  --theme-menu-highlight: #f3f4f6;
+  --icon-color: var(--theme-body-color);
+  --theme-border: #d2d5da;
+  --theme-text-field: #f3f4f6;
+  --theme-toggle-inner: var(--cool-gray-200);
+  --theme-toggle-selected: white;
+  --toolbarbutton-focus-background: var(--grey-20);
+
   --tab-standard-hover-textcolor: white;
   --tab-selected-color: var(--tab-standard-hover-bgcolor);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
@@ -305,9 +370,11 @@
   --theme-toggle-inner: #4b4747;
   --theme-toggle-selected: var(--chrome);
   --toolbarbutton-focus-background: black;
+  */
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);
+
   --theme-toolbar-background: #18181a;
   --theme-toolbar-color: var(--grey-20);
   --theme-toolbar-selected-color: white;
