@@ -16,7 +16,7 @@ function ToolboxOptions({
   setShowEditor,
 }: PropsFromRedux) {
   return (
-    <Menu as="div" className="secondary-toolbox-options relative z-20 inline-block text-left">
+    <Menu as="div" className="secondary-toolbox-options relative z-10 inline-block text-left">
       <div>
         <Menu.Button className="toolbox-options flex items-center text-iconColor hover:text-gray-600">
           <MaterialIcon
