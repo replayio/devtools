@@ -36,6 +36,11 @@ const getEventLabel = (event: ReplayEvent) => {
   const { kind } = event;
   const { label } = getReplayEvent(kind);
 
+  if (kind === "navigation") {
+    const url = new URL(event.url);
+    return <span title={event.url}>{url.host}</span>;
+  }
+
   if ("key" in event) {
     return `${label} ${event.key}`;
   }
