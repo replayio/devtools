@@ -46,7 +46,7 @@ module.exports = {
         headers: [
           {
             key: "X-Frame-Options",
-            value: "SAMEORIGIN",
+            value: "ALLOW-FROM *",
           },
           {
             key: "Content-Security-Policy",

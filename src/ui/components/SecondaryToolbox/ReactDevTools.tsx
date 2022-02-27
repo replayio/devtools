@@ -1,6 +1,13 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { createBridge, createStore, initialize, Store, Wall } from "react-devtools-inline/frontend";
+import {
+  createBridge,
+  createStore,
+  FrontendEvent,
+  initialize,
+  Store,
+  Wall,
+} from "react-devtools-inline/frontend";
 import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
@@ -53,7 +60,8 @@ class ReplayWall implements Wall {
   }
 
   // called by the frontend to send a request to the backend
-  async send(event: string, payload: any) {
+  async send(event: FrontendEvent, payload: any) {
+    console.log(`RDT: ${event}`, payload);
     try {
       switch (event) {
         case "inspectElement": {
