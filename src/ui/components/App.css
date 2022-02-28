@@ -119,5 +119,5 @@ h2 {
 @import url("devtools/client/themes/markup.css");
 @import url("devtools/client/themes/common.css");
 @import url("devtools/client/themes/splitters.css");
-@import url("devtools/client/themes/dark-theme.css");
 @import url("devtools/client/themes/light-theme.css");
+@import url("devtools/client/themes/dark-theme.css");

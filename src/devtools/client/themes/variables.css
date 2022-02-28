@@ -192,12 +192,13 @@
   --tab-standard-color: rgba(0, 0, 0, 0.5);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
-
   --theme-border: #d2d5da;
-
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --toolbarbutton-focus-background: var(--grey-20);
+
+  /* CODE MIRROR */
+  --cm-keyword: #ffab70;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -398,6 +399,9 @@
   --theme-toggle-selected: var(--chrome);
   --toolbarbutton-focus-background: black;
   */
+
+  /* CODE MIRROR */
+  --cm-keyword: #ffab70;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);

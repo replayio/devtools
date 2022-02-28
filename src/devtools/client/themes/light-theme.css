@@ -2,20 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-body {
-  margin: 0;
-}
-
-.theme-body {
-  background: var(--theme-body-background);
-  color: var(--theme-body-color);
-}
-
-.theme-sidebar {
-  background: var(--theme-sidebar-background);
-  color: var(--theme-body-color);
-}
-
 .theme-selected,
 .CodeMirror-hint-active {
   background-color: var(--theme-selection-background);
@@ -64,7 +50,7 @@ body {
 .variable-or-property .token-number,
 .variable-or-property[return] > .title > .name,
 .variable-or-property[scope] > .title > .name {
-  color: var(--theme-highlight-purple);
+  color: yellow;
 }
 
 .CodeMirror-Tern-completion-number:before {
@@ -76,7 +62,7 @@ body {
 .cm-s-mozilla .cm-builtin,
 .cm-s-mozilla .cm-keyword,
 .variables-view-variable > .title > .name {
-  color: var(--theme-highlight-red);
+  color: var(--cm-keyword);
 }
 
 .cm-s-mozilla .cm-def,
@@ -242,4 +228,8 @@ div.CodeMirror span.eval-text {
 .CodeMirror-Tern-tooltip {
   box-shadow: 0 0 4px rgba(128, 128, 128, 0.5);
   background-color: var(--theme-sidebar-background);
+}
+
+.CodeMirror-scrollbar-filler {
+  background-color: transparent;
 }
