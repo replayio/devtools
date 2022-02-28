@@ -10,8 +10,7 @@ import {
   getViewMode,
 } from "ui/reducers/layout";
 import { ViewMode } from "ui/state/layout";
-import { persistTabs, Tab } from "devtools/client/debugger/src/utils/tabs";
-import { selectors } from "ui/reducers";
+import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 
 export interface ReplaySessions {
