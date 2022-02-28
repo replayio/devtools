@@ -7,6 +7,7 @@ import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
+import { findAutomatedTests } from "protocol/find-tests";
 import { assert, waitForTime } from "protocol/utils";
 import { validateUUID } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
@@ -144,6 +145,8 @@ export function createSession(recordingId: string): UIThunkAction {
       ThreadFront.setSessionId(sessionId);
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
       dispatch(actions.setRecordingTarget(recordingTarget));
+
+      findAutomatedTests();
 
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {

@@ -126,7 +126,7 @@ function saveAnalysisError(locations: Location[], condition: string) {
 }
 
 // Define some logpoint helpers to manage pause data.
-const Helpers = `
+export const Helpers = `
   const finalData = { frames: [], scopes: [], objects: [] };
   function addPauseData({ frames, scopes, objects }) {
     finalData.frames.push(...(frames || []));
