@@ -133,7 +133,7 @@ export function getPropertiesForObject(object?: ObjectFront | WiredObject | null
   // Recursively gather the properties through the prototype chain.
   if (prototype?.getObject()) {
     const prototypeProperties = getPropertiesForObject(prototype.getObject());
-    properties.unshift(...prototypeProperties);
+    properties.push(...prototypeProperties);
   }
 
   return properties;
