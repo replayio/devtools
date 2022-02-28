@@ -50,7 +50,7 @@
 .variable-or-property .token-number,
 .variable-or-property[return] > .title > .name,
 .variable-or-property[scope] > .title > .name {
-  color: yellow;
+  color: var(--cm-number);
 }
 
 .CodeMirror-Tern-completion-number:before {
@@ -67,11 +67,11 @@
 
 .cm-s-mozilla .cm-def,
 .cm-s-mozilla .cm-variable-2 {
-  color: var(--theme-highlight-blue);
+  color: var(--cm-def);
 }
 
 .cm-s-mozilla .cm-variable {
-  color: var(--purple-60);
+  color: var(--cm-variable);
 }
 
 .cm-s-mozilla .cm-property {
@@ -103,7 +103,7 @@
 .cm-s-mozilla .cm-string-2,
 .variable-or-property .token-string,
 .CodeMirror-Tern-farg {
-  color: #709aff;
+  color: var(--cm-string);
 }
 
 .CodeMirror-Tern-completion-string:before,

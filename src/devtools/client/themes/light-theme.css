@@ -50,7 +50,7 @@
 .variable-or-property .token-number,
 .variable-or-property[return] > .title > .name,
 .variable-or-property[scope] > .title > .name {
-  color: yellow;
+  color: var(--cm-number);
 }
 
 .CodeMirror-Tern-completion-number:before {
@@ -71,7 +71,7 @@
 }
 
 .cm-s-mozilla .cm-variable {
-  color: var(--purple-60);
+  color: var(--cm-variable);
 }
 
 .cm-s-mozilla .cm-property {
