@@ -178,7 +178,7 @@ class ReplayWall implements Wall {
     for (const rootID of this.store!._roots) {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
-      const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id)) { map.set(node, id); } return map; }, new Map())`;
+      const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
       const response = await ThreadFront.evaluate({ asyncIndex: 0, text: expr });
       if (response.returned) {
         const entries = response.returned.previewContainerEntries();
