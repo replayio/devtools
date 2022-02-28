@@ -180,6 +180,9 @@
   --theme-text-field: var(--theme-base-95);
   --theme-console-input: var(--theme-body-background);
 
+  --progressbar-preview: var(--theme-base-85);
+  --progressbar-unloaded: var(--theme-base-100);
+
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
   --theme-toolbar-hover: #fff;
@@ -359,6 +362,9 @@
   --icon-color: var(--theme-body-color);
   --theme-text-field: var(--theme-base-95);
   --theme-console-input: var(--theme-text-field);
+
+  --progressbar-preview: var(--theme-base-70);
+  --progressbar-unloaded: var(--theme-base-100);
 
   /* TO AUDIT NEXT */
 

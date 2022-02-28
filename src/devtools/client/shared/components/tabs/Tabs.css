@@ -20,7 +20,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   box-sizing: border-box;
   display: flex;
   position: relative;
-  background: var(--theme-base-95);
+  background: var(--theme-base-90);
 }
 
 .requestDetails .tabs .tabs-navigation {
