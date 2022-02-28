@@ -198,6 +198,7 @@
   --toolbarbutton-focus-background: var(--grey-20);
 
   /* CODE MIRROR */
+  --cm-linenumber: var(--grey-80);
   --cm-keyword: #dd00a9;
   --cm-variable: #8000d7;
   --cm-def: #3172e0;
@@ -405,6 +406,7 @@
   */
 
   /* CODE MIRROR */
+  --cm-linenumber: var(--grey-40);
   --cm-keyword: #ff5353;
   --cm-variable: #c9d1d9;
   --cm-def: #fca657;
