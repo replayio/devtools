@@ -29,6 +29,7 @@ module.exports = {
         iconColorDisabled: "var(--theme-text-field)",
         themeBorder: "var(--theme-border)",
         themeTextField: "var(--theme-text-field)",
+        themeTrimmer: "var(--theme-trimmer)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
