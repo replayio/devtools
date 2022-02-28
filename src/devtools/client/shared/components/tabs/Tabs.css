@@ -20,7 +20,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   box-sizing: border-box;
   display: flex;
   position: relative;
-  background: var(--theme-base-95);
+  background: var(--tab-bgcolor);
 }
 
 .requestDetails .tabs .tabs-navigation {
@@ -68,16 +68,21 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 }
 
 .tabs .tabs-menu-item.is-active {
-  color: var(--theme-toolbar-selected-color);
+  color: var(--tab-selected-color);
   background: var(--tab-selected-bgcolor);
 }
 
-.tabs .tabs-menu-item:hover {
-  background-color: var(--theme-base-90);
+.tabs .tabs-menu-item {
+  color: var(--tab-color);
+  background: var(--tab-bgcolor);
 }
 
-.tabs .tabs-menu-item:hover:active:not(.is-active) {
-  background-color: var(--theme-base-90);
+.tabs .tabs-menu-item:hover {
+}
+
+.tabs .tabs-menu-item:hover:not(.is-active) {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
 }
 
 .tabs .tabs-menu-item a {
