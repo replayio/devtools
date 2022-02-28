@@ -38,6 +38,14 @@ export default function Table({
         accessor: "name" as const,
       },
       {
+        Header: "Path",
+        accessor: "path" as const,
+      },
+      {
+        Header: "Url",
+        accessor: "url" as const,
+      },
+      {
         Header: "Method",
         accessor: "method" as const,
         width: 50,
@@ -70,7 +78,12 @@ export default function Table({
     []
   );
   const tableInstance = useTable<RequestSummary>(
-    { columns: columns as any, data, defaultColumn },
+    {
+      columns: columns as any,
+      data,
+      defaultColumn,
+      initialState: { hiddenColumns: ["url", "path"] },
+    },
     useBlockLayout,
     useGlobalFilter,
     useResizeColumns

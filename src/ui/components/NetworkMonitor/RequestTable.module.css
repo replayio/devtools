@@ -9,6 +9,7 @@ table.requests {
   min-width: fit-content;
   position: relative;
   width: 100%;
+  cursor: pointer;
 }
 
 .row:hover {

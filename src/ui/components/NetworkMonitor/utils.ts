@@ -121,6 +121,15 @@ const name = (url: string): string =>
     .filter(f => f.length)
     .pop() || "/";
 
+const path = (url: string): string => {
+  let path = new URL(url).pathname;
+  if (path.startsWith("/")) {
+    path = path.substring(1);
+  }
+
+  return path;
+};
+
 const queryParams = (url: string): [string, string][] => {
   //@ts-ignore
   return Array.from(new URL(url).searchParams.entries() as [string, string][]);
@@ -155,6 +164,7 @@ export const partialRequestsToCompleteSummaries = (
         id: r.id,
         method: request.event.requestMethod,
         name: name(request.event.requestUrl),
+        path: path(request.event.requestUrl),
         point: {
           point: r.point,
           time: r.time,
