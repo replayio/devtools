@@ -152,17 +152,17 @@
 
 .timeline .progress-line.preview-min,
 .breakpoint-navigation-timeline .progress-line.preview-min {
-  border-top-color: #c0c0c0;
+  border-top-color: var(--progressbar-preview-min);
 }
 
 .timeline .progress-line.preview-max {
-  border-top-color: #dadada;
+  border-top-color: var(--progressbar-preview-max);
 }
 
 .timeline .unloaded-regions {
   height: 5px;
   border-radius: 5px;
-  background-image: url("/images/dotted-mask.svg");
+  background-image: var(--unloaded-region-img);
   position: absolute;
   pointer-events: none;
   margin-top: auto;

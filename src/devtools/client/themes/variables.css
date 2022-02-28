@@ -180,7 +180,8 @@
   --theme-text-field: var(--theme-base-95);
   --theme-console-input: var(--theme-body-background);
 
-  --progressbar-preview: var(--theme-base-85);
+  --progressbar-preview-min: var(--theme-base-80);
+  --progressbar-preview-max: var(--theme-base-85);
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
@@ -366,7 +367,8 @@
   --theme-text-field: var(--theme-base-95);
   --theme-console-input: var(--theme-text-field);
 
-  --progressbar-preview: var(--theme-base-70);
+  --progressbar-preview-min: var(--theme-base-80);
+  --progressbar-preview-max: var(--theme-base-70);
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
