@@ -27,7 +27,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.17",
+    "@apollo/client": "^3.5.9",
     "@auth0/auth0-react": "^1.2.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
