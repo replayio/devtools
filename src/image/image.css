@@ -94,8 +94,7 @@
   background-image: url(~devtools/client/themes/images/dropmarker.svg) !important;
 }
 .message.command > .icon {
-  -webkit-mask-image: url(~devtools/client/themes/images/webconsole/input.svg) !important;
-  background-color: orange;
+  background-image: url(~devtools/client/themes/images/webconsole/input.svg) !important;
 }
 .message.result > .icon {
   background-image: url(~devtools/client/themes/images/webconsole/return.svg) !important;
