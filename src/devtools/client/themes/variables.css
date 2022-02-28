@@ -184,6 +184,7 @@
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
+  --theme-trimmer: var(--primary-accent);
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -369,7 +370,7 @@
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
-
+  --theme-trimmer: white;
   /* TO AUDIT NEXT */
 
   /*

@@ -45,15 +45,15 @@ function Draggers({
     <>
       <div
         className={classNames(
-          dragging ? "w-1" : "w-0.5",
-          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-blue-500 group-hover:w-1"
+          dragging ? "w-1" : "w-1",
+          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-themeTrimmer group-hover:w-1"
         )}
         onMouseDown={e => onDragStart(e, TrimOperation.resizeStart)}
       />
       <div
         className={classNames(
-          dragging ? "w-1" : "w-0.5",
-          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-blue-500 group-hover:w-1"
+          dragging ? "w-1" : "w-1",
+          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-themeTrimmer group-hover:w-1"
         )}
         onMouseDown={e => onDragStart(e, TrimOperation.resizeEnd)}
       />
@@ -79,7 +79,7 @@ function Span({
 
   return (
     <div className="group absolute h-full" style={{ left: `${left}%`, width: `${right - left}%` }}>
-      <div className="h-full w-full bg-blue-300 opacity-50" onMouseDown={onMouseDown} />
+      <div className="h-full w-full bg-themeTrimmer opacity-50" onMouseDown={onMouseDown} />
       {draggers}
     </div>
   );
