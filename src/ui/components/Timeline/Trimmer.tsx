@@ -139,6 +139,10 @@ export const Trimmer: React.FC = () => {
       const trimRegion = { startTime: 0, endTime: zoomRegion.endTime };
       dispatch(actions.setTrimRegion(trimRegion));
     }
+
+    return () => {
+      dispatch(actions.syncTrimmedRegion());
+    };
   }, []);
 
   return (

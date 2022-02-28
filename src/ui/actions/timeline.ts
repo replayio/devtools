@@ -1,6 +1,6 @@
 import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
-import { client, log } from "protocol/socket";
+import { client, log, sendMessage } from "protocol/socket";
 import {
   getGraphicsAtTime,
   paintGraphics,
@@ -524,5 +524,35 @@ export function updateTrimRegion(operation: TrimOperation): UIThunkAction {
     }
 
     dispatch(setTrimRegion({ ...trimRegion, [type]: value }));
+  };
+}
+
+export function syncTrimmedRegion(): UIThunkAction {
+  return async ({ getState }) => {
+    const state = getState();
+    const zoomRegion = getZoomRegion(state);
+    const trimRegion = getTrimRegion(state);
+
+    if (!trimRegion) {
+      return;
+    }
+
+    sendMessage(
+      "Session.unloadRegion",
+      { region: { begin: 0, end: trimRegion.startTime } },
+      window.sessionId
+    );
+    sendMessage(
+      "Session.unloadRegion",
+      { region: { begin: trimRegion.endTime, end: zoomRegion.endTime } },
+      window.sessionId
+    );
+    sendMessage(
+      "Session.loadRegion",
+      {
+        region: { begin: trimRegion.startTime, end: trimRegion.endTime },
+      },
+      window.sessionId
+    );
   };
 }
