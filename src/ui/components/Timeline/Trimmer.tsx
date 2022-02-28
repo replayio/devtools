@@ -7,7 +7,6 @@ import { TrimOperation, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
-import { sendMessage } from "protocol/socket";
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
   const position = getVisiblePosition({ time, zoom }) * 100;

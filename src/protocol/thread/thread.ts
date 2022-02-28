@@ -280,8 +280,7 @@ class _ThreadFront {
 
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
       // Log loaded regions to help with diagnostics.
-      // console.log("LoadedRegions", parameters);
-      console.log("LoadedRegions", parameters.loaded);
+      console.log("LoadedRegions", parameters);
       listenerCallback(parameters);
     });
 
