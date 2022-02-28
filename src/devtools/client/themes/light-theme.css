@@ -215,7 +215,7 @@ div.CodeMirror span.eval-text {
 
 .cm-s-mozilla .CodeMirror-linenumber {
   /* line number text */
-  color: var(--grey-50);
+  color: var(--grey-60);
 }
 
 .cm-s-mozilla .CodeMirror-gutters {
