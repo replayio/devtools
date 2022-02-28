@@ -181,7 +181,9 @@
   --theme-console-input: var(--theme-body-background);
 
   --progressbar-preview: var(--theme-base-85);
-  --progressbar-unloaded: var(--theme-base-100);
+  --progressbar-unplayed: var(--theme-base-100);
+
+  --unloaded-region-img: url("/images/dotted-mask-light.svg");
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -364,7 +366,9 @@
   --theme-console-input: var(--theme-text-field);
 
   --progressbar-preview: var(--theme-base-70);
-  --progressbar-unloaded: var(--theme-base-100);
+  --progressbar-unplayed: var(--theme-base-100);
+
+  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* TO AUDIT NEXT */
 
