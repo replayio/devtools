@@ -22,6 +22,7 @@
   --replaying-marker-fill-hover: var(--blue-60);
   --hover-scrubber-line-background: var(--blue-50);
   --progress-recording-line: #d0021b;
+  --progressbar-background: #eeeeee;
   --progressbar-line-color: var(--primary-accent);
   --proggressbar-border-color: var(--theme-splitter-color);
   --tick-future-background: #bfc9d2;
@@ -146,21 +147,22 @@
 .timeline .progress-line.full,
 .breakpoint-navigation-timeline .progress-line.full {
   width: 100%;
+  border-top-color: var(--progressbar-background);
 }
 
 .timeline .progress-line.preview-min,
 .breakpoint-navigation-timeline .progress-line.preview-min {
-  border-top-color: var(--progressbar-preview);
+  border-top-color: #c0c0c0;
 }
 
 .timeline .progress-line.preview-max {
-  border-top-color: var(--progressbar-unplayed);
+  border-top-color: #dadada;
 }
 
 .timeline .unloaded-regions {
   height: 5px;
   border-radius: 5px;
-  background-image: var(--unloaded-region-img);
+  background-image: url("/images/dotted-mask.svg");
   position: absolute;
   pointer-events: none;
   margin-top: auto;
