@@ -94,22 +94,28 @@
   background-image: url(~devtools/client/themes/images/dropmarker.svg) !important;
 }
 .message.command > .icon {
-  background-image: url(~devtools/client/themes/images/webconsole/input.svg) !important;
+  -webkit-mask-image: url(~devtools/client/themes/images/webconsole/input.svg) !important;
+  background-color: var(--icon-color);
 }
 .message.result > .icon {
-  background-image: url(~devtools/client/themes/images/webconsole/return.svg) !important;
+  -webkit-mask-image: url(~devtools/client/themes/images/webconsole/return.svg) !important;
+  background-color: var(--icon-color);
 }
 .message.info > .icon {
-  background-image: url(~devtools/client/themes/images/info-small.svg) !important;
+  -webkit-mask-image: url(~devtools/client/themes/images/info-small.svg) !important;
+  background-color: var(--icon-color);
 }
 .message.error > .icon {
-  background-image: url(~devtools/client/themes/images/error-small.svg) !important;
+  -webkit-mask-image: url(~devtools/client/themes/images/error-small.svg) !important;
+  background-color: var(--icon-color);
 }
 .message.warn > .icon {
-  background-image: url(~devtools/client/themes/images/alert-small.svg) !important;
+  -webkit-mask-image: url(~devtools/client/themes/images/alert-small.svg) !important;
+  background-color: var(--icon-color);
 }
 .message.navigationMarker > .icon {
-  background-image: url(~devtools/client/themes/images/webconsole/navigation.svg) !important;
+  -webkit-mask-image: url(~devtools/client/themes/images/webconsole/navigation.svg) !important;
+  background-color: var(--icon-color);
 }
 #split-console-close-button::before {
   background-image: url(~devtools/client/themes/images/close.svg) !important;
