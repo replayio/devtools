@@ -150,6 +150,7 @@ class JestTestState {
     } catch (e) {
       // If there are too many exception sites in the recording we won't be able to
       // associate test failures with the most recent exception.
+      // See https://github.com/RecordReplay/devtools/issues/5534
     }
 
     // Exceptions which are associated with a test failure.
