@@ -23,6 +23,11 @@ const defaultUrl = {
 
 export const parse = memoize(function parse(url) {
   try {
+    if (url.startsWith("webpack://_N_E")) {
+      url = `webpack:${url.substring(14)}`;
+    } else if (url.startsWith("webpack-internal:///.")) {
+      url = `webpack-internal:${url.substring(21)}`;
+    }
     const urlObj = new URL(url);
     urlObj.path = urlObj.pathname + urlObj.search;
     return urlObj;
