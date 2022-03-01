@@ -10,11 +10,12 @@ import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 import ReplayLogo from "./shared/ReplayLogo";
 
-import { endUploadWaitTracking, trackEventOnce } from "ui/utils/mixpanel";
+import { endUploadWaitTracking, maybeSetGuestMixpanelContext, trackEventOnce } from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 import { decodeWorkspaceId } from "ui/utils/workspace";
+import useAuth0 from "ui/utils/useAuth0";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -51,6 +52,7 @@ function _DevTools({
   uploadComplete,
   viewMode,
 }: _DevToolsProps) {
+  const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { userIsAuthor, loading } = useUserIsAuthor();
@@ -58,6 +60,14 @@ function _DevTools({
   useEffect(() => {
     import("./Views/DevView");
   }, []);
+  useEffect(() => {
+    // Wait until we start rendering the DevTools component before potentially registering
+    // a user as a guest in Mixpanel. This is to avoid sending too many unique distinct guest
+    // users to Mixpanel.
+    if (!isAuthenticated) {
+      maybeSetGuestMixpanelContext();
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     if (loading) {

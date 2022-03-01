@@ -79,7 +79,7 @@ export function mockEnvironment() {
 }
 
 export function skipTelemetry() {
-  return isTest() || isMock() || isDevelopment() || isDeployPreview();
+  return isTest() || isDevelopment() || isDeployPreview();
 }
 
 export function isDeployPreview() {
