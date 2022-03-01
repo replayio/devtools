@@ -1,10 +1,13 @@
 import React, { FC, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { ValueFront } from "protocol/thread";
 import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
-import { eagerEvaluateExpression } from "../../utils/autocomplete-eager";
+import { eagerEvaluateExpression } from "../../actions/autocomplete-eagerer";
 
 function useEagerEvalPreview(expression: string) {
   const [value, setValue] = useState<ValueFront | null>(null);
+  const dispatch = useDispatch();
+
   const expressionRef = useRef(expression);
 
   useEffect(() => {
@@ -12,7 +15,7 @@ function useEagerEvalPreview(expression: string) {
 
     (async function updateValue() {
       setValue(null);
-      const rv = await eagerEvaluateExpression(expression);
+      const rv = await dispatch(eagerEvaluateExpression(expression));
       const isUndefined = rv?.isPrimitive && !rv.primitive;
 
       if (expressionRef.current === expression && !isUndefined) {

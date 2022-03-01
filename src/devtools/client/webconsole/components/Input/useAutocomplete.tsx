@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+
 import {
   fuzzyFilter,
   getAutocompleteMatches,
@@ -10,7 +12,7 @@ import uniq from "lodash/uniq";
 import { useSelector } from "react-redux";
 import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 import { UIState } from "ui/state";
-import { getEvaluatedProperties } from "../../utils/autocomplete-eager";
+import { getEvaluatedProperties } from "../../actions/autocomplete-eager";
 
 function useGetScopeMatches(expression: string) {
   const frameScope = useSelector((state: UIState) => getFrameScope(state, "0:0"));
@@ -26,6 +28,7 @@ function useGetScopeMatches(expression: string) {
 function useGetEvalMatches(expression: string) {
   const [matches, setMatches] = useState<string[]>([]);
   const expressionRef = useRef(expression);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     expressionRef.current = expression;
@@ -38,7 +41,7 @@ function useGetEvalMatches(expression: string) {
         return;
       }
 
-      const evaluatedProperties = await getEvaluatedProperties(propertyExpression.left);
+      const evaluatedProperties = await dispatch(getEvaluatedProperties(propertyExpression.left));
 
       if (expressionRef.current === expression) {
         setMatches(fuzzyFilter(evaluatedProperties, normalizeString(propertyExpression.right)));
