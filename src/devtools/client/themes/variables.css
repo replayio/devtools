@@ -522,6 +522,15 @@
   --theme-contrast-background-alpha: rgba(255, 233, 0, 0.15); /* Yellow 50-a15 */
   --theme-contrast-color: white;
   --theme-contrast-border: var(--yellow-65);
+
+  /* Timeline Navigation */
+  --replaying-marker-fill: var(--primary-accent);
+  --replaying-marker-stroke: var(--primary-accent);
+  --replaying-marker-future-fill: var(--primary-accent);
+  --replaying-marker-future-stroke: var(--primary-accent);
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
+  --replay-head-background: var(--purple-50);
 }
 
 /* Z-index scale */
