@@ -1,4 +1,5 @@
 export type LayoutState = {
+  consoleFilterDrawerExpanded: boolean;
   showCommandPalette: boolean;
   showEditor: boolean;
   showVideoPanel: boolean;
