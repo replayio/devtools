@@ -323,6 +323,11 @@ module.exports = [
     disabled: true,
   },
   {
+    example: "doc_control_flow.html",
+    script: "repaint.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/spawn.js",
     script: "node_spawn-01.js",
     targets: ["node"],
