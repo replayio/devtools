@@ -1,5 +1,10 @@
 name: Run test suites
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   download-browser:
