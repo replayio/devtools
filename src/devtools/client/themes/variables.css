@@ -193,12 +193,18 @@
   --tab-standard-color: rgba(0, 0, 0, 0.5);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-menu-highlight: #f3f4f6;
-
   --theme-border: #d2d5da;
-
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --toolbarbutton-focus-background: var(--grey-20);
+
+  /* CODE MIRROR */
+  --cm-linenumber: var(--grey-80);
+  --cm-keyword: #dd00a9;
+  --cm-variable: #8000d7;
+  --cm-def: #3172e0;
+  --cm-string: #0842a4;
+  --cm-number: #18181a;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -400,6 +406,14 @@
   --theme-toggle-selected: var(--chrome);
   --toolbarbutton-focus-background: black;
   */
+
+  /* CODE MIRROR */
+  --cm-linenumber: var(--grey-40);
+  --cm-keyword: #ff5353;
+  --cm-variable: #c9d1d9;
+  --cm-def: #fca657;
+  --cm-string: #a2d2fa;
+  --cm-number: green;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);
