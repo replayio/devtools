@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { FC } from "react";
 import FilterSettings from "devtools/client/webconsole/components/FilterBar/FilterSettings";
 import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
-import { getAllUi } from "../selectors/ui";
-import { UIState } from "ui/state";
-import { connect, ConnectedProps } from "react-redux";
+import { useSelector } from "react-redux";
+import { getConsoleFilterDrawerExpanded } from "ui/reducers/layout";
 
-function FilterDrawer({ collapseFilterDrawer }: PropsFromRedux) {
-  if (collapseFilterDrawer) {
+export const FilterDrawer: FC = () => {
+  const expanded = useSelector(getConsoleFilterDrawerExpanded);
+
+  if (!expanded) {
     return null;
   }
+
   return (
     <div className="flex flex-col bg-themeBodyBackground">
       <div
@@ -30,10 +32,4 @@ function FilterDrawer({ collapseFilterDrawer }: PropsFromRedux) {
       </div>
     </div>
   );
-}
-
-const connector = connect((state: UIState) => ({
-  collapseFilterDrawer: getAllUi(state).collapseFilterDrawer,
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(FilterDrawer);
+};

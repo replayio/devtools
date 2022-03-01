@@ -3,6 +3,7 @@ import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
+  getConsoleFilterDrawerExpanded,
   getSelectedPanel,
   getSelectedPrimaryPanel,
   getShowEditor,
@@ -118,6 +119,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
 
   const currentReplaySession = {
     viewMode: getViewMode(state),
+    consoleFilterDrawerExpanded: getConsoleFilterDrawerExpanded(state),
     showEditor: getShowEditor(state),
     showVideoPanel: getShowVideoPanel(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),

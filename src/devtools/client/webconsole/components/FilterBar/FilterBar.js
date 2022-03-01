@@ -20,7 +20,7 @@ const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constant
 
 const FilterSearchBox = require("./FilterSearchBox").default;
 const ClearButton = require("./ClearButton").default;
-const FilterDrawerToggle = require("./FilterDrawerToggle").default;
+const { FilterDrawerToggle } = require("./FilterDrawerToggle");
 const { isDemo } = require("ui/utils/environment");
 
 const PropTypes = require("prop-types");
