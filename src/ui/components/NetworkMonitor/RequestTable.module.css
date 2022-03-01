@@ -1,0 +1,90 @@
+table.requests {
+  border-collapse: collapse;
+}
+
+.row {
+  background: var(--theme-body-background);
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  min-width: fit-content;
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+.row:hover {
+  background-color: var(--theme-toolbar-background);
+}
+
+.row:not(:first-child) {
+  border-top: 2px solid var(--theme-toolbar-background);
+}
+
+.row.selected {
+  background: var(--primary-accent-hover);
+  border-color: var(--primary-accent-hover);
+  color: white;
+}
+
+.row.current {
+  border-top: 2px solid var(--secondary-accent);
+}
+
+.current.end {
+  background: var(--secondary-accent);
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+.resizer {
+  cursor: ew-resize;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 8px;
+  z-index: 50;
+}
+
+.seekBadge {
+  align-items: center;
+  background: linear-gradient(0deg, var(--primary-accent) 0, var(--primary-accent) 100%);
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  cursor: pointer;
+  display: none;
+  font-weight: 700;
+  height: 100%;
+  padding-left: 6px;
+  padding-right: 6px;
+  position: absolute;
+  left: -2px;
+  z-index: 1;
+}
+
+.row:hover .seekBadge {
+  display: flex;
+}
+
+.seekBadge .fastForward {
+  transform: scaleX(-1);
+  mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
+  -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
+  background: white;
+}
+
+.seekBadge .rewind {
+  mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
+  -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
+  background: white;
+}
+
+.seekBadge .verbose {
+  display: none;
+}
+
+.seekBadge:hover .verbose {
+  display: block;
+}
