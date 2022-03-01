@@ -48,17 +48,17 @@ export type RequestSummary = {
 };
 
 export const RequestTypeOptions: { type: CanonicalRequestType; icon: string; label: string }[] = [
-  { type: CanonicalRequestType.CSS, icon: "color_lens", label: "CSS" },
-  { type: CanonicalRequestType.FETCH_XHR, icon: "description", label: "Fetch/XHR" },
-  { type: CanonicalRequestType.FONT, icon: "text_fields", label: "Font" },
-  { type: CanonicalRequestType.HTML, icon: "description", label: "HTML" },
-  { type: CanonicalRequestType.IMAGE, icon: "perm_media", label: "Image" },
+  { type: CanonicalRequestType.CSS, icon: "palette", label: "CSS" },
+  { type: CanonicalRequestType.FETCH_XHR, icon: "doc", label: "Fetch/XHR" },
+  { type: CanonicalRequestType.FONT, icon: "typography", label: "Font" },
+  { type: CanonicalRequestType.HTML, icon: "doc", label: "HTML" },
+  { type: CanonicalRequestType.IMAGE, icon: "image", label: "Image" },
   { type: CanonicalRequestType.JAVASCRIPT, icon: "code", label: "Javascript" },
-  { type: CanonicalRequestType.MANIFEST, icon: "description", label: "Manifest" },
-  { type: CanonicalRequestType.MEDIA, icon: "perm_media", label: "Media" },
-  { type: CanonicalRequestType.OTHER, icon: "question_mark", label: "Other" },
-  { type: CanonicalRequestType.WASM, icon: "handyman", label: "WASM" },
-  { type: CanonicalRequestType.WEBSOCKET, icon: "autorenew", label: "Websocket" },
+  { type: CanonicalRequestType.MANIFEST, icon: "list", label: "Manifest" },
+  { type: CanonicalRequestType.MEDIA, icon: "image", label: "Media" },
+  { type: CanonicalRequestType.OTHER, icon: "questionmark", label: "Other" },
+  { type: CanonicalRequestType.WASM, icon: "tool", label: "WASM" },
+  { type: CanonicalRequestType.WEBSOCKET, icon: "reload", label: "Websocket" },
 ];
 
 // From https://github.com/RecordReplay/gecko-dev/blob/webreplay-release/devtools/server/actors/replay/network-helpers.jsm#L14
