@@ -4,13 +4,7 @@ import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer, Deferred } from "./utils";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import {
-  TimeStampedPoint,
-  MouseEvent,
-  paintPoints,
-  ScreenShot,
-  findPaintsResult,
-} from "@recordreplay/protocol";
+import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
 import { UIStore, UIThunkAction } from "ui/actions";
@@ -22,6 +16,13 @@ import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/time
 const MINIMUM_VIDEO_CONTENT = 5000;
 
 const { features } = require("ui/utils/prefs");
+
+declare global {
+  interface Window {
+    // we expose this for use in testing
+    currentScreenshotHash?: string;
+  }
+}
 
 export const screenshotCache = new ScreenshotCache();
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
@@ -442,6 +443,7 @@ export function paintGraphics(
   mouse?: MouseAndClickPosition,
   playing?: boolean
 ) {
+  window.currentScreenshotHash = screenShot?.hash;
   if (!screenShot || (playing && features.videoPlayback)) {
     clearGraphics();
   } else {
