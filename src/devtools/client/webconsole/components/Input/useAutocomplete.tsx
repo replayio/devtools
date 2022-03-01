@@ -47,7 +47,7 @@ function useGetEvalMatches(expression: string) {
     }
 
     updateMatches();
-  }, [expression]);
+  }, [expression, getEvaluatedProperties]);
 
   return matches;
 }

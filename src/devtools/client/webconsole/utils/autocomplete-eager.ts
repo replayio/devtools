@@ -4,7 +4,11 @@ import { useSelector } from "react-redux";
 import { getPropertiesForObject } from "./autocomplete";
 
 // Use eager eval to get the properties of the last complete object in the expression.
-async function getEvaluatedProperties(expression: string, asyncIndex: number, frameId?: string): Promise<string[]> {
+async function getEvaluatedProperties(
+  expression: string,
+  asyncIndex: number,
+  frameId?: string
+): Promise<string[]> {
   try {
     const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
@@ -26,7 +30,11 @@ async function getEvaluatedProperties(expression: string, asyncIndex: number, fr
   return [];
 }
 
-async function eagerEvaluateExpression(expression: string, asyncIndex: number, frameId?: string): Promise<ValueFront | null> {
+async function eagerEvaluateExpression(
+  expression: string,
+  asyncIndex: number,
+  frameId?: string
+): Promise<ValueFront | null> {
   try {
     const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
@@ -55,7 +63,8 @@ export function useGetEvaluatedProperties() {
     return () => null;
   }
 
-  return async (expression: string) => await getEvaluatedProperties(expression, frame.asyncIndex, frame.protocolId);
+  return async (expression: string) =>
+    await getEvaluatedProperties(expression, frame.asyncIndex, frame.protocolId);
 }
 export function useEagerEvaluateExpression() {
   const frame = useSelector(getSelectedFrame);
@@ -64,5 +73,6 @@ export function useEagerEvaluateExpression() {
     return () => null;
   }
 
-  return async (expression: string) => await eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId)
+  return async (expression: string) =>
+    await eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId);
 }

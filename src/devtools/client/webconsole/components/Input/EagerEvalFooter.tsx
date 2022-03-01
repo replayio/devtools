@@ -20,7 +20,7 @@ function useEagerEvalPreview(expression: string) {
         setValue(rv);
       }
     })();
-  }, [expression]);
+  }, [expression, eagerEvaluateExpression]);
 
   return value;
 }
