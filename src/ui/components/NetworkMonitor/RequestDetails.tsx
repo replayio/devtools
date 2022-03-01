@@ -29,7 +29,7 @@ function FormattedUrl({ url }: { url: string }) {
           {params.map(([key, value], index) => (
             <span key={key}>
               <span className="">{index === 0 ? "?" : "&"}</span>
-              <span className="text-red-500">{key}</span>
+              <span className="text-primaryAccent">{key}</span>
               <span>={value}</span>
             </span>
           ))}
