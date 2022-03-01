@@ -144,7 +144,13 @@ class JestTestState {
       return;
     }
 
-    const exceptionPoints = await this.getExceptionPoints();
+    let exceptionPoints: PointDescription[] = [];
+    try {
+      exceptionPoints = await this.getExceptionPoints();
+    } catch (e) {
+      // If there are too many exception sites in the recording we won't be able to
+      // associate test failures with the most recent exception.
+    }
 
     // Exceptions which are associated with a test failure.
     const failureExceptionPoints: PointDescription[] = [];
