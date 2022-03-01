@@ -1,5 +1,6 @@
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import { ThreadFront, ValueFront } from "protocol/thread";
+import { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getPropertiesForObject } from "./autocomplete";
 
@@ -58,21 +59,21 @@ async function eagerEvaluateExpression(
 
 export function useGetEvaluatedProperties() {
   const frame = useSelector(getSelectedFrame);
+  const callback = useCallback(
+    (expression: string) =>
+      frame ? getEvaluatedProperties(expression, frame.asyncIndex, frame.protocolId) : null,
+    [frame]
+  );
 
-  if (!frame) {
-    return () => null;
-  }
-
-  return async (expression: string) =>
-    await getEvaluatedProperties(expression, frame.asyncIndex, frame.protocolId);
+  return callback;
 }
 export function useEagerEvaluateExpression() {
   const frame = useSelector(getSelectedFrame);
+  const callback = useCallback(
+    (expression: string) =>
+      frame ? eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId) : null,
+    [frame]
+  );
 
-  if (!frame) {
-    return () => null;
-  }
-
-  return async (expression: string) =>
-    await eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId);
+  return callback;
 }
