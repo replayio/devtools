@@ -82,3 +82,53 @@ but without a background color so we can use hover effects
 .icon.warning {
   -webkit-mask-image: url(/icons/warning.svg);
 }
+
+/* network */
+
+.icon.palette {
+  -webkit-mask-image: url(/icons/palette.svg);
+}
+
+.icon.doc {
+  -webkit-mask-image: url(/icons/doc.svg);
+}
+
+.icon.typography {
+  -webkit-mask-image: url(/icons/typography.svg);
+}
+
+.icon.image {
+  -webkit-mask-image: url(/icons/image.svg);
+}
+
+.icon.code {
+  -webkit-mask-image: url(/icons/code.svg);
+}
+
+.icon.list {
+  -webkit-mask-image: url(/icons/list.svg);
+}
+
+.icon.questionmark {
+  -webkit-mask-image: url(/icons/questionmark.svg);
+}
+
+.icon.other {
+  -webkit-mask-image: url(/icons/other.svg);
+}
+
+.icon.tool {
+  -webkit-mask-image: url(/icons/tool.svg);
+}
+
+.icon.reload {
+  -webkit-mask-image: url(/icons/reload.svg);
+}
+
+.icon.checked {
+  -webkit-mask-image: url(/icons/checked.svg);
+}
+
+.icon.unchecked {
+  -webkit-mask-image: url(/icons/unchecked.svg);
+}

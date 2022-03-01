@@ -93,13 +93,14 @@ export function DropdownItemContent({
 }) {
   return (
     <div className="flex flex-row space-x-4">
-      <div
-        className={classNames(
-          "flex w-4 flex-row items-center",
-          selected ? "text-primaryAccent" : "text-gray-400"
-        )}
-      >
-        <MaterialIcon>{icon}</MaterialIcon>
+      <div className={classNames("flex w-4 flex-row items-center")}>
+        <Icon
+          filename={icon}
+          className={classNames(
+            "group-hover:bg-primaryAccent",
+            selected ? "bg-primaryAccent" : "bg-gray-400"
+          )}
+        />
       </div>
       <span className="overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
     </div>

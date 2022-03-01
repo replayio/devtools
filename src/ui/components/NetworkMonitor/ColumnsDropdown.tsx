@@ -8,7 +8,10 @@ export default function ColumnsDropdown({ columns }: { columns: Column[] }) {
     const attrs = (column as any).getToggleHiddenProps();
     return (
       <DropdownItem onClick={() => attrs.onChange({ target: { checked: !attrs.checked } })}>
-        <DropdownItemContent selected={attrs.checked} icon={attrs.checked ? "check" : ""}>
+        <DropdownItemContent
+          selected={attrs.checked}
+          icon={attrs.checked ? "checked" : "unchecked"}
+        >
           <span className="capitalize">{String(column.id)}</span>
         </DropdownItemContent>
       </DropdownItem>
