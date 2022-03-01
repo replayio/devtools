@@ -75,7 +75,7 @@
 }
 
 .cm-s-mozilla .cm-property {
-  color: var(--theme-highlight-green);
+  color: var(--cm-property);
 }
 
 .CodeMirror-Tern-completion-object:before {
@@ -117,7 +117,7 @@
 .variable-or-property .token-boolean,
 .variable-or-property .token-domnode,
 .variable-or-property[exception] > .title > .name {
-  color: var(--theme-highlight-red);
+  color: var(--cm-atom);
 }
 
 .CodeMirror-Tern-completion-bool:before {
