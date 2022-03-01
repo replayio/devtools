@@ -69,6 +69,7 @@ function cloneState(state) {
     hasExecutionPoints: state.hasExecutionPoints,
     lastMessageId: state.lastMessageId,
     overflow: state.overflow,
+    messagesLoaded: state.messagesLoaded,
   };
 }
 

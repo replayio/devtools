@@ -5,9 +5,9 @@ import { UIState } from "ui/state";
 import { getMessagesLoaded } from "../../selectors/messages";
 
 const ConsoleLoadingBar: FC = () => {
-  const messagesLoading = useSelector((state: UIState) => getMessagesLoaded(state));
+  const messagesLoaded = useSelector((state: UIState) => getMessagesLoaded(state));
 
-  if (!messagesLoading) {
+  if (messagesLoaded) {
     return null;
   }
 
