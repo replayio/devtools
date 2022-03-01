@@ -382,6 +382,16 @@ export class ValueFront {
     return rv;
   }
 
+  async loadDirectChildren() {
+    // Make sure we know all this node's children.
+    if (this.isObject() && this.hasPreviewOverflow()) {
+      await this.getPause()!.getObjectPreview(this._object!.objectId);
+      assert(!this.hasPreviewOverflow());
+    }
+
+    return this.getChildren();
+  }
+
   async loadChildren() {
     // Make sure we know all this node's children.
     if (this.isObject() && this.hasPreviewOverflow()) {
