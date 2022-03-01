@@ -487,7 +487,6 @@ button.jump-definition {
 .tree-node button.arrow {
   -webkit-mask-image: url(~devtools/client/debugger/images/arrow.svg);
 }
-
 #command-button-pick::before {
   -webkit-mask-image: url(~devtools/client/themes/images/command-pick.svg);
 }
