@@ -121,7 +121,7 @@ export function initializeMixpanel() {
 
 export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId: string | null }) {
   const { internal: isInternal } = userInfo;
-  const forceEnableMixpanel = prefs.logTelemetryEvent
+  const forceEnableMixpanel = prefs.logTelemetryEvent;
   const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
 
   if (shouldEnableMixpanel) {

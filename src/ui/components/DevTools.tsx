@@ -10,7 +10,11 @@ import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 import ReplayLogo from "./shared/ReplayLogo";
 
-import { endUploadWaitTracking, maybeSetGuestMixpanelContext, trackEventOnce } from "ui/utils/mixpanel";
+import {
+  endUploadWaitTracking,
+  maybeSetGuestMixpanelContext,
+  trackEventOnce,
+} from "ui/utils/mixpanel";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
@@ -67,7 +71,7 @@ function _DevTools({
     if (!isAuthenticated) {
       maybeSetGuestMixpanelContext();
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (loading) {
