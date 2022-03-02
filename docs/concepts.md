@@ -28,6 +28,7 @@ frames
 pause (point)
 logpoint
 watchpoint
+region
 ```
 
 important objects and/or components:
