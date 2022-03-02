@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { ValueItem } from "devtools/packages/devtools-reps";
+import { ValueFront } from "protocol/thread/value";
+import { Item, ValueItem } from "devtools/packages/devtools-reps";
 
-export function getFramePopVariables(why, path) {
+export function getFramePopVariables(why: any, path: string) {
   const vars = [];
 
   if (why && why.frameFinished) {
@@ -41,7 +42,7 @@ export function getFramePopVariables(why, path) {
   return vars;
 }
 
-export function getThisVariable(this_, path) {
+export function getThisVariable(this_: ValueFront, path: string) {
   if (!this_) {
     return null;
   }
@@ -55,7 +56,7 @@ export function getThisVariable(this_, path) {
 
 // Get a string path for an scope item which can be used in different pauses for
 // a thread.
-export function getScopeItemPath(item) {
+export function getScopeItemPath(item: Item) {
   // Calling toString() on item.path allows symbols to be handled.
   return item.path.toString();
 }
