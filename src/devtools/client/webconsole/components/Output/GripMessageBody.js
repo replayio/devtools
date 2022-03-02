@@ -10,8 +10,7 @@ const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const ObjectInspector =
   require("devtools/client/webconsole/utils/connected-object-inspector").default;
 
-const reps = require("devtools/packages/devtools-reps");
-const { MODE } = reps;
+const { MODE } = require("devtools/packages/devtools-reps");
 
 GripMessageBody.displayName = "GripMessageBody";
 

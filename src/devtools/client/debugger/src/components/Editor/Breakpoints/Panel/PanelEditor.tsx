@@ -80,7 +80,7 @@ class PanelEditor extends PureComponent<Props, State> {
     return (
       <div
         className={classnames(
-          "panel-editor items-top flex flex-row items-center space-x-2 bg-white",
+          "panel-editor items-top flex flex-row items-center space-x-2 bg-breakpointEditfieldActive",
           {
             conditional: showCondition,
           }

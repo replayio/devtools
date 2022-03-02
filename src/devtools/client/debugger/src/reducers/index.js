@@ -11,7 +11,6 @@
 
 import sourceActors from "./source-actors";
 import sources from "./sources";
-import tabs from "./tabs";
 import breakpoints from "./breakpoints";
 import pendingBreakpoints from "./pending-breakpoints";
 import asyncRequests from "./async-requests";
@@ -28,7 +27,6 @@ import eventListenerBreakpoints from "./event-listeners";
 export default {
   sourceActors,
   sources,
-  tabs,
   breakpoints,
   pendingBreakpoints,
   asyncRequests,

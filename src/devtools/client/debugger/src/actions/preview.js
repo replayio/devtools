@@ -5,6 +5,7 @@
 import { isConsole } from "../utils/preview";
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
 import { createPrimitiveValueFront } from "protocol/thread";
+import { ValueItem, loadChildren } from "devtools/packages/devtools-reps";
 
 import {
   getPreview,
@@ -72,12 +73,12 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       result = createPrimitiveValueFront(undefined);
     }
 
-    const root = {
+    const root = new ValueItem({
       name: expression,
       path: expression,
       contents: result,
-    };
-    const properties = await client.loadObjectProperties(root);
+    });
+    const properties = await loadChildren(root);
 
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should

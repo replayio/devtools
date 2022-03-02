@@ -4,25 +4,28 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import { ValueItem } from "devtools/packages/devtools-reps";
+
 // VarAndBindingsPair actually is [name: string, contents: BindingContents]
 
 // Scope's bindings field which holds variables and arguments
 
 // Create the tree nodes representing all the variables and arguments
 // for the bindings from a scope.
-export function getBindingVariables(bindings, parentName) {
+export function getBindingVariables(bindings: any, parentName: string) {
   if (!bindings) {
     return [];
   }
 
   const rv = [];
   for (const { name, value } of bindings) {
-    rv.push({
-      name,
-      path: `${parentName}/${name}`,
-      contents: value,
-    });
+    rv.push(
+      new ValueItem({
+        name,
+        path: `${parentName}/${name}`,
+        contents: value,
+      })
+    );
   }
   return rv;
 }

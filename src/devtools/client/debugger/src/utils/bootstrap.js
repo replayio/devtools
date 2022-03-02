@@ -7,7 +7,6 @@ import { ParserDispatcher } from "../workers/parser";
 
 import * as selectors from "../selectors";
 import { asyncStore } from "./prefs";
-import { persistTabs } from "../utils/tabs";
 
 export let parser;
 
@@ -25,19 +24,12 @@ export function teardownWorkers() {
 }
 
 let currentPendingBreakpoints;
-let currentTabs;
 
 export function updatePrefs(state) {
   const previousPendingBreakpoints = currentPendingBreakpoints;
-  const previousTabs = currentTabs;
   currentPendingBreakpoints = selectors.getPendingBreakpoints(state);
-  currentTabs = selectors.getTabs(state);
 
   if (previousPendingBreakpoints && currentPendingBreakpoints !== previousPendingBreakpoints) {
     asyncStore.pendingBreakpoints = currentPendingBreakpoints;
-  }
-
-  if (previousTabs && previousTabs !== currentTabs) {
-    asyncStore.tabs = persistTabs(currentTabs);
   }
 }

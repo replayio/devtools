@@ -6,7 +6,7 @@
 
 import React, { Component } from "react";
 import { connect } from "devtools/client/debugger/src/utils/connect";
-import Reps from "devtools/packages/devtools-reps";
+import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
 import actions from "devtools/client/debugger/src/actions";
 import {
   highlightDomElement,
@@ -15,19 +15,6 @@ import {
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
-
-const {
-  REPS: { Rep },
-  MODE,
-  objectInspector,
-} = Reps;
-
-const { utils } = objectInspector;
-const ObjectInspector = objectInspector.ObjectInspector.default;
-
-const {
-  node: { nodeIsPrimitive, nodeIsFunction, nodeIsObject },
-} = utils;
 
 export class Popup extends Component {
   calculateMaxHeight = () => {
@@ -133,12 +120,13 @@ export class Popup extends Component {
       preview: { root },
     } = this.props;
 
-    if (nodeIsFunction(root)) {
-      return this.renderFunctionPreview();
-    }
-
-    if (nodeIsObject(root)) {
-      return <div>{this.renderObjectPreview()}</div>;
+    if (root.type === "value") {
+      if (root.isFunction()) {
+        return this.renderFunctionPreview();
+      }
+      if (root.isObject()) {
+        return <div>{this.renderObjectPreview()}</div>;
+      }
     }
 
     return this.renderSimplePreview();
@@ -149,8 +137,8 @@ export class Popup extends Component {
       preview: { root, properties },
     } = this.props;
     if (
-      nodeIsPrimitive(root) ||
-      nodeIsFunction(root) ||
+      root.isPrimitive() ||
+      (root.type === "value" && root.isFunction()) ||
       !Array.isArray(properties) ||
       properties.length === 0
     ) {

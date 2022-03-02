@@ -7,10 +7,11 @@ import { sanityCheckMiddleware } from "ui/utils/sanitize";
 const configureStore = require("./redux/create-store").default;
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
+import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
 import { AppState } from "ui/state/app";
 import { LayoutState } from "ui/state/layout";
 
-let reducers: Record<string, any> = { app: appReducer, layout: layoutReducer };
+let reducers: Record<string, any> = { app: appReducer, layout: layoutReducer, tabs: tabsReducer };
 let thunkArgs: Record<string, any> = {};
 
 export function bootstrapStore(initialState: { app: AppState; layout: LayoutState }) {
@@ -33,7 +34,6 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
       ? applyMiddleware(sanityCheckMiddleware)
       : undefined
     : applyMiddleware(LogRocket.reduxMiddleware());
-
   return createStore(combineReducers(reducers), initialState, middleware);
 }
 

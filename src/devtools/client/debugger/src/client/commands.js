@@ -7,8 +7,6 @@
 import { prepareSourcePayload, createFrame } from "./create";
 import { clientEvents } from "./events";
 
-import Reps from "devtools/packages/devtools-reps";
-
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { fetchEventTypePoints } = require("protocol/logpoint");
 const {
@@ -29,15 +27,6 @@ let breakpoints;
 function setupCommands() {
   sourceActors = {};
   breakpoints = {};
-}
-
-async function loadObjectProperties(root) {
-  const utils = Reps.objectInspector.utils;
-  const properties = await utils.loadProperties.loadItemProperties(root);
-  return utils.node.getChildren({
-    item: root,
-    loadedProperties: new Map([[root.path, properties]]),
-  });
 }
 
 function releaseActor(actor) {
@@ -358,7 +347,6 @@ function pickExecutionPoints(count, options) {
 const clientCommands = {
   autocomplete,
   blackBox,
-  loadObjectProperties,
   releaseActor,
   interrupt,
   pauseGrip,

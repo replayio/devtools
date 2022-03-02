@@ -12,18 +12,20 @@ export interface FrameworkEventListener {
 
 export async function getFrameworkEventListeners(node: NodeFront) {
   const obj = node.getObjectFront();
-  const props = await obj.loadChildren();
-  const reactProp = props.find(v => v.name.startsWith("__reactEventHandlers$"));
+  await obj.loadProperties();
+  const props = Object.entries(obj.previewValueMap());
+  const reactProp = props.find(([key]) => key.startsWith("__reactEventHandlers$"));
   if (!reactProp) {
     return [];
   }
 
-  const handlerProps = await reactProp.contents.loadChildren();
+  await reactProp[1].loadProperties();
+  const handlerProps = Object.entries(reactProp[1].previewValueMap());
   return handlerProps
-    .filter(({ name, contents }) => {
+    .filter(([, contents]) => {
       return contents.isObject() && contents.className() == "Function";
     })
-    .map(({ name, contents }) => {
+    .map(([name, contents]) => {
       return { handler: contents, type: name, capture: false, tags: "React" };
     });
 }

@@ -11,6 +11,8 @@ import {
   getViewMode,
 } from "ui/reducers/layout";
 import { ViewMode } from "ui/state/layout";
+import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
+import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -125,6 +127,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
     selectedPanel: getSelectedPanel(state),
     localNags: [...(previousReplaySession?.localNags || [])],
+    tabs: persistTabs(getTabs(state)) || [],
   };
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };

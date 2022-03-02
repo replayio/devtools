@@ -1,8 +1,6 @@
 import { assert, DisallowEverythingProxyHandler } from "../utils";
-import { Pause, WiredContainerEntry, WiredObject } from "./pause";
+import { Pause, WiredObject } from "./pause";
 import { ThreadFront } from "./thread";
-
-type ValueFronts = { name: string; path?: string; contents: ValueFront }[];
 
 // like JSON, but including `undefined`
 type JSONishValue =
@@ -24,10 +22,8 @@ export class ValueFront {
   private _object: WiredObject | null;
   private _uninitialized: boolean;
   private _unavailable: boolean;
-  private _elements: ValueFronts | null;
-  private _isMapEntry: WiredContainerEntry | null;
 
-  constructor(pause: Pause | null, protocolValue: any, elements?: ValueFronts) {
+  constructor(pause: Pause | null, protocolValue: any) {
     this._pause = pause;
 
     // For primitive values.
@@ -43,13 +39,7 @@ export class ValueFront {
     this._uninitialized = false;
     this._unavailable = false;
 
-    // For arrays of values constructed by the devtools.
-    this._elements = null;
-    this._isMapEntry = null;
-
-    if (elements) {
-      this._elements = elements;
-    } else if ("value" in protocolValue) {
+    if ("value" in protocolValue) {
       this._hasPrimitive = true;
       this._primitive = protocolValue.value;
     } else if ("object" in protocolValue) {
@@ -97,9 +87,6 @@ export class ValueFront {
     }
     if (this._unavailable) {
       return "unavailable";
-    }
-    if (this._elements) {
-      return "elements";
     }
     throw new Error("bad contents");
   }
@@ -159,6 +146,10 @@ export class ValueFront {
   previewProxyState() {
     // Older recordings did not set proxyState so this could be null.
     return (this.hasPreview() && this._object!.preview!.proxyState) || null;
+  }
+
+  previewPrototypeValue() {
+    return (this.hasPreview() && this._object!.preview!.prototypeValue) || null;
   }
 
   className() {
@@ -227,10 +218,6 @@ export class ValueFront {
     return this._primitive;
   }
 
-  isMapEntry() {
-    return this._isMapEntry;
-  }
-
   isUninitialized() {
     return this._uninitialized;
   }
@@ -291,132 +278,43 @@ export class ValueFront {
     }
   }
 
-  getChildren(): ValueFronts {
-    if (this._elements) {
-      return this._elements;
+  async load() {
+    await this.getPause()!.getObjectPreview(this._object!.objectId);
+  }
+
+  async loadIfNecessary() {
+    if (this.isObject() && this.hasPreviewOverflow()) {
+      await this.load();
+      assert(!this.hasPreviewOverflow());
     }
+  }
+
+  async loadProperties() {
+    if (!this.isObject()) {
+      return;
+    }
+
+    // Make sure we know all this node's children.
     if (this.hasPreviewOverflow()) {
-      // See ObjectInspectorItem.js
-      return [
-        {
-          name: "Loading…",
-          contents: createUnavailableValueFront(),
-        },
-      ];
-    }
-    const previewValues = this.previewValueMap();
-    const rv = Object.entries(previewValues).map(([name, contents]) => ({
-      name,
-      contents,
-    }));
-    rv.sort((a, b) => {
-      // if both element names are numbers, sort them numerically instead of
-      // alphabetically.
-      const aN = Number.parseInt(a.name);
-      const bN = Number.parseInt(b.name);
-      if (!isNaN(aN) && !isNaN(bN)) {
-        return aN - bN;
-      }
-
-      const _a = a.name?.toUpperCase();
-      const _b = b.name?.toUpperCase();
-      return _a < _b ? -1 : _a > _b ? 1 : 0;
-    });
-    if (["Set", "WeakSet", "Map", "WeakMap"].includes(this.className()!)) {
-      const elements = this.previewContainerEntries()!.map(({ key, value }, i) => {
-        if (key) {
-          const entryElements = [
-            { name: "<key>", contents: key },
-            { name: "<value>", contents: value },
-          ];
-          const entry = createElementsFront(entryElements);
-          entry._isMapEntry = { key, value };
-          return { name: i.toString(), contents: entry };
-        } else {
-          return { name: i.toString(), contents: value };
-        }
-      });
-      rv.unshift({
-        name: "<entries>",
-        contents: createElementsFront(elements),
-      });
-    }
-    if (this.className() === "Promise") {
-      const result = this.previewPromiseState();
-      if (result) {
-        const { state, value } = result;
-
-        if (value) {
-          rv.unshift({
-            name: "<value>",
-            contents: value,
-          });
-        }
-        rv.unshift({
-          name: "<state>",
-          contents: state,
-        });
-      }
-    }
-
-    if (this.className() === "Proxy") {
-      const result = this.previewProxyState();
-      if (result) {
-        const { target, handler } = result;
-
-        rv.unshift({
-          name: "<handler>",
-          contents: handler,
-        });
-        rv.unshift({
-          name: "<target>",
-          contents: target,
-        });
-      }
-    } else {
-      rv.push({
-        name: "<prototype>",
-        contents: this._object!.preview!.prototypeValue,
-      });
-    }
-    return rv;
-  }
-
-  async loadDirectChildren() {
-    // Make sure we know all this node's children.
-    if (this.isObject() && this.hasPreviewOverflow()) {
       await this.getPause()!.getObjectPreview(this._object!.objectId);
       assert(!this.hasPreviewOverflow());
     }
 
-    return this.getChildren();
-  }
-
-  async loadChildren() {
-    // Make sure we know all this node's children.
-    if (this.isObject() && this.hasPreviewOverflow()) {
-      await this.getPause()!.getObjectPreview(this._object!.objectId);
-      assert(!this.hasPreviewOverflow());
-    }
-
-    const children = this.getChildren()!;
-
-    // Make sure we have previews for all of this node's object children.
+    // Make sure we have previews for all of this node's object properties.
+    const propertyValues = Object.values(this.previewValueMap());
     const promises = [];
-    for (const { contents } of children) {
-      if (contents.isObject() && !contents.hasPreview()) {
-        promises.push(contents.getPause()!.getObjectPreview(contents._object!.objectId));
+    for (const value of propertyValues) {
+      if (value.isObject() && !value.hasPreview()) {
+        promises.push(value.getPause()!.getObjectPreview(value._object!.objectId));
       }
     }
     await Promise.all(promises);
 
-    for (const { contents } of children) {
-      if (contents.isObject()) {
-        assert(contents.hasPreview());
+    for (const value of propertyValues) {
+      if (value.isObject()) {
+        assert(value.hasPreview());
       }
     }
-
-    return children;
   }
 
   /**
@@ -425,7 +323,7 @@ export class ValueFront {
    * circular reference, it is replaced by `undefined`.
    */
   async getJSON(visitedObjectIds = new Set<string>()): Promise<JSONishValue> {
-    await this.loadChildren();
+    await this.loadProperties();
 
     if (this.isPrimitive()) {
       return this.primitive();
@@ -470,11 +368,6 @@ Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProx
 export type PrimitiveValue = string | number | boolean | null | undefined;
 export function createPrimitiveValueFront(value: PrimitiveValue, pause: Pause | null = null) {
   return new ValueFront(pause, { value });
-}
-
-export function createElementsFront(elements: ValueFronts) {
-  elements.forEach(({ contents }) => contents.isObject());
-  return new ValueFront(null, undefined, elements);
 }
 
 export function createUnavailableValueFront() {

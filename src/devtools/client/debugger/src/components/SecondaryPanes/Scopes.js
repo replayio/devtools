@@ -24,10 +24,7 @@ import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
-
-const { objectInspector } = require("devtools/packages/devtools-reps");
-
-const ObjectInspector = objectInspector.ObjectInspector.default;
+import { ObjectInspector } from "devtools/packages/devtools-reps";
 
 class Scopes extends PureComponent {
   constructor(props) {
@@ -143,18 +140,16 @@ class Scopes extends PureComponent {
     }
 
     if (scopes && scopes.length > 0 && !isLoading) {
-      const roots = scopes.map((s, i) => ({
-        path: `scope${selectedFrame?.id}.${i}`,
-        name: s.name,
-        contents: s.contents,
-      }));
+      scopes.forEach((s, i) => {
+        s.path = `scope${selectedFrame?.id}.${i}`;
+      });
       return (
         <Redacted className="pane scopes-list">
           {originalScopesUnavailable ? (
             <div className="warning">The variables could not be mapped to their original names</div>
           ) : null}
           <ObjectInspector
-            roots={roots}
+            roots={scopes}
             autoExpandAll={false}
             autoExpandDepth={1}
             disableWrap={true}
