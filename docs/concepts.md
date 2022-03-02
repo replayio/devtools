@@ -104,6 +104,7 @@ front types
 logpoint
 breakpoint
 watchpoint
+region
 ```
 
 important objects and/or components:
