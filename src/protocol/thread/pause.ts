@@ -361,6 +361,20 @@ export class Pause {
     return this.objects.get(object)!;
   }
 
+  async getObjectProperty(object: ObjectId, property: string) {
+    const { result } = await this.sendMessage(client.Pause.getObjectProperty, {
+      object,
+      name: property,
+    });
+    const { returned, exception, failed, data } = result;
+    this.addData(data);
+    return {
+      returned: returned ? new ValueFront(this, returned) : undefined,
+      exception: exception ? new ValueFront(this, exception) : undefined,
+      failed,
+    };
+  }
+
   async evaluate(frameId: FrameId | undefined, expression: string, pure: boolean) {
     assert(this.createWaiter);
     await this.createWaiter;

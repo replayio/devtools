@@ -3,12 +3,14 @@ import { KeyValueItem } from "./keyValue";
 import { MODE } from "../../reps/constants";
 import { LoadingItem } from "./loading";
 import { ContainerItem } from "./container";
-import { Pause } from "protocol/thread";
+import { GetterItem } from "./getter";
+import { Pause, ValueFront } from "protocol/thread";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
-
 const {
   REPS: { Rep, Grip },
 } = require("../../reps/rep");
+
+export const GETTERS_FROM_PROTOTYPES = 1;
 
 export interface LabelAndValue {
   label?: React.ReactNode;
@@ -30,20 +32,24 @@ export interface IItem {
 // ContainerItems represent nodes with an arbitrary list of child nodes
 // - this is used to represent Scopes and the <entries> node of a native javascript container, for example
 // LoadingItem represents the "Loading…" node shown while a node's children are being loaded
-export { ValueItem, KeyValueItem, ContainerItem, LoadingItem };
-export type Item = ValueItem | KeyValueItem | ContainerItem | LoadingItem;
+export { ValueItem, KeyValueItem, ContainerItem, GetterItem, LoadingItem };
+export type Item = ValueItem | KeyValueItem | ContainerItem | GetterItem | LoadingItem;
 
 export async function loadChildren(root: Item): Promise<Item[]> {
   if (root.type === "value") {
-    if (root.needsToLoad()) {
-      await root.contents.load();
+    for (
+      let i = 0, currentValue: ValueFront | null = root.contents;
+      i <= GETTERS_FROM_PROTOTYPES && currentValue;
+      i++, currentValue = currentValue.previewPrototypeValue()
+    ) {
+      await currentValue.loadIfNecessary();
     }
   }
   const children = root.getChildren();
   await Promise.all(
     children.map(async child => {
-      if (child.type === "value" && child.needsToLoad()) {
-        await child.contents.load();
+      if (child.type === "value") {
+        await child.contents.loadIfNecessary();
       }
     })
   );

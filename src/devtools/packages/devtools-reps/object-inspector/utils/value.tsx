@@ -2,7 +2,17 @@ import React from "react";
 import { ValueFront } from "protocol/thread/value";
 import { MODE } from "../../reps/constants";
 import ErrorRep from "../../reps/error";
-import { ContainerItem, IItem, Item, KeyValueItem, LabelAndValue, LoadingItem, renderRep } from ".";
+import {
+  ContainerItem,
+  GetterItem,
+  GETTERS_FROM_PROTOTYPES,
+  IItem,
+  Item,
+  KeyValueItem,
+  LabelAndValue,
+  LoadingItem,
+  renderRep,
+} from ".";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 
 export class ValueItem implements IItem {
@@ -117,6 +127,20 @@ export class ValueItem implements IItem {
     const rv: Item[] = Object.entries(previewValues).map(
       ([name, contents]) => new ValueItem({ parent: this, name, contents })
     );
+    const knownProperties = new Set(Object.keys(previewValues));
+    for (
+      let i = 0, currentValue: ValueFront | null = value;
+      i <= GETTERS_FROM_PROTOTYPES && currentValue;
+      i++, currentValue = currentValue.previewPrototypeValue()
+    ) {
+      const getters = currentValue.previewGetters();
+      for (const name of Object.keys(getters)) {
+        if (!knownProperties.has(name)) {
+          rv.push(new GetterItem({ parent: this, name }));
+          knownProperties.add(name);
+        }
+      }
+    }
     rv.sort((a, b) => {
       // if both element names are numbers, sort them numerically instead of
       // alphabetically.

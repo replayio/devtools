@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 .tree.object-inspector .node.object-node {
-  display: inline-block;
+  display: flex;
+  align-items: center;
 }
 
 .tree.object-inspector .object-label,

@@ -295,8 +295,10 @@ button.invoke-getter {
   display: inline-block;
   background-color: var(--theme-icon-color);
   height: 10px;
+  width: 10px;
   vertical-align: middle;
   border: none;
+  margin-bottom: 1px;
 }
 
 .invoke-getter:hover {

@@ -63,14 +63,14 @@ export class Popup extends Component {
 
   renderObjectPreview() {
     const {
-      preview: { properties },
+      preview: { root },
       openLink,
       openElementInInspector,
       highlightDomElement,
       unHighlightDomElement,
     } = this.props;
 
-    if (properties.length == 0) {
+    if (root.getChildren().length == 0) {
       return (
         <div className="preview-popup">
           <span className="label">{"No properties"}</span>
@@ -81,7 +81,7 @@ export class Popup extends Component {
     return (
       <div className="preview-popup" style={{ maxHeight: this.calculateMaxHeight() }}>
         <ObjectInspector
-          roots={properties}
+          roots={() => root.getChildren()}
           autoExpandDepth={0}
           disableWrap={true}
           focusable={false}
