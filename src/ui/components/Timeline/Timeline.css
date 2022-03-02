@@ -164,11 +164,14 @@
   height: 5px;
   border-radius: 5px;
   position: absolute;
-  pointer-events: none;
   margin-top: auto;
   margin-bottom: auto;
   top: 0;
   bottom: 0;
+}
+
+.timeline .unloaded-regions {
+  pointer-events: none;
 }
 
 .timeline .unloaded-regions,
