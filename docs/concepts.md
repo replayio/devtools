@@ -80,6 +80,7 @@ Because the content of the `OI` is loaded async, properties can be in multiple s
 concepts:
 
 ```
+region
 wired types
   wired frame
   wired scope
@@ -104,7 +105,6 @@ front types
 logpoint
 breakpoint
 watchpoint
-region
 ```
 
 important objects and/or components:
