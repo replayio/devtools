@@ -30,6 +30,11 @@ module.exports = {
         themeBorder: "var(--theme-border)",
         themeTextField: "var(--theme-text-field)",
         themeTrimmer: "var(--theme-trimmer)",
+        breakpointEditfieldHover: "var(--breakpoint-editfield-hover)",
+        breakpointEditfieldActive: "var(--breakpoint-editfield-active)",
+        breakpointTip: "var(--breakpoint-tip)",
+        breakpointStatusBG: "var(--breakpoint-status-bg)",
+        breakpointStatus: "var(--breakpoint-status)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
