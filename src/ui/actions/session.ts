@@ -9,7 +9,6 @@ import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 import { findAutomatedTests } from "protocol/find-tests";
 import { assert, waitForTime } from "protocol/utils";
-import { validateUUID } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
@@ -105,6 +104,12 @@ function getRecordingNotAccessibleError(
 export function createSession(recordingId: string): UIThunkAction {
   return async ({ getState, dispatch }) => {
     try {
+      if (ThreadFront.recordingId) {
+        assert(recordingId === ThreadFront.recordingId);
+        return;
+      }
+      ThreadFront.recordingId = recordingId;
+
       const userSettings = await getUserSettings();
       const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording);
@@ -133,7 +138,6 @@ export function createSession(recordingId: string): UIThunkAction {
       }
 
       ThreadFront.setTest(getTest() || undefined);
-      ThreadFront.recordingId = recordingId;
 
       dispatch(showLoadingProgress());
 
