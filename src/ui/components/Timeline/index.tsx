@@ -318,7 +318,7 @@ class Timeline extends Component<PropsFromRedux> {
     );
   }
 
-  renderTrimmedRegion() {
+  renderUnfocusedRegion() {
     const { focusRegion, zoomRegion } = this.props;
 
     if (!focusRegion) {
@@ -333,17 +333,21 @@ class Timeline extends Component<PropsFromRedux> {
     return (
       <>
         <div
-          className="unloaded-regions start"
+          className="unfocused-regions-container start bg-primaryAccent"
           style={{
             width: `${clamp(start, 0, 100)}%`,
           }}
-        />
+        >
+          <div className="unfocused-regions" />
+        </div>
         <div
-          className="unloaded-regions end"
+          className="unfocused-regions-container end bg-gray-500"
           style={{
             width: `${clamp(end, 0, 100)}%`,
           }}
-        />
+          >
+          <div className="unfocused-regions" />
+        </div>
       </>
     );
   }
@@ -380,7 +384,7 @@ class Timeline extends Component<PropsFromRedux> {
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {this.renderUnloadedRegions()}
-            {features.focusing ? this.renderTrimmedRegion() : null}
+            {features.focusing ? this.renderUnfocusedRegion() : null}
             {showCurrentPauseMarker ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
