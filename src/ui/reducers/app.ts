@@ -295,25 +295,6 @@ export const isRegionLoaded = (state: UIState, time: number | null | undefined) 
   !!getLoadedRegions(state)?.loaded.some(
     region => time >= region.begin.time && time <= region.end.time
   );
-export const isFinishedLoadingRegions = (state: UIState) => {
-  const loadedRegions = getLoadedRegions(state)?.loaded;
-  const loadingRegions = getLoadedRegions(state)?.loading;
-
-  if (!loadingRegions || !loadedRegions) {
-    return false;
-  }
-
-  if (loadedRegions.length === 0) {
-    // If the empty loaded/loading region arrays, that means that the entire
-    // recording has been unloaded. We consider that as having finished loading.
-    return loadingRegions.length === 0;
-  }
-
-  const loading = loadingRegions[0];
-  const loaded = loadedRegions[0];
-
-  return isSameTimeStampedPointRange(loading, loaded);
-};
 export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
 export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
