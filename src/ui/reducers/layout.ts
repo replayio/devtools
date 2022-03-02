@@ -8,6 +8,7 @@ import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
 
 const syncInitialLayoutState: LayoutState = {
+  consoleFilterDrawerExpanded: true,
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
   viewMode: "non-dev",
@@ -52,12 +53,17 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     };
   }
 
-  const { viewMode, showVideoPanel, showEditor, selectedPanel } = syncInitialLayoutState;
+  const { viewMode, showVideoPanel, showEditor, selectedPanel, consoleFilterDrawerExpanded } =
+    syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
 
   return {
     ...syncInitialLayoutState,
+    consoleFilterDrawerExpanded:
+      "consoleFilterDrawerExpanded" in session
+        ? session.consoleFilterDrawerExpanded
+        : consoleFilterDrawerExpanded,
     viewMode: initialViewMode,
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
@@ -95,6 +101,10 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return { ...state, showEditor: action.showEditor };
     }
 
+    case "set_console_filter_drawer_expanded": {
+      return { ...state, consoleFilterDrawerExpanded: action.expanded };
+    }
+
     default: {
       return state;
     }
@@ -103,6 +113,8 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
 
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
+export const getConsoleFilterDrawerExpanded = (state: UIState) =>
+  state.layout.consoleFilterDrawerExpanded;
 export const getShowCommandPalette = (state: UIState) => state.layout.showCommandPalette;
 export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selectedPrimaryPanel;
 export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;

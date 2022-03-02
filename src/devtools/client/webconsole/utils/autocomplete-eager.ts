@@ -1,10 +1,15 @@
+import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import { ThreadFront, ValueFront } from "protocol/thread";
+import { useCallback } from "react";
+import { useSelector } from "react-redux";
 import { getPropertiesForObject } from "./autocomplete";
 
 // Use eager eval to get the properties of the last complete object in the expression.
-export async function getEvaluatedProperties(expression: string): Promise<string[]> {
-  const { asyncIndex, frameId } = gToolbox.getPanel("debugger")!.getFrameId();
-
+async function getEvaluatedProperties(
+  expression: string,
+  asyncIndex: number,
+  frameId?: string
+): Promise<string[]> {
   try {
     const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
@@ -26,9 +31,11 @@ export async function getEvaluatedProperties(expression: string): Promise<string
   return [];
 }
 
-export async function eagerEvaluateExpression(expression: string): Promise<ValueFront | null> {
-  const { asyncIndex, frameId } = gToolbox.getPanel("debugger")!.getFrameId();
-
+async function eagerEvaluateExpression(
+  expression: string,
+  asyncIndex: number,
+  frameId?: string
+): Promise<ValueFront | null> {
   try {
     const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
@@ -48,4 +55,25 @@ export async function eagerEvaluateExpression(expression: string): Promise<Value
   }
 
   return null;
+}
+
+export function useGetEvaluatedProperties() {
+  const frame = useSelector(getSelectedFrame);
+  const callback = useCallback(
+    (expression: string) =>
+      frame ? getEvaluatedProperties(expression, frame.asyncIndex, frame.protocolId) : null,
+    [frame]
+  );
+
+  return callback;
+}
+export function useEagerEvaluateExpression() {
+  const frame = useSelector(getSelectedFrame);
+  const callback = useCallback(
+    (expression: string) =>
+      frame ? eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId) : null,
+    [frame]
+  );
+
+  return callback;
 }

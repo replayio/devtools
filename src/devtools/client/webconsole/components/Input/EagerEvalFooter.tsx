@@ -1,11 +1,12 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { ValueFront } from "protocol/thread";
 import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
-import { eagerEvaluateExpression } from "../../utils/autocomplete-eager";
+import { useEagerEvaluateExpression } from "../../utils/autocomplete-eager";
 
 function useEagerEvalPreview(expression: string) {
   const [value, setValue] = useState<ValueFront | null>(null);
   const expressionRef = useRef(expression);
+  const eagerEvaluateExpression = useEagerEvaluateExpression();
 
   useEffect(() => {
     expressionRef.current = expression;
@@ -19,7 +20,7 @@ function useEagerEvalPreview(expression: string) {
         setValue(rv);
       }
     })();
-  }, [expression]);
+  }, [expression, eagerEvaluateExpression]);
 
   return value;
 }

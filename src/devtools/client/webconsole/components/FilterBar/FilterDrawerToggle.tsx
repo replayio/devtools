@@ -1,34 +1,25 @@
-import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { UIState } from "ui/state";
-import { getAllUi } from "../../selectors/ui";
+import React, { FC } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setConsoleFilterDrawerExpanded } from "ui/actions/layout";
 import Icon from "ui/components/shared/Icon";
-const actions = require("devtools/client/webconsole/actions/index");
+import { getConsoleFilterDrawerExpanded } from "ui/reducers/layout";
 
-function FilterDrawerToggle({ collapseFilterDrawer, toggleFilterDrawer }: PropsFromRedux) {
+export const FilterDrawerToggle: FC = () => {
+  const expanded = useSelector(getConsoleFilterDrawerExpanded);
+  const dispatch = useDispatch();
+
   const onClick = () => {
-    toggleFilterDrawer();
+    dispatch(setConsoleFilterDrawerExpanded(!expanded));
   };
+
   return (
     <div
       className="flex flex-row items-center justify-start"
-      style={!collapseFilterDrawer ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
+      style={expanded ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
     >
       <button className="console-filter-toggle" onClick={onClick}>
         <Icon filename="drawer" className="bg-iconColor hover:bg-primaryAccent" />
       </button>
     </div>
   );
-}
-
-const connector = connect(
-  (state: UIState) => ({
-    collapseFilterDrawer: getAllUi(state).collapseFilterDrawer,
-  }),
-  {
-    toggleFilterDrawer: actions.toggleFilterDrawer,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(FilterDrawerToggle);
+};

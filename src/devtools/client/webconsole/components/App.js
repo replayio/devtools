@@ -13,7 +13,7 @@ const ConsoleOutput = require("devtools/client/webconsole/components/Output/Cons
 const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar").default;
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
-const FilterDrawer = require("./FilterDrawer").default;
+const { FilterDrawer } = require("./FilterDrawer");
 const Warning = require("ui/components/shared/Warning").default;
 
 /**

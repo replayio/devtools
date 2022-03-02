@@ -47,7 +47,7 @@ const COMMANDS: readonly Command[] = [
   { key: "open_viewer", label: "Open Viewer" },
   { key: "open_file_search", label: "Search for file", shortcut: "CmdOrCtrl+P" },
   { key: "open_full_text_search", label: "Search full text", shortcut: "CmdOrCtrl+Shift+F" },
-  { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+P" },
+  { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+Shift+O" },
   { key: "open_outline", label: "Open Outline" },
   { key: "open_print_statements", label: "Open Print Statements" },
   { key: "open_react_devtools", label: "Open React DevTools", settingKey: "showReact" },
