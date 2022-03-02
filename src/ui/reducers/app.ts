@@ -9,6 +9,7 @@ import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getTrimRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 
 export const initialAppState: AppState = {
   analysisPoints: {},
@@ -298,3 +299,18 @@ export const isRegionLoaded = (state: UIState, time: number | null | undefined) 
 export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
 export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
+export const getIsInLoadedRegion = (state: UIState) => {
+  const loadedRegions = getLoadedRegions(state)?.loaded;
+  const currentPoint = getExecutionPoint(state);
+
+  if (!loadedRegions || loadedRegions.length !== 0 || !currentPoint) {
+    return false;
+  }
+
+  const currentPointIsLoaded = loadedRegions.find(
+    r =>
+      BigInt(r.begin.point) <= BigInt(currentPoint) && BigInt(r.end.point) >= BigInt(currentPoint)
+  );
+
+  return currentPointIsLoaded;
+};

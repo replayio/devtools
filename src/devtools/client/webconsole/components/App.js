@@ -15,6 +15,7 @@ const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").def
 const { ConsoleNag } = require("ui/components/shared/Nags/Nags");
 const FilterDrawer = require("./FilterDrawer").default;
 const Warning = require("ui/components/shared/Warning").default;
+const { getIsInLoadedRegion } = require("ui/reducers/app");
 
 /**
  * Console root Application component.
@@ -61,7 +62,7 @@ class App extends React.Component {
   };
 
   render() {
-    const { filterBarDisplayMode, consoleOverflow } = this.props;
+    const { filterBarDisplayMode, consoleOverflow, isInLoadedRegion } = this.props;
 
     return (
       <div className="flex w-full flex-col">
@@ -83,7 +84,7 @@ class App extends React.Component {
             ) : null}
             <div className="flexible-output-input" key="in-out-container">
               <ConsoleOutput key="console-output" />
-              <JSTerm />
+              {isInLoadedRegion ? <JSTerm /> : <div>Console evaluations are disabled while paused in an unloaded region</div>}
             </div>
           </div>
         </div>
@@ -94,6 +95,7 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
   return {
+    isInLoadedRegion: getIsInLoadedRegion(state),
     consoleOverflow: state.messages.overflow,
     filterBarDisplayMode: state.consoleUI.filterBarDisplayMode,
   };
