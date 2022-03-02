@@ -16,6 +16,15 @@ import { isSimilarTab, persistTabs } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
+import { asyncStore } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/recording";
+
+export const getInitialTabsState = async () => {
+  const sessions = await asyncStore.replaySessions;
+  const session = sessions[getRecordingId()];
+
+  return { tabs: session?.tabs || [] };
+};
 
 function initialTabState() {
   return { tabs: [] };
@@ -217,7 +226,7 @@ function moveTabInListBySourceId(state, { sourceId, tabIndex: newIndex }) {
 
 // Selectors
 
-export const getTabs = state => state.tabs.tabs;
+export const getTabs = state => state?.tabs.tabs || [];
 
 export const getSourceTabs = createSelector(
   state => state.tabs,

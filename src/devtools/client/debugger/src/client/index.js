@@ -20,13 +20,10 @@ import { initialBreakpointsState } from "../reducers/breakpoints";
 
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
-  const tabs = { tabs: await asyncStore.tabs };
-
   const breakpoints = initialBreakpointsState();
 
   return {
     pendingBreakpoints,
-    tabs,
     breakpoints,
   };
 }

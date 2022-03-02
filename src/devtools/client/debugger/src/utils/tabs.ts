@@ -1,6 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+export interface EditorTab {
+  url: string;
+  sourceId: string | null;
+  isOriginal: boolean;
+}
 
 export function getTabMenuItems() {
   return {
@@ -61,11 +63,11 @@ export function getTabMenuItems() {
   };
 }
 
-export function isSimilarTab(tab, url, isOriginal) {
+export function isSimilarTab(tab: EditorTab, url: string, isOriginal: boolean) {
   return tab.url === url && tab.isOriginal === isOriginal;
 }
 
-export function persistTabs(tabs) {
+export function persistTabs(tabs: EditorTab[]) {
   return [...tabs]
     .filter(tab => tab.url)
     .map(tab => {
