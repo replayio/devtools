@@ -151,6 +151,7 @@ class Timeline extends Component<PropsFromRedux> {
       replayPlayback,
       clearPendingComment,
       videoUrl,
+      trimRegion,
     } = this.props;
     const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
@@ -176,7 +177,7 @@ class Timeline extends Component<PropsFromRedux> {
       }
     };
 
-    if (currentTime == recordingDuration) {
+    if (trimRegion ? currentTime === trimRegion.endTime : currentTime == recordingDuration) {
       return (
         <div className="commands">
           <button className="relative" onClick={replay} disabled={disabled}>

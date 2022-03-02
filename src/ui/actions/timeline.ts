@@ -304,7 +304,8 @@ export function startPlayback(): UIThunkAction {
 
     const state = getState();
     const currentTime = getCurrentTime(state);
-    const { endTime } = getZoomRegion(state);
+    const trimRegion = getTrimRegion(state);
+    const { endTime } = trimRegion ? trimRegion : getZoomRegion(state);
 
     const startDate = Date.now();
     const startTime = currentTime >= endTime ? 0 : currentTime;
@@ -335,8 +336,15 @@ export function stopPlayback(): UIThunkAction {
 }
 
 export function replayPlayback(): UIThunkAction {
-  return ({ dispatch }) => {
-    dispatch(seekToTime(0));
+  return ({ getState, dispatch }) => {
+    const trimRegion = getTrimRegion(getState());
+    let startTime = 0;
+
+    if (trimRegion) {
+      startTime = trimRegion.startTime;
+    }
+
+    dispatch(seekToTime(startTime));
     dispatch(startPlayback());
   };
 }
