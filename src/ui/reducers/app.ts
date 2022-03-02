@@ -7,7 +7,7 @@ import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
-import { getTrimRegion } from "ui/reducers/timeline";
+import { getFocusRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";
 
 export const initialAppState: AppState = {
@@ -241,12 +241,12 @@ export const getAnalysisPointsForLocation = (
   if (!location) {
     return;
   }
-  const trimRegion = getTrimRegion(state);
+  const focusRegion = getFocusRegion(state);
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
 
-  if (features.trimming && trimRegion && points && points !== "error") {
-    return points.filter(p => isInTrimSpan(p.time, trimRegion));
+  if (features.focusing && focusRegion && points && points !== "error") {
+    return points.filter(p => isInTrimSpan(p.time, focusRegion));
   }
 
   return points;
@@ -255,10 +255,10 @@ export const getHoveredLineNumberLocation = (state: UIState) => state.app.hovere
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
   const points = getAnalysisPointsForLocation(state, location);
-  const trimRegion = getTrimRegion(state);
+  const focusRegion = getFocusRegion(state);
 
-  if (features.trimming && trimRegion && points && points !== "error") {
-    return points.filter(p => isInTrimSpan(p.time, trimRegion));
+  if (features.focusing && focusRegion && points && points !== "error") {
+    return points.filter(p => isInTrimSpan(p.time, focusRegion));
   }
 
   return points;
@@ -314,6 +314,6 @@ export const isFinishedLoadingRegions = (state: UIState) => {
 
   return isSameTimeStampedPointRange(loading, loaded);
 };
-export const getIsTrimming = (state: UIState) => getModal(state) === "trimming";
+export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
 export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;

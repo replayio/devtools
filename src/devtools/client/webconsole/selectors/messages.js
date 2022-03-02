@@ -6,7 +6,7 @@
 const { isError } = require("devtools/client/webconsole/utils/messages");
 const { pointPrecedes } = require("protocol/execution-point-utils");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const { getCurrentTime, getTrimRegion } = require("ui/reducers/timeline");
+const { getCurrentTime, getFocusRegion } = require("ui/reducers/timeline");
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { isInTrimSpan } = require("ui/utils/timeline");
 const { features } = require("ui/utils/prefs");
@@ -34,18 +34,18 @@ export const getVisibleMessages = createSelector(
   state => state.messages.visibleMessages,
   state => state.consoleUI.zoomStartTime,
   state => state.consoleUI.zoomEndTime,
-  getTrimRegion,
-  (messages, visibleMessages, zoomStartTime, zoomEndTime, trimRegion) => {
+  getFocusRegion,
+  (messages, visibleMessages, zoomStartTime, zoomEndTime, focusRegion) => {
     const msgs = visibleMessages.filter(id => {
       const msg = messages.get(id);
       const time = messageTime(msg);
       return time >= zoomStartTime && time <= zoomEndTime;
     });
 
-    if (trimRegion && features.trimming) {
+    if (focusRegion && features.focusing) {
       return msgs.filter(id => {
         const msg = messages.get(id);
-        return isInTrimSpan(msg.executionPointTime, trimRegion);
+        return isInTrimSpan(msg.executionPointTime, focusRegion);
       });
     }
 

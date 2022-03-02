@@ -32,10 +32,10 @@ import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
-import { Trimmer } from "./Trimmer";
-import TrimButton from "./TrimButton";
+import { Focuser } from "./Focuser";
 import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
+import { EditFocusButton } from "./EditFocusButton";
 
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
@@ -93,14 +93,14 @@ class Timeline extends Component<PropsFromRedux> {
   };
 
   onPlayerMouseMove: MouseEventHandler = e => {
-    const { hoverTime, setTimelineToTime, setTimelineState, isTrimming } = this.props;
+    const { hoverTime, setTimelineToTime, setTimelineState, isFocusing } = this.props;
     const mouseTime = this.getMouseTime(e);
     const isDragging = e.buttons === 1;
 
     if (hoverTime != mouseTime) {
       setTimelineToTime(mouseTime, isDragging);
     }
-    if (isDragging && !isTrimming) {
+    if (isDragging && !isFocusing) {
       setTimelineState({ currentTime: mouseTime });
     }
   };
@@ -113,7 +113,7 @@ class Timeline extends Component<PropsFromRedux> {
       clearPendingComment,
       setTimelineToTime,
       setTimelineState,
-      isTrimming,
+      isFocusing,
     } = this.props;
     // if the user clicked on a comment marker, we already seek to the comment's
     // execution point, so we don't want to seek a second time here
@@ -151,7 +151,7 @@ class Timeline extends Component<PropsFromRedux> {
       replayPlayback,
       clearPendingComment,
       videoUrl,
-      trimRegion,
+      focusRegion,
     } = this.props;
     const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
@@ -177,7 +177,7 @@ class Timeline extends Component<PropsFromRedux> {
       }
     };
 
-    if (trimRegion ? currentTime === trimRegion.endTime : currentTime == recordingDuration) {
+    if (focusRegion ? currentTime === focusRegion.endTime : currentTime == recordingDuration) {
       return (
         <div className="commands">
           <button className="relative" onClick={replay} disabled={disabled}>
@@ -319,13 +319,13 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderTrimmedRegion() {
-    const { trimRegion, zoomRegion } = this.props;
+    const { focusRegion, zoomRegion } = this.props;
 
-    if (!trimRegion) {
+    if (!focusRegion) {
       return null;
     }
 
-    const { startTime, endTime } = trimRegion;
+    const { startTime, endTime } = focusRegion;
     const { endTime: duration } = zoomRegion;
     const start = getVisiblePosition({ time: startTime, zoom: zoomRegion }) * 100;
     const end = getVisiblePosition({ time: duration - endTime, zoom: zoomRegion }) * 100;
@@ -349,14 +349,14 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   render() {
-    const { zoomRegion, currentTime, hoverTime, precachedTime, recordingDuration, isTrimming } =
+    const { zoomRegion, currentTime, hoverTime, precachedTime, recordingDuration, isFocusing } =
       this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
     const formattedTime = getFormattedTime(currentTime);
     const showCurrentPauseMarker =
-      (this.isHovering() && percent >= 0 && percent <= 100) || isTrimming;
+      (this.isHovering() && percent >= 0 && percent <= 100) || isFocusing;
 
     return (
       <div className="timeline">
@@ -380,13 +380,13 @@ class Timeline extends Component<PropsFromRedux> {
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {this.renderUnloadedRegions()}
-            {features.trimming ? this.renderTrimmedRegion() : null}
+            {features.focusing ? this.renderTrimmedRegion() : null}
             {showCurrentPauseMarker ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
             {this.renderPreviewMarkers()}
             <Comments />
-            {isTrimming ? <Trimmer /> : null}
+            {isFocusing ? <Focuser /> : null}
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>
@@ -398,7 +398,7 @@ class Timeline extends Component<PropsFromRedux> {
           <span className="time-divider">/</span>
           <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
         </div>
-        {features.trimming ? <TrimButton /> : null}
+        {features.focusing ? <EditFocusButton /> : null}
       </div>
     );
   }
@@ -423,8 +423,8 @@ const connector = connect(
     hoveredComment: selectors.getHoveredComment(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),
     videoUrl: selectors.getVideoUrl(state),
-    isTrimming: selectors.getIsTrimming(state),
-    trimRegion: selectors.getTrimRegion(state),
+    isFocusing: selectors.getIsFocusing(state),
+    focusRegion: selectors.getFocusRegion(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

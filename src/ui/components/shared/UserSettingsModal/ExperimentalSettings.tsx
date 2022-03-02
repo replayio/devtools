@@ -74,7 +74,7 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableTrimming, update: updateEnableTrimming } = useFeature("trimming");
+  const { value: enableTrimming, update: updateEnableTrimming } = useFeature("focusing");
   const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
 
   const onChange = (key: ExperimentalKey, value: any) => {

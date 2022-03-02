@@ -5,7 +5,7 @@ import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import MaterialIcon from "../MaterialIcon";
 
-function TrimmingModal({ hideModal }: PropsFromRedux) {
+function FocusingModal({ hideModal }: PropsFromRedux) {
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
@@ -25,7 +25,7 @@ function TrimmingModal({ hideModal }: PropsFromRedux) {
             <div className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white">
               <MaterialIcon>center_focus_strong</MaterialIcon>
             </div>
-            <div className="text-lg">Trimming mode</div>
+            <div className="text-lg">Focus mode</div>
           </div>
           <p>
             Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
@@ -45,4 +45,4 @@ const connector = connect(
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(TrimmingModal);
+export default connector(FocusingModal);

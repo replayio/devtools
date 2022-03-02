@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import clamp from "lodash/clamp";
-import { TrimOperation, ZoomRegion } from "ui/state/timeline";
+import { FocusOperation, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
@@ -39,23 +39,23 @@ function Draggers({
   onDragStart,
 }: {
   dragging: boolean;
-  onDragStart: (e: React.MouseEvent, target: TrimOperation) => void;
+  onDragStart: (e: React.MouseEvent, target: FocusOperation) => void;
 }) {
   return (
     <>
       <div
         className={classNames(
           dragging ? "w-1" : "w-1",
-          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-themeTrimmer group-hover:w-1"
+          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuser group-hover:w-1"
         )}
-        onMouseDown={e => onDragStart(e, TrimOperation.resizeStart)}
+        onMouseDown={e => onDragStart(e, FocusOperation.resizeStart)}
       />
       <div
         className={classNames(
           dragging ? "w-1" : "w-1",
-          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-themeTrimmer group-hover:w-1"
+          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuser group-hover:w-1"
         )}
-        onMouseDown={e => onDragStart(e, TrimOperation.resizeEnd)}
+        onMouseDown={e => onDragStart(e, FocusOperation.resizeEnd)}
       />
     </>
   );
@@ -79,7 +79,7 @@ function Span({
 
   return (
     <div className="group absolute h-full" style={{ left: `${left}%`, width: `${right - left}%` }}>
-      <div className="h-full w-full bg-themeTrimmer opacity-50" onMouseDown={onMouseDown} />
+      <div className="h-full w-full bg-themeFocuser opacity-50" onMouseDown={onMouseDown} />
       {draggers}
     </div>
   );
@@ -90,30 +90,30 @@ function TrimSpan({
   onDragStart,
 }: {
   dragging: boolean;
-  onDragStart: (e: React.MouseEvent, target: TrimOperation) => void;
+  onDragStart: (e: React.MouseEvent, target: FocusOperation) => void;
 }) {
   const zoomRegion = useSelector(selectors.getZoomRegion);
-  const trimRegion = useSelector(selectors.getTrimRegion);
+  const focusRegion = useSelector(selectors.getFocusRegion);
 
-  if (!trimRegion) {
+  if (!focusRegion) {
     return null;
   }
 
   const draggers = <Draggers {...{ dragging, onDragStart }} />;
-  const { startTime, endTime } = trimRegion;
+  const { startTime, endTime } = focusRegion;
 
   return <Span {...{ startTime, endTime, zoomRegion, draggers }} />;
 }
 
-export const Trimmer: React.FC = () => {
+export const Focuser: React.FC = () => {
   const dispatch = useDispatch();
   const zoomRegion = useSelector(selectors.getZoomRegion);
   const hoverTime = useSelector(selectors.getHoverTime);
   const currentTime = useSelector(selectors.getCurrentTime);
-  const trimRegion = useSelector(selectors.getTrimRegion);
-  const [draggingTarget, setDraggingTarget] = useState<TrimOperation | null>(null);
+  const focusRegion = useSelector(selectors.getFocusRegion);
+  const [draggingTarget, setDraggingTarget] = useState<FocusOperation | null>(null);
 
-  const onDragStart = (e: React.MouseEvent, target: TrimOperation) => {
+  const onDragStart = (e: React.MouseEvent, target: FocusOperation) => {
     e.stopPropagation();
     setDraggingTarget(target);
   };
@@ -121,8 +121,8 @@ export const Trimmer: React.FC = () => {
     e.stopPropagation();
     setDraggingTarget(null);
     if (
-      (draggingTarget === TrimOperation.resizeStart && currentTime < trimRegion!.startTime) ||
-      (draggingTarget === TrimOperation.resizeEnd && currentTime > trimRegion!.endTime)
+      (draggingTarget === FocusOperation.resizeStart && currentTime < focusRegion!.startTime) ||
+      (draggingTarget === FocusOperation.resizeEnd && currentTime > focusRegion!.endTime)
     ) {
       dispatch(setTimelineState({ currentTime: hoverTime! }));
       dispatch(setTimelineToTime(hoverTime, true));
@@ -132,25 +132,25 @@ export const Trimmer: React.FC = () => {
     if (!draggingTarget) {
       return;
     }
-    dispatch(actions.updateTrimRegion(draggingTarget));
+    dispatch(actions.updateFocusRegion(draggingTarget));
   };
   useEffect(() => {
-    if (!trimRegion) {
-      const trimRegion = { startTime: 0, endTime: zoomRegion.endTime };
-      dispatch(actions.setTrimRegion(trimRegion));
+    if (!focusRegion) {
+      const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
+      dispatch(actions.setFocusRegion(focusRegion));
     }
 
     return () => {
-      dispatch(actions.syncTrimmedRegion());
+      dispatch(actions.syncFocusedRegion());
     };
   }, []);
 
   return (
     <div className="relative top-0 left-0 h-full w-full">
-      {trimRegion ? (
+      {focusRegion ? (
         <TrimSpan
           {...{
-            trimRegion,
+            focusRegion,
             zoomRegion,
             onDragStart,
           }}

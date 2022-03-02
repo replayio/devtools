@@ -29,7 +29,7 @@ module.exports = {
         iconColorDisabled: "var(--theme-text-field)",
         themeBorder: "var(--theme-border)",
         themeTextField: "var(--theme-text-field)",
-        themeTrimmer: "var(--theme-trimmer)",
+        themeFocuser: "var(--theme-focuser)",
         breakpointEditfieldHover: "var(--breakpoint-editfield-hover)",
         breakpointEditfieldActive: "var(--breakpoint-editfield-active)",
         breakpointTip: "var(--breakpoint-tip)",

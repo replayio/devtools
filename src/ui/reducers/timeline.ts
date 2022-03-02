@@ -14,7 +14,7 @@ function initialTimelineState(): TimelineState {
     recordingDuration: null,
     timelineDimensions: { left: 1, top: 1, width: 1 },
     hoveredItem: null,
-    trimRegion: null,
+    focusRegion: null,
     stalled: false,
   };
 }
@@ -45,7 +45,7 @@ export default function update(
     }
 
     case "set_trim_region": {
-      return { ...state, trimRegion: action.trimRegion };
+      return { ...state, focusRegion: action.focusRegion };
     }
 
     default: {
@@ -64,4 +64,4 @@ export const getRecordingDuration = (state: UIState) => state.timeline.recording
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
-export const getTrimRegion = (state: UIState) => state.timeline.trimRegion;
+export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;

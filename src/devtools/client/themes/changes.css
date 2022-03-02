@@ -62,7 +62,7 @@
 }
 
 #sidebar-panel-changes .href span {
-  /* Allows trimming of flex item with overflow ellipsis within the flex container */
+  /* Allows focusing of flex item with overflow ellipsis within the flex container */
   min-width: 0;
   white-space: nowrap;
   text-overflow: ellipsis;

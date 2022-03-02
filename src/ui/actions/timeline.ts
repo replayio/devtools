@@ -18,14 +18,14 @@ import {
   getHoveredItem,
   getHoverTime,
   getPlayback,
-  getTrimRegion,
+  getFocusRegion,
   getZoomRegion,
 } from "ui/reducers/timeline";
 import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { TimelineState, ZoomRegion, HoveredItem, TrimOperation } from "ui/state/timeline";
+import { TimelineState, ZoomRegion, HoveredItem, FocusOperation } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
@@ -45,8 +45,8 @@ export type SetHoveredItemAction = Action<"set_hovered_item"> & {
 export type SetPlaybackPrecachedTimeAction = Action<"set_playback_precached_time"> & {
   time: number;
 };
-export type SetTrimRegionAction = Action<"set_trim_region"> & {
-  trimRegion: {
+export type SetFocusRegionAction = Action<"set_trim_region"> & {
+  focusRegion: {
     startTime: number;
     endTime: number;
   };
@@ -58,7 +58,7 @@ export type TimelineActions =
   | SetZoomRegionAction
   | SetHoveredItemAction
   | SetPlaybackPrecachedTimeAction
-  | SetTrimRegionAction;
+  | SetFocusRegionAction;
 
 export async function setupTimeline(store: UIStore) {
   const { dispatch } = store;
@@ -304,8 +304,8 @@ export function startPlayback(): UIThunkAction {
 
     const state = getState();
     const currentTime = getCurrentTime(state);
-    const trimRegion = getTrimRegion(state);
-    const { endTime } = trimRegion ? trimRegion : getZoomRegion(state);
+    const focusRegion = getFocusRegion(state);
+    const { endTime } = focusRegion ? focusRegion : getZoomRegion(state);
 
     const startDate = Date.now();
     const startTime = currentTime >= endTime ? 0 : currentTime;
@@ -337,11 +337,11 @@ export function stopPlayback(): UIThunkAction {
 
 export function replayPlayback(): UIThunkAction {
   return ({ getState, dispatch }) => {
-    const trimRegion = getTrimRegion(getState());
+    const focusRegion = getFocusRegion(getState());
     let startTime = 0;
 
-    if (trimRegion) {
-      startTime = trimRegion.startTime;
+    if (focusRegion) {
+      startTime = focusRegion.startTime;
     }
 
     dispatch(seekToTime(startTime));
@@ -501,29 +501,29 @@ export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTime
   return { type: "set_playback_precached_time", time };
 }
 
-export function setTrimRegion(trimRegion: {
+export function setFocusRegion(focusRegion: {
   startTime: number;
   endTime: number;
-}): SetTrimRegionAction {
-  return { type: "set_trim_region", trimRegion };
+}): SetFocusRegionAction {
+  return { type: "set_trim_region", focusRegion };
 }
 
-export function updateTrimRegion(operation: TrimOperation): UIThunkAction {
+export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
   return ({ dispatch, getState }) => {
     const state = getState();
     const hoverTime = getHoverTime(state)!;
-    const trimRegion = getTrimRegion(state)!;
+    const focusRegion = getFocusRegion(state)!;
     const zoomRegion = getZoomRegion(state);
 
     const duration = zoomRegion.endTime;
     // To get around a handful of selection UI bugs, this limits the allowable trimmed
     // region to 10% of the full duration of the replay.
     const minRegion = duration * 0.1;
-    const { startTime, endTime } = trimRegion;
+    const { startTime, endTime } = focusRegion;
 
     let value, type;
 
-    if (operation === TrimOperation.resizeStart) {
+    if (operation === FocusOperation.resizeStart) {
       type = "startTime";
       value = clamp(hoverTime, 0, endTime - minRegion);
     } else {
@@ -531,34 +531,34 @@ export function updateTrimRegion(operation: TrimOperation): UIThunkAction {
       value = clamp(hoverTime, startTime + minRegion, duration);
     }
 
-    dispatch(setTrimRegion({ ...trimRegion, [type]: value }));
+    dispatch(setFocusRegion({ ...focusRegion, [type]: value }));
   };
 }
 
-export function syncTrimmedRegion(): UIThunkAction {
+export function syncFocusedRegion(): UIThunkAction {
   return async ({ getState }) => {
     const state = getState();
     const zoomRegion = getZoomRegion(state);
-    const trimRegion = getTrimRegion(state);
+    const focusRegion = getFocusRegion(state);
 
-    if (!trimRegion) {
+    if (!focusRegion) {
       return;
     }
 
     sendMessage(
       "Session.unloadRegion",
-      { region: { begin: 0, end: trimRegion.startTime } },
+      { region: { begin: 0, end: focusRegion.startTime } },
       window.sessionId
     );
     sendMessage(
       "Session.unloadRegion",
-      { region: { begin: trimRegion.endTime, end: zoomRegion.endTime } },
+      { region: { begin: focusRegion.endTime, end: zoomRegion.endTime } },
       window.sessionId
     );
     sendMessage(
       "Session.loadRegion",
       {
-        region: { begin: trimRegion.startTime, end: trimRegion.endTime },
+        region: { begin: focusRegion.startTime, end: focusRegion.endTime },
       },
       window.sessionId
     );
