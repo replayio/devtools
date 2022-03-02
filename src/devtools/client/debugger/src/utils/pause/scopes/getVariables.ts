@@ -12,7 +12,7 @@ import { ValueItem } from "devtools/packages/devtools-reps";
 
 // Create the tree nodes representing all the variables and arguments
 // for the bindings from a scope.
-export function getBindingVariables(bindings, parentName) {
+export function getBindingVariables(bindings: any, parentName: string) {
   if (!bindings) {
     return [];
   }

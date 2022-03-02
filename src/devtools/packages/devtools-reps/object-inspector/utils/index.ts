@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
 import { ValueItem } from "./value";
 import { KeyValueItem } from "./keyValue";
 import { MODE } from "../../reps/constants";
@@ -30,7 +26,7 @@ export interface IItem {
 
 // An Item represents one node in the ObjectInspector tree:
 // ValueItems represent nodes that correspond to a ValueFront (i.e. a javascript value in the debuggee)
-// KeValueItems represent nodes for entries in a native javascript container (i.e. Map, WeakMap, Set and WeakSet)
+// KeyValueItems represent nodes for entries in a native javascript container (i.e. Map, WeakMap, Set and WeakSet)
 // ContainerItems represent nodes with an arbitrary list of child nodes
 // - this is used to represent Scopes and the <entries> node of a native javascript container, for example
 // LoadingItem represents the "Loading…" node shown while a node's children are being loaded
