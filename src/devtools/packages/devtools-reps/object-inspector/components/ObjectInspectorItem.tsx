@@ -33,6 +33,7 @@ export interface ObjectInspectorItemProps {
     }
   ) => void;
   renderItemActions: (item: Item) => ReactNode;
+  forceUpdate: () => void;
 }
 
 class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {

@@ -1,6 +1,8 @@
 import { assert, DisallowEverythingProxyHandler } from "../utils";
-import { Pause, WiredObject } from "./pause";
+import { EvaluationResult, Pause, WiredObject } from "./pause";
 import { ThreadFront } from "./thread";
+
+type ValueMap = { [key: string]: ValueFront };
 
 // like JSON, but including `undefined`
 type JSONishValue =
@@ -111,7 +113,7 @@ export class ValueFront {
     return !this.hasPreview() || this._object!.preview!.overflow;
   }
 
-  previewValueMap(): { [key: string]: ValueFront } {
+  previewValueMap(): ValueMap {
     const rv = Object.create(null);
     if (this.hasPreview()) {
       for (const { name, value, get, set } of this._object!.preview!.properties!) {
@@ -129,6 +131,20 @@ export class ValueFront {
 
   previewValueCount() {
     return Object.keys(this.previewValueMap()).length;
+  }
+
+  previewGetters(): ValueMap {
+    if (!this._object?.preview?.properties) {
+      return {};
+    }
+    const valueMap = this.previewValueMap();
+    const rv: ValueMap = {};
+    for (const { name, get } of this._object.preview.properties) {
+      if (get && !(name in valueMap)) {
+        rv[name] = get;
+      }
+    }
+    return rv;
   }
 
   previewContainerEntries() {
@@ -276,6 +292,12 @@ export class ValueFront {
     if (this._pause && this._object?.preview?.node) {
       return this._pause.getNodeFront(this._object.objectId);
     }
+  }
+
+  getProperty(property: string): Promise<EvaluationResult> {
+    assert(this._pause);
+    assert(this._object);
+    return this._pause.getObjectProperty(this._object.objectId, property);
   }
 
   async load() {

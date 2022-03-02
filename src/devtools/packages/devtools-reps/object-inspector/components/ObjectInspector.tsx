@@ -18,7 +18,7 @@ import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTra
 import { assert } from "protocol/utils";
 
 interface PropsFromParent {
-  roots: Item[];
+  roots: Item[] | (() => Item[]);
   defaultRep?: { rep: FC };
   focusable?: boolean;
   disableWrap?: boolean;
@@ -65,7 +65,7 @@ type ObjectInspectorProps = PropsFromRedux & PropsFromParent;
 // children.
 
 class OI extends PureComponent<ObjectInspectorProps> {
-  roots: Item[] | undefined;
+  roots: Item[] | (() => Item[]) | undefined;
   expandedPaths = new Set<string>();
   activeItem: Item | undefined;
   focusedItem: Item | undefined;
@@ -78,16 +78,24 @@ class OI extends PureComponent<ObjectInspectorProps> {
     this.activeItem = this.props.activeItem;
   }
 
-  getRoots = (): Item[] => this.props.roots;
+  getRoots = (): Item[] =>
+    this.props.roots instanceof Function ? this.props.roots() : this.props.roots;
 
   getItemChildren = (item: Item): Item[] => item.getChildren();
 
   areItemsEqual = (item1: Item, item2: Item): boolean => item1.path === item2.path;
 
-  shouldItemUpdate = (prevItem: Item, nextItem: Item): boolean =>
-    prevItem.type === "value" &&
-    nextItem.type === "value" &&
-    prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren();
+  shouldItemUpdate = (prevItem: Item, nextItem: Item): boolean => {
+    if (prevItem.type === "value") {
+      assert(nextItem.type === "value");
+      return prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren();
+    }
+    if (prevItem.type === "getter") {
+      assert(nextItem.type === "getter");
+      return prevItem.getLoadingState() !== nextItem.getLoadingState();
+    }
+    return false;
+  };
 
   getItemKey = (item: Item): string => item.path;
 
@@ -204,6 +212,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
               arrow,
               expanded,
               setExpanded: this.setExpanded,
+              forceUpdate: () => this.forceUpdate(),
             }}
           />
         )}
@@ -213,7 +222,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
 }
 
 function ObjectInspector(props: ObjectInspectorProps) {
-  const { roots } = props;
+  const roots = props.roots instanceof Function ? props.roots() : props.roots;
 
   if (roots.length == 0) {
     return null;
@@ -232,8 +241,11 @@ function ObjectInspector(props: ObjectInspectorProps) {
   );
 }
 
-const connector = connect((state: UIState, { roots }: PropsFromParent) => ({
-  isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
-}));
+const connector = connect((state: UIState, props: PropsFromParent) => {
+  const roots = props.roots instanceof Function ? props.roots() : props.roots;
+  return {
+    isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
+  };
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ObjectInspector);

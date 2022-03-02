@@ -90,11 +90,6 @@ html[dir="rtl"] .scopes-content .object-node {
   background: transparent;
 }
 
-.scopes-list .tree.object-inspector .node.object-node {
-  display: flex;
-  align-items: center;
-}
-
 .scopes-list .tree {
   line-height: 15px;
   min-width: fit-content;
