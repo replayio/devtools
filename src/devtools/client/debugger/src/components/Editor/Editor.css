@@ -3,8 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .editor-wrapper {
-  --debug-line-border: #037aff;
-  --debug-line-background: #e9f3ff;
   --debug-expression-background: rgba(202, 227, 255, 0.5);
   --debug-line-error-border: rgb(255, 0, 0);
   --debug-expression-error-background: rgba(231, 116, 113, 0.3);
@@ -13,8 +11,6 @@
 
 .theme-dark .editor-wrapper {
   --debug-expression-background: rgba(202, 227, 255, 0.3);
-  --debug-line-border: #7786a2;
-  --debug-line-background: #e9f3ff;
 }
 
 .editor-wrapper .CodeMirror-linewidget {

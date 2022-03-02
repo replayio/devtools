@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .popover .preview-popup {
-  background: var(--theme-body-background);
+  background: var(--theme-base-100);
   width: 350px;
   border: 1px solid var(--theme-splitter-color);
   padding: 10px;

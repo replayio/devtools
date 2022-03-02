@@ -233,3 +233,5 @@ div.CodeMirror span.eval-text {
 .CodeMirror-scrollbar-filler {
   background-color: transparent;
 }
+
+caret-color: red;

@@ -177,6 +177,15 @@
 
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
   --theme-trimmer: var(--primary-accent);
+  --toolbox-background: var(--theme-base-100);
+
+  --breakpoint-editfield-hover: var(--theme-text-field);
+  --breakpoint-editfield-active: #fff;
+  --breakpoint-tip: var(--theme-highlight-purple);
+  --breakpoint-status-bg: var(--theme-base-90);
+  --breakpoint-status: var(--theme-body-color);
+  --breakpoint-arrow: var(--theme-comment);
+  --breakpoint-arrow-disabled: var(--theme-base-90);
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -196,6 +205,9 @@
   --cm-def: #3172e0;
   --cm-string: #0842a4;
   --cm-number: #18181a;
+  --caret-color: #18181a;
+  --debug-line-border: #037aff;
+  --debug-line-background: #e9f3ff;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -361,28 +373,29 @@
 
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
   --theme-trimmer: white;
+  --toolbox-background: var(--theme-base-100);
 
-  /* CODE MIRROR */
+  --breakpoint-editfield-hover: var(--theme-base-90);
+  --breakpoint-editfield-active: var(--theme-base-95);
+  --breakpoint-tip: #fff;
+  --breakpoint-status-bg: var(--theme-base-90);
+  --breakpoint-status: var(--theme-body-color);
+  --breakpoint-arrow: #fff;
+  --breakpoint-arrow-disabled: var(--theme-base-80);
 
-  /* THEME ONE */
+  /* CODE MIRROR (DARK) */
+
   --cm-linenumber: var(--grey-40);
-  --cm-keyword: #fff;
-  --cm-def: #ff42a8;
-  --cm-string: #ff98eb;
-  --cm-variable: #01acfd;
+  --cm-keyword: #ff42a8;
+  --cm-def: #fff;
+  --cm-string: #01acfd;
+  --cm-variable: #58e0ff;
   --cm-number: yellow;
-  --cm-property: #fff;
+  --cm-property: #ff98eb;
   --cm-atom: #fff;
-
-  /* THEME TWO */
-  --cm-linenumber: var(--grey-40);
-  --cm-keyword: #ff98eb;
-  --cm-def: #ff42a8;
-  --cm-string: #58e0ff;
-  --cm-variable: #01acfd;
-  --cm-number: yellow;
-  --cm-property: #fff;
-  --cm-atom: #fff;
+  --caret-color: #fff;
+  --debug-line-border: var(--theme-base-85);
+  --debug-line-background: var(--theme-base-100);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-90);

@@ -87,6 +87,8 @@
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   width: 100%;
+  background-color: var(--breakpoint-editfield-active);
+  caret-color: yellow;
 }
 
 .breakpoint-panel .panel-editor.conditional form .CodeMirror {
@@ -134,11 +136,11 @@ non-editing markup */
 }
 
 .breakpoint-panel .breakpoint-navigation-commands .img {
-  background: var(--theme-comment);
+  background: var(--breakpoint-arrow);
 }
 
 .breakpoint-panel .breakpoint-navigation-commands .disabled .img {
-  background: var(--theme-splitter-color);
+  background: var(--breakpoint-arrow-disabled);
 }
 
 .breakpoint-panel .breakpoint-navigation-commands button:not(.disabled):hover {
@@ -150,14 +152,14 @@ non-editing markup */
 }
 
 .breakpoint-panel .summary .statement:hover .expression {
-  background-image: linear-gradient(to right, var(--theme-highlight-purple) 50%, transparent 0%);
+  background-image: linear-gradient(to right, var(--breakpoint-tip) 50%, transparent 0%);
   background-position: 1px 14px;
   background-size: 5px 1.5px;
   background-repeat: repeat-x;
 }
 
 .breakpoint-panel .summary.enabled:hover {
-  background: var(--theme-text-field);
+  background: var(--breakpoint-editfield-hover);
 }
 
 .breakpoint-panel .summary .statement:hover {
@@ -166,5 +168,5 @@ non-editing markup */
 
 .breakpoint-panel .summary .statement:hover .pencil {
   opacity: 1;
-  color: var(--theme-highlight-purple);
+  color: var(--breakpoint-tip);
 }

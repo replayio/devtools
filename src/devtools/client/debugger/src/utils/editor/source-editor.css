@@ -5,13 +5,9 @@
 :root {
   --breakpoint-active-color: rgba(44, 187, 15, 0.2);
   --breakpoint-active-color-hover: rgba(44, 187, 15, 0.5);
-  --debug-line-background: rgba(226, 236, 247, 0.5);
-  --debug-line-border: rgb(145, 188, 219);
 }
 
 .theme-dark:root {
-  --debug-line-background: rgb(73, 82, 103);
-  --debug-line-border: rgb(119, 134, 162);
   --breakpoint-active-color: rgba(45, 210, 158, 0.5);
   --breakpoint-active-color-hover: rgba(0, 255, 175, 0.7);
 }
@@ -49,11 +45,6 @@
 
 .theme-dark .debug-line .CodeMirror-linenumber {
   color: #c0c0c0;
-}
-
-.debug-line .CodeMirror-line {
-  background-color: var(--debug-line-background) !important;
-  outline: var(--debug-line-border) solid 1px;
 }
 
 /* Don't display the highlight color since the debug line
