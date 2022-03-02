@@ -30,7 +30,7 @@ logpoint
 watchpoint
 ```
 
-important objects:
+important objects and/or components:
 
 ```
 - ThreadFront
@@ -40,13 +40,15 @@ important objects:
   - DevToolsToolbox
     - Selection
     - panels:
-      - Inspector
+      - Inspector ("elements")
         - MarkupView
         - RulesView
         - BoxModel
-      - DebuggerPanel
+      - DebuggerPanel ("debugger")
+        - Editor (in devtools debugger, source-editor.js)
+      - React DevTools
 - Highlighter (quasi under DevToolsBox as well)
 - NodePicker
-- (Editor (in devtools debugger, source-editor.js))
 - JSTerm (jsterm.js) from ConsolePanel (WebConsole)
+- ObjectInspector
 ```
