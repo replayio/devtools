@@ -238,6 +238,8 @@ function ReactDevtoolsPanel({
   protocolCheckFailed,
   reactInitPoint,
 }: PropsFromRedux) {
+  const { value: enableDarkMode } = useFeature("darkMode");
+
   if (currentPoint === null) {
     return null;
   }
@@ -285,12 +287,9 @@ function ReactDevtoolsPanel({
     onShutdown
   );
 
-  const { value: enableDarkMode } = useFeature("darkMode");
-  let theme = enableDarkMode ? "dark" : "light";
-
   return (
     <ReactDevTools
-      browserTheme={theme}
+      browserTheme={enableDarkMode ? "dark" : "light"}
       enabledInspectedElementContextMenu={false}
       overrideTab="components"
       showTabBar={false}
