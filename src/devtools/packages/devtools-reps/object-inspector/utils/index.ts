@@ -4,12 +4,17 @@ import { MODE } from "../../reps/constants";
 import { LoadingItem } from "./loading";
 import { ContainerItem } from "./container";
 import { GetterItem } from "./getter";
-import { Pause, ValueFront } from "protocol/thread";
+import { Pause } from "protocol/thread";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 const {
   REPS: { Rep, Grip },
 } = require("../../reps/rep");
 
+/**
+ * We show getters that are defined on the inspected object itself as well as
+ * those defined on its prototype chain. GETTERS_FROM_PROTOTYPES defines how many
+ * levels we should walk down the prototype chain looking for getters.
+ */
 export const GETTERS_FROM_PROTOTYPES = 1;
 
 export interface LabelAndValue {
@@ -31,19 +36,17 @@ export interface IItem {
 // KeyValueItems represent nodes for entries in a native javascript container (i.e. Map, WeakMap, Set and WeakSet)
 // ContainerItems represent nodes with an arbitrary list of child nodes
 // - this is used to represent Scopes and the <entries> node of a native javascript container, for example
+// GetterItems represent nodes for getters
 // LoadingItem represents the "Loading…" node shown while a node's children are being loaded
 export { ValueItem, KeyValueItem, ContainerItem, GetterItem, LoadingItem };
 export type Item = ValueItem | KeyValueItem | ContainerItem | GetterItem | LoadingItem;
 
 export async function loadChildren(root: Item): Promise<Item[]> {
   if (root.type === "value") {
-    for (
-      let i = 0, currentValue: ValueFront | null = root.contents;
-      i <= GETTERS_FROM_PROTOTYPES && currentValue;
-      i++, currentValue = currentValue.previewPrototypeValue()
-    ) {
-      await currentValue.loadIfNecessary();
-    }
+    await root.contents.traversePrototypeChainAsync(
+      async current => await current.loadIfNecessary(),
+      GETTERS_FROM_PROTOTYPES
+    );
   }
   const children = root.getChildren();
   await Promise.all(

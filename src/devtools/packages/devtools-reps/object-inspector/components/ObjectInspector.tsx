@@ -92,7 +92,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
     }
     if (prevItem.type === "getter") {
       assert(nextItem.type === "getter");
-      return prevItem.getLoadingState() !== nextItem.getLoadingState();
+      return prevItem.loadingState !== nextItem.loadingState;
     }
     return false;
   };

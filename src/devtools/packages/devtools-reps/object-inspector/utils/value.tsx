@@ -128,19 +128,15 @@ export class ValueItem implements IItem {
       ([name, contents]) => new ValueItem({ parent: this, name, contents })
     );
     const knownProperties = new Set(Object.keys(previewValues));
-    for (
-      let i = 0, currentValue: ValueFront | null = value;
-      i <= GETTERS_FROM_PROTOTYPES && currentValue;
-      i++, currentValue = currentValue.previewPrototypeValue()
-    ) {
-      const getters = currentValue.previewGetters();
+    value.traversePrototypeChain(current => {
+      const getters = current.previewGetters();
       for (const name of Object.keys(getters)) {
         if (!knownProperties.has(name)) {
           rv.push(new GetterItem({ parent: this, name }));
           knownProperties.add(name);
         }
       }
-    }
+    }, GETTERS_FROM_PROTOTYPES);
     rv.sort((a, b) => {
       // if both element names are numbers, sort them numerically instead of
       // alphabetically.
