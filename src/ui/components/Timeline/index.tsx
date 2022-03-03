@@ -402,7 +402,7 @@ class Timeline extends Component<PropsFromRedux> {
             {this.renderUnloadedRegions()}
             {this.renderPreviewMarkers()}
             <Comments />
-            {features.focusing ? this.renderUnfocusedRegion() : null}
+            {this.renderUnfocusedRegion()}
             {showCurrentPauseMarker ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
@@ -418,7 +418,7 @@ class Timeline extends Component<PropsFromRedux> {
           <span className="time-divider">/</span>
           <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
         </div>
-        {features.focusing ? <EditFocusButton /> : null}
+        <EditFocusButton />
       </div>
     );
   }

@@ -42,7 +42,7 @@ export const getVisibleMessages = createSelector(
       return time >= zoomStartTime && time <= zoomEndTime;
     });
 
-    if (focusRegion && features.focusing) {
+    if (focusRegion) {
       return msgs.filter(id => {
         const msg = messages.get(id);
         return isInTrimSpan(msg.executionPointTime, focusRegion);
