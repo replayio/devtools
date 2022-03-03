@@ -25,7 +25,7 @@ function FocusingModal({ hideModal }: PropsFromRedux) {
             <div className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white">
               <MaterialIcon>center_focus_strong</MaterialIcon>
             </div>
-            <div className="text-lg">Focus mode</div>
+            <div className="text-lg">Edit Focus mode</div>
           </div>
           <p>
             Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.

@@ -10,6 +10,7 @@ import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { RecordingId } from "@recordreplay/protocol";
 import { User } from "ui/types";
 import { setSelectedPrimaryPanel } from "./layout";
+import { getFocusRegion } from "ui/reducers/timeline";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -177,6 +178,12 @@ export function editItem(item: Reply | Comment): UIThunkAction {
 export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
   return ({ dispatch, getState }) => {
     dispatch(clearPendingComment());
+    const focusRegion = getFocusRegion(getState());
+
+    if (focusRegion && (item.time < focusRegion.startTime || item.time > focusRegion.endTime)) {
+      console.error("Cannot seek outside the current focused region", focusRegion, item);
+      return;
+    }
 
     let cx = selectors.getThreadContext(getState());
     dispatch(actions.seek(item.point, item.time, item.hasFrames));
