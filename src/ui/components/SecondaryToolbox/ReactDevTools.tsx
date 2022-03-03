@@ -17,6 +17,7 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
+import { migratePrefToSettings, useFeature } from "ui/hooks/settings";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -284,9 +285,12 @@ function ReactDevtoolsPanel({
     onShutdown
   );
 
+  const { value: enableDarkMode } = useFeature("darkMode");
+  let theme = enableDarkMode ? "dark" : "light";
+
   return (
     <ReactDevTools
-      browserTheme="light"
+      browserTheme={theme}
       enabledInspectedElementContextMenu={false}
       overrideTab="components"
       showTabBar={false}
