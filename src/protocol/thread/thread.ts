@@ -99,6 +99,8 @@ function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
+type ThreadFrontEvent = "paused" | "resumed";
+
 declare global {
   interface Window {
     Test?: any;
@@ -198,10 +200,10 @@ class _ThreadFront {
   testName: string | undefined;
 
   // added by EventEmitter.decorate(ThreadFront)
-  eventListeners!: Map<string, ((value?: any) => void)[]>;
-  on!: (name: string, handler: (value?: any) => void) => void;
-  off!: (name: string, handler: (value?: any) => void) => void;
-  emit!: (name: string, value?: any) => void;
+  eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
+  on!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
+  off!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
+  emit!: (name: ThreadFrontEvent, value?: any) => void;
 
   constructor() {
     client.Debugger.addSearchSourceContentsMatchesListener(
@@ -1264,4 +1266,4 @@ class _ThreadFront {
 }
 
 export const ThreadFront = new _ThreadFront();
-EventEmitter.decorate(ThreadFront);
+EventEmitter.decorate<any, ThreadFrontEvent>(ThreadFront);
