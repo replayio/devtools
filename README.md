@@ -84,7 +84,7 @@ RECORD_REPLAY_SERVER=ws://localhost:8000 RECORD_REPLAY_DRIVER=~/devel/backend/ou
 
 Replace the paths with the appropriate paths within the `backend` repo as appropriate in your environment.
 
-#### Installing the trunk launcher
+#### Installing the Trunk launcher
 
 This project uses [trunk](https://trunk.io) to lint and format its code.
 
