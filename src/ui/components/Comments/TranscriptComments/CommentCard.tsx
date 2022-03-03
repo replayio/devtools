@@ -125,7 +125,8 @@ function CommentCard({
 }: CommentCardProps) {
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
   const focusRegion = useSelector(getFocusRegion);
-  const isOutsideFocusedRegion = focusRegion && (comment.time < focusRegion.startTime || comment.time > focusRegion.endTime);
+  const isOutsideFocusedRegion =
+    focusRegion && (comment.time < focusRegion.startTime || comment.time > focusRegion.endTime);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -169,12 +170,15 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`, isOutsideFocusedRegion ? "bg-gray-100" : "bg-themeBodyBackground"
+        `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
+        isOutsideFocusedRegion ? "bg-gray-100" : "bg-themeBodyBackground"
       )}
       onMouseDown={e => {
         seekToComment(comment);
       }}
-      title={isOutsideFocusedRegion ? "This comment is currently outside of the focused region" : ""}
+      title={
+        isOutsideFocusedRegion ? "This comment is currently outside of the focused region" : ""
+      }
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >

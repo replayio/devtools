@@ -68,4 +68,4 @@ export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
 export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
   (state.timeline.focusRegion.startTime !== 0 ||
-  state.timeline.focusRegion.endTime !== state.timeline.zoomRegion.endTime);
+    state.timeline.focusRegion.endTime !== state.timeline.zoomRegion.endTime);
