@@ -56,7 +56,7 @@ Scope is what the users want to often interact with and inspect, as it can tell 
 
 (in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
 
-# `Wired` types
+# `Wired...` types
 
 ...TODO
 
@@ -65,6 +65,22 @@ Scope is what the users want to often interact with and inspect, as it can tell 
 `Front` types are wrappers that combine raw data coming from the protocol (`Wired` types), their client representation (something that this codebase can easily work with and perhaps render) and interactions with those objects.
 
 Motivation: `Wired` types and `Object` are too abstract and cannot be repsented in the UI nor interacted with, so an additional layer is added to specialize types and add interactions (methods). But some of the interactions cannot be calculated only locally, and actually need to communicate with the backend to retrieve the additional data, so this layer serves that dual purpose of being a bridge between very raw remote values and something that the frontend can make sense of.
+
+<details>
+  <summary>all Front types</summary>
+  <ul>
+    <li><strong>ThreadFront:</strong> the main interface used to interact with the session on the backend</li>
+    <li><strong>ValueFront:</strong> some general JS object or type</li>
+    <li><strong>DOMFront</strong> (union type)<ul>
+      <li><strong>NodeFront:</strong> a DOM Node</li>
+      <li><strong>RuleFront:</strong> a single CSS style rule</li>
+      <li><strong>StyleFront:</strong> an inline CSS</li>
+      <li><strong>StyleSheetFront:</strong> a stylesheet</li>
+    </ul></li>
+    <li><strong>NodeBoundsFront:</strong> a DOM node's bounding box</li>
+    <li><s><strong>ChangesFront</strong></s> (unused)</li>
+  </ul>
+</details>
 
 (see `protocol/thread/**` for various `Front` implementations)
 
@@ -80,7 +96,7 @@ Motivation: `Wired` types and `Object` are too abstract and cannot be repsented 
 
 ...TODO
 
-# Object Inspector
+# `Object Inspector`
 
 `Object Inspector` (`OI`) is used to display a value of a certain JS object whose entire content is only loaded through user interactions, where the user expands the object progressively and loads further pieces of the content one by one.
 
@@ -101,7 +117,6 @@ Because the content of the `OI` is loaded async, properties can be in multiple s
 concepts:
 
 ```
-region
 wired types
   wired frame
   wired scope
@@ -111,18 +126,6 @@ wired types
   wired containerentry
   wired property
   wired namedvalue
-front types
-  DOMfront
-    nodefront
-    RuleFront
-    stylefront
-    stylesheetfront
-  threadfront
-  consolefront
-  changesfront
-  valuefront
-  headersfront
-  globalfront
 logpoint
 breakpoint
 watchpoint
