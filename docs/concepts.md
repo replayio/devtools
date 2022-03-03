@@ -12,9 +12,9 @@ It consists of:
 - scopes: `Scope[]`
 - objects: `Object[]`
 
-This is a highest-level object from which, and through which, all of the additional details about the recording are derrived. A recording can be viewed as a collection of `Pause`s, where a single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping)
+This is a highest-level object from which, and through which, all of the additional details about the recording are derrived. A recording can be viewed as a collection of `Pause`s, where a single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping and `ExeecutionPoint`s)
 
-(in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
+(defined in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`, client implementation in `src/protocol/thread/pause.ts`)
 
 # `Frame`
 
@@ -52,7 +52,7 @@ A single `Scope` can have multiple `Object`s. A single `Object` can be in multip
 
 `Front` types are wrappers that combine raw data coming from the protocol (`Wired` types), their client representation (something that this codebase can easily work with and perhaps render) and interactions with those objects.
 
-Motivation: `Wired` types are too abstract and cannot be repsented in the UI nor interacted with, so an additional layer is added to specialize types and add interactions (methods). But some of the interactions cannot be calculated only locally, and actually need to communicate with the backend to retrieve the additional data, so this layer serves that dual purpose of being a bridge between very raw remote values and something that the frontend can make sense of.
+Motivation: `Wired` types and `Object` are too abstract and cannot be repsented in the UI nor interacted with, so an additional layer is added to specialize types and add interactions (methods). But some of the interactions cannot be calculated only locally, and actually need to communicate with the backend to retrieve the additional data, so this layer serves that dual purpose of being a bridge between very raw remote values and something that the frontend can make sense of.
 
 # `Reps`
 
