@@ -97,7 +97,9 @@ class Timeline extends Component<PropsFromRedux> {
     const mouseTime = this.getMouseTime(e);
     const isDragging = e.buttons === 1;
     const hoveredOnUnfocusedRegion =
-      focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
+      focusRegion &&
+      (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime) &&
+      !isFocusing;
 
     if (hoveredOnUnfocusedRegion) {
       return;
@@ -114,6 +116,7 @@ class Timeline extends Component<PropsFromRedux> {
   onPlayerMouseUp: MouseEventHandler = e => {
     const {
       hoverTime,
+      isFocusing,
       seek,
       clearPendingComment,
       setTimelineToTime,
@@ -126,7 +129,9 @@ class Timeline extends Component<PropsFromRedux> {
       e.target instanceof Element && [...e.target.classList].includes("comment-marker");
     const mouseTime = this.getMouseTime(e);
     const clickedOnUnfocusedRegion =
-      focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
+      focusRegion &&
+      (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime) &&
+      !isFocusing;
 
     trackEvent("timeline.progress_select");
 
@@ -354,7 +359,7 @@ class Timeline extends Component<PropsFromRedux> {
           style={{
             width: `${clamp(end, 0, 100)}%`,
           }}
-          >
+        >
           <div className="unfocused-regions" />
         </div>
       </>
@@ -398,7 +403,7 @@ class Timeline extends Component<PropsFromRedux> {
             {features.focusing ? this.renderUnfocusedRegion() : null}
             {showCurrentPauseMarker ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
-              ) : null}
+            ) : null}
             {isFocusing ? <Focuser /> : null}
           </div>
           <Tooltip timelineWidth={this.overlayWidth} />

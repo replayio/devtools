@@ -269,6 +269,7 @@ export const getEventsForType = (state: UIState, type: string) =>
 
 export const getFlatEvents = (state: UIState) => {
   let events: ReplayEvent[] = [];
+  const focusRegion = getFocusRegion(state);
 
   Object.keys(state.app.events).map(
     (eventKind: EventKind) => (events = [...events, ...state.app.events[eventKind]])
@@ -280,7 +281,10 @@ export const getFlatEvents = (state: UIState) => {
   const filteredEventTypes = ["keydown", "keyup"];
   const filteredEvents = sortedEvents.filter(e => !filteredEventTypes.includes(e.kind));
 
-  return filteredEvents;
+  // Only show the events in the current focused region
+  return focusRegion
+    ? filteredEvents.filter(e => e.time > focusRegion.startTime && e.time < focusRegion.endTime)
+    : filteredEvents;
 };
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
