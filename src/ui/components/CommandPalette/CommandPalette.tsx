@@ -142,9 +142,11 @@ function CommandPalette({
     }
   };
 
+  // NOTE TO SELF: CHANGE THISSSSSSSS
+
   return (
     <div
-      className="flex w-full flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
+      className="flex w-full flex-col overflow-hidden rounded-md bg-themeTabBackground shadow-xl"
       style={{ maxWidth: 400, minWidth: 320 }}
     >
       <div className="border-b border-gray-300 p-3">
