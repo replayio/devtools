@@ -4,6 +4,7 @@ import { CheckboxRow } from "./CheckboxRow";
 import { CombinedUserSettings } from "ui/types";
 import { features } from "ui/utils/prefs";
 import { useFeature } from "ui/hooks/settings";
+import { trackEvent } from "ui/utils/telemetry";
 
 type ExperimentalKey = keyof CombinedUserSettings;
 interface ExperimentalSetting {
@@ -82,6 +83,7 @@ export default function ExperimentalSettings({}) {
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableDarkMode") {
+      trackEvent("feature.dark_mode", { enabled: !enableDarkMode });
       updateEnableDarkMode(!enableDarkMode);
     }
   };
