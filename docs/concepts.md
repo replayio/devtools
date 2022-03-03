@@ -54,11 +54,13 @@ A single `Scope` can have multiple `Object`s. A single `Object` can be in multip
 
 Motivation: `Wired` types and `Object` are too abstract and cannot be repsented in the UI nor interacted with, so an additional layer is added to specialize types and add interactions (methods). But some of the interactions cannot be calculated only locally, and actually need to communicate with the backend to retrieve the additional data, so this layer serves that dual purpose of being a bridge between very raw remote values and something that the frontend can make sense of.
 
+(see `protocol/thread/**` for various `Front` implementations)
+
 # `Reps`
 
-`Reps` (representations) are specific components for rendering native JS types or an object (`ValueFront`).
+`Reps` (representations) are components for rendering a specific native JS types or an object. Their primary input is a `ValueFront` and they render a component based on the type it represents.
 
-See `../reps/rep.js` for a full list of available types renderings.
+(see `../reps/rep.js` for a full list of available components)
 
 # `Grip`
 
