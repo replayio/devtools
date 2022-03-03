@@ -117,16 +117,16 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   },
 };
 
-export interface EventEmitter<T> {
-  eventListeners: Map<string, ((value?: T) => void)[]>;
-  on: (name: string, handler: (value?: T) => void) => void;
-  off: (name: string, handler: (value?: T) => void) => void;
-  emit: (name: string, value?: T) => void;
+export interface EventEmitter<T, E = string> {
+  eventListeners: Map<E, ((value?: T) => void)[]>;
+  on: (name: E, handler: (value?: T) => void) => void;
+  off: (name: E, handler: (value?: T) => void) => void;
+  emit: (name: E, value?: T) => void;
 }
 
 export const EventEmitter = {
-  decorate<T>(obj: EventEmitter<T>) {
-    obj.eventListeners = new Map<string, ((value?: T) => void)[]>();
+  decorate<T, E = string>(obj: EventEmitter<T, E>) {
+    obj.eventListeners = new Map<E, ((value?: T) => void)[]>();
 
     obj.on = (name, handler) => {
       if (obj.eventListeners.has(name)) {
