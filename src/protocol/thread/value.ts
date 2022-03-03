@@ -340,6 +340,31 @@ export class ValueFront {
   }
 
   /**
+   * walks down this object's prototype chain up to maxDepth levels
+   * and calls visitFn on this object and the visited prototypes
+   */
+  traversePrototypeChain(visitFn: (current: ValueFront) => unknown, maxDepth: number): void {
+    visitFn(this);
+    if (maxDepth > 0) {
+      this.previewPrototypeValue()?.traversePrototypeChain(visitFn, maxDepth - 1);
+    }
+  }
+
+  /**
+   * walks down this object's prototype chain up to maxDepth levels
+   * and calls visitFn on this object and the visited prototypes
+   */
+  async traversePrototypeChainAsync(
+    visitFn: (current: ValueFront) => Promise<unknown>,
+    maxDepth: number
+  ): Promise<void> {
+    await visitFn(this);
+    if (maxDepth > 0) {
+      await this.previewPrototypeValue()?.traversePrototypeChain(visitFn, maxDepth - 1);
+    }
+  }
+
+  /**
    * Recursively create a representation of this value, similar to a JSON value
    * but including `undefined`. If the object graph of this value contains a
    * circular reference, it is replaced by `undefined`.
