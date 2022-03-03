@@ -245,7 +245,7 @@ export const getAnalysisPointsForLocation = (
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
 
-  if (features.focusing && focusRegion && points && points !== "error") {
+  if (focusRegion && points && points !== "error") {
     return points.filter(p => isInTrimSpan(p.time, focusRegion));
   }
 
@@ -257,7 +257,7 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
   const points = getAnalysisPointsForLocation(state, location);
   const focusRegion = getFocusRegion(state);
 
-  if (features.focusing && focusRegion && points && points !== "error") {
+  if (focusRegion && points && points !== "error") {
     return points.filter(p => isInTrimSpan(p.time, focusRegion));
   }
 

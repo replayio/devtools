@@ -10,7 +10,6 @@ import MaterialIcon from "../shared/MaterialIcon";
 export const EditFocusButton = () => {
   const dispatch = useDispatch();
   const isFocusing = useSelector(getIsFocusing);
-  const { value: enableFocusing } = useFeature("focusing");
 
   const onClick = () => {
     if (isFocusing) {
@@ -21,10 +20,6 @@ export const EditFocusButton = () => {
       dispatch(actions.setModal("focusing"));
     }
   };
-
-  if (!enableFocusing) {
-    return null;
-  }
 
   return (
     <button
