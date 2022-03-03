@@ -7,6 +7,7 @@ import { FocusOperation, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
+import { trackEvent } from "ui/utils/telemetry";
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
   const position = getVisiblePosition({ time, zoom }) * 100;
@@ -41,6 +42,15 @@ function Draggers({
   dragging: boolean;
   onDragStart: (e: React.MouseEvent, target: FocusOperation) => void;
 }) {
+  const onStartMouseDown = (e: React.MouseEvent) => {
+    trackEvent("timeline.drag_start_marker");
+    onDragStart(e, FocusOperation.resizeStart);
+  };
+  const onEndMouseDown = (e: React.MouseEvent) => {
+    trackEvent("timeline.drag_start_marker");
+    onDragStart(e, FocusOperation.resizeEnd);
+  };
+
   return (
     <>
       <div
@@ -48,14 +58,14 @@ function Draggers({
           dragging ? "w-1" : "w-1",
           "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuser group-hover:w-1"
         )}
-        onMouseDown={e => onDragStart(e, FocusOperation.resizeStart)}
+        onMouseDown={onStartMouseDown}
       />
       <div
         className={classNames(
           dragging ? "w-1" : "w-1",
           "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuser group-hover:w-1"
         )}
-        onMouseDown={e => onDragStart(e, FocusOperation.resizeEnd)}
+        onMouseDown={onEndMouseDown}
       />
     </>
   );
@@ -142,6 +152,7 @@ export const Focuser: React.FC = () => {
 
     return () => {
       dispatch(actions.syncFocusedRegion());
+      trackEvent("timeline.save_focus");
     };
   }, []);
 

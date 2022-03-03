@@ -350,6 +350,7 @@ class Timeline extends Component<PropsFromRedux> {
           style={{
             width: `${clamp(start, 0, 100)}%`,
           }}
+          onClick={() => trackEvent("error.unfocused_timeline_click")}
         >
           <div className="unfocused-regions" />
         </div>
@@ -359,6 +360,7 @@ class Timeline extends Component<PropsFromRedux> {
           style={{
             width: `${clamp(end, 0, 100)}%`,
           }}
+          onClick={() => trackEvent("error.unfocused_timeline_click")}
         >
           <div className="unfocused-regions" />
         </div>
