@@ -88,6 +88,8 @@ It's mostly used in Console and Editor, so that the user can inspect the value o
 
 https://user-images.githubusercontent.com/1355455/156434746-a9656732-0d20-4a83-ba14-62373637d39a.mp4
 
+<img width="418" alt="image" src="https://user-images.githubusercontent.com/1355455/156566684-8eba49d5-cb53-4952-9d38-5ae463ca0288.png">
+
 `OI` doesn't load all of its content immediately, and, instead, it progressively collects more data as you interact with it in the UI.
 
 It works by coalescing several different types within its implementation that each know how to render themselves (see `Item` type in `src/devtools/packages/devtools-reps/object-inspector/utils/index.ts`) and it heavily relies on `Reps` to actually render sub-trees of an object's content. The main difference between `Reps` and `OI` is that `OI` is interactive, while they both serve the purpose of visualizing an object, although each `Rep` is concerned with an implementation of displaying only a particular type.
