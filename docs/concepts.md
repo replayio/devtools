@@ -16,6 +16,8 @@ This is a highest-level object from which, and through which, all of the additio
 
 A recording can be viewed as a collection of different objects (`Frame`s, `Scope`s and `Objects`, `Resources`,...) that have different lifetimes throughout the entire duration of the recording, and a single "pause" reflects object alive at one particular point in time. A "region" is an entire interval of time (and not just a single point in time) that represents objects alive during that period of time. So throughout the entire duration of the recording, many diffferent objects come to life and get destroyed, and a regions is a subset of those for a particular interval of time, and a "pause" an even smaller subset of those.
 
+An entire recording has way too many objects that go in and out of existence and carry too many details for us to be able to hold all of that information in the memory at once. And that's why every recording is split into "regions" - smaller chunks of data that can be transmitted over network and stored in memory on the client, and further data derived from and interacted with. "Regions" are not something that user ever particularly cares about (beside being forced to wait for them to be loaded) and that they interact with, and instead, the user interacts with "pauses". A "pause" is that single moment in time for which the user can inspect the state of the application.
+
 A single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping and `ExecutionPoint`s)
 
 (defined in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`, client implementation in `src/protocol/thread/pause.ts`)
