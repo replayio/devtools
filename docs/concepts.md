@@ -30,6 +30,8 @@ Types of frame: call, global, module, or eval.
 
 A single `Frame` can have multiple `Scope`s.
 
+A frame is not something that the user interacts with and is used to derive further information that the user can and wants to interacts with.
+
 (in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
 
 # `Scope`
@@ -38,7 +40,11 @@ Description of a scope.
 
 Types of scope can be: global, with, function, or block.
 
-A single `Scope` can have multiple `Object`s. A single `Object` can be in multiple `Scopes` at the same time. (TODO check)
+_Global_ and _with_ scopes have an underlaying `Object` associated with them, a _function_ scope has a function associated with it.
+
+Scope is simply a collection of (named) values which are more or less an `Object`. Thus, a scope is a subset of `Object`s, and every `Object` belongs to one `Scope`s. Because JavaScript is lexically scoped, scopes create a tree-like structure in which all objects can be found.
+
+Scope is what the users want to often interact with and inspect, as it can tell them information such as "what's the value of a particular variable while some function was executing" and "if a variable was shadowed by some other".
 
 (in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
 
