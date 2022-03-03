@@ -52,15 +52,15 @@ A single `Scope` can have multiple `Object`s. A single `Object` can be in multip
 
 Motivation: `Wired` types are too abstract and cannot be repsented in the UI nor interacted with, so an additional layer is added to specialize types and add interactions (methods). But some of the interactions cannot be calculated only locally, and actually need to communicate with the backend to retrieve the additional data, so this layer serves that dual purpose of being a bridge between very raw remote values and something that the frontend can make sense of.
 
-# Reps
+# `Reps`
 
-`Reps` are specific components for rendering native JS types or an object (`ValueFront`).
+`Reps` (representations) are specific components for rendering native JS types or an object (`ValueFront`).
 
 See `../reps/rep.js` for a full list of available types renderings.
 
-# Grip
+# `Grip`
 
-Grip is client representation of remote JS object.
+`Grip` is client representation of remote JS object.
 
 # Object Inspector
 
@@ -72,9 +72,9 @@ https://user-images.githubusercontent.com/1355455/156434746-a9656732-0d20-4a83-b
 
 `OI` doesn't load all of its content immediately, and, instead, it progressively collects more data as you interact with it in the UI.
 
-It works by coalescing several different types within its implementation that each know how to render themselves (see `Item` type in `src/devtools/packages/devtools-reps/object-inspector/utils/index.ts`) and it heavily relies on `Reps` to actually render sub-trees for an object's content.
+It works by coalescing several different types within its implementation that each know how to render themselves (see `Item` type in `src/devtools/packages/devtools-reps/object-inspector/utils/index.ts`) and it heavily relies on `Reps` to actually render sub-trees of an object's content. The main difference between `Reps` and `OI` is that `OI` is interactive, while they both serve the purpose of visualizing an object, although each `Rep` is concerned with an implementation of displaying only a particular type.
 
-Because the content of the `OI` is loaded async, properties can be in multiple states: unloaded, loading, failed loading, loaded.
+Because the content of the `OI` is loaded async, properties can be in multiple states: unloaded, loading, failed loading, loaded... and `OI` handles this additional async complexity that `Reps` never concern themselves about.
 
 
 concepts:
