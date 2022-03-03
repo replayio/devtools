@@ -1,26 +1,30 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
-import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { commentKeys } from "ui/utils/comments";
 
-function Transcript({ pendingComment }: PropsFromRedux) {
+export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();
   const { comments } = hooks.useGetComments(recordingId);
   const { loading } = hooks.useGetRecording(recordingId);
+  const pendingComment = useSelector(selectors.getPendingComment);
+  const focusRegion = useSelector(selectors.getFocusRegion);
   const { isAuthenticated } = useAuth0();
 
   if (loading) {
     return null;
   }
 
-  const displayedComments: Comment[] = [...comments];
+  const displayedComments: Comment[] = [...comments].filter(
+    e => !focusRegion || (e.time > focusRegion.startTime && e.time < focusRegion.endTime)
+  );
+
   if (pendingComment?.type == "new_comment") {
     displayedComments.push(pendingComment.comment);
   }
@@ -56,8 +60,3 @@ function Transcript({ pendingComment }: PropsFromRedux) {
     </div>
   );
 }
-const connector = connect((state: UIState) => ({
-  pendingComment: selectors.getPendingComment(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(Transcript);
