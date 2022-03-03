@@ -56,11 +56,11 @@ Scope is what the users want to often interact with and inspect, as it can tell 
 
 (in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
 
-# `Wired...` types
+# `Wired*` types
 
 ...TODO
 
-# `...Front` types
+# `*Front` types
 
 `Front` types are wrappers that combine raw data coming from the protocol (`Wired` types), their client representation (something that this codebase can easily work with and perhaps render) and interactions with those objects.
 
