@@ -13,6 +13,7 @@
   left: 0;
   transition: z-index 200ms;
   z-index: 100;
+  border-bottom: none;
 }
 
 .modal {
