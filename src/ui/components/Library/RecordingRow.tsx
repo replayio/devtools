@@ -11,6 +11,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
+import classNames from "classnames";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -77,10 +78,12 @@ function RecordingRow({
   const isOwner = userId == recording.user?.id;
 
   const toggleChecked = () => {
-    if (selected) {
-      removeSelectedId(recording.id);
-    } else {
-      addSelectedId(recording.id);
+    if (isOwner) {
+      if (selected) {
+        removeSelectedId(recording.id);
+      } else {
+        addSelectedId(recording.id);
+      }
     }
   };
 
@@ -88,9 +91,16 @@ function RecordingRow({
     return null;
   }
 
+  const isInteractive = isEditing ? isOwner : true;
+
   return (
     <RowWrapper recording={recording} isEditing={isEditing} onClick={toggleChecked}>
-      <div className="group flex cursor-pointer flex-row border-b border-gray-200 hover:bg-gray-50">
+      <div
+        className={classNames("group flex flex-row border-b border-gray-200 hover:bg-gray-50", {
+          "cursor-pointer": isInteractive,
+          "pointer-events-none opacity-60": !isInteractive,
+        })}
+      >
         <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre py-3 px-4">
           {isEditing && isOwner ? (
             <input
