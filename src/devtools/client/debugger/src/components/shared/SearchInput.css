@@ -10,7 +10,7 @@
   flex-shrink: 0;
   min-height: 28px;
   width: 100%;
-  background-color: white;
+  background-color: var(--theme-text-field);
 }
 
 .search-field .img.search {
