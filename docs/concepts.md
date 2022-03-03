@@ -1,8 +1,8 @@
 ...tl;dr of how things work in general and some basic structure
 
-# `Pause`
+# `Pause` and regions
 
-A block of data from this pause which might be useful to the protocol client (frontend).
+`Pause` is a block of data from this pause which might be useful to the protocol client (frontend).
 
 To reduce the number of back-and-forth calls required over the protocol, data which wasn't specifically asked for can be returned by commands or events.
 
@@ -12,7 +12,11 @@ It consists of:
 - scopes: `Scope[]`
 - objects: `Object[]`
 
-This is a highest-level object from which, and through which, all of the additional details about the recording are derrived. A recording can be viewed as a collection of `Pause`s, where a single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping and `ExeecutionPoint`s)
+This is a highest-level object from which, and through which, all of the additional details about the recording are derrived.
+
+A recording can be viewed as a collection of different objects (`Frame`s, `Scope`s and `Objects`, `Resources`,...) that have different lifetimes throughout the entire duration of the recording, and a single "pause" reflects object alive at one particular point in time. A "region" is an entire interval of time (and not just a single point in time) that represents objects alive during that period of time. So throughout the entire duration of the recording, many diffferent objects come to life and get destroyed, and a regions is a subset of those for a particular interval of time, and a "pause" an even smaller subset of those.
+
+A single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping and `ExecutionPoint`s)
 
 (defined in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`, client implementation in `src/protocol/thread/pause.ts`)
 
@@ -82,6 +86,7 @@ It works by coalescing several different types within its implementation that ea
 
 Because the content of the `OI` is loaded async, properties can be in multiple states: unloaded, loading, failed loading, loaded... and `OI` handles this additional async complexity that `Reps` never concern themselves about.
 
+---
 
 concepts:
 
