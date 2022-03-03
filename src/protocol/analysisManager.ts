@@ -125,19 +125,19 @@ class AnalysisManager {
 
   private readonly onAnalysisResult = ({ analysisId, results }: analysisResult) => {
     const handler = this.handlers.get(analysisId);
-    assert(handler);
+    assert(handler, "no handler for given analysisId");
     handler.onAnalysisResult?.(results);
   };
 
   private readonly onAnalysisPoints = ({ analysisId, points }: analysisPoints) => {
     const handler = this.handlers.get(analysisId);
-    assert(handler);
+    assert(handler, "no handler for given analysisId");
     handler.onAnalysisPoints?.(points);
   };
 
   private readonly onAnalysisError = ({ analysisId, error }: analysisError) => {
     const handler = this.handlers.get(analysisId);
-    assert(handler);
+    assert(handler, "no handler for given analysisId");
     handler.onAnalysisError?.(error);
   };
 }

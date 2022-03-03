@@ -89,7 +89,7 @@ export async function setupTimeline(store: UIStore) {
 
 export function jumpToInitialPausePoint(): UIThunkAction {
   return async ({ getState, dispatch }) => {
-    assert(ThreadFront.recordingId);
+    assert(ThreadFront.recordingId, "no recordingId");
 
     await ThreadFront.waitForSession();
     const { duration } = await ThreadFront.getRecordingDescription();

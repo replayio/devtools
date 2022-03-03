@@ -35,7 +35,7 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
 
   ["ADD_CHILDREN"](markup, { parentNodeId, children }) {
     const parentNodeInfo = markup.tree[parentNodeId];
-    assert(parentNodeInfo);
+    assert(parentNodeInfo, "parent node not found in markup state");
 
     const newNodes: MarkupTree = {};
     let hasNewNodes = false;
@@ -65,7 +65,7 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
 
   ["UPDATE_NODE_EXPANDED"](markup, { nodeId, isExpanded }) {
     const nodeInfo = markup.tree[nodeId];
-    assert(nodeInfo);
+    assert(nodeInfo, "node not found in markup state");
 
     return {
       ...markup,
@@ -81,7 +81,7 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
 
   ["UPDATE_CHILDREN_LOADING"](markup, { nodeId, isLoadingChildren }) {
     const nodeInfo = markup.tree[nodeId];
-    assert(nodeInfo);
+    assert(nodeInfo, "node not found in markup state");
 
     return {
       ...markup,

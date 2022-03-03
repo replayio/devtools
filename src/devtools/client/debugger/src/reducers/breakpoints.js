@@ -75,7 +75,7 @@ function update(state = initialBreakpointsState(), action) {
 }
 
 function setRequestedBreakpoint(state, { location }) {
-  assert(!location.column);
+  assert(!location.column, "location should have no column");
   const requestedId = getLocationKey(location);
   const requestedBreakpoints = { ...state.requestedBreakpoints, [requestedId]: location };
   return { ...state, requestedBreakpoints };

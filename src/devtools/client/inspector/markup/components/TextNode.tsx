@@ -12,7 +12,7 @@ interface TextNodeProps {
 class TextNode extends PureComponent<TextNodeProps> {
   render() {
     const { type, value } = this.props;
-    assert(typeof value === "string");
+    assert(typeof value === "string", "value not set in TextNode props");
     const isComment = type === COMMENT_NODE;
     const isWhiteSpace = !/[^\s]/.exec(value);
 

@@ -66,7 +66,7 @@ export function reset(): ResetAction {
 export function newRoot(): UIThunkAction {
   return async ({ dispatch }) => {
     const pause = ThreadFront.currentPause;
-    assert(pause);
+    assert(pause, "no current pause");
     const rootNodeFront = await ThreadFront.getRootDOMNode();
     if (!rootNodeFront || ThreadFront.currentPause !== pause) {
       return;
@@ -161,7 +161,7 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
   return async ({ dispatch, getState }) => {
     const tree = getState().markup.tree;
     const node = tree[nodeId];
-    assert(node);
+    assert(node, "node not found in markup state");
 
     if (node.isExpanded && !node.isLoadingChildren) {
       return;
@@ -176,7 +176,7 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       }
 
       const pause = ThreadFront.currentPause;
-      assert(pause);
+      assert(pause, "no current pause");
       const nodeFront = pause.getNodeFront(nodeId);
       const childNodes = await nodeFront.childNodes();
       if (ThreadFront.currentPause !== pause) {
@@ -277,7 +277,7 @@ function getPreviousNodeId(state: UIState, nodeId: string) {
     return nodeId;
   }
   const parentNodeInfo = getNodeInfo(state, parentNodeId);
-  assert(parentNodeInfo);
+  assert(parentNodeInfo, "parent node not found in markup state");
   if (parentNodeInfo.type === DOCUMENT_TYPE_NODE) {
     return nodeId;
   }
@@ -304,9 +304,9 @@ function getNextNodeId(state: UIState, nodeId: string) {
   let parentNodeId = getParentNodeId(state, currentNodeId);
   while (parentNodeId) {
     const siblingIds = getNodeInfo(state, parentNodeId)?.children;
-    assert(siblingIds);
+    assert(siblingIds, "sibling nodes not found in markup state");
     const index = siblingIds.indexOf(currentNodeId);
-    assert(index >= 0);
+    assert(index >= 0, "current node not found among siblings");
     if (index + 1 < siblingIds.length) {
       return siblingIds[index + 1];
     }
@@ -348,7 +348,7 @@ export function onRightKey(): UIThunkAction {
     }
 
     const selectedNodeInfo = getNodeInfo(state, selectedNodeId);
-    assert(selectedNodeInfo);
+    assert(selectedNodeInfo, "selected node not found in markup state");
     if (!selectedNodeInfo.isExpanded || selectedNodeInfo.isLoadingChildren) {
       dispatch(expandNode(selectedNodeId, true));
     } else {

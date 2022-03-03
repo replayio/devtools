@@ -294,7 +294,7 @@ export default class ElementStyle {
     // Gather all the computed properties applied by those text properties.
     let computedProps: ComputedProperty[] = [];
     for (const textProp of textProps) {
-      assert(textProp.computed);
+      assert(textProp.computed, "TextProperty has no computed properties");
       computedProps = computedProps.concat(textProp.computed);
     }
 
@@ -763,7 +763,7 @@ export default class ElementStyle {
     let overridden = true;
     let dirty = false;
 
-    assert(prop.computed);
+    assert(prop.computed, "TextProperty has no computed properties");
     for (const computedProp of prop.computed) {
       if (!computedProp.overridden) {
         overridden = false;

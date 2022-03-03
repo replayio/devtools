@@ -47,7 +47,7 @@ export class NodeFront {
     this._pause = pause;
 
     // The contents of the Node must already be available.
-    assert(data && data.preview && data.preview.node);
+    assert(data && data.preview && data.preview.node, "no node preview");
     this._object = data;
     this._node = data.preview.node;
 
@@ -380,7 +380,7 @@ export class NodeFront {
 Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 function buildBoxQuads(array: Quads) {
-  assert(array.length % 8 == 0);
+  assert(array.length % 8 == 0, "quads length must be a multiple of 8");
   array = [...array];
   const rv = [];
   while (array.length) {

@@ -28,7 +28,7 @@ export function getCodeMirror() {
 }
 
 export function createEditor() {
-  assert(SourceEditor);
+  assert(SourceEditor, "CodeMirror must have been loaded");
   const gutters = ["breakpoints", "hit-markers", "CodeMirror-linenumbers"];
 
   return new SourceEditor({

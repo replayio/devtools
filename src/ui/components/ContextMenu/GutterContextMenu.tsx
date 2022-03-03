@@ -32,7 +32,7 @@ function GutterContextMenu({
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent("gutter.add_comment");
-    assert(executionPoint);
+    assert(executionPoint, "no executionPoint");
     createFloatingCodeComment(currentTime, executionPoint, { ...user, id: userId }, recordingId, {
       location: contextMenu.contextMenuItem.location,
     });

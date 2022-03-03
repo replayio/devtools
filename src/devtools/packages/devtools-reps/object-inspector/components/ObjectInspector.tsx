@@ -87,11 +87,11 @@ class OI extends PureComponent<ObjectInspectorProps> {
 
   shouldItemUpdate = (prevItem: Item, nextItem: Item): boolean => {
     if (prevItem.type === "value") {
-      assert(nextItem.type === "value");
+      assert(nextItem.type === "value", "OI items for the same path must have the same type");
       return prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren();
     }
     if (prevItem.type === "getter") {
-      assert(nextItem.type === "getter");
+      assert(nextItem.type === "getter", "OI items for the same path must have the same type");
       return prevItem.loadingState !== nextItem.loadingState;
     }
     return false;
@@ -230,7 +230,7 @@ function ObjectInspector(props: ObjectInspectorProps) {
 
   if (shouldRenderRootsInReps(roots)) {
     const root = roots[0];
-    assert(root instanceof ValueItem);
+    assert(root instanceof ValueItem, "OI root item must be a ValueItem");
     return <RedactedSpan>{renderRep(root, props)}</RedactedSpan>;
   }
 

@@ -162,7 +162,7 @@ async function addBreakpoint(url, line, column, options) {
   } else {
     // If there are no options, use the default log value for adding new breakpoints,
     // as if the user clicked on the line.
-    assert(!column);
+    assert(!column, "column should not bet set if there are no options");
     await selectSource(url);
     await dbg.actions.addBreakpointAtLine(getContext(), line);
   }
@@ -416,7 +416,7 @@ async function warpToMessage(text) {
   const warpButton = msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
   warpButton.click();
   await waitForPaused();
-  assert(msg.classList.contains("paused"));
+  assert(msg.classList.contains("paused"), "classList must contain 'paused'");
 }
 
 function checkPausedMessage(text) {
@@ -435,7 +435,7 @@ function waitForMessageCount(text, count) {
 
 async function checkMessageStack(text, expectedFrameLines, expand) {
   const msgNode = await waitForMessage(text);
-  assert(!msgNode.classList.contains("open"));
+  assert(!msgNode.classList.contains("open"), "classList must contain 'open'");
 
   if (expand) {
     const button = await waitUntil(() => msgNode.querySelector(".collapse-button"), {
@@ -448,18 +448,18 @@ async function checkMessageStack(text, expectedFrameLines, expand) {
     waitingFor: ".frames to be present",
   });
   const frameNodes = Array.from(framesNode.querySelectorAll(".frame"));
-  assert(frameNodes.length == expectedFrameLines.length);
+  assert(frameNodes.length == expectedFrameLines.length, "unexpected number of frames");
 
   for (let i = 0; i < frameNodes.length; i++) {
     const frameNode = frameNodes[i];
     const line = frameNode.querySelector(".line").textContent;
-    assert(line == expectedFrameLines[i].toString());
+    assert(line == expectedFrameLines[i].toString(), "unexpected frame line");
   }
 }
 
 function checkJumpIcon(msg) {
   const jumpIcon = msg.querySelector(".jump-definition");
-  assert(jumpIcon);
+  assert(jumpIcon, "no jumpIcon");
 }
 
 function findObjectInspectorNode(oi, nodeLabel) {
@@ -688,7 +688,10 @@ function getMatchedSelectors(property) {
     expander.click();
   }
 
-  assert(propertyNode.nextSibling.matches(".computed-property-content"));
+  assert(
+    propertyNode.nextSibling.matches(".computed-property-content"),
+    "next sibling must have computed-property-content class"
+  );
 
   const selectorNodes = propertyNode.nextSibling.querySelectorAll(".rule-text");
   return [...selectorNodes].map(selectorNode => {

@@ -290,7 +290,7 @@ export async function repaint(force = false) {
   }
   ThreadFront.ensureCurrentPause();
   const pause = ThreadFront.currentPause;
-  assert(pause);
+  assert(pause, "no pause");
 
   let graphicsFetched = false;
   // Show a stalled message if the graphics have not fetched after half a second
@@ -447,7 +447,7 @@ export function paintGraphics(
   if (!screenShot || (playing && features.videoPlayback)) {
     clearGraphics();
   } else {
-    assert(screenShot.data);
+    assert(screenShot.data, "no screenshot data");
     addScreenShot(screenShot);
     if (gDrawImage && gDrawImage.width && gDrawImage.height) {
       gLastImage = gDrawImage;

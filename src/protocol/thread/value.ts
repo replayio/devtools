@@ -46,7 +46,7 @@ export class ValueFront {
       this._primitive = protocolValue.value;
     } else if ("object" in protocolValue) {
       const data = pause!.objects.get(protocolValue.object);
-      assert(data);
+      assert(data, "object preview not found");
       this._object = data;
     } else if ("unserializableNumber" in protocolValue) {
       this._hasPrimitive = true;
@@ -230,7 +230,7 @@ export class ValueFront {
   }
 
   primitive() {
-    assert(this._hasPrimitive);
+    assert(this._hasPrimitive, "must be a primitive value");
     return this._primitive;
   }
 
@@ -295,8 +295,8 @@ export class ValueFront {
   }
 
   getProperty(property: string): Promise<EvaluationResult> {
-    assert(this._pause);
-    assert(this._object);
+    assert(this._pause, "no pause");
+    assert(this._object, "no object to get property of");
     return this._pause.getObjectProperty(this._object.objectId, property);
   }
 
@@ -307,7 +307,7 @@ export class ValueFront {
   async loadIfNecessary() {
     if (this.isObject() && this.hasPreviewOverflow()) {
       await this.load();
-      assert(!this.hasPreviewOverflow());
+      assert(!this.hasPreviewOverflow(), "object still has previewOverflow after loading");
     }
   }
 
@@ -319,7 +319,7 @@ export class ValueFront {
     // Make sure we know all this node's children.
     if (this.hasPreviewOverflow()) {
       await this.getPause()!.getObjectPreview(this._object!.objectId);
-      assert(!this.hasPreviewOverflow());
+      assert(!this.hasPreviewOverflow(), "object still has previewOverflow after loading");
     }
 
     // Make sure we have previews for all of this node's object properties.
@@ -334,7 +334,7 @@ export class ValueFront {
 
     for (const value of propertyValues) {
       if (value.isObject()) {
-        assert(value.hasPreview());
+        assert(value.hasPreview(), "no object preview");
       }
     }
   }
