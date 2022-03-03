@@ -12,6 +12,8 @@ It consists of:
 - scopes: `Scope[]`
 - objects: `Object[]`
 
+This is a highest-level object from which, and through which, all of the additional details about the recording are derrived. A recording can be viewed as a collection of `Pause`s, where a single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping)
+
 (in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
 
 # `Frame`
@@ -44,7 +46,7 @@ A single `Scope` can have multiple `Object`s. A single `Object` can be in multip
 
 # `Wired` types
 
-
+...TODO
 
 # `...Front` types
 
@@ -61,6 +63,8 @@ See `../reps/rep.js` for a full list of available types renderings.
 # `Grip`
 
 `Grip` is client representation of remote JS object.
+
+...TODO
 
 # Object Inspector
 
