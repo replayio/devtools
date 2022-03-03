@@ -39,6 +39,7 @@ type MixpanelEvent =
   | ["error.reactdevtools.set_protocol_failed"]
   | ["error.add_member_error"]
   | ["error.unfocused_timeline_click"]
+  | ["feature.dark_mode", { enabled: boolean }]
   | ["gutter.add_comment"]
   | ["header.open_share"]
   | ["header.edit_title"]
