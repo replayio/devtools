@@ -13,6 +13,7 @@ import { getSources } from "devtools/client/debugger/src/reducers/sources";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
+import { getFocusRegion } from "./timeline";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -89,6 +90,22 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
 export const getEvents = (state: UIState) => state.network.events;
 export const getRequests = (state: UIState) => state.network.requests;
 export const getFrames = (state: UIState) => state.network.frames;
+export const getFocusedEvents = (state: UIState) => {
+  const events = getEvents(state);
+  const focusRegion = getFocusRegion(state);
+
+  return events.filter(
+    e => !focusRegion || (e.time > focusRegion.startTime && e.time <= focusRegion.endTime)
+  );
+};
+export const getFocusedRequests = (state: UIState) => {
+  const requests = getRequests(state);
+  const focusRegion = getFocusRegion(state);
+
+  return requests.filter(
+    r => !focusRegion || (r.time > focusRegion.startTime && r.time <= focusRegion.endTime)
+  );
+};
 
 export const getFormattedFrames = createSelector(getFrames, getSources, (frames, sources) => {
   return Object.keys(frames).reduce((acc: Record<string, WiredFrame[]>, frame) => {

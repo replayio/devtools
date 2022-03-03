@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import {
-  getEvents,
   getFormattedFrames,
-  getRequests,
   getResponseBodies,
   getRequestBodies,
+  getFocusedEvents,
+  getFocusedRequests,
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -19,7 +19,6 @@ import Table from "./Table";
 import { fetchFrames, fetchResponseBody, fetchRequestBody } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
-import mixpanel from "mixpanel-browser";
 import { trackEvent } from "ui/utils/telemetry";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 
@@ -65,6 +64,13 @@ export const NetworkMonitor = ({
       resizeObserver.current.observe(container.current);
     }
   }, [container.current]);
+
+  useEffect(() => {
+    // If the selected request has been filtered out by the focus region, unselect it.
+    if (selectedRequest && !requests.find(r => r.id === selectedRequest.id)) {
+      setSelectedRequest(undefined);
+    }
+  }, [requests, selectedRequest]);
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
@@ -134,11 +140,11 @@ const connector = connect(
   (state: UIState) => ({
     currentTime: getCurrentTime(state),
     cx: getThreadContext(state),
-    events: getEvents(state),
+    events: getFocusedEvents(state),
     frames: getFormattedFrames(state),
     loading: state.network.loading,
     requestBodies: getRequestBodies(state),
-    requests: getRequests(state),
+    requests: getFocusedRequests(state),
     responseBodies: getResponseBodies(state),
   }),
   {
