@@ -190,6 +190,14 @@
   transform: scaleX(-1);
 }
 
+.timeline .unfocused-regions-container.end {
+  background: var(--primary-accent);
+}
+
+.timeline .unfocused-regions-container.end {
+  background: var(--grey-30);
+}
+
 .timeline .zoomboundary {
   padding-top: 7px;
   padding-right: 4px;

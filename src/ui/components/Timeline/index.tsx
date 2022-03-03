@@ -345,7 +345,7 @@ class Timeline extends Component<PropsFromRedux> {
     return (
       <>
         <div
-          className="unfocused-regions-container start bg-primaryAccent"
+          className="unfocused-regions-container start"
           title="This region is unfocused"
           style={{
             width: `${clamp(start, 0, 100)}%`,
@@ -355,7 +355,7 @@ class Timeline extends Component<PropsFromRedux> {
           <div className="unfocused-regions" />
         </div>
         <div
-          className="unfocused-regions-container end bg-gray-500"
+          className="unfocused-regions-container end"
           title="This region is unfocused"
           style={{
             width: `${clamp(end, 0, 100)}%`,
