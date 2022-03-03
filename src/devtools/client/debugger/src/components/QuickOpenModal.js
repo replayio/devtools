@@ -382,7 +382,7 @@ export class QuickOpenModal extends Component {
     return (
       <Modal
         width="500px"
-        additionalClass={"border-b rounded-lg"}
+        additionalClass={"rounded-lg"}
         in={enabled}
         handleClose={this.closeModal}
       >
