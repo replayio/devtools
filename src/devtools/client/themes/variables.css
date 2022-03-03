@@ -364,7 +364,7 @@
   --theme-toggle: var(--theme-base-85);
   --theme-toggle-handle: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
-  --theme-text-field: var(--theme-base-95);
+  --theme-text-field: var(--theme-base-85);
   --theme-console-input: var(--theme-text-field);
 
   --progressbar-preview-min: var(--theme-base-80);
