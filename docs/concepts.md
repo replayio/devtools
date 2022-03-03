@@ -34,6 +34,8 @@ A frame is not something that the user interacts with and is used to derive furt
 
 (in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
 
+TODO why "Frame" exists and how it's used, what sort of info is derived using it
+
 # `Scope`
 
 Description of a scope.
@@ -59,6 +61,19 @@ Scope is what the users want to often interact with and inspect, as it can tell 
 # `Wired*` types
 
 ...TODO
+
+<details>
+  <summary>all Wired types</summary>
+  <ul>
+    <li><strong>WiredScope:</strong> todo</li>
+    <li><strong>WiredObject:</strong> todo</li>
+    <li><strong>WiredEventListener:</strong> todo</li>
+    <li><strong>WiredAppliedRule:</strong> todo</li>
+    <li><strong>WiredContainerEntry:</strong> todo</li>
+    <li><strong>WiredProperty:</strong> todo</li>
+    <li><strong>WiredNamedValue:</strong> todo</li>
+  </ul>
+</details>
 
 # `*Front` types
 
@@ -114,42 +129,50 @@ Because the content of the `OI` is loaded async, properties can be in multiple s
 
 ---
 
-concepts:
+# `Editor`
 
-```
-wired types
-  wired frame
-  wired scope
-  wired object
-  wired eventlistener
-  wired appliedrule
-  wired containerentry
-  wired property
-  wired namedvalue
-logpoint
-breakpoint
-watchpoint
-```
+- resources (Source panel)
+- outline (scopes)
 
-important objects and/or components:
+# `Debugger`
 
-```
-- ThreadFront
-- ProtocolClient
-- domains: Video(Player), AnalysisManager
-- DevTools
-  - DevToolsToolbox
-    - Selection
-    - panels:
-      - Inspector ("elements")
-        - MarkupView
-        - RulesView
-        - BoxModel
-      - DebuggerPanel ("debugger")
-        - Editor (in devtools debugger, source-editor.js)
-      - React DevTools
-- Highlighter (quasi under DevToolsBox as well)
-- NodePicker
-- JSTerm (jsterm.js) from ConsolePanel (WebConsole)
-- ObjectInspector
-```
+- breakpoints
+- logpoints
+  - smaller timeline that appears and debugging inside
+  - printing / eval
+- debugging (stepping)
+
+# `Console`
+
+how it works, eager eval overview, OI, autocomplete...
+
+# `Viewer`
+
+The viewer is the video preview of a recording.
+
+how it fetches image frames and doesn't affect the current pause while playing
+
+# `Inspector`
+
+- Elements
+  - Markup
+  - Rules
+  - Layout
+  - Computed
+  - Event Listeners
+
+# `NodePicker` and `Highlighter`
+
+With `NodePicker` you can pick a node from the `Viewer`.
+`Highlighter` highlights a node in the `Viewer` based on the interaction in the `Inspector`.
+
+It works by...
+
+# Networking
+
+how it gets its data, how it makes interactions within it possible
+
+
+# React DevTools
+
+how it works, how it makes interactions within it possible
