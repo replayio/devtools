@@ -65,3 +65,7 @@ export const getTimelineDimensions = (state: UIState) => state.timeline.timeline
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
+export const getIsInFocusMode = (state: UIState) =>
+  state.timeline.focusRegion &&
+  (state.timeline.focusRegion.startTime !== 0 ||
+  state.timeline.focusRegion.endTime !== state.timeline.zoomRegion.endTime);

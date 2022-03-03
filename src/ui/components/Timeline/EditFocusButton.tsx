@@ -2,14 +2,15 @@ import classNames from "classnames";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "ui/actions/app";
-import { useFeature } from "ui/hooks/settings";
 import { getIsFocusing } from "ui/reducers/app";
+import { getIsInFocusMode } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 import MaterialIcon from "../shared/MaterialIcon";
 
 export const EditFocusButton = () => {
   const dispatch = useDispatch();
   const isFocusing = useSelector(getIsFocusing);
+  const isInFocusMode = useSelector(getIsInFocusMode);
 
   const onClick = () => {
     if (isFocusing) {
@@ -24,13 +25,13 @@ export const EditFocusButton = () => {
   return (
     <button
       className={classNames(
-        "flex",
-        isFocusing ? "text-primaryAccent" : "text-themeToolbarPanelIconColor"
+        "flex text-white rounded-full h-6 w-6 justify-center items-center",
+        isInFocusMode ? "bg-primaryAccent" : "bg-themeToolbarPanelIconColor"
       )}
       onClick={onClick}
       title={isFocusing ? "Save current focus" : "Start focus edit mode"}
     >
-      <MaterialIcon iconSize="2xl">center_focus_strong</MaterialIcon>
+      <MaterialIcon iconSize="lg">center_focus_strong</MaterialIcon>
     </button>
   );
 };
