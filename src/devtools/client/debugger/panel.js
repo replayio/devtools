@@ -25,7 +25,7 @@ export class DebuggerPanel {
   }
 
   getVarsForTests() {
-    assert(this.isReady);
+    assert(this.isReady, "DebuggerPanel not ready");
     return {
       store: this._store,
       selectors: this._selectors,

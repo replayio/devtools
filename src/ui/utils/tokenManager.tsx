@@ -170,7 +170,7 @@ class TokenManager {
   }
 
   private async fetchToken(refresh: boolean) {
-    assert(this.auth0Client);
+    assert(this.auth0Client, "auth0Client not set yet");
 
     try {
       return await this.auth0Client.getAccessTokenSilently({ audience, ignoreCache: refresh });
@@ -192,7 +192,7 @@ class TokenManager {
 
   private setupTokenRefresh(token: string) {
     const decodedToken = jwt_decode<{ exp: number }>(token);
-    assert(typeof decodedToken.exp === "number");
+    assert(typeof decodedToken.exp === "number", "token expiration must be a number");
     const refreshDelay = Math.max(
       (decodedToken.exp - tokenRefreshSecondsBeforeExpiry) * 1000 - Date.now(),
       0

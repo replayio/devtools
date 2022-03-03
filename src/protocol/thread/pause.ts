@@ -136,8 +136,8 @@ export class Pause {
   }
 
   create(point: ExecutionPoint, time: number) {
-    assert(!this.createWaiter);
-    assert(!this.pauseId);
+    assert(!this.createWaiter, "createWaiter already set");
+    assert(!this.pauseId, "pauseId already set");
     this.createWaiter = client.Session.createPause({ point }, this.sessionId).then(
       ({ pauseId, stack, data }) => {
         this._setPauseId(pauseId);
@@ -160,8 +160,8 @@ export class Pause {
     hasFrames: boolean,
     data: PauseData = {}
   ) {
-    assert(!this.createWaiter);
-    assert(!this.pauseId);
+    assert(!this.createWaiter, "createWaiter already set");
+    assert(!this.pauseId, "pauseId already set");
     this.createWaiter = Promise.resolve();
     this._setPauseId(pauseId);
     this.point = point;
@@ -290,7 +290,7 @@ export class Pause {
   }
 
   async getFrames() {
-    assert(this.createWaiter);
+    assert(this.createWaiter, "no createWaiter");
     await this.createWaiter;
 
     if (this.hasFrames && !this.stack) {
@@ -312,7 +312,7 @@ export class Pause {
           this.addData(data);
         }
         const scope = this.scopes.get(id);
-        assert(scope);
+        assert(scope, "scope not found");
         return scope;
       })
     );
@@ -320,7 +320,7 @@ export class Pause {
 
   async getScopes(frameId: FrameId) {
     const frame = this.frames.get(frameId);
-    assert(frame);
+    assert(frame, "frame not found");
 
     // Normally we use the original scope chain for the frame if there is one,
     // but when a generated source is marked as preferred we use the generated
@@ -376,7 +376,7 @@ export class Pause {
   }
 
   async evaluate(frameId: FrameId | undefined, expression: string, pure: boolean) {
-    assert(this.createWaiter);
+    assert(this.createWaiter, "no createWaiter");
     await this.createWaiter;
     const { result } = frameId
       ? await this.sendMessage(client.Pause.evaluateInFrame, {
@@ -401,7 +401,7 @@ export class Pause {
       return this.domFronts.get(objectId)!;
     }
     const data = this.objects.get(objectId);
-    assert(data && data.preview);
+    assert(data && data.preview, "no preview");
     let front;
     if (data.preview.node) {
       front = new NodeFront(this, data);
@@ -420,25 +420,25 @@ export class Pause {
 
   getNodeFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
-    assert(front instanceof NodeFront);
+    assert(front instanceof NodeFront, "front must be a NodeFront");
     return front;
   }
 
   getRuleFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
-    assert(front instanceof RuleFront);
+    assert(front instanceof RuleFront, "front must be a RuleFront");
     return front;
   }
 
   getStyleFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
-    assert(front instanceof StyleFront);
+    assert(front instanceof StyleFront, "front must be a StyleFront");
     return front;
   }
 
   getStyleSheetFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
-    assert(front instanceof StyleSheetFront);
+    assert(front instanceof StyleSheetFront, "front must be a StyleSheetFront");
     return front;
   }
 
@@ -452,7 +452,7 @@ export class Pause {
         this.addData(data);
         break;
       }
-      assert(data.preview.node);
+      assert(data.preview.node, "no node preview");
       parentId = data.preview.node.parentNode;
     }
     return this.getNodeFront(nodeId)!;
@@ -462,7 +462,7 @@ export class Pause {
     if (this.documentNode) {
       return;
     }
-    assert(this.createWaiter);
+    assert(this.createWaiter, "no createWaiter");
     await this.createWaiter;
     const { document, data } = await this.sendMessage(client.DOM.getDocument, {});
     this.addData(data);

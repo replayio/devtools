@@ -324,7 +324,10 @@ class _ThreadFront {
     log(`TimeWarp ${pause.point} using existing pause`);
 
     const { point, time, hasFrames } = pause;
-    assert(point && time && typeof hasFrames === "boolean");
+    assert(
+      point && time && typeof hasFrames === "boolean",
+      "point, time or hasFrames not set on pause"
+    );
     this.currentPoint = point;
     this.currentTime = time;
     this.currentPointHasFrames = hasFrames;
@@ -453,7 +456,7 @@ class _ThreadFront {
   }
 
   async getSourceContents(sourceId: SourceId) {
-    assert(this.sessionId);
+    assert(this.sessionId, "no sessionId");
     const { contents, contentType } = await client.Debugger.getSourceContents(
       { sourceId },
       this.sessionId
@@ -479,7 +482,7 @@ class _ThreadFront {
     sourceId: SourceId,
     range?: { start: SourceLocation; end: SourceLocation }
   ) {
-    assert(this.sessionId);
+    assert(this.sessionId, "no sessionId");
     const begin = range ? range.start : undefined;
     const end = range ? range.end : undefined;
     const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
@@ -492,7 +495,7 @@ class _ThreadFront {
   async setBreakpoint(initialSourceId: SourceId, line: number, column: number, condition?: string) {
     try {
       this._invalidateResumeTargets(async () => {
-        assert(this.sessionId);
+        assert(this.sessionId, "no sessionId");
         await this.ensureAllSources();
         const sourceIds = this.getCorrespondingSourceIds(initialSourceId);
         await Promise.all(
@@ -539,7 +542,7 @@ class _ThreadFront {
       ) {
         this.breakpoints.delete(breakpointId);
         this._invalidateResumeTargets(async () => {
-          assert(this.sessionId);
+          assert(this.sessionId, "no sessionId");
           await client.Debugger.removeBreakpoint({ breakpointId }, this.sessionId);
         });
       }
@@ -558,7 +561,7 @@ class _ThreadFront {
   }
 
   ensurePause(point: ExecutionPoint, time: number) {
-    assert(this.sessionId);
+    assert(this.sessionId, "no sessionId");
     let pause = this.allPauses.get(point);
     if (pause) {
       return pause;
@@ -595,7 +598,7 @@ class _ThreadFront {
   async loadAsyncParentFrames() {
     await this.ensureAllSources();
     const basePause = this.lastAsyncPause();
-    assert(basePause);
+    assert(basePause, "no lastAsyncPause");
     const baseFrames = await basePause.getFrames();
     if (!baseFrames) {
       return [];
@@ -610,7 +613,7 @@ class _ThreadFront {
     if (entryPause != this.lastAsyncPause()) {
       return [];
     }
-    assert(frames);
+    assert(frames, "no frames");
     return frames.slice(1);
   }
 
@@ -622,7 +625,7 @@ class _ThreadFront {
   async getScopes(asyncIndex: number, frameId: FrameId) {
     await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause);
+    assert(pause, "no pause for asyncIndex");
     return await pause.getScopes(frameId);
   }
 
@@ -639,7 +642,7 @@ class _ThreadFront {
   }) {
     await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause);
+    assert(pause, "no pause for asyncIndex");
     const rv = await pause.evaluate(frameId, text, pure);
     if (rv.returned) {
       rv.returned = new ValueFront(pause, rv.returned);
@@ -745,7 +748,7 @@ class _ThreadFront {
   }
 
   private async _findResumeTarget(point: ExecutionPoint, command: FindTargetCommand) {
-    assert(this.sessionId);
+    assert(this.sessionId, "no sessionId");
     await this.ensureAllSources();
 
     // Check already-known resume targets.
@@ -839,14 +842,14 @@ class _ThreadFront {
 
   blackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
-      assert(this.sessionId);
+      assert(this.sessionId, "no sessionId");
       await client.Debugger.blackboxSource({ sourceId, begin, end }, this.sessionId);
     });
   }
 
   unblackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
-      assert(this.sessionId);
+      assert(this.sessionId, "no sessionId");
       await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);
     });
   }
@@ -926,7 +929,7 @@ class _ThreadFront {
   }
 
   getKnownRootDOMNode() {
-    assert(this.currentPause?.documentNode !== undefined);
+    assert(this.currentPause?.documentNode !== undefined, "no documentNode for current pause");
     return this.currentPause.documentNode;
   }
 
@@ -964,7 +967,7 @@ class _ThreadFront {
   }
 
   async ensureNodeLoaded(objectId: ObjectId) {
-    assert(this.currentPause);
+    assert(this.currentPause, "no current pause");
     const pause = this.currentPause;
     const node = await pause.ensureDOMFrontAndParents(objectId);
     if (pause != this.currentPause) {
@@ -976,14 +979,14 @@ class _ThreadFront {
   async getFrameSteps(asyncIndex: number, frameId: FrameId) {
     await this.ensureAllSources();
     const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause);
+    assert(pause, "no pause for asyncIndex");
     return await pause.getFrameSteps(frameId);
   }
 
   getPreferredLocationRaw(locations: MappedLocation) {
     const { sourceId } = this._chooseSourceId(locations.map(l => l.sourceId));
     const preferredLocation = locations.find(l => l.sourceId == sourceId);
-    assert(preferredLocation);
+    assert(preferredLocation, "no preferred location found");
     this.updateLocation(preferredLocation);
     return preferredLocation;
   }
@@ -1063,18 +1066,18 @@ class _ThreadFront {
           return { sourceId: id };
         }
         kind = minifiedInfo.kind;
-        assert(kind != "prettyPrinted");
+        assert(kind != "prettyPrinted", "source kind must be prettyPrinted");
       }
       if (kind == "sourceMapped") {
         originalId = id;
       } else {
-        assert(!generatedId);
+        assert(!generatedId, "there should be no generatedId");
         generatedId = id;
       }
     }
 
     if (!generatedId) {
-      assert(originalId);
+      assert(originalId, "there should be no originalId");
       return { sourceId: originalId };
     }
 
@@ -1127,7 +1130,7 @@ class _ThreadFront {
       }
       rv.add(currentSourceId);
       const sources = this.sources.get(currentSourceId);
-      assert(sources);
+      assert(sources, "no sources found for sourceId");
 
       const { generatedSourceIds } = sources;
       (generatedSourceIds || []).forEach(id => worklist.push(id));
@@ -1165,13 +1168,13 @@ class _ThreadFront {
         return false;
       }
       kind = minifiedInfo.kind;
-      assert(kind != "prettyPrinted");
+      assert(kind != "prettyPrinted", "source kind must be prettyPrinted");
     }
     return kind == "sourceMapped";
   }
 
   preferSource(sourceId: SourceId, value: SourceId) {
-    assert(!this.isSourceMappedSource(sourceId));
+    assert(!this.isSourceMappedSource(sourceId), "source is not sourceMapped");
     if (value) {
       this.preferredGeneratedSources.add(sourceId);
     } else {
@@ -1195,7 +1198,7 @@ class _ThreadFront {
   }
 
   async getRecordingDescription() {
-    assert(this.recordingId);
+    assert(this.recordingId, "no recordingId");
     let description;
     try {
       description = await client.Recording.getDescription({
@@ -1228,7 +1231,7 @@ class _ThreadFront {
       }
 
       const groups = this.getChosenSourceIdsForUrl(source.url);
-      assert(groups.length > 0);
+      assert(groups.length > 0, "no chosen sourceIds found for URL");
       const sourceIds = groups.map(group => group.sourceId);
       for (const sourceId of sourceIds) {
         this.correspondingSourceIds.set(sourceId, sourceIds);
@@ -1247,7 +1250,7 @@ class _ThreadFront {
   }
 
   getCorrespondingSourceIds(sourceId: SourceId) {
-    assert(this.hasAllSources);
+    assert(this.hasAllSources, "not all sources have been loaded yet");
     return this.correspondingSourceIds.get(sourceId) || [sourceId];
   }
 

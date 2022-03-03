@@ -123,7 +123,7 @@ export class Inspector {
    * model and grid React components.
    */
   getCommonComponentProps() {
-    assert(this.selection);
+    assert(this.selection, "selection object not found");
 
     return {
       setSelectedNode: this.selection.setNodeFront,

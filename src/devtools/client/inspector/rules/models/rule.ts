@@ -624,7 +624,7 @@ export default class Rule {
     const textProps = [];
     const store = this.elementStyle.store;
 
-    assert(this.domRule.style);
+    assert(this.domRule.style, "domRule.style not set");
     const properties = parseNamedDeclarations(
       this.cssProperties.isKnown,
       this.domRule.style.cssText
@@ -636,7 +636,7 @@ export default class Rule {
       // rewriting to work properly.  So, compute the "invisible"
       // property here.
       const invisible = this.inherited && !this.cssProperties.isInherited(name);
-      assert(store.userProperties);
+      assert(store.userProperties, "store.userProperties not set");
       const value = store.userProperties.getProperty(this.domRule, name, prop.value);
       const textProp = new TextProperty(
         this,

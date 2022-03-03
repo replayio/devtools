@@ -19,13 +19,13 @@ Test.describe(
     await Test.selectConsole();
 
     const messages = await Test.waitForMessageCount("Logpoint", 12);
-    assert(!Test.findMessages("Loading").length);
+    assert(!Test.findMessages("Loading").length, "there should be no more 'Loading' messages");
 
-    assert(messages[0].textContent.includes("Beginning"));
+    assert(messages[0].textContent.includes("Beginning"), "the message should include 'Beginning'");
     for (let i = 1; i <= 10; i++) {
-      assert(messages[i].textContent.includes("Number " + i));
+      assert(messages[i].textContent.includes("Number " + i), `the message should include 'Number ${i}'`);
     }
-    assert(messages[11].textContent.includes("Ending"));
+    assert(messages[11].textContent.includes("Ending"), "the message should include 'Ending'");
 
     await Test.warpToMessage("Number 5");
 

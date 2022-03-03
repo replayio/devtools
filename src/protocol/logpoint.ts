@@ -53,7 +53,7 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
       return;
     }
     const location = await ThreadFront.getPreferredLocation(frame);
-    assert(location);
+    assert(location, "preferred location not found");
     LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
   });
 }
@@ -74,7 +74,7 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
       pause.addData(data);
       const valueFronts = values.map((v: any) => new ValueFront(pause, v));
       const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
-      assert(mappedLocation);
+      assert(mappedLocation, "preferred mapped location not found");
       LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
 
       if (frameworkListeners) {
@@ -96,9 +96,9 @@ async function showPrimitiveLogpoints(
 
   for (const pointDescription of pointDescriptions) {
     const { point, time, frame } = pointDescription;
-    assert(frame);
+    assert(frame, "pointDescription.frame not set");
     const location = await ThreadFront.getPreferredLocation(frame);
-    assert(location);
+    assert(location, "preferred location not found");
     LogpointHandlers.onResult(logGroupId, point, time, location, undefined, values);
   }
 }

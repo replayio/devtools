@@ -20,7 +20,7 @@ class MarkupView {
   hoveredNodeId: string | undefined;
 
   constructor(inspector: Inspector) {
-    assert(inspector.selection);
+    assert(inspector.selection, "no selection object");
 
     this.inspector = inspector;
     this.selection = inspector.selection;
@@ -46,7 +46,7 @@ class MarkupView {
   }
 
   async init() {
-    assert(this.inspector);
+    assert(this.inspector, "no inspector");
 
     this.updateIsInspectorVisible();
     this.store?.subscribe(this.updateIsInspectorVisible);
@@ -82,7 +82,7 @@ class MarkupView {
   }
 
   async onPaused() {
-    assert(this.store);
+    assert(this.store, "no store");
 
     this.store.dispatch(reset());
     if (this.isInspectorVisible) {
@@ -93,8 +93,8 @@ class MarkupView {
   }
 
   async loadNewDocument() {
-    assert(this.store);
-    assert(this.selection);
+    assert(this.store, "no store");
+    assert(this.selection, "no selection object");
 
     this.isLoadingPostponed = false;
 
@@ -127,15 +127,15 @@ class MarkupView {
   }
 
   onResumed() {
-    assert(this.store);
-    assert(this.selection);
+    assert(this.store, "no store");
+    assert(this.selection, "no selection object");
 
     this.selection.setNodeFront(null);
     this.store.dispatch(reset());
   }
 
   destroy() {
-    assert(this.selection);
+    assert(this.selection, "no selection object");
 
     // this.inspector.sidebar.off("markupview-selected", this.update);
     this.selection.off("new-node-front", this.update);
@@ -173,7 +173,7 @@ class MarkupView {
    *         The NodeFront object id to select.
    */
   onSelectNode(nodeId: string) {
-    assert(ThreadFront.currentPause);
+    assert(ThreadFront.currentPause, "no current pause");
 
     this.selection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
       reason: "markup",
@@ -190,7 +190,7 @@ class MarkupView {
    *         Whether or not the node is expanded.
    */
   onToggleNodeExpanded(nodeId: string, isExpanded: boolean) {
-    assert(ThreadFront.currentPause);
+    assert(ThreadFront.currentPause, "no current pause");
 
     if (isExpanded) {
       this.collapseNode(nodeId);
@@ -202,7 +202,7 @@ class MarkupView {
   }
 
   onMouseEnterNode(nodeId: string) {
-    assert(ThreadFront.currentPause);
+    assert(ThreadFront.currentPause, "no current pause");
 
     if (this.hoveredNodeId !== nodeId) {
       this.hoveredNodeId = nodeId;

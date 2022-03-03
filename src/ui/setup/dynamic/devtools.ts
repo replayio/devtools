@@ -99,7 +99,7 @@ export default async function DevTools(store: Store) {
 
   const url = new URL(window.location.href);
   const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
-  assert(dispatchUrl);
+  assert(dispatchUrl, "no dispatchUrl");
 
   window.gToolbox = new DevToolsToolbox();
 

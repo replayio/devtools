@@ -11,7 +11,7 @@ export class StyleSheetFront {
   constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
-    assert(data && data.preview && data.preview.styleSheet);
+    assert(data && data.preview && data.preview.styleSheet, "no styleSheet preview");
     this._object = data;
     this._styleSheet = data.preview.styleSheet;
   }

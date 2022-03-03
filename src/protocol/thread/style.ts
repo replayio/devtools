@@ -20,7 +20,7 @@ export class StyleFront {
   constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
-    assert(data && data.preview && data.preview.style);
+    assert(data && data.preview && data.preview.style, "no style preview");
     this._object = data;
     this._style = data.preview.style;
   }

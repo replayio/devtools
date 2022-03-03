@@ -123,7 +123,7 @@ export default class TextProperty {
    * otherwise.
    */
   get isPropertyChanged() {
-    assert(this.userProperties);
+    assert(this.userProperties, "TextProperty.userProperties not set");
     return this.userProperties.contains(this.rule.domRule, this.name);
   }
 

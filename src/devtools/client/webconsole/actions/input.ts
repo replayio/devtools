@@ -36,7 +36,7 @@ async function getPause(toolbox: DevToolsToolbox) {
   const { asyncIndex } = toolbox.getPanel("debugger")!.getFrameId();
   await ThreadFront.ensureAllSources();
   const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
-  assert(pause);
+  assert(pause, "no pause for given asyncIndex");
 
   return pause;
 }

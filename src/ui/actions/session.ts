@@ -105,14 +105,17 @@ export function createSession(recordingId: string): UIThunkAction {
   return async ({ getState, dispatch }) => {
     try {
       if (ThreadFront.recordingId) {
-        assert(recordingId === ThreadFront.recordingId);
+        assert(
+          recordingId === ThreadFront.recordingId,
+          "can't create a session for 2 different recordings"
+        );
         return;
       }
       ThreadFront.recordingId = recordingId;
 
       const userSettings = await getUserSettings();
       const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
-      assert(recording);
+      assert(recording, "failed to load recording");
 
       if (recording.title) {
         document.title = recording.title;

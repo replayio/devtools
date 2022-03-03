@@ -101,7 +101,7 @@ class JestTestState {
   tests: JestTestInfo[] = [];
 
   constructor(invokeCallbackLocations: Location[], catchBlockLocation: Location) {
-    assert(ThreadFront.sessionId);
+    assert(ThreadFront.sessionId, "no sessionId");
     this.sessionId = ThreadFront.sessionId;
 
     this.invokeCallbackLocations = invokeCallbackLocations;
@@ -199,7 +199,7 @@ class JestTestState {
         if (!test.errorException) {
           return;
         }
-        assert(test.errorPoint);
+        assert(test.errorPoint, "errorException without errorPoint");
 
         const result = analysisResults.find(r => r.key == test.errorPoint?.point);
         if (!result) {

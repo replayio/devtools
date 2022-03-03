@@ -73,7 +73,7 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
     }
     const { top, bottom } = el.getBoundingClientRect();
     const container = document.getElementById("markup-box");
-    assert(container);
+    assert(container, "no markup container");
     const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
     if (top < containerTop || bottom > containerBottom) {
       // Chrome sometimes ignores element.scrollIntoView() here,

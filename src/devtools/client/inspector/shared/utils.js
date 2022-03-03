@@ -96,7 +96,7 @@ function createChild(parent, tagName, attributes = {}) {
  * @return {Promise} promise resolving with the retrieved string as argument
  */
 function getLongString(longStringActorPromise) {
-  assert(typeof longStringActorPromise == "string");
+  assert(typeof longStringActorPromise == "string", "longStringActorPromise should be a string");
   return longStringActorPromise;
 }
 

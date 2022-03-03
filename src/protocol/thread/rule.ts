@@ -11,7 +11,7 @@ export class RuleFront {
   constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
-    assert(data && data.preview && data.preview.rule);
+    assert(data && data.preview && data.preview.rule, "no rule preview");
     this._object = data;
     this._rule = data.preview.rule;
   }

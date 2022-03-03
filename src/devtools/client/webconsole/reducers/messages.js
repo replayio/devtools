@@ -700,7 +700,7 @@ function getPausePoint(newMessage, state) {
 // if other messages with real execution points appear later.
 function ensureExecutionPoint(state, newMessage) {
   if (newMessage.executionPoint) {
-    assert("executionPointTime" in newMessage);
+    assert("executionPointTime" in newMessage, "newMessage.executionPointTime not set");
     return;
   }
 
