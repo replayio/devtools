@@ -29,6 +29,7 @@ pref("devtools.features.comments", true);
 pref("devtools.features.darkMode", false);
 pref("devtools.features.consoleHover", false);
 pref("devtools.features.eventCount", true);
+pref("devtools.features.focusing", true);
 pref("devtools.features.httpBodies", true);
 pref("devtools.features.launchBrowser", true);
 pref("devtools.features.reactDevtools", false);

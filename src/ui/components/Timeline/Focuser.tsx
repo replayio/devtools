@@ -154,6 +154,7 @@ export const Focuser: React.FC = () => {
       dispatch(actions.syncFocusedRegion());
       trackEvent("timeline.save_focus");
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

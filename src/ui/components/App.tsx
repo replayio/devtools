@@ -100,6 +100,7 @@ function App({ children, modal }: AppProps) {
       trackEvent("login.first_log_in");
       dismissNag(Nag.FIRST_LOG_IN);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo.nags]);
 
   useEffect(() => {
