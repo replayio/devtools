@@ -63,7 +63,7 @@ export const NetworkMonitor = ({
     if (container.current) {
       resizeObserver.current.observe(container.current);
     }
-  }, [container.current]);
+  });
 
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
