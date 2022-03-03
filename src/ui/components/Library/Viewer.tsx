@@ -125,7 +125,7 @@ function ViewerContent({
           {isEditing ? (
             <>
               <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
-              <PrimaryButton className="bg-white" color="blue" onClick={handleDoneEditing}>
+              <PrimaryButton color="blue" onClick={handleDoneEditing}>
                 Done
               </PrimaryButton>
             </>

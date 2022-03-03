@@ -67,7 +67,7 @@ function BatchActionDropdown({
 
   if (!selectedIds.length) {
     return (
-      <DisabledButton>
+      <DisabledButton className="space-x-1 leading-4">
         <MaterialIcon outlined className="font-bold" iconSize="sm">
           expand_more
         </MaterialIcon>

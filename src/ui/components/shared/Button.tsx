@@ -7,14 +7,14 @@ type ColorScale = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 type Colors = "gray" | "blue" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "white";
 
 const STANDARD_CLASSES = {
-  sm: "flex-shrink-0 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded",
-  md: "flex-shrink-0 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md",
-  lg: "flex-shrink-0 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md",
-  xl: "flex-shrink-0 items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
+  sm: "inline-flex flex-shrink-0 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded",
+  md: "inline-flex flex-shrink-0 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md",
+  lg: "inline-flex flex-shrink-0 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md",
+  xl: "inline-flex flex-shrink-0 items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
   "2xl":
-    "flex-shrink-0 items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
+    "inline-flex flex-shrink-0 items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
   "3xl":
-    "flex-shrink-0 items-center px-6 py-3 border border-transparent text-2xl font-medium rounded-md",
+    "inline-flex flex-shrink-0 items-center px-6 py-3 border border-transparent text-2xl font-medium rounded-md",
 };
 
 function getColorCode(color: Colors, num: ColorScale) {
@@ -131,6 +131,12 @@ export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
 export const SecondaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="md" style="secondary" />
 );
-export const DisabledButton = (props: ButtonProps) => (
-  <Button {...props} size="md" style="disabled" className="cursor-default" color="gray" />
+export const DisabledButton = ({ className, ...rest }: ButtonProps) => (
+  <Button
+    {...rest}
+    size="md"
+    style="disabled"
+    className={classNames(className, "cursor-default")}
+    color="gray"
+  />
 );
