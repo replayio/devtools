@@ -308,7 +308,8 @@ export function startPlayback(): UIThunkAction {
     const { endTime } = focusRegion ? focusRegion : getZoomRegion(state);
 
     const startDate = Date.now();
-    const startTime = currentTime >= endTime ? 0 : currentTime;
+    const startTime =
+      currentTime >= endTime ? (focusRegion ? focusRegion.startTime : 0) : currentTime;
 
     dispatch(
       setTimelineState({

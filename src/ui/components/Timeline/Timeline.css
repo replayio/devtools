@@ -190,7 +190,7 @@
   transform: scaleX(-1);
 }
 
-.timeline .unfocused-regions-container.end {
+.timeline .unfocused-regions-container.start {
   background: var(--primary-accent);
 }
 
