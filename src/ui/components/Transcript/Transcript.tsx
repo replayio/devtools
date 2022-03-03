@@ -14,16 +14,13 @@ export default function Transcript() {
   const { comments } = hooks.useGetComments(recordingId);
   const { loading } = hooks.useGetRecording(recordingId);
   const pendingComment = useSelector(selectors.getPendingComment);
-  const focusRegion = useSelector(selectors.getFocusRegion);
   const { isAuthenticated } = useAuth0();
 
   if (loading) {
     return null;
   }
 
-  const displayedComments: Comment[] = [...comments].filter(
-    e => !focusRegion || (e.time > focusRegion.startTime && e.time < focusRegion.endTime)
-  );
+  const displayedComments: Comment[] = [...comments];
 
   if (pendingComment?.type == "new_comment") {
     displayedComments.push(pendingComment.comment);

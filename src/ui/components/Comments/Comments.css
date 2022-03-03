@@ -4,6 +4,7 @@
   width: 100%;
   top: 9px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
   height: 17px; /* Corresponds with the height of the comment marker */
+  z-index: var(--z-index-1--timeline-comment);
 }
 
 .comments-container > * {

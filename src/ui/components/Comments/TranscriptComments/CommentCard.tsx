@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import classNames from "classnames";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
@@ -16,6 +16,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { features } from "ui/utils/prefs";
+import { getFocusRegion } from "ui/reducers/timeline";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function BorderBridge({
@@ -123,6 +124,8 @@ function CommentCard({
   setHoveredComment,
 }: CommentCardProps) {
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
+  const focusRegion = useSelector(getFocusRegion);
+  const isOutsideFocusedRegion = focusRegion && (comment.time < focusRegion.startTime || comment.time > focusRegion.endTime);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -166,12 +169,12 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter bg-themeBodyBackground transition`
-        // hoveredComment === comment.id ? "bg-toolbarBackground" : "bg-themeBodyBackground"
+        `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`, isOutsideFocusedRegion ? "bg-gray-100" : "bg-themeBodyBackground"
       )}
       onMouseDown={e => {
         seekToComment(comment);
       }}
+      title={isOutsideFocusedRegion ? "This comment is currently outside of the focused region" : ""}
       onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
     >

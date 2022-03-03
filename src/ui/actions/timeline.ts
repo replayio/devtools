@@ -253,8 +253,14 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
-  return ({ dispatch }) => {
+  return ({ dispatch, getState }) => {
+    const focusRegion = getFocusRegion(getState());
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
+
+    if (focusRegion && (time < focusRegion.startTime || time > focusRegion.endTime)) {
+      console.error("Cannot seek outside the current focused region");
+      return false;
+    }
 
     updateUrl({ point, time, hasFrames });
     dispatch({ type: "CLEAR_FRAME_POSITIONS" });
