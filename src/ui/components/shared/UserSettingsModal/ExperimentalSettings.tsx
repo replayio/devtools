@@ -24,11 +24,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableEventLink",
   },
   {
-    label: "Trim Timeline",
-    description: "Crop the replay to a smaller window",
-    key: "enableTrimming",
-  },
-  {
     label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
@@ -74,7 +69,6 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableTrimming, update: updateEnableTrimming } = useFeature("trimming");
   const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
 
   const onChange = (key: ExperimentalKey, value: any) => {
@@ -87,8 +81,6 @@ export default function ExperimentalSettings({}) {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableTrimming") {
-      updateEnableTrimming(!enableTrimming);
     } else if (key == "enableDarkMode") {
       updateEnableDarkMode(!enableDarkMode);
     }
@@ -97,7 +89,6 @@ export default function ExperimentalSettings({}) {
   const localSettings = {
     enableCommentAttachments,
     enableColumnBreakpoints,
-    enableTrimming,
     enableDarkMode,
   };
   const settings = { ...userSettings, ...localSettings };

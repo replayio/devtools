@@ -159,21 +159,43 @@
   border-top-color: var(--progressbar-preview-max);
 }
 
-.timeline .unloaded-regions {
+.timeline .unloaded-regions,
+.timeline .unfocused-regions-container {
   height: 5px;
   border-radius: 5px;
-  background-image: var(--unloaded-region-img);
   position: absolute;
-  pointer-events: none;
   margin-top: auto;
   margin-bottom: auto;
   top: 0;
   bottom: 0;
 }
 
-.timeline .unloaded-regions.end {
+.timeline .unloaded-regions {
+  pointer-events: none;
+}
+
+.timeline .unloaded-regions,
+.timeline .unfocused-regions {
+  background-image: var(--unloaded-region-img);
+}
+
+.timeline .unfocused-regions {
+  width: 100%;
+  height: 100%;
+}
+
+.timeline .unloaded-regions.end,
+.timeline .unfocused-regions-container.end {
   right: 0;
   transform: scaleX(-1);
+}
+
+.timeline .unfocused-regions-container.start {
+  background: var(--primary-accent);
+}
+
+.timeline .unfocused-regions-container.end {
+  background: var(--grey-30);
 }
 
 .timeline .zoomboundary {

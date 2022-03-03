@@ -6,7 +6,7 @@ export interface ZoomRegion {
   scale: number;
 }
 
-export interface TrimRegion {
+export interface FocusRegion {
   endTime: number;
   startTime: number;
 }
@@ -27,7 +27,7 @@ export interface TimelineState {
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
   hoveredItem: HoveredItem | null;
-  trimRegion: { startTime: number; endTime: number } | null;
+  focusRegion: { startTime: number; endTime: number } | null;
 }
 
 export interface HoveredItem {
@@ -42,7 +42,7 @@ interface HoveredLocation extends Location {
   column: number;
 }
 
-export enum TrimOperation {
+export enum FocusOperation {
   resizeStart = "resizeStart",
   resizeEnd = "resizeEnd",
 }

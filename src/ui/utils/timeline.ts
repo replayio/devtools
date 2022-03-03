@@ -1,5 +1,5 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
-import { TrimRegion, ZoomRegion } from "ui/state/timeline";
+import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 import { timelineMarkerWidth } from "../constants";
 
 // calculate pixel distance from two times
@@ -134,8 +134,8 @@ export function isSameTimeStampedPointRange(
   return sameBegin && sameEnd;
 }
 
-export function isInTrimSpan(time: number, trimRegion: TrimRegion) {
-  const { startTime, endTime } = trimRegion;
+export function isInTrimSpan(time: number, focusRegion: FocusRegion) {
+  const { startTime, endTime } = focusRegion;
 
   return time >= startTime && time <= endTime;
 }

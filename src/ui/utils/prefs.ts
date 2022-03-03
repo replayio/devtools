@@ -35,7 +35,6 @@ pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
 pref("devtools.features.termsOfService", false);
 pref("devtools.features.transcriptHover", false);
-pref("devtools.features.trimming", false);
 pref("devtools.features.users", true);
 pref("devtools.features.videoComments", false);
 pref("devtools.features.videoPlayback", false);
@@ -75,7 +74,6 @@ export const features = new PrefsHelper("devtools.features", {
   smoothPlayback: ["Bool", "smoothPlayback"],
   termsOfService: ["Bool", "termsOfService"],
   transcriptHover: ["Bool", "transcriptHover"],
-  trimming: ["Bool", "trimming"],
   users: ["Bool", "users"],
   videoComments: ["Bool", "videoComments"],
   videoPlayback: ["Bool", "videoPlayback"],

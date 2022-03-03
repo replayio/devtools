@@ -176,7 +176,7 @@
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
-  --theme-trimmer: var(--primary-accent);
+  --theme-focuser: var(--primary-accent);
   --toolbox-background: var(--theme-base-100);
 
   --breakpoint-editfield-hover: var(--theme-text-field);
@@ -372,7 +372,7 @@
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
-  --theme-trimmer: white;
+  --theme-focuser: white;
   --toolbox-background: var(--theme-base-100);
 
   --breakpoint-editfield-hover: var(--theme-base-90);
