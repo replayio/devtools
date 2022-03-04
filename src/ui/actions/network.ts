@@ -5,10 +5,14 @@ import {
   responseBodyData,
   RequestId,
   requestBodyData,
+  ExecutionPoint,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
 import { createFrame } from "devtools/client/debugger/src/client/create";
+import { UIThunkAction } from ".";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+import { getLoadedRegions } from "ui/reducers/app";
 
 type NewNetworkRequestsAction = {
   type: "NEW_NETWORK_REQUESTS";
@@ -68,12 +72,29 @@ export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
   type: "NETWORK_REQUESTS_LOADED",
 });
 
-export function fetchResponseBody(requestId: RequestId) {
-  ThreadFront.fetchResponseBody(requestId);
-}
+export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
+  return ({ getState }) => {
+    const loadedRegions = getLoadedRegions(getState());
 
-export function fetchRequestBody(requestId: RequestId) {
-  ThreadFront.fetchRequestBody(requestId);
+    // Bail if the selected request's point has not been loaded yet
+    if (!loadedRegions || getPointIsInLoadedRegion(loadedRegions.loaded, point)) {
+      return false;
+    }
+
+    ThreadFront.fetchResponseBody(requestId);
+  };
+}
+export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
+  return ({ getState }) => {
+    const loadedRegions = getLoadedRegions(getState());
+
+    // Bail if the selected request's point has not been loaded yet
+    if (!loadedRegions || getPointIsInLoadedRegion(loadedRegions.loaded, point)) {
+      return;
+    }
+
+    ThreadFront.fetchRequestBody(requestId);
+  };
 }
 
 export function fetchFrames(tsPoint: TimeStampedPoint) {

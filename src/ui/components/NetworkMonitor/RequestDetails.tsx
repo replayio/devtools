@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { findHeader, RequestSummary } from "./utils";
 import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
@@ -16,6 +16,32 @@ interface Detail {
   name: string;
   value: string | React.ReactChild;
 }
+
+export const RequestDetailsUnavailable: FC<{ closePanel: () => void }> = ({ closePanel }) => {
+  return (
+    <div className="w-full h-full flex flex-col">
+      <RequestDetailsTabs>
+        <div className="flex-grow flex justify-end">
+          <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
+        </div>
+      </RequestDetailsTabs>
+      <div className="flex-grow relative">
+        <div className="m-2">Request details currently unavailable</div>
+      </div>
+    </div>
+  );
+};
+
+const RequestDetailsTabs: FC<{ children?: ReactNode }> = ({ children }) => {
+  return (
+    <div
+      className="sticky top-0 z-10 flex items-center justify-between border-b bg-toolbarBackground"
+      style={{ height: 25 }}
+    >
+      {children}
+    </div>
+  );
+};
 
 function FormattedUrl({ url }: { url: string }) {
   const parsedUrl = new URL(url);
@@ -264,13 +290,10 @@ const RequestDetails = ({
 
   return (
     <div className="min-w-full overflow-scroll border-l bg-themeBodyBackground">
-      <div
-        className="sticky top-0 z-10 flex items-center justify-between border-b bg-toolbarBackground"
-        style={{ height: 25 }}
-      >
+      <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
-      </div>
+      </RequestDetailsTabs>
       <div className={classNames("requestDetails", styles.requestDetails)}>
         <div>
           {activeTab === "headers" && <HeadersPanel request={request} />}

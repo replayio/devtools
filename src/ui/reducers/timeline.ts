@@ -2,6 +2,7 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { TimelineActions } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { TimelineState } from "ui/state/timeline";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 import { getLoadedRegions } from "./app";
 
 function initialTimelineState(): TimelineState {
@@ -79,11 +80,5 @@ export const getIsInLoadedRegion = (state: UIState) => {
     return false;
   }
 
-  const isInLoadedRegion = loadedRegions.find(
-    r =>
-      BigInt(currentPausePoint) >= BigInt(r.begin.point) &&
-      BigInt(currentPausePoint) <= BigInt(r.end.point)
-  );
-
-  return isInLoadedRegion;
+  return getPointIsInLoadedRegion(loadedRegions, currentPausePoint);
 };
