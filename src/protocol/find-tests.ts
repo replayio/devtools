@@ -215,7 +215,7 @@ class JestTestState {
         const exceptionValue = new ValueFront(pause, exception);
 
         const exceptionContents = exceptionValue.previewValueMap();
-        const exceptionProperty = exceptionContents.message || exceptionContents.name;
+        const exceptionProperty = exceptionContents.get("message") || exceptionContents.get("name");
         if (exceptionProperty && exceptionProperty.isString()) {
           test.errorText = String(exceptionProperty.primitive());
         } else {

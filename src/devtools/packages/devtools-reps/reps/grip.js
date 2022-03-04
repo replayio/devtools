@@ -224,10 +224,10 @@ function getProps(componentProps, properties, indexes, suppressQuotes) {
     return a - b;
   });
 
-  const propertiesKeys = Object.keys(properties);
+  const propertiesKeys = [...properties.keys()];
   return indexes.map(i => {
     const name = propertiesKeys[i];
-    const value = properties[name];
+    const value = properties.get(name);
 
     return PropRep({
       ...componentProps,
@@ -256,14 +256,14 @@ function getPropIndexes(properties, max, filter) {
 
   try {
     let i = 0;
-    for (const name in properties) {
+    for (const name of properties.keys()) {
       if (indexes.length >= max) {
         return indexes;
       }
 
       // Type is specified in grip's "class" field and for primitive
       // values use typeof.
-      const value = properties[name];
+      const value = properties.get(name);
       let type = value.isObject() ? value.className() : typeof value.primitive();
       type = type.toLowerCase();
 

@@ -347,8 +347,8 @@ function getGripPreviewItems(grip) {
   const rv = [];
 
   const properties = grip.previewValueMap();
-  for (const name in properties) {
-    rv.push(createPrimitiveValueFront(name), properties[name]);
+  for (const name of properties.keys()) {
+    rv.push(createPrimitiveValueFront(name), properties.get(name));
   }
 
   const containerEntries = grip.previewContainerEntries();
