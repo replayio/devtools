@@ -36,8 +36,8 @@ import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
+import { getSourceCount } from "../reducers/sources";
 
-const updateResultsThrottle = 1000;
 const maxResults = 100;
 
 const SIZE_BIG = { size: "big" };
@@ -79,6 +79,12 @@ export class QuickOpenModal extends Component {
 
     if (this.refs.resultList && this.refs.resultList.refs) {
       scrollList(this.refs.resultList.refs, this.state.selectedIndex);
+    }
+
+    if (hasChanged("sourceCount")) {
+      // If the source count has changed, we need to update the throttled
+      // updateResults callback with the appropriate throttle duration.
+      this.updateResults = this.getUpdateResultsCallback();
     }
 
     if (
@@ -154,25 +160,35 @@ export class QuickOpenModal extends Component {
     }
   };
 
-  updateResults = debounce(query => {
-    if (this.isGotoQuery()) {
-      return;
-    }
+  getDebounceMs = () => {
+    const { sourceCount } = this.props;
+    const ms = sourceCount > 1000 ? 1000 : 200;
 
-    if (query == "" && !this.isShortcutQuery()) {
-      return this.showTopSources();
-    }
+    return ms;
+  };
 
-    if (this.isFunctionQuery()) {
-      return this.searchFunctions(query);
-    }
+  getUpdateResultsCallback = () =>
+    debounce(query => {
+      if (this.isGotoQuery()) {
+        return;
+      }
 
-    if (this.isShortcutQuery()) {
-      return this.searchShortcuts(query);
-    }
+      if (query == "" && !this.isShortcutQuery()) {
+        return this.showTopSources();
+      }
 
-    return this.searchSources(query);
-  }, updateResultsThrottle);
+      if (this.isFunctionQuery()) {
+        return this.searchFunctions(query);
+      }
+
+      if (this.isShortcutQuery()) {
+        return this.searchShortcuts(query);
+      }
+
+      return this.searchSources(query);
+    }, this.getDebounceMs());
+
+  updateResults = this.getUpdateResultsCallback();
 
   setModifier = item => {
     if (["@", "#", ":"].includes(item.id)) {
@@ -427,6 +443,7 @@ function mapStateToProps(state) {
     cx: getContext(state),
     enabled: getQuickOpenEnabled(state),
     project: getQuickOpenProject(state),
+    sourceCount: getSourceCount(state),
     sourceList: getSourceList(state),
     displayedSources: getDisplayedSources(state),
     selectedSource,
