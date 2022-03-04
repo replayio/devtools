@@ -104,15 +104,12 @@ type MixpanelEvent =
   | ["user_options.select_docs"]
   | ["user_options.select_settings"];
 
-const QA_EMAIL_ADDRESSES = ["mock@user.io"];
-
 // Keep mixpanel disabled until we know we have the user's info
 // to send along with events. This keeps events from tests from being
 // sent to mixpanel.
 let mixpanelDisabled = true;
 
 const enableMixpanel = () => (mixpanelDisabled = false);
-const disableMixpanel = () => (mixpanelDisabled = true);
 
 export function initializeMixpanel() {
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
@@ -123,22 +120,26 @@ export function initializeMixpanel() {
 }
 
 export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId: string | null }) {
-  const { email, internal } = userInfo;
-  const isQAUser = email && QA_EMAIL_ADDRESSES.includes(email);
-  const isInternal = internal;
-  const shouldDisableMixpanel = isQAUser || isInternal || skipTelemetry();
-
-  // This gives us an option to log telemetry events in development.
+  const { internal: isInternal } = userInfo;
   const forceEnableMixpanel = prefs.logTelemetryEvent;
+  const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
 
-  if (!shouldDisableMixpanel || forceEnableMixpanel) {
+  if (shouldEnableMixpanel) {
     setMixpanelContext(userInfo);
     enableMixpanel();
     trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
     timeMixpanelEvent("session.devtools_start");
     setupSessionEndListener();
-  } else {
-    disableMixpanel();
+  }
+}
+
+export function maybeSetGuestMixpanelContext() {
+  const forceEnableMixpanel = prefs.logTelemetryEvent;
+  const shouldEnableMixpanel = !skipTelemetry() || forceEnableMixpanel;
+
+  if (shouldEnableMixpanel) {
+    mixpanel.identify();
+    enableMixpanel();
   }
 }
 
