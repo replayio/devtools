@@ -9,8 +9,6 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
 import Sharing, { MY_LIBRARY } from "./Sharing";
 import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
-import MaterialIcon from "../shared/MaterialIcon";
-import PortalTooltip from "../shared/PortalTooltip";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";

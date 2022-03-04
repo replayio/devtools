@@ -43,7 +43,6 @@ import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
 import SidePanel from "ui/components/SidePanel";
 import { waitForEditor } from "../utils/editor/create-editor";
-import { isDemo } from "ui/utils/environment";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 import useWidthObserver from "ui/utils/useWidthObserver";
 import classNames from "classnames";
@@ -178,11 +177,11 @@ class Debugger extends Component {
   renderEditor() {
     const { selectedSource } = this.props;
     const horizontal = this.isHorizontal();
-    const showFooter = !isDemo() && selectedSource;
+    const showFooter = selectedSource;
 
     return (
       <EditorPane>
-        {!isDemo() && <EditorTabs horizontal={horizontal} />}
+        <EditorTabs horizontal={horizontal} />
         {selectedSource ? (
           <Redacted>
             <Editor />
