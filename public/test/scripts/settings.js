@@ -19,7 +19,7 @@ Test.describe(`Test changing the user's settings.`, async () => {
   const experimentalSection = [...sections].find(s => s.textContent === "Experimental");
   experimentalSection.click();
 
-  let checkbox = await Test.waitUntil(() => document.getElementById("enableCommentAttachments"));
+  let checkbox = await Test.waitUntil(() => document.getElementById("enableColumnBreakpoints"));
   const initialState = checkbox.checked;
   checkbox.click();
   await Test.waitUntil(() => checkbox.checked === !initialState);
