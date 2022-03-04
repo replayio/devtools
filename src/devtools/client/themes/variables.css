@@ -385,6 +385,7 @@
   --breakpoint-arrow-disabled: var(--theme-base-80);
 
   --text-field-border: var(--theme-base-85);
+  --theme-border: var(--theme-base-100);
 
   /* CODE MIRROR (DARK) */
 
