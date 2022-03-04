@@ -35,6 +35,8 @@ module.exports = {
         breakpointTip: "var(--breakpoint-tip)",
         breakpointStatusBG: "var(--breakpoint-status-bg)",
         breakpointStatus: "var(--breakpoint-status)",
+        checkbox: "var(--checkbox)",
+        checkboxBorder: "var(--checkbox-border)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

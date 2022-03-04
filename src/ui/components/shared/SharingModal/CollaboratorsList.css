@@ -1,3 +1,7 @@
+.sharing-modal {
+  background-color: var(--theme-base-100);
+}
+
 .sharing-modal .permissions-list {
   max-height: 240px;
 }

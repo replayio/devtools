@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import cx from "classnames";
 import { actions } from "ui/actions";
 import { Command } from "./CommandPalette";
+import styles from "./CommandPalette.module.css";
 
 type CommandButtonProps = {
   command: Command;
@@ -31,14 +32,12 @@ const CommandButton: FC<CommandButtonProps> = ({ command, active }) => {
       onClick={onClick}
       className={cx(
         "flex justify-between px-6 py-2 transition",
-        active ? "bg-primaryAccent text-white" : "hover:bg-gray-200"
+        active ? styles.shortcutHover : styles.shortcut
       )}
       ref={buttonNode}
     >
       <div>{label}</div>
-      {shortcut ? (
-        <div className={active ? "text-white" : "text-gray-400"}>{formatKeyShortcut(shortcut)}</div>
-      ) : null}
+      {shortcut ? <div>{formatKeyShortcut(shortcut)}</div> : null}
     </button>
   );
 };

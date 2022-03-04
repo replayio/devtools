@@ -233,3 +233,13 @@ div.CodeMirror span.eval-text {
 .CodeMirror-scrollbar-filler {
   background-color: transparent;
 }
+
+.editor-container {
+  width: 100%;
+  background: linear-gradient(
+    25deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(176, 229, 245, 0.3) 67%,
+    rgba(235, 186, 202, 0.3) 95%
+  );
+}

@@ -53,7 +53,6 @@
   --secondary-accent-stroke: #f02d5e;
 
   --that-dark-color: #1f2937;
-  --text-field-border: var(--cool-gray-300);
 
   --new-blue-50: #eff7ff;
   --new-blue-100: #dbedff;
@@ -187,6 +186,8 @@
   --breakpoint-arrow: var(--theme-comment);
   --breakpoint-arrow-disabled: var(--theme-base-90);
 
+  --text-field-border: var(--cool-gray-300);
+
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
   --theme-toolbar-hover: #fff;
@@ -197,6 +198,9 @@
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --toolbarbutton-focus-background: var(--grey-20);
+
+  --checkbox: #fff;
+  --checkbox-border: var(--theme-base-80);
 
   /* CODE MIRROR */
   --cm-linenumber: var(--grey-80);
@@ -365,14 +369,14 @@
   --theme-toggle-handle: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
   --theme-text-field: var(--theme-base-85);
-  --theme-console-input: var(--theme-text-field);
+  --theme-console-input: var(--theme-base-95);
 
   --progressbar-preview-min: var(--theme-base-80);
   --progressbar-preview-max: var(--theme-base-70);
   --progressbar-unplayed: var(--theme-base-100);
 
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
-  --theme-focuser: white;
+  --theme-focuser: var(--primary-accent);
   --toolbox-background: var(--theme-base-100);
 
   --breakpoint-editfield-hover: var(--theme-base-90);
@@ -382,6 +386,11 @@
   --breakpoint-status: var(--theme-body-color);
   --breakpoint-arrow: #fff;
   --breakpoint-arrow-disabled: var(--theme-base-80);
+
+  --text-field-border: var(--theme-base-85);
+  --theme-border: var(--theme-base-100);
+  --checkbox: var(--theme-base-80);
+  --checkbox-border: var(--theme-base-90);
 
   /* CODE MIRROR (DARK) */
 

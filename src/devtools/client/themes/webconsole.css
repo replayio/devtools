@@ -37,6 +37,7 @@
   --console-navigation-border: var(--blue-60);
   --console-indent-border-color: var(--theme-highlight-blue);
   --console-repeat-bubble-background: var(--blue-60);
+  --paused-background-color: var(--secondary-accent);
 
   /* TODO in bug 1549195: colors used in shared components (e.g. Reps) should
      be renamed and/or moved to variables.css so they work everywhere */
@@ -427,11 +428,22 @@ html #webconsole-notificationbox {
 .jsterm-input-container {
   position: relative;
   max-width: 100%;
-  background-color: var(--console-input-background);
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
   height: var(--editor-footer-height);
+}
+
+.jsterm-input-container .CodeMirror::before {
+  content: " ";
+  height: 12px;
+  width: 12px;
+  background-color: var(--theme-icon-color);
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  -webkit-mask-image: url(data:image/svg+xml;base64,PCEtLSBUaGlzIFNvdXJjZSBDb2RlIEZvcm0gaXMgc3ViamVjdCB0byB0aGUgdGVybXMgb2YgdGhlIE1vemlsbGEgUHVibGljCiAgIC0gTGljZW5zZSwgdi4gMi4wLiBJZiBhIGNvcHkgb2YgdGhlIE1QTCB3YXMgbm90IGRpc3RyaWJ1dGVkIHdpdGggdGhpcwogICAtIGZpbGUsIFlvdSBjYW4gb2J0YWluIG9uZSBhdCBodHRwOi8vbW96aWxsYS5vcmcvTVBMLzIuMC8uIC0tPgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEyIDEyIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiPgogIDxwYXRoIGZpbGw9ImNvbnRleHQtZmlsbCIgZD0iTTEuMDcgMS4zMmMuMy0uMy43Ny0uMyAxLjA2IDBsNC4xNSA0LjE1YS43NS43NSAwIDAgMSAwIDEuMDZsLTQuMTUgNC4xNWEuNzUuNzUgMCAxIDEtMS4wNi0xLjA2TDQuNjkgNiAxLjA3IDIuMzhhLjc1Ljc1IDAgMCAxIDAtMS4wNnptNSAwYy4zLS4zLjc3LS4zIDEuMDYgMGw0LjE1IDQuMTVhLjc1Ljc1IDAgMCAxIDAgMS4wNmwtNC4xNSA0LjE1YS43NS43NSAwIDEgMS0xLjA2LTEuMDZMOS42OSA2IDYuMDcgMi4zOGEuNzUuNzUgMCAwIDEgMC0xLjA2eiIvPgo8L3N2Zz4K);
+  background-size: 12px 12px;
 }
 
 /* CodeMirror-powered JsTerm */
@@ -441,16 +453,7 @@ html #webconsole-notificationbox {
   /* Create a new stacking context */
   position: relative;
   z-index: 0; /* Keep below column resizers */
-  /* input icon */
-  /* embed this svg's data directly so that the other background-* styles work. */
-  background-image: url(data:image/svg+xml;base64,PCEtLSBUaGlzIFNvdXJjZSBDb2RlIEZvcm0gaXMgc3ViamVjdCB0byB0aGUgdGVybXMgb2YgdGhlIE1vemlsbGEgUHVibGljCiAgIC0gTGljZW5zZSwgdi4gMi4wLiBJZiBhIGNvcHkgb2YgdGhlIE1QTCB3YXMgbm90IGRpc3RyaWJ1dGVkIHdpdGggdGhpcwogICAtIGZpbGUsIFlvdSBjYW4gb2J0YWluIG9uZSBhdCBodHRwOi8vbW96aWxsYS5vcmcvTVBMLzIuMC8uIC0tPgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEyIDEyIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiPgogIDxwYXRoIGZpbGw9ImNvbnRleHQtZmlsbCIgZD0iTTEuMDcgMS4zMmMuMy0uMy43Ny0uMyAxLjA2IDBsNC4xNSA0LjE1YS43NS43NSAwIDAgMSAwIDEuMDZsLTQuMTUgNC4xNWEuNzUuNzUgMCAxIDEtMS4wNi0xLjA2TDQuNjkgNiAxLjA3IDIuMzhhLjc1Ljc1IDAgMCAxIDAtMS4wNnptNSAwYy4zLS4zLjc3LS4zIDEuMDYgMGw0LjE1IDQuMTVhLjc1Ljc1IDAgMCAxIDAgMS4wNmwtNC4xNSA0LjE1YS43NS43NSAwIDEgMS0xLjA2LTEuMDZMOS42OSA2IDYuMDcgMi4zOGEuNzUuNzUgMCAwIDEgMC0xLjA2eiIvPgo8L3N2Zz4K);
-  background-position-x: calc(10px + var(--console-icon-horizontal-offset));
-  background-position-y: 4px;
   background-color: var(--theme-console-input);
-  background-repeat: no-repeat;
-  background-size: 12px 12px;
-  -moz-context-properties: fill;
-  fill: var(--theme-icon-dimmed-color);
 }
 
 .jsterm-input-container .CodeMirror-focused {

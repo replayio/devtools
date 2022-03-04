@@ -9,6 +9,7 @@ import { UserSettings } from "ui/types";
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
 const { filter } = require("fuzzaldrin-plus");
+import styles from "./CommandPalette.module.css";
 
 export type Command = {
   key: CommandKey;
@@ -144,10 +145,9 @@ function CommandPalette({
 
   return (
     <div
-      className="flex w-full flex-col overflow-hidden rounded-md bg-gray-50 shadow-xl"
-      style={{ maxWidth: 400, minWidth: 320 }}
+      className={`${styles.commandPalleteWrapper} flex w-full flex-col overflow-hidden rounded-md bg-themeTabBackground shadow-xl`}
     >
-      <div className="border-b border-gray-300 p-3">
+      <div className={`${styles.commandPallete} p-3`}>
         <div className="relative flex items-center text-primaryAccent">
           <SearchInput
             value={searchString}
