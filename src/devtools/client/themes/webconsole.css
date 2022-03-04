@@ -37,6 +37,7 @@
   --console-navigation-border: var(--blue-60);
   --console-indent-border-color: var(--theme-highlight-blue);
   --console-repeat-bubble-background: var(--blue-60);
+  --paused-background-color: var(--secondary-accent);
 
   /* TODO in bug 1549195: colors used in shared components (e.g. Reps) should
      be renamed and/or moved to variables.css so they work everywhere */
