@@ -1,6 +1,6 @@
 import SplitBox from "devtools/packages/devtools-splitter";
 import React, { useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch } from "react-redux";
 import { actions } from "ui/actions";
 import {
   getFormattedFrames,
@@ -11,24 +11,26 @@ import {
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import RequestDetails from "./RequestDetails";
+import RequestDetails, { RequestDetailsUnavailable } from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import { CanonicalRequestType, RequestSummary } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
-import { fetchFrames, fetchResponseBody, fetchRequestBody } from "ui/actions/network";
+import { fetchResponseBody, fetchRequestBody } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import { trackEvent } from "ui/utils/telemetry";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
+import { getLoadedRegions } from "ui/reducers/app";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 
 export const NetworkMonitor = ({
   currentTime,
   cx,
   events,
-  fetchFrames,
   frames,
   loading,
+  loadedRegions,
   requestBodies,
   requests,
   responseBodies,
@@ -38,6 +40,7 @@ export const NetworkMonitor = ({
   const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
+  const dispatch = useDispatch();
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -64,7 +67,7 @@ export const NetworkMonitor = ({
       resizeObserver.current.observe(container.current);
     }
   });
-
+  //
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
     if (selectedRequest && !requests.find(r => r.id === selectedRequest.id)) {
@@ -100,13 +103,14 @@ export const NetworkMonitor = ({
                 currentTime={currentTime}
                 onRowSelect={row => {
                   trackEvent("net_monitor.select_request_row");
-                  fetchFrames(row.point);
+
                   if (row.hasResponseBody) {
-                    fetchResponseBody(row.id);
+                    dispatch(fetchResponseBody(row.id, row.point.point));
                   }
                   if (row.hasRequestBody) {
-                    fetchRequestBody(row.id);
+                    dispatch(fetchRequestBody(row.id, row.point.point));
                   }
+
                   setSelectedRequest(row);
                 }}
                 seek={seek}
@@ -114,17 +118,22 @@ export const NetworkMonitor = ({
               />
             }
             endPanel={
-              selectedRequest && (
-                <RequestDetails
-                  closePanel={closePanel}
-                  cx={cx}
-                  request={selectedRequest}
-                  responseBody={responseBodies[selectedRequest.id]}
-                  requestBody={requestBodies[selectedRequest.id]}
-                  frames={frames[selectedRequest?.point.point]}
-                  selectFrame={selectFrame}
-                />
-              )
+              selectedRequest ? (
+                loadedRegions &&
+                getPointIsInLoadedRegion(loadedRegions, selectedRequest.point.point) ? (
+                  <RequestDetails
+                    closePanel={closePanel}
+                    cx={cx}
+                    request={selectedRequest}
+                    responseBody={responseBodies[selectedRequest.id]}
+                    requestBody={requestBodies[selectedRequest.id]}
+                    frames={frames[selectedRequest?.point.point]}
+                    selectFrame={selectFrame}
+                  />
+                ) : (
+                  <RequestDetailsUnavailable closePanel={closePanel} />
+                )
+              ) : null
             }
             splitterClass="-m-1 bg-clip-padding box-border border-4 z-10"
             splitterSize={1}
@@ -142,13 +151,13 @@ const connector = connect(
     cx: getThreadContext(state),
     events: getFocusedEvents(state),
     frames: getFormattedFrames(state),
+    loadedRegions: getLoadedRegions(state)?.loaded,
     loading: state.network.loading,
     requestBodies: getRequestBodies(state),
     requests: getFocusedRequests(state),
     responseBodies: getResponseBodies(state),
   }),
   {
-    fetchFrames: fetchFrames,
     seek: actions.seek,
     selectFrame: actions.selectFrame,
   }
