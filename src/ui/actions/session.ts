@@ -34,7 +34,9 @@ export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
 export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boolean };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type ClearExpectedError = Action<"clear_expected_error">;
+export type OnConsoleOverflow = Action<"CONSOLE_OVERFLOW">;
 export type SessionActions =
+  | OnConsoleOverflow
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
   | SetTrialExpiredAction
@@ -276,4 +278,9 @@ export function clearExpectedError(): UIThunkAction {
   return ({ dispatch }) => {
     dispatch({ type: "clear_expected_error", error: null });
   };
+}
+
+export function onConsoleOverflow(): OnConsoleOverflow {
+  trackEvent("console.overflow");
+  return { type: "CONSOLE_OVERFLOW" };
 }

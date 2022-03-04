@@ -14,6 +14,7 @@ const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator")
 const { ThreadFront } = require("protocol/thread");
 const { LogpointHandlers } = require("protocol/logpoint");
 const { TestMessageHandlers } = require("protocol/find-tests");
+const { onConsoleOverflow } = require("ui/actions/session");
 
 const {
   MESSAGES_ADD,
@@ -126,11 +127,6 @@ function onConsoleMessage(msg) {
 
     dispatch(dispatchMessageAdd(packet));
   };
-}
-
-function onConsoleOverflow() {
-  trackEvent("console.overflow");
-  return { type: "CONSOLE_OVERFLOW" };
 }
 
 function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) {
