@@ -1,4 +1,12 @@
-import React, { useEffect, useState, useRef, Children, ReactChildren, ReactElement } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  Children,
+  ReactChildren,
+  ReactElement,
+  useMemo,
+} from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
@@ -18,7 +26,6 @@ import {
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
-import { decodeWorkspaceId } from "ui/utils/workspace";
 import useAuth0 from "ui/utils/useAuth0";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
@@ -60,18 +67,24 @@ function _DevTools({
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { userIsAuthor, loading } = useUserIsAuthor();
+  const isExternalRecording = useMemo(
+    () => recording?.user && !recording.user.internal,
+    [recording]
+  );
 
   useEffect(() => {
     import("./Views/DevView");
   }, []);
   useEffect(() => {
+    // We only track anonymous usage for recording by non-internal users so that
+    // test runner cases (e.g. QA Wolf) are excluded.
     // Wait until we start rendering the DevTools component before potentially registering
     // a user as a guest in Mixpanel. This is to avoid sending too many unique distinct guest
     // users to Mixpanel.
-    if (!isAuthenticated) {
+    if (!isAuthenticated && isExternalRecording) {
       maybeSetGuestMixpanelContext();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isExternalRecording]);
 
   useEffect(() => {
     if (loading) {
