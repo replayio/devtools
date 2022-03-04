@@ -64,10 +64,6 @@ export default function ExperimentalSettings({}) {
   const updateEventLink = hooks.useUpdateUserSetting("enableEventLink", "Boolean");
   const updateReact = hooks.useUpdateUserSetting("showReact", "Boolean");
 
-  const [enableCommentAttachments, setEnableCommentAttachments] = useState(
-    !!features.commentAttachments
-  );
-
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
   const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
@@ -75,9 +71,6 @@ export default function ExperimentalSettings({}) {
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
       updateEventLink({ variables: { newValue: value } });
-    } else if (key === "enableCommentAttachments") {
-      features.commentAttachments = value;
-      setEnableCommentAttachments(!!features.commentAttachments);
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
@@ -89,7 +82,6 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
-    enableCommentAttachments,
     enableColumnBreakpoints,
     enableDarkMode,
   };
