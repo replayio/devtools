@@ -57,7 +57,7 @@ class App extends React.Component {
       return;
     }
 
-    window.jsterm.editor.focus();
+    window.jsterm?.editor.focus();
   };
 
   render() {

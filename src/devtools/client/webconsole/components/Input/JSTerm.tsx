@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "../../utils/autocomplete";
 import AutocompleteMatches from "./AutocompleteMatches";
@@ -8,6 +8,8 @@ import { evaluateExpression, paywallExpression } from "../../actions/input";
 import EagerEvalFooter from "./EagerEvalFooter";
 import useAutocomplete from "./useAutocomplete";
 import useEvaluationHistory from "./useEvaluationHistory";
+import { getIsInLoadedRegion } from "ui/reducers/timeline";
+import Spinner from "ui/components/shared/Spinner";
 
 enum Keys {
   BACKSPACE = "Backspace",
@@ -33,6 +35,7 @@ export default function JSTerm() {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const isInLoadedRegion = useSelector(getIsInLoadedRegion);
 
   const [value, setValue] = useState("");
   const inputNode = useRef<HTMLDivElement | null>(null);
@@ -129,21 +132,29 @@ export default function JSTerm() {
           tabIndex={-1}
           ref={inputNode}
         >
-          <CodeMirror
-            onKeyPress={onKeyPress}
-            value={value}
-            onSelection={onSelection}
-            setValue={setValue}
-            execute={execute}
-          />
-          {shouldShowAutocomplete ? (
-            <div
-              className="absolute ml-8 opacity-50"
-              style={{ left: `${value.length}ch`, top: `5px` }}
-            >
-              {getRemainingCompletedTextAfterCursor(value, matches[autocompleteIndex])}
+          {isInLoadedRegion ? (
+            <>
+              <CodeMirror
+                onKeyPress={onKeyPress}
+                value={value}
+                onSelection={onSelection}
+                setValue={setValue}
+                execute={execute}
+              />
+              {shouldShowAutocomplete ? (
+                <div
+                  className="absolute ml-8 opacity-50"
+                  style={{ left: `${value.length}ch`, top: `5px` }}
+                >
+                  {getRemainingCompletedTextAfterCursor(value, matches[autocompleteIndex])}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="load-container flex items-center h-full italic text-gray-400">
+              Loading…
             </div>
-          ) : null}
+          )}
         </div>
         {shouldShowAutocomplete ? (
           <AutocompleteMatches
