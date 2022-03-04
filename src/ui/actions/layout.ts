@@ -2,7 +2,13 @@ import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
 import { getSelectedPrimaryPanel, getShowCommandPalette } from "ui/reducers/layout";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { ViewMode, PrimaryPanelName, SecondaryPanelName, VIEWER_PANELS } from "ui/state/layout";
+import {
+  ViewMode,
+  PrimaryPanelName,
+  SecondaryPanelName,
+  VIEWER_PANELS,
+  ToolboxLayout,
+} from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { UIThunkAction } from ".";
@@ -14,8 +20,9 @@ type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
 };
 type SetShowCommandPalette = Action<"set_show_command_palette"> & { value: boolean };
-type SetShowEditorAction = Action<"set_show_editor"> & {
-  showEditor: boolean;
+
+type SetToolboxLayoutAction = Action<"set_toolbox_layout"> & {
+  layout: ToolboxLayout;
 };
 type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
   showVideoPanel: boolean;
@@ -28,7 +35,7 @@ export type LayoutAction =
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetShowCommandPalette
-  | SetShowEditorAction
+  | SetToolboxLayoutAction
   | SetShowVideoPanelAction
   | SetViewMode;
 
@@ -67,8 +74,8 @@ export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAct
   return { type: "set_show_video_panel", showVideoPanel };
 }
 
-export function setShowEditor(showEditor: boolean): SetShowEditorAction {
-  return { type: "set_show_editor", showEditor };
+export function setToolboxLayout(layout: ToolboxLayout): SetToolboxLayoutAction {
+  return { type: "set_toolbox_layout", layout };
 }
 
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
@@ -91,10 +98,10 @@ export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
     const session = replaySessions[recordingId];
 
     if (recordingId && session) {
-      const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = session;
+      const { viewMode, showVideoPanel, toolboxLayout, selectedPrimaryPanel } = session;
 
       dispatch(setViewMode(viewMode));
-      dispatch(setShowEditor(showEditor));
+      dispatch(setToolboxLayout(toolboxLayout));
       dispatch(setShowVideoPanel(showVideoPanel));
       dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
     }
