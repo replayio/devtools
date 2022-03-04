@@ -5,7 +5,7 @@ import { LabelAndValue, ValueItem } from ".";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 
 function getterValueKey(object: ValueFront, property: string) {
-  return `${object.objectId()}:${property}`;
+  return `${object.getPause()?.pauseId}:${object.objectId()}:${property}`;
 }
 const getterValues = new Map<string, ValueFront | "loading" | "failed">();
 
