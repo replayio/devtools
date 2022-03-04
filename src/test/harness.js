@@ -493,7 +493,15 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
     const labelNode = await waitUntil(() => findObjectInspectorNode(oi, label), {
       waitingFor: `findObjectInspectorNode(${oi}, ${label})`,
     });
-    await toggleObjectInspectorNode(labelNode);
+    const getterButton = labelNode.querySelector(".invoke-getter");
+    if (getterButton) {
+      getterButton.click();
+      await waitUntil(() => labelNode.querySelector(".objectBox"), "The getter's value is shown");
+    }
+    const expandButton = labelNode.querySelector(".arrow");
+    if (expandButton) {
+      expandButton.click();
+    }
   }
 
   await waitUntil(
