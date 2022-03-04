@@ -90,19 +90,20 @@ function PanelSummary({
 
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
+    const hits = analysisPoints === "error" ? "10k" : prefs.maxHitsDisplayed;
 
     return (
       <div className="summary flex items-center bg-red-100 text-red-700">
         <Popup
           trigger={
-            <div className="flex items-center space-x-2 overflow-hidden">
-              <MaterialIcon className="pl-2 text-xl">error</MaterialIcon>
+            <div className="flex items-center space-x-2 overflow-hidden pl-2">
+              <MaterialIcon className="text-xl">error</MaterialIcon>
               <span className="overflow-hidden overflow-ellipsis whitespace-pre hover:underline">
                 <a
                   href="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#1e6ed519f3f849458a7aa88b7be497b6"
                   rel="noreferrer noopener"
                   target="_blank"
-                >{`Disabled because it was hit ${prefs.maxHitsDisplayed}+ times`}</a>
+                >{`Disabled because it was hit ${hits}+ times`}</a>
               </span>
             </div>
           }
