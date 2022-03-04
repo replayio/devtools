@@ -36,6 +36,7 @@ import { Focuser } from "./Focuser";
 import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
 import { EditFocusButton } from "./EditFocusButton";
+import { UnloadedRegions } from "./UnloadedRegions";
 
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
@@ -296,40 +297,6 @@ class Timeline extends Component<PropsFromRedux> {
     );
   }
 
-  renderUnloadedRegions() {
-    const { loadedRegions, isFinishedLoadingRegions, zoomRegion } = this.props;
-
-    // Check loadedRegions to keep typescript happy.
-    if (!loadedRegions || !isFinishedLoadingRegions) {
-      return null;
-    }
-
-    // An empty loadedRegions array after we've finished loading regions means that
-    // the whole recording has been unloaded.
-    if (loadedRegions.length === 0) {
-      return <div className="unloaded-regions w-full" />;
-    }
-
-    const { begin, end } = loadedRegions[0];
-    const { endTime } = zoomRegion;
-    const loadedRegionStart = getVisiblePosition({ time: begin.time, zoom: zoomRegion }) * 100;
-    const loadedRegionEnd =
-      getVisiblePosition({ time: endTime - end.time, zoom: zoomRegion }) * 100;
-
-    return (
-      <>
-        <div
-          className="unloaded-regions start"
-          style={{ width: `${clamp(loadedRegionStart, 0, 100)}%` }}
-        />
-        <div
-          className="unloaded-regions end"
-          style={{ width: `${clamp(loadedRegionEnd, 0, 100)}%` }}
-        />
-      </>
-    );
-  }
-
   renderUnfocusedRegion() {
     const { focusRegion, zoomRegion } = this.props;
 
@@ -399,7 +366,7 @@ class Timeline extends Component<PropsFromRedux> {
               style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
-            {this.renderUnloadedRegions()}
+            <UnloadedRegions />
             {this.renderPreviewMarkers()}
             <Comments />
             {this.renderUnfocusedRegion()}

@@ -16,6 +16,7 @@ import { connect, ConnectedProps, useSelector } from "react-redux";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { PointDescription } from "@recordreplay/protocol";
 import { HoveredItem } from "ui/state/timeline";
+import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
 
 function Points({
   analysisPoints,
@@ -110,6 +111,7 @@ function BreakpointTimeline({
           <div className="progress-line full" />
           <div className="progress-line preview-min" style={{ width: hoverPercent }} />
           <div className="progress-line" style={{ width: `${percent}%` }} />
+          <UnloadedRegions />
           {analysisPoints && analysisPoints !== "error" ? (
             <Points
               analysisPoints={analysisPoints}

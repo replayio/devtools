@@ -160,7 +160,8 @@
 }
 
 .timeline .unloaded-regions,
-.timeline .unfocused-regions-container {
+.timeline .unfocused-regions-container,
+.breakpoint-navigation-timeline .unloaded-regions {
   height: 5px;
   border-radius: 5px;
   position: absolute;
@@ -170,12 +171,14 @@
   bottom: 0;
 }
 
-.timeline .unloaded-regions {
+.timeline .unloaded-regions,
+.breakpoint-navigation-timeline .unloaded-regions {
   pointer-events: none;
 }
 
 .timeline .unloaded-regions,
-.timeline .unfocused-regions {
+.timeline .unfocused-regions,
+.breakpoint-navigation-timeline .unloaded-regions {
   background-image: var(--unloaded-region-img);
 }
 
@@ -185,6 +188,7 @@
 }
 
 .timeline .unloaded-regions.end,
+.breakpoint-navigation-timeline .unloaded-regions.end,
 .timeline .unfocused-regions-container.end {
   right: 0;
   transform: scaleX(-1);
