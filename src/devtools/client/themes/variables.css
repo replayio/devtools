@@ -53,7 +53,6 @@
   --secondary-accent-stroke: #f02d5e;
 
   --that-dark-color: #1f2937;
-  --text-field-border: var(--cool-gray-300);
 
   --new-blue-50: #eff7ff;
   --new-blue-100: #dbedff;
@@ -186,6 +185,8 @@
   --breakpoint-status: var(--theme-body-color);
   --breakpoint-arrow: var(--theme-comment);
   --breakpoint-arrow-disabled: var(--theme-base-90);
+
+  --text-field-border: var(--cool-gray-300);
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -382,6 +383,8 @@
   --breakpoint-status: var(--theme-body-color);
   --breakpoint-arrow: #fff;
   --breakpoint-arrow-disabled: var(--theme-base-80);
+
+  --text-field-border: var(--theme-base-85);
 
   /* CODE MIRROR (DARK) */
 
