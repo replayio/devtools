@@ -5,6 +5,10 @@ function recordingFinished() {
   console.log("ExampleFinished");
 }
 
+class C {
+  get foo() { return "bar"; }
+}
+
 function foo() {
 // Create various objects which the debugger must be able to show in the scopes
 // pane using only the pause data, i.e. without additional debugger requests.
@@ -41,6 +45,7 @@ var n = new Proxy({ a: 0 }, {
 var o = Symbol();
 var p = Symbol("symbol");
 var q = { [o]: 42, [p]: o };
+var r = { get c() { return new C(); } }
 console.log(a);
 console.log(b);
 console.log(c);
@@ -58,6 +63,7 @@ console.log(n);
 console.log(o);
 console.log(p);
 console.log(q);
+console.log(r);
 console.log("Done");
 window.setTimeout(recordingFinished);
 }

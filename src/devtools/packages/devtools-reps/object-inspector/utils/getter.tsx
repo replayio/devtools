@@ -21,16 +21,20 @@ export class GetterItem {
   // - "failed" - if loading failed
   // - ValueFront - the getter's value once it's been loaded
   readonly loadingState: undefined | "loading" | "failed" | ValueFront;
+  readonly valueItem?: ValueItem;
 
   constructor(opts: { parent: ValueItem; name: string }) {
     this.name = opts.name;
     this.path = `${opts.parent.path}/${opts.name}`;
     this.object = opts.parent.contents;
     this.loadingState = getterValues.get(getterValueKey(this.object, this.name));
-  }
-
-  getLoadingState() {
-    return this.loadingState;
+    if (this.loadingState instanceof ValueFront) {
+      this.valueItem = new ValueItem({
+        name: this.name,
+        contents: this.loadingState,
+        path: this.path,
+      });
+    }
   }
 
   isPrimitive() {
@@ -66,19 +70,12 @@ export class GetterItem {
       }
 
       default: {
-        return new ValueItem({
-          name: this.name,
-          contents: this.loadingState,
-          path: "",
-        }).getLabelAndValue(props);
+        return this.valueItem!.getLabelAndValue(props);
       }
     }
   }
 
   getChildren() {
-    if (!(this.loadingState instanceof ValueFront)) {
-      return [];
-    }
-    return new ValueItem({ contents: this.loadingState, path: "" }).getChildren();
+    return this.valueItem?.getChildren() || [];
   }
 }
