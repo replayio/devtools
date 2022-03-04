@@ -464,7 +464,7 @@ function checkJumpIcon(msg) {
 
 function findObjectInspectorNode(oi, nodeLabel) {
   return [...oi.querySelectorAll(".tree-node")].find(node => {
-    return node.innerText.includes(nodeLabel);
+    return node.innerText.replace(/\n/g, "").includes(nodeLabel);
   });
 }
 
