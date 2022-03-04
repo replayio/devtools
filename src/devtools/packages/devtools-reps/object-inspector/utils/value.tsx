@@ -124,13 +124,13 @@ export class ValueItem implements IItem {
 
     const value = this.contents;
     const previewValues = value.previewValueMap();
-    const rv: Item[] = Object.entries(previewValues).map(
+    const rv: Item[] = [...previewValues.entries()].map(
       ([name, contents]) => new ValueItem({ parent: this, name, contents })
     );
-    const knownProperties = new Set(Object.keys(previewValues));
+    const knownProperties = new Set(previewValues.keys());
     value.traversePrototypeChain(current => {
       const getters = current.previewGetters();
-      for (const name of Object.keys(getters)) {
+      for (const name of getters.keys()) {
         if (!knownProperties.has(name)) {
           rv.push(new GetterItem({ parent: this, name }));
           knownProperties.add(name);
@@ -201,7 +201,7 @@ export class ValueItem implements IItem {
 }
 
 function getChildValues(parentValue: ValueFront): ValueFront[] {
-  const rv = Object.values(parentValue.previewValueMap());
+  const rv = [...parentValue.previewValueMap().values()];
 
   if (parentValue.className() === "Promise") {
     const result = parentValue.previewPromiseState();

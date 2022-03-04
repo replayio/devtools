@@ -478,7 +478,7 @@ async function findFrameworkListeners(
 ) {
   const locations = [];
   await frameworkListeners.loadProperties();
-  const propertyValues = Object.values(frameworkListeners.previewValueMap());
+  const propertyValues = frameworkListeners.previewValueMap().values();
   for (const value of propertyValues) {
     if (value.isObject() && value.className() == "Function") {
       locations.push(value.functionLocationFromLogpoint()!);

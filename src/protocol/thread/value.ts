@@ -2,8 +2,6 @@ import { assert, DisallowEverythingProxyHandler } from "../utils";
 import { EvaluationResult, Pause, WiredObject } from "./pause";
 import { ThreadFront } from "./thread";
 
-type ValueMap = { [key: string]: ValueFront };
-
 // like JSON, but including `undefined`
 type JSONishValue =
   | boolean
@@ -113,35 +111,35 @@ export class ValueFront {
     return !this.hasPreview() || this._object!.preview!.overflow;
   }
 
-  previewValueMap(): ValueMap {
-    const rv = Object.create(null);
+  previewValueMap(): Map<string, ValueFront> {
+    const rv = new Map<string, ValueFront>();
     if (this.hasPreview()) {
       for (const { name, value, get, set } of this._object!.preview!.properties!) {
         // For now, ignore getter/setter properties.
         if (!get && !set) {
-          rv[name] = value;
+          rv.set(name, value);
         }
       }
       for (const { name, value } of this._object!.preview!.getterValues!) {
-        rv[name] = value;
+        rv.set(name, value);
       }
     }
     return rv;
   }
 
   previewValueCount() {
-    return Object.keys(this.previewValueMap()).length;
+    return this.previewValueMap().size;
   }
 
-  previewGetters(): ValueMap {
+  previewGetters(): Map<string, ValueFront> {
+    const rv = new Map<string, ValueFront>();
     if (!this._object?.preview?.properties) {
-      return {};
+      return rv;
     }
     const valueMap = this.previewValueMap();
-    const rv: ValueMap = {};
     for (const { name, get } of this._object.preview.properties) {
-      if (get && !(name in valueMap)) {
-        rv[name] = get;
+      if (get && !valueMap.has(name)) {
+        rv.set(name, get);
       }
     }
     return rv;
@@ -323,7 +321,7 @@ export class ValueFront {
     }
 
     // Make sure we have previews for all of this node's object properties.
-    const propertyValues = Object.values(this.previewValueMap());
+    const propertyValues = this.previewValueMap().values();
     const promises = [];
     for (const value of propertyValues) {
       if (value.isObject() && !value.hasPreview()) {
@@ -386,7 +384,7 @@ export class ValueFront {
       visitedObjectIds.add(objectId);
 
       const properties = await Promise.all(
-        Object.entries(this.previewValueMap()).map(async ([key, valueFront]) => {
+        [...this.previewValueMap().entries()].map(async ([key, valueFront]) => {
           const value = await valueFront.getJSON(visitedObjectIds);
           return [key, value] as [string, JSONishValue];
         })

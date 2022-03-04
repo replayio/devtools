@@ -70,14 +70,14 @@ function getProperties(props) {
   const preview = props.object.previewValueMap();
 
   propertyNames.forEach((name, i) => {
-    if (preview[name]) {
+    if (preview.get(name)) {
       elements.push(
         PropRep({
           ...props,
           key: name,
           mode: MODE.TINY,
           name,
-          object: preview[name],
+          object: preview.get(name),
           equal: ": ",
         })
       );
@@ -101,7 +101,7 @@ function getKeyboardEventModifiers(preview) {
 
   const modifiers = [];
   for (const [property, name] of Object.entries(keysToModifiersMap)) {
-    if (preview[property].primitive()) {
+    if (preview.get(property).primitive()) {
       modifiers.push(name);
     }
   }
@@ -110,7 +110,7 @@ function getKeyboardEventModifiers(preview) {
 
 function getTitle(props) {
   const preview = props.object.previewValueMap();
-  let title = preview.type.primitive();
+  let title = preview.get("type").primitive();
 
   if (props.object.className() == "KeyboardEvent") {
     const modifiers = getKeyboardEventModifiers(preview);

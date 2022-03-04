@@ -75,7 +75,7 @@ function getArrayLikeLength(object) {
     return object.containerEntryCount();
   }
   const propertyValues = object.previewValueMap();
-  return propertyValues.length.primitive();
+  return propertyValues.get("length").primitive();
 }
 
 function getTitle(props, object) {
@@ -112,7 +112,7 @@ function arrayIterator(props, array, max) {
     if (containerEntries && i < containerEntries.length) {
       elem = containerEntries[i].value;
     } else {
-      elem = propertyValues[i];
+      elem = propertyValues.get(i.toString());
     }
     if (!elem) {
       elem = createPrimitiveValueFront(null);

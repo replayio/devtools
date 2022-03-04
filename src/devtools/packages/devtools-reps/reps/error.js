@@ -37,7 +37,7 @@ function ErrorRep(props) {
       name = "DOMException";
       break;
     default:
-      name = preview.name.primitive();
+      name = preview.get("name").primitive();
       break;
   }
   const content = [];
@@ -45,12 +45,12 @@ function ErrorRep(props) {
   if (mode === MODE.TINY) {
     content.push(name);
   } else {
-    content.push(`${name}: "${preview.message.primitive()}"`);
+    content.push(`${name}: "${preview.get("message").primitive()}"`);
   }
 
-  if (preview.stack && mode !== MODE.TINY && mode !== MODE.SHORT) {
+  if (preview.get("stack") && mode !== MODE.TINY && mode !== MODE.SHORT) {
     const stacktrace = props.renderStacktrace
-      ? props.renderStacktrace(parseStackString(preview.stack.primitive()))
+      ? props.renderStacktrace(parseStackString(preview.get("stack").primitive()))
       : getStacktraceElements(props, preview);
 
     if (!isEvaluationError(stacktrace)) {
@@ -85,11 +85,11 @@ function ErrorRep(props) {
  */
 function getStacktraceElements(props, preview) {
   const stack = [];
-  if (!preview.stack) {
+  if (!preview.get("stack")) {
     return stack;
   }
 
-  parseStackString(preview.stack.primitive()).forEach((frame, index, frames) => {
+  parseStackString(preview.get("stack").primitive()).forEach((frame, index, frames) => {
     let onLocationClick;
     const { filename, lineNumber, columnNumber, functionName, location } = frame;
 

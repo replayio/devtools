@@ -13,14 +13,14 @@ export interface FrameworkEventListener {
 export async function getFrameworkEventListeners(node: NodeFront) {
   const obj = node.getObjectFront();
   await obj.loadProperties();
-  const props = Object.entries(obj.previewValueMap());
+  const props = [...obj.previewValueMap().entries()];
   const reactProp = props.find(([key]) => key.startsWith("__reactEventHandlers$"));
   if (!reactProp) {
     return [];
   }
 
   await reactProp[1].loadProperties();
-  const handlerProps = Object.entries(reactProp[1].previewValueMap());
+  const handlerProps = [...reactProp[1].previewValueMap().entries()];
   return handlerProps
     .filter(([, contents]) => {
       return contents.isObject() && contents.className() == "Function";
