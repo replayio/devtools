@@ -11,6 +11,7 @@ import { MY_LIBRARY } from "../UploadScreen/Sharing";
 import { actions } from "ui/actions";
 import { BlankViewportWrapper } from "../shared/Viewport";
 import Base64Image from "../shared/Base64Image";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 function ViewerLoader() {
   return (
@@ -80,15 +81,16 @@ type ViewerRouterProps = PropsFromRedux & {
 
 function ViewerRouter(props: ViewerRouterProps) {
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
-  const { features, loading } = hooks.useGetUserInfo();
-  const { currentWorkspaceId } = props;
+  const { id: userId, features, loading } = hooks.useGetUserInfo();
+  const { currentWorkspaceId, setUnexpectedError, setWorkspaceId } = props;
 
   useEffect(() => {
-    if (currentWorkspaceId === null && !features.library && !nonPendingLoading) {
+    if (currentWorkspaceId === null && !features.library && !loading && !nonPendingLoading) {
       if (!workspaces.length) {
+        sendTelemetryEvent("DevToolsNoActiveTeam", { userId });
         // This shouldn't be reachable because the library can only be disabled
         // by a workspace setting which means the user must be in a workspace
-        props.setUnexpectedError({
+        setUnexpectedError({
           message: "Unexpected error",
           content: "Unable to find an active team",
         });
@@ -96,9 +98,17 @@ function ViewerRouter(props: ViewerRouterProps) {
         return;
       }
 
-      props.setWorkspaceId(workspaces[0].id);
+      setWorkspaceId(workspaces[0].id);
     }
-  });
+  }, [
+    currentWorkspaceId,
+    loading,
+    features,
+    nonPendingLoading,
+    setUnexpectedError,
+    setWorkspaceId,
+    workspaces,
+  ]);
 
   if (loading) {
     return <BlankViewportWrapper />;
