@@ -81,14 +81,14 @@ type ViewerRouterProps = PropsFromRedux & {
 function ViewerRouter(props: ViewerRouterProps) {
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
   const { features, loading } = hooks.useGetUserInfo();
-  const { currentWorkspaceId } = props;
+  const { currentWorkspaceId, setUnexpectedError, setWorkspaceId } = props;
 
   useEffect(() => {
-    if (currentWorkspaceId === null && !features.library && !nonPendingLoading) {
+    if (currentWorkspaceId === null && !features.library && !loading && !nonPendingLoading) {
       if (!workspaces.length) {
         // This shouldn't be reachable because the library can only be disabled
         // by a workspace setting which means the user must be in a workspace
-        props.setUnexpectedError({
+        setUnexpectedError({
           message: "Unexpected error",
           content: "Unable to find an active team",
         });
@@ -96,9 +96,17 @@ function ViewerRouter(props: ViewerRouterProps) {
         return;
       }
 
-      props.setWorkspaceId(workspaces[0].id);
+      setWorkspaceId(workspaces[0].id);
     }
-  });
+  }, [
+    currentWorkspaceId,
+    loading,
+    features,
+    nonPendingLoading,
+    setUnexpectedError,
+    setWorkspaceId,
+    workspaces,
+  ]);
 
   if (loading) {
     return <BlankViewportWrapper />;
