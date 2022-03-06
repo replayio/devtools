@@ -50,7 +50,7 @@ function FormattedUrl({ url }: { url: string }) {
   const parsedUrl = new URL(url);
   const params = [...parsedUrl.searchParams.entries()];
   return (
-    <span className="text-gray-600">
+    <span className="text-themeBody">
       <span className="">{parsedUrl.origin}</span>
       <span className="">{parsedUrl.pathname}</span>
       {params.length > 0 ? (
