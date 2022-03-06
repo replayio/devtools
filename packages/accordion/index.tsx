@@ -113,7 +113,6 @@ export function AccordionPane({
     >
       {isResizable && <ResizeHandle onResizeStart={onResizeStart} isResizing={isBeingResized} />}
       <div className="flex h-full w-full flex-col overflow-hidden">
-        <div className={classNames("border-b", index! > 0 ? "" : "border-transparent")} />
         <div
           className="flex w-full cursor-pointer items-center justify-between space-x-2 p-2 px-2"
           style={{ fontSize: "15px" }}
