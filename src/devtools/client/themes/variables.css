@@ -432,7 +432,7 @@
   --theme-accordion-header-hover: #2a2a2e;
 
   /* Selection */
-  --theme-selection-background: #204e8a;
+  --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #353b48;
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);
