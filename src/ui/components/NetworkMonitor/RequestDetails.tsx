@@ -19,13 +19,13 @@ interface Detail {
 
 export const RequestDetailsUnavailable: FC<{ closePanel: () => void }> = ({ closePanel }) => {
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="flex h-full w-full flex-col">
       <RequestDetailsTabs>
-        <div className="flex-grow flex justify-end">
+        <div className="flex flex-grow justify-end">
           <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
         </div>
       </RequestDetailsTabs>
-      <div className="flex-grow relative">
+      <div className="relative flex-grow">
         <div className="m-2">Request details currently unavailable</div>
       </div>
     </div>
@@ -35,7 +35,10 @@ export const RequestDetailsUnavailable: FC<{ closePanel: () => void }> = ({ clos
 const RequestDetailsTabs: FC<{ children?: ReactNode }> = ({ children }) => {
   return (
     <div
-      className="sticky top-0 z-10 flex items-center justify-between border-b bg-toolbarBackground"
+      className={classNames(
+        "sticky top-0 z-10 flex items-center justify-between border-b border-themeBorder bg-toolbarBackground",
+        styles.border
+      )}
       style={{ height: 25 }}
     >
       {children}
@@ -69,7 +72,10 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
   return (
     <div className={classNames(className, "flex flex-col")}>
       {details.map((h, i) => (
-        <div className={classNames(styles.row, "py-1 hover:bg-gray-100")} key={`${h.name}-${i}`}>
+        <div
+          className={classNames(styles.row, "cursor-pointer py-1 hover:bg-toolbarBackground")}
+          key={`${h.name}-${i}`}
+        >
           <span className="font-bold ">{h.name}:</span> {h.value}
         </div>
       ))}
@@ -191,7 +197,10 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
       <h2
-        className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
+        className={classNames(
+          "cursor-pointer border-t border-themeBorder py-1 font-bold",
+          styles.title
+        )}
         onClick={() => setRequestHeadersExpanded(!requestHeadersExpanded)}
       >
         <TriangleToggle open={requestHeadersExpanded} />
@@ -289,7 +298,7 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="min-w-full overflow-scroll border-l bg-themeBodyBackground">
+    <div className="min-w-full overflow-scroll bg-themeBodyBackground">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
