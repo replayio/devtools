@@ -14,3 +14,4 @@ next-env.d.ts
 out
 tsconfig.tsbuildinfo
 yarn.lock
+.nova/

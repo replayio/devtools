@@ -129,7 +129,6 @@
 .breakpoint-navigation-timeline .progress-line {
   width: 0%;
   height: 5px;
-  border-radius: 4px;
   /* border-top: 3px dashed var(--primary-accent); */
   border-top: 5px solid var(--primary-accent);
   position: absolute;
