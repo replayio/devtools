@@ -88,7 +88,10 @@ class OI extends PureComponent<ObjectInspectorProps> {
   shouldItemUpdate = (prevItem: Item, nextItem: Item): boolean => {
     if (prevItem.type === "value") {
       assert(nextItem.type === "value", "OI items for the same path must have the same type");
-      return prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren();
+      return (
+        prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren() ||
+        prevItem.isInCurrentPause !== nextItem.isInCurrentPause
+      );
     }
     if (prevItem.type === "getter") {
       assert(nextItem.type === "getter", "OI items for the same path must have the same type");
