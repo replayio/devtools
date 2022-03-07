@@ -214,6 +214,8 @@
   --debug-line-border: #037aff;
   --debug-line-background: #e9f3ff;
 
+  --theme-toggle: var(--grey-20);
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
   --theme-toolbar-background: var(--grey-10);
@@ -409,8 +411,8 @@
   --debug-line-background: var(--theme-base-100);
 
   /* Toolbar */
+  --theme-toolbar-panel-icon-color: var(--icon-color);
   --theme-tab-toolbar-background: var(--grey-90);
-
   --theme-toolbar-background: #18181a;
   --theme-toolbar-color: var(--grey-20);
   --theme-toolbar-selected-color: white;
