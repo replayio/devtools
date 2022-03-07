@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -21,7 +21,7 @@ import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import FocusModal from "./shared/FocusModal/FocusModal";
-import { migratePrefToSettings, useFeature } from "ui/hooks/settings";
+import { useFeature } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
@@ -128,12 +128,6 @@ function App({ children, modal }: AppProps) {
   useEffect(() => {
     document.body.parentElement!.className = enableDarkMode ? "theme-dark" : "theme-light";
   }, [enableDarkMode]);
-
-  useEffect(() => {
-    if (!isTest() && auth.isAuthenticated) {
-      migratePrefToSettings("devtools.disableLogRocket", "disableLogRocket");
-    }
-  }, [auth.isAuthenticated]);
 
   if (auth.isLoading || userInfo.loading) {
     return <LoadingScreen />;
