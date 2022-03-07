@@ -30,17 +30,6 @@ button {
   z-index: 10; /* ensure tooltips are above other panes */
 }
 
-.editor-container {
-  width: 100%;
-  background: linear-gradient(
-    25deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 1) 33%,
-    rgba(176, 229, 245, 1) 67%,
-    rgba(235, 186, 202, 1) 95%
-  );
-}
-
 /* Utils */
 .absolute-center {
   position: absolute;

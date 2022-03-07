@@ -234,12 +234,12 @@ div.CodeMirror span.eval-text {
   background-color: transparent;
 }
 
-.editor-container {
+.theme-light .editor-container {
   width: 100%;
   background: linear-gradient(
     25deg,
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(176, 229, 245, 0.3) 67%,
-    rgba(235, 186, 202, 0.3) 95%
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(176, 229, 245, 0.4) 67%,
+    rgba(235, 186, 202, 0.4) 95%
   );
 }

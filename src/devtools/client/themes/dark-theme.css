@@ -250,5 +250,5 @@ div.CodeMirror span.eval-text {
 
 .editor-container {
   width: 100%;
-  background-color: var(--chrome);
+  background-color: var(--theme-base-95);
 }
