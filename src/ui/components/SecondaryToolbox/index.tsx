@@ -10,6 +10,7 @@ import { actions } from "../../actions";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { SecondaryPanelName } from "ui/state/layout";
+import { isDemo } from "ui/utils/environment";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
 import { trackEvent } from "ui/utils/telemetry";
@@ -126,15 +127,17 @@ function SecondaryToolbox({
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
-      <header className="secondary-toolbox-header">
-        <PanelButtons
-          selectedPanel={selectedPanel}
-          setSelectedPanel={setSelectedPanel}
-          isNode={isNode}
-          hasReactComponents={hasReactComponents}
-        />
-        <ToolboxOptions />
-      </header>
+      {!isDemo() && (
+        <header className="secondary-toolbox-header">
+          <PanelButtons
+            selectedPanel={selectedPanel}
+            setSelectedPanel={setSelectedPanel}
+            isNode={isNode}
+            hasReactComponents={hasReactComponents}
+          />
+          <ToolboxOptions />
+        </header>
+      )}
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
         {selectedPanel === "network" && <NetworkMonitor />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}

@@ -1,6 +1,8 @@
 import React from "react";
 import classNames from "classnames";
 
+import { isDemo } from "ui/utils/environment";
+
 interface CommentButtonProps {
   addComment: (e: React.MouseEvent) => void;
   pausedOnHit: boolean;
@@ -8,6 +10,10 @@ interface CommentButtonProps {
 
 export default function CommentButton({ addComment, pausedOnHit }: CommentButtonProps) {
   {
+    if (isDemo()) {
+      return null;
+    }
+
     return (
       <button
         type="button"

@@ -54,6 +54,12 @@ export function isMock() {
   return !!url.searchParams.get("mock");
 }
 
+// Used when we are showing the replay devtools in another environment like the
+// landing page (experimental)
+export function isDemo() {
+  return !!url.searchParams.get("demo");
+}
+
 export async function waitForMockEnvironment() {
   if (!isMock()) {
     return null;

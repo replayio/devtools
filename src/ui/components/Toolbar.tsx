@@ -7,6 +7,7 @@ import { selectors } from "../reducers";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { UIState } from "ui/state";
+import { isDemo } from "ui/utils/environment";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
@@ -79,6 +80,10 @@ function ToolbarButton({
 }
 
 function Toolbar({ viewMode }: PropsFromRedux) {
+  if (isDemo()) {
+    return <div></div>;
+  }
+
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar space-y-1">
