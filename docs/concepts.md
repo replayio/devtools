@@ -1,10 +1,27 @@
 ...tl;dr of how things work in general and some basic structure
 
-# `Pause` and regions
+# `ExecutionPoint`
 
-`Pause` is a block of data from this pause which might be useful to the protocol client (frontend).
+An [`ExecutionPoint`](https://static.replay.io/protocol/tot/Recording/#type-ExecutionPoint) is a numeric string
+that represents a point in time in the recording.
+`ExecutionPoint`s for earlier points in time are smaller numbers than the ones for later points in time.
+However, it is not possible to compute the time (i.e. the milliseconds elapsed since the beginning of the recording)
+from an `ExecutionPoint`, so that information is often transmitted together with an `ExecutionPoint`
+in a [`TimeStampedPoint`](https://static.replay.io/protocol/tot/Recording/#type-TimeStampedPoint).
+For more information on `ExecutionPoint`s see https://github.com/RecordReplay/backend/blob/master/docs/execution-points.md
 
-To reduce the number of back-and-forth calls required over the protocol, data which wasn't specifically asked for can be returned by commands or events.
+# Regions
+
+A region is a time range in the recording, usually described by a
+[TimeStampedPointRange](https://static.replay.io/protocol/tot/Recording/#type-TimeStampedPointRange).
+When the backend loads a recording, it divides it into regions that can be unloaded individually to free up resources.
+Regions can be unloaded spontaneously by the backend to alleviate memory pressure, but the frontend can also tell the backend
+that it wishes to unload a region or to load it again. When the user uses focus mode to focus on a time range in the recording,
+the frontend requests that all regions that do not intersect with the selected time range are unloaded.
+
+# `Pause`
+
+A `Pause` contains information about the debuggee's state at a specific `ExecutionPoint`.
 
 It consists of:
 
@@ -60,7 +77,10 @@ Scope is what the users want to often interact with and inspect, as it can tell 
 
 # `Wired*` types
 
-...TODO
+In protocol messages for scopes, frames, objects and some others, javascript values are represented by
+[`Value`](https://static.replay.io/protocol/tot/Pause/#type-Value).
+The `Pause` class replaces all these `Value`s with corresponding `ValueFront`s so that they're easier to work with.
+For example, a `Scope` with all `Value`s replaced by `ValueFront`s is a `WiredScope` etc.
 
 <details>
   <summary>all Wired types</summary>
@@ -171,7 +191,6 @@ It works by...
 # Networking
 
 how it gets its data, how it makes interactions within it possible
-
 
 # React DevTools
 
