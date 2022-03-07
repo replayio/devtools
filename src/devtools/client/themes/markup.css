@@ -412,10 +412,6 @@ ul.children + .tag-line::before {
   color: var(--markup-hidden-tag-color);
 }
 
-#markup-box .theme-selected {
-  background-color: var(--grey-35);
-}
-
 #markup-box:focus-within .theme-selected {
   background-color: var(--theme-selection-background);
 }

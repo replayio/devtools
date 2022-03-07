@@ -1,0 +1,16 @@
+.librarySearch input {
+  background-color: white;
+  border: 1px solid #d1d5db;
+}
+
+.libraryHeaderText {
+  color: #38383d;
+}
+
+.libraryHeaderButton button {
+  color: #38383d;
+}
+
+.recordingTitle {
+  color: #38383d;
+}

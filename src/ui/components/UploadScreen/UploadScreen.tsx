@@ -193,7 +193,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                   showLimitWarning={showDurationWarning(recording)}
                 />
               </div>
-              <div className="relative space-y-6 border-t border-gray-300 py-9 px-8">
+              <div className="relative space-y-6 border-t border-themeBorder py-9 px-8">
                 <Sharing
                   workspaces={workspaces}
                   selectedWorkspaceId={selectedWorkspaceId}

@@ -187,6 +187,7 @@
   --breakpoint-arrow-disabled: var(--theme-base-90);
 
   --text-field-border: var(--cool-gray-300);
+  --jellyfish: rgba(255, 255, 255, 0.8);
 
   /* TO AUDIT NEXT */
   --tab-standard-color: var(--theme-base-100);
@@ -388,6 +389,7 @@
   --breakpoint-arrow-disabled: var(--theme-base-80);
 
   --text-field-border: var(--theme-base-85);
+  --jellyfish: rgba(40, 40, 40, 0.8);
   --theme-border: var(--theme-base-100);
   --checkbox: var(--theme-base-80);
   --checkbox-border: var(--theme-base-90);
@@ -432,7 +434,7 @@
   --theme-accordion-header-hover: #2a2a2e;
 
   /* Selection */
-  --theme-selection-background: #204e8a;
+  --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #353b48;
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);

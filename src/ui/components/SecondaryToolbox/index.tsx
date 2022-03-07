@@ -138,7 +138,7 @@ function SecondaryToolbox({
           <ToolboxOptions />
         </header>
       )}
-      <Redacted className="secondary-toolbox-content bg-white text-xs">
+      <Redacted className="secondary-toolbox-content bg-chrome text-xs">
         {selectedPanel === "network" && <NetworkMonitor />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}

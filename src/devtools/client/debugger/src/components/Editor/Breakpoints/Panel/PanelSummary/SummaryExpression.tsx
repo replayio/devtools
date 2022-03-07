@@ -45,7 +45,7 @@ export function SummaryExpression({ isEditable, value }: SummaryExpressionProps 
       </MaterialIcon>
     </div>
   ) : (
-    <div className="rounded-sm bg-gray-200 px-2">
+    <div className="rounded-sm px-2">
       <Popup trigger={<Expression value={value} isEditable={false} />}>
         {isTeamDeveloper ? (
           <>
