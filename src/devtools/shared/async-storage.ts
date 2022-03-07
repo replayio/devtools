@@ -44,149 +44,147 @@
  *
  */
 
-"use strict";
-
 const DBNAME = "devtools-async-storage";
 const DBVERSION = 1;
 const STORENAME = "keyvaluepairs";
-var db = null;
 
-function withStore(type, onsuccess, onerror) {
-  if (db) {
+const withStore = (
+  type: IDBTransactionMode,
+  onsuccess: (store: IDBObjectStore) => void,
+  onerror: () => void
+) => {
+  const dbConn = indexedDB.open(DBNAME, DBVERSION);
+
+  dbConn.onerror = () => {
+    onerror();
+  };
+
+  dbConn.onupgradeneeded = () => {
+    // First time setup: create an empty object store
+    dbConn.result.createObjectStore(STORENAME);
+  };
+
+  dbConn.onsuccess = () => {
+    const db = dbConn.result;
     const transaction = db.transaction(STORENAME, type);
-    const store = transaction.objectStore(STORENAME);
-    onsuccess(store);
-  } else {
-    const openreq = indexedDB.open(DBNAME, DBVERSION);
-    openreq.onerror = function withStoreOnError() {
-      onerror();
-    };
-    openreq.onupgradeneeded = function withStoreOnUpgradeNeeded() {
-      // First time setup: create an empty object store
-      openreq.result.createObjectStore(STORENAME);
-    };
-    openreq.onsuccess = function withStoreOnSuccess() {
-      db = openreq.result;
-      const transaction = db.transaction(STORENAME, type);
+    transaction.oncomplete = () => {
       const store = transaction.objectStore(STORENAME);
       onsuccess(store);
+      db.close();
     };
-  }
-}
+  };
+};
 
-function getItem(itemKey) {
+export const getItem = (itemKey: string) => {
   return new Promise((resolve, reject) => {
-    let req;
     withStore(
       "readonly",
       store => {
-        store.transaction.oncomplete = function onComplete() {
+        store.transaction.oncomplete = () => {
           let value = req.result;
           if (value === undefined) {
             value = null;
           }
           resolve(value);
         };
-        req = store.get(itemKey);
-        req.onerror = function getItemOnError() {
-          console.error("Error in asyncStorage.getItem():", req.error.name);
+        const req = store.get(itemKey);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.getItem():", req.error?.name);
           reject(req.error);
         };
       },
       reject
     );
   });
-}
+};
 
-function setItem(itemKey, value) {
+export const setItem = (itemKey: string, value: any) => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       store => {
         store.transaction.oncomplete = resolve;
         const req = store.put(value, itemKey);
-        req.onerror = function setItemOnError() {
-          console.error("Error in asyncStorage.setItem():", req.error.name);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.setItem():", req.error?.name);
           reject(req.error);
         };
       },
       reject
     );
   });
-}
+};
 
-function removeItem(itemKey) {
+export const removeItem = (itemKey: string) => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       store => {
         store.transaction.oncomplete = resolve;
         const req = store.delete(itemKey);
-        req.onerror = function removeItemOnError() {
-          console.error("Error in asyncStorage.removeItem():", req.error.name);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.removeItem():", req.error?.name);
           reject(req.error);
         };
       },
       reject
     );
   });
-}
+};
 
-function clear() {
+export const clear = () => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       store => {
         store.transaction.oncomplete = resolve;
         const req = store.clear();
-        req.onerror = function clearOnError() {
-          console.error("Error in asyncStorage.clear():", req.error.name);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.clear():", req.error?.name);
           reject(req.error);
         };
       },
       reject
     );
   });
-}
+};
 
-function length() {
+export const length = () => {
   return new Promise((resolve, reject) => {
-    let req;
     withStore(
       "readonly",
       store => {
-        store.transaction.oncomplete = function onComplete() {
+        store.transaction.oncomplete = () => {
           resolve(req.result);
         };
-        req = store.count();
-        req.onerror = function lengthOnError() {
-          console.error("Error in asyncStorage.length():", req.error.name);
-          reject(req.error.name);
+        const req = store.count();
+        req.onerror = () => {
+          console.error("Error in asyncStorage.length():", req.error?.name);
+          reject(req.error?.name);
         };
       },
       reject
     );
   });
-}
+};
 
-function key(n) {
+export const key = (n: number) => {
   return new Promise((resolve, reject) => {
     if (n < 0) {
       resolve(null);
       return;
     }
 
-    let req;
     withStore(
       "readonly",
       store => {
-        store.transaction.oncomplete = function onComplete() {
+        store.transaction.oncomplete = () => {
           const cursor = req.result;
           resolve(cursor ? cursor.key : null);
         };
         let advanced = false;
-        req = store.openCursor();
-        req.onsuccess = function keyOnSuccess() {
+        const req = store.openCursor();
+        req.onsuccess = () => {
           const cursor = req.result;
           if (!cursor) {
             // this means there weren"t enough keys
@@ -202,21 +200,12 @@ function key(n) {
           advanced = true;
           cursor.advance(n);
         };
-        req.onerror = function keyOnError() {
-          console.error("Error in asyncStorage.key():", req.error.name);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.key():", req.error?.name);
           reject(req.error);
         };
       },
       reject
     );
   });
-}
-
-module.exports = {
-  getItem,
-  setItem,
-  removeItem,
-  clear,
-  length,
-  key,
 };
