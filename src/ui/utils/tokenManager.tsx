@@ -83,7 +83,10 @@ class TokenManager {
             setTimeout(() => {
               if (apiKey) {
                 this.setExternalAuth(apiKey);
-              } else if (!this.currentState) {
+              } else if (
+                !this.currentState ||
+                (!this.currentState.token && this.auth0Client?.isAuthenticated)
+              ) {
                 this.update(false);
               }
             }, 0);
