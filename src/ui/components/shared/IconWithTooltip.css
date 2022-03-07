@@ -9,6 +9,7 @@
 }
 
 .icon-with-tooltip button {
+  display: flex;
   cursor: pointer;
   border-radius: 4px;
   cursor: pointer;
