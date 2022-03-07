@@ -18,6 +18,7 @@ import "ui/setup/dynamic/inspector";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
+import ReplayLogo from "../shared/ReplayLogo";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -102,7 +103,17 @@ function ConsolePanel() {
 function InspectorPanel() {
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
-      <WaitForReduxSlice slice="inspector">
+      <WaitForReduxSlice
+        slice="inspector"
+        loading={
+          <div className="align-center m-auto flex w-full justify-center">
+            <div className="relative flex w-96 flex-col items-center rounded-lg bg-white/75 p-8 py-4">
+              <ReplayLogo wide size="lg" />
+              <div>Inspector is loading...</div>
+            </div>
+          </div>
+        }
+      >
         <React.Suspense fallback={null}>
           <InspectorApp />
         </React.Suspense>

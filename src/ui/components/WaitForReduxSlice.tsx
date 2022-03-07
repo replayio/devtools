@@ -5,10 +5,11 @@ import LoadingScreen from "./shared/LoadingScreen";
 interface PropsFromParent {
   slice: "inspector" | "messages";
   children: ReactNode;
+  loading?: ReactNode;
 }
 
-function WaitForReduxSlice({ hasSlice, children }: PropsFromParent & PropsFromRedux) {
-  return hasSlice ? <>{children}</> : <LoadingScreen />;
+function WaitForReduxSlice({ hasSlice, children, loading }: PropsFromParent & PropsFromRedux) {
+  return hasSlice ? <>{children}</> : <>{loading}</> || <LoadingScreen />;
 }
 
 const connector = connect((state: any, { slice }: PropsFromParent) => ({
