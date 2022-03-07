@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setConsoleFilterDrawerExpanded } from "ui/actions/layout";
@@ -18,7 +19,13 @@ export const FilterDrawerToggle: FC = () => {
       style={expanded ? { width: "calc(var(--console-drawer-width) - 1rem)" } : {}}
     >
       <button className="console-filter-toggle" onClick={onClick}>
-        <Icon filename="drawer" className="bg-iconColor hover:bg-primaryAccent" />
+        <Icon
+          filename="drawer"
+          className={classNames(
+            "hover:bg-primaryAccent",
+            expanded ? "bg-primaryAccent" : "bg-iconColor"
+          )}
+        />
       </button>
     </div>
   );
