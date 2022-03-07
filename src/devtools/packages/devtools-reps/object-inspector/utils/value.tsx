@@ -20,14 +20,19 @@ export class ValueItem implements IItem {
   name: string | undefined;
   path: string;
   contents: ValueFront;
+  isInCurrentPause?: boolean;
   private childrenLoaded: boolean;
 
   constructor(
-    opts: { name?: string; contents: ValueFront } & ({ parent: Item } | { path: string })
+    opts: { name?: string; contents: ValueFront; isInCurrentPause?: boolean } & (
+      | { parent: Item }
+      | { path: string }
+    )
   ) {
     this.name = opts.name;
     this.path = "path" in opts ? opts.path : `${opts.parent.path}/${opts.name}`;
     this.contents = opts.contents;
+    this.isInCurrentPause = opts.isInCurrentPause;
     this.childrenLoaded =
       !this.needsToLoad() && getChildValues(this.contents).every(value => isValueLoaded(value));
   }

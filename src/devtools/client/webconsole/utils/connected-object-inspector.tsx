@@ -5,23 +5,29 @@ import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTra
 import { actions } from "ui/actions";
 import { ObjectInspector, ValueItem, REPS, MODE } from "devtools/packages/devtools-reps";
 import SmartTrace from "devtools/client/webconsole/utils/connected-smart-trace";
+import { UIState } from "ui/state";
+import { getCurrentPoint } from "ui/reducers/app";
 
-type ObjectInspectorProps = PropsFromRedux & {
+interface PropsFromParent {
   value: ValueFront;
   useQuotes?: boolean;
   transformEmptyString?: boolean;
   escapeWhitespace?: boolean;
   style?: React.CSSProperties;
-};
+}
+type ObjectInspectorProps = PropsFromRedux & PropsFromParent;
 
 function OI(props: ObjectInspectorProps) {
-  const { value } = props;
+  const { value, isInCurrentPause } = props;
   const path = value.id();
-  const roots = [new ValueItem({ path, contents: value })];
+  const roots = [new ValueItem({ path, contents: value, isInCurrentPause })];
 
   return (
     <ObjectInspector
-      {...props}
+      {...{
+        ...props,
+        onInspectIconClick: isInCurrentPause ? props.onInspectIconClick : undefined,
+      }}
       autoExpandDepth={0}
       mode={MODE.LONG}
       defaultRep={REPS.Grip}
@@ -40,13 +46,18 @@ function renderStacktrace(stacktrace: SmartTraceStackFrame[]) {
   return <SmartTrace key="stacktrace" stacktrace={stacktrace} mapSources={true} />;
 }
 
-const connector = connect(null, {
-  onViewSourceInDebugger: actions.onViewSourceInDebugger,
-  openLink: actions.openLink,
-  onDOMNodeMouseOver: actions.highlightDomElement,
-  onDOMNodeMouseOut: actions.unHighlightDomElement,
-  onInspectIconClick,
-});
+const connector = connect(
+  (state: UIState, { value }: PropsFromParent) => ({
+    isInCurrentPause: value.getPause()?.point === getCurrentPoint(state),
+  }),
+  {
+    onViewSourceInDebugger: actions.onViewSourceInDebugger,
+    openLink: actions.openLink,
+    onDOMNodeMouseOver: actions.highlightDomElement,
+    onDOMNodeMouseOut: actions.unHighlightDomElement,
+    onInspectIconClick,
+  }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(OI);
