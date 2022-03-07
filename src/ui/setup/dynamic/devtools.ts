@@ -45,7 +45,6 @@ import { asyncStore } from "ui/utils/prefs";
 import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const { setupDemo } = require("ui/utils/demo");
 import network from "ui/reducers/network";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
 
@@ -180,8 +179,6 @@ export default async function DevTools(store: Store) {
   setupLogpoints(store);
   setupExceptions(store);
   setupReactDevTools(store);
-
-  setupDemo();
 }
 
 function bindSelectors(obj: any) {

@@ -11,7 +11,6 @@ const { actions } = require("ui/actions");
 const { isVisible } = require("ui/utils/dom");
 const ReactDOM = require("react-dom");
 const { selectors } = require("ui/reducers");
-const { isDemo } = require("ui/utils/environment");
 
 const PropTypes = require("prop-types");
 const {
@@ -53,7 +52,7 @@ class ConsoleOutput extends Component {
   scrollToClosestMessage() {
     const { closestMessage } = this.props;
 
-    if (!closestMessage || isDemo()) {
+    if (!closestMessage) {
       return;
     }
 
