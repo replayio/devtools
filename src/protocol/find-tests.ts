@@ -86,6 +86,10 @@ return [{
 }];
 `;
 
+// Limit on the number of points we will look for the starting point of tests at.
+// If hooks are running, the maximum number of actual tests we find will be lower.
+const MaxTestPoints = 1000;
+
 // Manages the state associated with any jest tests within the recording.
 class JestTestState {
   sessionId: string;
@@ -121,7 +125,7 @@ class JestTestState {
     const handler: AnalysisHandler<void> = {};
     handler.onAnalysisResult = results => analysisResults.push(...results);
 
-    await analysisManager.runAnalysis(params, handler);
+    await analysisManager.runAnalysisBatches(params, handler, MaxTestPoints);
 
     await Promise.all(
       analysisResults.map(async ({ key: callPoint, value: { names } }) => {
