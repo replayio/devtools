@@ -98,8 +98,8 @@ type MixpanelEvent =
   | ["toolbox.secondary.video_toggle"]
   | ["toolbox.toggle_sidebar"]
   | ["upload.complete", { sessionId: SessionId }]
-  | ["upload.create_replay", { isDemo: boolean; workspaceUuid: WorkspaceUuid | null }]
-  | ["upload.discard", { isDemo: boolean }]
+  | ["upload.create_replay", { workspaceUuid: WorkspaceUuid | null }]
+  | ["upload.discard"]
   | ["user_options.launch_replay"]
   | ["user_options.select_docs"]
   | ["user_options.select_settings"];

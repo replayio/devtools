@@ -14,7 +14,6 @@ import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
 import { decodeWorkspaceId } from "ui/utils/workspace";
-const { isDemoReplay } = require("ui/utils/demo");
 import Icon from "../shared/Icon";
 
 type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
@@ -147,7 +146,6 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     const workspaceId = selectedWorkspaceId == MY_LIBRARY ? null : selectedWorkspaceId;
 
     trackEvent("upload.create_replay", {
-      isDemo: isDemoReplay(recording),
       workspaceUuid: decodeWorkspaceId(workspaceId),
     });
     startUploadWaitTracking();
@@ -160,7 +158,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   };
   const onDiscard = () => {
     setStatus("deleting");
-    trackEvent("upload.discard", { isDemo: isDemoReplay(recording) });
+    trackEvent("upload.discard");
     window.onbeforeunload = null;
     deleteRecording({ variables: { recordingId } });
   };
