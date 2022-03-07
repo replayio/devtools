@@ -50,7 +50,7 @@ const STORENAME = "keyvaluepairs";
 
 const withStore = (
   type: IDBTransactionMode,
-  onsuccess: (store: IDBObjectStore) => void,
+  onsuccess: (store: IDBObjectStore, db: IDBDatabase) => void,
   onerror: () => void
 ) => {
   const dbConn = indexedDB.open(DBNAME, DBVERSION);
@@ -68,10 +68,7 @@ const withStore = (
     const db = dbConn.result;
     const transaction = db.transaction(STORENAME, type);
     const store = transaction.objectStore(STORENAME);
-    transaction.oncomplete = () => {
-      onsuccess(store);
-      db.close();
-    };
+    onsuccess(store, db);
   };
 };
 
@@ -79,12 +76,13 @@ export const getItem = (itemKey: string) => {
   return new Promise((resolve, reject) => {
     withStore(
       "readonly",
-      store => {
+      (store, db) => {
         store.transaction.oncomplete = () => {
           let value = req.result;
           if (value === undefined) {
             value = null;
           }
+          db.close();
           resolve(value);
         };
         const req = store.get(itemKey);
@@ -102,108 +100,14 @@ export const setItem = (itemKey: string, value: any) => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
-      store => {
+      (store, db) => {
         store.transaction.oncomplete = resolve;
         const req = store.put(value, itemKey);
         req.onerror = () => {
           console.error("Error in asyncStorage.setItem():", req.error?.name);
           reject(req.error);
         };
-      },
-      reject
-    );
-  });
-};
-
-export const removeItem = (itemKey: string) => {
-  return new Promise((resolve, reject) => {
-    withStore(
-      "readwrite",
-      store => {
-        store.transaction.oncomplete = resolve;
-        const req = store.delete(itemKey);
-        req.onerror = () => {
-          console.error("Error in asyncStorage.removeItem():", req.error?.name);
-          reject(req.error);
-        };
-      },
-      reject
-    );
-  });
-};
-
-export const clear = () => {
-  return new Promise((resolve, reject) => {
-    withStore(
-      "readwrite",
-      store => {
-        store.transaction.oncomplete = resolve;
-        const req = store.clear();
-        req.onerror = () => {
-          console.error("Error in asyncStorage.clear():", req.error?.name);
-          reject(req.error);
-        };
-      },
-      reject
-    );
-  });
-};
-
-export const length = () => {
-  return new Promise((resolve, reject) => {
-    withStore(
-      "readonly",
-      store => {
-        store.transaction.oncomplete = () => {
-          resolve(req.result);
-        };
-        const req = store.count();
-        req.onerror = () => {
-          console.error("Error in asyncStorage.length():", req.error?.name);
-          reject(req.error?.name);
-        };
-      },
-      reject
-    );
-  });
-};
-
-export const key = (n: number) => {
-  return new Promise((resolve, reject) => {
-    if (n < 0) {
-      resolve(null);
-      return;
-    }
-
-    withStore(
-      "readonly",
-      store => {
-        store.transaction.oncomplete = () => {
-          const cursor = req.result;
-          resolve(cursor ? cursor.key : null);
-        };
-        let advanced = false;
-        const req = store.openCursor();
-        req.onsuccess = () => {
-          const cursor = req.result;
-          if (!cursor) {
-            // this means there weren"t enough keys
-            return;
-          }
-          if (n === 0 || advanced) {
-            // Either 1) we have the first key, return it if that's what they
-            // wanted, or 2) we"ve got the nth key.
-            return;
-          }
-
-          // Otherwise, ask the cursor to skip ahead n records
-          advanced = true;
-          cursor.advance(n);
-        };
-        req.onerror = () => {
-          console.error("Error in asyncStorage.key():", req.error?.name);
-          reject(req.error);
-        };
+        db.close();
       },
       reject
     );
