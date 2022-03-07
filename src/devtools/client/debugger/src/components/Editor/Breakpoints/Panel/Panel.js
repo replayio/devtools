@@ -46,7 +46,7 @@ function Panel({
   const pausedOnHit =
     !error &&
     !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
-  const isHot = analysisPoints && !error && (analysisPoints?.length || 0) > prefs.maxHitsDisplayed;
+  const isHot = analysisPoints && (error || (analysisPoints?.length || 0) > prefs.maxHitsDisplayed);
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
