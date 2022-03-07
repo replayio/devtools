@@ -101,13 +101,15 @@ export const setItem = (itemKey: string, value: any) => {
     withStore(
       "readwrite",
       (store, db) => {
-        store.transaction.oncomplete = resolve;
+        store.transaction.oncomplete = () => {
+          db.close();
+          resolve(undefined);
+        };
         const req = store.put(value, itemKey);
         req.onerror = () => {
           console.error("Error in asyncStorage.setItem():", req.error?.name);
           reject(req.error);
         };
-        db.close();
       },
       reject
     );
