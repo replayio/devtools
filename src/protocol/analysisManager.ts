@@ -126,7 +126,11 @@ class AnalysisManager {
     return handler.onFinished?.();
   }
 
-  async runAnalysisBatches(params: AnalysisParams, handler: AnalysisHandler<T>, maxPoints: number) {
+  async runAnalysisBatches<T>(
+    params: AnalysisParams,
+    handler: AnalysisHandler<T>,
+    maxPoints: number
+  ) {
     assert(!handler.onAnalysisPoints);
     assert(handler.onAnalysisResult);
 
@@ -136,7 +140,9 @@ class AnalysisManager {
     pointsHandler.onAnalysisPoints = points => allPoints.push(...points);
     await this.runAnalysis(params, pointsHandler);
 
-    for (let i = 0; i < allPoints.length; i += MaxPointsPerBatch) {
+    const numPoints = Math.min(allPoints.length, maxPoints);
+
+    for (let i = 0; i < numPoints; i += MaxPointsPerBatch) {
       const batchPoints = allPoints.slice(i, i + MaxPointsPerBatch);
 
       const batchParams: AnalysisParams = {
