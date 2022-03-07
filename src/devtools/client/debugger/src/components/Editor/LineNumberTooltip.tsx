@@ -67,6 +67,7 @@ export default function LineNumberTooltip({ editor }: { editor: any }) {
   const dispatch = useDispatch();
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
+  const isMetaActive = useSelector(selectors.getIsMetaActive);
 
   const indexed = useSelector(selectors.getIndexed);
   const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
@@ -117,7 +118,7 @@ export default function LineNumberTooltip({ editor }: { editor: any }) {
     }
   }, [analysisPoints]);
 
-  if (!targetNode) {
+  if (!targetNode || isMetaActive) {
     return null;
   }
 

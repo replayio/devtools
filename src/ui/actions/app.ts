@@ -21,6 +21,7 @@ import {
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
+  KeyModifiers,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -96,7 +97,10 @@ export type SetLoadedRegions = Action<"set_loaded_regions"> & {
 export type SetLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
   index: number;
 };
-
+export type SetMetaKeyActiveAction = Action<"set_key_modifier"> & {
+  value: boolean;
+  key: keyof KeyModifiers;
+};
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;
 };
@@ -127,7 +131,8 @@ export type AppActions =
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
   | SetAwaitingSourcemapsAction
-  | SetLoadingPageTipIndexAction;
+  | SetLoadingPageTipIndexAction
+  | SetMetaKeyActiveAction;
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -360,6 +365,13 @@ export function loadMouseTargets(): UIThunkAction {
 
 export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAction {
   return { type: "set_loading_page_tip_index", index };
+}
+
+export function setMetaKeyActive(value: boolean): SetMetaKeyActiveAction {
+  return { type: "set_key_modifier", key: "meta", value };
+}
+export function setShiftKeyActive(value: boolean): SetMetaKeyActiveAction {
+  return { type: "set_key_modifier", key: "shift", value };
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {
