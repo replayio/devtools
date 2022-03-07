@@ -99,7 +99,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@babel/types": "^7.14.8",
     "@recordreplay/playwright": "^1.18.3",
-    "@recordreplay/recordings-cli": "^0.9.0",
+    "@recordreplay/recordings-cli": "^0.10.1",
     "@recordreplay/sourcemap-upload-cli": "^0.1.1",
     "@storybook/addon-actions": "^6.4.19",
     "@storybook/addon-essentials": "^6.4.19",
