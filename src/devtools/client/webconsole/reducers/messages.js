@@ -137,7 +137,8 @@ function addMessage(newMessage, state, filtersState) {
   } else if (DEFAULT_FILTERS.includes(cause)) {
     state.filteredMessagesCount.global++;
   }
-  if (addedMessage.level) {
+  // Don't count replay logpoints (including exceptions!).
+  if (addedMessage.level && addedMessage.type !== "logPoint") {
     state.filteredMessagesCount[addedMessage.level]++;
   }
 
@@ -333,7 +334,7 @@ function setVisibleMessages({ messagesState, filtersState, forceTimestampSort = 
     } else if (DEFAULT_FILTERS.includes(cause)) {
       filtered.global = filtered.global + 1;
     }
-    if (message.level) {
+    if (message.level && message.type !== "logPoint") {
       filtered[message.level] = filtered[message.level] + 1;
     }
   });
