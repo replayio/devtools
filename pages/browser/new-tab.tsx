@@ -9,7 +9,7 @@ export default function NewTab() {
     <LoadingScreenTemplate>
       <div className="space-y-8 text-center">
         {motd ? <h2 className="text-2xl text-gray-600">{motd}</h2> : null}
-        <div className="text-md text-gray-600">
+        <div className="text-base text-gray-600">
           Please navigate to the page you want to record, then press the blue record button.
         </div>
       </div>
