@@ -87,7 +87,6 @@ function ViewerRouter(props: ViewerRouterProps) {
   useEffect(() => {
     if (currentWorkspaceId === null && !features.library && !loading && !nonPendingLoading) {
       if (!workspaces.length) {
-        sendTelemetryEvent("DevToolsNoActiveTeam", { userId });
         // This shouldn't be reachable because the library can only be disabled
         // by a workspace setting which means the user must be in a workspace
         setUnexpectedError({
