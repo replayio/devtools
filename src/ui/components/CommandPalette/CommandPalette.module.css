@@ -9,7 +9,8 @@
   border-bottom: 1px solid var(--theme-base-85);
 }
 
-.shortcut {
+.shortcut:hover {
+  background-color: var(--theme-base-90);
 }
 
 .shortcutHover {
