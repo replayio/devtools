@@ -67,8 +67,8 @@ const withStore = (
   dbConn.onsuccess = () => {
     const db = dbConn.result;
     const transaction = db.transaction(STORENAME, type);
+    const store = transaction.objectStore(STORENAME);
     transaction.oncomplete = () => {
-      const store = transaction.objectStore(STORENAME);
       onsuccess(store);
       db.close();
     };
