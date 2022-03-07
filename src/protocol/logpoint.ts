@@ -6,7 +6,13 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
+import {
+  AnalysisEntry,
+  ExecutionPoint,
+  Location,
+  PointDescription,
+  ProtocolClient,
+} from "@recordreplay/protocol";
 import { assert, compareNumericStrings } from "./utils";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { PrimitiveValue } from "./thread/value";
@@ -16,7 +22,12 @@ import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
+import { onConsoleOverflow } from "ui/actions/session";
 const { prefs } = require("ui/utils/prefs");
+
+enum ProtocolError {
+  TooManyPoints = 55,
+}
 
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
@@ -530,7 +541,13 @@ export async function setExceptionLogpoint(logGroupId: string) {
     onAnalysisResult: result => showLogpointsResult(logGroupId, result),
   };
 
-  await analysisManager.runAnalysis(params, handler);
+  try {
+    await analysisManager.runAnalysis(params, handler);
+  } catch (e: any) {
+    if (e.code === ProtocolError.TooManyPoints) {
+      store.dispatch(onConsoleOverflow());
+    }
+  }
 }
 
 export function removeLogpoint(logGroupId: string) {
