@@ -11,6 +11,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
+import styles from "./Library.module.css";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -110,7 +111,7 @@ function RecordingRow({
               </LazyLoad>
             </div>
 
-            <div className="flex flex-col space-y-0.5 overflow-hidden">
+            <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <ReplayTitle title={recording.title} />
               <div className="flex flex-row space-x-4 font-light text-gray-400">
                 <div

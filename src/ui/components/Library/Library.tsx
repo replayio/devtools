@@ -16,6 +16,7 @@ import ViewerRouter from "./ViewerRouter";
 import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
+import styles from "./Library.module.css";
 import {
   downloadReplay,
   firstReplay,
@@ -52,7 +53,9 @@ function FilterBar({
   };
 
   return (
-    <div className="flex flex-grow flex-row items-center space-x-3 text-sm text-gray-500">
+    <div
+      className={`flex flex-grow flex-row items-center space-x-3 text-sm text-gray-500 ${styles.librarySearch}`}
+    >
       <div className="material-icons">search</div>
       <TextInput value={searchString} onChange={onChange} placeholder="Search" />
     </div>
