@@ -17,12 +17,21 @@ export default function Connection() {
       return;
     }
 
-    auth0.getAccessTokenSilently({ connection, redirect_uri: home }).catch(e =>
-      auth0.loginWithRedirect({
-        connection,
-        redirectUri: home,
+    auth0
+      .getAccessTokenSilently({ connection })
+      .then(() => {
+        // We used to use `redirect_url` but it introduced an odd race
+        // condition in which the auth0 client would not find the identity after
+        // the redirect but then would after the user refreshed. This works
+        // around that but may still need revisited later.
+        window.location.href = home;
       })
-    );
+      .catch(e =>
+        auth0.loginWithRedirect({
+          connection,
+          redirectUri: home,
+        })
+      );
   }, [auth0, connection, router]);
 
   return <LoadingScreen />;
