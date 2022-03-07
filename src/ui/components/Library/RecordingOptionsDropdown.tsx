@@ -14,10 +14,29 @@ import classNames from "classnames";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../shared/Confirm";
 import { isPublicDisabled } from "ui/utils/org";
+import { useGetNonPendingWorkspaces } from "ui/hooks/workspaces";
 
 type RecordingOptionsDropdownProps = PropsFromRedux & {
   recording: Recording;
 };
+
+function useGetPermissions(recording: Recording) {
+  const { userId, loading } = hooks.useGetUserId();
+  const { workspaces } = useGetNonPendingWorkspaces();
+
+  if (loading) {
+    return { showDropdown: false, loading };
+  }
+
+  const isOwner = userId == recording.user?.id;
+  // Node recordings don't have an owner since they're uploaded using the workspace's
+  // API key. We add this check here so the team is able to access the dropdown.
+  const sameTeam =
+    recording.workspace?.id && workspaces.find(w => w.id === recording.workspace?.id);
+  const showDropdown = isOwner || (!recording.user && sameTeam);
+
+  return { showDropdown, loading };
+}
 
 function RecordingOptionsDropdown({
   currentWorkspaceId,
@@ -26,8 +45,9 @@ function RecordingOptionsDropdown({
 }: RecordingOptionsDropdownProps) {
   const [isPrivate, setIsPrivate] = useState(recording.private);
   const [expanded, setExpanded] = useState(false);
+  const { showDropdown, loading: loadingOwnershipInfo } = useGetPermissions(recording);
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces, loading: loadingWorkspaces } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
@@ -66,6 +86,10 @@ function RecordingOptionsDropdown({
     setExpanded(false);
   };
 
+  if (loadingOwnershipInfo || !showDropdown) {
+    return null;
+  }
+
   const button = (
     <MaterialIcon
       outlined
@@ -97,7 +121,7 @@ function RecordingOptionsDropdown({
           }`}</DropdownItem>
         )}
         <DropdownItem onClick={handleShareClick}>Share</DropdownItem>
-        {!loading ? (
+        {!loadingWorkspaces ? (
           <MoveRecordingMenu workspaces={workspaces} onMoveRecording={updateRecording} />
         ) : null}
       </Dropdown>
