@@ -6,9 +6,9 @@ import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
+import { getCurrentPoint } from "ui/reducers/app";
 import {
   getAnnotations,
-  getCurrentPoint,
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
@@ -17,7 +17,7 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
-import { migratePrefToSettings, useFeature } from "ui/hooks/settings";
+import { useFeature } from "ui/hooks/settings";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 

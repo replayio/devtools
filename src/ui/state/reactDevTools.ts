@@ -8,7 +8,6 @@ export interface Annotation {
 
 export interface ReactDevToolsState {
   annotations: Annotation[];
-  currentPoint: ExecutionPoint | null;
   hasReactComponents: boolean;
   reactInitPoint: ExecutionPoint | null;
   protocolCheckFailed: boolean;
