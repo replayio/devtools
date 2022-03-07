@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import React, { useState, useEffect, MouseEventHandler } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
@@ -30,28 +30,66 @@ function ToggleButton({
   targetNode: HTMLElement;
   breakpoint?: Breakpoint;
 }) {
+  const isMetaActive = useSelector(selectors.getIsMetaActive);
+  const isShiftActive = useSelector(selectors.getIsShiftActive);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
   const icon = breakpoint?.options.logValue ? "remove" : "add";
   const { height } = targetNode.getBoundingClientRect();
   const style = {
-    top: `${(1 / 2) * height}px`,
     background: showNag ? AWESOME_BACKGROUND : "",
   };
 
+  let button;
+
+  if (isMetaActive && isShiftActive) {
+    button = (
+      <button
+        className={classNames(
+          "toggle-widget bg-primaryAccent",
+          "flex rounded-md p-px leading-3 text-white shadow-lg transition hover:scale-125"
+        )}
+        style={style}
+      >
+        <MaterialIcon>navigate_before</MaterialIcon>
+      </button>
+    );
+  } else if (isMetaActive) {
+    button = (
+      <button
+        className={classNames(
+          "toggle-widget bg-primaryAccent",
+          "flex rounded-md p-px leading-3 text-white shadow-lg transition hover:scale-125"
+        )}
+        style={style}
+      >
+        <MaterialIcon>navigate_next</MaterialIcon>
+      </button>
+    );
+  } else {
+    button = (
+      <button
+        className={classNames(
+          "toggle-widget bg-primaryAccent",
+          "flex rounded-md p-px leading-3 text-white shadow-lg transition hover:scale-125"
+        )}
+        style={style}
+        onClick={onClick}
+        onMouseDown={onMouseDown}
+      >
+        <MaterialIcon>{icon}</MaterialIcon>
+      </button>
+    );
+  }
+
   return (
-    <button
-      className={classNames(
-        "toggle-widget bg-primaryAccent",
-        "absolute z-50 flex -translate-y-1/2 transform rounded-md p-px leading-3 text-white shadow-lg transition hover:scale-125"
-      )}
-      style={style}
-      onClick={onClick}
-      onMouseDown={onMouseDown}
+    <div
+      className="absolute z-50 flex flex-row space-x-px transform -translate-y-1/2"
+      style={{ top: `${(1 / 2) * height}px` }}
     >
-      <MaterialIcon>{icon}</MaterialIcon>
-    </button>
+      {button}
+    </div>
   );
 }
 

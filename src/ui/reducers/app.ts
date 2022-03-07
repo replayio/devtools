@@ -41,6 +41,7 @@ export const initialAppState: AppState = {
   videoUrl: null,
   workspaceId: null,
   currentPoint: null,
+  keyModifiers: { shift: false, meta: false },
 };
 
 export default function update(
@@ -211,6 +212,13 @@ export default function update(
       };
     }
 
+    case "set_key_modifier": {
+      return {
+        ...state,
+        keyModifiers: { ...state.keyModifiers, [action.key]: action.value },
+      };
+    }
+
     default: {
       return state;
     }
@@ -325,3 +333,5 @@ export const isFinishedLoadingRegions = (state: UIState) => {
 export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;
+export const getIsMetaActive = (state: UIState) => state.app.keyModifiers.meta;
+export const getIsShiftActive = (state: UIState) => state.app.keyModifiers.shift;
