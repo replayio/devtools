@@ -8,21 +8,14 @@ export type AddAnnotationsAction = Action<"add_annotations"> & { annotations: An
 export type SetHasReactComponentsAction = Action<"set_has_react_components"> & {
   hasReactComponents: boolean;
 };
-export type SetCurrentPointAction = Action<"set_current_point"> & {
-  currentPoint: ExecutionPoint | null;
-};
 export type SetProtocolCheckFailedAction = Action<"set_protocol_fail">;
 
 export type ReactDevToolsAction =
   | AddAnnotationsAction
-  | SetCurrentPointAction
   | SetHasReactComponentsAction
   | SetProtocolCheckFailedAction;
 
 export function setupReactDevTools(store: UIStore) {
-  store.dispatch(setCurrentPoint(ThreadFront.currentPoint));
-  ThreadFront.on("paused", ({ point }) => store.dispatch(setCurrentPoint(point)));
-
   ThreadFront.getAnnotations(({ annotations }) => {
     store.dispatch(
       addAnnotations(
@@ -42,10 +35,6 @@ export function setHasReactComponents(hasReactComponents: boolean): SetHasReactC
 
 export function addAnnotations(annotations: Annotation[]): AddAnnotationsAction {
   return { type: "add_annotations", annotations };
-}
-
-export function setCurrentPoint(currentPoint: ExecutionPoint | null): SetCurrentPointAction {
-  return { type: "set_current_point", currentPoint };
 }
 
 export function setProtocolCheckFailed(): UIThunkAction {

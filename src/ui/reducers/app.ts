@@ -40,6 +40,7 @@ export const initialAppState: AppState = {
   videoNode: null,
   videoUrl: null,
   workspaceId: null,
+  currentPoint: null,
 };
 
 export default function update(
@@ -203,6 +204,13 @@ export default function update(
       return { ...state, recordingWorkspace: action.workspace };
     }
 
+    case "set_current_point": {
+      return {
+        ...state,
+        currentPoint: action.currentPoint,
+      };
+    }
+
     default: {
       return state;
     }
@@ -316,3 +324,4 @@ export const isFinishedLoadingRegions = (state: UIState) => {
 };
 export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
+export const getCurrentPoint = (state: UIState) => state.app.currentPoint;

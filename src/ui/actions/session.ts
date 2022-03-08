@@ -1,5 +1,5 @@
 import { sendMessage } from "protocol/socket";
-import { uploadedData } from "@recordreplay/protocol";
+import { ExecutionPoint, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
 
 import tokenManager from "ui/utils/tokenManager";
@@ -35,12 +35,16 @@ export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boo
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type ClearExpectedError = Action<"clear_expected_error">;
 export type OnConsoleOverflow = Action<"CONSOLE_OVERFLOW">;
+export type SetCurrentPointAction = Action<"set_current_point"> & {
+  currentPoint: ExecutionPoint | null;
+};
 export type SessionActions =
   | OnConsoleOverflow
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
   | SetTrialExpiredAction
-  | ClearExpectedError;
+  | ClearExpectedError
+  | SetCurrentPointAction;
 
 declare global {
   interface Window {
@@ -171,6 +175,8 @@ export function createSession(recordingId: string): UIThunkAction {
       dispatch(actions.setAwaitingSourcemaps(false));
       prefs.recordingId = recordingId;
 
+      ThreadFront.on("paused", ({ point }) => store.dispatch(setCurrentPoint(point)));
+
       dispatch(jumpToInitialPausePoint());
     } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());
@@ -283,4 +289,8 @@ export function clearExpectedError(): UIThunkAction {
 export function onConsoleOverflow(): OnConsoleOverflow {
   trackEvent("console.overflow");
   return { type: "CONSOLE_OVERFLOW" };
+}
+
+function setCurrentPoint(currentPoint: ExecutionPoint | null): SetCurrentPointAction {
+  return { type: "set_current_point", currentPoint };
 }

@@ -8,6 +8,7 @@ import {
   NavigationEvent,
   KeyboardEventKind,
   MouseEventKind,
+  ExecutionPoint,
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
@@ -96,6 +97,7 @@ export interface AppState {
   videoUrl: string | null;
   workspaceId: WorkspaceId | null;
   mouseTargetsLoading: boolean;
+  currentPoint: ExecutionPoint | null;
 }
 
 export interface AnalysisPoints {
