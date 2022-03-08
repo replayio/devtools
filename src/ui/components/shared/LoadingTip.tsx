@@ -32,16 +32,18 @@ const TIPS = [
 export default function LoadingTip() {
   const [tipIdx, setTipIdx] = useState(0);
   const { title, description, icon } = TIPS[tipIdx];
-  const timerRef = useRef<any>();
+  const timerRef = useRef<NodeJS.Timeout>();
 
-  const resetAutoNext = () => clearTimeout(timerRef.current);
+  const resetAutoNext = () => timerRef.current !== undefined && clearTimeout(timerRef.current);
 
-  useEffect(() => resetAutoNext, []);
+  useEffect(() => {
+    resetAutoNext();
+  }, []);
+
   useEffect(() => {
     resetAutoNext();
     timerRef.current = setTimeout(() => {
-      const nextTipIdx = (tipIdx + TIPS.length + 1) % TIPS.length;
-      setTipIdx(nextTipIdx);
+      setTipIdx((tipIdx + TIPS.length + 1) % TIPS.length);
     }, 5000);
   }, [tipIdx]);
 
