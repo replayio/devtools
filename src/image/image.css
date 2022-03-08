@@ -75,11 +75,12 @@
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton::before {
   background-image: url(~devtools/client/themes/images/close.svg) !important;
 }
-.devtools-searchinput {
-  background-image: url(~devtools/client/themes/images/search.svg) !important;
+#inspector-search.devtools-searchbox::before {
+  -webkit-mask-image: url(~devtools/client/themes/images/search.svg) !important;
 }
-.devtools-filterinput {
-  background-image: url(~devtools/client/themes/images/filter-small.svg) !important;
+.inspector #computed-search.devtools-searchbox::before,
+.inspector #ruleview-search.devtools-searchbox::before {
+  -webkit-mask-image: url(~devtools/client/themes/images/filter-small.svg) !important;
 }
 .devtools-searchinput-clear {
   background-image: url(~devtools/client/themes/images/search-clear.svg) !important;
