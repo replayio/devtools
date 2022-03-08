@@ -179,7 +179,7 @@ class CommandBar extends Component {
     const { isPaused, hasFramePositions } = this.props;
     const disabled = !isPaused || !hasFramePositions;
     const disabledTooltip = !isPaused
-      ? "Stepping is disabled until you're pause at a point"
+      ? "Stepping is disabled until you're paused at a point"
       : "Stepping is disabled because there are too many steps in the current frame";
 
     return [
