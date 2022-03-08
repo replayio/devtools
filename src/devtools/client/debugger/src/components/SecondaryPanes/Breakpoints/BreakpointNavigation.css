@@ -117,3 +117,12 @@
   .fill {
   fill: var(--new-blue-900);
 }
+
+.time-tooltip {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
+}
+
+.breakpoint-navigation :focus-visible {
+  outline: none;
+}

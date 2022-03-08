@@ -168,6 +168,7 @@
   --theme-toggle-handle: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
   --theme-text-field: var(--theme-base-95);
+  --theme-text-field-color: var(--theme-body-color);
   --theme-console-input: var(--theme-body-background);
 
   --progressbar-preview-min: var(--theme-base-80);
@@ -198,7 +199,7 @@
   --theme-border: #d2d5da;
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
-  --toolbarbutton-focus-background: var(--grey-20);
+  --toolbarbutton-focus-background: var(--theme-base-90);
 
   --checkbox: #fff;
   --checkbox-border: var(--theme-base-80);
@@ -213,6 +214,8 @@
   --caret-color: #18181a;
   --debug-line-border: #037aff;
   --debug-line-background: #e9f3ff;
+
+  --theme-toggle: var(--theme-base-80);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -370,6 +373,7 @@
   --theme-toggle-handle: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
   --theme-text-field: var(--theme-base-85);
+  --theme-text-field-color: #fff;
   --theme-console-input: var(--theme-base-95);
 
   --progressbar-preview-min: var(--theme-base-80);
@@ -394,6 +398,8 @@
   --checkbox: var(--theme-base-80);
   --checkbox-border: var(--theme-base-90);
 
+  --toolbarbutton-focus-background: var(--theme-base-90);
+
   /* CODE MIRROR (DARK) */
 
   --cm-linenumber: var(--grey-40);
@@ -409,8 +415,8 @@
   --debug-line-background: var(--theme-base-100);
 
   /* Toolbar */
+  --theme-toolbar-panel-icon-color: var(--icon-color);
   --theme-tab-toolbar-background: var(--grey-90);
-
   --theme-toolbar-background: #18181a;
   --theme-toolbar-color: var(--grey-20);
   --theme-toolbar-selected-color: white;

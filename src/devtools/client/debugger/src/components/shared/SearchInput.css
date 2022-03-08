@@ -11,6 +11,7 @@
   min-height: 28px;
   width: 100%;
   background-color: var(--theme-text-field);
+  color: var(--theme-text-field-color);
 }
 
 .search-field .img.search {
@@ -54,7 +55,7 @@
   line-height: 16px;
   font-family: inherit;
   font-size: inherit;
-  color: var(--theme-body-color);
+  color: var(--theme-text-field-color);
   background-color: transparent;
 }
 

@@ -128,7 +128,7 @@
 .timeline .progress-line,
 .breakpoint-navigation-timeline .progress-line {
   width: 0%;
-  height: 5px;
+  height: 4px;
   /* border-top: 3px dashed var(--primary-accent); */
   border-top: 5px solid var(--primary-accent);
   position: absolute;
@@ -137,6 +137,7 @@
   margin-bottom: auto;
   top: 0;
   bottom: 0;
+  border-radius: 4px;
 }
 
 .timeline .overlay-container:hover .progress-line {

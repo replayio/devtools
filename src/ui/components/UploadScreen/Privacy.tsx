@@ -49,7 +49,7 @@ function FavIcon({ url }: { url: string }) {
         <MaterialIcon>public</MaterialIcon>
       </div>
       <img
-        className="absolute top-0 left-0 h-4 w-4 bg-white"
+        className="absolute top-0 left-0 h-4 w-4 bg-transparent"
         src={`https://www.google.com/s2/favicons?domain=${url}`}
       />
     </div>

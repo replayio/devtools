@@ -29,6 +29,7 @@ module.exports = {
         iconColorDisabled: "var(--theme-text-field)",
         themeBorder: "var(--theme-border)",
         themeTextField: "var(--theme-text-field)",
+        themeTextFieldColor: "var(--theme-text-field-color)",
         themeFocuser: "var(--theme-focuser)",
         breakpointEditfieldHover: "var(--breakpoint-editfield-hover)",
         breakpointEditfieldActive: "var(--breakpoint-editfield-active)",
@@ -37,6 +38,7 @@ module.exports = {
         breakpointStatus: "var(--breakpoint-status)",
         checkbox: "var(--checkbox)",
         checkboxBorder: "var(--checkbox-border)",
+        themeToggle: "var(--theme-toggle)",
       },
       lineHeight: {
         "comment-text": "1.125rem",

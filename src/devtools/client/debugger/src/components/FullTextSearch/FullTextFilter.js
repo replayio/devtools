@@ -51,7 +51,7 @@ export function FullTextFilter({
         <input
           style={{ boxShadow: "unset" }}
           placeholder="Find in files…"
-          className="flex-grow border-0 bg-themeTextField p-0 text-xs focus:outline-none"
+          className="flex-grow border-0 bg-themeTextField p-0 text-xs text-themeTextFieldColor focus:outline-none"
           type="text"
           value={value}
           onChange={e => setValue(e.target.value)}

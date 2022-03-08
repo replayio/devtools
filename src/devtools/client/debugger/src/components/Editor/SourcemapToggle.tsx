@@ -46,7 +46,7 @@ export function Toggle({
         checked={enabled}
         onChange={onChange}
         className={classNames(
-          enabled ? "bg-primaryAccent" : "bg-gray-200",
+          enabled ? "bg-primaryAccent" : "bg-themeToggle",
           "relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         )}
       >

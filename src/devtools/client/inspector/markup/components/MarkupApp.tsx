@@ -29,7 +29,7 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
     <div className="devtools-inspector-tab-panel">
       <div id="inspector-main-content" className="devtools-main-content">
         <div id="inspector-toolbar" className="devtools-toolbar devtools-input-toolbar">
-          <div id="inspector-search" className="devtools-searchbox">
+          <div id="inspector-search" className="devtools-searchbox text-themeTextFieldColor">
             <input
               id="inspector-searchbox"
               className="devtools-searchinput"

@@ -45,6 +45,6 @@
 }
 
 .view-toggle .active {
-  color: var(--theme-body-color);
+  color: var(--tab-selected-color);
   font-weight: 400;
 }

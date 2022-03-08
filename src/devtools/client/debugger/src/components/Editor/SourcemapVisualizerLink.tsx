@@ -25,7 +25,7 @@ function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromR
         <Icon
           size="small"
           filename="external"
-          className="cursor-pointer bg-gray-800 group-hover:bg-primaryAccent"
+          className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
         />{" "}
         Source Map
       </a>
