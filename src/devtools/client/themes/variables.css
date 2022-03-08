@@ -517,7 +517,7 @@
   --theme-warning-color: hsl(43, 94%, 81%);
 
   /* Flashing colors used to highlight updates */
-  --theme-contrast-background: #4f4b1f; /* = Yellow 50-a20 on body background */
+  --theme-contrast-background: #1a4380;
   --theme-contrast-background-alpha: rgba(255, 233, 0, 0.15); /* Yellow 50-a15 */
   --theme-contrast-color: white;
   --theme-contrast-border: var(--yellow-65);
