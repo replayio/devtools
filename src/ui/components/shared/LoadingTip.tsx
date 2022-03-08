@@ -1,35 +1,35 @@
-import React, { useEffect, useRef, useState } from "react";
-import ZypsyIcon1 from "../../../image/zypsy/zypsy-security-icon1.svg";
-import ZypsyIcon2 from "../../../image/zypsy/zypsy-security-icon2.svg";
-import ZypsyIcon3 from "../../../image/zypsy/zypsy-security-icon3.svg";
+import React, { FC, useEffect, useRef, useState } from "react";
+import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
+import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
+import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
 
 const TIPS = [
   {
     title: "SAML 2.0 / SSO Authentication",
     description:
       "Replay supports single sign-on via Google SAML 2.0 by default. Reach out if you would like to provision your SSO.",
-    icon: ZypsyIcon1,
+    icon: CloudIcon,
   },
   {
     title: "Encryption at Rest & In-Transit",
     description:
       "Replay protects your data in transit with TLS v1.2 and strong ciphersuites. Replay protects your data at rest by encrypting it with AES-256 GCM.",
-    icon: ZypsyIcon2,
+    icon: KeyIcon,
   },
   {
     title: "Intellectual property",
     description:
       "Replay is architected with your privacy in mind. We try our hardest not to collect sensitive information that we don't need, and will never sell your information.",
-    icon: ZypsyIcon1,
+    icon: CloudIcon,
   },
   {
     title: "Private by default",
     description: "Replay will never view or analyze your replays without your explicit permission.",
-    icon: ZypsyIcon3,
+    icon: ShieldIcon,
   },
 ] as const;
 
-export default function LoadingTip() {
+export const LoadingTip: FC = () => {
   const [tipIdx, setTipIdx] = useState(0);
   const { title, description, icon: Icon } = TIPS[tipIdx];
   const timerRef = useRef<NodeJS.Timeout>();
@@ -60,4 +60,4 @@ export default function LoadingTip() {
       </div>
     </div>
   );
-}
+};
