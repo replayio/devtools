@@ -121,15 +121,21 @@ export const NetworkMonitor = ({
               selectedRequest ? (
                 loadedRegions &&
                 getPointIsInLoadedRegion(loadedRegions, selectedRequest.point.point) ? (
-                  <RequestDetails
-                    closePanel={closePanel}
-                    cx={cx}
-                    request={selectedRequest}
-                    responseBody={responseBodies[selectedRequest.id]}
-                    requestBody={requestBodies[selectedRequest.id]}
-                    frames={frames[selectedRequest?.point.point]}
-                    selectFrame={selectFrame}
-                  />
+                  <div
+                    style={{
+                      borderLeft: "1px solid var(--theme-border)",
+                    }}
+                  >
+                    <RequestDetails
+                      closePanel={closePanel}
+                      cx={cx}
+                      request={selectedRequest}
+                      responseBody={responseBodies[selectedRequest.id]}
+                      requestBody={requestBodies[selectedRequest.id]}
+                      frames={frames[selectedRequest?.point.point]}
+                      selectFrame={selectFrame}
+                    />
+                  </div>
                 ) : (
                   <RequestDetailsUnavailable closePanel={closePanel} />
                 )
