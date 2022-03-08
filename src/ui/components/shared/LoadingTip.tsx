@@ -1,5 +1,4 @@
-import { useState } from "@storybook/addons";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import zypsyIcon1 from "../../../image/zypsy/zypsy-security-icon1.svg";
 import zypsyIcon2 from "../../../image/zypsy/zypsy-security-icon2.svg";
 import zypsyIcon3 from "../../../image/zypsy/zypsy-security-icon3.svg";
