@@ -102,7 +102,7 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
 
 function PaletteShortcut() {
   return (
-    <div className="absolute right-4 select-none text-primaryAccent">
+    <div className="flex absolute right-4 select-none text-primaryAccent">
       <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
       <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
     </div>
