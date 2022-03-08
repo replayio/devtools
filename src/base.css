@@ -56,6 +56,10 @@ img.avatar,
   background: transparent;
 }
 
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 ::-webkit-scrollbar-track {
   border-radius: 8px;
   background: transparent;
