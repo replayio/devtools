@@ -1,4 +1,4 @@
-import SplitBox from "devtools/packages/devtools-splitter";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps, useDispatch } from "react-redux";
 import { actions } from "ui/actions";
@@ -135,7 +135,6 @@ export const NetworkMonitor = ({
                 )
               ) : null
             }
-            splitterClass="-m-1 bg-clip-padding box-border border-4 z-10"
             splitterSize={1}
             vert={vert}
           />
