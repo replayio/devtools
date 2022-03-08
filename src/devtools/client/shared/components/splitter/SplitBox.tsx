@@ -38,10 +38,9 @@ const SplitBox: FC<SplitterProps> = ({
   onMove,
   onResizeEnd,
   endPanelControl = false,
-  ...props
+  splitterSize = 8,
+  vert = true,
 }) => {
-  const [splitterSize, setsplitterSize] = useState<number>(props.splitterSize ?? 8);
-  const [vert, setvert] = useState<boolean>(props.vert === undefined ? true : props.vert);
   const [defaultCursor, setdefaultCursor] = useState<string>("auto");
   const [width, setwidth] = useState<string>(initialWidth || initialSize || "0");
   const [height, setheight] = useState<string>(initialHeight || initialSize || "0");
