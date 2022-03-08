@@ -170,7 +170,7 @@
   color: var(--theme-body-color);
 }
 
-.cm-s-mozilla .CodeMirror-lines .CodeMirror-cursor {
+.theme-light .cm-s-mozilla .CodeMirror-lines .CodeMirror-cursor {
   border-left: solid 1px black;
 }
 
