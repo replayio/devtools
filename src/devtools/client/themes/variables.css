@@ -214,7 +214,7 @@
   --debug-line-border: #037aff;
   --debug-line-background: #e9f3ff;
 
-  --theme-toggle: var(--grey-20);
+  --theme-toggle: var(--theme-base-80);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
