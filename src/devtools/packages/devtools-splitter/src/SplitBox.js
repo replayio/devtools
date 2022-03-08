@@ -245,7 +245,7 @@ class SplitBox extends Component {
     const draggable =
       startPanelDiv && endPanelDiv
         ? Draggable({
-            className: `splitter ${splitterClass}`,
+            className: cx("splitter", splitterClass),
             style: splitterStyle,
             onStart: this.onStartMove,
             onStop: this.onStopMove,
