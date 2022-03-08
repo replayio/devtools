@@ -198,7 +198,7 @@
   --theme-border: #d2d5da;
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
-  --toolbarbutton-focus-background: var(--grey-20);
+  --toolbarbutton-focus-background: var(--theme-base-90);
 
   --checkbox: #fff;
   --checkbox-border: var(--theme-base-80);
@@ -395,6 +395,8 @@
   --theme-border: var(--theme-base-100);
   --checkbox: var(--theme-base-80);
   --checkbox-border: var(--theme-base-90);
+
+  --toolbarbutton-focus-background: var(--theme-base-90);
 
   /* CODE MIRROR (DARK) */
 
