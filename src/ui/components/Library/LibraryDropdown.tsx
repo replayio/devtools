@@ -47,7 +47,7 @@ export function Dropdown({
             menuItemsClassName,
             widthClass,
             fontSizeClass,
-            "right-0 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            "right-0 origin-top-right rounded-md bg-menuBgcolor shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           )}
         >
           <div className="py-1">{children}</div>
@@ -70,7 +70,7 @@ export function DropdownItem({
         <a
           href="#"
           className={classNames(
-            active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+            active ? "bg-menuHoverBgcolor text-menuHoverColor" : "text-menuColor",
             "block px-4 py-2"
           )}
           onClick={onClick}
