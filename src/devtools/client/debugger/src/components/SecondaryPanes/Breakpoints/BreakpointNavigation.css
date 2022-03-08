@@ -47,6 +47,7 @@
 .breakpoint-navigation-status {
   border-radius: 4px;
   padding: 2px 6px;
+  background-color: Orange;
 }
 
 .breakpoint-navigation-timeline-container {
@@ -116,4 +117,9 @@
   .breakpoint-navigation-timeline-point.primary-highlight:not(.pause)
   .fill {
   fill: var(--new-blue-900);
+}
+
+.time-tooltip {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
 }
