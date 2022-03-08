@@ -1,4 +1,5 @@
 import { requiresWindow } from "./ssr";
+import { clear as clearAsyncStorage } from "devtools/shared/async-storage";
 
 requiresWindow(win => {
   const url = new URL(win.location.href);
@@ -11,6 +12,6 @@ requiresWindow(win => {
   // local storage in that case.
   if (test && !url.searchParams.get("navigated")) {
     localStorage.clear();
-    require("devtools/shared/async-storage").clear();
+    clearAsyncStorage();
   }
 });
