@@ -39,6 +39,9 @@ export interface AnalysisHandler<T> {
   onFinished?(): T;
 }
 
+// When running analyses in batches, limit on the points to use in each batch.
+const MaxPointsPerBatch = 200;
+
 class AnalysisManager {
   private handlers = new Map<AnalysisId, AnalysisHandler<any>>();
 
@@ -121,6 +124,36 @@ class AnalysisManager {
     }
 
     return handler.onFinished?.();
+  }
+
+  async runAnalysisBatches<T>(
+    params: AnalysisParams,
+    handler: AnalysisHandler<T>,
+    maxPoints: number
+  ) {
+    assert(!handler.onAnalysisPoints);
+    assert(handler.onAnalysisResult);
+
+    const pointsHandler: AnalysisHandler<void> = {};
+    const allPoints: PointDescription[] = [];
+
+    pointsHandler.onAnalysisPoints = points => allPoints.push(...points);
+    await this.runAnalysis(params, pointsHandler);
+
+    const numPoints = Math.min(allPoints.length, maxPoints);
+
+    for (let i = 0; i < numPoints; i += MaxPointsPerBatch) {
+      const batchPoints = allPoints.slice(i, i + MaxPointsPerBatch);
+
+      const batchParams: AnalysisParams = {
+        sessionId: params.sessionId,
+        mapper: params.mapper,
+        effectful: true,
+        points: batchPoints.map(p => p.point),
+      };
+
+      await this.runAnalysis(batchParams, handler);
+    }
   }
 
   private readonly onAnalysisResult = ({ analysisId, results }: analysisResult) => {
