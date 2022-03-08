@@ -123,3 +123,7 @@
   background-color: var(--tab-selected-bgcolor);
   color: var(--tab-selected-color);
 }
+
+.breakpoint-navigation :focus-visible {
+  outline: none;
+}

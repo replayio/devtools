@@ -524,7 +524,7 @@ checkbox:-moz-focusring {
   font: inherit;
   border: 1px solid transparent;
   background-color: var(--theme-body-background);
-  color: var(--theme-body-color);
+  color: var(--theme-body-background-color);
   flex-grow: 1;
 }
 
