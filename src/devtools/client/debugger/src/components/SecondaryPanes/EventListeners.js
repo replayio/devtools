@@ -17,6 +17,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import Spinner from "ui/components/shared/Spinner";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { CountPill } from "devtools/client/webconsole/components/FilterBar/FilterSettings";
+import { maxAnalysisPoints } from "ui/constants";
 
 class EventListeners extends Component {
   state = {
@@ -300,7 +301,7 @@ class EventListeners extends Component {
       return null;
     }
 
-    const isHot = points.length > prefs.maxHitsEditable;
+    const isHot = points.length > prefs.maxHitsEditable || points.length > maxAnalysisPoints;
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (
