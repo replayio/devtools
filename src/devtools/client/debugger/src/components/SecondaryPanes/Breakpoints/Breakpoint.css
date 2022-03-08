@@ -57,7 +57,7 @@
 }
 
 .breakpoints-list .breakpoint:hover {
-  background: var(--grey-20);
+  background: var(--theme-toolbar-background-alt);
 }
 
 .breakpoints-list .breakpoint-heading {
