@@ -228,7 +228,6 @@ class SplitBox extends Component {
     // Calculate splitter size
     const splitterStyle = {
       flex: `0 0 ${splitterSize}px`,
-      borderRight: `1px solid var(--theme-tab-background)`,
     };
 
     const startPanelDiv =
