@@ -8,6 +8,7 @@ const Draggable = React.createFactory(require("./Draggable"));
 const { Component } = React;
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
+import cx from "classnames";
 
 /**
  * This component represents a Splitter. The splitter supports vertical
@@ -212,16 +213,10 @@ class SplitBox extends Component {
       splitterSize,
       splitterClass,
       endPanelCollapsed,
+      className,
     } = this.props;
 
     const style = Object.assign({}, this.props.style);
-
-    // Calculate class names list.
-    let classNames = ["split-box"];
-    classNames.push(vert ? "vert" : "horz");
-    if (this.props.className) {
-      classNames = classNames.concat(this.props.className.split(" "));
-    }
 
     const { leftPanelStyle, rightPanelStyle } = this.preparePanelStyles();
 
@@ -260,7 +255,14 @@ class SplitBox extends Component {
 
     return dom.div(
       {
-        className: classNames.join(" "),
+        className: cx(
+          "split-box",
+          {
+            vert: vert,
+            horz: !vert,
+          },
+          className
+        ),
         style: style,
       },
       startPanelDiv,
