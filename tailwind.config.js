@@ -16,6 +16,7 @@ module.exports = {
         secondaryAccentHover: "var(--secondary-accent-hover)",
         textFieldBorder: "var(--text-field-border)",
         toolbarBackground: "var(--theme-toolbar-background)",
+        toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
         bodyColor: "var(--theme-body-color)",
         jellyfish: "var(--jellyfish)",
         splitter: "var(--theme-splitter-color)",
