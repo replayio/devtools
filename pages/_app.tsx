@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/utils/apolloClient";
-import LoadingScreen, { StaticLoadingScreen } from "ui/components/shared/LoadingScreen";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
@@ -160,7 +160,7 @@ function Routing({ Component, pageProps }: AppProps) {
   if (!store) {
     // We hide the tips here since we don't have the store ready yet, which
     // the tips need to work properly.
-    return <StaticLoadingScreen />;
+    return null;
   }
 
   if (maintenanceMode) {

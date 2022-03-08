@@ -11,10 +11,6 @@ import LoadingTip from "./LoadingTip";
 import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
 
-export function StaticLoadingScreen() {
-  return <LoadingScreenTemplate />;
-}
-
 export function LoadingScreenTemplate({
   children,
   showTips,
