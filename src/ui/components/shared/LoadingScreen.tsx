@@ -7,7 +7,7 @@ import {
   getUploading,
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
-import LoadingTip from "./LoadingTip";
+import { LoadingTip } from "./LoadingTip";
 import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
 
