@@ -155,7 +155,7 @@
   --menu-color: var(--theme-body-color);
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
-  --big-overlay-bgcolor: rgba(255, 255, 255, 0.75);
+  --big-overlay-bgcolor: rgba(255, 255, 255, 0.95);
   --big-overlay-border: none;
 
   --theme-tab-background: var(--theme-base-90); /* bg tabs */
@@ -364,7 +364,7 @@
   --menu-color: var(--theme-body-color);
   --menu-hover-bgcolor: var(--theme-base-85);
   --menu-hover-color: #fff;
-  --big-overlay-bgcolor: rgba(0, 0, 0, 0.75);
+  --big-overlay-bgcolor: rgba(0, 0, 0, 0.95);
   --big-overlay-border: var(--theme-base-95);
 
   --theme-tab-background: var(--theme-base-100); /* bg tabs */
