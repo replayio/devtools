@@ -98,12 +98,6 @@ export interface AppState {
   workspaceId: WorkspaceId | null;
   mouseTargetsLoading: boolean;
   currentPoint: ExecutionPoint | null;
-  keyModifiers: KeyModifiers;
-}
-
-export interface KeyModifiers {
-  meta: boolean;
-  shift: boolean;
 }
 
 export interface AnalysisPoints {

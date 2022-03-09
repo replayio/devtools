@@ -120,7 +120,7 @@ function _DevTools({
   }
 
   return (
-    <>
+    <KeyModifiers>
       <Header />
       {viewMode == "dev" ? (
         <React.Suspense fallback={<ViewLoader />}>
@@ -131,8 +131,7 @@ function _DevTools({
       )}
       {showCommandPalette ? <CommandPaletteModal /> : null}
       <KeyboardShortcuts />
-      <KeyModifiers />
-    </>
+    </KeyModifiers>
   );
 }
 

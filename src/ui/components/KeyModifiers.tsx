@@ -1,41 +1,47 @@
-import { FC, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setMetaKeyActive, setShiftKeyActive } from "ui/actions/app";
-import { getIsMetaActive, getIsShiftActive } from "ui/reducers/app";
+import { createContext, FC, ReactNode, useEffect, useState } from "react";
+import debounce from "lodash/debounce";
 
-export const KeyModifiers: FC = () => {
-  const dispatch = useDispatch();
-  const isMetaActive = useSelector(getIsMetaActive);
-  const isShiftActive = useSelector(getIsShiftActive);
+export interface KeyModifiers {
+  meta: boolean;
+  shift: boolean;
+}
+
+const defaultModifiers = { meta: false, shift: false };
+export const KeyModifiersContext = createContext(defaultModifiers);
+
+export const KeyModifiers: FC<{ children: ReactNode }> = ({ children }) => {
+  const [meta, setMeta] = useState(false);
+  const [shift, setShift] = useState(false);
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.metaKey) {
-      dispatch(setMetaKeyActive(true));
+      setMeta(true);
     }
     if (e.shiftKey) {
-      dispatch(setShiftKeyActive(true));
+      setShift(true);
     }
   };
   const onKeyUp = (e: KeyboardEvent) => {
     if (e.key === "Meta") {
-      dispatch(setMetaKeyActive(false));
+      setMeta(false);
     } else if (e.key === "Shift") {
-      dispatch(setShiftKeyActive(false));
+      setShift(false);
     }
   };
-  const onMouseMove = (e: MouseEvent) => {
+  const onMouseMove = debounce((e: MouseEvent) => {
+    console.log("Reset");
     if (!e.metaKey) {
-      dispatch(setMetaKeyActive(false));
+      setMeta(false);
     } else if (!e.shiftKey) {
-      dispatch(setShiftKeyActive(false));
+      setShift(false);
     }
-  };
+  }, 100);
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
 
-    if (isMetaActive || isShiftActive) {
+    if (meta || shift) {
       window.addEventListener("mousemove", onMouseMove);
     }
 
@@ -43,11 +49,13 @@ export const KeyModifiers: FC = () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
 
-      if (isMetaActive || isShiftActive) {
+      if (meta || shift) {
         window.removeEventListener("mousemove", onMouseMove);
       }
     };
   });
 
-  return null;
+  return (
+    <KeyModifiersContext.Provider value={{ meta, shift }}>{children}</KeyModifiersContext.Provider>
+  );
 };
