@@ -1,4 +1,6 @@
+import { selector } from "devtools/client/inspector/rules/types";
 import React from "react";
+import { useFeature } from "ui/hooks/settings";
 
 const logoSizes = {
   xs: "h-4",
@@ -39,9 +41,11 @@ export default function ReplayLogo({
   size?: keyof typeof logoSizes;
 }) {
   const height = logoSizes[size];
+  const { value: isDarkMode } = useFeature("darkMode");
 
   if (wide) {
-    return <img className={`${height} w-auto`} src="/images/logo-wide.svg" />;
+    const src = isDarkMode ? "/images/logo-wide-dark.svg" : "/images/logo-wide.svg";
+    return <img className={`${height} w-auto`} src={src} />;
   }
 
   const colorCode = logoColors[color];
