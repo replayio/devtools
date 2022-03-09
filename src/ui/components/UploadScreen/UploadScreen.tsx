@@ -104,7 +104,7 @@ function ReplayScreenshot({
   showLimitWarning: boolean;
 }) {
   return (
-    <div className="relative h-64 rounded-lg bg-jellyfishBgcolorpx-6 pt-6 shadow-lg short:hidden">
+    <div className="relative h-64 rounded-lg bg-jellyfishBgcolor px-6 pt-6 shadow-lg short:hidden">
       {showLimitWarning ? <LimitWarning /> : null}
       <img src={screenData} className="m-auto h-full" />
     </div>
@@ -185,7 +185,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
               className="relative flex flex-col overflow-hidden rounded-xl text-lg font-medium shadow-lg"
               style={{ width: "620px" }}
             >
-              <div className="absolute h-full w-full bg-jellyfish" />
+              <div className="absolute h-full w-full bg-jellyfishBgcolor" />
               <div className="relative space-y-6 py-9 px-8">
                 <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
                 <ReplayScreenshot
