@@ -531,11 +531,28 @@ checkbox:-moz-focusring {
 .devtools-searchinput,
 .devtools-filterinput {
   padding-inline-start: 22px;
-  background-position: 7px center;
+  position: relative;
+}
+
+.devtools-searchbox {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.inspector .devtools-searchbox::before,
+.inspector .devtools-filterinput::before {
+  content: " ";
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  height: 12px;
+  width: 12px;
+  mask-size: 12px;
   background-size: 12px;
-  background-repeat: no-repeat;
-  -moz-context-properties: fill;
-  fill: var(--theme-icon-dimmed-color);
+  background: var(--theme-toolbar-panel-icon-color);
+  z-index: 1;
 }
 
 .devtools-searchinput:-moz-locale-dir(rtl),

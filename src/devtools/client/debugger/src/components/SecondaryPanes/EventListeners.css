@@ -109,10 +109,6 @@
   color: var(--theme-comment);
 }
 
-.event-search-input::placeholder {
-  color: var(--theme-comment);
-}
-
 .devtools-searchinput-clear {
   position: absolute;
   right: 0px;
