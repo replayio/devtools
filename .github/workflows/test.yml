@@ -1,5 +1,10 @@
 name: Run test suites
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   download-browser:
@@ -39,19 +44,25 @@ jobs:
           name: replay-driver
           path: macOS-recordreplay.so
   preview-branch:
-    name: Wait for Vercel Preview Branch
+    name: Vercel Preview Build
     runs-on: ubuntu-latest
     steps:
-      - name: Waiting for 200 from the Vercel Preview
-        uses: patrickedqvist/wait-for-vercel-preview@v1.1.1
-        id: waitFor200
+      - uses: actions/checkout@v2
+      - uses: amondnet/vercel-action@v20
+        id: vercel-deploy
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 500
-          check_interval: 30
-      - run: echo ${{steps.waitFor200.outputs.url}}
+          # for posting a comment upon completion
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-token: "redacted"
+          vercel-org-id: "redacted"
+          vercel-project-id: "redacted"
+          # an additiona; param for prod deployments
+          vercel-args: ${{ fromJSON('["", "--prod"]')[github.ref == 'refs/heads/master'] }}
+          # vercel-project-name required for the right scope
+          # see https://github.com/amondnet/vercel-action/issues/4
+          vercel-project-name: devtools
     outputs:
-      url: ${{ steps.waitFor200.outputs.url }}
+      url: ${{ steps.vercel-deploy.outputs.preview-url }}
   test0:
     name: End-to-end tests (1)
     runs-on: macos-latest
