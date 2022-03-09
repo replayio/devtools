@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
 import { CheckboxRow } from "./CheckboxRow";
+import { useFeature } from "ui/hooks/settings";
+import { trackEvent } from "ui/utils/telemetry";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
@@ -41,7 +43,7 @@ function NotificationPreferences({
 }) {
   return (
     <div className="space-y-4">
-      <div className="text-lg">Notification Preferences</div>
+      <div className="text-lg">Notifications</div>
       <div>Choose which email updates you would like to receive:</div>
       <div className="flex flex-col space-y-2 p-1">
         {Object.entries(EMAIL_NOTIFICATIONS).map(([emailType, content]: string[], i) => (
@@ -80,7 +82,7 @@ function PrivacyPreferences() {
 
   return (
     <div className="space-y-4">
-      <div className="text-lg">Privacy Preferences</div>
+      <div className="text-lg">Privacy</div>
       <div className="flex flex-col space-y-2 p-1">
         <label
           className="flex cursor-pointer items-center space-x-2"
@@ -100,6 +102,31 @@ function PrivacyPreferences() {
   );
 }
 
+function UiPreferences() {
+  const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
+
+  const handleDarkModeToggle = () => {
+    trackEvent("feature.dark_mode", { enabled: !enableDarkMode });
+    updateEnableDarkMode(!enableDarkMode);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="text-lg">Appearance</div>
+      <div className="flex flex-col space-y-2 p-1">
+        <label
+          className="flex cursor-pointer items-center space-x-2"
+          data-private
+          htmlFor="enableDarkMode"
+        >
+          <Checkbox id="enableDarkMode" checked={enableDarkMode} onChange={handleDarkModeToggle} />
+          <div>Enable Dark Mode</div>
+        </label>
+      </div>
+    </div>
+  );
+}
+
 export default function PreferencesSettings() {
   const { loading, unsubscribedEmailTypes } = hooks.useGetUserInfo();
 
@@ -109,6 +136,7 @@ export default function PreferencesSettings() {
 
   return (
     <div className="space-y-6 overflow-auto">
+      <UiPreferences />
       <PrivacyPreferences />
       <NotificationPreferences {...{ unsubscribedEmailTypes }} />
     </div>

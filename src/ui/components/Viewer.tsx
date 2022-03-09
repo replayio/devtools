@@ -1,6 +1,6 @@
 import React from "react";
 import SecondaryToolbox from "./SecondaryToolbox";
-import SplitBox from "devtools/packages/devtools-splitter";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { prefs } from "ui/utils/prefs";
 import Video from "ui/components/Video";
 
@@ -14,9 +14,9 @@ const Vertical = ({ showVideo }: ViewerProps) => {
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={8}
-      initialSize={prefs.secondaryPanelHeight}
-      onResizeEnd={(num: number) => {
-        prefs.secondaryPanelHeight = `${num}px`;
+      initialSize={prefs.secondaryPanelHeight.toString()}
+      onResizeEnd={(size: string) => {
+        prefs.secondaryPanelHeight = size;
       }}
       minSize={showVideo ? "10%" : "100%"}
       maxSize={showVideo ? "70%" : "100%"}
@@ -33,9 +33,9 @@ const Horizontal = ({ showVideo }: ViewerProps) => {
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={8}
-      initialSize={prefs.secondaryPanelHeight}
-      onResizeEnd={(num: number) => {
-        prefs.secondaryPanelHeight = `${num}px`;
+      initialSize={prefs.secondaryPanelHeight.toString()}
+      onResizeEnd={(size: string) => {
+        prefs.secondaryPanelHeight = size;
       }}
       minSize={showVideo ? "10%" : "0"}
       maxSize={showVideo ? "70%" : "0"}

@@ -4,14 +4,14 @@ import { mutate, query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
-import type { UserSettings } from "../types";
+import type { ExperimentalUserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 import { features } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 
-const emptySettings: UserSettings = {
+const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
@@ -20,7 +20,7 @@ const emptySettings: UserSettings = {
   showReact: false,
 };
 
-const testSettings: UserSettings = {
+const testSettings: ExperimentalUserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
@@ -29,7 +29,7 @@ const testSettings: UserSettings = {
   showReact: true,
 };
 
-export async function getUserSettings(): Promise<UserSettings> {
+export async function getUserSettings(): Promise<ExperimentalUserSettings> {
   const result = await query({ query: GET_USER_SETTINGS, variables: {} });
 
   if (isTest()) {
@@ -84,7 +84,7 @@ export const useFeature = (prefKey: keyof typeof features) => {
   };
 };
 
-function convertUserSettings(data: any): UserSettings {
+function convertUserSettings(data: any): ExperimentalUserSettings {
   if (!data?.viewer) {
     return emptySettings;
   }

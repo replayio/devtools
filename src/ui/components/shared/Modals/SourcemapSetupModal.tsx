@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { isNextUrl } from "devtools/client/debugger/src/components/Editor/SourcemapToggle";
 import { getSelectedSourceWithContent } from "devtools/client/debugger/src/selectors";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -8,6 +7,8 @@ import { UIState } from "ui/state";
 import { PrimaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
 import Modal from "../NewModal";
+
+const isNextUrl = (url: string | undefined) => url && url.includes("/_next/");
 
 function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
   const { url } = selectedSource;

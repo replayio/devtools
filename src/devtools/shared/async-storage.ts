@@ -115,3 +115,20 @@ export const setItem = (itemKey: string, value: any) => {
     );
   });
 };
+
+export const clear = () => {
+  return new Promise((resolve, reject) => {
+    withStore(
+      "readwrite",
+      store => {
+        store.transaction.oncomplete = resolve;
+        const req = store.clear();
+        req.onerror = function clearOnError() {
+          console.error("Error in asyncStorage.clear():", req.error?.name);
+          reject(req.error);
+        };
+      },
+      reject
+    );
+  });
+};

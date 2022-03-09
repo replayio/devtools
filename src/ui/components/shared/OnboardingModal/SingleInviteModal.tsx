@@ -75,8 +75,7 @@ function SingleInviteModal({ workspace }: SingleInviteModalProps) {
     <DownloadReplayModal>
       {`You've been added to the team `}
       <strong>{name}</strong>
-      {` by `}
-      <strong>{inviterEmail}</strong>
+      {inviterEmail ? <strong>{` by ${inviterEmail}`}</strong> : null}
       {`. Would you like to go that team, or download Replay?`}
     </DownloadReplayModal>
   );

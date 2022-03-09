@@ -3,7 +3,7 @@ import hooks from "ui/hooks";
 import ReplayTitle from "./ReplayTitle";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
-import { Recording, UserSettings } from "ui/types";
+import { Recording, ExperimentalUserSettings } from "ui/types";
 import LoadingScreen from "../shared/LoadingScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
@@ -16,7 +16,11 @@ import { showDurationWarning } from "ui/utils/recording";
 import { decodeWorkspaceId } from "ui/utils/workspace";
 import Icon from "../shared/Icon";
 
-type UploadScreenProps = { recording: Recording; userSettings: UserSettings; onUpload: () => void };
+type UploadScreenProps = {
+  recording: Recording;
+  userSettings: ExperimentalUserSettings;
+  onUpload: () => void;
+};
 type Status = "saving" | "deleting" | "deleted" | null;
 
 function DeletedScreen({ url }: { url: string }) {

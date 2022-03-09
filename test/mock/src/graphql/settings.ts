@@ -1,10 +1,10 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { GET_USER_SETTINGS } from "ui/graphql/settings";
-import { UserSettings } from "ui/types";
+import { ExperimentalUserSettings } from "ui/types";
 import { cloneResponse } from "./utils";
 
 export function createUserSettingsMock(): MockedResponse[] {
-  const settings: UserSettings = {
+  const settings: ExperimentalUserSettings = {
     apiKeys: [],
     defaultWorkspaceId: null,
     disableLogRocket: false,

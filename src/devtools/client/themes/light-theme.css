@@ -170,7 +170,7 @@
   color: var(--theme-body-color);
 }
 
-.cm-s-mozilla .CodeMirror-lines .CodeMirror-cursor {
+.theme-light .cm-s-mozilla .CodeMirror-lines .CodeMirror-cursor {
   border-left: solid 1px black;
 }
 
@@ -179,12 +179,12 @@
   background: rgb(185, 215, 253);
 }
 
-.cm-s-mozilla .CodeMirror-selected {
+.theme-light .cm-s-mozilla .CodeMirror-selected {
   /* selected text (unfocused) */
   background: rgb(210, 210, 210);
 }
 
-.cm-s-mozilla .CodeMirror-activeline-background {
+.theme-light .cm-s-mozilla .CodeMirror-activeline-background {
   /* selected color with alpha */
   background: rgba(185, 215, 253, 0.35);
 }
