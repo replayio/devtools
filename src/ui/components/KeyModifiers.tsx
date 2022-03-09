@@ -29,7 +29,6 @@ export const KeyModifiers: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
   const onMouseMove = debounce((e: MouseEvent) => {
-    console.log("Reset");
     if (!e.metaKey) {
       setMeta(false);
     } else if (!e.shiftKey) {
