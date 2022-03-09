@@ -306,7 +306,7 @@ class EventListeners extends Component {
 
     return (
       <li
-        className="flex flex-row items-center rounded-md pl-2 hover:bg-menuHoverBgcolor hover:text-menuHoverColor"
+        className="flex flex-row items-center rounded-md pl-2 hover:bg-menuHoverBgcolor"
         key={event.id}
       >
         <div className="flex w-full flex-row justify-between">

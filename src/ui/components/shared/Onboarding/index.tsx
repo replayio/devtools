@@ -28,12 +28,10 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative m-4 flex flex-col items-center p-9 text-2xl shadow-md",
+        "relative m-4 flex flex-col items-center border-bigOverlayBorder bg-bigOverlayBgcolor p-9 text-2xl text-menuColor shadow-md",
         overlay ? "max-w-sm space-y-8" : "max-w-3xl space-y-12",
         {
           "rounded-lg bg-opacity-80": overlay,
-          "bg-white": overlay && ctx.theme === "light",
-          "bg-black": overlay && ctx.theme === "dark",
         }
       )}
     >
