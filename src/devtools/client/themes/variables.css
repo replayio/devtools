@@ -151,7 +151,6 @@
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
   --tab-selected-color: var(--theme-body-color);
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-standard-color: var(--theme-base-100);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
@@ -352,6 +351,7 @@
 
   /* Core classes (Dark) */
   --chrome: #1c1c1c; /* bg app */
+  --theme-body-color: var(--grey-40);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
   --modal-bgcolor: rgba(0, 0, 0, 0.75);
@@ -462,7 +462,7 @@
 
   /* Text color */
   --theme-comment: var(--grey-45);
-  --theme-body-color: var(--grey-40);
+
   --theme-text-color-alt: var(--grey-45);
   --theme-text-color-inactive: var(--grey-50);
   --theme-text-color-strong: var(--grey-30);

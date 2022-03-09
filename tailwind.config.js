@@ -15,7 +15,7 @@ module.exports = {
         checkbox: "var(--checkbox)",
         checkboxBorder: "var(--checkbox-border)",
         chrome: "var(--chrome)",
-        iconColor: ""var(--icon-color)"",
+        iconColor: "var(--icon-color)",
         iconColorDisabled: "var(--theme-text-field-bgcolor)",
         jellyfishBgcolor: "var(--jellyfish-bgcolor)",
         menuBgcolor: "var(--menu-bgcolor)",
