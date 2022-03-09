@@ -1066,7 +1066,7 @@ class _ThreadFront {
           return { sourceId: id };
         }
         kind = minifiedInfo.kind;
-        assert(kind != "prettyPrinted", "source kind must be prettyPrinted");
+        assert(kind != "prettyPrinted", "source kind must not be prettyPrinted");
       }
       if (kind == "sourceMapped") {
         originalId = id;
@@ -1077,7 +1077,7 @@ class _ThreadFront {
     }
 
     if (!generatedId) {
-      assert(originalId, "there should be no originalId");
+      assert(originalId, "there should be an originalId");
       return { sourceId: originalId };
     }
 
@@ -1106,7 +1106,7 @@ class _ThreadFront {
     const groups = [];
     while (sourceIds.length) {
       const id = sourceIds[0];
-      const group = [...this._getAlternateSourceIds(id)].filter(id => sourceIds.includes(id));
+      const group = [...this.getAlternateSourceIds(id)].filter(id => sourceIds.includes(id));
       groups.push(group);
       sourceIds = sourceIds.filter(id => !group.includes(id));
     }
@@ -1114,7 +1114,7 @@ class _ThreadFront {
   }
 
   // Get all original/generated IDs which can represent a location in sourceId.
-  private _getAlternateSourceIds(sourceId: SourceId) {
+  getAlternateSourceIds(sourceId: SourceId) {
     if (this.alternateSourceIds.has(sourceId)) {
       return this.alternateSourceIds.get(sourceId)!;
     }
@@ -1173,7 +1173,7 @@ class _ThreadFront {
     return kind == "sourceMapped";
   }
 
-  preferSource(sourceId: SourceId, value: SourceId) {
+  preferSource(sourceId: SourceId, value: boolean) {
     assert(!this.isSourceMappedSource(sourceId), "source is not sourceMapped");
     if (value) {
       this.preferredGeneratedSources.add(sourceId);
