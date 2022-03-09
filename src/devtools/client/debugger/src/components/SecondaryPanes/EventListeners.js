@@ -305,7 +305,10 @@ class EventListeners extends Component {
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (
-      <li className="flex flex-row items-center rounded-md pl-2 hover:bg-gray-100" key={event.id}>
+      <li
+        className="flex flex-row items-center rounded-md pl-2 hover:bg-menuHoverBgcolor"
+        key={event.id}
+      >
         <div className="flex w-full flex-row justify-between">
           <label title={title} className="flex w-full flex-row items-center space-x-2">
             <Checkbox

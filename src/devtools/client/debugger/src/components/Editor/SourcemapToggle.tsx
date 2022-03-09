@@ -8,11 +8,9 @@ import { connect, ConnectedProps } from "react-redux";
 import { Switch } from "@headlessui/react";
 import classNames from "classnames";
 import { setModal } from "ui/actions/app";
-
-export const isNextUrl = (url: string | undefined) => url && url.includes("/_next/");
-
-const shouldHaveSourcemaps = (source: Source, alternateSource: Source | null) =>
-  isNextUrl(source.url) || !!alternateSource;
+import { ThreadFront } from "protocol/thread";
+import { SourceId } from "@recordreplay/protocol";
+import { getUniqueAlternateSourceId } from "../../utils/source";
 
 function SourcemapError({ onClick }: { onClick: () => void }) {
   return (
@@ -68,12 +66,19 @@ export function SourcemapToggle({
   setModal,
   showAlternateSource,
 }: PropsFromRedux) {
-  if (!shouldHaveSourcemaps(selectedSource, alternateSource)) {
-    return null;
+  let alternateSourceId: SourceId | undefined;
+  if (alternateSource) {
+    alternateSourceId = alternateSource.id;
+  } else {
+    const result = getUniqueAlternateSourceId(selectedSource.id);
+    alternateSourceId = result.sourceId;
+    if (!alternateSourceId && result.why === "not-unique") {
+      return null;
+    }
   }
 
   const setEnabled = (v: React.SetStateAction<boolean>) => {
-    showAlternateSource(selectedSource, alternateSource);
+    showAlternateSource(selectedSource.id, alternateSourceId);
   };
   const onErrorClick = () => {
     setModal("sourcemap-setup");
@@ -84,9 +89,9 @@ export function SourcemapToggle({
       <Toggle
         enabled={selectedSource.isOriginal}
         setEnabled={setEnabled}
-        disabled={!alternateSource}
+        disabled={!alternateSourceId}
       />
-      {!alternateSource ? <SourcemapError onClick={onErrorClick} /> : <div>Original Source</div>}
+      {!alternateSourceId ? <SourcemapError onClick={onErrorClick} /> : <div>Original Source</div>}
     </div>
   );
 }

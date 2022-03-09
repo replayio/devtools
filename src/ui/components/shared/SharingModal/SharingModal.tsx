@@ -103,7 +103,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         style={{ width: "460px" }}
       >
         <CollaboratorsSection recording={recording} />
-        <section className="flex flex-row items-center justify-between space-x-2 bg-gray-100 p-8">
+        <section className="flex flex-row items-center justify-between space-x-2 bg-menuHoverBgcolor p-8">
           <div className="flex flex-row items-center space-x-3 overflow-hidden">
             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-200 font-bold">
               <MaterialIcon className="text-purple-600" iconSize="xl">
