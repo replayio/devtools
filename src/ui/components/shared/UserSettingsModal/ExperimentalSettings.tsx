@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import hooks from "ui/hooks";
 import { CheckboxRow } from "./CheckboxRow";
-import { CombinedUserSettings } from "ui/types";
-import { features } from "ui/utils/prefs";
+import { CombinedExperimentalUserSettings } from "ui/types";
 import { useFeature } from "ui/hooks/settings";
-import { trackEvent } from "ui/utils/telemetry";
 
-type ExperimentalKey = keyof CombinedUserSettings;
+type ExperimentalKey = keyof CombinedExperimentalUserSettings;
 interface ExperimentalSetting {
   label: string;
   description: string;
@@ -28,11 +26,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
-  },
-  {
-    label: "Dark Mode",
-    description: "Enable Dark mode",
-    key: "enableDarkMode",
   },
 ];
 
@@ -66,7 +59,6 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -75,15 +67,11 @@ export default function ExperimentalSettings({}) {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableDarkMode") {
-      trackEvent("feature.dark_mode", { enabled: !enableDarkMode });
-      updateEnableDarkMode(!enableDarkMode);
     }
   };
 
   const localSettings = {
     enableColumnBreakpoints,
-    enableDarkMode,
   };
   const settings = { ...userSettings, ...localSettings };
 

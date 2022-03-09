@@ -5,7 +5,7 @@ export interface User {
   internal: boolean;
 }
 
-export type UserSettings = {
+export type ExperimentalUserSettings = {
   apiKeys: ApiKey[];
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
@@ -14,12 +14,16 @@ export type UserSettings = {
   showReact: boolean;
 };
 
-export type LocalUserSettings = {
+export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
+};
+
+export type LocalUserSettings = LocalExperimentalUserSettings & {
   enableDarkMode: boolean;
 };
 
-export type CombinedUserSettings = UserSettings & LocalUserSettings;
+export type CombinedExperimentalUserSettings = ExperimentalUserSettings &
+  LocalExperimentalUserSettings;
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";
 
