@@ -72,7 +72,7 @@ const withStore = (
   };
 };
 
-export const getItem = (itemKey: string) => {
+export const getItem = (itemKey: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readonly",
@@ -96,14 +96,14 @@ export const getItem = (itemKey: string) => {
   });
 };
 
-export const setItem = (itemKey: string, value: any) => {
+export const setItem = (itemKey: string, value: any): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
           db.close();
-          resolve(undefined);
+          resolve();
         };
         const req = store.put(value, itemKey);
         req.onerror = () => {
@@ -116,15 +116,101 @@ export const setItem = (itemKey: string, value: any) => {
   });
 };
 
-export const clear = () => {
+export const clear = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
-      store => {
-        store.transaction.oncomplete = resolve;
+      (store, db) => {
+        store.transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
         const req = store.clear();
         req.onerror = function clearOnError() {
           console.error("Error in asyncStorage.clear():", req.error?.name);
+          reject(req.error);
+        };
+      },
+      reject
+    );
+  });
+};
+
+export const removeItem = (itemKey: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    withStore(
+      "readwrite",
+      (store, db) => {
+        store.transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        const req = store.delete(itemKey);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.removeItem():", req.error?.name);
+          reject(req.error);
+        };
+      },
+      reject
+    );
+  });
+};
+
+export const length = (): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    withStore(
+      "readonly",
+      (store, db) => {
+        const req = store.count();
+        store.transaction.oncomplete = () => {
+          db.close();
+          resolve(req.result);
+        };
+        req.onerror = () => {
+          console.error("Error in asyncStorage.length():", req.error?.name);
+          reject(req.error?.name);
+        };
+      },
+      reject
+    );
+  });
+};
+
+export const key = (n: number): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    if (n < 0) {
+      resolve(null);
+      return;
+    }
+
+    withStore(
+      "readonly",
+      (store, db) => {
+        const req = store.openCursor();
+        store.transaction.oncomplete = () => {
+          const cursor = req.result;
+          db.close();
+          resolve(cursor ? cursor.key : null);
+        };
+        let advanced = false;
+        req.onsuccess = () => {
+          const cursor = req.result;
+          if (!cursor) {
+            // this means there weren"t enough keys
+            return;
+          }
+          if (n === 0 || advanced) {
+            // Either 1) we have the first key, return it if that's what they
+            // wanted, or 2) we"ve got the nth key.
+            return;
+          }
+
+          // Otherwise, ask the cursor to skip ahead n records
+          advanced = true;
+          cursor.advance(n);
+        };
+        req.onerror = () => {
+          console.error("Error in asyncStorage.key():", req.error?.name);
           reject(req.error);
         };
       },
