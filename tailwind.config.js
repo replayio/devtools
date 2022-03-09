@@ -44,6 +44,7 @@ module.exports = {
         checkbox: "var(--checkbox)",
         checkboxBorder: "var(--checkbox-border)",
         themeToggle: "var(--theme-toggle)",
+        bigOverlayBgcolor: "var(--big-overlay-bgcolor)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
