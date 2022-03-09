@@ -135,3 +135,86 @@ export const clear = () => {
     );
   });
 };
+
+export const removeItem = (itemKey: string) => {
+  return new Promise((resolve, reject) => {
+    withStore(
+      "readwrite",
+      (store, db) => {
+        store.transaction.oncomplete = () => {
+          db.close();
+          resolve(undefined);
+        };
+        const req = store.delete(itemKey);
+        req.onerror = () => {
+          console.error("Error in asyncStorage.removeItem():", req.error?.name);
+          reject(req.error);
+        };
+      },
+      reject
+    );
+  });
+};
+
+export const length = () => {
+  return new Promise((resolve, reject) => {
+    withStore(
+      "readonly",
+      (store, db) => {
+        const req = store.count();
+        store.transaction.oncomplete = () => {
+          db.close();
+          resolve(req.result);
+        };
+        req.onerror = () => {
+          console.error("Error in asyncStorage.length():", req.error?.name);
+          reject(req.error?.name);
+        };
+      },
+      reject
+    );
+  });
+};
+
+export const key = (n: number) => {
+  return new Promise((resolve, reject) => {
+    if (n < 0) {
+      resolve(null);
+      return;
+    }
+
+    withStore(
+      "readonly",
+      (store, db) => {
+        const req = store.openCursor();
+        store.transaction.oncomplete = () => {
+          const cursor = req.result;
+          db.close();
+          resolve(cursor ? cursor.key : null);
+        };
+        let advanced = false;
+        req.onsuccess = () => {
+          const cursor = req.result;
+          if (!cursor) {
+            // this means there weren"t enough keys
+            return;
+          }
+          if (n === 0 || advanced) {
+            // Either 1) we have the first key, return it if that's what they
+            // wanted, or 2) we"ve got the nth key.
+            return;
+          }
+
+          // Otherwise, ask the cursor to skip ahead n records
+          advanced = true;
+          cursor.advance(n);
+        };
+        req.onerror = () => {
+          console.error("Error in asyncStorage.key():", req.error?.name);
+          reject(req.error);
+        };
+      },
+      reject
+    );
+  });
+};
