@@ -75,21 +75,21 @@ function getArrayLikeLength(object) {
     return object.containerEntryCount();
   }
   const propertyValues = object.previewValueMap();
-  return propertyValues.get("length").primitive();
+  return propertyValues.get("length")?.primitive();
 }
 
 function getTitle(props, object) {
   const name = object.className();
   const length = getArrayLikeLength(object);
-
+  const children = [name];
+  if (typeof length === "number") {
+    children.push("(", length, ") ");
+  }
   return span(
     {
       className: "objectTitle",
     },
-    name,
-    "(",
-    length,
-    ") "
+    ...children
   );
 }
 
