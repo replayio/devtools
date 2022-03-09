@@ -129,6 +129,7 @@
 
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
+
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
   --modal-bgcolor: rgba(255, 255, 255, 0.75);
@@ -142,6 +143,12 @@
   --theme-text-field-bgcolor-color: var(--theme-body-color);
   --theme-text-field-bgcolor: var(--theme-base-95);
   --text-field-border: var(--cool-gray-300);
+--menu-bgcolor: var(--theme-toolbar-background);
+--menu-color: var(--theme-body-color);
+--menu-hover-bgcolor: var(--theme-base-95);
+--menu-hover-color: #000;
+  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+
 
   /* Tabs (Light) */
   --tab-bgcolor: var(--theme-base-90);
@@ -351,6 +358,7 @@
 
   /* Core classes (Dark) */
   --chrome: #1c1c1c; /* bg app */
+
   --theme-body-color: var(--grey-40);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
@@ -365,6 +373,14 @@
   --theme-text-field-bgcolor-color: #fff;
   --theme-text-field-bgcolor: var(--theme-base-85);
   --text-field-border: var(--theme-base-85);
+
+  --menu-bgcolor: var(--theme-base-90);
+  --menu-color: var(--theme-body-color);
+  --menu-hover-bgcolor: var(--theme-base-85);
+  --menu-hover-color: #fff;
+
+  --tab-selected-bgcolor: var(--theme-base-95);
+
 
   /* Tabs (Dark) */
   --tab-bgcolor: var(--theme-base-100);
