@@ -28,14 +28,13 @@ export const KeyModifiers: FC<{ children: ReactNode }> = ({ children }) => {
       setShift(false);
     }
   };
-  const onMouseMove = debounce((e: MouseEvent) => {
-    console.log("Reset");
+  const onMouseMove = (e: MouseEvent) => {
     if (!e.metaKey) {
       setMeta(false);
     } else if (!e.shiftKey) {
       setShift(false);
     }
-  }, 100);
+  };
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyDown);

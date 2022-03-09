@@ -64,7 +64,13 @@ function Wrapper({
   return <div className="static-tooltip-content bg-gray-700">{children}</div>;
 }
 
-export default function LineNumberTooltip({ editor, keyModifiers }: { editor: any; keyModifiers: KeyModifiers }) {
+export default function LineNumberTooltip({
+  editor,
+  keyModifiers,
+}: {
+  editor: any;
+  keyModifiers: KeyModifiers;
+}) {
   const dispatch = useDispatch();
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
