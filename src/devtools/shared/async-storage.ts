@@ -72,7 +72,7 @@ const withStore = (
   };
 };
 
-export const getItem = (itemKey: string) => {
+export const getItem = (itemKey: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readonly",
@@ -96,14 +96,14 @@ export const getItem = (itemKey: string) => {
   });
 };
 
-export const setItem = (itemKey: string, value: any) => {
+export const setItem = (itemKey: string, value: any): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
           db.close();
-          resolve(undefined);
+          resolve();
         };
         const req = store.put(value, itemKey);
         req.onerror = () => {
@@ -116,14 +116,14 @@ export const setItem = (itemKey: string, value: any) => {
   });
 };
 
-export const clear = () => {
+export const clear = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
           db.close();
-          resolve(undefined);
+          resolve();
         };
         const req = store.clear();
         req.onerror = function clearOnError() {
@@ -136,14 +136,14 @@ export const clear = () => {
   });
 };
 
-export const removeItem = (itemKey: string) => {
+export const removeItem = (itemKey: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
           db.close();
-          resolve(undefined);
+          resolve();
         };
         const req = store.delete(itemKey);
         req.onerror = () => {
@@ -156,7 +156,7 @@ export const removeItem = (itemKey: string) => {
   });
 };
 
-export const length = () => {
+export const length = (): Promise<number> => {
   return new Promise((resolve, reject) => {
     withStore(
       "readonly",
@@ -176,7 +176,7 @@ export const length = () => {
   });
 };
 
-export const key = (n: number) => {
+export const key = (n: number): Promise<any> => {
   return new Promise((resolve, reject) => {
     if (n < 0) {
       resolve(null);
