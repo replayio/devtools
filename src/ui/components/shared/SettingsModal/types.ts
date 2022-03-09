@@ -1,5 +1,5 @@
 import React from "react";
-import { UserSettings } from "ui/types";
+import { ExperimentalUserSettings } from "ui/types";
 
 export type Settings<T extends string, P extends Record<string, unknown>> = Setting<T, P>[];
 
@@ -25,4 +25,4 @@ export interface SettingItem<V> {
   disabled: boolean;
 }
 
-export type SettingItemKey = keyof UserSettings;
+export type SettingItemKey = keyof ExperimentalUserSettings;

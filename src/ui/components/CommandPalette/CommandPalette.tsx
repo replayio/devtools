@@ -5,7 +5,7 @@ import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { UserSettings } from "ui/types";
+import { ExperimentalUserSettings } from "ui/types";
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
 const { filter } = require("fuzzaldrin-plus");
@@ -15,7 +15,7 @@ export type Command = {
   key: CommandKey;
   label: string;
   shortcut?: string;
-  settingKey?: keyof UserSettings;
+  settingKey?: keyof ExperimentalUserSettings;
 };
 export type CommandKey =
   | "open_console"
