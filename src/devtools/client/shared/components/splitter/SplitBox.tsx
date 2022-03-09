@@ -8,8 +8,6 @@ const dispatchResize = debounce(() => window.dispatchEvent(new Event("resize")),
 type SplitterProps = {
   className?: string;
   initialSize?: string;
-  initialWidth?: string;
-  initialHeight?: string;
   startPanel?: ReactNode;
   minSize?: string;
   maxSize?: string;
@@ -19,22 +17,18 @@ type SplitterProps = {
   vert?: boolean;
   style?: object;
   onControlledPanelResized?: Function;
-  onSelectContainerElement?: any;
   onMove?: Function;
   onResizeEnd?: (size: string) => void;
 };
 const SplitBox: FC<SplitterProps> = ({
   className,
   initialSize,
-  initialWidth,
-  initialHeight,
   startPanel,
   minSize,
   maxSize,
   endPanel,
   style,
   onControlledPanelResized,
-  onSelectContainerElement,
   onMove,
   onResizeEnd,
   endPanelControl = false,
@@ -42,8 +36,8 @@ const SplitBox: FC<SplitterProps> = ({
   vert = true,
 }) => {
   const [defaultCursor, setdefaultCursor] = useState<string>("auto");
-  const [width, setwidth] = useState<string>(initialWidth || initialSize || "0");
-  const [height, setheight] = useState<string>(initialHeight || initialSize || "0");
+  const [width, setwidth] = useState<string>(initialSize || "0");
+  const [height, setheight] = useState<string>(initialSize || "0");
 
   const splitBoxRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +97,6 @@ const SplitBox: FC<SplitterProps> = ({
   let leftPanelStyle: CSSProperties = {};
   let rightPanelStyle: CSSProperties = {};
 
-  // Set proper size for panels depending on the current state.
   if (vert) {
     leftPanelStyle.maxWidth = endPanelControl ? undefined : maxSize;
     leftPanelStyle.minWidth = endPanelControl ? undefined : minSize;
@@ -130,14 +123,7 @@ const SplitBox: FC<SplitterProps> = ({
         },
         className
       )}
-      style={{
-        // Set the size of the controlled panel (height or width depending on the
-        // current state). This can be used to help with styling of dependent
-        // panels.
-        // @ts-ignore
-        "--split-box-controlled-panel-size": `${vert ? width : height}`,
-        ...style,
-      }}
+      style={style}
       ref={splitBoxRef}
     >
       {startPanel && (

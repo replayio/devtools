@@ -58,14 +58,14 @@ function DevView({
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={8}
-          initialSize={prefs.toolboxSize as string}
+          initialSize={prefs.toolboxSize.toString()}
           minSize={minSize(sidePanelCollapsed, showEditor)}
           maxSize={maxSize(sidePanelCollapsed, showEditor)}
           vert={true}
           onMove={handleMove}
           startPanel={<Toolbox />}
           endPanel={<Viewer showVideo={!videoIsHidden} vertical={!showEditor} />}
-          endPanelControl={false}
+          // endPanelControl={false}
         />
       </div>
       <div className="timeline-container">
