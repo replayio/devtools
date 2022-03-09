@@ -10,6 +10,7 @@
  */
 
 import { tabExists } from "../../reducers/tabs";
+import { getFrames, getSelectedFrameId } from "../../reducers/pause";
 import { setSymbols } from "./symbols";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
 import { addTab } from "../tabs";
@@ -29,6 +30,7 @@ import {
   getSelectedSource,
   getExecutionPoint,
   getThreadContext,
+  getContext,
 } from "../../selectors";
 
 export const setSelectedLocation = (cx, source, location) => ({
@@ -162,17 +164,34 @@ export function selectSpecificLocation(cx, location) {
 // The RRP protocol values include both generated and original information about
 // a paused frame and its scope contents. The ThreadFront is responsible for
 // determining which one to use. When changing between a generated and original
-// source for a frame, we tell the thread which one we prefer, and then perform
-// the pause again to refresh all the debugger's state.
-export function showAlternateSource(oldSource, newSource) {
+// source, we tell the thread which one we prefer.
+// Then, if we're currently paused in this source, we perform the pause again to
+// refresh all the debugger's state, this will also open the alternate source.
+// Otherwise, we only open the alternate source in the editor.
+export function showAlternateSource(oldSourceId, newSourceId) {
   return async ({ dispatch, getState }) => {
-    if (ThreadFront.isSourceMappedSource(oldSource.id)) {
-      ThreadFront.preferSource(newSource.id, true);
+    if (ThreadFront.isSourceMappedSource(oldSourceId)) {
+      ThreadFront.preferSource(newSourceId, true);
     } else {
-      ThreadFront.preferSource(oldSource.id, false);
+      ThreadFront.preferSource(oldSourceId, false);
     }
 
-    const executionPoint = getExecutionPoint(getState());
-    await dispatch(paused({ executionPoint }));
+    let isPausedInSource = false;
+    const state = getState();
+    const frames = getFrames(state);
+    if (frames) {
+      const selectedFrameId = getSelectedFrameId(state);
+      const selectedFrame = frames.find(f => f.id == selectedFrameId);
+      if (selectedFrame?.location.sourceId === oldSourceId) {
+        isPausedInSource = true;
+      }
+    }
+
+    if (isPausedInSource) {
+      const executionPoint = getExecutionPoint(state);
+      await dispatch(paused({ executionPoint }));
+    } else {
+      await dispatch(selectSource(getContext(state), newSourceId));
+    }
   };
 }

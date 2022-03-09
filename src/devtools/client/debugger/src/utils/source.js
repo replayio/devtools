@@ -18,6 +18,7 @@ import { memoizeLast } from "../utils/memoizeLast";
 export { isMinified } from "./isMinified";
 import { getURL, getFileExtension } from "./sources-tree";
 import sortBy from "lodash/sortBy";
+import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 
 import { isFulfilled } from "./async-value";
@@ -472,4 +473,32 @@ export function getSourcemapVisualizerURL(selectedSource, alternateSource) {
   }
 
   return href;
+}
+
+// Get the ID of the only alternate source that can be switched to from the source with
+// the given ID. This doesn't work for sources that are bundles or linked to bundles
+// through sourcemaps, because in that case there may be multiple alternate sources.
+// If no unique alternate source could be found, the reason ("no-sourcemap" or "not-unique")
+// is returned.
+export function getUniqueAlternateSourceId(sourceId) {
+  const generatedSourceIds = ThreadFront.getGeneratedSourceIds(sourceId);
+  if (!generatedSourceIds?.length) {
+    return { why: "no-sourcemap" };
+  }
+
+  const alternateSourceIds = [...ThreadFront.getAlternateSourceIds(sourceId)].filter(
+    sourceId => !ThreadFront.isMinifiedSource(sourceId)
+  );
+  if (alternateSourceIds.length > 2) {
+    return { why: "not-unique" };
+  }
+
+  let alternateSourceId = alternateSourceIds.find(
+    alternateSourceId => alternateSourceId !== sourceId
+  );
+  if (!alternateSourceId) {
+    // the only alternate source is the minified version of the given source
+    return { sourceId: generatedSourceIds[0] };
+  }
+  return { sourceId: alternateSourceId };
 }
