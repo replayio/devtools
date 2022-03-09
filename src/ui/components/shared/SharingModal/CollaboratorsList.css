@@ -16,7 +16,7 @@
 }
 
 .sharing-modal .permission:hover {
-  background: #eee;
+  background: var(--menu-hover-bgcolor);
   border-radius: 8px;
 }
 
