@@ -74,5 +74,5 @@
 }
 
 .secondary-panes-wrapper .command-bar.bottom {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
 }

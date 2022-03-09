@@ -56,14 +56,14 @@ function Draggers({
       <div
         className={classNames(
           dragging ? "w-1" : "w-1",
-          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuser group-hover:w-1"
+          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuserBgcolor group-hover:w-1"
         )}
         onMouseDown={onStartMouseDown}
       />
       <div
         className={classNames(
           dragging ? "w-1" : "w-1",
-          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuser group-hover:w-1"
+          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-full bg-themeFocuserBgcolor group-hover:w-1"
         )}
         onMouseDown={onEndMouseDown}
       />
@@ -89,7 +89,7 @@ function Span({
 
   return (
     <div className="group absolute h-full" style={{ left: `${left}%`, width: `${right - left}%` }}>
-      <div className="h-full w-full bg-themeFocuser opacity-50" onMouseDown={onMouseDown} />
+      <div className="h-full w-full bg-themeFocuserBgcolor opacity-50" onMouseDown={onMouseDown} />
       {draggers}
     </div>
   );

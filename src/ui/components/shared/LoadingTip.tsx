@@ -49,7 +49,7 @@ export default function LoadingTip() {
 
   return (
     <div className="h-32 w-96 space-y-8">
-      <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-bigOverlayBgcolor px-8 py-4 align-middle text-bodyColor">
+      <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-modalBgcolor px-8 py-4 align-middle text-bodyColor">
         <img className="h-16 p-2" src={`/images/${icon}`} />
         <div className="flex flex-col space-y-2">
           <div className="text-sm font-bold">{title}</div>

@@ -145,7 +145,7 @@ function CommandPalette({
 
   return (
     <div
-      className={`${styles.commandPalleteWrapper} flex w-full flex-col overflow-hidden rounded-md bg-themeTabBackground shadow-xl`}
+      className={`${styles.commandPalleteWrapper} flex w-full flex-col overflow-hidden rounded-md bg-themeTabBgcolor shadow-xl`}
     >
       <div className={`${styles.commandPallete} p-3`}>
         <div className="relative flex items-center text-primaryAccent">

@@ -298,7 +298,7 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="min-w-full overflow-y-scroll bg-themeBodyBackground">
+    <div className="min-w-full overflow-y-scroll bg-themeBodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />

@@ -26,8 +26,8 @@
   min-width: 480px;
   border-radius: 8px;
   padding: 20px;
-  background: var(--big-overlay-bgcolor);
-  border: 1px solid var(--big-overlay-border);
+  background: var(--modal-bgcolor);
+  border: 1px solid var(--modal-border);
   backdrop-filter: blur(21px);
   color: var(--theme-toolbar-color);
   box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,

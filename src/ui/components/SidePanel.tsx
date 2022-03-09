@@ -49,7 +49,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-lg bg-themeBodyBackground">{sidepanel}</div>
+    <div className="w-full overflow-hidden rounded-lg bg-themeBodyBgcolor">{sidepanel}</div>
   );
 }
 

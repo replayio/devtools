@@ -104,7 +104,7 @@ function ReplayScreenshot({
   showLimitWarning: boolean;
 }) {
   return (
-    <div className="relative h-64 rounded-lg bg-jellyfish px-6 pt-6 shadow-lg short:hidden">
+    <div className="relative h-64 rounded-lg bg-jellyfishBgcolorpx-6 pt-6 shadow-lg short:hidden">
       {showLimitWarning ? <LimitWarning /> : null}
       <img src={screenData} className="m-auto h-full" />
     </div>

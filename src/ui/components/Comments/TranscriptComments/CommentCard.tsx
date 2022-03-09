@@ -140,7 +140,7 @@ function CommentCard({
   if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
-        className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeTextField transition`}
+        className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeTextFieldBgcolor transition`}
         onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
         onMouseDown={() => {
@@ -171,7 +171,7 @@ function CommentCard({
     <div
       className={classNames(
         `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-themeBodyBackground"
+        isOutsideFocusedRegion ? "opacity-30" : "bg-themeBodyBgcolor"
       )}
       onMouseDown={e => {
         seekToComment(comment);
