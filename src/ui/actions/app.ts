@@ -93,9 +93,6 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
   parameters: loadedRegions;
 };
-export type SetLoadingPageTipIndexAction = Action<"set_loading_page_tip_index"> & {
-  index: number;
-};
 
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;
@@ -126,8 +123,7 @@ export type AppActions =
   | SetRecordingTargetAction
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
-  | SetAwaitingSourcemapsAction
-  | SetLoadingPageTipIndexAction;
+  | SetAwaitingSourcemapsAction;
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -356,10 +352,6 @@ export function loadMouseTargets(): UIThunkAction {
       dispatch(setIsNodePickerActive(true));
     }
   };
-}
-
-export function setLoadingPageTipIndex(index: number): SetLoadingPageTipIndexAction {
-  return { type: "set_loading_page_tip_index", index };
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {
