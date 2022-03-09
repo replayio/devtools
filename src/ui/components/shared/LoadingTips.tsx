@@ -3,6 +3,8 @@ import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
 import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
 import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
 
+const TIP_DURATION = 5000;
+
 const TIPS = [
   {
     title: "SAML 2.0 / SSO Authentication",
@@ -29,9 +31,9 @@ const TIPS = [
   },
 ] as const;
 
-export const LoadingTip: FC = () => {
-  const [tipIdx, setTipIdx] = useState(0);
-  const { title, description, icon: Icon } = TIPS[tipIdx];
+export const LoadingTips: FC = () => {
+  const [currentTipIdx, setCurrentTipIdx] = useState(0);
+  const { title, description, icon: Icon } = TIPS[currentTipIdx];
   const timerRef = useRef<NodeJS.Timeout>();
 
   const resetAutoNext = () => timerRef.current !== undefined && clearTimeout(timerRef.current);
@@ -43,9 +45,9 @@ export const LoadingTip: FC = () => {
   useEffect(() => {
     resetAutoNext();
     timerRef.current = setTimeout(() => {
-      setTipIdx((tipIdx + TIPS.length + 1) % TIPS.length);
-    }, 5000);
-  }, [tipIdx]);
+      setCurrentTipIdx((currentTipIdx + TIPS.length + 1) % TIPS.length);
+    }, TIP_DURATION);
+  }, [currentTipIdx]);
 
   return (
     <div className="h-32 w-96 space-y-8">

@@ -7,7 +7,7 @@ import {
   getUploading,
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { LoadingTip } from "./LoadingTip";
+import { LoadingTips } from "./LoadingTips";
 import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
 
@@ -30,7 +30,7 @@ export function LoadingScreenTemplate({
           {children}
         </div>
       </div>
-      {showTips ? <LoadingTip /> : null}
+      {showTips ? <LoadingTips /> : null}
     </BubbleViewportWrapper>
   );
 }
