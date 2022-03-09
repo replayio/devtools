@@ -13,6 +13,7 @@ import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { Nag } from "ui/hooks/users";
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
+import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -22,16 +23,18 @@ const {
 function ToggleButton({
   onClick,
   onMouseDown,
+  keyModifiers,
   targetNode,
   breakpoint,
 }: {
   onClick: MouseEventHandler;
   onMouseDown: MouseEventHandler;
+  keyModifiers: KeyModifiers;
   targetNode: HTMLElement;
   breakpoint?: Breakpoint;
 }) {
-  const isMetaActive = useSelector(selectors.getIsMetaActive);
-  const isShiftActive = useSelector(selectors.getIsShiftActive);
+  const isMetaActive = keyModifiers.meta;
+  const isShiftActive = keyModifiers.shift;
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
@@ -134,12 +137,17 @@ function ToggleWidgetButton({ editor, toggleLogpoint, cx, breakpoints }: ToggleW
   }
 
   return ReactDOM.createPortal(
-    <ToggleButton
-      onClick={onClick}
-      onMouseDown={onMouseDown}
-      targetNode={targetNode}
-      breakpoint={bp}
-    />,
+    <KeyModifiersContext.Consumer>
+      {keyModifiers => (
+        <ToggleButton
+          onClick={onClick}
+          onMouseDown={onMouseDown}
+          targetNode={targetNode}
+          breakpoint={bp}
+          keyModifiers={keyModifiers}
+        />
+      )}
+    </KeyModifiersContext.Consumer>,
     targetNode
   );
 }
