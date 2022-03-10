@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   /* @TODO: Remove the !important in bug 1535956 */
-  background-color: var(--theme-body-background) !important;
+  background-color: var(--theme-body-bgcolor) !important;
   color: inherit;
 }
 

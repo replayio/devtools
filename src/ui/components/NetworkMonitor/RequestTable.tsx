@@ -37,7 +37,7 @@ const RequestTable = ({
   return (
     <div
       className={classNames(
-        "no-scrollbar min-w-full overflow-scroll bg-themeBodyBackground",
+        "no-scrollbar min-w-full overflow-scroll bg-themeBodyBgcolor",
         className
       )}
     >

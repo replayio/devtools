@@ -22,7 +22,7 @@
   --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
   --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
 
-  --toolbarbutton-focus-background: var(--theme-selection-focus-background);
+  --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
   --toolbarbutton-focus-color: var(--theme-selection-focus-color);
   --toolbarbutton-checked-background: var(--theme-selection-background);
   --toolbarbutton-checked-color: var(--theme-selection-color);
@@ -52,37 +52,15 @@
   --secondary-accent-hover: #d72451;
   --secondary-accent-stroke: #f02d5e;
 
-  --that-dark-color: #1f2937;
-
-  --new-blue-50: #eff7ff;
-  --new-blue-100: #dbedff;
-  --new-blue-200: #b9dbfd;
-  --new-blue-300: #94c6fa;
-  --new-blue-400: #76b5f4;
-  --new-blue-500: #55a1ec;
-  --new-blue-600: #3b8fe3;
-  --new-blue-700: #257ad0;
-  --new-blue-800: #2569ad;
+  /* used in our codebase, to be refactored */
   --new-blue-900: #215487;
-
-  --cool-gray-50: #f9fafb;
-  --cool-gray-100: #f3f4f6;
   --cool-gray-200: #e5e7eb;
   --cool-gray-300: #d1d5db;
   --cool-gray-400: #9ca3af;
   --cool-gray-500: #6b7280;
-  --cool-gray-600: #4b5563;
-  --cool-gray-700: #374151;
-  --cool-gray-800: #1f2937;
-  --cool-gray-900: #111827;
-
-  --magenta-50: #ff1ad9;
   --magenta-65: #dd00a9;
-  --magenta-70: #b5007f;
-
   --purple-50: #9400ff;
   --purple-60: #8000d7;
-
   --blue-30: #75baff;
   --blue-40: #45a1ff;
   --blue-50: #0a84ff;
@@ -90,27 +68,20 @@
   --blue-60: #0060df;
   --blue-70: #003eaa;
   --blue-80: #002275;
-
-  --teal-60: #00c8d7;
-  --teal-70: #008ea4;
-
   --green-50: #30e60b;
   --green-60: #12bc00;
   --green-70: #058b00;
-
   --yellow-50: #ffe900;
   --yellow-60: #d7b600;
   --yellow-65: #be9b00;
   --yellow-70: #a47f00;
   --yellow-80: #715100;
   --yellow-90: #3e2800;
-
   --red-20: #ffb3d2;
   --red-40: #ff3b6b;
   --red-50: #ff0039;
   --red-60: #d70022;
   --red-70: #a4000f;
-
   --grey-10: #f9f9fa;
   --grey-10-a15: rgba(249, 249, 250, 0.15);
   --grey-10-a20: rgba(249, 249, 250, 0.2);
@@ -128,17 +99,26 @@
   --grey-60: #4a4a4f;
   --grey-70: #38383d;
   --grey-80: #2a2a2e;
-  --grey-85: #1b1b1d;
   --grey-90: #0c0c0d;
-  --grey-90-a05: rgba(12, 12, 13, 0.05);
   --grey-90-a10: rgba(12, 12, 13, 0.1);
-  --grey-90-a15: rgba(12, 12, 13, 0.15);
-  --grey-90-a20: rgba(12, 12, 13, 0.2);
   --grey-90-a30: rgba(12, 12, 13, 0.3);
 }
 
 :root.theme-light {
-  /* TOP LEVEL STYLES */
+  /*
+  TABLE OF CONTENTS
+  - Color ramp
+  - Core classes
+  - Tabs
+  - Timeline
+  - Menus
+  - Code Mirror (Editor)
+  - Breakpoints
+  - To Organise
+  - (Previous styles; to organise)
+  */
+
+  /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
   --theme-base-95: hsl(0, 0%, 95%);
   --theme-base-90: hsl(0, 0%, 90%);
@@ -146,71 +126,53 @@
   --theme-base-80: hsl(0, 0%, 80%);
   --theme-base-70: hsl(0, 0%, 70%);
   --theme-base-60: hsl(0, 0%, 60%);
-  --theme-base-50: hsl(0, 0%, 50%);
-  --theme-base-40: hsl(0, 0%, 40%);
 
-  /* AUDITED */
+  /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
+
+  --checkbox-border: var(--theme-base-80);
+  --checkbox: #fff;
+  --modal-bgcolor: rgba(255, 255, 255, 0.95);
+  --theme-tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
+  --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
+  --theme-body-bgcolor: var(--theme-base-100); /* bg text */
+  --theme-border: #d2d5da;
+  --icon-color: var(--theme-body-color);
+  --theme-focuser-bgcolor: var(--primary-accent);
+  --theme-sidebar-background: var(--theme-base-100);
+  --theme-text-field-bgcolor-color: var(--theme-body-color);
+  --theme-text-field-bgcolor: var(--theme-base-95);
+  --text-field-border: var(--cool-gray-300);
   --menu-bgcolor: var(--theme-toolbar-background);
   --menu-color: var(--theme-body-color);
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
-  --big-overlay-bgcolor: rgba(255, 255, 255, 0.95);
-  --big-overlay-border: none;
-
-  --theme-tab-background: var(--theme-base-90); /* bg tabs */
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
 
+  /* Tabs (Light) */
   --tab-bgcolor: var(--theme-base-90);
   --tab-color: var(--theme-base-40);
-  --tab-selected-color: var(--theme-body-color);
   --tab-hover-bgcolor: var(--theme-base-85);
   --tab-hover-color: var(--tab-selected-color);
-
-  --theme-body-background: var(--theme-base-100); /* bg text */
-  --theme-tab-background-alt-subtle: var(--theme-base-100); /* info, events */
-  --theme-sidebar-background: var(--theme-base-100);
-  --theme-toggle: var(--theme-base-85);
-  --theme-toggle-handle: var(--theme-base-100);
-  --icon-color: var(--theme-body-color);
-  --theme-text-field: var(--theme-base-95);
-  --theme-text-field-color: var(--theme-body-color);
-  --theme-console-input: var(--theme-body-background);
-
-  --progressbar-preview-min: var(--theme-base-80);
-  --progressbar-preview-max: var(--theme-base-85);
-  --progressbar-unplayed: var(--theme-base-100);
-
-  --unloaded-region-img: url("/images/dotted-mask-light.svg");
-  --theme-focuser: var(--primary-accent);
-  --toolbox-background: var(--theme-base-100);
-
-  --breakpoint-editfield-hover: var(--theme-text-field);
-  --breakpoint-editfield-active: #fff;
-  --breakpoint-tip: var(--theme-highlight-purple);
-  --breakpoint-status-bg: var(--theme-base-90);
-  --breakpoint-status: var(--theme-body-color);
-  --breakpoint-arrow: var(--theme-comment);
-  --breakpoint-arrow-disabled: var(--theme-base-90);
-
-  --text-field-border: var(--cool-gray-300);
-  --jellyfish: rgba(255, 255, 255, 0.8);
-
-  /* TO AUDIT NEXT */
-  --tab-standard-color: var(--theme-base-100);
-  --theme-toolbar-hover: #fff;
+  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+  --tab-selected-color: var(--theme-body-color);
   --tab-standard-color: rgba(0, 0, 0, 0.5);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
+  --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
+
+  /* Timeline (Light) */
+  --progressbar-preview-max: var(--theme-base-85);
+  --progressbar-preview-min: var(--theme-base-80);
+  --progressbar-unplayed: var(--theme-base-100);
+
+  /* Menus (Light) */
+  --menu-bgcolor: var(--theme-toolbar-background);
+  --menu-color: var(--theme-body-color);
+  --menu-hover-bgcolor: var(--theme-base-95);
+  --menu-hover-color: #000;
   --theme-menu-highlight: #f3f4f6;
-  --theme-border: #d2d5da;
-  --theme-toggle-inner: var(--cool-gray-200);
-  --theme-toggle-selected: white;
-  --toolbarbutton-focus-background: var(--theme-base-90);
 
-  --checkbox: #fff;
-  --checkbox-border: var(--theme-base-80);
-
-  /* CODE MIRROR */
+  /* Code Mirror (Light) */
   --cm-linenumber: var(--grey-80);
   --cm-keyword: #dd00a9;
   --cm-variable: #8000d7;
@@ -220,6 +182,28 @@
   --caret-color: #18181a;
   --debug-line-border: #037aff;
   --debug-line-background: #e9f3ff;
+
+  /* Breakpoints (Light) */
+  --breakpoint-arrow-disabled: var(--theme-base-90);
+  --breakpoint-arrow: var(--theme-comment);
+  --breakpoint-editfield-active: #fff;
+  --breakpoint-editfield-hover: var(--theme-text-field-bgcolor);
+  --breakpoint-status-bg: var(--theme-base-90);
+  --breakpoint-status: var(--theme-body-color);
+  --breakpoint-tip: var(--theme-highlight-purple);
+  --breakpoint-label: var(--cm-string);
+
+  /* To organise (Light) */
+  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
+  --theme-console-input-bgcolor: var(--theme-body-bgcolor);
+  --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --theme-toggle-inner: var(--cool-gray-200);
+  --theme-toggle-selected: white;
+  --theme-toggle-bgcolor: var(--theme-base-85);
+  --theme-toolbar-hover: #fff;
+  --toolbarbutton-focus-bgcolor: var(--theme-base-90);
+  --toolbox-bgcolor: var(--theme-base-100);
+  --unloaded-region-img: url("/images/dotted-mask-light.svg");
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -350,7 +334,20 @@
 }
 
 :root.theme-dark {
-  /* TOP LEVEL STYLES */
+  /*
+  TABLE OF CONTENTS
+  - Color ramp
+  - Core classes
+  - Tabs
+  - Timeline
+  - Menus
+  - Code Mirror (Editor)
+  - Breakpoints
+  - To Organise
+  - (Previous styles; to organise)
+  */
+
+  /* Color ramp (Dark) */
   --theme-base-100: #000000; /* background chrome */
   --theme-base-95: #252525; /* tab bars */
   --theme-base-90: #303030; /* editor and selected tab */
@@ -359,59 +356,51 @@
   --theme-base-70: #828282;
   --theme-base-60: #a3a3a3;
 
+  /* Core classes (Dark) */
   --chrome: #1c1c1c; /* bg app */
+
+  --theme-body-color: var(--grey-40);
+  --checkbox-border: var(--theme-base-90);
+  --checkbox: var(--theme-base-80);
+  --modal-bgcolor: rgba(0, 0, 0, 0.95);
+  --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
+  --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
+  --theme-body-bgcolor: var(--theme-base-95); /* bg text */
+  --theme-border: var(--theme-base-100);
+  --icon-color: var(--theme-body-color);
+  --theme-focuser-bgcolor: var(--primary-accent);
+  --theme-sidebar-background: var(--theme-body-bgcolor);
+  --theme-text-field-bgcolor-color: #fff;
+  --theme-text-field-bgcolor: var(--theme-base-85);
+  --text-field-border: var(--theme-base-85);
+
   --menu-bgcolor: var(--theme-base-90);
   --menu-color: var(--theme-body-color);
   --menu-hover-bgcolor: var(--theme-base-85);
   --menu-hover-color: #fff;
-  --big-overlay-bgcolor: rgba(0, 0, 0, 0.95);
-  --big-overlay-border: var(--theme-base-95);
 
-  --theme-tab-background: var(--theme-base-100); /* bg tabs */
   --tab-selected-bgcolor: var(--theme-base-95);
 
+  /* Tabs (Dark) */
   --tab-bgcolor: var(--theme-base-100);
   --tab-color: var(--theme-base-40);
-  --tab-selected-color: #fff;
   --tab-hover-bgcolor: var(--theme-base-85);
   --tab-hover-color: var(--tab-selected-color);
+  --tab-selected-bgcolor: var(--theme-base-95);
+  --tab-selected-color: #fff;
 
-  --theme-body-background: var(--theme-base-95); /* bg text */
-  --theme-tab-background-alt-subtle: var(--theme-base-95); /* info, events */
-  --theme-sidebar-background: var(--theme-body-background);
-  --theme-toggle: var(--theme-base-85);
-  --theme-toggle-handle: var(--theme-base-100);
-  --icon-color: var(--theme-body-color);
-  --theme-text-field: var(--theme-base-85);
-  --theme-text-field-color: #fff;
-  --theme-console-input: var(--theme-base-95);
-
-  --progressbar-preview-min: var(--theme-base-80);
+  /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
+  --progressbar-preview-min: var(--theme-base-80);
   --progressbar-unplayed: var(--theme-base-100);
 
-  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
-  --theme-focuser: var(--primary-accent);
-  --toolbox-background: var(--theme-base-100);
+  /* Menus (Dark) */
+  --menu-bgcolor: var(--theme-base-90);
+  --menu-color: var(--theme-body-color);
+  --menu-hover-bgcolor: var(--theme-base-85);
+  --menu-hover-color: #fff;
 
-  --breakpoint-editfield-hover: var(--theme-base-90);
-  --breakpoint-editfield-active: var(--theme-base-95);
-  --breakpoint-tip: #fff;
-  --breakpoint-status-bg: var(--theme-base-90);
-  --breakpoint-status: var(--theme-body-color);
-  --breakpoint-arrow: #fff;
-  --breakpoint-arrow-disabled: var(--theme-base-80);
-
-  --text-field-border: var(--theme-base-85);
-  --jellyfish: rgba(40, 40, 40, 0.8);
-  --theme-border: var(--theme-base-100);
-  --checkbox: var(--theme-base-80);
-  --checkbox-border: var(--theme-base-90);
-
-  --toolbarbutton-focus-background: var(--theme-base-90);
-
-  /* CODE MIRROR (DARK) */
-
+  /* Code Mirror (Dark) */
   --cm-linenumber: var(--grey-40);
   --cm-keyword: #ff42a8;
   --cm-def: #fff;
@@ -423,6 +412,25 @@
   --caret-color: #fff;
   --debug-line-border: var(--theme-base-85);
   --debug-line-background: var(--theme-base-100);
+
+  /* Breakpoints (Dark) */
+  --breakpoint-arrow-disabled: var(--theme-base-80);
+  --breakpoint-arrow: #fff;
+  --breakpoint-editfield-active: var(--theme-base-95);
+  --breakpoint-editfield-hover: var(--theme-base-90);
+  --breakpoint-status-bg: var(--theme-base-90);
+  --breakpoint-status: var(--theme-body-color);
+  --breakpoint-tip: #fff;
+  --breakpoint-label: var(--cm-string);
+
+  /* To organise (Dark) */
+  --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
+  --theme-console-input-bgcolor: var(--theme-base-95);
+  --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --theme-toggle-bgcolor: var(--theme-base-85);
+  --toolbarbutton-focus-bgcolor: var(--theme-base-90);
+  --toolbox-bgcolor: var(--theme-base-100);
+  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* Toolbar */
   --theme-toolbar-panel-icon-color: var(--icon-color);
@@ -470,7 +478,6 @@
 
   /* Text color */
   --theme-comment: var(--grey-45);
-  --theme-body-color: var(--grey-40);
   --theme-text-color-alt: var(--grey-45);
   --theme-text-color-inactive: var(--grey-50);
   --theme-text-color-strong: var(--grey-30);
@@ -571,19 +578,14 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-1--comment-container: var(--z-index-1);
   --z-index-1--icon-tooltip: var(--z-index-1);
   --z-index-1--timeline-tooltip: var(--z-index-1);
-
   --z-index-2--hovered-point-secondary: var(--z-index-2);
-
   --z-index-3--hovered-point-primary: var(--z-index-3);
   --z-index-3--hovered-comment-primary: var(--z-index-3);
-
   --z-index-4--name: var(--z-index-4);
   --z-index-5--name: var(--z-index-5);
   --z-index-6--name: var(--z-index-6);
   --z-index-7--name: var(--z-index-7);
-
   --z-index-7--mask: var(--z-index-7);
-
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
 }
