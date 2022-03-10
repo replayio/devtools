@@ -12,6 +12,7 @@ module.exports = {
         breakpointStatus: "var(--breakpoint-status)",
         breakpointStatusBG: "var(--breakpoint-status-bg)",
         breakpointTip: "var(--breakpoint-tip)",
+        breakpointLabel: "var(--breakpoint-label)",
         checkbox: "var(--checkbox)",
         checkboxBorder: "var(--checkbox-border)",
         chrome: "var(--chrome)",
@@ -41,7 +42,6 @@ module.exports = {
         themeTabBgcolorAltSubtle: "var(--theme-tab-bgcolor-alt-subtle)",
         themeTextFieldBgcolor: "var(--theme-text-field-bgcolor)",
         themeTextFieldColor: "var(--theme-text-field-color)",
-
         themeToggleBgcolor: "var(--theme-toggle-bgcolor)",
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
         toolbarBackground: "var(--theme-toolbar-background)",

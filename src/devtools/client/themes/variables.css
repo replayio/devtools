@@ -191,6 +191,7 @@
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--theme-body-color);
   --breakpoint-tip: var(--theme-highlight-purple);
+  --breakpoint-label: var(--cm-string);
 
   /* To organise (Light) */
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
@@ -420,6 +421,7 @@
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--theme-body-color);
   --breakpoint-tip: #fff;
+  --breakpoint-label: var(--cm-string);
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);

@@ -118,7 +118,7 @@
   margin-top: 1px;
   margin-right: 1em;
   font-family: var(--monospace-font-family);
-  color: var(--blue-80);
+  color: var(--breakpoint-label);
 }
 
 .breakpoint .close-btn,
