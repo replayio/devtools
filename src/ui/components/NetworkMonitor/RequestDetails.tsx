@@ -36,10 +36,9 @@ const RequestDetailsTabs: FC<{ children?: ReactNode }> = ({ children }) => {
   return (
     <div
       className={classNames(
-        "sticky top-0 z-10 flex items-center justify-between border-b border-themeBorder bg-toolbarBackground",
+        "sticky top-0 z-10 flex items-center justify-between bg-toolbarBackground",
         styles.border
       )}
-      style={{ height: 25 }}
     >
       {children}
     </div>
@@ -298,10 +297,10 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="min-w-full overflow-y-scroll bg-themeBodyBackground">
+    <div className="no-scrollbar min-w-full overflow-y-scroll border-l border-themeBorder bg-themeBodyBackground">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
+        <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
       </RequestDetailsTabs>
       <div className={classNames("requestDetails", styles.requestDetails)}>
         <div>
