@@ -6,7 +6,7 @@
   display: flex;
   width: 100%;
   height: var(--editor-header-height);
-  background-color: var(--theme-tab-background);
+  background-color: var(--theme-tab-bgcolor);
   border-radius: 8px 8px 0 0;
   overflow: scroll;
   scrollbar-width: none;
@@ -21,7 +21,7 @@
   flex-shrink: 0;
   border-bottom: 0;
   border-inline-start: 1px solid var(--theme-splitter-color);
-  background-color: var(--theme-tab-background);
+  background-color: var(--theme-tab-bgcolor);
 }
 
 .source-tabs {

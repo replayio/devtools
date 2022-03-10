@@ -38,7 +38,7 @@ export function HeaderGroups({
         return (
           <div
             key={key}
-            className="flex items-center divide-x divide-themeTextField font-normal"
+            className="flex items-center divide-x divide-themeTextFieldBgcolor font-normal"
             {...headerProps}
           >
             {headerGroup.headers.map(column => {

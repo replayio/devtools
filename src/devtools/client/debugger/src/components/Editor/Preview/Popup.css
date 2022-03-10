@@ -91,7 +91,7 @@
 }
 
 .tooltip .preview-popup {
-  background: var(--toolbox-background);
+  background: var(--toolbox-bgcolor);
   max-width: inherit;
   min-height: 80px;
   border: 1px solid var(--theme-splitter-color);

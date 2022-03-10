@@ -194,7 +194,7 @@
   display: block;
   border: 1px solid var(--theme-splitter-color);
   border-radius: 3px;
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   margin: 0 auto;
 }
 

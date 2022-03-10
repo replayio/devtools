@@ -85,7 +85,7 @@
   padding: 0 2px;
   font: inherit;
   color: var(--theme-text-color-strong);
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
 }
 
 #storage-table input:focus {

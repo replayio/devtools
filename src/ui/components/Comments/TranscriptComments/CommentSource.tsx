@@ -42,7 +42,7 @@ function CommentSource({
   return (
     <div
       onClick={onSelectSource}
-      className="group cursor-pointer rounded-md border-gray-200 bg-chrome px-2 py-0.5 hover:bg-themeTextField"
+      className="group cursor-pointer rounded-md border-gray-200 bg-chrome px-2 py-0.5 hover:bg-themeTextFieldBgcolor"
     >
       <div className="mono flex flex-col font-medium">
         <div className="flex w-full flex-row justify-between space-x-1">
