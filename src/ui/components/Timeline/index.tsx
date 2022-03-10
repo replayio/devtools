@@ -37,7 +37,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
 import { EditFocusButton } from "./EditFocusButton";
 import { UnloadedRegions } from "./UnloadedRegions";
-import { DragMask } from "./DragMask";
+import { MouseDownMask } from "./MouseDownMask";
 
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
@@ -68,9 +68,8 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
   }
 
   // Get the time for a mouse event within the recording.
-  getMouseTime(e: React.MouseEvent) {
+  getMouseTime(e: MouseEvent | React.MouseEvent) {
     const { startTime, endTime } = this.props.zoomRegion;
-    // const { left, width } = e.currentTarget.getBoundingClientRect();
     const { left, width } = this.$progressBar!.getBoundingClientRect();
     const clickLeft = e.clientX;
 
@@ -101,7 +100,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     this.setState({ isDragging: true });
   };
 
-  onPlayerMouseMove: MouseEventHandler = e => {
+  onPlayerMouseMove = (e: MouseEvent | React.MouseEvent) => {
     const { hoverTime, setTimelineToTime, setTimelineState, isFocusing, focusRegion } = this.props;
     const mouseTime = this.getMouseTime(e);
     const isDragging = e.buttons === 1;
@@ -122,7 +121,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     }
   };
 
-  onPlayerMouseUp: MouseEventHandler = e => {
+  onPlayerMouseUp = (e: MouseEvent | React.MouseEvent) => {
     const {
       hoverTime,
       isFocusing,
@@ -363,6 +362,8 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
             <div
               className="progress-bar"
               ref={node => (this.$progressBar = node)}
+              onMouseMove={e => this.onPlayerMouseMove(e)}
+              onMouseUp={e => this.onPlayerMouseUp(e)}
               onMouseEnter={this.onPlayerMouseEnter}
               onMouseDown={this.onMouseDown}
             >
@@ -383,10 +384,15 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
               {showCurrentPauseMarker ? (
                 <div className="progress-line-paused" style={{ left: `${percent}%` }} />
               ) : null}
-              {/* {isDragging ? (
-                <DragMask onMouseMove={this.onPlayerMouseMove} onMouseUp={this.onPlayerMouseUp} />
-              ) : null} */}
-              {isFocusing ? <Focuser /> : null}
+              {isFocusing ? (
+                <Focuser setIsDragging={isDragging => this.setState({ isDragging })} />
+              ) : null}
+              {isDragging ? (
+                <MouseDownMask
+                  onMouseMove={this.onPlayerMouseMove}
+                  onMouseUp={this.onPlayerMouseUp}
+                />
+              ) : null}
             </div>
             <Tooltip timelineWidth={this.overlayWidth} />
           </div>
