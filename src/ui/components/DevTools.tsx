@@ -1,12 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  Children,
-  ReactChildren,
-  ReactElement,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
@@ -27,8 +19,9 @@ import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 import useAuth0 from "ui/utils/useAuth0";
+import { lazyWithPreload } from "ui/utils/preload";
 
-const DevView = React.lazy(() => import("./Views/DevView"));
+const DevView = lazyWithPreload(() => import("./Views/DevView"));
 
 type _DevToolsProps = PropsFromRedux & DevToolsProps;
 
@@ -73,7 +66,8 @@ function _DevTools({
   );
 
   useEffect(() => {
-    import("./Views/DevView");
+    // @ts-ignore
+    DevView.preload();
   }, []);
   useEffect(() => {
     // We only track anonymous usage for recording by non-internal users so that
