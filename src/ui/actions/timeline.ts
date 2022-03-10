@@ -31,7 +31,6 @@ import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { getModal } from "ui/reducers/app";
 import clamp from "lodash/clamp";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {

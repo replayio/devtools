@@ -118,7 +118,6 @@ import "ui/components/shared/SharingModal/EmailForm.css";
 import "ui/components/shared/SharingModal/ReplayLink.css";
 import "ui/components/shared/WorkspaceSettingsModal/WorkspaceMember.css";
 import "ui/components/Timeline/MessageMarker.css";
-import "ui/components/Timeline/ScrollContainer.css";
 import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
