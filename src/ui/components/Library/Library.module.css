@@ -1,16 +1,80 @@
-.librarySearch input {
-  background-color: white;
-  border: 1px solid #d1d5db;
+:root:global(.theme-dark) .libraryHeader {
+  background-color: var(--theme-base-100);
 }
 
-.libraryHeaderText {
-  color: #38383d;
+:root:global(.theme-dark) .libraryWrapper {
+  background-color: var(--theme-base-100);
 }
 
-.libraryHeaderButton button {
-  color: #38383d;
+:root:global(.theme-dark) .libraryRow {
+  background-color: var(--theme-base-90);
 }
 
-.recordingTitle {
-  color: #38383d;
+:root:global(.theme-dark) .libraryRow:hover {
+  background-color: var(--theme-base-85);
+}
+
+:root:global(.theme-dark) .replayTitle {
+  color: #fff;
+}
+
+:root:global(.theme-dark) .libraryHeaderDivider {
+  border-bottom: 1px solid var(--theme-base-85);
+}
+
+:root:global(.theme-dark) .recordingList {
+  background-color: var(--theme-base-100);
+}
+
+:root:global(.theme-dark) .dropdownDivider {
+  border-bottom: 1px solid var(--theme-base-80);
+}
+
+:root:global(.theme-dark) .editButton {
+  background-color: var(--theme-base-80);
+  color: #fff;
+  border: none;
+}
+
+:root:global(.theme-dark) .editButton:hover {
+  background-color: var(--primary-accent-hover);
+  color: #fff;
+  border: none;
+}
+
+:root:global(.theme-light) .libraryHeader {
+  background-color: var(--theme-base-100);
+}
+
+:root:global(.theme-light) .libraryWrapper {
+  background-color: var(--theme-base-95);
+}
+
+:root:global(.theme-light) .libraryRow {
+  background-color: var(--theme-base-100);
+}
+
+:root:global(.theme-light) .libraryRow:hover {
+  background-color: var(--theme-base-95);
+}
+
+:root:global(.theme-light) .libraryHeaderDivider {
+  border-bottom: 1px solid var(--theme-base-85);
+}
+
+:root:global(.theme-light) .recordingList {
+  background-color: var(--theme-base-100);
+}
+
+:root:global(.theme-light) .dropdownDivider {
+  border-bottom: 1px solid var(--theme-base-90);
+}
+
+:root:global(.theme-light) .editButton {
+  background-color: #fff;
+}
+
+:root:global(.theme-light) .editButton:hover {
+  background-color: var(--primary-accent-hover);
+  color: #fff;
 }

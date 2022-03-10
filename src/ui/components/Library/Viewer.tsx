@@ -8,6 +8,7 @@ import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
 import TeamTrialEnd from "./TeamTrialEnd";
+import styles from "./Library.module.css";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -60,7 +61,9 @@ export default function Viewer({
     : recordings;
 
   return (
-    <div className="flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6">
+    <div
+      className={`flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
+    >
       <ViewerContent {...{ workspaceName, searchString }} recordings={filteredRecordings} />
     </div>
   );
@@ -140,7 +143,9 @@ function ViewerContent({
           )}
         </div>
       </ViewerHeader>
-      <div className="recording-list flex flex-col overflow-y-auto rounded-md bg-white text-sm shadow-md">
+      <div
+        className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
+      >
         {sortedRecordings.map((r, i) => (
           <RecordingRow
             key={i}
