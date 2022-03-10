@@ -35,6 +35,11 @@
   animation: dropdownFadeIn ease 200ms;
 }
 
+.modal-with-border {
+  border: 1px solid var(--modal-border);
+  background-color: var(--modal-bgcolor);
+}
+
 .modal-close {
   position: absolute;
   top: 12px;
