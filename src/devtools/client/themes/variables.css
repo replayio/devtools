@@ -132,7 +132,7 @@
 
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
-  --modal-bgcolor: rgba(255, 255, 255, 0.95);
+  --modal-bgcolor: rgba(255, 255, 255, 0.8);
   --modal-border: none;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
@@ -325,6 +325,13 @@
   --replay-head-background: var(--purple-50);
 }
 
+/* browser specific tweaks */
+@-moz-document url-prefix() {
+  :root.theme-light {
+    --modal-bgcolor: rgba(255, 255, 255, 0.98);
+  }
+}
+
 /*
  * For doorhangers elsewhere in Firefox, Mac uses fixed colors rather than
  * system colors.
@@ -362,7 +369,7 @@
   --theme-body-color: var(--grey-40);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
-  --modal-bgcolor: rgba(0, 0, 0, 0.95);
+  --modal-bgcolor: rgba(0, 0, 0, 0.78);
   --modal-border: #222;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
@@ -548,6 +555,13 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
+}
+
+/* browser specific tweaks */
+@-moz-document url-prefix() {
+  :root.theme-dark {
+    --modal-bgcolor: rgba(0, 0, 0, 0.35);
+  }
 }
 
 /* Z-index scale */

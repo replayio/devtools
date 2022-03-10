@@ -108,5 +108,5 @@ export function DropdownItemContent({
 }
 
 export function DropdownDivider() {
-  return <div className="w-full border-b border-gray-200" />;
+  return <div className="w-full border-b border-themeToggleBgcolor" />;
 }
