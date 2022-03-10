@@ -297,7 +297,6 @@ const RequestDetails = ({
   }, [activeTab, activeTabs]);
 
   return (
-    <div className="min-w-full overflow-y-scroll bg-themeBodyBgcolor">
     <div className="no-scrollbar min-w-full overflow-y-scroll border-l border-themeBorder bg-themeBodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
