@@ -363,7 +363,7 @@
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
   --modal-bgcolor: rgba(0, 0, 0, 0.95);
-  --modal-border: orange;
+  --modal-border: #222;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
   --theme-body-bgcolor: var(--theme-base-95); /* bg text */
