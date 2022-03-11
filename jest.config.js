@@ -16,6 +16,12 @@ module.exports = {
 
     // Handle module aliases
     "^@/components/(.*)$": "<rootDir>/components/$1",
+
+    "devtools/(.*)": "<rootDir>/src/devtools/$1",
+
+    "protocol/(.*)": "<rootDir>/src/protocol/$1",
+
+    ssr: "<rootDir>/src/ssr",
   },
   testEnvironment: "jsdom",
   testMatch: [
