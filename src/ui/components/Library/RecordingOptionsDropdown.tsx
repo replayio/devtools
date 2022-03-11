@@ -40,6 +40,8 @@ function RecordingOptionsDropdown({
     setExpanded(false);
   };
   const onDeleteRecording = (recordingId: RecordingId) => {
+    setExpanded(false);
+    
     confirmDestructive({
       message: "Delete replay?",
       description:
@@ -49,7 +51,6 @@ function RecordingOptionsDropdown({
       if (confirmed) {
         deleteRecording(recordingId, currentWorkspaceId);
       }
-      setExpanded(false);
     });
   };
   const onRename = () => {
