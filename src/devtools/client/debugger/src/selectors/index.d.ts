@@ -29,4 +29,4 @@ export function hasFrames(state: UIState): boolean;
 export function getSelectedSourceWithContent(state: UIState): any;
 export function getSymbols(state: UIState, source: any): any;
 export function getCursorPosition(state: UIState): any;
-export function getSelectedFrame(state: UIState): SelectedFrame;
+export function getSelectedFrame(state: UIState): SelectedFrame | null;
