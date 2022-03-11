@@ -1,5 +1,6 @@
 import React from "react";
 import classNames from "classnames";
+import styles from "./Library.module.css";
 
 export default function SidebarButton({
   children,
@@ -15,9 +16,9 @@ export default function SidebarButton({
   return (
     <a
       className={classNames(
-        `group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:bg-gray-900 hover:text-white focus:outline-none`,
+        `${styles.teamRow} group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:text-white focus:outline-none`,
         { underline },
-        shouldHighlight ? "cursor-auto bg-gray-900 text-white" : "cursor-pointer"
+        shouldHighlight ? `${styles.teamRowActive} cursor-auto` : "cursor-pointer"
       )}
       onClick={onClick}
     >

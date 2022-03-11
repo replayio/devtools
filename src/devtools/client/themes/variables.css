@@ -129,6 +129,7 @@
 
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
+
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
   --modal-bgcolor: rgba(255, 255, 255, 0.95);
@@ -365,7 +366,7 @@
   --modal-border: #222;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
-  --theme-body-bgcolor: var(--theme-base-95); /* bg text */
+  --theme-body-bgcolor: var(--theme-base-95);
   --theme-border: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
   --theme-focuser-bgcolor: var(--primary-accent);

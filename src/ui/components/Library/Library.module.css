@@ -1,20 +1,26 @@
 /* Dark */
 
 :root:global(.theme-dark) .libraryHeader {
-  background-color: var(--theme-base-100);
+  background-color: var(--chrome);
   border-bottom: 1px solid var(--theme-base-90);
 }
 
 :root:global(.theme-dark) .libraryWrapper {
-  background-color: var(--theme-base-100);
+  background-color: var(--chrome);
 }
 
 :root:global(.theme-dark) .libraryRow {
-  background-color: var(--theme-base-90);
+  background-color: var(--theme-body-bgcolor);
 }
 
 :root:global(.theme-dark) .libraryRow:hover {
-  background-color: var(--theme-base-85);
+  background-color: var(--theme-base-90);
+}
+
+:root:global(.theme-dark) .teamRow:hover,
+:root:global(.theme-dark) .teamRowActive {
+  background-color: var(--theme-base-90);
+  color: #fff;
 }
 
 :root:global(.theme-dark) .replayTitle {
@@ -47,7 +53,7 @@
 }
 
 :root:global(.theme-dark) .sidebar {
-  background-color: var(--theme-base-90);
+  background-color: var(--theme-body-bgcolor);
   color: var(--theme-body-color);
 }
 
@@ -74,6 +80,12 @@
   background-color: var(--grey-10);
 }
 
+:root:global(.theme-light) .teamRow:hover,
+:root:global(.theme-light) .teamRowActive {
+  background-color: red;
+  color: #fff;
+}
+
 :root:global(.theme-light) .recordingList {
   background-color: var(--theme-base-100);
 }
@@ -97,7 +109,7 @@
 }
 
 :root:global(.theme-light) .sidebar {
-  background-color: #303030;
+  background-color: #252525;
   color: hsl(0, 0%, 90%);
 }
 
