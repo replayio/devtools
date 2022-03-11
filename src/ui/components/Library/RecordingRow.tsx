@@ -33,7 +33,7 @@ export function getRelativeDate(date: string) {
 
 function ReplayTitle({ title }: { title?: string }) {
   return (
-    <div className="overflow-hidden overflow-ellipsis whitespace-pre">
+    <div className={`${styles.replayTitle} overflow-hidden overflow-ellipsis whitespace-pre`}>
       {title || <span className="italic">Untitled</span>}
     </div>
   );
@@ -91,7 +91,9 @@ function RecordingRow({
 
   return (
     <RowWrapper recording={recording} isEditing={isEditing} onClick={toggleChecked}>
-      <div className="group flex cursor-pointer flex-row border-b border-gray-200 hover:bg-gray-50">
+      <div
+        className={`group flex cursor-pointer flex-row border-b border-themeBorder ${styles.libraryRow}`}
+      >
         <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre py-3 px-4">
           {isEditing && isOwner ? (
             <input
@@ -99,7 +101,7 @@ function RecordingRow({
               onClick={e => e.stopPropagation()}
               onChange={toggleChecked}
               checked={selected}
-              className="focus:primaryAccentHover h-4 w-4 rounded border-gray-300 text-primaryAccent"
+              className="focus:primaryAccentHover h-4 w-4 rounded border-themeBorder text-primaryAccent"
             />
           ) : null}
         </div>
