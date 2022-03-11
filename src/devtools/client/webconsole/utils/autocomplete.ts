@@ -9,6 +9,7 @@ import {
 import generate from "@babel/generator";
 import { ValueFront } from "protocol/thread";
 import { WiredObject } from "protocol/thread/pause";
+import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/utils";
 const { filter } = require("fuzzaldrin-plus");
 
 type PropertyExpression = {
@@ -246,16 +247,20 @@ export function insertAutocompleteMatch(value: string, match: string) {
     return match;
   }
 }
-export function getAutocompleteMatches(input: string, scope: Scope) {
+export async function getAutocompleteMatches(input: string, scope: Scope) {
   const propertyExpression = getPropertyExpression(input);
 
   if (propertyExpression) {
     const properties = [];
     const { left, right } = propertyExpression;
 
-    const object = getBinding(left, scope)?.value.getObject();
-    if (object) {
-      properties.push(...getPropertiesForObject(object));
+    const value = getBinding(left, scope)?.value;
+    if (value) {
+      await value.traversePrototypeChainAsync(
+        current => current.loadIfNecessary(),
+        GETTERS_FROM_PROTOTYPES
+      );
+      properties.push(...getPropertiesForObject(value.getObject()));
     }
 
     return fuzzyFilter(properties, normalizeString(right));
