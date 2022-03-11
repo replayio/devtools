@@ -82,7 +82,7 @@
 
 :root:global(.theme-light) .teamRow:hover,
 :root:global(.theme-light) .teamRowActive {
-  background-color: red;
+  background-color: #303030;
   color: #fff;
 }
 
