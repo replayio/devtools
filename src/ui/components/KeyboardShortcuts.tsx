@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { usesWindow } from "ssr";
 import { connect, ConnectedProps } from "react-redux";

@@ -2,7 +2,6 @@ import { AppState, EventKind, ReplayEvent } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-import { features } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";

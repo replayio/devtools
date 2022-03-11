@@ -93,7 +93,6 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
   parameters: loadedRegions;
 };
-
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;
 };
