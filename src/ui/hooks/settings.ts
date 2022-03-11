@@ -46,6 +46,7 @@ const testSettings: ExperimentalUserSettings = {
   enableEventLink: false,
   enableTeams: true,
   showReact: true,
+  codeHeatMaps: false,
 };
 
 export async function getUserSettings(): Promise<ExperimentalUserSettings> {
@@ -116,6 +117,7 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
     showReact: settings.showReact,
+    codeHeatMaps: settings.codeHeatMaps,
   };
 }
 

@@ -51,6 +51,14 @@ export default function update(state = initial, action) {
       state = updateBreakpointColumns(state, action);
       break;
 
+    case "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS":
+      state = updateBreakpointHitCounts(state, action);
+      break;
+
+    case "set_trim_region":
+      state.values = clearBreakpointHitCounts(state);
+      break;
+
     case "SET_SOURCE_ACTOR_BREAKABLE_LINES":
       state = updateBreakableLines(state, action);
       break;
@@ -101,16 +109,53 @@ function updateBreakableLines(state, action) {
   return updateResources(state, [{ id: sourceId, breakableLines: value }]);
 }
 
-export function resourceAsSourceActor({ breakpointPositions, breakableLines, ...sourceActor }) {
-  return sourceActor;
+function updateBreakpointHitCounts(state, action) {
+  const value = asyncActionAsValue(action);
+  if (value.state === "pending") {
+    return state;
+  }
+
+  const hitCountsMap = value.value.hits.reduce(
+    (acc, { location, hits }) => {
+      if (!acc.minColumn[location.line]) {
+        acc.hits[location.line] = hits;
+        acc.minColumn[location.line] = location.column;
+      } else if (acc.minColumn[location.line] > location.column) {
+        acc.hits[location.line] = hits;
+        acc.minColumn[location.line] = location.column;
+      }
+      return acc;
+    },
+    { hits: {}, minColumn: {} }
+  );
+
+  const { id: sourceId } = action;
+
+  if (!hasResource(state, sourceId)) {
+    return state;
+  }
+
+  return updateResources(state, [{ id: sourceId, breakpointHitCounts: hitCountsMap.hits }]);
 }
 
-// Because we are using an opaque type for our source actor IDs, these
-// functions are required to convert back and forth in order to get a string
-// version of the IDs. That should be super rarely used, but it means that
-// we can very easily see where we're relying on the string version of IDs.
-export function stringToSourceActorId(s) {
-  return s;
+function clearBreakpointHitCounts(state) {
+  const withoutBreakpointHitCounts = makeReduceAllQuery(
+    x => x,
+    actors => {
+      return actors.reduce((acc, actor) => {
+        acc[actor.id] = {
+          ...actor,
+          breakpointHitCounts: null,
+        };
+        return acc;
+      }, {});
+    }
+  );
+  return withoutBreakpointHitCounts(state);
+}
+
+export function resourceAsSourceActor({ breakpointPositions, breakableLines, ...sourceActor }) {
+  return sourceActor;
 }
 
 export function hasSourceActor(state, id) {
@@ -165,6 +210,12 @@ const queryThreadsBySourceObject = makeReduceAllQuery(
 
 export function getAllThreadsBySource(state) {
   return queryThreadsBySourceObject(state.sourceActors);
+}
+
+export function getSourceActorBreakpointHitCounts(state, id) {
+  const { breakpointHitCounts } = getResource(state.sourceActors, id);
+
+  return asSettled(breakpointHitCounts);
 }
 
 export function getSourceActorBreakableLines(state, id) {

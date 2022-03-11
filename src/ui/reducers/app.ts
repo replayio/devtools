@@ -228,6 +228,7 @@ export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
+
 export const getAnalysisPointsForLocation = (
   state: UIState,
   location: Location | null,
@@ -246,6 +247,7 @@ export const getAnalysisPointsForLocation = (
 
   return points;
 };
+
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);

@@ -9,7 +9,6 @@
  * @module actions/sources
  */
 
-import { stringToSourceActorId } from "../../reducers/source-actors";
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
 import { toggleBlackBox } from "./blackbox";
@@ -229,13 +228,11 @@ export function newGeneratedSources(sourceInfo) {
         };
       }
 
-      const actorId = stringToSourceActorId(source.actor);
-
       // We are sometimes notified about a new source multiple times if we
       // request a new source list and also get a source event from the server.
-      if (!hasSourceActor(getState(), actorId)) {
+      if (!hasSourceActor(getState(), source.actor)) {
         newSourceActors.push({
-          id: actorId,
+          id: source.actor,
           actor: source.actor,
           thread,
           source: newId,

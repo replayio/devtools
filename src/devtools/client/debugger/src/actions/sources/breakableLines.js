@@ -4,28 +4,28 @@
 
 //
 
-import { getSourceActorsForSource, getBreakableLines } from "../../selectors";
-import { setBreakpointPositions } from "../breakpoints/breakpointPositions";
-import { loadSourceActorBreakableLines } from "../source-actors";
-
-function calculateBreakableLines(positions) {
-  const lines = [];
-  for (const line in positions) {
-    if (positions[line].length > 0) {
-      lines.push(Number(line));
-    }
-  }
-
-  return lines;
-}
+import { getSourceActorsForSource } from "../../selectors";
+import {
+  loadSourceActorBreakableLines,
+  loadSourceActorBreakpointHitCounts,
+} from "../source-actors";
 
 export function setBreakableLines(cx, sourceId) {
-  return async (dispatch, getState, { client }) => {
-    let breakableLines;
+  return async (dispatch, getState) => {
     const actors = getSourceActorsForSource(getState(), sourceId);
 
     await Promise.all(
       actors.map(actor => dispatch(loadSourceActorBreakableLines({ id: actor.id, cx })))
+    );
+  };
+}
+
+export function setBreakpointHitCounts(sourceId) {
+  return async (dispatch, getState) => {
+    const actors = getSourceActorsForSource(getState(), sourceId);
+
+    await Promise.all(
+      actors.map(actor => dispatch(loadSourceActorBreakpointHitCounts({ id: actor.id })))
     );
   };
 }

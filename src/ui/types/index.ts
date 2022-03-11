@@ -11,6 +11,7 @@ export type ExperimentalUserSettings = {
   disableLogRocket: boolean;
   enableEventLink: boolean;
   enableTeams: boolean;
+  codeHeatMaps: boolean;
   showReact: boolean;
 };
 
