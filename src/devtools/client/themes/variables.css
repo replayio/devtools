@@ -366,7 +366,7 @@
 
   /* Core classes (Dark) */
   --chrome: #1c1c1c; /* bg app */
-  --theme-body-color: var(--grey-40);
+  --theme-body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
   --modal-bgcolor: rgba(0, 0, 0, 0.78);
