@@ -1,15 +1,16 @@
 import { getAutocompleteMatches } from "./autocomplete";
+import { ValueFront } from "../../../../protocol/value";
 
 const MOCK_SCOPE = {
   bindings: [
     {
       name: "foo",
-      value: {
-        getObject: () => ({
+      value: new ValueFront(null, {
+        _object: {
           className: "Object",
           preview: { properties: [{ name: "bar" }, { name: "baz" }] },
-        }),
-      },
+        },
+      }),
     },
   ],
   parent: {},
