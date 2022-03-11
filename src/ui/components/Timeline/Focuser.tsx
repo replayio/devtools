@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useEffect, useState } from "react";
+import React, { FC, MouseEventHandler, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -8,6 +8,7 @@ import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { trackEvent } from "ui/utils/telemetry";
+import { MouseDownMask } from "./MouseDownMask";
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
   const position = getVisiblePosition({ time, zoom }) * 100;
@@ -15,24 +16,34 @@ const getPosition = (time: number, zoom: ZoomRegion) => {
 };
 
 function ResizeMask({
-  onMouseUp,
-  onMouseMove,
+  draggingTarget,
+  onDragEnd,
 }: {
-  onMouseUp: MouseEventHandler;
-  onMouseMove: () => void;
+  onDragEnd: () => void;
+  draggingTarget: FocusOperation;
 }) {
-  // This is so that the mask would overlay the modal's mask and we can detect
-  // mouse movement throughout the entire screen.
-  const zIndex = 100;
+  const dispatch = useDispatch();
+  const hoverTime = useSelector(selectors.getHoverTime);
+  const currentTime = useSelector(selectors.getCurrentTime);
+  const focusRegion = useSelector(selectors.getFocusRegion);
 
-  return (
-    <div
-      onMouseUp={onMouseUp}
-      onMouseMove={onMouseMove}
-      className="fixed top-0 left-0 h-full w-full opacity-50"
-      style={{ cursor: "ew-resize", zIndex }}
-    />
-  );
+  const onMouseMove = () => {
+    dispatch(actions.updateFocusRegion(draggingTarget));
+  };
+  const onMouseUp = (e: MouseEvent) => {
+    e.stopPropagation();
+    onDragEnd();
+
+    if (
+      (draggingTarget === FocusOperation.resizeStart && currentTime < focusRegion!.startTime) ||
+      (draggingTarget === FocusOperation.resizeEnd && currentTime > focusRegion!.endTime)
+    ) {
+      dispatch(setTimelineState({ currentTime: hoverTime! }));
+      dispatch(setTimelineToTime(hoverTime, true));
+    }
+  };
+
+  return <MouseDownMask onMouseMove={onMouseMove} onMouseUp={onMouseUp} />;
 }
 
 function Draggers({
@@ -118,35 +129,24 @@ function TrimSpan({
   return <Span {...{ startTime, endTime, zoomRegion, draggers }} />;
 }
 
-export const Focuser: React.FC = () => {
+export const Focuser: FC<{ setIsDragging: (isDragging: boolean) => void }> = ({
+  setIsDragging,
+}) => {
   const dispatch = useDispatch();
   const zoomRegion = useSelector(selectors.getZoomRegion);
-  const hoverTime = useSelector(selectors.getHoverTime);
-  const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
   const [draggingTarget, setDraggingTarget] = useState<FocusOperation | null>(null);
 
   const onDragStart = (e: React.MouseEvent, target: FocusOperation) => {
     e.stopPropagation();
+    setIsDragging(true);
     setDraggingTarget(target);
   };
-  const onMouseUp: MouseEventHandler = e => {
-    e.stopPropagation();
+  const onDragEnd = () => {
+    setIsDragging(false);
     setDraggingTarget(null);
-    if (
-      (draggingTarget === FocusOperation.resizeStart && currentTime < focusRegion!.startTime) ||
-      (draggingTarget === FocusOperation.resizeEnd && currentTime > focusRegion!.endTime)
-    ) {
-      dispatch(setTimelineState({ currentTime: hoverTime! }));
-      dispatch(setTimelineToTime(hoverTime, true));
-    }
   };
-  const onMouseMove = () => {
-    if (!draggingTarget) {
-      return;
-    }
-    dispatch(actions.updateFocusRegion(draggingTarget));
-  };
+
   useEffect(() => {
     if (!focusRegion) {
       const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
@@ -172,7 +172,7 @@ export const Focuser: React.FC = () => {
           dragging={!!draggingTarget}
         />
       ) : null}
-      {draggingTarget ? <ResizeMask onMouseMove={onMouseMove} onMouseUp={onMouseUp} /> : null}
+      {draggingTarget ? <ResizeMask onDragEnd={onDragEnd} draggingTarget={draggingTarget} /> : null}
     </div>
   );
 };
