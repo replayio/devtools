@@ -7,6 +7,7 @@ import {
   GetterItem,
   GETTERS_FROM_PROTOTYPES,
   IItem,
+  isValueLoaded,
   Item,
   KeyValueItem,
   LabelAndValue,
@@ -14,6 +15,7 @@ import {
   renderRep,
 } from ".";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+import { assert } from "protocol/utils";
 
 export class ValueItem implements IItem {
   readonly type = "value";
@@ -135,9 +137,9 @@ export class ValueItem implements IItem {
     const knownProperties = new Set(previewValues.keys());
     value.traversePrototypeChain(current => {
       const getters = current.previewGetters();
-      for (const name of getters.keys()) {
+      for (const [name, getterFn] of getters.entries()) {
         if (!knownProperties.has(name)) {
-          rv.push(new GetterItem({ parent: this, name }));
+          rv.push(new GetterItem({ parent: this, name, getterFn }));
           knownProperties.add(name);
         }
       }
@@ -203,10 +205,41 @@ export class ValueItem implements IItem {
 
     return rv;
   }
+
+  async loadChildren() {
+    // ensure we have the prototype chain so that getChildValues()
+    // will find all getters
+    await this.contents.traversePrototypeChainAsync(async current => {
+      await current.loadIfNecessary();
+    }, GETTERS_FROM_PROTOTYPES);
+
+    await Promise.all(getChildValues(this.contents).map(value => value.loadIfNecessary()));
+  }
+
+  shouldUpdate(prevItem: Item) {
+    assert(this.type === prevItem.type, "OI items for the same path must have the same type");
+    return (
+      this.needsToLoadChildren() !== prevItem.needsToLoadChildren() ||
+      this.isInCurrentPause !== prevItem.isInCurrentPause
+    );
+  }
 }
 
 function getChildValues(parentValue: ValueFront): ValueFront[] {
-  const rv = [...parentValue.previewValueMap().values()];
+  const previewValues = parentValue.previewValueMap();
+  const rv = [...previewValues.values()];
+
+  const knownProperties = new Set(previewValues.keys());
+  parentValue.traversePrototypeChain(current => {
+    rv.push(current);
+    const getters = current.previewGetters();
+    for (const [name, getterFn] of getters.entries()) {
+      if (!knownProperties.has(name)) {
+        rv.push(getterFn);
+        knownProperties.add(name);
+      }
+    }
+  }, GETTERS_FROM_PROTOTYPES);
 
   if (parentValue.className() === "Promise") {
     const result = parentValue.previewPromiseState();
@@ -234,8 +267,4 @@ function getChildValues(parentValue: ValueFront): ValueFront[] {
   }
 
   return rv;
-}
-
-function isValueLoaded(value: ValueFront): boolean {
-  return value.isPrimitive() || !value.hasPreviewOverflow();
 }
