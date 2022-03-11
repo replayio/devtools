@@ -106,8 +106,10 @@ function ViewerContent({
     return (
       <>
         <ViewerHeader>{HeaderLeft}</ViewerHeader>
-        <section className="grid flex-grow items-center justify-center bg-gray-100 text-sm">
-          <span className="text-gray-500">{errorText}</span>
+        <section
+          className={`grid flex-grow items-center justify-center text-sm ${styles.recordingsBackground}`}
+        >
+          <span>{errorText}</span>
         </section>
       </>
     );
@@ -134,7 +136,7 @@ function ViewerContent({
             </>
           ) : (
             <SecondaryButton
-              className="bg-white hover:bg-primaryAccentHover hover:text-white"
+              className={styles.editButton}
               color="blue"
               onClick={() => setIsEditing(true)}
             >

@@ -1,3 +1,5 @@
+/* Dark */
+
 :root:global(.theme-dark) .libraryHeader {
   background-color: var(--theme-base-100);
 }
@@ -42,6 +44,18 @@
   border: none;
 }
 
+:root:global(.theme-dark) .recordingsBackground {
+  background-color: transparent;
+  color: var(--theme-body-color);
+}
+
+:root:global(.theme-dark) .sidebar {
+  background-color: var(--theme-base-90);
+  color: var(--theme-body-color);
+}
+
+/* Light */
+
 :root:global(.theme-light) .libraryHeader {
   background-color: var(--theme-base-100);
 }
@@ -55,7 +69,7 @@
 }
 
 :root:global(.theme-light) .libraryRow:hover {
-  background-color: var(--theme-base-95);
+  background-color: var(--grey-10);
 }
 
 :root:global(.theme-light) .libraryHeaderDivider {
@@ -77,4 +91,14 @@
 :root:global(.theme-light) .editButton:hover {
   background-color: var(--primary-accent-hover);
   color: #fff;
+}
+
+:root:global(.theme-light) .recordingsBackground {
+  background-color: transparent;
+  color: var(--theme-body-color);
+}
+
+:root:global(.theme-light) .sidebar {
+  background-color: #303030;
+  color: hsl(0, 0%, 90%);
 }
