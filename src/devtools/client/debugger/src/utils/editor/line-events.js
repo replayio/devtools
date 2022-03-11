@@ -27,7 +27,7 @@ function isValidTarget(target) {
   return isHoveredOnLine(target) && !isNonBreakableLineNode && !isTooltip;
 }
 
-function emitLineMouseEnter(codeMirror, target) {
+function emitLineMouseEnter(codeMirror, target, event) {
   trackEventOnce("editor.mouse_over");
 
   const lineNode = target.closest(".CodeMirror-line");
@@ -38,14 +38,14 @@ function emitLineMouseEnter(codeMirror, target) {
 
   target.addEventListener(
     "mouseleave",
-    event => dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode }),
+    event => dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode, event }),
     {
       capture: true,
       once: true,
     }
   );
 
-  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode });
+  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode, event });
 }
 
 export function onLineMouseOver(codeMirror) {
@@ -60,7 +60,7 @@ export function onLineMouseOver(codeMirror) {
     }
 
     if (isValidTarget(target)) {
-      emitLineMouseEnter(codeMirror, target);
+      emitLineMouseEnter(codeMirror, target, event);
     }
   };
 }

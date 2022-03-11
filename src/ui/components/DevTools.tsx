@@ -1,12 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  Children,
-  ReactChildren,
-  ReactElement,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
@@ -27,7 +19,6 @@ import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 import useAuth0 from "ui/utils/useAuth0";
-import { KeyModifiers } from "./KeyModifiers";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -120,7 +111,7 @@ function _DevTools({
   }
 
   return (
-    <KeyModifiers>
+    <>
       <Header />
       {viewMode == "dev" ? (
         <React.Suspense fallback={<ViewLoader />}>
@@ -131,7 +122,7 @@ function _DevTools({
       )}
       {showCommandPalette ? <CommandPaletteModal /> : null}
       <KeyboardShortcuts />
-    </KeyModifiers>
+    </>
   );
 }
 

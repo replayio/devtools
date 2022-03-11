@@ -13,7 +13,6 @@ import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { Nag } from "ui/hooks/users";
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
-import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import findLast from "lodash/findLast";
 import find from "lodash/find";
 import { getPointsForHoveredLineNumber } from "ui/reducers/app";
@@ -21,18 +20,19 @@ import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { PointDescription } from "@recordreplay/protocol";
 import { seek } from "ui/actions/timeline";
+import { KeyModifiers, useKeyModifiers } from "./useKeyModifiers";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
   updateHoveredLineNumber,
 } = require("devtools/client/debugger/src/actions/breakpoints/index");
 
-const QuickActionButton: FC<{ showNag: boolean; children: ReactNode; onClick: () => void; disabled?: boolean }> = ({
-  showNag,
-  disabled,
-  children,
-  onClick,
-}) => {
+const QuickActionButton: FC<{
+  showNag: boolean;
+  children: ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}> = ({ showNag, disabled, children, onClick }) => {
   return (
     <button
       className={classNames(
@@ -48,12 +48,20 @@ const QuickActionButton: FC<{ showNag: boolean; children: ReactNode; onClick: ()
   );
 };
 
-const ContinueToPrevious: FC<{ showNag: boolean; onClick: () => void; disabled: boolean }> = ({ showNag, onClick, disabled }) => (
+const ContinueToPrevious: FC<{ showNag: boolean; onClick: () => void; disabled: boolean }> = ({
+  showNag,
+  onClick,
+  disabled,
+}) => (
   <QuickActionButton showNag={showNag} onClick={onClick} disabled={disabled}>
     <MaterialIcon>navigate_before</MaterialIcon>
   </QuickActionButton>
 );
-const ContinueToNext: FC<{ showNag: boolean; onClick: () => void, disabled: boolean }> = ({ showNag, onClick, disabled }) => (
+const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: boolean }> = ({
+  showNag,
+  onClick,
+  disabled,
+}) => (
   <QuickActionButton showNag={showNag} onClick={onClick} disabled={disabled}>
     <MaterialIcon>navigate_next</MaterialIcon>
   </QuickActionButton>
@@ -86,8 +94,6 @@ function QuickActions({
   breakpoint?: Breakpoint;
   cx: any;
 }) {
-  const isMetaActive = keyModifiers.meta;
-  const isShiftActive = keyModifiers.shift;
   const dispatch = useDispatch();
   const analysisPoints = useSelector(getPointsForHoveredLineNumber);
   const executionPoint = useSelector(getExecutionPoint);
@@ -101,7 +107,7 @@ function QuickActions({
 
   let prev: PointDescription | undefined, next: PointDescription | undefined;
 
-  if (analysisPoints && analysisPoints !== "error" && executionPoint ) {
+  if (analysisPoints && analysisPoints !== "error" && executionPoint) {
     prev = findLast(analysisPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
@@ -119,9 +125,11 @@ function QuickActions({
 
   let button;
 
-  if (isMetaActive && isShiftActive) {
-    button = <ContinueToPrevious showNag={showNag} onClick={onContinueToPrevious} disabled={!prev} />;
-  } else if (isMetaActive) {
+  if (keyModifiers.meta && keyModifiers.shift) {
+    button = (
+      <ContinueToPrevious showNag={showNag} onClick={onContinueToPrevious} disabled={!prev} />
+    );
+  } else if (keyModifiers.meta) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
   } else {
     button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
@@ -142,13 +150,28 @@ type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
 function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
+  const { keyModifiers, updateKeyModifiers, resetKeyModifiers } = useKeyModifiers();
 
-  const onLineEnter = ({ lineNode, lineNumber }: { lineNode: HTMLElement; lineNumber: number }) => {
+  const onLineEnter = ({
+    lineNode,
+    lineNumber,
+    event,
+  }: {
+    lineNode: HTMLElement;
+    lineNumber: number;
+    event: KeyboardEvent;
+  }) => {
     setHoveredLineNumber(lineNumber);
     setTargetNode(lineNode);
+
+    updateKeyModifiers({
+      shift: event.shiftKey,
+      meta: event.metaKey,
+    });
   };
   const onLineLeave = () => {
     setTargetNode(null);
+    resetKeyModifiers();
     setHoveredLineNumber(null);
   };
   const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
@@ -170,18 +193,14 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   }
 
   return ReactDOM.createPortal(
-    <KeyModifiersContext.Consumer>
-      {keyModifiers => (
-        <QuickActions
-          hoveredLineNumber={hoveredLineNumber}
-          onMouseDown={onMouseDown}
-          targetNode={targetNode}
-          breakpoint={bp}
-          cx={cx}
-          keyModifiers={keyModifiers}
-        />
-      )}
-    </KeyModifiersContext.Consumer>,
+    <QuickActions
+      hoveredLineNumber={hoveredLineNumber}
+      onMouseDown={onMouseDown}
+      targetNode={targetNode}
+      breakpoint={bp}
+      cx={cx}
+      keyModifiers={keyModifiers}
+    />,
     targetNode
   );
 }

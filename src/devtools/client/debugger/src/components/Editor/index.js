@@ -32,7 +32,6 @@ import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
 import { EditorNag } from "ui/components/shared/Nags/Nags";
-import { KeyModifiersContext } from "ui/components/KeyModifiers";
 
 import {
   showSourceText,
@@ -437,11 +436,7 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        {
-          <KeyModifiersContext.Consumer>
-            {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
-          </KeyModifiersContext.Consumer>
-        }
+        <LineNumberTooltip editor={editor} />
         <ToggleWidgetButton editor={editor} />
         <HighlightLines editor={editor} />
         {

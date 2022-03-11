@@ -2,7 +2,6 @@ import { PointDescription } from "@recordreplay/protocol";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHoveredLineNumberLocation } from "ui/actions/app";
-import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
@@ -11,6 +10,7 @@ import { prefs } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 import StaticTooltip from "./StaticTooltip";
+import { useKeyModifiers } from "./useKeyModifiers";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -64,17 +64,11 @@ function Wrapper({
   return <div className="static-tooltip-content bg-gray-700">{children}</div>;
 }
 
-export default function LineNumberTooltip({
-  editor,
-  keyModifiers,
-}: {
-  editor: any;
-  keyModifiers: KeyModifiers;
-}) {
+export default function LineNumberTooltip({ editor }: { editor: any }) {
   const dispatch = useDispatch();
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
-  const isMetaActive = keyModifiers.meta;
+  const { keyModifiers, updateKeyModifiers, resetKeyModifiers } = useKeyModifiers();
 
   const indexed = useSelector(selectors.getIndexed);
   const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
@@ -82,10 +76,17 @@ export default function LineNumberTooltip({
   const setHoveredLineNumber = ({
     lineNumber,
     lineNode,
+    event,
   }: {
     lineNumber: number;
     lineNode: HTMLElement;
+    event: KeyboardEvent;
   }) => {
+    updateKeyModifiers({
+      shift: event.shiftKey,
+      meta: event.metaKey,
+    });
+
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
     // for the same line number. In that case, we shouldn't run
@@ -103,6 +104,7 @@ export default function LineNumberTooltip({
     setTargetNode(lineNode);
   };
   const clearHoveredLineNumber = () => {
+    resetKeyModifiers();
     setTargetNode(null);
     dispatch(setHoveredLineNumberLocation(null));
   };
@@ -125,7 +127,7 @@ export default function LineNumberTooltip({
     }
   }, [analysisPoints]);
 
-  if (!targetNode || isMetaActive) {
+  if (!targetNode || keyModifiers.meta) {
     return null;
   }
 
