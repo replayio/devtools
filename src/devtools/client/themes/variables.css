@@ -129,7 +129,6 @@
 
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
-
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
   --modal-bgcolor: rgba(255, 255, 255, 0.95);

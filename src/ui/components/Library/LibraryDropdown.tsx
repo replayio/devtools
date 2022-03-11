@@ -3,6 +3,7 @@ import { Menu } from "@headlessui/react";
 import classNames from "classnames";
 import MaterialIcon from "../shared/MaterialIcon";
 import Icon from "../shared/Icon";
+import styles from "./Library.module.css";
 
 // This should be the standard dropdown component for the Library
 // but then we should slowly make it even more general purpose
@@ -47,7 +48,7 @@ export function Dropdown({
             menuItemsClassName,
             widthClass,
             fontSizeClass,
-            "right-0 origin-top-right rounded-md bg-menuBgcolor shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            "right-0 origin-top-right rounded-md border-modalBorder bg-modalBgcolor shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           )}
         >
           <div className="py-1">{children}</div>
@@ -108,5 +109,5 @@ export function DropdownItemContent({
 }
 
 export function DropdownDivider() {
-  return <div className="w-full border-b border-gray-200" />;
+  return <div className={`w-full ${styles.dropdownDivider}`} />;
 }

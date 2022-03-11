@@ -142,7 +142,7 @@ function Library({
     <main className="flex h-full w-full flex-row">
       <Sidebar nonPendingWorkspaces={workspaces} />
       <div className="flex flex-grow flex-col overflow-x-hidden">
-        <div className="flex h-16 flex-row items-center space-x-3 border-b border-gray-300 bg-white p-5">
+        <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
           <FilterBar searchString={searchString} setSearchString={setSearchString} />
           <LaunchButton />
         </div>
