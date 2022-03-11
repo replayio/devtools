@@ -132,3 +132,15 @@ but without a background color so we can use hover effects
 .icon.unchecked {
   -webkit-mask-image: url(/icons/unchecked.svg);
 }
+
+.icon.dock-bottom {
+  -webkit-mask-image: url(/icons/dock-bottom.svg);
+}
+
+.icon.dock-left {
+  -webkit-mask-image: url(/icons/dock-left.svg);
+}
+
+.icon.dock-bottom-right {
+  -webkit-mask-image: url(/icons/dock-bottom-right.svg);
+}
