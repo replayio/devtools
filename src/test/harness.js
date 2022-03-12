@@ -226,7 +226,7 @@ async function waitForLoadedScopes() {
 }
 
 function waitForSelectedSource(url) {
-  const { getSelectedSourceWithContent, hasSymbols, getBreakableLines } = dbgSelectors;
+  const { getSelectedSourceWithContent, getBreakableLines } = dbgSelectors;
 
   return waitUntil(
     () => {
