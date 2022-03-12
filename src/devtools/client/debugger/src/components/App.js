@@ -181,8 +181,8 @@ class Debugger extends Component {
     const { startPanelCollapsed, toolboxLayout } = this.props;
 
     const isIde = toolboxLayout == "ide";
-    const onResize = num => {
-      prefs.sidePanelSize = `${num}px`;
+    const onResize = pxString => {
+      prefs.sidePanelSize = pxString;
     };
 
     return (
