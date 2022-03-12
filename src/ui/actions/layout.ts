@@ -71,6 +71,8 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
   };
 }
 export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
+  trackEvent("toolbox.secondary.video_toggle");
+  
   return { type: "set_show_video_panel", showVideoPanel };
 }
 

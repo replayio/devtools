@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
@@ -21,6 +21,8 @@ import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
 import ReplayLogo from "../shared/ReplayLogo";
+import { getShowVideoPanel } from "ui/reducers/layout";
+import { ShowVideoButton } from "./ToolboxButton";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -68,7 +70,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   );
 
   return (
-    <div className="theme-tab-font-size flex flex-row items-center overflow-hidden">
+    <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
       <PanelButton label="Console" panel="console" />
       {!isNode && <PanelButton label="Elements" panel="inspector" />}
@@ -118,6 +120,7 @@ function SecondaryToolbox({
   recordingTarget,
   hasReactComponents,
 }: PropsFromRedux) {
+  const showVideoPanel = useSelector(getShowVideoPanel);
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
@@ -135,7 +138,10 @@ function SecondaryToolbox({
           hasReactComponents={hasReactComponents}
           toolboxLayout={toolboxLayout}
         />
-        <ToolboxOptions />
+        <div className="flex">
+          {!showVideoPanel || true ? <ShowVideoButton /> : null}
+          <ToolboxOptions />
+        </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
         {selectedPanel === "network" && <NetworkMonitor />}

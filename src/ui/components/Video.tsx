@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { FC, useEffect } from "react";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { selectors } from "../reducers";
@@ -9,6 +9,22 @@ import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
+import MaterialIcon from "./shared/MaterialIcon";
+import { setShowVideoPanel } from "ui/actions/layout";
+
+const HideVideoButton: FC = () => {
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    dispatch(setShowVideoPanel(false));
+  }
+
+  return (
+    <button className="absolute top-0 right-0 flex bg-themeTabBgcolor rounded-full p-1" title="Hide Video" onClick={onClick} >
+      <MaterialIcon>videocam_off</MaterialIcon>
+    </button>
+  )
+}
 
 function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
@@ -77,6 +93,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       <div id="highlighter-root"></div>
+      <HideVideoButton />
     </div>
   );
 }
