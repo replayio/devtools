@@ -10,7 +10,7 @@ import { getShowVideoPanel, getToolboxLayout } from "ui/reducers/layout";
 import { setShowVideoPanel, setToolboxLayout } from "ui/actions/layout";
 import Icon from "../shared/Icon";
 
-const LAYOUT_ICONS = {ide: "dock-bottom-right", left: "dock-left", bottom: "dock-bottom"};
+const LAYOUT_ICONS = { ide: "dock-bottom-right", left: "dock-left", bottom: "dock-bottom" };
 
 function ToolboxOption({
   label,
@@ -21,7 +21,7 @@ function ToolboxOption({
   label: string;
   onClick: () => void;
   selected: boolean;
-  icon?: string,
+  icon?: string;
 }) {
   return (
     <div
@@ -33,15 +33,23 @@ function ToolboxOption({
       )}
       onClick={onClick}
     >
-      {icon ? <Icon filename={icon} className={classNames(selected ? "bg-white" : "bg-iconColor")} /> : null}
-      <div>
-        {label}
-      </div>
+      {icon ? (
+        <Icon filename={icon} className={classNames(selected ? "bg-white" : "bg-iconColor")} />
+      ) : null}
+      <div>{label}</div>
     </div>
   );
 }
 
-function LayoutOption({ label, value, icon }: { label: string; value: ToolboxLayout; icon: string }) {
+function LayoutOption({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: ToolboxLayout;
+  icon: string;
+}) {
   const toolboxLayout = useSelector(getToolboxLayout);
   const dispatch = useDispatch();
 
@@ -49,7 +57,9 @@ function LayoutOption({ label, value, icon }: { label: string; value: ToolboxLay
     dispatch(setToolboxLayout(value));
   };
 
-  return <ToolboxOption onClick={onClick} label={label} selected={toolboxLayout == value} icon={icon} />;
+  return (
+    <ToolboxOption onClick={onClick} label={label} selected={toolboxLayout == value} icon={icon} />
+  );
 }
 
 function VideoToggle() {
