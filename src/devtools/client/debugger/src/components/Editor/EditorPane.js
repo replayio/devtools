@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 import Editor from "./index";

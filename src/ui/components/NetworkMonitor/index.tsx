@@ -37,14 +37,14 @@ export const NetworkMonitor = ({
   seek,
   selectFrame,
 }: PropsFromRedux) => {
-  const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
+  const [selectedRequestId, setSelectedRequestId] = useState<string>();
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const container = useRef<HTMLDivElement>(null);
 
-  const closePanel = () => setSelectedRequest(undefined);
+  const closePanel = () => setSelectedRequestId(undefined);
 
   const toggleType = (type: CanonicalRequestType) => {
     const newTypes = new Set(types);
@@ -70,10 +70,10 @@ export const NetworkMonitor = ({
   //
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
-    if (selectedRequest && !requests.find(r => r.id === selectedRequest.id)) {
-      setSelectedRequest(undefined);
+    if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
+      setSelectedRequestId(undefined);
     }
-  }, [requests, selectedRequest]);
+  }, [requests, selectedRequestId, setSelectedRequestId]);
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
@@ -94,8 +94,8 @@ export const NetworkMonitor = ({
           <SplitBox
             className="min-h-0 border-t border-splitter"
             initialSize="350px"
-            minSize={selectedRequest ? "30%" : "100%"}
-            maxSize={selectedRequest ? "70%" : "100%"}
+            minSize={selectedRequestId ? "30%" : "100%"}
+            maxSize={selectedRequestId ? "70%" : "100%"}
             startPanel={
               <RequestTable
                 table={table}
@@ -111,23 +111,23 @@ export const NetworkMonitor = ({
                     dispatch(fetchRequestBody(row.id, row.point.point));
                   }
 
-                  setSelectedRequest(row);
+                  setSelectedRequestId(row.id);
                 }}
                 seek={seek}
-                selectedRequest={selectedRequest}
+                selectedRequest={data.find(request => request.id === selectedRequestId)}
               />
             }
             endPanel={
-              selectedRequest ? (
+              selectedRequestId ? (
                 loadedRegions &&
-                getPointIsInLoadedRegion(loadedRegions, selectedRequest.point.point) ? (
+                getPointIsInLoadedRegion(loadedRegions, data.find(request => request.id === selectedRequestId)!.point.point) ? (
                   <RequestDetails
                     closePanel={closePanel}
                     cx={cx}
-                    request={selectedRequest}
-                    responseBody={responseBodies[selectedRequest.id]}
-                    requestBody={requestBodies[selectedRequest.id]}
-                    frames={frames[selectedRequest?.point.point]}
+                    request={data.find(request => request.id === selectedRequestId)!}
+                    responseBody={responseBodies[selectedRequestId]}
+                    requestBody={requestBodies[selectedRequestId]}
+                    frames={frames[data.find(request => request.id === selectedRequestId)!.point.point]}
                     selectFrame={selectFrame}
                   />
                 ) : (
