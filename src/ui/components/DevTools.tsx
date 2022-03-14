@@ -67,7 +67,6 @@ function _DevTools({
   );
 
   useEffect(() => {
-    // @ts-ignore
     DevView.preload();
   }, []);
   useEffect(() => {
