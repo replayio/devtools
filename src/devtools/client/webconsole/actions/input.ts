@@ -90,9 +90,7 @@ let nextEvalId = 1;
 export function evaluateExpression(expression: string): UIThunkAction {
   return async ({ dispatch, toolbox }) => {
     if (!expression) {
-      const inputSelection = window.jsterm?.editor.getSelection();
-      const inputValue = window.jsterm?._getValue();
-      expression = inputSelection || inputValue;
+      expression = window.jsterm?.editor.getSelection();
     }
     if (!expression) {
       return null;
