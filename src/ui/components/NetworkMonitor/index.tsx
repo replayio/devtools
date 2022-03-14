@@ -1,6 +1,6 @@
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import React, { useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps, useDispatch } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import {
   getFormattedFrames,
@@ -8,6 +8,7 @@ import {
   getRequestBodies,
   getFocusedEvents,
   getFocusedRequests,
+  getSelectedRequestId,
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -16,7 +17,7 @@ import RequestTable from "./RequestTable";
 import { CanonicalRequestType, RequestSummary } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
-import { fetchResponseBody, fetchRequestBody } from "ui/actions/network";
+import { fetchResponseBody, fetchRequestBody, hideRequestDetails, showRequestDetails } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import { trackEvent } from "ui/utils/telemetry";
@@ -37,14 +38,14 @@ export const NetworkMonitor = ({
   seek,
   selectFrame,
 }: PropsFromRedux) => {
-  const [selectedRequestId, setSelectedRequestId] = useState<string>();
+  const selectedRequestId = useSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const container = useRef<HTMLDivElement>(null);
 
-  const closePanel = () => setSelectedRequestId(undefined);
+  const closePanel = () => dispatch(hideRequestDetails());
 
   const toggleType = (type: CanonicalRequestType) => {
     const newTypes = new Set(types);
@@ -71,9 +72,9 @@ export const NetworkMonitor = ({
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
     if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
-      setSelectedRequestId(undefined);
+      dispatch(hideRequestDetails());
     }
-  }, [requests, selectedRequestId, setSelectedRequestId]);
+  }, [requests, selectedRequestId, dispatch]);
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
@@ -111,7 +112,7 @@ export const NetworkMonitor = ({
                     dispatch(fetchRequestBody(row.id, row.point.point));
                   }
 
-                  setSelectedRequestId(row.id);
+                  dispatch(showRequestDetails(row.id));
                 }}
                 seek={seek}
                 selectedRequest={data.find(request => request.id === selectedRequestId)}

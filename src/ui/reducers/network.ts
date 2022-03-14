@@ -22,6 +22,7 @@ export type NetworkState = {
   responseBodies: Record<string, ResponseBodyData[]>;
   requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
+  selectedRequestId: string | null;
 };
 
 const initialState = (): NetworkState => ({
@@ -31,6 +32,7 @@ const initialState = (): NetworkState => ({
   requests: [],
   responseBodies: {},
   requestBodies: {},
+  selectedRequestId: null,
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -82,6 +84,16 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
           [action.payload.point]: action.payload.frames,
         },
       };
+    case "SHOW_REQUEST_DETAILS":
+      return {
+        ...state,
+        selectedRequestId: action.requestId,
+      };
+    case "HIDE_REQUEST_DETAILS":
+      return {
+        ...state,
+        selectedRequestId: null,
+      };
     default:
       return state;
   }
@@ -115,5 +127,6 @@ export const getFormattedFrames = createSelector(getFrames, getSources, (frames,
 
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;
+export const getSelectedRequestId = (state: UIState) => state.network.selectedRequestId;
 
 export default update;
