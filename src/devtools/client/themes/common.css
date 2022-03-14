@@ -432,7 +432,7 @@ checkbox:-moz-focusring {
 
 .devtools-button:not(:empty):not(.checked):not(:disabled):focus,
 .devtools-toolbarbutton:not(:-moz-any([checked="true"], [disabled]))[label]:focus {
-  background-color: var(--toolbarbutton-focus-background);
+  background-color: var(--toolbarbutton-focus-bgcolor);
   color: var(--toolbarbutton-focus-color);
 }
 
@@ -523,8 +523,8 @@ checkbox:-moz-focusring {
   padding: 0 4px;
   font: inherit;
   border: 1px solid transparent;
-  background-color: var(--theme-body-background);
-  color: var(--theme-body-background-color);
+  background-color: var(--theme-body-bgcolor);
+  color: var(--theme-body-bgcolor-color);
   flex-grow: 1;
 }
 

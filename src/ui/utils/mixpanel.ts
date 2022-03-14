@@ -93,7 +93,7 @@ type MixpanelEvent =
   | ["timeline.drag_start_marker"]
   | [`toolbox.primary.${PrimaryPanelName}_select`]
   | [`toolbox.secondary.${SecondaryPanelName}_select`]
-  | ["toolbox.secondary.editor_toggle"]
+  | ["toolbox.secondary.layout_toggle"]
   | ["toolbox.secondary.video_toggle"]
   | ["toolbox.toggle_sidebar"]
   | ["upload.complete", { sessionId: SessionId }]

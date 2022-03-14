@@ -10,7 +10,6 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
-import { getFeatureFlag } from "ui/utils/launchdarkly";
 
 import APIKeys from "../APIKeys";
 import ExternalLink from "../ExternalLink";
@@ -159,9 +158,9 @@ const getSettings = (): Settings<SettingsTabTitle, {}> => [
 export function UserSettingsModal(props: PropsFromRedux) {
   const { features: orgFeatures, loading: orgFeaturesLoading } = hooks.useGetUserInfo();
   const view = props.view === "preferences" ? "Preferences" : props.defaultSettingsTab;
-  const hiddenTabs = getFeatureFlag("new-user-invitations", true) ? undefined : ["Invitations"];
+  const hiddenTabs = [];
 
-  if (!orgFeatures.library && hiddenTabs) {
+  if (!orgFeatures.library) {
     hiddenTabs.push("API Keys");
   }
 

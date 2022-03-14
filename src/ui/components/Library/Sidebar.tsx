@@ -5,6 +5,7 @@ import Invitations from "./Invitations";
 import NewTeamButton from "./NewTeamButton";
 import SidebarFooter from "./SidebarFooter";
 import TeamButton from "./TeamButton";
+import styles from "./Library.module.css";
 
 export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces: Workspace[] }) {
   const { features } = useGetUserInfo();
@@ -14,7 +15,7 @@ export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces
   const scrollbarStyle = { scrollbarColor: "#6B7280 #1F2937" };
 
   return (
-    <div className="flex w-64 flex-shrink-0 flex-col bg-gray-800 text-gray-300">
+    <div className={`flex w-64 flex-shrink-0 flex-col ${styles.sidebar}`}>
       <div className="p-4">
         <img className="h-8 w-8" src="/images/logo.svg" />
       </div>

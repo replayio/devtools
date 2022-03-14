@@ -1,3 +1,4 @@
+import { assert } from "protocol/utils";
 import { IItem, Item, LabelAndValue } from ".";
 
 export class LoadingItem implements IItem {
@@ -19,5 +20,10 @@ export class LoadingItem implements IItem {
 
   getChildren(): Item[] {
     return [];
+  }
+
+  shouldUpdate(prevItem: Item) {
+    assert(this.type === prevItem.type, "OI items for the same path must have the same type");
+    return false;
   }
 }

@@ -53,7 +53,7 @@ h2 {
 }
 
 .webconsole-app {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   height: 100%;
   width: 100%;
 }
@@ -77,7 +77,7 @@ h2 {
 }
 
 #command-button-pick:hover {
-  background-color: var(--toolbarbutton-focus-background);
+  background-color: var(--toolbarbutton-focus-bgcolor);
 }
 
 .app-mask {

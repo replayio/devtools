@@ -15,8 +15,8 @@ import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 function ViewerLoader() {
   return (
-    <div className="grid h-full w-full items-center justify-items-center bg-gray-100">
-      <Spinner className="h-6 w-6 animate-spin text-black" />
+    <div className="grid h-full w-full items-center justify-items-center bg-chrome">
+      <Spinner className="text-themeBodyColor h-6 w-6 animate-spin" />
     </div>
   );
 }

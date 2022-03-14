@@ -8,7 +8,6 @@ import {
   LoadingItem,
   Item,
   KeyValueItem,
-  loadChildren,
 } from "./object-inspector/utils";
 
 export type { Item };
@@ -23,5 +22,4 @@ export {
   ValueItem,
   KeyValueItem,
   getGripPreviewItems,
-  loadChildren,
 };

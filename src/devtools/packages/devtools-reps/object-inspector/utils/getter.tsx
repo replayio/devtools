@@ -1,8 +1,9 @@
 import React from "react";
 import { ValueFront } from "protocol/thread";
 import Spinner from "ui/components/shared/Spinner";
-import { LabelAndValue, ValueItem } from ".";
+import { Item, LabelAndValue, ValueItem } from ".";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+import { assert } from "protocol/utils";
 
 function getterValueKey(object: ValueFront, property: string) {
   return `${object.getPause()?.pauseId}:${object.objectId()}:${property}`;
@@ -14,6 +15,8 @@ export class GetterItem {
   name: string;
   path: string;
   object: ValueFront;
+  getterFn: ValueFront;
+  getterFnLoaded: boolean;
 
   // loadingState is:
   // - undefined - by default (not loaded)
@@ -23,10 +26,12 @@ export class GetterItem {
   readonly loadingState: undefined | "loading" | "failed" | ValueFront;
   readonly valueItem?: ValueItem;
 
-  constructor(opts: { parent: ValueItem; name: string }) {
+  constructor(opts: { parent: ValueItem; name: string; getterFn: ValueFront }) {
     this.name = opts.name;
     this.path = `${opts.parent.path}/${opts.name}`;
     this.object = opts.parent.contents;
+    this.getterFn = opts.getterFn;
+    this.getterFnLoaded = !this.getterFn.hasPreviewOverflow();
     this.loadingState = getterValues.get(getterValueKey(this.object, this.name));
     if (this.loadingState instanceof ValueFront) {
       this.valueItem = new ValueItem({
@@ -42,6 +47,7 @@ export class GetterItem {
   }
 
   getLabelAndValue(props: ObjectInspectorItemProps): LabelAndValue {
+    const label = this.getLabel(props);
     switch (this.loadingState) {
       case undefined: {
         const onClick = async () => {
@@ -58,24 +64,69 @@ export class GetterItem {
             <button className="invoke-getter" title="Invoke getter"></button>
           </span>
         );
-        return { label: this.name, value };
+        return { label, value };
       }
 
       case "loading": {
-        return { label: this.name, value: <Spinner className="w-3 animate-spin" /> };
+        return { label, value: <Spinner className="w-3 animate-spin" /> };
       }
 
       case "failed": {
-        return { label: this.name, value: <span className="unavailable">(failed to load)</span> };
+        return { label, value: <span className="unavailable">(failed to load)</span> };
       }
 
       default: {
-        return this.valueItem!.getLabelAndValue(props);
+        const { value } = this.valueItem!.getLabelAndValue(props);
+        return { label, value };
       }
     }
   }
 
+  private getLabel(props: ObjectInspectorItemProps) {
+    if (this.getterFn.hasPreviewOverflow()) {
+      return this.name;
+    }
+    const url = this.getterFn.functionLocationURL();
+    const location = this.getterFn.functionLocation();
+    if (!url || !location) {
+      return this.name;
+    }
+    const onClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      props.onViewSourceInDebugger({
+        url,
+        line: location.line,
+        column: location.column,
+      });
+    };
+    return (
+      <span>
+        {this.name}
+        <button
+          className="jump-definition"
+          draggable={false}
+          title="Jump to definition"
+          onClick={onClick}
+        />
+      </span>
+    );
+  }
+
   getChildren() {
     return this.valueItem?.getChildren() || [];
+  }
+
+  shouldUpdate(prevItem: Item) {
+    assert(this.type === prevItem.type, "OI items for the same path must have the same type");
+    if (
+      this.getterFnLoaded !== prevItem.getterFnLoaded ||
+      this.loadingState !== prevItem.loadingState
+    ) {
+      return true;
+    }
+    if (this.valueItem && prevItem.valueItem) {
+      return this.valueItem.shouldUpdate(prevItem.valueItem);
+    }
+    return false;
   }
 }

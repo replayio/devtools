@@ -37,6 +37,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
 import { EditFocusButton } from "./EditFocusButton";
 import { UnloadedRegions } from "./UnloadedRegions";
+import { MouseDownMask } from "./MouseDownMask";
 
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
@@ -49,14 +50,16 @@ function getIsSecondaryHighlighted(
   return getLocationKey(hoveredItem.location) == getLocationKey(location);
 }
 
-class Timeline extends Component<PropsFromRedux> {
+class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
   $progressBar: HTMLDivElement | null = null;
   hoverInterval: number | undefined;
+  state = {
+    isDragging: false,
+  };
 
   async componentDidMount() {
     // Used in the test harness for starting playback recording.
     gToolbox.timeline = this;
-
     this.props.updateTimelineDimensions();
   }
 
@@ -65,9 +68,9 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   // Get the time for a mouse event within the recording.
-  getMouseTime(e: React.MouseEvent) {
+  getMouseTime(e: MouseEvent | React.MouseEvent) {
     const { startTime, endTime } = this.props.zoomRegion;
-    const { left, width } = e.currentTarget.getBoundingClientRect();
+    const { left, width } = this.$progressBar!.getBoundingClientRect();
     const clickLeft = e.clientX;
 
     const clickPosition = Math.max((clickLeft - left) / width, 0);
@@ -93,7 +96,11 @@ class Timeline extends Component<PropsFromRedux> {
     }
   };
 
-  onPlayerMouseMove: MouseEventHandler = e => {
+  onMouseDown = () => {
+    this.setState({ isDragging: true });
+  };
+
+  onPlayerMouseMove = (e: MouseEvent | React.MouseEvent) => {
     const { hoverTime, setTimelineToTime, setTimelineState, isFocusing, focusRegion } = this.props;
     const mouseTime = this.getMouseTime(e);
     const isDragging = e.buttons === 1;
@@ -114,7 +121,7 @@ class Timeline extends Component<PropsFromRedux> {
     }
   };
 
-  onPlayerMouseUp: MouseEventHandler = e => {
+  onPlayerMouseUp = (e: MouseEvent | React.MouseEvent) => {
     const {
       hoverTime,
       isFocusing,
@@ -135,6 +142,7 @@ class Timeline extends Component<PropsFromRedux> {
       !isFocusing;
 
     trackEvent("timeline.progress_select");
+    this.setState({ isDragging: false });
 
     if (!(hoverTime === null || clickedOnCommentMarker || clickedOnUnfocusedRegion)) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
@@ -338,55 +346,67 @@ class Timeline extends Component<PropsFromRedux> {
   render() {
     const { zoomRegion, currentTime, hoverTime, precachedTime, recordingDuration, isFocusing } =
       this.props;
+    const { isDragging } = this.state;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
     const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
     const formattedTime = getFormattedTime(currentTime);
     const showCurrentPauseMarker =
-      (this.isHovering() && percent >= 0 && percent <= 100) || isFocusing;
+      (this.isHovering() && percent >= 0 && percent <= 100) || isFocusing || isDragging;
 
     return (
-      <div className="timeline">
-        {this.renderCommands()}
-        <div className={classnames("progress-bar-container", { paused: true })}>
-          <div
-            className="progress-bar"
-            ref={node => (this.$progressBar = node)}
-            onMouseEnter={this.onPlayerMouseEnter}
-            onMouseMove={this.onPlayerMouseMove}
-            onMouseUp={this.onPlayerMouseUp}
-          >
-            <div className="progress-line full" />
+      <>
+        <div className="timeline">
+          {this.renderCommands()}
+          <div className={classnames("progress-bar-container", { paused: true })}>
             <div
-              className="progress-line preview-max"
-              style={{ width: `${clamp(Math.max(hoverPercent, precachedPercent), 0, 100)}%` }}
-            />
-            <div
-              className="progress-line preview-min"
-              style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
-            />
-            <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
-            <UnloadedRegions />
-            {this.renderPreviewMarkers()}
-            <Comments />
-            {this.renderUnfocusedRegion()}
-            {showCurrentPauseMarker ? (
-              <div className="progress-line-paused" style={{ left: `${percent}%` }} />
-            ) : null}
-            {isFocusing ? <Focuser /> : null}
+              className="progress-bar"
+              ref={node => (this.$progressBar = node)}
+              onMouseMove={e => this.onPlayerMouseMove(e)}
+              onMouseUp={e => this.onPlayerMouseUp(e)}
+              onMouseEnter={this.onPlayerMouseEnter}
+              onMouseDown={this.onMouseDown}
+            >
+              <div className="progress-line full" />
+              <div
+                className="progress-line preview-max"
+                style={{ width: `${clamp(Math.max(hoverPercent, precachedPercent), 0, 100)}%` }}
+              />
+              <div
+                className="progress-line preview-min"
+                style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
+              />
+              <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
+              <UnloadedRegions />
+              {this.renderPreviewMarkers()}
+              <Comments />
+              {this.renderUnfocusedRegion()}
+              {showCurrentPauseMarker ? (
+                <div className="progress-line-paused" style={{ left: `${percent}%` }} />
+              ) : null}
+              {isFocusing ? (
+                <Focuser setIsDragging={isDragging => this.setState({ isDragging })} />
+              ) : null}
+              {isDragging ? (
+                <MouseDownMask
+                  onMouseMove={this.onPlayerMouseMove}
+                  onMouseUp={this.onPlayerMouseUp}
+                />
+              ) : null}
+            </div>
+            <Tooltip timelineWidth={this.overlayWidth} />
           </div>
-          <Tooltip timelineWidth={this.overlayWidth} />
+          <div
+            className="timeline-time text-right"
+            style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
+          >
+            <span className="time-current">{formattedTime}</span>
+            <span className="time-divider">/</span>
+            <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
+          </div>
+          <EditFocusButton />
         </div>
-        <div
-          className="timeline-time text-right"
-          style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
-        >
-          <span className="time-current">{formattedTime}</span>
-          <span className="time-divider">/</span>
-          <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
-        </div>
-        <EditFocusButton />
-      </div>
+      </>
     );
   }
 }

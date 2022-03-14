@@ -29,7 +29,7 @@ export function ToggleShowPrivacyButton({
     <button
       type="button"
       onClick={() => setShowPrivacy(!showPrivacy)}
-      className="group flex w-full flex-row items-center justify-between rounded-lg bg-jellyfish p-3 text-left font-normal"
+      className="group flex w-full flex-row items-center justify-between rounded-lg bg-jellyfishBgcolor p-3 text-left font-normal"
     >
       <div className="flex flex-row items-center space-x-2">
         <MaterialIcon iconSize="xl">storage</MaterialIcon>
@@ -67,7 +67,7 @@ function Source({ url }: { url: string }) {
 
 function PrivacyData({ icon, name, urls }: { icon: string; name: string; urls: string[] }) {
   return (
-    <div className="space-y-3 rounded-lg bg-jellyfish p-3">
+    <div className="space-y-3 rounded-lg bg-jellyfishBgcolor p-3">
       <div className="flex flex-row items-center space-x-2 font-bold">
         <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
         <div>{name}</div>
@@ -86,7 +86,7 @@ export function Privacy() {
   const { operations } = recording!;
 
   return (
-    <div className="relative flex h-full w-full overflow-hidden rounded-xl bg-jellyfish p-5 shadow-xl">
+    <div className="relative flex h-full w-full overflow-hidden rounded-xl bg-jellyfishBgcolor p-5 shadow-xl">
       <div className="flex flex-col space-y-7 overflow-hidden">
         <div className="flex flex-col space-y-1">
           <div className="text-lg font-bold">Privacy</div>

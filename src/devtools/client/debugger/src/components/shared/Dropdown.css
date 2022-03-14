@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .dropdown {
-  background: var(--theme-body-background);
+  background: var(--theme-body-bgcolor);
   border: 1px solid var(--theme-splitter-color);
   border-radius: 2px;
   max-height: 300px;

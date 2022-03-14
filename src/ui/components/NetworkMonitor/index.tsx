@@ -93,7 +93,7 @@ export const NetworkMonitor = ({
           <FilterBar types={types} toggleType={toggleType} table={table} />
           <SplitBox
             className="min-h-0 border-t border-splitter"
-            initialSize="350"
+            initialSize="350px"
             minSize={selectedRequest ? "30%" : "100%"}
             maxSize={selectedRequest ? "70%" : "100%"}
             startPanel={
@@ -121,21 +121,15 @@ export const NetworkMonitor = ({
               selectedRequest ? (
                 loadedRegions &&
                 getPointIsInLoadedRegion(loadedRegions, selectedRequest.point.point) ? (
-                  <div
-                    style={{
-                      borderLeft: "1px solid var(--theme-border)",
-                    }}
-                  >
-                    <RequestDetails
-                      closePanel={closePanel}
-                      cx={cx}
-                      request={selectedRequest}
-                      responseBody={responseBodies[selectedRequest.id]}
-                      requestBody={requestBodies[selectedRequest.id]}
-                      frames={frames[selectedRequest?.point.point]}
-                      selectFrame={selectFrame}
-                    />
-                  </div>
+                  <RequestDetails
+                    closePanel={closePanel}
+                    cx={cx}
+                    request={selectedRequest}
+                    responseBody={responseBodies[selectedRequest.id]}
+                    requestBody={requestBodies[selectedRequest.id]}
+                    frames={frames[selectedRequest?.point.point]}
+                    selectFrame={selectFrame}
+                  />
                 ) : (
                   <RequestDetailsUnavailable closePanel={closePanel} />
                 )

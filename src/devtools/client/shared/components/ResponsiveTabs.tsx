@@ -143,7 +143,7 @@ export const ResponsiveTabs = ({
           className={cx("absolute right-0 top-0 flex h-full items-center", dropdownClassName)}
         >
           {dropdownButton ?? (
-            <span className="flex h-full cursor-pointer select-none items-center px-1 hover:bg-[color:var(--theme-tab-background)]">
+            <span className="flex h-full cursor-pointer select-none items-center px-1 hover:bg-[color:var(--theme-tab-bgcolor)]">
               ···
             </span>
           )}

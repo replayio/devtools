@@ -9,9 +9,11 @@ import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
-import { SecondaryPanelName } from "ui/state/layout";
+import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
+import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
+
 import { trackEvent } from "ui/utils/telemetry";
 
 import "ui/setup/dynamic/inspector";
@@ -24,13 +26,20 @@ const InspectorApp = React.lazy(() => import("devtools/client/inspector/componen
 
 interface PanelButtonsProps {
   hasReactComponents: boolean;
+  toolboxLayout: ToolboxLayout;
   isNode: boolean;
   selectedPanel: SecondaryPanelName;
   setSelectedPanel: (panel: SecondaryPanelName) => any;
 }
 
+interface PanelButtonProps {
+  panel: SecondaryPanelName;
+  label: string;
+}
+
 const PanelButtons: FC<PanelButtonsProps> = ({
   hasReactComponents,
+  toolboxLayout,
   isNode,
   selectedPanel,
   setSelectedPanel,
@@ -47,45 +56,25 @@ const PanelButtons: FC<PanelButtonsProps> = ({
     }
   };
 
+  const PanelButton: FC<PanelButtonProps> = ({ panel, label }) => (
+    <button
+      className={classnames(`${panel}-panel-button`, {
+        expanded: selectedPanel === panel,
+      })}
+      onClick={() => onClick(panel)}
+    >
+      <div className="label">{label}</div>
+    </button>
+  );
+
   return (
     <div className="theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
-      <button
-        className={classnames("console-panel-button", {
-          expanded: selectedPanel === "console",
-        })}
-        onClick={() => onClick("console")}
-      >
-        <div className="label">Console</div>
-      </button>
-      {!isNode && (
-        <button
-          className={classnames("inspector-panel-button", {
-            expanded: selectedPanel === "inspector",
-          })}
-          onClick={() => onClick("inspector")}
-        >
-          <div className="label">Elements</div>
-        </button>
-      )}
-      {hasReactComponents && showReact && (
-        <button
-          className={classnames("components-panel-button", {
-            expanded: selectedPanel === "react-components",
-          })}
-          onClick={() => onClick("react-components")}
-        >
-          <div className="label">React</div>
-        </button>
-      )}
-      <button
-        className={classnames("console-panel-button", {
-          expanded: selectedPanel === "network",
-        })}
-        onClick={() => onClick("network")}
-      >
-        <div className="label">Network</div>
-      </button>
+      <PanelButton label="Console" panel="console" />
+      {!isNode && <PanelButton label="Elements" panel="inspector" />}
+      {toolboxLayout !== "ide" && <PanelButton label="Sources" panel="debugger" />}
+      {hasReactComponents && showReact && <PanelButton label="React" panel="react-components" />}
+      <PanelButton label="Network" panel="network" />
     </div>
   );
 };
@@ -125,6 +114,7 @@ function InspectorPanel() {
 function SecondaryToolbox({
   selectedPanel,
   setSelectedPanel,
+  toolboxLayout,
   recordingTarget,
   hasReactComponents,
 }: PropsFromRedux) {
@@ -143,6 +133,7 @@ function SecondaryToolbox({
           setSelectedPanel={setSelectedPanel}
           isNode={isNode}
           hasReactComponents={hasReactComponents}
+          toolboxLayout={toolboxLayout}
         />
         <ToolboxOptions />
       </header>
@@ -151,6 +142,9 @@ function SecondaryToolbox({
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
+        {toolboxLayout !== "ide" && selectedPanel === "debugger" ? (
+          <EditorPane toolboxLayout={toolboxLayout} />
+        ) : null}
       </Redacted>
     </div>
   );
@@ -162,6 +156,7 @@ const connector = connect(
     recordingTarget: selectors.getRecordingTarget(state),
     showVideoPanel: selectors.getShowVideoPanel(state),
     hasReactComponents: selectors.hasReactComponents(state),
+    toolboxLayout: selectors.getToolboxLayout(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
 );

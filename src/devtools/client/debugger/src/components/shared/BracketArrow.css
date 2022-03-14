@@ -26,7 +26,7 @@
 }
 
 .bracket-arrow.up::after {
-  border-bottom-color: var(--theme-body-background);
+  border-bottom-color: var(--theme-body-bgcolor);
   top: 0px;
 }
 
@@ -42,7 +42,7 @@
 
 .bracket-arrow.down::after {
   border-bottom-color: transparent;
-  border-top-color: var(--theme-body-background);
+  border-top-color: var(--theme-body-bgcolor);
   top: -1px;
 }
 
@@ -58,7 +58,7 @@
 
 .bracket-arrow.left::after {
   border-left-color: transparent;
-  border-right-color: var(--theme-body-background);
+  border-right-color: var(--theme-body-bgcolor);
   top: 0px;
   left: 1px;
 }

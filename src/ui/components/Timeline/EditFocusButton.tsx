@@ -25,8 +25,8 @@ export const EditFocusButton = () => {
   return (
     <button
       className={classNames(
-        "flex text-white rounded-full h-6 w-6 justify-center items-center",
-        isInFocusMode ? "bg-primaryAccent" : "bg-themeToolbarPanelIconColor"
+        "flex h-6 w-6 items-center justify-center rounded-full text-white",
+        isInFocusMode ? "bg-primaryAccent" : "bg-themeToggleBgcolor"
       )}
       onClick={onClick}
       title={isFocusing ? "Save current focus" : "Start focus edit mode"}

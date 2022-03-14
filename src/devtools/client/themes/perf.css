@@ -179,7 +179,7 @@
   padding: 4px;
   box-sizing: border-box;
   border: 1px solid var(--theme-splitter-color);
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   color: var(--theme-body-color);
 }
 
@@ -299,7 +299,7 @@
   border: 1px solid var(--theme-splitter-color);
   padding: 0;
   overflow-y: auto;
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   color: var(--theme-body-color);
 }
 
