@@ -10,7 +10,10 @@ import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { RecordingId } from "@recordreplay/protocol";
 import { User } from "ui/types";
 import { setSelectedPrimaryPanel } from "./layout";
-import { getFocusRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { trackEvent } from "ui/utils/telemetry";
+import { Breakpoint } from "devtools/client/debugger/src/reducers/breakpoints";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -80,6 +83,49 @@ export function createComment(
     dispatch(setSelectedPrimaryPanel("comments"));
     dispatch(setPendingComment(pendingComment));
   };
+}
+
+export function createCommentForLine(breakpoint: Breakpoint, user: User, recordingId: RecordingId): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    trackEvent("breakpoint.add_comment");
+    const state = getState();
+    const executionPoint = getExecutionPoint(state);
+    const currentTime = getCurrentTime(state);
+    const analysisPoints = selectors.getAnalysisPointsForLocation(
+      state,
+      breakpoint.location,
+      breakpoint.options.condition
+    )
+
+    if (!executionPoint) {
+      return;
+    }
+
+    const pausedOnHit =
+      executionPoint &&
+      analysisPoints !== "error" &&
+      !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
+
+
+    if (pausedOnHit) {
+      dispatch(createFrameComment(
+        currentTime,
+        executionPoint,
+        null,
+        user,
+        recordingId,
+        breakpoint
+      ));
+    } else {
+      dispatch(createFloatingCodeComment(
+        currentTime,
+        executionPoint,
+        user,
+        recordingId,
+        breakpoint
+      ));
+    }
+  }
 }
 
 export function createFrameComment(

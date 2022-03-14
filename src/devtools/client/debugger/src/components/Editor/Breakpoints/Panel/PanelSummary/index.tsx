@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch } from "react-redux";
 
 import CommentButton from "./CommentButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -20,6 +20,7 @@ import { useGetUserId } from "ui/hooks/users";
 import { PointDescription } from "@recordreplay/protocol";
 import classNames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
+import { createCommentForLine } from "ui/actions/comments";
 
 export type Input = "condition" | "logValue";
 
@@ -45,6 +46,7 @@ function PanelSummary({
   setInputToFocus,
   toggleEditingOn,
 }: PanelSummaryProps) {
+  const dispatch = useDispatch();
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const { user } = useAuth0();
   const { userId } = useGetUserId();
@@ -65,27 +67,7 @@ function PanelSummary({
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
-
-    trackEvent("breakpoint.add_comment");
-
-    if (pausedOnHit) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        null,
-        { ...user, userId },
-        recordingId,
-        breakpoint
-      );
-    } else {
-      createFloatingCodeComment(
-        currentTime,
-        executionPoint,
-        { ...user, id: userId },
-        recordingId,
-        breakpoint
-      );
-    }
+    dispatch(createCommentForLine(breakpoint, { ...user, userId }, recordingId));
   };
 
   if (isHot) {

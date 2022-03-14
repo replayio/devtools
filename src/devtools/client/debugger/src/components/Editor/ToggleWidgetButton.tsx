@@ -11,7 +11,7 @@ import classNames from "classnames";
 import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
 import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
-import { Nag } from "ui/hooks/users";
+import { Nag, useGetUserId } from "ui/hooks/users";
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import findLast from "lodash/findLast";
@@ -21,6 +21,9 @@ import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { PointDescription } from "@recordreplay/protocol";
 import { seek } from "ui/actions/timeline";
+import { createCommentForLine } from "ui/actions/comments";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import useAuth0 from "ui/utils/useAuth0";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -79,6 +82,25 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
     </QuickActionButton>
   );
 };
+const AddComment: FC<{ showNag: boolean; breakpoint: Breakpoint }> = ({
+  showNag,
+  breakpoint,
+}) => {
+  const { user } = useAuth0();
+  const { userId } = useGetUserId();
+  const recordingId = useGetRecordingId();
+  const dispatch = useDispatch();
+
+  const onAddComment = () => {
+    dispatch(createCommentForLine(breakpoint, { ...user, userId }, recordingId));
+  };
+
+  return (
+    <QuickActionButton showNag={showNag} onClick={onAddComment}>
+      <div className="material-icons add-comment-icon text-white">add_comment</div>
+    </QuickActionButton>
+  );
+};
 
 function QuickActions({
   hoveredLineNumber,
@@ -96,6 +118,7 @@ function QuickActions({
 }) {
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
+  const isAltActive = keyModifiers.alt;
   const dispatch = useDispatch();
   const analysisPoints = useSelector(getPointsForHoveredLineNumber);
   const executionPoint = useSelector(getExecutionPoint);
@@ -133,9 +156,14 @@ function QuickActions({
     );
   } else if (isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
+  } else if (isAltActive) {
+    // butto
+    button = <AddComment showNag={showNag} breakpoint={breakpoint!} />;
   } else {
     button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
   }
+
+  console.log({isAltActive});
 
   return (
     <div
