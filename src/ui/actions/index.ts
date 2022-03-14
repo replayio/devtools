@@ -18,6 +18,7 @@ import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
+import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
 import { NetworkAction } from "./network";
 import { LayoutAction } from "./layout";
 
@@ -32,7 +33,8 @@ export type UIAction =
   | NetworkAction
   | ReactDevToolsAction
   | SessionActions
-  | TimelineActions;
+  | TimelineActions
+  | QuickOpenActions;
 
 export type UIThunkAction<TReturn = void> = ThunkAction<TReturn, UIState, ThunkExtraArgs, UIAction>;
 

@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { UIState } from "ui/state";
 /**
  * Quick Open reducer
  * @module reducers/quick-open
@@ -11,47 +11,60 @@
 
 import { parseQuickOpenQuery } from "../utils/quick-open";
 
-export const createQuickOpenState = () => ({
+// Ref: `MODIFIERS` and `parseQuickOpenQuery` in `../utils/quick-open.js`
+type SearchTypes = "sources" | "gotoSource" | "functions" | "variables" | "goto" | "shortcuts";
+
+export interface QuickOpenState {
+  enabled: boolean;
+  query: string;
+  searchType: SearchTypes;
+  project: boolean;
+}
+
+export const initialQuickOpenState: QuickOpenState = {
   enabled: false,
   query: "",
   searchType: "sources",
   project: false,
+};
+
+const quickOpenSlice = createSlice({
+  name: "quickOpen",
+  initialState: initialQuickOpenState,
+  reducers: {
+    openQuickOpen(state, action: PayloadAction<{ query: string; project: boolean }>) {
+      const { query, project } = action.payload;
+      state.enabled = true;
+      state.project = project;
+      state.query = query;
+      state.searchType = parseQuickOpenQuery(query);
+    },
+    closeQuickOpen(state) {
+      return initialQuickOpenState;
+    },
+    setQuickOpenQuery(state, action: PayloadAction<string>) {
+      const query = action.payload;
+      state.query = query;
+      state.searchType = parseQuickOpenQuery(query);
+    },
+  },
 });
 
-export default function update(state = createQuickOpenState(), action) {
-  switch (action.type) {
-    case "OPEN_QUICK_OPEN":
-      return {
-        ...state,
-        enabled: true,
-        project: action.project,
-        query: action.query,
-        searchType: parseQuickOpenQuery(action.query),
-      };
-    case "CLOSE_QUICK_OPEN":
-      return createQuickOpenState();
-    case "SET_QUICK_OPEN_QUERY":
-      return {
-        ...state,
-        query: action.query,
-        searchType: parseQuickOpenQuery(action.query),
-      };
-    default:
-      return state;
-  }
-}
+export const { openQuickOpen, closeQuickOpen, setQuickOpenQuery } = quickOpenSlice.actions;
 
-export function getQuickOpenEnabled(state) {
+export default quickOpenSlice.reducer;
+
+export function getQuickOpenEnabled(state: UIState) {
   return state.quickOpen.enabled;
 }
-export function getQuickOpenProject(state) {
+export function getQuickOpenProject(state: UIState) {
   return state.quickOpen.project;
 }
 
-export function getQuickOpenQuery(state) {
+export function getQuickOpenQuery(state: UIState) {
   return state.quickOpen.query;
 }
 
-export function getQuickOpenType(state) {
+export function getQuickOpenType(state: UIState) {
   return state.quickOpen.searchType;
 }
