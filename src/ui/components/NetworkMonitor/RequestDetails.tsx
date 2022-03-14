@@ -195,7 +195,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
         General
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
-      <h2
+      <div
         className={classNames(
           "cursor-pointer border-t border-themeBorder py-1 font-bold",
           styles.title
@@ -204,31 +204,31 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       >
         <TriangleToggle open={requestHeadersExpanded} />
         Request Headers
-      </h2>
+      </div>
       {requestHeadersExpanded && (
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
       {request.responseHeaders.length > 0 && (
         <>
-          <h2
+          <div
             className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
             onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
           >
             <TriangleToggle open={responseHeadersExpanded} />
             Response Headers
-          </h2>
+          </div>
           {responseHeadersExpanded && (
             <DetailTable className={styles.headerTable} details={responseHeaders} />
           )}
           {request.queryParams.length > 0 && (
             <div>
-              <h2
+              <div
                 className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
                 onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
               >
                 <TriangleToggle open={queryParametersExpanded} />
                 Query Parameters
-              </h2>
+              </div>
               {queryParametersExpanded && (
                 <DetailTable
                   className={classNames("py-1", styles.request)}
