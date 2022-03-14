@@ -3,12 +3,11 @@ import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { useDispatch, useSelector } from "react-redux";
 import classNames from "classnames";
-import MaterialIcon from "../shared/MaterialIcon";
-import { trackEvent } from "ui/utils/telemetry";
 import { ToolboxLayout } from "ui/state/layout";
-import { getShowVideoPanel, getToolboxLayout } from "ui/reducers/layout";
-import { setShowVideoPanel, setToolboxLayout } from "ui/actions/layout";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { setToolboxLayout } from "ui/actions/layout";
 import Icon from "../shared/Icon";
+import { ToolboxButton } from "./ToolboxButton";
 
 const LAYOUT_ICONS = { ide: "dock-bottom-right", left: "dock-left", bottom: "dock-bottom" };
 
@@ -62,26 +61,15 @@ function LayoutOption({
   );
 }
 
-function VideoToggle() {
-  const dispatch = useDispatch();
-  const showVideoPanel = useSelector(getShowVideoPanel);
-  const label = `${showVideoPanel ? "Hide" : "Show"} Video`;
-
-  const toggleShowVideoPanel = () => {
-    trackEvent("toolbox.secondary.video_toggle");
-    dispatch(setShowVideoPanel(!showVideoPanel));
-  };
-
-  return <ToolboxOption onClick={toggleShowVideoPanel} label={label} selected={false} />;
-}
-
 export default function ToolboxOptions() {
   const toolboxLayout = useSelector(getToolboxLayout);
 
   return (
     <Menu as="div" className="secondary-toolbox-options relative z-20 inline-block text-left">
-      <Menu.Button className="layoutbutton toolbox-options flex items-center text-iconColor hover:text-gray-600">
-        <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />
+      <Menu.Button>
+        <ToolboxButton>
+          <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />
+        </ToolboxButton>
       </Menu.Button>
       <Transition
         as={Fragment}
@@ -93,9 +81,6 @@ export default function ToolboxOptions() {
         leaveTo="transform opacity-0 scale-95"
       >
         <Menu.Items className="absolute right-0 w-56 origin-top-right rounded-md bg-menuBgcolor text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <Menu.Item as="div">
-            <VideoToggle />
-          </Menu.Item>
           <Menu.Item as="div">
             <LayoutOption label="Dock to Bottom Right" value="ide" icon={LAYOUT_ICONS["ide"]} />
           </Menu.Item>
