@@ -93,7 +93,7 @@ export const NetworkMonitor = ({
           <FilterBar types={types} toggleType={toggleType} table={table} />
           <SplitBox
             className="min-h-0 border-t border-splitter"
-            initialSize="350"
+            initialSize="350px"
             minSize={selectedRequest ? "30%" : "100%"}
             maxSize={selectedRequest ? "70%" : "100%"}
             startPanel={

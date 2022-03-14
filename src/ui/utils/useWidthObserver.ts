@@ -7,7 +7,6 @@ var resizeObserver;
 export default function useWidthObserver(node: RefObject<HTMLElement | null>) {
   const [width, setWidth] = useState<number | null>(null);
 
-  console.log({ node });
   useEffect(() => {
     if (node?.current === null) {
       return;

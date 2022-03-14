@@ -5,51 +5,59 @@ import Draggable from "devtools/client/shared/components/splitter/Draggable";
 
 const dispatchResize = debounce(() => window.dispatchEvent(new Event("resize")), 50, {});
 
+type CSSSize = `${number}px` | `${number}` | `${number}%`;
+
 type SplitterProps = {
   className?: string;
-  initialSize?: string;
-  initialWidth?: string;
-  initialHeight?: string;
+  initialSize?: CSSSize;
+  initialWidth?: CSSSize;
+  initialHeight?: CSSSize;
   startPanel?: ReactNode;
-  minSize?: string;
-  maxSize?: string;
+  minSize?: CSSSize;
+  maxSize?: CSSSize;
   endPanel?: ReactNode;
   endPanelControl?: boolean;
   splitterSize?: number;
   vert?: boolean;
   style?: object;
   onControlledPanelResized?: Function;
-  onSelectContainerElement?: any;
   onMove?: Function;
-  onResizeEnd?: (size: string) => void;
+  onResizeEnd?: (size: CSSSize) => void;
 };
 const SplitBox: FC<SplitterProps> = ({
   className,
   initialSize,
-  initialWidth,
-  initialHeight,
   startPanel,
   minSize,
   maxSize,
   endPanel,
   style,
   onControlledPanelResized,
-  onSelectContainerElement,
   onMove,
   onResizeEnd,
   endPanelControl = false,
   splitterSize = 8,
   vert = true,
 }) => {
-  const [defaultCursor, setdefaultCursor] = useState<string>("auto");
-  const [width, setwidth] = useState<string>(initialWidth || initialSize || "0");
-  const [height, setheight] = useState<string>(initialHeight || initialSize || "0");
+  const [defaultCursor, setDefaultCursor] = useState<string>("auto");
+  const [width, setWidth] = useState<CSSSize>(initialSize || "0");
+  const [height, setHeight] = useState<CSSSize>(initialSize || "0");
 
   const splitBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     onControlledPanelResized?.(width, height);
   }, [width, height, onControlledPanelResized]);
+
+  useEffect(() => {
+    const nodeBounds = splitBoxRef.current!.getBoundingClientRect();
+    if (vert) {
+      setWidth(`${getConstrainedSizeInPx(0, nodeBounds.width)}px`);
+    } else {
+      setHeight(`${getConstrainedSizeInPx(0, nodeBounds.height)}px`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getConstrainedSizeInPx = (requestedSize: number, splitBoxWidthOrHeight: number): number => {
     let _minSize: number = 0;
@@ -68,7 +76,7 @@ const SplitBox: FC<SplitterProps> = ({
 
     splitBoxRef.current!.classList.add("dragging");
 
-    setdefaultCursor(defaultCursor);
+    setDefaultCursor(defaultCursor);
   };
 
   const onStopMoveHandler = () => {
@@ -87,10 +95,10 @@ const SplitBox: FC<SplitterProps> = ({
 
     if (vert) {
       size = endPanelControl ? nodeBounds.left + nodeBounds.width - x : x - nodeBounds.left;
-      setwidth(getConstrainedSizeInPx(size, nodeBounds.width) + "px");
+      setWidth(`${getConstrainedSizeInPx(size, nodeBounds.width)}px`);
     } else {
       size = endPanelControl ? nodeBounds.top + nodeBounds.height - y : y - nodeBounds.top;
-      setheight(getConstrainedSizeInPx(size, nodeBounds.height) + "px");
+      setHeight(`${getConstrainedSizeInPx(size, nodeBounds.height)}px`);
     }
 
     // Fire resize events at the window occasionally so that any visible
@@ -100,14 +108,14 @@ const SplitBox: FC<SplitterProps> = ({
     onMove?.(size);
   };
 
-  let leftPanelStyle: CSSProperties = {};
-  let rightPanelStyle: CSSProperties = {};
+  const leftPanelStyle: CSSProperties = {};
+  const rightPanelStyle: CSSProperties = {};
 
-  // Set proper size for panels depending on the current state.
   if (vert) {
     leftPanelStyle.maxWidth = endPanelControl ? undefined : maxSize;
     leftPanelStyle.minWidth = endPanelControl ? undefined : minSize;
     leftPanelStyle.width = endPanelControl ? undefined : width;
+
     rightPanelStyle.maxWidth = endPanelControl ? maxSize : undefined;
     rightPanelStyle.minWidth = endPanelControl ? minSize : undefined;
     rightPanelStyle.width = endPanelControl ? width : undefined;
@@ -115,6 +123,7 @@ const SplitBox: FC<SplitterProps> = ({
     leftPanelStyle.maxHeight = endPanelControl ? undefined : maxSize;
     leftPanelStyle.minHeight = endPanelControl ? undefined : minSize;
     leftPanelStyle.height = endPanelControl ? undefined : height;
+
     rightPanelStyle.maxHeight = endPanelControl ? maxSize : undefined;
     rightPanelStyle.minHeight = endPanelControl ? minSize : undefined;
     rightPanelStyle.height = endPanelControl ? height : undefined;
@@ -130,14 +139,7 @@ const SplitBox: FC<SplitterProps> = ({
         },
         className
       )}
-      style={{
-        // Set the size of the controlled panel (height or width depending on the
-        // current state). This can be used to help with styling of dependent
-        // panels.
-        // @ts-ignore
-        "--split-box-controlled-panel-size": `${vert ? width : height}`,
-        ...style,
-      }}
+      style={style}
       ref={splitBoxRef}
     >
       {startPanel && (

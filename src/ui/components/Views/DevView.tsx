@@ -13,7 +13,7 @@ import { selectors } from "../../reducers";
 import { UIState } from "ui/state";
 import { ToolboxLayout } from "ui/state/layout";
 
-function minSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout): string {
+function minSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout): `${number}px` {
   if (!sidePanelCollapsed && toolboxLayout === "ide") {
     return "300px";
   }
@@ -25,7 +25,10 @@ function minSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout): str
   return "0px";
 }
 
-function maxSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout) {
+function maxSize(
+  sidePanelCollapsed: boolean,
+  toolboxLayout: ToolboxLayout
+): `${number}` | `${number}%` | `${number}px` {
   if (toolboxLayout === "ide") {
     return "80%";
   }
@@ -34,7 +37,7 @@ function maxSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout) {
     return "0";
   }
 
-  return String(prefs.sidePanelSize);
+  return String(prefs.sidePanelSize) as `${number}px`;
 }
 
 function DevView({
@@ -59,7 +62,7 @@ function DevView({
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={8}
-          initialSize={prefs.toolboxSize as string}
+          initialSize={prefs.toolboxSize as `${number}px`}
           minSize={minSize(sidePanelCollapsed, toolboxLayout)}
           maxSize={maxSize(sidePanelCollapsed, toolboxLayout)}
           vert={true}
