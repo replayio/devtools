@@ -253,7 +253,6 @@ module.exports = [
     targets: ["gecko"],
   },
   {
-    // This  test just times out, it doesn't even seem to run
     example: "doc_inspector_styles.html",
     script: "inspector-03.js",
     targets: ["gecko"],
@@ -303,7 +302,11 @@ module.exports = [
   // Miscellaneous
   //////////////////////////////////////////////////////////////////////////////
 
-  // disabled for now because this test requires authentication
+  {
+    example: "doc_rr_objects.html",
+    script: "autocomplete.js",
+    targets: ["gecko", "chromium"],
+  },
   {
     example: "doc_rr_basic.html",
     script: "settings.js",
@@ -318,8 +321,8 @@ module.exports = [
     example: "cra/dist/index.html",
     script: "react_devtools.js",
     targets: ["gecko", "chromium"],
-    // Disabled because playwright doesn't support ReactDevTools yet
-    // https://github.com/RecordReplay/gecko-dev/issues/716
+    // Disabled because we can't record the example in CI
+    // https://github.com/RecordReplay/gecko-dev/issues/726
     disabled: true,
   },
   {
