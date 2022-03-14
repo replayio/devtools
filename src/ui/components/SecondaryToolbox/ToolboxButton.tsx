@@ -4,13 +4,21 @@ import { setShowVideoPanel } from "ui/actions/layout";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import Icon from "../shared/Icon";
 
-export const ToolboxButton: FC<{ title?: string, onClick?: () => void }> = ({ children, title, onClick = () => {} }) => {
+export const ToolboxButton: FC<{ title?: string; onClick?: () => void }> = ({
+  children,
+  title,
+  onClick = () => {},
+}) => {
   return (
-    <button className="toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600" title={title} onClick={onClick}>
+    <button
+      className="toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
+      title={title}
+      onClick={onClick}
+    >
       {children}
     </button>
   );
-}
+};
 
 export const ShowVideoButton: FC = () => {
   const dispatch = useDispatch();
@@ -18,7 +26,7 @@ export const ShowVideoButton: FC = () => {
 
   const onClick = () => {
     dispatch(setShowVideoPanel(true));
-  }
+  };
 
   if (showVideoPanel) {
     return null;
@@ -29,4 +37,4 @@ export const ShowVideoButton: FC = () => {
       <Icon filename="video" className="bg-iconColor" size="small" />
     </ToolboxButton>
   );
-}
+};

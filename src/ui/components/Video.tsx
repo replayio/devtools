@@ -17,14 +17,18 @@ const HideVideoButton: FC = () => {
 
   const onClick = () => {
     dispatch(setShowVideoPanel(false));
-  }
+  };
 
   return (
-    <button className="absolute top-0 right-0 flex bg-themeTabBgcolor rounded-full p-1" title="Hide Video" onClick={onClick} >
+    <button
+      className="absolute top-0 right-0 flex bg-themeTabBgcolor rounded-full p-1"
+      title="Hide Video"
+      onClick={onClick}
+    >
       <MaterialIcon>videocam_off</MaterialIcon>
     </button>
-  )
-}
+  );
+};
 
 function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
