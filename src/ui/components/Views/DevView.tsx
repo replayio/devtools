@@ -11,21 +11,25 @@ import { installObserver } from "../../../protocol/graphics";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 import { UIState } from "ui/state";
+import { ToolboxLayout } from "ui/state/layout";
 
-function minSize(sidePanelCollapsed: boolean, showEditor: boolean): string {
-  if (!sidePanelCollapsed && showEditor) {
+function minSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout): `${number}px` {
+  if (!sidePanelCollapsed && toolboxLayout === "ide") {
     return "300px";
   }
 
-  if (!sidePanelCollapsed || showEditor) {
+  if (!sidePanelCollapsed || toolboxLayout === "ide") {
     return "200px";
   }
 
   return "0px";
 }
 
-function maxSize(sidePanelCollapsed: boolean, showEditor: boolean) {
-  if (showEditor) {
+function maxSize(
+  sidePanelCollapsed: boolean,
+  toolboxLayout: ToolboxLayout
+): `${number}` | `${number}%` | `${number}px` {
+  if (toolboxLayout === "ide") {
     return "80%";
   }
 
@@ -33,7 +37,7 @@ function maxSize(sidePanelCollapsed: boolean, showEditor: boolean) {
     return "0";
   }
 
-  return String(prefs.sidePanelSize);
+  return String(prefs.sidePanelSize) as `${number}px`;
 }
 
 function DevView({
@@ -58,9 +62,9 @@ function DevView({
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={8}
-          initialSize={prefs.toolboxSize.toString()}
-          minSize={minSize(sidePanelCollapsed, showEditor)}
-          maxSize={maxSize(sidePanelCollapsed, showEditor)}
+          initialSize={prefs.toolboxSize as `${number}px`}
+          minSize={minSize(sidePanelCollapsed, toolboxLayout)}
+          maxSize={maxSize(sidePanelCollapsed, toolboxLayout)}
           vert={true}
           onMove={handleMove}
           startPanel={<Toolbox />}

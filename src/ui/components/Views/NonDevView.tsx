@@ -50,7 +50,7 @@ function NonDevView({ sidePanelCollapsed }: PropsFromRedux) {
         <SplitBox
           startPanel={<SidePanel />}
           endPanel={viewer}
-          initialSize={prefs.sidePanelSize.toString()}
+          initialSize={prefs.sidePanelSize as `${number}px`}
           maxSize={sidePanelCollapsed ? "0" : "80%"}
           minSize={sidePanelCollapsed ? "0" : "240px"}
           onControlledPanelResized={handleMove}
