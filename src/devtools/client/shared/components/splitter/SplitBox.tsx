@@ -9,7 +9,7 @@ type CSSSize = `${number}px` | `${number}` | `${number}%`;
 
 type SplitterProps = {
   className?: string;
-  initialSize?: CSSSize;
+  initialSize: CSSSize;
   startPanel?: ReactNode;
   minSize?: CSSSize;
   maxSize?: CSSSize;
@@ -43,7 +43,7 @@ const SplitBox: FC<SplitterProps> = ({
   const splitBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    onControlledPanelResized?.(size, size);
+    onControlledPanelResized?.(size);
   }, [size, onControlledPanelResized]);
 
   useEffect(() => {
