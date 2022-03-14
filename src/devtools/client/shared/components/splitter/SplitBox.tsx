@@ -40,8 +40,8 @@ const SplitBox: FC<SplitterProps> = ({
   vert = true,
 }) => {
   const [defaultCursor, setDefaultCursor] = useState<string>("auto");
-  const [width, setWidth] = useState<CSSSize>(initialWidth || initialSize || "0");
-  const [height, setHeight] = useState<CSSSize>(initialHeight || initialSize || "0");
+  const [width, setWidth] = useState<CSSSize>(initialSize || "0");
+  const [height, setHeight] = useState<CSSSize>(initialSize || "0");
 
   const splitBoxRef = useRef<HTMLDivElement>(null);
 
