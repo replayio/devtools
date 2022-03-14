@@ -49,6 +49,16 @@ const SplitBox: FC<SplitterProps> = ({
     onControlledPanelResized?.(width, height);
   }, [width, height, onControlledPanelResized]);
 
+  useEffect(() => {
+    const nodeBounds = splitBoxRef.current!.getBoundingClientRect();
+    if (vert) {
+      setWidth(`${getConstrainedSizeInPx(0, nodeBounds.width)}px`);
+    } else {
+      setHeight(`${getConstrainedSizeInPx(0, nodeBounds.height)}px`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getConstrainedSizeInPx = (requestedSize: number, splitBoxWidthOrHeight: number): number => {
     let _minSize: number = 0;
     if (minSize?.endsWith("%")) {
