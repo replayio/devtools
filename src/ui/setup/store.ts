@@ -1,4 +1,5 @@
 import { combineReducers, applyMiddleware, Store } from "redux";
+import { composeWithDevToolsDevelopmentOnly } from "@redux-devtools/extension";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
@@ -34,7 +35,13 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
       ? applyMiddleware(sanityCheckMiddleware)
       : undefined
     : applyMiddleware(LogRocket.reduxMiddleware());
-  return createStore(combineReducers(reducers), initialState, middleware);
+
+  // Work around case where `middleware` may be undefined
+  const composedEnhancers = middleware
+    ? composeWithDevToolsDevelopmentOnly(middleware)
+    : composeWithDevToolsDevelopmentOnly();
+
+  return createStore(combineReducers(reducers), initialState, composedEnhancers);
 }
 
 export function extendStore(
