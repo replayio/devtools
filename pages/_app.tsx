@@ -118,7 +118,6 @@ import "ui/components/shared/SharingModal/EmailForm.css";
 import "ui/components/shared/SharingModal/ReplayLink.css";
 import "ui/components/shared/WorkspaceSettingsModal/WorkspaceMember.css";
 import "ui/components/Timeline/MessageMarker.css";
-import "ui/components/Timeline/ScrollContainer.css";
 import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
@@ -127,6 +126,7 @@ import "ui/components/Views/NonDevView.css";
 import "ui/utils/sourcemapVisualizer.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import { useRouter } from "next/router";
+import { useLaunchDarkly } from "ui/utils/launchdarkly";
 
 interface AuthProps {
   apiKey?: string;
@@ -153,6 +153,8 @@ function AppUtilities({
 }
 function Routing({ Component, pageProps }: AppProps) {
   const [store, setStore] = useState<Store | null>(null);
+  const { getFeatureFlag } = useLaunchDarkly();
+
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
   }, []);
@@ -163,7 +165,7 @@ function Routing({ Component, pageProps }: AppProps) {
     return null;
   }
 
-  if (maintenanceMode) {
+  if (getFeatureFlag("maintenance-mode")) {
     return <MaintenanceModeScreen />;
   }
 

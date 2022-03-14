@@ -7,7 +7,7 @@ import {
   getUploading,
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
-import LoadingTip from "./LoadingTip";
+import { LoadingTips } from "./LoadingTips";
 import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
 
@@ -20,13 +20,13 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="relative flex w-96 flex-col items-center space-y-8 rounded-lg bg-bigOverlayBgcolor p-8 py-4 shadow-md">
+      <div className="relative flex w-96 flex-col items-center space-y-8 rounded-lg bg-modalBgcolor p-8 py-4 shadow-md">
         <div className="flex flex-col items-center space-y-2">
           <ReplayLogo wide size="lg" />
           {children}
         </div>
       </div>
-      {showTips ? <LoadingTip /> : null}
+      {showTips ? <LoadingTips /> : null}
     </BubbleViewportWrapper>
   );
 }

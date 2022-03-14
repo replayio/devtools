@@ -358,7 +358,7 @@ export class ValueFront {
   ): Promise<void> {
     await visitFn(this);
     if (maxDepth > 0) {
-      await this.previewPrototypeValue()?.traversePrototypeChain(visitFn, maxDepth - 1);
+      await this.previewPrototypeValue()?.traversePrototypeChainAsync(visitFn, maxDepth - 1);
     }
   }
 

@@ -4,7 +4,7 @@ import { MODE } from "../../reps/constants";
 import { LoadingItem } from "./loading";
 import { ContainerItem } from "./container";
 import { GetterItem } from "./getter";
-import { Pause } from "protocol/thread";
+import { Pause, ValueFront } from "protocol/thread";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 const {
   REPS: { Rep, Grip },
@@ -29,6 +29,7 @@ export interface IItem {
   isPrimitive(): boolean;
   getLabelAndValue(props: ObjectInspectorItemProps): LabelAndValue;
   getChildren(): Item[];
+  shouldUpdate(prevItem: Item): boolean;
 }
 
 // An Item represents one node in the ObjectInspector tree:
@@ -41,22 +42,8 @@ export interface IItem {
 export { ValueItem, KeyValueItem, ContainerItem, GetterItem, LoadingItem };
 export type Item = ValueItem | KeyValueItem | ContainerItem | GetterItem | LoadingItem;
 
-export async function loadChildren(root: Item): Promise<Item[]> {
-  if (root.type === "value") {
-    await root.contents.traversePrototypeChainAsync(
-      async current => await current.loadIfNecessary(),
-      GETTERS_FROM_PROTOTYPES
-    );
-  }
-  const children = root.getChildren();
-  await Promise.all(
-    children.map(async child => {
-      if (child.type === "value") {
-        await child.contents.loadIfNecessary();
-      }
-    })
-  );
-  return children;
+export function isValueLoaded(value: ValueFront): boolean {
+  return value.isPrimitive() || !value.hasPreviewOverflow();
 }
 
 export function shouldRenderRootsInReps(roots: Item[]): boolean {

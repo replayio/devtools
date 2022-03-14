@@ -289,7 +289,7 @@ body,
    * is the sidebar. @see #memory-tool-container.
    */
   flex: 1;
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
 
   /**
    * By default, flex items have min-width: auto;
@@ -334,7 +334,7 @@ body,
 }
 
 #heap-view > .heap-view-panel[data-state="snapshot-state-error"] pre {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   margin: 20px;
   padding: 20px;
 }
@@ -374,7 +374,7 @@ body,
 }
 
 #shortest-paths {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   overflow: hidden;
   height: 100%;
   width: 100%;
@@ -394,7 +394,7 @@ body,
    */
   flex: 1;
   overflow-y: auto;
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
 }
 
 .tree-node {
@@ -638,7 +638,7 @@ svg #arrowhead {
 }
 
 g.edgeLabel rect {
-  fill: var(--theme-body-background);
+  fill: var(--theme-body-bgcolor);
 }
 
 g.edgeLabel tspan {

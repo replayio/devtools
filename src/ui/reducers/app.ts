@@ -2,7 +2,6 @@ import { AppState, EventKind, ReplayEvent } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
-import { features } from "../utils/prefs";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
@@ -204,10 +203,6 @@ export default function update(
       return { ...state, recordingWorkspace: action.workspace };
     }
 
-    case "set_loading_page_tip_index": {
-      return { ...state, loadingPageTipIndex: action.index };
-    }
-
     case "set_current_point": {
       return {
         ...state,
@@ -327,6 +322,5 @@ export const isFinishedLoadingRegions = (state: UIState) => {
   return isSameTimeStampedPointRange(loading, loaded);
 };
 export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
-export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;

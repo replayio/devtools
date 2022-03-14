@@ -27,7 +27,7 @@
 
 .theme-dark {
   --console-input-background: var(--theme-tab-toolbar-background);
-  --console-message-background: var(--theme-body-background);
+  --console-message-background: var(--theme-body-bgcolor);
   --console-message-border: var(--theme-splitter-color);
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(345, 23%, 24%);
@@ -46,8 +46,8 @@
 }
 
 .theme-light {
-  --console-input-background: var(--theme-body-background);
-  --console-message-background: var(--theme-body-background);
+  --console-input-background: var(--theme-body-bgcolor);
+  --console-message-background: var(--theme-body-bgcolor);
   --console-message-border: #f2f2f4; /* between Grey 10 and Grey 20 */
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(344, 73%, 97%);
@@ -60,7 +60,7 @@
   --console-indent-border-color: var(--theme-highlight-blue);
   --console-repeat-bubble-background: var(--theme-highlight-blue);
 
-  --toolbox-background: #f9f9fa;
+  --toolbox-bgcolor: #f9f9fa;
   --paused-background-color: var(--secondary-accent);
 
   /* TODO in bug 1549195: colors used in shared components (e.g. Reps) should
@@ -404,7 +404,7 @@
 
 .webconsole-app .message.network .xhr {
   background-color: var(--theme-text-color-alt);
-  color: var(--theme-body-background);
+  color: var(--theme-body-bgcolor);
   border-radius: 3px;
   font-weight: bold;
   font-size: 10px;
@@ -454,7 +454,7 @@ html #webconsole-notificationbox {
   /* Create a new stacking context */
   position: relative;
   z-index: 0; /* Keep below column resizers */
-  background-color: var(--theme-console-input);
+  background-color: var(--theme-console-input-bgcolor);
 }
 
 .jsterm-input-container .CodeMirror-focused {
@@ -557,7 +557,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-filteringbar-wrapper .devtools-toolbar {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
 }
 
 .webconsole-filterbar-primary {
@@ -789,7 +789,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .new-consoletable > [role="gridcell"] {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   color: var(--theme-body-color);
   padding: 3px 4px;
   text-overflow: ellipsis;

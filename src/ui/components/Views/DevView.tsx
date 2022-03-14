@@ -43,7 +43,7 @@ function maxSize(
 function DevView({
   recordingTarget,
   showVideoPanel,
-  showEditor,
+  toolboxLayout,
   sidePanelCollapsed,
 }: PropsFromRedux) {
   const videoIsHidden = !showVideoPanel || recordingTarget == "node";
@@ -68,8 +68,8 @@ function DevView({
           vert={true}
           onMove={handleMove}
           startPanel={<Toolbox />}
-          endPanel={<Viewer showVideo={!videoIsHidden} vertical={!showEditor} />}
-          // endPanelControl={false}
+          endPanel={<Viewer showVideo={!videoIsHidden} vertical={toolboxLayout === "left"} />}
+          endPanelControl={false}
         />
       </div>
       <div className="timeline-container">
@@ -82,7 +82,7 @@ function DevView({
 const connector = connect((state: UIState) => ({
   recordingTarget: selectors.getRecordingTarget(state),
   showVideoPanel: selectors.getShowVideoPanel(state),
-  showEditor: selectors.getShowEditor(state),
+  toolboxLayout: selectors.getToolboxLayout(state),
   sidePanelCollapsed: selectors.getPaneCollapse(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

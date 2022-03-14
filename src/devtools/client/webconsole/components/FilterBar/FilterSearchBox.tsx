@@ -30,14 +30,14 @@ export function FilterSearchBox({ filterTextSet }: { filterTextSet: any }) {
 
   return (
     <div className="devtools-searchbox relative flex flex-grow items-center">
-      <div className="flex w-full flex-row rounded-md bg-themeTextField px-2 py-1 text-themeTextFieldColor focus:ring-primaryAccent">
+      <div className="flex w-full flex-row rounded-md bg-themeTextFieldBgcolor px-2 py-1 text-themeTextFieldColor focus:ring-primaryAccent">
         <TextInput
           value={searchString}
           onChange={onChange}
           onKeyDown={onKeyDown}
           placeholder="Filter Output"
           style={{
-            backgroundColor: "var(--bg-themeTextField)",
+            backgroundColor: "var(--bg-themeTextFieldBgcolor)",
             color: "var(--bg-themeTextFieldColor)",
           }}
         />

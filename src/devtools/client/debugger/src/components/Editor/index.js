@@ -4,8 +4,8 @@
 
 //
 
-import PropTypes from "prop-types";
 import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
@@ -15,7 +15,6 @@ import debounce from "lodash/debounce";
 import { isFirefox } from "ui/utils/environment";
 import { getIndentation } from "../../utils/indentation";
 
-// Redux actions
 import actions from "../../actions";
 
 import SearchBar from "./SearchBar";
@@ -32,7 +31,8 @@ import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
 import { EditorNag } from "ui/components/shared/Nags/Nags";
-import WelcomeBox from "../WelcomeBox";
+import { KeyModifiersContext } from "ui/components/KeyModifiers";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import {
   showSourceText,
@@ -73,6 +73,8 @@ class Editor extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.shortcuts = new KeyShortcuts({ window, target: document });
+
     this.state = {
       highlightedLineRange: null,
       editor: null,
@@ -81,12 +83,14 @@ class Editor extends PureComponent {
   }
 
   componentDidMount() {
-    const { shortcuts } = this.context;
-
-    shortcuts.on("CmdOrCtrl+W", this.onClosePress);
-    shortcuts.on("Esc", this.onEscape);
+    this.shortcuts.on("CmdOrCtrl+W", this.onClosePress);
+    this.shortcuts.on("Esc", this.onEscape);
     this.updateEditor(this.props);
   }
+
+  getChildContext = () => {
+    return { shortcuts: this.shortcuts };
+  };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.updateEditor(nextProps);
@@ -167,7 +171,7 @@ class Editor extends PureComponent {
       this.setState({ editor: null });
     }
 
-    const shortcuts = this.context.shortcuts;
+    const shortcuts = this.shortcuts;
     shortcuts.off("CmdOrCtrl+W");
     shortcuts.off("CmdOrCtrl+B");
   }
@@ -437,7 +441,11 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        <LineNumberTooltip editor={editor} />
+        {
+          <KeyModifiersContext.Consumer>
+            {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
+          </KeyModifiersContext.Consumer>
+        }
         <ToggleWidgetButton editor={editor} />
         <HighlightLines editor={editor} />
         {
@@ -482,7 +490,7 @@ class Editor extends PureComponent {
   }
 }
 
-Editor.contextTypes = {
+Editor.childContextTypes = {
   shortcuts: PropTypes.object,
 };
 

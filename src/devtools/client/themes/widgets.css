@@ -570,7 +570,7 @@
 
 .table-widget-body,
 .table-widget-empty-text {
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
 }
 
 /* Column Headers */

@@ -115,7 +115,7 @@ window {
   border-top-color: var(--theme-splitter-color);
   /* Bug 1262668 - Use the same background as the body so the breadcrumbs toolbar doesn't
      get mistaken as a splitter */
-  background-color: var(--theme-body-background);
+  background-color: var(--theme-body-bgcolor);
   display: block;
   position: relative;
 }

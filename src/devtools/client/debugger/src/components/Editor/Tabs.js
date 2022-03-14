@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
@@ -15,14 +13,11 @@ import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
 import CommandPaletteButton from "./CommandPaletteButton";
+import { getToolboxLayout } from "ui/reducers/layout";
 
 class Tabs extends PureComponent {
   _draggedSource;
   _draggedSourceIndex;
-
-  constructor(props) {
-    super(props);
-  }
 
   componentDidUpdate(prevProps) {
     const { selectedSource } = this.props;
@@ -136,11 +131,11 @@ class Tabs extends PureComponent {
   };
 
   renderTabs() {
-    const { tabSources } = this.props;
+    const { tabSources, toolboxLayout } = this.props;
 
     return (
       <div className="source-tabs tab" ref="sourceTabs">
-        <CommandPaletteButton />
+        {toolboxLayout == "ide" && <CommandPaletteButton />}
         {tabSources.map((source, index) => {
           return (
             <Tab
@@ -169,6 +164,7 @@ const mapStateToProps = state => ({
   selectedSource: getSelectedSource(state),
   tabSources: getSourcesForTabs(state),
   isPaused: getIsPaused(state),
+  toolboxLayout: getToolboxLayout(state),
 });
 
 export default connect(mapStateToProps, {

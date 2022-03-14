@@ -4,16 +4,10 @@ import { Tree } from "devtools/client/debugger/src/components/shared/tree";
 import ObjectInspectorItem from "./ObjectInspectorItem";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
+import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { isRegionLoaded } from "ui/reducers/app";
 import { RedactedSpan } from "ui/components/Redacted";
-import {
-  Item,
-  ValueItem,
-  renderRep,
-  shouldRenderRootsInReps,
-  loadChildren,
-  findPause,
-} from "../utils";
+import { Item, ValueItem, renderRep, shouldRenderRootsInReps, findPause } from "../utils";
 import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
 import { assert } from "protocol/utils";
 
@@ -86,18 +80,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
   areItemsEqual = (item1: Item, item2: Item): boolean => item1.path === item2.path;
 
   shouldItemUpdate = (prevItem: Item, nextItem: Item): boolean => {
-    if (prevItem.type === "value") {
-      assert(nextItem.type === "value", "OI items for the same path must have the same type");
-      return (
-        prevItem.needsToLoadChildren() !== nextItem.needsToLoadChildren() ||
-        prevItem.isInCurrentPause !== nextItem.isInCurrentPause
-      );
-    }
-    if (prevItem.type === "getter") {
-      assert(nextItem.type === "getter", "OI items for the same path must have the same type");
-      return prevItem.loadingState !== nextItem.loadingState;
-    }
-    return false;
+    return nextItem.shouldUpdate(prevItem);
   };
 
   getItemKey = (item: Item): string => item.path;
@@ -126,7 +109,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
     }
     if (item.type === "value" && item.needsToLoadChildren()) {
       try {
-        await loadChildren(item);
+        await item.loadChildren();
       } catch {
         this.expandedPaths.delete(item.path);
       }
@@ -251,11 +234,14 @@ function ObjectInspector(props: ObjectInspectorProps) {
   );
 }
 
-const connector = connect((state: UIState, props: PropsFromParent) => {
-  const roots = props.roots instanceof Function ? props.roots() : props.roots;
-  return {
-    isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
-  };
-});
+const connector = connect(
+  (state: UIState, props: PropsFromParent) => {
+    const roots = props.roots instanceof Function ? props.roots() : props.roots;
+    return {
+      isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
+    };
+  },
+  { onViewSourceInDebugger }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ObjectInspector);

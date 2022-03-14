@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: row;
   padding-right: 1px; /* Without this, the console message overlay buttons cover the splitbox splitter. */
-  --toolbox-background: #f9f9fa;
+  --toolbox-bgcolor: #f9f9fa;
   --paused-background-color: var(--secondary-accent);
 }
 
@@ -55,7 +55,7 @@
 }
 
 .toolbar-panel-button:hover {
-  background-color: var(--toolbarbutton-focus-background);
+  background-color: var(--toolbarbutton-focus-bgcolor);
 }
 
 .toolbar-panel-icon {
