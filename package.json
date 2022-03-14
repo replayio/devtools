@@ -58,7 +58,7 @@
     "lodash-move": "^1.1.1",
     "logrocket": "^2.2.0",
     "logrocket-react": "^5.0.1",
-    "mixpanel-browser": "^2.43.0",
+    "mixpanel-browser": "^2.45.0",
     "next": "^12.1.0",
     "parse-script-tags": "^0.1.7",
     "prop-types": "^15.8.1",
