@@ -116,7 +116,7 @@
     "@types/lodash": "^4.14.179",
     "@types/logrocket-react": "^3.0.0",
     "@types/mixpanel-browser": "^2.35.6",
-    "@types/react": "^16.9.55",
+    "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0",
     "@types/react-lazyload": "^3.1.1",
     "@types/react-redux": "^7.1.22",
