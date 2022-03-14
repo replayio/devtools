@@ -6,14 +6,14 @@ import FilterBar from "devtools/client/webconsole/components/FilterBar/FilterBar
 import { ConsoleNag } from "ui/components/shared/Nags/Nags";
 import { FilterDrawer } from "./FilterDrawer";
 import Warning from "ui/components/shared/Warning";
-import { FC, MouseEventHandler, useEffect } from "react";
+import { MouseEventHandler } from "react";
 import { useSelector } from "react-redux";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 
 /**
  * Console root Application component.
  */
-const App: FC = () => {
+const App = (): JSX.Element => {
   // @ts-ignore
   const consoleOverflow = useSelector(state => state.messages.overflow);
   // @ts-ignore
