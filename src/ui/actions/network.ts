@@ -52,8 +52,7 @@ export type NetworkAction =
   | NewResponseBodyPartsAction
   | SetFramesAction
   | ShowRequestDetailsAction
-  | HideRequestDetailsAction
-;
+  | HideRequestDetailsAction;
 
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData

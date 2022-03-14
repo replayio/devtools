@@ -11,13 +11,21 @@ import { RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
 import ResponseBody from "./ResponseBody";
 import { useFeature } from "ui/hooks/settings";
 import RequestBody from "./RequestBody";
+import { getLoadedRegions } from "ui/reducers/app";
+import { useDispatch, useSelector } from "react-redux";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+import { hideRequestDetails } from "ui/actions/network";
+import { getFormattedFrames } from "ui/reducers/network";
 
 interface Detail {
   name: string;
   value: string | React.ReactChild;
 }
 
-export const RequestDetailsUnavailable: FC<{ closePanel: () => void }> = ({ closePanel }) => {
+export const RequestDetailsUnavailable: FC = () => {
+  const dispatch = useDispatch();
+  const closePanel = () => dispatch(hideRequestDetails());
+
   return (
     <div className="flex h-full w-full flex-col">
       <RequestDetailsTabs>
@@ -251,23 +259,22 @@ const DEFAULT_TAB = "headers";
 export type NetworkTab = "headers" | "cookies" | "response" | "request" | "stackTrace" | "timings";
 
 const RequestDetails = ({
-  closePanel,
   cx,
-  frames,
   request,
   requestBody,
   responseBody,
   selectFrame,
 }: {
-  closePanel: () => void;
   cx: any;
-  frames: WiredFrame[];
   request: RequestSummary;
   responseBody: ResponseBodyData[] | undefined;
   requestBody: RequestBodyData[] | undefined;
   selectFrame: (cx: any, frame: WiredFrame) => void;
 }) => {
+  const dispatch = useDispatch();
+  const frames = useSelector(getFormattedFrames)[request.point.point];
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
+  const loadedRegions = useSelector(getLoadedRegions)?.loaded;
 
   const { value: httpBodies } = useFeature("httpBodies");
 
@@ -289,12 +296,17 @@ const RequestDetails = ({
   ];
 
   const activeTabs = tabs.filter(t => t.visible);
+  const closePanel = () => dispatch(hideRequestDetails());
 
   useEffect(() => {
     if (!activeTabs.find(t => t.id === activeTab)) {
       setActiveTab(DEFAULT_TAB);
     }
   }, [activeTab, activeTabs]);
+
+  if (!(loadedRegions && request && getPointIsInLoadedRegion(loadedRegions, request.point.point))) {
+    return <RequestDetailsUnavailable />;
+  }
 
   return (
     <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-themeBodyBgcolor">

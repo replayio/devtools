@@ -12,26 +12,28 @@ import {
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import RequestDetails, { RequestDetailsUnavailable } from "./RequestDetails";
+import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import { CanonicalRequestType, RequestSummary } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
-import { fetchResponseBody, fetchRequestBody, hideRequestDetails, showRequestDetails } from "ui/actions/network";
+import {
+  fetchResponseBody,
+  fetchRequestBody,
+  hideRequestDetails,
+  showRequestDetails,
+} from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import { trackEvent } from "ui/utils/telemetry";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 
 export const NetworkMonitor = ({
   currentTime,
   cx,
   events,
-  frames,
   loading,
-  loadedRegions,
   requestBodies,
   requests,
   responseBodies,
@@ -44,8 +46,6 @@ export const NetworkMonitor = ({
   const dispatch = useDispatch();
 
   const container = useRef<HTMLDivElement>(null);
-
-  const closePanel = () => dispatch(hideRequestDetails());
 
   const toggleType = (type: CanonicalRequestType) => {
     const newTypes = new Set(types);
@@ -120,20 +120,13 @@ export const NetworkMonitor = ({
             }
             endPanel={
               selectedRequestId ? (
-                loadedRegions &&
-                getPointIsInLoadedRegion(loadedRegions, data.find(request => request.id === selectedRequestId)!.point.point) ? (
-                  <RequestDetails
-                    closePanel={closePanel}
-                    cx={cx}
-                    request={data.find(request => request.id === selectedRequestId)!}
-                    responseBody={responseBodies[selectedRequestId]}
-                    requestBody={requestBodies[selectedRequestId]}
-                    frames={frames[data.find(request => request.id === selectedRequestId)!.point.point]}
-                    selectFrame={selectFrame}
-                  />
-                ) : (
-                  <RequestDetailsUnavailable closePanel={closePanel} />
-                )
+                <RequestDetails
+                  cx={cx}
+                  request={data.find(request => request.id === selectedRequestId)!}
+                  responseBody={responseBodies[selectedRequestId]}
+                  requestBody={requestBodies[selectedRequestId]}
+                  selectFrame={selectFrame}
+                />
               ) : null
             }
             splitterSize={1}
