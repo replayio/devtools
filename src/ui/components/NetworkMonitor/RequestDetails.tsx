@@ -298,6 +298,7 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
       </RequestDetailsTabs>
       <div className={classNames("requestDetails", styles.requestDetails)}>
+        <div className="flex border-b p-2"><AddCommentButton /></div>
         <div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}
@@ -310,5 +311,14 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
     </div>
   );
 };
+
+const AddCommentButton: FC = () => {
+  return (
+    <button className="bg-primaryAccent space-x-2 inline-flex items-center rounded-md border border-transparent px-1 text-xs font-medium leading-4 text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2">
+      <div className="material-icons add-comment-icon text-base text-white">add_comment</div>
+      <div>Add a comment</div>
+    </button>
+  );
+}
 
 export default RequestDetails;
