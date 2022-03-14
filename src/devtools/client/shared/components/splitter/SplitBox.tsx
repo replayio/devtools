@@ -10,8 +10,6 @@ type CSSSize = `${number}px` | `${number}` | `${number}%`;
 type SplitterProps = {
   className?: string;
   initialSize?: CSSSize;
-  initialWidth?: CSSSize;
-  initialHeight?: CSSSize;
   startPanel?: ReactNode;
   minSize?: CSSSize;
   maxSize?: CSSSize;
@@ -40,22 +38,27 @@ const SplitBox: FC<SplitterProps> = ({
   vert = true,
 }) => {
   const [defaultCursor, setDefaultCursor] = useState<string>("auto");
-  const [width, setWidth] = useState<CSSSize>(initialSize || "0");
-  const [height, setHeight] = useState<CSSSize>(initialSize || "0");
+  const [size, setSize] = useState<CSSSize>(initialSize || "0");
 
   const splitBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    onControlledPanelResized?.(width, height);
-  }, [width, height, onControlledPanelResized]);
+    onControlledPanelResized?.(size, size);
+  }, [size, onControlledPanelResized]);
 
   useEffect(() => {
     const nodeBounds = splitBoxRef.current!.getBoundingClientRect();
-    if (vert) {
-      setWidth(`${getConstrainedSizeInPx(0, nodeBounds.width)}px`);
-    } else {
-      setHeight(`${getConstrainedSizeInPx(0, nodeBounds.height)}px`);
-    }
+    const splitBoxWidthOrHeight = vert ? nodeBounds.width : nodeBounds.height;
+
+    const sizePx = (() => {
+      if (size.endsWith("%")) {
+        return parseFloat(size) * 0.01 * splitBoxWidthOrHeight;
+      }
+      return parseFloat(size);
+    })();
+
+    setSize(`${getConstrainedSizeInPx(sizePx, splitBoxWidthOrHeight)}px`);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -85,7 +88,7 @@ const SplitBox: FC<SplitterProps> = ({
 
     splitBoxRef.current!.classList.remove("dragging");
 
-    onResizeEnd?.(vert ? width : height);
+    onResizeEnd?.(size);
   };
 
   const onMoveHandler = (x: number, y: number) => {
@@ -95,10 +98,10 @@ const SplitBox: FC<SplitterProps> = ({
 
     if (vert) {
       size = endPanelControl ? nodeBounds.left + nodeBounds.width - x : x - nodeBounds.left;
-      setWidth(`${getConstrainedSizeInPx(size, nodeBounds.width)}px`);
+      setSize(`${getConstrainedSizeInPx(size, nodeBounds.width)}px`);
     } else {
       size = endPanelControl ? nodeBounds.top + nodeBounds.height - y : y - nodeBounds.top;
-      setHeight(`${getConstrainedSizeInPx(size, nodeBounds.height)}px`);
+      setSize(`${getConstrainedSizeInPx(size, nodeBounds.height)}px`);
     }
 
     // Fire resize events at the window occasionally so that any visible
@@ -114,19 +117,19 @@ const SplitBox: FC<SplitterProps> = ({
   if (vert) {
     leftPanelStyle.maxWidth = endPanelControl ? undefined : maxSize;
     leftPanelStyle.minWidth = endPanelControl ? undefined : minSize;
-    leftPanelStyle.width = endPanelControl ? undefined : width;
+    leftPanelStyle.width = endPanelControl ? undefined : size;
 
     rightPanelStyle.maxWidth = endPanelControl ? maxSize : undefined;
     rightPanelStyle.minWidth = endPanelControl ? minSize : undefined;
-    rightPanelStyle.width = endPanelControl ? width : undefined;
+    rightPanelStyle.width = endPanelControl ? size : undefined;
   } else {
     leftPanelStyle.maxHeight = endPanelControl ? undefined : maxSize;
     leftPanelStyle.minHeight = endPanelControl ? undefined : minSize;
-    leftPanelStyle.height = endPanelControl ? undefined : height;
+    leftPanelStyle.height = endPanelControl ? undefined : size;
 
     rightPanelStyle.maxHeight = endPanelControl ? maxSize : undefined;
     rightPanelStyle.minHeight = endPanelControl ? minSize : undefined;
-    rightPanelStyle.height = endPanelControl ? height : undefined;
+    rightPanelStyle.height = endPanelControl ? size : undefined;
   }
 
   return (
