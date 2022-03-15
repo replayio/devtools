@@ -129,4 +129,13 @@ export const getResponseBodies = (state: UIState) => state.network.responseBodie
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;
 export const getSelectedRequestId = (state: UIState) => state.network.selectedRequestId;
 
+export const getSelectedResponseBody = (state: UIState) => {
+  const requestId = getSelectedRequestId(state);
+  return requestId ? getResponseBodies(state)[requestId] : null;
+};
+export const getSelectedRequestBody = (state: UIState) => {
+  const requestId = getSelectedRequestId(state);
+  return requestId ? getRequestBodies(state)[requestId] : null;
+};
+
 export default update;

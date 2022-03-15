@@ -123,9 +123,6 @@ export const NetworkMonitor = ({
                 <RequestDetails
                   cx={cx}
                   request={data.find(request => request.id === selectedRequestId)!}
-                  responseBody={responseBodies[selectedRequestId]}
-                  requestBody={requestBodies[selectedRequestId]}
-                  selectFrame={selectFrame}
                 />
               ) : null
             }

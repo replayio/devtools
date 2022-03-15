@@ -7,7 +7,6 @@ import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 import { WiredFrame } from "protocol/thread/pause";
-import { RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
 import ResponseBody from "./ResponseBody";
 import { useFeature } from "ui/hooks/settings";
 import RequestBody from "./RequestBody";
@@ -16,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 import { hideRequestDetails } from "ui/actions/network";
 import { getFormattedFrames } from "ui/reducers/network";
+import { actions } from "ui/actions";
 
 interface Detail {
   name: string;
@@ -125,15 +125,10 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
   );
 };
 
-const StackTrace = ({
-  cx,
-  frames,
-  selectFrame,
-}: {
-  cx: any;
-  frames: WiredFrame[];
-  selectFrame: (cx: any, frame: WiredFrame) => void;
-}) => {
+const StackTrace = ({ cx, frames }: { cx: any; frames: WiredFrame[] }) => {
+  const dispatch = useDispatch();
+  const selectFrame = (cx: any, frame: WiredFrame) => dispatch(actions.selectFrame(cx, frame));
+
   return (
     <div>
       <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
@@ -258,19 +253,7 @@ const DEFAULT_TAB = "headers";
 
 export type NetworkTab = "headers" | "cookies" | "response" | "request" | "stackTrace" | "timings";
 
-const RequestDetails = ({
-  cx,
-  request,
-  requestBody,
-  responseBody,
-  selectFrame,
-}: {
-  cx: any;
-  request: RequestSummary;
-  responseBody: ResponseBodyData[] | undefined;
-  requestBody: RequestBodyData[] | undefined;
-  selectFrame: (cx: any, frame: WiredFrame) => void;
-}) => {
+const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) => {
   const dispatch = useDispatch();
   const frames = useSelector(getFormattedFrames)[request.point.point];
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
@@ -318,15 +301,9 @@ const RequestDetails = ({
         <div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}
-          {activeTab === "response" && (
-            <ResponseBody request={request} responseBodyParts={responseBody} />
-          )}
-          {activeTab === "request" && (
-            <RequestBody request={request} requestBodyParts={requestBody} />
-          )}
-          {activeTab === "stackTrace" && (
-            <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
-          )}
+          {activeTab === "response" && <ResponseBody request={request} />}
+          {activeTab === "request" && <RequestBody request={request} />}
+          {activeTab === "stackTrace" && <StackTrace cx={cx} frames={frames} />}
           {activeTab === "timings" && <Timing request={request} />}
         </div>
       </div>
