@@ -1,6 +1,10 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
-import { getSelectedPrimaryPanel, getShowCommandPalette } from "ui/reducers/layout";
+import {
+  getSelectedPanel,
+  getSelectedPrimaryPanel,
+  getShowCommandPalette,
+} from "ui/reducers/layout";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
 import {
   ViewMode,
@@ -76,8 +80,18 @@ export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAct
   return { type: "set_show_video_panel", showVideoPanel };
 }
 
-export function setToolboxLayout(layout: ToolboxLayout): SetToolboxLayoutAction {
-  return { type: "set_toolbox_layout", layout };
+export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const selectedPanel = getSelectedPanel(getState());
+
+    // If the debugger's being unset from the toolbox and it happens to be selected,
+    // we should deselect it and select the console instead.
+    if (layout == "ide" && selectedPanel === "debugger") {
+      dispatch(setSelectedPanel("console"));
+    }
+
+    dispatch({ type: "set_toolbox_layout", layout });
+  };
 }
 
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
