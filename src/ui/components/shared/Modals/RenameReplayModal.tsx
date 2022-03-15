@@ -29,7 +29,7 @@ function RenameReplayModal({
 
   return (
     <Modal onMaskClick={dismissModal} options={{ maskTransparency: "translucent" }}>
-      <Dialog style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}>
+      <Dialog>
         <DialogTitle>Edit Replay</DialogTitle>
         <TextInput value={title} onChange={onChange} autoFocus />
         <DialogActions>

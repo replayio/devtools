@@ -48,14 +48,13 @@ export const ConfirmDialog = ({
   return (
     <Dialog
       {...props}
-      className={classNames("flex flex-col items-center", className)}
+      className={className}
       onKeyUp={evt => {
         if (evt.key === "Escape") {
           evt.stopPropagation();
           onDecline();
         }
       }}
-      style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
     >
       <DialogLogo />
       <DialogTitle>{message}</DialogTitle>

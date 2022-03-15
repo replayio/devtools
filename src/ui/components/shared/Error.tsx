@@ -37,7 +37,7 @@ function RefreshButton() {
   };
 
   return (
-    <PrimaryButton className="mx-2 flex-1 justify-center" color="blue" onClick={onClick}>
+    <PrimaryButton color="blue" onClick={onClick}>
       {clicked ? `Refreshing...` : `Refresh`}
     </PrimaryButton>
   );
@@ -142,7 +142,7 @@ function Error({ error }: ErrorProps) {
   const { action, message, content } = error;
 
   return (
-    <Dialog style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}>
+    <Dialog>
       <DialogLogo />
       <DialogTitle>{message}</DialogTitle>
       {content && <DialogDescription>{content}</DialogDescription>}
@@ -177,9 +177,7 @@ function TrialExpired() {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
-      <Dialog
-        style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
-      >
+      <Dialog>
         <DialogLogo />
         <DialogTitle>Free Trial Expired</DialogTitle>
         <DialogDescription>

@@ -28,9 +28,7 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <Dialog
-        style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
-      >
+      <Dialog>
         <DialogLogo />
         <DialogTitle>Replay is better with sourcemaps</DialogTitle>
         <DialogDescription>{msg}</DialogDescription>

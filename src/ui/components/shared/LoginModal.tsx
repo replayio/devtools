@@ -9,7 +9,7 @@ function LoginModal() {
 
   return (
     <Modal>
-      <Dialog style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}>
+      <Dialog style={{ animation: "linearFadeIn ease 200ms", width: 400 }}>
         <DialogLogo />
         <DialogTitle>Free Trial Expired</DialogTitle>
         <DialogDescription>
