@@ -27,6 +27,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
   },
+  {
+    label: "Network Request Comments",
+    description: "Leave comments on a network request",
+    key: "enableNetworkRequestComments",
+  },
 ];
 
 function Experiment({
@@ -59,6 +64,8 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
+  const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
+    useFeature("networkRequestComments");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -67,11 +74,14 @@ export default function ExperimentalSettings({}) {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
+    } else if (key == "enableNetworkRequestComments") {
+      updateEnableNetworkRequestComments(!enableNetworkRequestComments);
     }
   };
 
   const localSettings = {
     enableColumnBreakpoints,
+    enableNetworkRequestComments,
   };
   const settings = { ...userSettings, ...localSettings };
 

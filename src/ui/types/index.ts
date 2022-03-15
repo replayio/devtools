@@ -16,6 +16,7 @@ export type ExperimentalUserSettings = {
 
 export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
+  enableNetworkRequestComments: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
