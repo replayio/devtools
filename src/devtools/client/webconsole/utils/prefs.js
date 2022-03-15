@@ -7,6 +7,8 @@
 import Services from "devtools/shared/services";
 import { PrefsHelper } from "devtools/client/shared/prefs";
 
+// TODO Can this file just be deleted entirely?
+
 const { pref } = Services;
 
 pref("console.filter.error", true);
@@ -37,13 +39,3 @@ export const prefs = new PrefsHelper("console", {
   timestampsVisible: ["Bool", "timestampsVisible"],
   inputContext: ["Bool", "input.context"],
 });
-
-export function getPrefsService() {
-  return {
-    getBoolPref: (pref, deflt) => deflt,
-    getIntPref: (pref, deflt) => deflt,
-    setBoolPref: (pref, value) => {},
-    setIntPref: (pref, value) => {},
-    clearUserPref: pref => {},
-  };
-}

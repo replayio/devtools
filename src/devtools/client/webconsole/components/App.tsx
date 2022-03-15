@@ -49,7 +49,7 @@ const App = (): JSX.Element => {
 
   return (
     <div className="flex w-full flex-col">
-      <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
+      <FilterBar key="filterbar" />
       <div className="flex flex-grow overflow-hidden">
         <FilterDrawer />
         <div className="webconsole-app" onClick={onClick}>

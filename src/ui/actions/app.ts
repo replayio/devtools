@@ -36,10 +36,10 @@ import {
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
 import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
+import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -318,8 +318,20 @@ export function setVideoNode(videoNode: HTMLVideoElement | null): SetVideoNode {
   return { type: "set_video_node", videoNode };
 }
 
-export function setCanvas(canvas: Canvas): SetCanvas {
+export function setCanvasAction(canvas: Canvas): SetCanvas {
   return { type: "set_canvas", canvas };
+}
+
+export function setCanvas(canvas: Canvas): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const { canvas: existingCanvas } = getState().app;
+
+    // Skip dispatching if the new canvas value is identical to what's in the store.
+    // This improves perf slightly, especially since this was dispatching frequently.
+    if (!shallowEqual(existingCanvas, canvas)) {
+      dispatch(setCanvasAction(canvas));
+    }
+  };
 }
 
 export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId {
@@ -402,7 +414,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "show_console_filters") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
-      dispatch(setFilterDrawer(false));
     } else if (key === "show_events" || key === "show_replay_info") {
       dispatch(setSelectedPrimaryPanel("events"));
     } else if (key === "show_privacy") {
