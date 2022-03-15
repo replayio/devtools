@@ -16,8 +16,6 @@ const { getFilteredMessagesCount } = require("devtools/client/webconsole/selecto
 const { getAllMessagesById } = require("devtools/client/webconsole/selectors/messages");
 
 // Constants
-const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
-
 const FilterSearchBox = require("./FilterSearchBox").default;
 const ClearButton = require("./ClearButton").default;
 const { FilterDrawerToggle } = require("./FilterDrawerToggle");
@@ -27,22 +25,13 @@ const PropTypes = require("prop-types");
 class FilterBar extends Component {
   static get propTypes() {
     return {
-      displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
       allMessagesById: PropTypes.object,
     };
   }
 
-  constructor(props) {
-    super(props);
-  }
-
   shouldComponentUpdate(nextProps) {
-    const { displayMode, filteredMessagesCount, allMessagesById } = this.props;
-
-    if (nextProps.displayMode !== displayMode) {
-      return true;
-    }
+    const { filteredMessagesCount, allMessagesById } = this.props;
 
     if (JSON.stringify(nextProps.filteredMessagesCount) !== JSON.stringify(filteredMessagesCount)) {
       return true;
@@ -56,11 +45,9 @@ class FilterBar extends Component {
   }
 
   render() {
-    const { displayMode } = this.props;
-
     return (
       <div
-        className={`webconsole-filteringbar-wrapper text-xs ${displayMode}`}
+        className={`webconsole-filteringbar-wrapper text-xs`}
         aria-live="off"
         ref={node => (this.wrapperNode = node)}
       >
@@ -82,7 +69,6 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, {
-  filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
   messagesClearEvaluations: actions.messagesClearEvaluations,
   filterTextSet: actions.filterTextSet,
   filterToggle: actions.filterToggle,
