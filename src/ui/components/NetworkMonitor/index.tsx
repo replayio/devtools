@@ -126,7 +126,7 @@ export const NetworkMonitor = ({
                 />
               ) : null
             }
-            splitterSize={1}
+            splitterSize={2}
             vert={vert}
           />
         </div>
