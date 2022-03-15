@@ -34,6 +34,15 @@ type SetFramesAction = {
   payload: { frames: any[]; point: string };
 };
 
+type ShowRequestDetailsAction = {
+  type: "SHOW_REQUEST_DETAILS";
+  requestId: RequestId;
+};
+
+type HideRequestDetailsAction = {
+  type: "HIDE_REQUEST_DETAILS";
+};
+
 type NetworkRequestsLoadedAction = { type: "NETWORK_REQUESTS_LOADED" };
 
 export type NetworkAction =
@@ -41,7 +50,9 @@ export type NetworkAction =
   | NewNetworkRequestsAction
   | NewRequestBodyPartsAction
   | NewResponseBodyPartsAction
-  | SetFramesAction;
+  | SetFramesAction
+  | ShowRequestDetailsAction
+  | HideRequestDetailsAction;
 
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData
@@ -106,5 +117,18 @@ export function fetchFrames(tsPoint: TimeStampedPoint) {
       type: "SET_FRAMES",
       payload: { frames: formattedFrames, point: tsPoint.point },
     });
+  };
+}
+
+export function showRequestDetails(requestId: RequestId) {
+  return {
+    type: "SHOW_REQUEST_DETAILS",
+    requestId,
+  };
+}
+
+export function hideRequestDetails() {
+  return {
+    type: "HIDE_REQUEST_DETAILS",
   };
 }
