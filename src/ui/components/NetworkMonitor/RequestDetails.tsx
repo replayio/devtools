@@ -16,6 +16,7 @@ import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 import { hideRequestDetails } from "ui/actions/network";
 import { getFormattedFrames } from "ui/reducers/network";
 import { actions } from "ui/actions";
+import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
 
 interface Detail {
   name: string;
@@ -191,11 +192,16 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   return (
     <>
       <div
-        className={classNames("flex cursor-pointer items-center py-1 font-bold")}
+        className={classNames(
+          "flex cursor-pointer items-center py-1 font-bold justify-between pr-2"
+        )}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
-        <TriangleToggle open={requestExpanded} />
-        General
+        <div>
+          <TriangleToggle open={requestExpanded} />
+          General
+        </div>
+        <AddNetworkRequestCommentButton request={request} />
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
       <div
@@ -298,7 +304,9 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
       </RequestDetailsTabs>
       <div className={classNames("requestDetails", styles.requestDetails)}>
-        <div className="flex border-b p-2"><AddCommentButton /></div>
+        {/* <div className="flex border-b p-2">
+          <AddNetworkRequestCommentButton request={request} />
+        </div> */}
         <div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}
@@ -311,14 +319,5 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
     </div>
   );
 };
-
-const AddCommentButton: FC = () => {
-  return (
-    <button className="bg-primaryAccent space-x-2 inline-flex items-center rounded-md border border-transparent px-1 text-xs font-medium leading-4 text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2">
-      <div className="material-icons add-comment-icon text-base text-white">add_comment</div>
-      <div>Add a comment</div>
-    </button>
-  );
-}
 
 export default RequestDetails;

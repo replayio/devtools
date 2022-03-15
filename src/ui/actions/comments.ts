@@ -1,16 +1,18 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { PendingComment, Comment, Reply, SourceLocation } from "ui/state/comments";
+import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { User } from "ui/types";
 import { setSelectedPrimaryPanel } from "./layout";
-import { getFocusRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
@@ -46,13 +48,12 @@ export function updatePendingCommentContent(content: string): UpdatePendingComme
 export function createComment(
   time: number,
   point: string,
-  position: { x: number; y: number } | null,
-  hasFrames: boolean,
-  sourceLocation: SourceLocation | null,
   user: User,
-  recordingId: RecordingId
+  recordingId: RecordingId,
+  options: CommentOptions
 ): UIThunkAction {
   return async ({ dispatch }) => {
+    const { sourceLocation, hasFrames, position, networkRequestId } = options;
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
     const primaryLabel = labels?.primary;
     const secondaryLabel = labels?.secondary;
@@ -64,6 +65,7 @@ export function createComment(
         createdAt: new Date().toISOString(),
         hasFrames,
         id: PENDING_COMMENT_ID,
+        networkRequestId: networkRequestId || null,
         point,
         position,
         primaryLabel,
@@ -93,7 +95,12 @@ export function createFrameComment(
   return async ({ dispatch }) => {
     const sourceLocation =
       breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
-    dispatch(createComment(time, point, position, true, sourceLocation || null, user, recordingId));
+    const options = {
+      position,
+      hasFrames: true,
+      sourceLocation: sourceLocation || null,
+    };
+    dispatch(createComment(time, point, user, recordingId, options));
   };
 }
 
@@ -110,7 +117,35 @@ export function createFloatingCodeComment(
 ): UIThunkAction {
   return async ({ dispatch }) => {
     const { location: sourceLocation } = breakpoint;
-    dispatch(createComment(time, point, null, false, sourceLocation || null, user, recordingId));
+    const options = {
+      position: null,
+      hasFrames: false,
+      sourceLocation: sourceLocation || null,
+    };
+    dispatch(createComment(time, point, user, recordingId, options));
+  };
+}
+
+export function createNetworkRequestComment(
+  request: RequestSummary,
+  user: User,
+  recordingId: RecordingId
+): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    const state = getState();
+    const currentTime = getCurrentTime(state);
+    const executionPoint = getExecutionPoint(state);
+
+    const time = request.triggerPoint?.time ?? currentTime;
+    const point = request.triggerPoint?.point || executionPoint!;
+
+    const options = {
+      position: null,
+      hasFrames: false,
+      sourceLocation: null,
+      networkRequestId: request.id,
+    };
+    dispatch(createComment(time, point, user, recordingId, options));
   };
 }
 

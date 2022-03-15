@@ -17,6 +17,7 @@ import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { features } from "ui/utils/prefs";
 import { getFocusRegion } from "ui/reducers/timeline";
+import NetworkRequestPreview from "./NetworkRequestPreview";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function BorderBridge({
@@ -100,6 +101,16 @@ function CommentItem({
   );
 }
 
+function CommentTarget({ comment }: { comment: Comment }) {
+  if (comment.sourceLocation) {
+    return <CommentSource comment={comment} />;
+  } else if (comment.networkRequestId) {
+    return <NetworkRequestPreview networkRequestId={comment.networkRequestId} />;
+  }
+
+  return null;
+}
+
 type PropsFromParent = {
   comment: Comment;
   comments: Comment[];
@@ -150,7 +161,7 @@ function CommentCard({
       >
         <div className={classNames("w-full border-l-2 border-secondaryAccent py-2.5")}>
           <div className={classNames("space-y-2 px-2.5 pl-2")}>
-            {comment.sourceLocation && <CommentSource comment={comment} />}
+            <CommentTarget comment={comment} />
             <FocusContext.Provider
               value={{
                 autofocus: true,
@@ -189,7 +200,7 @@ function CommentCard({
           "border-transparent": !isPaused,
         })}
       >
-        {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
+        <CommentTarget comment={comment} />
         <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
         {comment.replies?.map((reply: Reply, i: number) => (
           <div key={replyKeys[i]}>
