@@ -304,9 +304,6 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
       </RequestDetailsTabs>
       <div className={classNames("requestDetails", styles.requestDetails)}>
-        {/* <div className="flex border-b p-2">
-          <AddNetworkRequestCommentButton request={request} />
-        </div> */}
         <div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}

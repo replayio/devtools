@@ -22,7 +22,7 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
     return null;
   }
 
-  const { method, name, domain } = request;
+  const { method, name } = request;
 
   return (
     <div
@@ -35,9 +35,8 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
             className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs space-x-2"
             style={{ fontSize: "11px" }}
           >
-            <span>{`[${method}]`}</span>
+            <span className="font-bold">{`[${method}]`}</span>
             <span>{name}</span>
-            <span>({`${domain}`})</span>
           </div>
           <div
             className="flex flex-shrink-0 opacity-0 transition group-hover:opacity-100"
