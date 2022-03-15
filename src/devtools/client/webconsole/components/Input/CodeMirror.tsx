@@ -3,16 +3,6 @@ import React, { FC, useRef } from "react";
 import { Controlled as CodeMirror } from "react-codemirror2";
 
 import "codemirror/mode/javascript/javascript";
-import "codemirror/mode/htmlmixed/htmlmixed";
-import "codemirror/mode/coffeescript/coffeescript";
-import "codemirror/mode/jsx/jsx";
-import "codemirror/mode/elm/elm";
-import "codemirror/mode/clojure/clojure";
-import "codemirror/mode/haxe/haxe";
-import "codemirror/addon/search/searchcursor";
-import "codemirror/addon/runmode/runmode";
-import "codemirror/addon/selection/active-line";
-import "codemirror/addon/edit/matchbrackets";
 
 const CODEMIRROR_OPTIONS = {
   autofocus: true,
