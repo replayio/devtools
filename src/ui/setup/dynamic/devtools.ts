@@ -34,7 +34,6 @@ const { setupExceptions } = require("devtools/client/debugger/src/actions/logExc
 import { getConsoleInitialState } from "devtools/client/webconsole/store";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import consoleReducers from "devtools/client/webconsole/reducers";
-import { getPrefsService } from "devtools/client/webconsole/utils/prefs";
 const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 const {
   initOutputSyntaxHighlighting,
@@ -137,7 +136,6 @@ export default async function DevTools(store: Store) {
   const thunkArgs = {
     client: clientCommands,
     ...bootstrapWorkers(),
-    prefsService: getPrefsService(),
   };
 
   extendStore(store, initialState, reducers, thunkArgs);

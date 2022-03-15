@@ -1,5 +1,4 @@
 import { Action } from "redux";
-import { getPrefsService } from "devtools/client/webconsole/utils/prefs";
 import { DevToolsToolbox } from "./devtools-toolbox";
 import { ProtocolClient } from "@recordreplay/protocol";
 
@@ -55,7 +54,6 @@ export type ThunkAction<TReturnType, TState, TExtraThunkArg, TBasicAction extend
 
 export interface ThunkExtraArgs {
   client: ProtocolClient;
-  prefsService: ReturnType<typeof getPrefsService>;
   toolbox: DevToolsToolbox;
 }
 
