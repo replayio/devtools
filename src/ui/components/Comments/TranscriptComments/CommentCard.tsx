@@ -18,6 +18,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { features } from "ui/utils/prefs";
 import { getFocusRegion } from "ui/reducers/timeline";
 import NetworkRequestPreview from "./NetworkRequestPreview";
+import { useFeature } from "ui/hooks/settings";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function BorderBridge({
@@ -102,9 +103,11 @@ function CommentItem({
 }
 
 function CommentTarget({ comment }: { comment: Comment }) {
+  const { value: networkRequestComments } = useFeature("networkRequestComments");
+
   if (comment.sourceLocation) {
     return <CommentSource comment={comment} />;
-  } else if (comment.networkRequestId) {
+  } else if (comment.networkRequestId && networkRequestComments) {
     return <NetworkRequestPreview networkRequestId={comment.networkRequestId} />;
   }
 
