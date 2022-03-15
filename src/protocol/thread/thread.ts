@@ -1168,7 +1168,7 @@ class _ThreadFront {
         return false;
       }
       kind = minifiedInfo.kind;
-      assert(kind != "prettyPrinted", "source kind must be prettyPrinted");
+      assert(kind != "prettyPrinted", "source kind must not be prettyPrinted");
     }
     return kind == "sourceMapped";
   }
