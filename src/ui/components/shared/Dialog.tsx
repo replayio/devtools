@@ -6,7 +6,7 @@ export type DialogPropTypes = HTMLProps<HTMLDivElement>;
 
 export function Dialog({ children, className, ...props }: DialogPropTypes) {
   return (
-    <div {...props} className={classNames("dialog", className)} role="dialog">
+    <div {...props} className={classNames("dialog flex flex-col items-center", className)} role="dialog">
       {children}
     </div>
   );
@@ -45,7 +45,5 @@ export const DialogDescription = ({
 };
 
 export const DialogActions = ({ children, className, ...props }: HTMLProps<HTMLDivElement>) => {
-  return (
-    <div className={classNames("mt-6 flex w-full justify-between", className)}>{children}</div>
-  );
+  return <div className={classNames("mt-6 flex w-full justify-center", className)}>{children}</div>;
 };

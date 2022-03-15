@@ -1,4 +1,4 @@
-import { Button, PrimaryButton, SecondaryButton } from "../Button";
+import { Button, SecondaryButton } from "../Button";
 import {
   Dialog,
   DialogActions,

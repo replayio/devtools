@@ -29,7 +29,6 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <Dialog
-        className={classNames("flex flex-col items-center")}
         style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
       >
         <DialogLogo />

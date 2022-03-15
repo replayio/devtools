@@ -101,6 +101,7 @@ function ReplayScreenshot({
   showLimitWarning,
 }: {
   screenData: string;
+
   showLimitWarning: boolean;
 }) {
   return (
