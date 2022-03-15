@@ -23,11 +23,11 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
     <>
       <div className="flex items-center justify-between space-x-3">
         <div className="w-0 flex-auto">
-          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-blue-100 px-2.5 text-blue-800">
+          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-blue-50 px-2.5 text-primaryAccent">
             <input
               readOnly
               value={keyValue}
-              className="flex-auto truncate bg-blue-100 focus:outline-none"
+              className="flex-auto truncate bg-blue-50 focus:outline-none"
               onFocus={ev => ev.target.setSelectionRange(0, keyValue.length)}
             />
             {copied ? (
