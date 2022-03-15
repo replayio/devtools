@@ -71,12 +71,8 @@ const prefs = {
       PERSIST: "devtools.webconsole.persistlog",
       // Max number of entries in history list.
       INPUT_HISTORY_COUNT: "devtools.webconsole.inputHistoryCount",
-      // Is editor mode enabled.
-      EDITOR: "input.editor",
       // Display timestamp in messages.
       MESSAGE_TIMESTAMP: "devtools.webconsole.timestampMessages",
-      // Store the editor width.
-      EDITOR_WIDTH: "input.editorWidth",
       // Show the Editor onboarding UI
       EDITOR_ONBOARDING: "devtools.webconsole.input.editorOnboarding",
       // Show the Input Context the selector

@@ -36,7 +36,6 @@ import {
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
 import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
@@ -415,7 +414,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "show_console_filters") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
-      dispatch(setFilterDrawer(false));
     } else if (key === "show_events" || key === "show_replay_info") {
       dispatch(setSelectedPrimaryPanel("events"));
     } else if (key === "show_privacy") {
