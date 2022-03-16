@@ -163,7 +163,7 @@ export function setupApp(store: UIStore) {
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {
       return;
@@ -323,7 +323,7 @@ export function setCanvasAction(canvas: Canvas): SetCanvas {
 }
 
 export function setCanvas(canvas: Canvas): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const { canvas: existingCanvas } = getState().app;
 
     // Skip dispatching if the new canvas value is identical to what's in the store.
@@ -355,7 +355,7 @@ export function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading
 }
 
 export function loadMouseTargets(): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     dispatch(setMouseTargetsLoading(true));
     const resp = await ThreadFront.loadMouseTargets();
     dispatch(setMouseTargetsLoading(false));
@@ -366,7 +366,7 @@ export function loadMouseTargets(): UIThunkAction {
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     const recordingId = getRecordingId();
 
     if (key === "open_console") {

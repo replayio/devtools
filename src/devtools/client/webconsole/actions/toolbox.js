@@ -33,7 +33,7 @@ export function unHighlightDomElement(grip) {
 }
 
 export function openNodeInInspector(valueFront) {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     const pause = valueFront.getPause();
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
@@ -51,7 +51,7 @@ export function openNodeInInspector(valueFront) {
 }
 
 export function onMessageHover(type, message) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (type == "mouseenter") {
       const hoveredItem = {
         target: "console",

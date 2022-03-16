@@ -8,7 +8,7 @@ import {
 } from "devtools/client/debugger/src/reducers/ast";
 
 export function loadGlobalFunctions() {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     // Only load global functions once.
     if (getGlobalFunctions(getState()) !== null || isGlobalFunctionsLoading(getState())) {
       return;

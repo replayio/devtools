@@ -20,7 +20,7 @@ function calculateBreakableLines(positions) {
 }
 
 export function setBreakableLines(cx, sourceId) {
-  return async ({ getState, dispatch, client }) => {
+  return async (dispatch, getState, { client }) => {
     let breakableLines;
     const actors = getSourceActorsForSource(getState(), sourceId);
 

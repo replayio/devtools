@@ -1,4 +1,6 @@
-import { Action, Store, ThunkAction } from "@reduxjs/toolkit";
+import { Action, Store, ThunkAction, AnyAction } from "@reduxjs/toolkit";
+
+import type { AppStore } from "ui/setup/store";
 
 import * as appActions from "./app";
 import * as timelineActions from "./timeline";
@@ -36,9 +38,14 @@ export type UIAction =
   | TimelineActions
   | QuickOpenActions;
 
-export type UIThunkAction<TReturn = void> = ThunkAction<TReturn, UIState, ThunkExtraArgs, UIAction>;
+export type UIThunkAction<TReturn = void> = ThunkAction<
+  TReturn,
+  UIState,
+  ThunkExtraArgs,
+  AnyAction
+>;
 
-export type UIStore = Store<UIState, UIAction> & {
+export type UIStore = AppStore & {
   userProperties?: UserProperties;
 };
 

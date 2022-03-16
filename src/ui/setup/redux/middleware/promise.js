@@ -33,7 +33,7 @@ function filterAction(action) {
   return fromPairs(toPairs(action).filter(pair => pair[0] !== PROMISE));
 }
 
-function promiseMiddleware({ dispatch, getState }) {
+function promiseMiddleware(storeApi) {
   return next => action => {
     if (!(PROMISE in action)) {
       return next(action);
@@ -46,7 +46,7 @@ function promiseMiddleware({ dispatch, getState }) {
     // the `seqId` field that represents the sequence id
     action = { ...filterAction(action), seqId };
 
-    dispatch({ ...action, status: "start" });
+    storeApi.dispatch({ ...action, status: "start" });
 
     // Return the promise so action creators can still compose if they
     // want to.
@@ -54,11 +54,11 @@ function promiseMiddleware({ dispatch, getState }) {
       .finally(() => new Promise(resolve => executeSoon(resolve)))
       .then(
         value => {
-          dispatch({ ...action, status: "done", value: value });
+          storeApi.dispatch({ ...action, status: "done", value: value });
           return value;
         },
         error => {
-          dispatch({
+          storeApi.dispatch({
             ...action,
             status: "error",
             error: error.message || error,

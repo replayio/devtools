@@ -58,10 +58,10 @@ function logAction(action) {
 
 // Middleware which looks for actions that have a cx property and ignores
 // them if the context is no longer valid.
-function context({ dispatch, getState }) {
+function context(storeApi) {
   return next => action => {
     if ("cx" in action) {
-      validateActionContext(getState, action);
+      validateActionContext(storeApi.getState, action);
     }
 
     logAction(action);

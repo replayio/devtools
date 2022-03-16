@@ -54,7 +54,7 @@ declare global {
 export function getAccessibleRecording(
   recordingId: string
 ): UIThunkAction<Promise<Recording | null>> {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     try {
       const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
       if (!recording || recording.isInitialized) {
@@ -107,7 +107,7 @@ function getRecordingNotAccessibleError(
 
 // Create a session to use while debugging.
 export function createSession(recordingId: string): UIThunkAction {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     try {
       if (ThreadFront.recordingId) {
         assert(
@@ -194,7 +194,7 @@ export function createSession(recordingId: string): UIThunkAction {
 }
 
 export function showLoadingProgress(): UIThunkAction<Promise<void>> {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     let displayedProgress = selectors.getLoading(getState());
     while (displayedProgress < 100) {
       await waitForTime(200);
@@ -210,7 +210,7 @@ export function showLoadingProgress(): UIThunkAction<Promise<void>> {
 }
 
 function onLoadingFinished(): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const selectedPanel = getSelectedPanel(getState());
     // This shouldn't hit when the selectedPanel is "comments"
     // as that's not dealt with in toolbox, however we still
@@ -230,7 +230,7 @@ function onLoadingFinished(): UIThunkAction {
 }
 
 export function onUploadedData({ uploaded, length }: uploadedData): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
     const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
     dispatch(actions.setUploading({ total: lengthMB, amount: uploadedMB }));
@@ -238,7 +238,7 @@ export function onUploadedData({ uploaded, length }: uploadedData): UIThunkActio
 }
 
 export function setExpectedError(error: ExpectedError): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
 
     sendTelemetryEvent("DevtoolsExpectedError", {
@@ -258,11 +258,11 @@ export function setTrialExpired(expired = true): SetTrialExpiredAction {
 }
 
 export function clearTrialExpired(): UIThunkAction {
-  return ({ dispatch }) => dispatch(setTrialExpired(false));
+  return dispatch => dispatch(setTrialExpired(false));
 }
 
 export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
 
     if (!skipTelemetry) {
@@ -279,7 +279,7 @@ export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false
 }
 
 export function clearExpectedError(): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     dispatch({ type: "clear_expected_error", error: null });
   };
 }

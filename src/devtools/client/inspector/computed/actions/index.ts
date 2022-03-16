@@ -30,7 +30,7 @@ export type InspectorThunkAction<TReturn = void> = ThunkAction<
 >;
 
 export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const properties = await createComputedProperties(elementStyle);
     return dispatch({ type: "set_computed_properties", properties });
   };

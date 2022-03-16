@@ -16,7 +16,7 @@ export function insertSourceActor(item) {
   return insertSourceActors([item]);
 }
 export function insertSourceActors(items) {
-  return function ({ dispatch }) {
+  return function (dispatch) {
     dispatch({
       type: "INSERT_SOURCE_ACTORS",
       items,
@@ -28,7 +28,7 @@ export function removeSourceActor(item) {
   return removeSourceActors([item]);
 }
 export function removeSourceActors(items) {
-  return function ({ dispatch }) {
+  return function (dispatch) {
     dispatch({ type: "REMOVE_SOURCE_ACTORS", items });
   };
 }
@@ -45,7 +45,7 @@ export const loadSourceActorBreakpointColumns = memoizeableAction(
         sourceId: id,
         line,
         [PROMISE]: (async () => {
-          const positions = await client.getSourceActorBreakpointPositions(
+          const positions = await thunkArgs.client.getSourceActorBreakpointPositions(
             getSourceActor(thunkArgs.getState(), id),
             {
               start: { line, column: 0 },
@@ -67,7 +67,9 @@ export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorB
     await thunkArgs.dispatch({
       type: "SET_SOURCE_ACTOR_BREAKABLE_LINES",
       sourceId: id,
-      [PROMISE]: client.getSourceActorBreakableLines(getSourceActor(thunkArgs.getState(), id)),
+      [PROMISE]: thunkArgs.client.getSourceActorBreakableLines(
+        getSourceActor(thunkArgs.getState(), id)
+      ),
     });
   },
 });

@@ -628,7 +628,7 @@ const precacheTime = 5000;
 let precacheStartTime = -1;
 
 export function precacheScreenshots(startTime: number): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;

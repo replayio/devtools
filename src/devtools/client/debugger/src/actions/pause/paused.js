@@ -14,7 +14,7 @@ import { trackEvent } from "ui/utils/telemetry";
 const MaxAsyncFrames = 5;
 
 export function fetchFrames(cx) {
-  return async function ({ dispatch, client }) {
+  return async function (dispatch, getState, { client }) {
     let frames;
     try {
       frames = await client.getFrames();
@@ -24,7 +24,7 @@ export function fetchFrames(cx) {
 }
 
 function fetchAsyncFrames(cx) {
-  return async ({ dispatch, client }) => {
+  return async (dispatch, getState, { client }) => {
     for (let i = 0; i < MaxAsyncFrames; i++) {
       let asyncFrames;
       try {
@@ -48,7 +48,7 @@ function fetchAsyncFrames(cx) {
  * @static
  */
 export function paused({ executionPoint, time }) {
-  return async function ({ dispatch, getState }) {
+  return async function (dispatch, getState) {
     dispatch({ type: "PAUSED", executionPoint, time });
     trackEvent("paused");
 

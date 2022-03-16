@@ -52,7 +52,7 @@ export function createComment(
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const { sourceLocation, hasFrames, position, networkRequestId } = options;
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
     const primaryLabel = labels?.primary;
@@ -92,7 +92,7 @@ export function createFrameComment(
   recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const sourceLocation =
       breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
     const options = {
@@ -115,7 +115,7 @@ export function createFloatingCodeComment(
   recordingId: RecordingId,
   breakpoint: any
 ): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const { location: sourceLocation } = breakpoint;
     const options = {
       position: null,
@@ -131,7 +131,7 @@ export function createNetworkRequestComment(
   user: User,
   recordingId: RecordingId
 ): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
     const executionPoint = getExecutionPoint(state);
@@ -154,7 +154,7 @@ export function createLabels(sourceLocation: {
   sourceUrl: string;
   line: number;
 }): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     const { sourceId, sourceUrl, line } = sourceLocation;
     const filename = getFilenameFromURL(sourceUrl);
     if (!sourceId) {
@@ -189,7 +189,7 @@ export function createLabels(sourceLocation: {
 }
 
 export function editItem(item: Reply | Comment): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const { point, time, hasFrames } = item;
 
     dispatch(seekToComment(item));
@@ -211,7 +211,7 @@ export function editItem(item: Reply | Comment): UIThunkAction {
 }
 
 export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     dispatch(clearPendingComment());
     const focusRegion = getFocusRegion(getState());
 

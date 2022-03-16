@@ -29,7 +29,7 @@ async function findNewLocation(cx, { name, offset, index }, location, source, di
 }
 
 export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     assertPendingBreakpoint(pendingBreakpoint);
 
     const source = getSource(getState(), sourceId);

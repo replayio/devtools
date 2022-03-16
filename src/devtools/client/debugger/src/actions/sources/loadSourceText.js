@@ -59,7 +59,7 @@ async function loadSourceTextPromise(cx, source, thunkArgs) {
 }
 
 export function loadSourceById(cx, sourceId) {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const source = getSourceFromId(getState(), sourceId);
     return dispatch(loadSourceText({ cx, source }));
   };

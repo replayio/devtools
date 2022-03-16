@@ -21,7 +21,7 @@ const { log } = require("protocol/socket");
  * @static
  */
 export function command(cx, type) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     log(`Debugger CommandStart ${type}`);
 
     const point = getExecutionPoint(getState());
@@ -52,7 +52,7 @@ export function command(cx, type) {
  * @returns {Function} {@link command}
  */
 export function stepIn(cx) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepIn"));
     }
@@ -66,7 +66,7 @@ export function stepIn(cx) {
  * @returns {Function} {@link command}
  */
 export function stepOver(cx) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepOver"));
     }
@@ -80,7 +80,7 @@ export function stepOver(cx) {
  * @returns {Function} {@link command}
  */
 export function stepOut(cx) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepOut"));
     }
@@ -94,7 +94,7 @@ export function stepOut(cx) {
  * @returns {Function} {@link command}
  */
 export function resume(cx) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (cx.isPaused) {
       recordEvent("continue");
       return dispatch(command(cx, "resume"));
@@ -109,7 +109,7 @@ export function resume(cx) {
  * @returns {Function} {@link command}
  */
 export function rewind(cx) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "rewind"));
     }
@@ -123,7 +123,7 @@ export function rewind(cx) {
  * @returns {Function} {@link command}
  */
 export function reverseStepOver(cx) {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "reverseStepOver"));
     }

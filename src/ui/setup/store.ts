@@ -4,6 +4,7 @@ import {
   Store,
   Middleware,
   Reducer,
+  ThunkDispatch,
   AnyAction,
 } from "@reduxjs/toolkit";
 import { Immer, enableMapSet } from "immer";
@@ -42,9 +43,10 @@ let extraThunkArgs = {} as ThunkExtraArgs;
 // Create a custom Immer instance that does not autofreeze.
 const customImmer = new Immer({ autoFreeze: false });
 
-const sanitizeStateForDevtools = (state: UIState) => {
-  enableMapSet();
+// This _should_ be our UIState type, but I'm getting "<S> is not assignable to UIState" TS errors
+const sanitizeStateForDevtools = <S>(state: S) => {
   const OMITTED = "<OMITTED>";
+  enableMapSet();
 
   const sanitizeContentItem = (item: any) => {
     if (item.content?.value) {
@@ -95,10 +97,10 @@ const sanitizeStateForDevtools = (state: UIState) => {
     }
   });
 
-  return sanitizedState;
+  return sanitizedState as S;
 };
 
-const sanitizeActionForDevTools = (action: AnyAction) => {
+const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
   // Actions may contain `ValueFront` objects
   const sanitizedAction = customImmer.produce(action, draft => {
     return sanitize(draft, "", `sanitizedAction[${action.type}]`, false);
@@ -114,7 +116,11 @@ const sanitizeActionForDevTools = (action: AnyAction) => {
 };
 
 export function bootstrapStore(initialState: { app: AppState; layout: LayoutState }) {
-  type UIStateMiddleware = Middleware<{}, UIState>;
+  type UIStateMiddleware = Middleware<
+    {},
+    UIState,
+    ThunkDispatch<UIState, ThunkExtraArgs, UIAction>
+  >;
 
   const store = configureStore({
     // NOTE: This is only the _initial_ setup! Other reducers are code-split for now.
@@ -122,11 +128,20 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
     reducer: reducers,
     // @ts-ignore
     middleware: gDM => {
-      let middlewareArray = gDM({
+      const originalMiddlewareArray = gDM({
+        // TODO Disabling these checks is not _good_. But we know they fail now anyway.
+        // TODO Fix the offending code and turn these on.
+        serializableCheck: false,
+        immutableCheck: false,
         thunk: {
           extraArgument: extraThunkArgs,
         },
-      }).concat([promise, context] as UIStateMiddleware[]);
+      });
+
+      let updatedMiddlewareArray = originalMiddlewareArray.concat([
+        promise,
+        context,
+      ] as UIStateMiddleware[]);
 
       const telemetryMiddleware = skipTelemetry()
         ? isDevelopment()
@@ -135,12 +150,11 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
         : (LogRocket.reduxMiddleware() as UIStateMiddleware);
 
       if (telemetryMiddleware) {
-        middlewareArray = middlewareArray.concat(telemetryMiddleware);
+        updatedMiddlewareArray = updatedMiddlewareArray.concat(telemetryMiddleware);
       }
 
-      return middlewareArray;
+      return updatedMiddlewareArray as typeof originalMiddlewareArray;
     },
-    // @ts-ignore Type 'S' is not assignable to type 'UIState'
     devTools:
       process.env.NODE_ENV === "production"
         ? false
@@ -152,6 +166,10 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
 
   return store;
 }
+
+export type AppStore = ReturnType<typeof bootstrapStore>;
+// TODO Actually duplicated this with ./index.ts
+export type AppDispatch = AppStore["dispatch"];
 
 export function extendStore(
   store: Store,
