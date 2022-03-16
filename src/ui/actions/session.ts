@@ -9,7 +9,6 @@ import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 import { findAutomatedTests } from "protocol/find-tests";
 import { assert, waitForTime } from "protocol/utils";
-import { prefs } from "ui/utils/prefs";
 import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
@@ -173,7 +172,6 @@ export function createSession(recordingId: string): UIThunkAction {
 
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
-      prefs.recordingId = recordingId;
 
       ThreadFront.on("paused", ({ point }) => store.dispatch(setCurrentPoint(point)));
 

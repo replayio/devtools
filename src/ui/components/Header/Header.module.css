@@ -102,12 +102,3 @@ button.login:focus {
   background: linear-gradient(138.3deg, #236eff 7.98%, #71e5ff 93.53%);
   transition-duration: 300ms;
 }
-
-@keyframes dropdownFadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}

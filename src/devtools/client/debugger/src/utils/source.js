@@ -447,9 +447,12 @@ function getSourceToVisualize(selectedSource, alternateSource) {
     // for pretty-printed sources we show the sourcemap of the non-pretty-printed version
     const nonPrettyPrintedSourceId = ThreadFront.getGeneratedSourceIds(selectedSource.id)?.[0];
     if (nonPrettyPrintedSourceId) {
-      const originalSourceIds = ThreadFront.getOriginalSourceIds(nonPrettyPrintedSourceId);
-      // originalSourceIds always contains the id of the pretty-printed version
-      const hasSourceMap = originalSourceIds && originalSourceIds.length > 1;
+      let hasSourceMap = ThreadFront.getSourceKind(nonPrettyPrintedSourceId) === "sourceMapped";
+      if (!hasSourceMap) {
+        const originalSourceIds = ThreadFront.getOriginalSourceIds(nonPrettyPrintedSourceId);
+        // originalSourceIds always contains the id of the pretty-printed version
+        hasSourceMap = originalSourceIds && originalSourceIds.length > 1;
+      }
       if (hasSourceMap) {
         return nonPrettyPrintedSourceId;
       }
