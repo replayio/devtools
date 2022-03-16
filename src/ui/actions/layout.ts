@@ -1,4 +1,5 @@
 import { RecordingId } from "@recordreplay/protocol";
+import { useRef } from "react";
 import { Action } from "redux";
 import {
   getSelectedPanel,
@@ -12,6 +13,8 @@ import {
   SecondaryPanelName,
   VIEWER_PANELS,
   ToolboxLayout,
+  ToggleMode,
+  TOGGLE_DELAY,
 } from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -34,6 +37,8 @@ type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 
+type SetToggleModeAction = Action<"set_toggle_mode"> & {toggleMode: ToggleMode}
+
 export type LayoutAction =
   | SetConsoleFilterDrawerExpandedAction
   | SetSelectedPanelAction
@@ -41,7 +46,8 @@ export type LayoutAction =
   | SetShowCommandPalette
   | SetToolboxLayoutAction
   | SetShowVideoPanelAction
-  | SetViewMode;
+  | SetViewMode
+  | SetToggleModeAction;
 
 export function setShowCommandPalette(value: boolean): SetShowCommandPalette {
   return { type: "set_show_command_palette", value };
@@ -63,6 +69,22 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
       await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
       dispatch(setSelectedPrimaryPanel("explorer"));
     }
+
+    let toggleTimeoutKey: NodeJS.Timeout | null = null;
+    
+     //Update toggleMode to start toggle animation
+    dispatch(setToggleMode(viewMode))
+
+    // Delay updating the viewMode in redux so that the toggle can fully animate
+    // before re-rendering all of devtools in the new viewMode.
+    if (toggleTimeoutKey) {
+      clearTimeout(toggleTimeoutKey);
+    } 
+    const delayPromise = new Promise<void>(resolve => {
+      toggleTimeoutKey = setTimeout(() => resolve(), TOGGLE_DELAY);
+    });
+
+    await delayPromise;
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
     // if selectedPrimaryPanel is one that should only be visible in dev mode.
     const selectedPrimaryPanel = getSelectedPrimaryPanel(getState());
@@ -93,7 +115,9 @@ export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
     dispatch({ type: "set_toolbox_layout", layout });
   };
 }
-
+export function setToggleMode(toggleMode: ToggleMode): SetToggleModeAction {
+  return { type: "set_toggle_mode", toggleMode}
+}
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
 }
