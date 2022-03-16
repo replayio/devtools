@@ -34,11 +34,8 @@ export const NetworkMonitor = ({
   cx,
   events,
   loading,
-  requestBodies,
   requests,
-  responseBodies,
   seek,
-  selectFrame,
 }: PropsFromRedux) => {
   const selectedRequestId = useSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
@@ -68,7 +65,7 @@ export const NetworkMonitor = ({
       resizeObserver.current.observe(container.current);
     }
   });
-  //
+
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
     if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
