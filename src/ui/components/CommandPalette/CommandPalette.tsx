@@ -39,6 +39,7 @@ export type CommandKey =
   | "show_privacy"
   | "show_replay_info"
   | "show_sharing"
+  | "toggle_dark_mode"
   | "toggle_edit_focus"
   | "toggle_video";
 
@@ -64,6 +65,7 @@ const COMMANDS: readonly Command[] = [
   { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
+  { key: "toggle_dark_mode", label: "Toggle Dark Mode" },
   { key: "toggle_edit_focus", label: "Toggle Edit Focus Mode" },
   { key: "toggle_video", label: "Toggle Video" },
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
