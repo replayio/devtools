@@ -133,9 +133,10 @@ export default async function DevTools(store: Store) {
     ...consoleReducers.reducers,
   };
 
+  bootstrapWorkers();
+
   const thunkArgs = {
     client: clientCommands,
-    ...bootstrapWorkers(),
   };
 
   extendStore(store, initialState, reducers, thunkArgs);

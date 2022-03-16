@@ -23,7 +23,7 @@ async function blackboxActors(state, client, sourceId, isBlackBoxed, range) {
 }
 
 export function toggleBlackBox(cx, source) {
-  return async ({ dispatch, getState, client, sourceMaps }) => {
+  return async ({ dispatch, getState, client }) => {
     const { isBlackBoxed } = source;
 
     if (!isBlackBoxed) {

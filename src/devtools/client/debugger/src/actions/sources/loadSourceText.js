@@ -5,6 +5,7 @@
 //
 
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import {
   getSource,
   getSourceFromId,
@@ -17,7 +18,7 @@ import { fulfilled } from "../../utils/async-value";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 
-export async function loadSource(state, source, { parser, client }) {
+export async function loadSource(state, source, thunkArgs) {
   // We only need the source text from one actor, but messages sent to retrieve
   // the source might fail if the actor has or is about to shut down. Keep
   // trying with different actors until one request succeeds.
@@ -32,7 +33,7 @@ export async function loadSource(state, source, { parser, client }) {
     handledActors.add(actor.actor);
 
     try {
-      response = await client.sourceContents(actor);
+      response = await thunkArgs.client.sourceContents(actor);
       break;
     } catch (e) {
       console.warn(`sourceContents failed: ${e}`);
@@ -47,13 +48,13 @@ export async function loadSource(state, source, { parser, client }) {
   return { text, contentType };
 }
 
-async function loadSourceTextPromise(cx, source, { dispatch, getState, client, parser }) {
-  const epoch = getSourcesEpoch(getState());
-  await dispatch({
+async function loadSourceTextPromise(cx, source, thunkArgs) {
+  const epoch = getSourcesEpoch(thunkArgs.getState());
+  await thunkArgs.dispatch({
     type: "LOAD_SOURCE_TEXT",
     sourceId: source.id,
     epoch,
-    [PROMISE]: loadSource(getState(), source, { parser, client, getState }),
+    [PROMISE]: loadSource(thunkArgs.getState(), source, thunkArgs),
   });
 }
 
@@ -65,13 +66,13 @@ export function loadSourceById(cx, sourceId) {
 }
 
 export const loadSourceText = memoizeableAction("loadSourceText", {
-  getValue: ({ source }, { getState }) => {
-    source = source ? getSource(getState(), source.id) : null;
+  getValue: ({ source }, thunkArgs) => {
+    source = source ? getSource(thunkArgs.getState(), source.id) : null;
     if (!source) {
       return null;
     }
 
-    const { content } = getSourceWithContent(getState(), source.id);
+    const { content } = getSourceWithContent(thunkArgs.getState(), source.id);
     if (!content || content.state === "pending") {
       return content;
     }
@@ -81,8 +82,8 @@ export const loadSourceText = memoizeableAction("loadSourceText", {
     // propagate that error upward.
     return fulfilled(source);
   },
-  createKey: ({ source }, { getState }) => {
-    const epoch = getSourcesEpoch(getState());
+  createKey: ({ source }, thunkArgs) => {
+    const epoch = getSourcesEpoch(thunkArgs.getState());
     return `${epoch}:${source.id}`;
   },
   action: ({ cx, source }, thunkArgs) => loadSourceTextPromise(cx, source, thunkArgs),
