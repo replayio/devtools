@@ -135,11 +135,11 @@ export default async function DevTools(store: Store) {
 
   bootstrapWorkers();
 
-  const thunkArgs = {
+  const extraThunkArgs = {
     client: clientCommands,
   };
 
-  extendStore(store, initialState, reducers, thunkArgs);
+  extendStore(store, initialState, reducers, extraThunkArgs);
 
   dbgClient.bootstrap(store);
 

@@ -1,4 +1,4 @@
-import { Action, Store } from "redux";
+import { Action, Store, ThunkAction } from "@reduxjs/toolkit";
 
 import * as appActions from "./app";
 import * as timelineActions from "./timeline";
@@ -6,7 +6,7 @@ import * as sessionActions from "./session";
 import * as commentsActions from "./comments";
 import * as layoutActions from "./layout";
 import * as reactDevToolsActions from "./reactDevTools";
-import { ThunkAction, ThunkExtraArgs } from "ui/utils/thunk";
+import { ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
 import type { AppActions } from "./app";
 import type { TimelineActions } from "./timeline";
