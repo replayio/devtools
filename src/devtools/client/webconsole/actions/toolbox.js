@@ -10,12 +10,12 @@ import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
 
 export function highlightDomElement(grip) {
-  return async ({ toolbox }) => {
+  return async () => {
     if (grip.getPause() !== ThreadFront.currentPause) {
       return;
     }
 
-    const highlighter = toolbox.getHighlighter();
+    const highlighter = window.gToolbox.getHighlighter();
     const nodeFront = grip.getNodeFront();
     if (highlighter && nodeFront) {
       highlighter.highlight(nodeFront);
@@ -24,8 +24,8 @@ export function highlightDomElement(grip) {
 }
 
 export function unHighlightDomElement(grip) {
-  return ({ toolbox }) => {
-    const highlighter = toolbox.getHighlighter();
+  return () => {
+    const highlighter = window.gToolbox.getHighlighter();
     if (highlighter) {
       highlighter.unhighlight(grip);
     }
@@ -33,25 +33,25 @@ export function unHighlightDomElement(grip) {
 }
 
 export function openNodeInInspector(valueFront) {
-  return async ({ getState, dispatch, toolbox }) => {
+  return async ({ getState, dispatch }) => {
     const pause = valueFront.getPause();
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
     }
 
-    toolbox.selectTool("inspector", "inspect_dom");
+    window.gToolbox.selectTool("inspector", "inspect_dom");
     dispatch(setSelectedPanel("inspector"));
 
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
 
-    await toolbox.selection.setNodeFront(nodeFront, {
+    await window.gToolbox.selection.setNodeFront(nodeFront, {
       reason: "console",
     });
   };
 }
 
 export function onMessageHover(type, message) {
-  return ({ dispatch, getState }) => {
+  return ({ dispatch }) => {
     if (type == "mouseenter") {
       const hoveredItem = {
         target: "console",
@@ -68,7 +68,7 @@ export function onMessageHover(type, message) {
 }
 
 export function onViewSourceInDebugger(frame) {
-  return ({ toolbox }) => {
-    toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.sourceId);
+  return () => {
+    window.gToolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.sourceId);
   };
 }

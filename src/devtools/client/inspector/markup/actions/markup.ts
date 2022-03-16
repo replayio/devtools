@@ -241,11 +241,11 @@ export function selectionChanged(
 }
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
-  return ({ toolbox }) => {
+  return () => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);
-      toolbox.selection.setNodeFront(nodeFront, { reason });
+      window.gToolbox.selection.setNodeFront(nodeFront, { reason });
     }
   };
 }
