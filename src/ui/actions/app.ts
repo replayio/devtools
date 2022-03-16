@@ -33,6 +33,7 @@ import {
   setSelectedPanel,
   setSelectedPrimaryPanel,
   setShowVideoPanel,
+  setToolboxLayout,
   setViewMode,
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
@@ -425,8 +426,14 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "toggle_video") {
       const showVideoPanel = getShowVideoPanel(getState());
       dispatch(setShowVideoPanel(!showVideoPanel));
+    } else if (key === "pin_to_bottom") {
+      dispatch(setToolboxLayout("bottom"));
+    } else if (key === "pin_to_left") {
+      dispatch(setToolboxLayout("left"));
+    } else if (key === "pin_to_bottom_right") {
+      dispatch(setToolboxLayout("ide"));
     }
 
-    dispatch(hideCommandPalette());
+    {dispatch(hideCommandPalette());}
   };
 }

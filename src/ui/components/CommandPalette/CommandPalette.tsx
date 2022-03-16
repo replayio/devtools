@@ -29,7 +29,10 @@ export type CommandKey =
   | "open_outline"
   | "open_print_statements"
   | "open_react_devtools"
-  | "open_sources"
+  | "open_sources" 
+  | "pin_to_bottom" 
+  | "pin_to_left" 
+  | "pin_to_bottom_right"
   | "show_comments"
   | "show_console_filters"
   | "show_events"
@@ -61,6 +64,9 @@ const COMMANDS: readonly Command[] = [
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
   { key: "toggle_video", label: "Toggle Video" },
+  { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
+  { key: "pin_to_left", label: "Pin Toolbox To Left" },
+  { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },
 ] as const;
 
 const DEFAULT_COMMANDS: readonly CommandKey[] = [
