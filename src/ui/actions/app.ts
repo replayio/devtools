@@ -32,6 +32,7 @@ import {
   hideCommandPalette,
   setSelectedPanel,
   setSelectedPrimaryPanel,
+  setShowVideoPanel,
   setViewMode,
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
@@ -40,6 +41,7 @@ import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import { getShowVideoPanel } from "ui/reducers/layout";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -366,7 +368,7 @@ export function loadMouseTargets(): UIThunkAction {
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {
-  return ({ dispatch }) => {
+  return ({ dispatch, getState }) => {
     const recordingId = getRecordingId();
 
     if (key === "open_console") {
@@ -420,6 +422,9 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setModal("privacy"));
     } else if (key === "show_sharing") {
       dispatch(setModal("sharing", { recordingId }));
+    } else if (key === "toggle_video") {
+      const showVideoPanel = getShowVideoPanel(getState());
+      dispatch(setShowVideoPanel(!showVideoPanel));
     }
 
     dispatch(hideCommandPalette());

@@ -35,7 +35,8 @@ export type CommandKey =
   | "show_events"
   | "show_privacy"
   | "show_replay_info"
-  | "show_sharing";
+  | "show_sharing"
+  | "toggle_video";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -59,6 +60,7 @@ const COMMANDS: readonly Command[] = [
   { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
+  { key: "toggle_video", label: "Toggle Video" },
 ] as const;
 
 const DEFAULT_COMMANDS: readonly CommandKey[] = [
