@@ -14,6 +14,7 @@ import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/ge
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { getFocusRegion } from "./timeline";
+import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -128,6 +129,14 @@ export const getFormattedFrames = createSelector(getFrames, getSources, (frames,
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;
 export const getSelectedRequestId = (state: UIState) => state.network.selectedRequestId;
+export const getSummaryById = (state: UIState, id: string) => {
+  const summaries = partialRequestsToCompleteSummaries(
+    getRequests(state),
+    getEvents(state),
+    new Set()
+  );
+  return summaries.find(s => s.id === id);
+};
 
 export const getSelectedResponseBody = (state: UIState) => {
   const requestId = getSelectedRequestId(state);

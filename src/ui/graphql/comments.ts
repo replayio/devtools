@@ -16,6 +16,7 @@ export const GET_COMMENTS = gql`
         time
         point
         position
+        networkRequestId
         user {
           id
           name

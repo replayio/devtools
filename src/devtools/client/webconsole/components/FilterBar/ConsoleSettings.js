@@ -28,7 +28,7 @@ export const ToggleRow = ({ children, selected, onClick, id }) => {
   );
 };
 
-function ConsoleSettings({ filters, filterToggle, timestampsToggle, timestampsVisible }) {
+function ConsoleSettings({ filters, filterToggle, toggleTimestamps, timestampsVisible }) {
   return (
     <div className="flex flex-col">
       <ToggleRow
@@ -44,7 +44,7 @@ function ConsoleSettings({ filters, filterToggle, timestampsToggle, timestampsVi
       <ToggleRow
         onClick={() => {
           trackEvent("console.settings.toggle_timestamp");
-          timestampsToggle();
+          toggleTimestamps();
         }}
         selected={timestampsVisible}
         id="show-timestamps"
@@ -62,6 +62,6 @@ export default connect(
   }),
   {
     filterToggle: actions.filterToggle,
-    timestampsToggle: actions.timestampsToggle,
+    toggleTimestamps: actions.toggleTimestamps,
   }
 )(ConsoleSettings);

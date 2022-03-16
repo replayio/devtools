@@ -18,7 +18,6 @@ const { onConsoleOverflow } = require("ui/actions/session");
 
 const {
   MESSAGES_ADD,
-  MESSAGES_CLEAR,
   MESSAGES_CLEAR_LOGPOINT,
   MESSAGE_OPEN,
   MESSAGE_CLOSE,
@@ -205,12 +204,6 @@ export function messagesAdd(packets, idGenerator = null) {
       messages,
       filtersState,
     });
-  };
-}
-
-export function messagesClear() {
-  return {
-    type: MESSAGES_CLEAR,
   };
 }
 

@@ -16,6 +16,7 @@ import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 import { hideRequestDetails } from "ui/actions/network";
 import { getFormattedFrames } from "ui/reducers/network";
 import { actions } from "ui/actions";
+import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
 
 interface Detail {
   name: string;
@@ -191,11 +192,16 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   return (
     <>
       <div
-        className={classNames("flex cursor-pointer items-center py-1 font-bold")}
+        className={classNames(
+          "flex cursor-pointer items-center py-1 font-bold justify-between pr-2"
+        )}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
-        <TriangleToggle open={requestExpanded} />
-        General
+        <div>
+          <TriangleToggle open={requestExpanded} />
+          General
+        </div>
+        <AddNetworkRequestCommentButton request={request} />
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
       <div
