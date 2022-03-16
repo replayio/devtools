@@ -18,6 +18,9 @@ export function initOutputSyntaxHighlighting() {
   customElements.define(
     "syntax-highlighted",
     class extends HTMLElement {
+      // constructor() {
+      //   console.log("woop");
+      // }
       connectedCallback() {
         if (!this.connected) {
           this.connected = true;

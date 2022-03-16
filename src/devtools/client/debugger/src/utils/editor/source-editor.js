@@ -25,6 +25,7 @@ export default class Editor {
   editor;
 
   constructor(opts) {
+    console.log("huehue");
     this.opts = opts;
   }
 
