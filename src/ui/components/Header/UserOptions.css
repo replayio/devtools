@@ -80,7 +80,7 @@
 
 .dropdown-container .content {
   top: 48px;
-  animation: dropdownFadeIn ease 200ms;
+  animation: linearFadeIn ease 200ms;
 }
 
 .avatar img {

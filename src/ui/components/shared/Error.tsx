@@ -5,7 +5,7 @@ import { connect, ConnectedProps, useDispatch } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import classNames from "classnames";
-import { ExpectedError, UnexpectedError } from "ui/state/app";
+import { ErrorActions, ExpectedError, UnexpectedError } from "ui/state/app";
 import hooks from "ui/hooks";
 import { setModal } from "ui/actions/app";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
@@ -37,7 +37,7 @@ function RefreshButton() {
   };
 
   return (
-    <PrimaryButton className="mx-2 flex-1 justify-center" color="blue" onClick={onClick}>
+    <PrimaryButton color="blue" onClick={onClick}>
       {clicked ? `Refreshing...` : `Refresh`}
     </PrimaryButton>
   );
@@ -118,22 +118,20 @@ function RequestRecordingAccessButton() {
   );
 }
 
-function ActionButton({ action }: { action: string }) {
-  let button;
-
+function ActionButton({ action }: { action: ErrorActions }) {
   if (action === "refresh") {
-    button = <RefreshButton />;
+    return <RefreshButton />;
   } else if (action === "sign-in") {
-    button = <SignInButton />;
+    return <SignInButton />;
   } else if (action === "library") {
-    button = <LibraryButton />;
+    return <LibraryButton />;
   } else if (action === "team-billing") {
-    button = <TeamBillingButton />;
+    return <TeamBillingButton />;
   } else if (action === "request-access") {
-    button = <RequestRecordingAccessButton />;
+    return <RequestRecordingAccessButton />;
   }
 
-  return <div className="m-auto">{button}</div>;
+  return null;
 }
 
 interface ErrorProps {
@@ -144,10 +142,7 @@ function Error({ error }: ErrorProps) {
   const { action, message, content } = error;
 
   return (
-    <Dialog
-      className={classNames("flex flex-col items-center")}
-      style={{ animation: "dropdownFadeIn ease 200ms", width: 400 }}
-    >
+    <Dialog>
       <DialogLogo />
       <DialogTitle>{message}</DialogTitle>
       {content && <DialogDescription>{content}</DialogDescription>}
@@ -182,23 +177,18 @@ function TrialExpired() {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
-      <section className="m-auto w-full max-w-lg overflow-hidden rounded-lg bg-white text-base shadow-lg">
-        <div className="flex flex-col items-center space-y-12 p-12">
-          <div className="place-content-center space-y-4">
-            <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
-          </div>
-          <div className="max-w-lg space-y-3 text-center	">
-            <div className="text-lg font-bold">Free Trial Expired</div>
-            <div className="text-center text-gray-500 ">
-              This replay is unavailable because it was recorded after your team's free trial
-              expired.
-            </div>
-          </div>
+      <Dialog>
+        <DialogLogo />
+        <DialogTitle>Free Trial Expired</DialogTitle>
+        <DialogDescription>
+          This replay is unavailable because it was recorded after your team's free trial expired.
+        </DialogDescription>
+        <DialogActions>
           <ActionButton
             action={loading || recording?.userRole !== "team-admin" ? "library" : "team-billing"}
           />
-        </div>
-      </section>
+        </DialogActions>
+      </Dialog>
     </Modal>
   );
 }

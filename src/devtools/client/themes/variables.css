@@ -604,3 +604,12 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
 }
+
+@keyframes linearFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
