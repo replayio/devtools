@@ -43,16 +43,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     setExpanded(false);
     trackEvent("user_options.launch_replay");
 
-    if (features.launchBrowser) {
-      setModal("browser-launch");
-    } else {
-      const launchUrl = `${window.location.origin}/welcome`;
-      if (event.metaKey) {
-        return window.open(launchUrl);
-      }
-      // right now we just send you to the download screen, but eventually this will launch Replay
-      window.location.href = launchUrl;
-    }
+    setModal("browser-launch");
   };
   const onSettingsClick = () => {
     setExpanded(false);
@@ -85,17 +76,10 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
           <Icon filename="settings" className="bg-iconColor" />
           <span>Settings</span>
         </button>
-        {features.launchBrowser ? (
-          window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
-            <button className="row group" onClick={onLaunchClick}>
-              <Icon filename="replay-logo" className="bg-iconColor" />
-              <span>Launch Replay</span>
-            </button>
-          )
-        ) : (
-          <button className="row" onClick={onLaunchClick}>
-            <MaterialIcon iconSize="xl">download</MaterialIcon>
-            <span>Download Replay</span>
+        {window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
+          <button className="row group" onClick={onLaunchClick}>
+            <Icon filename="replay-logo" className="bg-iconColor" />
+            <span>Launch Replay</span>
           </button>
         )}
         <LoginButton />

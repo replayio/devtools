@@ -102,10 +102,8 @@ export function getEventListenerBreakpointTypes() {
     const categories = await getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
-    if (features.eventCount) {
-      const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
-      dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
-    }
+    const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
+    dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
   };
 }
 

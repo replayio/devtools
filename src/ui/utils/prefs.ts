@@ -17,12 +17,8 @@ pref("devtools.sidePanelSize", "240px");
 
 // app features
 pref("devtools.features.columnBreakpoints", false);
-pref("devtools.features.comments", true);
 pref("devtools.features.darkMode", false);
-pref("devtools.features.eventCount", true);
 pref("devtools.features.httpBodies", true);
-pref("devtools.features.launchBrowser", true);
-pref("devtools.features.smoothPlayback", true);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.commentAttachments", false);
 
@@ -41,12 +37,8 @@ export const prefs = new PrefsHelper("devtools", {
 
 export const features = new PrefsHelper("devtools.features", {
   columnBreakpoints: ["Bool", "columnBreakpoints"],
-  comments: ["Bool", "comments"],
   darkMode: ["Bool", "darkMode"],
-  eventCount: ["Bool", "eventCount"],
   httpBodies: ["Bool", "httpBodies"],
-  launchBrowser: ["Bool", "launchBrowser"],
-  smoothPlayback: ["Bool", "smoothPlayback"],
   videoPlayback: ["Bool", "videoPlayback"],
   commentAttachments: ["Bool", "commentAttachments"],
 });

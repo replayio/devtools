@@ -297,7 +297,7 @@ class EventListeners extends Component {
     const { searchText } = this.state;
 
     const points = eventTypePoints[event.id];
-    if (features.eventCount && (!points || points.length == 0)) {
+    if (!points || points.length == 0) {
       return null;
     }
 
