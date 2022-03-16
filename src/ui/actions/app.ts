@@ -43,6 +43,8 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 import { getShowVideoPanel } from "ui/reducers/layout";
+import { getIsInFocusMode } from "ui/reducers/timeline";
+import { toggleFocusMode } from "./timeline";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -423,6 +425,8 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setModal("privacy"));
     } else if (key === "show_sharing") {
       dispatch(setModal("sharing", { recordingId }));
+    } else if (key === "toggle_edit_focus") {
+      dispatch(toggleFocusMode());
     } else if (key === "toggle_video") {
       const showVideoPanel = getShowVideoPanel(getState());
       dispatch(setShowVideoPanel(!showVideoPanel));
