@@ -96,7 +96,7 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
     }
 
     case "set_toggle_mode": {
-      return {...state, toggleMode: action.toggleMode}
+      return { ...state, toggleMode: action.toggleMode };
     }
 
     case "set_show_video_panel": {

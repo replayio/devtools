@@ -19,7 +19,7 @@ const MODES = [
   },
 ] as const;
 
-function ViewToggle({ toggleMode, setViewMode, }: PropsFromRedux) {
+function ViewToggle({ toggleMode, setViewMode }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
@@ -54,7 +54,7 @@ function ViewToggle({ toggleMode, setViewMode, }: PropsFromRedux) {
 
 const connector = connect(
   (state: UIState) => ({
-    toggleMode: getToggleMode(state)
+    toggleMode: getToggleMode(state),
   }),
   {
     setViewMode,

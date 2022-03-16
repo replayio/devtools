@@ -37,7 +37,7 @@ type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 
-type SetToggleModeAction = Action<"set_toggle_mode"> & {toggleMode: ToggleMode}
+type SetToggleModeAction = Action<"set_toggle_mode"> & { toggleMode: ToggleMode };
 
 export type LayoutAction =
   | SetConsoleFilterDrawerExpandedAction
@@ -71,15 +71,15 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     }
 
     let toggleTimeoutKey: NodeJS.Timeout | null = null;
-    
-     //Update toggleMode to start toggle animation
-    dispatch(setToggleMode(viewMode))
+
+    //Update toggleMode to start toggle animation
+    dispatch(setToggleMode(viewMode));
 
     // Delay updating the viewMode in redux so that the toggle can fully animate
     // before re-rendering all of devtools in the new viewMode.
     if (toggleTimeoutKey) {
       clearTimeout(toggleTimeoutKey);
-    } 
+    }
     const delayPromise = new Promise<void>(resolve => {
       toggleTimeoutKey = setTimeout(() => resolve(), TOGGLE_DELAY);
     });
@@ -116,7 +116,7 @@ export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
   };
 }
 export function setToggleMode(toggleMode: ToggleMode): SetToggleModeAction {
-  return { type: "set_toggle_mode", toggleMode}
+  return { type: "set_toggle_mode", toggleMode };
 }
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
