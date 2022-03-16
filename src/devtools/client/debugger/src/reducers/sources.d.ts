@@ -21,9 +21,15 @@ export type Source = {
   extensionName?: string | null;
   introductionType?: "scriptElement";
 };
+type SelectedLocation = {
+  sourceId: string;
+  line: number;
+  column?: number;
+  sourceUrl: string;
+}
 
 export function getSelectedSourceWithContent(state: UIState): Source;
 export function getIsSourceMappedSource(state: UIState): boolean;
 export function getSources(state: UIState): Source[];
 export function getSelectedSource(state: UIState): Source;
-export function getSelectedLocation(state: UIState): Source;
+export function getSelectedLocation(state: UIState): SelectedLocation;
