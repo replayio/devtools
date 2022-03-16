@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
@@ -23,6 +23,8 @@ import { StartablePanelName } from "ui/utils/devtools-toolbox";
 import ReplayLogo from "../shared/ReplayLogo";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
+import TabSpotlight from "./TabSpotlight";
+import { setSelectedPanel } from "ui/actions/layout";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -30,27 +32,20 @@ interface PanelButtonsProps {
   hasReactComponents: boolean;
   toolboxLayout: ToolboxLayout;
   isNode: boolean;
-  selectedPanel: SecondaryPanelName;
-  setSelectedPanel: (panel: SecondaryPanelName) => any;
 }
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
   label: string;
+  showSpotlight?: boolean;
 }
 
-const PanelButtons: FC<PanelButtonsProps> = ({
-  hasReactComponents,
-  toolboxLayout,
-  isNode,
-  selectedPanel,
-  setSelectedPanel,
-}) => {
-  const { userSettings } = hooks.useGetUserSettings();
-  const { showReact } = userSettings;
+const PanelButton: FC<PanelButtonProps> = ({ panel, label, showSpotlight }) => {
+  const selectedPanel = useSelector(selectors.getSelectedPanel);
+  const dispatch = useDispatch();
 
   const onClick = (panel: SecondaryPanelName) => {
-    setSelectedPanel(panel);
+    dispatch(setSelectedPanel(panel));
     trackEvent(`toolbox.secondary.${panel}_select`);
 
     if (["debugger", "inspector", "react-components"].includes(panel)) {
@@ -58,23 +53,29 @@ const PanelButtons: FC<PanelButtonsProps> = ({
     }
   };
 
-  const PanelButton: FC<PanelButtonProps> = ({ panel, label }) => (
+  return (
     <button
-      className={classnames(`${panel}-panel-button`, {
+      className={classnames(`${panel}-panel-button relative`, {
         expanded: selectedPanel === panel,
       })}
       onClick={() => onClick(panel)}
     >
+      {showSpotlight ? <TabSpotlight /> : null}
       <div className="label">{label}</div>
     </button>
   );
+};
+
+const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout, isNode }) => {
+  const { userSettings } = hooks.useGetUserSettings();
+  const { showReact } = userSettings;
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
       <PanelButton label="Console" panel="console" />
       {!isNode && <PanelButton label="Elements" panel="inspector" />}
-      {toolboxLayout !== "ide" && <PanelButton label="Sources" panel="debugger" />}
+      {toolboxLayout !== "ide" && <PanelButton label="Sources" panel="debugger" showSpotlight />}
       {hasReactComponents && showReact && <PanelButton label="React" panel="react-components" />}
       <PanelButton label="Network" panel="network" />
     </div>
@@ -132,8 +133,6 @@ function SecondaryToolbox({
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          selectedPanel={selectedPanel}
-          setSelectedPanel={setSelectedPanel}
           isNode={isNode}
           hasReactComponents={hasReactComponents}
           toolboxLayout={toolboxLayout}
