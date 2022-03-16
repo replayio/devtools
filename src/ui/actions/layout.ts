@@ -26,7 +26,7 @@ type SetConsoleFilterDrawerExpandedAction = Action<"set_console_filter_drawer_ex
 type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
 };
-type SetShowCommandPalette = Action<"set_show_command_palette"> & { value: boolean };
+type SetShowCommandPaletteAction = Action<"set_show_command_palette"> & { value: boolean };
 
 type SetToolboxLayoutAction = Action<"set_toolbox_layout"> & {
   layout: ToolboxLayout;
@@ -34,7 +34,7 @@ type SetToolboxLayoutAction = Action<"set_toolbox_layout"> & {
 type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
   showVideoPanel: boolean;
 };
-type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
+type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 
 type SetToggleModeAction = Action<"set_toggle_mode"> & {toggleMode: ToggleMode}
@@ -43,16 +43,16 @@ export type LayoutAction =
   | SetConsoleFilterDrawerExpandedAction
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
-  | SetShowCommandPalette
+  | SetShowCommandPaletteAction
   | SetToolboxLayoutAction
   | SetShowVideoPanelAction
-  | SetViewMode
+  | SetViewModeAction
   | SetToggleModeAction;
 
-export function setShowCommandPalette(value: boolean): SetShowCommandPalette {
+export function setShowCommandPalette(value: boolean): SetShowCommandPaletteAction {
   return { type: "set_show_command_palette", value };
 }
-export function hideCommandPalette(): SetShowCommandPalette {
+export function hideCommandPalette(): SetShowCommandPaletteAction {
   return setShowCommandPalette(false);
 }
 export function toggleCommandPalette(): UIThunkAction {
