@@ -577,19 +577,19 @@ export function enterFocusMode(): UIThunkAction {
     const state = getState();
     const focusRegion = getFocusRegion(state);
     const zoomRegion = getZoomRegion(state);
-    
+
     if (!focusRegion) {
       const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
       dispatch(setFocusRegion(focusRegion));
     }
-  }
+  };
 }
 
 export function toggleFocusMode(): UIThunkAction {
   return ({ dispatch, getState }) => {
     const state = getState();
     const isFocusing = getIsFocusing(state);
-    
+
     if (isFocusing) {
       trackEvent("timeline.exit_focus_edit");
       dispatch(hideModal());
@@ -597,5 +597,5 @@ export function toggleFocusMode(): UIThunkAction {
       trackEvent("timeline.start_focus_edit");
       dispatch(enterFocusMode());
     }
-  }
+  };
 }

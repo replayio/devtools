@@ -441,6 +441,8 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("ide"));
     }
 
-    {dispatch(hideCommandPalette());}
+    {
+      dispatch(hideCommandPalette());
+    }
   };
 }
