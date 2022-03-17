@@ -154,7 +154,7 @@ function CommentCard({
   if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
-        className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-black transition`}
+        className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeBase-90 transition`}
         onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
         onMouseDown={() => {
