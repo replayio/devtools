@@ -24,16 +24,14 @@ export default function TabSpotlight() {
 
     timeoutKey.current = setTimeout(() => {
       setIsShown(false);
+      console.log('setting');
       timeoutKey.current = null;
     }, 2000);
   }, [selectedSource?.sourceId]);
 
-  return (
-    <div
-      className={classNames(
-        "h-full w-full bg-yellow-500 absolute top-0 left-0 transition-opacity duration-500",
-        isShown ? "opacity-50" : "opacity-0"
-      )}
-    />
-  );
+  return (<span className={classNames(
+    "transition duration-1000",
+    isShown ? "text-yellow-200" : "text-bodyColor"
+  )}>Sources</span>);
+  
 }

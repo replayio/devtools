@@ -23,7 +23,7 @@ import { StartablePanelName } from "ui/utils/devtools-toolbox";
 import ReplayLogo from "../shared/ReplayLogo";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
-import TabSpotlight from "./TabSpotlight";
+import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
@@ -37,10 +37,9 @@ interface PanelButtonsProps {
 interface PanelButtonProps {
   panel: SecondaryPanelName;
   label: string;
-  showSpotlight?: boolean;
 }
 
-const PanelButton: FC<PanelButtonProps> = ({ panel, label, showSpotlight }) => {
+const PanelButton: FC<PanelButtonProps> = ({ panel, label, children }) => {
   const selectedPanel = useSelector(selectors.getSelectedPanel);
   const dispatch = useDispatch();
 
@@ -59,9 +58,8 @@ const PanelButton: FC<PanelButtonProps> = ({ panel, label, showSpotlight }) => {
         expanded: selectedPanel === panel,
       })}
       onClick={() => onClick(panel)}
-    >
-      {showSpotlight ? <TabSpotlight /> : null}
-      <div className="label">{label}</div>
+    >    
+      <div className="label">{children}</div>
     </button>
   );
 };
@@ -73,11 +71,32 @@ const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
-      <PanelButton label="Console" panel="console" />
-      {!isNode && <PanelButton label="Elements" panel="inspector" />}
-      {toolboxLayout !== "ide" && <PanelButton label="Sources" panel="debugger" showSpotlight />}
-      {hasReactComponents && showReact && <PanelButton label="React" panel="react-components" />}
-      <PanelButton label="Network" panel="network" />
+      
+      <PanelButton panel="console">
+        Console
+      </PanelButton>
+      
+      {!isNode &&
+        <PanelButton panel="inspector">
+        Elements
+      </PanelButton>}
+      
+      {toolboxLayout !== "ide" &&
+      <PanelButton panel="debugger">
+        <SourcesTabLabel />
+      </PanelButton>
+      }
+      
+      {hasReactComponents && showReact &&
+      <PanelButton panel="react-components">
+        React
+      </PanelButton>
+      }
+      
+      <PanelButton panel="network">
+        Network
+      </PanelButton>
+      
     </div>
   );
 };
