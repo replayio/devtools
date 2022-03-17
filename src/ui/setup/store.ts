@@ -1,11 +1,12 @@
 import { combineReducers, applyMiddleware, Store, compose } from "redux";
 import { devToolsEnhancer, EnhancerOptions } from "@redux-devtools/extension";
-import { Immer } from "immer";
+import { Immer, enableMapSet } from "immer";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
+import { ValueFront } from "protocol/thread";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
-import { sanityCheckMiddleware } from "ui/utils/sanitize";
+import { sanityCheckMiddleware, sanitize } from "ui/utils/sanitize";
 const configureStore = require("./redux/create-store").default;
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
@@ -52,6 +53,7 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
     // To optimize perf, we "sanitize" the state before serialization, by replacing
     // large values with a simple "OMITTED" string.
     stateSanitizer: state => {
+      enableMapSet();
       const OMITTED = "<OMITTED>";
 
       const sanitizeContentItem = (item: any) => {
@@ -76,7 +78,7 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
       };
 
       // Use Immer to simplify nested immutable updates when making a copy of the state
-      return customImmer.produce(state, (draft: any) => {
+      const sanitizedState = customImmer.produce(state, (draft: any) => {
         if (draft.app) {
           // TODO This is a DOM node in the Redux state and shouldn't even be here anyway
           draft.app.videoNode = OMITTED;
@@ -89,7 +91,35 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
           // This is a large lookup table of source string related values
           draft.sources.sources = OMITTED;
         }
+
+        if (draft.pause) {
+          draft.pause.frames = OMITTED;
+          draft.pause.frameScopes = OMITTED;
+        }
+
+        if (draft.messages?.messagesById) {
+          // This may contain nested `ValueFront` objects, which cause lots of
+          // "Not Allowed" messages when serialized.
+          // TODO Make this more precise later
+          draft.messages.messagesById = OMITTED;
+        }
       });
+
+      return sanitizedState;
+    },
+    actionSanitizer: action => {
+      // Actions may contain `ValueFront` objects
+      const sanitizedAction = customImmer.produce(action, draft => {
+        return sanitize(draft, "", `sanitizedAction[${action.type}]`, false);
+      });
+
+      // @ts-ignore
+      if (sanitizedAction.videoNode) {
+        // @ts-ignore
+        delete sanitizedAction.videoNode;
+      }
+
+      return sanitizedAction;
     },
   });
 
