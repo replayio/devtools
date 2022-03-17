@@ -16,6 +16,8 @@ module.exports = {
         checkbox: "var(--checkbox)",
         checkboxBorder: "var(--checkbox-border)",
         chrome: "var(--chrome)",
+        errorBgcolor: "var(--console-error-background)",
+        errorColor: "var(--console-error-color)",
         iconColor: "var(--icon-color)",
         iconColorDisabled: "var(--theme-text-field-bgcolor)",
         jellyfishBgcolor: "var(--jellyfish-bgcolor)",
@@ -46,7 +48,7 @@ module.exports = {
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
-        lightGrey: "var(--light-grey)",
+        lightGrey: "var(--light-grey)",      
       },
       lineHeight: {
         "comment-text": "1.125rem",
