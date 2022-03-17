@@ -66,7 +66,7 @@ export default function ToolboxOptions() {
 
   return (
     <Menu as="div" className="secondary-toolbox-options relative z-20 inline-block text-left">
-      <Menu.Button>
+      <Menu.Button as="div">
         <ToolboxButton>
           <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />
         </ToolboxButton>
