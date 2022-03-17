@@ -115,7 +115,7 @@ const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
   return sanitizedAction;
 };
 
-export function bootstrapStore(initialState: { app: AppState; layout: LayoutState }) {
+export function bootstrapStore(initialState: Partial<UIState>) {
   type UIStateMiddleware = Middleware<
     {},
     UIState,
@@ -126,6 +126,8 @@ export function bootstrapStore(initialState: { app: AppState; layout: LayoutStat
     // NOTE: This is only the _initial_ setup! Other reducers are code-split for now.
     // See devtools.ts and devtools-toolbox.ts for other reducers
     reducer: reducers,
+    // TODO This works around a TS error from `app.videoNode`. Move that out of Redux.
+    preloadedState: initialState as any,
     // @ts-ignore
     middleware: gDM => {
       const originalMiddlewareArray = gDM({
