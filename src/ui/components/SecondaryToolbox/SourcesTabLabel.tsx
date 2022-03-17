@@ -31,7 +31,7 @@ export default function TabSpotlight() {
 
   return (<span className={classNames(
     "transition duration-1000",
-    isShown ? "text-yellow-100" : "text-bodyColor"
+    isShown ? "text-yellow-200" : "text-bodyColor"
   )}>Sources</span>);
   
 }
