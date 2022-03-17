@@ -30,8 +30,8 @@ export default function TabSpotlight() {
   }, [selectedSource?.sourceId]);
 
   return (<span className={classNames(
-    "transition duration-1000",
-    isShown ? "text-yellow-200" : "text-bodyColor"
+    "transition duration-3000",
+    isShown ? "text-primaryAccent" : "text-bodyColor"
   )}>Sources</span>);
   
 }
