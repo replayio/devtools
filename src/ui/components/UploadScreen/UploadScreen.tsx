@@ -30,32 +30,21 @@ function DeletedScreen({ url }: { url: string }) {
   useEffect(() => {
     setTimeout(() => {
       navigateToUrl();
-    }, 5000);
+    }, 1200);
   });
 
   return (
     <div className="h-full w-full" style={{ background: "white" }}>
       <Modal>
         <div
-          className="relative flex flex-col justify-between space-y-9 overflow-y-auto rounded-md bg-white p-9 text-base shadow-lg"
-          style={{ width: "300px", maxHeight: "90vh" }}
+          className="relative flex flex-col justify-between space-y-4 overflow-y-auto rounded-md bg-white p-9 text-base shadow-lg"
+          style={{ width: "400px"}}
         >
-          <h2 className="text-2xl font-bold ">{`Redirecting...`}</h2>
-          <div className="space-y-5 text-lg text-gray-500">
-            <div>{`Sit tight! We'll take you back to the library in a few seconds.`}</div>
+          <h2 className="text-2xl font-bold ">{`Replay discarded`}</h2>
+          <div className="space-y-2 text-md text-gray-500">
+            <div>{`Hang tight while we load your library...`}</div>
           </div>
-          <div className="space-y-1">
-            <button
-              type="button"
-              onClick={navigateToUrl}
-              className={classNames(
-                "inline-flex items-center justify-center rounded border border-transparent px-3 py-1.5 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccentHover focus:ring-offset-2",
-                "bg-primaryAccent text-white hover:bg-primaryAccentHover"
-              )}
-            >
-              Go now
-            </button>
-          </div>
+          
         </div>
       </Modal>
     </div>
