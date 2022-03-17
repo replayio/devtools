@@ -6,6 +6,15 @@ module.exports = {
         short: { raw: "(max-height: 615px)" },
       },
       colors: {
+        'themeBase': {
+          100: var(--theme-base-100),
+          95: var(--theme-base-95),
+          90: var(--theme-base-90),
+          85: var(--theme-base-85),
+          80: var(--theme-base-80),
+          70: var(--theme-base-70),
+          60: var(--theme-base-60),
+        },
         bodyColor: "var(--theme-body-color)",
         breakpointEditfieldActive: "var(--breakpoint-editfield-active)",
         breakpointEditfieldHover: "var(--breakpoint-editfield-hover)",
