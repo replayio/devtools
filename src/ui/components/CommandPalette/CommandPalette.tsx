@@ -8,7 +8,7 @@ import { UIState } from "ui/state";
 import { ExperimentalUserSettings } from "ui/types";
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
-const { filter } = require("fuzzaldrin-plus");
+import { filter } from "fuzzaldrin-plus";
 import styles from "./CommandPalette.module.css";
 
 export type Command = {
@@ -86,8 +86,8 @@ const ITEMS_TO_SHOW = 4;
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
 
-  const commands: Command[] = searchString
-    ? filter(COMMANDS, searchString, { key: "label" })
+  const commands: readonly Command[] = searchString
+    ? filter(COMMANDS as Command[], searchString, { key: "label" })
     : COMMANDS;
 
   const enabledCommands = commands.filter(command => {
@@ -114,7 +114,7 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
 
 function PaletteShortcut() {
   return (
-    <div className="flex absolute right-4 select-none text-primaryAccent">
+    <div className="absolute right-4 flex select-none text-primaryAccent">
       <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
       <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
     </div>
