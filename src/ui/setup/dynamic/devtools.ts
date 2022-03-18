@@ -13,7 +13,7 @@ import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
 
-import { extendStore } from "../store";
+import { extendStore, AppStore } from "../store";
 import app from "ui/reducers/app";
 import timeline from "ui/reducers/timeline";
 import comments from "ui/reducers/comments";
@@ -88,7 +88,7 @@ const SessionErrorMessages: Record<number, string> = {
     "You’ve hit an error that happens with long recordings. Can you try a shorter recording?",
 };
 
-export default async function DevTools(store: Store) {
+export default async function DevTools(store: AppStore) {
   if (window.hasAlreadyBootstrapped) {
     return;
   } else {
@@ -133,12 +133,13 @@ export default async function DevTools(store: Store) {
     ...consoleReducers.reducers,
   };
 
-  const thunkArgs = {
+  bootstrapWorkers();
+
+  const extraThunkArgs = {
     client: clientCommands,
-    ...bootstrapWorkers(),
   };
 
-  extendStore(store, initialState, reducers, thunkArgs);
+  extendStore(store, initialState, reducers, extraThunkArgs);
 
   dbgClient.bootstrap(store);
 

@@ -60,8 +60,7 @@ function groupByLine(results, sourceId, line) {
 }
 
 async function _setBreakpointPositions(sourceId, line, thunkArgs) {
-  const { dispatch, getState } = thunkArgs;
-  let generatedSource = getSource(getState(), sourceId);
+  let generatedSource = getSource(thunkArgs.getState(), sourceId);
   if (!generatedSource) {
     return;
   }
@@ -71,8 +70,8 @@ async function _setBreakpointPositions(sourceId, line, thunkArgs) {
   }
 
   const actorColumns = await Promise.all(
-    getSourceActorsForSource(getState(), generatedSource.id).map(actor =>
-      dispatch(loadSourceActorBreakpointColumns({ id: actor.id, line }))
+    getSourceActorsForSource(thunkArgs.getState(), generatedSource.id).map(actor =>
+      thunkArgs.dispatch(loadSourceActorBreakpointColumns({ id: actor.id, line }))
     )
   );
 
@@ -85,13 +84,13 @@ async function _setBreakpointPositions(sourceId, line, thunkArgs) {
   positions = filterByUniqLocation(positions);
   positions = groupByLine(positions, sourceId, line);
 
-  const source = getSource(getState(), sourceId);
+  const source = getSource(thunkArgs.getState(), sourceId);
   // NOTE: it's possible that the source was removed during a navigate
   if (!source) {
     return;
   }
 
-  dispatch({
+  thunkArgs.dispatch({
     type: "ADD_BREAKPOINT_POSITIONS",
     source,
     positions,
@@ -105,8 +104,8 @@ function generatedSourceActorKey(state, sourceId) {
 }
 
 export const setBreakpointPositions = memoizeableAction("setBreakpointPositions", {
-  getValue: ({ sourceId, line }, { getState }) => {
-    const positions = getBreakpointPositionsForSource(getState(), sourceId);
+  getValue: ({ sourceId, line }, thunkArgs) => {
+    const positions = getBreakpointPositionsForSource(thunkArgs.getState(), sourceId);
     if (!positions) {
       return null;
     }
@@ -119,8 +118,8 @@ export const setBreakpointPositions = memoizeableAction("setBreakpointPositions"
 
     return fulfilled(positions);
   },
-  createKey({ sourceId, line }, { getState }) {
-    const key = generatedSourceActorKey(getState(), sourceId);
+  createKey({ sourceId, line }, thunkArgs) {
+    const key = generatedSourceActorKey(thunkArgs.getState(), sourceId);
     return line ? `${key}-${line}` : key;
   },
   action: async ({ sourceId, line }, thunkArgs) =>

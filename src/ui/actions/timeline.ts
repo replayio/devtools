@@ -63,7 +63,7 @@ export type TimelineActions =
   | SetFocusRegionAction;
 
 export async function setupTimeline(store: UIStore) {
-  const { dispatch } = store;
+  const dispatch = store.dispatch;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);
 
@@ -90,7 +90,7 @@ export async function setupTimeline(store: UIStore) {
 }
 
 export function jumpToInitialPausePoint(): UIThunkAction {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     assert(ThreadFront.recordingId, "no recordingId");
 
     await ThreadFront.waitForSession();
@@ -166,13 +166,13 @@ function onWarp(store: UIStore) {
 }
 
 function onPaused({ time }: PauseEventArgs): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
   };
 }
 
 function setRecordingDescription(duration: number): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const zoomRegion = getZoomRegion(getState());
 
     dispatch(
@@ -186,7 +186,7 @@ function setRecordingDescription(duration: number): UIThunkAction {
 }
 
 export function updateTimelineDimensions(): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     const el = document.querySelector(".progress-bar");
     const width = el ? el.clientWidth : 1;
     const left = el ? el.getBoundingClientRect().left : 1;
@@ -200,7 +200,7 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
 }
 
 export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     dispatch(setTimelineState({ hoverTime: time }));
     const stateBeforeScreenshot = getState();
 
@@ -255,7 +255,7 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const focusRegion = getFocusRegion(getState());
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 
@@ -276,7 +276,7 @@ export function seek(
 }
 
 export function seekToTime(targetTime: number): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (targetTime == null) {
       return;
     }
@@ -295,7 +295,7 @@ export function seekToTime(targetTime: number): UIThunkAction {
 }
 
 export function togglePlayback(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const playback = getPlayback(getState());
 
     if (playback) {
@@ -307,7 +307,7 @@ export function togglePlayback(): UIThunkAction {
 }
 
 export function startPlayback(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     log(`StartPlayback`);
 
     const state = getState();
@@ -331,7 +331,7 @@ export function startPlayback(): UIThunkAction {
 }
 
 export function stopPlayback(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     log(`StopPlayback`);
 
     const playback = getPlayback(getState());
@@ -345,7 +345,7 @@ export function stopPlayback(): UIThunkAction {
 }
 
 export function replayPlayback(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const focusRegion = getFocusRegion(getState());
     let startTime = 0;
 
@@ -359,7 +359,7 @@ export function replayPlayback(): UIThunkAction {
 }
 
 function playback(startTime: number, endTime: number): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     let startDate = Date.now();
     let currentDate = startDate;
     let currentTime = startTime;
@@ -438,7 +438,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 }
 
 export function goToPrevPaint(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const currentTime = getCurrentTime(getState());
     const { startTime } = getZoomRegion(getState());
 
@@ -457,7 +457,7 @@ export function goToPrevPaint(): UIThunkAction {
 }
 
 export function goToNextPaint(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const currentTime = getCurrentTime(getState());
     const { endTime } = getZoomRegion(getState());
 
@@ -476,7 +476,7 @@ export function goToNextPaint(): UIThunkAction {
 }
 
 export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const { target } = hoveredItem;
 
     const hoverEnabledForTarget = (features as any)[`${target}Hover`];
@@ -493,7 +493,7 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
 }
 
 export function clearHoveredItem(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const hoveredItem = getHoveredItem(getState());
     if (!hoveredItem) {
       return;
@@ -515,7 +515,7 @@ export function setFocusRegion(focusRegion: {
 }
 
 export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const hoverTime = getHoverTime(state)!;
     const focusRegion = getFocusRegion(state)!;
@@ -542,7 +542,7 @@ export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
 }
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async ({ getState }) => {
+  return async (dispatch, getState) => {
     const state = getState();
     const zoomRegion = getZoomRegion(state);
     const focusRegion = getFocusRegion(state);
@@ -572,7 +572,7 @@ export function syncFocusedRegion(): UIThunkAction {
 }
 
 export function enterFocusMode(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     dispatch(setModal("focusing"));
     const state = getState();
     const focusRegion = getFocusRegion(state);
@@ -586,7 +586,7 @@ export function enterFocusMode(): UIThunkAction {
 }
 
 export function toggleFocusMode(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const isFocusing = getIsFocusing(state);
 

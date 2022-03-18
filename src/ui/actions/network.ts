@@ -84,7 +84,7 @@ export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
 });
 
 export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return ({ getState }) => {
+  return (dispatch, getState) => {
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
@@ -96,7 +96,7 @@ export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): 
   };
 }
 export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return ({ getState }) => {
+  return (dispatch, getState) => {
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
@@ -108,8 +108,8 @@ export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): U
   };
 }
 
-export function fetchFrames(tsPoint: TimeStampedPoint) {
-  return async ({ dispatch }: { dispatch: AppDispatch }) => {
+export function fetchFrames(tsPoint: TimeStampedPoint): UIThunkAction {
+  return async dispatch => {
     const pause = ThreadFront.ensurePause(tsPoint.point, tsPoint.time);
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
     const formattedFrames = await Promise.all(frames?.map((frame, i) => createFrame(frame, i)));

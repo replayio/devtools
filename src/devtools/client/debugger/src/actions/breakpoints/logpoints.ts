@@ -9,7 +9,7 @@ import { isBreakable } from "../../utils/breakpoint";
 import { _removeBreakpoint, removeBreakpointOption, removeRequestedBreakpoint } from "./modify";
 
 export function removeLogpointsInSource(cx: Context, source: Source): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const breakpoints = getLogpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       dispatch(removeLogpoint(cx, breakpoint));
@@ -24,7 +24,7 @@ export function removeLogpointsInSource(cx: Context, source: Source): UIThunkAct
 }
 
 export function toggleLogpoint(cx: Context, line: number, bp?: Breakpoint): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (bp?.options.logValue) {
       trackEvent("breakpoint.minus_click");
       return dispatch(removeLogpoint(cx, bp));
@@ -36,7 +36,7 @@ export function toggleLogpoint(cx: Context, line: number, bp?: Breakpoint): UITh
 }
 
 export function addLogpoint(cx: Context, line: number): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const logpoints = getBreakpointsForSourceId(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
     const shouldPause = isBreakable(breakpoint);
@@ -46,7 +46,7 @@ export function addLogpoint(cx: Context, line: number): UIThunkAction {
 }
 
 export function removeLogpoint(cx: Context, bp: Breakpoint): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     if (isBreakable(bp)) {
       // Keep the breakpoint while removing the log value from its options,
       // so that the breakable breakpoint remains.

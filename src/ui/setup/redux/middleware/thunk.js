@@ -12,11 +12,11 @@
  * actions (most likely asynchronously).
  */
 export function thunk(makeArgs) {
-  return ({ dispatch, getState }) => {
-    const args = { dispatch, getState };
-
+  return storeApi => {
     return next => action => {
-      return typeof action === "function" ? action(makeArgs ? makeArgs(args) : args) : next(action);
+      return typeof action === "function"
+        ? action(makeArgs ? makeArgs(storeApi) : storeApi)
+        : next(action);
     };
   };
 }

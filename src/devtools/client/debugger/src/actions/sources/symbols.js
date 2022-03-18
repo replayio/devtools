@@ -4,16 +4,17 @@
 
 import { selectors } from "ui/reducers";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { loadSourceText } from "./loadSourceText";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 
-async function doSetSymbols(source, { dispatch, parser }) {
+async function doSetSymbols(source, thunkArgs) {
   const sourceId = source.id;
-  await dispatch(loadSourceText({ source }));
+  await thunkArgs.dispatch(loadSourceText({ source }));
 
-  await dispatch({
+  await thunkArgs.dispatch({
     type: "SET_SYMBOLS",
     sourceId,
     [PROMISE]: parser.getSymbols(sourceId),
@@ -21,8 +22,8 @@ async function doSetSymbols(source, { dispatch, parser }) {
 }
 
 export const setSymbols = memoizeableAction("setSymbols", {
-  getValue: ({ source }, { getState }) => {
-    const symbols = selectors.getSymbols(getState(), source);
+  getValue: ({ source }, thunkArgs) => {
+    const symbols = selectors.getSymbols(thunkArgs.getState(), source);
     if (!symbols || symbols.loading) {
       return null;
     }

@@ -29,7 +29,7 @@ const updatePrefs = (filter, active) => {
 };
 
 export function filterTextSet(text) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const filtersState = { ...getAllFilters(getState()), text };
     return dispatch({
       type: FILTER_TEXT_SET,
@@ -40,7 +40,7 @@ export function filterTextSet(text) {
 }
 
 export function filterToggle(filter) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const filters = getAllFilters(getState());
     const newValue = !filters[filter];
     const filtersState = { ...filters, [filter]: newValue };

@@ -14,7 +14,7 @@ import { inDebuggerEval } from "../../utils/pause";
  * @static
  */
 export function resumed() {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     dispatch({ type: "RESUME" });
   };
 }

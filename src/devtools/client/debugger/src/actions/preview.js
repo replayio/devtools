@@ -15,7 +15,7 @@ import {
 } from "../selectors";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const cursorPos = target.getBoundingClientRect();
 
     if (!isSelectedFrameVisible(getState())) {
@@ -38,7 +38,7 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
 }
 
 export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     dispatch({
       type: "START_PREVIEW",
       value: {
@@ -102,7 +102,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
 }
 
 export function clearPreview(cx, previewId) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     return dispatch({
       type: "CLEAR_PREVIEW",
       cx,

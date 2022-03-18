@@ -10,8 +10,8 @@ import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpo
 import { getSource } from "../../selectors";
 import { addBreakpoint } from ".";
 
-async function findNewLocation(cx, { name, offset, index }, location, source, thunkArgs) {
-  const symbols = await thunkArgs.dispatch(setSymbols({ cx, source }));
+async function findNewLocation(cx, { name, offset, index }, location, source, dispatch) {
+  const symbols = await dispatch(setSymbols({ cx, source }));
   const func = symbols ? findFunctionByName(symbols, name, index) : null;
 
   // Fallback onto the location line, if we do not find a function.
@@ -29,8 +29,7 @@ async function findNewLocation(cx, { name, offset, index }, location, source, th
 }
 
 export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
-  return async thunkArgs => {
-    const { getState, client, dispatch } = thunkArgs;
+  return async (dispatch, getState) => {
     assertPendingBreakpoint(pendingBreakpoint);
 
     const source = getSource(getState(), sourceId);
@@ -41,7 +40,7 @@ export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
 
     const { location, astLocation } = pendingBreakpoint;
     const previousLocation = { ...location, sourceId };
-    const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, thunkArgs);
+    const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, dispatch);
 
     dispatch({ type: "REMOVE_PENDING_BREAKPOINT", location });
 

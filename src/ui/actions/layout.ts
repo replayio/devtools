@@ -50,13 +50,13 @@ export function hideCommandPalette(): SetShowCommandPalette {
   return setShowCommandPalette(false);
 }
 export function toggleCommandPalette(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const showCommandPalette = getShowCommandPalette(getState());
     dispatch(setShowCommandPalette(!showCommandPalette));
   };
 }
 export function setViewMode(viewMode: ViewMode): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     // There's a possible race condition here so it's important to handle the nag logic first.
     // Otherwise, it's possible for the nag to not be properly dismissed.
     if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
@@ -81,7 +81,7 @@ export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAct
 }
 
 export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const selectedPanel = getSelectedPanel(getState());
 
     // If the debugger's being unset from the toolbox and it happens to be selected,
@@ -109,7 +109,7 @@ export function setConsoleFilterDrawerExpanded(
 }
 
 export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const replaySessions = await asyncStore.replaySessions;
     const session = replaySessions[recordingId];
 

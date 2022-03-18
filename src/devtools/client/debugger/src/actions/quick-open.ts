@@ -22,7 +22,7 @@ export type QuickOpenActions = ReturnType<
 export { setQuickOpenQuery, closeQuickOpen };
 
 export function openQuickOpen(query = "", project = false): UIThunkAction {
-  return ({ dispatch }) => {
+  return dispatch => {
     dispatch(loadGlobalFunctions());
 
     return dispatch(openQuickOpenAction({ query, project }));

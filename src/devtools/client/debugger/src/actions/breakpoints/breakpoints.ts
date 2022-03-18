@@ -13,7 +13,7 @@ import { isLogpoint } from "../../utils/breakpoint";
 import { _removeBreakpoint, removeBreakpointOption, removeRequestedBreakpoint } from "./modify";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const logpoints = getBreakpointsForSourceId(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
     const logValue = isLogpoint(breakpoint);
@@ -27,7 +27,7 @@ export function removeBreakpointsAtLine(
   sourceId: SourceId,
   line: number
 ): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     trackEvent("breakpoint.remove");
 
     dispatch(removeRequestedBreakpoint({ sourceId, line }));
@@ -38,7 +38,7 @@ export function removeBreakpointsAtLine(
 }
 
 export function removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     if (isLogpoint(breakpoint)) {
       // Keep the breakpoint while removing the log value from its options,
       // so that the print statement remains.
@@ -50,7 +50,7 @@ export function removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAc
 }
 
 export function removeBreakpointsInSource(cx: Context, source: Source): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       dispatch(removeBreakpoint(cx, breakpoint));

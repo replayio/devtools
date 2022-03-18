@@ -8,7 +8,7 @@ import { asSettled } from "./async-value";
 import { validateContext } from "./context";
 
 /*
- * memoizableActon is a utility for actions that should only be performed
+ * memoizableAction is a utility for actions that should only be performed
  * once per key. It is useful for loading sources, parsing symbols ...
  *
  * @getValue - gets the result from the redux store
@@ -31,7 +31,18 @@ import { validateContext } from "./context";
  */
 export function memoizeableAction(name, { getValue, createKey, action }) {
   const requests = new Map();
-  return args => async thunkArgs => {
+  return args => async (dispatch, getState, extraArgs) => {
+    // TODO Consider rewriting usage sites to not need thunkArgs as an object
+
+    // This mimics the existing pattern from the legacy "object thunk args" middleware.
+    // The "action" functions given to `memoizableAction` are not thunks themselves,
+    // but expect that same `{dispatch, getState, client}` object.
+    const thunkArgs = {
+      dispatch,
+      getState,
+      ...extraArgs,
+    };
+
     let result = asSettled(getValue(args, thunkArgs));
     if (!result) {
       const key = createKey(args, thunkArgs);

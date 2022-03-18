@@ -38,7 +38,7 @@ export function addAnnotations(annotations: Annotation[]): AddAnnotationsAction 
 }
 
 export function setProtocolCheckFailed(): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     dispatch({ type: "set_protocol_fail" });
   };
 }
