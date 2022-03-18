@@ -1,5 +1,5 @@
 const Services = require("devtools/shared/services");
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation, DocumentNode } from "@apollo/client";
 import { mutate, query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
@@ -10,6 +10,7 @@ import { features } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
+import APIKeys from "ui/components/shared/APIKeys";
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
@@ -101,13 +102,52 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
 }
 
 function getUpdateUserSettingQuery(key: SettingItemKey, type: "uuid" | "Boolean") {
-  return gql`
-    mutation UpdateUserSettings($newValue: Boolean) {
-      updateUserSettings(input: { showReact: $newValue }) {
-        success
+  const mutations: Record<typeof key, DocumentNode> = {
+    apiKeys: gql`
+      mutation UpdateUserSettings1($newValue: uuid) {
+        updateUserSettings(input: { apiKeys: $newValue }) {
+          success
+        }
       }
-    }
-  `;
+    `,
+    defaultWorkspaceId: gql`
+      mutation UpdateUserSettings2($newValue: uuid) {
+        updateUserSettings(input: { defaultWorkspaceId: $newValue }) {
+          success
+        }
+      }
+    `,
+    disableLogRocket: gql`
+      mutation UpdateUserSettings3($newValue: Boolean) {
+        updateUserSettings(input: { disableLogRocket: $newValue }) {
+          success
+        }
+      }
+    `,
+    enableEventLink: gql`
+      mutation UpdateUserSettings4($newValue: Boolean) {
+        updateUserSettings(input: { enableEventLink: $newValue }) {
+          success
+        }
+      }
+    `,
+    enableTeams: gql`
+      mutation UpdateUserSettings5($newValue: Boolean) {
+        updateUserSettings(input: { enableTeams: $newValue }) {
+          success
+        }
+      }
+    `,
+    showReact: gql`
+      mutation UpdateUserSettings6($newValue: Boolean) {
+        updateUserSettings(input: { showReact: $newValue }) {
+          success
+        }
+      }
+    `,
+  };
+
+  return mutations[key];
 }
 
 export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
