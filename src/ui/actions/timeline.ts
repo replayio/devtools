@@ -32,6 +32,9 @@ import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import clamp from "lodash/clamp";
+import { hideModal, setModal } from "./app";
+import { getIsFocusing } from "ui/reducers/app";
+import { trackEvent } from "ui/utils/telemetry";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -565,5 +568,34 @@ export function syncFocusedRegion(): UIThunkAction {
       },
       window.sessionId
     );
+  };
+}
+
+export function enterFocusMode(): UIThunkAction {
+  return (dispatch, getState) => {
+    dispatch(setModal("focusing"));
+    const state = getState();
+    const focusRegion = getFocusRegion(state);
+    const zoomRegion = getZoomRegion(state);
+
+    if (!focusRegion) {
+      const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
+      dispatch(setFocusRegion(focusRegion));
+    }
+  };
+}
+
+export function toggleFocusMode(): UIThunkAction {
+  return (dispatch, getState) => {
+    const state = getState();
+    const isFocusing = getIsFocusing(state);
+
+    if (isFocusing) {
+      trackEvent("timeline.exit_focus_edit");
+      dispatch(hideModal());
+    } else {
+      trackEvent("timeline.start_focus_edit");
+      dispatch(enterFocusMode());
+    }
   };
 }
