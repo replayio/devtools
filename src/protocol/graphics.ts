@@ -12,6 +12,7 @@ import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
+import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
@@ -206,7 +207,7 @@ class VideoPlayer {
     this.commands =
       this.commands &&
       this.commands.then(async () => {
-        const video = this.store?.getState().app.videoNode;
+        const video = getVideoNode();
         if (features.videoPlayback && video) {
           video.pause();
           video.currentTime = timeMs / 1000;
@@ -218,7 +219,7 @@ class VideoPlayer {
     this.commands =
       this.commands &&
       this.commands.then(() => {
-        const video = this.store?.getState().app.videoNode;
+        const video = getVideoNode();
         const currentTime = this.store?.getState().timeline.currentTime;
         if (features.videoPlayback && video) {
           video.currentTime = (currentTime || 0) / 1000;

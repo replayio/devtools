@@ -71,11 +71,6 @@ const sanitizeStateForDevtools = <S>(state: S) => {
 
   // Use Immer to simplify nested immutable updates when making a copy of the state
   const sanitizedState = customImmer.produce(state, (draft: any) => {
-    if (draft.app) {
-      // TODO This is a DOM node in the Redux state and shouldn't even be here anyway
-      draft.app.videoNode = OMITTED;
-    }
-
     sanitizeContents(draft.sources?.focusedItem?.contents);
     sanitizeContents(draft.sourceTree?.focusedItem?.contents);
 
@@ -106,12 +101,6 @@ const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
     return sanitize(draft, "", `sanitizedAction[${action.type}]`, false);
   });
 
-  // @ts-ignore
-  if (sanitizedAction.videoNode) {
-    // @ts-ignore
-    delete sanitizedAction.videoNode;
-  }
-
   return sanitizedAction;
 };
 
@@ -126,8 +115,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
     // NOTE: This is only the _initial_ setup! Other reducers are code-split for now.
     // See devtools.ts and devtools-toolbox.ts for other reducers
     reducer: reducers,
-    // TODO This works around a TS error from `app.videoNode`. Move that out of Redux.
-    preloadedState: initialState as any,
+    preloadedState: initialState,
     // @ts-ignore
     middleware: gDM => {
       const originalMiddlewareArray = gDM({
