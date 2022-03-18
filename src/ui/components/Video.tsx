@@ -11,6 +11,7 @@ import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
 import MaterialIcon from "./shared/MaterialIcon";
 import { setShowVideoPanel } from "ui/actions/layout";
+import { getViewMode } from "ui/reducers/layout";
 
 const HideVideoButton: FC = () => {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ function Video({
   videoUrl,
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
+  const viewMode = useSelector(getViewMode);
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
@@ -97,7 +99,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       <div id="highlighter-root"></div>
-      <HideVideoButton />
+      {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>
   );
 }
