@@ -1,15 +1,15 @@
-const PREFIX = "comments.newComment.";
+const STORAGE_KEY_PREFIX = "comments.newComment.";
 
 const setComment = (recordingId: string, serializedEditorState: string): void => {
-  localStorage.setItem(`${PREFIX}${recordingId}`, serializedEditorState);
+  localStorage.setItem(`${STORAGE_KEY_PREFIX}${recordingId}`, serializedEditorState);
 };
 
 const getComment = (recordingId: string): string | null => {
-  return localStorage.getItem(`${PREFIX}${recordingId}`);
+  return localStorage.getItem(`${STORAGE_KEY_PREFIX}${recordingId}`);
 };
 
 const clearComment = (recordingId: string): void => {
-  localStorage.removeItem(`${PREFIX}${recordingId}`);
+  localStorage.removeItem(`${STORAGE_KEY_PREFIX}${recordingId}`);
 };
 
 export const commentsLocalStorage = {
