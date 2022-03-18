@@ -2,9 +2,11 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
-import CommentEditor from "./CommentEditor";
+import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
 import { Comment, Reply } from "ui/state/comments";
 import { useGetUserId } from "ui/hooks/users";
+import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
+import debounce from "lodash/debounce";
 
 const LoomComment = connect(null, { setModal: actions.setModal })(
   ({ setModal, loom }: { loom: string; setModal: typeof actions.setModal }) => {
@@ -36,6 +38,10 @@ function ExistingCommentEditor({
   const { userId } = useGetUserId();
   const updateComment = hooks.useUpdateComment();
   const updateCommentReply = hooks.useUpdateCommentReply();
+  const commentsLocalStorage = useCommentsLocalStorage({
+    type: "existing",
+    commentId: comment.id,
+  });
 
   const handleSubmit = (inputValue: string) => {
     if (type === "comment") {
@@ -59,7 +65,18 @@ function ExistingCommentEditor({
         }
       }}
     >
-      <CommentEditor editable={editable} comment={comment} handleSubmit={handleSubmit} />
+      <CommentEditor
+        editable={editable}
+        comment={comment}
+        handleSubmit={handleSubmit}
+        onCreate={({ editor }) => {
+          const storedComment = commentsLocalStorage.get();
+          editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
+        }}
+        onUpdate={debounce(({ editor }) => {
+          commentsLocalStorage.set(JSON.stringify(editor.getJSON()));
+        }, PERSIST_COMM_DEBOUNCE_DELAY)}
+      />
     </div>
   );
 }

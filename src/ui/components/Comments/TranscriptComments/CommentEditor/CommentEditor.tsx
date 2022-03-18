@@ -12,6 +12,8 @@ import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
 import { Editor } from "@tiptap/react";
 
+export const PERSIST_COMM_DEBOUNCE_DELAY = 500;
+
 export function getCommentEditorDOMId(comment: Comment | Reply) {
   return `comment-editor-${comment.id}`;
 }

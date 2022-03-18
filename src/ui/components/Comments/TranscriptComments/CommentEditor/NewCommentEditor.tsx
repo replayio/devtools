@@ -3,12 +3,10 @@ import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import { Comment, Reply } from "ui/state/comments";
-import CommentEditor from "./CommentEditor";
+import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
 import useAuth0 from "ui/utils/useAuth0";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 import debounce from "lodash/debounce";
-
-const PERSIST_COMM_DEBOUNCE_DELAY = 500;
 
 interface NewCommentEditorProps extends PropsFromRedux {
   data:
@@ -27,7 +25,12 @@ function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEdi
   const addComment = hooks.useAddComment();
   const addCommentReply = hooks.useAddCommentReply();
   const commentsLocalStorage = useCommentsLocalStorage(
-    data.type === "new_reply" ? data.comment.parentId : undefined
+    data.type === "new_reply"
+      ? {
+          type: "reply",
+          parentId: data.comment.parentId,
+        }
+      : "pending"
   );
 
   const handleSubmit = (inputValue: string) => {
