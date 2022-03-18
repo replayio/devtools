@@ -42,7 +42,7 @@ export const useCommentsLocalStorage = (mode: Mode) => {
 };
 
 const genStoreKey = (mode: Mode, recordingId: string): string => {
-  let key = `comments.newComment.${recordingId}`;
+  let key = `comments.edit.${recordingId}`;
   if (mode === "video") {
     return key + `.video`;
   } else if (mode.type === "reply") {
