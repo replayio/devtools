@@ -40,9 +40,12 @@ function mostRecentIndex<T extends Timed>(array: T[], time: number): number | un
   const index = binarySearch(0, array.length, (index: number) => {
     return time - array[index].time;
   });
-  assert(array[index].time <= time);
+  assert(
+    array[index].time <= time,
+    "The most recent item should be at or preceding the given time"
+  );
   if (index + 1 < array.length) {
-    assert(array[index + 1].time >= time);
+    assert(array[index + 1].time >= time, "the most recent item's index should be in the array");
   }
   return index;
 }
