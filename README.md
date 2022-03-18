@@ -95,3 +95,14 @@ You can [install](https://docs.trunk.io/getting-started) the trunk launcher usin
 In most cases you can simply run `trunk check` which will autodetect the changes you have made and lint them.
 If you would like to only autoformat your changes, you can run `trunk fmt`.
 More information on using trunk can be found [here](https://docs.trunk.io/getting-started/usage).
+
+#### Generating GraphQL types for Typescript
+
+- install `graphqurl` via `npm i -g graphqurl`
+- run `HASURA_KEY=<key> npm run gqlschema`
+  - ask somebody on the team to provide `<key>` for you, which is Hasura admin secret
+  - **DONT'T EVER COMMIT THIS KEY, IT'S DANGEROUS**
+- you have now created `gql_schema.json` which is a GraphQL schema file
+- run ... to generate types
+- use types
+- profit $$$

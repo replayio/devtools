@@ -24,7 +24,8 @@
     "upload-e2e-mapped-styles-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_styles.js*",
     "upload-e2e-mapped-minified-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_minified.js*",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "gqlschema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect --format json > gql_schema.json"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -136,6 +137,7 @@
     "babel-loader": "^8.2.3",
     "babel-plugin-add-react-displayname": "^0.0.5",
     "bufferutil": "^4.0.6",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
     "eslint": "^8.10.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -146,6 +148,7 @@
     "eslint-plugin-react": "^7.29.2",
     "eslint-plugin-react-hooks": "^4.3.0",
     "fs-extra": "^10.0.1",
+    "graphqurl": "^1.0.1",
     "mini-css-extract-plugin": "^2.6.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^8.4.8",
