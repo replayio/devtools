@@ -72,7 +72,9 @@ function ExistingCommentEditor({
         handleSubmit={handleSubmit}
         onCreate={({ editor }) => {
           const storedComment = commentsLocalStorage.get();
-          editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
+          if (storedComment) {
+            editor.commands.setContent(JSON.parse(storedComment));
+          }
         }}
         onUpdate={debounce(({ editor }) => {
           commentsLocalStorage.set(JSON.stringify(editor.getJSON()));
