@@ -79,6 +79,7 @@ function ExistingCommentEditor({
         onUpdate={debounce(({ editor }) => {
           commentsLocalStorage.set(JSON.stringify(editor.getJSON()));
         }, PERSIST_COMM_DEBOUNCE_DELAY)}
+        handleCancel={() => commentsLocalStorage.clear()}
       />
     </div>
   );
