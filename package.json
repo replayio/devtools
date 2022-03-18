@@ -25,7 +25,8 @@
     "upload-e2e-mapped-minified-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_minified.js*",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "gqlschema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect --format json > gql_schema.json"
+    "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect --format json > gql_schema.json",
+    "gql:codegen": "apollo codegen:generate --localSchemaFile=gql_schema.json --target=typescript --tagName=gql"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
