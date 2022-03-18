@@ -173,7 +173,6 @@ function CommentCard({
                 close: () => setIsEditorOpen(false),
               }}
             >
-              <div>newly created comment</div>
               <NewCommentEditor data={{ type: "new_comment", comment }} />
             </FocusContext.Provider>
           </div>
@@ -204,7 +203,6 @@ function CommentCard({
           "border-transparent": !isPaused,
         })}
       >
-        <div>already written comment</div>
         <CommentTarget comment={comment} />
         <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
         {comment.replies?.map((reply: Reply, i: number) => (

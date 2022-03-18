@@ -1,10 +1,7 @@
-// import { useSelector } from "react-redux";
 import { useGetRecordingId } from "ui/hooks/recordings";
-// import { UIState } from "ui/state";
 
 export const useCommentsLocalStorage = (parentCommentId?: string) => {
   const recordingId = useGetRecordingId();
-  // const pendingComment = useSelector((state: UIState) => state.comments.pendingComment);
 
   const storeKey =
     `comments.newComment.${recordingId}` + (parentCommentId ? `.${parentCommentId}` : "");
