@@ -13,9 +13,9 @@ type Mode =
       type: "existing";
       commentId: string;
     }
-  | "pending";
+  | "video";
 
-export const useCommentsLocalStorage = (mode: Mode = "pending") => {
+export const useCommentsLocalStorage = (mode: Mode) => {
   const recordingId = useGetRecordingId();
 
   const storeKey = genStoreKey(mode, recordingId);
@@ -41,8 +41,8 @@ export const useCommentsLocalStorage = (mode: Mode = "pending") => {
 
 const genStoreKey = (mode: Mode, recordingId: string): string => {
   let key = `comments.newComment.${recordingId}`;
-  if (mode === "pending") {
-    return key + `.pending`;
+  if (mode === "video") {
+    return key + `.video`;
   } else if (mode.type === "reply") {
     return key + `.reply.${mode.parentId}`;
   } else {

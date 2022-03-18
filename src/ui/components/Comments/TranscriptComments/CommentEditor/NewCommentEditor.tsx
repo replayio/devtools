@@ -30,7 +30,7 @@ function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEdi
           type: "reply",
           parentId: data.comment.parentId,
         }
-      : "pending"
+      : "video"
   );
 
   const handleSubmit = (inputValue: string) => {

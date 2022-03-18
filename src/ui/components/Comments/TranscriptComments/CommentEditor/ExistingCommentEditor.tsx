@@ -49,6 +49,7 @@ function ExistingCommentEditor({
     } else if (type === "reply") {
       updateCommentReply(comment.id, inputValue);
     }
+    commentsLocalStorage.clear();
     clearPendingComment();
   };
 
