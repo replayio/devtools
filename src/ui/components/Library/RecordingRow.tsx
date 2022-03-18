@@ -165,7 +165,7 @@ function RecordingRow({
           className="relative flex w-6 flex-shrink-0 flex-row items-center justify-center py-3 pr-4"
           onClick={e => e.stopPropagation()}
         >
-          {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
+          {!isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
         </div>
       </div>
     </RowWrapper>
