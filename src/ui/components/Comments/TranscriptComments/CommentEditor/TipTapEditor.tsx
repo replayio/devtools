@@ -7,6 +7,11 @@ import classNames from "classnames";
 import { GitHubLink } from "./githubLink";
 import { ReplayLink } from "./replayLink";
 import useAuth0 from "ui/utils/useAuth0";
+import debounce from "lodash/debounce";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { commentsLocalStorage } from "./commentsLocalStorage";
+
+const PERSIST_COMM_DEBOUNCE_DELAY = 500;
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -48,6 +53,7 @@ const TipTapEditor = ({
   takeFocus,
 }: TipTapEditorProps) => {
   const { isAuthenticated } = useAuth0();
+  const recordingId = useGetRecordingId();
 
   const onSubmit = (newContent: string) => {
     handleSubmit(newContent);
@@ -87,6 +93,17 @@ const TipTapEditor = ({
       ],
       editorProps: { attributes: { class: "focus:outline-none" } },
       content: tryToParse(content),
+      onCreate: ({ editor }) => {
+        if (editable) {
+          const storedComment = commentsLocalStorage.getComment(recordingId);
+          editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
+        }
+      },
+      onUpdate: debounce(({ editor }) => {
+        if (editable) {
+          commentsLocalStorage.setComment(recordingId, JSON.stringify(editor.getJSON()));
+        }
+      }, PERSIST_COMM_DEBOUNCE_DELAY),
       editable,
       autofocus,
     },

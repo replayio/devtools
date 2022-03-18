@@ -5,6 +5,7 @@ import { actions } from "ui/actions";
 import { Comment, Reply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
 import useAuth0 from "ui/utils/useAuth0";
+import { commentsLocalStorage } from "./commentsLocalStorage";
 
 interface NewCommentEditorProps extends PropsFromRedux {
   comment: Comment | Reply;
@@ -27,6 +28,8 @@ function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewC
     } else {
       handleNewSave(comment as Comment, inputValue);
     }
+
+    commentsLocalStorage.clearComment(comment.recordingId);
 
     clearPendingComment();
   };
