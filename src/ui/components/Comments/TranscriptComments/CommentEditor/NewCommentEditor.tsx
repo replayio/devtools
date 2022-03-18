@@ -5,17 +5,30 @@ import { actions } from "ui/actions";
 import { Comment, Reply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
 import useAuth0 from "ui/utils/useAuth0";
-import { commentsLocalStorage } from "./commentsLocalStorage";
+import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
+import debounce from "lodash/debounce";
+
+const PERSIST_COMM_DEBOUNCE_DELAY = 500;
 
 interface NewCommentEditorProps extends PropsFromRedux {
-  comment: Comment | Reply;
-  type: "new_reply" | "new_comment";
+  data:
+    | {
+        type: "new_reply";
+        comment: Reply;
+      }
+    | {
+        type: "new_comment";
+        comment: Comment;
+      };
 }
 
-function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewCommentEditorProps) {
+function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEditorProps) {
   const { isAuthenticated } = useAuth0();
   const addComment = hooks.useAddComment();
   const addCommentReply = hooks.useAddCommentReply();
+  const commentsLocalStorage = useCommentsLocalStorage(
+    data.type === "new_reply" ? data.comment.parentId : undefined
+  );
 
   const handleSubmit = (inputValue: string) => {
     if (!isAuthenticated) {
@@ -23,13 +36,13 @@ function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewC
       return;
     }
 
-    if (type == "new_reply") {
-      handleReplySave(comment as Reply, inputValue);
+    if (data.type == "new_reply") {
+      handleReplySave(data.comment, inputValue);
     } else {
-      handleNewSave(comment as Comment, inputValue);
+      handleNewSave(data.comment, inputValue);
     }
 
-    commentsLocalStorage.clearComment(comment.recordingId);
+    commentsLocalStorage.clear();
 
     clearPendingComment();
   };
@@ -52,7 +65,20 @@ function NewCommentEditor({ clearPendingComment, comment, setModal, type }: NewC
     addComment(newComment);
   };
 
-  return <CommentEditor editable={true} {...{ comment, handleSubmit }} />;
+  return (
+    <CommentEditor
+      editable={true}
+      comment={data.comment}
+      handleSubmit={handleSubmit}
+      onCreate={({ editor }) => {
+        const storedComment = commentsLocalStorage.get();
+        editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
+      }}
+      onUpdate={debounce(({ editor }) => {
+        commentsLocalStorage.set(JSON.stringify(editor.getJSON()));
+      }, PERSIST_COMM_DEBOUNCE_DELAY)}
+    />
+  );
 }
 
 const connector = connect(null, {

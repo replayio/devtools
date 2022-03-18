@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -7,11 +8,7 @@ import classNames from "classnames";
 import { GitHubLink } from "./githubLink";
 import { ReplayLink } from "./replayLink";
 import useAuth0 from "ui/utils/useAuth0";
-import debounce from "lodash/debounce";
-import { useGetRecordingId } from "ui/hooks/recordings";
-import { commentsLocalStorage } from "./commentsLocalStorage";
-
-const PERSIST_COMM_DEBOUNCE_DELAY = 500;
+import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -25,6 +22,8 @@ interface TipTapEditorProps {
   // Not actually implementing this now, but leaving it in the API for later
   possibleMentions: User[];
   takeFocus: boolean;
+  onCreate: (editor: { editor: Editor }) => void;
+  onUpdate: (editor: { editor: Editor }) => void;
 }
 
 const tryToParse = (content: string): any => {
@@ -51,9 +50,11 @@ const TipTapEditor = ({
   handleCancel,
   placeholder,
   takeFocus,
+  onCreate,
+  onUpdate,
 }: TipTapEditorProps) => {
   const { isAuthenticated } = useAuth0();
-  const recordingId = useGetRecordingId();
+  const commentsLocalStorage = useCommentsLocalStorage();
 
   const onSubmit = (newContent: string) => {
     handleSubmit(newContent);
@@ -93,17 +94,8 @@ const TipTapEditor = ({
       ],
       editorProps: { attributes: { class: "focus:outline-none" } },
       content: tryToParse(content),
-      onCreate: ({ editor }) => {
-        if (editable) {
-          const storedComment = commentsLocalStorage.getComment(recordingId);
-          editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
-        }
-      },
-      onUpdate: debounce(({ editor }) => {
-        if (editable) {
-          commentsLocalStorage.setComment(recordingId, JSON.stringify(editor.getJSON()));
-        }
-      }, PERSIST_COMM_DEBOUNCE_DELAY),
+      onCreate,
+      onUpdate,
       editable,
       autofocus,
     },

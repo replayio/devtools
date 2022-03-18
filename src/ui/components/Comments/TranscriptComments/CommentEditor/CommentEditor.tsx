@@ -10,6 +10,7 @@ import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
 import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
+import { Editor } from "@tiptap/core";
 
 export function getCommentEditorDOMId(comment: Comment | Reply) {
   return `comment-editor-${comment.id}`;
@@ -19,6 +20,8 @@ type CommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply;
   editable: boolean;
   handleSubmit: (inputValue: string) => void;
+  onCreate: (editor: { editor: Editor }) => void;
+  onUpdate: (editor: { editor: Editor }) => void;
 };
 
 function CommentEditor({
@@ -26,6 +29,8 @@ function CommentEditor({
   comment,
   editable,
   handleSubmit,
+  onCreate,
+  onUpdate,
 }: CommentEditorProps) {
   const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
@@ -65,6 +70,8 @@ function CommentEditor({
                   : ""
               }
               takeFocus={isFocused}
+              onCreate={onCreate}
+              onUpdate={onUpdate}
             />
           )}
         </FocusContext.Consumer>
