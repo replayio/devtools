@@ -54,7 +54,6 @@ const TipTapEditor = ({
   onUpdate,
 }: TipTapEditorProps) => {
   const { isAuthenticated } = useAuth0();
-  const commentsLocalStorage = useCommentsLocalStorage();
 
   const onSubmit = (newContent: string) => {
     handleSubmit(newContent);
