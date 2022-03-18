@@ -602,7 +602,7 @@ export function useGetMyRecordings() {
 export function useDeleteRecording(onCompleted: () => void) {
   const [deleteRecording] = useMutation(
     gql`
-      mutation DeleteRecording($recordingId: ID!) {
+      mutation DeleteRecording1($recordingId: ID!) {
         deleteRecording(input: { id: $recordingId }) {
           success
         }
