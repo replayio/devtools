@@ -79,7 +79,7 @@ function RecordingRow({
   const allowSelecting = isEditing && isOwner;
 
   const toggleChecked = () => {
-    if (allowSelecting) {
+    if (!allowSelecting) {
       return;
     }
 
