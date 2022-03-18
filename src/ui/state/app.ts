@@ -94,7 +94,6 @@ export interface AppState {
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
-  videoNode: HTMLVideoElement | null;
   videoUrl: string | null;
   workspaceId: WorkspaceId | null;
   mouseTargetsLoading: boolean;

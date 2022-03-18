@@ -36,7 +36,6 @@ export const initialAppState: AppState = {
   trialExpired: false,
   unexpectedError: null,
   uploading: null,
-  videoNode: null,
   videoUrl: null,
   workspaceId: null,
   currentPoint: null,
@@ -173,13 +172,6 @@ export default function update(
       };
     }
 
-    case "set_video_node": {
-      return {
-        ...state,
-        videoNode: action.videoNode,
-      };
-    }
-
     case "set_video_url": {
       return {
         ...state,
@@ -292,7 +284,6 @@ export const getFlatEvents = (state: UIState) => {
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
-export const getVideoNode = (state: UIState) => state.app.videoNode;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;

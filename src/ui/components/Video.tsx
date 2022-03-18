@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
-import { actions } from "ui/actions";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
+import { setVideoNode } from "../../protocol/videoNode";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
@@ -22,7 +22,7 @@ const HideVideoButton: FC = () => {
 
   return (
     <button
-      className="absolute top-0 right-0 flex bg-themeTabBgcolor rounded-full p-1"
+      className="absolute top-0 right-0 flex rounded-full bg-themeTabBgcolor p-1"
       title="Hide Video"
       onClick={onClick}
     >
@@ -47,7 +47,6 @@ function Video({
   isNodePickerActive,
   pendingComment,
   recordingTarget,
-  setVideoNode,
   stalled,
   mouseTargetsLoading,
   videoUrl,
@@ -104,21 +103,16 @@ function Video({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    pendingComment: selectors.getPendingComment(state),
-    isNodePickerActive: selectors.getIsNodePickerActive(state),
-    currentTime: selectors.getCurrentTime(state),
-    playback: selectors.getPlayback(state),
-    recordingTarget: selectors.getRecordingTarget(state),
-    videoUrl: selectors.getVideoUrl(state),
-    stalled: selectors.isPlaybackStalled(state),
-    mouseTargetsLoading: selectors.areMouseTargetsLoading(state),
-  }),
-  {
-    setVideoNode: actions.setVideoNode,
-  }
-);
+const connector = connect((state: UIState) => ({
+  pendingComment: selectors.getPendingComment(state),
+  isNodePickerActive: selectors.getIsNodePickerActive(state),
+  currentTime: selectors.getCurrentTime(state),
+  playback: selectors.getPlayback(state),
+  recordingTarget: selectors.getRecordingTarget(state),
+  videoUrl: selectors.getVideoUrl(state),
+  stalled: selectors.isPlaybackStalled(state),
+  mouseTargetsLoading: selectors.areMouseTargetsLoading(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(Video);
