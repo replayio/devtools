@@ -8,7 +8,6 @@ export interface DebuggerLocation {
   column?: number;
 }
 
-export function setZoomedRegion(zoomStartTime: number, zoomEndTime: number, scale: number): any;
 export function onViewSourceInDebugger(location: DebuggerLocation): UIThunkAction;
 export function openNodeInInspector(valueFront: ValueFront): UIThunkAction;
 export function openLink(url: string): UIThunkAction;

@@ -32,15 +32,9 @@ export function getAllMessagesById(state) {
 export const getVisibleMessages = createSelector(
   getAllMessagesById,
   state => state.messages.visibleMessages,
-  state => state.consoleUI.zoomStartTime,
-  state => state.consoleUI.zoomEndTime,
   getFocusRegion,
-  (messages, visibleMessages, zoomStartTime, zoomEndTime, focusRegion) => {
-    const msgs = visibleMessages.filter(id => {
-      const msg = messages.get(id);
-      const time = messageTime(msg);
-      return time >= zoomStartTime && time <= zoomEndTime;
-    });
+  (messages, visibleMessages, focusRegion) => {
+    const msgs = visibleMessages;
 
     if (focusRegion) {
       return msgs.filter(id => {
