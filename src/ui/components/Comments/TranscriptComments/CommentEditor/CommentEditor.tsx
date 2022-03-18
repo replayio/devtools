@@ -10,7 +10,7 @@ import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
 import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
-import { Editor } from "@tiptap/core";
+import { Editor } from "@tiptap/react";
 
 export function getCommentEditorDOMId(comment: Comment | Reply) {
   return `comment-editor-${comment.id}`;
@@ -20,8 +20,8 @@ type CommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply;
   editable: boolean;
   handleSubmit: (inputValue: string) => void;
-  onCreate: (editor: { editor: Editor }) => void;
-  onUpdate: (editor: { editor: Editor }) => void;
+  onCreate: (editor: { editor: Pick<Editor, "commands"> }) => void;
+  onUpdate: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
 };
 
 function CommentEditor({

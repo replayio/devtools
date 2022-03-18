@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
-import { Editor } from "@tiptap/core";
+import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -21,8 +20,8 @@ interface TipTapEditorProps {
   // Not actually implementing this now, but leaving it in the API for later
   possibleMentions: User[];
   takeFocus: boolean;
-  onCreate: (editor: { editor: Editor }) => void;
-  onUpdate: (editor: { editor: Editor }) => void;
+  onCreate: (editor: { editor: Pick<Editor, "commands"> }) => void;
+  onUpdate: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
 }
 
 const tryToParse = (content: string): any => {
