@@ -8,7 +8,6 @@ import classNames from "classnames";
 import { GitHubLink } from "./githubLink";
 import { ReplayLink } from "./replayLink";
 import useAuth0 from "ui/utils/useAuth0";
-import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 
 interface TipTapEditorProps {
   autofocus: boolean;
