@@ -102,10 +102,8 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
 
 function getUpdateUserSettingQuery(key: SettingItemKey, type: "uuid" | "Boolean") {
   return gql`
-    mutation UpdateUserSettings($newValue: ${type}) {
-      updateUserSettings(
-        input: { ${key}: $newValue },
-      ) {
+    mutation UpdateUserSettings($newValue: Boolean) {
+      updateUserSettings(input: { showReact: $newValue }) {
         success
       }
     }
