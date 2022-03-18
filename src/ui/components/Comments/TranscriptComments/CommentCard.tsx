@@ -173,7 +173,7 @@ function CommentCard({
                 close: () => setIsEditorOpen(false),
               }}
             >
-              <NewCommentEditor comment={comment} type={"new_comment"} />
+              <NewCommentEditor data={{ type: "new_comment", comment }} />
             </FocusContext.Provider>
           </div>
         </div>
@@ -220,16 +220,17 @@ function CommentCard({
             }}
           >
             <NewCommentEditor
-              key={PENDING_COMMENT_ID}
-              comment={{
-                ...comment,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                content: "",
-                parentId: comment.id,
-                id: PENDING_COMMENT_ID,
+              data={{
+                type: "new_reply",
+                comment: {
+                  ...comment,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  content: "",
+                  parentId: comment.id,
+                  id: PENDING_COMMENT_ID,
+                },
               }}
-              type={"new_reply"}
             />
           </FocusContext.Provider>
         ) : (
