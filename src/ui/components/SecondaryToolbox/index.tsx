@@ -36,10 +36,9 @@ interface PanelButtonsProps {
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
-  label: string;
 }
 
-const PanelButton: FC<PanelButtonProps> = ({ panel, label, children }) => {
+const PanelButton: FC<PanelButtonProps> = ({ panel, children }) => {
   const selectedPanel = useSelector(selectors.getSelectedPanel);
   const dispatch = useDispatch();
 
@@ -58,7 +57,7 @@ const PanelButton: FC<PanelButtonProps> = ({ panel, label, children }) => {
         expanded: selectedPanel === panel,
       })}
       onClick={() => onClick(panel)}
-    >    
+    >
       <div className="label">{children}</div>
     </button>
   );
@@ -71,32 +70,15 @@ const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
-      
-      <PanelButton panel="console">
-        Console
-      </PanelButton>
-      
-      {!isNode &&
-        <PanelButton panel="inspector">
-        Elements
-      </PanelButton>}
-      
-      {toolboxLayout !== "ide" &&
-      <PanelButton panel="debugger">
-        <SourcesTabLabel />
-      </PanelButton>
-      }
-      
-      {hasReactComponents && showReact &&
-      <PanelButton panel="react-components">
-        React
-      </PanelButton>
-      }
-      
-      <PanelButton panel="network">
-        Network
-      </PanelButton>
-      
+      <PanelButton panel="console">Console</PanelButton>
+      {!isNode && <PanelButton panel="inspector">Elements</PanelButton>}
+      {toolboxLayout !== "ide" && (
+        <PanelButton panel="debugger">
+          <SourcesTabLabel />
+        </PanelButton>
+      )}
+      {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
+      <PanelButton panel="network">Network</PanelButton>
     </div>
   );
 };

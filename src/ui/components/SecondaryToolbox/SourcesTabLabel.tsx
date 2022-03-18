@@ -24,14 +24,17 @@ export default function TabSpotlight() {
 
     timeoutKey.current = setTimeout(() => {
       setIsShown(false);
-      console.log('setting');
       timeoutKey.current = null;
     }, 2000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSource?.sourceId]);
 
-  return (<span className={classNames(
-    "transition duration-3000",
-    isShown ? "text-primaryAccent" : "text-bodyColor"
-  )}>Sources</span>);
-  
+  return (
+    <span
+      className={classNames("transition", isShown ? "text-primaryAccent" : "text-bodyColor")}
+      style={{ transitionDuration: "3000" }}
+    >
+      Sources
+    </span>
+  );
 }

@@ -69,9 +69,6 @@ module.exports = {
       cursor: {
         "ew-resize": "ew-resize",
       },
-      transitionDuration: {
-        '3000': '3000ms',
-      }
     },
   },
   plugins: [require("@tailwindcss/forms")],
