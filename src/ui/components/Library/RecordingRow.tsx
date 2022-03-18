@@ -12,6 +12,7 @@ import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 import styles from "./Library.module.css";
+import { useGetUserPermissions } from "ui/hooks/users";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -74,9 +75,9 @@ function RecordingRow({
   removeSelectedId,
   addSelectedId,
 }: RecordingRowProps) {
-  const { userId, loading } = hooks.useGetUserId();
-  const isOwner = userId == recording.user?.id;
-  const allowSelecting = isEditing && isOwner;
+  const { permissions, loading: permissionsLoading } = useGetUserPermissions(recording);
+  const allowSelecting =
+    isEditing && (permissions.moveToLibrary || permissions.move || permissions.delete);
 
   const toggleChecked = () => {
     if (!allowSelecting) {
@@ -90,7 +91,7 @@ function RecordingRow({
     }
   };
 
-  if (loading) {
+  if (permissionsLoading) {
     return null;
   }
 

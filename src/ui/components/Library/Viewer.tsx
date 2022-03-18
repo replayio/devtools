@@ -131,7 +131,11 @@ function ViewerContent({
           <TeamTrialEnd />
           {isEditing ? (
             <>
-              <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
+              <BatchActionDropdown
+                setSelectedIds={setSelectedIds}
+                selectedIds={selectedIds}
+                recordings={sortedRecordings}
+              />
               <PrimaryButton color="blue" onClick={handleDoneEditing}>
                 Done
               </PrimaryButton>

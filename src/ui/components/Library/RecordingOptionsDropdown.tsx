@@ -11,46 +11,9 @@ import classNames from "classnames";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../shared/Confirm";
 import { useIsPublicEnabled } from "ui/utils/org";
-import { useGetNonPendingWorkspaces } from "ui/hooks/workspaces";
 import { getWorkspaceId } from "ui/reducers/app";
 import { setModal } from "ui/actions/app";
-
-export function useGetPermissions(recording: Recording) {
-  const { userId, loading: userIdLoading } = hooks.useGetUserId();
-  const { workspaces, loading: workspacesLoading } = useGetNonPendingWorkspaces();
-  const isOwner = userId == recording.user?.id;
-
-  if (userIdLoading || workspacesLoading) {
-    return {
-      loading: true,
-      permissions: {
-        move: false,
-        moveToLibrary: false,
-        privacy: false,
-        rename: false,
-        delete: false,
-      },
-    };
-  }
-
-  const sameTeam =
-    recording.workspace?.id && workspaces.find(w => w.id === recording.workspace?.id);
-  // Here we are inferring that recordings without a user are node recordings, since they've
-  // been update using the workspace's API key.
-  const isNodeRecording = !recording.user;
-  const isPrivilegedUser = isOwner || (isNodeRecording && sameTeam);
-
-  return {
-    loading: false,
-    permissions: {
-      move: isOwner,
-      moveToLibrary: isOwner,
-      privacy: isPrivilegedUser,
-      rename: isPrivilegedUser,
-      delete: isPrivilegedUser,
-    },
-  };
-}
+import { useGetUserPermissions } from "ui/hooks/users";
 
 function DeleteOption({
   onOptionClick,
@@ -151,7 +114,7 @@ function MoveRecordingOption({
   onOptionClick: () => void;
   recording: Recording;
 }) {
-  const { permissions } = useGetPermissions(recording);
+  const { permissions } = useGetUserPermissions(recording);
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const currentWorkspaceId = useSelector(getWorkspaceId);
@@ -176,7 +139,7 @@ function MoveRecordingOption({
 
 export default function RecordingOptionsDropdown({ recording }: { recording: Recording }) {
   const [expanded, setExpanded] = useState(false);
-  const { loading, permissions } = useGetPermissions(recording);
+  const { loading, permissions } = useGetUserPermissions(recording);
 
   if (loading) {
     return null;
