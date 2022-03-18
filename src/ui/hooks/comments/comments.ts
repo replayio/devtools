@@ -16,6 +16,8 @@ export function useGetComments(recordingId: RecordingId): {
     pollInterval: 5000,
   });
 
+  console.log(data);
+
   if (error) {
     console.error("Apollo error while fetching comments:", error);
   }

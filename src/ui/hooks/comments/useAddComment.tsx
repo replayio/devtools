@@ -1,13 +1,30 @@
 import { Comment } from "ui/state/comments";
-import { gql, useMutation } from "@apollo/client";
-import { Remark } from "ui/state/comments";
-import { GET_COMMENTS } from "ui/graphql/comments";
+import { ApolloCache, gql, useMutation } from "@apollo/client";
+import { GqlGetComments, GET_COMMENTS, GqlComment, U2N } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import omit from "lodash/omit";
 import { GET_USER_ID } from "ui/graphql/users";
 
+type AddCommentData = {
+  addComment: {
+    success: boolean;
+    comment: {
+      id: Comment["id"];
+    };
+  };
+};
+
+type AddCommentVariables = {
+  input: Omit<Comment, "id" | "createdAt" | "updatedAt" | "replies" | "user">;
+};
+
 export default function useAddComment() {
-  const [addComment, { error }] = useMutation(
+  const [addComment, { error }] = useMutation<
+    AddCommentData,
+    AddCommentVariables,
+    {},
+    ApolloCache<GqlGetComments>
+  >(
     gql`
       mutation AddComment($input: AddCommentInput!) {
         addComment(input: $input) {
@@ -38,29 +55,23 @@ export default function useAddComment() {
         addComment: {
           success: true,
           comment: {
-            id: comment["id"],
-            __typename: "Comment",
+            id: comment.id,
           },
-          __typename: "AddComment",
         },
       },
-      update: (cache, { data: { addComment } }) => {
-        const {
-          comment: { id: commentId },
-        } = addComment;
-        const data: any = cache.readQuery({
+      update: (cache, { data }) => {
+        const commentId = data!.addComment.comment.id;
+        const getCommentsCache = cache.readQuery<GqlGetComments>({
           query: GET_COMMENTS,
           variables: { recordingId: comment.recordingId },
-        });
-        const {
-          viewer: {
-            user: { id: userId },
-          },
-        }: any = cache.readQuery({
-          query: GET_USER_ID,
-        });
+        })!;
+        const userId = (
+          cache.readQuery({
+            query: GET_USER_ID,
+          }) as any
+        ).viewer.user.id;
 
-        const newComment = {
+        const newComment: U2N<Comment> = {
           ...comment,
           id: commentId,
           primaryLabel: comment.primaryLabel || null,
@@ -69,16 +80,15 @@ export default function useAddComment() {
             id: userId,
             name: comment.user.name,
             picture: comment.user.picture,
-            __typename: "User",
+            internal: comment.user.internal,
           },
-          __typename: "Comment",
         };
         const newData = {
-          ...data,
+          ...getCommentsCache,
           recording: {
-            ...data.recording,
+            ...getCommentsCache.recording,
             comments: [
-              ...data.recording.comments.filter((c: Remark) => c.id !== commentId),
+              ...getCommentsCache.recording.comments.filter(c => c.id !== commentId),
               newComment,
             ],
           },

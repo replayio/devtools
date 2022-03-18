@@ -1,16 +1,39 @@
-import { gql, useMutation } from "@apollo/client";
+import { ApolloCache, gql, useMutation } from "@apollo/client";
 import useAuth0 from "ui/utils/useAuth0";
 import { GET_USER_ID } from "ui/graphql/users";
-import { GET_COMMENTS } from "ui/graphql/comments";
-import { Reply } from "ui/state/comments";
+import { GET_COMMENTS, GqlComment, GqlGetComments } from "ui/graphql/comments";
+import { Comment, Reply } from "ui/state/comments";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { useGetRecordingId } from "../recordings";
+
+type AddCommentReplyData = {
+  addCommentReply: {
+    __typename: "AddCommentReply";
+    success: true;
+    commentReply: {
+      id: typeof PENDING_COMMENT_ID;
+      __typename: "CommentReply";
+    };
+  };
+};
+
+type AddCommentReplyVariables = {
+  input: {
+    commentId: Comment["id"];
+    content: string;
+  };
+};
 
 export default function useAddCommentReply() {
   const { user } = useAuth0();
   const recordingId = useGetRecordingId();
 
-  const [addCommentReply, { error }] = useMutation(
+  const [addCommentReply, { error }] = useMutation<
+    AddCommentReplyData,
+    AddCommentReplyVariables,
+    any,
+    ApolloCache<GqlGetComments>
+  >(
     gql`
       mutation AddCommentReply($input: AddCommentReplyInput!) {
         addCommentReply(input: $input) {
@@ -45,25 +68,21 @@ export default function useAddCommentReply() {
           __typename: "AddCommentReply",
         },
       },
-      update: (cache, payload) => {
-        const {
-          data: {
-            addCommentReply: { commentReply },
-          },
-        } = payload;
-        const data: any = cache.readQuery({
+      update: (cache, { data }) => {
+        const commentReply = data!.addCommentReply.commentReply;
+        const getCommentsCache: GqlGetComments = cache.readQuery({
           query: GET_COMMENTS,
           variables: { recordingId },
-        });
-        const {
-          viewer: {
-            user: { id: userId },
-          },
-        }: any = cache.readQuery({
-          query: GET_USER_ID,
-        });
+        })!;
+        const userId = (
+          cache.readQuery({
+            query: GET_USER_ID,
+          }) as any
+        ).viewer.user.id;
 
-        const parentComment = data.recording.comments.find((r: any) => r.id === reply.parentId);
+        const parentComment = getCommentsCache.recording.comments.find(
+          (r: any) => r.id === reply.parentId
+        );
         if (!parentComment) {
           return;
         }
@@ -84,27 +103,26 @@ export default function useAddCommentReply() {
         const newParentComment = {
           ...parentComment,
           replies: [
-            ...parentComment.replies.filter(
+            ...(parentComment.replies || []).filter(
               (r: any) => r.id !== PENDING_COMMENT_ID && r.id !== commentReply.id
             ),
             newReply,
           ],
         };
-        const newData = {
-          ...data,
-          recording: {
-            ...data.recording,
-            comments: [
-              ...data.recording.comments.filter((r: any) => r.id !== reply.parentId),
-              newParentComment,
-            ],
-          },
-        };
 
-        cache.writeQuery({
+        cache.writeQuery<GqlGetComments>({
           query: GET_COMMENTS,
           variables: { recordingId },
-          data: newData,
+          data: {
+            ...getCommentsCache,
+            recording: {
+              ...getCommentsCache.recording,
+              comments: [
+                ...getCommentsCache.recording.comments.filter((r: any) => r.id !== reply.parentId),
+                newParentComment,
+              ],
+            },
+          },
         });
       },
     });
