@@ -2,10 +2,10 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 
 // types of editable comments:
 // - existing comments (zero or more active)
-// - new replay comments (zero or more active)
+// - new reply comments (zero or more active)
 // - pending comments (zero or one active)
-//   - pending (video) comment
-//   - pending (network request) comment
+//   - video comment
+//   - network request comment
 type Mode =
   | {
       type: "reply";
