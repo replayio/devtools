@@ -599,19 +599,18 @@ export function useGetMyRecordings() {
   return useGetPersonalRecordings();
 }
 
-export function useDeleteRecording(onCompleted: () => void) {
-  const [deleteRecording] = useMutation(
-    gql`
-      mutation DeleteRecording1($recordingId: ID!) {
-        deleteRecording(input: { id: $recordingId }) {
-          success
-        }
-      }
-    `,
-    {
-      onCompleted,
+const DELETE_RECORDING = gql`
+  mutation DeleteRecording1($recordingId: ID!) {
+    deleteRecording(input: { id: $recordingId }) {
+      success
     }
-  );
+  }
+`;
+
+export function useDeleteRecording(onCompleted: () => void) {
+  const [deleteRecording] = useMutation(DELETE_RECORDING, {
+    onCompleted,
+  });
 
   return deleteRecording;
 }

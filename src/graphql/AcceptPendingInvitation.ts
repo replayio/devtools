@@ -9,7 +9,7 @@
 
 export interface AcceptPendingInvitation_acceptWorkspaceMembership {
   __typename: "AcceptWorkspaceMembership";
-  success: boolean | null | "yolo";
+  success: boolean | null;
 }
 
 export interface AcceptPendingInvitation {

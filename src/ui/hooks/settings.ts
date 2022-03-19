@@ -101,45 +101,38 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
   };
 }
 
-function getUpdateUserSettingQuery(key: SettingItemKey, type: "uuid" | "Boolean") {
+function getUpdateUserSettingQuery(key: Exclude<SettingItemKey, "apiKeys">) {
   const mutations: Record<typeof key, DocumentNode> = {
-    apiKeys: gql`
-      mutation UpdateUserSettings1($newValue: uuid) {
-        updateUserSettings(input: { apiKeys: $newValue }) {
-          success
-        }
-      }
-    `,
     defaultWorkspaceId: gql`
-      mutation UpdateUserSettings2($newValue: uuid) {
+      mutation UpdateUserSettingsDefaultWorkspace($newValue: uuid) {
         updateUserSettings(input: { defaultWorkspaceId: $newValue }) {
           success
         }
       }
     `,
     disableLogRocket: gql`
-      mutation UpdateUserSettings3($newValue: Boolean) {
+      mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
         updateUserSettings(input: { disableLogRocket: $newValue }) {
           success
         }
       }
     `,
     enableEventLink: gql`
-      mutation UpdateUserSettings4($newValue: Boolean) {
+      mutation UpdateUserSettingsEventLink($newValue: Boolean) {
         updateUserSettings(input: { enableEventLink: $newValue }) {
           success
         }
       }
     `,
     enableTeams: gql`
-      mutation UpdateUserSettings5($newValue: Boolean) {
+      mutation UpdateUserSettingsTeams($newValue: Boolean) {
         updateUserSettings(input: { enableTeams: $newValue }) {
           success
         }
       }
     `,
     showReact: gql`
-      mutation UpdateUserSettings6($newValue: Boolean) {
+      mutation UpdateUserSettingsReact($newValue: Boolean) {
         updateUserSettings(input: { showReact: $newValue }) {
           success
         }
@@ -150,8 +143,8 @@ function getUpdateUserSettingQuery(key: SettingItemKey, type: "uuid" | "Boolean"
   return mutations[key];
 }
 
-export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
-  const [updateUserSetting, { error }] = useMutation(getUpdateUserSettingQuery(key, type), {
+export function useUpdateUserSetting(key: Exclude<SettingItemKey, "apiKeys">) {
+  const [updateUserSetting, { error }] = useMutation(getUpdateUserSettingQuery(key), {
     refetchQueries: ["GetUserSettings"],
   });
 
@@ -160,19 +153,6 @@ export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolea
   }
 
   return updateUserSetting;
-}
-
-export async function migratePrefToSettings(prefKey: string, settingKey: SettingItemKey) {
-  if (Services.prefs.prefHasUserValue(prefKey)) {
-    const newValue = Services.prefs.getBoolPref(prefKey);
-    await mutate({
-      mutation: getUpdateUserSettingQuery(settingKey, "Boolean"),
-      variables: {
-        newValue,
-      },
-    });
-    Services.prefs.clearUserPref(prefKey);
-  }
 }
 
 export function useUpdateDefaultWorkspace() {
