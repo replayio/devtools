@@ -15,5 +15,4 @@ out
 tsconfig.tsbuildinfo
 yarn.lock
 .nova/
-gql_schema.json
-gql_schema.graphql
+schema.graphql
