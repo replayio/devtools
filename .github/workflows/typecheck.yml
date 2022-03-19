@@ -17,9 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Deps
-        run: npm install
-      - name: Install graphqurl
-        run: npm install -g graphqurl
+        run: npm install && npm install -g graphqurl
       - name: Fetch the schema
         run: npm run gql:schema
         env:
