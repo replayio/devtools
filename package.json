@@ -54,7 +54,6 @@
     "dotenv": "^16.0.0",
     "escape-html": "^1.0.3",
     "fuzzaldrin-plus": "^0.6.0",
-    "graphql": "15.8.0",
     "immer": "^9.0.7",
     "jest": "^27.5.1",
     "jwt-decode": "^3.1.2",
@@ -68,11 +67,11 @@
     "parse-script-tags": "^0.1.7",
     "prop-types": "^15.8.1",
     "properties-parser": "^0.3.1",
-    "react": "^0.0.0-experimental-edfe50510-20210823",
+    "react": "^0.0.0-experimental-645ec5d6f-20220317",
     "react-circular-progressbar": "^2.0.4",
     "react-codemirror2": "^7.2.1",
     "react-devtools-inline": "^4.17.0",
-    "react-dom": "^0.0.0-experimental-edfe50510-20210823",
+    "react-dom": "^0.0.0-experimental-645ec5d6f-20220317",
     "react-dom-factories": "^1.0.2",
     "react-json-view": "^1.21.3",
     "react-lazyload": "^3.2.0",
@@ -186,7 +185,6 @@
     "packages/accordion"
   ],
   "overrides": {
-    "graphql": "15.8.0",
     "@auth0/auth0-react": "1.2.0"
   }
 }
