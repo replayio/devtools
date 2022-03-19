@@ -18,11 +18,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Deps
         run: npm install && npm install -g graphqurl
-      - name: Fetch the schema
+      - name: Fetch GraphQL schema
         run: npm run gql:schema
         env:
           HASURA_KEY: ${{ secrets.HASURA_ADMIN_SECRET }}
-      - name: Codegen
+      - name: Apollo codegen
         run: npm run gql:codegen
       - name: Checks if types match
         run: git diff --quiet HEAD .
