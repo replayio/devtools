@@ -600,7 +600,7 @@ export function useGetMyRecordings() {
 }
 
 const DELETE_RECORDING = gql`
-  mutation DeleteRecording1($recordingId: ID!) {
+  mutation DeleteRecording($recordingId: ID!) {
     deleteRecording(input: { id: $recordingId }) {
       success
     }
@@ -616,15 +616,7 @@ export function useDeleteRecording(onCompleted: () => void) {
 }
 
 export function useDeleteRecordingFromLibrary() {
-  const [deleteRecording] = useMutation(
-    gql`
-      mutation DeleteRecording($recordingId: ID!) {
-        deleteRecording(input: { id: $recordingId }) {
-          success
-        }
-      }
-    `
-  );
+  const [deleteRecording] = useMutation(DELETE_RECORDING);
 
   return (recordingId: RecordingId, workspaceId: WorkspaceId | null) => {
     deleteRecording({
