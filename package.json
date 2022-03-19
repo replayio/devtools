@@ -26,7 +26,9 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect --format json > gql_schema.json",
-    "gql:codegen": "apollo codegen:generate --localSchemaFile=gql_schema.json --target=typescript --tagName=gql"
+    "gql:codegen": "apollo codegen:generate --localSchemaFile=gql_schema.json --target=typescript --tagName=gql",
+    "gql:schema2": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > gql_schema.graphql",
+    "gql:codegen2": "apollo codegen:generate --localSchemaFile=gql_schema.graphql --target=typescript --tagName=gql"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
