@@ -1,4 +1,4 @@
-This entire folder's content is auto-generated (`src/graphql).
+This entire folder's content is auto-generated.
 
 Editing any of these files manually is not recommended.
 
