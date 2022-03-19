@@ -12,4 +12,4 @@ lint:
     - linters: [ALL]
       paths:
         - public
-        - sec/graphql
+        - src/graphql
