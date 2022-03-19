@@ -7,6 +7,7 @@ import { createGetUserMock, createUserSettingsMock } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
 import { GET_RECORDING } from "ui/graphql/recordings";
+import { GraphQLError } from "graphql";
 import { cloneResponse } from "../src/graphql/utils";
 
 const errorMessage = "Error from GraphQL";
@@ -19,7 +20,7 @@ const errorMock = {
     variables: { recordingId },
   },
   result: {
-    errors: [],
+    errors: [new GraphQLError(errorMessage)],
   },
 };
 const graphqlMocks = [
