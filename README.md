@@ -95,3 +95,7 @@ You can [install](https://docs.trunk.io/getting-started) the trunk launcher usin
 In most cases you can simply run `trunk check` which will autodetect the changes you have made and lint them.
 If you would like to only autoformat your changes, you can run `trunk fmt`.
 More information on using trunk can be found [here](https://docs.trunk.io/getting-started/usage).
+
+#### Generating GraphQL types for Typescript
+
+See [src/graphql/README.md](./src/graphql/README.md) for details.
