@@ -4,7 +4,7 @@ Editing any of these files manually is not recommended.
 
 ### Generating GraphQL types for Typescript
 
-```
+```bash
 npm i -g graphqurl # you do this only once
 
 HASURA_KEY=<key> npm run gql:schema # outputs schema.graphql
