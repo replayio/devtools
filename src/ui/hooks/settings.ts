@@ -10,7 +10,6 @@ import { features } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
-import APIKeys from "ui/components/shared/APIKeys";
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
@@ -101,15 +100,10 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
   };
 }
 
-function getUpdateUserSettingQuery(key: Exclude<SettingItemKey, "apiKeys">) {
+function getUpdateUserSettingQuery(
+  key: Extract<SettingItemKey, "disableLogRocket" | "enableEventLink" | "showReact">
+) {
   const mutations: Record<typeof key, DocumentNode> = {
-    defaultWorkspaceId: gql`
-      mutation UpdateUserSettingsDefaultWorkspace($newValue: uuid) {
-        updateUserSettings(input: { defaultWorkspaceId: $newValue }) {
-          success
-        }
-      }
-    `,
     disableLogRocket: gql`
       mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
         updateUserSettings(input: { disableLogRocket: $newValue }) {
@@ -120,13 +114,6 @@ function getUpdateUserSettingQuery(key: Exclude<SettingItemKey, "apiKeys">) {
     enableEventLink: gql`
       mutation UpdateUserSettingsEventLink($newValue: Boolean) {
         updateUserSettings(input: { enableEventLink: $newValue }) {
-          success
-        }
-      }
-    `,
-    enableTeams: gql`
-      mutation UpdateUserSettingsTeams($newValue: Boolean) {
-        updateUserSettings(input: { enableTeams: $newValue }) {
           success
         }
       }
@@ -143,7 +130,9 @@ function getUpdateUserSettingQuery(key: Exclude<SettingItemKey, "apiKeys">) {
   return mutations[key];
 }
 
-export function useUpdateUserSetting(key: Exclude<SettingItemKey, "apiKeys">) {
+export function useUpdateUserSetting(
+  key: Extract<SettingItemKey, "disableLogRocket" | "enableEventLink" | "showReact">
+) {
   const [updateUserSetting, { error }] = useMutation(getUpdateUserSettingQuery(key), {
     refetchQueries: ["GetUserSettings"],
   });
