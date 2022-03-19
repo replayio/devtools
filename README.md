@@ -98,4 +98,4 @@ More information on using trunk can be found [here](https://docs.trunk.io/gettin
 
 #### Generating GraphQL types for Typescript
 
-See [src/graphql/README.md](./src/graphql/README.md) for details.
+See [/src/graphql/README.md](./src/graphql/README.md) for details.

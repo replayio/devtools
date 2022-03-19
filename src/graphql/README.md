@@ -5,10 +5,9 @@ Editing any of these files manually is not recommended.
 ### Generating GraphQL types for Typescript
 
 ```bash
-npm i -g graphqurl # you do this only once
+npm i -g graphqurl
 
-HASURA_KEY=<key> npm run gql:schema # outputs schema.graphql
-npm run gql:codegen # outputs .ts files to src/graphql
+HASURA_KEY=<key> npm run gql
 ```
 
 Ask somebody on the team to provide the `<key>` to you, which is Hasura admin secret.
