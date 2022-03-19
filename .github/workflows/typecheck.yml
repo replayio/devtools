@@ -11,3 +11,20 @@ jobs:
         run: npm install
       - name: Run tsc
         run: npm run typecheck
+  gql:
+    name: GraphQL schema types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Deps
+        run: npm install
+      - name: Install graphqurl
+        run: npm install -g graphqurl
+      - name: Fetch the schema
+        run: npm run gql:schema
+        env:
+          HASURA_KEY: ${{ secrets.HASURA_ADMIN_SECRET }}
+      - name: Codegen
+        run: npm run gql:codegen
+      - name: Checks if types match
+        run: git diff --quiet HEAD .
