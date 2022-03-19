@@ -19,4 +19,4 @@ jobs:
       - name: Codegen
         run: npm run gql:codegen
       - name: Checks if types match
-        run: git diff origin/master --quiet
+        run: git diff --quiet HEAD .
