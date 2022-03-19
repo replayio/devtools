@@ -100,40 +100,37 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
   };
 }
 
-function getUpdateUserSettingQuery(
-  key: Extract<SettingItemKey, "disableLogRocket" | "enableEventLink" | "showReact">
-) {
-  const mutations: Record<typeof key, DocumentNode> = {
-    disableLogRocket: gql`
-      mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
-        updateUserSettings(input: { disableLogRocket: $newValue }) {
-          success
-        }
-      }
-    `,
-    enableEventLink: gql`
-      mutation UpdateUserSettingsEventLink($newValue: Boolean) {
-        updateUserSettings(input: { enableEventLink: $newValue }) {
-          success
-        }
-      }
-    `,
-    showReact: gql`
-      mutation UpdateUserSettingsReact($newValue: Boolean) {
-        updateUserSettings(input: { showReact: $newValue }) {
-          success
-        }
-      }
-    `,
-  };
+type MutableSettings = Extract<
+  SettingItemKey,
+  "disableLogRocket" | "enableEventLink" | "showReact"
+>;
 
-  return mutations[key];
-}
+const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
+  disableLogRocket: gql`
+    mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
+      updateUserSettings(input: { disableLogRocket: $newValue }) {
+        success
+      }
+    }
+  `,
+  enableEventLink: gql`
+    mutation UpdateUserSettingsEventLink($newValue: Boolean) {
+      updateUserSettings(input: { enableEventLink: $newValue }) {
+        success
+      }
+    }
+  `,
+  showReact: gql`
+    mutation UpdateUserSettingsReact($newValue: Boolean) {
+      updateUserSettings(input: { showReact: $newValue }) {
+        success
+      }
+    }
+  `,
+} as const;
 
-export function useUpdateUserSetting(
-  key: Extract<SettingItemKey, "disableLogRocket" | "enableEventLink" | "showReact">
-) {
-  const [updateUserSetting, { error }] = useMutation(getUpdateUserSettingQuery(key), {
+export function useUpdateUserSetting(key: MutableSettings) {
+  const [updateUserSetting, { error }] = useMutation(SETTINGS_MUTATIONS[key], {
     refetchQueries: ["GetUserSettings"],
   });
 
