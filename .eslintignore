@@ -4,4 +4,3 @@ src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
 sourcemapVisualizer.js
 public/test/examples
-src/graphql
