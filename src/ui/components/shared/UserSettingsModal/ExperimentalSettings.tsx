@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import hooks from "ui/hooks";
 import { CheckboxRow } from "./CheckboxRow";
 import { CombinedExperimentalUserSettings } from "ui/types";
@@ -9,6 +9,7 @@ interface ExperimentalSetting {
   label: string;
   description: string;
   key: ExperimentalKey;
+  secret?: boolean;
 }
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
@@ -31,6 +32,18 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Network Request Comments",
     description: "Leave comments on a network request",
     key: "enableNetworkRequestComments",
+  },
+  {
+    label: "Multiple Controllers",
+    description: "Runs the replay across many machines",
+    key: "useMultipleControllers",
+    secret: true,
+  },
+  {
+    label: "Replay Snapshots",
+    description: "Use snapshots to restore from a prior replay",
+    key: "multipleControllerUseSnapshots",
+    secret: true,
   },
 ];
 
@@ -55,8 +68,34 @@ function Experiment({
   );
 }
 
+function useGetShowSecretSettings() {
+  const [showSecretSettings, setShowSecretSettings] = useState(false);
+  const [shiftCount, setShiftCount] = useState(0);
+
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  });
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (e.key !== "Shift") {
+      return setShiftCount(0);
+    } else if (shiftCount !== 8) {
+      return setShiftCount(shiftCount + 1);
+    }
+
+    setShowSecretSettings(!showSecretSettings);
+  }
+
+  return showSecretSettings;
+}
+
 export default function ExperimentalSettings({}) {
   const { userSettings, loading } = hooks.useGetUserSettings();
+  const showSecretSettings = useGetShowSecretSettings();
 
   // TODO: This is bad and should be updated with a better generalized hook
   const updateEventLink = hooks.useUpdateUserSetting("enableEventLink", "Boolean");
@@ -66,6 +105,12 @@ export default function ExperimentalSettings({}) {
     useFeature("columnBreakpoints");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
     useFeature("networkRequestComments");
+  const { value: enableUseMultipleControllers, update: updateEnableUseMultipleControllers } =
+    useFeature("useMultipleControllers");
+  const {
+    value: enableMultipleControllerUseSnapshots,
+    update: updateEnableMultipleControllerUseSnapshots,
+  } = useFeature("multipleControllerUseSnapshots");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -76,13 +121,20 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableNetworkRequestComments") {
       updateEnableNetworkRequestComments(!enableNetworkRequestComments);
+    } else if (key == "useMultipleControllers") {
+      updateEnableUseMultipleControllers(!enableUseMultipleControllers);
+    } else if (key == "multipleControllerUseSnapshots") {
+      updateEnableMultipleControllerUseSnapshots(!enableMultipleControllerUseSnapshots);
     }
   };
 
   const localSettings = {
     enableColumnBreakpoints,
     enableNetworkRequestComments,
+    useMultipleControllers: enableUseMultipleControllers,
+    multipleControllerUseSnapshots: enableMultipleControllerUseSnapshots,
   };
+
   const settings = { ...userSettings, ...localSettings };
 
   if (loading) {
@@ -92,14 +144,17 @@ export default function ExperimentalSettings({}) {
   return (
     <div className="space-y-6 overflow-auto">
       <div className="flex flex-col space-y-2 p-1">
-        {EXPERIMENTAL_SETTINGS.map(setting => (
-          <Experiment
-            onChange={onChange}
-            key={setting.key}
-            setting={setting}
-            checked={!!settings[setting.key]}
-          />
-        ))}
+        {EXPERIMENTAL_SETTINGS.map(
+          setting =>
+            (!setting.secret || showSecretSettings) && (
+              <Experiment
+                onChange={onChange}
+                key={setting.key}
+                setting={setting}
+                checked={!!settings[setting.key]}
+              />
+            )
+        )}
       </div>
     </div>
   );

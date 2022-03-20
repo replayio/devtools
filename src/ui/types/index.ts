@@ -17,6 +17,8 @@ export type ExperimentalUserSettings = {
 export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
+  useMultipleControllers: boolean;
+  multipleControllerUseSnapshots: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
