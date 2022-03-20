@@ -1,8 +1,18 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
-import { getSelectedPrimaryPanel, getShowCommandPalette } from "ui/reducers/layout";
+import {
+  getSelectedPanel,
+  getSelectedPrimaryPanel,
+  getShowCommandPalette,
+} from "ui/reducers/layout";
 import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
-import { ViewMode, PrimaryPanelName, SecondaryPanelName, VIEWER_PANELS } from "ui/state/layout";
+import {
+  ViewMode,
+  PrimaryPanelName,
+  SecondaryPanelName,
+  VIEWER_PANELS,
+  ToolboxLayout,
+} from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { UIThunkAction } from ".";
@@ -14,8 +24,9 @@ type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
 };
 type SetShowCommandPalette = Action<"set_show_command_palette"> & { value: boolean };
-type SetShowEditorAction = Action<"set_show_editor"> & {
-  showEditor: boolean;
+
+type SetToolboxLayoutAction = Action<"set_toolbox_layout"> & {
+  layout: ToolboxLayout;
 };
 type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
   showVideoPanel: boolean;
@@ -28,7 +39,7 @@ export type LayoutAction =
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetShowCommandPalette
-  | SetShowEditorAction
+  | SetToolboxLayoutAction
   | SetShowVideoPanelAction
   | SetViewMode;
 
@@ -39,13 +50,13 @@ export function hideCommandPalette(): SetShowCommandPalette {
   return setShowCommandPalette(false);
 }
 export function toggleCommandPalette(): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const showCommandPalette = getShowCommandPalette(getState());
     dispatch(setShowCommandPalette(!showCommandPalette));
   };
 }
 export function setViewMode(viewMode: ViewMode): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     // There's a possible race condition here so it's important to handle the nag logic first.
     // Otherwise, it's possible for the nag to not be properly dismissed.
     if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
@@ -64,11 +75,23 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
   };
 }
 export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
+  trackEvent("toolbox.secondary.video_toggle");
+
   return { type: "set_show_video_panel", showVideoPanel };
 }
 
-export function setShowEditor(showEditor: boolean): SetShowEditorAction {
-  return { type: "set_show_editor", showEditor };
+export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
+  return (dispatch, getState) => {
+    const selectedPanel = getSelectedPanel(getState());
+
+    // If the debugger's being unset from the toolbox and it happens to be selected,
+    // we should deselect it and select the console instead.
+    if (layout == "ide" && selectedPanel === "debugger") {
+      dispatch(setSelectedPanel("console"));
+    }
+
+    dispatch({ type: "set_toolbox_layout", layout });
+  };
 }
 
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
@@ -86,15 +109,15 @@ export function setConsoleFilterDrawerExpanded(
 }
 
 export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const replaySessions = await asyncStore.replaySessions;
     const session = replaySessions[recordingId];
 
     if (recordingId && session) {
-      const { viewMode, showVideoPanel, showEditor, selectedPrimaryPanel } = session;
+      const { viewMode, showVideoPanel, toolboxLayout, selectedPrimaryPanel } = session;
 
       dispatch(setViewMode(viewMode));
-      dispatch(setShowEditor(showEditor));
+      dispatch(setToolboxLayout(toolboxLayout));
       dispatch(setShowVideoPanel(showVideoPanel));
       dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
     }

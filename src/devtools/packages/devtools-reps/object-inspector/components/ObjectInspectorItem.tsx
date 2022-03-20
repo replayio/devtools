@@ -8,6 +8,7 @@ import React, { HTMLProps, PureComponent, ReactNode } from "react";
 import classnames from "classnames";
 import { Item, documentHasSelection } from "../utils";
 import { trackEvent } from "ui/utils/telemetry";
+import { DebuggerLocation } from "devtools/client/webconsole/actions";
 
 export interface ObjectInspectorItemProps {
   item: Item;
@@ -32,6 +33,7 @@ export interface ObjectInspectorItemProps {
       setExpanded: (item: Item, expand: boolean) => void;
     }
   ) => void;
+  onViewSourceInDebugger: (location: DebuggerLocation) => void;
   renderItemActions: (item: Item) => ReactNode;
   forceUpdate: () => void;
 }

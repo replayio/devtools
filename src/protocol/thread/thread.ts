@@ -1168,7 +1168,7 @@ class _ThreadFront {
         return false;
       }
       kind = minifiedInfo.kind;
-      assert(kind != "prettyPrinted", "source kind must be prettyPrinted");
+      assert(kind != "prettyPrinted", "source kind must not be prettyPrinted");
     }
     return kind == "sourceMapped";
   }
@@ -1220,6 +1220,7 @@ class _ThreadFront {
     return this._chooseSourceIdList(this.getSourceIdsForURL(url));
   }
 
+  // Try to group identical sources together and save the result in `correspondingSourceIds`
   private groupSourceIds() {
     for (const [sourceId, source] of this.sources.entries()) {
       if (!source.url) {
@@ -1254,10 +1255,12 @@ class _ThreadFront {
     return this.correspondingSourceIds.get(sourceId) || [sourceId];
   }
 
+  // Replace the sourceId in a location with the first corresponding sourceId
   updateLocation(location: Location) {
     location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
   }
 
+  // Replace all sourceIds in a mapped location with the first corresponding sourceId
   updateMappedLocation(mappedLocation: MappedLocation | undefined) {
     if (!mappedLocation) {
       return;

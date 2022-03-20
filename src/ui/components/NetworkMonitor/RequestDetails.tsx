@@ -7,17 +7,26 @@ import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 import { WiredFrame } from "protocol/thread/pause";
-import { RequestBodyData, ResponseBodyData } from "@recordreplay/protocol";
 import ResponseBody from "./ResponseBody";
 import { useFeature } from "ui/hooks/settings";
 import RequestBody from "./RequestBody";
+import { getLoadedRegions } from "ui/reducers/app";
+import { useDispatch, useSelector } from "react-redux";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+import { hideRequestDetails } from "ui/actions/network";
+import { getFormattedFrames } from "ui/reducers/network";
+import { actions } from "ui/actions";
+import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
 
 interface Detail {
   name: string;
   value: string | React.ReactChild;
 }
 
-export const RequestDetailsUnavailable: FC<{ closePanel: () => void }> = ({ closePanel }) => {
+export const RequestDetailsUnavailable: FC = () => {
+  const dispatch = useDispatch();
+  const closePanel = () => dispatch(hideRequestDetails());
+
   return (
     <div className="flex h-full w-full flex-col">
       <RequestDetailsTabs>
@@ -117,15 +126,10 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
   );
 };
 
-const StackTrace = ({
-  cx,
-  frames,
-  selectFrame,
-}: {
-  cx: any;
-  frames: WiredFrame[];
-  selectFrame: (cx: any, frame: WiredFrame) => void;
-}) => {
+const StackTrace = ({ cx, frames }: { cx: any; frames: WiredFrame[] }) => {
+  const dispatch = useDispatch();
+  const selectFrame = (cx: any, frame: WiredFrame) => dispatch(actions.selectFrame(cx, frame));
+
   return (
     <div>
       <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
@@ -188,14 +192,19 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
   return (
     <>
       <div
-        className={classNames("flex cursor-pointer items-center py-1 font-bold")}
+        className={classNames(
+          "flex cursor-pointer items-center py-1 font-bold justify-between pr-2"
+        )}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >
-        <TriangleToggle open={requestExpanded} />
-        General
+        <div>
+          <TriangleToggle open={requestExpanded} />
+          General
+        </div>
+        <AddNetworkRequestCommentButton request={request} />
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
-      <h2
+      <div
         className={classNames(
           "cursor-pointer border-t border-themeBorder py-1 font-bold",
           styles.title
@@ -204,31 +213,31 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
       >
         <TriangleToggle open={requestHeadersExpanded} />
         Request Headers
-      </h2>
+      </div>
       {requestHeadersExpanded && (
         <DetailTable className={styles.headerTable} details={requestHeaders} />
       )}
       {request.responseHeaders.length > 0 && (
         <>
-          <h2
+          <div
             className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
             onClick={() => setResponseHeadersExpanded(!responseHeadersExpanded)}
           >
             <TriangleToggle open={responseHeadersExpanded} />
             Response Headers
-          </h2>
+          </div>
           {responseHeadersExpanded && (
             <DetailTable className={styles.headerTable} details={responseHeaders} />
           )}
           {request.queryParams.length > 0 && (
             <div>
-              <h2
+              <div
                 className={classNames("cursor-pointer border-t py-1 font-bold", styles.title)}
                 onClick={() => setQueryParametersExpanded(!queryParametersExpanded)}
               >
                 <TriangleToggle open={queryParametersExpanded} />
                 Query Parameters
-              </h2>
+              </div>
               {queryParametersExpanded && (
                 <DetailTable
                   className={classNames("py-1", styles.request)}
@@ -250,24 +259,11 @@ const DEFAULT_TAB = "headers";
 
 export type NetworkTab = "headers" | "cookies" | "response" | "request" | "stackTrace" | "timings";
 
-const RequestDetails = ({
-  closePanel,
-  cx,
-  frames,
-  request,
-  requestBody,
-  responseBody,
-  selectFrame,
-}: {
-  closePanel: () => void;
-  cx: any;
-  frames: WiredFrame[];
-  request: RequestSummary;
-  responseBody: ResponseBodyData[] | undefined;
-  requestBody: RequestBodyData[] | undefined;
-  selectFrame: (cx: any, frame: WiredFrame) => void;
-}) => {
+const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) => {
+  const dispatch = useDispatch();
+  const frames = useSelector(getFormattedFrames)[request.point.point];
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
+  const loadedRegions = useSelector(getLoadedRegions)?.loaded;
 
   const { value: httpBodies } = useFeature("httpBodies");
 
@@ -289,12 +285,17 @@ const RequestDetails = ({
   ];
 
   const activeTabs = tabs.filter(t => t.visible);
+  const closePanel = () => dispatch(hideRequestDetails());
 
   useEffect(() => {
     if (!activeTabs.find(t => t.id === activeTab)) {
       setActiveTab(DEFAULT_TAB);
     }
   }, [activeTab, activeTabs]);
+
+  if (!(loadedRegions && request && getPointIsInLoadedRegion(loadedRegions, request.point.point))) {
+    return <RequestDetailsUnavailable />;
+  }
 
   return (
     <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-themeBodyBgcolor">
@@ -306,15 +307,9 @@ const RequestDetails = ({
         <div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}
-          {activeTab === "response" && (
-            <ResponseBody request={request} responseBodyParts={responseBody} />
-          )}
-          {activeTab === "request" && (
-            <RequestBody request={request} requestBodyParts={requestBody} />
-          )}
-          {activeTab === "stackTrace" && (
-            <StackTrace cx={cx} frames={frames} selectFrame={selectFrame} />
-          )}
+          {activeTab === "response" && <ResponseBody request={request} />}
+          {activeTab === "request" && <RequestBody request={request} />}
+          {activeTab === "stackTrace" && <StackTrace cx={cx} frames={frames} />}
           {activeTab === "timings" && <Timing request={request} />}
         </div>
       </div>

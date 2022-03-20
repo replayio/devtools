@@ -65,7 +65,7 @@ export const clearSelectedLocation = cx => ({
  * @static
  */
 export function selectSourceURL(cx, url, options) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const source = getSourceByURL(getState(), url);
     if (!source) {
       return dispatch(setPendingSelectedLocation(cx, url, options));
@@ -82,7 +82,7 @@ export function selectSourceURL(cx, url, options) {
  * @static
  */
 export function selectSource(cx, sourceId, options = {}) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location));
@@ -90,7 +90,7 @@ export function selectSource(cx, sourceId, options = {}) {
 }
 
 export function deselectSource() {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const cx = getThreadContext(getState());
     dispatch(clearSelectedLocation(cx));
   };
@@ -101,7 +101,7 @@ export function deselectSource() {
  * @static
  */
 export function selectLocation(cx, location, { keepContext = true } = {}) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
@@ -169,7 +169,7 @@ export function selectSpecificLocation(cx, location) {
 // refresh all the debugger's state, this will also open the alternate source.
 // Otherwise, we only open the alternate source in the editor.
 export function showAlternateSource(oldSourceId, newSourceId) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     if (ThreadFront.isSourceMappedSource(oldSourceId)) {
       ThreadFront.preferSource(newSourceId, true);
     } else {

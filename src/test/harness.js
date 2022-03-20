@@ -226,7 +226,7 @@ async function waitForLoadedScopes() {
 }
 
 function waitForSelectedSource(url) {
-  const { getSelectedSourceWithContent, hasSymbols, getBreakableLines } = dbgSelectors;
+  const { getSelectedSourceWithContent, getBreakableLines } = dbgSelectors;
 
   return waitUntil(
     () => {
@@ -532,11 +532,32 @@ async function toggleScopeNode(text) {
   return toggleObjectInspectorNode(node);
 }
 
-async function executeInConsole(value) {
+function writeInConsole(value) {
   window.jsterm.setValue(value);
-  await waitUntil(() => window.jsterm.editor.getValue() === value);
+  return waitUntil(() => window.jsterm.editor.getValue() === value);
+}
+
+async function executeInConsole(value) {
+  await writeInConsole(value);
   window.jsterm.execute();
   await new Promise(resolve => setTimeout(resolve, 1));
+}
+
+function getAutocompleteMatches() {
+  return [...document.querySelectorAll(".autocomplete-matches button")].map(btn => btn.innerText);
+}
+
+function checkAutocompleteMatches(expected) {
+  const expectedJSON = JSON.stringify([...expected].sort());
+  return waitUntil(
+    () => {
+      const actualJSON = JSON.stringify(getAutocompleteMatches().sort());
+      return actualJSON === expectedJSON;
+    },
+    {
+      waitingFor: `autocomplete matches to equal ${expectedJSON}`,
+    }
+  );
 }
 
 function waitForFrameTimeline(width) {
@@ -548,6 +569,7 @@ function waitForFrameTimeline(width) {
     { waitingFor: `timeline to be ${width} wide` }
   );
 }
+
 async function checkFrames(count) {
   return waitUntil(
     () => {
@@ -858,7 +880,9 @@ const testCommands = {
   toggleObjectInspectorNode,
   findScopeNode,
   toggleScopeNode,
+  writeInConsole,
   executeInConsole,
+  checkAutocompleteMatches,
   waitForFrameTimeline,
   checkFrames,
   selectFrame,

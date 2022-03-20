@@ -10,7 +10,7 @@ import zip from "lodash/zip";
 const { ThreadFront } = require("protocol/thread");
 
 export function setFramePositions() {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const frame = getSelectedFrame(getState());
     if (!frame) {
       return;

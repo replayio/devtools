@@ -7,7 +7,7 @@ import { getContext } from "../../selectors";
 
 //sets pause preview location for frame timeline scrubber
 export function setPreviewPausedLocation(location) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const cx = getContext(getState());
 
     dispatch(selectLocation(cx, location));

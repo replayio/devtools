@@ -126,6 +126,7 @@ import "ui/components/Views/NonDevView.css";
 import "ui/utils/sourcemapVisualizer.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import { useRouter } from "next/router";
+import { useLaunchDarkly } from "ui/utils/launchdarkly";
 
 interface AuthProps {
   apiKey?: string;
@@ -152,6 +153,8 @@ function AppUtilities({
 }
 function Routing({ Component, pageProps }: AppProps) {
   const [store, setStore] = useState<Store | null>(null);
+  const { getFeatureFlag } = useLaunchDarkly();
+
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));
   }, []);
@@ -162,7 +165,7 @@ function Routing({ Component, pageProps }: AppProps) {
     return null;
   }
 
-  if (maintenanceMode) {
+  if (getFeatureFlag("maintenance-mode")) {
     return <MaintenanceModeScreen />;
   }
 

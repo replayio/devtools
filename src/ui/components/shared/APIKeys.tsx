@@ -23,11 +23,11 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
     <>
       <div className="flex items-center justify-between space-x-3">
         <div className="w-0 flex-auto">
-          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-blue-100 px-2.5">
+          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-blue-50 px-2.5 text-primaryAccent">
             <input
               readOnly
               value={keyValue}
-              className="flex-auto truncate bg-blue-100 focus:outline-none"
+              className="flex-auto truncate bg-blue-50 focus:outline-none"
               onFocus={ev => ev.target.setSelectionRange(0, keyValue.length)}
             />
             {copied ? (
@@ -50,7 +50,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
           Done
         </button>
       </div>
-      <div className="flex items-center rounded-md border border-textFieldBorder bg-red-100 p-2.5">
+      <div className="flex items-center rounded-md border border-textFieldBorder bg-red-100 p-2.5 text-red-800">
         Make sure to copy your API key now. You won{"'"}t be able to see it again!
       </div>
     </>

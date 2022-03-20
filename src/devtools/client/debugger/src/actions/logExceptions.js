@@ -20,7 +20,7 @@ export function setupExceptions(store) {
  * @static
  */
 export function logExceptions(shouldLogExceptions) {
-  return ({ dispatch, getState, client }) => {
+  return (dispatch, getState, { client }) => {
     return dispatch({
       type: "LOG_EXCEPTIONS",
       shouldLogExceptions,

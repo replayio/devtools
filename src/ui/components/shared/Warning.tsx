@@ -9,8 +9,8 @@ export default function Warning({ children, link }: { children: React.ReactNode;
   }
 
   return (
-    <div className="flex flex-col bg-red-100 py-1 px-2 font-sans leading-tight text-red-700">
-      <div className="flex items-center space-x-1">
+    <div className="flex flex-col message error font-sans leading-tight">
+      <div className="flex items-center space-x-1 py-1">
         <MaterialIcon>error</MaterialIcon>
         <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
           {children}

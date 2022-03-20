@@ -187,15 +187,19 @@ class Message extends Component {
     let handleAddComment = async () => {
       trackEvent("console.add_comment");
       let userId = await getUserId();
+      const opts = {
+        position: null,
+        hasFrames: true,
+        sourceLocation: frame,
+      };
+
       dispatch(
         actions.createComment(
           executionPointTime,
           executionPoint,
-          null,
-          true,
-          frame,
           { ...this.props.auth0.user, id: userId },
-          getRecordingId(this.props.router.query.id)
+          getRecordingId(this.props.router.query.id),
+          opts
         )
       );
     };

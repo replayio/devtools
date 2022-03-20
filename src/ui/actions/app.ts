@@ -32,14 +32,20 @@ import {
   hideCommandPalette,
   setSelectedPanel,
   setSelectedPrimaryPanel,
+  setShowVideoPanel,
+  setToolboxLayout,
   setViewMode,
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { setFilterDrawer } from "devtools/client/webconsole/actions/ui";
 import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
+import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import { getShowVideoPanel } from "ui/reducers/layout";
+import { getIsInFocusMode } from "ui/reducers/timeline";
+import { toggleFocusMode } from "./timeline";
+import { features } from "ui/utils/prefs";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -79,7 +85,6 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
 export type SetVideoUrl = Action<"set_video_url"> & { videoUrl: string };
-export type SetVideoNode = Action<"set_video_node"> & { videoNode: HTMLVideoElement | null };
 export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId | null };
 export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
   tabTitle: SettingsTabTitle;
@@ -93,7 +98,6 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
   parameters: loadedRegions;
 };
-
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;
 };
@@ -117,7 +121,6 @@ export type AppActions =
   | SetCanvas
   | SetMouseTargetsLoading
   | SetVideoUrl
-  | SetVideoNode
   | SetWorkspaceId
   | SetDefaultSettingsTab
   | SetRecordingTargetAction
@@ -164,7 +167,7 @@ export function setupApp(store: UIStore) {
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {
       return;
@@ -315,12 +318,20 @@ export function setVideoUrl(videoUrl: string): SetVideoUrl {
   return { type: "set_video_url", videoUrl };
 }
 
-export function setVideoNode(videoNode: HTMLVideoElement | null): SetVideoNode {
-  return { type: "set_video_node", videoNode };
+export function setCanvasAction(canvas: Canvas): SetCanvas {
+  return { type: "set_canvas", canvas };
 }
 
-export function setCanvas(canvas: Canvas): SetCanvas {
-  return { type: "set_canvas", canvas };
+export function setCanvas(canvas: Canvas): UIThunkAction {
+  return (dispatch, getState) => {
+    const { canvas: existingCanvas } = getState().app;
+
+    // Skip dispatching if the new canvas value is identical to what's in the store.
+    // This improves perf slightly, especially since this was dispatching frequently.
+    if (!shallowEqual(existingCanvas, canvas)) {
+      dispatch(setCanvasAction(canvas));
+    }
+  };
 }
 
 export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId {
@@ -344,7 +355,7 @@ export function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading
 }
 
 export function loadMouseTargets(): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     dispatch(setMouseTargetsLoading(true));
     const resp = await ThreadFront.loadMouseTargets();
     dispatch(setMouseTargetsLoading(false));
@@ -355,7 +366,7 @@ export function loadMouseTargets(): UIThunkAction {
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {
-  return ({ dispatch }) => {
+  return (dispatch, getState) => {
     const recordingId = getRecordingId();
 
     if (key === "open_console") {
@@ -403,15 +414,29 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "show_console_filters") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("console"));
-      dispatch(setFilterDrawer(false));
     } else if (key === "show_events" || key === "show_replay_info") {
       dispatch(setSelectedPrimaryPanel("events"));
     } else if (key === "show_privacy") {
       dispatch(setModal("privacy"));
     } else if (key === "show_sharing") {
       dispatch(setModal("sharing", { recordingId }));
+    } else if (key === "toggle_edit_focus") {
+      dispatch(toggleFocusMode());
+    } else if (key === "toggle_video") {
+      const showVideoPanel = getShowVideoPanel(getState());
+      dispatch(setShowVideoPanel(!showVideoPanel));
+    } else if (key === "toggle_dark_mode") {
+      features.darkMode = !features.darkMode;
+    } else if (key === "pin_to_bottom") {
+      dispatch(setToolboxLayout("bottom"));
+    } else if (key === "pin_to_left") {
+      dispatch(setToolboxLayout("left"));
+    } else if (key === "pin_to_bottom_right") {
+      dispatch(setToolboxLayout("ide"));
     }
 
-    dispatch(hideCommandPalette());
+    {
+      dispatch(hideCommandPalette());
+    }
   };
 }

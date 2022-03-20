@@ -8,6 +8,7 @@ import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
 import TeamTrialEnd from "./TeamTrialEnd";
+import styles from "./Library.module.css";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -60,7 +61,9 @@ export default function Viewer({
     : recordings;
 
   return (
-    <div className="flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6">
+    <div
+      className={`flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
+    >
       <ViewerContent {...{ workspaceName, searchString }} recordings={filteredRecordings} />
     </div>
   );
@@ -86,8 +89,10 @@ function ViewerContent({
 
   const HeaderLeft = (
     <ViewerHeaderLeft>
-      <span>{workspaceName}</span>
-      <span>{recordings.length != 0 ? <>({recordings.length})</> : <></>}</span>
+      <span className={styles.workspaceName}>{workspaceName}</span>
+      <span className={styles.workspaceName}>
+        {recordings.length != 0 ? <>({recordings.length})</> : <></>}
+      </span>
     </ViewerHeaderLeft>
   );
 
@@ -103,8 +108,10 @@ function ViewerContent({
     return (
       <>
         <ViewerHeader>{HeaderLeft}</ViewerHeader>
-        <section className="grid flex-grow items-center justify-center bg-gray-100 text-sm">
-          <span className="text-gray-500">{errorText}</span>
+        <section
+          className={`grid flex-grow items-center justify-center text-sm ${styles.recordingsBackground}`}
+        >
+          <span>{errorText}</span>
         </section>
       </>
     );
@@ -131,7 +138,7 @@ function ViewerContent({
             </>
           ) : (
             <SecondaryButton
-              className="bg-white hover:bg-primaryAccentHover hover:text-white"
+              className={styles.editButton}
               color="blue"
               onClick={() => setIsEditing(true)}
             >
@@ -140,7 +147,9 @@ function ViewerContent({
           )}
         </div>
       </ViewerHeader>
-      <div className="recording-list flex flex-col overflow-y-auto rounded-md bg-white text-sm shadow-md">
+      <div
+        className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
+      >
         {sortedRecordings.map((r, i) => (
           <RecordingRow
             key={i}

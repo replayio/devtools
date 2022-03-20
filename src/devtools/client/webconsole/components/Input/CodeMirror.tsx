@@ -31,7 +31,11 @@ const CODEMIRROR_OPTIONS = {
   disableSearchAddon: true,
 } as const;
 
-const getJsTermApi = (editor: Editor, execute: () => void) => {
+const getJsTermApi = (
+  editor: Editor,
+  execute: () => void,
+  showAutocomplete?: (show: boolean) => void
+) => {
   return {
     editor,
     setValue: (newValue = "") => {
@@ -51,6 +55,7 @@ const getJsTermApi = (editor: Editor, execute: () => void) => {
       });
     },
     execute,
+    showAutocomplete,
   };
 };
 
@@ -66,14 +71,17 @@ const WrappedCodeMirror: FC<{
   onKeyPress: (e: KeyboardEvent) => void;
   setValue: (value: string) => void;
   onSelection: (obj: any) => void;
+  showAutocomplete?: (show: boolean) => void;
   execute: () => void;
-}> = ({ value, onKeyPress, setValue, onSelection, execute }) => {
+}> = ({ value, onKeyPress, setValue, onSelection, showAutocomplete, execute }) => {
   const onKeyPressRef = useRef(onKeyPress);
   onKeyPressRef.current = onKeyPress;
   const setValueRef = useRef(setValue);
   setValueRef.current = setValue;
   const onSelectionRef = useRef(onSelection);
   onSelectionRef.current = onSelection;
+  const showAutocompleteRef = useRef(showAutocomplete);
+  showAutocompleteRef.current = showAutocomplete;
   const executeRef = useRef(execute);
   executeRef.current = execute;
 
@@ -86,6 +94,7 @@ const WrappedCodeMirror: FC<{
   const _onSelection = (_: Editor, obj: any) => {
     onSelectionRef.current(obj);
   };
+  const _showAutocomplete = (show: boolean) => showAutocompleteRef.current?.(show);
   const _execute = () => executeRef.current();
 
   return (
@@ -93,7 +102,7 @@ const WrappedCodeMirror: FC<{
       options={CODEMIRROR_OPTIONS}
       value={value}
       editorDidMount={editor => {
-        window.jsterm = getJsTermApi(editor, _execute);
+        window.jsterm = getJsTermApi(editor, _execute, _showAutocomplete);
       }}
       onBeforeChange={_onBeforeChange}
       onKeyDown={_onKeyPress}

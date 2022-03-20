@@ -27,6 +27,7 @@ import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 import useAuth0 from "ui/utils/useAuth0";
+import { KeyModifiers } from "./KeyModifiers";
 
 const DevView = React.lazy(() => import("./Views/DevView"));
 
@@ -119,7 +120,7 @@ function _DevTools({
   }
 
   return (
-    <>
+    <KeyModifiers>
       <Header />
       {viewMode == "dev" ? (
         <React.Suspense fallback={<ViewLoader />}>
@@ -130,7 +131,7 @@ function _DevTools({
       )}
       {showCommandPalette ? <CommandPaletteModal /> : null}
       <KeyboardShortcuts />
-    </>
+    </KeyModifiers>
   );
 }
 

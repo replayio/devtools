@@ -5,12 +5,10 @@
 
 const { filters } = require("devtools/client/webconsole/reducers/filters");
 const { messages } = require("devtools/client/webconsole/reducers/messages");
-const { prefs } = require("devtools/client/webconsole/reducers/prefs");
 const { ui } = require("devtools/client/webconsole/reducers/ui");
 
 exports.reducers = {
   filters,
   messages,
-  prefs,
   consoleUI: ui,
 };

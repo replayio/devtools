@@ -1,16 +1,13 @@
-import { RequestBodyData } from "@recordreplay/protocol";
-import React, { useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
+import { getSelectedRequestBody } from "ui/reducers/network";
 import HttpBody from "./HttpBody";
-import { contentType, findHeader, RequestSummary } from "./utils";
+import { findHeader, RequestSummary } from "./utils";
 
-const RequestBody = ({
-  request,
-  requestBodyParts,
-}: {
-  request: RequestSummary | undefined;
-  requestBodyParts: RequestBodyData[] | undefined;
-}) => {
-  if (!request || !requestBodyParts) {
+const RequestBody = ({ request }: { request: RequestSummary | undefined }) => {
+  const requestBody = useSelector(getSelectedRequestBody);
+
+  if (!request || !requestBody) {
     return null;
   }
 
@@ -19,7 +16,7 @@ const RequestBody = ({
       <div className="flex items-center py-2 pl-4 font-bold">Request body:</div>
       <div className="pl-6">
         <HttpBody
-          bodyParts={requestBodyParts}
+          bodyParts={requestBody}
           contentType={findHeader(request.responseHeaders, "content-type") || "unknown"}
           filename={request.name}
         />

@@ -132,7 +132,7 @@
 
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
-  --modal-bgcolor: rgba(255, 255, 255, 0.95);
+  --modal-bgcolor: rgba(255, 255, 255, 0.8);
   --modal-border: none;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
@@ -325,6 +325,13 @@
   --replay-head-background: var(--purple-50);
 }
 
+/* browser specific tweaks */
+@-moz-document url-prefix() {
+  :root.theme-light {
+    --modal-bgcolor: rgba(255, 255, 255, 0.98);
+  }
+}
+
 /*
  * For doorhangers elsewhere in Firefox, Mac uses fixed colors rather than
  * system colors.
@@ -359,14 +366,14 @@
 
   /* Core classes (Dark) */
   --chrome: #1c1c1c; /* bg app */
-  --theme-body-color: var(--grey-40);
+  --theme-body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
-  --modal-bgcolor: rgba(0, 0, 0, 0.95);
+  --modal-bgcolor: rgba(0, 0, 0, 0.82);
   --modal-border: #222;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
-  --theme-body-bgcolor: var(--theme-base-95); /* bg text */
+  --theme-body-bgcolor: var(--theme-base-95);
   --theme-border: var(--theme-base-100);
   --icon-color: var(--theme-body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
@@ -550,6 +557,13 @@
   --replay-head-background: var(--purple-50);
 }
 
+/* browser specific tweaks */
+@-moz-document url-prefix() {
+  :root.theme-dark {
+    --modal-bgcolor: rgba(0, 0, 0, 0.98);
+  }
+}
+
 /* Z-index scale */
 
 /* Z-index values should always be defined in #app. This allows us to at a glance determine
@@ -589,4 +603,13 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-7--mask: var(--z-index-7);
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
+}
+
+@keyframes linearFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

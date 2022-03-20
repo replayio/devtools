@@ -4,17 +4,11 @@
 "use strict";
 
 import { FilterState } from "devtools/client/webconsole/reducers/filters";
-import { PrefState } from "devtools/client/webconsole/reducers/prefs";
 import { UiState } from "devtools/client/webconsole/reducers/ui";
 import { prefs } from "devtools/client/webconsole/utils/prefs";
 
 export function getConsoleInitialState() {
-  const groupWarnings = prefs.groupWarningMessages;
-
   return {
-    prefs: PrefState({
-      groupWarnings,
-    }),
     filters: FilterState({
       error: prefs.filterError,
       warn: prefs.filterWarn,
@@ -22,8 +16,6 @@ export function getConsoleInitialState() {
       debug: prefs.filterDebug,
       log: prefs.filterLog,
     }),
-    consoleUI: UiState({
-      timestampsVisible: prefs.timestampsVisible,
-    }),
+    consoleUI: UiState(),
   };
 }

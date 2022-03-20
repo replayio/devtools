@@ -51,7 +51,7 @@ import { trackEvent } from "ui/utils/telemetry";
 // See syncBreakpoint.js for more.
 
 export function enableBreakpoint(cx, initialBreakpoint) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || !breakpoint.disabled) {
       return;
@@ -75,7 +75,7 @@ export function addBreakpoint(
   shouldTrack = false,
   shouldCancel = () => false
 ) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const { sourceId, column, line } = initialLocation;
 
     dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
@@ -142,7 +142,7 @@ export function addBreakpoint(
 }
 
 export function runAnalysis(cx, initialLocation, options) {
-  return async ({ getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     if (!location) {
@@ -169,7 +169,7 @@ export function removeRequestedBreakpoint(location) {
 }
 
 export function _removeBreakpoint(cx, initialBreakpoint) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint) {
       return;
@@ -189,7 +189,7 @@ export function _removeBreakpoint(cx, initialBreakpoint) {
 }
 
 export function removeBreakpointAtGeneratedLocation(cx, target) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     // Remove any breakpoints matching the generated location.
     const breakpoints = getBreakpointsList(getState());
     for (const { location } of breakpoints) {
@@ -220,7 +220,7 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
 }
 
 export function disableBreakpoint(cx, initialBreakpoint) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || breakpoint.disabled) {
       return;
@@ -237,7 +237,7 @@ export function disableBreakpoint(cx, initialBreakpoint) {
 }
 
 export function removeBreakpointOption(cx, breakpoint, option) {
-  return async ({ dispatch, client }) => {
+  return async (dispatch, getState, { client }) => {
     const newOptions = { ...breakpoint.options };
     delete newOptions[option];
 
@@ -252,7 +252,7 @@ export function removeBreakpointOption(cx, breakpoint, option) {
 }
 
 export function setBreakpointOptions(cx, location, options = {}) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
       return dispatch(addBreakpoint(cx, location, options));

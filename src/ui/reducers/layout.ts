@@ -13,7 +13,7 @@ const syncInitialLayoutState: LayoutState = {
   selectedPrimaryPanel: "events",
   viewMode: "non-dev",
   showVideoPanel: true,
-  showEditor: true,
+  toolboxLayout: "ide",
   selectedPanel: "console",
 };
 
@@ -53,7 +53,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     };
   }
 
-  const { viewMode, showVideoPanel, showEditor, selectedPanel, consoleFilterDrawerExpanded } =
+  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel, consoleFilterDrawerExpanded } =
     syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
@@ -68,7 +68,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
-    showEditor: "showEditor" in session ? session.showEditor : showEditor,
+    toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
   };
 }
 
@@ -97,8 +97,8 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return { ...state, showVideoPanel: action.showVideoPanel };
     }
 
-    case "set_show_editor": {
-      return { ...state, showEditor: action.showEditor };
+    case "set_toolbox_layout": {
+      return { ...state, toolboxLayout: action.layout };
     }
 
     case "set_console_filter_drawer_expanded": {
@@ -120,4 +120,4 @@ export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selected
 export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 export const getViewMode = (state: UIState) => state.layout.viewMode;
 export const getShowVideoPanel = (state: UIState) => state.layout.showVideoPanel;
-export const getShowEditor = (state: UIState) => state.layout.showEditor;
+export const getToolboxLayout = (state: UIState) => state.layout.toolboxLayout;

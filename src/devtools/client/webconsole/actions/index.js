@@ -8,7 +8,8 @@ const actionModules = [
   require("devtools/client/webconsole/actions/filters"),
   require("devtools/client/webconsole/actions/input"),
   require("devtools/client/webconsole/actions/messages"),
-  require("devtools/client/webconsole/actions/ui"),
+  // This is now an RTK "slice" exporting its action creators
+  require("devtools/client/webconsole/reducers/ui"),
   require("devtools/client/webconsole/actions/toolbox"),
 ];
 

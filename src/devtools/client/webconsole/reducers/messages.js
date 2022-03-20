@@ -181,9 +181,6 @@ function messages(state = MessageState(), action) {
       });
       return newState;
 
-    case constants.MESSAGES_CLEAR:
-      return MessageState({});
-
     case constants.MESSAGE_OPEN:
       const openState = { ...state };
       openState.messagesUiById = [...messagesUiById, action.id];

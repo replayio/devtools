@@ -5,7 +5,7 @@
 import { isConsole } from "../utils/preview";
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
 import { createPrimitiveValueFront } from "protocol/thread";
-import { ValueItem, loadChildren } from "devtools/packages/devtools-reps";
+import { ValueItem } from "devtools/packages/devtools-reps";
 
 import {
   getPreview,
@@ -15,7 +15,7 @@ import {
 } from "../selectors";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const cursorPos = target.getBoundingClientRect();
 
     if (!isSelectedFrameVisible(getState())) {
@@ -38,7 +38,7 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
 }
 
 export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     dispatch({
       type: "START_PREVIEW",
       value: {
@@ -78,7 +78,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       path: expression,
       contents: result,
     });
-    const properties = await loadChildren(root);
+    const properties = await root.loadChildren();
 
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should
@@ -102,7 +102,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
 }
 
 export function clearPreview(cx, previewId) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     return dispatch({
       type: "CLEAR_PREVIEW",
       cx,

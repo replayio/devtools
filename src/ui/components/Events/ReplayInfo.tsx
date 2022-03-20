@@ -92,10 +92,12 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
 
 function WarningRow() {
   return (
-    <Row>
-      <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
-      <div>This replay is over two minutes, which can cause delays</div>
-    </Row>
+    <div className="group">
+      <Row>
+        <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+        <div>This replay is over two minutes, which can cause delays</div>
+      </Row>
+    </div>
   );
 }
 

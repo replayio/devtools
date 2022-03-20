@@ -1,9 +1,9 @@
-import { Action } from "redux";
+import { Action, ThunkAction } from "@reduxjs/toolkit";
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
 import CSSProperties from "../../css-properties";
 
-import { ThunkAction, ThunkExtraArgs } from "ui/utils/thunk";
+import { ThunkExtraArgs } from "ui/utils/thunk";
 import { InspectorState } from "../state";
 const { OutputParser } = require("devtools/client/shared/output-parser");
 
@@ -30,7 +30,7 @@ export type InspectorThunkAction<TReturn = void> = ThunkAction<
 >;
 
 export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const properties = await createComputedProperties(elementStyle);
     return dispatch({ type: "set_computed_properties", properties });
   };

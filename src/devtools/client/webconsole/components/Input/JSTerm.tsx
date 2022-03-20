@@ -9,7 +9,7 @@ import EagerEvalFooter from "./EagerEvalFooter";
 import useAutocomplete from "./useAutocomplete";
 import useEvaluationHistory from "./useEvaluationHistory";
 import { getIsInLoadedRegion } from "ui/reducers/timeline";
-import Spinner from "ui/components/shared/Spinner";
+import { isTest } from "ui/utils/environment";
 
 enum Keys {
   BACKSPACE = "Backspace",
@@ -77,6 +77,15 @@ export default function JSTerm() {
       setHideAutocomplete(true);
     }
   };
+  // for use in e2e tests
+  const showAutocomplete = isTest()
+    ? (show: boolean) => {
+        setHideAutocomplete(!show);
+        if (show) {
+          resetAutocompleteIndex();
+        }
+      }
+    : undefined;
   const onKeyPress = (e: KeyboardEvent) => {
     if (shouldShowAutocomplete) {
       onAutocompleteKeyPress(e);
@@ -139,6 +148,7 @@ export default function JSTerm() {
                 value={value}
                 onSelection={onSelection}
                 setValue={setValue}
+                showAutocomplete={showAutocomplete}
                 execute={execute}
               />
               {shouldShowAutocomplete ? (
