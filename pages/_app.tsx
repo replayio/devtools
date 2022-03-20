@@ -165,7 +165,7 @@ function Routing({ Component, pageProps }: AppProps) {
     return null;
   }
 
-  if (getFeatureFlag("maintenance-mode", false)) {
+  if (getFeatureFlag("maintenance-mode")) {
     return <MaintenanceModeScreen />;
   }
 

@@ -18,7 +18,6 @@ const { onConsoleOverflow } = require("ui/actions/session");
 
 const {
   MESSAGES_ADD,
-  MESSAGES_CLEAR,
   MESSAGES_CLEAR_LOGPOINT,
   MESSAGE_OPEN,
   MESSAGE_CLOSE,
@@ -66,7 +65,7 @@ function convertStack(stack, { frames }) {
 }
 
 function onConsoleMessage(msg) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const stacktrace = await convertStack(msg.stack, msg.data);
     const sourceId = stacktrace?.[0]?.sourceId;
 
@@ -130,7 +129,7 @@ function onConsoleMessage(msg) {
 }
 
 function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const packet = {
       errorMessage: "Loading...",
       sourceName: await ThreadFront.getSourceURL(sourceId),
@@ -150,7 +149,7 @@ function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) 
 }
 
 function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, pause, values) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const packet = {
       errorMessage: "",
       sourceName: await ThreadFront.getSourceURL(sourceId),
@@ -172,7 +171,7 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, p
 }
 
 function dispatchMessageAdd(packet) {
-  return ({ dispatch }) => {
+  return dispatch => {
     queuedMessages = queuedMessages.concat(packet);
     if (throttledDispatchPromise) {
       return throttledDispatchPromise;
@@ -193,7 +192,7 @@ function dispatchMessageAdd(packet) {
 }
 
 export function messagesAdd(packets, idGenerator = null) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     if (idGenerator == null) {
       idGenerator = defaultIdGenerator;
     }
@@ -205,12 +204,6 @@ export function messagesAdd(packets, idGenerator = null) {
       messages,
       filtersState,
     });
-  };
-}
-
-export function messagesClear() {
-  return {
-    type: MESSAGES_CLEAR,
   };
 }
 
@@ -238,7 +231,7 @@ export function messagesClearLogpoint(logpointId) {
 }
 
 export function messageOpen(id) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const filtersState = getAllFilters(getState());
     return dispatch({
       type: MESSAGE_OPEN,

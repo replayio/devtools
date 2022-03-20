@@ -15,7 +15,6 @@ export function bootstrapWorkers(panelWorkers) {
 
   parser.start(() => new Worker(new URL("../workers/parser/worker", import.meta.url)), "parser");
   search.start(() => new Worker(new URL("../workers/search/worker", import.meta.url)), "search");
-  return { ...panelWorkers, parser, search };
 }
 
 export function teardownWorkers() {

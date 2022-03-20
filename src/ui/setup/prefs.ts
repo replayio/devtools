@@ -6,11 +6,11 @@ import {
   getConsoleFilterDrawerExpanded,
   getSelectedPanel,
   getSelectedPrimaryPanel,
-  getShowEditor,
+  getToolboxLayout,
   getShowVideoPanel,
   getViewMode,
 } from "ui/reducers/layout";
-import { ViewMode } from "ui/state/layout";
+import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 
@@ -20,7 +20,7 @@ export interface ReplaySessions {
 export interface ReplaySession {
   viewMode: ViewMode;
   showVideoPanel: boolean;
-  showEditor: boolean;
+  toolboxLayout: ToolboxLayout;
 }
 
 export function registerStoreObserver(
@@ -122,7 +122,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
   const currentReplaySession = {
     viewMode: getViewMode(state),
     consoleFilterDrawerExpanded: getConsoleFilterDrawerExpanded(state),
-    showEditor: getShowEditor(state),
+    toolboxLayout: getToolboxLayout(state),
     showVideoPanel: getShowVideoPanel(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
     selectedPanel: getSelectedPanel(state),

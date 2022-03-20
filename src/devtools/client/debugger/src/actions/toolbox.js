@@ -9,19 +9,19 @@
  * @static
  */
 export function openLink(url) {
-  return ({ toolbox }) => {
-    toolbox.getPanel("debugger")?.openLink(url);
+  return () => {
+    window.gToolbox.getPanel("debugger")?.openLink(url);
   };
 }
 
 export function openElementInInspectorCommand(grip) {
-  return ({ toolbox }) => {
-    toolbox.getPanel("debugger")?.openElementInInspector(grip);
+  return () => {
+    window.gToolbox.getPanel("debugger")?.openElementInInspector(grip);
   };
 }
 
 export function openInspector(grip) {
-  return ({ toolbox }) => {
-    toolbox.getPanel("debugger")?.openInspector();
+  return () => {
+    window.gToolbox.getPanel("debugger")?.openInspector();
   };
 }

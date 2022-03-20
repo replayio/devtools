@@ -34,6 +34,15 @@ type SetFramesAction = {
   payload: { frames: any[]; point: string };
 };
 
+type ShowRequestDetailsAction = {
+  type: "SHOW_REQUEST_DETAILS";
+  requestId: RequestId;
+};
+
+type HideRequestDetailsAction = {
+  type: "HIDE_REQUEST_DETAILS";
+};
+
 type NetworkRequestsLoadedAction = { type: "NETWORK_REQUESTS_LOADED" };
 
 export type NetworkAction =
@@ -41,7 +50,9 @@ export type NetworkAction =
   | NewNetworkRequestsAction
   | NewRequestBodyPartsAction
   | NewResponseBodyPartsAction
-  | SetFramesAction;
+  | SetFramesAction
+  | ShowRequestDetailsAction
+  | HideRequestDetailsAction;
 
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData
@@ -73,7 +84,7 @@ export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
 });
 
 export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return ({ getState }) => {
+  return (dispatch, getState) => {
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
@@ -85,7 +96,7 @@ export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): 
   };
 }
 export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return ({ getState }) => {
+  return (dispatch, getState) => {
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
@@ -97,8 +108,8 @@ export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): U
   };
 }
 
-export function fetchFrames(tsPoint: TimeStampedPoint) {
-  return async ({ dispatch }: { dispatch: AppDispatch }) => {
+export function fetchFrames(tsPoint: TimeStampedPoint): UIThunkAction {
+  return async dispatch => {
     const pause = ThreadFront.ensurePause(tsPoint.point, tsPoint.time);
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
     const formattedFrames = await Promise.all(frames?.map((frame, i) => createFrame(frame, i)));
@@ -106,5 +117,18 @@ export function fetchFrames(tsPoint: TimeStampedPoint) {
       type: "SET_FRAMES",
       payload: { frames: formattedFrames, point: tsPoint.point },
     });
+  };
+}
+
+export function showRequestDetails(requestId: RequestId) {
+  return {
+    type: "SHOW_REQUEST_DETAILS",
+    requestId,
+  };
+}
+
+export function hideRequestDetails() {
+  return {
+    type: "HIDE_REQUEST_DETAILS",
   };
 }

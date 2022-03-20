@@ -369,7 +369,7 @@
   --theme-body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
-  --modal-bgcolor: rgba(0, 0, 0, 0.78);
+  --modal-bgcolor: rgba(0, 0, 0, 0.82);
   --modal-border: #222;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
@@ -560,7 +560,7 @@
 /* browser specific tweaks */
 @-moz-document url-prefix() {
   :root.theme-dark {
-    --modal-bgcolor: rgba(0, 0, 0, 0.35);
+    --modal-bgcolor: rgba(0, 0, 0, 0.98);
   }
 }
 
@@ -603,4 +603,13 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-7--mask: var(--z-index-7);
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
+}
+
+@keyframes linearFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

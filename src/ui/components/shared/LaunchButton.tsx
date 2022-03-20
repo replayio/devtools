@@ -11,7 +11,7 @@ function ShareButton({ setModal }: PropsFromRedux) {
     setModal("browser-launch");
   };
 
-  if (window.__IS_RECORD_REPLAY_RUNTIME__ || !features.launchBrowser) {
+  if (window.__IS_RECORD_REPLAY_RUNTIME__) {
     return null;
   }
 

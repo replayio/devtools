@@ -12,6 +12,7 @@ import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
+import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
@@ -40,9 +41,12 @@ function mostRecentIndex<T extends Timed>(array: T[], time: number): number | un
   const index = binarySearch(0, array.length, (index: number) => {
     return time - array[index].time;
   });
-  assert(array[index].time <= time);
+  assert(
+    array[index].time <= time,
+    "The most recent item should be at or preceding the given time"
+  );
   if (index + 1 < array.length) {
-    assert(array[index + 1].time >= time);
+    assert(array[index + 1].time >= time, "the most recent item's index should be in the array");
   }
   return index;
 }
@@ -203,7 +207,7 @@ class VideoPlayer {
     this.commands =
       this.commands &&
       this.commands.then(async () => {
-        const video = this.store?.getState().app.videoNode;
+        const video = getVideoNode();
         if (features.videoPlayback && video) {
           video.pause();
           video.currentTime = timeMs / 1000;
@@ -215,7 +219,7 @@ class VideoPlayer {
     this.commands =
       this.commands &&
       this.commands.then(() => {
-        const video = this.store?.getState().app.videoNode;
+        const video = getVideoNode();
         const currentTime = this.store?.getState().timeline.currentTime;
         if (features.videoPlayback && video) {
           video.currentTime = (currentTime || 0) / 1000;
@@ -628,7 +632,7 @@ const precacheTime = 5000;
 let precacheStartTime = -1;
 
 export function precacheScreenshots(startTime: number): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;

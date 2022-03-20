@@ -8,7 +8,7 @@ import { getSelectedFrame, getFrameScope } from "../../selectors";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 export function fetchScopes(cx) {
-  return async function ({ dispatch, getState, client }) {
+  return async function (dispatch, getState, { client }) {
     const frame = getSelectedFrame(getState());
     if (!frame || getFrameScope(getState(), frame.id)) {
       return;

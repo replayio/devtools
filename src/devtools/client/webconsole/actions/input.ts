@@ -4,11 +4,12 @@
 
 "use strict";
 
+import type { ThunkDispatch } from "redux-thunk";
 import { Pause } from "protocol/thread";
 import { UIAction, UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
-import { ThunkDispatch, ThunkExtraArgs } from "ui/utils/thunk";
+import { ThunkExtraArgs } from "ui/utils/thunk";
 
 const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
@@ -65,8 +66,8 @@ async function dispatchExpression(
 }
 
 export function paywallExpression(expression: string, reason = "team-user"): UIThunkAction {
-  return async ({ dispatch, toolbox }) => {
-    const pause = await getPause(toolbox);
+  return async dispatch => {
+    const pause = await getPause(window.gToolbox);
     const evalId = await dispatchExpression(dispatch, pause, expression);
 
     dispatch(
@@ -88,18 +89,16 @@ export function paywallExpression(expression: string, reason = "team-user"): UIT
 
 let nextEvalId = 1;
 export function evaluateExpression(expression: string): UIThunkAction {
-  return async ({ dispatch, toolbox }) => {
+  return async dispatch => {
     if (!expression) {
-      const inputSelection = window.jsterm?.editor.getSelection();
-      const inputValue = window.jsterm?._getValue();
-      expression = inputSelection || inputValue;
+      expression = window.jsterm?.editor.getSelection();
     }
     if (!expression) {
       return null;
     }
 
-    const { asyncIndex, frameId } = toolbox.getPanel("debugger")!.getFrameId();
-    const pause = await getPause(toolbox);
+    const { asyncIndex, frameId } = window.gToolbox.getPanel("debugger")!.getFrameId();
+    const pause = await getPause(window.gToolbox);
     const evalId = await dispatchExpression(dispatch, pause, expression);
     dispatch(
       messagesActions.messagesAdd([
@@ -138,12 +137,12 @@ export function evaluateExpression(expression: string): UIThunkAction {
 }
 
 export function eagerEvalExpression(expression: string): UIThunkAction {
-  return async ({ toolbox }) => {
+  return async () => {
     if (!expression) {
       return null;
     }
 
-    const { asyncIndex, frameId } = toolbox.getPanel("debugger")!.getFrameId();
+    const { asyncIndex, frameId } = window.gToolbox.getPanel("debugger")!.getFrameId();
 
     try {
       const response = await evaluateJSAsync(expression, {
@@ -204,7 +203,7 @@ async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptio
  *        The message received from the server.
  */
 function onExpressionEvaluated(response: EvaluationResponse): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     // If the evaluation was a top-level await expression that was rejected, there will
     // be an uncaught exception reported, so we don't need to do anything.
     if (response.topLevelAwaitRejected === true) {

@@ -18,6 +18,13 @@ export interface CommentPosition {
   y: number;
 }
 
+export type CommentOptions = {
+  position: CommentPosition | null;
+  hasFrames: boolean;
+  sourceLocation: SourceLocation | null;
+  networkRequestId?: string;
+};
+
 export interface Remark {
   content: string;
   createdAt: string;
@@ -33,6 +40,7 @@ export interface Remark {
 
 export interface Comment extends Remark {
   position: CommentPosition | null;
+  networkRequestId: string | null;
   primaryLabel?: string;
   replies: Reply[];
   secondaryLabel?: string;

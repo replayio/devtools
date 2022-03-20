@@ -87,7 +87,7 @@ export function SourcemapToggle({
   return (
     <div className="mapped-source flex items-center space-x-1 pl-3">
       <Toggle
-        enabled={selectedSource.isOriginal}
+        enabled={ThreadFront.isSourceMappedSource(selectedSource.id)}
         setEnabled={setEnabled}
         disabled={!alternateSourceId}
       />

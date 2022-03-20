@@ -60,7 +60,7 @@ export function moveTabBySourceId(sourceId, tabIndex) {
  * @static
  */
 export function closeTab(cx, source) {
-  return ({ dispatch, getState, client }) => {
+  return (dispatch, getState, { client }) => {
     removeDocument(source.id);
 
     const tabs = getSourceTabs(getState());
@@ -76,7 +76,7 @@ export function closeTab(cx, source) {
  * @static
  */
 export function closeTabs(cx, urls) {
-  return ({ dispatch, getState, client }) => {
+  return (dispatch, getState, { client }) => {
     const sources = urls.map(url => getSourceByURL(getState(), url)).filter(Boolean);
 
     const tabs = getSourceTabs(getState());

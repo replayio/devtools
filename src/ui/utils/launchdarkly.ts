@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { UserInfo } from "ui/hooks/users";
 import { isDevelopment } from "./environment";
 
+const DEFAULT_FLAGS = {
+  "maintenance-mode": false,
+} as const;
+
 let client: LDClient.LDClient;
 let resolveReady: (ready: boolean) => void;
 const readyPromise = new Promise<boolean>(resolve => {
@@ -27,12 +31,12 @@ function useLaunchDarkly() {
     readyPromise.then(r => setReady(r));
   }, [setReady]);
 
-  function getFeatureFlag(name: string, defaultValue: any) {
+  function getFeatureFlag<F extends keyof typeof DEFAULT_FLAGS>(name: F): typeof DEFAULT_FLAGS[F] {
     if (!ready) {
-      return defaultValue;
+      return DEFAULT_FLAGS[name];
     }
 
-    return client.variation(name, defaultValue);
+    return client.variation(name, DEFAULT_FLAGS[name]);
   }
 
   return { ready, getFeatureFlag };

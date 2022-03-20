@@ -14,6 +14,7 @@ import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/ge
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { getFocusRegion } from "./timeline";
+import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -22,6 +23,7 @@ export type NetworkState = {
   responseBodies: Record<string, ResponseBodyData[]>;
   requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
+  selectedRequestId: string | null;
 };
 
 const initialState = (): NetworkState => ({
@@ -31,6 +33,7 @@ const initialState = (): NetworkState => ({
   requests: [],
   responseBodies: {},
   requestBodies: {},
+  selectedRequestId: null,
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -82,6 +85,16 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
           [action.payload.point]: action.payload.frames,
         },
       };
+    case "SHOW_REQUEST_DETAILS":
+      return {
+        ...state,
+        selectedRequestId: action.requestId,
+      };
+    case "HIDE_REQUEST_DETAILS":
+      return {
+        ...state,
+        selectedRequestId: null,
+      };
     default:
       return state;
   }
@@ -115,5 +128,23 @@ export const getFormattedFrames = createSelector(getFrames, getSources, (frames,
 
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;
+export const getSelectedRequestId = (state: UIState) => state.network.selectedRequestId;
+export const getSummaryById = (state: UIState, id: string) => {
+  const summaries = partialRequestsToCompleteSummaries(
+    getRequests(state),
+    getEvents(state),
+    new Set()
+  );
+  return summaries.find(s => s.id === id);
+};
+
+export const getSelectedResponseBody = (state: UIState) => {
+  const requestId = getSelectedRequestId(state);
+  return requestId ? getResponseBodies(state)[requestId] : null;
+};
+export const getSelectedRequestBody = (state: UIState) => {
+  const requestId = getSelectedRequestId(state);
+  return requestId ? getRequestBodies(state)[requestId] : null;
+};
 
 export default update;

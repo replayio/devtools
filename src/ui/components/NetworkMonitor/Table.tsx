@@ -79,6 +79,8 @@ export default function Table({
   );
   const tableInstance = useTable<RequestSummary>(
     {
+      //@ts-ignore
+      autoResetGlobalFilter: false,
       columns: columns as any,
       data,
       defaultColumn,

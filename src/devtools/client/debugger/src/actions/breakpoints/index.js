@@ -45,7 +45,7 @@ export * from "./syncBreakpoint";
  * @static
  */
 export function disableBreakpointsInSource(cx, source) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       if (!breakpoint.disabled) {
@@ -62,7 +62,7 @@ export function disableBreakpointsInSource(cx, source) {
  * @static
  */
 export function enableBreakpointsInSource(cx, source) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     trackEvent("breakpoints.remove_all_in_source");
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
@@ -80,7 +80,7 @@ export function enableBreakpointsInSource(cx, source) {
  * @static
  */
 export function removeAllBreakpoints(cx) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     trackEvent("breakpoints.remove_all");
 
     const breakpointList = getBreakpointsList(getState());
@@ -96,13 +96,13 @@ export function removeAllBreakpoints(cx) {
  * @static
  */
 export function removeBreakpoints(cx, breakpoints) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     return Promise.all(breakpoints.map(bp => dispatch(_removeBreakpoint(cx, bp))));
   };
 }
 
 export function toggleBreakpointAtLine(cx, line) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedSource = getSelectedSource(state);
 
@@ -125,7 +125,7 @@ export function toggleBreakpointAtLine(cx, line) {
 }
 
 export function runAnalysisOnLine(line) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const cx = getThreadContext(state);
     const source = getSelectedSource(state);
@@ -147,7 +147,7 @@ export function runAnalysisOnLine(line) {
 }
 
 export function updateHoveredLineNumber(line) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const state = getState();
     const source = getSelectedSource(state);
 
@@ -176,7 +176,7 @@ export function updateHoveredLineNumber(line) {
 }
 
 export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = false, shouldPause) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const source = getSelectedSource(state);
 
@@ -204,7 +204,7 @@ export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = fal
 }
 
 export function addBreakpointAtColumn(cx, location) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const source = getSelectedSource(state);
     const { column, line } = location;

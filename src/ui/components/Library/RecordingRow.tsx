@@ -76,8 +76,13 @@ function RecordingRow({
 }: RecordingRowProps) {
   const { userId, loading } = hooks.useGetUserId();
   const isOwner = userId == recording.user?.id;
+  const allowSelecting = isEditing && isOwner;
 
   const toggleChecked = () => {
+    if (!allowSelecting) {
+      return;
+    }
+
     if (selected) {
       removeSelectedId(recording.id);
     } else {
@@ -95,7 +100,7 @@ function RecordingRow({
         className={`group flex cursor-pointer flex-row border-b border-themeBorder ${styles.libraryRow}`}
       >
         <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre py-3 px-4">
-          {isEditing && isOwner ? (
+          {allowSelecting ? (
             <input
               type="checkbox"
               onClick={e => e.stopPropagation()}

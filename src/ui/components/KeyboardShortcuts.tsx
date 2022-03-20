@@ -28,7 +28,7 @@ function KeyboardShortcuts({
   focusFullTextInput,
   setViewMode,
   selectedSource,
-  showEditor,
+  toolboxLayout,
   toggleCommandPalette,
   togglePaneCollapse,
   viewMode,
@@ -65,7 +65,7 @@ function KeyboardShortcuts({
     e.preventDefault();
     trackEvent("key_shortcut.show_command_palette");
 
-    if (viewMode === "dev" && !selectedSource && showEditor) {
+    if (viewMode === "dev" && !selectedSource && toolboxLayout === "ide") {
       // Show the command palette in the editor
       showCommandPaletteInEditor();
     } else {
@@ -100,7 +100,7 @@ const connector = connect(
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedSource: getSelectedSource(state),
     viewMode: selectors.getViewMode(state),
-    showEditor: selectors.getShowEditor(state),
+    toolboxLayout: selectors.getToolboxLayout(state),
   }),
   {
     focusFullTextInput: dbgActions.focusFullTextInput,
