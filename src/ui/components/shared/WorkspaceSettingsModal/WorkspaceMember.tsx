@@ -118,7 +118,7 @@ function Status({
 }) {
   return (
     <div
-      className={classnames("group flex flex-row items-center", { italic: member.pending })}
+      className={classnames("flex flex-row items-center", { italic: member.pending })}
       title={title}
     >
       <span className="whitespace-pre">
@@ -173,7 +173,7 @@ export function NonRegisteredWorkspaceMember({
         buttonContent={<Status member={member} />}
         setExpanded={setExpanded}
         expanded={expanded}
-        buttonStyle=""
+        buttonStyle="group"
         position="bottom-right"
       >
         <Dropdown>
@@ -245,7 +245,7 @@ function Role({
       buttonContent={<Status member={member} />}
       setExpanded={setExpanded}
       expanded={expanded}
-      buttonStyle=""
+      buttonStyle="group"
       position="bottom-right"
     >
       <Dropdown>
