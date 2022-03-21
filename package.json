@@ -117,7 +117,7 @@
     "@types/cookie": "^0.4.1",
     "@types/escape-html": "^1.0.1",
     "@types/fuzzaldrin-plus": "^0.6.2",
-    "@types/lodash": "^4.14.179",
+    "@types/lodash": "^4.14.180",
     "@types/logrocket-react": "^3.0.0",
     "@types/mixpanel-browser": "^2.35.6",
     "@types/react": "^16.9.55",
