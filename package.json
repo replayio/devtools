@@ -35,7 +35,7 @@
     "@redux-devtools/extension": "^3.2.2",
     "@reduxjs/toolkit": "^1.8.0",
     "@sentry/react": "^6.18.1",
-    "@sentry/tracing": "^6.18.1",
+    "@sentry/tracing": "^6.18.2",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",
     "@svgr/webpack": "^6.2.1",
