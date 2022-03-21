@@ -31,13 +31,36 @@ const updatePrefs = (filter: MessageFilters, active: boolean) => {
   prefs[prefKey] = active;
 };
 
-export const filterTextSet = filterTextUpdated;
+const filterStateUpdated = (): UIThunkAction => (dispatch, getState) => {
+  const newFiltersState = getAllFilters(getState());
+  // TODO This only exists to work around an issue with the messages reducer seeing stale state
+  // That was caused by moving calculation of toggled filter state into the reducer.
+  // I plan to refactor the messages reducer to make "filtered messages" a derived value,
+  // calculated by a Reselect selector. At that time this can go away.
+  dispatch({ type: "FILTER_STATE_UPDATED", filtersState: newFiltersState });
+};
+
+export const filterTextSet = (text: string): UIThunkAction => {
+  return (dispatch, getState) => {
+    dispatch(filterTextUpdated(text));
+
+    // Force a recalculation of updated messages
+    dispatch(filterStateUpdated());
+  };
+};
 
 export function filterToggle(filter: FilterBooleanFields): UIThunkAction {
   return (dispatch, getState) => {
-    dispatch(filterToggled(filter));
     const filtersState = getAllFilters(getState());
-    const newValue = filtersState[filter];
+    // Actually toggle the state
+    dispatch(filterToggled(filter));
+
+    // Force a recalculation of updated messages
+    dispatch(filterStateUpdated());
+
+    // Now update prefs
+    const newFiltersState = getAllFilters(getState());
+    const newValue = newFiltersState[filter];
 
     // Technically mismatching keys here - the UI does toggle `"nodemodules"`,
     // but we don't have that set up to persist right now
