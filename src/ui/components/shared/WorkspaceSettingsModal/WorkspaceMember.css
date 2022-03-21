@@ -25,8 +25,3 @@
   background-color: var(--grey-20);
   cursor: pointer;
 }
-
-/* Override common.css line 100 button pointer-events behavior so group-hover will work*/
-button > * {
-  pointer-events: auto;
-}
