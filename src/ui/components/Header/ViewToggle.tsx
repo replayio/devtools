@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import { UIState } from "ui/state";
-import { getViewMode, getToggleMode } from "ui/reducers/layout";
+import { getViewToggleMode } from "ui/reducers/layout";
 import { setViewMode } from "ui/actions/layout";
 import { ViewMode } from "ui/state/layout";
 
@@ -54,7 +54,7 @@ function ViewToggle({ toggleMode, setViewMode }: PropsFromRedux) {
 
 const connector = connect(
   (state: UIState) => ({
-    toggleMode: getToggleMode(state),
+    toggleMode: getViewToggleMode(state),
   }),
   {
     setViewMode,
