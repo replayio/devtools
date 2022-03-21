@@ -9,7 +9,6 @@ const actionTypes = {
   SET_TERMINAL_EAGER_RESULT: "SET_TERMINAL_EAGER_RESULT",
   FILTER_TEXT_SET: "FILTER_TEXT_SET",
   FILTER_TOGGLE: "FILTER_TOGGLE",
-  FILTERS_CLEAR: "FILTERS_CLEAR",
   MESSAGE_CLOSE: "MESSAGE_CLOSE",
   MESSAGE_OPEN: "MESSAGE_OPEN",
   MESSAGE_UPDATE_PAYLOAD: "MESSAGE_UPDATE_PAYLOAD",
@@ -29,7 +28,6 @@ const prefs = {
       DEBUG: "filter.debug",
       CSS: "filter.css",
       NET: "filter.net",
-      NETXHR: "filter.netxhr",
       NODEMODULES: "filter.nodemodules",
     },
     UI: {
@@ -55,7 +53,6 @@ const FILTERS = {
   INFO: "info",
   LOG: "log",
   NET: "net",
-  NETXHR: "netxhr",
   TEXT: "text",
   WARN: "warn",
   NODEMODULES: "nodemodules",
@@ -70,7 +67,6 @@ const DEFAULT_FILTERS_VALUES = {
   [FILTERS.DEBUG]: true,
   [FILTERS.CSS]: false,
   [FILTERS.NET]: false,
-  [FILTERS.NETXHR]: false,
   [FILTERS.NODEMODULES]: true,
 };
 

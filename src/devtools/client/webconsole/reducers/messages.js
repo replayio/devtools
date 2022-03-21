@@ -299,7 +299,6 @@ function messages(state = MessageState(), action) {
 
     case constants.FILTER_TOGGLE:
     case constants.FILTER_TEXT_SET:
-    case constants.FILTERS_CLEAR:
     case constants.DEFAULT_FILTERS_RESET:
       return setVisibleMessages({
         messagesState: state,
