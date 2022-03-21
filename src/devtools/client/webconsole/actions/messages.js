@@ -4,7 +4,7 @@
 
 "use strict";
 
-import { getAllFilters } from "../selectors/filters";
+import { getAllFilters } from "../reducers/filters";
 
 const {
   prepareMessage,

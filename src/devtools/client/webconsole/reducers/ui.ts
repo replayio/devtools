@@ -13,7 +13,7 @@ const initialState: WebconsoleUIState = {
 
 export const UiState = (overrides: Partial<WebconsoleUIState> = {}) => {
   return createNextState(initialState, draft => {
-    return Object.assign(draft, overrides);
+    Object.assign(draft, overrides);
   });
 };
 

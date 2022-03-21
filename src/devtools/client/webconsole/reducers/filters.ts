@@ -1,32 +1,54 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
+import { createSlice, createNextState, PayloadAction } from "@reduxjs/toolkit";
 
-const constants = require("devtools/client/webconsole/constants");
+import type { UIState } from "ui/state";
 
-const FilterState = overrides =>
-  Object.freeze(cloneState(constants.DEFAULT_FILTERS_VALUES, overrides));
+// @ts-ignore
+import constants from "devtools/client/webconsole/constants";
 
-function filters(state = FilterState(), action) {
-  switch (action.type) {
-    case constants.FILTER_TOGGLE:
-      const { filter } = action;
-      const active = !state[filter];
-      return cloneState(state, { [filter]: active });
-    case constants.FILTERS_CLEAR:
-      return FilterState();
-    case constants.FILTER_TEXT_SET:
-      const { text } = action;
-      return cloneState(state, { text });
-  }
-
-  return state;
+// Matches the fields in `DEFAULT_FILTERS_VALUES`
+export interface WebconsoleFiltersState {
+  text: string;
+  error: boolean;
+  warn: boolean;
+  log: boolean;
+  info: boolean;
+  debug: boolean;
+  css: boolean;
+  net: boolean;
+  nodemodules: boolean;
 }
 
-function cloneState(state, overrides) {
-  return Object.assign({}, state, overrides);
-}
+export type FilterBooleanFields = Exclude<keyof WebconsoleFiltersState, "text">;
 
-exports.FilterState = FilterState;
-exports.filters = filters;
+// Already defined in `constants.js`, and don't want to duplicate for now
+const initialFiltersState: WebconsoleFiltersState = constants.DEFAULT_FILTERS_VALUES;
+
+export const FilterState = (overrides: Partial<WebconsoleFiltersState> = {}) => {
+  return createNextState(initialFiltersState, draft => {
+    Object.assign(draft, overrides);
+  });
+};
+
+const filtersSlice = createSlice({
+  name: "filters",
+  initialState: initialFiltersState,
+  reducers: {
+    filterToggled(state, action: PayloadAction<FilterBooleanFields>) {
+      state[action.payload] = !state[action.payload];
+    },
+    filterTextUpdated(state, action: PayloadAction<string>) {
+      state.text = action.payload;
+    },
+  },
+});
+
+export const { filterTextUpdated, filterToggled } = filtersSlice.actions;
+
+export const filters = filtersSlice.reducer;
+
+export function getAllFilters(state: UIState) {
+  return state.filters;
+}

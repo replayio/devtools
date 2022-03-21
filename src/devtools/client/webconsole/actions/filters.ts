@@ -2,54 +2,45 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import type { UIThunkAction } from "ui/actions";
 
 import { prefs } from "../utils/prefs";
 
-const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
+import {
+  filterTextUpdated,
+  filterToggled,
+  getAllFilters,
+  FilterBooleanFields,
+} from "../reducers/filters";
 
-const {
-  FILTER_TEXT_SET,
-  FILTER_TOGGLE,
-  FILTERS_CLEAR,
-  PREFS,
-  FILTERS,
-} = require("devtools/client/webconsole/constants");
+type PrefsKeys = keyof typeof prefs;
 
-const updatePrefs = (filter, active) => {
-  const FILTER_PREF_MAP = {
-    error: "filterError",
-    warn: "filterWarn",
-    info: "filterInfo",
-    debug: "filterDebug",
-    log: "filterLog",
-  };
+type MessageFilters = "error" | "warn" | "info" | "debug" | "log";
+
+const FILTER_PREF_MAP: Record<MessageFilters, PrefsKeys> = {
+  error: "filterError",
+  warn: "filterWarn",
+  info: "filterInfo",
+  debug: "filterDebug",
+  log: "filterLog",
+};
+
+const updatePrefs = (filter: MessageFilters, active: boolean) => {
   const prefKey = FILTER_PREF_MAP[filter];
+  // TODO Centralize prefs updates instead of doing in a thunk
   prefs[prefKey] = active;
 };
 
-export function filterTextSet(text) {
-  return (dispatch, getState) => {
-    const filtersState = { ...getAllFilters(getState()), text };
-    return dispatch({
-      type: FILTER_TEXT_SET,
-      filtersState,
-      text,
-    });
-  };
-}
+export const filterTextSet = filterTextUpdated;
 
-export function filterToggle(filter) {
+export function filterToggle(filter: FilterBooleanFields): UIThunkAction {
   return (dispatch, getState) => {
-    const filters = getAllFilters(getState());
-    const newValue = !filters[filter];
-    const filtersState = { ...filters, [filter]: newValue };
+    dispatch(filterToggled(filter));
+    const filtersState = getAllFilters(getState());
+    const newValue = filtersState[filter];
 
-    dispatch({
-      type: FILTER_TOGGLE,
-      filtersState,
-      filter,
-    });
-    updatePrefs(filter, newValue);
+    // Technically mismatching keys here - the UI does toggle `"nodemodules"`,
+    // but we don't have that set up to persist right now
+    updatePrefs(filter as MessageFilters, newValue);
   };
 }
