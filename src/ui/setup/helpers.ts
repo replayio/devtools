@@ -12,12 +12,31 @@ declare global {
     prefs: typeof prefs;
     features: typeof features;
     dumpPrefs: () => string;
+    dumpBasicProcessing: () => void;
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
     triggerEvent: typeof triggerEvent;
     sendMessage: typeof sendMessage;
   }
+}
+
+function dumpBasicProcessing() {
+  const processing = window.sessionMetrics?.filter(
+    (data: any) => data.event === "RegionBasicProcessing"
+  );
+
+  if (!processing) {
+    return;
+  }
+
+  const firstStartTime = processing[0]?.params.timings.creationTimestamp;
+  const stats = processing.map((region: any) => ({
+    id: region.params.regionIdx,
+    startTime: region.params.timings.creationTimestamp - firstStartTime,
+    duration: region.params.timings.processingDuration,
+  }));
+  console.table(stats);
 }
 
 export function setupAppHelper(store: UIStore) {
@@ -30,6 +49,8 @@ export function setupAppHelper(store: UIStore) {
     triggerEvent,
     sendMessage: (cmd, args = {}, pauseId) =>
       sendMessage(cmd, args, window.sessionId, pauseId as any),
+
+    dumpBasicProcessing,
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {

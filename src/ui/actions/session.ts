@@ -147,10 +147,17 @@ export function createSession(recordingId: string): UIThunkAction {
 
       ThreadFront.setTest(getTest() || undefined);
 
+      type ExperimentalSettings = { listenForMetrics: boolean; disableCache?: boolean };
+      const experimentalSettings: ExperimentalSettings = {
+        listenForMetrics: !!window.app.prefs.listenForMetrics,
+        disableCache: !!window.app.prefs.disableCache,
+      };
+
       dispatch(showLoadingProgress());
 
       const { sessionId } = await sendMessage("Recording.createSession", {
         recordingId,
+        experimentalSettings,
       });
 
       window.sessionId = sessionId;

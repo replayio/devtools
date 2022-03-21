@@ -36,7 +36,7 @@ import {
   responseBodyData,
   requestBodyData,
 } from "@recordreplay/protocol";
-import { client, log } from "../socket";
+import { client, log, addEventListener } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
@@ -44,6 +44,11 @@ import { Pause } from "./pause";
 import uniqueId from "lodash/uniqueId";
 import { repaint } from "protocol/graphics";
 
+declare global {
+  interface Window {
+    sessionMetrics: any[] | undefined;
+  }
+}
 export interface RecordingDescription {
   duration: TimeStamp;
   length?: number;
@@ -228,6 +233,13 @@ class _ThreadFront {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
+    if (window.app.prefs.listenForMetrics) {
+      window.sessionMetrics = [];
+      addEventListener("Session.newMetric", ({ data }) => {
+        window.sessionMetrics?.push(data);
+      });
+    }
+
     log(`GotSessionId ${sessionId}`);
 
     const { buildId } = await client.Session.getBuildId({}, sessionId);
@@ -235,7 +247,7 @@ class _ThreadFront {
   }
 
   async initializeToolbox() {
-    const sessionId = await this.waitForSession();
+    await this.waitForSession();
 
     await this.initializedWaiter.promise;
     await this.ensureAllSources();
