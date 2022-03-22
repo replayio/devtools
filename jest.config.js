@@ -1,6 +1,12 @@
 module.exports = {
   collectCoverageFrom: ["**/*.{js,jsx,ts,tsx}", "!**/*.d.ts", "!**/node_modules/**"],
   moduleNameMapper: {
+    "devtools/(.*)": "<rootDir>/src/devtools/$1",
+    "highlighter/(.*)": "<rootDir>/src/highlighter/$1",
+    "protocol/(.*)": "<rootDir>/src/protocol/$1",
+    "shims/(.*)": "<rootDir>/src/shims/$1",
+    "toolkit/(.*)": "<rootDir>/src/toolkit/$1",
+    "test/(.*)": "<rootDir>/src/test/$1",
     "ui/(.*)": "<rootDir>/src/ui/$1",
 
     // Handle CSS imports (with CSS modules)
@@ -31,7 +37,17 @@ module.exports = {
   transform: {
     // Use babel-jest to transpile tests with the next/babel preset
     // https://jestjs.io/docs/configuration#transform-objectstring-pathtotransformer--pathtotransformer-object
-    "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["next/babel"] }],
+    "^.+\\.(js|jsx|ts|tsx)$": [
+      "babel-jest",
+      {
+        presets: ["next/babel"],
+        plugins: ["babel-plugin-transform-import-meta"],
+      },
+    ],
+
+    // Handle text file imports
+    "^.+\\.properties$": "<rootDir>/test/jest/jest-text-transformer.js",
   },
   transformIgnorePatterns: ["/node_modules/", "^.+\\.module\\.(css|sass|scss)$"],
+  setupFilesAfterEnv: ["<rootDir>/test/jest/setupEnv.js"],
 };
