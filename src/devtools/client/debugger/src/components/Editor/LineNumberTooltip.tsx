@@ -81,10 +81,10 @@ export default function LineNumberTooltip({
 
   const setHoveredLineNumber = ({
     lineNumber,
-    lineNode,
+    lineNumberNode,
   }: {
     lineNumber: number;
-    lineNode: HTMLElement;
+    lineNumberNode: HTMLElement;
   }) => {
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
@@ -100,7 +100,7 @@ export default function LineNumberTooltip({
     }
 
     dispatch(updateHoveredLineNumber(lineNumber));
-    setTargetNode(lineNode);
+    setTargetNode(lineNumberNode);
   };
   const clearHoveredLineNumber = () => {
     setTargetNode(null);

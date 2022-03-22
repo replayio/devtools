@@ -27,6 +27,8 @@ function isValidTarget(target) {
   return isHoveredOnLine(target) && !isNonBreakableLineNode && !isTooltip;
 }
 
+let _LAST_LINE_NUMBER = null;
+
 function emitLineMouseEnter(codeMirror, target) {
   trackEventOnce("editor.mouse_over");
 
@@ -35,17 +37,23 @@ function emitLineMouseEnter(codeMirror, target) {
 
   const lineNumberNode = getLineNumberNode(row);
   const lineNumber = safeJsonParse(lineNumberNode.textContent);
+  _LAST_LINE_NUMBER = lineNumber;
 
-  target.addEventListener(
+  lineNode.addEventListener(
     "mouseleave",
-    event => dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode }),
+    event => {
+      console.log({lineNumber, _LAST_LINE_NUMBER});
+      if (lineNumber !== _LAST_LINE_NUMBER || !lineNumberNode.matches(":hover")) {
+        dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode, lineNumberNode })
+      }
+    },
     {
       capture: true,
       once: true,
     }
   );
 
-  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode });
+  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode, lineNumberNode });
 }
 
 export function onLineMouseOver(codeMirror) {

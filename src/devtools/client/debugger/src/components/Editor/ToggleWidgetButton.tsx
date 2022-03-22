@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode } from "react";
+import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, useRef } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -21,6 +21,9 @@ import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { PointDescription } from "@recordreplay/protocol";
 import { seek } from "ui/actions/timeline";
+
+const GUTTER_HEIGHT = 15;
+const BUTTON_HEIGHT = 18;
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
 const {
@@ -101,7 +104,6 @@ function QuickActions({
   const executionPoint = useSelector(getExecutionPoint);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
-  const { height } = targetNode.getBoundingClientRect();
 
   const onAddLogpoint = () => {
     dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
@@ -137,10 +139,12 @@ function QuickActions({
     button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
   }
 
+  const { top, right } = targetNode.getBoundingClientRect();
+
   return (
     <div
-      className="absolute z-50 flex flex-row space-x-px transform -translate-y-1/2"
-      style={{ top: `${(1 / 2) * height}px` }}
+      className="absolute z-50"
+      style={{ top: top + (GUTTER_HEIGHT - BUTTON_HEIGHT) / 2, left: right }}
     >
       {button}
     </div>
@@ -152,12 +156,32 @@ type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
 function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
+  const timeoutKey = useRef<NodeJS.Timeout | null>(null);
+  const actionNode = useRef<HTMLDivElement | null>(null);
 
-  const onLineEnter = ({ lineNode, lineNumber }: { lineNode: HTMLElement; lineNumber: number }) => {
+  const onLineEnter = ({
+    lineNumberNode,
+    lineNumber,
+  }: {
+    lineNumberNode: HTMLElement;
+    lineNumber: number;
+  }) => {
+    if (timeoutKey.current) {
+      clearTimeout(timeoutKey.current);
+    }
+
     setHoveredLineNumber(lineNumber);
-    setTargetNode(lineNode);
+    setTargetNode(lineNumberNode);
+    // timeoutKey.current = setInterval(() => {
+    //   if (timeoutKey.current && !targetNode?.matches(":hover")) {
+    //     clearInterval(timeoutKey.current);
+    //     setTargetNode(null);
+    //     setHoveredLineNumber(null);
+    //   }
+    // }, 1000);
   };
   const onLineLeave = () => {
+    console.log("leave");
     setTargetNode(null);
     setHoveredLineNumber(null);
   };
@@ -182,17 +206,19 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   return ReactDOM.createPortal(
     <KeyModifiersContext.Consumer>
       {keyModifiers => (
-        <QuickActions
-          hoveredLineNumber={hoveredLineNumber}
-          onMouseDown={onMouseDown}
-          targetNode={targetNode}
-          breakpoint={bp}
-          cx={cx}
-          keyModifiers={keyModifiers}
-        />
+        <div ref={actionNode}>
+          <QuickActions
+            hoveredLineNumber={hoveredLineNumber}
+            onMouseDown={onMouseDown}
+            targetNode={targetNode}
+            breakpoint={bp}
+            cx={cx}
+            keyModifiers={keyModifiers}
+          />
+        </div>
       )}
     </KeyModifiersContext.Consumer>,
-    targetNode
+    document.body
   );
 }
 
