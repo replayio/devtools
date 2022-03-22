@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { Editor } from "codemirror";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "../../utils/autocomplete";
@@ -30,6 +31,34 @@ const DISMISS_KEYS = [
   Keys.ARROW_RIGHT,
   Keys.ARROW_LEFT,
 ];
+
+const getJsTermApi = (
+  editor: Editor,
+  execute: () => void,
+  showAutocomplete?: (show: boolean) => void
+) => {
+  return {
+    editor,
+    setValue: (newValue = "") => {
+      // In order to get the autocomplete popup to work properly, we need to set the
+      // editor text and the cursor in the same operation. If we don't, the text change
+      // is done before the cursor is moved, and the autocompletion call to the server
+      // sends an erroneous query.
+      editor.operation(() => {
+        editor.setValue(newValue);
+
+        // Set the cursor at the end of the input.
+        const lines = newValue.split("\n");
+        editor.setCursor({
+          line: lines.length - 1,
+          ch: lines[lines.length - 1].length,
+        });
+      });
+    },
+    execute,
+    showAutocomplete,
+  };
+};
 
 export default function JSTerm() {
   const dispatch = useDispatch();
@@ -78,7 +107,7 @@ export default function JSTerm() {
     }
   };
   // for use in e2e tests
-  const showAutocomplete = isTest()
+  const _showAutocomplete = isTest()
     ? (show: boolean) => {
         setHideAutocomplete(!show);
         if (show) {
@@ -148,8 +177,9 @@ export default function JSTerm() {
                 value={value}
                 onSelection={onSelection}
                 setValue={setValue}
-                showAutocomplete={showAutocomplete}
-                execute={execute}
+                onEditorMount={(editor: Editor) =>
+                  (window.jsterm = getJsTermApi(editor, execute, _showAutocomplete))
+                }
               />
               {shouldShowAutocomplete ? (
                 <div
