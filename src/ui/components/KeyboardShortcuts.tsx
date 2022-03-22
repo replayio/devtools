@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import { usesWindow } from "ssr";
+import { usesWindow } from "../../ssr";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
