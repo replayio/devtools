@@ -11,12 +11,14 @@ import { subscriptionExpired } from "ui/utils/workspace";
 type RecordingOptionsDropdownProps = PropsFromRedux & {
   onMoveRecording: (targetWorkspaceId: WorkspaceId | null) => void;
   workspaces: Workspace[];
+  disableLibrary: boolean;
 };
 
 function MoveRecordingMenu({
   currentWorkspaceId,
   onMoveRecording,
   workspaces,
+  disableLibrary,
 }: RecordingOptionsDropdownProps) {
   const { workspace, loading } = hooks.useGetWorkspace(currentWorkspaceId || "");
 
@@ -35,7 +37,7 @@ function MoveRecordingMenu({
       <div className="px-4 py-2 text-xs font-bold uppercase">Move to:</div>
       <DropdownDivider />
       <div className="max-h-48 overflow-y-auto">
-        {currentWorkspaceId !== null ? (
+        {!(currentWorkspaceId === null || disableLibrary) ? (
           <DropdownItem onClick={() => onMoveRecording(null)}>Your library</DropdownItem>
         ) : null}
         {availableWorkspaces.map(({ id, name }) => (

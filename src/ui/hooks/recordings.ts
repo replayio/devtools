@@ -47,6 +47,7 @@ const GET_WORKSPACE_RECORDINGS = gql`
                 }
               }
               workspace {
+                id
                 hasPaymentMethod
                 subscription {
                   status
