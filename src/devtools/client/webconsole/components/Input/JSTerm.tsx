@@ -83,7 +83,7 @@ export default function JSTerm() {
     <div>
       <div className="relative">
         <div
-          className="jsterm-input-container"
+          className="jsterm-input-container pl-7"
           key="jsterm-container"
           aria-live="off"
           tabIndex={-1}

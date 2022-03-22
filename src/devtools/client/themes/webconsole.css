@@ -431,12 +431,15 @@ html #webconsole-notificationbox {
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
-  height: var(--editor-footer-height);
   position: relative;
   background-color: var(--theme-console-input-bgcolor);
 }
 
-.jsterm-input-container::before {
+.webconsole-app .jsterm-input-container {
+  height: var(--editor-footer-height);
+}
+
+.webconsole-app .jsterm-input-container::before {
   content: " ";
   height: 12px;
   width: 12px;

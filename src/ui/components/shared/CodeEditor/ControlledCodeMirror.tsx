@@ -67,6 +67,7 @@ const ControlledCodeMirror: FC<{
 
   return (
     <CodeMirror
+      className="w-full"
       options={CODEMIRROR_OPTIONS}
       value={value}
       editorDidMount={_onEditorMount}
