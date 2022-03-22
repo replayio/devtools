@@ -1,6 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { Editor } from "codemirror";
-import { usesWindow } from "ssr";
+import { usesWindow } from "../../ssr";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
