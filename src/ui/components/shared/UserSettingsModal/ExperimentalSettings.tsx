@@ -81,13 +81,19 @@ function useGetShowSecretSettings() {
   });
 
   function onKeyDown(e: KeyboardEvent) {
-    if (e.key !== "Shift") {
-      return setShiftCount(0);
-    } else if (shiftCount !== 8) {
-      return setShiftCount(shiftCount + 1);
+    if (showSecretSettings) {
+      return;
     }
 
-    setShowSecretSettings(!showSecretSettings);
+    if (e.key !== "Shift") {
+      return setShiftCount(0);
+    }
+
+    if (shiftCount == 9) {
+      return setShowSecretSettings(true);
+    }
+
+    setShiftCount(shiftCount + 1);
   }
 
   return showSecretSettings;
