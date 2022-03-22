@@ -297,10 +297,8 @@ function messages(state = MessageState(), action) {
         messagesPayloadById: new Map(messagesPayloadById).set(action.id, action.data),
       };
 
-    case constants.FILTER_TOGGLE:
-    case constants.FILTER_TEXT_SET:
-    case constants.FILTERS_CLEAR:
-    case constants.DEFAULT_FILTERS_RESET:
+    // TODO Remove this action entirely when the filtered messages is turned into a selector
+    case "FILTER_STATE_UPDATED":
       return setVisibleMessages({
         messagesState: state,
         filtersState,

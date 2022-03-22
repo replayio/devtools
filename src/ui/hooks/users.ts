@@ -4,6 +4,8 @@ import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
 import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
+import { Recording, Workspace } from "ui/types";
+import { useGetNonPendingWorkspaces } from "./workspaces";
 
 export async function getUserId() {
   const result = await query({
@@ -207,4 +209,45 @@ export function useAcceptTOS() {
   );
 
   return acceptTOS;
+}
+
+export function isPrivilegedUser(recording: Recording, userId: string, workspaces: Workspace[]) {
+  const sameTeam =
+    recording.workspace?.id && workspaces.find(w => w.id === recording.workspace?.id);
+  const isOwner = userId == recording.user?.id;
+  const isPrivilegedUser = isOwner || sameTeam;
+
+  return isPrivilegedUser;
+}
+
+export function useGetUserPermissions(recording: Recording) {
+  const { userId, loading: userIdLoading } = useGetUserId();
+  const { workspaces, loading: workspacesLoading } = useGetNonPendingWorkspaces();
+
+  if (userIdLoading || workspacesLoading) {
+    return {
+      loading: true,
+      permissions: {
+        move: false,
+        moveToLibrary: false,
+        privacy: false,
+        rename: false,
+        delete: false,
+      },
+    };
+  }
+
+  const isOwner = userId == recording.user?.id;
+  const isPrivileged = isPrivilegedUser(recording, userId, workspaces);
+
+  return {
+    loading: false,
+    permissions: {
+      move: isPrivileged,
+      moveToLibrary: isOwner,
+      privacy: isPrivileged,
+      rename: isPrivileged,
+      delete: isPrivileged,
+    },
+  };
 }

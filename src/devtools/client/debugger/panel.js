@@ -118,8 +118,8 @@ export class DebuggerPanel {
     const cx = this._selectors.getContext(this._getState());
     const location = { sourceId, line, column };
 
-    this._actions.showSource(cx, sourceId);
-    await this._actions.selectSource(cx, sourceId, location);
+    this._actions.showSource(cx, sourceId, /* openSourcesTab */ false);
+    await this._actions.selectSource(cx, sourceId, location, /* openSourcesTab */ false);
   }
 
   getSourceByActorId(sourceId) {

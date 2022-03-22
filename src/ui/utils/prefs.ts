@@ -13,6 +13,8 @@ pref("devtools.maxHitsEditable", 200);
 pref("devtools.logTelemetryEvent", false);
 pref("devtools.showRedactions", false);
 pref("devtools.disableLogRocket", false);
+pref("devtools.listenForMetrics", false);
+pref("devtools.disableCache", false);
 pref("devtools.sidePanelSize", "240px");
 
 // app features
@@ -34,6 +36,8 @@ export const prefs = new PrefsHelper("devtools", {
   showRedactions: ["Bool", "showRedactions"],
   disableLogRocket: ["Bool", "disableLogRocket"],
   sidePanelSize: ["String", "sidePanelSize"],
+  listenForMetrics: ["Bool", "listenForMetrics"],
+  disableCache: ["Bool", "disableCache"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

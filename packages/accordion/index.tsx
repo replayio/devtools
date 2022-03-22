@@ -135,9 +135,9 @@ export const Accordion: FC<{
 }> = ({ children }) => {
   const initialExpandedState = Children.map(
     children,
-    c => (c.props as unknown as AccordionItem).expanded ?? false
+    c => (c as unknown as AccordionItem).expanded ?? false
   );
-  const [state, dispatch] = useReducer(reducer, getInitialState(initialExpandedState));
+  const [state, dispatch] = useReducer(reducer, getInitialState(initialExpandedState as boolean[]));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -174,20 +174,23 @@ export const Accordion: FC<{
     resizeObserver.observe(containerRef.current!);
   }, []);
 
-  const newChildren = React.Children.map(children, (child, index) => {
-    const childProps = {
-      index,
-      dispatch,
-      _expanded: !getIsCollapsed(state, index),
-      toggleCollapsed: () => toggleCollapsed(index),
-      height: getHeight(state, index),
-      isResizable: getIsIndexResizable(state, index),
-      onResizeStart: (e: React.MouseEvent) => onResizeStart(e, index),
-      isBeingResized: isResizing && resizingParams?.initialIndex === index,
-    };
+  const newChildren = React.Children.map(
+    children as ReactElement<typeof AccordionPane>[],
+    (child, index) => {
+      const childProps = {
+        index,
+        dispatch,
+        _expanded: !getIsCollapsed(state, index),
+        toggleCollapsed: () => toggleCollapsed(index),
+        height: getHeight(state, index),
+        isResizable: getIsIndexResizable(state, index),
+        onResizeStart: (e: React.MouseEvent) => onResizeStart(e, index),
+        isBeingResized: isResizing && resizingParams?.initialIndex === index,
+      };
 
-    return React.cloneElement(child, childProps);
-  });
+      return React.cloneElement(child, childProps);
+    }
+  );
 
   return (
     <div className="relative flex h-full flex-col overflow-auto" ref={containerRef}>

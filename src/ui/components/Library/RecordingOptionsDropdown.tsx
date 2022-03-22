@@ -1,47 +1,34 @@
 import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import { UIState } from "ui/state";
+import { useDispatch, useSelector } from "react-redux";
 import { Recording } from "ui/types";
 import MaterialIcon from "../shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
-import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
+import { Dropdown, DropdownItem } from "./LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";
 import classNames from "classnames";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../shared/Confirm";
-import { isPublicDisabled } from "ui/utils/org";
+import { useIsPublicEnabled } from "ui/utils/org";
+import { getWorkspaceId } from "ui/reducers/app";
+import { setModal } from "ui/actions/app";
+import { useGetUserPermissions } from "ui/hooks/users";
 
-type RecordingOptionsDropdownProps = PropsFromRedux & {
-  recording: Recording;
-};
-
-function RecordingOptionsDropdown({
-  currentWorkspaceId,
+function DeleteOption({
+  onOptionClick,
   recording,
-  setModal,
-}: RecordingOptionsDropdownProps) {
-  const [isPrivate, setIsPrivate] = useState(recording.private);
-  const [expanded, setExpanded] = useState(false);
-  const deleteRecording = hooks.useDeleteRecordingFromLibrary();
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
-  const updateRecordingTitle = hooks.useUpdateRecordingTitle();
-  const updateIsPrivate = hooks.useUpdateIsPrivate();
-  const recordingId = recording.id;
+}: {
+  onOptionClick: () => void;
+  recording: Recording;
+}) {
+  const currentWorkspaceId = useSelector(getWorkspaceId);
   const { confirmDestructive } = useConfirm();
+  const deleteRecording = hooks.useDeleteRecordingFromLibrary();
 
-  const toggleIsPrivate = () => {
-    setIsPrivate(!isPrivate);
-    updateIsPrivate(recording.id, !isPrivate);
-    setExpanded(false);
-  };
   const onDeleteRecording = (recordingId: RecordingId) => {
-    setExpanded(false);
-    
+    onOptionClick();
+
     confirmDestructive({
       message: "Delete replay?",
       description:
@@ -53,18 +40,110 @@ function RecordingOptionsDropdown({
       }
     });
   };
+
+  return <DropdownItem onClick={() => onDeleteRecording(recording.id)}>Delete</DropdownItem>;
+}
+function RenameOption({
+  onOptionClick,
+  recording,
+}: {
+  onOptionClick: () => void;
+  recording: Recording;
+}) {
+  const dispatch = useDispatch();
+  const isPublicEnabled = useIsPublicEnabled();
+
+  if (!isPublicEnabled) {
+    return null;
+  }
+
   const onRename = () => {
-    setModal("rename-replay", { recordingId: recording.id, title: recording.title || "" });
-    setExpanded(false);
+    const modalOptions = { recordingId: recording.id, title: recording.title || "" };
+    dispatch(setModal("rename-replay", modalOptions));
+    onOptionClick();
   };
-  const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
-    updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId);
-    setExpanded(false);
+
+  return <DropdownItem onClick={() => onRename()}>Rename</DropdownItem>;
+}
+function TogglePrivacyOption({
+  onOptionClick,
+  recording,
+}: {
+  onOptionClick: () => void;
+  recording: Recording;
+}) {
+  const [isPrivate, setIsPrivate] = useState(recording.private);
+  const isPublicEnabled = useIsPublicEnabled();
+  const updateIsPrivate = hooks.useUpdateIsPrivate();
+
+  const toggleIsPrivate = () => {
+    setIsPrivate(!isPrivate);
+    updateIsPrivate(recording.id, !isPrivate);
+    onOptionClick();
   };
+
+  if (!isPublicEnabled) {
+    return null;
+  }
+
+  return (
+    <DropdownItem onClick={toggleIsPrivate}>{`Make ${
+      isPrivate ? "public" : "private"
+    }`}</DropdownItem>
+  );
+}
+function ShareOption({
+  onOptionClick,
+  recording,
+}: {
+  onOptionClick: () => void;
+  recording: Recording;
+}) {
+  const dispatch = useDispatch();
   const handleShareClick = () => {
-    setModal("sharing", { recordingId });
-    setExpanded(false);
+    dispatch(setModal("sharing", { recordingId: recording.id }));
+    onOptionClick();
   };
+
+  return <DropdownItem onClick={handleShareClick}>Share</DropdownItem>;
+}
+function MoveRecordingOption({
+  onOptionClick,
+  recording,
+}: {
+  onOptionClick: () => void;
+  recording: Recording;
+}) {
+  const { permissions } = useGetUserPermissions(recording);
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
+  const currentWorkspaceId = useSelector(getWorkspaceId);
+
+  const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
+    updateRecordingWorkspace(recording.id, currentWorkspaceId, targetWorkspaceId);
+    onOptionClick();
+  };
+
+  if (loading) {
+    return null;
+  }
+
+  return (
+    <MoveRecordingMenu
+      workspaces={workspaces}
+      onMoveRecording={updateRecording}
+      disableLibrary={!permissions.moveToLibrary}
+    />
+  );
+}
+
+export default function RecordingOptionsDropdown({ recording }: { recording: Recording }) {
+  const [expanded, setExpanded] = useState(false);
+  const { loading, permissions } = useGetUserPermissions(recording);
+
+  if (loading) {
+    return null;
+  }
 
   const button = (
     <MaterialIcon
@@ -77,6 +156,7 @@ function RecordingOptionsDropdown({
       more_vert
     </MaterialIcon>
   );
+  const onOptionClick = () => setExpanded(false);
 
   return (
     <PortalDropdown
@@ -87,29 +167,16 @@ function RecordingOptionsDropdown({
       distance={0}
     >
       <Dropdown>
-        {isPublicDisabled(workspaces, currentWorkspaceId) ? null : (
-          <DropdownItem onClick={() => onRename()}>Rename</DropdownItem>
+        {permissions.rename && <RenameOption onOptionClick={onOptionClick} recording={recording} />}
+        {permissions.delete && <DeleteOption onOptionClick={onOptionClick} recording={recording} />}
+        {permissions.privacy && (
+          <TogglePrivacyOption onOptionClick={onOptionClick} recording={recording} />
         )}
-        <DropdownItem onClick={() => onDeleteRecording(recordingId)}>Delete</DropdownItem>
-        {isPublicDisabled(workspaces, currentWorkspaceId) ? null : (
-          <DropdownItem onClick={toggleIsPrivate}>{`Make ${
-            isPrivate ? "public" : "private"
-          }`}</DropdownItem>
+        <ShareOption onOptionClick={onOptionClick} recording={recording} />
+        {permissions.move && (
+          <MoveRecordingOption onOptionClick={onOptionClick} recording={recording} />
         )}
-        <DropdownItem onClick={handleShareClick}>Share</DropdownItem>
-        {!loading ? (
-          <MoveRecordingMenu workspaces={workspaces} onMoveRecording={updateRecording} />
-        ) : null}
       </Dropdown>
     </PortalDropdown>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({ currentWorkspaceId: selectors.getWorkspaceId(state) }),
-  {
-    setModal: actions.setModal,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(RecordingOptionsDropdown);

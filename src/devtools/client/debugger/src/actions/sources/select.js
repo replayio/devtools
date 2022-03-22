@@ -18,6 +18,8 @@ import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines } from ".";
 
 import { createLocation } from "../../utils/location";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { setSelectedPanel } from "ui/actions/layout";
 import { trackEvent } from "ui/utils/telemetry";
 import { paused } from "../pause/paused";
 
@@ -81,11 +83,11 @@ export function selectSourceURL(cx, url, options) {
  * @memberof actions/sources
  * @static
  */
-export function selectSource(cx, sourceId, options = {}) {
+export function selectSource(cx, sourceId, options = {}, openSourcesTab) {
   return async dispatch => {
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
-    return dispatch(selectSpecificLocation(cx, location));
+    return dispatch(selectSpecificLocation(cx, location, openSourcesTab));
   };
 }
 
@@ -100,7 +102,7 @@ export function deselectSource() {
  * @memberof actions/sources
  * @static
  */
-export function selectLocation(cx, location, { keepContext = true } = {}) {
+export function selectLocation(cx, location, openSourcesTab = true) {
   return async (dispatch, getState, { client }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
@@ -127,6 +129,13 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
     }
 
     dispatch(setSelectedLocation(cx, source, location));
+    const layout = getToolboxLayout(getState());
+
+    // Yank the user to the editor tab in case the debugger/editor is tucked in
+    // the toolbox.
+    if (layout !== "ide" && openSourcesTab) {
+      dispatch(setSelectedPanel("debugger"));
+    }
 
     await dispatch(loadSourceText({ source }));
     await dispatch(setBreakableLines(cx, source.id));
@@ -157,8 +166,8 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
  * @memberof actions/sources
  * @static
  */
-export function selectSpecificLocation(cx, location) {
-  return selectLocation(cx, location, { keepContext: false });
+export function selectSpecificLocation(cx, location, openSourcesTab) {
+  return selectLocation(cx, location, openSourcesTab);
 }
 
 // The RRP protocol values include both generated and original information about

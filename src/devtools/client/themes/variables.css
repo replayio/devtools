@@ -356,16 +356,16 @@
   */
 
   /* Color ramp (Dark) */
-  --theme-base-100: #000000; /* background chrome */
-  --theme-base-95: #252525; /* tab bars */
-  --theme-base-90: #303030; /* editor and selected tab */
-  --theme-base-85: #3c3c3c; /* textfields */
-  --theme-base-80: #5c5c5c;
-  --theme-base-70: #828282;
-  --theme-base-60: #a3a3a3;
+  --theme-base-100: #000; /* background chrome */
+  --theme-base-95: #192230; /* tab bars */
+  --theme-base-90: #3d4552; /* editor and selected tab */
+  --theme-base-85: #3e434b; /* textfields */
+  --theme-base-80: #797d81;
+  --theme-base-70: #a2a6a8;
+  --theme-base-60: #c3c6c8;
 
   /* Core classes (Dark) */
-  --chrome: #1c1c1c; /* bg app */
+  --chrome: #081120; /* bg app */
   --theme-body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);

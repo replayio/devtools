@@ -114,7 +114,7 @@ export function openSourceLink(sourceId, line, column) {
   };
 }
 
-export function showSource(cx, sourceId) {
+export function showSource(cx, sourceId, openSourcesTab = true) {
   return (dispatch, getState) => {
     const source = getSource(getState(), sourceId);
 
@@ -123,7 +123,7 @@ export function showSource(cx, sourceId) {
     }
 
     dispatch(setPrimaryPaneTab("sources"));
-    dispatch(selectSource(cx, source.id));
+    dispatch(selectSource(cx, source.id, {}, openSourcesTab));
   };
 }
 
