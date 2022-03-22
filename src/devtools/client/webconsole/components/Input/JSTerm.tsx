@@ -67,22 +67,13 @@ export default function JSTerm() {
   const isInLoadedRegion = useSelector(getIsInLoadedRegion);
 
   const [value, setValue] = useState("");
-  const inputNode = useRef<HTMLDivElement | null>(null);
+  const [autocompletePreview, setAutocompletePreview] = useState<string | null>(null);
   const executeRef = useRef(() => {});
   const _execute = () => executeRef.current();
 
   const { moveHistoryCursor, setHistoryIndex } = useEvaluationHistory(setValue);
-  const {
-    autocompleteIndex,
-    matches,
-    shouldShowAutocomplete,
-    applySelectedMatch,
-    moveAutocompleteCursor,
-    resetAutocompleteIndex,
-    setHideAutocomplete,
-  } = useAutocomplete(value);
 
-  const onRegularKeyPress = (e: KeyboardEvent) => {
+  const onKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER) {
       e.preventDefault();
       _execute();
@@ -92,6 +83,92 @@ export default function JSTerm() {
       moveHistoryCursor(-1);
     }
   };
+  const onPreviewAvailable = (previewValue: string | null) => setAutocompletePreview(previewValue);
+  executeRef.current = () => {
+    if (!value) {
+      return;
+    }
+
+    const canEval = recording!.userRole !== "team-user";
+    if (canEval) {
+      dispatch(evaluateExpression(value));
+    } else {
+      dispatch(paywallExpression(value));
+    }
+
+    setValue("");
+    setHistoryIndex(0);
+  };
+
+  return (
+    <div>
+      <div className="relative">
+        <div
+          className="jsterm-input-container"
+          key="jsterm-container"
+          aria-live="off"
+          tabIndex={-1}
+        >
+          {isInLoadedRegion ? (
+            <EditorWithAutocomplete
+              onEditorMount={(editor: Editor, showAutocomplete?: (show: boolean) => void) =>
+                (window.jsterm = getJsTermApi(editor, _execute, showAutocomplete))
+              }
+              onPreviewAvailable={onPreviewAvailable}
+              value={value}
+              setValue={setValue}
+              onRegularKeyPress={onKeyPress}
+            />
+          ) : (
+            <div className="flex items-center h-full italic text-gray-400">Loading…</div>
+          )}
+        </div>
+      </div>
+      <EagerEvalFooter expression={value} completedExpression={autocompletePreview} />
+    </div>
+  );
+}
+
+export function EditorWithAutocomplete({
+  onEditorMount,
+  onRegularKeyPress,
+  onPreviewAvailable,
+  setValue,
+  value,
+}: {
+  onEditorMount: (editor: Editor, showAutocomplete?: (show: boolean) => void) => void;
+  onRegularKeyPress: (e: KeyboardEvent) => void;
+  onPreviewAvailable: (value: string | null) => void;
+  setValue: (newValue: string) => void;
+  value: string;
+}) {
+  const {
+    autocompleteIndex,
+    matches,
+    shouldShowAutocomplete,
+    applySelectedMatch,
+    moveAutocompleteCursor,
+    resetAutocompleteIndex,
+    setHideAutocomplete,
+  } = useAutocomplete(value, onPreviewAvailable);
+
+  const autocomplete = () => setValue(applySelectedMatch());
+  const onSelection = (obj?: any) => {
+    const cursorMoved = obj?.origin && ["*mouse", "+move"].includes(obj.origin);
+
+    if (cursorMoved) {
+      setHideAutocomplete(true);
+    }
+  };
+  // for use in e2e tests
+  const showAutocomplete = isTest()
+    ? (show: boolean) => {
+        setHideAutocomplete(!show);
+        if (show) {
+          resetAutocompleteIndex();
+        }
+      }
+    : undefined;
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER || e.key === Keys.TAB || e.key === Keys.ARROW_RIGHT) {
       e.preventDefault();
@@ -108,15 +185,6 @@ export default function JSTerm() {
       setHideAutocomplete(true);
     }
   };
-  // for use in e2e tests
-  const _showAutocomplete = isTest()
-    ? (show: boolean) => {
-        setHideAutocomplete(!show);
-        if (show) {
-          resetAutocompleteIndex();
-        }
-      }
-    : undefined;
   const onKeyPress = (e: KeyboardEvent) => {
     if (shouldShowAutocomplete) {
       onAutocompleteKeyPress(e);
@@ -138,79 +206,29 @@ export default function JSTerm() {
       resetAutocompleteIndex();
     }
   };
-  const onSelection = (obj?: any) => {
-    const cursorMoved = obj?.origin && ["*mouse", "+move"].includes(obj.origin);
-
-    if (cursorMoved) {
-      setHideAutocomplete(true);
-    }
-  };
-  const autocomplete = () => setValue(applySelectedMatch());
-  executeRef.current = () => {
-    if (!value) {
-      return;
-    }
-
-    const canEval = recording!.userRole !== "team-user";
-    if (canEval) {
-      dispatch(evaluateExpression(value));
-    } else {
-      dispatch(paywallExpression(value));
-    }
-
-    setValue("");
-    setHistoryIndex(0);
-  };
 
   return (
-    <div>
-      <div className="relative">
-        <div
-          className="jsterm-input-container devtools-input relative"
-          key="jsterm-container"
-          aria-live="off"
-          tabIndex={-1}
-          ref={inputNode}
-        >
-          {isInLoadedRegion ? (
-            <>
-              <CodeMirror
-                onKeyPress={onKeyPress}
-                value={value}
-                onSelection={onSelection}
-                setValue={setValue}
-                onEditorMount={(editor: Editor) =>
-                  (window.jsterm = getJsTermApi(editor, _execute, _showAutocomplete))
-                }
-              />
-              {shouldShowAutocomplete ? (
-                <div
-                  className="absolute ml-8 opacity-50"
-                  style={{ left: `${value.length}ch`, top: `5px` }}
-                >
-                  {getRemainingCompletedTextAfterCursor(value, matches[autocompleteIndex])}
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <div className="load-container flex items-center h-full italic text-gray-400">
-              Loading…
-            </div>
-          )}
-        </div>
-        {shouldShowAutocomplete ? (
-          <AutocompleteMatches
-            leftOffset={getCursorIndex(value)}
-            matches={matches}
-            selectedIndex={autocompleteIndex}
-            onMatchClick={autocomplete}
-          />
-        ) : null}
-      </div>
-      <EagerEvalFooter
-        expression={value}
-        completedExpression={shouldShowAutocomplete ? applySelectedMatch() : null}
+    <div className="pl-7">
+      <CodeMirror
+        onKeyPress={onKeyPress}
+        value={value}
+        onSelection={onSelection}
+        setValue={setValue}
+        onEditorMount={(editor: Editor) => onEditorMount(editor, showAutocomplete)}
       />
+      {shouldShowAutocomplete ? (
+        <div className="absolute ml-8 opacity-50" style={{ left: `${value.length}ch`, top: `5px` }}>
+          {getRemainingCompletedTextAfterCursor(value, matches[autocompleteIndex])}
+        </div>
+      ) : null}
+      {shouldShowAutocomplete && (
+        <AutocompleteMatches
+          leftOffset={getCursorIndex(value)}
+          matches={matches}
+          selectedIndex={autocompleteIndex}
+          onMatchClick={autocomplete}
+        />
+      )}
     </div>
   );
 }

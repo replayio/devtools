@@ -107,7 +107,10 @@ function getShouldShowAutocomplete(
   return !hideAutocomplete && !!matchCount;
 }
 
-export default function useAutocomplete(expression: string) {
+export default function useAutocomplete(
+  expression: string,
+  onPreviewAvailable: (val: string | null) => void
+) {
   const [isHidden, setIsHidden] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const matches = useGetMatches(expression);
@@ -121,6 +124,11 @@ export default function useAutocomplete(expression: string) {
     const match = matches[selectedIndex];
     return insertAutocompleteMatch(expression, match);
   };
+
+  useEffect(() => {
+    // This is not optimal.
+    onPreviewAvailable(applySelectedMatch());
+  });
 
   return {
     autocompleteIndex: selectedIndex,
