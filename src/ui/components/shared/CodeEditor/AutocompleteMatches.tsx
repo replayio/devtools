@@ -32,7 +32,7 @@ function Match({
   );
 }
 
-export default function Autocomplete({
+export default function AutocompleteMatches({
   leftOffset,
   matches,
   selectedIndex,

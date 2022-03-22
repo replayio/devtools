@@ -38,7 +38,7 @@ const CODEMIRROR_OPTIONS = {
 // This wrapper works around that by passing in callbacks that reference
 // refs, so that CodeMirror always ends up using the latest callback.
 
-const WrappedCodeMirror: FC<{
+const ControlledCodeMirror: FC<{
   value: string;
   onKeyPress: (e: KeyboardEvent) => void;
   setValue: (value: string) => void;
@@ -77,4 +77,4 @@ const WrappedCodeMirror: FC<{
   );
 };
 
-export default WrappedCodeMirror;
+export default ControlledCodeMirror;

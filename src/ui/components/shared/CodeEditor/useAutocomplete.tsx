@@ -5,13 +5,13 @@ import {
   getPropertyExpression,
   insertAutocompleteMatch,
   normalizeString,
-} from "../../utils/autocomplete";
+} from "ui/utils/autocomplete";
 import uniq from "lodash/uniq";
 import { useSelector } from "react-redux";
 import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 import { UIState } from "ui/state";
-import { getEvaluatedProperties } from "../../utils/autocomplete-eager";
 import { getSelectedFrame, SelectedFrame } from "devtools/client/debugger/src/selectors";
+import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
 
 // turns an async getMatches function into a hook
 function useGetAsyncMatches(

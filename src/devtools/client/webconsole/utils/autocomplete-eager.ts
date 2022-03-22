@@ -3,7 +3,7 @@ import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-
 import { ThreadFront, ValueFront } from "protocol/thread";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
-import { getPropertiesForObject } from "./autocomplete";
+import { getPropertiesForObject } from "ui/utils/autocomplete";
 
 // Use eager eval to get the properties of the last complete object in the expression.
 export async function getEvaluatedProperties(
