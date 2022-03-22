@@ -68,6 +68,8 @@ export default function JSTerm() {
 
   const [value, setValue] = useState("");
   const inputNode = useRef<HTMLDivElement | null>(null);
+  const executeRef = useRef(() => {});
+  const _execute = () => executeRef.current();
 
   const { moveHistoryCursor, setHistoryIndex } = useEvaluationHistory(setValue);
   const {
@@ -83,7 +85,7 @@ export default function JSTerm() {
   const onRegularKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER) {
       e.preventDefault();
-      execute();
+      _execute();
     } else if (e.key === Keys.ARROW_UP) {
       moveHistoryCursor(1);
     } else if (e.key === Keys.ARROW_DOWN) {
@@ -144,7 +146,7 @@ export default function JSTerm() {
     }
   };
   const autocomplete = () => setValue(applySelectedMatch());
-  const execute = () => {
+  executeRef.current = () => {
     if (!value) {
       return;
     }
@@ -178,7 +180,7 @@ export default function JSTerm() {
                 onSelection={onSelection}
                 setValue={setValue}
                 onEditorMount={(editor: Editor) =>
-                  (window.jsterm = getJsTermApi(editor, execute, _showAutocomplete))
+                  (window.jsterm = getJsTermApi(editor, _execute, _showAutocomplete))
                 }
               />
               {shouldShowAutocomplete ? (
