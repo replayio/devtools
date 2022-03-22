@@ -4,32 +4,12 @@
 
 import type { UIThunkAction } from "ui/actions";
 
-import { prefs } from "../utils/prefs";
-
 import {
   filterTextUpdated,
   filterToggled,
   getAllFilters,
   FilterBooleanFields,
 } from "../reducers/filters";
-
-type PrefsKeys = keyof typeof prefs;
-
-type MessageFilters = "error" | "warn" | "info" | "debug" | "log";
-
-const FILTER_PREF_MAP: Record<MessageFilters, PrefsKeys> = {
-  error: "filterError",
-  warn: "filterWarn",
-  info: "filterInfo",
-  debug: "filterDebug",
-  log: "filterLog",
-};
-
-const updatePrefs = (filter: MessageFilters, active: boolean) => {
-  const prefKey = FILTER_PREF_MAP[filter];
-  // TODO Centralize prefs updates instead of doing in a thunk
-  prefs[prefKey] = active;
-};
 
 const filterStateUpdated = (): UIThunkAction => (dispatch, getState) => {
   const newFiltersState = getAllFilters(getState());
@@ -51,19 +31,10 @@ export const filterTextSet = (text: string): UIThunkAction => {
 
 export function filterToggle(filter: FilterBooleanFields): UIThunkAction {
   return (dispatch, getState) => {
-    const filtersState = getAllFilters(getState());
     // Actually toggle the state
     dispatch(filterToggled(filter));
 
     // Force a recalculation of updated messages
     dispatch(filterStateUpdated());
-
-    // Now update prefs
-    const newFiltersState = getAllFilters(getState());
-    const newValue = newFiltersState[filter];
-
-    // Technically mismatching keys here - the UI does toggle `"nodemodules"`,
-    // but we don't have that set up to persist right now
-    updatePrefs(filter as MessageFilters, newValue);
   };
 }
