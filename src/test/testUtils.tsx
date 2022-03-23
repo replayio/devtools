@@ -2,13 +2,33 @@ import * as rtl from "@testing-library/react";
 import type { RenderOptions } from "@testing-library/react";
 import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
+import { MockedProvider, MockedResponse } from "@apollo/client/testing";
+import { v4 as uuid } from "uuid";
 import type { PreloadedState } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
 
 import { bootstrapStore, extendStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
-// import type { AppStore, RootState } from "../store";
+
+import {
+  createRecordingOwnerUserIdMock,
+  createGetRecordingMock,
+  createUserSettingsMock,
+  createGetUserMock,
+} from "../../test/mock/src/graphql";
+
+const recordingId = uuid();
+const userId = uuid();
+const user = { id: userId, uuid: userId };
+
+// Create common GraphQL mocks, reused from the E2E tests
+const graphqlMocks = [
+  ...createUserSettingsMock(),
+  ...createRecordingOwnerUserIdMock({ recordingId, user }),
+  ...createGetRecordingMock({ recordingId }),
+  ...createGetUserMock({ user }),
+];
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store. For
@@ -35,7 +55,13 @@ async function render(
     store = await createTestStore(preloadedState);
   }
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
-    return <Provider store={store!}>{children}</Provider>;
+    return (
+      <Provider store={store!}>
+        <MockedProvider mocks={graphqlMocks} addTypename={false}>
+          {children}
+        </MockedProvider>
+      </Provider>
+    );
   }
   return { store, ...rtl.render(ui, { wrapper: Wrapper, ...renderOptions }) };
 }

@@ -37,7 +37,7 @@ export interface Error {
 }
 
 // This script runs within the browser process.
-function doInstall(options: MockOptionsJSON) {
+export function doInstall(options: MockOptionsJSON) {
   function setImmediate(callback: () => void) {
     setTimeout(callback, 0);
   }
