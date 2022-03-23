@@ -70,14 +70,14 @@ export default function PanelForm({
   };
 
   return (
-    <form className="flex flex-grow flex-col overflow-hidden pl-2">
+    <form className="flex flex-grow flex-col pl-2 relative">
       {showCondition ? (
-        <div className={classnames("form-row")}>
+        <div className={"form-row"}>
           <div className="mr-1 w-6 flex-shrink-0">if</div>
           <PanelInput
             autofocus={inputToFocus == "condition"}
-            defaultValue={condition}
-            onChange={(cm: any) => onConditionChange(cm.getValue().trim())}
+            value={condition}
+            onChange={(value: string) => onConditionChange(value)}
             onEnter={handleSetBreakpoint}
             onEscape={toggleEditingOff}
           />
@@ -87,8 +87,8 @@ export default function PanelForm({
         {showCondition ? <div className="mr-1 w-6 flex-shrink-0">log</div> : null}
         <PanelInput
           autofocus={inputToFocus == "logValue"}
-          defaultValue={logValue}
-          onChange={(cm: any) => onLogValueChange(cm.getValue().trim())}
+          value={logValue}
+          onChange={(value: string) => onLogValueChange(value)}
           onEnter={handleSetBreakpoint}
           onEscape={toggleEditingOff}
         />

@@ -32,12 +32,14 @@ export function EditorWithAutocomplete({
   onPreviewAvailable,
   setValue,
   value,
+  disableAutocomplete,
 }: {
   onEditorMount: (editor: Editor, showAutocomplete?: (show: boolean) => void) => void;
   onRegularKeyPress: (e: KeyboardEvent) => void;
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
   value: string;
+  disableAutocomplete?: boolean;
 }) {
   const {
     autocompleteIndex,
@@ -104,8 +106,22 @@ export function EditorWithAutocomplete({
     }
   };
 
+  if (disableAutocomplete) {
+    return (
+      <div className="flex items-center relative">
+        <ControlledCodeMirror
+          onKeyPress={onKeyPress}
+          value={value}
+          onSelection={onSelection}
+          setValue={setValue}
+          onEditorMount={(editor: Editor) => onEditorMount(editor, showAutocomplete)}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="pl-7">
+    <div className="flex items-center relative">
       <ControlledCodeMirror
         onKeyPress={onKeyPress}
         value={value}
@@ -114,7 +130,7 @@ export function EditorWithAutocomplete({
         onEditorMount={(editor: Editor) => onEditorMount(editor, showAutocomplete)}
       />
       {shouldShowAutocomplete ? (
-        <div className="absolute ml-8 opacity-50" style={{ left: `${value.length}ch`, top: `5px` }}>
+        <div className="absolute ml-1 opacity-50" style={{ left: `${value.length}ch` }}>
           {getRemainingCompletedTextAfterCursor(value, matches[autocompleteIndex])}
         </div>
       ) : null}

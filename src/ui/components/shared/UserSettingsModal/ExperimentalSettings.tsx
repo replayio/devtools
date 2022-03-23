@@ -34,6 +34,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableNetworkRequestComments",
   },
   {
+    label: "Breakpoint Panel Autocomplete",
+    description: "Show autocomplete in the breakpoint panel",
+    key: "enableBreakpointPanelAutocomplete",
+  },
+  {
     label: "Multiple Controllers",
     description: "Runs the replay across many machines",
     key: "useMultipleControllers",
@@ -107,6 +112,10 @@ export default function ExperimentalSettings({}) {
   const updateEventLink = hooks.useUpdateUserSetting("enableEventLink");
   const updateReact = hooks.useUpdateUserSetting("showReact");
 
+  const {
+    value: enableBreakpointPanelAutocomplete,
+    update: updateEnableBreakpointPanelAutocomplete,
+  } = useFeature("breakpointPanelAutocomplete");
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
@@ -123,6 +132,8 @@ export default function ExperimentalSettings({}) {
       updateEventLink({ variables: { newValue: value } });
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
+    } else if (key === "enableBreakpointPanelAutocomplete") {
+      updateEnableBreakpointPanelAutocomplete(!enableBreakpointPanelAutocomplete);
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableNetworkRequestComments") {
@@ -135,6 +146,7 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
+    enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     useMultipleControllers: enableUseMultipleControllers,
