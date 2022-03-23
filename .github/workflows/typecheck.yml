@@ -25,4 +25,4 @@ jobs:
       - name: Apollo codegen
         run: rm -rf src/graphql/*.ts && npm run gql:gen
       - name: Checks if types match
-        run: git diff --quiet HEAD .
+        run: git diff HEAD .
