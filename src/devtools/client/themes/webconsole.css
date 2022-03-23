@@ -454,6 +454,7 @@ html #webconsole-notificationbox {
 
 .jsterm-input-container .CodeMirror-lines {
   padding-block: var(--console-output-vertical-padding);
+  background-color: var(--console-message-background);
 }
 
 .webconsole-app .cm-auto-complete-shadow-text::after {
