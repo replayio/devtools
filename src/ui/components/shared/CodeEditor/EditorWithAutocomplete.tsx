@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Editor } from "codemirror";
 import useAutocomplete from "./useAutocomplete";
 import { isTest } from "ui/utils/environment";
-import AutocompleteMatches from "./AutocompleteMatches";
+import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
 import ControlledCodeMirror from "./ControlledCodeMirror";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
 
@@ -26,11 +26,16 @@ const DISMISS_KEYS = [
   Keys.ARROW_LEFT,
 ];
 
+const DEFAULT_OPTIONS = {
+  minLeft: 0,
+};
+
 export function EditorWithAutocomplete({
   onEditorMount,
   onRegularKeyPress,
   onPreviewAvailable,
   setValue,
+  options = DEFAULT_OPTIONS,
   value,
   disableAutocomplete,
 }: {
@@ -38,9 +43,12 @@ export function EditorWithAutocomplete({
   onRegularKeyPress: (e: KeyboardEvent) => void;
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
+  // For minor adjustments to the autocomplete menu position.
+  options?: AutocompleteMatchesOptions;
   value: string;
   disableAutocomplete?: boolean;
 }) {
+  const containerNode = useRef<HTMLDivElement | null>(null);
   const {
     autocompleteIndex,
     matches,
@@ -121,7 +129,7 @@ export function EditorWithAutocomplete({
   }
 
   return (
-    <div className="flex items-center relative w-full">
+    <div className="flex items-center relative w-full" ref={containerNode}>
       <ControlledCodeMirror
         onKeyPress={onKeyPress}
         value={value}
@@ -136,6 +144,8 @@ export function EditorWithAutocomplete({
       ) : null}
       {shouldShowAutocomplete && (
         <AutocompleteMatches
+          options={options}
+          containerRect={containerNode.current!.getBoundingClientRect()}
           leftOffset={getCursorIndex(value)}
           matches={matches}
           selectedIndex={autocompleteIndex}

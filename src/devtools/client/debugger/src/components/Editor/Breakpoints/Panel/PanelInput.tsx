@@ -28,6 +28,10 @@ export function PanelInput({
     }
   };
 
+  // Adding a minimum left value here to keep the autocomplete menu from colliding with any of the 
+  // gutter popups that also rely on createPortal, e.g. LineNumberTooltip, ToggleWidgetButton
+  const options = { minLeft: 24 }
+
   return (
     <div className="jsterm-input-container w-full">
       <EditorWithAutocomplete
@@ -37,6 +41,7 @@ export function PanelInput({
         setValue={onChange}
         onRegularKeyPress={onKeyPress}
         disableAutocomplete={!enableBreakpointPanelAutocomplete}
+        options={options}
       />
     </div>
   );

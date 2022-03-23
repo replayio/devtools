@@ -1,5 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
+import { createPortal } from "react-dom";
+
+export type AutocompleteMatchesOptions = {
+  minLeft: number;
+};
 
 function Match({
   label,
@@ -33,31 +38,39 @@ function Match({
 }
 
 export default function AutocompleteMatches({
+  containerRect,
   leftOffset,
   matches,
   selectedIndex,
   onMatchClick,
+  options,
 }: {
+  options: AutocompleteMatchesOptions;
+  containerRect: DOMRect;
   leftOffset: number;
   matches: string[];
   selectedIndex: number;
   onMatchClick: (match: string) => void;
 }) {
-  return (
-    <div
-      className="autocomplete-matches absolute z-10 flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono shadow-sm"
-      style={{
-        bottom: "var(--editor-footer-height)",
-        fontSize: "var(--theme-code-font-size)",
-        marginLeft: `${leftOffset}ch`,
-        maxHeight: "160px",
-        maxWidth: "200px",
-        minWidth: "160px",
-      }}
-    >
-      {matches.map((match, i) => (
-        <Match label={match} isSelected={i === selectedIndex} key={i} onClick={onMatchClick} />
-      ))}
-    </div>
+  const { top, left } = containerRect;
+
+  return createPortal(
+    <div className="absolute z-10 transform -translate-y-full" style={{ top, left }}>
+      <div
+        className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono shadow-sm"
+        style={{
+          fontSize: "var(--theme-code-font-size)",
+          marginLeft: `max(${options.minLeft}px, ${leftOffset}ch)`,
+          maxHeight: "160px",
+          maxWidth: "200px",
+          minWidth: "160px",
+        }}
+      >
+        {matches.map((match, i) => (
+          <Match label={match} isSelected={i === selectedIndex} key={i} onClick={onMatchClick} />
+        ))}
+      </div>
+    </div>,
+    document.body
   );
 }
