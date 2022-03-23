@@ -1,9 +1,20 @@
 import React from "react";
 import { render, createTestStore } from "test/testUtils";
 
-describe("First example test", () => {
-  it("Creates a store without exploding", async () => {
-    const store = await createTestStore();
-    expect(store.getState().consoleUI).toBeTruthy();
+import WebConsoleApp from "devtools/client/webconsole/components/App";
+
+const useRouter = jest.spyOn(require("next/router"), "useRouter");
+
+useRouter.mockImplementationOnce(() => ({
+  query: { id: "abcd" },
+  asPath: "/recording/abcd",
+}));
+
+describe("Web Console UI", () => {
+  it("Renders the Web Console UI without exploding", async () => {
+    const { findByText } = await render(<WebConsoleApp />);
+
+    const timestampsCheckbox = await findByText("Show Timestamps");
+    expect(timestampsCheckbox).toBeInTheDocument();
   });
 });
