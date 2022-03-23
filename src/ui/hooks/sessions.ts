@@ -4,6 +4,7 @@ import { User } from "ui/state/session";
 import { useGetUserId } from "./users";
 import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
 import { GetActiveSessions, GetActiveSessionsVariables } from "graphql/GetActiveSessions";
+import { filter } from "lodash";
 
 interface SessionUser extends User {
   sessionId?: string;
@@ -37,16 +38,18 @@ export function useGetActiveSessions(recordingId: RecordingId) {
 
   // Don't show the user's own sessions.
   const activeSessions = data.recording?.activeSessions || [];
-  const filteredSessions = activeSessions.filter((session: Session) => session.user?.id !== userId);
+  const filteredSessions = activeSessions.filter(session => session.user?.id !== userId);
 
   // This includes the sessionId with the user. Otherwise, all anonymous users
   // look the same (null) and we can't maintain some order.
-  const users: SessionUser[] = filteredSessions
-    .map((session: Session) => ({
-      ...session.user,
-      sessionId: session.id,
-    }))
-    .sort();
+  const users: SessionUser[] = (
+    filteredSessions
+      .map(session => ({
+        ...session.user,
+        sessionId: session.id,
+      }))
+      .filter(i => i.name !== null) as SessionUser[]
+  ).sort();
 
   return { users, loading };
 }
