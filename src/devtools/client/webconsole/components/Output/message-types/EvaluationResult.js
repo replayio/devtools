@@ -5,10 +5,13 @@
 "use strict";
 
 // React & Redux
-const { createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
-const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
-const GripMessageBody = require("devtools/client/webconsole/components/Output/GripMessageBody");
+const Message = React.createFactory(
+  require("devtools/client/webconsole/components/Output/Message")
+);
+const GripMessageBody =
+  require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 
 EvaluationResult.displayName = "EvaluationResult";
 
