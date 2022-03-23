@@ -5,12 +5,14 @@ import { GET_COMMENTS } from "ui/graphql/comments";
 import { Reply } from "ui/state/comments";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { useGetRecordingId } from "../recordings";
+import { AddCommentReply, AddCommentReplyVariables } from "graphql/AddCommentReply";
+import { GetComments } from "graphql/GetComments";
 
 export default function useAddCommentReply() {
   const { user } = useAuth0();
   const recordingId = useGetRecordingId();
 
-  const [addCommentReply, { error }] = useMutation(
+  const [addCommentReply, { error }] = useMutation<AddCommentReply, AddCommentReplyVariables>(
     gql`
       mutation AddCommentReply($input: AddCommentReplyInput!) {
         addCommentReply(input: $input) {
@@ -46,15 +48,11 @@ export default function useAddCommentReply() {
         },
       },
       update: (cache, payload) => {
-        const {
-          data: {
-            addCommentReply: { commentReply },
-          },
-        } = payload;
-        const data: any = cache.readQuery({
+        const commentReply = payload?.data?.addCommentReply?.commentReply;
+        const cachedata = cache.readQuery<GetComments>({
           query: GET_COMMENTS,
           variables: { recordingId },
-        });
+        })!;
         const {
           viewer: {
             user: { id: userId },
@@ -63,12 +61,14 @@ export default function useAddCommentReply() {
           query: GET_USER_ID,
         });
 
-        const parentComment = data.recording.comments.find((r: any) => r.id === reply.parentId);
+        const parentComment = (cachedata?.recording?.comments ?? []).find(
+          (r: any) => r.id === reply.parentId
+        );
         if (!parentComment) {
           return;
         }
         const newReply = {
-          id: commentReply.id,
+          id: commentReply!.id,
           content: reply.content,
           createdAt: reply.createdAt,
           updatedAt: reply.updatedAt,
@@ -85,17 +85,17 @@ export default function useAddCommentReply() {
           ...parentComment,
           replies: [
             ...parentComment.replies.filter(
-              (r: any) => r.id !== PENDING_COMMENT_ID && r.id !== commentReply.id
+              (r: any) => r.id !== PENDING_COMMENT_ID && r.id !== commentReply!.id
             ),
             newReply,
           ],
         };
         const newData = {
-          ...data,
+          ...cachedata,
           recording: {
-            ...data.recording,
+            ...cachedata.recording,
             comments: [
-              ...data.recording.comments.filter((r: any) => r.id !== reply.parentId),
+              ...(cachedata.recording?.comments ?? []).filter((r: any) => r.id !== reply.parentId),
               newParentComment,
             ],
           },

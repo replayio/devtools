@@ -1,6 +1,6 @@
 const Services = require("devtools/shared/services");
-import { gql, useQuery, useMutation } from "@apollo/client";
-import { mutate, query } from "ui/utils/apolloClient";
+import { gql, useQuery, useMutation, DocumentNode } from "@apollo/client";
+import { query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
@@ -10,6 +10,25 @@ import { features } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useState } from "react";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
+import {
+  UpdateUserDefaultWorkspace,
+  UpdateUserDefaultWorkspaceVariables,
+} from "graphql/UpdateUserDefaultWorkspace";
+import { CreateUserAPIKey, CreateUserAPIKeyVariables } from "graphql/CreateUserAPIKey";
+import { DeleteUserAPIKey, DeleteUserAPIKeyVariables } from "graphql/DeleteUserAPIKey";
+import {
+  UpdateUserSettingsLogRocket,
+  UpdateUserSettingsLogRocketVariables,
+} from "graphql/UpdateUserSettingsLogRocket";
+import {
+  UpdateUserSettingsEventLink,
+  UpdateUserSettingsEventLinkVariables,
+} from "graphql/UpdateUserSettingsEventLink";
+import {
+  UpdateUserSettingsReact,
+  UpdateUserSettingsReactVariables,
+} from "graphql/UpdateUserSettingsReact";
+import { GetUserSettings } from "graphql/GetUserSettings";
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
@@ -41,7 +60,7 @@ export async function getUserSettings(): Promise<ExperimentalUserSettings> {
 
 export function useGetUserSettings() {
   const { isAuthenticated } = useAuth0();
-  const { data, error, loading } = useQuery(GET_USER_SETTINGS);
+  const { data, error, loading } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
 
   if (isTest()) {
     return { userSettings: testSettings, loading: false };
@@ -100,20 +119,46 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
   };
 }
 
-function getUpdateUserSettingQuery(key: SettingItemKey, type: "uuid" | "Boolean") {
-  return gql`
-    mutation UpdateUserSettings($newValue: ${type}) {
-      updateUserSettings(
-        input: { ${key}: $newValue },
-      ) {
+type MutableSettings = Extract<
+  SettingItemKey,
+  "disableLogRocket" | "enableEventLink" | "showReact"
+>;
+
+type GqlPair = {
+  disableLogRocket: [UpdateUserSettingsLogRocket, UpdateUserSettingsLogRocketVariables];
+  enableEventLink: [UpdateUserSettingsEventLink, UpdateUserSettingsEventLinkVariables];
+  showReact: [UpdateUserSettingsReact, UpdateUserSettingsReactVariables];
+};
+
+const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
+  disableLogRocket: gql`
+    mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
+      updateUserSettings(input: { disableLogRocket: $newValue }) {
         success
       }
     }
-  `;
-}
+  `,
+  enableEventLink: gql`
+    mutation UpdateUserSettingsEventLink($newValue: Boolean) {
+      updateUserSettings(input: { enableEventLink: $newValue }) {
+        success
+      }
+    }
+  `,
+  showReact: gql`
+    mutation UpdateUserSettingsReact($newValue: Boolean) {
+      updateUserSettings(input: { showReact: $newValue }) {
+        success
+      }
+    }
+  `,
+} as const;
 
-export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
-  const [updateUserSetting, { error }] = useMutation(getUpdateUserSettingQuery(key, type), {
+export function useUpdateUserSetting(key: MutableSettings) {
+  const [updateUserSetting, { error }] = useMutation<
+    GqlPair[typeof key][0],
+    GqlPair[typeof key][1]
+  >(SETTINGS_MUTATIONS[key], {
     refetchQueries: ["GetUserSettings"],
   });
 
@@ -124,21 +169,11 @@ export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolea
   return updateUserSetting;
 }
 
-export async function migratePrefToSettings(prefKey: string, settingKey: SettingItemKey) {
-  if (Services.prefs.prefHasUserValue(prefKey)) {
-    const newValue = Services.prefs.getBoolPref(prefKey);
-    await mutate({
-      mutation: getUpdateUserSettingQuery(settingKey, "Boolean"),
-      variables: {
-        newValue,
-      },
-    });
-    Services.prefs.clearUserPref(prefKey);
-  }
-}
-
 export function useUpdateDefaultWorkspace() {
-  const [updateUserSetting, { error }] = useMutation(
+  const [updateUserSetting, { error }] = useMutation<
+    UpdateUserDefaultWorkspace,
+    UpdateUserDefaultWorkspaceVariables
+  >(
     gql`
       mutation UpdateUserDefaultWorkspace($workspaceId: ID) {
         updateUserDefaultWorkspace(input: { workspaceId: $workspaceId }) {
@@ -173,7 +208,10 @@ export function useUpdateDefaultWorkspace() {
 }
 
 export function useAddUserApiKey() {
-  const [addUserApiKey, { loading, error }] = useMutation(ADD_USER_API_KEY, {
+  const [addUserApiKey, { loading, error }] = useMutation<
+    CreateUserAPIKey,
+    CreateUserAPIKeyVariables
+  >(ADD_USER_API_KEY, {
     refetchQueries: ["GetUserSettings"],
   });
 
@@ -181,7 +219,10 @@ export function useAddUserApiKey() {
 }
 
 export function useDeleteUserApiKey() {
-  const [deleteUserApiKey, { loading, error }] = useMutation(DELETE_USER_API_KEY, {
+  const [deleteUserApiKey, { loading, error }] = useMutation<
+    DeleteUserAPIKey,
+    DeleteUserAPIKeyVariables
+  >(DELETE_USER_API_KEY, {
     refetchQueries: ["GetUserSettings"],
   });
 

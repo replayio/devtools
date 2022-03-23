@@ -104,8 +104,8 @@ export default function ExperimentalSettings({}) {
   const showSecretSettings = useGetShowSecretSettings();
 
   // TODO: This is bad and should be updated with a better generalized hook
-  const updateEventLink = hooks.useUpdateUserSetting("enableEventLink", "Boolean");
-  const updateReact = hooks.useUpdateUserSetting("showReact", "Boolean");
+  const updateEventLink = hooks.useUpdateUserSetting("enableEventLink");
+  const updateReact = hooks.useUpdateUserSetting("showReact");
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");

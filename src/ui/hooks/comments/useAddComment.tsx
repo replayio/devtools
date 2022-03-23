@@ -5,9 +5,11 @@ import { GET_COMMENTS } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import omit from "lodash/omit";
 import { GET_USER_ID } from "ui/graphql/users";
+import { AddComment, AddCommentVariables } from "graphql/AddComment";
+import { GetComments } from "graphql/GetComments";
 
 export default function useAddComment() {
-  const [addComment, { error }] = useMutation(
+  const [addComment, { error }] = useMutation<AddComment, AddCommentVariables>(
     gql`
       mutation AddComment($input: AddCommentInput!) {
         addComment(input: $input) {
@@ -44,14 +46,12 @@ export default function useAddComment() {
           __typename: "AddComment",
         },
       },
-      update: (cache, { data: { addComment } }) => {
-        const {
-          comment: { id: commentId },
-        } = addComment;
-        const data: any = cache.readQuery({
+      update: (cache, { data }) => {
+        const commentId = data?.addComment?.comment?.id;
+        const cacheData = cache.readQuery<GetComments>({
           query: GET_COMMENTS,
           variables: { recordingId: comment.recordingId },
-        });
+        })!;
         const {
           viewer: {
             user: { id: userId },
@@ -74,11 +74,11 @@ export default function useAddComment() {
           __typename: "Comment",
         };
         const newData = {
-          ...data,
+          ...cacheData,
           recording: {
-            ...data.recording,
+            ...cacheData.recording,
             comments: [
-              ...data.recording.comments.filter((c: Remark) => c.id !== commentId),
+              ...(cacheData.recording?.comments ?? []).filter(c => c.id !== commentId),
               newComment,
             ],
           },

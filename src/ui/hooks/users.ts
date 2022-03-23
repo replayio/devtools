@@ -6,6 +6,15 @@ import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
 import { Recording, Workspace } from "ui/types";
 import { useGetNonPendingWorkspaces } from "./workspaces";
+import { DismissNag, DismissNagVariables } from "graphql/DismissNag";
+import { subscribeToEmailType, subscribeToEmailTypeVariables } from "graphql/subscribeToEmailType";
+import {
+  unsubscribeToEmailType,
+  unsubscribeToEmailTypeVariables,
+} from "graphql/unsubscribeToEmailType";
+import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
+import { GetUserId } from "graphql/GetUserId";
+import { GetUser } from "graphql/GetUser";
 
 export async function getUserId() {
   const result = await query({
@@ -24,7 +33,7 @@ export async function dismissNag(nag: Nag) {
 }
 
 export function useGetUserId() {
-  const { data, loading, error } = useQuery(GET_USER_ID);
+  const { data, loading, error } = useQuery<GetUserId>(GET_USER_ID);
   return { userId: data?.viewer?.user.id, loading, error };
 }
 
@@ -104,22 +113,25 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
 }
 
 export function useGetUserInfo(): UserInfo & { loading: boolean } {
-  const { data, loading, error } = useQuery(GET_USER_INFO);
+  const { data, loading, error } = useQuery<GetUser>(GET_USER_INFO);
 
   if (error) {
     console.error("Apollo error while fetching user:", error);
   }
 
-  const id: string = data?.viewer?.user.id;
-  const picture: string = data?.viewer?.user.picture;
-  const name: string = data?.viewer?.user.name;
-  const email: string = data?.viewer?.email;
-  const internal: boolean = data?.viewer?.internal;
-  const nags: Nag[] = data?.viewer?.nags;
-  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
-  const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
-  const motd: string = data?.viewer?.motd;
-  const features = data?.viewer?.features || {};
+  const id: string = data?.viewer?.user.id!;
+  const picture: string = data?.viewer?.user.picture!;
+  const name: string = data?.viewer?.user.name!;
+  const email: string = data?.viewer?.email!;
+  const internal: boolean = data?.viewer?.internal!;
+  const nags: Nag[] = data?.viewer?.nags as Nag[];
+  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer
+    ?.unsubscribedEmailTypes as EmailSubscription[];
+  const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion ?? null;
+  const motd: string = data?.viewer?.motd!;
+  const features = data?.viewer?.features || {
+    library: false,
+  };
 
   return {
     loading,
@@ -138,7 +150,7 @@ export function useGetUserInfo(): UserInfo & { loading: boolean } {
 
 export function useDismissNag() {
   const { id, nags } = useGetUserInfo();
-  const [dismissNag, { error }] = useMutation(DISMISS_NAG, {
+  const [dismissNag, { error }] = useMutation<DismissNag, DismissNagVariables>(DISMISS_NAG, {
     refetchQueries: ["GetUser"],
   });
 
@@ -158,7 +170,10 @@ export function useDismissNag() {
 }
 
 export function useSubscribeToEmailType() {
-  const [subscribeToEmailType, { error }] = useMutation(
+  const [subscribeToEmailType, { error }] = useMutation<
+    subscribeToEmailType,
+    subscribeToEmailTypeVariables
+  >(
     gql`
       mutation subscribeToEmailType($emailType: String!) {
         subscribeToEmailType(input: { emailType: $emailType }) {
@@ -176,7 +191,10 @@ export function useSubscribeToEmailType() {
   return (emailType: EmailSubscription) => subscribeToEmailType({ variables: { emailType } });
 }
 export function useUnsubscribeToEmailType() {
-  const [unsubscribeToEmailType, { error }] = useMutation(
+  const [unsubscribeToEmailType, { error }] = useMutation<
+    unsubscribeToEmailType,
+    unsubscribeToEmailTypeVariables
+  >(
     gql`
       mutation unsubscribeToEmailType($emailType: String!) {
         unsubscribeToEmailType(input: { emailType: $emailType }) {
@@ -195,7 +213,7 @@ export function useUnsubscribeToEmailType() {
 }
 
 export function useAcceptTOS() {
-  const [acceptTOS] = useMutation(
+  const [acceptTOS] = useMutation<AcceptTOS, AcceptTOSVariables>(
     gql`
       mutation AcceptTOS($version: Int!) {
         acceptTermsOfService(input: { version: $version }) {
@@ -238,7 +256,7 @@ export function useGetUserPermissions(recording: Recording) {
   }
 
   const isOwner = userId == recording.user?.id;
-  const isPrivileged = isPrivilegedUser(recording, userId, workspaces);
+  const isPrivileged = userId ? isPrivilegedUser(recording, userId, workspaces) : false;
 
   return {
     loading: false,
