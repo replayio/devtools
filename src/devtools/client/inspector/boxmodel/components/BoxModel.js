@@ -4,23 +4,17 @@
 
 "use strict";
 
-const { createFactory, PureComponent } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-const BoxModelInfo = createFactory(
-  require("devtools/client/inspector/boxmodel/components/BoxModelInfo")
-);
-const BoxModelMain = createFactory(
-  require("devtools/client/inspector/boxmodel/components/BoxModelMain")
-);
-const BoxModelProperties = createFactory(
-  require("devtools/client/inspector/boxmodel/components/BoxModelProperties")
-);
+const BoxModelInfo = require("devtools/client/inspector/boxmodel/components/BoxModelInfo");
+const BoxModelMain = require("devtools/client/inspector/boxmodel/components/BoxModelMain");
+const BoxModelProperties = require("devtools/client/inspector/boxmodel/components/BoxModelProperties");
 
 const Types = require("devtools/client/inspector/boxmodel/types");
 
-class BoxModel extends PureComponent {
+class BoxModel extends React.PureComponent {
   static get propTypes() {
     return {
       boxModel: PropTypes.shape(Types.boxModel).isRequired,
@@ -68,7 +62,7 @@ class BoxModel extends PureComponent {
         },
         onKeyDown: this.onKeyDown,
       },
-      BoxModelMain({
+      React.createElement(BoxModelMain, {
         boxModel,
         boxModelContainer: this.boxModelContainer,
         ref: boxModelMain => {
@@ -79,11 +73,11 @@ class BoxModel extends PureComponent {
         onShowBoxModelHighlighter,
         onShowRulePreviewTooltip,
       }),
-      BoxModelInfo({
+      React.createElement(BoxModelInfo, {
         boxModel,
       }),
       showBoxModelProperties
-        ? BoxModelProperties({
+        ? React.createElement(BoxModelProperties, {
             boxModel,
             setSelectedNode,
             onHideBoxModelHighlighter,

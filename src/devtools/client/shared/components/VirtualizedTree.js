@@ -4,7 +4,7 @@
 /* eslint-env browser */
 "use strict";
 
-const { Component, createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { scrollIntoView } = require("devtools/client/shared/scroll");
@@ -56,7 +56,7 @@ const NUMBER_OF_OFFSCREEN_ITEMS = 1;
  *
  * Here is how we could render that data with this component:
  *
- *     class MyTree extends Component {
+ *     class MyTree extends {
  *       static get propTypes() {
  *         // The root item of the tree, with the form described above.
  *         return {
@@ -100,7 +100,7 @@ const NUMBER_OF_OFFSCREEN_ITEMS = 1;
  *       }
  *     }
  */
-class Tree extends Component {
+class Tree extends React.Component {
   static get propTypes() {
     return {
       // Required props
@@ -756,7 +756,7 @@ class Tree extends Component {
       const { item, depth } = toRender[i];
       const key = this.props.getKey(item);
       nodes.push(
-        TreeNode({
+        React.createElement(TreeNodeClass, {
           // We make a key unique depending on whether the tree node is in active or
           // inactive state to make sure that it is actually replaced and the tabbable
           // state is reset.
@@ -844,7 +844,7 @@ class Tree extends Component {
  * An arrow that displays whether its node is expanded (▼) or collapsed
  * (▶). When its node has no children, it is hidden.
  */
-class ArrowExpanderClass extends Component {
+class ArrowExpanderClass extends React.Component {
   static get propTypes() {
     return {
       item: PropTypes.any.isRequired,
@@ -888,7 +888,7 @@ class ArrowExpanderClass extends Component {
   }
 }
 
-class TreeNodeClass extends Component {
+class TreeNodeClass extends React.Component {
   static get propTypes() {
     return {
       id: PropTypes.any.isRequired,
@@ -951,7 +951,7 @@ class TreeNodeClass extends Component {
   }
 
   render() {
-    const arrow = ArrowExpander({
+    const arrow = React.createElement(ArrowExpanderClass, {
       item: this.props.item,
       expanded: this.props.expanded,
       visible: this.props.hasChildren,
@@ -1009,9 +1009,6 @@ class TreeNodeClass extends Component {
     );
   }
 }
-
-const ArrowExpander = createFactory(ArrowExpanderClass);
-const TreeNode = createFactory(TreeNodeClass);
 
 /**
  * Create a function that calls the given function `fn` only once per animation

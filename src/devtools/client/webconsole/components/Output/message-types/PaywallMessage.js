@@ -7,10 +7,7 @@
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
-const Message = React.createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
-
+const Message = require("devtools/client/webconsole/components/Output/Message");
 PaywallMessage.displayName = "PaywallMessage";
 
 PaywallMessage.propTypes = {
@@ -26,7 +23,7 @@ function PaywallMessage(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
   const { indent, source, level, timeStamp, executionPointTime } = message;
 
-  return Message({
+  return React.createElement(Message, {
     source,
     type: "paywall",
     level,

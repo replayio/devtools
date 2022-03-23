@@ -5,14 +5,14 @@
 "use strict";
 
 const Services = require("devtools/shared/services");
-const { createFactory, createRef, PureComponent } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
-const BoxModel = createFactory(require("devtools/client/inspector/boxmodel/components/BoxModel"));
+const Accordion = require("devtools/client/shared/components/Accordion");
+const BoxModel = require("devtools/client/inspector/boxmodel/components/BoxModel");
 
 const BoxModelTypes = require("devtools/client/inspector/boxmodel/types");
 
@@ -24,7 +24,7 @@ const LAYOUT_L10N = new LocalizationHelper(LAYOUT_STRINGS_URI);
 
 const BOXMODEL_OPENED_PREF = "devtools.layout.boxmodel.opened";
 
-class LayoutApp extends PureComponent {
+class LayoutApp extends React.PureComponent {
   static get propTypes() {
     return {
       boxModel: PropTypes.shape(BoxModelTypes.boxModel).isRequired,
@@ -39,7 +39,7 @@ class LayoutApp extends PureComponent {
 
   constructor(props) {
     super(props);
-    this.containerRef = createRef();
+    this.containerRef = React.createRef();
 
     this.scrollToTop = this.scrollToTop.bind(this);
   }
@@ -87,7 +87,7 @@ class LayoutApp extends PureComponent {
         {
           className: "h-full overflow-y-auto",
         },
-        Accordion({
+        React.createElement(Accordion, {
           items,
           style: {
             overflow: "auto",

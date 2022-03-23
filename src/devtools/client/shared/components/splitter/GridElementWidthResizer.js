@@ -4,11 +4,11 @@
 
 "use strict";
 
-const { Component, createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
-const Draggable = createFactory(require("devtools/client/shared/components/splitter/Draggable"));
+const Draggable = require("devtools/client/shared/components/splitter/Draggable");
 
-class GridElementWidthResizer extends Component {
+class GridElementWidthResizer extends React.Component {
   static get propTypes() {
     return {
       getControlledElementNode: PropTypes.func.isRequired,
@@ -119,7 +119,7 @@ class GridElementWidthResizer extends Component {
       classNames.push(this.props.className);
     }
 
-    return Draggable({
+    return React.createElement(Draggable, {
       className: classNames.join(" "),
       onStart: this.onStartMove,
       onStop: this.onStopMove,

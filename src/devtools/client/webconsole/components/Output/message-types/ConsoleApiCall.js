@@ -10,15 +10,10 @@ const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const GripMessageBody =
   require("devtools/client/webconsole/components/Output/GripMessageBody").default;
-const ConsoleTable = React.createFactory(
-  require("devtools/client/webconsole/components/Output/ConsoleTable")
-);
+const ConsoleTable = require("devtools/client/webconsole/components/Output/ConsoleTable");
 const { isGroupType, l10n } = require("devtools/client/webconsole/utils/messages");
 
-const Message = React.createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
-
+const Message = require("devtools/client/webconsole/components/Output/Message");
 ConsoleApiCall.displayName = "ConsoleApiCall";
 
 ConsoleApiCall.propTypes = {
@@ -109,7 +104,7 @@ function ConsoleApiCall(props) {
   } else if (typeof messageText === "string") {
     messageBody = messageText;
   } else if (messageText) {
-    messageBody = GripMessageBody({
+    messageBody = React.createElement(GripMessageBody, {
       dispatch,
       messageId,
       grip: messageText,
@@ -121,7 +116,7 @@ function ConsoleApiCall(props) {
 
   let attachment = null;
   if (type === "table") {
-    attachment = ConsoleTable({
+    attachment = React.createElement(ConsoleTable, {
       dispatch,
       id: message.id,
       parameters: message.parameters,
@@ -136,7 +131,7 @@ function ConsoleApiCall(props) {
 
   const collapsible = isGroupType(type) || (level === "error" && Array.isArray(stacktrace));
   const topLevelClasses = ["cm-s-mozilla"];
-  return Message({
+  return React.createElement(Message, {
     messageId,
     executionPoint,
     executionPointTime,
@@ -184,7 +179,7 @@ function formatReps(options = {}) {
     parameters
       // Get all the grips.
       .map((grip, key) =>
-        GripMessageBody({
+        React.createElement(GripMessageBody, {
           dispatch,
           messageId,
           grip,
