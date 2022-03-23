@@ -8,6 +8,7 @@ import {
   UpdateCommentReplyContent,
   UpdateCommentReplyContentVariables,
 } from "graphql/UpdateCommentReplyContent";
+import { GetComments, GetCommentsVariables } from "graphql/GetComments";
 
 const NO_COMMENTS: Comment[] = [];
 
@@ -16,7 +17,7 @@ export function useGetComments(recordingId: RecordingId): {
   loading: boolean;
   error?: ApolloError;
 } {
-  const { data, loading, error } = useQuery(GET_COMMENTS, {
+  const { data, loading, error } = useQuery<GetComments, GetCommentsVariables>(GET_COMMENTS, {
     variables: { recordingId },
     pollInterval: 5000,
   });

@@ -29,6 +29,19 @@ import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
 } from "graphql/AcceptRecordingCollaboratorRequest";
+import { GetRecording, GetRecordingVariables } from "graphql/GetRecording";
+import { GetRecordingUserId, GetRecordingUserIdVariables } from "graphql/GetRecordingUserId";
+import { GetMyRecordings } from "graphql/GetMyRecordings";
+import { getRecordingPhoto, getRecordingPhotoVariables } from "graphql/getRecordingPhoto";
+import {
+  GetOwnerAndCollaborators,
+  GetOwnerAndCollaboratorsVariables,
+} from "graphql/GetOwnerAndCollaborators";
+import { GetRecordingPrivacy, GetRecordingPrivacyVariables } from "graphql/GetRecordingPrivacy";
+import {
+  GetWorkspaceRecordings,
+  GetWorkspaceRecordingsVariables,
+} from "graphql/GetWorkspaceRecordings";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -148,7 +161,7 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
   isAuthorized: boolean;
   loading: boolean;
 } {
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
     variables: { recordingId },
     skip: !recordingId,
   });
@@ -166,7 +179,7 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
 
 export function useIsTeamDeveloper() {
   const recordingId = getRecordingId();
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
     variables: { recordingId },
   });
 
@@ -181,7 +194,7 @@ export function useIsTeamDeveloper() {
 // don't own, or a team recording for a team that they don't belong to.
 export function useHasNoRole() {
   const recordingId = getRecordingId();
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
     variables: { recordingId },
   });
 
@@ -228,7 +241,7 @@ export function useGetRecordingPhoto(recordingId: RecordingId): {
   loading: boolean;
   screenData?: string;
 } {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<getRecordingPhoto, getRecordingPhotoVariables>(
     gql`
       query getRecordingPhoto($recordingId: UUID!) {
         recording(uuid: $recordingId) {
@@ -258,7 +271,10 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
   recording: Recording | undefined;
   collaborators: CollaboratorDbData[] | null;
 } {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<
+    GetOwnerAndCollaborators,
+    GetOwnerAndCollaboratorsVariables
+  >(
     gql`
       query GetOwnerAndCollaborators($recordingId: UUID!) {
         recording(uuid: $recordingId) {
@@ -332,7 +348,7 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
 }
 
 export function useGetIsPrivate(recordingId: RecordingId) {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<GetRecordingPrivacy, GetRecordingPrivacyVariables>(
     gql`
       query GetRecordingPrivacy($recordingId: UUID!) {
         recording(uuid: $recordingId) {
@@ -378,9 +394,12 @@ export function useUpdateIsPrivate() {
 export function useIsOwner() {
   const recordingId = useGetRecordingId();
   const { userId } = useGetUserId();
-  const { data, loading, error } = useQuery(GET_RECORDING_USER_ID, {
-    variables: { recordingId },
-  });
+  const { data, loading, error } = useQuery<GetRecordingUserId, GetRecordingUserIdVariables>(
+    GET_RECORDING_USER_ID,
+    {
+      variables: { recordingId },
+    }
+  );
 
   if (loading) {
     return false;
@@ -402,7 +421,7 @@ export function useIsOwner() {
 export function useGetPersonalRecordings():
   | { recordings: null; loading: true }
   | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
+  const { data, error, loading } = useQuery<GetMyRecordings>(GET_MY_RECORDINGS, {
     pollInterval: 5000,
   });
 
@@ -424,7 +443,10 @@ export function useGetPersonalRecordings():
 export function useGetWorkspaceRecordings(
   currentWorkspaceId: WorkspaceId
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery(GET_WORKSPACE_RECORDINGS, {
+  const { data, error, loading } = useQuery<
+    GetWorkspaceRecordings,
+    GetWorkspaceRecordingsVariables
+  >(GET_WORKSPACE_RECORDINGS, {
     variables: { workspaceId: currentWorkspaceId },
     pollInterval: 5000,
   });

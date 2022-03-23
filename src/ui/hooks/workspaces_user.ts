@@ -11,6 +11,7 @@ import {
   DeleteUserFromWorkspace,
   DeleteUserFromWorkspaceVariables,
 } from "graphql/DeleteUserFromWorkspace";
+import { GetWorkspaceMembers, GetWorkspaceMembersVariables } from "graphql/GetWorkspaceMembers";
 import {
   InviteNewWorkspaceMember,
   InviteNewWorkspaceMemberVariables,
@@ -22,7 +23,7 @@ import {
 import { WorkspaceUser } from "ui/types";
 
 export function useGetWorkspaceMembers(workspaceId: string) {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<GetWorkspaceMembers, GetWorkspaceMembersVariables>(
     gql`
       query GetWorkspaceMembers($workspaceId: ID!) {
         node(id: $workspaceId) {

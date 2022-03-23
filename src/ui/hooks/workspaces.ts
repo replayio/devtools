@@ -8,6 +8,8 @@ import {
   DeleteWorkspaceAPIKey,
   DeleteWorkspaceAPIKeyVariables,
 } from "graphql/DeleteWorkspaceAPIKey";
+import { GetNonPendingWorkspaces } from "graphql/GetNonPendingWorkspaces";
+import { GetPendingWorkspaces } from "graphql/GetPendingWorkspaces";
 import {
   UpdateWorkspaceCodeDomainLimitations,
   UpdateWorkspaceCodeDomainLimitationsVariables,
@@ -65,7 +67,7 @@ export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
 }
 
 export function useGetPendingWorkspaces() {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<GetPendingWorkspaces>(
     gql`
       query GetPendingWorkspaces {
         viewer {
@@ -173,7 +175,7 @@ export function useUpdateWorkspaceSettings() {
 }
 
 export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading: boolean } {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<GetNonPendingWorkspaces>(
     gql`
       query GetNonPendingWorkspaces {
         viewer {

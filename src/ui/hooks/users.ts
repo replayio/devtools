@@ -13,6 +13,8 @@ import {
   unsubscribeToEmailTypeVariables,
 } from "graphql/unsubscribeToEmailType";
 import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
+import { GetUserId } from "graphql/GetUserId";
+import { GetUser } from "graphql/GetUser";
 
 export async function getUserId() {
   const result = await query({
@@ -31,7 +33,7 @@ export async function dismissNag(nag: Nag) {
 }
 
 export function useGetUserId() {
-  const { data, loading, error } = useQuery(GET_USER_ID);
+  const { data, loading, error } = useQuery<GetUserId>(GET_USER_ID);
   return { userId: data?.viewer?.user.id, loading, error };
 }
 
@@ -111,7 +113,7 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
 }
 
 export function useGetUserInfo(): UserInfo & { loading: boolean } {
-  const { data, loading, error } = useQuery(GET_USER_INFO);
+  const { data, loading, error } = useQuery<GetUser>(GET_USER_INFO);
 
   if (error) {
     console.error("Apollo error while fetching user:", error);

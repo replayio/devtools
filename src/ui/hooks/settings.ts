@@ -28,6 +28,7 @@ import {
   UpdateUserSettingsReact,
   UpdateUserSettingsReactVariables,
 } from "graphql/UpdateUserSettingsReact";
+import { GetUserSettings } from "graphql/GetUserSettings";
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
@@ -59,7 +60,7 @@ export async function getUserSettings(): Promise<ExperimentalUserSettings> {
 
 export function useGetUserSettings() {
   const { isAuthenticated } = useAuth0();
-  const { data, error, loading } = useQuery(GET_USER_SETTINGS);
+  const { data, error, loading } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
 
   if (isTest()) {
     return { userSettings: testSettings, loading: false };
