@@ -10,6 +10,25 @@ import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 import { ColorSwatchIcon } from "@heroicons/react/solid";
+import {
+  SetRecordingIsPrivate,
+  SetRecordingIsPrivateVariables,
+} from "graphql/SetRecordingIsPrivate";
+import {
+  UpdateRecordingWorkspace,
+  UpdateRecordingWorkspaceVariables,
+} from "graphql/UpdateRecordingWorkspace";
+import { DeleteRecording, DeleteRecordingVariables } from "graphql/DeleteRecording";
+import { InitializeRecording, InitializeRecordingVariables } from "graphql/InitializeRecording";
+import { UpdateRecordingTitle, UpdateRecordingTitleVariables } from "graphql/UpdateRecordingTitle";
+import {
+  RequestRecordingAccess,
+  RequestRecordingAccessVariables,
+} from "graphql/RequestRecordingAccess";
+import {
+  AcceptRecordingCollaboratorRequest,
+  AcceptRecordingCollaboratorRequestVariables,
+} from "graphql/AcceptRecordingCollaboratorRequest";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -341,7 +360,7 @@ export function useGetIsPrivate(recordingId: RecordingId) {
 }
 
 export function useUpdateIsPrivate() {
-  const [updateIsPrivate] = useMutation(
+  const [updateIsPrivate] = useMutation<SetRecordingIsPrivate, SetRecordingIsPrivateVariables>(
     gql`
       mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
         updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
@@ -426,7 +445,10 @@ export function useGetWorkspaceRecordings(
 }
 
 export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
-  const [updateRecordingWorkspace] = useMutation(
+  const [updateRecordingWorkspace] = useMutation<
+    UpdateRecordingWorkspace,
+    UpdateRecordingWorkspaceVariables
+  >(
     gql`
       mutation UpdateRecordingWorkspace($recordingId: ID!, $workspaceId: ID) {
         updateRecordingWorkspace(input: { id: $recordingId, workspaceId: $workspaceId }) {
@@ -609,15 +631,20 @@ const DELETE_RECORDING = gql`
 `;
 
 export function useDeleteRecording(onCompleted: () => void) {
-  const [deleteRecording] = useMutation(DELETE_RECORDING, {
-    onCompleted,
-  });
+  const [deleteRecording] = useMutation<DeleteRecording, DeleteRecordingVariables>(
+    DELETE_RECORDING,
+    {
+      onCompleted,
+    }
+  );
 
   return deleteRecording;
 }
 
 export function useDeleteRecordingFromLibrary() {
-  const [deleteRecording] = useMutation(DELETE_RECORDING);
+  const [deleteRecording] = useMutation<DeleteRecording, DeleteRecordingVariables>(
+    DELETE_RECORDING
+  );
 
   return (recordingId: RecordingId, workspaceId: WorkspaceId | null) => {
     deleteRecording({
@@ -685,7 +712,7 @@ export function useDeleteRecordingFromLibrary() {
 }
 
 export function useInitializeRecording() {
-  const [initializeRecording] = useMutation(
+  const [initializeRecording] = useMutation<InitializeRecording, InitializeRecordingVariables>(
     gql`
       mutation InitializeRecording($recordingId: ID!, $title: String!, $workspaceId: ID) {
         initializeRecording(input: { id: $recordingId, title: $title, workspaceId: $workspaceId }) {
@@ -708,7 +735,7 @@ export function useInitializeRecording() {
 }
 
 export function useUpdateRecordingTitle() {
-  const [updateRecordingTitle] = useMutation(
+  const [updateRecordingTitle] = useMutation<UpdateRecordingTitle, UpdateRecordingTitleVariables>(
     gql`
       mutation UpdateRecordingTitle($recordingId: ID!, $title: String!) {
         updateRecordingTitle(input: { id: $recordingId, title: $title }) {
@@ -780,7 +807,10 @@ export async function getRecordingMetadata(id: string) {
 export function useRequestRecordingAccess() {
   const recordingId = useGetRecordingId();
 
-  const [requestRecordingAccess] = useMutation(
+  const [requestRecordingAccess] = useMutation<
+    RequestRecordingAccess,
+    RequestRecordingAccessVariables
+  >(
     gql`
       mutation RequestRecordingAccess($recordingId: ID!) {
         requestRecordingAccess(input: { recordingId: $recordingId }) {
@@ -794,7 +824,10 @@ export function useRequestRecordingAccess() {
 }
 
 export function useAcceptRecordingRequest() {
-  const [acceptRecordingRequest] = useMutation(
+  const [acceptRecordingRequest] = useMutation<
+    AcceptRecordingCollaboratorRequest,
+    AcceptRecordingCollaboratorRequestVariables
+  >(
     gql`
       mutation AcceptRecordingCollaboratorRequest($requestId: ID!) {
         acceptRecordingCollaboratorRequest(input: { id: $requestId }) {
