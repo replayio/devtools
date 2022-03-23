@@ -20,7 +20,9 @@ function Collaborator({
 }) {
   const { deleteCollaborator } = hooks.useDeleteCollaborator();
   const handleDeleteClick = () => {
-    deleteCollaborator({ variables: { collaborationId } });
+    if (collaborationId) {
+      deleteCollaborator({ variables: { collaborationId } });
+    }
   };
   let iconAndName;
 

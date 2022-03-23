@@ -37,7 +37,7 @@ export default function Share() {
         return;
       }
 
-      if (auth0.isAuthenticated) {
+      if (auth0.isAuthenticated && invitationCode) {
         claimTeamInvitationCode({ variables: { code: invitationCode } });
       } else {
         // If the user is not logged in, show them the login screen
