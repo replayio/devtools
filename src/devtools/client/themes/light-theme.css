@@ -158,7 +158,7 @@
   font-family: inherit;
   font-size: inherit;
   /* disabled to show the icon for typing into the terminal. */
-  /*background: transparent;*/
+  background: transparent;
 }
 
 .CodeMirror.cm-s-mozilla pre,
