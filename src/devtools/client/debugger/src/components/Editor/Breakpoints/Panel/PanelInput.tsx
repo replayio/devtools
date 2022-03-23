@@ -3,6 +3,7 @@ import {
   EditorWithAutocomplete,
   Keys,
 } from "ui/components/shared/CodeEditor/EditorWithAutocomplete";
+import { useFeature } from "ui/hooks/settings";
 
 export function PanelInput({
   autofocus,
@@ -17,6 +18,7 @@ export function PanelInput({
   onEnter: () => void;
   onEscape: () => void;
 }) {
+  const { value: enableBreakpointPanelAutocomplete } = useFeature("breakpointPanelAutocomplete");
   const onKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER) {
       e.preventDefault();
@@ -34,6 +36,7 @@ export function PanelInput({
         value={value}
         setValue={onChange}
         onRegularKeyPress={onKeyPress}
+        disableAutocomplete={!enableBreakpointPanelAutocomplete}
       />
     </div>
   );

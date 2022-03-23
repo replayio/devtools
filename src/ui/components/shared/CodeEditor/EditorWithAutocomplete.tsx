@@ -32,12 +32,14 @@ export function EditorWithAutocomplete({
   onPreviewAvailable,
   setValue,
   value,
+  disableAutocomplete,
 }: {
   onEditorMount: (editor: Editor, showAutocomplete?: (show: boolean) => void) => void;
   onRegularKeyPress: (e: KeyboardEvent) => void;
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
   value: string;
+  disableAutocomplete?: boolean;
 }) {
   const {
     autocompleteIndex,
@@ -103,6 +105,20 @@ export function EditorWithAutocomplete({
       resetAutocompleteIndex();
     }
   };
+
+  if (disableAutocomplete) {
+    return (
+      <div className="flex items-center relative">
+        <ControlledCodeMirror
+          onKeyPress={onKeyPress}
+          value={value}
+          onSelection={onSelection}
+          setValue={setValue}
+          onEditorMount={(editor: Editor) => onEditorMount(editor, showAutocomplete)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center relative">
