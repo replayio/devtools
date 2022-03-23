@@ -11,7 +11,7 @@ export interface GetUser_viewer_user {
   __typename: "User";
   name: string | null;
   picture: string | null;
-  id: string;
+  id: string | "yolo";
 }
 
 export interface GetUser_viewer_features {
