@@ -1,5 +1,18 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
+  CreateWorkspaceAPIKey,
+  CreateWorkspaceAPIKeyVariables,
+} from "graphql/CreateWorkspaceAPIKey";
+import { DeleteWorkspace, DeleteWorkspaceVariables } from "graphql/DeleteWorkspace";
+import {
+  DeleteWorkspaceAPIKey,
+  DeleteWorkspaceAPIKeyVariables,
+} from "graphql/DeleteWorkspaceAPIKey";
+import {
+  UpdateWorkspaceCodeDomainLimitations,
+  UpdateWorkspaceCodeDomainLimitationsVariables,
+} from "graphql/UpdateWorkspaceCodeDomainLimitations";
+import {
   ACTIVATE_WORKSPACE_SUBSCRIPTION,
   ADD_WORKSPACE_API_KEY,
   CANCEL_WORKSPACE_SUBSCRIPTION,
@@ -227,7 +240,10 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
 }
 
 export function useUpdateWorkspaceCodeDomainLimitations() {
-  const [updateWorkspaceCodeDomainLimitations] = useMutation(
+  const [updateWorkspaceCodeDomainLimitations] = useMutation<
+    UpdateWorkspaceCodeDomainLimitations,
+    UpdateWorkspaceCodeDomainLimitationsVariables
+  >(
     gql`
       mutation UpdateWorkspaceCodeDomainLimitations($workspaceId: ID!, $isLimited: Boolean!) {
         updateWorkspaceCodeDomainLimitations(
@@ -246,7 +262,7 @@ export function useUpdateWorkspaceCodeDomainLimitations() {
 }
 
 export function useDeleteWorkspace() {
-  const [deleteWorkspace] = useMutation(
+  const [deleteWorkspace] = useMutation<DeleteWorkspace, DeleteWorkspaceVariables>(
     gql`
       mutation DeleteWorkspace($workspaceId: ID!, $shouldDeleteRecordings: Boolean!) {
         deleteWorkspace(
@@ -276,7 +292,10 @@ export function useGetWorkspaceApiKeys(workspaceId: string) {
 }
 
 export function useAddWorkspaceApiKey() {
-  const [addWorkspaceApiKey, { loading, error }] = useMutation(ADD_WORKSPACE_API_KEY, {
+  const [addWorkspaceApiKey, { loading, error }] = useMutation<
+    CreateWorkspaceAPIKey,
+    CreateWorkspaceAPIKeyVariables
+  >(ADD_WORKSPACE_API_KEY, {
     refetchQueries: ["GetWorkspaceApiKeys"],
   });
 
@@ -284,7 +303,10 @@ export function useAddWorkspaceApiKey() {
 }
 
 export function useDeleteWorkspaceApiKey() {
-  const [deleteWorkspaceApiKey, { loading, error }] = useMutation(DELETE_WORKSPACE_API_KEY, {
+  const [deleteWorkspaceApiKey, { loading, error }] = useMutation<
+    DeleteWorkspaceAPIKey,
+    DeleteWorkspaceAPIKeyVariables
+  >(DELETE_WORKSPACE_API_KEY, {
     refetchQueries: ["GetWorkspaceApiKeys"],
   });
 
