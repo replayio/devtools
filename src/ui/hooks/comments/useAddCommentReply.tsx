@@ -5,12 +5,13 @@ import { GET_COMMENTS } from "ui/graphql/comments";
 import { Reply } from "ui/state/comments";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { useGetRecordingId } from "../recordings";
+import { AddCommentReply, AddCommentReplyVariables } from "graphql/AddCommentReply";
 
 export default function useAddCommentReply() {
   const { user } = useAuth0();
   const recordingId = useGetRecordingId();
 
-  const [addCommentReply, { error }] = useMutation(
+  const [addCommentReply, { error }] = useMutation<AddCommentReply, AddCommentReplyVariables>(
     gql`
       mutation AddCommentReply($input: AddCommentReplyInput!) {
         addCommentReply(input: $input) {

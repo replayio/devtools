@@ -5,9 +5,10 @@ import { GET_COMMENTS } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import omit from "lodash/omit";
 import { GET_USER_ID } from "ui/graphql/users";
+import { AddComment, AddCommentVariables } from "graphql/AddComment";
 
 export default function useAddComment() {
-  const [addComment, { error }] = useMutation(
+  const [addComment, { error }] = useMutation<AddComment, AddCommentVariables>(
     gql`
       mutation AddComment($input: AddCommentInput!) {
         addComment(input: $input) {

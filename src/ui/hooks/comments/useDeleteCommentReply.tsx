@@ -1,9 +1,13 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useMutation } from "@apollo/client";
 import { GET_COMMENTS } from "ui/graphql/comments";
+import { DeleteCommentReply, DeleteCommentReplyVariables } from "graphql/DeleteCommentReply";
 
 export default function useDeleteCommentReply() {
-  const [deleteCommentReply, { error }] = useMutation(
+  const [deleteCommentReply, { error }] = useMutation<
+    DeleteCommentReply,
+    DeleteCommentReplyVariables
+  >(
     gql`
       mutation DeleteCommentReply($commentReplyId: ID!) {
         deleteCommentReply(input: { id: $commentReplyId }) {

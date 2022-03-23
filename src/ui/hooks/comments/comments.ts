@@ -3,6 +3,11 @@ import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { Comment, CommentPosition } from "ui/state/comments";
 import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
+import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
+import {
+  UpdateCommentReplyContent,
+  UpdateCommentReplyContentVariables,
+} from "graphql/UpdateCommentReplyContent";
 
 const NO_COMMENTS: Comment[] = [];
 
@@ -36,7 +41,10 @@ export function useGetComments(recordingId: RecordingId): {
 }
 
 export function useUpdateComment() {
-  const [updateCommentContent, { error }] = useMutation(
+  const [updateCommentContent, { error }] = useMutation<
+    UpdateCommentContent,
+    UpdateCommentContentVariables
+  >(
     gql`
       mutation UpdateCommentContent($newContent: String!, $commentId: ID!, $position: JSONObject) {
         updateComment(input: { id: $commentId, content: $newContent, position: $position }) {
@@ -73,7 +81,10 @@ export function useUpdateComment() {
 }
 
 export function useUpdateCommentReply() {
-  const [updateCommentReplyContent, { error }] = useMutation(
+  const [updateCommentReplyContent, { error }] = useMutation<
+    UpdateCommentReplyContent,
+    UpdateCommentReplyContentVariables
+  >(
     gql`
       mutation UpdateCommentReplyContent($newContent: String!, $commentId: ID!) {
         updateCommentReply(input: { id: $commentId, content: $newContent }) {
