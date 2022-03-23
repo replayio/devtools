@@ -13,10 +13,8 @@ const {
 
 const { MODE } = require("devtools/packages/devtools-reps");
 
-const GripMessageBody = React.createFactory(
-  require("devtools/client/webconsole/components/Output/GripMessageBody").default
-);
-
+const GripMessageBody =
+  require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 const PropTypes = require("prop-types");
 
 const TABLE_ROW_MAX_ITEMS = 1000;
@@ -68,7 +66,7 @@ class ConsoleTable extends React.Component {
         const cellContent =
           typeof cellValue === "undefined"
             ? ""
-            : GripMessageBody({
+            : React.createElement(GripMessageBody, {
                 grip: cellValue,
                 mode: MODE.SHORT,
                 useQuotes: false,

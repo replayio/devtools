@@ -7,10 +7,7 @@
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
-const Message = React.createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
-
+const Message = require("devtools/client/webconsole/components/Output/Message");
 ConsoleCommand.displayName = "ConsoleCommand";
 
 ConsoleCommand.propTypes = {
@@ -31,7 +28,7 @@ function ConsoleCommand(props) {
   // (no CodeMirror editor), then it will just render text.
   const messageBody = React.createElement("syntax-highlighted", null, messageText);
 
-  return Message({
+  return React.createElement(Message, {
     source,
     type,
     level,

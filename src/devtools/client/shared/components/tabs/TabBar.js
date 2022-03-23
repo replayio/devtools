@@ -6,11 +6,11 @@
 
 "use strict";
 
-const { Component, createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 
-const Sidebar = createFactory(require("devtools/client/shared/components/Sidebar"));
+const Sidebar = require("devtools/client/shared/components/Sidebar");
 
 // Shortcuts
 const { div } = dom;
@@ -18,7 +18,7 @@ const { div } = dom;
 /**
  * Renders Tabbar component.
  */
-class Tabbar extends Component {
+class Tabbar extends React.Component {
   static get propTypes() {
     return {
       children: PropTypes.array,
@@ -325,7 +325,8 @@ class Tabbar extends Component {
 
     return div(
       { className: "devtools-sidebar-tabs" },
-      Sidebar(
+      React.createElement(
+        Sidebar,
         {
           onAllTabsMenuClick: this.onAllTabsMenuClick,
           renderOnlySelected: this.props.renderOnlySelected,

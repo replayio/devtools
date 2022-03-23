@@ -4,14 +4,14 @@
 
 "use strict";
 
-const { createFactory, createRef, Component, cloneElement } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 const { ul, li, div } = require("react-dom-factories");
 
 const { scrollIntoView } = require("devtools/client/shared/scroll");
 const { preventDefaultAndStopPropagation } = require("devtools/client/shared/events");
 
-class ListItemClass extends Component {
+class ListItemClass extends React.Component {
   static get propTypes() {
     return {
       active: PropTypes.bool,
@@ -29,7 +29,7 @@ class ListItemClass extends Component {
   constructor(props) {
     super(props);
 
-    this.contentRef = createRef();
+    this.contentRef = React.createRef();
 
     this._setTabbableState = this._setTabbableState.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -102,15 +102,15 @@ class ListItemClass extends Component {
           role: "presentation",
           ref: this.contentRef,
         },
-        cloneElement(component, componentProps || {})
+        React.cloneElement(component, componentProps || {})
       )
     );
   }
 }
 
-const ListItem = createFactory(ListItemClass);
+const ListItem = ListItemClass;
 
-class List extends Component {
+class List extends React.Component {
   static get propTypes() {
     return {
       // A list of all items to be rendered using a List component.
@@ -137,7 +137,7 @@ class List extends Component {
   constructor(props) {
     super(props);
 
-    this.listRef = createRef();
+    this.listRef = React.createRef();
 
     this.state = {
       active: null,
@@ -305,7 +305,7 @@ class List extends Component {
         "aria-activedescendant": current != null ? items[current].key : null,
       },
       items.map((item, index) => {
-        return ListItem({
+        return React.createElement(ListItem, {
           item,
           current: index === current,
           active: index === active,

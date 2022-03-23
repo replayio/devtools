@@ -4,13 +4,13 @@
 
 "use strict";
 
-const { createFactory, PureComponent } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 
-const SidebarToggle = createFactory(require("devtools/client/shared/components/SidebarToggle"));
-const Tabs = createFactory(require("devtools/client/shared/components/tabs/Tabs").Tabs);
+const SidebarToggle = require("devtools/client/shared/components/SidebarToggle");
+const Tabs = require("devtools/client/shared/components/tabs/Tabs").Tabs;
 
-class Sidebar extends PureComponent {
+class Sidebar extends React.PureComponent {
   static get propTypes() {
     return {
       children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired,
@@ -43,7 +43,7 @@ class Sidebar extends PureComponent {
     const { collapsed, collapsePaneTitle, expandPaneTitle, onClick, alignRight, canVerticalSplit } =
       this.props.sidebarToggleButton;
 
-    return SidebarToggle({
+    return React.createElement(SidebarToggle, {
       collapsed,
       collapsePaneTitle,
       expandPaneTitle,
@@ -64,7 +64,8 @@ class Sidebar extends PureComponent {
       activeTab,
     } = this.props;
 
-    return Tabs(
+    return React.createElement(
+      Tabs,
       {
         onAfterChange,
         onAllTabsMenuClick,

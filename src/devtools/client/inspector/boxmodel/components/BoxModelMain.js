@@ -4,22 +4,20 @@
 
 "use strict";
 
-const { createFactory, PureComponent } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const BoxModelEditable = createFactory(
-  require("devtools/client/inspector/boxmodel/components/BoxModelEditable")
-);
+const BoxModelEditable = require("devtools/client/inspector/boxmodel/components/BoxModelEditable");
 
 const Types = require("devtools/client/inspector/boxmodel/types");
 
 const SHARED_STRINGS_URI = "devtools/client/locales/shared.properties";
 const SHARED_L10N = new LocalizationHelper(SHARED_STRINGS_URI);
 
-class BoxModelMain extends PureComponent {
+class BoxModelMain extends React.PureComponent {
   static get propTypes() {
     return {
       boxModel: PropTypes.shape(Types.boxModel).isRequired,
@@ -429,7 +427,7 @@ class BoxModelMain extends PureComponent {
       layout["box-sizing"] == "content-box"
         ? dom.div(
             { className: "boxmodel-size" },
-            BoxModelEditable({
+            React.createElement(BoxModelEditable, {
               box: "content",
               focusable,
               level,
@@ -442,7 +440,7 @@ class BoxModelMain extends PureComponent {
               onShowRulePreviewTooltip,
             }),
             dom.span({}, "\u00D7"),
-            BoxModelEditable({
+            React.createElement(BoxModelEditable, {
               box: "content",
               focusable,
               level,
@@ -545,7 +543,7 @@ class BoxModelMain extends PureComponent {
         )
       ),
       displayPosition
-        ? BoxModelEditable({
+        ? React.createElement(BoxModelEditable, {
             box: "position",
             direction: "top",
             focusable,
@@ -560,7 +558,7 @@ class BoxModelMain extends PureComponent {
           })
         : null,
       displayPosition
-        ? BoxModelEditable({
+        ? React.createElement(BoxModelEditable, {
             box: "position",
             direction: "right",
             focusable,
@@ -572,7 +570,7 @@ class BoxModelMain extends PureComponent {
           })
         : null,
       displayPosition
-        ? BoxModelEditable({
+        ? React.createElement(BoxModelEditable, {
             box: "position",
             direction: "bottom",
             focusable,
@@ -584,7 +582,7 @@ class BoxModelMain extends PureComponent {
           })
         : null,
       displayPosition
-        ? BoxModelEditable({
+        ? React.createElement(BoxModelEditable, {
             box: "position",
             direction: "left",
             focusable,
@@ -595,7 +593,7 @@ class BoxModelMain extends PureComponent {
             onShowRulePreviewTooltip,
           })
         : null,
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "top",
         focusable,
@@ -608,7 +606,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "right",
         focusable,
@@ -618,7 +616,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "bottom",
         focusable,
@@ -628,7 +626,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "left",
         focusable,
@@ -638,7 +636,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "border",
         direction: "top",
         focusable,
@@ -651,7 +649,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "border",
         direction: "right",
         focusable,
@@ -661,7 +659,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "border",
         direction: "bottom",
         focusable,
@@ -671,7 +669,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "border",
         direction: "left",
         focusable,
@@ -681,7 +679,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "top",
         focusable,
@@ -694,7 +692,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "right",
         focusable,
@@ -704,7 +702,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "bottom",
         focusable,
@@ -714,7 +712,7 @@ class BoxModelMain extends PureComponent {
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
       }),
-      BoxModelEditable({
+      React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "left",
         focusable,

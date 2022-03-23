@@ -7,9 +7,7 @@
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
-const Message = React.createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
+const Message = require("devtools/client/webconsole/components/Output/Message");
 const GripMessageBody =
   require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 
@@ -70,7 +68,7 @@ function EvaluationResult(props) {
 
   const topLevelClasses = ["cm-s-mozilla"];
 
-  return Message({
+  return React.createElement(Message, {
     dispatch,
     source,
     type,

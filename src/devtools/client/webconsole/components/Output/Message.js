@@ -14,7 +14,7 @@ const { actions } = require("ui/actions/index");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
-const FrameView = React.createFactory(require("devtools/client/shared/components/Frame"));
+const FrameView = require("devtools/client/shared/components/Frame");
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
@@ -391,7 +391,7 @@ class Message extends React.Component {
           dom.span(
             { className: "message-location devtools-monospace" },
             note.frame
-              ? FrameView({
+              ? React.createElement(FrameView, {
                   frame: note.frame,
                   onClick: this.onViewSourceInDebugger,
                   showEmptyPathAsHost: true,
@@ -413,7 +413,7 @@ class Message extends React.Component {
     const location = dom.span(
       { className: "message-location devtools-monospace" },
       frame
-        ? FrameView({
+        ? React.createElement(FrameView, {
             frame,
             onClick: frame ? this.onViewSourceInDebugger : undefined,
             showEmptyPathAsHost: true,

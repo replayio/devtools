@@ -5,15 +5,15 @@
 
 // Make this available to both AMD and CJS environments
 define(function (require, exports, module) {
-  const { cloneElement, Component, createFactory, createRef } = require("react");
+  const React = require("react");
   const { findDOMNode } = require("react-dom");
   const PropTypes = require("prop-types");
   const dom = require("react-dom-factories");
 
   // Reps
   const { ObjectProvider } = require("devtools/client/shared/components/tree/ObjectProvider");
-  const TreeRow = createFactory(require("devtools/client/shared/components/tree/TreeRow"));
-  const TreeHeader = createFactory(require("devtools/client/shared/components/tree/TreeHeader"));
+  const TreeRow = require("devtools/client/shared/components/tree/TreeRow");
+  const TreeHeader = require("devtools/client/shared/components/tree/TreeHeader");
 
   const { scrollIntoView } = require("devtools/client/shared/scroll");
 
@@ -75,7 +75,7 @@ define(function (require, exports, module) {
    *   renderLabelCell: function(object);
    * }
    */
-  class TreeView extends Component {
+  class TreeView extends React.Component {
     // The only required property (not set by default) is the input data
     // object that is used to populate the tree.
     static get propTypes() {
@@ -207,7 +207,7 @@ define(function (require, exports, module) {
         lastSelectedIndex: 0,
       };
 
-      this.treeRef = createRef();
+      this.treeRef = React.createRef();
 
       this.toggle = this.toggle.bind(this);
       this.isExpanded = this.isExpanded.bind(this);
@@ -571,7 +571,7 @@ define(function (require, exports, module) {
     renderRows(parent, level = 0, path = "") {
       let rows = [];
       const decorator = this.props.decorator;
-      let renderRow = this.props.renderRow || TreeRow;
+      let renderRow = this.props.renderRow || (props => React.createElement(TreeRow, props));
 
       // Get children for given parent node, iterate over them and render
       // a row for every one. Use row template (a component) from properties.
@@ -610,7 +610,7 @@ define(function (require, exports, module) {
           if (!Array.isArray(childRows)) {
             const lastIndex = rows.length - 1;
             props.member.loading = true;
-            rows[lastIndex] = cloneElement(rows[lastIndex], props);
+            rows[lastIndex] = React.cloneElement(rows[lastIndex], props);
           } else {
             rows = rows.concat(childRows);
           }
@@ -670,7 +670,7 @@ define(function (require, exports, module) {
           cellPadding: 0,
           cellSpacing: 0,
         },
-        TreeHeader(props),
+        React.createElement(TreeHeader, props),
         dom.tbody(
           {
             role: "presentation",

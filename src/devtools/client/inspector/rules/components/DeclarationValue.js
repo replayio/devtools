@@ -1,14 +1,12 @@
-const { createFactory, PureComponent } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 const { COLOR, FONT_FAMILY, URI } = require("devtools/client/shared/output-parser");
 
-const Color = createFactory(require("devtools/client/inspector/rules/components/value/Color"));
-const FontFamily = createFactory(
-  require("devtools/client/inspector/rules/components/value/FontFamily")
-);
-const Url = createFactory(require("devtools/client/inspector/rules/components/value/Url"));
+const Color = require("devtools/client/inspector/rules/components/value/Color");
+const FontFamily = require("devtools/client/inspector/rules/components/value/FontFamily");
+const Url = require("devtools/client/inspector/rules/components/value/Url");
 
-class DeclarationValue extends PureComponent {
+class DeclarationValue extends React.PureComponent {
   static get propTypes() {
     return {
       colorSpanClassName: PropTypes.string,
@@ -29,20 +27,20 @@ class DeclarationValue extends PureComponent {
 
       switch (type) {
         case COLOR:
-          return Color({
+          return React.createElement(Color, {
             colorSpanClassName: this.props.colorSpanClassName,
             colorSwatchClassName: this.props.colorSwatchClassName,
             key: value,
             value,
           });
         case FONT_FAMILY:
-          return FontFamily({
+          return React.createElement(FontFamily, {
             fontFamilySpanClassName: this.props.fontFamilySpanClassName,
             key: value,
             value,
           });
         case URI:
-          return Url({
+          return React.createElement(Url, {
             key: value,
             href: v.href,
             value,
