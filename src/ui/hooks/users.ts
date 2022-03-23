@@ -119,16 +119,19 @@ export function useGetUserInfo(): UserInfo & { loading: boolean } {
     console.error("Apollo error while fetching user:", error);
   }
 
-  const id: string = data?.viewer?.user.id;
-  const picture: string = data?.viewer?.user.picture;
-  const name: string = data?.viewer?.user.name;
-  const email: string = data?.viewer?.email;
-  const internal: boolean = data?.viewer?.internal;
-  const nags: Nag[] = data?.viewer?.nags;
-  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer?.unsubscribedEmailTypes;
-  const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion;
-  const motd: string = data?.viewer?.motd;
-  const features = data?.viewer?.features || {};
+  const id: string = data?.viewer?.user.id!;
+  const picture: string = data?.viewer?.user.picture!;
+  const name: string = data?.viewer?.user.name!;
+  const email: string = data?.viewer?.email!;
+  const internal: boolean = data?.viewer?.internal!;
+  const nags: Nag[] = data?.viewer?.nags as Nag[];
+  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer
+    ?.unsubscribedEmailTypes as EmailSubscription[];
+  const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion ?? null;
+  const motd: string = data?.viewer?.motd!;
+  const features = data?.viewer?.features || {
+    library: false,
+  };
 
   return {
     loading,
@@ -253,7 +256,7 @@ export function useGetUserPermissions(recording: Recording) {
   }
 
   const isOwner = userId == recording.user?.id;
-  const isPrivileged = isPrivilegedUser(recording, userId, workspaces);
+  const isPrivileged = userId ? isPrivilegedUser(recording, userId, workspaces) : false;
 
   return {
     loading: false,
