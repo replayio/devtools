@@ -24,7 +24,9 @@ export default function useDeleteCommentReply() {
   return (commentReplyId: string, recordingId: RecordingId) => {
     deleteCommentReply({
       variables: { commentReplyId },
-      optimisticResponse: { deleteCommentReply: { success: true } },
+      optimisticResponse: {
+        deleteCommentReply: { success: true, __typename: "DeleteCommentReply" },
+      },
       update: cache => {
         const data: any = cache.readQuery({
           query: GET_COMMENTS,

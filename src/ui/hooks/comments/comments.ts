@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { Comment, CommentPosition } from "ui/state/comments";
+import { Comment, CommentPosition, Reply } from "ui/state/comments";
 import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
 import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
 import {
@@ -9,8 +9,6 @@ import {
   UpdateCommentReplyContentVariables,
 } from "graphql/UpdateCommentReplyContent";
 import { GetComments, GetCommentsVariables } from "graphql/GetComments";
-
-const NO_COMMENTS: Comment[] = [];
 
 export function useGetComments(recordingId: RecordingId): {
   comments: Comment[];
@@ -26,8 +24,7 @@ export function useGetComments(recordingId: RecordingId): {
     console.error("Apollo error while fetching comments:", error);
   }
 
-  let comments = data?.recording?.comments || NO_COMMENTS;
-  comments = comments.map((comment: any) => ({
+  let comments = (data?.recording?.comments ?? []).map((comment: any) => ({
     ...comment,
     replies: comment.replies.map((reply: any) => ({
       ...reply,
@@ -103,7 +100,7 @@ export function useUpdateCommentReply() {
     updateCommentReplyContent({
       variables: { commentId, newContent },
       optimisticResponse: {
-        updateComment: {
+        updateCommentReply: {
           success: true,
           __typename: "UpdateCommentReply",
         },
