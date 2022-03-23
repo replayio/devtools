@@ -8,7 +8,13 @@ import { UIState } from "ui/state";
 
 import { trackEvent } from "ui/utils/telemetry";
 
-export default function NetworkRequestPreview({ networkRequestId }: { networkRequestId: string }) {
+type CommentNetReqTargetProps = {
+  networkRequestId: string;
+};
+
+export default function CommentNetReqTarget({
+  networkRequestId,
+}: CommentNetReqTargetProps): JSX.Element | null {
   const dispatch = useDispatch();
   const request = useSelector((state: UIState) => getSummaryById(state, networkRequestId));
 
@@ -32,7 +38,7 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
       <div className="mono flex flex-col font-medium">
         <div className="flex w-full flex-row justify-between space-x-1">
           <div
-            className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs space-x-2"
+            className="cm-s-mozilla space-x-2 overflow-hidden whitespace-pre font-mono text-xs"
             style={{ fontSize: "11px" }}
           >
             <span className="font-bold">{`[${method}]`}</span>

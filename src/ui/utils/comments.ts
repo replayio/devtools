@@ -8,7 +8,7 @@ import compact from "lodash/compact";
 import range from "lodash/range";
 import sortBy from "lodash/sortBy";
 
-export function formatRelativeTime(date: Date) {
+export function formatRelativeTime(date: Date): string {
   const minutes = differenceInMinutes(Date.now(), date);
   const days = differenceInCalendarDays(Date.now(), date);
   const weeks = differenceInWeeks(Date.now(), date);

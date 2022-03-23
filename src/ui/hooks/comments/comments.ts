@@ -21,17 +21,23 @@ export function useGetComments(recordingId: RecordingId): {
   }
 
   let comments = data?.recording?.comments || NO_COMMENTS;
-  comments = comments.map((comment: any) => ({
-    ...comment,
-    replies: comment.replies.map((reply: any) => ({
-      ...reply,
-      hasFrames: comment.hasFrames,
-      sourceLocation: comment.sourceLocation,
-      time: comment.time,
-      point: comment.point,
-      position: comment.position,
-    })),
-  }));
+  comments = comments.map(
+    (comment: Comment): Comment => ({
+      ...comment,
+      replies: comment.replies.map(
+        (reply: any): Comment => ({
+          ...reply,
+          hasFrames: comment.hasFrames,
+          sourceLocation: comment.sourceLocation,
+          time: comment.time,
+          point: comment.point,
+          position: comment.position,
+          replies: reply.replies ?? [],
+          parentId: comment.id,
+        })
+      ),
+    })
+  );
   return { comments, loading, error };
 }
 

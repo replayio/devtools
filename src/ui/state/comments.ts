@@ -2,7 +2,7 @@ import { RecordingId } from "@recordreplay/protocol";
 import { User } from "ui/types";
 
 export interface CommentsState {
-  pendingComment: PendingComment | null;
+  pendingComment: Comment | null;
   hoveredComment: any;
 }
 
@@ -25,47 +25,21 @@ export type CommentOptions = {
   networkRequestId?: string;
 };
 
-export interface Remark {
-  content: string;
-  createdAt: string;
-  hasFrames: boolean;
+export interface Comment {
   id: string;
   point: string;
+  createdAt: string;
+  hasFrames: boolean;
+  content: string;
   recordingId: RecordingId;
-  sourceLocation: SourceLocation | null;
   time: number;
   updatedAt: string;
   user: User;
-}
-
-export interface Comment extends Remark {
+  parentId: string | null;
+  replies: Comment[];
   position: CommentPosition | null;
-  networkRequestId: string | null;
+  sourceLocation: SourceLocation | null;
   primaryLabel?: string;
-  replies: Reply[];
   secondaryLabel?: string;
+  networkRequestId: string;
 }
-
-export interface Reply extends Remark {
-  parentId: string;
-}
-
-export type PendingComment =
-  | {
-      comment: Comment;
-      type: "new_comment";
-    }
-  | {
-      comment: Reply;
-      type: "new_reply";
-    }
-  | {
-      comment: Comment;
-      type: "edit_comment";
-    }
-  | {
-      comment: Reply;
-      type: "edit_reply";
-    };
-
-export type PendingCommentAction = "edit_reply" | "edit_comment" | "new_reply" | "new_comment";

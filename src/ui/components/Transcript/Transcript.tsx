@@ -1,44 +1,36 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { selectors } from "ui/reducers";
-import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
-import { Comment } from "ui/state/comments";
-import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { commentKeys } from "ui/utils/comments";
+import { flatToHierarchicalComments, sortHierarchicalComments } from "./utils.comments";
+import { CommentItem } from "./CommentItem";
 
-export default function Transcript() {
+const Transcript = (): JSX.Element | null => {
   const recordingId = hooks.useGetRecordingId();
   const { comments } = hooks.useGetComments(recordingId);
   const { loading } = hooks.useGetRecording(recordingId);
-  const pendingComment = useSelector(selectors.getPendingComment);
   const { isAuthenticated } = useAuth0();
 
   if (loading) {
     return null;
   }
 
-  const displayedComments: Comment[] = [...comments];
+  console.log(comments);
 
-  if (pendingComment?.type == "new_comment") {
-    displayedComments.push(pendingComment.comment);
-  }
-
-  const sortedComments = sortBy(displayedComments, ["time", "createdAt"]);
-  const keys = commentKeys(sortedComments);
+  const hierarchicalComments = flatToHierarchicalComments(comments);
+  const sortedHierarchicalComments = sortHierarchicalComments(hierarchicalComments);
 
   return (
     <div className="right-sidebar">
-      <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item comments">Comments</div>
+      <div className="border-b border-b-splitter p-2 text-sm font-normal leading-5 text-bodyColor">
+        Comments
       </div>
+
       <div className="transcript-list flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden bg-themeBodyBgcolor text-xs">
-        {displayedComments.length > 0 ? (
+        {sortedHierarchicalComments.length > 0 ? (
           <div className="w-full flex-grow overflow-auto bg-themeBodyBgcolor">
-            {sortedComments.map((comment, i) => {
-              return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
+            {sortedHierarchicalComments.map(comment => {
+              return <CommentItem key={comment.id} comment={comment} />;
             })}
           </div>
         ) : (
@@ -56,4 +48,6 @@ export default function Transcript() {
       </div>
     </div>
   );
-}
+};
+
+export default Transcript;
