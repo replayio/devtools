@@ -123,6 +123,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
       <TipTapEditor
         editable={isEdit}
         content={content}
+        placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
         autofocus
         handleCancel={() => {
           setIsEdit(false);
