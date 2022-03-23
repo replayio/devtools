@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { Component, createFactory } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const {
   l10n,
@@ -13,8 +13,8 @@ const {
 
 const { MODE } = require("devtools/packages/devtools-reps");
 
-const GripMessageBody = createFactory(
-  require("devtools/client/webconsole/components/Output/GripMessageBody")
+const GripMessageBody = React.createFactory(
+  require("devtools/client/webconsole/components/Output/GripMessageBody").default
 );
 
 const PropTypes = require("prop-types");
@@ -23,7 +23,7 @@ const TABLE_ROW_MAX_ITEMS = 1000;
 // Match Chrome max column number.
 const TABLE_COLUMN_MAX_ITEMS = 21;
 
-class ConsoleTable extends Component {
+class ConsoleTable extends React.Component {
   static get propTypes() {
     return {
       dispatch: PropTypes.func.isRequired,

@@ -5,7 +5,7 @@
 "use strict";
 
 // React & Redux
-const { Component } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 
 const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
@@ -34,7 +34,7 @@ const componentMap = new Map([
   ["PageError", require("devtools/client/webconsole/components/Output/message-types/PageError")],
 ]);
 
-class MessageContainer extends Component {
+class MessageContainer extends React.Component {
   static get propTypes() {
     return {
       messageId: PropTypes.string.isRequired,

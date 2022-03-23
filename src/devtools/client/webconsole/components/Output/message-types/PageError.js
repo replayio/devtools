@@ -5,9 +5,11 @@
 "use strict";
 
 // React & Redux
-const { createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
-const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
+const Message = React.createFactory(
+  require("devtools/client/webconsole/components/Output/Message")
+);
 
 const { createPrimitiveValueFront } = require("protocol/thread");
 

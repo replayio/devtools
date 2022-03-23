@@ -3,24 +3,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const React = require("react");
-const { Component, createElement } = require("react");
-const dom = require("react-dom-factories");
-const { connect } = require("react-redux");
-const { actions } = require("ui/actions");
-const { isVisible } = require("ui/utils/dom");
-const ReactDOM = require("react-dom");
-const { selectors } = require("ui/reducers");
+import React from "react";
+import ReactDOM from "react-dom";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 
-const PropTypes = require("prop-types");
-const {
-  MessageContainer,
-} = require("devtools/client/webconsole/components/Output/MessageContainer");
-const ConsoleLoadingBar = require("./ConsoleLoadingBar").default;
+import { actions } from "ui/actions";
+import { isVisible } from "ui/utils/dom";
+import { selectors } from "ui/reducers";
 
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
+import ConsoleLoadingBar from "./ConsoleLoadingBar";
 
-class ConsoleOutput extends Component {
+import { MESSAGE_TYPE } from "devtools/client/webconsole/constants";
+
+class ConsoleOutput extends React.Component {
   static get propTypes() {
     return {
       messages: PropTypes.object.isRequired,
@@ -146,7 +143,7 @@ class ConsoleOutput extends Component {
         const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
         const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
-        return createElement(MessageContainer, {
+        return React.createElement(MessageContainer, {
           dispatch,
           key: messageId,
           messageId,
@@ -163,7 +160,8 @@ class ConsoleOutput extends Component {
         });
       });
 
-    return dom.div(
+    return React.createElement(
+      "div",
       {
         className: "webconsole-output",
         role: "main",
@@ -202,4 +200,4 @@ const mapDispatchToProps = dispatch => ({
   dispatch,
 });
 
-module.exports = connect(mapStateToProps, mapDispatchToProps)(ConsoleOutput);
+export default connect(mapStateToProps, mapDispatchToProps)(ConsoleOutput);

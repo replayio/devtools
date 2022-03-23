@@ -5,16 +5,19 @@
 "use strict";
 
 // React & Redux
-const { createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const GripMessageBody = require("devtools/client/webconsole/components/Output/GripMessageBody");
-const ConsoleTable = createFactory(
+const GripMessageBody =
+  require("devtools/client/webconsole/components/Output/GripMessageBody").default;
+const ConsoleTable = React.createFactory(
   require("devtools/client/webconsole/components/Output/ConsoleTable")
 );
 const { isGroupType, l10n } = require("devtools/client/webconsole/utils/messages");
 
-const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
+const Message = React.createFactory(
+  require("devtools/client/webconsole/components/Output/Message")
+);
 
 ConsoleApiCall.displayName = "ConsoleApiCall";
 
