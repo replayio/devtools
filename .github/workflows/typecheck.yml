@@ -12,12 +12,12 @@ jobs:
       - name: Run tsc
         run: npm run typecheck
   gql:
-    name: GraphQL schema typesdsa
+    name: GraphQL schema types
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install Deps
-        run: npm install && npm install -g graphqurl
+        run: npm install
       - name: Fetch GraphQL schema
         run: npm run gql:schema
         env:
