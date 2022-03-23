@@ -108,7 +108,7 @@ export function EditorWithAutocomplete({
 
   if (disableAutocomplete) {
     return (
-      <div className="flex items-center relative">
+      <div className="flex items-center relative w-full">
         <ControlledCodeMirror
           onKeyPress={onKeyPress}
           value={value}
@@ -121,7 +121,7 @@ export function EditorWithAutocomplete({
   }
 
   return (
-    <div className="flex items-center relative">
+    <div className="flex items-center relative w-full">
       <ControlledCodeMirror
         onKeyPress={onKeyPress}
         value={value}

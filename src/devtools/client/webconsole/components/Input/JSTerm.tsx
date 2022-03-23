@@ -5,7 +5,7 @@ import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { evaluateExpression, paywallExpression } from "../../actions/input";
 import EagerEvalFooter from "./EagerEvalFooter";
 import useEvaluationHistory from "./useEvaluationHistory";
-import { getIsInLoadedRegion } from "ui/reducers/timeline";
+import { getIsInLoadedRegion, getPlayback } from "ui/reducers/timeline";
 import {
   EditorWithAutocomplete,
   Keys,
@@ -83,11 +83,12 @@ export default function JSTerm() {
     <div>
       <div className="relative">
         <div
-          className="jsterm-input-container pl-7"
+          className="jsterm-input-container flex items-center"
           key="jsterm-container"
           aria-live="off"
           tabIndex={-1}
         >
+          <div className="ml-3 console-chevron h-3 w-3 mr-1" />
           {isInLoadedRegion ? (
             <EditorWithAutocomplete
               onEditorMount={(editor: Editor, showAutocomplete?: (show: boolean) => void) =>
@@ -99,11 +100,18 @@ export default function JSTerm() {
               onRegularKeyPress={onKeyPress}
             />
           ) : (
-            <div className="flex items-center h-full italic text-gray-400">Loading…</div>
+            <InaccessibleEditor />
           )}
         </div>
       </div>
       <EagerEvalFooter expression={value} completedExpression={autocompletePreview} />
     </div>
   );
+}
+
+function InaccessibleEditor() {
+  const playback = useSelector(getPlayback);
+  const msg = playback ? "Console evaluations are disabled during playback" : "Loading…";
+
+  return <div className="flex items-center h-full italic text-gray-400">{msg}</div>;
 }
