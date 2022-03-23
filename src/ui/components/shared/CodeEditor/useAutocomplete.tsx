@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import {
   fuzzyFilter,
   getAutocompleteMatches,
+  getLastArgumentExpression,
   getPropertyExpression,
   insertAutocompleteMatch,
   normalizeString,
@@ -12,6 +13,7 @@ import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 import { UIState } from "ui/state";
 import { getSelectedFrame, SelectedFrame } from "devtools/client/debugger/src/selectors";
 import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
+import { AutocompleteOptions } from "./AutocompleteMatches";
 
 // turns an async getMatches function into a hook
 function useGetAsyncMatches(
@@ -108,11 +110,13 @@ function getShouldShowAutocomplete(
 }
 
 export default function useAutocomplete(
-  expression: string,
-  onPreviewAvailable: (val: string | null) => void
+  exp: string,
+  onPreviewAvailable: (val: string | null) => void,
+  options: AutocompleteOptions
 ) {
   const [isHidden, setIsHidden] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const expression = options.isArg ? getLastArgumentExpression(exp)[1] : exp;
   const matches = useGetMatches(expression);
 
   const moveAutocompleteCursor = (difference: number) => {
@@ -122,7 +126,9 @@ export default function useAutocomplete(
   };
   const applySelectedMatch = () => {
     const match = matches[selectedIndex];
-    return insertAutocompleteMatch(expression, match);
+    return options.isArg
+      ? getLastArgumentExpression(exp)[0] + insertAutocompleteMatch(expression, match)
+      : insertAutocompleteMatch(expression, match);
   };
 
   useEffect(() => {

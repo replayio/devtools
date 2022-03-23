@@ -30,7 +30,7 @@ export function PanelInput({
 
   // Adding a minimum left value here to keep the autocomplete menu from colliding with any of the
   // gutter popups that also rely on createPortal, e.g. LineNumberTooltip, ToggleWidgetButton
-  const options = { minLeft: 24 };
+  const options = { minLeft: 24, isArg: true };
 
   return (
     <div className="jsterm-input-container w-full">

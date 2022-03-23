@@ -283,3 +283,13 @@ export function getRemainingCompletedTextAfterCursor(value: string, match: strin
 
   return match.slice(propertyExpression.right.length);
 }
+
+export function getLastArgumentExpression(expression: string) { 
+  const match = expression.match(/.*?,\s*|.+$/g);
+
+  if (!match || match.length <= 1) {
+    return ["",""];
+  }
+  
+  return [match.slice(0, match.length - 1).join(""), match[match.length - 1]];
+}

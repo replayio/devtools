@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { Editor } from "codemirror";
 import useAutocomplete from "./useAutocomplete";
 import { isTest } from "ui/utils/environment";
-import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
+import AutocompleteMatches, { AutocompleteOptions } from "./AutocompleteMatches";
 import ControlledCodeMirror from "./ControlledCodeMirror";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
 
@@ -28,6 +28,7 @@ const DISMISS_KEYS = [
 
 const DEFAULT_OPTIONS = {
   minLeft: 0,
+  isArg: false,
 };
 
 export function EditorWithAutocomplete({
@@ -44,7 +45,7 @@ export function EditorWithAutocomplete({
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
   // For minor adjustments to the autocomplete menu position.
-  options?: AutocompleteMatchesOptions;
+  options?: AutocompleteOptions;
   value: string;
   disableAutocomplete?: boolean;
 }) {
@@ -57,7 +58,7 @@ export function EditorWithAutocomplete({
     moveAutocompleteCursor,
     resetAutocompleteIndex,
     setHideAutocomplete,
-  } = useAutocomplete(value, onPreviewAvailable);
+  } = useAutocomplete(value, onPreviewAvailable, options);
 
   const autocomplete = () => setValue(applySelectedMatch());
   const onSelection = (obj?: any) => {

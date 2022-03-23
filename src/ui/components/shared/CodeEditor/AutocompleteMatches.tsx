@@ -2,8 +2,12 @@ import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
 
-export type AutocompleteMatchesOptions = {
+export type AutocompleteOptions = {
   minLeft: number;
+  // Flag to know whether we're trying to autocomplete a regular expression or a partial expression
+  // for an argument(s) that's supposed to be wrapped by a call expression, e.g. console.log(arg1, arg2)
+  // where "arg1, arg2" is the partial expression.
+  isArg: boolean;
 };
 
 function Match({
@@ -45,7 +49,7 @@ export default function AutocompleteMatches({
   onMatchClick,
   options,
 }: {
-  options: AutocompleteMatchesOptions;
+  options: AutocompleteOptions;
   containerRect: DOMRect;
   leftOffset: number;
   matches: string[];
