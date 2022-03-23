@@ -1,8 +1,29 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
+import {
+  AcceptPendingInvitation,
+  AcceptPendingInvitationVariables,
+} from "graphql/AcceptPendingInvitation";
+import {
+  ClaimTeamInvitationCode,
+  ClaimTeamInvitationCodeVariables,
+} from "graphql/ClaimTeamInvitationCode";
+import {
+  DeleteUserFromWorkspace,
+  DeleteUserFromWorkspaceVariables,
+} from "graphql/DeleteUserFromWorkspace";
+import { GetWorkspaceMembers, GetWorkspaceMembersVariables } from "graphql/GetWorkspaceMembers";
+import {
+  InviteNewWorkspaceMember,
+  InviteNewWorkspaceMemberVariables,
+} from "graphql/InviteNewWorkspaceMember";
+import {
+  RejectPendingInvitation,
+  RejectPendingInvitationVariables,
+} from "graphql/RejectPendingInvitation";
 import { WorkspaceUser } from "ui/types";
 
 export function useGetWorkspaceMembers(workspaceId: string) {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<GetWorkspaceMembers, GetWorkspaceMembersVariables>(
     gql`
       query GetWorkspaceMembers($workspaceId: ID!) {
         node(id: $workspaceId) {
@@ -59,8 +80,10 @@ export function useGetWorkspaceMembers(workspaceId: string) {
   }
 
   let workspaceUsers: WorkspaceUser[] | undefined = undefined;
-  if (data?.node?.members) {
-    workspaceUsers = data.node.members.edges.map(({ node }: any) => {
+  // @ts-ignore
+  const members = data?.node?.members;
+  if (members) {
+    workspaceUsers = members.edges.map(({ node }: any) => {
       if (node.__typename === "WorkspacePendingEmailMember") {
         return {
           membershipId: node.id,
@@ -89,7 +112,10 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
   // user to a team.
   const onError = onCompleted;
 
-  const [inviteNewWorkspaceMember] = useMutation(
+  const [inviteNewWorkspaceMember] = useMutation<
+    InviteNewWorkspaceMember,
+    InviteNewWorkspaceMemberVariables
+  >(
     gql`
       mutation InviteNewWorkspaceMember($email: String!, $workspaceId: ID!, $roles: [String!]) {
         addWorkspaceMember(input: { email: $email, workspaceId: $workspaceId, roles: $roles }) {
@@ -104,7 +130,10 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
 }
 
 export function useClaimTeamInvitationCode(onCompleted: () => void, onError: () => void) {
-  const [inviteNewWorkspaceMember] = useMutation(
+  const [inviteNewWorkspaceMember] = useMutation<
+    ClaimTeamInvitationCode,
+    ClaimTeamInvitationCodeVariables
+  >(
     gql`
       mutation ClaimTeamInvitationCode($code: ID!) {
         claimTeamInvitationCode(input: { code: $code }) {
@@ -119,7 +148,10 @@ export function useClaimTeamInvitationCode(onCompleted: () => void, onError: () 
 }
 
 export function useDeleteUserFromWorkspace() {
-  const [deleteUserFromWorkspace] = useMutation(
+  const [deleteUserFromWorkspace] = useMutation<
+    DeleteUserFromWorkspace,
+    DeleteUserFromWorkspaceVariables
+  >(
     gql`
       mutation DeleteUserFromWorkspace($membershipId: ID!) {
         removeWorkspaceMember(input: { id: $membershipId }) {
@@ -134,7 +166,10 @@ export function useDeleteUserFromWorkspace() {
 }
 
 export function useAcceptPendingInvitation(onCompleted: () => void) {
-  const [acceptPendingInvitation] = useMutation(
+  const [acceptPendingInvitation] = useMutation<
+    AcceptPendingInvitation,
+    AcceptPendingInvitationVariables
+  >(
     gql`
       mutation AcceptPendingInvitation($workspaceId: ID!) {
         acceptWorkspaceMembership(input: { id: $workspaceId }) {
@@ -152,7 +187,10 @@ export function useAcceptPendingInvitation(onCompleted: () => void) {
 }
 
 export function useRejectPendingInvitation(onCompleted: () => void) {
-  const [rejectPendingInvitation] = useMutation(
+  const [rejectPendingInvitation] = useMutation<
+    RejectPendingInvitation,
+    RejectPendingInvitationVariables
+  >(
     gql`
       mutation RejectPendingInvitation($workspaceId: ID!) {
         rejectWorkspaceMembership(input: { id: $workspaceId }) {

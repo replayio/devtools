@@ -87,7 +87,7 @@ function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
     setErrorMessage(null);
     setIsLoading(true);
     const resp = await inviteNewWorkspaceMember({
-      variables: { workspaceId, email: inputValue, roles: ["viewer", "debugger"] },
+      variables: { workspaceId: workspaceId!, email: inputValue, roles: ["viewer", "debugger"] },
     });
 
     if (resp.errors) {

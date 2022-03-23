@@ -23,9 +23,10 @@ export default function WorkspaceAPIKeys({ workspaceId }: { workspaceId: string 
       loading={addLoading}
       error={addError}
       addKey={(label, scopes) =>
+        // @ts-ignore
         addWorkspaceApiKey({
-          variables: { label, scopes, workspaceId },
-        }).then(resp => resp.data.createWorkspaceAPIKey)
+          variables: { label, scopes: scopes ?? [], workspaceId },
+        }).then(resp => resp.data?.createWorkspaceAPIKey)
       }
       scopes={["admin:all", "write:sourcemap"]}
       deleteKey={id => deleteWorkspaceApiKey({ variables: { id } })}

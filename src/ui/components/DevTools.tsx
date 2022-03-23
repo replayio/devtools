@@ -93,7 +93,7 @@ function _DevTools({
     }
 
     trackEventOnce("session.devtools_start", {
-      userIsAuthor,
+      userIsAuthor: !!userIsAuthor,
       workspaceUuid: recording?.workspace?.id || null,
     });
   }, [loading]);
