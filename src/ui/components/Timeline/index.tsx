@@ -73,7 +73,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     const { left, width } = this.$progressBar!.getBoundingClientRect();
     const clickLeft = e.clientX;
 
-    const clickPosition = Math.max((clickLeft - left) / width, 0);
+    const clickPosition = Math.min(1, Math.max((clickLeft - left) / width, 0));
     return Math.ceil(startTime + (endTime - startTime) * clickPosition);
   }
 

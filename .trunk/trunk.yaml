@@ -12,3 +12,4 @@ lint:
     - linters: [ALL]
       paths:
         - public
+        - src/graphql

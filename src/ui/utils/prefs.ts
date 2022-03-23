@@ -24,6 +24,9 @@ pref("devtools.features.httpBodies", true);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.networkRequestComments", false);
+pref("devtools.features.useMultipleControllers", false);
+pref("devtools.features.multipleControllerUseSnapshots", false);
+pref("devtools.features.breakpointPanelAutocomplete", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -41,12 +44,15 @@ export const prefs = new PrefsHelper("devtools", {
 });
 
 export const features = new PrefsHelper("devtools.features", {
+  useMultipleControllers: ["Bool", "useMultipleControllers"],
+  multipleControllerUseSnapshots: ["Bool", "multipleControllerUseSnapshots"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   darkMode: ["Bool", "darkMode"],
   httpBodies: ["Bool", "httpBodies"],
   videoPlayback: ["Bool", "videoPlayback"],
   commentAttachments: ["Bool", "commentAttachments"],
   networkRequestComments: ["Bool", "networkRequestComments"],
+  breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

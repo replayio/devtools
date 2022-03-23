@@ -147,10 +147,18 @@ export function createSession(recordingId: string): UIThunkAction {
 
       ThreadFront.setTest(getTest() || undefined);
 
-      type ExperimentalSettings = { listenForMetrics: boolean; disableCache?: boolean };
+      type ExperimentalSettings = {
+        listenForMetrics: boolean;
+        disableCache?: boolean;
+        useMultipleControllers: boolean;
+        multipleControllerUseSnapshots: boolean;
+      };
+
       const experimentalSettings: ExperimentalSettings = {
         listenForMetrics: !!window.app.prefs.listenForMetrics,
         disableCache: !!window.app.prefs.disableCache,
+        useMultipleControllers: !!window.app.features.useMultipleControllers,
+        multipleControllerUseSnapshots: !!window.app.features.multipleControllerUseSnapshots,
       };
 
       dispatch(showLoadingProgress());

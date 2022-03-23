@@ -16,6 +16,8 @@ export function getConsoleInitialState() {
       debug: prefs.filterDebug,
       log: prefs.filterLog,
     }),
-    consoleUI: UiState(),
+    consoleUI: UiState({
+      timestampsVisible: prefs.timestampsVisible,
+    }),
   };
 }

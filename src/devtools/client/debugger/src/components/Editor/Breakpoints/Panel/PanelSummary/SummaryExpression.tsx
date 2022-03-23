@@ -38,7 +38,7 @@ export function SummaryExpression({ isEditable, value }: SummaryExpressionProps 
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
 
   return isEditable ? (
-    <div className="group flex space-x-1 px-2 hover:text-primaryAccent">
+    <div className="group flex space-x-1 px-1 hover:text-primaryAccent">
       <Expression value={value} isEditable={true} />
       <MaterialIcon className="pencil opacity-0" iconSize="xs">
         edit

@@ -1,5 +1,5 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from "react";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 const actions = require("devtools/client/webconsole/actions/index");
 
@@ -14,11 +14,13 @@ function TextInput(props: React.HTMLProps<HTMLInputElement>) {
   );
 }
 
-export function FilterSearchBox({ filterTextSet }: { filterTextSet: any }) {
+export function FilterSearchBox() {
+  const dispatch = useDispatch();
+
   const [searchString, _setSearchString] = useState("");
   const setSearchString = (value: string) => {
     _setSearchString(value);
-    filterTextSet(value);
+    dispatch(actions.filterTextSet(value));
   };
   const onChange = (e: ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value);
   const clearInput = () => setSearchString("");
@@ -51,6 +53,4 @@ export function FilterSearchBox({ filterTextSet }: { filterTextSet: any }) {
   );
 }
 
-export default connect(state => ({}), {
-  filterTextSet: actions.filterTextSet,
-})(FilterSearchBox);
+export default FilterSearchBox;

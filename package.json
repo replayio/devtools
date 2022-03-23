@@ -24,11 +24,14 @@
     "upload-e2e-mapped-styles-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_styles.js*",
     "upload-e2e-mapped-minified-bundle-sourcemap": "cd public/test/examples/ && replay-sourcemap-upload --group e2e-test --key rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ mapped_minified.js*",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > schema.graphql",
+    "gql:gen": "apollo codegen:generate --localSchemaFile=schema.graphql --target=typescript --tagName=gql --outputFlat src/graphql",
+    "gql": "npm run gql:schema && npm run gql:gen"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
-    "@auth0/auth0-react": "^1.2.0",
+    "@auth0/auth0-react": "1.2.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
     "@recordreplay/protocol": "^0.19.0",
@@ -52,7 +55,6 @@
     "dotenv": "^16.0.0",
     "escape-html": "^1.0.3",
     "fuzzaldrin-plus": "^0.6.0",
-    "graphql": "^16.3.0",
     "immer": "^9.0.7",
     "jest": "^27.5.1",
     "jwt-decode": "^3.1.2",
@@ -112,11 +114,15 @@
     "@storybook/manager-webpack5": "^6.4.19",
     "@storybook/react": "^6.4.19",
     "@tailwindcss/forms": "^0.5.0",
+    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/react": "^12.1.4",
+    "@testing-library/user-event": "^13.5.0",
     "@types/classnames": "^2.2.11",
     "@types/codemirror": "^5.60.5",
     "@types/cookie": "^0.4.1",
     "@types/escape-html": "^1.0.1",
     "@types/fuzzaldrin-plus": "^0.6.2",
+    "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.180",
     "@types/logrocket-react": "^3.0.0",
     "@types/mixpanel-browser": "^2.35.6",
@@ -131,10 +137,12 @@
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.13.0",
+    "apollo": "^2.33.9",
     "autoprefixer": "^10.4.4",
     "babel-jest": "^27.3.1",
     "babel-loader": "^8.2.3",
     "babel-plugin-add-react-displayname": "^0.0.5",
+    "babel-plugin-transform-import-meta": "^2.1.1",
     "bufferutil": "^4.0.6",
     "css-loader": "^6.7.1",
     "eslint": "^8.11.0",
@@ -145,7 +153,10 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.29.2",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "fake-indexeddb": "^3.1.7",
     "fs-extra": "^10.0.1",
+    "graphql": "15.8.0",
+    "graphqurl": "^1.0.1",
     "mini-css-extract-plugin": "^2.6.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^8.4.12",
@@ -181,5 +192,9 @@
   "homepage": "https://github.com/RecordReplay/devtools#readme",
   "workspaces": [
     "packages/accordion"
-  ]
+  ],
+  "overrides": {
+    "graphql": "15.8.0",
+    "@auth0/auth0-react": "1.2.0"
+  }
 }

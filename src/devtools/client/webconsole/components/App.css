@@ -52,8 +52,6 @@
 }
 
 .webconsole-app .jsterm-input-container {
-  overflow-y: auto;
-  overflow-x: hidden;
   outline: none;
 }
 
