@@ -10,6 +10,7 @@
 export interface AddCommentInput {
   content: string;
   hasFrames: boolean;
+  networkRequestId?: string | null;
   point: string;
   position?: any | null;
   primaryLabel?: string | null;

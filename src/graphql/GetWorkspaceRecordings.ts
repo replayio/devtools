@@ -37,6 +37,7 @@ export interface GetWorkspaceRecordings_node_Workspace_recordings_edges_node_wor
 
 export interface GetWorkspaceRecordings_node_Workspace_recordings_edges_node_workspace {
   __typename: "Workspace";
+  id: string;
   hasPaymentMethod: boolean;
   subscription: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_workspace_subscription | null;
 }
