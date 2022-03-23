@@ -12,7 +12,7 @@ jobs:
       - name: Run tsc
         run: npm run typecheck
   gql:
-    name: GraphQL schema types
+    name: GraphQL schema typesdsa
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +23,6 @@ jobs:
         env:
           HASURA_KEY: ${{ secrets.HASURA_ADMIN_SECRET }}
       - name: Apollo codegen
-        run: rm -rf src/graphql/*.ts && npm run gql:gen
+        run: rm -rf src/graphql && npm run gql:gen
       - name: Checks if types match
-        run: git diff HEAD .
+        run: git diff HEAD src/graphql
