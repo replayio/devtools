@@ -6,6 +6,13 @@ import { sendTelemetryEvent } from "ui/utils/telemetry";
 import { useGetRecording } from "./recordings";
 import { Recording, Workspace } from "ui/types";
 import { useGetNonPendingWorkspaces } from "./workspaces";
+import { DismissNag, DismissNagVariables } from "graphql/DismissNag";
+import { subscribeToEmailType, subscribeToEmailTypeVariables } from "graphql/subscribeToEmailType";
+import {
+  unsubscribeToEmailType,
+  unsubscribeToEmailTypeVariables,
+} from "graphql/unsubscribeToEmailType";
+import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
 
 export async function getUserId() {
   const result = await query({
@@ -138,7 +145,7 @@ export function useGetUserInfo(): UserInfo & { loading: boolean } {
 
 export function useDismissNag() {
   const { id, nags } = useGetUserInfo();
-  const [dismissNag, { error }] = useMutation(DISMISS_NAG, {
+  const [dismissNag, { error }] = useMutation<DismissNag, DismissNagVariables>(DISMISS_NAG, {
     refetchQueries: ["GetUser"],
   });
 
@@ -158,7 +165,10 @@ export function useDismissNag() {
 }
 
 export function useSubscribeToEmailType() {
-  const [subscribeToEmailType, { error }] = useMutation(
+  const [subscribeToEmailType, { error }] = useMutation<
+    subscribeToEmailType,
+    subscribeToEmailTypeVariables
+  >(
     gql`
       mutation subscribeToEmailType($emailType: String!) {
         subscribeToEmailType(input: { emailType: $emailType }) {
@@ -176,7 +186,10 @@ export function useSubscribeToEmailType() {
   return (emailType: EmailSubscription) => subscribeToEmailType({ variables: { emailType } });
 }
 export function useUnsubscribeToEmailType() {
-  const [unsubscribeToEmailType, { error }] = useMutation(
+  const [unsubscribeToEmailType, { error }] = useMutation<
+    unsubscribeToEmailType,
+    unsubscribeToEmailTypeVariables
+  >(
     gql`
       mutation unsubscribeToEmailType($emailType: String!) {
         unsubscribeToEmailType(input: { emailType: $emailType }) {
@@ -195,7 +208,7 @@ export function useUnsubscribeToEmailType() {
 }
 
 export function useAcceptTOS() {
-  const [acceptTOS] = useMutation(
+  const [acceptTOS] = useMutation<AcceptTOS, AcceptTOSVariables>(
     gql`
       mutation AcceptTOS($version: Int!) {
         acceptTermsOfService(input: { version: $version }) {
