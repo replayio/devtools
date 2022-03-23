@@ -187,7 +187,7 @@ export function useIsTeamDeveloper() {
     console.error("Apollo error while getting the user's role", error);
   }
 
-  return { isTeamDeveloper: data?.recording.userRole !== "team-user", loading };
+  return { isTeamDeveloper: data?.recording?.userRole !== "team-user", loading };
 }
 
 // If the user has no role, then they're either viewing a non-team recording they
@@ -202,7 +202,7 @@ export function useHasNoRole() {
     console.error("Apollo error while getting the user's role", error);
   }
 
-  return { hasNoRole: data?.recording.userRole === "none", loading };
+  return { hasNoRole: data?.recording?.userRole === "none", loading };
 }
 
 function convertRecording(rec: any): Recording | undefined {
@@ -262,7 +262,7 @@ export function useGetRecordingPhoto(recordingId: RecordingId): {
   }
 
   const screenData = data.recording?.thumbnail;
-  return { error, loading, screenData };
+  return { error, loading, screenData: screenData ?? undefined };
 }
 
 export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
@@ -343,7 +343,7 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
   }
-  const recording = convertRecording(data.recording);
+  const recording = convertRecording(data?.recording);
   return { collaborators, recording, loading, error };
 }
 
@@ -370,7 +370,7 @@ export function useGetIsPrivate(recordingId: RecordingId) {
     console.error("Apollo error while getting isPrivate", error);
   }
 
-  const isPrivate = data.recording?.private;
+  const isPrivate = data?.recording?.private;
 
   return { isPrivate, loading, error };
 }
@@ -410,7 +410,7 @@ export function useIsOwner() {
     return false;
   }
 
-  const recording = data.recording;
+  const recording = data?.recording;
   if (!recording?.owner) {
     return false;
   }
@@ -460,8 +460,11 @@ export function useGetWorkspaceRecordings(
   }
 
   let recordings: Recording[] = [];
-  if (data?.node?.recordings) {
-    recordings = data.node.recordings.edges.map(({ node }: any) => convertRecording(node));
+
+  // @ts-ignore
+  const recordingsData = data?.node?.recordings;
+  if (recordingsData) {
+    recordings = recordingsData.edges.map(({ node }: any) => convertRecording(node));
   }
   return { recordings, loading };
 }
@@ -630,7 +633,7 @@ export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
           recording: {
             uuid: recordingId,
             __typename: "Recording",
-            workspace: { __typename: "Workspace", id: targetWorkspaceId },
+            workspace: { __typename: "Workspace", id: targetWorkspaceId! },
           },
           success: true,
           __typename: "UpdateRecordingWorkspace",
