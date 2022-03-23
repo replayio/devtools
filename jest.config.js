@@ -1,13 +1,19 @@
 module.exports = {
-  collectCoverageFrom: ["**/*.{js,jsx,ts,tsx}", "!**/*.d.ts", "!**/node_modules/**"],
+  collectCoverageFrom: [
+    "src/**/*.{js,jsx,ts,tsx}",
+    "!**/*.d.ts",
+    "!**/node_modules/**",
+    "!**/fixtures/**",
+    "!src/graphql/*.ts",
+  ],
   moduleNameMapper: {
-    "devtools/(.*)": "<rootDir>/src/devtools/$1",
-    "highlighter/(.*)": "<rootDir>/src/highlighter/$1",
-    "protocol/(.*)": "<rootDir>/src/protocol/$1",
-    "shims/(.*)": "<rootDir>/src/shims/$1",
-    "toolkit/(.*)": "<rootDir>/src/toolkit/$1",
-    "test/(.*)": "<rootDir>/src/test/$1",
-    "ui/(.*)": "<rootDir>/src/ui/$1",
+    "^devtools/(.*)": "<rootDir>/src/devtools/$1",
+    "^highlighter/(.*)": "<rootDir>/src/highlighter/$1",
+    "^protocol/(.*)": "<rootDir>/src/protocol/$1",
+    "^shims/(.*)": "<rootDir>/src/shims/$1",
+    "^toolkit/(.*)": "<rootDir>/src/toolkit/$1",
+    "^test/(.*)": "<rootDir>/src/test/$1",
+    "^ui/(.*)": "<rootDir>/src/ui/$1",
 
     // Handle CSS imports (with CSS modules)
     // https://jestjs.io/docs/webpack#mocking-css-modules
