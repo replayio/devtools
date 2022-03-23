@@ -11,18 +11,18 @@
 
 "use strict";
 
-const exports = module.exports;
 const { getCSSLexer } = require("devtools/shared/css/lexer");
 
-const SELECTOR_ATTRIBUTE = (exports.SELECTOR_ATTRIBUTE = 1);
-const SELECTOR_ELEMENT = (exports.SELECTOR_ELEMENT = 2);
-const SELECTOR_PSEUDO_CLASS = (exports.SELECTOR_PSEUDO_CLASS = 3);
+const SELECTOR_ATTRIBUTE = (module.exports.SELECTOR_ATTRIBUTE = 1);
+const SELECTOR_ELEMENT = (module.exports.SELECTOR_ELEMENT = 2);
+const SELECTOR_PSEUDO_CLASS = (module.exports.SELECTOR_PSEUDO_CLASS = 3);
 const CSS_BLOCKS = { "(": ")", "[": "]", "{": "}" };
 
 // When commenting out a declaration, we put this character into the
 // comment opener so that future parses of the commented text know to
 // bypass the property name validity heuristic.
-const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = (exports.COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = "!");
+const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR =
+  (module.exports.COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = "!");
 
 /**
  * A generator function that lexes a CSS source string, yielding the
@@ -678,14 +678,14 @@ function getAngleValueInDegrees(angleValue, angleUnit) {
   }
 }
 
-exports.cssTokenizer = cssTokenizer;
-exports.cssTokenizerWithLineColumn = cssTokenizerWithLineColumn;
-exports.escapeCSSComment = escapeCSSComment;
-exports.unescapeCSSComment = unescapeCSSComment;
-exports.parseDeclarations = parseDeclarations;
-exports.parseNamedDeclarations = parseNamedDeclarations;
+module.exports.cssTokenizer = cssTokenizer;
+module.exports.cssTokenizerWithLineColumn = cssTokenizerWithLineColumn;
+module.exports.escapeCSSComment = escapeCSSComment;
+module.exports.unescapeCSSComment = unescapeCSSComment;
+module.exports.parseDeclarations = parseDeclarations;
+module.exports.parseNamedDeclarations = parseNamedDeclarations;
 // parseCommentDeclarations is exported for testing.
-exports._parseCommentDeclarations = parseCommentDeclarations;
-exports.parsePseudoClassesAndAttributes = parsePseudoClassesAndAttributes;
-exports.parseSingleValue = parseSingleValue;
-exports.getAngleValueInDegrees = getAngleValueInDegrees;
+module.exports._parseCommentDeclarations = parseCommentDeclarations;
+module.exports.parsePseudoClassesAndAttributes = parsePseudoClassesAndAttributes;
+module.exports.parseSingleValue = parseSingleValue;
+module.exports.getAngleValueInDegrees = getAngleValueInDegrees;

@@ -14,7 +14,7 @@ import { UIStore, UIThunkAction } from "ui/actions";
 import { Action, Dispatch } from "redux";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import { UnexpectedError } from "ui/state/app";
-import { requiresWindow } from "ssr";
+import { requiresWindow } from "../ssr";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 
 interface Message {

@@ -1,5 +1,5 @@
 import { LogoutOptions } from "@auth0/auth0-react";
-import { requiresWindow } from "ssr";
+import { requiresWindow } from "../../ssr";
 
 declare global {
   var Intercom: any;

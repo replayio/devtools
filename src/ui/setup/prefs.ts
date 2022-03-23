@@ -1,6 +1,7 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
+import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
   getConsoleFilterDrawerExpanded,
@@ -37,19 +38,46 @@ export function registerStoreObserver(
 
 export function updatePrefs(state: UIState, oldState: UIState) {
   function updatePref(field: keyof typeof prefs, selector: Function) {
-    if (selector(state) != selector(oldState)) {
-      prefs[field] = selector(state);
+    const newValue = selector(state);
+    if (newValue != selector(oldState)) {
+      prefs[field] = newValue;
     }
   }
+
+  function updateWebconsolePref(field: keyof typeof webconsolePrefs, selector: Function) {
+    const newValue = selector(state);
+    if (newValue != selector(oldState)) {
+      webconsolePrefs[field] = newValue;
+    }
+  }
+
   function updateAsyncPref(field: keyof typeof asyncStore, selector: Function) {
-    if (selector(state) != selector(oldState)) {
-      asyncStore[field] = selector(state);
+    const newValue = selector(state);
+    if (newValue != selector(oldState)) {
+      asyncStore[field] = newValue;
     }
   }
 
   updatePref("viewMode", getViewMode);
+
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);
+
+  // This is lazy-loaded, so it may not exist on startup
+  if (state.consoleUI && oldState.consoleUI) {
+    updateWebconsolePref("timestampsVisible", (state: UIState) => {
+      return state.consoleUI.timestampsVisible;
+    });
+  }
+
+  if (state.filters && oldState.filters) {
+    updateWebconsolePref("filterError", (state: UIState) => state.filters.error);
+    updateWebconsolePref("filterWarn", (state: UIState) => state.filters.warn);
+    updateWebconsolePref("filterInfo", (state: UIState) => state.filters.info);
+    updateWebconsolePref("filterDebug", (state: UIState) => state.filters.debug);
+    updateWebconsolePref("filterLog", (state: UIState) => state.filters.log);
+    updateWebconsolePref("filterNodeModules", (state: UIState) => state.filters.nodemodules);
+  }
 
   maybeUpdateReplaySessions(state);
 }

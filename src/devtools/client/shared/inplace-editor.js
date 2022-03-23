@@ -159,8 +159,7 @@ function editableField(options) {
   });
 }
 
-const exports = module.exports;
-exports.editableField = editableField;
+module.exports.editableField = editableField;
 
 /**
  * Handle events for an element that should respond to
@@ -238,7 +237,7 @@ function editableItem(options, callback) {
   };
 }
 
-exports.editableItem = editableItem;
+module.exports.editableItem = editableItem;
 
 /*
  * Various API consumers (especially tests) sometimes want to grab the
@@ -251,7 +250,7 @@ function getInplaceEditorForSpan(span) {
   return span.inplaceEditor;
 }
 
-exports.getInplaceEditorForSpan = getInplaceEditorForSpan;
+module.exports.getInplaceEditorForSpan = getInplaceEditorForSpan;
 
 function InplaceEditor(options, event) {
   this.elt = options.element;
@@ -347,7 +346,7 @@ function InplaceEditor(options, event) {
   this._getGridNamesBeforeCompletion(options.getGridLineNames);
 }
 
-exports.InplaceEditor = InplaceEditor;
+module.exports.InplaceEditor = InplaceEditor;
 
 InplaceEditor.CONTENT_TYPES = CONTENT_TYPES;
 

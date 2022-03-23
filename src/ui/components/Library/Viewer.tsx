@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Recording } from "ui/types";
 import { RecordingId } from "@recordreplay/protocol";
 import BatchActionDropdown from "./BatchActionDropdown";
@@ -78,6 +78,16 @@ function ViewerContent({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showMore, toggleShowMore] = useState(false);
+
+  const shownRecordings = useMemo(() => {
+    const sortedRecordings = sortBy(recordings, recording => {
+      const ascOrder = false;
+      const order = ascOrder ? 1 : -1;
+      return order * new Date(recording.date).getTime();
+    });
+    return showMore ? sortedRecordings : sortedRecordings.slice(0, 100);
+  }, [recordings, showMore]);
 
   const addSelectedId = (recordingId: RecordingId) => setSelectedIds([...selectedIds, recordingId]);
   const removeSelectedId = (recordingId: RecordingId) =>
@@ -99,12 +109,6 @@ function ViewerContent({
   if (!recordings.length) {
     const errorText = getErrorText();
 
-    // if (searchString) {
-    //   errorText = "No replays found, please expand your search";
-    // } else {
-    //   errorText = getErrorText();
-    // }
-
     return (
       <>
         <ViewerHeader>{HeaderLeft}</ViewerHeader>
@@ -117,12 +121,6 @@ function ViewerContent({
     );
   }
 
-  let sortedRecordings = sortBy(recordings, recording => {
-    const ascOrder = false;
-    const order = ascOrder ? 1 : -1;
-    return order * new Date(recording.date).getTime();
-  });
-
   return (
     <>
       <ViewerHeader>
@@ -134,7 +132,7 @@ function ViewerContent({
               <BatchActionDropdown
                 setSelectedIds={setSelectedIds}
                 selectedIds={selectedIds}
-                recordings={sortedRecordings}
+                recordings={shownRecordings}
               />
               <PrimaryButton color="blue" onClick={handleDoneEditing}>
                 Done
@@ -154,7 +152,7 @@ function ViewerContent({
       <div
         className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
       >
-        {sortedRecordings.map((r, i) => (
+        {shownRecordings.map((r, i) => (
           <RecordingRow
             key={i}
             recording={r}
@@ -162,6 +160,13 @@ function ViewerContent({
             {...{ addSelectedId, removeSelectedId, isEditing }}
           />
         ))}
+        {!showMore && recordings.length > 100 && (
+          <div className="flex justify-center p-4">
+            <SecondaryButton className="" color="blue" onClick={() => toggleShowMore(!showMore)}>
+              Show More
+            </SecondaryButton>
+          </div>
+        )}
       </div>
     </>
   );
