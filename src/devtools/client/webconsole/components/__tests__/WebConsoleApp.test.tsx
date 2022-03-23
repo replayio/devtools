@@ -1,5 +1,5 @@
 import React from "react";
-import { render, createTestStore } from "test/testUtils";
+import { render, createTestStore, filterCommonTestWarnings } from "test/testUtils";
 
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 
@@ -11,6 +11,8 @@ useRouter.mockImplementationOnce(() => ({
 }));
 
 describe("Web Console UI", () => {
+  filterCommonTestWarnings();
+
   it("Renders the Web Console UI without exploding", async () => {
     const { findByText } = await render(<WebConsoleApp />);
 

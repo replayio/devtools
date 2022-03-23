@@ -4,11 +4,10 @@ import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
 import { MockedProvider, MockedResponse } from "@apollo/client/testing";
 import { v4 as uuid } from "uuid";
-import type { PreloadedState } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
 
-import { bootstrapStore, extendStore } from "ui/setup/store";
+import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
 
 import {
@@ -29,6 +28,43 @@ const graphqlMocks = [
   ...createGetRecordingMock({ recordingId }),
   ...createGetUserMock({ user }),
 ];
+
+const noop = () => false;
+
+export const filterLoggingInTests = (
+  conditionFilter: (message: string) => boolean = noop,
+  method: keyof Console = "log"
+) => {
+  // @ts-ignore
+  const originalConsoleLog = console[method].bind(console);
+
+  beforeEach(function () {
+    // @ts-ignore
+    jest.spyOn(console, method).mockImplementation((...args) => {
+      const [message = ""] = args;
+      const shouldSilence = conditionFilter(message);
+      if (shouldSilence) {
+        return;
+      }
+
+      originalConsoleLog(...args);
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+};
+
+export const filterCommonTestWarnings = () => {
+  // Skip websocket "Socket Open" message
+  filterLoggingInTests(message => message.includes("Socket Open"));
+  // Skip React 18 "stop using ReactDOM.render" message
+  filterLoggingInTests(
+    message => message.includes("ReactDOM.render is no longer supported"),
+    "error"
+  );
+};
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store. For
