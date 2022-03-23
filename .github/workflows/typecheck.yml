@@ -23,6 +23,6 @@ jobs:
         env:
           HASURA_KEY: ${{ secrets.HASURA_ADMIN_SECRET }}
       - name: Apollo codegen
-        run: rm -rf src/graphql && npm run gql:gen
+        run: rm -rf src/graphql/*.ts && npm run gql:gen
       - name: Checks if types match
         run: git diff --quiet HEAD .
