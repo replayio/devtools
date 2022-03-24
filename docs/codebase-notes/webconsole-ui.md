@@ -1,0 +1,55 @@
+# Web Console React Components and Redux Usage
+
+## `<WebConsoleApp>`
+
+- Uses: `messages.overflow`, `consoleUI.filterBarDisplayMode`
+- Renders:
+  - `<FilterBar>`
+    - Renders:
+      - `<FilterDrawerToggle>`
+        - Uses: `layout.consoleFilterDrawerExpanded`
+        - Dispatches: `setConsoleFilterDrawerExpanded`
+      - `<FilterSearchBox>`
+        - Dispatches: `filterTextSet`
+      - `<ClearButton>`
+        - Uses: `getAllMessagesById / messages.messagesById`
+        - Dispatches: `messagesClearEvaluations`
+        - \*_Note_: does a seemingly expensive `Map > array` conversion on every render just to see if any messages match types "COMMAND" or "RESULT". Should really be a memoized selector?
+  - `<FilterDrawer>`
+    - Uses: `layout.consoleFilterDrawerExpanded`
+    - Renders:
+      - `<FilterSettings>`
+        - Uses: `getAllFilters`, `getFilteredMessagesCount`, `getShouldLogExceptions`
+        - Dispatches: `filterToggle`, `logExceptions`
+      - `<EventListeners>`
+        - Uses: `getActiveEventListeners`, `getEventListenerBreakpointTypes`, `getEventListenerExpanded`, `getEventListenerPoints`, `isLoadingInitialPoints`, `isLoadingAdditionalPoints`
+        - Dispatches: `addEventListenerBreakpoints`, `removeEventListenerBreakpoints`, `addEventListenerExpanded`, `removeEventListenerExpanded`, `loadAdditionalPoints`
+      - `<ConsoleSettings>`
+        - Uses: `getAllFilters`, `getAllUI`
+        - Dispatches: `filterToggle`, `toggleTimestamps`
+  - `<ConsoleNag>`
+  - `<ConsoleOutput>`
+    - Uses: `getExecutionPoint`, `getClosestMessage`, `getAllMessagesById`, `getVisibleMessages`, `getAllMessagesUiById`, `getAllMessagesPayloadById`, `consoleUI.timestampsVisible`, `getPlayback`, `getHoveredItem`, `getLoadedRegions`
+    - Dispatches: `openLink`
+    - Renders:
+      - `<MessageContainer>` (list items)
+        - No Redux usage, pure presentational
+        - Maps message type to specific display component
+        - Good candidate for TS conversion; change `Map<String, ComponentType>` to a JS obj, wrap in `React.memo()`
+      - `<ConsoleLoadingBar>`
+        - Uses: `getMessagesLoaded`
+        - Renders: `<LoadingProgressBar>`
+    - **Notes**:
+      - Looks like a classic list component scenario
+      - Should make sure that `MessageContainer` is memoized
+      - Passes down a bunch of props to `MessageContainer`
+      - Can we convert to a function component and `useMemo()` the loaded regions filtering for a bit of perf improvement?
+      - Uses `ReactDOM.findDOMNode`, which seems unnecessary
+  - `<JSTerm>`
+    - Uses: `getIsInLoadedRegion`
+    - Dispatches: `evaluateExpression`, `paywallExpression`
+    - Renders:
+      - `<EditorWithAutocomplete>`
+      - `<InaccessibleEditor>`
+        - Uses: `getPlayback`
+      - `<EagerEvalFooter>`
