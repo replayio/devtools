@@ -82,7 +82,8 @@ export function doInstall(options: MockOptionsJSON) {
     sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
       if (!messageHandlers[msg.method]) {
-        console.error(`Missing mock message handler for ${msg.method}`);
+        // Leave this here for later use
+        // console.error(`Missing mock message handler for ${msg.method}`);
         return;
       }
       let promise;

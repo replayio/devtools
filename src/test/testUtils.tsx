@@ -42,9 +42,13 @@ export const filterLoggingInTests = (
     // @ts-ignore
     jest.spyOn(console, method).mockImplementation((...args) => {
       const [message = ""] = args;
-      const shouldSilence = conditionFilter(message);
-      if (shouldSilence) {
-        return;
+      if (typeof message !== "string") {
+        originalConsoleLog("Message is not a string: ", message);
+      } else {
+        const shouldSilence = conditionFilter(message);
+        if (shouldSilence) {
+          return;
+        }
       }
 
       originalConsoleLog(...args);
@@ -58,10 +62,13 @@ export const filterLoggingInTests = (
 
 export const filterCommonTestWarnings = () => {
   // Skip websocket "Socket Open" message
-  filterLoggingInTests(message => message.includes("Socket Open"));
+  filterLoggingInTests(message => message.includes("Socket Open") || message === "indexed");
+  filterLoggingInTests(message => message.includes("is of type ValueFront"), "warn");
   // Skip React 18 "stop using ReactDOM.render" message
   filterLoggingInTests(
-    message => message.includes("ReactDOM.render is no longer supported"),
+    message =>
+      message.includes("ReactDOM.render is no longer supported") ||
+      message.includes("Received unknown message"),
     "error"
   );
 };
