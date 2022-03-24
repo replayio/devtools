@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
+import AppContainerPortal from "../AppContainerPortal";
 
 export type AutocompleteMatchesOptions = {
   minLeft: number;
@@ -54,23 +55,24 @@ export default function AutocompleteMatches({
 }) {
   const { top, left } = containerRect;
 
-  return createPortal(
-    <div className="absolute z-10 -translate-y-full transform" style={{ top, left }}>
-      <div
-        className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono text-menuColor shadow-sm"
-        style={{
-          fontSize: "var(--theme-code-font-size)",
-          marginLeft: `max(${options.minLeft}px, ${leftOffset}ch)`,
-          maxHeight: "160px",
-          maxWidth: "200px",
-          minWidth: "160px",
-        }}
-      >
-        {matches.map((match, i) => (
-          <Match label={match} isSelected={i === selectedIndex} key={i} onClick={onMatchClick} />
-        ))}
+  return (
+    <AppContainerPortal>
+      <div className="absolute z-10 -translate-y-full transform" style={{ top, left }}>
+        <div
+          className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter text-menuColor bg-menuBgcolor py-1 font-mono shadow-sm"
+          style={{
+            fontSize: "var(--theme-code-font-size)",
+            marginLeft: `max(${options.minLeft}px, ${leftOffset}ch)`,
+            maxHeight: "160px",
+            maxWidth: "200px",
+            minWidth: "160px",
+          }}
+        >
+          {matches.map((match, i) => (
+            <Match label={match} isSelected={i === selectedIndex} key={i} onClick={onMatchClick} />
+          ))}
+        </div>
       </div>
-    </div>,
-    document.body
+    </AppContainerPortal>
   );
 }
