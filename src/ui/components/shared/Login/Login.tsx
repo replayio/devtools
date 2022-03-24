@@ -1,13 +1,22 @@
 import { gql } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { query } from "ui/utils/apolloClient";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
+import { getLoginReferrerParam } from "ui/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
+
+const LOGIN_TEXT = {
+  default: "Replay captures everything you need for the perfect bug report, all in one link",
+  "first-browser-open":
+    "Replay captures everything you need for the perfect bug report, all in one link",
+} as const;
+type LoginReferrer = keyof typeof LOGIN_TEXT;
 
 const GET_CONNECTION = gql`
   query GetConnection($email: String!) {
@@ -83,6 +92,8 @@ function SocialLogin({
   onShowSSOLogin: () => void;
   onLogin: () => void;
 }) {
+  const msg = LOGIN_TEXT[getLoginReferrerParam()];
+
   return (
     <div className="space-y-6">
       {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
@@ -91,13 +102,12 @@ function SocialLogin({
           <p>In order to join your team, we first need you to sign in.</p>
         ) : (
           <>
-            <p className="text-center">
-              Replay captures everything you need for the perfect bug report, all in one link.{" "}
+            <div className="text-center">
+              <p>{msg}</p>
               <a href="https://replay.io" className="pointer-hand underline">
                 Learn more
               </a>
-            </p>
-            <p></p>
+            </div>
           </>
         )}
       </div>
@@ -112,6 +122,17 @@ function SocialLogin({
       </button>
     </div>
   );
+}
+
+export function LoginLink({
+  children,
+  referrer,
+}: {
+  children: ReactNode;
+  referrer?: LoginReferrer;
+}) {
+  const href = `/${referrer ? `?login-referrer=${referrer}` : ""}`;
+  return <Link href={href}>{children}</Link>;
 }
 
 export default function Login({ returnToPath = "" }: { returnToPath?: string }) {
