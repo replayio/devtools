@@ -109,6 +109,11 @@ export function getPausePointParams() {
   return null;
 }
 
+export function getLoginReferrerParam() {
+  const referrerParam = url.searchParams.get("login-referrer");
+  return referrerParam === "first-browser-open" ? referrerParam : "default";
+}
+
 export function removeUrlParameters() {
   window.history.pushState({}, document.title, window.location.pathname);
 }
