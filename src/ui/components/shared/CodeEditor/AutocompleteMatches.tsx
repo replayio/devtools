@@ -57,7 +57,7 @@ export default function AutocompleteMatches({
   return createPortal(
     <div className="absolute z-10 -translate-y-full transform" style={{ top, left }}>
       <div
-        className="autocomplete-matches color-menuColor flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono shadow-sm"
+        className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono text-menuColor shadow-sm"
         style={{
           fontSize: "var(--theme-code-font-size)",
           marginLeft: `max(${options.minLeft}px, ${leftOffset}ch)`,
