@@ -26,7 +26,7 @@ function Match({
   return (
     <button
       className={classNames(
-        "cursor-default px-1 text-left w-full",
+        "w-full cursor-default px-1 text-left",
         isSelected ? "bg-primaryAccent text-white" : "hover:bg-toolbarBackgroundAlt"
       )}
       ref={buttonNode}
@@ -55,9 +55,9 @@ export default function AutocompleteMatches({
   const { top, left } = containerRect;
 
   return createPortal(
-    <div className="absolute z-10 transform -translate-y-full" style={{ top, left }}>
+    <div className="absolute z-10 -translate-y-full transform" style={{ top, left }}>
       <div
-        className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono shadow-sm"
+        className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono text-menuColor shadow-sm"
         style={{
           fontSize: "var(--theme-code-font-size)",
           marginLeft: `max(${options.minLeft}px, ${leftOffset}ch)`,
