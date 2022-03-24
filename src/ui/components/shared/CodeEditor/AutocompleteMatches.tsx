@@ -45,12 +45,12 @@ export default function AutocompleteMatches({
   onMatchClick,
   options,
 }: {
-  options: AutocompleteMatchesOptions;
   containerRect: DOMRect;
   leftOffset: number;
   matches: string[];
   selectedIndex: number;
   onMatchClick: (match: string) => void;
+  options: AutocompleteMatchesOptions;
 }) {
   const { top, left } = containerRect;
 
