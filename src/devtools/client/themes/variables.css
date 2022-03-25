@@ -132,7 +132,7 @@
 
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
-  --modal-bgcolor: rgba(255, 255, 255, 0.8);
+  --modal-bgcolor: rgba(255, 255, 255, 0.86);
   --modal-border: none;
   --theme-tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
