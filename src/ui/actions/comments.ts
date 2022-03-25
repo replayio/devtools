@@ -64,7 +64,7 @@ export function createComment(
         content: "",
         createdAt: new Date().toISOString(),
         hasFrames,
-        id: PENDING_COMMENT_ID,
+        id: crypto.randomUUID!(),
         networkRequestId: networkRequestId || null,
         point,
         position,

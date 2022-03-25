@@ -31,7 +31,7 @@ export default function useAddComment() {
     return addComment({
       variables: {
         input: {
-          ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),
+          ...omit(comment, ["createdAt", "updatedAt", "replies", "user"]),
           recordingId: comment.recordingId,
         },
       },

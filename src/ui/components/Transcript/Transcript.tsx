@@ -8,6 +8,7 @@ import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { commentKeys } from "ui/utils/comments";
+import NewCommentCard from "../Comments/TranscriptComments/NewCommentCard";
 
 export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();
@@ -37,8 +38,11 @@ export default function Transcript() {
       <div className="transcript-list flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden bg-themeBodyBgcolor text-xs">
         {displayedComments.length > 0 ? (
           <div className="w-full flex-grow overflow-auto bg-themeBodyBgcolor">
-            {sortedComments.map((comment, i) => {
+            {/* {sortedComments.map((comment, i) => {
               return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
+            })} */}
+            {sortedComments.map((comment, i) => {
+              return <NewCommentCard comment={comment} key={keys[i]} />;
             })}
           </div>
         ) : (
