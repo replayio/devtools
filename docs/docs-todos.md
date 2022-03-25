@@ -19,6 +19,10 @@ A list of concepts and questions about the Replay client architecture and implem
   - [ ] When do we fetch pieces of data like comments, sources, messages, etc?
   - [ ] What are the most critical sections of the state / client logic?
   - [ ] What does the overall data flow look like, both client<-> server, and within the client itself?
+- Quirks of the specific codebase
+  - [ ] What is this `cx` thing? Why is it used and how does it work?
+  - [ ] What is `memoizableAction`?
+  - [ ] How do preferences work? How are they persisted?
 - Replay client and protocol
   - [ ] What is `ThreadFront`?
   - [ ] How does the Replay client communicate to the backend (sockets, AJAX, etc)?
