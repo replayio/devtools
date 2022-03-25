@@ -34,7 +34,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const addComment = commentsHooks.useAddComment();
   const updateComment = commentsHooks.useUpdateComment();
   const deleteComment = commentsHooks.useDeleteComment();
-  const makeComment = commentsHooks.useMakeComment();
+  const makeFromPendingComment = commentsHooks.useMakeFromPendingComment();
 
   const isActivePause = currentTime === comment.time && executionPoint === comment.point;
   const isTopLevelComment = !comment.parentId;
@@ -183,7 +183,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
           }}
           handleConfirm={content => {
             // @ts-ignore
-            const comment = makeComment({
+            const comment = makeFromPendingComment({
               /* TODO */
             });
             addComment(comment);

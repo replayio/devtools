@@ -11,10 +11,6 @@ const Transcript = (): JSX.Element | null => {
   const { loading } = hooks.useGetRecording(recordingId);
   const { isAuthenticated } = useAuth0();
 
-  if (loading) {
-    return null;
-  }
-
   comments.map(c => JSON.stringify(c.content, null, 4)).forEach(console.log);
 
   const sortedHierarchicalComments = useMemo(() => {
@@ -22,6 +18,10 @@ const Transcript = (): JSX.Element | null => {
     const sortedHierarchicalComments = sortHierarchicalComments(hierarchicalComments);
     return sortedHierarchicalComments;
   }, [comments]);
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <div className="right-sidebar">
