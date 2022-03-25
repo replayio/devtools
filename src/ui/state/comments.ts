@@ -36,7 +36,14 @@ export interface CommentPosition {
 
 export type PendingCommentData = Pick<
   Comment,
-  "hasFrames" | "position" | "networkRequestId" | "sourceLocation" | "point" | "time"
+  | "hasFrames"
+  | "position"
+  | "networkRequestId"
+  | "sourceLocation"
+  | "point"
+  | "time"
+  | "primaryLabel"
+  | "secondaryLabel"
 >;
 
 export interface Comment {

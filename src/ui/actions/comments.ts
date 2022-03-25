@@ -43,41 +43,6 @@ export function setHoveredComment(comment: any): SetHoveredComment {
   return { type: "set_hovered_comment", comment };
 }
 
-export function createComment(
-  parentId: Comment["id"] | null,
-  pendingCommentData: PendingCommentData
-): UIThunkAction {
-  return async dispatch => {
-    // const { sourceLocation, hasFrames, position, networkRequestId } = pendingCommentData;
-    // const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
-    // const primaryLabel = labels?.primary;
-    // const secondaryLabel = labels?.secondary;
-    // const pendingComment: PendingComment = {
-    //   type: "new_comment",
-    //   comment: {
-    //     content: "",
-    //     createdAt: new Date().toISOString(),
-    //     hasFrames,
-    //     id: PENDING_COMMENT_ID,
-    //     networkRequestId: networkRequestId || null,
-    //     point,
-    //     position,
-    //     primaryLabel,
-    //     recordingId,
-    //     replies: [],
-    //     secondaryLabel,
-    //     sourceLocation,
-    //     time,
-    //     updatedAt: new Date().toISOString(),
-    //     user,
-    //   },
-    // };
-    // addPendingCommentData(parentId, pendingCommentData);
-    // dispatch(setSelectedPrimaryPanel("comments"));
-    // dispatch(setPendingComment(pendingComment));
-  };
-}
-
 export function createFrameComment({
   time,
   point,
@@ -92,6 +57,11 @@ export function createFrameComment({
   return async dispatch => {
     const sourceLocation =
       breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
+    const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
+    const primaryLabel = labels?.primary;
+    const secondaryLabel = labels?.secondary;
+
+    dispatch(setSelectedPrimaryPanel("comments"));
 
     // set data for pending top-level comment (currently not setting ever for
     // non-top-level comments)
@@ -103,6 +73,8 @@ export function createFrameComment({
         hasFrames: true,
         sourceLocation: sourceLocation || null,
         networkRequestId: null,
+        primaryLabel,
+        secondaryLabel,
       })
     );
   };
@@ -122,6 +94,12 @@ export function createFloatingCodeComment({
   breakpoint: Breakpoint;
 }): UIThunkAction {
   return async dispatch => {
+    const sourceLocation = breakpoint.location;
+    const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
+    const primaryLabel = labels?.primary;
+    const secondaryLabel = labels?.secondary;
+
+    dispatch(setSelectedPrimaryPanel("comments"));
     // set data for pending top-level comment (currently not setting ever for
     // non-top-level comments)
     dispatch(
@@ -132,6 +110,8 @@ export function createFloatingCodeComment({
         hasFrames: false,
         sourceLocation: breakpoint.location ?? null,
         networkRequestId: null,
+        primaryLabel,
+        secondaryLabel,
       })
     );
   };
@@ -149,6 +129,8 @@ export function createNetworkRequestComment({
 
     const time = request.triggerPoint?.time ?? currentTime;
     const point = request.triggerPoint?.point || executionPoint!;
+
+    dispatch(setSelectedPrimaryPanel("comments"));
 
     // set data for pending top-level comment (currently not setting ever for
     // non-top-level comments)
