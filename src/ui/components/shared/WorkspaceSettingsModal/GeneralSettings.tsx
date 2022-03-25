@@ -85,7 +85,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label>Name</Label>
         <Input>
           <input
-            className="w-full rounded-md text-sm"
+            className="w-full rounded-md border-textFieldBorder bg-themeTextFieldBgcolor text-sm"
             type="text"
             value={name}
             onChange={e => setName(e.currentTarget.value)}
