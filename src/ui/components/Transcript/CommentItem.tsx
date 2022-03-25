@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
-import { Comment } from "ui/state/comments";
+import { Comment, CommentPosition, SourceLocation } from "ui/state/comments";
 import cx from "classnames";
 import TipTapEditor from "../Comments/TranscriptComments/CommentEditor/TipTapEditor";
 import PortalDropdown from "../shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "../shared/MaterialIcon";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AvatarImage } from "../Avatar";
 import { formatRelativeTime } from "ui/utils/comments";
 import { JSONContent } from "@tiptap/react";
@@ -17,6 +17,7 @@ import { CommentSourceTarget } from "./CommentSourceTarget";
 import CommentNetReqTarget from "./CommentNetReqTarget";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { commentsHooks } from "ui/hooks/comments";
+import { useGetRecordingId } from "ui/hooks/recordings";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 type CommentItemProps = {
@@ -25,11 +26,15 @@ type CommentItemProps = {
 
 export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const dispatch = useDispatch();
+  const recordingId = useGetRecordingId();
   const currentTime = useSelector(selectors.getCurrentTime);
   const executionPoint = useSelector(getExecutionPoint);
   const focusRegion = useSelector(getFocusRegion);
   const { value: netReqCommentsFeature } = useFeature("networkRequestComments");
+  const addComment = commentsHooks.useAddComment();
   const updateComment = commentsHooks.useUpdateComment();
+  const deleteComment = commentsHooks.useDeleteComment();
+  const makeComment = commentsHooks.useMakeComment();
 
   const isActivePause = currentTime === comment.time && executionPoint === comment.point;
   const isTopLevelComment = !comment.parentId;
@@ -42,11 +47,14 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const [headerActionsExpanded, setHeaderActionsExpanded] = useState(false);
 
   // content
-  const [content, setContent] = useState<JSONContent>(tryToParse(comment.content));
+  const content = useMemo(() => tryToParse(comment.content), [comment.content]);
   const [isEdit, setIsEdit] = useState(false);
 
-  // in-progress reply
-  const [draftCommentContent, draftCommentComment] = useState<JSONContent | null>(null);
+  // a singular pending (unsubmitted) commment reply to this one
+  // other contextual data for it is in a store's pendingCommentData that we
+  // will extract from when submitting
+  // TODO doesn't need a state
+  const [newReplyContent, setNewReplyContent] = useState<JSONContent | null>(null);
 
   return (
     <div
@@ -113,6 +121,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
                 </DropdownItem>
                 <DropdownItem
                   onClick={() => {
+                    deleteComment(comment, recordingId);
                     setHeaderActionsExpanded(false);
                   }}
                 >
@@ -162,6 +171,31 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
         </div>
       )}
 
+      {/* A NEW REPLY */}
+      {newReplyContent !== null && (
+        <TipTapEditor
+          editable={true}
+          content={newReplyContent}
+          placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
+          autofocus
+          handleCancel={() => {
+            // setIsEdit(false);
+          }}
+          handleConfirm={content => {
+            // @ts-ignore
+            const comment = makeComment({
+              /* TODO */
+            });
+            addComment(comment);
+            // setIsEdit(false);
+            // updateComment(comment, JSON.stringify(content));
+          }}
+          onCreate={({ editor }) => {
+            // editor.commands.focus();
+          }}
+        />
+      )}
+
       {/* ACTIONS */}
       {isTopLevelComment && (
         <button
@@ -169,6 +203,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
           onClick={() => {
             // setIsEditorOpen(true);
             // setIsFocused(true);
+            setNewReplyContent({});
           }}
         >
           Reply
