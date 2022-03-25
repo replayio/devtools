@@ -82,6 +82,7 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
 
 function QuickActions({
   hoveredLineNumber,
+  onMouseDown,
   keyModifiers,
   targetNode,
   breakpoint,
@@ -140,6 +141,8 @@ function QuickActions({
   return (
     <div
       className="absolute z-50 flex flex-row space-x-px transform -translate-y-1/2"
+      // This is necessary so that we don't move the CodeMirror cursor while clicking.
+      onMouseDown={onMouseDown}
       style={{ top: `${(1 / 2) * height}px` }}
     >
       {button}

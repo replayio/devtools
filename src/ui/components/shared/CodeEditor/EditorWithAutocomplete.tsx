@@ -3,7 +3,7 @@ import { Editor } from "codemirror";
 import useAutocomplete from "./useAutocomplete";
 import { isTest } from "ui/utils/environment";
 import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
-import ControlledCodeMirror from "./ControlledCodeMirror";
+import ControlledCodeMirror, { ControlledCodeMirrorOptions } from "./ControlledCodeMirror";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
 
 export enum Keys {
@@ -28,14 +28,17 @@ const DISMISS_KEYS = [
 
 const DEFAULT_OPTIONS = {
   minLeft: 0,
+  autofocus: false,
 };
+
+type EditorWithAutocompleteOptions = AutocompleteMatchesOptions | ControlledCodeMirrorOptions;
 
 export function EditorWithAutocomplete({
   onEditorMount,
   onRegularKeyPress,
   onPreviewAvailable,
   setValue,
-  options = DEFAULT_OPTIONS,
+  opts,
   value,
   disableAutocomplete,
 }: {
@@ -44,10 +47,11 @@ export function EditorWithAutocomplete({
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
   // For minor adjustments to the autocomplete menu position.
-  options?: AutocompleteMatchesOptions;
+  opts?: EditorWithAutocompleteOptions;
   value: string;
   disableAutocomplete?: boolean;
 }) {
+  const options = { ...DEFAULT_OPTIONS, ...opts };
   const containerNode = useRef<HTMLDivElement | null>(null);
   const {
     autocompleteIndex,
@@ -136,6 +140,7 @@ export function EditorWithAutocomplete({
         onSelection={onSelection}
         setValue={setValue}
         onEditorMount={(editor: Editor) => onEditorMount(editor, showAutocomplete)}
+        options={{ autofocus: options.autofocus }}
       />
       {shouldShowAutocomplete ? (
         <div className="absolute ml-1 opacity-50" style={{ left: `${value.length}ch` }}>

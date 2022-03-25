@@ -14,22 +14,12 @@ import "codemirror/addon/runmode/runmode";
 import "codemirror/addon/selection/active-line";
 import "codemirror/addon/edit/matchbrackets";
 
-const CODEMIRROR_OPTIONS = {
-  autofocus: true,
-  enableCodeFolding: false,
-  lineNumbers: false,
-  lineWrapping: true,
-  mode: {
-    name: "javascript",
-    globalVars: true,
-  },
-  theme: "mozilla",
-  styleActiveLine: false,
-  tabIndex: "0",
-  readOnly: false,
-  viewportMargin: Infinity,
-  disableSearchAddon: true,
-} as const;
+export type ControlledCodeMirrorOptions = {
+  autofocus: boolean;
+};
+const DEFAULT_OPTIONS = {
+  autofocus: false,
+};
 
 // CodeMirror does not refresh its event handlers once it's initialized,
 // making it difficult to work with using React functional components
@@ -44,7 +34,25 @@ const ControlledCodeMirror: FC<{
   setValue: (value: string) => void;
   onSelection: (obj: any) => void;
   onEditorMount: (editor: Editor) => void;
-}> = ({ value, onKeyPress, setValue, onSelection, onEditorMount }) => {
+  options?: ControlledCodeMirrorOptions;
+}> = ({ value, onKeyPress, setValue, onSelection, onEditorMount, options = DEFAULT_OPTIONS }) => {
+  const codemirrorOptions = {
+    autofocus: options.autofocus,
+    enableCodeFolding: false,
+    lineNumbers: false,
+    lineWrapping: true,
+    mode: {
+      name: "javascript",
+      globalVars: true,
+    },
+    theme: "mozilla",
+    styleActiveLine: false,
+    tabIndex: "0",
+    readOnly: false,
+    viewportMargin: Infinity,
+    disableSearchAddon: true,
+  } as const;
+
   const onKeyPressRef = useRef(onKeyPress);
   onKeyPressRef.current = onKeyPress;
   const setValueRef = useRef(setValue);
@@ -68,7 +76,7 @@ const ControlledCodeMirror: FC<{
   return (
     <CodeMirror
       className="w-full"
-      options={CODEMIRROR_OPTIONS}
+      options={codemirrorOptions}
       value={value}
       editorDidMount={_onEditorMount}
       onBeforeChange={_onBeforeChange}

@@ -32,7 +32,7 @@ export function TextInputCopy({
         className={classNames(
           isLarge ? "text-xl" : "text-sm",
           isCenter ? "text-center" : "",
-          "block w-full rounded-md border border-textFieldBorder px-2.5 py-1.5 focus:border-primaryAccent focus:ring-primaryAccent"
+          "block w-full rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor focus:border-primaryAccent focus:ring-primaryAccent"
         )}
         type="text"
         value={text}

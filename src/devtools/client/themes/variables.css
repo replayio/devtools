@@ -144,10 +144,6 @@
   --theme-text-field-bgcolor-color: var(--theme-body-color);
   --theme-text-field-bgcolor: var(--theme-base-95);
   --text-field-border: var(--cool-gray-300);
-  --menu-bgcolor: var(--theme-toolbar-background);
-  --menu-color: var(--theme-body-color);
-  --menu-hover-bgcolor: var(--theme-base-95);
-  --menu-hover-color: #000;
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
 
   /* Tabs (Light) */
@@ -382,11 +378,6 @@
   --theme-text-field-bgcolor: var(--theme-base-85);
   --text-field-border: var(--theme-base-85);
 
-  --menu-bgcolor: var(--theme-base-90);
-  --menu-color: var(--theme-body-color);
-  --menu-hover-bgcolor: var(--theme-base-85);
-  --menu-hover-color: #fff;
-
   --tab-selected-bgcolor: var(--theme-base-95);
 
   /* Tabs (Dark) */
@@ -405,8 +396,8 @@
   /* Menus (Dark) */
   --menu-bgcolor: var(--theme-base-90);
   --menu-color: var(--theme-body-color);
-  --menu-hover-bgcolor: var(--theme-base-85);
-  --menu-hover-color: #fff;
+  --menu-hover-bgcolor: var(--theme-base-95);
+  --menu-hover-color: white;
 
   /* Code Mirror (Dark) */
   --cm-linenumber: var(--grey-40);
