@@ -181,8 +181,8 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
         <div>
           <textarea
             className={classNames("h-20 w-full rounded-md text-sm", {
-              "bg-toolbarBackground": disabled,
-              "border-gray-300": disabled,
+              "bg-themeTextFieldBgcolor": disabled,
+              "border-textFieldBorder": disabled,
             })}
             disabled={disabled}
             onChange={e => setMessage(e.currentTarget.value)}
