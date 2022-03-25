@@ -69,22 +69,18 @@ function PanelSummary({
     trackEvent("breakpoint.add_comment");
 
     if (pausedOnHit) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        null,
-        { ...user, userId },
-        recordingId,
-        breakpoint
-      );
+      createFrameComment({
+        time: currentTime,
+        point: executionPoint,
+        position: null,
+        breakpoint,
+      });
     } else {
-      createFloatingCodeComment(
-        currentTime,
-        executionPoint,
-        { ...user, id: userId },
-        recordingId,
-        breakpoint
-      );
+      createFloatingCodeComment({
+        time: currentTime,
+        point: executionPoint,
+        breakpoint,
+      });
     }
   };
 

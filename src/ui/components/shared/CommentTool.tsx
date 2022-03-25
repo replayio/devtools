@@ -74,7 +74,7 @@ function CommentTool({
   areMouseTargetsLoading,
   canvas,
   createFrameComment,
-  setPendingComment,
+  setPendingCommentData,
   setSelectedPrimaryPanel,
 }: CommentToolProps) {
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
@@ -127,13 +127,11 @@ function CommentTool({
     // If there's no pending comment at that point and time, create one
     // with the mouse click as its position.
     if (!pendingComment) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        mouseEventCanvasPosition(e),
-        { ...user, id: userId },
-        recordingId
-      );
+      createFrameComment({
+        time: currentTime,
+        point: executionPoint,
+        position: mouseEventCanvasPosition(e),
+      });
       return;
     }
 
@@ -142,6 +140,9 @@ function CommentTool({
       const newComment = { ...pendingComment };
       newComment.comment.position = mouseEventCanvasPosition(e);
 
+      // setPendingCommentData(null, {
+      // TODO
+      // })
       setPendingComment(newComment);
       setSelectedPrimaryPanel("comments");
     }
@@ -194,14 +195,14 @@ function CommentTool({
 const connector = connect(
   (state: UIState) => ({
     recordingTarget: selectors.getRecordingTarget(state),
-    pendingComment: selectors.getPendingComment(state),
+    pendingCommentData: selectors.getPendingComment(state),
     executionPoint: getExecutionPoint(state),
     currentTime: selectors.getCurrentTime(state),
     canvas: selectors.getCanvas(state),
     areMouseTargetsLoading: selectors.areMouseTargetsLoading(state),
   }),
   {
-    setPendingComment: actions.setPendingComment,
+    setPendingCommentData: actions.setPendingCommentData,
     createFrameComment: actions.createFrameComment,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }

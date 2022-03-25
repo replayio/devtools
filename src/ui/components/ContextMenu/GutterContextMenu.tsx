@@ -33,8 +33,13 @@ function GutterContextMenu({
     e.stopPropagation();
     trackEvent("gutter.add_comment");
     assert(executionPoint, "no executionPoint");
-    createFloatingCodeComment(currentTime, executionPoint, { ...user, id: userId }, recordingId, {
-      location: contextMenu.contextMenuItem.location,
+    createFloatingCodeComment({
+      time: currentTime,
+      point: executionPoint,
+      breakpoint: {
+        location: contextMenu.contextMenuItem.location,
+        options: {},
+      },
     });
     close();
   };

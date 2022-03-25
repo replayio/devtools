@@ -1,7 +1,7 @@
 import { Location, SourceId } from "@recordreplay/protocol";
 import { UIState } from "ui/state";
 
-type Breakpoint = {
+export type Breakpoint = {
   location: any;
   options: {
     shouldPause?: boolean;
