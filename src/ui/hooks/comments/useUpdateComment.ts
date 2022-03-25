@@ -1,44 +1,12 @@
-import { RecordingId } from "@recordreplay/protocol";
-import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { Comment, CommentPosition } from "ui/state/comments";
-import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
-import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
+import { GET_COMMENTS_TIME } from "ui/graphql/comments";
 import {
   UpdateCommentReplyContent,
   UpdateCommentReplyContentVariables,
 } from "graphql/UpdateCommentReplyContent";
-import { GetComments, GetCommentsVariables } from "graphql/GetComments";
-
-export function useGetComments(recordingId: RecordingId): {
-  comments: Comment[];
-  loading: boolean;
-  error?: ApolloError;
-} {
-  const { data, loading, error } = useQuery<GetComments, GetCommentsVariables>(GET_COMMENTS, {
-    variables: { recordingId },
-    pollInterval: 5000,
-  });
-
-  if (error) {
-    console.error("Apollo error while fetching comments:", error);
-  }
-
-  let comments = (data?.recording?.comments ?? []).map((comment: any) => ({
-    ...comment,
-    replies: comment.replies.map((reply: any) => ({
-      ...reply,
-      hasFrames: comment.hasFrames,
-      sourceLocation: comment.sourceLocation,
-      time: comment.time,
-      point: comment.point,
-      position: comment.position,
-      replies: reply.replies ?? [],
-      parentId: comment.id,
-    })),
-  }));
-  return { comments, loading, error };
-}
+import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
 
 function _useUpdateComment() {
   const [updateCommentContent, { error }] = useMutation<
