@@ -30,6 +30,7 @@ export default function update(
         };
       }
 
+      // ...or actually set new pending comments data
       return {
         ...state,
         pendingCommentsData: {
@@ -52,5 +53,6 @@ export default function update(
   }
 }
 
-export const getPendingComment = (state: UIState) => state.comments.pendingComment; // TODO
+export const getPendingComment = (state: UIState) =>
+  state.comments.pendingCommentsData[ROOT_COMMENT_ID];
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
