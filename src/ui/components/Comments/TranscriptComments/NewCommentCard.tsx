@@ -44,6 +44,8 @@ const NewCommentCard = ({ comment }: { comment: Comment }) => {
               console.log({ result });
             } catch (e) {
               setStatus(CommentStatus.ERROR);
+              alert(e);
+              console.log(e);
               alert("There was a problem saving your comment");
             }
           }}

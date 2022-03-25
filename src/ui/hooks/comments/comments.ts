@@ -17,7 +17,7 @@ export function useGetComments(recordingId: RecordingId): {
 } {
   const { data, loading, error } = useQuery<GetComments, GetCommentsVariables>(GET_COMMENTS, {
     variables: { recordingId },
-    pollInterval: 5000,
+    // pollInterval: 5000,
   });
 
   if (error) {
