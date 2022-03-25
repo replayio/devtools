@@ -18,7 +18,7 @@ export interface CommentsState {
   // non-existing, inferred root comment for the entire recording. the replies
   // of this inferred root comment and actually the top-level comments on the
   // recording itself (and not replies)
-  pendingCommentData: { [parentId: Comment["id"] | typeof ROOT_COMMENT_ID]: PendingCommentData };
+  pendingCommentsData: { [parentId: Comment["id"] | typeof ROOT_COMMENT_ID]: PendingCommentData };
   hoveredComment: any;
 }
 
