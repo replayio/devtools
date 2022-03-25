@@ -39,7 +39,6 @@ export function basicMessageHandlers(): MockHandlerRecord {
       endpoint: h.bindings.endpoint,
     }),
     "Session.loadedRegions": (params: any, h: MockHandlerHelpers) => {
-      // console.log("Loaded regions args: ", ...args);
       h.emitEvent("Session.loadedRegions", params);
       return new Promise(resolve => {});
     },
