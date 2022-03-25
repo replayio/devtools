@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
+import { Comment, SourceLocation, PendingCommentData } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import escapeHtml from "escape-html";
@@ -23,37 +23,38 @@ const {
   getCodeMirror,
 } = require("devtools/client/debugger/src/utils/editor/create-editor");
 
-type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
+type AddPendingComment = Action<"add_pending_comment"> & {
+  parentId: Comment["id"] | null;
+  data: PendingCommentData;
+};
+type ClearPendingComment = Action<"clear_pending_comment"> & {
+  parentId: Comment["id"] | null;
+};
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
-type UpdatePendingCommentContent = Action<"update_pending_comment_content"> & { content: string };
 
-export type CommentsAction = SetPendingComment | SetHoveredComment | UpdatePendingCommentContent;
+export type CommentsAction = AddPendingComment | ClearPendingComment | SetHoveredComment;
 
-export function setPendingComment(comment: PendingComment): SetPendingComment {
-  return { type: "set_pending_comment", comment };
+export function addPendingCommentData(
+  parentId: Comment["id"] | null,
+  data: PendingCommentData
+): AddPendingComment {
+  return { type: "add_pending_comment", parentId, data };
+}
+
+export function clearPendingCommentData(parentId: Comment["id"] | null): ClearPendingComment {
+  return { type: "clear_pending_comment", parentId };
 }
 
 export function setHoveredComment(comment: any): SetHoveredComment {
   return { type: "set_hovered_comment", comment };
 }
 
-export function clearPendingComment(): SetPendingComment {
-  return { type: "set_pending_comment", comment: null };
-}
-
-export function updatePendingCommentContent(content: string): UpdatePendingCommentContent {
-  return { type: "update_pending_comment_content", content };
-}
-
 export function createComment(
-  time: number,
-  point: string,
-  user: User,
-  recordingId: RecordingId,
-  options: CommentOptions
+  parentId: Comment["id"] | null,
+  pendingCommentData: PendingCommentData
 ): UIThunkAction {
   return async dispatch => {
-    const { sourceLocation, hasFrames, position, networkRequestId } = options;
+    const { sourceLocation, hasFrames, position, networkRequestId } = pendingCommentData;
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
     const primaryLabel = labels?.primary;
     const secondaryLabel = labels?.secondary;
@@ -79,6 +80,7 @@ export function createComment(
       },
     };
 
+    addPendingCommentData(parentId, pendingCommentData);
     dispatch(setSelectedPrimaryPanel("comments"));
     dispatch(setPendingComment(pendingComment));
   };
@@ -185,28 +187,6 @@ export function createLabels(sourceLocation: {
       });
     }
     return { primary, secondary };
-  };
-}
-
-export function editItem(item: Reply | Comment): UIThunkAction {
-  return async dispatch => {
-    const { point, time, hasFrames } = item;
-
-    dispatch(seekToComment(item));
-
-    if (!("replies" in item)) {
-      const pendingComment: PendingComment = {
-        comment: item,
-        type: "edit_reply",
-      };
-      dispatch(setPendingComment(pendingComment));
-    } else {
-      const pendingComment: PendingComment = {
-        comment: item,
-        type: "edit_comment",
-      };
-      dispatch(setPendingComment(pendingComment));
-    }
   };
 }
 
