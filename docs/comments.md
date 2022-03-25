@@ -1,6 +1,15 @@
 ### Displaying comments
 
+Comments are displayed in these components:
+- `Transcribe`: left side panel with nested comments
+- `VideoComments`: overlay on `Video` that shows comment markers
+- `TimelineComments`: overlay on `Timeline` that shows small comment markers
+
 All comments are loaded inside `Transcript` via GraphQL hook as flat array, and then made into a hierarchical structure representing parent-reply relation. We then use `CommentItem` to recursively render this hierarchy of comments.
+
+For `VideoComments` and `TimelineComments`, all top-level comments are loaded, and just used as is (i.e. no need to convert to any kind of hierarchical structure as we only show comments from the top level).
+
+A bit of special handling is required for comments that have been submitted to backend, but still haven't returned back and filled GraphQL cache with real data. These comments have a special ID that signals that they are not fully yet "real" comments. For all abovementioned componenets, we render real and these unconfirmed comments in the same way.
 
 ### New comment
 
