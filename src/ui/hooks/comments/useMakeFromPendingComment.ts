@@ -1,19 +1,18 @@
-import { useDispatch, useSelector } from "react-redux";
-import { createLabels } from "ui/actions/comments";
+import { useSelector } from "react-redux";
 import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { UIState } from "ui/state";
 import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
 import { useGetRecordingId } from "../recordings";
 import { useGetUserInfo } from "../users";
 
-type MakeCommentAsyncFn = (parentId: Comment["id"] | null, content: string) => Promise<Comment>;
+type MakeCommentFn = (parentId: Comment["id"] | null, content: string) => Comment;
 
-export const useMakeFromPendingComment = (): MakeCommentAsyncFn => {
+export const useMakeFromPendingComment = (): MakeCommentFn => {
   const recordingId = useGetRecordingId();
   const user = useGetUserInfo();
-  const allPendingCommentData = useSelector((state: UIState) => state.comments.pendingCommentData);
+  const allPendingCommentData = useSelector((state: UIState) => state.comments.pendingCommentsData);
 
-  const makeComment: MakeCommentAsyncFn = async (parentId, content) => {
+  return (parentId, content) => {
     const pendingCommentData = allPendingCommentData[parentId ?? ROOT_COMMENT_ID];
 
     return {
@@ -28,6 +27,4 @@ export const useMakeFromPendingComment = (): MakeCommentAsyncFn => {
       user,
     };
   };
-
-  return makeComment;
 };
