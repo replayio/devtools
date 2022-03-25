@@ -1,14 +1,11 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { Comment, SourceLocation, PendingCommentData } from "ui/state/comments";
+import { Comment, PendingCommentData } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
-import { PENDING_COMMENT_ID } from "ui/reducers/comments";
-import { RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
-import { User } from "ui/types";
 import { setSelectedPrimaryPanel } from "./layout";
 import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
