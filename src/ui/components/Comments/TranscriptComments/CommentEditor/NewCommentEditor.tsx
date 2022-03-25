@@ -65,7 +65,8 @@ function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEdi
       content: inputValue,
     };
 
-    addComment(newComment);
+    const result = await addComment(newComment);
+    console.log(result);
   };
 
   return (

@@ -1,6 +1,5 @@
 import { Comment } from "ui/state/comments";
 import { gql, useMutation } from "@apollo/client";
-import { Remark } from "ui/state/comments";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import omit from "lodash/omit";
@@ -29,7 +28,7 @@ export default function useAddComment() {
   return (comment: Comment) => {
     trackEvent("comments.create");
 
-    addComment({
+    return addComment({
       variables: {
         input: {
           ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),
