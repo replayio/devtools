@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { Comment, CommentPosition, Reply } from "ui/state/comments";
+import { Comment, CommentPosition } from "ui/state/comments";
 import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
 import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
 import {
@@ -40,7 +40,7 @@ export function useGetComments(recordingId: RecordingId): {
   return { comments, loading, error };
 }
 
-export function useUpdateComment() {
+function _useUpdateComment() {
   const [updateCommentContent, { error }] = useMutation<
     UpdateCommentContent,
     UpdateCommentContentVariables
@@ -80,7 +80,7 @@ export function useUpdateComment() {
   };
 }
 
-export function useUpdateCommentReply() {
+function _useUpdateCommentReply() {
   const [updateCommentReplyContent, { error }] = useMutation<
     UpdateCommentReplyContent,
     UpdateCommentReplyContentVariables
@@ -116,6 +116,26 @@ export function useUpdateCommentReply() {
     });
   };
 }
+
+// a unified handler for updating comments and/or replies
+export const useUpdateComment = (): ((
+  comment: Comment,
+  newContent: string,
+  position?: CommentPosition
+) => void) => {
+  const updateComment = _useUpdateComment();
+  const updateCommentReply = _useUpdateCommentReply();
+
+  return (comment, newContent, position) => {
+    // top-level comment
+    if (!comment.parentId) {
+      updateComment(comment.id, newContent, position ?? null);
+      // reply
+    } else {
+      updateCommentReply(comment.id, newContent);
+    }
+  };
+};
 
 export async function getFirstComment(
   recordingId: string
