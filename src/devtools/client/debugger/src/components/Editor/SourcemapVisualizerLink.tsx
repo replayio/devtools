@@ -14,7 +14,7 @@ function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromR
   }
 
   return (
-    <div className="flex items-center pl-4">
+    <div className=" flex items-center pl-2">
       <a
         className="hover:underline"
         target="_blank"
@@ -27,7 +27,6 @@ function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromR
           filename="external"
           className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
         />{" "}
-        Source Map
       </a>
     </div>
   );
