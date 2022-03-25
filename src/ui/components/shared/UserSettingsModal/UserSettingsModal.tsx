@@ -125,6 +125,11 @@ function UserAPIKeys() {
 
 const getSettings = (): Settings<SettingsTabTitle, {}> => [
   {
+    title: "Preferences",
+    icon: "tune",
+    component: PreferencesSettings,
+  },
+  {
     title: "Personal",
     icon: "person",
     component: Personal,
@@ -134,11 +139,7 @@ const getSettings = (): Settings<SettingsTabTitle, {}> => [
     icon: "vpn_key",
     component: UserAPIKeys,
   },
-  {
-    title: "Preferences",
-    icon: "tune",
-    component: PreferencesSettings,
-  },
+
   {
     title: "Experimental",
     icon: "biotech",
