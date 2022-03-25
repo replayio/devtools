@@ -16,6 +16,7 @@ import { useFeature } from "ui/hooks/settings";
 import { CommentSourceTarget } from "./CommentSourceTarget";
 import CommentNetReqTarget from "./CommentNetReqTarget";
 import { getFocusRegion } from "ui/reducers/timeline";
+import { commentsHooks } from "ui/hooks/comments";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 type CommentItemProps = {
@@ -28,6 +29,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const executionPoint = useSelector(getExecutionPoint);
   const focusRegion = useSelector(getFocusRegion);
   const { value: netReqCommentsFeature } = useFeature("networkRequestComments");
+  const updateComment = commentsHooks.useUpdateComment();
 
   const isActivePause = currentTime === comment.time && executionPoint === comment.point;
   const isTopLevelComment = !comment.parentId;
@@ -42,6 +44,9 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   // content
   const [content, setContent] = useState<JSONContent>(tryToParse(comment.content));
   const [isEdit, setIsEdit] = useState(false);
+
+  // in-progress reply
+  const [draftCommentContent, draftCommentComment] = useState<JSONContent | null>(null);
 
   return (
     <div
@@ -98,8 +103,19 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
               position="bottom-right"
             >
               <Dropdown>
-                <DropdownItem onClick={() => setIsEdit(true)}>Edit comment</DropdownItem>
-                <DropdownItem onClick={() => {}}>
+                <DropdownItem
+                  onClick={() => {
+                    setIsEdit(true);
+                    setHeaderActionsExpanded(false);
+                  }}
+                >
+                  Edit comment
+                </DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    setHeaderActionsExpanded(false);
+                  }}
+                >
                   {isTopLevelComment ? "Delete comment and replies" : "Delete comment"}
                 </DropdownItem>
               </Dropdown>
@@ -124,13 +140,16 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
         editable={isEdit}
         content={content}
         placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
-        autofocus
+        // autofocus
         handleCancel={() => {
           setIsEdit(false);
         }}
         handleConfirm={content => {
           setIsEdit(false);
-          console.log(content);
+          updateComment(comment, JSON.stringify(content));
+        }}
+        onCreate={({ editor }) => {
+          editor.commands.focus();
         }}
       />
 

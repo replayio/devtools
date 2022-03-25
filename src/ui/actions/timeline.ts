@@ -30,7 +30,7 @@ import { getPausePointParams, getTest } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
-import { getFirstComment } from "ui/hooks/comments/comments";
+import { getFirstComment } from "ui/hooks/comments/useUpdateComment";
 import clamp from "lodash/clamp";
 import { hideModal, setModal } from "./app";
 import { getIsFocusing } from "ui/reducers/app";

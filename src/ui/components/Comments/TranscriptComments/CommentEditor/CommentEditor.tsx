@@ -8,7 +8,6 @@ import { Comment, Reply } from "ui/state/comments";
 
 import { User } from "ui/types";
 import TipTapEditor from "./TipTapEditor";
-import { FocusContext } from "../CommentCard";
 import classNames from "classnames";
 import { Editor } from "@tiptap/react";
 

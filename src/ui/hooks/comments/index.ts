@@ -1,13 +1,9 @@
-import * as comments from "./comments";
-import useAddComment from "./useAddComment";
-import useAddCommentReply from "./useAddCommentReply";
-import useDeleteComment from "./useDeleteComment";
-import useDeleteCommentReply from "./useDeleteCommentReply";
+import { useAddComment } from "./useAddComment";
+import { useUpdateComment } from "./useUpdateComment";
+import { useDeleteComment } from "./useDeleteComment";
 
 export const commentsHooks = {
-  ...comments,
   useAddComment,
-  useAddCommentReply,
+  useUpdateComment,
   useDeleteComment,
-  useDeleteCommentReply,
 };
