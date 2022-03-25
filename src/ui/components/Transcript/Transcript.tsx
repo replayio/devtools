@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import hooks from "ui/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -15,10 +15,13 @@ const Transcript = (): JSX.Element | null => {
     return null;
   }
 
-  console.log(comments);
+  comments.map(c => JSON.stringify(c.content, null, 4)).forEach(console.log);
 
-  const hierarchicalComments = flatToHierarchicalComments(comments);
-  const sortedHierarchicalComments = sortHierarchicalComments(hierarchicalComments);
+  const sortedHierarchicalComments = useMemo(() => {
+    const hierarchicalComments = flatToHierarchicalComments(comments);
+    const sortedHierarchicalComments = sortHierarchicalComments(hierarchicalComments);
+    return sortedHierarchicalComments;
+  }, [comments]);
 
   return (
     <div className="right-sidebar">
