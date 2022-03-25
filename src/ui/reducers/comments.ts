@@ -1,14 +1,13 @@
-import { CommentsState } from "ui/state/comments";
+import { CommentsState, ROOT_COMMENT_ID } from "ui/state/comments";
 import { CommentsAction } from "ui/actions/comments";
 import { UIState } from "ui/state";
-import cloneDeep from "lodash/cloneDeep";
 
 export const PENDING_COMMENT_ID = "PENDING";
 
 function initialCommentsState(): CommentsState {
   return {
     hoveredComment: null,
-    pendingComment: null,
+    pendingCommentsData: {},
   };
 }
 
@@ -17,10 +16,26 @@ export default function update(
   action: CommentsAction
 ): CommentsState {
   switch (action.type) {
-    case "set_pending_comment": {
+    case "set_pending_comment_data": {
+      const parentId = action.parentId ?? ROOT_COMMENT_ID;
+
+      // clean up data
+      if (action.data === null) {
+        delete state.pendingCommentsData[parentId];
+        return {
+          ...state,
+          pendingCommentsData: {
+            ...state.pendingCommentsData,
+          },
+        };
+      }
+
       return {
         ...state,
-        pendingComment: action.comment,
+        pendingCommentsData: {
+          ...state.pendingCommentsData,
+          [parentId]: action.data,
+        },
       };
     }
 
@@ -31,27 +46,11 @@ export default function update(
       };
     }
 
-    case "update_pending_comment_content": {
-      if (!state.pendingComment) {
-        return state;
-      }
-
-      // Using cloneDeep instead of copying with destructure syntax
-      // to keep TS happy.
-      const newPendingComment = cloneDeep(state.pendingComment);
-      newPendingComment.comment.content = action.content;
-
-      return {
-        ...state,
-        pendingComment: newPendingComment,
-      };
-    }
-
     default: {
       return state;
     }
   }
 }
 
-export const getPendingComment = (state: UIState) => state.comments.pendingComment;
+export const getPendingComment = (state: UIState) => state.comments.pendingComment; // TODO
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
