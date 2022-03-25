@@ -15,7 +15,7 @@ import classnames from "classnames";
 import clamp from "lodash/clamp";
 
 import Tooltip from "./Tooltip";
-import Comments from "../Comments";
+import TimelineComments from "../Comments/TimelineComments";
 
 import { ThreadFront } from "protocol/thread";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
@@ -126,7 +126,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       hoverTime,
       isFocusing,
       seek,
-      clearPendingComment,
+      setPendingCommentData,
       setTimelineToTime,
       setTimelineState,
       focusRegion,
@@ -153,7 +153,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
           setTimelineToTime(ThreadFront.currentTime, true);
           setTimelineState({ currentTime: ThreadFront.currentTime });
         }
-        clearPendingComment();
+        setPendingCommentData(null, null);
       }
     }
   };
@@ -170,17 +170,18 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       startPlayback,
       stopPlayback,
       replayPlayback,
-      clearPendingComment,
+      setPendingCommentData,
       videoUrl,
       focusRegion,
     } = this.props;
+
     const disabled = !videoUrl && (features.videoPlayback as boolean);
     const replay = () => {
       if (disabled) {
         return;
       }
       trackEvent("timeline.replay");
-      clearPendingComment();
+      setPendingCommentData(null, null);
       replayPlayback();
     };
     const togglePlayback = () => {
@@ -188,7 +189,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
         return;
       }
 
-      clearPendingComment();
+      setPendingCommentData(null, null);
       if (playback) {
         trackEvent("timeline.pause");
         stopPlayback();
@@ -379,7 +380,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
               <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
               <UnloadedRegions />
               {this.renderPreviewMarkers()}
-              <Comments />
+              <TimelineComments />
               {this.renderUnfocusedRegion()}
               {showCurrentPauseMarker ? (
                 <div className="progress-line-paused" style={{ left: `${percent}%` }} />
@@ -442,7 +443,7 @@ const connector = connect(
     startPlayback: actions.startPlayback,
     stopPlayback: actions.stopPlayback,
     replayPlayback: actions.replayPlayback,
-    clearPendingComment: actions.clearPendingComment,
+    setPendingCommentData: actions.setPendingCommentData,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
