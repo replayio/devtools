@@ -4,7 +4,7 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-import { Comment, Reply } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import classNames from "classnames";
 import { Canvas } from "ui/state/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -66,7 +66,7 @@ type Coordinates = {
   y: number;
 };
 
-function CommentTool({
+function VideoComments({
   pendingComment,
   currentTime,
   executionPoint,
@@ -209,4 +209,4 @@ const connector = connect(
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connector(CommentTool);
+export default connector(VideoComments);

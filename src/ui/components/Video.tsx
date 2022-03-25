@@ -3,8 +3,8 @@ import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { setVideoNode } from "../../protocol/videoNode";
 import { selectors } from "../reducers";
-import CommentsOverlay from "ui/components/Comments/VideoComments/index";
-import CommentTool from "ui/components/shared/CommentTool";
+import CommentsOverlay from "ui/components/Comments/VideoComments";
+import VideoComments from "ui/components/shared/VideoComments";
 import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import ReplayLogo from "./shared/ReplayLogo";
@@ -38,7 +38,7 @@ function CommentLoader({ recordingId }: { recordingId: string }) {
     return null;
   }
 
-  return <CommentTool comments={comments} />;
+  return <VideoComments comments={comments} />;
 }
 
 function Video({
