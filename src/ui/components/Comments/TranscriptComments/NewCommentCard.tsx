@@ -16,13 +16,14 @@ const NewCommentCard = ({ comment }: { comment: Comment }) => {
   const [status, setStatus] = useState(CommentStatus.IDLE);
   const createComment = useAddComment();
 
-  console.log({ comment });
+  console.log({ comment, status });
 
   return (
     <div
       onDoubleClick={() => setIsEditing(true)}
       className={classNames({
         "opacity-50": status === CommentStatus.PERSISTING,
+        "bg-red-100": status === CommentStatus.ERROR,
       })}
     >
       <div className="m-4">{comment.user.name}</div>
@@ -44,7 +45,9 @@ const NewCommentCard = ({ comment }: { comment: Comment }) => {
               console.log({ result });
             } catch (e) {
               setStatus(CommentStatus.ERROR);
-              alert(e);
+              setTimeout(() => {
+                setStatus(CommentStatus.IDLE);
+              }, 4000);
               console.log(e);
               alert("There was a problem saving your comment");
             }

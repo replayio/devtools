@@ -32,7 +32,6 @@ export default function Transcript() {
   }
 
   const sortedComments = sortBy(displayedComments, ["time", "createdAt"]);
-  const keys = commentKeys(sortedComments);
 
   return (
     <div className="right-sidebar">
@@ -45,9 +44,9 @@ export default function Transcript() {
             {/* {sortedComments.map((comment, i) => {
               return <CommentCard comments={sortedComments} comment={comment} key={keys[i]} />;
             })} */}
-            {sortedComments.map((comment, i) => {
-              return <NewCommentCard comment={comment} key={keys[i]} />;
-            })}
+            {sortedComments.map(comment => (
+              <NewCommentCard comment={comment} key={comment.id} />
+            ))}
           </div>
         ) : (
           <div className="transcript-list onboarding-text space-y-3 self-stretch p-3 text-base text-gray-500">
