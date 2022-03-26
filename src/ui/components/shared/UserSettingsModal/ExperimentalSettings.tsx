@@ -131,7 +131,7 @@ export default function ExperimentalSettings({}) {
     value: enableMultipleControllerUseSnapshots,
     update: updateEnableMultipleControllerUseSnapshots,
   } = useFeature("multipleControllerUseSnapshots");
-  const { value: codeHeatMaps, update: updateLiveCodeAnalysis } = useFeature("codeHeatMaps");
+  const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -149,17 +149,17 @@ export default function ExperimentalSettings({}) {
     } else if (key == "multipleControllerUseSnapshots") {
       updateEnableMultipleControllerUseSnapshots(!enableMultipleControllerUseSnapshots);
     } else if (key == "codeHeatMaps") {
-      updateLiveCodeAnalysis(!codeHeatMaps);
+      updateCodeHeatMaps(!codeHeatMaps);
     }
   };
 
   const localSettings = {
+    codeHeatMaps,
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     useMultipleControllers: enableUseMultipleControllers,
     multipleControllerUseSnapshots: enableMultipleControllerUseSnapshots,
-    codeHeatMaps,
   };
 
   const settings = { ...userSettings, ...localSettings };

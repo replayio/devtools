@@ -11,11 +11,11 @@ export type ExperimentalUserSettings = {
   disableLogRocket: boolean;
   enableEventLink: boolean;
   enableTeams: boolean;
-  codeHeatMaps: boolean;
   showReact: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
+  codeHeatMaps: boolean;
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
