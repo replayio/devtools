@@ -57,6 +57,7 @@ export function createComment(
     const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
     const primaryLabel = labels?.primary;
     const secondaryLabel = labels?.secondary;
+    const id = crypto.randomUUID!();
 
     const pendingComment: PendingComment = {
       type: "new_comment",
@@ -64,7 +65,7 @@ export function createComment(
         content: "",
         createdAt: new Date().toISOString(),
         hasFrames,
-        id: crypto.randomUUID!(),
+        id: btoa(`c:${id}`),
         networkRequestId: networkRequestId || null,
         point,
         position,

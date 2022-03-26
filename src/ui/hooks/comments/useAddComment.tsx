@@ -28,66 +28,14 @@ export default function useAddComment() {
   return (comment: Comment) => {
     trackEvent("comments.create");
 
+    comment.id = atob(comment.id).slice(2);
+
     return addComment({
       variables: {
         input: {
           ...omit(comment, ["createdAt", "updatedAt", "replies", "user"]),
           recordingId: comment.recordingId,
         },
-      },
-      optimisticResponse: {
-        addComment: {
-          success: true,
-          comment: {
-            id: comment["id"],
-            __typename: "Comment",
-          },
-          __typename: "AddComment",
-        },
-      },
-      update: (cache, { data }) => {
-        const commentId = data?.addComment?.comment?.id;
-        const cacheData = cache.readQuery<GetComments>({
-          query: GET_COMMENTS,
-          variables: { recordingId: comment.recordingId },
-        })!;
-        const {
-          viewer: {
-            user: { id: userId },
-          },
-        }: any = cache.readQuery({
-          query: GET_USER_ID,
-        });
-
-        const newComment = {
-          ...comment,
-          id: commentId,
-          primaryLabel: comment.primaryLabel || null,
-          secondaryLabel: comment.secondaryLabel || null,
-          user: {
-            id: userId,
-            name: comment.user.name,
-            picture: comment.user.picture,
-            __typename: "User",
-          },
-          __typename: "Comment",
-        };
-        const newData = {
-          ...cacheData,
-          recording: {
-            ...cacheData.recording,
-            comments: [
-              ...(cacheData.recording?.comments ?? []).filter(c => c.id !== commentId),
-              newComment,
-            ],
-          },
-        };
-
-        cache.writeQuery({
-          query: GET_COMMENTS,
-          variables: { recordingId: comment.recordingId },
-          data: newData,
-        });
       },
     });
   };

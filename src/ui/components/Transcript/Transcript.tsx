@@ -23,7 +23,11 @@ export default function Transcript() {
 
   const displayedComments: Comment[] = [...comments];
 
-  if (pendingComment?.type == "new_comment") {
+  console.log({ ids: displayedComments.map(x => x.id), pendingId: pendingComment?.comment.id });
+  if (
+    pendingComment?.type == "new_comment" &&
+    !comments.map(x => x.id).includes(pendingComment.comment.id)
+  ) {
     displayedComments.push(pendingComment.comment);
   }
 
