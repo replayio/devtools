@@ -27,11 +27,13 @@ type SelectedLocation = {
   column?: number;
   sourceUrl: string;
 };
-export type HitCounts = any;
+
+export type HitCounts = { location: SelectedLocation; hits: number }[];
 
 export function getSelectedSourceWithContent(state: UIState): Source;
 export function getIsSourceMappedSource(state: UIState): boolean;
 export function getSources(state: UIState): Source[];
 export function getSelectedSource(state: UIState): Source;
 export function getSelectedLocation(state: UIState): SelectedLocation;
-export function getHitCounts(state: UIState): HitCounts;
+export function getHitCountsForSelectedSource(state: UIState): HitCounts;
+export function getHitCountsForSource(state: UIState, sourceId: string): HitCounts;

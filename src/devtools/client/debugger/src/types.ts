@@ -15,6 +15,7 @@ export type FunctionSymbol = {
     start: SourceLocation;
     end: SourceLocation;
   };
+  hits?: number;
   parameterNames: string[];
 };
 

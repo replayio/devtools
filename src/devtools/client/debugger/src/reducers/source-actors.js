@@ -115,27 +115,13 @@ function updateBreakpointHitCounts(state, action) {
     return state;
   }
 
-  const hitCountsMap = value.value.hits.reduce(
-    (acc, { location, hits }) => {
-      if (!acc.minColumn[location.line]) {
-        acc.hits[location.line] = hits;
-        acc.minColumn[location.line] = location.column;
-      } else if (acc.minColumn[location.line] > location.column) {
-        acc.hits[location.line] = hits;
-        acc.minColumn[location.line] = location.column;
-      }
-      return acc;
-    },
-    { hits: {}, minColumn: {} }
-  );
-
   const { id: sourceId } = action;
 
   if (!hasResource(state, sourceId)) {
     return state;
   }
 
-  return updateResources(state, [{ id: sourceId, breakpointHitCounts: hitCountsMap.hits }]);
+  return updateResources(state, [{ id: sourceId, breakpointHitCounts: action.value.hits }]);
 }
 
 function clearBreakpointHitCounts(state) {

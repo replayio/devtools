@@ -21,10 +21,15 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
       })}
       onClick={onSelect ? () => onSelect(func) : undefined}
     >
-      <span className="outline-list__element-icon">λ</span>
-      <Redacted className="inline-block">
-        <PreviewFunction func={func} />
-      </Redacted>
+      <div>
+        <span className="outline-list__element-icon">λ</span>
+        <Redacted className="inline-block">
+          <PreviewFunction func={func} />
+        </Redacted>
+      </div>
+      {func.hits !== undefined && (
+        <div className="rounded bg-gray-100 px-2 text-gray-600">{func.hits}</div>
+      )}
     </li>
   );
 });

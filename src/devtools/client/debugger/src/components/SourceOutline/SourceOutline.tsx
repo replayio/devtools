@@ -9,12 +9,13 @@ import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 import { getOutlineSymbols } from "./getOutlineSymbols";
 import { FunctionSymbol, ClassSymbol } from "../../types";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import Spinner from "ui/components/shared/Spinner";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getHitCountsForSelectedSource } from "../../reducers/sources";
+import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 
 export function isFunctionSymbol(symbol: FunctionSymbol | ClassSymbol): symbol is FunctionSymbol {
   return "parameterNames" in symbol;
@@ -25,13 +26,16 @@ export function SourceOutline({
   cursorPosition,
   selectedSource,
   symbols,
+  hitCounts,
   selectLocation,
 }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
-  const outlineSymbols = useMemo(() => getOutlineSymbols(symbols, filter), [symbols, filter]);
+  const outlineSymbols = useMemo(
+    () => getOutlineSymbols(symbols, filter, hitCounts),
+    [symbols, filter, hitCounts]
+  );
   const [focusedSymbol, setFocusedSymbol] = useState<ClassSymbol | FunctionSymbol | null>(null);
   const listRef = useRef<any>();
-
   const closestSymbolIndex = useMemo(() => {
     if (!cursorPosition) {
       return;
@@ -39,6 +43,13 @@ export function SourceOutline({
     const symbol = findClosestEnclosedSymbol(symbols, cursorPosition);
     return outlineSymbols?.findIndex(a => a === symbol);
   }, [cursorPosition, outlineSymbols, symbols, listRef]);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedSource) {
+      dispatch(setBreakpointHitCounts(selectedSource.id));
+    }
+  }, [selectedSource?.id]);
 
   useEffect(() => {
     if (outlineSymbols && closestSymbolIndex) {
@@ -148,9 +159,11 @@ export function SourceOutline({
 const mapStateToProps = (state: UIState) => {
   const selectedSource = selectors.getSelectedSourceWithContent(state);
   const symbols = selectedSource ? selectors.getSymbols(state, selectedSource) : null;
+  const hitCounts = selectedSource ? getHitCountsForSelectedSource(state) : null;
   return {
     cx: selectors.getContext(state),
     symbols,
+    hitCounts,
     selectedSource: selectedSource,
     cursorPosition: selectors.getCursorPosition(state),
   };

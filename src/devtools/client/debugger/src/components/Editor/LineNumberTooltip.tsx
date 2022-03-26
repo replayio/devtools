@@ -8,11 +8,10 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
-import { prefs } from "ui/utils/prefs";
-import { prefs as prefsService } from "devtools/shared/services";
+import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
-import { getHitCounts, getSelectedSource } from "../../reducers/sources";
+import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
 import StaticTooltip from "./StaticTooltip";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
@@ -87,17 +86,19 @@ export default function LineNumberTooltip({
   const isMetaActive = keyModifiers.meta;
 
   const indexed = useSelector(selectors.getIndexed);
-  const hitCounts = useSelector(getHitCounts);
+  const hitCounts = useSelector(getHitCountsForSelectedSource);
   const source = useSelector(getSelectedSource);
   const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
 
   let analysisPointsCount: number | undefined;
 
-  if (prefsService.getBoolPref("devtools.features.codeHeatMaps")) {
-    analysisPointsCount =
-      hitCounts && lastHoveredLineNumber.current
-        ? hitCounts[lastHoveredLineNumber.current]
-        : undefined;
+  if (features.codeHeatMaps) {
+    if (lastHoveredLineNumber.current && hitCounts) {
+      const lineHitCounts = hitCounts.filter(
+        hitCount => hitCount.location.line === lastHoveredLineNumber.current
+      );
+      analysisPointsCount = lineHitCounts?.[0]?.hits;
+    }
   } else {
     analysisPointsCount = analysisPoints?.length;
   }
@@ -116,20 +117,15 @@ export default function LineNumberTooltip({
     if (lineNumber !== lastHoveredLineNumber.current) {
       lastHoveredLineNumber.current = lineNumber;
     }
-    if (prefsService.getBoolPref("devtools.features.codeHeatMaps")) {
-      setTimeout(() => {
-        if (lineNumber === lastHoveredLineNumber.current) {
+    setTimeout(() => {
+      if (lineNumber === lastHoveredLineNumber.current) {
+        if (features.codeHeatMaps) {
           dispatch(setBreakpointHitCounts(source.id));
-        }
-      }, 200);
-    } else {
-      setTimeout(() => {
-        if (lineNumber === lastHoveredLineNumber.current) {
+        } else {
           dispatch(runAnalysisOnLine(lineNumber));
         }
-      }, 200);
-    }
-
+      }
+    }, 200);
     dispatch(updateHoveredLineNumber(lineNumber));
     setTargetNode(lineNode);
   };

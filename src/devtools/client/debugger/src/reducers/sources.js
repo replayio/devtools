@@ -557,9 +557,13 @@ export function getSelectedSourceId(state) {
   return source && source.id;
 }
 
-export function getHitCounts(state) {
+export function getHitCountsForSource(state, sourceId) {
+  return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId]);
+}
+
+export function getHitCountsForSelectedSource(state) {
   const id = getSelectedSourceId(state);
-  return getSourceActorBreakpointHitCounts(state, state.sources.actors[id]);
+  return getHitCountsForSource(state, id);
 }
 
 export const getDisplayedSources = createSelector(
