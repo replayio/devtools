@@ -32,7 +32,7 @@
 
 .notificationbox .notification {
   color: var(--theme-toolbar-color);
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   text-shadow: none;
   border-color: var(--theme-splitter-color);
   border-style: solid;

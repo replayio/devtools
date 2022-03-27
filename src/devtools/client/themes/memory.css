@@ -179,7 +179,7 @@ body,
    */
   display: flex;
   flex-direction: column;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   border-bottom: 1px solid rgba(128, 128, 128, 0.15);
   padding: 8px;
   cursor: default;
@@ -289,7 +289,7 @@ body,
    * is the sidebar. @see #memory-tool-container.
    */
   flex: 1;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 
   /**
    * By default, flex items have min-width: auto;
@@ -334,7 +334,7 @@ body,
 }
 
 #heap-view > .heap-view-panel[data-state="snapshot-state-error"] pre {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   margin: 20px;
   padding: 20px;
 }
@@ -350,7 +350,7 @@ body,
    * the last one needs to flex to fill out all remaining horizontal space.
    */
   display: flex;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   background-color: var(--theme-tab-toolbar-background);
   border-bottom: 1px solid var(--cell-border-color);
   flex: 0;
@@ -374,7 +374,7 @@ body,
 }
 
 #shortest-paths {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   overflow: hidden;
   height: 100%;
   width: 100%;
@@ -394,7 +394,7 @@ body,
    */
   flex: 1;
   overflow-y: auto;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 .tree-node {
@@ -619,7 +619,7 @@ body,
 
 svg {
   --arrow-color: var(--theme-splitter-color);
-  --text-color: var(--theme-body-color);
+  --text-color: var(--body-color);
 }
 
 .theme-dark svg {
@@ -638,7 +638,7 @@ svg #arrowhead {
 }
 
 g.edgeLabel rect {
-  fill: var(--theme-body-bgcolor);
+  fill: var(--body-bgcolor);
 }
 
 g.edgeLabel tspan {
