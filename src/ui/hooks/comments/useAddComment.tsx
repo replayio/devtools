@@ -3,6 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import { trackEvent } from "ui/utils/telemetry";
 import omit from "lodash/omit";
 import { AddComment, AddCommentVariables } from "graphql/AddComment";
+import { GET_COMMENTS } from "ui/graphql/comments";
 
 export default function useAddComment() {
   const [addComment, { error }] = useMutation<AddComment, AddCommentVariables>(
@@ -31,6 +32,7 @@ export default function useAddComment() {
       variables: {
         input: { ...omit(comment, ["createdAt", "updatedAt", "replies", "user"]) },
       },
+      refetchQueries: [GET_COMMENTS],
     });
   };
 }

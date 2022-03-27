@@ -4,10 +4,8 @@ import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
 import { Comment } from "ui/state/comments";
-import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { commentKeys } from "ui/utils/comments";
 import NewCommentCard from "../Comments/TranscriptComments/NewCommentCard";
 
 export default function Transcript() {
