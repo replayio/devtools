@@ -159,8 +159,7 @@
 
   /* Timeline (Light) */
   --progressbar-preview-max: var(--theme-base-85);
-  --progressbar-preview-min: var(--theme-base-80);
-  --progressbar-unplayed: var(--theme-base-100);
+  --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Light) */
   --menu-bgcolor: var(--theme-toolbar-background);
@@ -377,7 +376,6 @@
   --theme-text-field-color: #fff;
   --theme-text-field-bgcolor: var(--theme-base-85);
   --text-field-border: var(--theme-base-85);
-
   --tab-selected-bgcolor: var(--theme-base-95);
 
   /* Tabs (Dark) */
@@ -390,8 +388,7 @@
 
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
-  --progressbar-preview-min: var(--theme-base-80);
-  --progressbar-unplayed: var(--theme-base-100);
+  --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
   --menu-bgcolor: var(--theme-base-90);

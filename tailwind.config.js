@@ -6,7 +6,7 @@ module.exports = {
         short: { raw: "(max-height: 615px)" },
       },
       colors: {
-        'themeBase': {
+        themeBase: {
           100: "var(--theme-base-100)",
           95: "var(--theme-base-95)",
           90: "var(--theme-base-90)",
@@ -40,10 +40,9 @@ module.exports = {
         primaryAccentHover: "var(--primary-accent-hover)",
         primaryAccentLegacy: "var(--primary-accent-legacy)",
         primaryAccentLegacyHover: "var(--primary-accent-legacy-hover)",
-        primaryAccentText: "var(--primary-accent-text)",      
+        primaryAccentText: "var(--primary-accent-text)",
         progressbarPreviewMax: "var(--progressbar-preview-max)",
         progressbarPreviewMin: "var(--progressbar-preview-min)",
-        progressbarUnplayed: "var( --progressbar-unplayed)",        
         secondaryAccent: "var(--secondary-accent)",
         secondaryAccentHover: "var(--secondary-accent-hover)",
         splitter: "var(--theme-splitter-color)",
@@ -60,7 +59,7 @@ module.exports = {
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
-        lightGrey: "var(--light-grey)",      
+        lightGrey: "var(--light-grey)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
