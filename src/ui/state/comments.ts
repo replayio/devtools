@@ -2,7 +2,7 @@ import { RecordingId } from "@recordreplay/protocol";
 import { User } from "ui/types";
 
 export interface CommentsState {
-  pendingComment: PendingComment | null;
+  pendingComments: Comment[];
   hoveredComment: any;
 }
 

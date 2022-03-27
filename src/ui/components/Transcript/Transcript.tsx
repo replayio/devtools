@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer } from "react";
 import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
@@ -10,25 +10,39 @@ import NewCommentCard from "../Comments/TranscriptComments/NewCommentCard";
 
 export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();
-  const { comments } = hooks.useGetComments(recordingId);
   const { loading } = hooks.useGetRecording(recordingId);
-  const pendingComment = useSelector(selectors.getPendingComment);
   const { isAuthenticated } = useAuth0();
+
+  // Apollo Comments
+  const { comments } = hooks.useGetComments(recordingId);
+
+  // Redux Comments
+  const [localComments, dispatch] = useReducer(
+    (
+      state: Comment[],
+      action:
+        | { type: "ADD_COMMENT"; comment: Comment }
+        | { type: "UPDATE_COMMENT"; comment: Comment }
+        | { type: "REMOVE_COMMENT"; id: string }
+    ) => {
+      switch (action.type) {
+        case "ADD_COMMENT":
+          return [...state, action.comment];
+        case "UPDATE_COMMENT":
+          return [...state.filter(x => x.id !== action.comment.id), action.comment];
+        case "REMOVE_COMMENT":
+          return state.filter(x => x.id !== action.id);
+      }
+    },
+    []
+  );
+  const dedupedFromServer = comments.filter(x => localComments.map(y => y.id).includes(x.id));
 
   if (loading) {
     return null;
   }
 
-  const displayedComments: Comment[] = [...comments];
-
-  console.log({ ids: displayedComments.map(x => x.id), pendingId: pendingComment?.comment.id });
-  if (
-    pendingComment?.type == "new_comment" &&
-    !comments.map(x => x.id).includes(pendingComment.comment.id)
-  ) {
-    displayedComments.push(pendingComment.comment);
-  }
-
+  const displayedComments: Comment[] = [...dedupedFromServer, ...localComments];
   const sortedComments = sortBy(displayedComments, ["time", "createdAt"]);
 
   return (

@@ -8,7 +8,7 @@ export const PENDING_COMMENT_ID = "PENDING";
 function initialCommentsState(): CommentsState {
   return {
     hoveredComment: null,
-    pendingComment: null,
+    pendingComments: [],
   };
 }
 
@@ -17,10 +17,17 @@ export default function update(
   action: CommentsAction
 ): CommentsState {
   switch (action.type) {
-    case "set_pending_comment": {
+    case "add_pending_comment": {
       return {
         ...state,
-        pendingComment: action.comment,
+        pendingComments: [...state.pendingComments, action.comment],
+      };
+    }
+
+    case "remove_pending_comment": {
+      return {
+        ...state,
+        pendingComments: state.pendingComments.filter(x => x.id !== action.id),
       };
     }
 
@@ -32,19 +39,8 @@ export default function update(
     }
 
     case "update_pending_comment_content": {
-      if (!state.pendingComment) {
-        return state;
-      }
-
-      // Using cloneDeep instead of copying with destructure syntax
-      // to keep TS happy.
-      const newPendingComment = cloneDeep(state.pendingComment);
-      newPendingComment.comment.content = action.content;
-
-      return {
-        ...state,
-        pendingComment: newPendingComment,
-      };
+      // This is a complicated case that does not seem particularly important
+      return state;
     }
 
     default: {
@@ -53,5 +49,4 @@ export default function update(
   }
 }
 
-export const getPendingComment = (state: UIState) => state.comments.pendingComment;
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
