@@ -24,7 +24,7 @@
 }
 
 .timeline .marker .stroke {
-  stroke: var(--theme-body-bgcolor);
+  stroke: var(--body-bgcolor);
   pointer-events: none;
 }
 
@@ -38,7 +38,7 @@
 
 .timeline .marker.paused .stroke {
   stroke: var(--replaying-paused-marker-stroke);
-  stroke: var(--theme-body-bgcolor);
+  stroke: var(--body-bgcolor);
 }
 
 .timeline .marker:focus {

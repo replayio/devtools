@@ -131,7 +131,7 @@
 }
 
 .theme-light .breadcrumbs-widget-item {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .breadcrumbs-widget-item-id,

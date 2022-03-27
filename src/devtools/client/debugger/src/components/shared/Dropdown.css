@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .dropdown {
-  background: var(--theme-body-bgcolor);
+  background: var(--body-bgcolor);
   border: 1px solid var(--theme-splitter-color);
   border-radius: 2px;
   max-height: 300px;
@@ -103,7 +103,7 @@
 
 .dropdown-panel .menu-item {
   padding: 4px 8px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .dropdown-panel .menu-item:hover {

@@ -570,7 +570,7 @@
 
 .table-widget-body,
 .table-widget-empty-text {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 /* Column Headers */
@@ -647,7 +647,7 @@
   padding: 3px 4px;
   min-width: 100px;
   -moz-user-focus: normal;
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .table-widget-cell[hidden] {

@@ -3,7 +3,7 @@ table.requests {
 }
 
 .row {
-  background: var(--theme-body-bgcolor);
+  background: var(--body-bgcolor);
   border-top: 2px solid transparent;
   border-bottom: 2px solid transparent;
   min-width: fit-content;

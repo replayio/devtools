@@ -30,7 +30,7 @@
   --bezier-grid-color: rgba(0, 0, 0, 0.05);
 
   /* Tooltips */
-  --theme-tooltip-color: var(--theme-body-color);
+  --theme-tooltip-color: var(--body-color);
   --theme-tooltip-background: rgb(255, 255, 255);
   --theme-tooltip-shadow: var(--grey-90-a10);
 
@@ -64,7 +64,7 @@ strong {
 /* Tooltip: CSS variables tooltip */
 
 .devtools-tooltip-css-variable {
-  color: var(--theme-body-color);
+  color: var(--body-color);
   padding: 2px;
   direction: ltr;
 }
@@ -638,7 +638,7 @@ strong {
   padding: 1px 3px;
   margin-inline-start: 4px;
   background-color: var(--theme-text-color-alt);
-  color: var(--theme-body-bgcolor);
+  color: var(--body-bgcolor);
 }
 
 .event-tooltip-attributes {
@@ -802,7 +802,7 @@ strong {
   display: flex;
   flex-direction: column;
   max-width: 200px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   padding: 5px;
 }
 
@@ -812,7 +812,7 @@ strong {
 
 .rule-preview-tooltip-source-rule-footer {
   align-self: center;
-  border-top: 1px solid var(--theme-body-color);
+  border-top: 1px solid var(--body-color);
   margin-top: 5px;
   margin-right: 5px;
   margin-left: 5px;

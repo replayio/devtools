@@ -53,7 +53,7 @@ h2 {
 }
 
 .webconsole-app {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   height: 100%;
   width: 100%;
 }

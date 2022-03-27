@@ -147,7 +147,7 @@
   text-transform: capitalize;
   border-right: 1px solid var(--theme-splitter-color);
   cursor: default;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -194,7 +194,7 @@
   display: block;
   border: 1px solid var(--theme-splitter-color);
   border-radius: 3px;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   margin: 0 auto;
 }
 
@@ -209,7 +209,7 @@
 
 .cubic-bezier-container .active-preset p,
 .cubic-bezier-container .active-preset:hover p {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .cubic-bezier-container .preset:hover canvas {
