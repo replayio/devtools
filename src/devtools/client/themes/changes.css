@@ -98,7 +98,7 @@
   background-size: 16px;
   border: none;
   border-radius: 3px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   fill: currentColor;
   padding-block: 4px;
   padding-inline: 25px 5px;
@@ -137,7 +137,7 @@
   );
   border-radius: 8px;
   border: none;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   display: none;
   padding: 1px 7px;
   position: absolute;

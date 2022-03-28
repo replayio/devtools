@@ -22,7 +22,6 @@
   --replaying-marker-fill-hover: var(--blue-60);
   --hover-scrubber-line-background: var(--blue-50);
   --progress-recording-line: #d0021b;
-  --progressbar-background: #eeeeee;
   --progressbar-line-color: var(--primary-accent);
   --proggressbar-border-color: var(--theme-splitter-color);
   --tick-future-background: #bfc9d2;
@@ -156,7 +155,7 @@
 }
 
 .timeline .progress-line.preview-max {
-  border-top-color: var(--progressbar-preview-max);
+  border-top-color: #89ceee; /* primary accent color at 40% opacity */
 }
 
 .timeline .unloaded-regions,
@@ -199,7 +198,7 @@
 }
 
 .timeline .unfocused-regions-container.end {
-  background: var(--grey-30);
+  background: var(--progressbar-unfocused-background);
 }
 
 .timeline .zoomboundary {

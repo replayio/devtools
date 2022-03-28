@@ -28,7 +28,7 @@
 }
 
 :root.theme-dark .command-bar-button {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .command-bar-button > * {

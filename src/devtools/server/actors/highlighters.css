@@ -644,7 +644,7 @@
 
   /* We don't have access to DevTools themes here, but some of these colors come from the
      themes. Theme variable names are given in comments. */
-  --text-color: #585959; /* --theme-body-color-alt */
+  --text-color: #585959; /* --body-color-alt */
   --toolbar-background: #fcfcfc; /* --theme-toolbar-background */
   --toolbar-border: #dde1e4; /* --theme-splitter-color */
   --toolbar-box-shadow: 0 2px 2px 0 rgba(155, 155, 155, 0.26); /* --rdm-box-shadow */

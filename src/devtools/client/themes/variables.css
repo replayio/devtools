@@ -129,16 +129,16 @@
 
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
-
+  --body-color: #38383d;
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
   --modal-bgcolor: rgba(255, 255, 255, 0.8);
   --modal-border: none;
-  --theme-tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
-  --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
-  --theme-body-bgcolor: var(--theme-base-100); /* bg text */
+  --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
+  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
+  --body-bgcolor: var(--theme-base-100); /* bg text */
   --theme-border: #d2d5da;
-  --icon-color: var(--theme-body-color);
+  --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-color: var(--theme-body-color);
@@ -152,19 +152,18 @@
   --tab-hover-bgcolor: var(--theme-base-85);
   --tab-hover-color: var(--tab-selected-color);
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --tab-selected-color: var(--theme-body-color);
+  --tab-selected-color: var(--body-color);
   --tab-standard-color: rgba(0, 0, 0, 0.5);
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
-  --theme-tab-bgcolor: var(--theme-base-90); /* bg tabs */
+  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
   /* Timeline (Light) */
   --progressbar-preview-max: var(--theme-base-85);
-  --progressbar-preview-min: var(--theme-base-80);
-  --progressbar-unplayed: var(--theme-base-100);
+  --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Light) */
   --menu-bgcolor: var(--theme-toolbar-background);
-  --menu-color: var(--theme-body-color);
+  --menu-color: var(--body-color);
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
   --theme-menu-highlight: #f3f4f6;
@@ -186,13 +185,13 @@
   --breakpoint-editfield-active: #fff;
   --breakpoint-editfield-hover: var(--theme-text-field-bgcolor);
   --breakpoint-status-bg: var(--theme-base-90);
-  --breakpoint-status: var(--theme-body-color);
+  --breakpoint-status: var(--body-color);
   --breakpoint-tip: var(--theme-highlight-purple);
   --breakpoint-label: var(--cm-string);
 
   /* To organise (Light) */
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
-  --theme-console-input-bgcolor: var(--theme-body-bgcolor);
+  --theme-console-input-bgcolor: var(--body-bgcolor);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
@@ -205,8 +204,7 @@
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
   --theme-toolbar-background: var(--grey-10);
-
-  --theme-toolbar-selected-color: var(--theme-body-color);
+  --theme-toolbar-selected-color: var(--body-color);
   --theme-toolbar-panel-icon-color: #bcbcbc;
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
@@ -248,7 +246,6 @@
 
   /* Text color */
   --theme-comment: var(--grey-50);
-  --theme-body-color: #38383d;
   --theme-text-color-alt: var(--grey-50);
   --theme-text-color-inactive: var(--grey-40);
   --theme-text-color-strong: var(--grey-90);
@@ -362,22 +359,21 @@
 
   /* Core classes (Dark) */
   --chrome: #081120; /* bg app */
-  --theme-body-color: var(--grey-30);
+  --body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
   --modal-bgcolor: rgba(0, 0, 0, 0.82);
   --modal-border: #222;
-  --theme-tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
-  --theme-tab-bgcolor: var(--theme-base-100); /* bg tabs */
-  --theme-body-bgcolor: var(--theme-base-95);
+  --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
+  --tab-bgcolor: var(--theme-base-100); /* bg tabs */
+  --body-bgcolor: var(--theme-base-95);
   --theme-border: var(--theme-base-100);
-  --icon-color: var(--theme-body-color);
+  --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
-  --theme-sidebar-background: var(--theme-body-bgcolor);
+  --theme-sidebar-background: var(--body-bgcolor);
   --theme-text-field-color: #fff;
   --theme-text-field-bgcolor: var(--theme-base-85);
   --text-field-border: var(--theme-base-85);
-
   --tab-selected-bgcolor: var(--theme-base-95);
 
   /* Tabs (Dark) */
@@ -390,12 +386,11 @@
 
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
-  --progressbar-preview-min: var(--theme-base-80);
-  --progressbar-unplayed: var(--theme-base-100);
+  --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
   --menu-bgcolor: var(--theme-base-90);
-  --menu-color: var(--theme-body-color);
+  --menu-color: var(--body-color);
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: white;
 
@@ -418,7 +413,7 @@
   --breakpoint-editfield-active: var(--theme-base-95);
   --breakpoint-editfield-hover: var(--theme-base-90);
   --breakpoint-status-bg: var(--theme-base-90);
-  --breakpoint-status: var(--theme-body-color);
+  --breakpoint-status: var(--body-color);
   --breakpoint-tip: #fff;
   --breakpoint-label: var(--cm-string);
 
