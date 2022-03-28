@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { setVideoNode } from "../../protocol/videoNode";
@@ -31,16 +31,6 @@ const HideVideoButton: FC = () => {
   );
 };
 
-function CommentLoader({ recordingId }: { recordingId: string }) {
-  const { comments, loading } = hooks.useGetComments(recordingId);
-
-  if (loading) {
-    return null;
-  }
-
-  return <CommentTool comments={comments} />;
-}
-
 function Video({
   currentTime,
   playback,
@@ -52,9 +42,11 @@ function Video({
   videoUrl,
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
+  const { comments, loading: loadingComments } = hooks.useGetComments(recordingId);
   const viewMode = useSelector(getViewMode);
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     installObserver();
@@ -86,10 +78,10 @@ function Video({
       </div>
 
       <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
-      <canvas id="graphics" onMouseDown={onMouseDown} />
+      <canvas id="graphics" onMouseDown={onMouseDown} ref={canvasRef} />
       {showCommentTool ? (
         <CommentsOverlay>
-          <CommentLoader recordingId={recordingId} />
+          {loadingComments ? null : <CommentTool comments={comments} />}
           {(mouseTargetsLoading || stalled) && (
             <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
               <Spinner className="w-4 animate-spin" />

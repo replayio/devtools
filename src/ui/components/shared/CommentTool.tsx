@@ -1,5 +1,5 @@
 import { connect, ConnectedProps } from "react-redux";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, RefObject } from "react";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
@@ -59,6 +59,7 @@ const getStyles = (
 
 type CommentToolProps = PropsFromRedux & {
   comments: Comment[];
+  canvasRef: RefObject<HTMLCanvasElement>;
 };
 
 type Coordinates = {
@@ -76,6 +77,7 @@ function CommentTool({
   createFrameComment,
   setPendingCommentData,
   setSelectedPrimaryPanel,
+  canvasRef,
 }: CommentToolProps) {
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
   const recordingId = useGetRecordingId();
@@ -84,26 +86,26 @@ function CommentTool({
   const captionNode = useRef<HTMLDivElement | null>(null);
 
   const addListeners = () => {
-    const videoNode = document.getElementById("graphics");
-
-    if (videoNode) {
-      videoNode.classList.add("location-marker");
-      videoNode.addEventListener("mousedown", onMouseDown);
-      videoNode.addEventListener("mouseup", onClickInCanvas);
-      videoNode.addEventListener("mousemove", onMouseMove);
-      videoNode.addEventListener("mouseleave", onMouseLeave);
+    if (!canvasRef.current) {
+      return;
     }
+
+    canvasRef.current.classList.add("location-marker");
+    canvasRef.current.addEventListener("mousedown", onMouseDown);
+    canvasRef.current.addEventListener("mouseup", onClickInCanvas);
+    canvasRef.current.addEventListener("mousemove", onMouseMove);
+    canvasRef.current.addEventListener("mouseleave", onMouseLeave);
   };
   const removeListeners = () => {
-    const videoNode = document.getElementById("graphics");
-
-    if (videoNode) {
-      videoNode.classList.remove("location-marker");
-      videoNode.removeEventListener("mousedown", onMouseDown);
-      videoNode.removeEventListener("mouseup", onClickInCanvas);
-      videoNode.removeEventListener("mousemove", onMouseMove);
-      videoNode.removeEventListener("mouseleave", onMouseLeave);
+    if (!canvasRef.current) {
+      return;
     }
+
+    canvasRef.current.classList.remove("location-marker");
+    canvasRef.current.removeEventListener("mousedown", onMouseDown);
+    canvasRef.current.removeEventListener("mouseup", onClickInCanvas);
+    canvasRef.current.removeEventListener("mousemove", onMouseMove);
+    canvasRef.current.removeEventListener("mouseleave", onMouseLeave);
   };
   const onMouseDown = (evt: MouseEvent) => {
     //   if (!pendingComment || !document.activeElement) {
@@ -118,9 +120,9 @@ function CommentTool({
     //   }
   };
   const onClickInCanvas = async (e: MouseEvent) => {
-    //   if (e.target !== document.querySelector("canvas#graphics")) {
-    //     return;
-    //   }
+    if (e.target !== canvasRef.current) {
+      return;
+    }
     //   // If there's no pending comment at that point and time, create one
     //   // with the mouse click as its position.
     //   if (!pendingComment) {
