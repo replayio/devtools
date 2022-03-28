@@ -52,6 +52,7 @@ async function recordToFile(state, browserName, example) {
     env: {
       ...process.env,
       RECORD_REPLAY_DRIVER: state.driverPath,
+      RECORD_REPLAY_VERBOSE: state.diverPath ? "1" : undefined,
     },
   });
 
