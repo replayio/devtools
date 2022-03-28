@@ -43,7 +43,6 @@ module.exports = {
         primaryAccentText: "var(--primary-accent-text)",
         progressbarPreviewMax: "var(--progressbar-preview-max)",
         progressbarPreviewMin: "var(--progressbar-preview-min)",
-        progressbarUnplayed: "var( --progressbar-unplayed)",
         secondaryAccent: "var(--secondary-accent)",
         secondaryAccentHover: "var(--secondary-accent-hover)",
         splitter: "var(--theme-splitter-color)",
