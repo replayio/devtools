@@ -43,7 +43,7 @@ export function EditorWithAutocomplete({
   disableAutocomplete,
 }: {
   onEditorMount: (editor: Editor, showAutocomplete?: (show: boolean) => void) => void;
-  onRegularKeyPress: (e: KeyboardEvent) => void;
+  onRegularKeyPress: (e: KeyboardEvent, editor: Editor) => void;
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
   // For minor adjustments to the autocomplete menu position.
@@ -81,7 +81,7 @@ export function EditorWithAutocomplete({
       }
     : undefined;
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
-    if (e.key === Keys.ENTER || e.key === Keys.TAB || e.key === Keys.ARROW_RIGHT) {
+    if ((e.key === Keys.ENTER && !e.shiftKey) || e.key === Keys.TAB || e.key === Keys.ARROW_RIGHT) {
       e.preventDefault();
       autocomplete();
     } else if (e.key === Keys.ARROW_DOWN) {
@@ -96,11 +96,11 @@ export function EditorWithAutocomplete({
       setHideAutocomplete(true);
     }
   };
-  const onKeyPress = (e: KeyboardEvent) => {
+  const onKeyPress = (e: KeyboardEvent, editor: Editor) => {
     if (shouldShowAutocomplete) {
       onAutocompleteKeyPress(e);
     } else {
-      onRegularKeyPress(e);
+      onRegularKeyPress(e, editor);
     }
 
     if (
