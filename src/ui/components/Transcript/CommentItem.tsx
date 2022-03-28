@@ -13,7 +13,7 @@ import { JSONContent } from "@tiptap/react";
 import { tryToParse } from "./utils.comments";
 import { seekToComment, setHoveredComment } from "ui/actions/comments";
 import { useFeature } from "ui/hooks/settings";
-import { CommentSourceTarget } from "./CommentSourceTarget";
+import CommentSourceTarget from "./CommentSourceTarget";
 import CommentNetReqTarget from "./CommentNetReqTarget";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { commentsHooks } from "ui/hooks/comments";
@@ -183,10 +183,10 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
           }}
           handleConfirm={content => {
             // @ts-ignore
-            const comment = makeFromPendingComment({
-              /* TODO */
-            });
-            addComment(comment);
+            // const comment = makeFromPendingComment({
+            //   /* TODO */
+            // });
+            // await addComment(comment);
             // setIsEdit(false);
             // updateComment(comment, JSON.stringify(content));
           }}

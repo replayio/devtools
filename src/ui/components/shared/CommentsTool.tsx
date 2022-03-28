@@ -58,7 +58,7 @@ const getStyles = (
 };
 
 type CommentToolProps = PropsFromRedux & {
-  comments: (Comment | Reply)[];
+  comments: Comment[];
 };
 
 type Coordinates = {
@@ -67,7 +67,7 @@ type Coordinates = {
 };
 
 function VideoComments({
-  pendingComment,
+  pendingCommentData,
   currentTime,
   executionPoint,
   comments,
@@ -106,46 +106,42 @@ function VideoComments({
     }
   };
   const onMouseDown = (evt: MouseEvent) => {
-    if (!pendingComment || !document.activeElement) {
-      return;
-    }
-
-    const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
-    // this uses `[id="..."]` because comment ids can have "="s in them!
-    const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
-
-    // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
-    if (isEditorFocused) {
-      evt.preventDefault();
-    }
+    //   if (!pendingComment || !document.activeElement) {
+    //     return;
+    //   }
+    //   const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
+    //   // this uses `[id="..."]` because comment ids can have "="s in them!
+    //   const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
+    //   // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
+    //   if (isEditorFocused) {
+    //     evt.preventDefault();
+    //   }
   };
   const onClickInCanvas = async (e: MouseEvent) => {
-    if (e.target !== document.querySelector("canvas#graphics")) {
-      return;
-    }
-
-    // If there's no pending comment at that point and time, create one
-    // with the mouse click as its position.
-    if (!pendingComment) {
-      createFrameComment({
-        time: currentTime,
-        point: executionPoint,
-        position: mouseEventCanvasPosition(e),
-      });
-      return;
-    }
-
-    // If there's a pending comment (not a reply), change its position.
-    if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
-      const newComment = { ...pendingComment };
-      newComment.comment.position = mouseEventCanvasPosition(e);
-
-      // setPendingCommentData(null, {
-      // TODO
-      // })
-      setPendingComment(newComment);
-      setSelectedPrimaryPanel("comments");
-    }
+    //   if (e.target !== document.querySelector("canvas#graphics")) {
+    //     return;
+    //   }
+    //   // If there's no pending comment at that point and time, create one
+    //   // with the mouse click as its position.
+    //   if (!pendingComment) {
+    //     createFrameComment({
+    //       time: currentTime,
+    //       point: executionPoint,
+    //       position: mouseEventCanvasPosition(e),
+    //     });
+    //     return;
+    //   }
+    //   // If there's a pending comment (not a reply), change its position.
+    //   if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
+    //     const newComment = { ...pendingComment };
+    //     newComment.comment.position = mouseEventCanvasPosition(e);
+    //     // setPendingCommentData(null, {
+    //     // TODO
+    //     // })
+    //     setPendingComment(newComment);
+    //     setSelectedPrimaryPanel("comments");
+    //   }
+    // TODO
   };
 
   const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
@@ -158,23 +154,23 @@ function VideoComments({
   useEffect(() => {
     addListeners();
     return () => removeListeners();
-  }, [currentTime, executionPoint, pendingComment, comments]);
+  }, [currentTime, executionPoint, /* pendingComment, */ comments]);
 
   if (
-    !mousePosition ||
-    pendingComment?.type === "edit_reply" ||
-    pendingComment?.type === "new_reply"
+    !mousePosition
+    //   || pendingComment?.type === "edit_reply" ||
+    //   pendingComment?.type === "new_reply"
   ) {
     return null;
   }
 
   const { parentStyle, childStyle } = getStyles(mousePosition, canvas!, captionNode.current);
   let label = "Add comment";
-  if (areMouseTargetsLoading) {
-    label = "Targets loading...";
-  } else if (pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment") {
-    label = "Move the marker";
-  }
+  // if (areMouseTargetsLoading) {
+  //   label = "Targets loading...";
+  // } else if (pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment") {
+  //   label = "Move the marker";
+  // }
 
   return (
     <div style={parentStyle} className="absolute">

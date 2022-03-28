@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import { createLabels } from "ui/actions/comments";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -12,22 +12,22 @@ const { selectLocation } = actions;
 type CommentSourceTargetProps = {
   secondaryLabel?: string;
   sourceLocation: SourceLocation;
-};
+} & PropsFromRedux;
 
-export const CommentSourceTarget = ({
+const CommentSourceTarget = ({
   secondaryLabel,
   sourceLocation,
+  createLabels,
 }: CommentSourceTargetProps): JSX.Element => {
-  const dispatch = useDispatch();
   const threadContext = useSelector(selectors.getThreadContext);
 
   const [label, setLabel] = useState<string>(secondaryLabel ?? "");
 
   useEffect(() => {
-    const updateLabels = async () => {
-      // const labels = await createLabels(sourceLocation!);
-      // TODO
-    };
+    async function updateLabels() {
+      const labels = await createLabels(sourceLocation!);
+      setLabel(labels.secondary);
+    }
 
     if (!label) {
       updateLabels();
@@ -43,7 +43,7 @@ export const CommentSourceTarget = ({
   return (
     <div
       onClick={onClick}
-      className="group cursor-pointer rounded-md border-gray-200 bg-chrome px-2 py-0.5 hover:bg-themeTextFieldBgcolor"
+      className="group cursor-pointer rounded-md border-gray-200 bg-chrome px-2 py-0.5"
     >
       <div className="mono flex flex-col font-medium">
         <div className="flex w-full flex-row justify-between space-x-1">
@@ -63,3 +63,9 @@ export const CommentSourceTarget = ({
     </div>
   );
 };
+
+const connector = connect(null, {
+  createLabels,
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(CommentSourceTarget);

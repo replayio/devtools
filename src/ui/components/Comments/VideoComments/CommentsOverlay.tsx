@@ -4,7 +4,7 @@ import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
 import { UIState } from "ui/state";
-import { Comment, PendingComment } from "ui/state/comments";
+import { Comment, PendingCommentData } from "ui/state/comments";
 
 function findComment({
   hasuraComments,
@@ -12,21 +12,22 @@ function findComment({
   currentTime,
 }: {
   hasuraComments: Comment[];
-  pendingComment: PendingComment | null;
+  pendingComment: PendingCommentData | null;
   currentTime: number;
 }) {
-  let comments: (Comment | PendingComment["comment"])[] = [...hasuraComments];
+  let comments: Comment[] = [...hasuraComments];
 
   // We replace the hasuraComment that's currently being edited with our own
   // pendingComment. This lets us update the pendingComment as the user
   // move the location marker around the video and have it visually update
   // the displayed comments.
-  if (pendingComment) {
-    comments = hasuraComments.filter(
-      comment => !("id" in pendingComment?.comment) || pendingComment?.comment.id != comment.id
-    );
-    comments.push(pendingComment.comment);
-  }
+  // if (pendingComment) {
+  //   comments = hasuraComments.filter(
+  //     comment => !("id" in pendingComment?.comment) || pendingComment?.comment.id != comment.id
+  //   );
+  //   comments.push(pendingComment.comment);
+  // }
+  // TODO
 
   // Find the comment at the current position
   return comments.filter(
