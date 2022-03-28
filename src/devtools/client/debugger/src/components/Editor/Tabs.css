@@ -6,7 +6,7 @@
   display: flex;
   width: 100%;
   height: var(--editor-header-height);
-  background-color: var(--theme-tab-bgcolor);
+  background-color: var(--tab-bgcolor);
   border-radius: 8px 8px 0 0;
   overflow: scroll;
   scrollbar-width: none;
@@ -21,7 +21,7 @@
   flex-shrink: 0;
   border-bottom: 0;
   border-inline-start: 1px solid var(--theme-splitter-color);
-  background-color: var(--theme-tab-bgcolor);
+  background-color: var(--tab-bgcolor);
 }
 
 .source-tabs {
@@ -75,7 +75,7 @@
 
 .source-tab.active,
 .source-header button.command-palette.active {
-  --tab-line-color: var(--theme-body-color);
+  --tab-line-color: var(--body-color);
   color: var(--tab-selected-color);
   border-bottom-color: transparent;
   background-color: var(--tab-selected-bgcolor);
@@ -115,7 +115,7 @@
 }
 
 .source-tab.active .close-btn {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .source-tab.active .close-btn,

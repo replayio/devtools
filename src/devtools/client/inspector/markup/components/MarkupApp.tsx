@@ -58,7 +58,7 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
             hidden={true}
           ></button>
         </div>
-        <div id="markup-box" className="devtools-monospace bg-themeBodyBgcolor">
+        <div id="markup-box" className="devtools-monospace bg-bodyBgcolor">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
               {<Nodes {...props.inspector.markup.getMarkupProps()} />}

@@ -74,7 +74,7 @@
 .sources-list .tree .label {
   display: inline-block;
   line-height: 16px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .no-sources-message {

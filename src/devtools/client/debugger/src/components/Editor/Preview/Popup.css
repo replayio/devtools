@@ -81,7 +81,7 @@
 }
 
 .theme-dark .popover .preview-popup {
-  border-color: var(--theme-body-color);
+  border-color: var(--body-color);
 }
 
 .tooltip {
@@ -104,7 +104,7 @@
 }
 
 .theme-dark .tooltip .preview-popup {
-  border-color: var(--theme-body-color);
+  border-color: var(--body-color);
 }
 
 .tooltip .gap {

@@ -47,7 +47,7 @@
 }
 
 .pane {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .pane .pane-info {
@@ -74,5 +74,5 @@
 }
 
 .secondary-panes-wrapper .command-bar.bottom {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
