@@ -67,14 +67,14 @@ type Coordinates = {
 };
 
 function CommentTool({
-  pendingComment,
+  pendingComments,
   currentTime,
   executionPoint,
   comments,
   areMouseTargetsLoading,
   canvas,
   createFrameComment,
-  setPendingComment,
+  addPendingComment,
   setSelectedPrimaryPanel,
 }: CommentToolProps) {
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
@@ -106,18 +106,18 @@ function CommentTool({
     }
   };
   const onMouseDown = (evt: MouseEvent) => {
-    if (!pendingComment || !document.activeElement) {
+    if (!pendingComments.length || !document.activeElement) {
       return;
     }
 
-    const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
+    // const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
     // this uses `[id="..."]` because comment ids can have "="s in them!
-    const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
+    // const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
 
     // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
-    if (isEditorFocused) {
-      evt.preventDefault();
-    }
+    // if (isEditorFocused) {
+    //   evt.preventDefault();
+    // }
   };
   const onClickInCanvas = async (e: MouseEvent) => {
     if (e.target !== document.querySelector("canvas#graphics")) {
@@ -126,25 +126,25 @@ function CommentTool({
 
     // If there's no pending comment at that point and time, create one
     // with the mouse click as its position.
-    if (!pendingComment) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        mouseEventCanvasPosition(e),
-        { ...user, id: userId },
-        recordingId
-      );
-      return;
-    }
+    // if (!pendingComment) {
+    //   createFrameComment(
+    //     currentTime,
+    //     executionPoint,
+    //     mouseEventCanvasPosition(e),
+    //     { ...user, id: userId },
+    //     recordingId
+    //   );
+    //   return;
+    // }
 
     // If there's a pending comment (not a reply), change its position.
-    if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
-      const newComment = { ...pendingComment };
-      newComment.comment.position = mouseEventCanvasPosition(e);
+    // if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
+    //   const newComment = { ...pendingComment };
+    //   newComment.comment.position = mouseEventCanvasPosition(e);
 
-      setPendingComment(newComment);
-      setSelectedPrimaryPanel("comments");
-    }
+    //   setPendingComment(newComment);
+    //   setSelectedPrimaryPanel("comments");
+    // }
   };
 
   const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
@@ -157,51 +157,52 @@ function CommentTool({
   useEffect(() => {
     addListeners();
     return () => removeListeners();
-  }, [currentTime, executionPoint, pendingComment, comments]);
+  }, [currentTime, executionPoint, comments]);
 
-  if (
-    !mousePosition ||
-    pendingComment?.type === "edit_reply" ||
-    pendingComment?.type === "new_reply"
-  ) {
-    return null;
-  }
+  // if (
+  //   !mousePosition
+  //   // pendingComment?.type === "edit_reply" ||
+  //   // pendingComment?.type === "new_reply"
+  // ) {
+  return null;
+  // }
 
-  const { parentStyle, childStyle } = getStyles(mousePosition, canvas!, captionNode.current);
-  let label = "Add comment";
-  if (areMouseTargetsLoading) {
-    label = "Targets loading...";
-  } else if (pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment") {
-    label = "Move the marker";
-  }
+  // const { parentStyle, childStyle } = getStyles(mousePosition, canvas!, captionNode.current);
+  // let label = "Add comment";
+  // if (areMouseTargetsLoading) {
+  //   label = "Targets loading...";
+  // } else {
+  //   // if (pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment") {
+  //   label = "Move the marker";
+  // }
 
-  return (
-    <div style={parentStyle} className="absolute">
-      <div
-        className={classNames(
-          "absolute flex w-max items-center space-x-1.5 rounded-2xl bg-black bg-opacity-70 px-2.5 py-1 text-xs text-white",
-          !captionNode.current ? "invisible" : ""
-        )}
-        style={childStyle}
-        ref={captionNode}
-      >
-        <span>{label}</span>
-      </div>
-    </div>
-  );
+  // return (
+  //   <div style={parentStyle} className="absolute">
+  //     <div
+  //       className={classNames(
+  //         "absolute flex w-max items-center space-x-1.5 rounded-2xl bg-black bg-opacity-70 px-2.5 py-1 text-xs text-white",
+  //         !captionNode.current ? "invisible" : ""
+  //       )}
+  //       style={childStyle}
+  //       ref={captionNode}
+  //     >
+  //       <span>{label}</span>
+  //     </div>
+  //   </div>
+  // );
 }
 
 const connector = connect(
   (state: UIState) => ({
     recordingTarget: selectors.getRecordingTarget(state),
-    pendingComment: selectors.getPendingComment(state),
+    pendingComments: selectors.getPendingComments(state),
     executionPoint: getExecutionPoint(state),
     currentTime: selectors.getCurrentTime(state),
     canvas: selectors.getCanvas(state),
     areMouseTargetsLoading: selectors.areMouseTargetsLoading(state),
   }),
   {
-    setPendingComment: actions.setPendingComment,
+    addPendingComment: actions.addPendingComment,
     createFrameComment: actions.createFrameComment,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
   }

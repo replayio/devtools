@@ -26,12 +26,12 @@ type AddPendingComment = Action<"add_pending_comment"> & { comment: Comment };
 type RemovePendingComment = Action<"remove_pending_comment"> & { id: string };
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
-type UpdatePendingCommentContent = Action<"update_pending_comment_content"> & { content: string };
+type UpdatePendingComment = Action<"update_pending_comment"> & { comment: Comment };
 
 export type CommentsAction =
   | AddPendingComment
   | SetHoveredComment
-  | UpdatePendingCommentContent
+  | UpdatePendingComment
   | RemovePendingComment;
 
 export function addPendingComment(comment: Comment): AddPendingComment {
@@ -46,8 +46,8 @@ export function removePendingComment(id: string): RemovePendingComment {
   return { type: "remove_pending_comment", id };
 }
 
-export function updatePendingCommentContent(content: string): UpdatePendingCommentContent {
-  return { type: "update_pending_comment_content", content };
+export function updatePendingComment(comment: Comment): UpdatePendingComment {
+  return { type: "update_pending_comment", comment };
 }
 
 export function createComment(

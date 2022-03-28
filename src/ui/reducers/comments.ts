@@ -1,7 +1,6 @@
 import { CommentsState } from "ui/state/comments";
 import { CommentsAction } from "ui/actions/comments";
 import { UIState } from "ui/state";
-import cloneDeep from "lodash/cloneDeep";
 
 export const PENDING_COMMENT_ID = "PENDING";
 
@@ -38,9 +37,14 @@ export default function update(
       };
     }
 
-    case "update_pending_comment_content": {
-      // This is a complicated case that does not seem particularly important
-      return state;
+    case "update_pending_comment": {
+      return {
+        ...state,
+        pendingComments: [
+          ...state.pendingComments.filter(x => x.id !== action.comment.id),
+          action.comment,
+        ],
+      };
     }
 
     default: {
@@ -50,3 +54,4 @@ export default function update(
 }
 
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
+export const getPendingComments = (state: UIState) => state.comments.pendingComments;

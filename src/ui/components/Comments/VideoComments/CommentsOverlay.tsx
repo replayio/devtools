@@ -8,11 +8,11 @@ import { Comment, PendingComment } from "ui/state/comments";
 
 function findComment({
   hasuraComments,
-  pendingComment,
+  pendingComments,
   currentTime,
 }: {
   hasuraComments: Comment[];
-  pendingComment: PendingComment | null;
+  pendingComments: Comment[];
   currentTime: number;
 }) {
   let comments: (Comment | PendingComment["comment"])[] = [...hasuraComments];
@@ -21,12 +21,12 @@ function findComment({
   // pendingComment. This lets us update the pendingComment as the user
   // move the location marker around the video and have it visually update
   // the displayed comments.
-  if (pendingComment) {
-    comments = hasuraComments.filter(
-      comment => !("id" in pendingComment?.comment) || pendingComment?.comment.id != comment.id
-    );
-    comments.push(pendingComment.comment);
-  }
+  // if (pendingComment) {
+  //   comments = hasuraComments.filter(
+  //     comment => !("id" in pendingComment?.comment) || pendingComment?.comment.id != comment.id
+  //   );
+  //   comments.push(pendingComment.comment);
+  // }
 
   // Find the comment at the current position
   return comments.filter(
@@ -35,7 +35,7 @@ function findComment({
 }
 
 function CommentsOverlay({
-  pendingComment,
+  pendingComments,
   canvas,
   currentTime,
   children,
@@ -48,7 +48,7 @@ function CommentsOverlay({
   }
 
   const { top, left, width, height, scale } = canvas;
-  const comments = findComment({ hasuraComments, pendingComment, currentTime });
+  const comments = findComment({ hasuraComments, pendingComments, currentTime });
 
   return (
     <div
@@ -72,7 +72,7 @@ function CommentsOverlay({
 
 const connector = connect((state: UIState) => ({
   currentTime: selectors.getCurrentTime(state),
-  pendingComment: selectors.getPendingComment(state),
+  pendingComments: selectors.getPendingComments(state),
   canvas: selectors.getCanvas(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

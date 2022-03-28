@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
@@ -28,7 +27,7 @@ type CommentEditorProps = PropsFromRedux & {
 };
 
 function CommentEditor({
-  clearPendingComment,
+  removePendingComment,
   comment,
   editable,
   handleSubmit,
@@ -60,7 +59,7 @@ function CommentEditor({
               content={comment.content || ""}
               editable={editable}
               handleCancel={() => {
-                clearPendingComment();
+                removePendingComment(comment.id);
                 handleCancel();
                 blur();
                 close();
@@ -85,11 +84,8 @@ function CommentEditor({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    pendingComment: selectors.getPendingComment(state),
-  }),
-  { clearPendingComment: actions.clearPendingComment }
-);
+const connector = connect((state: UIState) => ({}), {
+  removePendingComment: actions.removePendingComment,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommentEditor);

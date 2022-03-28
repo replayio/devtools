@@ -21,7 +21,7 @@ import {
   getFocusRegion,
   getZoomRegion,
 } from "ui/reducers/timeline";
-import { getPendingComment } from "ui/reducers/comments";
+import { getPendingComments } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
@@ -487,7 +487,7 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
     dispatch({ type: "set_hovered_item", hoveredItem });
 
     // Don't update the video if user is adding a new comment.
-    const updateGraphics = !getPendingComment(getState());
+    const updateGraphics = !getPendingComments(getState()).length;
     dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
   };
 }

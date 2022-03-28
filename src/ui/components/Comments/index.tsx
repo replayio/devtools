@@ -1,5 +1,5 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 
 import hooks from "ui/hooks";
 import CommentMarker from "./CommentMarker";
@@ -7,11 +7,14 @@ import { selectors } from "../../reducers";
 import sortBy from "lodash/sortBy";
 
 import { UIState } from "ui/state";
-import { Comment, PendingComment } from "ui/state/comments";
+import { getPendingComments } from "ui/reducers/comments";
 
-function Comments({ pendingComment, hoveredItem }: PropsFromRedux) {
+function Comments({ pendingComments, hoveredItem }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const { comments: hasuraComments, loading, error } = hooks.useGetComments(recordingId);
+
+  // Redux Comments
+  const localComments = useSelector(getPendingComments);
 
   // Don't render anything if the comments are loading. For now, we fail silently
   // if there happens to be an error while fetching the comments. In the future, we
@@ -21,15 +24,7 @@ function Comments({ pendingComment, hoveredItem }: PropsFromRedux) {
     return null;
   }
 
-  const comments: (Comment | PendingComment["comment"])[] = [...hasuraComments];
-
-  // New comments that haven't been sent to Hasura will not have an associated ID.
-  // They're not included in the comments data from the query, so we have to insert
-  // them manually here. If a pending comment has an ID, it already exists in the
-  // comments data and we don't have to insert it.
-  if (pendingComment && !(pendingComment as any).id) {
-    comments.push(pendingComment.comment);
-  }
+  const comments = hasuraComments.filter(x => localComments.map(y => y.id).includes(x.id));
 
   const sortedComments = sortBy(comments, comment => comment.time);
 
@@ -52,7 +47,7 @@ function Comments({ pendingComment, hoveredItem }: PropsFromRedux) {
 
 const connector = connect((state: UIState) => ({
   playback: selectors.getPlayback(state),
-  pendingComment: selectors.getPendingComment(state),
+  pendingComments: selectors.getPendingComments(state),
   hoveredItem: selectors.getHoveredItem(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

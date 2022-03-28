@@ -80,26 +80,27 @@ function CommentItemHeader({
 
 function CommentItem({
   comment,
-  pendingComment,
+  pendingComments,
   type,
 }: {
   comment: Comment | Reply;
-  pendingComment: PendingComment | null;
+  pendingComments: PendingComment;
   type: "comment" | "reply";
 }) {
-  const isEditing = Boolean(pendingComment?.comment?.id == comment.id);
-  const showOptions = !isEditing;
+  return null;
+  // const isEditing = Boolean(pendingComment?.comment?.id == comment.id);
+  // const showOptions = !isEditing;
 
-  return (
-    <div className="group space-y-1.5">
-      <CommentItemHeader {...{ comment, showOptions }} />
-      <ExistingCommentEditor
-        comment={comment}
-        type={type}
-        editable={pendingComment?.comment.id === comment.id}
-      />
-    </div>
-  );
+  // return (
+  //   <div className="group space-y-1.5">
+  //     <CommentItemHeader {...{ comment, showOptions }} />
+  //     <ExistingCommentEditor
+  //       comment={comment}
+  //       type={type}
+  //       editable={pendingComment?.comment.id === comment.id}
+  //     />
+  //   </div>
+  // );
 }
 
 function CommentTarget({ comment }: { comment: Comment }) {
@@ -132,7 +133,7 @@ function CommentCard({
   comments,
   currentTime,
   executionPoint,
-  pendingComment,
+  pendingComments,
   setModal,
   seekToComment,
   setHoveredComment,
@@ -204,12 +205,12 @@ function CommentCard({
         })}
       >
         <CommentTarget comment={comment} />
-        <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
+        {/* <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
         {comment.replies?.map((reply: Reply, i: number) => (
           <div key={replyKeys[i]}>
             <CommentItem type="reply" comment={reply} pendingComment={pendingComment} />
           </div>
-        ))}
+        ))} */}
         {isEditorOpen ? (
           <FocusContext.Provider
             value={{
@@ -263,7 +264,7 @@ const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
-    pendingComment: selectors.getPendingComment(state),
+    pendingComments: selectors.getPendingComments(state),
   }),
   {
     editItem: actions.editItem,

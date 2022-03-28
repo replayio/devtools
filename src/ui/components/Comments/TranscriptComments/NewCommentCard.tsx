@@ -1,6 +1,7 @@
-import { Editor, JSONContent } from "@tiptap/react";
+import { Editor } from "@tiptap/react";
 import classNames from "classnames";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import useAddComment from "ui/hooks/comments/useAddComment";
 import { Comment } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
@@ -15,6 +16,7 @@ const NewCommentCard = ({ comment }: { comment: Comment }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState(CommentStatus.IDLE);
   const createComment = useAddComment();
+  const dispatch = useDispatch();
 
   console.log({ comment, status });
 
@@ -41,7 +43,7 @@ const NewCommentCard = ({ comment }: { comment: Comment }) => {
                 content: inputValue,
               });
               setStatus(CommentStatus.IDLE);
-              // dispatch("COMMENT_PERSISTED", { id: id });
+              dispatch("update_pending_comment", { id: id });
               console.log({ result });
             } catch (e) {
               setStatus(CommentStatus.ERROR);

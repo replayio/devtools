@@ -7,6 +7,7 @@ import { Comment } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import NewCommentCard from "../Comments/TranscriptComments/NewCommentCard";
+import { getPendingComments } from "ui/reducers/comments";
 
 export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();
@@ -17,26 +18,15 @@ export default function Transcript() {
   const { comments } = hooks.useGetComments(recordingId);
 
   // Redux Comments
-  const [localComments, dispatch] = useReducer(
-    (
-      state: Comment[],
-      action:
-        | { type: "ADD_COMMENT"; comment: Comment }
-        | { type: "UPDATE_COMMENT"; comment: Comment }
-        | { type: "REMOVE_COMMENT"; id: string }
-    ) => {
-      switch (action.type) {
-        case "ADD_COMMENT":
-          return [...state, action.comment];
-        case "UPDATE_COMMENT":
-          return [...state.filter(x => x.id !== action.comment.id), action.comment];
-        case "REMOVE_COMMENT":
-          return state.filter(x => x.id !== action.id);
-      }
-    },
-    []
-  );
-  const dedupedFromServer = comments.filter(x => localComments.map(y => y.id).includes(x.id));
+  const localComments = useSelector(getPendingComments);
+
+  const dedupedFromServer = comments.filter(x => !localComments.map(y => y.id).includes(x.id));
+
+  console.log({
+    comments: comments.map(x => x.id),
+    localComments: localComments.map(x => x.id),
+    dedupedFromServer: dedupedFromServer.map(x => x.id),
+  });
 
   if (loading) {
     return null;

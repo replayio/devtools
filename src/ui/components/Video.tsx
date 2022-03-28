@@ -45,7 +45,7 @@ function Video({
   currentTime,
   playback,
   isNodePickerActive,
-  pendingComment,
+  pendingComments,
   recordingTarget,
   stalled,
   mouseTargetsLoading,
@@ -73,7 +73,7 @@ function Video({
   // first. This updates the isNodePickerActive value and makes it look like the node picker is
   // inactive when we check it here.
   const onMouseDown = () => {
-    if (isNodePickerActive || pendingComment) {
+    if (isNodePickerActive || pendingComments.length) {
       return;
     }
   };
@@ -104,7 +104,7 @@ function Video({
 }
 
 const connector = connect((state: UIState) => ({
-  pendingComment: selectors.getPendingComment(state),
+  pendingComments: selectors.getPendingComments(state),
   isNodePickerActive: selectors.getIsNodePickerActive(state),
   currentTime: selectors.getCurrentTime(state),
   playback: selectors.getPlayback(state),
