@@ -15,7 +15,7 @@ export function InputField({
           {...rest}
           name={id}
           id={id}
-          className="block w-full min-w-0 flex-1 rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="block w-full min-w-0 flex-1 rounded-md border-themeBorder bg-themeTextFieldBgcolor text-sm text-themeTextFieldColor focus:border-indigo-500 focus:ring-indigo-500"
         />
       </div>
     </Field>
