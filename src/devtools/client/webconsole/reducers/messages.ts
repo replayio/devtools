@@ -55,7 +55,7 @@ interface ExecutionPoint {
   progress: number;
 }
 
-interface Message {
+export interface Message {
   allowRepeating: boolean;
   category: string | null;
   errorMessageName: string | null;
