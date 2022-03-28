@@ -37,8 +37,6 @@ const isMacOS = appinfo.OS === "Darwin";
 
 import QuickOpenModal from "./QuickOpenModal";
 import SidePanel from "ui/components/SidePanel";
-import { waitForEditor } from "../utils/editor/create-editor";
-import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 import { EditorPane } from "./Editor/EditorPane";
 
 class Debugger extends Component {
@@ -244,26 +242,12 @@ Debugger.childContextTypes = {
 };
 
 function DebuggerLoader(props) {
-  const [loadingEditor, setLoadingEditor] = useState(true);
   const wrapperNode = useRef();
   const { loading: loadingSettings } = useGetUserSettings();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await waitForEditor();
-        setLoadingEditor(false);
-      } catch {
-        props.setUnexpectedError(ReplayUpdatedError, true);
-      }
-    })();
-  }, []);
-
   return (
     <div className="debugger" ref={wrapperNode}>
-      {loadingEditor || loadingSettings ? null : (
-        <Debugger {...props} wrapper={wrapperNode.current} />
-      )}
+      {loadingSettings ? null : <Debugger {...props} wrapper={wrapperNode.current} />}
     </div>
   );
 }
