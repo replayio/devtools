@@ -131,7 +131,8 @@ export class DevToolsToolbox {
     url: string | undefined,
     line: number | undefined,
     column: number | undefined,
-    id: string | undefined
+    id: string | undefined,
+    openSourcesTab: boolean
   ) {
     const dbg = this.getPanel("debugger");
     if (!dbg) {
@@ -139,7 +140,7 @@ export class DevToolsToolbox {
     }
     const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
     if (source) {
-      dbg.selectSource(source.id, line, column);
+      dbg.selectSource(source.id, line, column, openSourcesTab);
     }
   }
 }

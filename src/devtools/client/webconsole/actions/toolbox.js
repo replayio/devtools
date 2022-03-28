@@ -67,8 +67,14 @@ export function onMessageHover(type, message) {
   };
 }
 
-export function onViewSourceInDebugger(frame) {
+export function onViewSourceInDebugger(frame, openSourcesTab) {
   return () => {
-    window.gToolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.sourceId);
+    window.gToolbox.viewSourceInDebugger(
+      frame.url,
+      frame.line,
+      frame.column,
+      frame.sourceId,
+      openSourcesTab
+    );
   };
 }

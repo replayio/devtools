@@ -120,10 +120,10 @@ class Message extends React.Component {
     e.preventDefault();
   }
 
-  onViewSourceInDebugger = frame => {
+  onViewSourceInDebugger = (frame, openSourcesTab = true) => {
     const { dispatch } = this.props;
     trackEvent("console.select_source ");
-    dispatch(actions.onViewSourceInDebugger(frame));
+    dispatch(actions.onViewSourceInDebugger(frame, openSourcesTab));
   };
 
   toggleMessage(e) {
@@ -181,7 +181,7 @@ class Message extends React.Component {
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
 
-      this.onViewSourceInDebugger({ ...frame, url: frame.source });
+      this.onViewSourceInDebugger({ ...frame, url: frame.source }, false);
       dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
     };
     let handleAddComment = async () => {
