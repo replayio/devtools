@@ -93,6 +93,8 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   })();
 
   if (isRootComment) {
+    // when we render top-level comments and a pending top-level comment, we
+    // don't need any other components, headers, actions etc
     return replies;
   }
 

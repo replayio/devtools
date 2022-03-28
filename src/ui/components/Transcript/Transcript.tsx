@@ -13,6 +13,10 @@ const Transcript = (): JSX.Element | null => {
   const { isAuthenticated } = useAuth0();
 
   const sortedHierarchicalComments = useMemo(() => {
+    if (loading) {
+      return [];
+    }
+
     const hierarchicalComments = flatToHierarchicalComments(comments);
     const sortedHierarchicalComments = sortHierarchicalComments(hierarchicalComments);
     return sortedHierarchicalComments;
@@ -22,7 +26,10 @@ const Transcript = (): JSX.Element | null => {
     return null;
   }
 
-  const _rootComments = {
+  // by creating this faux "root comment", we can gather together all top-level
+  // comments and a top-level pending comment under the same object and reuse
+  // CommentItem component to render them like they are some regular comments
+  const _rootComment = {
     id: ROOT_COMMENT_ID,
     replies: sortedHierarchicalComments,
   } as Comment;
@@ -36,10 +43,7 @@ const Transcript = (): JSX.Element | null => {
       <div className="transcript-list bg-themeBodyBgcolor flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden text-xs">
         {sortedHierarchicalComments.length > 0 ? (
           <div className="bg-themeBodyBgcolor w-full flex-grow overflow-auto">
-            <CommentItem comment={_rootComments} />
-            {/* {sortedHierarchicalComments.map(comment => {
-              return <CommentItem key={comment.id} comment={comment} />;
-            })} */}
+            <CommentItem comment={_rootComment} />
           </div>
         ) : (
           <div className="transcript-list onboarding-text space-y-3 self-stretch p-3 text-base text-gray-500">
