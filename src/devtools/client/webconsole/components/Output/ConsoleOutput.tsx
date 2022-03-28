@@ -5,37 +5,53 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { connect } from "react-redux";
+import { Dispatch } from "@reduxjs/toolkit";
+import { connect, ConnectedProps } from "react-redux";
 import PropTypes from "prop-types";
 
 import { actions } from "ui/actions";
 import { isVisible } from "ui/utils/dom";
 import { selectors } from "ui/reducers";
+import type { UIState } from "ui/state";
 
 import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 
-import { MESSAGE_TYPE } from "devtools/client/webconsole/constants";
+import constants from "devtools/client/webconsole/constants";
 
-class ConsoleOutput extends React.Component {
-  static get propTypes() {
-    return {
-      messages: PropTypes.object.isRequired,
-      messagesUi: PropTypes.array.isRequired,
-      timestampsVisible: PropTypes.bool,
-      messagesPayload: PropTypes.object.isRequired,
-      visibleMessages: PropTypes.array.isRequired,
-      pausedExecutionPoint: PropTypes.string,
-    };
-  }
+function mapStateToProps(state: UIState) {
+  return {
+    // @ts-ignore
+    pausedExecutionPoint: selectors.getExecutionPoint(state),
+    closestMessage: selectors.getClosestMessage(state),
+    messages: selectors.getAllMessagesById(state),
+    visibleMessages: selectors.getVisibleMessages(state),
+    messagesUi: selectors.getAllMessagesUiById(state),
+    messagesPayload: selectors.getAllMessagesPayloadById(state),
+    timestampsVisible: state.consoleUI.timestampsVisible,
+    playback: selectors.getPlayback(state),
+    hoveredItem: selectors.getHoveredItem(state),
+    loadedRegions: selectors.getLoadedRegions(state),
+  };
+}
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  openLink: actions.openLink,
+  dispatch,
+});
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+class ConsoleOutput extends React.Component<PropsFromRedux> {
+  outputNode = React.createRef<HTMLDivElement>();
 
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
-      scrollToBottom(this.outputNode);
+      scrollToBottom(this.outputNode.current!);
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: PropsFromRedux) {
     if (
       this.props.pausedExecutionPoint != prevProps.pausedExecutionPoint &&
       this.props.closestMessage != prevProps.closestMessage
@@ -53,15 +69,16 @@ class ConsoleOutput extends React.Component {
       return;
     }
 
-    const outputNode = ReactDOM.findDOMNode(this);
-    const element = outputNode.querySelector(`.message[data-message-id="${closestMessage.id}"]`);
+    const element: HTMLElement = this.outputNode.current!.querySelector(
+      `.message[data-message-id="${closestMessage.id}"]`
+    )!;
 
     if (!element) {
       return;
     }
 
     // Don't scroll to the message if it's already in view.
-    if (isVisible(outputNode, element)) {
+    if (isVisible(this.outputNode.current!, element)) {
       return;
     }
 
@@ -70,7 +87,7 @@ class ConsoleOutput extends React.Component {
     setTimeout(() => element.scrollIntoView({ block: "center", behavior: "smooth" }));
   }
 
-  maybeScrollToResult(prevProps) {
+  maybeScrollToResult(prevProps: PropsFromRedux) {
     const messagesDelta = this.props.messages.size - prevProps.messages.size;
 
     // [...this.props.messages.values()] seems slow
@@ -78,12 +95,12 @@ class ConsoleOutput extends React.Component {
     // use a memoization function to be able to get the last message quickly
     const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
 
-    if (messagesDelta <= 0 || lastMessage.type !== MESSAGE_TYPE.RESULT) {
+    if (messagesDelta <= 0 || lastMessage.type !== constants.MESSAGE_TYPE.RESULT) {
       return;
     }
 
-    const node = ReactDOM.findDOMNode(this);
-    const resultNode = node.querySelector(`div[data-message-id='${lastMessage.id}']`);
+    const node = this.outputNode.current!;
+    const resultNode: HTMLElement = node.querySelector(`div[data-message-id='${lastMessage.id}']`)!;
 
     if (!resultNode) {
       return;
@@ -97,10 +114,11 @@ class ConsoleOutput extends React.Component {
     // Scroll to the previous message node if it exists. It should be the
     // input which triggered the evaluation result we're scrolling to.
     const previous = resultNode.previousSibling;
+    // @ts-ignore
     (previous || resultNode).scrollIntoView();
   }
 
-  getIsFirstMessageForPoint(index, visibleMessages) {
+  getIsFirstMessageForPoint(index: number, visibleMessages: PropsFromRedux["visibleMessages"]) {
     const { messages } = this.props;
 
     if (index == 0) {
@@ -133,13 +151,14 @@ class ConsoleOutput extends React.Component {
 
     const messageNodes = visibleMessages
       .filter(messageId => {
-        const time = messages.get(messageId).executionPointTime;
-        return loadedRegions.loaded.some(
+        const time = messages.get(messageId)!.executionPointTime!;
+        return loadedRegions!.loaded.some(
           region => time >= region.begin.time && time <= region.end.time
         );
       })
       .map((messageId, i) => {
         const message = messages.get(messageId);
+        // @ts-ignore
         const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
         const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
@@ -160,44 +179,18 @@ class ConsoleOutput extends React.Component {
         });
       });
 
-    return React.createElement(
-      "div",
-      {
-        className: "webconsole-output",
-        role: "main",
-        ref: node => {
-          this.outputNode = node;
-        },
-      },
-      <ConsoleLoadingBar />,
-      messageNodes
+    return (
+      <div className="webconsole-output" ref={this.outputNode} role="main">
+        <ConsoleLoadingBar />,{messageNodes}
+      </div>
     );
   }
 }
 
-function scrollToBottom(node) {
+function scrollToBottom(node: HTMLElement) {
   if (node.scrollHeight > node.clientHeight) {
     node.scrollTop = node.scrollHeight;
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    pausedExecutionPoint: selectors.getExecutionPoint(state),
-    closestMessage: selectors.getClosestMessage(state),
-    messages: selectors.getAllMessagesById(state),
-    visibleMessages: selectors.getVisibleMessages(state),
-    messagesUi: selectors.getAllMessagesUiById(state),
-    messagesPayload: selectors.getAllMessagesPayloadById(state),
-    timestampsVisible: state.consoleUI.timestampsVisible,
-    playback: selectors.getPlayback(state),
-    hoveredItem: selectors.getHoveredItem(state),
-    loadedRegions: selectors.getLoadedRegions(state),
-  };
-}
-const mapDispatchToProps = dispatch => ({
-  openLink: actions.openLink,
-  dispatch,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ConsoleOutput);
+export default connector(ConsoleOutput);
