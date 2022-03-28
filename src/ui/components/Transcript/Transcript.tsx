@@ -20,7 +20,7 @@ const Transcript = (): JSX.Element | null => {
     const hierarchicalComments = flatToHierarchicalComments(comments);
     const sortedHierarchicalComments = sortHierarchicalComments(hierarchicalComments);
     return sortedHierarchicalComments;
-  }, [comments]);
+  }, [comments, loading]);
 
   if (loading) {
     return null;
