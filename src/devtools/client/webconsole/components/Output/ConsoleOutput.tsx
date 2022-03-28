@@ -27,7 +27,6 @@ function mapStateToProps(state: UIState) {
     messages: selectors.getAllMessagesById(state),
     visibleMessages: selectors.getVisibleMessages(state),
     messagesUi: selectors.getAllMessagesUiById(state),
-    messagesPayload: selectors.getAllMessagesPayloadById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
     playback: selectors.getPlayback(state),
     hoveredItem: selectors.getHoveredItem(state),
@@ -141,7 +140,6 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       visibleMessages,
       messages,
       messagesUi,
-      messagesPayload,
       timestampsVisible,
       pausedExecutionPoint,
       closestMessage,
@@ -168,7 +166,8 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
           messageId,
           message,
           open: messagesUi.includes(messageId),
-          payload: messagesPayload.get(messageId),
+          // TODO Reconsider this when we rebuild message grouping
+          payload: undefined,
           timestampsVisible,
 
           pausedExecutionPoint,

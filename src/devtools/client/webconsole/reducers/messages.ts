@@ -110,7 +110,6 @@ export interface MessageState {
   visibleMessages: MessageId[];
   filteredMessagesCount: FilteredMessagesCount;
   messagesUiById: MessageId[];
-  messagesPayloadById: Map<MessageId, unknown>;
   logpointMessages: Map<MessageId, Message>;
   removedLogpointIds: Set<MessageId>;
   pausedExecutionPoint: ExecutionPoint | null;
@@ -127,9 +126,6 @@ const MessageState = (overrides?: Partial<MessageState>): MessageState =>
       {
         // List of all the messages added to the console.
         messagesById: new Map(),
-        // List of additional data associated with messages (populated async or on-demand at a
-        // later time after the message is received).
-        messagesPayloadById: new Map(),
         // Array of the visible messages.
         visibleMessages: [],
         // Object for the filtered messages.
@@ -166,7 +162,6 @@ function cloneState(state: MessageState) {
     visibleMessages: [...state.visibleMessages],
     filteredMessagesCount: { ...state.filteredMessagesCount },
     messagesUiById: [...state.messagesUiById],
-    messagesPayloadById: new Map(state.messagesPayloadById),
     logpointMessages: new Map(state.logpointMessages),
     removedLogpointIds: new Set(state.removedLogpointIds),
     pausedExecutionPoint: state.pausedExecutionPoint,
@@ -256,7 +251,7 @@ function addMessage(
 
 // eslint-disable-next-line complexity
 function messages(state = MessageState(), action: AnyAction) {
-  const { messagesById, messagesPayloadById, messagesUiById, visibleMessages } = state;
+  const { messagesById, messagesUiById, visibleMessages } = state;
   const { filtersState } = action;
 
   log(`WebConsole ${action.type}`);
@@ -359,12 +354,6 @@ function messages(state = MessageState(), action: AnyAction) {
       );
     }
 
-    case constants.MESSAGE_UPDATE_PAYLOAD:
-      return {
-        ...state,
-        messagesPayloadById: new Map(messagesPayloadById).set(action.id, action.data),
-      };
-
     // TODO Remove this action entirely when the filtered messages is turned into a selector
     case "FILTER_STATE_UPDATED":
       return setVisibleMessages({
@@ -463,10 +452,6 @@ function removeMessagesFromState(state: MessageState, removedMessagesIds: Messag
 
   if (state.messagesUiById.find(isInRemovedId)) {
     state.messagesUiById = state.messagesUiById.filter(id => !isInRemovedId(id));
-  }
-
-  if (mapHasRemovedIdKey(state.messagesPayloadById)) {
-    state.messagesPayloadById = cleanUpMap(state.messagesPayloadById);
   }
 
   return state;

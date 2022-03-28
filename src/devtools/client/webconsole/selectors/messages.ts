@@ -13,7 +13,6 @@ const { isInTrimSpan } = require("ui/utils/timeline");
 
 import { createSelector } from "reselect";
 
-export const getAllMessagesPayloadById = (state: UIState) => state.messages.messagesPayloadById;
 export const getAllMessagesUiById = (state: UIState) => state.messages.messagesUiById;
 export const getCommandHistory = (state: UIState) => state.messages.commandHistory;
 export const getFilteredMessagesCount = (state: UIState) => state.messages.filteredMessagesCount;
