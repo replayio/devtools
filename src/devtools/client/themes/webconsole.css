@@ -27,7 +27,7 @@
 
 .theme-dark {
   --console-input-background: var(--theme-tab-toolbar-background);
-  --console-message-background: var(--theme-body-bgcolor);
+  --console-message-background: var(--body-bgcolor);
   --console-message-border: var(--theme-splitter-color);
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(345, 23%, 24%);
@@ -46,8 +46,8 @@
 }
 
 .theme-light {
-  --console-input-background: var(--theme-body-bgcolor);
-  --console-message-background: var(--theme-body-bgcolor);
+  --console-input-background: var(--body-bgcolor);
+  --console-message-background: var(--body-bgcolor);
   --console-message-border: #f2f2f4; /* between Grey 10 and Grey 20 */
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(344, 73%, 97%);
@@ -404,7 +404,7 @@
 
 .webconsole-app .message.network .xhr {
   background-color: var(--theme-text-color-alt);
-  color: var(--theme-body-bgcolor);
+  color: var(--body-bgcolor);
   border-radius: 3px;
   font-weight: bold;
   font-size: 10px;
@@ -434,10 +434,6 @@ html #webconsole-notificationbox {
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
   background-color: var(--theme-console-input-bgcolor);
-}
-
-.webconsole-app .jsterm-input-container {
-  height: var(--editor-footer-height);
 }
 
 .console-chevron {
@@ -547,7 +543,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-filteringbar-wrapper .devtools-toolbar {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 .webconsole-filterbar-primary {
@@ -643,11 +639,11 @@ a.learn-more-link.webconsole-learn-more-link {
 .theme-dark .message.warn .objectRightBrace,
 .theme-dark .message.warn .arrayLeftBracket,
 .theme-dark .message.warn .arrayRightBracket {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 .theme-dark .message.error .tree.object-inspector,
 .theme-dark .message.warn .tree.object-inspector {
-  --console-indent-border-color: var(--theme-body-color);
+  --console-indent-border-color: var(--body-color);
 }
 
 .webconsole-app .message-flex-body > .message-body {
@@ -661,7 +657,7 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.startGroup .message-body > .objectBox-string,
 .webconsole-app .message.startGroupCollapsed .message-body > .objectBox-string {
-  color: var(--theme-body-color);
+  color: var(--body-color);
   font-weight: bold;
 }
 
@@ -752,7 +748,7 @@ a.learn-more-link.webconsole-learn-more-link {
   width: 100%;
   --consoletable-border: var(--theme-splitter-color);
   margin-block-end: var(--attachment-margin-block-end);
-  color: var(--theme-body-color);
+  color: var(--body-color);
   display: grid;
   max-height: 250px;
   overflow-y: auto;
@@ -770,7 +766,7 @@ a.learn-more-link.webconsole-learn-more-link {
   top: 0;
   border-bottom: 1px solid var(--consoletable-border);
   background-color: var(--theme-toolbar-background);
-  color: var(--theme-body-color);
+  color: var(--body-color);
   margin: 0;
   padding: 5px 4px;
   font-weight: inherit;
@@ -779,8 +775,8 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .new-consoletable > [role="gridcell"] {
-  background-color: var(--theme-body-bgcolor);
-  color: var(--theme-body-color);
+  background-color: var(--body-bgcolor);
+  color: var(--body-color);
   padding: 3px 4px;
   text-overflow: ellipsis;
 }

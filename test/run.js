@@ -45,13 +45,16 @@ async function runMatchingTests(state) {
         continue;
       }
 
-      console.log(`[${elapsedTime(state)}] Starting test:${test} target:${target}`);
+      console.log(`[${elapsedTime(state)}] TestStart:${test} target:${target}`);
       const exampleRecordingId = await getExample(state, example, target);
+      console.log(
+        `[${elapsedTime(state)}] TestExample:${test} target:${target} ${exampleRecordingId}`
+      );
 
       const startTime = Date.now();
       await runTest(state, test, exampleRecordingId, target);
       state.timings[`${test}-${target}`] = Date.now() - startTime;
-      console.log(`[${elapsedTime(state)}] Finished test:${test} target:${target}`);
+      console.log(`[${elapsedTime(state)}] TestFinished:${test} target:${target}`);
     }
   }
 }

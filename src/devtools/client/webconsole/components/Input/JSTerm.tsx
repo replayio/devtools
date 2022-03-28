@@ -52,13 +52,13 @@ export default function JSTerm() {
 
   const { moveHistoryCursor, setHistoryIndex } = useEvaluationHistory(setValue);
 
-  const onKeyPress = (e: KeyboardEvent) => {
-    if (e.key === Keys.ENTER) {
+  const onKeyPress = (e: KeyboardEvent, editor: Editor) => {
+    if (e.key === Keys.ENTER && !e.shiftKey) {
       e.preventDefault();
       _execute();
-    } else if (e.key === Keys.ARROW_UP) {
+    } else if (e.key === Keys.ARROW_UP && editor.getCursor().line === 0) {
       moveHistoryCursor(1);
-    } else if (e.key === Keys.ARROW_DOWN) {
+    } else if (e.key === Keys.ARROW_DOWN && editor.getCursor().line === editor.lineCount() - 1) {
       moveHistoryCursor(-1);
     }
   };

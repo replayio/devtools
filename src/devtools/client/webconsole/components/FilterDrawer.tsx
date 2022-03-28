@@ -13,7 +13,7 @@ export const FilterDrawer: FC = () => {
   }
 
   return (
-    <div className="flex flex-col bg-themeBodyBgcolor">
+    <div className="flex flex-col bg-bodyBgcolor">
       <div
         className="flex flex-grow flex-col space-y-2 overflow-y-auto border-r border-themeBorder py-2"
         style={{ width: "var(--console-drawer-width)" }}

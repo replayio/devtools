@@ -148,9 +148,7 @@ function SecondaryToolbox({
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
-        {toolboxLayout !== "ide" && selectedPanel === "debugger" ? (
-          <EditorPane toolboxLayout={toolboxLayout} />
-        ) : null}
+        {toolboxLayout !== "ide" && selectedPanel === "debugger" ? <EditorPane /> : null}
       </Redacted>
     </div>
   );

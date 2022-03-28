@@ -133,7 +133,7 @@
 
 .event-listeners-modes button {
   background: transparent;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   padding: 0px;
 }
 

@@ -30,7 +30,7 @@ const DEFAULT_OPTIONS = {
 
 const ControlledCodeMirror: FC<{
   value: string;
-  onKeyPress: (e: KeyboardEvent) => void;
+  onKeyPress: (e: KeyboardEvent, editor: Editor) => void;
   setValue: (value: string) => void;
   onSelection: (obj: any) => void;
   onEditorMount: (editor: Editor) => void;
@@ -62,8 +62,8 @@ const ControlledCodeMirror: FC<{
   const onEditorMountRef = useRef(onEditorMount);
   onEditorMountRef.current = onEditorMount;
 
-  const _onKeyPress = (_: Editor, event: any) => {
-    onKeyPressRef.current(event);
+  const _onKeyPress = (editor: Editor, event: any) => {
+    onKeyPressRef.current(event, editor);
   };
   const _onBeforeChange = (_: Editor, __: EditorChange, value: string) => {
     setValueRef.current(value);

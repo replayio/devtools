@@ -105,7 +105,8 @@ export const EventListenersApp: FC = () => {
                                   locationUrl,
                                   location.line,
                                   location.column,
-                                  location.sourceId
+                                  location.sourceId,
+                                  true
                                 );
                               }}
                             >

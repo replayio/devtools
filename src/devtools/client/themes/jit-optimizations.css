@@ -56,7 +56,7 @@
   -moz-box-flex: 1;
   -moz-box-orient: vertical;
   overflow: auto;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 #jit-optimizations-view .tree-node {

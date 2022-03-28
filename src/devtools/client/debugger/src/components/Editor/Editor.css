@@ -79,13 +79,13 @@ html[dir="rtl"] .editor-mount {
 
 .editor-wrapper .editor-mount {
   width: 100%;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   font-size: var(--theme-code-font-size);
   line-height: var(--theme-code-line-height);
 }
 
 .editor-mount > .CodeMirror {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 /* set the linenumber white when there is a breakpoint */
@@ -181,7 +181,7 @@ separately stack the pause line visuals and the code. */
   margin-right: -14px;
   z-index: 10000;
   position: relative;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   cursor: pointer;
 }
 

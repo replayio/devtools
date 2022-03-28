@@ -317,7 +317,7 @@ checkbox:-moz-focusring {
   background: transparent;
   border: none;
   border-radius: 2px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   transition: background-color 0.05s ease-in-out;
   -moz-box-align: center;
   text-shadow: none;
@@ -523,8 +523,8 @@ checkbox:-moz-focusring {
   padding: 0 4px;
   font: inherit;
   border: 1px solid transparent;
-  background-color: var(--theme-body-bgcolor);
-  color: var(--theme-body-bgcolor-color);
+  background-color: var(--body-bgcolor);
+  color: var(--body-bgcolor-color);
   flex-grow: 1;
 }
 
