@@ -29,7 +29,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
   const currentTime = useSelector(selectors.getCurrentTime);
-  const executionPoint = useSelector(getExecutionPoint);
+  const executionPoint = useSelector(getExecutionPoint) as string;
   const focusRegion = useSelector(getFocusRegion);
   const pendingCommentsData = useSelector((state: UIState) => state.comments.pendingCommentsData);
   const { value: netReqCommentsFeature } = useFeature("networkRequestComments");
@@ -208,10 +208,16 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
       {isTopLevelComment && (
         <button
           className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:text-primaryAccent focus:outline-none"
-          onClick={() => {
-            // setIsEditorOpen(true);
-            // setIsFocused(true);
-            setNewReplyContent({});
+          onClick={e => {
+            e.stopPropagation();
+            setPendingCommentData(comment.id, {
+              time: currentTime,
+              networkRequestId: null,
+              hasFrames: false,
+              point: executionPoint,
+              position: null,
+              sourceLocation: null,
+            });
           }}
         >
           Reply
