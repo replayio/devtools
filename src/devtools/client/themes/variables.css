@@ -142,7 +142,7 @@
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-color: var(--theme-body-color);
-  --theme-text-field-bgcolor: var(--theme-base-95);
+  --theme-text-field-bgcolor: var(--theme-base-100);
   --text-field-border: var(--cool-gray-300);
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
 
