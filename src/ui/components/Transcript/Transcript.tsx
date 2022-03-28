@@ -4,14 +4,13 @@ import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { flatToHierarchicalComments, sortHierarchicalComments } from "./utils.comments";
 import { CommentItem } from "./CommentItem";
+import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
 
 const Transcript = (): JSX.Element | null => {
   const recordingId = hooks.useGetRecordingId();
   const { comments } = hooks.useGetComments(recordingId);
   const { loading } = hooks.useGetRecording(recordingId);
   const { isAuthenticated } = useAuth0();
-
-  comments.map(c => JSON.stringify(c.content, null, 4)).forEach(console.log);
 
   const sortedHierarchicalComments = useMemo(() => {
     const hierarchicalComments = flatToHierarchicalComments(comments);
@@ -23,6 +22,11 @@ const Transcript = (): JSX.Element | null => {
     return null;
   }
 
+  const _rootComments = {
+    id: ROOT_COMMENT_ID,
+    replies: sortedHierarchicalComments,
+  } as Comment;
+
   return (
     <div className="right-sidebar">
       <div className="border-b border-b-splitter p-2 text-sm font-normal leading-5 text-bodyColor">
@@ -32,9 +36,10 @@ const Transcript = (): JSX.Element | null => {
       <div className="transcript-list bg-themeBodyBgcolor flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden text-xs">
         {sortedHierarchicalComments.length > 0 ? (
           <div className="bg-themeBodyBgcolor w-full flex-grow overflow-auto">
-            {sortedHierarchicalComments.map(comment => {
+            <CommentItem comment={_rootComments} />
+            {/* {sortedHierarchicalComments.map(comment => {
               return <CommentItem key={comment.id} comment={comment} />;
-            })}
+            })} */}
           </div>
         ) : (
           <div className="transcript-list onboarding-text space-y-3 self-stretch p-3 text-base text-gray-500">

@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { Comment, CommentPosition } from "ui/state/comments";
+import { Comment, CommentPosition, ROOT_COMMENT_ID } from "ui/state/comments";
 import { GET_COMMENTS_TIME } from "ui/graphql/comments";
 import {
   UpdateCommentReplyContent,
@@ -96,7 +96,7 @@ export const useUpdateComment = (): ((
 
   return (comment, newContent, position) => {
     // top-level comment
-    if (!comment.parentId) {
+    if (comment.parentId === ROOT_COMMENT_ID) {
       updateComment(comment.id, newContent, position ?? null);
       // reply
     } else {

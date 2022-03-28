@@ -3,7 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { DeleteComment, DeleteCommentVariables } from "graphql/DeleteComment";
 import { DeleteCommentReply, DeleteCommentReplyVariables } from "graphql/DeleteCommentReply";
-import { Comment } from "ui/state/comments";
+import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
 
 const _useDeleteComment = () => {
   const [deleteComment, { error }] = useMutation<DeleteComment, DeleteCommentVariables>(
@@ -117,7 +117,7 @@ export const useDeleteComment = (): ((comment: Comment, recordingId: RecordingId
 
   return (comment, recordingId) => {
     // top-level comment
-    if (!comment.parentId) {
+    if (comment.parentId === ROOT_COMMENT_ID) {
       deleteComment(comment.id, recordingId);
       // reply
     } else {

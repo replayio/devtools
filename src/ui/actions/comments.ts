@@ -33,6 +33,7 @@ export function setPendingCommentData(
   parentId: Comment["id"] | null,
   data: PendingCommentData | null
 ): SetPendingCommentData {
+  console.log("set pending comments", parentId);
   return { type: "set_pending_comment_data", parentId, data };
 }
 

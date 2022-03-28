@@ -3,7 +3,7 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
-import { Comment, Reply } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import sortBy from "lodash/sortBy";
@@ -36,22 +36,22 @@ export function formatRelativeTime(date: Date): string {
   return "Now";
 }
 
-export function commentKeys(comments: (Comment | Reply)[]): string[] {
+export function commentKeys(comments: Comment[]): string[] {
   const createdAt = orderedByApproximatelyCreatedAt(comments);
   return comments.map((c, i) => commentKey(c, createdAt[i]));
 }
 
-function commentKey(comment: Comment | Reply, createdAtOrder: number): string {
+function commentKey(comment: Comment, createdAtOrder: number): string {
   return compact([createdAtOrder + 1, commentIdentifiers(comment)]).join("-");
 }
 
-function orderedByApproximatelyCreatedAt(comments: (Comment | Reply)[]): number[] {
+function orderedByApproximatelyCreatedAt(comments: Comment[]): number[] {
   const indices = range(comments.length);
   const permutation = sortBy(indices, [i => Number(Date.parse(comments[i].createdAt))]);
   return indices.map(i => permutation.indexOf(i));
 }
 
-function commentIdentifiers(comment: Comment | Reply): string {
+function commentIdentifiers(comment: Comment): string {
   return compact([
     comment.point,
     comment.sourceLocation?.sourceId,

@@ -5,7 +5,7 @@ import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { useGetRecordingId } from "../recordings";
 import { AddCommentReply, AddCommentReplyVariables } from "graphql/AddCommentReply";
 import { GetComments } from "graphql/GetComments";
-import { Comment } from "ui/state/comments";
+import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import omit from "lodash/omit";
@@ -207,7 +207,7 @@ export const useAddComment = (): ((comment: Comment) => void) => {
 
   return comment => {
     // top-level comment
-    if (!comment.parentId) {
+    if (comment.parentId === ROOT_COMMENT_ID) {
       addComment(comment);
       // reply
     } else {

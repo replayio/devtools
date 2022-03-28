@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
-import { Comment, CommentPosition, SourceLocation } from "ui/state/comments";
+import { Comment, CommentPosition, ROOT_COMMENT_ID, SourceLocation } from "ui/state/comments";
 import cx from "classnames";
 import TipTapEditor from "../Comments/TranscriptComments/CommentEditor/TipTapEditor";
 import PortalDropdown from "../shared/PortalDropdown";
@@ -11,13 +11,14 @@ import { AvatarImage } from "../Avatar";
 import { formatRelativeTime } from "ui/utils/comments";
 import { JSONContent } from "@tiptap/react";
 import { tryToParse } from "./utils.comments";
-import { seekToComment, setHoveredComment } from "ui/actions/comments";
+import { seekToComment, setHoveredComment, setPendingCommentData } from "ui/actions/comments";
 import { useFeature } from "ui/hooks/settings";
 import CommentSourceTarget from "./CommentSourceTarget";
 import CommentNetReqTarget from "./CommentNetReqTarget";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { commentsHooks } from "ui/hooks/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { UIState } from "ui/state";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 type CommentItemProps = {
@@ -30,6 +31,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const currentTime = useSelector(selectors.getCurrentTime);
   const executionPoint = useSelector(getExecutionPoint);
   const focusRegion = useSelector(getFocusRegion);
+  const pendingCommentsData = useSelector((state: UIState) => state.comments.pendingCommentsData);
   const { value: netReqCommentsFeature } = useFeature("networkRequestComments");
   const addComment = commentsHooks.useAddComment();
   const updateComment = commentsHooks.useUpdateComment();
@@ -37,6 +39,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const makeFromPendingComment = commentsHooks.useMakeFromPendingComment();
 
   const isActivePause = currentTime === comment.time && executionPoint === comment.point;
+  const isRootComment = comment.id === ROOT_COMMENT_ID;
   const isTopLevelComment = !comment.parentId;
   const isOutsideFocusedRegion =
     focusRegion && (comment.time < focusRegion.startTime || comment.time > focusRegion.endTime);
@@ -53,16 +56,53 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   // a singular pending (unsubmitted) commment reply to this one
   // other contextual data for it is in a store's pendingCommentData that we
   // will extract from when submitting
-  // TODO doesn't need a state
-  const [newReplyContent, setNewReplyContent] = useState<JSONContent | null>(null);
+  const hasPendingCommentData = !!pendingCommentsData[comment.id];
+
+  const replies = (() => {
+    return (
+      <>
+        {/* REPLIES */}
+        {isTopLevelComment && (
+          <div>
+            {comment.replies.map(reply => (
+              <CommentItem key={reply.id} comment={reply} />
+            ))}
+          </div>
+        )}
+
+        {/* A NEW REPLY */}
+        {hasPendingCommentData && (
+          <TipTapEditor
+            editable={true}
+            placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
+            autofocus
+            handleCancel={() => {
+              dispatch(setPendingCommentData(comment.id, null));
+            }}
+            handleConfirm={async content => {
+              const newComment = makeFromPendingComment(comment.id, JSON.stringify(content));
+              await addComment(newComment);
+              dispatch(setPendingCommentData(comment.id, null));
+            }}
+            onCreate={({ editor }) => {
+              // editor.commands.focus();
+            }}
+          />
+        )}
+      </>
+    );
+  })();
+
+  if (isRootComment) {
+    return replies;
+  }
 
   return (
     <div
       className={cx("group cursor-pointer space-y-2", {
-        "border-l-2 p-2.5": isTopLevelComment,
+        "border-l-2 border-b border-b-splitter p-2.5": isTopLevelComment,
         "border-l-secondaryAccent": isActivePause,
         "border-l-transparent": !isActivePause,
-        "border-b border-b-splitter": isTopLevelComment,
         "opacity-30": isOutsideFocusedRegion,
       })}
       onMouseEnter={() => dispatch(setHoveredComment(comment.id))}
@@ -162,39 +202,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
         }}
       />
 
-      {/* REPLIES */}
-      {isTopLevelComment && (
-        <div>
-          {comment.replies.map(reply => (
-            <CommentItem key={reply.id} comment={reply} />
-          ))}
-        </div>
-      )}
-
-      {/* A NEW REPLY */}
-      {newReplyContent !== null && (
-        <TipTapEditor
-          editable={true}
-          content={newReplyContent}
-          placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
-          autofocus
-          handleCancel={() => {
-            // setIsEdit(false);
-          }}
-          handleConfirm={content => {
-            // @ts-ignore
-            // const comment = makeFromPendingComment({
-            //   /* TODO */
-            // });
-            // await addComment(comment);
-            // setIsEdit(false);
-            // updateComment(comment, JSON.stringify(content));
-          }}
-          onCreate={({ editor }) => {
-            // editor.commands.focus();
-          }}
-        />
-      )}
+      {replies}
 
       {/* ACTIONS */}
       {isTopLevelComment && (

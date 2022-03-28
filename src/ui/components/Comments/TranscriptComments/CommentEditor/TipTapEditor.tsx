@@ -7,7 +7,7 @@ import { GitHubLink } from "./githubLink";
 import { ReplayLink } from "./replayLink";
 
 interface TipTapEditorProps {
-  content: JSONContent;
+  content?: JSONContent;
   placeholder?: string;
   editable?: boolean;
   autofocus?: boolean;
@@ -52,7 +52,7 @@ const TipTapEditor = ({
             },
             Escape: ({ editor }) => {
               editor.commands.blur();
-              editor.commands.setContent(content);
+              !!content && editor.commands.setContent(content);
               handleCancel?.();
               return true;
             },
