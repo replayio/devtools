@@ -1,6 +1,7 @@
 ### Displaying comments
 
 Comments are displayed in these components:
+
 - `Transcribe`: left side panel with nested comments
 - `VideoComments`: overlay on `Video` that shows comment markers
 - `TimelineComments`: overlay on `Timeline` that shows small comment markers
