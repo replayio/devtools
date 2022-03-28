@@ -50,7 +50,7 @@ describe("Web Console UI", () => {
     // Verify we actually have rendered list items in the UI
     const loadedListItems = getListItems();
     expect(loadedListItems.length).toBeGreaterThan(0);
-    expect(loadedListItems.length).toBe(messages.messagesById.size);
+    expect(loadedListItems.length).toBe(messages.messages.ids.length);
 
     // Should have this specific list item as a confirmation
     const messageEntry = await findByText("2. Mousing over a line number");

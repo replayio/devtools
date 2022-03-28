@@ -31,6 +31,8 @@ function mapStateToProps(state: UIState) {
     playback: selectors.getPlayback(state),
     hoveredItem: selectors.getHoveredItem(state),
     loadedRegions: selectors.getLoadedRegions(state),
+    lastMessageId: selectors.getLastMessageId(state),
+    messagesCount: selectors.getTotalMessagesCount(state),
   };
 }
 const mapDispatchToProps = (dispatch: Dispatch) => ({
@@ -87,12 +89,22 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
   }
 
   maybeScrollToResult(prevProps: PropsFromRedux) {
-    const messagesDelta = this.props.messages.size - prevProps.messages.size;
+    const messagesDelta = this.props.messagesCount - prevProps.messagesCount;
+
+    const { entities, ids } = this.props.messages;
+    if (ids.length === 0) {
+      return;
+    }
+
+    // We're not sorting the IDs array, so should be latest added
+    const lastMessageId = ids[ids.length - 1];
+    const lastMessage = entities[lastMessageId]!;
 
     // [...this.props.messages.values()] seems slow
     // we should have a separate messageList somewhere we can check OR
     // use a memoization function to be able to get the last message quickly
-    const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
+    // const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
+    // const lastMessage = this.props.messages.entities[]
 
     if (messagesDelta <= 0 || lastMessage.type !== constants.MESSAGE_TYPE.RESULT) {
       return;
@@ -124,8 +136,8 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       return true;
     }
 
-    let previousMessage = messages.get(visibleMessages[index - 1]);
-    let currentMessage = messages.get(visibleMessages[index]);
+    let previousMessage = messages.entities[visibleMessages[index - 1]];
+    let currentMessage = messages.entities[visibleMessages[index]];
 
     if (!previousMessage || !currentMessage) {
       return false;
@@ -149,14 +161,14 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
 
     const messageNodes = visibleMessages
       .filter(messageId => {
-        const time = messages.get(messageId)!.executionPointTime!;
+        const time = messages.entities[messageId]!.executionPointTime!;
         return loadedRegions!.loaded.some(
           region => time >= region.begin.time && time <= region.end.time
         );
       })
       .map((messageId, i) => {
-        const message = messages.get(messageId);
-        // @ts-ignore
+        const message = messages.entities[messageId]!;
+        // @ts-ignore ExecutionPoint/string mismatch
         const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
         const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
