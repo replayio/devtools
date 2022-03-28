@@ -77,7 +77,7 @@ async function onFinish(state, { test, target, success, testPath, why, recording
 
   if (success === false) {
     state.failures.push(`Failed test:${test} target:${target} ${why}`);
-    console.log(`[${elapsedTime(state)}] Test failed: ${why}`);
+    console.log(`[${elapsedTime(state)}] TestFailed: ${why}`);
 
     recordingId = await upload(state, testPath);
 
