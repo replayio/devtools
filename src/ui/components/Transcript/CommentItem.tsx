@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
-import { Comment, CommentPosition, ROOT_COMMENT_ID, SourceLocation } from "ui/state/comments";
+import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
 import cx from "classnames";
 import TipTapEditor from "../Comments/TranscriptComments/CommentEditor/TipTapEditor";
 import PortalDropdown from "../shared/PortalDropdown";
@@ -9,7 +9,6 @@ import MaterialIcon from "../shared/MaterialIcon";
 import { useMemo, useState } from "react";
 import { AvatarImage } from "../Avatar";
 import { formatRelativeTime } from "ui/utils/comments";
-import { JSONContent } from "@tiptap/react";
 import { tryToParse } from "./utils.comments";
 import { seekToComment, setHoveredComment, setPendingCommentData } from "ui/actions/comments";
 import { useFeature } from "ui/hooks/settings";
