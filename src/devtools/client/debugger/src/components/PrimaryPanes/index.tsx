@@ -34,7 +34,7 @@ function PrimaryPanes(props: PropsFromRedux) {
         className="sources-pane"
         expanded={!sourcesCollapsed}
         onToggle={() => props.toggleSourcesCollapse()}
-        initialHeight={"50%"}
+        initialHeight={400}
         button={<QuickOpenButton />}
       >
         <SourcesTree />

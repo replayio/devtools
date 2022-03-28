@@ -38,7 +38,7 @@ export interface AccordionItem {
   header: string;
   expanded: boolean;
   className?: string;
-  initialHeight?: SectionHeight;
+  initialHeight?: number;
   onToggle?: () => void;
   button?: React.ReactNode;
 }
@@ -91,7 +91,7 @@ export function AccordionPane({
   header: string;
   height?: SectionHeight;
   index?: number;
-  initialHeight?: SectionHeight;
+  initialHeight?: number;
   isBeingResized?: boolean;
   isResizable?: boolean;
   onResizeStart?: (e: React.MouseEvent) => void;
