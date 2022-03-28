@@ -53,7 +53,7 @@
 }
 
 :root.theme-dark .frames .location {
-  color: var(--theme-body-color);
+  color: var(--body-color);
   opacity: 0.6;
 }
 
@@ -70,7 +70,7 @@
 
 .call-stack-pane .frames [role="list"] [role="listitem"]:hover .location-async-cause,
 .call-stack-pane .frames [role="list"] [role="listitem"]:focus .location-async-cause {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 .theme-dark .frames [role="list"] [role="listitem"]:focus,
@@ -169,7 +169,7 @@
 
 .call-stack-pane .async-label {
   z-index: 1;
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
   padding: 0 3px;
   display: inline-block;
 }
@@ -181,7 +181,7 @@
 
 .accordion .call-stack-pane ._header,
 .accordion .scopes-pane ._header {
-  border-top: 1px solid var(--theme-tab-bgcolor);
+  border-top: 1px solid var(--tab-bgcolor);
 }
 
 .frame:hover {

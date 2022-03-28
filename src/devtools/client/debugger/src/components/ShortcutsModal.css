@@ -32,7 +32,7 @@
 
 .shortcuts-list li {
   font-size: 12px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   padding-top: 5px;
   display: flex;
   justify-content: space-between;

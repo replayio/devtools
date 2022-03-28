@@ -75,7 +75,7 @@ li.error > .stylesheet-info > .stylesheet-more > .stylesheet-error-message {
 .stylesheet-rule-count,
 .stylesheet-linked-file,
 .stylesheet-saveButton {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .stylesheet-saveButton {

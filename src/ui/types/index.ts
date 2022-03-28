@@ -15,6 +15,7 @@ export type ExperimentalUserSettings = {
 };
 
 export type LocalExperimentalUserSettings = {
+  codeHeatMaps: boolean;
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;

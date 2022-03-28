@@ -29,9 +29,9 @@ const Transcript = (): JSX.Element | null => {
         Comments
       </div>
 
-      <div className="transcript-list flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden bg-themeBodyBgcolor text-xs">
+      <div className="transcript-list bg-themeBodyBgcolor flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden text-xs">
         {sortedHierarchicalComments.length > 0 ? (
-          <div className="w-full flex-grow overflow-auto bg-themeBodyBgcolor">
+          <div className="bg-themeBodyBgcolor w-full flex-grow overflow-auto">
             {sortedHierarchicalComments.map(comment => {
               return <CommentItem key={comment.id} comment={comment} />;
             })}

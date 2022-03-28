@@ -13,7 +13,7 @@
 }
 
 .img.annotation-logo {
-  background-color: var(--theme-body-color);
+  background-color: var(--body-color);
 }
 
 .frames [role="list"] {
@@ -106,7 +106,7 @@
 
 .badge {
   background: var(--theme-toolbar-background-hover);
-  color: var(--theme-body-color);
+  color: var(--body-color);
   border-radius: 8px;
   padding: 1px 4px;
   font-size: 0.9em;
@@ -130,7 +130,7 @@
    */
   display: none;
   /*
-  background-color:var(--theme-body-color);
+  background-color:var(--body-color);
   display: inline-block;
   width: 12px;
   height:12px;

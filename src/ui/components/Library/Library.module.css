@@ -10,7 +10,7 @@
 }
 
 :root:global(.theme-dark) .libraryRow {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 :root:global(.theme-dark) .libraryRow:hover {
@@ -49,12 +49,12 @@
 
 :root:global(.theme-dark) .recordingsBackground {
   background-color: transparent;
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 :root:global(.theme-dark) .sidebar {
-  background-color: var(--theme-body-bgcolor);
-  color: var(--theme-body-color);
+  background-color: var(--body-bgcolor);
+  color: var(--body-color);
 }
 
 :root:global(.theme-dark) .workspaceName {
@@ -105,7 +105,7 @@
 
 :root:global(.theme-light) .recordingsBackground {
   background-color: transparent;
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 :root:global(.theme-light) .sidebar {
@@ -114,5 +114,5 @@
 }
 
 :root:global(.theme-light) .workspaceName {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }

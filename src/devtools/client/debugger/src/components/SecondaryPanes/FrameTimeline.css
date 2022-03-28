@@ -3,15 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 .theme-light {
-  --progress-playing-background: hsl(207, 100%, 97%);
-  --progressbar-background: #ffffff;
+  --progress-playing-background: red;
+  --progressbar-background: var(--theme-base-85);
   --replay-head-background: var(--purple-50);
+  --progressbar-unfocused-background: var(--theme-base-70);
 }
 
 .theme-dark {
-  --progress-playing-background: #071a2b;
-  --progressbar-background: #0c0c0d;
+  --progress-playing-background: #2d4a65;
+  --progressbar-background: var(--theme-base-90);
   --replay-head-background: var(--theme-highlight-purple);
+  --progressbar-unfocused-background: #8fa7be;
 }
 
 body.scrubbing {

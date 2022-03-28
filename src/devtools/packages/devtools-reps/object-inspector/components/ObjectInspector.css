@@ -25,7 +25,7 @@
 
 .tree.object-inspector .block .object-label,
 .tree.object-inspector .block .object-label * {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .tree.object-inspector .block .object-label::before {

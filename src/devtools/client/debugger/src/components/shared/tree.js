@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React from "react";
-const { Component, createFactory } = React;
+const { Component } = React;
 import dom from "react-dom-factories";
 import PropTypes from "prop-types";
 
@@ -174,7 +174,7 @@ class TreeNode extends Component {
     const { depth, id, item, focused, active, expanded, renderItem, isExpandable } = this.props;
 
     const arrow = isExpandable
-      ? ArrowExpanderFactory({
+      ? React.createElement(ArrowExpander, {
           item,
           expanded,
         })
@@ -213,9 +213,6 @@ class TreeNode extends Component {
     );
   }
 }
-
-const ArrowExpanderFactory = createFactory(ArrowExpander);
-const TreeNodeFactory = createFactory(TreeNode);
 
 /**
  * Create a function that calls the given function `fn` only once per animation
@@ -972,7 +969,7 @@ export class Tree extends Component {
     const nodes = traversal.map((v, i) => {
       const { item, depth } = traversal[i];
       const key = this.props.getKey(item, i);
-      return TreeNodeFactory({
+      return React.createElement(TreeNode, {
         // We make a key unique depending on whether the tree node is in active
         // or inactive state to make sure that it is actually replaced and the
         // tabbable state is reset.

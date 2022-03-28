@@ -48,7 +48,7 @@ export function Dropdown({
             menuItemsClassName,
             widthClass,
             fontSizeClass,
-            "right-0 origin-top-right rounded-md border-modalBorder bg-modalBgcolor shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none backdrop-blur-sm"
+            "right-0 origin-top-right rounded-md border-modalBorder bg-menuBgcolor shadow-lg ring-1 ring-black ring-opacity-5 backdrop-blur-sm focus:outline-none"
           )}
         >
           <div className="py-1">{children}</div>

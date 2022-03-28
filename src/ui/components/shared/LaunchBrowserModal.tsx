@@ -18,7 +18,7 @@ function LaunchBrowser({
   }, [path]);
 
   return (
-    <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg bg-white text-sm shadow-lg">
+    <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg bg-modalBgcolor text-sm text-bodyColor shadow-lg">
       <div className="flex flex-col items-center space-y-9 p-12">
         <div className="place-content-center space-y-3">
           <img className="mx-auto h-12 w-12" src="/images/logo.svg" />

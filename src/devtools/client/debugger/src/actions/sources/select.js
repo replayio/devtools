@@ -15,7 +15,7 @@ import { setSymbols } from "./symbols";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
 import { addTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
-import { setBreakableLines } from ".";
+import { setBreakableLines, setBreakpointHitCounts } from ".";
 
 import { createLocation } from "../../utils/location";
 import { getToolboxLayout } from "ui/reducers/layout";
@@ -24,6 +24,8 @@ import { trackEvent } from "ui/utils/telemetry";
 import { paused } from "../pause/paused";
 
 import { ThreadFront } from "protocol/thread";
+
+import { prefs } from "devtools/shared/services";
 
 import {
   getSource,
@@ -139,7 +141,6 @@ export function selectLocation(cx, location, openSourcesTab = true) {
 
     await dispatch(loadSourceText({ source }));
     await dispatch(setBreakableLines(cx, source.id));
-
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch({ type: "SHOW_SOURCE", source: null });

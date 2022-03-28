@@ -6,11 +6,15 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
   const userInfo = {
     acceptedTOSVersion: 1,
     email: "mock@user.io",
+    features: {
+      library: true,
+    },
     id: opts.user?.id || "1",
     internal: false,
+    motd: null,
     nags: [],
     unsubscribedEmailTypes: [],
-    user: { id: opts.user?.id || "1" },
+    user: { id: opts.user?.id || "1", picture: null, name: "Mock User" },
   };
   const getUser = {
     request: {

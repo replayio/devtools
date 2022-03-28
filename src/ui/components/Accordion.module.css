@@ -27,7 +27,7 @@
 }
 
 .accordionItemContainer .header {
-  background: var(--theme-tab-bgcolor);
+  background: var(--tab-bgcolor);
   cursor: pointer;
   font-size: 15px;
   line-height: 1.25;

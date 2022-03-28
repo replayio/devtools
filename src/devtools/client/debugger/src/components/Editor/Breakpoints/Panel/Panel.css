@@ -93,12 +93,10 @@
 
 .breakpoint-panel .panel-editor.conditional form .CodeMirror {
   border: 1px solid #e5e7eb;
-  height: 21px;
 }
 
 .breakpoint-panel form .form-row {
   align-items: center;
-  height: 28px;
   display: flex;
 }
 

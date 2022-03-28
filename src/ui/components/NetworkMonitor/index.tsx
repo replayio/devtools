@@ -45,6 +45,8 @@ export const NetworkMonitor = ({
   const container = useRef<HTMLDivElement>(null);
 
   const toggleType = (type: CanonicalRequestType) => {
+    dispatch(hideRequestDetails());
+
     const newTypes = new Set(types);
     if (newTypes.has(type)) {
       trackEvent("net_monitor.delete_type", { type });

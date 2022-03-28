@@ -4,12 +4,10 @@
 
 "use strict";
 
-const { createFactory, createElement } = require("react");
+const React = require("react");
 const { Provider } = require("react-redux");
 
-const ChangesApp = createFactory(
-  require("devtools/client/inspector/changes/components/ChangesApp")
-);
+const ChangesApp = require("devtools/client/inspector/changes/components/ChangesApp");
 const { getChangesStylesheet } = require("devtools/client/inspector/changes/selectors/changes");
 const { resetChanges, trackChange } = require("devtools/client/inspector/changes/actions/changes");
 
@@ -56,14 +54,14 @@ class ChangesView {
   }
 
   init() {
-    const changesApp = ChangesApp({
+    const changesApp = React.createElement(ChangesApp, {
       onContextMenu: this.onContextMenu,
       onCopyAllChanges: this.onCopyAllChanges,
       onCopyRule: this.onCopyRule,
     });
 
     // Expose the provider to let inspector.js use it in setupSidebar.
-    this.provider = createElement(
+    this.provider = React.createElement(
       Provider,
       {
         id: "changesview",

@@ -8,9 +8,11 @@ import {
   getSourceActor,
   getSourceActorBreakableLines,
   getSourceActorBreakpointColumns,
+  getSourceActorBreakpointHitCounts,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import compact from "lodash/compact";
 
 export function insertSourceActor(item) {
   return insertSourceActors([item]);
@@ -73,3 +75,25 @@ export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorB
     });
   },
 });
+
+export const loadSourceActorBreakpointHitCounts = memoizeableAction(
+  "loadSourceActorBreakpointHitCounts",
+  {
+    createKey: ({ id }, { getState }) => {
+      const state = getState();
+      return compact([
+        id,
+        state.timeline.focusRegion?.startTime,
+        state.timeline.focusRegion?.endTime,
+      ]).join("-");
+    },
+    getValue: ({ id }, { getState }) => getSourceActorBreakpointHitCounts(getState(), id),
+    action: async ({ id }, { dispatch, getState, client }) => {
+      await dispatch({
+        type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
+        id,
+        [PROMISE]: client.getSourceActorBreakpointHitCounts(getSourceActor(getState(), id)),
+      });
+    },
+  }
+);

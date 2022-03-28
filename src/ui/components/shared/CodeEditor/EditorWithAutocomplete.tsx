@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Editor } from "codemirror";
 import useAutocomplete from "./useAutocomplete";
 import { isTest } from "ui/utils/environment";
-import AutocompleteMatches from "./AutocompleteMatches";
-import ControlledCodeMirror from "./ControlledCodeMirror";
+import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
+import ControlledCodeMirror, { ControlledCodeMirrorOptions } from "./ControlledCodeMirror";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
 
 export enum Keys {
@@ -26,11 +26,19 @@ const DISMISS_KEYS = [
   Keys.ARROW_LEFT,
 ];
 
+const DEFAULT_OPTIONS = {
+  minLeft: 0,
+  autofocus: false,
+};
+
+type EditorWithAutocompleteOptions = AutocompleteMatchesOptions | ControlledCodeMirrorOptions;
+
 export function EditorWithAutocomplete({
   onEditorMount,
   onRegularKeyPress,
   onPreviewAvailable,
   setValue,
+  opts,
   value,
   disableAutocomplete,
 }: {
@@ -38,9 +46,13 @@ export function EditorWithAutocomplete({
   onRegularKeyPress: (e: KeyboardEvent) => void;
   onPreviewAvailable: (value: string | null) => void;
   setValue: (newValue: string) => void;
+  // For minor adjustments to the autocomplete menu position.
+  opts?: EditorWithAutocompleteOptions;
   value: string;
   disableAutocomplete?: boolean;
 }) {
+  const options = { ...DEFAULT_OPTIONS, ...opts };
+  const containerNode = useRef<HTMLDivElement | null>(null);
   const {
     autocompleteIndex,
     matches,
@@ -108,7 +120,7 @@ export function EditorWithAutocomplete({
 
   if (disableAutocomplete) {
     return (
-      <div className="flex items-center relative">
+      <div className="flex items-center relative w-full">
         <ControlledCodeMirror
           onKeyPress={onKeyPress}
           value={value}
@@ -121,13 +133,14 @@ export function EditorWithAutocomplete({
   }
 
   return (
-    <div className="flex items-center relative">
+    <div className="flex items-center relative w-full" ref={containerNode}>
       <ControlledCodeMirror
         onKeyPress={onKeyPress}
         value={value}
         onSelection={onSelection}
         setValue={setValue}
         onEditorMount={(editor: Editor) => onEditorMount(editor, showAutocomplete)}
+        options={{ autofocus: options.autofocus }}
       />
       {shouldShowAutocomplete ? (
         <div className="absolute ml-1 opacity-50" style={{ left: `${value.length}ch` }}>
@@ -136,6 +149,8 @@ export function EditorWithAutocomplete({
       ) : null}
       {shouldShowAutocomplete && (
         <AutocompleteMatches
+          options={options}
+          containerRect={containerNode.current!.getBoundingClientRect()}
           leftOffset={getCursorIndex(value)}
           matches={matches}
           selectedIndex={autocompleteIndex}

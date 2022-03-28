@@ -5,15 +5,15 @@
 
 // Make this available to both AMD and CJS environments
 define(function (require, exports, module) {
-  const { Component, createFactory, createRef } = require("react");
+  const React = require("react");
   const PropTypes = require("prop-types");
   const dom = require("react-dom-factories");
   const { findDOMNode } = require("react-dom");
   const { tr } = dom;
 
   // Tree
-  const TreeCell = createFactory(require("devtools/client/shared/components/tree/TreeCell"));
-  const LabelCell = createFactory(require("devtools/client/shared/components/tree/LabelCell"));
+  const TreeCell = require("devtools/client/shared/components/tree/TreeCell");
+  const LabelCell = require("devtools/client/shared/components/tree/LabelCell");
 
   const { wrapMoveFocus, getFocusableElements } = require("devtools/client/shared/focus");
 
@@ -32,7 +32,7 @@ define(function (require, exports, module) {
    * This template represents a node in TreeView component. It's rendered
    * using <tr> element (the entire tree is one big <table>).
    */
-  class TreeRow extends Component {
+  class TreeRow extends React.Component {
     // See TreeView component for more details about the props and
     // the 'member' object.
     static get propTypes() {
@@ -68,7 +68,7 @@ define(function (require, exports, module) {
     constructor(props) {
       super(props);
 
-      this.treeRowRef = createRef();
+      this.treeRowRef = React.createRef();
 
       this.getRowClass = this.getRowClass.bind(this);
       this._onKeyDown = this._onKeyDown.bind(this);
@@ -274,11 +274,11 @@ define(function (require, exports, module) {
   // Helpers
 
   const RenderCell = props => {
-    return TreeCell(props);
+    return React.createElement(TreeCell, props);
   };
 
   const RenderLabelCell = props => {
-    return LabelCell(props);
+    return React.createElement(LabelCell, props);
   };
 
   // Exports from this module

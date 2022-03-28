@@ -50,6 +50,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "multipleControllerUseSnapshots",
     secret: true,
   },
+  {
+    label: "Code Heatmaps ",
+    description: "Calculate hit counts for editor files all at once",
+    key: "codeHeatMaps",
+  },
 ];
 
 function Experiment({
@@ -126,6 +131,7 @@ export default function ExperimentalSettings({}) {
     value: enableMultipleControllerUseSnapshots,
     update: updateEnableMultipleControllerUseSnapshots,
   } = useFeature("multipleControllerUseSnapshots");
+  const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -142,10 +148,13 @@ export default function ExperimentalSettings({}) {
       updateEnableUseMultipleControllers(!enableUseMultipleControllers);
     } else if (key == "multipleControllerUseSnapshots") {
       updateEnableMultipleControllerUseSnapshots(!enableMultipleControllerUseSnapshots);
+    } else if (key == "codeHeatMaps") {
+      updateCodeHeatMaps(!codeHeatMaps);
     }
   };
 
   const localSettings = {
+    codeHeatMaps,
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,

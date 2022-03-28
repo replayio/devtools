@@ -36,7 +36,7 @@ import {
   responseBodyData,
   requestBodyData,
 } from "@recordreplay/protocol";
-import { client, log, addEventListener } from "../socket";
+import { client, log, addEventListener, sendMessage } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
@@ -248,7 +248,6 @@ class _ThreadFront {
 
   async initializeToolbox() {
     await this.waitForSession();
-
     await this.initializedWaiter.promise;
     await this.ensureAllSources();
     this.ensureCurrentPause();
@@ -293,6 +292,7 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
+      // TODO Remove this once we have a better region loading indicator
       // Log loaded regions to help with diagnostics.
       console.log("LoadedRegions", parameters);
       listenerCallback(parameters);
@@ -474,6 +474,16 @@ class _ThreadFront {
       this.sessionId
     );
     return { contents, contentType };
+  }
+
+  async getHitCounts(sourceId: SourceId, locations: SameLineSourceLocations[]) {
+    // @ts-ignore
+    return sendMessage(
+      // @ts-ignore
+      "Debugger.getHitCounts",
+      { sourceId, locations, maxHits: 10000 },
+      this.sessionId!
+    );
   }
 
   getBreakpointPositionsCompressed(

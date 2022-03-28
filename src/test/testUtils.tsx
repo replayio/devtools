@@ -2,13 +2,76 @@ import * as rtl from "@testing-library/react";
 import type { RenderOptions } from "@testing-library/react";
 import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
-import type { PreloadedState } from "@reduxjs/toolkit";
+import { MockedProvider, MockedResponse } from "@apollo/client/testing";
+import { v4 as uuid } from "uuid";
 import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
 
-import { bootstrapStore, extendStore } from "ui/setup/store";
+import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
-// import type { AppStore, RootState } from "../store";
+
+import {
+  createRecordingOwnerUserIdMock,
+  createGetRecordingMock,
+  createUserSettingsMock,
+  createGetUserMock,
+} from "../../test/mock/src/graphql";
+
+const recordingId = uuid();
+const userId = uuid();
+const user = { id: userId, uuid: userId };
+
+// Create common GraphQL mocks, reused from the E2E tests
+const graphqlMocks = [
+  ...createUserSettingsMock(),
+  ...createRecordingOwnerUserIdMock({ recordingId, user }),
+  ...createGetRecordingMock({ recordingId }),
+  ...createGetUserMock({ user }),
+];
+
+const noop = () => false;
+
+export const filterLoggingInTests = (
+  conditionFilter: (message: string) => boolean = noop,
+  method: keyof Console = "log"
+) => {
+  // @ts-ignore
+  const originalConsoleLog = console[method].bind(console);
+
+  beforeEach(function () {
+    // @ts-ignore
+    jest.spyOn(console, method).mockImplementation((...args) => {
+      const [message = ""] = args;
+      if (typeof message !== "string") {
+        originalConsoleLog("Message is not a string: ", message);
+      } else {
+        const shouldSilence = conditionFilter(message);
+        if (shouldSilence) {
+          return;
+        }
+      }
+
+      originalConsoleLog(...args);
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+};
+
+export const filterCommonTestWarnings = () => {
+  // Skip websocket "Socket Open" message
+  filterLoggingInTests(message => message.includes("Socket Open") || message === "indexed");
+  filterLoggingInTests(message => message.includes("is of type ValueFront"), "warn");
+  // Skip React 18 "stop using ReactDOM.render" message
+  filterLoggingInTests(
+    message =>
+      message.includes("ReactDOM.render is no longer supported") ||
+      message.includes("Received unknown message"),
+    "error"
+  );
+};
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store. For
@@ -35,7 +98,13 @@ async function render(
     store = await createTestStore(preloadedState);
   }
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
-    return <Provider store={store!}>{children}</Provider>;
+    return (
+      <Provider store={store!}>
+        <MockedProvider mocks={graphqlMocks} addTypename={false}>
+          {children}
+        </MockedProvider>
+      </Provider>
+    );
   }
   return { store, ...rtl.render(ui, { wrapper: Wrapper, ...renderOptions }) };
 }

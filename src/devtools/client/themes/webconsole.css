@@ -27,7 +27,7 @@
 
 .theme-dark {
   --console-input-background: var(--theme-tab-toolbar-background);
-  --console-message-background: var(--theme-body-bgcolor);
+  --console-message-background: var(--body-bgcolor);
   --console-message-border: var(--theme-splitter-color);
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(345, 23%, 24%);
@@ -46,8 +46,8 @@
 }
 
 .theme-light {
-  --console-input-background: var(--theme-body-bgcolor);
-  --console-message-background: var(--theme-body-bgcolor);
+  --console-input-background: var(--body-bgcolor);
+  --console-message-background: var(--body-bgcolor);
   --console-message-border: #f2f2f4; /* between Grey 10 and Grey 20 */
   --console-message-color: var(--theme-text-color-strong);
   --console-error-background: hsl(344, 73%, 97%);
@@ -404,7 +404,7 @@
 
 .webconsole-app .message.network .xhr {
   background-color: var(--theme-text-color-alt);
-  color: var(--theme-body-bgcolor);
+  color: var(--body-bgcolor);
   border-radius: 3px;
   font-weight: bold;
   font-size: 10px;
@@ -427,11 +427,12 @@ html #webconsole-notificationbox {
 
 .jsterm-input-container {
   position: relative;
+  display: flex;
+  align-items: center;
   max-width: 100%;
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
-  position: relative;
   background-color: var(--theme-console-input-bgcolor);
 }
 
@@ -439,14 +440,8 @@ html #webconsole-notificationbox {
   height: var(--editor-footer-height);
 }
 
-.webconsole-app .jsterm-input-container::before {
-  content: " ";
-  height: 12px;
-  width: 12px;
+.console-chevron {
   background-color: var(--theme-icon-color);
-  position: absolute;
-  top: 7px;
-  left: 12px;
   -webkit-mask-image: url(data:image/svg+xml;base64,PCEtLSBUaGlzIFNvdXJjZSBDb2RlIEZvcm0gaXMgc3ViamVjdCB0byB0aGUgdGVybXMgb2YgdGhlIE1vemlsbGEgUHVibGljCiAgIC0gTGljZW5zZSwgdi4gMi4wLiBJZiBhIGNvcHkgb2YgdGhlIE1QTCB3YXMgbm90IGRpc3RyaWJ1dGVkIHdpdGggdGhpcwogICAtIGZpbGUsIFlvdSBjYW4gb2J0YWluIG9uZSBhdCBodHRwOi8vbW96aWxsYS5vcmcvTVBMLzIuMC8uIC0tPgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEyIDEyIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiPgogIDxwYXRoIGZpbGw9ImNvbnRleHQtZmlsbCIgZD0iTTEuMDcgMS4zMmMuMy0uMy43Ny0uMyAxLjA2IDBsNC4xNSA0LjE1YS43NS43NSAwIDAgMSAwIDEuMDZsLTQuMTUgNC4xNWEuNzUuNzUgMCAxIDEtMS4wNi0xLjA2TDQuNjkgNiAxLjA3IDIuMzhhLjc1Ljc1IDAgMCAxIDAtMS4wNnptNSAwYy4zLS4zLjc3LS4zIDEuMDYgMGw0LjE1IDQuMTVhLjc1Ljc1IDAgMCAxIDAgMS4wNmwtNC4xNSA0LjE1YS43NS43NSAwIDEgMS0xLjA2LTEuMDZMOS42OSA2IDYuMDcgMi4zOGEuNzUuNzUgMCAwIDEgMC0xLjA2eiIvPgo8L3N2Zz4K);
   background-size: 12px 12px;
 }
@@ -552,7 +547,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-filteringbar-wrapper .devtools-toolbar {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 .webconsole-filterbar-primary {
@@ -648,11 +643,11 @@ a.learn-more-link.webconsole-learn-more-link {
 .theme-dark .message.warn .objectRightBrace,
 .theme-dark .message.warn .arrayLeftBracket,
 .theme-dark .message.warn .arrayRightBracket {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 .theme-dark .message.error .tree.object-inspector,
 .theme-dark .message.warn .tree.object-inspector {
-  --console-indent-border-color: var(--theme-body-color);
+  --console-indent-border-color: var(--body-color);
 }
 
 .webconsole-app .message-flex-body > .message-body {
@@ -666,7 +661,7 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.startGroup .message-body > .objectBox-string,
 .webconsole-app .message.startGroupCollapsed .message-body > .objectBox-string {
-  color: var(--theme-body-color);
+  color: var(--body-color);
   font-weight: bold;
 }
 
@@ -757,7 +752,7 @@ a.learn-more-link.webconsole-learn-more-link {
   width: 100%;
   --consoletable-border: var(--theme-splitter-color);
   margin-block-end: var(--attachment-margin-block-end);
-  color: var(--theme-body-color);
+  color: var(--body-color);
   display: grid;
   max-height: 250px;
   overflow-y: auto;
@@ -775,7 +770,7 @@ a.learn-more-link.webconsole-learn-more-link {
   top: 0;
   border-bottom: 1px solid var(--consoletable-border);
   background-color: var(--theme-toolbar-background);
-  color: var(--theme-body-color);
+  color: var(--body-color);
   margin: 0;
   padding: 5px 4px;
   font-weight: inherit;
@@ -784,8 +779,8 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .new-consoletable > [role="gridcell"] {
-  background-color: var(--theme-body-bgcolor);
-  color: var(--theme-body-color);
+  background-color: var(--body-bgcolor);
+  color: var(--body-color);
   padding: 3px 4px;
   text-overflow: ellipsis;
 }
