@@ -91,7 +91,10 @@ async function onFinish(state, { test, target, success, testPath, why, recording
 }
 
 async function runTest(state, test, exampleRecordingId, target) {
-  const testPath = `${state.testingServer}/recording/${exampleRecordingId}?test=${test}`;
+  let testPath = `${state.testingServer}/recording/${exampleRecordingId}?test=${test}`;
+  if (state.dispatchServer != "wss://dispatch.replay.io") {
+    testPath += `&dispatch=${state.dispatchServer}`;
+  }
 
   let success, why, recordingId;
   if (target == "gecko" || target == "chromium") {
