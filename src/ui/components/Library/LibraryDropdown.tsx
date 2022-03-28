@@ -40,7 +40,7 @@ export function Dropdown({
   fontSizeClass?: "text-sm" | "text-base";
 }) {
   return (
-    <Menu as="div" className="recording-options inline-block text-left">
+    <Menu as="div" className="recording-options inline-block text-left shadow-lg">
       {({ open }) => (
         <Menu.Items
           static
