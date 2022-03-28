@@ -6,14 +6,14 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { UIState } from "ui/state";
-import { Comment, PendingComment } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
 const markerWidth = 19;
 
 interface CommentMarkerProps extends PropsFromRedux {
-  comment: Comment | PendingComment["comment"];
-  comments: (Comment | PendingComment["comment"])[];
+  comment: Comment;
+  comments: Comment[];
   isPrimaryHighlighted: boolean;
 }
 

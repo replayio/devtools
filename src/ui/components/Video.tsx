@@ -4,7 +4,7 @@ import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../pr
 import { setVideoNode } from "../../protocol/videoNode";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments";
-import CommentsTool from "ui/components/shared/CommentsTool";
+import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import ReplayLogo from "./shared/ReplayLogo";
@@ -38,7 +38,7 @@ function CommentLoader({ recordingId }: { recordingId: string }) {
     return null;
   }
 
-  return <CommentsTool comments={comments} />;
+  return <CommentTool comments={comments} />;
 }
 
 function Video({

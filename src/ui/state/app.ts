@@ -12,7 +12,7 @@ import {
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
-import { Reply } from "./comments";
+import { Comment } from "./comments";
 import { PanelName } from "./layout";
 
 export type ModalOptionsType = {
@@ -20,7 +20,7 @@ export type ModalOptionsType = {
   title?: string;
   view?: string;
   loom?: string;
-  comment?: Reply;
+  comment?: Comment;
 } | null;
 export type ModalType =
   | "sharing"

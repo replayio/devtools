@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { Comment, Reply } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import classNames from "classnames";
@@ -31,92 +31,93 @@ function getDeleteDescription(replyCount: number) {
 }
 
 type CommentActionsProps = PropsFromRedux & {
-  comment: Comment | Reply;
+  comment: Comment;
   isRoot: boolean;
 };
 
-function CommentActions({ comment, editItem, isRoot, setHoveredComment }: CommentActionsProps) {
-  const recordingId = hooks.useGetRecordingId();
-  const { userId } = hooks.useGetUserId();
-  const deleteComment = hooks.useDeleteComment();
-  const deleteCommentReply = hooks.useDeleteCommentReply();
-  const [expanded, setExpanded] = useState(false);
-  const { confirmDestructive } = useConfirm();
+function CommentActions({}: /* comment, editItem, isRoot, setHoveredComment */ CommentActionsProps) {
+  return null;
+  // const recordingId = hooks.useGetRecordingId();
+  // const { userId } = hooks.useGetUserId();
+  // const deleteComment = hooks.useDeleteComment();
+  // const deleteCommentReply = hooks.useDeleteComment();
+  // const [expanded, setExpanded] = useState(false);
+  // const { confirmDestructive } = useConfirm();
 
-  const isCommentAuthor = userId === comment.user.id;
+  // const isCommentAuthor = userId === comment.user.id;
 
-  if (!isCommentAuthor) {
-    return null;
-  }
+  // if (!isCommentAuthor) {
+  //   return null;
+  // }
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setExpanded(false);
+  // const handleDelete = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   setExpanded(false);
 
-    const replyCount = ("replies" in comment && comment.replies?.length) || 0;
-    const message = getDeleteMessage(replyCount);
-    const description = `${getDeleteDescription(replyCount)}. Are you sure you want to proceed?`;
+  //   const replyCount = ("replies" in comment && comment.replies?.length) || 0;
+  //   const message = getDeleteMessage(replyCount);
+  //   const description = `${getDeleteDescription(replyCount)}. Are you sure you want to proceed?`;
 
-    confirmDestructive({
-      message,
-      description,
-      acceptLabel: "Delete comment",
-    }).then(confirmed => {
-      if (!confirmed) {
-        return;
-      }
+  //   confirmDestructive({
+  //     message,
+  //     description,
+  //     acceptLabel: "Delete comment",
+  //   }).then(confirmed => {
+  //     if (!confirmed) {
+  //       return;
+  //     }
 
-      trackEvent("comments.delete");
-      if (isRoot) {
-        deleteComment(comment.id, recordingId!);
-      } else {
-        deleteCommentReply(comment.id, recordingId!);
-      }
-    });
+  //     trackEvent("comments.delete");
+  //     if (isRoot) {
+  //       deleteComment(comment.id, recordingId!);
+  //     } else {
+  //       deleteCommentReply(comment.id, recordingId!);
+  //     }
+  //   });
 
-    setHoveredComment(null);
-  };
-  const editComment = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setExpanded(false);
-    trackEvent("comments.start_edit");
+  //   setHoveredComment(null);
+  // };
+  // const editComment = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   setExpanded(false);
+  //   trackEvent("comments.start_edit");
 
-    editItem(comment);
-  };
+  //   editItem(comment);
+  // };
 
-  const button = (
-    <MaterialIcon
-      outlined
-      className={classNames(
-        expanded ? "opacity-100" : "",
-        "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
-      )}
-    >
-      more_vert
-    </MaterialIcon>
-  );
+  // const button = (
+  //   <MaterialIcon
+  //     outlined
+  //     className={classNames(
+  //       expanded ? "opacity-100" : "",
+  //       "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
+  //     )}
+  //   >
+  //     more_vert
+  //   </MaterialIcon>
+  // );
 
-  return (
-    <PortalDropdown
-      buttonContent={button}
-      setExpanded={setExpanded}
-      expanded={expanded}
-      buttonStyle=""
-      distance={0}
-      position="bottom-right"
-    >
-      <Dropdown>
-        <DropdownItem onClick={editComment}>Edit comment</DropdownItem>
-        <DropdownItem onClick={handleDelete}>
-          {isRoot ? "Delete comment and replies" : "Delete comment"}
-        </DropdownItem>
-      </Dropdown>
-    </PortalDropdown>
-  );
+  // return (
+  //   <PortalDropdown
+  //     buttonContent={button}
+  //     setExpanded={setExpanded}
+  //     expanded={expanded}
+  //     buttonStyle=""
+  //     distance={0}
+  //     position="bottom-right"
+  //   >
+  //     <Dropdown>
+  //       <DropdownItem onClick={editComment}>Edit comment</DropdownItem>
+  //       <DropdownItem onClick={handleDelete}>
+  //         {isRoot ? "Delete comment and replies" : "Delete comment"}
+  //       </DropdownItem>
+  //     </Dropdown>
+  //   </PortalDropdown>
+  // );
 }
 
 const connector = connect(null, {
-  editItem: actions.editItem,
+  // editItem: actions.editItem,
   setHoveredComment: actions.setHoveredComment,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

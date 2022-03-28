@@ -18,6 +18,7 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { commentsHooks } from "ui/hooks/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { UIState } from "ui/state";
+import { JSONContent } from "@tiptap/react";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 type CommentItemProps = {
@@ -49,7 +50,8 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const [headerActionsExpanded, setHeaderActionsExpanded] = useState(false);
 
   // content
-  const content = useMemo(() => tryToParse(comment.content), [comment.content]);
+  const [content, setContent] = useState<JSONContent>(tryToParse(comment.content));
+  // const content = useMemo(() => tryToParse(comment.content), [comment.content]);
   const [isEdit, setIsEdit] = useState(false);
 
   // a singular pending (unsubmitted) commment reply to this one
@@ -190,9 +192,13 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
         editable={isEdit}
         content={content}
         placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
-        // autofocus
+        autofocus
         handleCancel={() => {
+          setContent(tryToParse(comment.content));
           setIsEdit(false);
+        }}
+        onUpdate={({ editor }) => {
+          setContent(editor.getJSON());
         }}
         handleConfirm={content => {
           setIsEdit(false);

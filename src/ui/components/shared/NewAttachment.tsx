@@ -19,7 +19,7 @@ function addLoomComment(loom: string) {
 }
 
 function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
-  const addCommentReply = hooks.useAddCommentReply();
+  const addCommentReply = hooks.useAddComment();
   const [url, setUrl] = useState("");
   const loom = url.match(/loom\.com\/share\/(\S*?)(\"|\?|$)/)?.[1];
 
