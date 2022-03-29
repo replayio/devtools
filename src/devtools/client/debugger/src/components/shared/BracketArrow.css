@@ -22,11 +22,11 @@
 }
 
 .theme-dark .bracket-arrow.up::before {
-  border-bottom-color: var(--theme-body-color);
+  border-bottom-color: var(--body-color);
 }
 
 .bracket-arrow.up::after {
-  border-bottom-color: var(--theme-body-bgcolor);
+  border-bottom-color: var(--body-bgcolor);
   top: 0px;
 }
 
@@ -37,12 +37,12 @@
 }
 
 .theme-dark .bracket-arrow.down::before {
-  border-top-color: var(--theme-body-color);
+  border-top-color: var(--body-color);
 }
 
 .bracket-arrow.down::after {
   border-bottom-color: transparent;
-  border-top-color: var(--theme-body-bgcolor);
+  border-top-color: var(--body-bgcolor);
   top: -1px;
 }
 
@@ -53,12 +53,12 @@
 }
 
 .theme-dark .bracket-arrow.left::before {
-  border-right-color: var(--theme-body-color);
+  border-right-color: var(--body-color);
 }
 
 .bracket-arrow.left::after {
   border-left-color: transparent;
-  border-right-color: var(--theme-body-bgcolor);
+  border-right-color: var(--body-bgcolor);
   top: 0px;
   left: 1px;
 }

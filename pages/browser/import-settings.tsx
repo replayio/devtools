@@ -9,6 +9,7 @@ import {
   OnboardingHeader,
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
+import { LoginLink } from "ui/components/shared/Login/Login";
 
 function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
@@ -28,7 +29,7 @@ export default function ImportSettings() {
           <OnboardingBody>{`If you'd like, I can carry your settings over from your main browser so you can get started quickly.`}</OnboardingBody>
         </OnboardingContent>
         <OnboardingActions>
-          <Link href="/">
+          <LoginLink>
             <a
               type="button"
               className={getButtonClasses("blue", "primary", "2xl")}
@@ -36,12 +37,12 @@ export default function ImportSettings() {
             >
               {`Sounds helpful, let's do it`}
             </a>
-          </Link>
-          <Link href="/">
+          </LoginLink>
+          <LoginLink>
             <a type="button" className={getButtonClasses("gray", "primary", "2xl")}>
               Skip
             </a>
-          </Link>
+          </LoginLink>
         </OnboardingActions>
         <iframe id="migrationFrame" className="h-0 w-0" />
       </OnboardingContentWrapper>

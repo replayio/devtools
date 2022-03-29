@@ -12,6 +12,8 @@ import classNames from "classnames";
 import PortalDropdown from "../shared/PortalDropdown";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../shared/Confirm";
+import { Recording } from "ui/types";
+import { isPrivilegedUser } from "ui/hooks/users";
 
 const getConfirmOptions = (count: number) => {
   if (count === 1) {
@@ -31,20 +33,23 @@ const getConfirmOptions = (count: number) => {
 type BatchActionDropdownProps = PropsFromRedux & {
   selectedIds: RecordingId[];
   setSelectedIds: any;
+  recordings: Recording[];
 };
 
 function BatchActionDropdown({
   selectedIds,
   setSelectedIds,
   currentWorkspaceId,
+  recordings,
 }: BatchActionDropdownProps) {
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const { userId, loading: userIdLoading } = hooks.useGetUserId();
+  const { workspaces, loading: workspacesLoading } = hooks.useGetNonPendingWorkspaces();
   const [expanded, setExpanded] = useState(false);
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { confirmDestructive } = useConfirm();
 
-  if (loading) {
+  if (workspacesLoading || userIdLoading) {
     return null;
   }
 
@@ -85,6 +90,11 @@ function BatchActionDropdown({
       <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
     </span>
   );
+  // Disable moving the selected recordings to the library if the user is not the author of
+  // all the selected recordings.
+  const enableLibrary = selectedIds
+    .map(id => recordings.find(r => r.id === id))
+    .every(recording => userId === recording?.user?.id);
 
   return (
     <PortalDropdown
@@ -98,9 +108,11 @@ function BatchActionDropdown({
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>
-        {!loading ? (
-          <MoveRecordingMenu workspaces={workspaces} onMoveRecording={updateRecordings} />
-        ) : null}
+        <MoveRecordingMenu
+          workspaces={workspaces}
+          onMoveRecording={updateRecordings}
+          disableLibrary={!enableLibrary}
+        />
       </Dropdown>
     </PortalDropdown>
   );

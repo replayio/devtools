@@ -18,8 +18,8 @@
 }
 
 .chart-colored-blob {
-  fill: var(--theme-body-color);
-  background: var(--theme-body-color);
+  fill: var(--body-color);
+  background: var(--body-color);
 }
 
 /* Chart: Pie */
@@ -134,5 +134,5 @@
 }
 
 .theme-light .table-chart-summary-label {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }

@@ -25,7 +25,7 @@ import { closeActiveSearch, clearHighlightLineRange, setActiveSearch } from "./u
 import { isFulfilled } from "../utils/async-value";
 
 export function doSearch(cx, query, editor) {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
       return;
@@ -37,7 +37,7 @@ export function doSearch(cx, query, editor) {
 }
 
 export function doSearchForHighlight(query, editor, line, ch) {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
       return;
@@ -74,7 +74,7 @@ export function updateSearchResults(cx, characterIndex, line, matches) {
 }
 
 export function searchContents(cx, query, editor, focusFirstResult = true) {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
@@ -111,7 +111,7 @@ export function searchContents(cx, query, editor, focusFirstResult = true) {
 }
 
 export function searchContentsForHighlight(query, editor, line, ch) {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
@@ -125,7 +125,7 @@ export function searchContentsForHighlight(query, editor, line, ch) {
 }
 
 export function traverseResults(cx, rev, editor) {
-  return async ({ getState, dispatch }) => {
+  return async (dispatch, getState) => {
     if (!editor) {
       return;
     }
@@ -155,7 +155,7 @@ export function traverseResults(cx, rev, editor) {
 }
 
 export function closeFileSearch(cx, editor) {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     if (editor) {
       const query = getFileSearchQuery(getState());
       const ctx = { ed: editor, cm: editor.codeMirror };

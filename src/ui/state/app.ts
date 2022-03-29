@@ -50,10 +50,11 @@ export type SettingsTabTitle =
   | "API Keys"
   | "Preferences";
 
+export type ErrorActions = "sign-in" | "refresh" | "library" | "request-access" | "team-billing";
 export interface ExpectedError {
   message: string;
   content: string;
-  action?: "sign-in" | "refresh" | "library" | "request-access";
+  action?: ErrorActions;
 }
 
 export type UnexpectedError = {
@@ -93,7 +94,6 @@ export interface AppState {
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
-  videoNode: HTMLVideoElement | null;
   videoUrl: string | null;
   workspaceId: WorkspaceId | null;
   mouseTargetsLoading: boolean;

@@ -4,19 +4,17 @@
 
 "use strict";
 
-const { createFactory, PureComponent } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 
-const CSSDeclaration = createFactory(
-  require("devtools/client/inspector/changes/components/CSSDeclaration")
-);
+const CSSDeclaration = require("devtools/client/inspector/changes/components/CSSDeclaration");
 const { getChangesTree } = require("devtools/client/inspector/changes/selectors/changes");
 const { getSourceForDisplay } = require("devtools/client/inspector/changes/utils/changes-utils");
 const { getStr } = require("devtools/client/inspector/changes/utils/l10n");
 
-class ChangesApp extends PureComponent {
+class ChangesApp extends React.PureComponent {
   static get propTypes() {
     return {
       // Nested CSS rule tree structure of CSS changes grouped by source (stylesheet)
@@ -69,7 +67,7 @@ class ChangesApp extends PureComponent {
       // Sorting changed declarations in the order they appear in the Rules view.
       .sort((a, b) => a.index > b.index)
       .map(({ property, value, index }) => {
-        return CSSDeclaration({
+        return React.createElement(CSSDeclaration, {
           key: "remove-" + property + index,
           className: "level diff-remove",
           property,
@@ -81,7 +79,7 @@ class ChangesApp extends PureComponent {
       // Sorting changed declarations in the order they appear in the Rules view.
       .sort((a, b) => a.index > b.index)
       .map(({ property, value, index }) => {
-        return CSSDeclaration({
+        return React.createElement(CSSDeclaration, {
           key: "add-" + property + index,
           className: "level diff-add",
           property,

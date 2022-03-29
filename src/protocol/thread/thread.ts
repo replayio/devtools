@@ -36,7 +36,7 @@ import {
   responseBodyData,
   requestBodyData,
 } from "@recordreplay/protocol";
-import { client, log } from "../socket";
+import { client, log, addEventListener, sendMessage } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
@@ -44,6 +44,11 @@ import { Pause } from "./pause";
 import uniqueId from "lodash/uniqueId";
 import { repaint } from "protocol/graphics";
 
+declare global {
+  interface Window {
+    sessionMetrics: any[] | undefined;
+  }
+}
 export interface RecordingDescription {
   duration: TimeStamp;
   length?: number;
@@ -228,6 +233,13 @@ class _ThreadFront {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
+    if (window.app.prefs.listenForMetrics) {
+      window.sessionMetrics = [];
+      addEventListener("Session.newMetric", ({ data }) => {
+        window.sessionMetrics?.push(data);
+      });
+    }
+
     log(`GotSessionId ${sessionId}`);
 
     const { buildId } = await client.Session.getBuildId({}, sessionId);
@@ -235,8 +247,7 @@ class _ThreadFront {
   }
 
   async initializeToolbox() {
-    const sessionId = await this.waitForSession();
-
+    await this.waitForSession();
     await this.initializedWaiter.promise;
     await this.ensureAllSources();
     this.ensureCurrentPause();
@@ -281,6 +292,7 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
+      // TODO Remove this once we have a better region loading indicator
       // Log loaded regions to help with diagnostics.
       console.log("LoadedRegions", parameters);
       listenerCallback(parameters);
@@ -462,6 +474,16 @@ class _ThreadFront {
       this.sessionId
     );
     return { contents, contentType };
+  }
+
+  async getHitCounts(sourceId: SourceId, locations: SameLineSourceLocations[]) {
+    // @ts-ignore
+    return sendMessage(
+      // @ts-ignore
+      "Debugger.getHitCounts",
+      { sourceId, locations, maxHits: 10000 },
+      this.sessionId!
+    );
   }
 
   getBreakpointPositionsCompressed(
@@ -1168,7 +1190,7 @@ class _ThreadFront {
         return false;
       }
       kind = minifiedInfo.kind;
-      assert(kind != "prettyPrinted", "source kind must be prettyPrinted");
+      assert(kind != "prettyPrinted", "source kind must not be prettyPrinted");
     }
     return kind == "sourceMapped";
   }
@@ -1220,6 +1242,7 @@ class _ThreadFront {
     return this._chooseSourceIdList(this.getSourceIdsForURL(url));
   }
 
+  // Try to group identical sources together and save the result in `correspondingSourceIds`
   private groupSourceIds() {
     for (const [sourceId, source] of this.sources.entries()) {
       if (!source.url) {
@@ -1254,10 +1277,12 @@ class _ThreadFront {
     return this.correspondingSourceIds.get(sourceId) || [sourceId];
   }
 
+  // Replace the sourceId in a location with the first corresponding sourceId
   updateLocation(location: Location) {
     location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
   }
 
+  // Replace all sourceIds in a mapped location with the first corresponding sourceId
   updateMappedLocation(mappedLocation: MappedLocation | undefined) {
     if (!mappedLocation) {
       return;

@@ -13,7 +13,7 @@ import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
 
-import { extendStore } from "../store";
+import { extendStore, AppStore } from "../store";
 import app from "ui/reducers/app";
 import timeline from "ui/reducers/timeline";
 import comments from "ui/reducers/comments";
@@ -34,7 +34,6 @@ const { setupExceptions } = require("devtools/client/debugger/src/actions/logExc
 import { getConsoleInitialState } from "devtools/client/webconsole/store";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import consoleReducers from "devtools/client/webconsole/reducers";
-import { getPrefsService } from "devtools/client/webconsole/utils/prefs";
 const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 const {
   initOutputSyntaxHighlighting,
@@ -81,15 +80,16 @@ enum SessionError {
 const SessionErrorMessages: Record<number, string> = {
   [SessionError.BackendDeploy]: "Please wait a few minutes and try again.",
   [SessionError.NodeTerminated]: "Our servers hiccuped but things should be back to normal soon.",
+  [SessionError.UnknownFatalError]: "There was an error. Please try recording again.",
   [SessionError.KnownFatalError]:
     "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
   [SessionError.OldBuild]:
     "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
   [SessionError.LongRecording]:
-    "You’ve hit an error that happens with long recordings. Can you try a shorter recording?",
+    "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
 };
 
-export default async function DevTools(store: Store) {
+export default async function DevTools(store: AppStore) {
   if (window.hasAlreadyBootstrapped) {
     return;
   } else {
@@ -110,6 +110,7 @@ export default async function DevTools(store: Store) {
   window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
+  window.app.prefs = window.app.prefs ?? {};
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
@@ -134,13 +135,13 @@ export default async function DevTools(store: Store) {
     ...consoleReducers.reducers,
   };
 
-  const thunkArgs = {
+  bootstrapWorkers();
+
+  const extraThunkArgs = {
     client: clientCommands,
-    ...bootstrapWorkers(),
-    prefsService: getPrefsService(),
   };
 
-  extendStore(store, initialState, reducers, thunkArgs);
+  extendStore(store, initialState, reducers, extraThunkArgs);
 
   dbgClient.bootstrap(store);
 

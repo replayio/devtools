@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import React, { useEffect } from "react";
+import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -20,6 +20,8 @@ interface TipTapEditorProps {
   // Not actually implementing this now, but leaving it in the API for later
   possibleMentions: User[];
   takeFocus: boolean;
+  onCreate: (editor: { editor: Pick<Editor, "commands"> }) => void;
+  onUpdate: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
 }
 
 const tryToParse = (content: string): any => {
@@ -46,6 +48,8 @@ const TipTapEditor = ({
   handleCancel,
   placeholder,
   takeFocus,
+  onCreate,
+  onUpdate,
 }: TipTapEditorProps) => {
   const { isAuthenticated } = useAuth0();
 
@@ -87,6 +91,8 @@ const TipTapEditor = ({
       ],
       editorProps: { attributes: { class: "focus:outline-none" } },
       content: tryToParse(content),
+      onCreate,
+      onUpdate,
       editable,
       autofocus,
     },
@@ -117,7 +123,7 @@ const TipTapEditor = ({
     >
       <EditorContent
         className={classNames("w-full rounded-md border p-1 outline-none transition", {
-          "bg-themeBodyBgcolor": editable,
+          "bg-bodyBgcolor": editable,
           "border-gray-400": editable,
           "border-transparent": !editable,
           "cursor-text": editable,

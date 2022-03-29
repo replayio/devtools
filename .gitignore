@@ -15,3 +15,5 @@ out
 tsconfig.tsbuildinfo
 yarn.lock
 .nova/
+schema.graphql
+/coverage/

@@ -179,8 +179,8 @@
   padding: 4px;
   box-sizing: border-box;
   border: 1px solid var(--theme-splitter-color);
-  background-color: var(--theme-body-bgcolor);
-  color: var(--theme-body-color);
+  background-color: var(--body-bgcolor);
+  color: var(--body-color);
 }
 
 .perf-settings-text-input:focus {
@@ -299,8 +299,8 @@
   border: 1px solid var(--theme-splitter-color);
   padding: 0;
   overflow-y: auto;
-  background-color: var(--theme-body-bgcolor);
-  color: var(--theme-body-color);
+  background-color: var(--body-bgcolor);
+  color: var(--body-color);
 }
 
 .pref-settings-dir-list-item {
@@ -339,7 +339,7 @@
   /* photon styles */
   background-color: var(--toolbarbutton-background);
   border-radius: 2px;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   font: inherit;
 }
 

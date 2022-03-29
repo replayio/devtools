@@ -181,9 +181,6 @@ function messages(state = MessageState(), action) {
       });
       return newState;
 
-    case constants.MESSAGES_CLEAR:
-      return MessageState({});
-
     case constants.MESSAGE_OPEN:
       const openState = { ...state };
       openState.messagesUiById = [...messagesUiById, action.id];
@@ -300,10 +297,8 @@ function messages(state = MessageState(), action) {
         messagesPayloadById: new Map(messagesPayloadById).set(action.id, action.data),
       };
 
-    case constants.FILTER_TOGGLE:
-    case constants.FILTER_TEXT_SET:
-    case constants.FILTERS_CLEAR:
-    case constants.DEFAULT_FILTERS_RESET:
+    // TODO Remove this action entirely when the filtered messages is turned into a selector
+    case "FILTER_STATE_UPDATED":
       return setVisibleMessages({
         messagesState: state,
         filtersState,

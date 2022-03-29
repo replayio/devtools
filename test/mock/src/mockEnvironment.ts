@@ -37,7 +37,7 @@ export interface Error {
 }
 
 // This script runs within the browser process.
-function doInstall(options: MockOptionsJSON) {
+export function doInstall(options: MockOptionsJSON) {
   function setImmediate(callback: () => void) {
     setTimeout(callback, 0);
   }
@@ -82,7 +82,8 @@ function doInstall(options: MockOptionsJSON) {
     sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
       if (!messageHandlers[msg.method]) {
-        console.error(`Missing mock message handler for ${msg.method}`);
+        // Leave this here for later use
+        // console.error(`Missing mock message handler for ${msg.method}`);
         return;
       }
       let promise;

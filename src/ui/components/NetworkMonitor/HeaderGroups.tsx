@@ -41,19 +41,22 @@ export function HeaderGroups({
             className="flex items-center divide-x divide-themeTextFieldBgcolor font-normal"
             {...headerProps}
           >
-            {headerGroup.headers.map(column => {
+            {headerGroup.headers.map((column, index) => {
               const { key, ...columnProps } = column.getHeaderProps();
+              const isLastColumn = index === headerGroup.headers.length - 1;
               return (
                 <div className={classNames("p-1", styles[column.id])} {...columnProps} key={key}>
                   {column.render("Header")}
-                  <div
-                    //@ts-ignore
-                    {...column.getResizerProps()}
-                    className={classNames("select-none", styles.resizer, {
-                      //@ts-ignore typescript freaking *hates* react-table
-                      isResizing: column.isResizing,
-                    })}
-                  />
+                  {!isLastColumn ? (
+                    <div
+                      //@ts-ignore
+                      {...column.getResizerProps()}
+                      className={classNames("select-none", styles.resizer, {
+                        //@ts-ignore typescript freaking *hates* react-table
+                        isResizing: column.isResizing,
+                      })}
+                    />
+                  ) : null}
                 </div>
               );
             })}

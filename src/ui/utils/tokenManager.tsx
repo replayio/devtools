@@ -3,7 +3,6 @@ import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 import { assert, defer, Deferred } from "protocol/utils";
-import { usesWindow } from "ssr";
 import { useRouter } from "next/router";
 import { listenForAccessToken } from "./browser";
 

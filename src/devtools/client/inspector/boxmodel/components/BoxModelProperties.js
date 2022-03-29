@@ -4,21 +4,18 @@
 
 "use strict";
 
-const { createFactory, PureComponent } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const ComputedProperty = createFactory(
-  require("devtools/client/inspector/boxmodel/components/ComputedProperty")
-);
-
+const ComputedProperty = require("devtools/client/inspector/boxmodel/components/ComputedProperty");
 const Types = require("devtools/client/inspector/boxmodel/types");
 
 const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
 const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
 
-class BoxModelProperties extends PureComponent {
+class BoxModelProperties extends React.PureComponent {
   static get propTypes() {
     return {
       boxModel: PropTypes.shape(Types.boxModel).isRequired,
@@ -89,7 +86,7 @@ class BoxModelProperties extends PureComponent {
     const properties = layoutInfo.map(info => {
       const { referenceElement, referenceElementType } = this.getReferenceElement(info);
 
-      return ComputedProperty({
+      return React.createElement(ComputedProperty, {
         key: info,
         name: info,
         onHideBoxModelHighlighter,

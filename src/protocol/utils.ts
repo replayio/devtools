@@ -41,7 +41,7 @@ export function throttle(callback: () => void, time: number) {
 }
 
 export function clamp(value: number, min: number, max: number) {
-  assert(min < max);
+  assert(min < max, "min should be less than max");
   return Math.max(min, Math.min(max, value));
 }
 

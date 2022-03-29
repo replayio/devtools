@@ -144,3 +144,7 @@ but without a background color so we can use hover effects
 .icon.dock-bottom-right {
   -webkit-mask-image: url(/icons/dock-bottom-right.svg);
 }
+
+.icon.video {
+  -webkit-mask-image: url(/icons/video.svg);
+}

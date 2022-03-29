@@ -1,6 +1,6 @@
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import React, { useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps, useDispatch } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import {
   getFormattedFrames,
@@ -8,45 +8,45 @@ import {
   getRequestBodies,
   getFocusedEvents,
   getFocusedRequests,
+  getSelectedRequestId,
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import RequestDetails, { RequestDetailsUnavailable } from "./RequestDetails";
+import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import { CanonicalRequestType, RequestSummary } from "./utils";
 import FilterBar from "./FilterBar";
 import Table from "./Table";
-import { fetchResponseBody, fetchRequestBody } from "ui/actions/network";
+import {
+  fetchResponseBody,
+  fetchRequestBody,
+  hideRequestDetails,
+  showRequestDetails,
+} from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import { trackEvent } from "ui/utils/telemetry";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 
 export const NetworkMonitor = ({
   currentTime,
   cx,
   events,
-  frames,
   loading,
-  loadedRegions,
-  requestBodies,
   requests,
-  responseBodies,
   seek,
-  selectFrame,
 }: PropsFromRedux) => {
-  const [selectedRequest, setSelectedRequest] = useState<RequestSummary>();
+  const selectedRequestId = useSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const container = useRef<HTMLDivElement>(null);
 
-  const closePanel = () => setSelectedRequest(undefined);
-
   const toggleType = (type: CanonicalRequestType) => {
+    dispatch(hideRequestDetails());
+
     const newTypes = new Set(types);
     if (newTypes.has(type)) {
       trackEvent("net_monitor.delete_type", { type });
@@ -67,13 +67,13 @@ export const NetworkMonitor = ({
       resizeObserver.current.observe(container.current);
     }
   });
-  //
+
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
-    if (selectedRequest && !requests.find(r => r.id === selectedRequest.id)) {
-      setSelectedRequest(undefined);
+    if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
+      dispatch(hideRequestDetails());
     }
-  }, [requests, selectedRequest]);
+  }, [requests, selectedRequestId, dispatch]);
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
@@ -94,8 +94,8 @@ export const NetworkMonitor = ({
           <SplitBox
             className="min-h-0 border-t border-splitter"
             initialSize="350px"
-            minSize={selectedRequest ? "30%" : "100%"}
-            maxSize={selectedRequest ? "70%" : "100%"}
+            minSize={selectedRequestId ? "30%" : "100%"}
+            maxSize={selectedRequestId ? "70%" : "100%"}
             startPanel={
               <RequestTable
                 table={table}
@@ -111,31 +111,21 @@ export const NetworkMonitor = ({
                     dispatch(fetchRequestBody(row.id, row.point.point));
                   }
 
-                  setSelectedRequest(row);
+                  dispatch(showRequestDetails(row.id));
                 }}
                 seek={seek}
-                selectedRequest={selectedRequest}
+                selectedRequest={data.find(request => request.id === selectedRequestId)}
               />
             }
             endPanel={
-              selectedRequest ? (
-                loadedRegions &&
-                getPointIsInLoadedRegion(loadedRegions, selectedRequest.point.point) ? (
-                  <RequestDetails
-                    closePanel={closePanel}
-                    cx={cx}
-                    request={selectedRequest}
-                    responseBody={responseBodies[selectedRequest.id]}
-                    requestBody={requestBodies[selectedRequest.id]}
-                    frames={frames[selectedRequest?.point.point]}
-                    selectFrame={selectFrame}
-                  />
-                ) : (
-                  <RequestDetailsUnavailable closePanel={closePanel} />
-                )
+              selectedRequestId ? (
+                <RequestDetails
+                  cx={cx}
+                  request={data.find(request => request.id === selectedRequestId)!}
+                />
               ) : null
             }
-            splitterSize={1}
+            splitterSize={2}
             vert={vert}
           />
         </div>

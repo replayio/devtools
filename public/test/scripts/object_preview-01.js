@@ -31,8 +31,8 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   await Test.waitForMessage("Symbol(symbol)");
   await Test.waitForMessage(`Object { "Symbol()": 42, "Symbol(symbol)": "Symbol()" }`);
 
-  msg = await Test.waitForMessage("Object {  }");
-  await Test.checkMessageObjectContents(msg, ["c: {}", 'foo: "bar"'], ["c", "foo"]);
+  msg = await Test.waitForMessage('Object { _foo: {…} }');
+  await Test.checkMessageObjectContents(msg, ['foo: Object { baz: "baz" }', 'bar: "bar"', 'baz: "baz"'], ["foo", "bar"]);
 
   await Test.warpToMessage("Done");
 

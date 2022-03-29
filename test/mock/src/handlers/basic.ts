@@ -16,9 +16,13 @@ export function basicBindings() {
 
 export function basicMessageHandlers(): MockHandlerRecord {
   return {
-    "Console.findMessages": () => ({}),
+    "Console.findMessages": arg => ({}),
     "Debugger.findSources": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Debugger.newSource", h.bindings.DefaultSource);
+      return {};
+    },
+    "Debugger.newSource": (params: any, h: MockHandlerHelpers) => {
+      h.emitEvent("Debugger.newSource", params);
       return {};
     },
     "Graphics.findPaints": () => ({}),
@@ -34,6 +38,14 @@ export function basicMessageHandlers(): MockHandlerRecord {
     "Session.getEndpoint": (params: any, h: MockHandlerHelpers) => ({
       endpoint: h.bindings.endpoint,
     }),
+    "Session.loadedRegions": (params: any, h: MockHandlerHelpers) => {
+      h.emitEvent("Session.loadedRegions", params);
+      return new Promise(resolve => {});
+    },
+    "Console.newMessage": (params: any, h: MockHandlerHelpers) => {
+      h.emitEvent("Console.newMessage", params);
+      return new Promise(resolve => {});
+    },
     "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Session.loadedRegions", {
         loaded: [

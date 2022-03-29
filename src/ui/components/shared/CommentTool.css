@@ -5,5 +5,5 @@ button.comment-tool {
 
 button.comment-tool:focus {
   background: var(--primary-accent);
-  color: var(--theme-body-bgcolor);
+  color: var(--body-bgcolor);
 }

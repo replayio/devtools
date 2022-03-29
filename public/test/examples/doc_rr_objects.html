@@ -6,7 +6,8 @@ function recordingFinished() {
 }
 
 class C {
-  get foo() { return "bar"; }
+  get bar() { return "bar"; }
+  baz = "baz";
 }
 
 function foo() {
@@ -45,7 +46,7 @@ var n = new Proxy({ a: 0 }, {
 var o = Symbol();
 var p = Symbol("symbol");
 var q = { [o]: 42, [p]: o };
-var r = { get c() { return new C(); } }
+var r = { _foo: new C(), get foo() { return this._foo; } }
 console.log(a);
 console.log(b);
 console.log(c);

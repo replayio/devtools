@@ -7,8 +7,6 @@
 const Services = require("devtools/shared/services");
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
 const { OutputParser } = require("devtools/client/shared/output-parser");
-const { createFactory, createElement } = require("react");
-const { Provider } = require("react-redux");
 const EventEmitter = require("devtools/shared/event-emitter");
 const ClassList = require("devtools/client/inspector/rules/models/class-list").default;
 const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
@@ -26,8 +24,6 @@ const {
   updateRules,
 } = require("devtools/client/inspector/rules/actions/rules");
 const { setComputedProperties } = require("devtools/client/inspector/computed/actions");
-
-const RulesApp = createFactory(require("devtools/client/inspector/rules/components/RulesApp"));
 
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 

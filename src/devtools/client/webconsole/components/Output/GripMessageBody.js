@@ -4,13 +4,12 @@
 "use strict";
 
 // React
-const React = require("react");
-const PropTypes = require("prop-types");
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const ObjectInspector =
-  require("devtools/client/webconsole/utils/connected-object-inspector").default;
+import React from "react";
+import PropTypes from "prop-types";
+import { MESSAGE_TYPE } from "devtools/client/webconsole/constants";
+import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
 
-const { MODE } = require("devtools/packages/devtools-reps");
+import { MODE } from "devtools/packages/devtools-reps";
 
 GripMessageBody.displayName = "GripMessageBody";
 
@@ -109,4 +108,4 @@ function shouldAutoExpandObjectInspector(props) {
   return type === MESSAGE_TYPE.DIR;
 }
 
-module.exports = GripMessageBody;
+export default GripMessageBody;

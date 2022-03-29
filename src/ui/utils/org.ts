@@ -1,3 +1,6 @@
+import { useSelector } from "react-redux";
+import { useGetNonPendingWorkspaces } from "ui/hooks/workspaces";
+import { getWorkspaceId } from "ui/reducers/app";
 import { Workspace, WorkspaceSettings } from "ui/types";
 
 export function getDefaultOrganizationSettings(): WorkspaceSettings {
@@ -18,6 +21,17 @@ export function getDefaultOrganizationSettings(): WorkspaceSettings {
 export function getOrganizationSettings(workspaces: Workspace[]) {
   const org = workspaces.find(w => w.isOrganization);
   return org?.settings || getDefaultOrganizationSettings();
+}
+
+export function useIsPublicEnabled() {
+  const { workspaces, loading: loadingWorkspaces } = useGetNonPendingWorkspaces();
+  const currentWorkspaceId = useSelector(getWorkspaceId);
+
+  if (loadingWorkspaces) {
+    return false;
+  }
+
+  return !isPublicDisabled(workspaces, currentWorkspaceId);
 }
 
 export function isPublicDisabled(workspaces: Workspace[], selectedWorkspaceId: string | null) {

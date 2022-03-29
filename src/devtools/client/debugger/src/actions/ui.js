@@ -38,7 +38,7 @@ export function closeActiveSearch() {
 }
 
 export function setActiveSearch(activeSearch) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const activeSearchState = getActiveSearch(getState());
     if (activeSearchState === activeSearch) {
       return;
@@ -56,7 +56,7 @@ export function setActiveSearch(activeSearch) {
 }
 
 export function updateActiveFileSearch(cx) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const isFileSearchOpen = getActiveSearch(getState()) === "file";
     const fileSearchQuery = getFileSearchQuery(getState());
     if (isFileSearchOpen && fileSearchQuery) {
@@ -67,7 +67,7 @@ export function updateActiveFileSearch(cx) {
 }
 
 export function toggleFrameworkGrouping(toggleValue) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     dispatch({
       type: "TOGGLE_FRAMEWORK_GROUPING",
       value: toggleValue,
@@ -76,7 +76,7 @@ export function toggleFrameworkGrouping(toggleValue) {
 }
 
 export function ensureSourcesIsVisible() {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     // Make sure the explorer/pause information panel is open so that the user
     // sees those panels
     if (getPaneCollapse(getState())) {
@@ -105,7 +105,7 @@ export function ensureSourcesIsVisible() {
 }
 
 export function openSourceLink(sourceId, line, column) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const cx = getContext(getState());
     const location = { sourceId, line, column };
 
@@ -114,8 +114,8 @@ export function openSourceLink(sourceId, line, column) {
   };
 }
 
-export function showSource(cx, sourceId) {
-  return ({ dispatch, getState }) => {
+export function showSource(cx, sourceId, openSourcesTab = true) {
+  return (dispatch, getState) => {
     const source = getSource(getState(), sourceId);
 
     if (!source) {
@@ -123,26 +123,26 @@ export function showSource(cx, sourceId) {
     }
 
     dispatch(setPrimaryPaneTab("sources"));
-    dispatch(selectSource(cx, source.id));
+    dispatch(selectSource(cx, source.id, {}, openSourcesTab));
   };
 }
 
 export function togglePaneCollapse() {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const paneCollapsed = getPaneCollapse(getState());
     dispatch({ type: "TOGGLE_PANE", paneCollapsed: !paneCollapsed });
   };
 }
 
 export function toggleSourcesCollapse() {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const sourcesCollapsed = getSourcesCollapsed(getState());
     dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: !sourcesCollapsed });
   };
 }
 
 export function expandSourcesPane() {
-  return ({ dispatch }) => {
+  return dispatch => {
     dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: false });
   };
 }
@@ -155,7 +155,7 @@ export function highlightLineRange(location) {
 }
 
 export function flashLineRange(location) {
-  return ({ dispatch }) => {
+  return dispatch => {
     dispatch(highlightLineRange(location));
     setTimeout(() => dispatch(clearHighlightLineRange()), 200);
   };
@@ -179,7 +179,7 @@ export function updateCursorPosition(cursorPosition) {
 }
 
 export function copyToClipboard(source) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const content = getSourceContent(getState(), source.id);
     if (content && isFulfilled(content) && content.value.type === "text") {
       copyToTheClipboard(content.value.value);
@@ -188,7 +188,7 @@ export function copyToClipboard(source) {
 }
 
 export function refreshCodeMirror() {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     // CodeMirror does not update properly when it is hidden. This method has
     // a few workarounds to get the editor to behave as expected when switching
     // to the debugger from another panel and the selected location has changed.

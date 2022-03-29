@@ -5,10 +5,11 @@
 "use strict";
 
 // React & Redux
-const { createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
-const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
-const GripMessageBody = require("devtools/client/webconsole/components/Output/GripMessageBody");
+const Message = require("devtools/client/webconsole/components/Output/Message");
+const GripMessageBody =
+  require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 
 EvaluationResult.displayName = "EvaluationResult";
 
@@ -67,7 +68,7 @@ function EvaluationResult(props) {
 
   const topLevelClasses = ["cm-s-mozilla"];
 
-  return Message({
+  return React.createElement(Message, {
     dispatch,
     source,
     type,

@@ -10,7 +10,7 @@
   overflow-x: hidden;
   width: 100%;
   border-top: 1px solid var(--theme-splitter-color);
-  background: var(--theme-body-bgcolor);
+  background: var(--body-bgcolor);
 }
 
 .result-list * {
@@ -18,7 +18,7 @@
 }
 
 .result-list li {
-  color: var(--theme-body-color);
+  color: var(--body-color);
   padding: 4px 8px;
   display: flex;
 }
@@ -49,7 +49,7 @@
 }
 
 .theme-dark .result-list.small li.selected {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 .theme-dark .result-list li:hover {
@@ -138,7 +138,7 @@
 }
 
 .theme-dark .result-list {
-  background-color: var(--theme-body-bgcolor);
+  background-color: var(--body-bgcolor);
 }
 
 .result-list .secondary-title {

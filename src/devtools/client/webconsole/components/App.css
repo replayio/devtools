@@ -52,8 +52,6 @@
 }
 
 .webconsole-app .jsterm-input-container {
-  overflow-y: auto;
-  overflow-x: hidden;
   outline: none;
 }
 
@@ -64,10 +62,7 @@
   --jsterm-border-width: 0;
   --jsterm-padding-top: 0;
   --jsterm-padding-bottom: 0;
-  min-height: calc(
-    var(--console-row-height) + var(--jsterm-border-width) + var(--jsterm-padding-top) +
-      var(--jsterm-padding-bottom)
-  );
+  min-height: var(--editor-footer-height);
   padding-top: var(--jsterm-padding-top);
   padding-bottom: var(--jsterm-padding-bottom);
   border-top: 1px solid var(--theme-splitter-color);

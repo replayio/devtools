@@ -7,14 +7,14 @@
 const { getUserId } = require("ui/hooks/users");
 const { withAuth0 } = require("@auth0/auth0-react");
 const { withRouter } = require("next/router");
-const { Component, createFactory, createElement } = require("react");
+const React = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { actions } = require("ui/actions/index");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
-const FrameView = createFactory(require("devtools/client/shared/components/Frame"));
+const FrameView = require("devtools/client/shared/components/Frame");
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
@@ -24,7 +24,7 @@ const { trackEvent } = require("ui/utils/telemetry");
 const { dismissNag, Nag } = require("ui/hooks/users");
 import { getRecordingId } from "ui/utils/recording";
 
-class Message extends Component {
+class Message extends React.Component {
   static get propTypes() {
     return {
       open: PropTypes.bool,
@@ -120,10 +120,10 @@ class Message extends Component {
     e.preventDefault();
   }
 
-  onViewSourceInDebugger = frame => {
+  onViewSourceInDebugger = (frame, openSourcesTab = true) => {
     const { dispatch } = this.props;
     trackEvent("console.select_source ");
-    dispatch(actions.onViewSourceInDebugger(frame));
+    dispatch(actions.onViewSourceInDebugger(frame, openSourcesTab));
   };
 
   toggleMessage(e) {
@@ -181,21 +181,25 @@ class Message extends Component {
         actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
 
-      this.onViewSourceInDebugger({ ...frame, url: frame.source });
+      this.onViewSourceInDebugger({ ...frame, url: frame.source }, false);
       dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
     };
     let handleAddComment = async () => {
       trackEvent("console.add_comment");
       let userId = await getUserId();
+      const opts = {
+        position: null,
+        hasFrames: true,
+        sourceLocation: frame,
+      };
+
       dispatch(
         actions.createComment(
           executionPointTime,
           executionPoint,
-          null,
-          true,
-          frame,
           { ...this.props.auth0.user, id: userId },
-          getRecordingId(this.props.router.query.id)
+          getRecordingId(this.props.router.query.id),
+          opts
         )
       );
     };
@@ -360,7 +364,7 @@ class Message extends Component {
         {
           className: "stacktrace devtools-monospace",
         },
-        createElement(SmartTrace, {
+        React.createElement(SmartTrace, {
           stacktrace,
           onViewSourceInDebugger: this.onViewSourceInDebugger,
           onReady: this.props.maybeScrollToBottom,
@@ -371,7 +375,7 @@ class Message extends Component {
     // If there is an expandable part, make it collapsible.
     let collapse = null;
     if (collapsible) {
-      collapse = createElement(CollapseButton, {
+      collapse = React.createElement(CollapseButton, {
         open,
         title: collapseTitle,
         onClick: this.toggleMessage,
@@ -387,7 +391,7 @@ class Message extends Component {
           dom.span(
             { className: "message-location devtools-monospace" },
             note.frame
-              ? FrameView({
+              ? React.createElement(FrameView, {
                   frame: note.frame,
                   onClick: this.onViewSourceInDebugger,
                   showEmptyPathAsHost: true,
@@ -402,14 +406,14 @@ class Message extends Component {
 
     const repeat =
       this.props.repeat && this.props.repeat > 1
-        ? createElement(MessageRepeat, { repeat: this.props.repeat })
+        ? React.createElement(MessageRepeat, { repeat: this.props.repeat })
         : null;
 
     // Configure the location.
     const location = dom.span(
       { className: "message-location devtools-monospace" },
       frame
-        ? FrameView({
+        ? React.createElement(FrameView, {
             frame,
             onClick: frame ? this.onViewSourceInDebugger : undefined,
             showEmptyPathAsHost: true,

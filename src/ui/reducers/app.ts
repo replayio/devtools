@@ -13,7 +13,7 @@ export const initialAppState: AppState = {
   analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
-  defaultSettingsTab: "Personal",
+  defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
   events: {},
   expectedError: null,
@@ -36,7 +36,6 @@ export const initialAppState: AppState = {
   trialExpired: false,
   unexpectedError: null,
   uploading: null,
-  videoNode: null,
   videoUrl: null,
   workspaceId: null,
   currentPoint: null,
@@ -173,13 +172,6 @@ export default function update(
       };
     }
 
-    case "set_video_node": {
-      return {
-        ...state,
-        videoNode: action.videoNode,
-      };
-    }
-
     case "set_video_url": {
       return {
         ...state,
@@ -236,6 +228,7 @@ export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
+
 export const getAnalysisPointsForLocation = (
   state: UIState,
   location: Location | null,
@@ -254,6 +247,7 @@ export const getAnalysisPointsForLocation = (
 
   return points;
 };
+
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
@@ -292,7 +286,6 @@ export const getFlatEvents = (state: UIState) => {
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
-export const getVideoNode = (state: UIState) => state.app.videoNode;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;

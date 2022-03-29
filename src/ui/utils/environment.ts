@@ -1,5 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
-import { usesWindow } from "ssr";
+import { Editor } from "codemirror";
+import { usesWindow } from "../../ssr";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
@@ -11,7 +12,12 @@ declare global {
   var __IS_RECORD_REPLAY_RUNTIME__: boolean;
   interface Window {
     mockEnvironment?: MockEnvironment;
-    jsterm: any;
+    jsterm: {
+      editor: Editor;
+      setValue: (newValue: string) => void;
+      execute: () => void;
+      showAutocomplete?: (show: boolean) => void;
+    };
   }
 }
 
@@ -101,6 +107,11 @@ export function getPausePointParams() {
   }
 
   return null;
+}
+
+export function getLoginReferrerParam() {
+  const referrerParam = url.searchParams.get("login-referrer");
+  return referrerParam === "first-browser-open" ? referrerParam : "default";
 }
 
 export function removeUrlParameters() {

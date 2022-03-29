@@ -44,7 +44,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   return (
-    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-themeBodyBgcolor">
+    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
       <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
@@ -92,10 +92,12 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
 
 function WarningRow() {
   return (
-    <Row>
-      <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
-      <div>This replay is over two minutes, which can cause delays</div>
-    </Row>
+    <div className="group">
+      <Row>
+        <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+        <div>This replay is over two minutes, which can cause delays</div>
+      </Row>
+    </div>
   );
 }
 

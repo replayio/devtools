@@ -131,8 +131,8 @@ class AnalysisManager {
     handler: AnalysisHandler<T>,
     maxPoints: number
   ) {
-    assert(!handler.onAnalysisPoints);
-    assert(handler.onAnalysisResult);
+    assert(!handler.onAnalysisPoints, "There should be no onAnalysisPoints handler.");
+    assert(handler.onAnalysisResult, "There should be an onAnalysisResults handler");
 
     const pointsHandler: AnalysisHandler<void> = {};
     const allPoints: PointDescription[] = [];

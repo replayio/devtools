@@ -64,7 +64,7 @@ export function reset(): ResetAction {
  * Clears the tree and adds the new root node.
  */
 export function newRoot(): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const pause = ThreadFront.currentPause;
     assert(pause, "no current pause");
     const rootNodeFront = await ThreadFront.getRootDOMNode();
@@ -90,7 +90,7 @@ export function newRoot(): UIThunkAction {
  * Adds the children of a node to the tree and updates the parent's `children` property.
  */
 export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     if (!features.showWhitespaceNodes) {
       childFronts = childFronts.filter(
         node => node.nodeType !== TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
@@ -158,7 +158,7 @@ export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoView
  * If shouldScrollIntoView is true, the node is scrolled into view if its children need to be loaded.
  */
 export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const tree = getState().markup.tree;
     const node = tree[nodeId];
     assert(node, "node not found in markup state");
@@ -202,7 +202,7 @@ export function selectionChanged(
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
 ): UIThunkAction {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const selectedNode = selection.nodeFront;
     if (!selectedNode) {
       dispatch(updateSelectedNode(null));
@@ -241,11 +241,11 @@ export function selectionChanged(
 }
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
-  return ({ toolbox }) => {
+  return () => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);
-      toolbox.selection.setNodeFront(nodeFront, { reason });
+      window.gToolbox.selection.setNodeFront(nodeFront, { reason });
     }
   };
 }
@@ -318,7 +318,7 @@ function getNextNodeId(state: UIState, nodeId: string) {
 }
 
 export function onLeftKey(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
     if (selectedNodeId == null) {
@@ -340,7 +340,7 @@ export function onLeftKey(): UIThunkAction {
 }
 
 export function onRightKey(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
     if (selectedNodeId == null) {
@@ -364,7 +364,7 @@ export function onRightKey(): UIThunkAction {
 }
 
 export function onUpKey(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
     if (selectedNodeId == null) {
@@ -377,7 +377,7 @@ export function onUpKey(): UIThunkAction {
 }
 
 export function onDownKey(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
     if (selectedNodeId == null) {
@@ -390,7 +390,7 @@ export function onDownKey(): UIThunkAction {
 }
 
 export function onPageUpKey(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
     if (selectedNodeId == null) {
@@ -406,7 +406,7 @@ export function onPageUpKey(): UIThunkAction {
 }
 
 export function onPageDownKey(): UIThunkAction {
-  return ({ getState, dispatch }) => {
+  return (dispatch, getState) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
     if (selectedNodeId == null) {

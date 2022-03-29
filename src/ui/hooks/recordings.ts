@@ -10,6 +10,38 @@ import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 import { ColorSwatchIcon } from "@heroicons/react/solid";
+import {
+  SetRecordingIsPrivate,
+  SetRecordingIsPrivateVariables,
+} from "graphql/SetRecordingIsPrivate";
+import {
+  UpdateRecordingWorkspace,
+  UpdateRecordingWorkspaceVariables,
+} from "graphql/UpdateRecordingWorkspace";
+import { DeleteRecording, DeleteRecordingVariables } from "graphql/DeleteRecording";
+import { InitializeRecording, InitializeRecordingVariables } from "graphql/InitializeRecording";
+import { UpdateRecordingTitle, UpdateRecordingTitleVariables } from "graphql/UpdateRecordingTitle";
+import {
+  RequestRecordingAccess,
+  RequestRecordingAccessVariables,
+} from "graphql/RequestRecordingAccess";
+import {
+  AcceptRecordingCollaboratorRequest,
+  AcceptRecordingCollaboratorRequestVariables,
+} from "graphql/AcceptRecordingCollaboratorRequest";
+import { GetRecording, GetRecordingVariables } from "graphql/GetRecording";
+import { GetRecordingUserId, GetRecordingUserIdVariables } from "graphql/GetRecordingUserId";
+import { GetMyRecordings } from "graphql/GetMyRecordings";
+import { getRecordingPhoto, getRecordingPhotoVariables } from "graphql/getRecordingPhoto";
+import {
+  GetOwnerAndCollaborators,
+  GetOwnerAndCollaboratorsVariables,
+} from "graphql/GetOwnerAndCollaborators";
+import { GetRecordingPrivacy, GetRecordingPrivacyVariables } from "graphql/GetRecordingPrivacy";
+import {
+  GetWorkspaceRecordings,
+  GetWorkspaceRecordingsVariables,
+} from "graphql/GetWorkspaceRecordings";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -47,6 +79,7 @@ const GET_WORKSPACE_RECORDINGS = gql`
                 }
               }
               workspace {
+                id
                 hasPaymentMethod
                 subscription {
                   status
@@ -128,7 +161,7 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
   isAuthorized: boolean;
   loading: boolean;
 } {
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
     variables: { recordingId },
     skip: !recordingId,
   });
@@ -146,7 +179,7 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
 
 export function useIsTeamDeveloper() {
   const recordingId = getRecordingId();
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
     variables: { recordingId },
   });
 
@@ -154,14 +187,14 @@ export function useIsTeamDeveloper() {
     console.error("Apollo error while getting the user's role", error);
   }
 
-  return { isTeamDeveloper: data?.recording.userRole !== "team-user", loading };
+  return { isTeamDeveloper: data?.recording?.userRole !== "team-user", loading };
 }
 
 // If the user has no role, then they're either viewing a non-team recording they
 // don't own, or a team recording for a team that they don't belong to.
 export function useHasNoRole() {
   const recordingId = getRecordingId();
-  const { data, error, loading } = useQuery(GET_RECORDING, {
+  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
     variables: { recordingId },
   });
 
@@ -169,7 +202,7 @@ export function useHasNoRole() {
     console.error("Apollo error while getting the user's role", error);
   }
 
-  return { hasNoRole: data?.recording.userRole === "none", loading };
+  return { hasNoRole: data?.recording?.userRole === "none", loading };
 }
 
 function convertRecording(rec: any): Recording | undefined {
@@ -208,7 +241,7 @@ export function useGetRecordingPhoto(recordingId: RecordingId): {
   loading: boolean;
   screenData?: string;
 } {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<getRecordingPhoto, getRecordingPhotoVariables>(
     gql`
       query getRecordingPhoto($recordingId: UUID!) {
         recording(uuid: $recordingId) {
@@ -229,7 +262,7 @@ export function useGetRecordingPhoto(recordingId: RecordingId): {
   }
 
   const screenData = data.recording?.thumbnail;
-  return { error, loading, screenData };
+  return { error, loading, screenData: screenData ?? undefined };
 }
 
 export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
@@ -238,7 +271,10 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
   recording: Recording | undefined;
   collaborators: CollaboratorDbData[] | null;
 } {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<
+    GetOwnerAndCollaborators,
+    GetOwnerAndCollaboratorsVariables
+  >(
     gql`
       query GetOwnerAndCollaborators($recordingId: UUID!) {
         recording(uuid: $recordingId) {
@@ -307,12 +343,12 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
   }
-  const recording = convertRecording(data.recording);
+  const recording = convertRecording(data?.recording);
   return { collaborators, recording, loading, error };
 }
 
 export function useGetIsPrivate(recordingId: RecordingId) {
-  const { data, loading, error } = useQuery(
+  const { data, loading, error } = useQuery<GetRecordingPrivacy, GetRecordingPrivacyVariables>(
     gql`
       query GetRecordingPrivacy($recordingId: UUID!) {
         recording(uuid: $recordingId) {
@@ -334,13 +370,13 @@ export function useGetIsPrivate(recordingId: RecordingId) {
     console.error("Apollo error while getting isPrivate", error);
   }
 
-  const isPrivate = data.recording?.private;
+  const isPrivate = data?.recording?.private;
 
   return { isPrivate, loading, error };
 }
 
 export function useUpdateIsPrivate() {
-  const [updateIsPrivate] = useMutation(
+  const [updateIsPrivate] = useMutation<SetRecordingIsPrivate, SetRecordingIsPrivateVariables>(
     gql`
       mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
         updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
@@ -358,9 +394,12 @@ export function useUpdateIsPrivate() {
 export function useIsOwner() {
   const recordingId = useGetRecordingId();
   const { userId } = useGetUserId();
-  const { data, loading, error } = useQuery(GET_RECORDING_USER_ID, {
-    variables: { recordingId },
-  });
+  const { data, loading, error } = useQuery<GetRecordingUserId, GetRecordingUserIdVariables>(
+    GET_RECORDING_USER_ID,
+    {
+      variables: { recordingId },
+    }
+  );
 
   if (loading) {
     return false;
@@ -371,7 +410,7 @@ export function useIsOwner() {
     return false;
   }
 
-  const recording = data.recording;
+  const recording = data?.recording;
   if (!recording?.owner) {
     return false;
   }
@@ -382,7 +421,7 @@ export function useIsOwner() {
 export function useGetPersonalRecordings():
   | { recordings: null; loading: true }
   | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
+  const { data, error, loading } = useQuery<GetMyRecordings>(GET_MY_RECORDINGS, {
     pollInterval: 5000,
   });
 
@@ -404,7 +443,10 @@ export function useGetPersonalRecordings():
 export function useGetWorkspaceRecordings(
   currentWorkspaceId: WorkspaceId
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery(GET_WORKSPACE_RECORDINGS, {
+  const { data, error, loading } = useQuery<
+    GetWorkspaceRecordings,
+    GetWorkspaceRecordingsVariables
+  >(GET_WORKSPACE_RECORDINGS, {
     variables: { workspaceId: currentWorkspaceId },
     pollInterval: 5000,
   });
@@ -418,14 +460,20 @@ export function useGetWorkspaceRecordings(
   }
 
   let recordings: Recording[] = [];
-  if (data?.node?.recordings) {
-    recordings = data.node.recordings.edges.map(({ node }: any) => convertRecording(node));
+
+  // @ts-ignore
+  const recordingsData = data?.node?.recordings;
+  if (recordingsData) {
+    recordings = recordingsData.edges.map(({ node }: any) => convertRecording(node));
   }
   return { recordings, loading };
 }
 
 export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
-  const [updateRecordingWorkspace] = useMutation(
+  const [updateRecordingWorkspace] = useMutation<
+    UpdateRecordingWorkspace,
+    UpdateRecordingWorkspaceVariables
+  >(
     gql`
       mutation UpdateRecordingWorkspace($recordingId: ID!, $workspaceId: ID) {
         updateRecordingWorkspace(input: { id: $recordingId, workspaceId: $workspaceId }) {
@@ -585,7 +633,7 @@ export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
           recording: {
             uuid: recordingId,
             __typename: "Recording",
-            workspace: { __typename: "Workspace", id: targetWorkspaceId },
+            workspace: { __typename: "Workspace", id: targetWorkspaceId! },
           },
           success: true,
           __typename: "UpdateRecordingWorkspace",
@@ -599,15 +647,17 @@ export function useGetMyRecordings() {
   return useGetPersonalRecordings();
 }
 
+const DELETE_RECORDING = gql`
+  mutation DeleteRecording($recordingId: ID!) {
+    deleteRecording(input: { id: $recordingId }) {
+      success
+    }
+  }
+`;
+
 export function useDeleteRecording(onCompleted: () => void) {
-  const [deleteRecording] = useMutation(
-    gql`
-      mutation DeleteRecording($recordingId: ID!) {
-        deleteRecording(input: { id: $recordingId }) {
-          success
-        }
-      }
-    `,
+  const [deleteRecording] = useMutation<DeleteRecording, DeleteRecordingVariables>(
+    DELETE_RECORDING,
     {
       onCompleted,
     }
@@ -617,14 +667,8 @@ export function useDeleteRecording(onCompleted: () => void) {
 }
 
 export function useDeleteRecordingFromLibrary() {
-  const [deleteRecording] = useMutation(
-    gql`
-      mutation DeleteRecording($recordingId: ID!) {
-        deleteRecording(input: { id: $recordingId }) {
-          success
-        }
-      }
-    `
+  const [deleteRecording] = useMutation<DeleteRecording, DeleteRecordingVariables>(
+    DELETE_RECORDING
   );
 
   return (recordingId: RecordingId, workspaceId: WorkspaceId | null) => {
@@ -693,7 +737,7 @@ export function useDeleteRecordingFromLibrary() {
 }
 
 export function useInitializeRecording() {
-  const [initializeRecording] = useMutation(
+  const [initializeRecording] = useMutation<InitializeRecording, InitializeRecordingVariables>(
     gql`
       mutation InitializeRecording($recordingId: ID!, $title: String!, $workspaceId: ID) {
         initializeRecording(input: { id: $recordingId, title: $title, workspaceId: $workspaceId }) {
@@ -716,7 +760,7 @@ export function useInitializeRecording() {
 }
 
 export function useUpdateRecordingTitle() {
-  const [updateRecordingTitle] = useMutation(
+  const [updateRecordingTitle] = useMutation<UpdateRecordingTitle, UpdateRecordingTitleVariables>(
     gql`
       mutation UpdateRecordingTitle($recordingId: ID!, $title: String!) {
         updateRecordingTitle(input: { id: $recordingId, title: $title }) {
@@ -788,7 +832,10 @@ export async function getRecordingMetadata(id: string) {
 export function useRequestRecordingAccess() {
   const recordingId = useGetRecordingId();
 
-  const [requestRecordingAccess] = useMutation(
+  const [requestRecordingAccess] = useMutation<
+    RequestRecordingAccess,
+    RequestRecordingAccessVariables
+  >(
     gql`
       mutation RequestRecordingAccess($recordingId: ID!) {
         requestRecordingAccess(input: { recordingId: $recordingId }) {
@@ -802,7 +849,10 @@ export function useRequestRecordingAccess() {
 }
 
 export function useAcceptRecordingRequest() {
-  const [acceptRecordingRequest] = useMutation(
+  const [acceptRecordingRequest] = useMutation<
+    AcceptRecordingCollaboratorRequest,
+    AcceptRecordingCollaboratorRequestVariables
+  >(
     gql`
       mutation AcceptRecordingCollaboratorRequest($requestId: ID!) {
         acceptRecordingCollaboratorRequest(input: { id: $requestId }) {

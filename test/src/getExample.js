@@ -49,6 +49,11 @@ async function recordToFile(state, browserName, example) {
   const browser = await playwright[browserName].launch({
     executablePath: state.browserPath,
     headless: state.headless,
+    env: {
+      ...process.env,
+      RECORD_REPLAY_DRIVER: state.driverPath,
+      RECORD_REPLAY_VERBOSE: state.diverPath ? "1" : undefined,
+    },
   });
 
   const context = await browser.newContext();
@@ -75,6 +80,7 @@ async function upload(state, example) {
 
     const recordingId = await cli.uploadRecording(id, {
       apiKey: state.replayApiKey,
+      server: state.dispatchServer,
     });
 
     console.log(

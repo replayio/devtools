@@ -17,6 +17,8 @@ import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { features } from "ui/utils/prefs";
 import { getFocusRegion } from "ui/reducers/timeline";
+import NetworkRequestPreview from "./NetworkRequestPreview";
+import { useFeature } from "ui/hooks/settings";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function BorderBridge({
@@ -100,6 +102,18 @@ function CommentItem({
   );
 }
 
+function CommentTarget({ comment }: { comment: Comment }) {
+  const { value: networkRequestComments } = useFeature("networkRequestComments");
+
+  if (comment.sourceLocation) {
+    return <CommentSource comment={comment} />;
+  } else if (comment.networkRequestId && networkRequestComments) {
+    return <NetworkRequestPreview networkRequestId={comment.networkRequestId} />;
+  }
+
+  return null;
+}
+
 type PropsFromParent = {
   comment: Comment;
   comments: Comment[];
@@ -140,7 +154,7 @@ function CommentCard({
   if (comment.id === PENDING_COMMENT_ID) {
     return (
       <div
-        className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeTextFieldBgcolor transition`}
+        className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeBase-90 transition`}
         onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
         onMouseLeave={() => setHoveredComment(null)}
         onMouseDown={() => {
@@ -150,7 +164,7 @@ function CommentCard({
       >
         <div className={classNames("w-full border-l-2 border-secondaryAccent py-2.5")}>
           <div className={classNames("space-y-2 px-2.5 pl-2")}>
-            {comment.sourceLocation && <CommentSource comment={comment} />}
+            <CommentTarget comment={comment} />
             <FocusContext.Provider
               value={{
                 autofocus: true,
@@ -159,7 +173,7 @@ function CommentCard({
                 close: () => setIsEditorOpen(false),
               }}
             >
-              <NewCommentEditor comment={comment} type={"new_comment"} />
+              <NewCommentEditor data={{ type: "new_comment", comment }} />
             </FocusContext.Provider>
           </div>
         </div>
@@ -171,7 +185,7 @@ function CommentCard({
     <div
       className={classNames(
         `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-themeBodyBgcolor"
+        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor"
       )}
       onMouseDown={e => {
         seekToComment(comment);
@@ -189,7 +203,7 @@ function CommentCard({
           "border-transparent": !isPaused,
         })}
       >
-        {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
+        <CommentTarget comment={comment} />
         <CommentItem type="comment" comment={comment as Comment} pendingComment={pendingComment} />
         {comment.replies?.map((reply: Reply, i: number) => (
           <div key={replyKeys[i]}>
@@ -206,16 +220,17 @@ function CommentCard({
             }}
           >
             <NewCommentEditor
-              key={PENDING_COMMENT_ID}
-              comment={{
-                ...comment,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                content: "",
-                parentId: comment.id,
-                id: PENDING_COMMENT_ID,
+              data={{
+                type: "new_reply",
+                comment: {
+                  ...comment,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  content: "",
+                  parentId: comment.id,
+                  id: PENDING_COMMENT_ID,
+                },
               }}
-              type={"new_reply"}
             />
           </FocusContext.Provider>
         ) : (

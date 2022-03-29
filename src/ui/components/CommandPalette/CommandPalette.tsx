@@ -8,7 +8,7 @@ import { UIState } from "ui/state";
 import { ExperimentalUserSettings } from "ui/types";
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
-const { filter } = require("fuzzaldrin-plus");
+import { filter } from "fuzzaldrin-plus";
 import styles from "./CommandPalette.module.css";
 
 export type Command = {
@@ -30,12 +30,18 @@ export type CommandKey =
   | "open_print_statements"
   | "open_react_devtools"
   | "open_sources"
+  | "pin_to_bottom"
+  | "pin_to_left"
+  | "pin_to_bottom_right"
   | "show_comments"
   | "show_console_filters"
   | "show_events"
   | "show_privacy"
   | "show_replay_info"
-  | "show_sharing";
+  | "show_sharing"
+  | "toggle_dark_mode"
+  | "toggle_edit_focus"
+  | "toggle_video";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -59,6 +65,12 @@ const COMMANDS: readonly Command[] = [
   { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
+  { key: "toggle_dark_mode", label: "Toggle Dark Mode" },
+  { key: "toggle_edit_focus", label: "Toggle Edit Focus Mode" },
+  { key: "toggle_video", label: "Toggle Video" },
+  { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
+  { key: "pin_to_left", label: "Pin Toolbox To Left" },
+  { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },
 ] as const;
 
 const DEFAULT_COMMANDS: readonly CommandKey[] = [
@@ -74,8 +86,8 @@ const ITEMS_TO_SHOW = 4;
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
 
-  const commands: Command[] = searchString
-    ? filter(COMMANDS, searchString, { key: "label" })
+  const commands: readonly Command[] = searchString
+    ? filter(COMMANDS as Command[], searchString, { key: "label" })
     : COMMANDS;
 
   const enabledCommands = commands.filter(command => {
@@ -102,7 +114,7 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
 
 function PaletteShortcut() {
   return (
-    <div className="flex absolute right-4 select-none text-primaryAccent">
+    <div className="absolute right-4 flex select-none text-primaryAccent">
       <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
       <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
     </div>
@@ -145,7 +157,7 @@ function CommandPalette({
 
   return (
     <div
-      className={`${styles.commandPalleteWrapper} flex w-full flex-col overflow-hidden rounded-md bg-themeTabBgcolor shadow-xl`}
+      className={`${styles.commandPalleteWrapper} flex w-full flex-col overflow-hidden rounded-md bg-tabBgcolor shadow-xl`}
     >
       <div className={`${styles.commandPallete} p-3`}>
         <div className="relative flex items-center text-primaryAccent">

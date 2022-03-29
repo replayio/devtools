@@ -156,6 +156,13 @@ class Tabs extends PureComponent {
   }
 
   render() {
+    const { toolboxLayout, tabSources } = this.props;
+    const isSingleColumnLayout = ["left", "bottom"].includes(toolboxLayout);
+
+    if (isSingleColumnLayout && !tabSources.length) {
+      return null;
+    }
+
     return <div className="source-header">{this.renderTabs()}</div>;
   }
 }

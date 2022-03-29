@@ -61,7 +61,7 @@ function NotificationPreferences({
 function PrivacyPreferences() {
   const [disableLogRocket, setDisableLogRocket] = useState<boolean>();
   const { userSettings, loading } = hooks.useGetUserSettings();
-  const updateLogRocket = hooks.useUpdateUserSetting("disableLogRocket", "Boolean");
+  const updateLogRocket = hooks.useUpdateUserSetting("disableLogRocket");
 
   const toggle = (newValue: boolean) => {
     setDisableLogRocket(newValue);

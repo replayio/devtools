@@ -276,7 +276,12 @@ function ReactDevtoolsPanel({
     compareNumericStrings(reactInitPoint, currentPoint) <= 0;
 
   if (!isReady) {
-    return <div className="p-4">React DevTools not yet initialised at this point in time.</div>;
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <div>React DevTools not yet loaded.</div>
+        <div>Try picking a different point on the timeline.</div>
+      </div>
+    );
   }
 
   const ReactDevTools = createReactDevTools(

@@ -60,6 +60,6 @@ export function sanitizeAction(action: any, logSanitized: boolean) {
 
 export const sanityCheckMiddleware: Middleware<{}, UIState, Dispatch<UIAction>> =
   store => next => action => {
-    sanitizeAction(action, true);
+    sanitizeAction(action, false);
     return next(action);
   };

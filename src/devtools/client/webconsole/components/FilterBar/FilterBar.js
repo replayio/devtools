@@ -4,86 +4,23 @@
 "use strict";
 
 // React & Redux
-const React = require("react");
-const { Component } = React;
-const { connect } = require("react-redux");
-
-// Actions
-const actions = require("devtools/client/webconsole/actions/index");
-
-// Selectors
-const { getFilteredMessagesCount } = require("devtools/client/webconsole/selectors/messages");
-const { getAllMessagesById } = require("devtools/client/webconsole/selectors/messages");
+import React from "react";
 
 // Constants
-const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
+import FilterSearchBox from "./FilterSearchBox";
+import ClearButton from "./ClearButton";
+import { FilterDrawerToggle } from "./FilterDrawerToggle";
 
-const FilterSearchBox = require("./FilterSearchBox").default;
-const ClearButton = require("./ClearButton").default;
-const { FilterDrawerToggle } = require("./FilterDrawerToggle");
-
-const PropTypes = require("prop-types");
-
-class FilterBar extends Component {
-  static get propTypes() {
-    return {
-      displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
-      filteredMessagesCount: PropTypes.object.isRequired,
-      allMessagesById: PropTypes.object,
-    };
-  }
-
-  constructor(props) {
-    super(props);
-  }
-
-  shouldComponentUpdate(nextProps) {
-    const { displayMode, filteredMessagesCount, allMessagesById } = this.props;
-
-    if (nextProps.displayMode !== displayMode) {
-      return true;
-    }
-
-    if (JSON.stringify(nextProps.filteredMessagesCount) !== JSON.stringify(filteredMessagesCount)) {
-      return true;
-    }
-
-    if (nextProps.allMessagesById !== allMessagesById) {
-      return true;
-    }
-
-    return false;
-  }
-
-  render() {
-    const { displayMode } = this.props;
-
-    return (
-      <div
-        className={`webconsole-filteringbar-wrapper text-xs ${displayMode}`}
-        aria-live="off"
-        ref={node => (this.wrapperNode = node)}
-      >
-        <div className="devtools-toolbar devtools-input-toolbar webconsole-filterbar-primary space-x-2 px-2 py-1">
-          <FilterDrawerToggle />
-          <FilterSearchBox />
-          <ClearButton />
-        </div>
+function FilterBar() {
+  return (
+    <div className={`webconsole-filteringbar-wrapper text-xs`} aria-live="off">
+      <div className="devtools-toolbar devtools-input-toolbar webconsole-filterbar-primary space-x-2 px-2 py-1">
+        <FilterDrawerToggle />
+        <FilterSearchBox />
+        <ClearButton />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
-function mapStateToProps(state) {
-  return {
-    filteredMessagesCount: getFilteredMessagesCount(state),
-    allMessagesById: getAllMessagesById(state),
-  };
-}
-
-export default connect(mapStateToProps, {
-  filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
-  messagesClearEvaluations: actions.messagesClearEvaluations,
-  filterTextSet: actions.filterTextSet,
-  filterToggle: actions.filterToggle,
-})(FilterBar);
+export default FilterBar;

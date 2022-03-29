@@ -93,17 +93,20 @@ function PanelSummary({
     const hits = analysisPoints === "error" ? "10k" : prefs.maxHitsDisplayed;
 
     return (
-      <div className="summary flex items-center bg-red-100 text-red-700">
+      <div className="summary flex items-center rounded-t bg-errorBgcolor text-errorColor">
         <Popup
           trigger={
             <div className="flex items-center space-x-2 overflow-hidden pl-2">
               <MaterialIcon className="text-xl">error</MaterialIcon>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre hover:underline">
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+                Use {""}
                 <a
-                  href="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#1e6ed519f3f849458a7aa88b7be497b6"
+                  href="https://www.notion.so/replayio/Viewer-26591deb256c473a946d0f64abb67859#bf19baaa57004b0d9282cc0a02b281f5"
                   rel="noreferrer noopener"
+                  className="underline "
                   target="_blank"
-                >{`Disabled because it was hit ${hits}+ times`}</a>
+                >{`Focus Mode`}</a>{" "}
+                to reduce the number of hits.
               </span>
             </div>
           }

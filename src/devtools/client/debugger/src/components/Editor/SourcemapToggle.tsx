@@ -85,13 +85,13 @@ export function SourcemapToggle({
   };
 
   return (
-    <div className="mapped-source flex items-center space-x-1 pl-3">
+    <div className="mapped-source flex items-center space-x-1 pt-0.5 pl-3">
       <Toggle
-        enabled={selectedSource.isOriginal}
+        enabled={ThreadFront.isSourceMappedSource(selectedSource.id)}
         setEnabled={setEnabled}
         disabled={!alternateSourceId}
       />
-      {!alternateSourceId ? <SourcemapError onClick={onErrorClick} /> : <div>Original Source</div>}
+      {!alternateSourceId ? <SourcemapError onClick={onErrorClick} /> : <div>Use Source Map</div>}
     </div>
   );
 }

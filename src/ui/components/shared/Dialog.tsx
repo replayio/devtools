@@ -1,12 +1,17 @@
 import classNames from "classnames";
-import React, { HTMLProps, ReactNode } from "react";
+import React, { HTMLProps } from "react";
 import ReplayLogo from "./ReplayLogo";
 
 export type DialogPropTypes = HTMLProps<HTMLDivElement>;
 
 export function Dialog({ children, className, ...props }: DialogPropTypes) {
   return (
-    <div {...props} className={classNames("dialog", className)} role="dialog">
+    <div
+      {...props}
+      className={classNames("dialog flex flex-col items-center", className)}
+      role="dialog"
+      style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
+    >
       {children}
     </div>
   );
@@ -34,18 +39,12 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p
-      {...props}
-      className="mb-2 text-center text-sm text-gray-500"
-      style={{ minHeight: "2.5rem" }}
-    >
+    <p {...props} className="mb-2 text-center text-sm text-gray-500">
       {children}
     </p>
   );
 };
 
 export const DialogActions = ({ children, className, ...props }: HTMLProps<HTMLDivElement>) => {
-  return (
-    <div className={classNames("mt-6 flex w-full justify-between", className)}>{children}</div>
-  );
+  return <div className={classNames("mt-6 flex w-full justify-center", className)}>{children}</div>;
 };

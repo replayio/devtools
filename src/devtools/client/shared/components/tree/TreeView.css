@@ -159,7 +159,7 @@
   background: linear-gradient(rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05)),
     radial-gradient(1px 60% at right, rgba(0, 0, 0, 0.8) 0%, transparent 80%) repeat-x
       var(--tree-header-background);
-  color: var(--theme-body-color);
+  color: var(--body-color);
   white-space: nowrap;
 }
 

@@ -5,10 +5,9 @@
 "use strict";
 
 // React & Redux
-const { createElement, createFactory, useEffect } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
-const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
-
+const Message = require("devtools/client/webconsole/components/Output/Message");
 PaywallMessage.displayName = "PaywallMessage";
 
 PaywallMessage.propTypes = {
@@ -24,12 +23,12 @@ function PaywallMessage(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
   const { indent, source, level, timeStamp, executionPointTime } = message;
 
-  return Message({
+  return React.createElement(Message, {
     source,
     type: "paywall",
     level,
     topLevelClasses: [],
-    messageBody: createElement("span", {
+    messageBody: React.createElement("span", {
       className: "text-gray-500 font-bold",
       children: "Evaluations are only available for Developers in the Team plan.",
     }),

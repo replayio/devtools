@@ -10,11 +10,11 @@ import {
   CommandResult,
 } from "@recordreplay/protocol";
 import { setUnexpectedError } from "ui/actions/session";
-import { UIStore } from "ui/actions";
+import { UIStore, UIThunkAction } from "ui/actions";
 import { Action, Dispatch } from "redux";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import { UnexpectedError } from "ui/state/app";
-import { requiresWindow } from "ssr";
+import { requiresWindow } from "../ssr";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 
 interface Message {
@@ -171,8 +171,8 @@ export function getDisconnectionError(): UnexpectedError {
   };
 }
 
-function onSocketClose() {
-  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
+function onSocketClose(): UIThunkAction {
+  return dispatch => {
     log("Socket Closed");
     gSocketOpen = false;
 
@@ -182,12 +182,12 @@ function onSocketClose() {
   };
 }
 
-function onSocketError(evt: Event) {
+function onSocketError(evt: Event): UIThunkAction {
   console.error("Socket Error", evt);
   // If the socket has errored, the connection will close. So let's set `willClose`
   // so that we show _this_ error message, and not the `onSocketClose` error message
   willClose = true;
-  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
+  return dispatch => {
     log("Socket Error");
     if (Date.now() - lastReceivedMessageTime < 300000) {
       dispatch(

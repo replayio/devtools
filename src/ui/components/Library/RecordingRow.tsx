@@ -12,6 +12,7 @@ import { actions } from "ui/actions";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 import styles from "./Library.module.css";
+import { useGetUserPermissions } from "ui/hooks/users";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -74,10 +75,15 @@ function RecordingRow({
   removeSelectedId,
   addSelectedId,
 }: RecordingRowProps) {
-  const { userId, loading } = hooks.useGetUserId();
-  const isOwner = userId == recording.user?.id;
+  const { permissions, loading: permissionsLoading } = useGetUserPermissions(recording);
+  const allowSelecting =
+    isEditing && (permissions.moveToLibrary || permissions.move || permissions.delete);
 
   const toggleChecked = () => {
+    if (!allowSelecting) {
+      return;
+    }
+
     if (selected) {
       removeSelectedId(recording.id);
     } else {
@@ -85,7 +91,7 @@ function RecordingRow({
     }
   };
 
-  if (loading) {
+  if (permissionsLoading) {
     return null;
   }
 
@@ -95,7 +101,7 @@ function RecordingRow({
         className={`group flex cursor-pointer flex-row border-b border-themeBorder ${styles.libraryRow}`}
       >
         <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre py-3 px-4">
-          {isEditing && isOwner ? (
+          {allowSelecting ? (
             <input
               type="checkbox"
               onClick={e => e.stopPropagation()}
@@ -160,7 +166,7 @@ function RecordingRow({
           className="relative flex w-6 flex-shrink-0 flex-row items-center justify-center py-3 pr-4"
           onClick={e => e.stopPropagation()}
         >
-          {isOwner && !isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
+          {!isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
         </div>
       </div>
     </RowWrapper>

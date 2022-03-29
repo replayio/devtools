@@ -1,5 +1,5 @@
 .right-sidebar {
-  background: var(--theme-tab-bgcolor-alt-subtle);
+  background: var(--tab-bgcolor-alt-subtle);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -19,7 +19,7 @@
   font-size: 15px;
   line-height: 19px;
   font-weight: 400;
-  color: var(--theme-body-color);
+  color: var(--body-color);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

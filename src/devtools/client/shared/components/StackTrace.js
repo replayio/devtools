@@ -4,15 +4,15 @@
 
 "use strict";
 
-const { Component, createFactory } = require("react");
+const React = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const Frame = createFactory(require("devtools/client/shared/components/Frame"));
+const Frame = require("devtools/client/shared/components/Frame");
 
 const l10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
-class AsyncFrameClass extends Component {
+class AsyncFrameClass extends React.Component {
   static get propTypes() {
     return {
       asyncCause: PropTypes.string.isRequired,
@@ -29,7 +29,7 @@ class AsyncFrameClass extends Component {
   }
 }
 
-class StackTrace extends Component {
+class StackTrace extends React.Component {
   static get propTypes() {
     return {
       stacktrace: PropTypes.array.isRequired,
@@ -49,7 +49,7 @@ class StackTrace extends Component {
       if (s.asyncCause) {
         frames.push(
           "\t",
-          AsyncFrame({
+          React.createElement(AsyncFrameClass, {
             key: `${i}-asyncframe`,
             asyncCause: s.asyncCause,
           }),
@@ -60,7 +60,7 @@ class StackTrace extends Component {
       const source = s.filename;
       frames.push(
         "\t",
-        Frame({
+        React.createElement(Frame, {
           key: `${i}-frame`,
           frame: {
             functionDisplayName: s.functionName,
@@ -80,7 +80,5 @@ class StackTrace extends Component {
     return dom.div({ className: "stack-trace" }, frames);
   }
 }
-
-const AsyncFrame = createFactory(AsyncFrameClass);
 
 module.exports = StackTrace;

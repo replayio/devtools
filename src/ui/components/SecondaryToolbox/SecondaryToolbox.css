@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background: var(--theme-tab-bgcolor);
+  background: var(--tab-bgcolor);
 }
 
 .secondary-toolbox-header .panel-buttons {
@@ -22,7 +22,6 @@
 
 .secondary-toolbox-header button {
   position: relative;
-  padding: 8px 12px;
   height: calc(var(--editor-header-height) - 1px);
   cursor: pointer;
   transition: color 200ms;
@@ -31,6 +30,14 @@
   align-items: flex-end;
   overflow: hidden;
   background-color: var(--tab-bgcolor);
+}
+
+.secondary-toolbox-header .panel-buttons button {
+  padding: 8px 12px;
+}
+
+.secondary-toolbox-header .panel-buttons button {
+  padding: 8px 12px;
 }
 
 .secondary-toolbox-header button .label {

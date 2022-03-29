@@ -27,6 +27,7 @@ type MixpanelEvent =
   | ["comments.delete"]
   | ["comments.focus"]
   | ["comments.select_location"]
+  | ["comments.select_request"]
   | ["comments.start_edit"]
   | ["console.clear_messages"]
   | ["console.overflow"]

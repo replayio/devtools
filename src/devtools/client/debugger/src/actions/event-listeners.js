@@ -36,14 +36,14 @@ export async function setupEventListeners(store) {
 }
 
 function updateEventListeners(newEvents) {
-  return async ({ dispatch, client }) => {
+  return async (dispatch, getState, { client }) => {
     dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
     await client.setEventListenerBreakpoints(newEvents);
   };
 }
 
 function setEventListeners(newEvents) {
-  return async ({ client }) => {
+  return async (dispatch, getState, { client }) => {
     await client.setEventListenerBreakpoints(newEvents);
   };
 }
@@ -56,7 +56,7 @@ async function updateExpanded(dispatch, newExpanded) {
 }
 
 export function addEventListenerBreakpoints(eventsToAdd) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     try {
       const activeListenerBreakpoints = selectors.getActiveEventListeners(getState());
       const newEvents = uniq([...eventsToAdd, ...activeListenerBreakpoints]);
@@ -68,7 +68,7 @@ export function addEventListenerBreakpoints(eventsToAdd) {
 }
 
 export function removeEventListenerBreakpoints(eventsToRemove) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const activeListenerBreakpoints = selectors.getActiveEventListeners(getState());
 
     const newEvents = remove(activeListenerBreakpoints, event => !eventsToRemove.includes(event));
@@ -78,7 +78,7 @@ export function removeEventListenerBreakpoints(eventsToRemove) {
 }
 
 export function addEventListenerExpanded(category) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const expanded = await selectors.getEventListenerExpanded(getState());
 
     const newExpanded = uniq([...expanded, category]);
@@ -88,7 +88,7 @@ export function addEventListenerExpanded(category) {
 }
 
 export function removeEventListenerExpanded(category) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const expanded = await selectors.getEventListenerExpanded(getState());
 
     const newExpanded = expanded.filter(expand => expand != category);
@@ -98,19 +98,17 @@ export function removeEventListenerExpanded(category) {
 }
 
 export function getEventListenerBreakpointTypes() {
-  return async ({ dispatch, client }) => {
+  return async (dispatch, getState, { client }) => {
     const categories = await getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
-    if (features.eventCount) {
-      const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
-      dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
-    }
+    const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
+    dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
   };
 }
 
 export function loadAdditionalPoints() {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     if (!selectors.isLoadingAdditionalPoints(getState())) {
       return;
     }

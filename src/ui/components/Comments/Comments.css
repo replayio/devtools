@@ -79,7 +79,7 @@ deletes the comment */
 .onboarding-text h2 {
   font-size: 18px;
   font-weight: bold;
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .onboarding-text {

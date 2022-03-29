@@ -18,10 +18,9 @@ const lazyContainer = {
   },
 };
 
-const exports = module.exports;
-exports.getComputedStyle = node => lazyContainer.CssLogic.getComputedStyle(node);
+module.exports.getComputedStyle = node => lazyContainer.CssLogic.getComputedStyle(node);
 
-exports.getBindingElementAndPseudo = node =>
+module.exports.getBindingElementAndPseudo = node =>
   lazyContainer.CssLogic.getBindingElementAndPseudo(node);
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -103,7 +102,7 @@ function isXUL(window) {
     (window.isChromeWindow && window.document.documentElement.getAttribute("scrolling") === "false")
   );
 }
-exports.isXUL = isXUL;
+module.exports.isXUL = isXUL;
 
 /**
  * Returns true if a DOM node is "valid", where "valid" means that the node isn't a dead
@@ -136,7 +135,7 @@ function isNodeValid(node, nodeType = Node.ELEMENT_NODE) {
 
   return true;
 }
-exports.isNodeValid = isNodeValid;
+module.exports.isNodeValid = isNodeValid;
 
 /**
  * Helper function that creates SVG DOM nodes.
@@ -156,7 +155,7 @@ function createSVGNode(win, options) {
   options.namespace = SVG_NS;
   return createNode(win, options);
 }
-exports.createSVGNode = createSVGNode;
+module.exports.createSVGNode = createSVGNode;
 
 /**
  * Helper function that creates DOM nodes.
@@ -196,7 +195,7 @@ function createNode(win, options) {
 
   return node;
 }
-exports.createNode = createNode;
+module.exports.createNode = createNode;
 
 /**
  * Every highlighters should insert their markup content into the document's
@@ -484,7 +483,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
     return this._content;
   },
 };
-exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHelper;
+module.exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHelper;
 
 /**
  * Move the infobar to the right place in the highlighter. This helper method is utilized
@@ -607,4 +606,4 @@ function moveInfobar(container, bounds, win, options = {}) {
 
   container.setAttribute("position", positionAttribute);
 }
-exports.moveInfobar = moveInfobar;
+module.exports.moveInfobar = moveInfobar;

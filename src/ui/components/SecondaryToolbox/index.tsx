@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
@@ -21,6 +21,10 @@ import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
 import ReplayLogo from "../shared/ReplayLogo";
+import { getShowVideoPanel } from "ui/reducers/layout";
+import { ShowVideoButton } from "./ToolboxButton";
+import SourcesTabLabel from "./SourcesTabLabel";
+import { setSelectedPanel } from "ui/actions/layout";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -28,27 +32,18 @@ interface PanelButtonsProps {
   hasReactComponents: boolean;
   toolboxLayout: ToolboxLayout;
   isNode: boolean;
-  selectedPanel: SecondaryPanelName;
-  setSelectedPanel: (panel: SecondaryPanelName) => any;
 }
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
-  label: string;
 }
 
-const PanelButtons: FC<PanelButtonsProps> = ({
-  hasReactComponents,
-  toolboxLayout,
-  isNode,
-  selectedPanel,
-  setSelectedPanel,
-}) => {
-  const { userSettings } = hooks.useGetUserSettings();
-  const { showReact } = userSettings;
+const PanelButton: FC<PanelButtonProps> = ({ panel, children }) => {
+  const selectedPanel = useSelector(selectors.getSelectedPanel);
+  const dispatch = useDispatch();
 
   const onClick = (panel: SecondaryPanelName) => {
-    setSelectedPanel(panel);
+    dispatch(setSelectedPanel(panel));
     trackEvent(`toolbox.secondary.${panel}_select`);
 
     if (["debugger", "inspector", "react-components"].includes(panel)) {
@@ -56,25 +51,34 @@ const PanelButtons: FC<PanelButtonsProps> = ({
     }
   };
 
-  const PanelButton: FC<PanelButtonProps> = ({ panel, label }) => (
+  return (
     <button
-      className={classnames(`${panel}-panel-button`, {
+      className={classnames(`${panel}-panel-button relative`, {
         expanded: selectedPanel === panel,
       })}
       onClick={() => onClick(panel)}
     >
-      <div className="label">{label}</div>
+      <div className="label">{children}</div>
     </button>
   );
+};
+
+const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout, isNode }) => {
+  const { userSettings } = hooks.useGetUserSettings();
+  const { showReact } = userSettings;
 
   return (
-    <div className="theme-tab-font-size flex flex-row items-center overflow-hidden">
+    <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
-      <PanelButton label="Console" panel="console" />
-      {!isNode && <PanelButton label="Elements" panel="inspector" />}
-      {toolboxLayout !== "ide" && <PanelButton label="Sources" panel="debugger" />}
-      {hasReactComponents && showReact && <PanelButton label="React" panel="react-components" />}
-      <PanelButton label="Network" panel="network" />
+      <PanelButton panel="console">Console</PanelButton>
+      {!isNode && <PanelButton panel="inspector">Elements</PanelButton>}
+      {toolboxLayout !== "ide" && (
+        <PanelButton panel="debugger">
+          <SourcesTabLabel />
+        </PanelButton>
+      )}
+      {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
+      <PanelButton panel="network">Network</PanelButton>
     </div>
   );
 };
@@ -118,6 +122,7 @@ function SecondaryToolbox({
   recordingTarget,
   hasReactComponents,
 }: PropsFromRedux) {
+  const showVideoPanel = useSelector(getShowVideoPanel);
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
@@ -129,22 +134,21 @@ function SecondaryToolbox({
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          selectedPanel={selectedPanel}
-          setSelectedPanel={setSelectedPanel}
           isNode={isNode}
           hasReactComponents={hasReactComponents}
           toolboxLayout={toolboxLayout}
         />
-        <ToolboxOptions />
+        <div className="flex">
+          {!showVideoPanel || true ? <ShowVideoButton /> : null}
+          <ToolboxOptions />
+        </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
         {selectedPanel === "network" && <NetworkMonitor />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
-        {toolboxLayout !== "ide" && selectedPanel === "debugger" ? (
-          <EditorPane toolboxLayout={toolboxLayout} />
-        ) : null}
+        {toolboxLayout !== "ide" && selectedPanel === "debugger" ? <EditorPane /> : null}
       </Redacted>
     </div>
   );

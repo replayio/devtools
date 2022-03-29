@@ -9,7 +9,6 @@
  * @module actions/sources
  */
 
-import { stringToSourceActorId } from "../../reducers/source-actors";
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
 import { toggleBlackBox } from "./blackbox";
@@ -37,7 +36,7 @@ import { ThreadFront } from "protocol/thread";
 // If a request has been made to show this source, go ahead and
 // select it.
 function checkSelectedSource(cx, sourceId) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const state = getState();
     const pendingLocation = getPendingSelectedLocation(state);
 
@@ -67,7 +66,7 @@ function checkSelectedSource(cx, sourceId) {
 }
 
 function checkPendingBreakpoints(cx, sourceId) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     // source may have been modified by selectLocation
     const source = getSource(getState(), sourceId);
     if (!source) {
@@ -103,7 +102,7 @@ function checkPendingBreakpoints(cx, sourceId) {
 }
 
 function restoreBlackBoxedSources(cx, sources) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const tabs = getBlackBoxList();
     if (tabs.length == 0) {
       return;
@@ -117,7 +116,7 @@ function restoreBlackBoxedSources(cx, sources) {
 }
 
 export function newQueuedSources(sourceInfo) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const generated = [];
     const original = [];
     for (const source of sourceInfo) {
@@ -138,13 +137,13 @@ export function newQueuedSources(sourceInfo) {
 }
 
 export function newOriginalSource(sourceInfo) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const sources = await dispatch(newOriginalSources([sourceInfo]));
     return sources[0];
   };
 }
 export function newOriginalSources(sourceInfo) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const state = getState();
     const seen = new Set();
     const sources = [];
@@ -184,13 +183,13 @@ export function newOriginalSources(sourceInfo) {
 }
 
 export function newGeneratedSource(sourceInfo) {
-  return async ({ dispatch }) => {
+  return async dispatch => {
     const sources = await dispatch(newGeneratedSources([sourceInfo]));
     return sources[0];
   };
 }
 export function newGeneratedSources(sourceInfo) {
-  return async ({ dispatch, getState, client }) => {
+  return async (dispatch, getState, { client }) => {
     const resultIds = [];
     const newSourcesObj = {};
     const newSourceActors = [];
@@ -229,13 +228,11 @@ export function newGeneratedSources(sourceInfo) {
         };
       }
 
-      const actorId = stringToSourceActorId(source.actor);
-
       // We are sometimes notified about a new source multiple times if we
       // request a new source list and also get a source event from the server.
-      if (!hasSourceActor(getState(), actorId)) {
+      if (!hasSourceActor(getState(), source.actor)) {
         newSourceActors.push({
-          id: actorId,
+          id: source.actor,
           actor: source.actor,
           thread,
           source: newId,
@@ -281,13 +278,13 @@ export function newGeneratedSources(sourceInfo) {
 }
 
 function addSources(cx, sources) {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     dispatch({ type: "ADD_SOURCES", cx, sources });
   };
 }
 
 function checkNewSources(cx, sources) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     for (const source of sources) {
       dispatch(checkSelectedSource(cx, source.id));
     }
@@ -299,7 +296,7 @@ function checkNewSources(cx, sources) {
 }
 
 export function ensureSourceActor(thread, sourceActor) {
-  return async function ({ dispatch, getState, client }) {
+  return async function (dispatch, getState, { client }) {
     await sourceQueue.flush();
     if (hasSourceActor(getState(), sourceActor)) {
       return Promise.resolve();

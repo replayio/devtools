@@ -4,81 +4,57 @@ const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 import { pref } from "devtools/shared/services";
 
 // app prefs.
-pref("devtools.split-console", false);
-pref("devtools.user", "{}");
-pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.toolbox-size", "50%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
-pref("devtools.sidePanelSize", "240px");
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
-pref("devtools.libraryFilterTime", "all");
-pref("devtools.libraryFilterAssociation", "all");
 pref("devtools.logTelemetryEvent", false);
 pref("devtools.showRedactions", false);
 pref("devtools.disableLogRocket", false);
+pref("devtools.listenForMetrics", false);
+pref("devtools.disableCache", false);
+pref("devtools.sidePanelSize", "240px");
 
 // app features
-pref("devtools.features.auth0", true);
 pref("devtools.features.columnBreakpoints", false);
-pref("devtools.features.commentEmojis", false);
-pref("devtools.features.commentMentions", false);
-pref("devtools.features.comments", true);
 pref("devtools.features.darkMode", false);
-pref("devtools.features.consoleHover", false);
-pref("devtools.features.eventCount", true);
 pref("devtools.features.httpBodies", true);
-pref("devtools.features.launchBrowser", true);
-pref("devtools.features.reactDevtools", false);
-pref("devtools.features.smoothPlayback", true);
-pref("devtools.features.termsOfService", false);
-pref("devtools.features.transcriptHover", false);
-pref("devtools.features.users", true);
-pref("devtools.features.videoComments", false);
 pref("devtools.features.videoPlayback", false);
-pref("devtools.features.widgetHover", false);
 pref("devtools.features.commentAttachments", false);
+pref("devtools.features.networkRequestComments", true);
+pref("devtools.features.useMultipleControllers", false);
+pref("devtools.features.multipleControllerUseSnapshots", false);
+pref("devtools.features.breakpointPanelAutocomplete", true);
+pref("devtools.features.codeHeatMaps", false);
 
 export const prefs = new PrefsHelper("devtools", {
-  user: ["Json", "user"],
-  recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
   toolboxSize: ["String", "toolbox-size"],
   viewMode: ["String", "view-mode"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
-  libraryFilterTime: ["String", "libraryFilterTime"],
-  libraryFilterAssociation: ["String", "libraryFilterAssociation"],
   logTelemetryEvent: ["Bool", "logTelemetryEvent"],
   showRedactions: ["Bool", "showRedactions"],
   disableLogRocket: ["Bool", "disableLogRocket"],
   sidePanelSize: ["String", "sidePanelSize"],
+  listenForMetrics: ["Bool", "listenForMetrics"],
+  disableCache: ["Bool", "disableCache"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
-  auth0: ["Bool", "auth0"],
+  useMultipleControllers: ["Bool", "useMultipleControllers"],
+  multipleControllerUseSnapshots: ["Bool", "multipleControllerUseSnapshots"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
-  commentEmojis: ["Bool", "commentEmojis"],
-  commentMentions: ["Bool", "commentMentions"],
-  comments: ["Bool", "comments"],
   darkMode: ["Bool", "darkMode"],
-  consoleHover: ["Bool", "consoleHover"],
-  eventCount: ["Bool", "eventCount"],
   httpBodies: ["Bool", "httpBodies"],
-  launchBrowser: ["Bool", "launchBrowser"],
-  private: ["Bool", "private"],
-  reactDevtools: ["Bool", "reactDevtools"],
-  smoothPlayback: ["Bool", "smoothPlayback"],
-  termsOfService: ["Bool", "termsOfService"],
-  transcriptHover: ["Bool", "transcriptHover"],
-  users: ["Bool", "users"],
-  videoComments: ["Bool", "videoComments"],
   videoPlayback: ["Bool", "videoPlayback"],
-  widgetHover: ["Bool", "widgetHover"],
   commentAttachments: ["Bool", "commentAttachments"],
+  networkRequestComments: ["Bool", "networkRequestComments"],
+  breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
+  codeHeatMaps: ["Bool", "codeHeatMaps"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

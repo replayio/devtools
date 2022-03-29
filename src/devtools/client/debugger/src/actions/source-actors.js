@@ -8,15 +8,17 @@ import {
   getSourceActor,
   getSourceActorBreakableLines,
   getSourceActorBreakpointColumns,
+  getSourceActorBreakpointHitCounts,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import compact from "lodash/compact";
 
 export function insertSourceActor(item) {
   return insertSourceActors([item]);
 }
 export function insertSourceActors(items) {
-  return function ({ dispatch }) {
+  return function (dispatch) {
     dispatch({
       type: "INSERT_SOURCE_ACTORS",
       items,
@@ -28,7 +30,7 @@ export function removeSourceActor(item) {
   return removeSourceActors([item]);
 }
 export function removeSourceActors(items) {
-  return function ({ dispatch }) {
+  return function (dispatch) {
     dispatch({ type: "REMOVE_SOURCE_ACTORS", items });
   };
 }
@@ -37,15 +39,16 @@ export const loadSourceActorBreakpointColumns = memoizeableAction(
   "loadSourceActorBreakpointColumns",
   {
     createKey: ({ id, line }) => `${id}:${line}`,
-    getValue: ({ id, line }, { getState }) => getSourceActorBreakpointColumns(getState(), id, line),
-    action: async ({ id, line }, { dispatch, getState, client }) => {
-      await dispatch({
+    getValue: ({ id, line }, thunkArgs) =>
+      getSourceActorBreakpointColumns(thunkArgs.getState(), id, line),
+    action: async ({ id, line }, thunkArgs) => {
+      await thunkArgs.dispatch({
         type: "SET_SOURCE_ACTOR_BREAKPOINT_COLUMNS",
         sourceId: id,
         line,
         [PROMISE]: (async () => {
-          const positions = await client.getSourceActorBreakpointPositions(
-            getSourceActor(getState(), id),
+          const positions = await thunkArgs.client.getSourceActorBreakpointPositions(
+            getSourceActor(thunkArgs.getState(), id),
             {
               start: { line, column: 0 },
               end: { line: line + 1, column: 0 },
@@ -61,12 +64,36 @@ export const loadSourceActorBreakpointColumns = memoizeableAction(
 
 export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorBreakableLines", {
   createKey: args => args.id,
-  getValue: ({ id }, { getState }) => getSourceActorBreakableLines(getState(), id),
-  action: async ({ id }, { dispatch, getState, client }) => {
-    await dispatch({
+  getValue: ({ id }, thunkArgs) => getSourceActorBreakableLines(thunkArgs.getState(), id),
+  action: async ({ id }, thunkArgs) => {
+    await thunkArgs.dispatch({
       type: "SET_SOURCE_ACTOR_BREAKABLE_LINES",
       sourceId: id,
-      [PROMISE]: client.getSourceActorBreakableLines(getSourceActor(getState(), id)),
+      [PROMISE]: thunkArgs.client.getSourceActorBreakableLines(
+        getSourceActor(thunkArgs.getState(), id)
+      ),
     });
   },
 });
+
+export const loadSourceActorBreakpointHitCounts = memoizeableAction(
+  "loadSourceActorBreakpointHitCounts",
+  {
+    createKey: ({ id }, { getState }) => {
+      const state = getState();
+      return compact([
+        id,
+        state.timeline.focusRegion?.startTime,
+        state.timeline.focusRegion?.endTime,
+      ]).join("-");
+    },
+    getValue: ({ id }, { getState }) => getSourceActorBreakpointHitCounts(getState(), id),
+    action: async ({ id }, { dispatch, getState, client }) => {
+      await dispatch({
+        type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
+        id,
+        [PROMISE]: client.getSourceActorBreakpointHitCounts(getSourceActor(getState(), id)),
+      });
+    },
+  }
+);

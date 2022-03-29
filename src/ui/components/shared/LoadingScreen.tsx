@@ -34,7 +34,7 @@ export function LoadingScreenTemplate({
 // White progress screen used for showing the scanning progress of a replay
 export function ProgressBar({ progress }: { progress: number }) {
   return (
-    <div className="relative h-1.5 w-full overflow-hidden rounded-lg bg-gray-200 p-0">
+    <div className="relative h-1.5 w-full overflow-hidden rounded-lg bg-themeBase-90 p-0">
       <div
         className="t-0 absolute h-full bg-primaryAccent"
         style={{ width: `${progress}%`, transitionDuration: "400ms" }}

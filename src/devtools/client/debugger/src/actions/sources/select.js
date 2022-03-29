@@ -15,13 +15,17 @@ import { setSymbols } from "./symbols";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
 import { addTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
-import { setBreakableLines } from ".";
+import { setBreakableLines, setBreakpointHitCounts } from ".";
 
 import { createLocation } from "../../utils/location";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { setSelectedPanel } from "ui/actions/layout";
 import { trackEvent } from "ui/utils/telemetry";
 import { paused } from "../pause/paused";
 
 import { ThreadFront } from "protocol/thread";
+
+import { prefs } from "devtools/shared/services";
 
 import {
   getSource,
@@ -65,7 +69,7 @@ export const clearSelectedLocation = cx => ({
  * @static
  */
 export function selectSourceURL(cx, url, options) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     const source = getSourceByURL(getState(), url);
     if (!source) {
       return dispatch(setPendingSelectedLocation(cx, url, options));
@@ -81,16 +85,16 @@ export function selectSourceURL(cx, url, options) {
  * @memberof actions/sources
  * @static
  */
-export function selectSource(cx, sourceId, options = {}) {
-  return async ({ dispatch }) => {
+export function selectSource(cx, sourceId, options = {}, openSourcesTab) {
+  return async dispatch => {
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
-    return dispatch(selectSpecificLocation(cx, location));
+    return dispatch(selectSpecificLocation(cx, location, openSourcesTab));
   };
 }
 
 export function deselectSource() {
-  return ({ dispatch, getState }) => {
+  return (dispatch, getState) => {
     const cx = getThreadContext(getState());
     dispatch(clearSelectedLocation(cx));
   };
@@ -100,8 +104,8 @@ export function deselectSource() {
  * @memberof actions/sources
  * @static
  */
-export function selectLocation(cx, location, { keepContext = true } = {}) {
-  return async ({ dispatch, getState, client }) => {
+export function selectLocation(cx, location, openSourcesTab = true) {
+  return async (dispatch, getState, { client }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
@@ -127,10 +131,16 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
     }
 
     dispatch(setSelectedLocation(cx, source, location));
+    const layout = getToolboxLayout(getState());
+
+    // Yank the user to the editor tab in case the debugger/editor is tucked in
+    // the toolbox.
+    if (layout !== "ide" && openSourcesTab) {
+      dispatch(setSelectedPanel("debugger"));
+    }
 
     await dispatch(loadSourceText({ source }));
     await dispatch(setBreakableLines(cx, source.id));
-
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch({ type: "SHOW_SOURCE", source: null });
@@ -157,8 +167,8 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
  * @memberof actions/sources
  * @static
  */
-export function selectSpecificLocation(cx, location) {
-  return selectLocation(cx, location, { keepContext: false });
+export function selectSpecificLocation(cx, location, openSourcesTab) {
+  return selectLocation(cx, location, openSourcesTab);
 }
 
 // The RRP protocol values include both generated and original information about
@@ -169,7 +179,7 @@ export function selectSpecificLocation(cx, location) {
 // refresh all the debugger's state, this will also open the alternate source.
 // Otherwise, we only open the alternate source in the editor.
 export function showAlternateSource(oldSourceId, newSourceId) {
-  return async ({ dispatch, getState }) => {
+  return async (dispatch, getState) => {
     if (ThreadFront.isSourceMappedSource(oldSourceId)) {
       ThreadFront.preferSource(newSourceId, true);
     } else {
