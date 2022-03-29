@@ -64,7 +64,7 @@ export interface Comment {
   time: number;
   updatedAt: string;
   user: User;
-  parentId: string | null;
+  parentId: Comment["id"] | null;
   replies: Comment[];
   position: CommentPosition | null;
   sourceLocation: SourceLocation | null;

@@ -5,7 +5,7 @@ import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
 import { useGetRecordingId } from "../recordings";
 import { useGetUserInfo } from "../users";
 
-type MakeCommentFn = (parentId: Comment["id"] | null, content: string) => Comment;
+type MakeCommentFn = (parentId: Comment["id"], content: string) => Comment;
 
 export const useMakeFromPendingComment = (): MakeCommentFn => {
   const recordingId = useGetRecordingId();

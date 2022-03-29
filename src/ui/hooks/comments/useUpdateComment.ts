@@ -97,11 +97,9 @@ export const useUpdateComment = (): ((
   return (comment, newContent, position) => {
     // top-level comment
     if (comment.parentId === ROOT_COMMENT_ID) {
-      console.log("com");
       updateComment(comment.id, newContent, position ?? null);
       // reply
     } else {
-      console.log("rep");
       updateCommentReply(comment.id, newContent);
     }
   };
