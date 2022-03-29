@@ -13,7 +13,7 @@ export const initialAppState: AppState = {
   analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
-  defaultSettingsTab: "Preferences",
+  defaultSettingsTab: "Personal",
   displayedLoadingProgress: null,
   events: {},
   expectedError: null,
