@@ -34,6 +34,11 @@ function processHar(harPath) {
     return true;
   });
 
+  receivedMessages.forEach(message => {
+    delete message.type;
+    delete message.opcode;
+  });
+
   console.log("Matching messages: ", receivedMessages.length);
 
   fs.writeFileSync("./websocketMessages.json", JSON.stringify(receivedMessages));
