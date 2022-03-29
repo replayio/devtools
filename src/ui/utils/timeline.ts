@@ -115,12 +115,12 @@ export function getNewZoomRegion({
 }
 
 // Format a time value to mm:ss
-export function getFormattedTime(time: number) {
+export function getFormattedTime(time: number, showMs = false) {
   const date = new Date(time);
   const seconds = date.getSeconds().toString().padStart(2, "0");
   const minutes = date.getMinutes();
 
-  return `${minutes}:${seconds}`;
+  return `${minutes}:${seconds}${showMs ? `.${date.getMilliseconds()}` : ""}`;
 }
 
 export function isSameTimeStampedPointRange(

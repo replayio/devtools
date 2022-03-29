@@ -82,3 +82,15 @@ export const getIsInLoadedRegion = (state: UIState) => {
 
   return getPointIsInLoadedRegion(loadedRegions, currentPausePoint);
 };
+export const getIsAtFocusSoftLimit = (state: UIState) => {
+  const focusRegion = getFocusRegion(state);
+
+  if (!focusRegion) {
+    return false;
+  }
+
+  const focusDuration = focusRegion.endTime - focusRegion.startTime;
+  const duration = getZoomRegion(state).endTime;
+
+  return focusDuration < duration * 0.1;
+};
