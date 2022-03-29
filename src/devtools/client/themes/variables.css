@@ -159,7 +159,7 @@
 
   /* Timeline (Light) */
   --progressbar-preview-max: var(--theme-base-85);
-  --progressbar-preview-min: var(--primary-accent);
+  --progressbar-preview-min: var(--theme-base-95);
 
   /* Menus (Light) */
   --menu-bgcolor: var(--theme-toolbar-background);
@@ -386,7 +386,7 @@
 
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
-  --progressbar-preview-min: var(--primary-accent);
+  --progressbar-preview-min: var(--theme-base-90);
 
   /* Menus (Dark) */
   --menu-bgcolor: var(--theme-base-90);
