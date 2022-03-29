@@ -58,11 +58,7 @@ function LayoutOption({
 export default function ToolboxOptions() {
   const toolboxLayout = useSelector(getToolboxLayout);
   const [expanded, setExpanded] = useState(false);
-  const button = (
-    <ToolboxButton>
-      <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />
-    </ToolboxButton>
-  );
+  const button = <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />;
   const collapseDropdown = () => setExpanded(false);
 
   return (
@@ -70,7 +66,7 @@ export default function ToolboxOptions() {
       buttonContent={button}
       setExpanded={setExpanded}
       expanded={expanded}
-      buttonStyle=""
+      buttonStyle="toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
       distance={0}
     >
       <Dropdown>
