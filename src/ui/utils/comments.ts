@@ -37,12 +37,11 @@ export function formatRelativeTime(date: Date) {
 }
 
 export function commentKeys(comments: (Comment | Reply)[]): string[] {
-  const createdAt = orderedByApproximatelyCreatedAt(comments);
-  return comments.map((c, i) => commentKey(c, createdAt[i]));
+  return comments.map((c, i) => commentKey(c));
 }
 
-function commentKey(comment: Comment | Reply, createdAtOrder: number): string {
-  return compact([createdAtOrder + 1, commentIdentifiers(comment)]).join("-");
+export function commentKey(comment: Comment | Reply): string {
+  return compact([comment.createdAt, commentIdentifiers(comment)]).join("-");
 }
 
 function orderedByApproximatelyCreatedAt(comments: (Comment | Reply)[]): number[] {

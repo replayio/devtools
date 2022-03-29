@@ -33,20 +33,19 @@ function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEdi
       : "video"
   );
 
-  const handleSubmit = (inputValue: string) => {
+  const handleSubmit = async (inputValue: string) => {
     if (!isAuthenticated) {
       setModal("login");
       return;
     }
 
     if (data.type == "new_reply") {
-      handleReplySave(data.comment, inputValue);
+      await handleReplySave(data.comment, inputValue);
     } else {
-      handleNewSave(data.comment, inputValue);
+      await handleNewSave(data.comment, inputValue);
     }
 
     commentsLocalStorage.clear();
-
     clearPendingComment();
   };
 
