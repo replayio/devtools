@@ -90,14 +90,16 @@ export function paywallExpression(expression: string, reason = "team-user"): UIT
 let nextEvalId = 1;
 export function evaluateExpression(expression: string): UIThunkAction {
   return async dispatch => {
+    const debuggerPanel = window.gToolbox.getPanel("debugger");
+
     if (!expression) {
       expression = window.jsterm?.editor.getSelection();
     }
-    if (!expression) {
+    if (!expression || !debuggerPanel) {
       return null;
     }
 
-    const { asyncIndex, frameId } = window.gToolbox.getPanel("debugger")!.getFrameId();
+    const { asyncIndex, frameId } = debuggerPanel.getFrameId();
     const pause = await getPause(window.gToolbox);
     const evalId = await dispatchExpression(dispatch, pause, expression);
     dispatch(
