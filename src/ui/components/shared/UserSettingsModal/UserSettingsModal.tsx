@@ -125,14 +125,14 @@ function UserAPIKeys() {
 
 const getSettings = (): Settings<SettingsTabTitle, {}> => [
   {
-    title: "Preferences",
-    icon: "tune",
-    component: PreferencesSettings,
-  },
-  {
     title: "Personal",
     icon: "person",
     component: Personal,
+  },
+  {
+    title: "Preferences",
+    icon: "tune",
+    component: PreferencesSettings,
   },
   {
     title: "API Keys",
