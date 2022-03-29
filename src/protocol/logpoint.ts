@@ -253,8 +253,8 @@ async function setMultiSourceLogpoint(
   if (showInConsole && primitiveFronts) {
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
-      if (points !== "error") {
-        showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+      if (points.error) {
+        showPrimitiveLogpoints(logGroupId, points.data, primitiveFronts);
       }
       return;
     }

@@ -68,7 +68,7 @@ function BreakpointTimelinePoint({
         "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
         "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
-      title={`${index + 1}/${analysisPoints.length}`}
+      title={`${index + 1}/${analysisPoints.data.length}`}
       onClick={onClick}
       style={{ left: `calc(${leftPercentOffset}% - ${pointWidth / 2}px)` }}
       onMouseEnter={onMouseEnter}

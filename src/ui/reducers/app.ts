@@ -1,4 +1,4 @@
-import { AppState, EventKind, ReplayEvent } from "ui/state/app";
+import { AnalysisError, AnalysisPayload, AppState, EventKind, ReplayEvent } from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
@@ -124,7 +124,10 @@ export default function update(
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: action.analysisPoints,
+          [id]: {
+            data: action.analysisPoints,
+            error: null,
+          },
         },
       };
     }
@@ -136,7 +139,7 @@ export default function update(
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: "error",
+          [id]: { data: [], error: AnalysisError.hellaHits },
         },
       };
     }
@@ -208,6 +211,19 @@ export default function update(
   }
 }
 
+const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
+  const focusRegion = getFocusRegion(state);
+
+  if (!focusRegion || points.error) {
+    return points;
+  }
+
+  return {
+    ...points,
+    data: points.data.filter(p => isInTrimSpan(p.time, focusRegion)) || [],
+  };
+};
+
 export const getTheme = (state: UIState) => state.app.theme;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
@@ -227,8 +243,6 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
-export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
-
 export const getAnalysisPointsForLocation = (
   state: UIState,
   location: Location | null,
@@ -237,28 +251,16 @@ export const getAnalysisPointsForLocation = (
   if (!location) {
     return;
   }
-  const focusRegion = getFocusRegion(state);
+
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
-
-  if (focusRegion && points && points !== "error") {
-    return points.filter(p => isInTrimSpan(p.time, focusRegion));
-  }
-
-  return points;
+  return getPointsInTrimSpan(state, points);
 };
 
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
-  const points = getAnalysisPointsForLocation(state, location);
-  const focusRegion = getFocusRegion(state);
-
-  if (focusRegion && points && points !== "error") {
-    return points.filter(p => isInTrimSpan(p.time, focusRegion));
-  }
-
-  return points;
+  return getAnalysisPointsForLocation(state, location);
 };
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>

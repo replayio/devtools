@@ -30,11 +30,11 @@ function BreakpointNavigation({
       seek(point.point, point.time, true);
     }
   };
-  const isEmpty = analysisPoints && (analysisPoints === "error" || analysisPoints?.length == 0);
+  const isEmpty = analysisPoints && (analysisPoints.error || analysisPoints.data.length == 0);
 
   let prev, next;
 
-  if (executionPoint && analysisPoints !== "error" && analysisPoints?.length > 0) {
+  if (executionPoint && analysisPoints.error && analysisPoints.data.length > 0) {
     prev = findLast(analysisPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
@@ -47,8 +47,8 @@ function BreakpointNavigation({
 
   useEffect(() => {
     if (analysisPoints) {
-      trackEvent(analysisPoints.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
-        hits: analysisPoints.length,
+      trackEvent(analysisPoints.data.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
+        hits: analysisPoints.data.length,
       });
     }
   }, [analysisPoints]);
@@ -58,7 +58,7 @@ function BreakpointNavigation({
       {!isEmpty ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
-      {analysisPoints !== "error" ? (
+      {analysisPoints.error ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : (
         <div className="flex-grow" />
@@ -122,19 +122,19 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
     status = "Indexing";
   } else if (!analysisPoints || !executionPoint) {
     status = "Loading";
-  } else if (analysisPoints === "error") {
+  } else if (analysisPoints.error) {
     // This error is currently caused by how the backend limits the returned
     // hits to 10k. Lines with more than 10k hits don't get returned.
     status = "10k+ hits";
-  } else if (analysisPoints.length == 0) {
+  } else if (analysisPoints.data.length == 0) {
     status = "No hits";
   } else {
     const points = analysisPoints
-      ? analysisPoints.filter(point => BigInt(point.point) <= BigInt(executionPoint))
+      ? analysisPoints.data.filter(point => BigInt(point.point) <= BigInt(executionPoint))
       : [];
 
-    status = `${points.length}/${analysisPoints.length}`;
-    maxStatusLength = `${analysisPoints.length}/${analysisPoints.length}`.length;
+    status = `${points.length}/${analysisPoints.data.length}`;
+    maxStatusLength = `${analysisPoints.length}/${analysisPoints.data.length}`.length;
   }
 
   return (

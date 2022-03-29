@@ -17,14 +17,14 @@ import Condition from "./Condition";
 import useAuth0 from "ui/utils/useAuth0";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
-import { PointDescription } from "@recordreplay/protocol";
 import classNames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
+import { AnalysisPayload } from "ui/state/app";
 
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
-  analysisPoints: PointDescription[] | "error";
+  analysisPoints: AnalysisPayload;
   breakpoint: any;
   executionPoint: any;
   isHot: boolean;
@@ -57,7 +57,10 @@ function PanelSummary({
 
   const focusInput = (input: Input) => {
     if (isEditable) {
-      trackEvent("breakpoint.start_edit", { input, hitsCount: analysisPoints?.length || null });
+      trackEvent("breakpoint.start_edit", {
+        input,
+        hitsCount: analysisPoints?.data.length || null,
+      });
       toggleEditingOn();
       setInputToFocus(input);
     }
@@ -90,7 +93,7 @@ function PanelSummary({
 
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
-    const hits = analysisPoints === "error" ? "10k" : prefs.maxHitsDisplayed;
+    const hits = analysisPoints.error ? "10k" : prefs.maxHitsDisplayed;
 
     return (
       <div className="summary flex items-center rounded-t bg-errorBgcolor text-errorColor">

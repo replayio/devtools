@@ -101,7 +101,7 @@ export default function LineNumberTooltip({
       analysisPointsCount = lineHitCounts?.[0]?.hits;
     }
   } else {
-    analysisPointsCount = analysisPoints?.length;
+    analysisPointsCount = analysisPoints?.data.length;
   }
 
   const setHoveredLineNumber = ({

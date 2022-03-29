@@ -274,15 +274,15 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
 
     if (
       !pointsForHoveredLineNumber ||
-      pointsForHoveredLineNumber === "error" ||
-      pointsForHoveredLineNumber.length > prefs.maxHitsDisplayed
+      pointsForHoveredLineNumber.error ||
+      pointsForHoveredLineNumber.data.length > prefs.maxHitsDisplayed
     ) {
       return [];
     }
 
     return (
       <div className="preview-markers-container">
-        {pointsForHoveredLineNumber.map((point: PointDescription, index: number) => {
+        {pointsForHoveredLineNumber.data.map((point: PointDescription, index: number) => {
           const isPrimaryHighlighted = hoveredItem?.point === point.point;
           const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
 

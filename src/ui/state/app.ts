@@ -100,8 +100,13 @@ export interface AppState {
   currentPoint: ExecutionPoint | null;
 }
 
-export interface AnalysisPoints {
-  [key: string]: PointDescription[] | "error";
+export type AnalysisPoints = Record<string, AnalysisPayload>;
+export type AnalysisPayload = {
+  data: PointDescription[];
+  error: AnalysisError | null;
+};
+export enum AnalysisError {
+  hellaHits = "hella-hits",
 }
 
 interface Events {
