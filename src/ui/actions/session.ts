@@ -299,9 +299,11 @@ export function clearExpectedError(): UIThunkAction {
   };
 }
 
-export function onConsoleOverflow(): OnConsoleOverflow {
+export function onConsoleOverflow() {
   trackEvent("console.overflow");
-  return { type: "CONSOLE_OVERFLOW" };
+  // NOTE: Must match value from `reducers/messages`, but left here
+  // as a string to avoid a circular import issue
+  return { type: "messages/consoleOverflowed" };
 }
 
 function setCurrentPoint(currentPoint: ExecutionPoint | null): SetCurrentPointAction {

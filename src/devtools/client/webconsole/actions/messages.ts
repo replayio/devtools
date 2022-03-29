@@ -17,18 +17,16 @@ import { LogpointHandlers } from "protocol/logpoint";
 import { TestMessageHandlers } from "protocol/find-tests";
 import { onConsoleOverflow } from "ui/actions/session";
 
-const {
-  MESSAGES_ADD,
-  MESSAGES_CLEAR_LOGPOINT,
-  MESSAGE_OPEN,
-  MESSAGE_CLOSE,
-  MESSAGE_UPDATE_PAYLOAD,
-  MESSAGES_CLEAR_EVALUATIONS,
-  MESSAGES_CLEAR_EVALUATION,
-} = require("devtools/client/webconsole/constants");
-
 import type { Message, Frame, ExecutionPoint } from "@recordreplay/protocol";
 import type { Message as InternalMessage } from "../reducers/messages";
+import {
+  messageEvaluationsCleared,
+  logpointMessagesCleared,
+  messagesAdded,
+  messageOpened,
+  messageClosed,
+  messagesLoaded,
+} from "../reducers/messages";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
@@ -45,7 +43,7 @@ export function setupMessages(store: UIStore) {
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),
     () => store.dispatch(onConsoleOverflow())
-  ).then(() => store.dispatch({ type: "MESSAGES_LOADED" }));
+  ).then(() => store.dispatch(messagesLoaded()));
 }
 
 function convertStack(stack: string[], { frames }: { frames?: Frame[] }) {
@@ -215,67 +213,16 @@ export function messagesAdd(packets: unknown[], idGenerator = null): UIThunkActi
     const messages: InternalMessage[] = packets.map(packet => prepareMessage(packet, idGenerator));
     const filtersState = getAllFilters(getState());
 
-    return dispatch({
-      type: MESSAGES_ADD,
-      messages,
-      filtersState,
-    });
+    dispatch(
+      messagesAdded({
+        messages,
+        filtersState,
+      })
+    );
   };
 }
 
-export function messagesClearEvaluations() {
-  return {
-    type: MESSAGES_CLEAR_EVALUATIONS,
-  };
-}
-
-export function messagesClearEvaluation(messageId: string, messageType: string) {
-  // The messageType is only used for logging purposes to determine what type of messages
-  // are typically cleared.
-  return {
-    type: MESSAGES_CLEAR_EVALUATION,
-    messageId,
-    messageType,
-  };
-}
-
-export function messagesClearLogpoint(logpointId: string) {
-  return {
-    type: MESSAGES_CLEAR_LOGPOINT,
-    logpointId,
-  };
-}
-
-export function messageOpen(id: string): UIThunkAction {
-  return (dispatch, getState) => {
-    const filtersState = getAllFilters(getState());
-    return dispatch({
-      type: MESSAGE_OPEN,
-      id,
-      filtersState,
-    });
-  };
-}
-
-export function messageClose(id: string) {
-  return {
-    type: MESSAGE_CLOSE,
-    id,
-  };
-}
-
-/**
- * Associate additional data with a message without mutating the original message object.
- *
- * @param {String} id
- *        Message ID
- * @param {Object} data
- *        Object with arbitrary data.
- */
-export function messageUpdatePayload(id: string, data: any) {
-  return {
-    type: MESSAGE_UPDATE_PAYLOAD,
-    id,
-    data,
-  };
-}
+export const messagesClearEvaluations = messageEvaluationsCleared;
+export const messagesClearLogpoint = logpointMessagesCleared;
+export const messageOpen = messageOpened;
+export const messageClose = messageClosed;

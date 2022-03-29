@@ -1,29 +1,28 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
 
 import type { AnyAction, PayloadAction, EntityState } from "@reduxjs/toolkit";
 import { createSlice, createEntityAdapter } from "@reduxjs/toolkit";
+import uniq from "lodash/uniq";
 
-const constants = require("devtools/client/webconsole/constants");
+import constants from "devtools/client/webconsole/constants";
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
 
 import type { ValueFront } from "protocol/thread";
 
-const { pointEquals } = require("protocol/execution-point-utils");
-const { getGripPreviewItems } = require("devtools/packages/devtools-reps");
-const { getUnicodeUrlPath } = require("devtools/client/shared/unicode-url");
-const { getSourceNames } = require("devtools/client/shared/source-utils");
+import { pointEquals } from "protocol/execution-point-utils";
+// TODO Disable this for now to avoid circular imports
+// import { getGripPreviewItems } from "devtools/packages/devtools-reps";
+import { getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
+import { getSourceNames } from "devtools/client/shared/source-utils";
 
-const { log } = require("protocol/socket");
-const { assert, compareNumericStrings } = require("protocol/utils");
-import type { Command } from "ui/utils/commandHistory";
+import { log } from "protocol/socket";
+import { assert, compareNumericStrings } from "protocol/utils";
 import type { WebconsoleFiltersState } from "./filters";
-import { WebconsoleUIState } from "./ui";
-const { appendToHistory } = require("ui/utils/commandHistory");
 
 type MessageId = string;
+type Command = string;
 
 interface Frame {
   column: number;
@@ -52,17 +51,20 @@ interface Note {
   frame: Frame;
 }
 
-interface ExecutionPoint {
-  checkpoint: number;
-  progress: number;
-}
+// TODO Multiple type mismatches with related fields being a string or an object
+type ExecutionPoint =
+  | {
+      checkpoint: number;
+      progress: number;
+    }
+  | string;
 
 export interface Message {
   allowRepeating: boolean;
   category: string | null;
   errorMessageName: string | null;
   exceptionDocURL: string | null;
-  executionPoint: ExecutionPoint | null;
+  executionPoint: string | null;
   executionHasFrames: boolean;
   executionPointTime: number | null;
   evalId?: number;
@@ -119,13 +121,19 @@ export interface MessageState {
   messagesUiById: MessageId[];
   logpointMessages: EntityState<LogpointMessageEntry>;
   removedLogpointIds: MessageId[];
-  pausedExecutionPoint: ExecutionPoint | null;
+  pausedExecutionPoint: string | null;
   pausedExecutionPointTime: number;
   hasExecutionPoints: boolean;
   lastMessageId: MessageId | null;
   overflow: boolean;
   messagesLoaded: boolean;
 }
+
+const MAX_HISTORY_LENGTH = 1000;
+
+export const appendToHistory = (command: Command, history: Command[]): Command[] => {
+  return uniq([command, ...history].slice(0, MAX_HISTORY_LENGTH));
+};
 
 export const messagesAdapter = createEntityAdapter<Message>();
 const logpointMessagesAdapter = createEntityAdapter<LogpointMessageEntry>({
@@ -189,7 +197,7 @@ function cloneState(state: MessageState) {
 
 interface PausedAction extends AnyAction {
   type: "PAUSED";
-  executionPoint: ExecutionPoint;
+  executionPoint: string;
   time: number;
 }
 
@@ -207,6 +215,10 @@ const messagesSlice = createSlice({
       const { messages, filtersState } = action.payload;
       messages.forEach(message => {
         addMessage(message, state as MessageState, filtersState);
+
+        if (message.type === "command") {
+          state.commandHistory = appendToHistory(message.messageText, state.commandHistory);
+        }
       });
     },
     messageOpened(state, action: PayloadAction<MessageId>) {
@@ -222,23 +234,14 @@ const messagesSlice = createSlice({
         if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
           removedIds.push(message.id);
         }
-
-        // If there have been no console evaluations, there's no need to change the state.
-        if (removedIds.length === 0) {
-          return;
-        }
-
-        return removeMessagesFromState(state as MessageState, removedIds);
       }
-    },
-    singleMessageEvaluationCleared(state, action: PayloadAction<string>) {
-      const commandId = action.payload;
 
-      // This assumes that messages IDs are generated sequentially, and the result's ID
-      // should be the command message's ID + 1.
-      const resultId = (Number(commandId) + 1).toString();
+      // If there have been no console evaluations, there's no need to change the state.
+      if (removedIds.length === 0) {
+        return;
+      }
 
-      return removeMessagesFromState(state as MessageState, [commandId, resultId]);
+      return removeMessagesFromState(state as MessageState, removedIds);
     },
     logpointMessagesCleared(state, action: PayloadAction<string>) {
       const logpointId = action.payload;
@@ -292,7 +295,6 @@ export const {
   messageOpened,
   messagesAdded,
   messagesLoaded,
-  singleMessageEvaluationCleared,
 } = messagesSlice.actions;
 
 export const messages = messagesSlice.reducer;
@@ -362,6 +364,9 @@ function addMessage(
 
   return removeMessagesFromState(state, removedIds);
 }
+
+// TODO Actually remove the dead logic here.
+// Left in for PR comparison
 
 /*
 // eslint-disable-next-line complexity
@@ -713,6 +718,7 @@ function isTextInFrame(matchStr: StringMatcher, frame?: Frame) {
   }
 
   const { functionName, line, column, source } = frame;
+  // @ts-ignore
   const { short } = getSourceNames(source);
   const unicodeShort = getUnicodeUrlPath(short);
 
@@ -758,12 +764,13 @@ function isTextInParameter(
   visitedObjectIds = new Set(visitedObjectIds);
   visitedObjectIds.add(objectId);
 
-  const previewItems = getGripPreviewItems(parameter);
-  for (const item of previewItems) {
-    if (isTextInParameter(matchStr, item, visitedObjectIds)) {
-      return true;
-    }
-  }
+  // TODO Disable this for now to avoid circular imports
+  // const previewItems = getGripPreviewItems(parameter);
+  // for (const item of previewItems) {
+  //   if (isTextInParameter(matchStr, item, visitedObjectIds)) {
+  //     return true;
+  //   }
+  // }
 
   return false;
 }
@@ -919,6 +926,7 @@ function getLastMessageWithPoint(state: MessageState, point: ExecutionPoint) {
       return false;
     }
 
+    // @ts-ignore ExecutionPoint/string mismatch
     return point.progress === currentMessage.lastExecutionPoint.point.progress;
   });
 
@@ -926,8 +934,9 @@ function getLastMessageWithPoint(state: MessageState, point: ExecutionPoint) {
   return state.messages.entities[lastMessageId] ?? ({} as Message);
 }
 
-function messageExecutionPoint(state: MessageState, id: MessageId) {
+function messageExecutionPoint(state: MessageState, id: MessageId): string {
   const message = state.messages.entities[id]!;
+  // @ts-ignore ExecutionPoint/string
   return message.executionPoint || message.lastExecutionPoint.point;
 }
 

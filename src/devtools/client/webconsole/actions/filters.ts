@@ -11,13 +11,15 @@ import {
   FilterBooleanFields,
 } from "../reducers/filters";
 
+import { filterStateUpdated as filterStateUpdatedAction } from "../reducers/messages";
+
 const filterStateUpdated = (): UIThunkAction => (dispatch, getState) => {
   const newFiltersState = getAllFilters(getState());
   // TODO This only exists to work around an issue with the messages reducer seeing stale state
   // That was caused by moving calculation of toggled filter state into the reducer.
   // I plan to refactor the messages reducer to make "filtered messages" a derived value,
   // calculated by a Reselect selector. At that time this can go away.
-  dispatch({ type: "FILTER_STATE_UPDATED", filtersState: newFiltersState });
+  dispatch(filterStateUpdatedAction(newFiltersState));
 };
 
 export const filterTextSet = (text: string): UIThunkAction => {
