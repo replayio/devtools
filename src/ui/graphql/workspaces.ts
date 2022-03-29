@@ -85,7 +85,7 @@ export const PREPARE_WORKSPACE_PAYMENT_METHOD = gql`
 `;
 
 export const SET_WORKSPACE_DEFAULT_PAYMENT_METHOD = gql`
-  mutation SetWorkspaceDefaultPaymentMethod($workspaceId: ID!, $paymentMethodId: ID!) {
+  mutation SetWorkspaceDefaultPaymentMethod($workspaceId: ID!, $paymentMethodId: String!) {
     setWorkspaceDefaultPaymentMethod(
       input: { workspaceId: $workspaceId, paymentMethodId: $paymentMethodId }
     ) {
@@ -95,7 +95,7 @@ export const SET_WORKSPACE_DEFAULT_PAYMENT_METHOD = gql`
 `;
 
 export const DELETE_WORKSPACE_PAYMENT_METHOD = gql`
-  mutation DeleteWorkspacePaymentMethod($workspaceId: ID!, $paymentMethodId: ID!) {
+  mutation DeleteWorkspacePaymentMethod($workspaceId: ID!, $paymentMethodId: String!) {
     deleteWorkspacePaymentMethod(
       input: { workspaceId: $workspaceId, paymentMethodId: $paymentMethodId }
     ) {
