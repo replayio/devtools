@@ -181,7 +181,8 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
 
     return (
       <div className="webconsole-output" ref={this.outputNode} role="main">
-        <ConsoleLoadingBar />,{messageNodes}
+        <ConsoleLoadingBar />
+        {messageNodes}
       </div>
     );
   }
