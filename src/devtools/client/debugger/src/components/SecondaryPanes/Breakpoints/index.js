@@ -19,7 +19,7 @@ class Breakpoints extends Component {
   };
   headlessEditor;
 
-  onComponentDidMount() {
+  componentDidMount() {
     (async () => {
       await waitForEditor();
       this.setState({ editorLoaded: true });
