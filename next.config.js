@@ -70,6 +70,21 @@ module.exports = {
 
     config.plugins.push(new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }));
 
+    // Check for circular imports and throw errors, but only if the
+    // env variable is set.  Should only be true if manually defined
+    // in a local dev environment.
+    if (process.env.CHECK_CIRCULAR_IMPORTS) {
+      const CircularDependencyPlugin = require("circular-dependency-plugin");
+
+      config.plugins.push(
+        new CircularDependencyPlugin({
+          exclude: /node_modules/,
+          failOnError: true,
+          cwd: process.cwd(),
+        })
+      );
+    }
+
     // handles build error from webpack/runtime/compat
     // https://github.com/vercel/next.js/issues/25484
     if (isServer) {
