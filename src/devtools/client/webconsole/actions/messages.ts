@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import type { UIState } from "ui/state";
+import type { UIStore, UIThunkAction } from "ui/actions";
 
 import { getAllFilters } from "../reducers/filters";
 
@@ -11,10 +12,10 @@ const {
   isBrowserInternalMessage,
 } = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
-const { ThreadFront } = require("protocol/thread");
-const { LogpointHandlers } = require("protocol/logpoint");
-const { TestMessageHandlers } = require("protocol/find-tests");
-const { onConsoleOverflow } = require("ui/actions/session");
+import { Pause, ThreadFront } from "protocol/thread";
+import { LogpointHandlers } from "protocol/logpoint";
+import { TestMessageHandlers } from "protocol/find-tests";
+import { onConsoleOverflow } from "ui/actions/session";
 
 const {
   MESSAGES_ADD,
@@ -26,11 +27,14 @@ const {
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
 
-const defaultIdGenerator = new IdGenerator();
-let queuedMessages = [];
-let throttledDispatchPromise = null;
+import type { Message, Frame, ExecutionPoint } from "@recordreplay/protocol";
+import type { Message as InternalMessage } from "../reducers/messages";
 
-export function setupMessages(store) {
+const defaultIdGenerator = new IdGenerator();
+let queuedMessages: unknown[] = [];
+let throttledDispatchPromise: Promise<void> | null = null;
+
+export function setupMessages(store: UIStore) {
   LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
   LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
@@ -44,13 +48,13 @@ export function setupMessages(store) {
   ).then(() => store.dispatch({ type: "MESSAGES_LOADED" }));
 }
 
-function convertStack(stack, { frames }) {
+function convertStack(stack: string[], { frames }: { frames?: Frame[] }) {
   if (!stack) {
     return null;
   }
   return Promise.all(
     stack.map(async frameId => {
-      const frame = frames.find(f => f.frameId == frameId);
+      const frame = frames!.find(f => f.frameId == frameId)!;
       const location = await ThreadFront.getPreferredLocation(frame.location);
       return {
         filename: await ThreadFront.getSourceURL(location.sourceId),
@@ -63,9 +67,9 @@ function convertStack(stack, { frames }) {
   );
 }
 
-function onConsoleMessage(msg) {
+function onConsoleMessage(msg: Message): UIThunkAction {
   return async dispatch => {
-    const stacktrace = await convertStack(msg.stack, msg.data);
+    const stacktrace = await convertStack(msg.stack!, msg.data);
     const sourceId = stacktrace?.[0]?.sourceId;
 
     let { url, sourceId: msgSourceId, line, column } = msg;
@@ -84,7 +88,7 @@ function onConsoleMessage(msg) {
       column = location.column;
     } else {
       if (!msgSourceId) {
-        const ids = ThreadFront.getSourceIdsForURL(url);
+        const ids = ThreadFront.getSourceIdsForURL(url!);
         if (ids.length == 1) {
           msgSourceId = ids[0];
         }
@@ -93,8 +97,8 @@ function onConsoleMessage(msg) {
         // Ask the ThreadFront to map the location we got manually.
         const location = await ThreadFront.getPreferredMappedLocation({
           sourceId: msgSourceId,
-          line,
-          column,
+          line: line!,
+          column: column!,
         });
         url = await ThreadFront.getSourceURL(location.sourceId);
         line = location.line;
@@ -115,7 +119,7 @@ function onConsoleMessage(msg) {
       info: msg.level == "info",
       trace: msg.level == "trace",
       assert: msg.level == "assert",
-      stacktrace,
+      stacktrace: stacktrace!,
       argumentValues: msg.argumentValues,
       executionPoint: msg.point.point,
       executionPointTime: msg.point.time,
@@ -127,7 +131,12 @@ function onConsoleMessage(msg) {
   };
 }
 
-function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) {
+function onLogpointLoading(
+  logGroupId: string,
+  point: ExecutionPoint,
+  time: number,
+  { sourceId, line, column }: { sourceId: string; line: number; column: number }
+): UIThunkAction {
   return async dispatch => {
     const packet = {
       errorMessage: "Loading...",
@@ -147,7 +156,14 @@ function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) 
   };
 }
 
-function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, pause, values) {
+function onLogpointResult(
+  logGroupId: string,
+  point: string,
+  time: number,
+  { sourceId, line, column }: { sourceId: string; line: number; column: number },
+  pause?: Pause,
+  values?: unknown[]
+): UIThunkAction {
   return async dispatch => {
     const packet = {
       errorMessage: "",
@@ -169,7 +185,7 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, p
   };
 }
 
-function dispatchMessageAdd(packet) {
+function dispatchMessageAdd(packet: unknown): UIThunkAction {
   return dispatch => {
     queuedMessages = queuedMessages.concat(packet);
     if (throttledDispatchPromise) {
@@ -190,12 +206,13 @@ function dispatchMessageAdd(packet) {
   };
 }
 
-export function messagesAdd(packets, idGenerator = null) {
+export function messagesAdd(packets: unknown[], idGenerator = null): UIThunkAction {
   return (dispatch, getState) => {
     if (idGenerator == null) {
       idGenerator = defaultIdGenerator;
     }
-    const messages = packets.map(packet => prepareMessage(packet, idGenerator));
+    // TODO This really a good type here?
+    const messages: InternalMessage[] = packets.map(packet => prepareMessage(packet, idGenerator));
     const filtersState = getAllFilters(getState());
 
     return dispatch({
@@ -212,7 +229,7 @@ export function messagesClearEvaluations() {
   };
 }
 
-export function messagesClearEvaluation(messageId, messageType) {
+export function messagesClearEvaluation(messageId: string, messageType: string) {
   // The messageType is only used for logging purposes to determine what type of messages
   // are typically cleared.
   return {
@@ -222,14 +239,14 @@ export function messagesClearEvaluation(messageId, messageType) {
   };
 }
 
-export function messagesClearLogpoint(logpointId) {
+export function messagesClearLogpoint(logpointId: string) {
   return {
     type: MESSAGES_CLEAR_LOGPOINT,
     logpointId,
   };
 }
 
-export function messageOpen(id) {
+export function messageOpen(id: string): UIThunkAction {
   return (dispatch, getState) => {
     const filtersState = getAllFilters(getState());
     return dispatch({
@@ -240,7 +257,7 @@ export function messageOpen(id) {
   };
 }
 
-export function messageClose(id) {
+export function messageClose(id: string) {
   return {
     type: MESSAGE_CLOSE,
     id,
@@ -255,7 +272,7 @@ export function messageClose(id) {
  * @param {Object} data
  *        Object with arbitrary data.
  */
-export function messageUpdatePayload(id, data) {
+export function messageUpdatePayload(id: string, data: any) {
   return {
     type: MESSAGE_UPDATE_PAYLOAD,
     id,

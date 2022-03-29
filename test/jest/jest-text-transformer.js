@@ -1,4 +1,4 @@
-"use strict";
+// Source: https://github.com/janouma/jest-text-transformer
 
 const { statSync } = require("fs");
 const uuid = require("uuid/v4");
