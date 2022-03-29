@@ -54,6 +54,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 500
           check_interval: 30
+          environment: ${{ github.ref == 'refs/heads/master' && "production" || "staging" }}
       - run: echo ${{steps.waitFor200.outputs.url}}
     outputs:
       url: ${{ steps.waitFor200.outputs.url }}
