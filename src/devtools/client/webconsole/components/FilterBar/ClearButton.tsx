@@ -1,25 +1,29 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
+
 import Icon from "ui/components/shared/Icon";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const actions = require("devtools/client/webconsole/actions/index");
-const { getAllMessagesById } = require("devtools/client/webconsole/selectors/messages");
+import { getAllMessagesById } from "devtools/client/webconsole/selectors/messages";
 
 type Message = {
   type: string;
 };
 
-const getIsEnabled = (messages: Map<string, Message>) => {
-  const evalTypes = [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT];
-  return [...messages].find(([_, message]) => evalTypes.includes(message.type));
-};
+const evalTypes = [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT];
 
 function ClearButton(props: PropsFromRedux) {
   const { messagesClearEvaluations, allMessagesById } = props;
-  const isEnabled = getIsEnabled(allMessagesById);
+
+  const isEnabled = useMemo(() => {
+    const foundMessage = Object.values(allMessagesById.entities).find(message => {
+      return evalTypes.includes(message!.type);
+    });
+    return !!foundMessage;
+  }, [allMessagesById]);
 
   const onClick = () => {
     trackEvent("console.clear_messages");

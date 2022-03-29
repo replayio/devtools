@@ -84,11 +84,11 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.pause.frameScopes = OMITTED;
     }
 
-    if (draft.messages?.messagesById) {
+    if (draft.messages?.messages) {
       // This may contain nested `ValueFront` objects, which cause lots of
       // "Not Allowed" messages when serialized.
       // TODO Make this more precise later
-      draft.messages.messagesById = OMITTED;
+      draft.messages.messages = OMITTED;
     }
   });
 
