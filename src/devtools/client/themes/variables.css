@@ -132,7 +132,7 @@
   --body-color: #38383d;
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
-  --modal-bgcolor: rgba(255, 255, 255, 0.86);
+  --modal-bgcolor: rgba(255, 255, 255, 0.8);
   --modal-border: none;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
@@ -159,7 +159,7 @@
 
   /* Timeline (Light) */
   --progressbar-preview-max: var(--theme-base-85);
-  --progressbar-preview-min: var(--theme-base-95);
+  --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Light) */
   --menu-bgcolor: var(--theme-toolbar-background);
@@ -386,7 +386,7 @@
 
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
-  --progressbar-preview-min: var(--theme-base-90);
+  --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
   --menu-bgcolor: var(--theme-base-90);
