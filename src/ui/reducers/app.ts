@@ -218,6 +218,13 @@ export default function update(
       };
     }
 
+    case "set_app_mode": {
+      return {
+        ...state,
+        mode: action.mode,
+      };
+    }
+
     default: {
       return state;
     }

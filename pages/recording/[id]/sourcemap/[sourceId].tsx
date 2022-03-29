@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { initSocket, client } from "protocol/socket";
-import { useStore } from "react-redux";
+import { useDispatch, useStore } from "react-redux";
 import { UIStore } from "ui/actions";
 import { ExpectedError } from "ui/state/app";
-import { onUnprocessedRegions } from "ui/actions/app";
+import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
 import { getAccessibleRecording, showLoadingProgress } from "ui/actions/session";
 import tokenManager from "ui/utils/tokenManager";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -96,8 +96,11 @@ function SourcemapVisualizer({
   map: string;
   url: string | undefined;
 }) {
+  const dispatch = useDispatch();
+
   useEffect(() => {
     document.body.className = "sourcemap-visualizer";
+    dispatch(setAppMode("sourcemap-visualizer"));
     renderSourcemap(source, map, url, document);
   }, []);
 

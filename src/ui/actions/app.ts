@@ -21,6 +21,7 @@ import {
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
+  AppMode,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -102,6 +103,7 @@ export type SetLoadedRegions = Action<"set_loaded_regions"> & {
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;
 };
+export type SetAppModeAction = Action<"set_app_mode"> & { mode: AppMode };
 
 export type AppActions =
   | SetRecordingDurationAction
@@ -127,7 +129,8 @@ export type AppActions =
   | SetRecordingTargetAction
   | SetRecordingWorkspaceAction
   | SetLoadedRegions
-  | SetAwaitingSourcemapsAction;
+  | SetAwaitingSourcemapsAction
+  | SetAppModeAction;
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -445,4 +448,8 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(hideCommandPalette());
     }
   };
+}
+
+export function setAppMode(mode: AppMode): SetAppModeAction {
+  return { type: "set_app_mode", mode };
 }
