@@ -31,7 +31,7 @@ const Transcript = (): JSX.Element | null => {
   // CommentItem component to render them like they are some regular comments
   const _rootComment = {
     id: ROOT_COMMENT_ID,
-    replies: sortedHierarchicalComments,
+    replies: sortedHierarchicalComments.map(c => ({ ...c, parentId: ROOT_COMMENT_ID })),
   } as Comment;
 
   return (

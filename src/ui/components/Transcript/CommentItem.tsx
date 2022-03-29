@@ -6,11 +6,16 @@ import TipTapEditor from "../Comments/TranscriptComments/CommentEditor/TipTapEdi
 import PortalDropdown from "../shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "../shared/MaterialIcon";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AvatarImage } from "../Avatar";
 import { formatRelativeTime } from "ui/utils/comments";
 import { tryToParse } from "./utils.comments";
-import { seekToComment, setHoveredComment, setPendingCommentData } from "ui/actions/comments";
+import {
+  seekToComment,
+  setExistingCommentData,
+  setHoveredComment,
+  setPendingCommentData,
+} from "ui/actions/comments";
 import { useFeature } from "ui/hooks/settings";
 import CommentSourceTarget from "./CommentSourceTarget";
 import CommentNetReqTarget from "./CommentNetReqTarget";
@@ -21,21 +26,24 @@ import { UIState } from "ui/state";
 import { JSONContent } from "@tiptap/react";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
+const MAX_NESTING_DEPTH = 1;
+
 type CommentItemProps = {
   comment: Comment;
+  level?: number;
 };
 
-export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
+export const CommentItem = ({ comment: _comment, level = -1 }: CommentItemProps): JSX.Element => {
   const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
   const currentTime = useSelector(selectors.getCurrentTime);
   const executionPoint = useSelector(getExecutionPoint) as string;
   const focusRegion = useSelector(getFocusRegion);
   const pendingCommentExtras = useSelector(
-    (state: UIState) => state.comments.pendingCommentsDataExtras[comment.id]
+    (state: UIState) => state.comments.pendingCommentsDataExtras[_comment.id]
   );
   const existingCommentExtras = useSelector(
-    (state: UIState) => state.comments.existingCommentsDataExtras[comment.id]
+    (state: UIState) => state.comments.existingCommentsDataExtras[_comment.id] || {}
   );
   const { value: netReqCommentsFeature } = useFeature("networkRequestComments");
   const addComment = commentsHooks.useAddComment();
@@ -43,9 +51,23 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const deleteComment = commentsHooks.useDeleteComment();
   const makeFromPendingComment = commentsHooks.useMakeFromPendingComment();
 
+  const comment: Comment = useMemo(() => {
+    return {
+      ..._comment,
+      position: _comment.position
+        ? {
+            ..._comment.position,
+            ...(existingCommentExtras.position ?? {}),
+          }
+        : null,
+    };
+  }, [_comment, existingCommentExtras.position]);
+
+  const commentContent = useMemo(() => tryToParse(comment.content), [comment]);
+
   const isActivePause = currentTime === comment.time && executionPoint === comment.point;
   const isRootComment = comment.id === ROOT_COMMENT_ID;
-  const isTopLevelComment = !comment.parentId;
+  const isTopLevelComment = level === 0;
   const isOutsideFocusedRegion =
     focusRegion && (comment.time < focusRegion.startTime || comment.time > focusRegion.endTime);
 
@@ -56,7 +78,6 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
 
   // editing
   const [isEdit, setIsEdit] = useState(false);
-  // existingCommentExtras;
 
   // a singular pending (unsubmitted) commment reply to this one
   // other contextual data for it is in a store's pendingCommentData that we
@@ -67,10 +88,10 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
     return (
       <>
         {/* REPLIES */}
-        {isTopLevelComment && (
+        {level < MAX_NESTING_DEPTH && (
           <div>
             {comment.replies.map(reply => (
-              <CommentItem key={reply.id} comment={reply} />
+              <CommentItem key={reply.id} comment={reply} level={level + 1} />
             ))}
           </div>
         )}
@@ -79,7 +100,7 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
         {hasPendingCommentData && (
           <TipTapEditor
             editable={true}
-            placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
+            placeholder={isTopLevelComment ? "Write a reply..." : "Type a comment"}
             autofocus
             handleCancel={() => {
               dispatch(setPendingCommentData(comment.id, null));
@@ -194,28 +215,19 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
       {/* CONTENT */}
       <TipTapEditor
         editable={isEdit}
-        content={editedCommentDetails.content}
-        placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
-        autofocus
-        handleCancel={() => {
-          setEditedCommentDetails({
-            content: tryToParse(comment.content),
-            position: comment.position,
-          });
+        placeholder={isTopLevelComment ? "Write a reply..." : "Type a comment"}
+        autofocus={isEdit}
+        handleCancel={({ editor }) => {
+          editor.commands.setContent(commentContent);
           setIsEdit(false);
-        }}
-        onUpdate={({ editor }) => {
-          setEditedCommentDetails({
-            content: editor.getJSON(),
-            position: editedCommentDetails.position,
-          });
         }}
         handleConfirm={content => {
+          updateComment(comment, JSON.stringify(content), existingCommentExtras.position);
+          dispatch(setExistingCommentData(comment.id, null));
           setIsEdit(false);
-          // TODO
-          updateComment(comment, JSON.stringify(content));
         }}
         onCreate={({ editor }) => {
+          editor.commands.setContent(commentContent);
           editor.commands.focus();
         }}
       />

@@ -89,7 +89,7 @@ function _useUpdateCommentReply() {
 export const useUpdateComment = (): ((
   comment: Comment,
   newContent: string,
-  position?: CommentPosition
+  position?: CommentPosition | null
 ) => void) => {
   const updateComment = _useUpdateComment();
   const updateCommentReply = _useUpdateCommentReply();
@@ -97,9 +97,11 @@ export const useUpdateComment = (): ((
   return (comment, newContent, position) => {
     // top-level comment
     if (comment.parentId === ROOT_COMMENT_ID) {
+      console.log("com");
       updateComment(comment.id, newContent, position ?? null);
       // reply
     } else {
+      console.log("rep");
       updateCommentReply(comment.id, newContent);
     }
   };

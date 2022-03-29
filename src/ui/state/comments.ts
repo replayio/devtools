@@ -1,4 +1,5 @@
 import { RecordingId } from "@recordreplay/protocol";
+import { JSONContent } from "@tiptap/react";
 import { User } from "ui/types";
 
 export const ROOT_COMMENT_ID = "recording";
@@ -39,7 +40,7 @@ export interface CommentPosition {
   y: number;
 }
 
-export type ExistingCommentDataExtras = Pick<Comment, "position" | "content">;
+export type ExistingCommentDataExtras = Pick<Comment, "position">;
 
 export type PendingCommentDataExtras = Pick<
   Comment,

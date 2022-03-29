@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent, Extension, Editor, JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -14,7 +14,7 @@ interface TipTapEditorProps {
   blur?: () => void;
   close?: () => void;
   handleConfirm?: (content: JSONContent) => void;
-  handleCancel?: () => void;
+  handleCancel?: (editor: { editor: Pick<Editor, "commands"> }) => void;
   onCreate?: (editor: { editor: Pick<Editor, "commands"> }) => void;
   onUpdate?: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
 }
@@ -53,7 +53,7 @@ const TipTapEditor = ({
             Escape: ({ editor }) => {
               editor.commands.blur();
               !!content && editor.commands.setContent(content);
-              handleCancel?.();
+              handleCancel?.({ editor });
               return true;
             },
           };
@@ -67,6 +67,10 @@ const TipTapEditor = ({
     editable,
     autofocus,
   });
+
+  useEffect(() => {
+    editor?.setEditable(editable);
+  }, [editable]);
 
   return (
     <div
