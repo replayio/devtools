@@ -106,8 +106,8 @@ export type AnalysisPayload = {
   error: AnalysisError | null;
 };
 export enum AnalysisError {
-  hellaHits = "hella-hits",
-  default = "default"
+  TooManyPoints = "too-many-points",
+  Default = "default",
 }
 
 interface Events {
@@ -131,4 +131,8 @@ export interface Canvas {
   scale: number;
   top: number;
   width: number;
+}
+
+export enum ProtocolError {
+  TooManyPoints = 55,
 }

@@ -58,7 +58,7 @@ function BreakpointNavigation({
       {!isEmpty ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
-      {analysisPoints.error ? (
+      {!analysisPoints.error ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : (
         <div className="flex-grow" />

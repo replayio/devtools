@@ -1,4 +1,11 @@
-import { AnalysisError, AnalysisPayload, AppState, EventKind, ReplayEvent } from "ui/state/app";
+import {
+  AnalysisError,
+  AnalysisPayload,
+  AppState,
+  EventKind,
+  ProtocolError,
+  ReplayEvent,
+} from "ui/state/app";
 import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
@@ -139,7 +146,13 @@ export default function update(
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: { data: [], error: action.errorKey === 55 ? AnalysisError.hellaHits : AnalysisError.default },
+          [id]: {
+            data: [],
+            error:
+              action.errorKey === ProtocolError.TooManyPoints
+                ? AnalysisError.TooManyPoints
+                : AnalysisError.Default,
+          },
         },
       };
     }
@@ -249,7 +262,7 @@ export const getAnalysisPointsForLocation = (
   condition = ""
 ) => {
   if (!location) {
-    return;
+    return undefined;
   }
 
   const key = getLocationAndConditionKey(location, condition);

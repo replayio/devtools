@@ -23,11 +23,8 @@ import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { onConsoleOverflow } from "ui/actions/session";
+import { ProtocolError } from "ui/state/app";
 const { prefs } = require("ui/utils/prefs");
-
-enum ProtocolError {
-  TooManyPoints = 55,
-}
 
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
@@ -130,7 +127,7 @@ function saveLogpointHits(
   }
 }
 
-function saveAnalysisError(locations: Location[], condition: string, errorKey: number) {
+function saveAnalysisError(locations: Location[], condition: string, errorKey?: number) {
   for (const location of locations) {
     store.dispatch(setAnalysisError(location, condition, errorKey));
   }
@@ -253,7 +250,7 @@ async function setMultiSourceLogpoint(
   if (showInConsole && primitiveFronts) {
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
-      if (points.error) {
+      if (!points.error) {
         showPrimitiveLogpoints(logGroupId, points.data, primitiveFronts);
       }
       return;
@@ -299,13 +296,13 @@ async function setMultiSourceLogpoint(
 
   try {
     await analysisManager.runAnalysis(params, handler);
-  } catch (e) {
+  } catch (e: any) {
     // Only save the error if we're only grabbing the points for a location.
     // This means that we're not handling cases where the full analysis
     // throws. We should add that as a follow-up.
     if (!shouldGetResults) {
       console.error("Cannot get analysis points", e);
-      saveAnalysisError(locations, condition, e.code);
+      saveAnalysisError(locations, condition, e?.code);
     }
     return;
   }
