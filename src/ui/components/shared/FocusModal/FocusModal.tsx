@@ -1,13 +1,34 @@
-import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { useState } from "react";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import MaterialIcon from "../MaterialIcon";
+import {
+  getFocusRegion,
+  getCurrentTime,
+  getIsAtFocusSoftLimit,
+  getZoomRegion,
+} from "ui/reducers/timeline";
+import { DisabledButton, PrimaryButton } from "../Button";
+import { getFormattedTime } from "ui/utils/timeline";
 
 function FocusingModal({ hideModal }: PropsFromRedux) {
+  const currentTime = useSelector(getCurrentTime);
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
+  const isAtFocusLimit = useSelector(getIsAtFocusSoftLimit);
+
+  const msg = isAtFocusLimit ? (
+    <p>{`Looks like you're making a precise selection. You're paused at ${getFormattedTime(
+      currentTime,
+      true
+    )}.`}</p>
+  ) : (
+    <p>
+      Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
+    </p>
+  );
 
   return (
     <div className="pointer-events-none fixed z-50 grid h-full w-full items-center justify-center">
@@ -27,10 +48,49 @@ function FocusingModal({ hideModal }: PropsFromRedux) {
             </div>
             <div className="text-lg">Edit Focus mode</div>
           </div>
-          <p>
-            Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
-          </p>
+          <div>{msg}</div>
+          {isAtFocusLimit && <QuickActions />}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickActions() {
+  const focusRegion = useSelector(getFocusRegion);
+  const zoomRegion = useSelector(getZoomRegion);
+  const currentTime = useSelector(getCurrentTime);
+  const dispatch = useDispatch();
+
+  const snapStart = () => {
+    dispatch(actions.setFocusRegion({ ...focusRegion!, startTime: Math.max(currentTime - 10, 0) }));
+  };
+  const snapEnd = () => {
+    dispatch(
+      actions.setFocusRegion({
+        ...focusRegion!,
+        endTime: Math.min(currentTime + 10, zoomRegion.endTime),
+      })
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        {currentTime !== focusRegion!.startTime ? (
+          <PrimaryButton color="blue" onClick={snapStart}>
+            Start at this point
+          </PrimaryButton>
+        ) : (
+          <DisabledButton>Start at this point</DisabledButton>
+        )}
+        {currentTime !== focusRegion!.endTime ? (
+          <PrimaryButton color="blue" onClick={snapEnd}>
+            End at this point
+          </PrimaryButton>
+        ) : (
+          <DisabledButton>End at this point</DisabledButton>
+        )}
       </div>
     </div>
   );
