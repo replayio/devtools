@@ -53,7 +53,7 @@ function CommentItemHeader({
 
   useEffect(() => {
     setRelativeDate(formatRelativeTime(new Date(comment.createdAt)));
-  }, []);
+  }, [comment.createdAt]);
 
   if (!comment.user) {
     return null;

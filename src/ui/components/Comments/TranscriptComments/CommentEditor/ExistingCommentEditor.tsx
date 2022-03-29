@@ -43,11 +43,11 @@ function ExistingCommentEditor({
     commentId: comment.id,
   });
 
-  const handleSubmit = (inputValue: string) => {
+  const handleSubmit = async (inputValue: string) => {
     if (type === "comment") {
-      updateComment(comment.id, inputValue, (comment as Comment).position);
+      await updateComment(comment.id, inputValue, (comment as Comment).position);
     } else if (type === "reply") {
-      updateCommentReply(comment.id, inputValue);
+      await updateCommentReply(comment.id, inputValue);
     }
     commentsLocalStorage.clear();
     clearPendingComment();

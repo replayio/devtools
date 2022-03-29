@@ -44,7 +44,7 @@ function CommentEditor({
       collaborators && recording
         ? ([...collaborators.map(c => c.user), recording.user].filter(Boolean) as User[])
         : undefined,
-    [loading]
+    [collaborators, recording]
   );
 
   return (
