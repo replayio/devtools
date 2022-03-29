@@ -3,8 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+import type { AnyAction } from "@reduxjs/toolkit";
+
 const constants = require("devtools/client/webconsole/constants");
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
+
+import type { ValueFront } from "protocol/thread";
 
 const { pointEquals } = require("protocol/execution-point-utils");
 const { getGripPreviewItems } = require("devtools/packages/devtools-reps");
@@ -13,10 +17,111 @@ const { getSourceNames } = require("devtools/client/shared/source-utils");
 
 const { log } = require("protocol/socket");
 const { assert, compareNumericStrings } = require("protocol/utils");
+import type { Command } from "ui/utils/commandHistory";
+import type { WebconsoleFiltersState } from "./filters";
 const { appendToHistory } = require("ui/utils/commandHistory");
-const { isGroupType } = require("devtools/client/webconsole/utils/messages");
 
-const MessageState = overrides =>
+type MessageId = string;
+
+interface Frame {
+  column: number;
+  line: number;
+  source: string;
+  sourceId?: string;
+  functionName?: string;
+}
+
+interface StackFrame {
+  columnNumber: number;
+  lineNumber: number;
+  filename: string;
+  functionName: string;
+  source: string;
+  sourceId: string;
+}
+
+interface MessageRequest {
+  url: string;
+  method: string;
+}
+
+interface Note {
+  messageBody: string;
+  frame: Frame;
+}
+
+interface ExecutionPoint {
+  checkpoint: number;
+  progress: number;
+}
+
+export interface Message {
+  allowRepeating: boolean;
+  category: string | null;
+  errorMessageName: string | null;
+  exceptionDocURL: string | null;
+  executionPoint: ExecutionPoint | null;
+  executionHasFrames: boolean;
+  executionPointTime: number | null;
+  evalId?: number;
+  frame?: Frame;
+  groupId: string | null;
+  id: MessageId;
+  indent: number;
+  innerWindowID: string | null;
+  level: string;
+  logpointId?: string;
+  messageText: string;
+  notes: Note[] | null;
+  parameters: ValueFront[];
+  pauseId: string;
+  prefix?: string;
+  private?: unknown;
+  repeatId: string | null;
+  source: string;
+  stacktrace: StackFrame[];
+  timeStamp?: number;
+  type: string;
+  userProvidedStyles?: unknown;
+  request?: MessageRequest;
+  lastExecutionPoint: {
+    point: ExecutionPoint;
+    time: number;
+    messageCount: number;
+  };
+}
+
+interface FilteredMessagesCount {
+  debug: number;
+  info: number;
+  log: number;
+  warn: number;
+  error: number;
+  global: number;
+  nodemodules: number;
+  text: number;
+}
+
+type FilterCountKeys = keyof FilteredMessagesCount;
+
+export interface MessageState {
+  commandHistory: Command[];
+  messagesById: Map<MessageId, Message>;
+  visibleMessages: MessageId[];
+  filteredMessagesCount: FilteredMessagesCount;
+  messagesUiById: MessageId[];
+  messagesPayloadById: Map<MessageId, unknown>;
+  logpointMessages: Map<MessageId, Message>;
+  removedLogpointIds: Set<MessageId>;
+  pausedExecutionPoint: ExecutionPoint | null;
+  pausedExecutionPointTime: number;
+  hasExecutionPoints: boolean;
+  lastMessageId: MessageId | null;
+  overflow: boolean;
+  messagesLoaded: boolean;
+}
+
+const MessageState = (overrides?: Partial<MessageState>): MessageState =>
   Object.freeze(
     Object.assign(
       {
@@ -54,7 +159,7 @@ const MessageState = overrides =>
     )
   );
 
-function cloneState(state) {
+function cloneState(state: MessageState) {
   return {
     commandHistory: [...state.commandHistory],
     messagesById: new Map(state.messagesById),
@@ -82,7 +187,11 @@ function cloneState(state) {
  * @returns {MessageState} a new messages state.
  */
 // eslint-disable-next-line complexity
-function addMessage(newMessage, state, filtersState) {
+function addMessage(
+  newMessage: Message,
+  state: MessageState,
+  filtersState: WebconsoleFiltersState
+) {
   if (newMessage.type === constants.MESSAGE_TYPE.NULL_MESSAGE) {
     // When the message has a NULL type, we don't add it.
     return state;
@@ -139,14 +248,14 @@ function addMessage(newMessage, state, filtersState) {
   }
   // Don't count replay logpoints (including exceptions!).
   if (addedMessage.level && addedMessage.type !== "logPoint") {
-    state.filteredMessagesCount[addedMessage.level]++;
+    state.filteredMessagesCount[addedMessage.level as FilterCountKeys]++;
   }
 
   return removeMessagesFromState(state, removedIds);
 }
 
 // eslint-disable-next-line complexity
-function messages(state = MessageState(), action) {
+function messages(state = MessageState(), action: AnyAction) {
   const { messagesById, messagesPayloadById, messagesUiById, visibleMessages } = state;
   const { filtersState } = action;
 
@@ -173,7 +282,7 @@ function messages(state = MessageState(), action) {
       };
     case constants.MESSAGES_ADD:
       let newState = cloneState(state);
-      action.messages.forEach(message => {
+      (action.messages as Message[]).forEach(message => {
         newState = addMessage(message, newState, filtersState);
         if (message.type === "command") {
           newState.commandHistory = appendToHistory(message.messageText, state.commandHistory);
@@ -186,56 +295,15 @@ function messages(state = MessageState(), action) {
       openState.messagesUiById = [...messagesUiById, action.id];
       const currMessage = messagesById.get(action.id);
 
-      // If the message is a console.group/groupCollapsed or a warning group.
-      if (currMessage && isGroupType(currMessage.type)) {
-        // We want to make its children visible
-        const messagesToShow = [...messagesById].reduce((res, [id, message]) => {
-          if (
-            !visibleMessages.includes(message.id) &&
-            isGroupType(currMessage.type) &&
-            getParentGroups(message.groupId, groupsById).includes(action.id) &&
-            getMessageVisibility(message, {
-              messagesState: openState,
-              filtersState,
-              // We want to check if the message is in an open group
-              // only if it is not a direct child of the group we're opening.
-              checkGroup: message.groupId !== action.id,
-            }).visible
-          ) {
-            res.push(id);
-          }
-          return res;
-        }, []);
-
-        // We can then insert the messages ids right after the one of the group.
-        const insertIndex = visibleMessages.indexOf(action.id) + 1;
-        openState.visibleMessages = [
-          ...visibleMessages.slice(0, insertIndex),
-          ...messagesToShow,
-          ...visibleMessages.slice(insertIndex),
-        ];
-      }
-
       return openState;
 
     case constants.MESSAGE_CLOSE:
-      console.log("MESAGE CLOSE");
       const closeState = { ...state };
       const messageId = action.id;
       const index = closeState.messagesUiById.indexOf(messageId);
       closeState.messagesUiById.splice(index, 1);
       closeState.messagesUiById = [...closeState.messagesUiById];
 
-      // If the message is a group
-      if (isGroupType(messagesById.get(messageId).type)) {
-        // Hide all its children
-        closeState.visibleMessages = visibleMessages.filter((id, i, arr) => {
-          const message = messagesById.get(id);
-
-          const parentGroups = getParentGroups(message.groupId, groupsById);
-          return parentGroups.includes(messageId) === false;
-        });
-      }
       return closeState;
 
     case constants.MESSAGES_CLEAR_EVALUATIONS: {
@@ -312,10 +380,21 @@ function messages(state = MessageState(), action) {
   return state;
 }
 
-function setVisibleMessages({ messagesState, filtersState, forceTimestampSort = false }) {
+interface MessagesFilters {
+  messagesState: MessageState;
+  filtersState: WebconsoleFiltersState;
+}
+
+function setVisibleMessages({
+  messagesState,
+  filtersState,
+  forceTimestampSort = false,
+}: MessagesFilters & {
+  forceTimestampSort?: boolean;
+}) {
   const { messagesById } = messagesState;
 
-  const messagesToShow = [];
+  const messagesToShow: MessageId[] = [];
   const filtered = getDefaultFiltersCounter();
 
   messagesById.forEach((message, msgId) => {
@@ -330,7 +409,7 @@ function setVisibleMessages({ messagesState, filtersState, forceTimestampSort = 
       filtered.global = filtered.global + 1;
     }
     if (message.level && message.type !== "logPoint") {
-      filtered[message.level] = filtered[message.level] + 1;
+      filtered[message.level as FilterCountKeys] = filtered[message.level as FilterCountKeys] + 1;
     }
   });
 
@@ -353,7 +432,7 @@ function setVisibleMessages({ messagesState, filtersState, forceTimestampSort = 
  * @param {Array} removedMessagesIds
  * @returns {MessageState}
  */
-function removeMessagesFromState(state, removedMessagesIds) {
+function removeMessagesFromState(state: MessageState, removedMessagesIds: MessageId[]) {
   if (!Array.isArray(removedMessagesIds) || removedMessagesIds.length === 0) {
     return state;
   }
@@ -370,22 +449,15 @@ function removeMessagesFromState(state, removedMessagesIds) {
     state.visibleMessages = visibleMessages;
   }
 
-  const isInRemovedId = id => removedMessagesIds.includes(id);
-  const mapHasRemovedIdKey = map => removedMessagesIds.some(id => map.has(id));
-  const objectHasRemovedIdKey = obj => Object.keys(obj).findIndex(isInRemovedId) !== -1;
+  const isInRemovedId = (id: MessageId) => removedMessagesIds.includes(id);
+  const mapHasRemovedIdKey = (map: Map<MessageId, any>) =>
+    removedMessagesIds.some(id => map.has(id));
 
-  const cleanUpMap = map => {
+  const cleanUpMap = (map: Map<MessageId, any>) => {
     const clonedMap = new Map(map);
     removedMessagesIds.forEach(id => clonedMap.delete(id));
     return clonedMap;
   };
-  const cleanUpObject = object =>
-    [...Object.entries(object)].reduce((res, [id, value]) => {
-      if (!isInRemovedId(id)) {
-        res[id] = value;
-      }
-      return res;
-    }, {});
 
   state.messagesById = cleanUpMap(state.messagesById);
 
@@ -413,7 +485,7 @@ function removeMessagesFromState(state, removedMessagesIds) {
  *         - cause {String}: if visible is false, what causes the message to be hidden.
  */
 // eslint-disable-next-line complexity
-function getMessageVisibility(message, { messagesState, filtersState }) {
+function getMessageVisibility(message: Message, { messagesState, filtersState }: MessagesFilters) {
   // Some messages can't be filtered out
   // So, always return visible: true for those.
   if (isUnfilterable(message)) {
@@ -452,7 +524,7 @@ function getMessageVisibility(message, { messagesState, filtersState }) {
   };
 }
 
-function isUnfilterable(message) {
+function isUnfilterable(message: Message) {
   return [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT, MESSAGE_TYPE.NAVIGATION_MARKER].includes(
     message.type
   );
@@ -465,8 +537,11 @@ function isUnfilterable(message) {
  * @param {FilterState} filters - redux "filters" state.
  * @returns {Boolean}
  */
-function passNodeModuleFilters(message, filters) {
-  return message.frame?.source?.includes("node_modules") && filters[FILTERS.NODEMODULES] == false;
+function passNodeModuleFilters(message: Message, filters: WebconsoleFiltersState) {
+  return (
+    message.frame?.source?.includes("node_modules") &&
+    filters[FILTERS.NODEMODULES as keyof WebconsoleFiltersState] == false
+  );
 }
 
 /**
@@ -476,16 +551,18 @@ function passNodeModuleFilters(message, filters) {
  * @param {FilterState} filters - redux "filters" state.
  * @returns {Boolean}
  */
-function passLevelFilters(message, filters) {
+function passLevelFilters(message: Message, filters: WebconsoleFiltersState) {
   // The message passes the filter if it is not a console call,
   // or if its level matches the state of the corresponding filter.
   return (
     (message.source !== MESSAGE_SOURCE.CONSOLE_API &&
       message.source !== MESSAGE_SOURCE.JAVASCRIPT) ||
     message.type !== MESSAGE_TYPE.LOG ||
-    filters[message.level] === true
+    filters[message.level as keyof WebconsoleFiltersState] === true
   );
 }
+
+type StringMatcher = (str: string) => boolean;
 
 /**
  * Returns true if the message shouldn't be hidden because of search filter state.
@@ -494,20 +571,22 @@ function passLevelFilters(message, filters) {
  * @param {FilterState} filters - redux "filters" state.
  * @returns {Boolean}
  */
-function passSearchFilters(message, filters) {
+function passSearchFilters(message: Message, filters: WebconsoleFiltersState) {
   const trimmed = (filters.text || "").trim().toLocaleLowerCase();
 
   // "-"-prefix switched to exclude mode
   const exclude = trimmed.startsWith("-");
   const term = exclude ? trimmed.slice(1) : trimmed;
 
-  let regex;
+  let regex: RegExp | undefined;
   if (term.startsWith("/") && term.endsWith("/") && term.length > 2) {
     try {
       regex = new RegExp(term.slice(1, -1), "im");
     } catch (e) {}
   }
-  const matchStr = regex ? str => regex.test(str) : str => str.toLocaleLowerCase().includes(term);
+  const matchStr: StringMatcher = regex
+    ? str => regex!.test(str)
+    : str => str.toLocaleLowerCase().includes(term);
 
   // If there is no search, the message passes the filter.
   if (!term) {
@@ -536,7 +615,7 @@ function passSearchFilters(message, filters) {
 /**
  * Returns true if given text is included in provided stack frame.
  */
-function isTextInFrame(matchStr, frame) {
+function isTextInFrame(matchStr: StringMatcher, frame?: Frame) {
   if (!frame) {
     return false;
   }
@@ -552,7 +631,7 @@ function isTextInFrame(matchStr, frame) {
 /**
  * Returns true if given text is included in provided parameters.
  */
-function isTextInParameters(matchStr, parameters) {
+function isTextInParameters(matchStr: StringMatcher, parameters?: ValueFront[]) {
   if (!parameters) {
     return false;
   }
@@ -563,7 +642,11 @@ function isTextInParameters(matchStr, parameters) {
 /**
  * Returns true if given text is included in provided parameter.
  */
-function isTextInParameter(matchStr, parameter, visitedObjectIds = new Set()) {
+function isTextInParameter(
+  matchStr: StringMatcher,
+  parameter: ValueFront,
+  visitedObjectIds = new Set()
+) {
   if (parameter.isPrimitive()) {
     return matchStr(String(parameter.primitive()));
   }
@@ -572,7 +655,7 @@ function isTextInParameter(matchStr, parameter, visitedObjectIds = new Set()) {
     return false;
   }
 
-  if (matchStr(parameter.className())) {
+  if (matchStr(parameter.className()!)) {
     return true;
   }
 
@@ -596,7 +679,7 @@ function isTextInParameter(matchStr, parameter, visitedObjectIds = new Set()) {
 /**
  * Returns true if given text is included in provided net event grip.
  */
-function isTextInNetEvent(matchStr, request) {
+function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest) {
   if (!request) {
     return false;
   }
@@ -609,7 +692,7 @@ function isTextInNetEvent(matchStr, request) {
 /**
  * Returns true if given text is included in provided stack trace.
  */
-function isTextInStackTrace(matchStr, stacktrace) {
+function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]) {
   if (!Array.isArray(stacktrace)) {
     return false;
   }
@@ -620,8 +703,8 @@ function isTextInStackTrace(matchStr, stacktrace) {
     isTextInFrame(matchStr, {
       functionName: frame.functionName || "<anonymous>",
       source: frame.filename,
-      lineNumber: frame.lineNumber,
-      columnNumber: frame.columnNumber,
+      line: frame.lineNumber,
+      column: frame.columnNumber,
     })
   );
 }
@@ -629,7 +712,7 @@ function isTextInStackTrace(matchStr, stacktrace) {
 /**
  * Returns true if given text is included in `messageText` field.
  */
-function isTextInMessageText(matchStr, messageText) {
+function isTextInMessageText(matchStr: StringMatcher, messageText?: string) {
   if (!messageText) {
     return false;
   }
@@ -638,18 +721,13 @@ function isTextInMessageText(matchStr, messageText) {
     return matchStr(messageText);
   }
 
-  const grip = messageText && messageText.getGrip ? messageText.getGrip() : messageText;
-  if (grip && grip.type === "longString") {
-    return matchStr(grip.initial);
-  }
-
   return true;
 }
 
 /**
  * Returns true if given text is included in notes.
  */
-function isTextInNotes(matchStr, notes) {
+function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null) {
   if (!Array.isArray(notes)) {
     return false;
   }
@@ -666,7 +744,7 @@ function isTextInNotes(matchStr, notes) {
 /**
  * Returns true if given text is included in prefix.
  */
-function isTextInPrefix(matchStr, prefix) {
+function isTextInPrefix(matchStr: StringMatcher, prefix?: string) {
   if (!prefix) {
     return false;
   }
@@ -675,16 +753,19 @@ function isTextInPrefix(matchStr, prefix) {
 }
 
 function getDefaultFiltersCounter() {
-  const count = DEFAULT_FILTERS.reduce((res, filter) => {
-    res[filter] = 0;
-    return res;
-  }, {});
+  const count = (DEFAULT_FILTERS as FilterCountKeys[]).reduce(
+    (res: FilteredMessagesCount, filter) => {
+      res[filter] = 0;
+      return res;
+    },
+    {} as FilteredMessagesCount
+  );
   count.global = 0;
   return count;
 }
 
 //get the point for the corresponding command, regardless of where we're currently paused
-function getPausePoint(newMessage, state) {
+function getPausePoint(newMessage: Message, state: MessageState) {
   if (newMessage.type === constants.MESSAGE_TYPE.RESULT && newMessage.parameters[0]) {
     return newMessage.parameters[0].getExecutionPoint() || state.pausedExecutionPoint;
   } else {
@@ -694,7 +775,7 @@ function getPausePoint(newMessage, state) {
 
 // Make sure that message has an execution point which can be used for sorting
 // if other messages with real execution points appear later.
-function ensureExecutionPoint(state, newMessage) {
+function ensureExecutionPoint(state: MessageState, newMessage: Message) {
   if (newMessage.executionPoint) {
     assert("executionPointTime" in newMessage, "newMessage.executionPointTime not set");
     return;
@@ -703,25 +784,27 @@ function ensureExecutionPoint(state, newMessage) {
   // Add a lastExecutionPoint property which will group messages evaluated during
   // the same replay pause point. When applicable, it will place the message immediately
   // after the last visible message in the group without an execution point when sorting.
-  let point = { checkpoint: 0, progress: 0 },
+  let point: ExecutionPoint | string = { checkpoint: 0, progress: 0 },
     time = 0,
     messageCount = 1;
   if (state.pausedExecutionPoint) {
+    // @ts-ignore string/obj mismatch
     point = getPausePoint(newMessage, state);
     time = state.pausedExecutionPointTime;
+    // @ts-ignorestring/obj mismatch
     const lastMessage = getLastMessageWithPoint(state, point);
     if (lastMessage.lastExecutionPoint) {
       messageCount = lastMessage.lastExecutionPoint.messageCount + 1;
     }
   } else if (state.visibleMessages.length) {
     const lastId = state.visibleMessages[state.visibleMessages.length - 1];
-    const lastMessage = state.messagesById.get(lastId);
+    const lastMessage = state.messagesById.get(lastId)!;
     if (lastMessage.executionPoint) {
       // If the message is evaluated while we are not paused, we want
       // to make sure that those messages are placed immediately after the execution
       // point's message.
       point = lastMessage.executionPoint;
-      time = lastMessage.executionPointTime;
+      time = lastMessage.executionPointTime!;
       messageCount = 0;
     } else {
       point = lastMessage.lastExecutionPoint.point;
@@ -730,14 +813,15 @@ function ensureExecutionPoint(state, newMessage) {
     }
   }
 
+  // @ts-ignorestring/obj mismatch
   newMessage.lastExecutionPoint = { point, time, messageCount };
 }
 
-function getLastMessageWithPoint(state, point) {
+function getLastMessageWithPoint(state: MessageState, point: ExecutionPoint) {
   // Find all of the messageIds with no real execution point and the same progress
   // value as the given point.
   const filteredMessageId = state.visibleMessages.filter(function (p) {
-    const currentMessage = state.messagesById.get(p);
+    const currentMessage = state.messagesById.get(p)!;
 
     if (currentMessage.executionPoint) {
       return false;
@@ -747,16 +831,16 @@ function getLastMessageWithPoint(state, point) {
   });
 
   const lastMessageId = filteredMessageId[filteredMessageId.length - 1];
-  return state.messagesById.get(lastMessageId) || {};
+  return state.messagesById.get(lastMessageId) || ({} as Message);
 }
 
-function messageExecutionPoint(state, id) {
-  const message = state.messagesById.get(id);
+function messageExecutionPoint(state: MessageState, id: MessageId) {
+  const message = state.messagesById.get(id)!;
   return message.executionPoint || message.lastExecutionPoint.point;
 }
 
-function messageCountSinceLastExecutionPoint(state, id) {
-  const message = state.messagesById.get(id);
+function messageCountSinceLastExecutionPoint(state: MessageState, id: MessageId) {
+  const message = state.messagesById.get(id)!;
   return message.lastExecutionPoint ? message.lastExecutionPoint.messageCount : 0;
 }
 
@@ -766,7 +850,7 @@ function messageCountSinceLastExecutionPoint(state, id) {
  * @param {MessageState} state
  * @param {Boolean} timeStampSort: set to true to sort messages by their timestamps.
  */
-function maybeSortVisibleMessages(state, timeStampSort = false) {
+function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
   // When using log points while replaying, messages can be added out of order˜
   // with respect to how they originally executed. Use the execution point
   // information in the messages to sort visible messages according to how
@@ -784,8 +868,8 @@ function maybeSortVisibleMessages(state, timeStampSort = false) {
       } else if (compared > 0) {
         return 1;
       } else {
-        const msgA = state.messagesById.get(a);
-        const msgB = state.messagesById.get(b);
+        const msgA = state.messagesById.get(a)!;
+        const msgB = state.messagesById.get(b)!;
         if (msgA.evalId) {
           if (!msgB.evalId) {
             return 1;
@@ -807,17 +891,14 @@ function maybeSortVisibleMessages(state, timeStampSort = false) {
 
   if (timeStampSort) {
     state.visibleMessages.sort((a, b) => {
-      const messageA = state.messagesById.get(a);
-      const messageB = state.messagesById.get(b);
+      const messageA = state.messagesById.get(a)!;
+      const messageB = state.messagesById.get(b)!;
 
-      return messageA.timeStamp < messageB.timeStamp ? -1 : 1;
+      return messageA.timeStamp! < messageB.timeStamp! ? -1 : 1;
     });
   }
 }
 
-exports.messages = messages;
+export const initialMessageState = MessageState;
 
-// Export for testing purpose.
-exports.ensureExecutionPoint = ensureExecutionPoint;
-
-exports.initialMessageState = MessageState;
+export { messages, ensureExecutionPoint };
