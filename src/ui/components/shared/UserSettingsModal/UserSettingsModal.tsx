@@ -130,15 +130,16 @@ const getSettings = (): Settings<SettingsTabTitle, {}> => [
     component: Personal,
   },
   {
-    title: "API Keys",
-    icon: "vpn_key",
-    component: UserAPIKeys,
-  },
-  {
     title: "Preferences",
     icon: "tune",
     component: PreferencesSettings,
   },
+  {
+    title: "API Keys",
+    icon: "vpn_key",
+    component: UserAPIKeys,
+  },
+
   {
     title: "Experimental",
     icon: "biotech",
