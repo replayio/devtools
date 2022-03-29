@@ -20,7 +20,7 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 describe("Web Console UI", () => {
   filterCommonTestWarnings();
 
-  it("Can render a list of messages", async () => {
+  it("Can render a list of messages and filter it", async () => {
     const store = await createTestStore();
     // This is necessary to unblock various event listeners and parsing.
     // Actual session ID value _probably_ doesn't matter here
@@ -35,7 +35,9 @@ describe("Web Console UI", () => {
     // Give everything time to settle
     await sleep(100);
 
-    const { findByText, findByPlaceholderText } = await render(<WebConsoleApp />, { store });
+    const { findByText, findByPlaceholderText, findByRole } = await render(<WebConsoleApp />, {
+      store,
+    });
 
     const timestampsCheckbox = await findByText("Show Timestamps");
     expect(timestampsCheckbox).toBeInTheDocument();
@@ -63,5 +65,33 @@ describe("Web Console UI", () => {
 
     const filteredListItems = getListItems();
     expect(filteredListItems.length).toBe(5);
+
+    // Clear out the text filter
+    const clearTextButton = await findByRole("button", { name: "close" });
+    act(() => {
+      userEvent.click(clearTextButton);
+    });
+
+    const loadedListItems2 = getListItems();
+    expect(loadedListItems2.length).toBe(loadedListItems.length);
+
+    // Toggle the "Logs" filter option on and off
+    const logsCheckbox = await findByRole("checkbox", {
+      name: /^Logs/,
+    });
+
+    act(() => {
+      userEvent.click(logsCheckbox);
+    });
+
+    const filteredListItems2 = getListItems();
+    expect(filteredListItems2.length).toBe(0);
+
+    act(() => {
+      userEvent.click(logsCheckbox);
+    });
+
+    const loadedListItems3 = getListItems();
+    expect(loadedListItems3.length).toBe(loadedListItems.length);
   }, 20000);
 });

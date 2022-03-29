@@ -62,7 +62,10 @@ export const filterLoggingInTests = (
 
 export const filterCommonTestWarnings = () => {
   // Skip websocket "Socket Open" message
-  filterLoggingInTests(message => message.includes("Socket Open") || message === "indexed");
+  filterLoggingInTests(
+    message =>
+      message.includes("Socket Open") || message === "indexed" || message.includes("LoadedRegions")
+  );
   filterLoggingInTests(message => message.includes("is of type ValueFront"), "warn");
   // Skip React 18 "stop using ReactDOM.render" message
   filterLoggingInTests(
