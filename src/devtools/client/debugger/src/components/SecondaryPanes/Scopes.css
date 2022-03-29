@@ -80,7 +80,7 @@ html[dir="rtl"] .scopes-content .object-node {
 
 .scopes-list .scope-type-toggle button {
   /* Override color so that the link doesn't turn purple */
-  color: var(--theme-body-color);
+  color: var(--body-color);
   font-size: inherit;
   text-decoration: underline;
   cursor: pointer;

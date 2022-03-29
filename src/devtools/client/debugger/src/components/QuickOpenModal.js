@@ -394,6 +394,7 @@ export class QuickOpenModal extends Component {
 
     const items = this.highlightMatching(query, results || []);
     const expanded = !!items && items.length > 0;
+    const showLoadingResults = query?.replace(/@/g, "") && results === null;
 
     return (
       <Modal
@@ -418,6 +419,7 @@ export class QuickOpenModal extends Component {
           selectedItemId={expanded && items[selectedIndex] ? items[selectedIndex].id : ""}
           size="big"
         />
+        {showLoadingResults ? <div className="px-2 py-1">Loading results…</div> : null}
         {results && items && (
           <ResultList
             key="results"

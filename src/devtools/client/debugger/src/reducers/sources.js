@@ -32,6 +32,7 @@ import {
   getSourceActor,
   getSourceActors,
   getBreakableLinesForSourceActors,
+  getSourceActorBreakpointHitCounts,
 } from "./source-actors";
 import uniq from "lodash/uniq";
 
@@ -554,6 +555,11 @@ export function getSourceContent(state, id) {
 export function getSelectedSourceId(state) {
   const source = getSelectedSource(state);
   return source && source.id;
+}
+
+export function getHitCounts(state) {
+  const id = getSelectedSourceId(state);
+  return getSourceActorBreakpointHitCounts(state, state.sources.actors[id]);
 }
 
 export const getDisplayedSources = createSelector(

@@ -25,7 +25,6 @@ const {
   MESSAGES_CLEAR_EVALUATIONS,
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
-import { trackEvent } from "ui/utils/telemetry";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages = [];

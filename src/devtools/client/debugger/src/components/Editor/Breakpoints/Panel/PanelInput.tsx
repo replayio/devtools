@@ -20,7 +20,7 @@ export function PanelInput({
 }) {
   const { value: enableBreakpointPanelAutocomplete } = useFeature("breakpointPanelAutocomplete");
   const onKeyPress = (e: KeyboardEvent) => {
-    if (e.key === Keys.ENTER) {
+    if (e.key === Keys.ENTER && !e.shiftKey) {
       e.preventDefault();
       onEnter();
     } else if (e.key === Keys.ESCAPE) {

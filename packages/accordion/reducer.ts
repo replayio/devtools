@@ -41,10 +41,16 @@ export type AccordionAction =
   | ResizeAction
   | ContainerResizeAction;
 
-const createDefaultSection = (expanded: boolean) => {
+const createDefaultSection = ({
+  expanded,
+  initialHeight,
+}: {
+  expanded: boolean;
+  initialHeight: number | undefined;
+}) => {
   return {
     expanded,
-    displayedHeight: 0,
+    displayedHeight: initialHeight || 0,
   };
 };
 
@@ -123,7 +129,9 @@ export const getResizingParams = (state: AccordionState) => {
 
 // Reducer
 
-export function getInitialState(expandedState: boolean[]): AccordionState {
+export function getInitialState(
+  expandedState: { initialHeight: number | undefined; expanded: boolean }[]
+): AccordionState {
   const sections: Section[] = [];
 
   for (let i = 0; i < expandedState.length; i++) {

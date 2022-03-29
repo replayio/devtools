@@ -298,7 +298,7 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
   }
 
   return (
-    <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-themeBodyBgcolor">
+    <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-bodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />

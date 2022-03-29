@@ -7,21 +7,21 @@
 
 .workspace-members-container .member-permissions .expand-dropdown {
   padding: 0px;
-  color: var(--theme-toolbar-color);
-  background: inherit;
+  color: var(--menu-color);
 }
 
 .permissions-dropdown-item {
   padding: 0px;
   padding: 0px;
-  color: var(--theme-toolbar-color);
-  background: inherit;
+  color: var(--menu-color);
+  background-color: var(--menu-bgcolor);
   line-height: 20px;
   font-size: 14px;
   padding: 4px 8px 4px 8px;
 }
 
 .permissions-dropdown-item:hover {
-  background-color: var(--grey-20);
+  background-color: var(--menu-hover-bgcolor);
+  color: var(--menu-hover-color);
   cursor: pointer;
 }

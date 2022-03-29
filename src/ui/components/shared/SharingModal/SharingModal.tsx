@@ -52,7 +52,7 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
       <div className="space-y-1.5 overflow-auto" style={{ maxHeight: "160px" }}>
         {displayedRequests.map((c, i) => (
           <div
-            className="flex items-center justify-between space-x-2 rounded-lg p-2 hover:bg-gray-100"
+            className="hover:bg-theme-base-90 flex items-center justify-between space-x-2 rounded-lg p-2"
             key={i}
           >
             <div className="flex items-center space-x-2">

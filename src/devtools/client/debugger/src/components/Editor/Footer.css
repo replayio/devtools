@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .source-footer {
-  background: var(--theme-body-bgcolor);
+  background: var(--body-bgcolor);
   border-top: 1px solid var(--theme-splitter-color);
   position: absolute;
   display: flex;
@@ -46,7 +46,7 @@
 }
 
 :root.theme-dark .source-footer .commands .action {
-  fill: var(--theme-body-color);
+  fill: var(--body-color);
 }
 
 :root.theme-dark .source-footer .commands .action:hover {

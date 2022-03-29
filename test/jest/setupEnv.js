@@ -22,3 +22,11 @@ doInstall({
   bindings: basicBindings(),
   messageHandlers: basicMessageHandlers(),
 });
+
+delete window.performance;
+window.performance = {
+  mark: () => {},
+  measure: () => {},
+  getEntriesByName: () => [],
+  getEntriesByType: () => [],
+};

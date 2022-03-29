@@ -24,7 +24,7 @@ function TrialDetails({
       <div className="p-4">
         <div
           style={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)" }}
-          className="space-y-6 rounded bg-white px-6 pt-8 pb-4 text-lg"
+          className="space-y-6 rounded bg-themeBase-95 px-6 pt-8 pb-4 text-lg text-bodyColor"
         >
           {!expired && (
             <p>
@@ -73,7 +73,7 @@ function SubscriptionDetails({
       {isSubscriptionCancelled(subscription) ||
       subscription.billingSchedule === "contract" ||
       subscription.plan.key === "beta-v1" ? null : (
-        <div className="border-color-gray-50 flex flex-row items-center justify-between border-b py-2">
+        <div className="flex flex-row items-center justify-between border-b border-themeBase-85 py-2">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">
             {subscription.paymentMethods && subscription.paymentMethods.length > 0 ? (

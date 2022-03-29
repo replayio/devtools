@@ -110,6 +110,7 @@ export default async function DevTools(store: AppStore) {
   window.app.selectors = bindSelectors({ store, selectors });
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
+  window.app.prefs = window.app.prefs ?? {};
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();

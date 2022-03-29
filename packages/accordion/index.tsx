@@ -30,17 +30,18 @@ import {
 
 // When I wrote this code God and I knew what I was doing. Now only God knows.
 
+export type SectionHeight = string | number;
+export type CollapsedState = boolean[];
+export type CreasesState = number[];
 export interface AccordionItem {
   component: React.ReactNode;
   header: string;
   expanded: boolean;
   className?: string;
+  initialHeight?: number;
   onToggle?: () => void;
   button?: React.ReactNode;
 }
-export type SectionHeight = string | number;
-export type CollapsedState = boolean[];
-export type CreasesState = number[];
 
 function ResizeHandle({
   onResizeStart,
@@ -66,42 +67,42 @@ function ResizeHandle({
 }
 
 export function AccordionPane({
-  children,
-  header,
+  _expanded = false,
   button,
-  index,
-  expanded,
+  children,
   className,
   dispatch = () => ({}),
-  isBeingResized = false,
-  _expanded = false,
-  isResizable = false,
+  expanded,
+  header,
   height = 0,
-  onToggle = () => ({}),
+  index,
+  initialHeight,
+  isBeingResized = false,
+  isResizable = false,
   onResizeStart = () => ({}),
+  onToggle = () => ({}),
 }: {
-  children: React.ReactNode;
-  header: string;
+  _expanded?: boolean;
   button?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
   dispatch?: Dispatch<AccordionAction>;
   expanded?: boolean;
-  index?: number;
-  className?: string;
-  isBeingResized?: boolean;
-  _expanded?: boolean;
-  isResizable?: boolean;
+  header: string;
   height?: SectionHeight;
-  onToggle: () => void;
+  index?: number;
+  initialHeight?: number;
+  isBeingResized?: boolean;
+  isResizable?: boolean;
   onResizeStart?: (e: React.MouseEvent) => void;
+  onToggle: () => void;
 }) {
   // Whenever the real `expanded` state changes, make sure we update the Accordion's
   // internal `_expanded` state to reflect the change. There's probably a simpler way to
   // do this by intercepting the expanded state in the Accordion so we only have one
   // expanded prop (the one from the Accordion) being considered by the AccordionPane.
   // https://gist.github.com/jaril/dfad5343f141c175d767d21cd6fdaab2
-  useEffect(() => {
-    dispatch(expanded ? expandSection(index!) : collapseSection(index!));
-  }, [expanded]);
+  useEffect(() => dispatch(expanded ? expandSection(index!) : collapseSection(index!)), [expanded]);
 
   return (
     <div
@@ -133,11 +134,20 @@ export function AccordionPane({
 export const Accordion: FC<{
   children: ReactElement<typeof AccordionPane>[];
 }> = ({ children }) => {
-  const initialExpandedState = Children.map(
-    children,
-    c => (c as unknown as AccordionItem).expanded ?? false
-  );
-  const [state, dispatch] = useReducer(reducer, getInitialState(initialExpandedState as boolean[]));
+  const initialState = Children.map(children, c => {
+    if (!c?.hasOwnProperty("props")) {
+      return {
+        expanded: false,
+        initialHeight: undefined,
+      };
+    }
+
+    return {
+      expanded: !!(c as ReactElement).props.expanded ?? false,
+      initialHeight: (c as ReactElement).props.initialHeight,
+    };
+  });
+  const [state, dispatch] = useReducer(reducer, getInitialState(initialState!));
   const isResizing = getIsResizing(state);
   const resizingParams = getResizingParams(state);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -158,12 +168,8 @@ export const Accordion: FC<{
 
     dispatch(startResizing(index, e.screenY));
   };
-  const onResize = (e: React.MouseEvent) => {
-    dispatch(resize(e.screenY));
-  };
-  const onResizeEnd = (e: React.MouseEvent) => {
-    dispatch(endResizing());
-  };
+  const onResize = (e: React.MouseEvent) => dispatch(resize(e.screenY));
+  const onResizeEnd = (e: React.MouseEvent) => dispatch(endResizing());
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(entries => {

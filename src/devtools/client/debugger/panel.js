@@ -114,12 +114,12 @@ export class DebuggerPanel {
     return this._selectors.getIsPaused(this._getState());
   }
 
-  async selectSource(sourceId, line, column) {
+  async selectSource(sourceId, line, column, openSourcesTab) {
     const cx = this._selectors.getContext(this._getState());
     const location = { sourceId, line, column };
 
-    this._actions.showSource(cx, sourceId, /* openSourcesTab */ false);
-    await this._actions.selectSource(cx, sourceId, location, /* openSourcesTab */ false);
+    this._actions.showSource(cx, sourceId, openSourcesTab);
+    await this._actions.selectSource(cx, sourceId, location, openSourcesTab);
   }
 
   getSourceByActorId(sourceId) {

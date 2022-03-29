@@ -131,7 +131,7 @@
 .devtools-sidebar-alltabs,
 .cm-s-mozilla .CodeMirror-dialog {
   /* General toolbar styling */
-  color: var(--theme-body-color);
+  color: var(--body-color);
   background-color: var(--theme-toolbar-background);
   border-color: var(--theme-splitter-color);
 }
@@ -167,7 +167,7 @@
 .cm-s-mozilla .cm-variable-3,
 .cm-s-mozilla .cm-operator,
 .cm-s-mozilla .cm-special {
-  color: var(--theme-body-color);
+  color: var(--body-color);
 }
 
 .theme-light .cm-s-mozilla .CodeMirror-lines .CodeMirror-cursor {
