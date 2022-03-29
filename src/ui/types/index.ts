@@ -21,6 +21,7 @@ export type LocalExperimentalUserSettings = {
   enableNetworkRequestComments: boolean;
   useMultipleControllers: boolean;
   multipleControllerUseSnapshots: boolean;
+  enableResolveRecording: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
@@ -138,7 +139,12 @@ export interface Recording {
   comments?: any;
   userRole?: RecordingRole;
   operations: OperationsData;
+  resolution: { resolvedAt: string; resolvedBy: string };
   collaboratorRequests: CollaboratorRequest[];
+}
+
+export interface RecordingOptions {
+  resolvedAt: string | null;
 }
 
 export interface CollaboratorRequest {

@@ -28,6 +28,7 @@ pref("devtools.features.useMultipleControllers", false);
 pref("devtools.features.multipleControllerUseSnapshots", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", false);
+pref("devtools.features.resolveRecording", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -55,6 +56,7 @@ export const features = new PrefsHelper("devtools.features", {
   networkRequestComments: ["Bool", "networkRequestComments"],
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
   codeHeatMaps: ["Bool", "codeHeatMaps"],
+  resolveRecording: ["Bool", "resolveRecording"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
