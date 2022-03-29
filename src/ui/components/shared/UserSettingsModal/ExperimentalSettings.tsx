@@ -55,6 +55,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Calculate hit counts for editor files all at once",
     key: "codeHeatMaps",
   },
+  {
+    label: "Resolve recording",
+    description: "Mark a recording as resolved",
+    key: "enableResolveRecording",
+  },
 ];
 
 function Experiment({
@@ -132,6 +137,8 @@ export default function ExperimentalSettings({}) {
     update: updateEnableMultipleControllerUseSnapshots,
   } = useFeature("multipleControllerUseSnapshots");
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
+  const { value: enableResolveRecording, update: updateEnableResolveRecording } =
+    useFeature("resolveRecording");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -150,6 +157,8 @@ export default function ExperimentalSettings({}) {
       updateEnableMultipleControllerUseSnapshots(!enableMultipleControllerUseSnapshots);
     } else if (key == "codeHeatMaps") {
       updateCodeHeatMaps(!codeHeatMaps);
+    } else if (key == "enableResolveRecording") {
+      updateEnableResolveRecording(!enableResolveRecording);
     }
   };
 
@@ -160,6 +169,7 @@ export default function ExperimentalSettings({}) {
     enableNetworkRequestComments,
     useMultipleControllers: enableUseMultipleControllers,
     multipleControllerUseSnapshots: enableMultipleControllerUseSnapshots,
+    enableResolveRecording,
   };
 
   const settings = { ...userSettings, ...localSettings };

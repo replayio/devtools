@@ -13,3 +13,4 @@ lint:
       paths:
         - public
         - src/graphql
+        - docs/codebase-notes

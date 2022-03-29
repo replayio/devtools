@@ -414,7 +414,6 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
 const connector = connect(
   (state: UIState) => ({
     loadedRegions: selectors.getLoadedRegions(state)?.loaded,
-    isFinishedLoadingRegions: selectors.isFinishedLoadingRegions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
