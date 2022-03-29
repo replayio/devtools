@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import { getLoadedRegions, isFinishedLoadingRegions } from "ui/reducers/app";
+import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import clamp from "lodash/clamp";
@@ -8,10 +8,9 @@ import clamp from "lodash/clamp";
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useSelector(getLoadedRegions);
   const zoomRegion = useSelector(getZoomRegion);
-  const finishedLoadingRegions = useSelector(isFinishedLoadingRegions);
 
   // Check loadedRegions to keep typescript happy.
-  if (!loadedRegions || !finishedLoadingRegions) {
+  if (!loadedRegions) {
     return null;
   }
 
