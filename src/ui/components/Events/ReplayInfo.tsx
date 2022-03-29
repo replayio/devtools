@@ -12,6 +12,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
+import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {

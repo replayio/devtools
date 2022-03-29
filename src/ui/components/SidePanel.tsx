@@ -6,6 +6,8 @@ import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
+import StatusDropdown from "./shared/StatusDropdown";
+import { useFeature } from "ui/hooks/settings";
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
@@ -13,6 +15,8 @@ const Accordion = require("devtools/client/debugger/src/components/shared/Accord
 type SidePanelProps = PropsFromRedux;
 
 function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
+  const { value: resolveRecording } = useFeature("resolveRecording");
+
   let sidepanel;
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
@@ -30,7 +34,8 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
       <Accordion
         items={[
           {
-            header: "Replay Info",
+            header: "Info",
+            buttons: resolveRecording ? <StatusDropdown /> : null,
             className: "replay-info",
             component: <ReplayInfo />,
             opened: !replayInfoCollapsed,

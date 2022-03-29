@@ -233,6 +233,7 @@ function convertRecording(rec: any): Recording | undefined {
     ownerNeedsInvite: rec.ownerNeedsInvite,
     userRole: rec.userRole,
     operations: rec.operations,
+    resolution: rec.resolution,
   };
 }
 
@@ -866,4 +867,22 @@ export function useAcceptRecordingRequest() {
   );
 
   return (requestId: string) => acceptRecordingRequest({ variables: { requestId } });
+}
+
+export function useUpdateRecordingResolution(recordingId: RecordingId) {
+  const [updateRecordingResolution] = useMutation(
+    gql`
+      mutation UpdateRecordingResolution($id: ID!, $isResolved: Boolean!) {
+        updateRecordingResolution(input: { id: $id, isResolved: $isResolved }) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetRecording"],
+    }
+  );
+
+  return (isResolved: boolean) =>
+    updateRecordingResolution({ variables: { id: recordingId, isResolved } });
 }
