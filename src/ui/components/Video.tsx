@@ -81,7 +81,7 @@ function Video({
       <canvas id="graphics" onMouseDown={onMouseDown} ref={canvasRef} />
       {showCommentTool ? (
         <CommentsOverlay>
-          {loadingComments ? null : <CommentTool comments={comments} />}
+          {loadingComments ? null : <CommentTool comments={comments} canvasRef={canvasRef} />}
           {(mouseTargetsLoading || stalled) && (
             <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
               <Spinner className="w-4 animate-spin" />

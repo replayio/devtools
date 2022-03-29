@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { Comment, PendingCommentData } from "ui/state/comments";
+import { Comment, ExistingCommentDataExtras, PendingCommentDataExtras } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import escapeHtml from "escape-html";
@@ -23,18 +23,28 @@ const {
 
 type SetPendingCommentData = Action<"set_pending_comment_data"> & {
   parentId: Comment["id"] | null;
-  data: PendingCommentData | null;
+  data: PendingCommentDataExtras | null;
+};
+type SetExistingCommentData = Action<"set_existing_comment_data"> & {
+  commentId: Comment["id"];
+  data: ExistingCommentDataExtras | null;
 };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 
-export type CommentsAction = SetPendingCommentData | SetHoveredComment;
+export type CommentsAction = SetPendingCommentData | SetExistingCommentData | SetHoveredComment;
 
 export function setPendingCommentData(
   parentId: Comment["id"] | null,
-  data: PendingCommentData | null
+  data: PendingCommentDataExtras | null
 ): SetPendingCommentData {
-  console.log("set pending comments", parentId);
   return { type: "set_pending_comment_data", parentId, data };
+}
+
+export function setExistingCommentData(
+  commentId: Comment["id"],
+  data: ExistingCommentDataExtras | null
+): SetExistingCommentData {
+  return { type: "set_existing_comment_data", commentId, data };
 }
 
 export function setHoveredComment(comment: any): SetHoveredComment {

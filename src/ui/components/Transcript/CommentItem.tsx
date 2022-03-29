@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
-import { Comment, ROOT_COMMENT_ID } from "ui/state/comments";
+import { Comment, CommentPosition, ROOT_COMMENT_ID } from "ui/state/comments";
 import cx from "classnames";
 import TipTapEditor from "../Comments/TranscriptComments/CommentEditor/TipTapEditor";
 import PortalDropdown from "../shared/PortalDropdown";
@@ -31,7 +31,12 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
   const currentTime = useSelector(selectors.getCurrentTime);
   const executionPoint = useSelector(getExecutionPoint) as string;
   const focusRegion = useSelector(getFocusRegion);
-  const pendingCommentsData = useSelector((state: UIState) => state.comments.pendingCommentsData);
+  const pendingCommentExtras = useSelector(
+    (state: UIState) => state.comments.pendingCommentsDataExtras[comment.id]
+  );
+  const existingCommentExtras = useSelector(
+    (state: UIState) => state.comments.existingCommentsDataExtras[comment.id]
+  );
   const { value: netReqCommentsFeature } = useFeature("networkRequestComments");
   const addComment = commentsHooks.useAddComment();
   const updateComment = commentsHooks.useUpdateComment();
@@ -46,18 +51,17 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
 
   // header
   const relativeCreationDate = formatRelativeTime(new Date(comment.createdAt));
-  const showCommentActions = true;
+  const showCommentActions = true; // TODO
   const [headerActionsExpanded, setHeaderActionsExpanded] = useState(false);
 
-  // content
-  const [content, setContent] = useState<JSONContent>(tryToParse(comment.content));
-  // const content = useMemo(() => tryToParse(comment.content), [comment.content]);
+  // editing
   const [isEdit, setIsEdit] = useState(false);
+  // existingCommentExtras;
 
   // a singular pending (unsubmitted) commment reply to this one
   // other contextual data for it is in a store's pendingCommentData that we
   // will extract from when submitting
-  const hasPendingCommentData = !!pendingCommentsData[comment.id];
+  const hasPendingCommentData = !!pendingCommentExtras;
 
   const replies = (() => {
     return (
@@ -190,18 +194,25 @@ export const CommentItem = ({ comment }: CommentItemProps): JSX.Element => {
       {/* CONTENT */}
       <TipTapEditor
         editable={isEdit}
-        content={content}
+        content={editedCommentDetails.content}
         placeholder={!comment.parentId ? "Write a reply..." : "Type a comment"}
         autofocus
         handleCancel={() => {
-          setContent(tryToParse(comment.content));
+          setEditedCommentDetails({
+            content: tryToParse(comment.content),
+            position: comment.position,
+          });
           setIsEdit(false);
         }}
         onUpdate={({ editor }) => {
-          setContent(editor.getJSON());
+          setEditedCommentDetails({
+            content: editor.getJSON(),
+            position: editedCommentDetails.position,
+          });
         }}
         handleConfirm={content => {
           setIsEdit(false);
+          // TODO
           updateComment(comment, JSON.stringify(content));
         }}
         onCreate={({ editor }) => {

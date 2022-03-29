@@ -10,7 +10,9 @@ type MakeCommentFn = (parentId: Comment["id"] | null, content: string) => Commen
 export const useMakeFromPendingComment = (): MakeCommentFn => {
   const recordingId = useGetRecordingId();
   const user = useGetUserInfo();
-  const allPendingCommentData = useSelector((state: UIState) => state.comments.pendingCommentsData);
+  const allPendingCommentData = useSelector(
+    (state: UIState) => state.comments.pendingCommentsDataExtras
+  );
 
   return (parentId, content) => {
     const pendingCommentData = allPendingCommentData[parentId ?? ROOT_COMMENT_ID];

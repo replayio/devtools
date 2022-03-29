@@ -4,7 +4,7 @@ import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
 import { UIState } from "ui/state";
-import { Comment, PendingCommentData } from "ui/state/comments";
+import { Comment, PendingCommentDataExtras } from "ui/state/comments";
 
 function findComment({
   hasuraComments,
@@ -12,7 +12,7 @@ function findComment({
   currentTime,
 }: {
   hasuraComments: Comment[];
-  pendingComment: PendingCommentData | null;
+  pendingComment: PendingCommentDataExtras | null;
   currentTime: number;
 }) {
   let comments: Comment[] = [...hasuraComments];

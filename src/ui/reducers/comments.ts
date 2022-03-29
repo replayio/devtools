@@ -7,7 +7,8 @@ export const PENDING_COMMENT_ID = "PENDING";
 function initialCommentsState(): CommentsState {
   return {
     hoveredComment: null,
-    pendingCommentsData: {},
+    pendingCommentsDataExtras: {},
+    existingCommentsDataExtras: {},
   };
 }
 
@@ -21,11 +22,11 @@ export default function update(
 
       // clean up data
       if (action.data === null) {
-        delete state.pendingCommentsData[parentId];
+        delete state.pendingCommentsDataExtras[parentId];
         return {
           ...state,
-          pendingCommentsData: {
-            ...state.pendingCommentsData,
+          pendingCommentsDataExtras: {
+            ...state.pendingCommentsDataExtras,
           },
         };
       }
@@ -33,9 +34,31 @@ export default function update(
       // ...or actually set new pending comments data
       return {
         ...state,
-        pendingCommentsData: {
-          ...state.pendingCommentsData,
+        pendingCommentsDataExtras: {
+          ...state.pendingCommentsDataExtras,
           [parentId]: action.data,
+        },
+      };
+    }
+
+    case "set_existing_comment_data": {
+      // remove data
+      if (action.data === null) {
+        delete state.existingCommentsDataExtras[action.commentId];
+        return {
+          ...state,
+          existingCommentsDataExtras: {
+            ...state.existingCommentsDataExtras,
+          },
+        };
+      }
+
+      // ...or actually set some existing comments data
+      return {
+        ...state,
+        existingCommentsDataExtras: {
+          ...state.existingCommentsDataExtras,
+          [action.commentId]: action.data,
         },
       };
     }
@@ -54,5 +77,5 @@ export default function update(
 }
 
 export const getPendingComment = (state: UIState) =>
-  state.comments.pendingCommentsData[ROOT_COMMENT_ID];
+  state.comments.pendingCommentsDataExtras[ROOT_COMMENT_ID];
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;

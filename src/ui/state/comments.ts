@@ -18,7 +18,12 @@ export interface CommentsState {
   // non-existing, inferred root comment for the entire recording. the replies
   // of this inferred root comment and actually the top-level comments on the
   // recording itself (and not replies)
-  pendingCommentsData: { [parentId: Comment["id"] | typeof ROOT_COMMENT_ID]: PendingCommentData };
+  pendingCommentsDataExtras: {
+    [parentId: Comment["id"] | typeof ROOT_COMMENT_ID]: PendingCommentDataExtras;
+  };
+  existingCommentsDataExtras: {
+    [commentId: Comment["id"]]: ExistingCommentDataExtras;
+  };
   hoveredComment: any;
 }
 
@@ -34,7 +39,9 @@ export interface CommentPosition {
   y: number;
 }
 
-export type PendingCommentData = Pick<
+export type ExistingCommentDataExtras = Pick<Comment, "position" | "content">;
+
+export type PendingCommentDataExtras = Pick<
   Comment,
   | "hasFrames"
   | "position"
