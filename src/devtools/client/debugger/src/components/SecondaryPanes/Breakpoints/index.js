@@ -6,18 +6,25 @@
 
 import React, { Component } from "react";
 import { connect } from "../../../utils/connect";
-
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
-
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
-
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
-
 import { getSelectedSource } from "../../../selectors";
+import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
 
 class Breakpoints extends Component {
+  state = {
+    editorLoaded: false,
+  };
   headlessEditor;
+
+  onComponentDidMount() {
+    (async () => {
+      await waitForEditor();
+      this.setState({ editorLoaded: true });
+    })();
+  }
 
   componentWillUnmount() {
     this.removeEditor();
@@ -41,6 +48,7 @@ class Breakpoints extends Component {
   renderBreakpoints() {
     const { breakpointSources, emptyContent, onRemoveBreakpoints, onRemoveBreakpoint, type } =
       this.props;
+    const { editorLoaded } = this.state;
 
     if (!breakpointSources.length) {
       return (
@@ -54,33 +62,34 @@ class Breakpoints extends Component {
 
     return (
       <div className="pane breakpoints-list">
-        {breakpointSources.map(({ source, breakpoints, i }) => {
-          const sortedBreakpoints = sortSelectedBreakpoints(breakpoints);
-          const renderedBreakpoints = sortedBreakpoints.map(breakpoint => {
-            return (
-              <Breakpoint
-                type={type}
-                breakpoint={breakpoint}
-                source={source}
-                sources={sources}
-                editor={this.getEditor()}
-                key={getLocationKey(breakpoint.location)}
-                onRemoveBreakpoint={onRemoveBreakpoint}
-              />
-            );
-          });
+        {editorLoaded &&
+          breakpointSources.map(({ source, breakpoints, i }) => {
+            const sortedBreakpoints = sortSelectedBreakpoints(breakpoints);
+            const renderedBreakpoints = sortedBreakpoints.map(breakpoint => {
+              return (
+                <Breakpoint
+                  type={type}
+                  breakpoint={breakpoint}
+                  source={source}
+                  sources={sources}
+                  editor={this.getEditor()}
+                  key={getLocationKey(breakpoint.location)}
+                  onRemoveBreakpoint={onRemoveBreakpoint}
+                />
+              );
+            });
 
-          return (
-            <div className="breakpoints-list-source" key={source.id}>
-              <BreakpointHeading
-                source={source}
-                key="header"
-                onRemoveBreakpoints={onRemoveBreakpoints}
-              />
-              {renderedBreakpoints}
-            </div>
-          );
-        })}
+            return (
+              <div className="breakpoints-list-source" key={source.id}>
+                <BreakpointHeading
+                  source={source}
+                  key="header"
+                  onRemoveBreakpoints={onRemoveBreakpoints}
+                />
+                {renderedBreakpoints}
+              </div>
+            );
+          })}
       </div>
     );
   }
