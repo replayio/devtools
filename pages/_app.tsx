@@ -175,8 +175,6 @@ function Routing({ Component, pageProps }: AppProps) {
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
         <title>Replay</title>
-        <link rel="stylesheet" href="/fonts/inter/inter.css" />
-        <link rel="stylesheet" href="/fonts/material_icons/material_icons.css" />
       </Head>
       <_App>
         <InstallRouteListener />
