@@ -73,8 +73,6 @@ class Editor extends PureComponent {
   constructor(props) {
     super(props);
 
-    console.log("blorp");
-
     this.shortcuts = new KeyShortcuts({ window, target: document });
 
     this.state = {
