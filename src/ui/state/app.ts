@@ -107,6 +107,7 @@ export type AnalysisPayload = {
 };
 export enum AnalysisError {
   hellaHits = "hella-hits",
+  default = "default"
 }
 
 interface Events {

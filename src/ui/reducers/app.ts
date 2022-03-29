@@ -139,7 +139,7 @@ export default function update(
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: { data: [], error: AnalysisError.hellaHits },
+          [id]: { data: [], error: action.errorKey === 55 ? AnalysisError.hellaHits : AnalysisError.default },
         },
       };
     }
@@ -254,7 +254,7 @@ export const getAnalysisPointsForLocation = (
 
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
-  return getPointsInTrimSpan(state, points);
+  return points ? getPointsInTrimSpan(state, points) : undefined;
 };
 
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;

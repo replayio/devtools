@@ -130,9 +130,9 @@ function saveLogpointHits(
   }
 }
 
-function saveAnalysisError(locations: Location[], condition: string) {
+function saveAnalysisError(locations: Location[], condition: string, errorKey: number) {
   for (const location of locations) {
-    store.dispatch(setAnalysisError(location, condition));
+    store.dispatch(setAnalysisError(location, condition, errorKey));
   }
 }
 
@@ -299,12 +299,13 @@ async function setMultiSourceLogpoint(
 
   try {
     await analysisManager.runAnalysis(params, handler);
-  } catch {
+  } catch (e) {
     // Only save the error if we're only grabbing the points for a location.
     // This means that we're not handling cases where the full analysis
     // throws. We should add that as a follow-up.
     if (!shouldGetResults) {
-      saveAnalysisError(locations, condition);
+      console.error("Cannot get analysis points", e);
+      saveAnalysisError(locations, condition, e.code);
     }
     return;
   }
