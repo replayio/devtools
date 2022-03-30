@@ -8,6 +8,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
+import { AnalysisPayload } from "ui/state/app";
 import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
@@ -22,18 +23,12 @@ const {
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
-function getTextAndWarning(analysisPoints: number | PointDescription[] | "error") {
-  if (analysisPoints === "error") {
+function getTextAndWarning(analysisPoints?: AnalysisPayload, analysisPointsCount?: number) {
+  if (analysisPoints?.error) {
     return { text: "10k+ hits", showWarning: false };
   }
 
-  let points: Number;
-  if (isNumber(analysisPoints)) {
-    points = analysisPoints;
-  } else {
-    points = analysisPoints.length;
-  }
-
+  const points = analysisPointsCount || 0;
   const text = `${points} hit${points == 1 ? "" : "s"}`;
   const showWarning = points > prefs.maxHitsDisplayed;
   return { text, showWarning };
@@ -170,7 +165,7 @@ export default function LineNumberTooltip({
     );
   }
 
-  const { text, showWarning } = getTextAndWarning(analysisPointsCount);
+  const { text, showWarning } = getTextAndWarning(analysisPoints, analysisPointsCount);
   return (
     <StaticTooltip targetNode={targetNode}>
       <Wrapper showWarning={showWarning}>{text}</Wrapper>
