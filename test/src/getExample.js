@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const playwright = require("@recordreplay/playwright");
-const cli = require("@recordreplay/recordings-cli");
+const cli = require("@replayio/replay");
 const _ = require("lodash");
 
 const { recordNode } = require("./recordNode");

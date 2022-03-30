@@ -1,6 +1,6 @@
 const { spawnSync } = require("child_process");
 const manifest = require("./manifest");
-const { listAllRecordings, uploadRecording } = require("@recordreplay/recordings-cli");
+const { listAllRecordings, uploadRecording } = require("@replayio/replay");
 
 const devtools = `${__dirname}/../..`;
 let scriptsToRun = [];
