@@ -2,16 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import type { UIState } from "ui/state";
 import type { UIStore, UIThunkAction } from "ui/actions";
 
 import { getAllFilters } from "../reducers/filters";
 
-const {
+import {
   prepareMessage,
   isBrowserInternalMessage,
-} = require("devtools/client/webconsole/utils/messages");
-const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
+} from "devtools/client/webconsole/utils/messages";
+import { IdGenerator } from "devtools/client/webconsole/utils/id-generator";
 import { Pause, ThreadFront } from "protocol/thread";
 import { LogpointHandlers } from "protocol/logpoint";
 import { TestMessageHandlers } from "protocol/find-tests";
@@ -204,7 +203,10 @@ function dispatchMessageAdd(packet: unknown): UIThunkAction {
   };
 }
 
-export function messagesAdd(packets: unknown[], idGenerator = null): UIThunkAction {
+export function messagesAdd(
+  packets: unknown[],
+  idGenerator: IdGenerator | null = null
+): UIThunkAction {
   return (dispatch, getState) => {
     if (idGenerator == null) {
       idGenerator = defaultIdGenerator;

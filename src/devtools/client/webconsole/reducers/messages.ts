@@ -12,7 +12,7 @@ const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
 import type { ValueFront } from "protocol/thread";
 
 import { pointEquals } from "protocol/execution-point-utils";
-// TODO Disable this for now to avoid circular imports
+// TODO Disabled this for now to avoid circular imports
 // import { getGripPreviewItems } from "devtools/packages/devtools-reps";
 import { getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
 import { getSourceNames } from "devtools/client/shared/source-utils";
@@ -114,17 +114,27 @@ interface FilteredMessagesCount {
 type FilterCountKeys = keyof FilteredMessagesCount;
 
 export interface MessageState {
+  /** History of the user's entered commands */
   commandHistory: Command[];
+  /** Lookup table of all the messages added to the console */
   messages: EntityState<Message>;
+  /** IDs for all visible messages, in order */
   visibleMessages: MessageId[];
+  /** Counters for filtered-out messages, by cause */
   filteredMessagesCount: FilteredMessagesCount;
+  /** List of message IDs that are opened */
   messagesUiById: MessageId[];
+  /** Lookup table of which messages are "logpoint" messages */
   logpointMessages: EntityState<LogpointMessageEntry>;
+  /** Set of logpoint IDs that have been removed */
   removedLogpointIds: MessageId[];
+  /** Any execution point we are currently paused at, when replaying. */
   pausedExecutionPoint: string | null;
   pausedExecutionPointTime: number;
+  /** Whether any messages with execution points have been seen. */
   hasExecutionPoints: boolean;
   lastMessageId: MessageId | null;
+  /** Flag that indicates if not all console messages will be displayed. */
   overflow: boolean;
   messagesLoaded: boolean;
 }
@@ -144,57 +154,25 @@ export const initialMessageState = (overrides?: Partial<MessageState>): MessageS
   Object.freeze(
     Object.assign(
       {
-        // List of all the messages added to the console.
         messages: messagesAdapter.getInitialState(),
-        // Array of the visible messages.
         visibleMessages: [],
-        // Object for the filtered messages.
         filteredMessagesCount: getDefaultFiltersCounter(),
-        // List of the message ids which are opened.
         messagesUiById: [],
-
         commandHistory: [],
-
-        // Map logpointId:pointString to messages.
         logpointMessages: logpointMessagesAdapter.getInitialState(),
-        // Set of logpoint IDs that have been removed
         removedLogpointIds: [],
-        // Any execution point we are currently paused at, when replaying.
         pausedExecutionPoint: null,
         pausedExecutionPointTime: 0,
-        // Whether any messages with execution points have been seen.
         hasExecutionPoints: false,
-        // Id of the last messages that was added.
         lastMessageId: null,
-        // Flag that indicates if not all console messages will be displayed.
         overflow: false,
-
         messagesLoaded: false,
       },
       overrides
     )
   );
 
-/*
-function cloneState(state: MessageState) {
-  return {
-    commandHistory: [...state.commandHistory],
-    messagesById: new Map(state.messages),
-    visibleMessages: [...state.visibleMessages],
-    filteredMessagesCount: { ...state.filteredMessagesCount },
-    messagesUiById: [...state.messagesUiById],
-    logpointMessages: new Map(state.logpointMessages),
-    removedLogpointIds: Array.from(new Set(state.removedLogpointIds)),
-    pausedExecutionPoint: state.pausedExecutionPoint,
-    pausedExecutionPointTime: state.pausedExecutionPointTime,
-    hasExecutionPoints: state.hasExecutionPoints,
-    lastMessageId: state.lastMessageId,
-    overflow: state.overflow,
-    messagesLoaded: state.messagesLoaded,
-  };
-}
-*/
-
+// Dispatched manually elsewhere in the codebase, so typed here for reference
 interface PausedAction extends AnyAction {
   type: "PAUSED";
   executionPoint: string;
@@ -257,6 +235,8 @@ const messagesSlice = createSlice({
 
       return removeMessagesFromState(state as MessageState, removedIds);
     },
+    //  This is only here to force recalculation after filters are updated
+    // TODO Find a way to rework `visibleMessages` as derived data and remove this
     filterStateUpdated(state, action: PayloadAction<WebconsoleFiltersState>) {
       return setVisibleMessages({
         // @ts-ignore Doesn't like `WritableDraft<ValueFront>`
@@ -301,6 +281,8 @@ export const messages = messagesSlice.reducer;
 
 /**
  * Add a console message to the state
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
  */
 // eslint-disable-next-line complexity
 function addMessage(
@@ -342,7 +324,6 @@ function addMessage(
       log(`LogpointStart ${newMessage.executionPoint}`);
     }
     logpointMessagesAdapter.upsertOne(state.logpointMessages, { key, messageId: newMessage.id });
-    // state.logpointMessages.set(key, newMessage);
   }
 
   // Immer will freeze anyway, but this might help skipping the `ValueFront` fields
@@ -365,136 +346,22 @@ function addMessage(
   return removeMessagesFromState(state, removedIds);
 }
 
-// TODO Actually remove the dead logic here.
-// Left in for PR comparison
-
-/*
-// eslint-disable-next-line complexity
-function messages(state = initialMessageState(), action: AnyAction) {
-  const { messages: messagesById, messagesUiById, visibleMessages } = state;
-  const { filtersState } = action;
-
-  log(`WebConsole ${action.type}`);
-
-  let newState;
-  switch (action.type) {
-    case "MESSAGES_LOADED":
-      return { ...state, messagesLoaded: true };
-    case "PAUSED":
-      if (
-        state.pausedExecutionPoint &&
-        action.executionPoint &&
-        pointEquals(state.pausedExecutionPoint, action.executionPoint) &&
-        state.pausedExecutionPointTime == action.time
-      ) {
-        return state;
-      }
-
-      return {
-        ...state,
-        pausedExecutionPoint: action.executionPoint,
-        pausedExecutionPointTime: action.time,
-      };
-    case constants.MESSAGES_ADD:
-      let newState = cloneState(state);
-      (action.messages as Message[]).forEach(message => {
-        newState = addMessage(message, newState, filtersState);
-        if (message.type === "command") {
-          newState.commandHistory = appendToHistory(message.messageText, state.commandHistory);
-        }
-      });
-      return newState;
-
-    case constants.MESSAGE_OPEN:
-      const openState = { ...state };
-      openState.messagesUiById = [...messagesUiById, action.id];
-      const currMessage = messagesById.get(action.id);
-
-      return openState;
-
-    case constants.MESSAGE_CLOSE:
-      const closeState = { ...state };
-      const messageId = action.id;
-      const index = closeState.messagesUiById.indexOf(messageId);
-      closeState.messagesUiById.splice(index, 1);
-      closeState.messagesUiById = [...closeState.messagesUiById];
-
-      return closeState;
-
-    case constants.MESSAGES_CLEAR_EVALUATIONS: {
-      const removedIds = [];
-      for (const [id, message] of messagesById) {
-        if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
-          removedIds.push(id);
-        }
-      }
-
-      // If there have been no console evaluations, there's no need to change the state.
-      if (removedIds.length === 0) {
-        return state;
-      }
-
-      return removeMessagesFromState(
-        {
-          ...state,
-        },
-        removedIds
-      );
-    }
-
-    case constants.MESSAGES_CLEAR_EVALUATION: {
-      const commandId = action.messageId;
-
-      // This assumes that messages IDs are generated sequentially, and the result's ID
-      // should be the command message's ID + 1.
-      const resultId = (Number(commandId) + 1).toString();
-
-      return removeMessagesFromState(
-        {
-          ...state,
-        },
-        [commandId, resultId]
-      );
-    }
-
-    case constants.MESSAGES_CLEAR_LOGPOINT: {
-      const removedIds = [];
-      for (const [id, message] of Object.entries(state.messages.entities)) {
-        if (message!.logpointId == action.logpointId) {
-          removedIds.push(id);
-        }
-      }
-
-      return removeMessagesFromState(
-        {
-          ...state,
-          removedLogpointIds: Array.from(new Set([...state.removedLogpointIds, action.logpointId])),
-        },
-        removedIds
-      );
-    }
-
-    // TODO Remove this action entirely when the filtered messages is turned into a selector
-    case "FILTER_STATE_UPDATED":
-      return setVisibleMessages({
-        messagesState: state,
-        filtersState,
-      });
-
-    case "CONSOLE_OVERFLOW": {
-      return { ...state, overflow: true };
-    }
-  }
-
-  return state;
-}
-*/
-
 interface MessagesFilters {
   messagesState: MessageState;
   filtersState: WebconsoleFiltersState;
 }
 
+// TODO Turn this into derived state instead, so that we don't have to
+// keep passing `filtersState` into the messages reducer. Alternately:
+// - We could run another reducer in sequence after the root reducer this
+//   to calculate after all other state updates are done.
+// - We could move the filters state _inside_ the messages slice so that
+//   it's all available in one place.
+/**
+ * Updates the count of filtered-out messages by cause.
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
+ */
 function setVisibleMessages({
   messagesState,
   filtersState,
@@ -502,12 +369,9 @@ function setVisibleMessages({
 }: MessagesFilters & {
   forceTimestampSort?: boolean;
 }) {
-  const { messages } = messagesState;
-
   const messagesToShow: MessageId[] = [];
   const filtered = getDefaultFiltersCounter();
 
-  // messagesById.forEach((message, msgId) => {
   for (const [id, maybeMessage] of Object.entries(messagesState.messages.entities)) {
     // Appease TS, which thinks it could be undefined
     const message = maybeMessage!;
@@ -525,11 +389,6 @@ function setVisibleMessages({
 
   messagesState.visibleMessages = messagesToShow;
   messagesState.filteredMessagesCount = filtered;
-  // const newState = {
-  //   ...messagesState,
-  //   visibleMessages: messagesToShow,
-  //   filteredMessagesCount: filtered,
-  // };
 
   maybeSortVisibleMessages(messagesState, forceTimestampSort);
 
@@ -538,7 +397,8 @@ function setVisibleMessages({
 
 /**
  * Clean the properties for a given state object and an array of removed messages ids.
- * Be aware that this function MUTATE the `state` argument.
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
  */
 function removeMessagesFromState(
   state: MessageState,
@@ -558,7 +418,7 @@ function removeMessagesFromState(
     state.visibleMessages = Array.from(visibleSet);
   }
 
-  const isInRemovedId = (id: MessageId) => removedMessagesIds.includes(id);
+  const isInRemovedId = (id: MessageId) => removedSet.has(id);
 
   messagesAdapter.removeMany(state.messages, removedMessagesIds);
 
@@ -569,20 +429,20 @@ function removeMessagesFromState(
   return state;
 }
 
+interface MessageVisibility {
+  visible: boolean;
+  /** if visible is false, what causes the message to be hidden. */
+  cause?: string;
+}
 /**
- * Check if a message should be visible in the console output, and if not, what
- * causes it to be hidden.
- * @param {Message} message: The message to check
- * @param {Object} option: An option object of the following shape:
- *                   - {MessageState} messagesState: The current messages state
- *                   - {FilterState} filtersState: The current filters state
- *
- * @return {Object} An object of the following form:
- *         - visible {Boolean}: true if the message should be visible
- *         - cause {String}: if visible is false, what causes the message to be hidden.
+ * Check if a message should be visible in the console output, and if not,
+ * what causes it to be hidden
  */
 // eslint-disable-next-line complexity
-function getMessageVisibility(message: Message, filtersState: WebconsoleFiltersState) {
+function getMessageVisibility(
+  message: Message,
+  filtersState: WebconsoleFiltersState
+): MessageVisibility {
   // Some messages can't be filtered out
   // So, always return visible: true for those.
   if (isUnfilterable(message)) {
@@ -621,7 +481,7 @@ function getMessageVisibility(message: Message, filtersState: WebconsoleFiltersS
   };
 }
 
-function isUnfilterable(message: Message) {
+function isUnfilterable(message: Message): boolean {
   return [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT, MESSAGE_TYPE.NAVIGATION_MARKER].includes(
     message.type
   );
@@ -629,24 +489,16 @@ function isUnfilterable(message: Message) {
 
 /**
  * Returns true if the message is in node modules and should be hidden
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
  */
-function passNodeModuleFilters(message: Message, filters: WebconsoleFiltersState) {
+function passNodeModuleFilters(message: Message, filters: WebconsoleFiltersState): boolean {
   return (
-    message.frame?.source?.includes("node_modules") &&
+    !!message.frame?.source?.includes("node_modules") &&
     filters[FILTERS.NODEMODULES as keyof WebconsoleFiltersState] == false
   );
 }
 
 /**
- * Returns true if the message shouldn't be hidden because of levels filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
+ * Returns true if the message shouldn't be hidden because of levels filter state
  */
 function passLevelFilters(message: Message, filters: WebconsoleFiltersState) {
   // The message passes the filter if it is not a console call,
@@ -662,13 +514,9 @@ function passLevelFilters(message: Message, filters: WebconsoleFiltersState) {
 type StringMatcher = (str: string) => boolean;
 
 /**
- * Returns true if the message shouldn't be hidden because of search filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
+ * Returns true if the message shouldn't be hidden because of search filter state
  */
-function passSearchFilters(message: Message, filters: WebconsoleFiltersState) {
+function passSearchFilters(message: Message, filters: WebconsoleFiltersState): boolean {
   const trimmed = (filters.text || "").trim().toLocaleLowerCase();
 
   // "-"-prefix switched to exclude mode
@@ -712,7 +560,7 @@ function passSearchFilters(message: Message, filters: WebconsoleFiltersState) {
 /**
  * Returns true if given text is included in provided stack frame.
  */
-function isTextInFrame(matchStr: StringMatcher, frame?: Frame) {
+function isTextInFrame(matchStr: StringMatcher, frame?: Frame): boolean {
   if (!frame) {
     return false;
   }
@@ -729,7 +577,7 @@ function isTextInFrame(matchStr: StringMatcher, frame?: Frame) {
 /**
  * Returns true if given text is included in provided parameters.
  */
-function isTextInParameters(matchStr: StringMatcher, parameters?: ValueFront[]) {
+function isTextInParameters(matchStr: StringMatcher, parameters?: ValueFront[]): boolean {
   if (!parameters) {
     return false;
   }
@@ -744,7 +592,7 @@ function isTextInParameter(
   matchStr: StringMatcher,
   parameter: ValueFront,
   visitedObjectIds = new Set()
-) {
+): boolean {
   if (parameter.isPrimitive()) {
     return matchStr(String(parameter.primitive()));
   }
@@ -778,7 +626,7 @@ function isTextInParameter(
 /**
  * Returns true if given text is included in provided net event grip.
  */
-function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest) {
+function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest): boolean {
   if (!request) {
     return false;
   }
@@ -791,7 +639,7 @@ function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest) {
 /**
  * Returns true if given text is included in provided stack trace.
  */
-function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]) {
+function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]): boolean {
   if (!Array.isArray(stacktrace)) {
     return false;
   }
@@ -811,7 +659,7 @@ function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]) 
 /**
  * Returns true if given text is included in `messageText` field.
  */
-function isTextInMessageText(matchStr: StringMatcher, messageText?: string) {
+function isTextInMessageText(matchStr: StringMatcher, messageText?: string): boolean {
   if (!messageText) {
     return false;
   }
@@ -826,7 +674,7 @@ function isTextInMessageText(matchStr: StringMatcher, messageText?: string) {
 /**
  * Returns true if given text is included in notes.
  */
-function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null) {
+function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null): boolean {
   if (!Array.isArray(notes)) {
     return false;
   }
@@ -843,7 +691,7 @@ function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null) {
 /**
  * Returns true if given text is included in prefix.
  */
-function isTextInPrefix(matchStr: StringMatcher, prefix?: string) {
+function isTextInPrefix(matchStr: StringMatcher, prefix?: string): boolean {
   if (!prefix) {
     return false;
   }
@@ -851,14 +699,11 @@ function isTextInPrefix(matchStr: StringMatcher, prefix?: string) {
   return matchStr(`${prefix}: `);
 }
 
-function getDefaultFiltersCounter() {
-  const count = (DEFAULT_FILTERS as FilterCountKeys[]).reduce(
-    (res: FilteredMessagesCount, filter) => {
-      res[filter] = 0;
-      return res;
-    },
-    {} as FilteredMessagesCount
-  );
+function getDefaultFiltersCounter(): FilteredMessagesCount {
+  const count = (DEFAULT_FILTERS as FilterCountKeys[]).reduce((res, filter) => {
+    res[filter] = 0;
+    return res;
+  }, {} as FilteredMessagesCount);
   count.global = 0;
   return count;
 }
@@ -890,7 +735,6 @@ export function ensureExecutionPoint(state: MessageState, newMessage: Message) {
     // @ts-ignore string/obj mismatch
     point = getPausePoint(newMessage, state);
     time = state.pausedExecutionPointTime;
-    // @ts-ignorestring/obj mismatch
     const lastMessage = getLastMessageWithPoint(state, point);
     if (lastMessage.lastExecutionPoint) {
       messageCount = lastMessage.lastExecutionPoint.messageCount + 1;
@@ -900,8 +744,8 @@ export function ensureExecutionPoint(state: MessageState, newMessage: Message) {
     const lastMessage = state.messages.entities[lastId]!;
     if (lastMessage.executionPoint) {
       // If the message is evaluated while we are not paused, we want
-      // to make sure that those messages are placed immediately after the execution
-      // point's message.
+      // to make sure that those messages are placed immediately after
+      // the execution point's message.
       point = lastMessage.executionPoint;
       time = lastMessage.executionPointTime!;
       messageCount = 0;
@@ -912,7 +756,6 @@ export function ensureExecutionPoint(state: MessageState, newMessage: Message) {
     }
   }
 
-  // @ts-ignorestring/obj mismatch
   newMessage.lastExecutionPoint = { point, time, messageCount };
 }
 
@@ -947,9 +790,8 @@ function messageCountSinceLastExecutionPoint(state: MessageState, id: MessageId)
 
 /**
  * Sort state.visibleMessages if needed.
- *
- * @param {MessageState} state
- * @param {Boolean} timeStampSort: set to true to sort messages by their timestamps.
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
  */
 function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
   // When using log points while replaying, messages can be added out of order˜
@@ -959,7 +801,7 @@ function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
   // messages with execution points, as either we aren't replaying or haven't
   // seen any messages yet.
   if (state.hasExecutionPoints) {
-    state.visibleMessages = [...state.visibleMessages].sort((a, b) => {
+    state.visibleMessages.sort((a, b) => {
       const compared = compareNumericStrings(
         messageExecutionPoint(state, a),
         messageExecutionPoint(state, b)
