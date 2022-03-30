@@ -1,27 +1,28 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
 
-import type { AnyAction } from "@reduxjs/toolkit";
+import type { AnyAction, PayloadAction, EntityState } from "@reduxjs/toolkit";
+import { createSlice, createEntityAdapter } from "@reduxjs/toolkit";
+import uniq from "lodash/uniq";
 
-const constants = require("devtools/client/webconsole/constants");
+import constants from "devtools/client/webconsole/constants";
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
 
 import type { ValueFront } from "protocol/thread";
 
-const { pointEquals } = require("protocol/execution-point-utils");
-const { getGripPreviewItems } = require("devtools/packages/devtools-reps");
-const { getUnicodeUrlPath } = require("devtools/client/shared/unicode-url");
-const { getSourceNames } = require("devtools/client/shared/source-utils");
+import { pointEquals } from "protocol/execution-point-utils";
+// TODO Disabled this for now to avoid circular imports
+// import { getGripPreviewItems } from "devtools/packages/devtools-reps";
+import { getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
+import { getSourceNames } from "devtools/client/shared/source-utils";
 
-const { log } = require("protocol/socket");
-const { assert, compareNumericStrings } = require("protocol/utils");
-import type { Command } from "ui/utils/commandHistory";
+import { log } from "protocol/socket";
+import { assert, compareNumericStrings } from "protocol/utils";
 import type { WebconsoleFiltersState } from "./filters";
-const { appendToHistory } = require("ui/utils/commandHistory");
 
 type MessageId = string;
+type Command = string;
 
 interface Frame {
   column: number;
@@ -50,17 +51,20 @@ interface Note {
   frame: Frame;
 }
 
-interface ExecutionPoint {
-  checkpoint: number;
-  progress: number;
-}
+// TODO Multiple type mismatches with related fields being a string or an object
+type ExecutionPoint =
+  | {
+      checkpoint: number;
+      progress: number;
+    }
+  | string;
 
 export interface Message {
   allowRepeating: boolean;
   category: string | null;
   errorMessageName: string | null;
   exceptionDocURL: string | null;
-  executionPoint: ExecutionPoint | null;
+  executionPoint: string | null;
   executionHasFrames: boolean;
   executionPointTime: number | null;
   evalId?: number;
@@ -91,6 +95,11 @@ export interface Message {
   };
 }
 
+interface LogpointMessageEntry {
+  messageId: MessageId;
+  key: string;
+}
+
 interface FilteredMessagesCount {
   debug: number;
   info: number;
@@ -105,93 +114,182 @@ interface FilteredMessagesCount {
 type FilterCountKeys = keyof FilteredMessagesCount;
 
 export interface MessageState {
+  /** History of the user's entered commands */
   commandHistory: Command[];
-  messagesById: Map<MessageId, Message>;
+  /** Lookup table of all the messages added to the console */
+  messages: EntityState<Message>;
+  /** IDs for all visible messages, in order */
   visibleMessages: MessageId[];
+  /** Counters for filtered-out messages, by cause */
   filteredMessagesCount: FilteredMessagesCount;
+  /** List of message IDs that are opened */
   messagesUiById: MessageId[];
-  messagesPayloadById: Map<MessageId, unknown>;
-  logpointMessages: Map<MessageId, Message>;
-  removedLogpointIds: Set<MessageId>;
-  pausedExecutionPoint: ExecutionPoint | null;
+  /** Lookup table of which messages are "logpoint" messages */
+  logpointMessages: EntityState<LogpointMessageEntry>;
+  /** Set of logpoint IDs that have been removed */
+  removedLogpointIds: MessageId[];
+  /** Any execution point we are currently paused at, when replaying. */
+  pausedExecutionPoint: string | null;
   pausedExecutionPointTime: number;
+  /** Whether any messages with execution points have been seen. */
   hasExecutionPoints: boolean;
   lastMessageId: MessageId | null;
+  /** Flag that indicates if not all console messages will be displayed. */
   overflow: boolean;
   messagesLoaded: boolean;
 }
 
-const MessageState = (overrides?: Partial<MessageState>): MessageState =>
+const MAX_HISTORY_LENGTH = 1000;
+
+export const appendToHistory = (command: Command, history: Command[]): Command[] => {
+  return uniq([command, ...history].slice(0, MAX_HISTORY_LENGTH));
+};
+
+export const messagesAdapter = createEntityAdapter<Message>();
+const logpointMessagesAdapter = createEntityAdapter<LogpointMessageEntry>({
+  selectId: entry => entry.key,
+});
+
+export const initialMessageState = (overrides?: Partial<MessageState>): MessageState =>
   Object.freeze(
     Object.assign(
       {
-        // List of all the messages added to the console.
-        messagesById: new Map(),
-        // List of additional data associated with messages (populated async or on-demand at a
-        // later time after the message is received).
-        messagesPayloadById: new Map(),
-        // Array of the visible messages.
+        messages: messagesAdapter.getInitialState(),
         visibleMessages: [],
-        // Object for the filtered messages.
         filteredMessagesCount: getDefaultFiltersCounter(),
-        // List of the message ids which are opened.
         messagesUiById: [],
-
         commandHistory: [],
-
-        // Map logpointId:pointString to messages.
-        logpointMessages: new Map(),
-        // Set of logpoint IDs that have been removed
-        removedLogpointIds: new Set(),
-        // Any execution point we are currently paused at, when replaying.
+        logpointMessages: logpointMessagesAdapter.getInitialState(),
+        removedLogpointIds: [],
         pausedExecutionPoint: null,
         pausedExecutionPointTime: 0,
-        // Whether any messages with execution points have been seen.
         hasExecutionPoints: false,
-        // Id of the last messages that was added.
         lastMessageId: null,
-        // Flag that indicates if not all console messages will be displayed.
         overflow: false,
-
         messagesLoaded: false,
       },
       overrides
     )
   );
 
-function cloneState(state: MessageState) {
-  return {
-    commandHistory: [...state.commandHistory],
-    messagesById: new Map(state.messagesById),
-    visibleMessages: [...state.visibleMessages],
-    filteredMessagesCount: { ...state.filteredMessagesCount },
-    messagesUiById: [...state.messagesUiById],
-    messagesPayloadById: new Map(state.messagesPayloadById),
-    logpointMessages: new Map(state.logpointMessages),
-    removedLogpointIds: new Set(state.removedLogpointIds),
-    pausedExecutionPoint: state.pausedExecutionPoint,
-    pausedExecutionPointTime: state.pausedExecutionPointTime,
-    hasExecutionPoints: state.hasExecutionPoints,
-    lastMessageId: state.lastMessageId,
-    overflow: state.overflow,
-    messagesLoaded: state.messagesLoaded,
-  };
+// Dispatched manually elsewhere in the codebase, so typed here for reference
+interface PausedAction extends AnyAction {
+  type: "PAUSED";
+  executionPoint: string;
+  time: number;
 }
 
+const messagesSlice = createSlice({
+  name: "messages",
+  initialState: initialMessageState,
+  reducers: {
+    messagesLoaded(state) {
+      state.messagesLoaded = true;
+    },
+    messagesAdded(
+      state,
+      action: PayloadAction<{ messages: Message[]; filtersState: WebconsoleFiltersState }>
+    ) {
+      const { messages, filtersState } = action.payload;
+      messages.forEach(message => {
+        addMessage(message, state as MessageState, filtersState);
+
+        if (message.type === "command") {
+          state.commandHistory = appendToHistory(message.messageText, state.commandHistory);
+        }
+      });
+    },
+    messageOpened(state, action: PayloadAction<MessageId>) {
+      state.messagesUiById.push(action.payload);
+    },
+    messageClosed(state, action: PayloadAction<MessageId>) {
+      state.messagesUiById = state.messagesUiById.filter(id => id !== action.payload);
+    },
+    messageEvaluationsCleared(state) {
+      const removedIds: MessageId[] = [];
+      for (let maybeMessage of Object.values(state.messages.entities)) {
+        const message = maybeMessage!;
+        if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
+          removedIds.push(message.id);
+        }
+      }
+
+      // If there have been no console evaluations, there's no need to change the state.
+      if (removedIds.length === 0) {
+        return;
+      }
+
+      return removeMessagesFromState(state as MessageState, removedIds);
+    },
+    logpointMessagesCleared(state, action: PayloadAction<string>) {
+      const logpointId = action.payload;
+      const removedIds = [];
+
+      for (const [id, message] of Object.entries(state.messages.entities)) {
+        if (message!.logpointId == logpointId) {
+          removedIds.push(id);
+        }
+      }
+
+      state.removedLogpointIds = Array.from(new Set([...state.removedLogpointIds, logpointId]));
+
+      return removeMessagesFromState(state as MessageState, removedIds);
+    },
+    //  This is only here to force recalculation after filters are updated
+    // TODO Find a way to rework `visibleMessages` as derived data and remove this
+    filterStateUpdated(state, action: PayloadAction<WebconsoleFiltersState>) {
+      return setVisibleMessages({
+        // @ts-ignore Doesn't like `WritableDraft<ValueFront>`
+        messagesState: state,
+        filtersState: action.payload,
+      });
+    },
+    consoleOverflowed(state) {
+      state.overflow = true;
+    },
+  },
+  extraReducers: builder => {
+    // Dispatched from `actions/paused.js`
+    builder.addCase("PAUSED", (state, action: PausedAction) => {
+      if (
+        state.pausedExecutionPoint &&
+        action.executionPoint &&
+        pointEquals(state.pausedExecutionPoint, action.executionPoint) &&
+        state.pausedExecutionPointTime == action.time
+      ) {
+        return;
+      }
+
+      state.pausedExecutionPoint = action.executionPoint;
+      state.pausedExecutionPointTime = action.time;
+    });
+  },
+});
+
+export const {
+  consoleOverflowed,
+  filterStateUpdated,
+  logpointMessagesCleared,
+  messageClosed,
+  messageEvaluationsCleared,
+  messageOpened,
+  messagesAdded,
+  messagesLoaded,
+} = messagesSlice.actions;
+
+export const messages = messagesSlice.reducer;
+
 /**
- * Add a console message to the state.
- *
- * @param {ConsoleMessage} newMessage: The message to add to the state.
- * @param {MessageState} state: The message state ( = managed by this reducer).
- * @param {FiltersState} filtersState: The filters state.
- * @returns {MessageState} a new messages state.
+ * Add a console message to the state
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
  */
 // eslint-disable-next-line complexity
 function addMessage(
   newMessage: Message,
   state: MessageState,
   filtersState: WebconsoleFiltersState
-) {
+): MessageState {
   if (newMessage.type === constants.MESSAGE_TYPE.NULL_MESSAGE) {
     // When the message has a NULL type, we don't add it.
     return state;
@@ -199,11 +297,7 @@ function addMessage(
 
   // After messages with a given logpoint ID have been removed, ignore all
   // future messages with that ID.
-  if (
-    newMessage.logpointId &&
-    state.removedLogpointIds &&
-    state.removedLogpointIds.has(newMessage.logpointId)
-  ) {
+  if (newMessage.logpointId && state.removedLogpointIds.includes(newMessage.logpointId)) {
     return state;
   }
 
@@ -222,23 +316,21 @@ function addMessage(
   const removedIds = [];
   if (newMessage.logpointId || (newMessage.evalId && newMessage.type === MESSAGE_TYPE.RESULT)) {
     const key = `${newMessage.logpointId || newMessage.evalId}:${newMessage.executionPoint}`;
-    const existingMessage = state.logpointMessages.get(key);
+    const existingMessage = state.logpointMessages.entities[key];
     if (existingMessage) {
       log(`LogpointFinish ${newMessage.executionPoint}`);
-      removedIds.push(existingMessage.id);
+      removedIds.push(existingMessage.messageId);
     } else {
       log(`LogpointStart ${newMessage.executionPoint}`);
     }
-    state.logpointMessages.set(key, newMessage);
+    logpointMessagesAdapter.upsertOne(state.logpointMessages, { key, messageId: newMessage.id });
   }
 
+  // Immer will freeze anyway, but this might help skipping the `ValueFront` fields
   const addedMessage = Object.freeze(newMessage);
-  state.messagesById.set(newMessage.id, addedMessage);
+  messagesAdapter.upsertOne(state.messages, addedMessage);
 
-  const { visible, cause } = getMessageVisibility(addedMessage, {
-    messagesState: state,
-    filtersState,
-  });
+  const { visible, cause } = getMessageVisibility(addedMessage, filtersState);
 
   if (visible) {
     state.visibleMessages.push(newMessage.id);
@@ -254,137 +346,22 @@ function addMessage(
   return removeMessagesFromState(state, removedIds);
 }
 
-// eslint-disable-next-line complexity
-function messages(state = MessageState(), action: AnyAction) {
-  const { messagesById, messagesPayloadById, messagesUiById, visibleMessages } = state;
-  const { filtersState } = action;
-
-  log(`WebConsole ${action.type}`);
-
-  let newState;
-  switch (action.type) {
-    case "MESSAGES_LOADED":
-      return { ...state, messagesLoaded: true };
-    case "PAUSED":
-      if (
-        state.pausedExecutionPoint &&
-        action.executionPoint &&
-        pointEquals(state.pausedExecutionPoint, action.executionPoint) &&
-        state.pausedExecutionPointTime == action.time
-      ) {
-        return state;
-      }
-
-      return {
-        ...state,
-        pausedExecutionPoint: action.executionPoint,
-        pausedExecutionPointTime: action.time,
-      };
-    case constants.MESSAGES_ADD:
-      let newState = cloneState(state);
-      (action.messages as Message[]).forEach(message => {
-        newState = addMessage(message, newState, filtersState);
-        if (message.type === "command") {
-          newState.commandHistory = appendToHistory(message.messageText, state.commandHistory);
-        }
-      });
-      return newState;
-
-    case constants.MESSAGE_OPEN:
-      const openState = { ...state };
-      openState.messagesUiById = [...messagesUiById, action.id];
-      const currMessage = messagesById.get(action.id);
-
-      return openState;
-
-    case constants.MESSAGE_CLOSE:
-      const closeState = { ...state };
-      const messageId = action.id;
-      const index = closeState.messagesUiById.indexOf(messageId);
-      closeState.messagesUiById.splice(index, 1);
-      closeState.messagesUiById = [...closeState.messagesUiById];
-
-      return closeState;
-
-    case constants.MESSAGES_CLEAR_EVALUATIONS: {
-      const removedIds = [];
-      for (const [id, message] of messagesById) {
-        if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
-          removedIds.push(id);
-        }
-      }
-
-      // If there have been no console evaluations, there's no need to change the state.
-      if (removedIds.length === 0) {
-        return state;
-      }
-
-      return removeMessagesFromState(
-        {
-          ...state,
-        },
-        removedIds
-      );
-    }
-
-    case constants.MESSAGES_CLEAR_EVALUATION: {
-      const commandId = action.messageId;
-
-      // This assumes that messages IDs are generated sequentially, and the result's ID
-      // should be the command message's ID + 1.
-      const resultId = (Number(commandId) + 1).toString();
-
-      return removeMessagesFromState(
-        {
-          ...state,
-        },
-        [commandId, resultId]
-      );
-    }
-
-    case constants.MESSAGES_CLEAR_LOGPOINT: {
-      const removedIds = [];
-      for (const [id, message] of messagesById) {
-        if (message.logpointId == action.logpointId) {
-          removedIds.push(id);
-        }
-      }
-
-      return removeMessagesFromState(
-        {
-          ...state,
-          removedLogpointIds: new Set([...state.removedLogpointIds, action.logpointId]),
-        },
-        removedIds
-      );
-    }
-
-    case constants.MESSAGE_UPDATE_PAYLOAD:
-      return {
-        ...state,
-        messagesPayloadById: new Map(messagesPayloadById).set(action.id, action.data),
-      };
-
-    // TODO Remove this action entirely when the filtered messages is turned into a selector
-    case "FILTER_STATE_UPDATED":
-      return setVisibleMessages({
-        messagesState: state,
-        filtersState,
-      });
-
-    case "CONSOLE_OVERFLOW": {
-      return { ...state, overflow: true };
-    }
-  }
-
-  return state;
-}
-
 interface MessagesFilters {
   messagesState: MessageState;
   filtersState: WebconsoleFiltersState;
 }
 
+// TODO Turn this into derived state instead, so that we don't have to
+// keep passing `filtersState` into the messages reducer. Alternately:
+// - We could run another reducer in sequence after the root reducer this
+//   to calculate after all other state updates are done.
+// - We could move the filters state _inside_ the messages slice so that
+//   it's all available in one place.
+/**
+ * Updates the count of filtered-out messages by cause.
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
+ */
 function setVisibleMessages({
   messagesState,
   filtersState,
@@ -392,100 +369,80 @@ function setVisibleMessages({
 }: MessagesFilters & {
   forceTimestampSort?: boolean;
 }) {
-  const { messagesById } = messagesState;
-
   const messagesToShow: MessageId[] = [];
   const filtered = getDefaultFiltersCounter();
 
-  messagesById.forEach((message, msgId) => {
-    const { visible, cause } = getMessageVisibility(message, {
-      messagesState,
-      filtersState,
-    });
+  for (const [id, maybeMessage] of Object.entries(messagesState.messages.entities)) {
+    // Appease TS, which thinks it could be undefined
+    const message = maybeMessage!;
+    const { visible, cause } = getMessageVisibility(message, filtersState);
 
     if (visible) {
-      messagesToShow.push(msgId);
+      messagesToShow.push(id);
     } else if (DEFAULT_FILTERS.includes(cause)) {
       filtered.global = filtered.global + 1;
     }
     if (message.level && message.type !== "logPoint") {
       filtered[message.level as FilterCountKeys] = filtered[message.level as FilterCountKeys] + 1;
     }
-  });
+  }
 
-  const newState = {
-    ...messagesState,
-    visibleMessages: messagesToShow,
-    filteredMessagesCount: filtered,
-  };
+  messagesState.visibleMessages = messagesToShow;
+  messagesState.filteredMessagesCount = filtered;
 
-  maybeSortVisibleMessages(newState, forceTimestampSort);
+  maybeSortVisibleMessages(messagesState, forceTimestampSort);
 
-  return newState;
+  return messagesState;
 }
 
 /**
  * Clean the properties for a given state object and an array of removed messages ids.
- * Be aware that this function MUTATE the `state` argument.
- *
- * @param {MessageState} state
- * @param {Array} removedMessagesIds
- * @returns {MessageState}
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
  */
-function removeMessagesFromState(state: MessageState, removedMessagesIds: MessageId[]) {
+function removeMessagesFromState(
+  state: MessageState,
+  removedMessagesIds: MessageId[]
+): MessageState {
   if (!Array.isArray(removedMessagesIds) || removedMessagesIds.length === 0) {
     return state;
   }
 
-  const visibleMessages = [...state.visibleMessages];
-  removedMessagesIds.forEach(id => {
-    const index = visibleMessages.indexOf(id);
-    if (index > -1) {
-      visibleMessages.splice(index, 1);
-    }
+  const visibleSet = new Set(state.visibleMessages);
+  const removedSet = new Set(removedMessagesIds);
+  removedSet.forEach(id => {
+    visibleSet.delete(id);
   });
 
-  if (state.visibleMessages.length > visibleMessages.length) {
-    state.visibleMessages = visibleMessages;
+  if (state.visibleMessages.length > visibleSet.size) {
+    state.visibleMessages = Array.from(visibleSet);
   }
 
-  const isInRemovedId = (id: MessageId) => removedMessagesIds.includes(id);
-  const mapHasRemovedIdKey = (map: Map<MessageId, any>) =>
-    removedMessagesIds.some(id => map.has(id));
+  const isInRemovedId = (id: MessageId) => removedSet.has(id);
 
-  const cleanUpMap = (map: Map<MessageId, any>) => {
-    const clonedMap = new Map(map);
-    removedMessagesIds.forEach(id => clonedMap.delete(id));
-    return clonedMap;
-  };
-
-  state.messagesById = cleanUpMap(state.messagesById);
+  messagesAdapter.removeMany(state.messages, removedMessagesIds);
 
   if (state.messagesUiById.find(isInRemovedId)) {
     state.messagesUiById = state.messagesUiById.filter(id => !isInRemovedId(id));
   }
 
-  if (mapHasRemovedIdKey(state.messagesPayloadById)) {
-    state.messagesPayloadById = cleanUpMap(state.messagesPayloadById);
-  }
-
   return state;
 }
 
+interface MessageVisibility {
+  visible: boolean;
+  /** if visible is false, what causes the message to be hidden. */
+  cause?: string;
+}
 /**
- * Check if a message should be visible in the console output, and if not, what
- * causes it to be hidden.
- * @param {Message} message: The message to check
- * @param {Object} option: An option object of the following shape:
- *                   - {MessageState} messagesState: The current messages state
- *                   - {FilterState} filtersState: The current filters state
- *
- * @return {Object} An object of the following form:
- *         - visible {Boolean}: true if the message should be visible
- *         - cause {String}: if visible is false, what causes the message to be hidden.
+ * Check if a message should be visible in the console output, and if not,
+ * what causes it to be hidden
  */
 // eslint-disable-next-line complexity
-function getMessageVisibility(message: Message, { messagesState, filtersState }: MessagesFilters) {
+function getMessageVisibility(
+  message: Message,
+  filtersState: WebconsoleFiltersState
+): MessageVisibility {
   // Some messages can't be filtered out
   // So, always return visible: true for those.
   if (isUnfilterable(message)) {
@@ -524,7 +481,7 @@ function getMessageVisibility(message: Message, { messagesState, filtersState }:
   };
 }
 
-function isUnfilterable(message: Message) {
+function isUnfilterable(message: Message): boolean {
   return [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT, MESSAGE_TYPE.NAVIGATION_MARKER].includes(
     message.type
   );
@@ -532,24 +489,16 @@ function isUnfilterable(message: Message) {
 
 /**
  * Returns true if the message is in node modules and should be hidden
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
  */
-function passNodeModuleFilters(message: Message, filters: WebconsoleFiltersState) {
+function passNodeModuleFilters(message: Message, filters: WebconsoleFiltersState): boolean {
   return (
-    message.frame?.source?.includes("node_modules") &&
+    !!message.frame?.source?.includes("node_modules") &&
     filters[FILTERS.NODEMODULES as keyof WebconsoleFiltersState] == false
   );
 }
 
 /**
- * Returns true if the message shouldn't be hidden because of levels filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
+ * Returns true if the message shouldn't be hidden because of levels filter state
  */
 function passLevelFilters(message: Message, filters: WebconsoleFiltersState) {
   // The message passes the filter if it is not a console call,
@@ -565,13 +514,9 @@ function passLevelFilters(message: Message, filters: WebconsoleFiltersState) {
 type StringMatcher = (str: string) => boolean;
 
 /**
- * Returns true if the message shouldn't be hidden because of search filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
+ * Returns true if the message shouldn't be hidden because of search filter state
  */
-function passSearchFilters(message: Message, filters: WebconsoleFiltersState) {
+function passSearchFilters(message: Message, filters: WebconsoleFiltersState): boolean {
   const trimmed = (filters.text || "").trim().toLocaleLowerCase();
 
   // "-"-prefix switched to exclude mode
@@ -615,12 +560,13 @@ function passSearchFilters(message: Message, filters: WebconsoleFiltersState) {
 /**
  * Returns true if given text is included in provided stack frame.
  */
-function isTextInFrame(matchStr: StringMatcher, frame?: Frame) {
+function isTextInFrame(matchStr: StringMatcher, frame?: Frame): boolean {
   if (!frame) {
     return false;
   }
 
   const { functionName, line, column, source } = frame;
+  // @ts-ignore
   const { short } = getSourceNames(source);
   const unicodeShort = getUnicodeUrlPath(short);
 
@@ -631,7 +577,7 @@ function isTextInFrame(matchStr: StringMatcher, frame?: Frame) {
 /**
  * Returns true if given text is included in provided parameters.
  */
-function isTextInParameters(matchStr: StringMatcher, parameters?: ValueFront[]) {
+function isTextInParameters(matchStr: StringMatcher, parameters?: ValueFront[]): boolean {
   if (!parameters) {
     return false;
   }
@@ -646,7 +592,7 @@ function isTextInParameter(
   matchStr: StringMatcher,
   parameter: ValueFront,
   visitedObjectIds = new Set()
-) {
+): boolean {
   if (parameter.isPrimitive()) {
     return matchStr(String(parameter.primitive()));
   }
@@ -666,12 +612,13 @@ function isTextInParameter(
   visitedObjectIds = new Set(visitedObjectIds);
   visitedObjectIds.add(objectId);
 
-  const previewItems = getGripPreviewItems(parameter);
-  for (const item of previewItems) {
-    if (isTextInParameter(matchStr, item, visitedObjectIds)) {
-      return true;
-    }
-  }
+  // TODO Disable this for now to avoid circular imports
+  // const previewItems = getGripPreviewItems(parameter);
+  // for (const item of previewItems) {
+  //   if (isTextInParameter(matchStr, item, visitedObjectIds)) {
+  //     return true;
+  //   }
+  // }
 
   return false;
 }
@@ -679,7 +626,7 @@ function isTextInParameter(
 /**
  * Returns true if given text is included in provided net event grip.
  */
-function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest) {
+function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest): boolean {
   if (!request) {
     return false;
   }
@@ -692,7 +639,7 @@ function isTextInNetEvent(matchStr: StringMatcher, request?: MessageRequest) {
 /**
  * Returns true if given text is included in provided stack trace.
  */
-function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]) {
+function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]): boolean {
   if (!Array.isArray(stacktrace)) {
     return false;
   }
@@ -712,7 +659,7 @@ function isTextInStackTrace(matchStr: StringMatcher, stacktrace?: StackFrame[]) 
 /**
  * Returns true if given text is included in `messageText` field.
  */
-function isTextInMessageText(matchStr: StringMatcher, messageText?: string) {
+function isTextInMessageText(matchStr: StringMatcher, messageText?: string): boolean {
   if (!messageText) {
     return false;
   }
@@ -727,7 +674,7 @@ function isTextInMessageText(matchStr: StringMatcher, messageText?: string) {
 /**
  * Returns true if given text is included in notes.
  */
-function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null) {
+function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null): boolean {
   if (!Array.isArray(notes)) {
     return false;
   }
@@ -744,7 +691,7 @@ function isTextInNotes(matchStr: StringMatcher, notes: Note[] | null) {
 /**
  * Returns true if given text is included in prefix.
  */
-function isTextInPrefix(matchStr: StringMatcher, prefix?: string) {
+function isTextInPrefix(matchStr: StringMatcher, prefix?: string): boolean {
   if (!prefix) {
     return false;
   }
@@ -752,14 +699,11 @@ function isTextInPrefix(matchStr: StringMatcher, prefix?: string) {
   return matchStr(`${prefix}: `);
 }
 
-function getDefaultFiltersCounter() {
-  const count = (DEFAULT_FILTERS as FilterCountKeys[]).reduce(
-    (res: FilteredMessagesCount, filter) => {
-      res[filter] = 0;
-      return res;
-    },
-    {} as FilteredMessagesCount
-  );
+function getDefaultFiltersCounter(): FilteredMessagesCount {
+  const count = (DEFAULT_FILTERS as FilterCountKeys[]).reduce((res, filter) => {
+    res[filter] = 0;
+    return res;
+  }, {} as FilteredMessagesCount);
   count.global = 0;
   return count;
 }
@@ -775,7 +719,7 @@ function getPausePoint(newMessage: Message, state: MessageState) {
 
 // Make sure that message has an execution point which can be used for sorting
 // if other messages with real execution points appear later.
-function ensureExecutionPoint(state: MessageState, newMessage: Message) {
+export function ensureExecutionPoint(state: MessageState, newMessage: Message) {
   if (newMessage.executionPoint) {
     assert("executionPointTime" in newMessage, "newMessage.executionPointTime not set");
     return;
@@ -791,18 +735,17 @@ function ensureExecutionPoint(state: MessageState, newMessage: Message) {
     // @ts-ignore string/obj mismatch
     point = getPausePoint(newMessage, state);
     time = state.pausedExecutionPointTime;
-    // @ts-ignorestring/obj mismatch
     const lastMessage = getLastMessageWithPoint(state, point);
     if (lastMessage.lastExecutionPoint) {
       messageCount = lastMessage.lastExecutionPoint.messageCount + 1;
     }
   } else if (state.visibleMessages.length) {
     const lastId = state.visibleMessages[state.visibleMessages.length - 1];
-    const lastMessage = state.messagesById.get(lastId)!;
+    const lastMessage = state.messages.entities[lastId]!;
     if (lastMessage.executionPoint) {
       // If the message is evaluated while we are not paused, we want
-      // to make sure that those messages are placed immediately after the execution
-      // point's message.
+      // to make sure that those messages are placed immediately after
+      // the execution point's message.
       point = lastMessage.executionPoint;
       time = lastMessage.executionPointTime!;
       messageCount = 0;
@@ -813,7 +756,6 @@ function ensureExecutionPoint(state: MessageState, newMessage: Message) {
     }
   }
 
-  // @ts-ignorestring/obj mismatch
   newMessage.lastExecutionPoint = { point, time, messageCount };
 }
 
@@ -821,34 +763,35 @@ function getLastMessageWithPoint(state: MessageState, point: ExecutionPoint) {
   // Find all of the messageIds with no real execution point and the same progress
   // value as the given point.
   const filteredMessageId = state.visibleMessages.filter(function (p) {
-    const currentMessage = state.messagesById.get(p)!;
+    const currentMessage = state.messages.entities[p]!;
 
     if (currentMessage.executionPoint) {
       return false;
     }
 
+    // @ts-ignore ExecutionPoint/string mismatch
     return point.progress === currentMessage.lastExecutionPoint.point.progress;
   });
 
   const lastMessageId = filteredMessageId[filteredMessageId.length - 1];
-  return state.messagesById.get(lastMessageId) || ({} as Message);
+  return state.messages.entities[lastMessageId] ?? ({} as Message);
 }
 
-function messageExecutionPoint(state: MessageState, id: MessageId) {
-  const message = state.messagesById.get(id)!;
+function messageExecutionPoint(state: MessageState, id: MessageId): string {
+  const message = state.messages.entities[id]!;
+  // @ts-ignore ExecutionPoint/string
   return message.executionPoint || message.lastExecutionPoint.point;
 }
 
 function messageCountSinceLastExecutionPoint(state: MessageState, id: MessageId) {
-  const message = state.messagesById.get(id)!;
+  const message = state.messages.entities[id]!;
   return message.lastExecutionPoint ? message.lastExecutionPoint.messageCount : 0;
 }
 
 /**
  * Sort state.visibleMessages if needed.
- *
- * @param {MessageState} state
- * @param {Boolean} timeStampSort: set to true to sort messages by their timestamps.
+ * Be aware that this function MUTATES the `state` argument, which is okay
+ * because it actually runs inside of `createSlice` and Immer.
  */
 function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
   // When using log points while replaying, messages can be added out of order˜
@@ -858,7 +801,7 @@ function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
   // messages with execution points, as either we aren't replaying or haven't
   // seen any messages yet.
   if (state.hasExecutionPoints) {
-    state.visibleMessages = [...state.visibleMessages].sort((a, b) => {
+    state.visibleMessages.sort((a, b) => {
       const compared = compareNumericStrings(
         messageExecutionPoint(state, a),
         messageExecutionPoint(state, b)
@@ -868,8 +811,8 @@ function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
       } else if (compared > 0) {
         return 1;
       } else {
-        const msgA = state.messagesById.get(a)!;
-        const msgB = state.messagesById.get(b)!;
+        const msgA = state.messages.entities[a]!;
+        const msgB = state.messages.entities[b]!;
         if (msgA.evalId) {
           if (!msgB.evalId) {
             return 1;
@@ -891,14 +834,10 @@ function maybeSortVisibleMessages(state: MessageState, timeStampSort = false) {
 
   if (timeStampSort) {
     state.visibleMessages.sort((a, b) => {
-      const messageA = state.messagesById.get(a)!;
-      const messageB = state.messagesById.get(b)!;
+      const messageA = state.messages.entities[a]!;
+      const messageB = state.messages.entities[b]!;
 
       return messageA.timeStamp! < messageB.timeStamp! ? -1 : 1;
     });
   }
 }
-
-export const initialMessageState = MessageState;
-
-export { messages, ensureExecutionPoint };
