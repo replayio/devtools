@@ -29,7 +29,7 @@ export default function useAddCommentReply() {
     console.error("Apollo error while adding a comment:", error);
   }
 
-  return (reply: Reply) => {
+  return (reply: Reply) =>
     addCommentReply({
       variables: {
         input: {
@@ -108,5 +108,4 @@ export default function useAddCommentReply() {
         });
       },
     });
-  };
 }

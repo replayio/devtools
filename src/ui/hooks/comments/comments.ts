@@ -56,7 +56,7 @@ export function useUpdateComment() {
     console.error("Apollo error while updating a comment:", error);
   }
 
-  return (commentId: string, newContent: string, position: CommentPosition | null) => {
+  return (commentId: string, newContent: string, position: CommentPosition | null) =>
     updateCommentContent({
       variables: { commentId, newContent, position },
       optimisticResponse: {
@@ -75,7 +75,6 @@ export function useUpdateComment() {
         });
       },
     });
-  };
 }
 
 export function useUpdateCommentReply() {
@@ -96,7 +95,7 @@ export function useUpdateCommentReply() {
     console.error("Apollo error while updating a comment:", error);
   }
 
-  return (commentId: string, newContent: string) => {
+  return (commentId: string, newContent: string) =>
     updateCommentReplyContent({
       variables: { commentId, newContent },
       optimisticResponse: {
@@ -112,7 +111,6 @@ export function useUpdateCommentReply() {
         });
       },
     });
-  };
 }
 
 export async function getFirstComment(

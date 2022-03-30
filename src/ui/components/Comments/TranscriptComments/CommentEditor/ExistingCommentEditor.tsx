@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
 import { useGetUserId } from "ui/hooks/users";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
@@ -23,7 +22,6 @@ const LoomComment = connect(null, { setModal: actions.setModal })(
 );
 
 type ExistingCommentEditorProps = PropsFromRedux & {
-  editable: boolean;
   data: CommentData;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
@@ -31,7 +29,6 @@ type ExistingCommentEditorProps = PropsFromRedux & {
 };
 
 function ExistingCommentEditor({
-  editable,
   isEditing,
   setIsEditing,
   data,
@@ -58,7 +55,7 @@ function ExistingCommentEditor({
       }}
     >
       <CommentEditor
-        editable={editable && isEditing}
+        editable={isEditing}
         comment={comment}
         handleSubmit={inputValue => {
           commentsLocalStorage.clear();

@@ -29,7 +29,7 @@ export default function useAddComment() {
   return (comment: Comment) => {
     trackEvent("comments.create");
 
-    addComment({
+    return addComment({
       variables: {
         input: {
           ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),

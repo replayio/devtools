@@ -23,6 +23,7 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import NetworkRequestPreview from "./NetworkRequestPreview";
 import { useFeature } from "ui/hooks/settings";
 import { CommentData } from "./types";
+import { useGetUserId } from "ui/hooks/users";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 type PendingCommentProps = {
@@ -138,27 +139,34 @@ function CommentItemHeader({
 
 function CommentItem({
   data,
-  editable,
   onSubmit,
+  isUpdating,
 }: {
   data: CommentData;
-  editable: boolean;
   onSubmit: (data: CommentData, inputValue: string) => void;
+  isUpdating: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const { userId } = useGetUserId();
+
+  const maybeSetIsUpdating = (value: boolean) => {
+    if (!isUpdating) {
+      setIsEditing(value);
+    }
+  };
+
   return (
     <div className="group space-y-1.5">
       <CommentItemHeader
         comment={data.comment}
-        showOptions={!editable}
-        setIsEditing={setIsEditing}
+        showOptions={!isEditing && !isUpdating && data.comment.user.id === userId}
+        setIsEditing={maybeSetIsUpdating}
       />
       <ExistingCommentEditor
         data={data}
         onSubmit={onSubmit}
-        editable={editable}
         isEditing={isEditing}
-        setIsEditing={setIsEditing}
+        setIsEditing={maybeSetIsUpdating}
       />
     </div>
   );
@@ -258,7 +266,8 @@ function CommentCard({
     <div
       className={classNames(
         `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor"
+        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor",
+        { "opacity-50": isUpdating }
       )}
       onMouseDown={e => {
         seekToComment(comment);
@@ -279,16 +288,16 @@ function CommentCard({
         <CommentTarget comment={comment} />
         <CommentItem
           data={{ type: "comment", comment }}
-          editable={!isUpdating}
           onSubmit={onSubmit}
+          isUpdating={isUpdating}
         />
 
         {comment.replies?.map((reply: Reply, i: number) => (
           <div key={replyKeys[i]}>
             <CommentItem
               data={{ type: "reply", comment: reply }}
-              editable={!isUpdating}
               onSubmit={onSubmit}
+              isUpdating={isUpdating}
             />
           </div>
         ))}
