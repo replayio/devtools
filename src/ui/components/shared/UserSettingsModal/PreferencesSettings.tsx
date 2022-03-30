@@ -138,7 +138,7 @@ export default function PreferencesSettings() {
     <div className="space-y-6 overflow-auto">
       <UiPreferences />
       <PrivacyPreferences />
-      <NotificationPreferences {...{ unsubscribedEmailTypes }} />
+      {unsubscribedEmailTypes ? <NotificationPreferences {...{ unsubscribedEmailTypes }} /> : null}
     </div>
   );
 }
