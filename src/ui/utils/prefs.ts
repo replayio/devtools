@@ -27,7 +27,7 @@ pref("devtools.features.networkRequestComments", true);
 pref("devtools.features.useMultipleControllers", false);
 pref("devtools.features.multipleControllerUseSnapshots", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
-pref("devtools.features.codeHeatMaps", false);
+pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
 
 export const prefs = new PrefsHelper("devtools", {
