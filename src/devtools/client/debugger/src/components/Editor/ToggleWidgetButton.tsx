@@ -140,10 +140,10 @@ function QuickActions({
 
   return (
     <div
-      className="absolute z-50 flex flex-row space-x-px transform -translate-y-1/2"
+      className="absolute z-50 flex flex-row space-x-px transform -right-1 translate-x-full"
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
-      style={{ top: `${(1 / 2) * height}px` }}
+      style={{ top: `-${(1 / 2) * (18 - height)}px` }}
     >
       {button}
     </div>
@@ -156,9 +156,15 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
-  const onLineEnter = ({ lineNode, lineNumber }: { lineNode: HTMLElement; lineNumber: number }) => {
+  const onLineEnter = ({
+    lineNumberNode,
+    lineNumber,
+  }: {
+    lineNumberNode: HTMLElement;
+    lineNumber: number;
+  }) => {
     setHoveredLineNumber(lineNumber);
-    setTargetNode(lineNode);
+    setTargetNode(lineNumberNode);
   };
   const onLineLeave = () => {
     setTargetNode(null);

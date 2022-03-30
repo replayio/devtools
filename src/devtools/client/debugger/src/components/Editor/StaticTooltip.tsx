@@ -7,14 +7,11 @@ type StaticTooltipProps = {
   className?: string;
 };
 
-export default function StaticTooltip({ targetNode, children, className }: StaticTooltipProps) {
-  const { top, left } = targetNode.getBoundingClientRect();
-  let style = { top: `${top}px`, left: `${left}px` };
-
+export default function StaticTooltip({ targetNode, children }: StaticTooltipProps) {
   return ReactDOM.createPortal(
-    <div className={`static-tooltip z-10 ml-1 -mt-1 text-sm ${className}`} style={style}>
-      <div className="-translate-y-full transform">{children}</div>
+    <div className="absolute z-50 flex flex-row space-x-px transform -right-1 translate-x-full bottom-4 mb-0.5">
+      {children}
     </div>,
-    document.body
+    targetNode
   );
 }

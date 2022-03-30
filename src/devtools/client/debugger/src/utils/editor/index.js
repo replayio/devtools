@@ -10,7 +10,6 @@ export * from "./source-search";
 export * from "../ui";
 export { onTokenMouseOver } from "./token-events";
 export { onLineMouseOver } from "./line-events";
-export { onGutterMouseOver } from "./gutter-events";
 
 import { createEditor } from "./create-editor";
 import { findNext, findPrev } from "./source-search";
