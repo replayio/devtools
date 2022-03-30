@@ -95,6 +95,9 @@ async function runTest(state, test, exampleRecordingId, target) {
   if (state.dispatchServer != "wss://dispatch.replay.io") {
     testPath += `&dispatch=${state.dispatchServer}`;
   }
+  if (state.longTimeout) {
+    testPath += "&longTimeout=1";
+  }
 
   let success, why, recordingId;
   if (target == "gecko" || target == "chromium") {
