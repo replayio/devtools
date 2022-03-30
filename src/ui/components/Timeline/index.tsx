@@ -34,9 +34,8 @@ import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
 import { Focuser } from "./Focuser";
 import { trackEvent } from "ui/utils/telemetry";
-import IndexingLoader from "../shared/IndexingLoader";
+import RegionsLoader from "../shared/RegionsLoader";
 import { EditFocusButton } from "./EditFocusButton";
-import { UnloadedRegions } from "./UnloadedRegions";
 import { MouseDownMask } from "./MouseDownMask";
 
 function getIsSecondaryHighlighted(
@@ -202,7 +201,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       return (
         <div className="commands">
           <button className="relative" onClick={replay} disabled={disabled}>
-            <IndexingLoader />
+            <RegionsLoader />
             <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
               <img className="m-auto h-6 w-6" src="/images/playback-refresh.svg" />
             </div>
@@ -214,7 +213,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     return (
       <div className="commands">
         <button className="relative" onClick={togglePlayback} disabled={disabled}>
-          <IndexingLoader />
+          <RegionsLoader />
           {playback ? (
             <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
               <img className="m-auto h-6 w-6" src="/images/playback-pause.svg" />
@@ -377,7 +376,6 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
                 style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
               />
               <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
-              <UnloadedRegions />
               {this.renderPreviewMarkers()}
               <Comments />
               {this.renderUnfocusedRegion()}

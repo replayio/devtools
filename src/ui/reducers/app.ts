@@ -298,3 +298,21 @@ export const isRegionLoaded = (state: UIState, time: number | null | undefined) 
 export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;
+export const getLoadingProgress = (state: UIState) => {
+  const regions = getLoadedRegions(state);
+
+  if (!regions) {
+    return 0;
+  }
+
+  const loadedTotal = regions.loaded.reduce(
+    (acc, region) => acc + region.end.time - region.begin.time,
+    0
+  );
+  const loadingTotal = regions.loading.reduce(
+    (acc, region) => acc + region.end.time - region.begin.time,
+    0
+  );
+
+  return (loadedTotal / loadingTotal) * 100;
+};
