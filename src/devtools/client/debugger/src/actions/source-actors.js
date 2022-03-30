@@ -88,11 +88,14 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
       ]).join("-");
     },
     getValue: ({ id }, { getState }) => getSourceActorBreakpointHitCounts(getState(), id),
-    action: async ({ id }, { dispatch, getState, client }) => {
+    action: async ({ id, onFailure }, { dispatch, getState, client }) => {
       await dispatch({
         type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
         id,
-        [PROMISE]: client.getSourceActorBreakpointHitCounts(getSourceActor(getState(), id)),
+        [PROMISE]: client.getSourceActorBreakpointHitCounts(
+          getSourceActor(getState(), id),
+          onFailure
+        ),
       });
     },
   }

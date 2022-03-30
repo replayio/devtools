@@ -332,9 +332,9 @@ async function getSourceActorBreakableLines({ actor }) {
   return positions.map(({ line }) => line);
 }
 
-async function getSourceActorBreakpointHitCounts({ actor, id }) {
+async function getSourceActorBreakpointHitCounts({ actor, id }, onFailure) {
   const locations = await ThreadFront.getBreakpointPositionsCompressed(id);
-  return ThreadFront.getHitCounts(id, locations);
+  return ThreadFront.getHitCounts(id, locations).catch(onFailure);
 }
 
 function getFrontByID(actorID) {

@@ -84,6 +84,7 @@ export default function LineNumberTooltip({
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
   const isMetaActive = keyModifiers.meta;
+  const [codeHeatMaps, setCodeHeatMaps] = useState(features.codeHeatMaps);
 
   const indexed = useSelector(selectors.getIndexed);
   const hitCounts = useSelector(getHitCountsForSelectedSource);
@@ -92,7 +93,7 @@ export default function LineNumberTooltip({
 
   let analysisPointsCount: number | undefined;
 
-  if (features.codeHeatMaps) {
+  if (codeHeatMaps) {
     if (lastHoveredLineNumber.current && hitCounts) {
       const lineHitCounts = hitCounts.filter(
         hitCount => hitCount.location.line === lastHoveredLineNumber.current
@@ -119,8 +120,13 @@ export default function LineNumberTooltip({
     }
     setTimeout(() => {
       if (lineNumber === lastHoveredLineNumber.current) {
-        if (features.codeHeatMaps) {
-          dispatch(setBreakpointHitCounts(source.id));
+        if (codeHeatMaps) {
+          dispatch(
+            setBreakpointHitCounts(source.id, () => {
+              setCodeHeatMaps(false);
+              dispatch(runAnalysisOnLine(lineNumber));
+            })
+          );
         } else {
           dispatch(runAnalysisOnLine(lineNumber));
         }
