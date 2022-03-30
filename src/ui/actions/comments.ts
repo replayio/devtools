@@ -188,28 +188,6 @@ export function createLabels(sourceLocation: {
   };
 }
 
-export function editItem(item: Reply | Comment): UIThunkAction {
-  return async dispatch => {
-    const { point, time, hasFrames } = item;
-
-    dispatch(seekToComment(item));
-
-    if (!("replies" in item)) {
-      const pendingComment: PendingComment = {
-        comment: item,
-        type: "edit_reply",
-      };
-      dispatch(setPendingComment(pendingComment));
-    } else {
-      const pendingComment: PendingComment = {
-        comment: item,
-        type: "edit_comment",
-      };
-      dispatch(setPendingComment(pendingComment));
-    }
-  };
-}
-
 export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
   return (dispatch, getState) => {
     dispatch(clearPendingComment());
