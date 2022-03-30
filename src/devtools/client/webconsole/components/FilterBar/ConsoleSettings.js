@@ -28,13 +28,13 @@ export const ToggleRow = ({ children, selected, onClick, id }) => {
   );
 };
 
-function ConsoleSettings({ filters, filterToggle, toggleTimestamps, timestampsVisible }) {
+function ConsoleSettings({ filters, filterToggled, toggleTimestamps, timestampsVisible }) {
   return (
     <div className="flex flex-col">
       <ToggleRow
         onClick={() => {
           trackEvent("console.settings.toggle_node_modules");
-          filterToggle(FILTERS.NODEMODULES);
+          filterToggled(FILTERS.NODEMODULES);
         }}
         selected={!filters[FILTERS.NODEMODULES]}
         id="hide-node-modules"
@@ -61,7 +61,7 @@ export default connect(
     timestampsVisible: getAllUi(state).timestampsVisible,
   }),
   {
-    filterToggle: actions.filterToggle,
+    filterToggled: actions.filterToggled,
     toggleTimestamps: actions.toggleTimestamps,
   }
 )(ConsoleSettings);

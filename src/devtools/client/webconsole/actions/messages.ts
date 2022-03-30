@@ -4,7 +4,7 @@
 
 import type { UIStore, UIThunkAction } from "ui/actions";
 
-import { getAllFilters } from "../reducers/filters";
+import { getAllFilters } from "../selectors/messages";
 
 import {
   prepareMessage,
@@ -213,14 +213,7 @@ export function messagesAdd(
     }
     // TODO This really a good type here?
     const messages: InternalMessage[] = packets.map(packet => prepareMessage(packet, idGenerator));
-    const filtersState = getAllFilters(getState());
-
-    dispatch(
-      messagesAdded({
-        messages,
-        filtersState,
-      })
-    );
+    dispatch(messagesAdded(messages));
   };
 }
 

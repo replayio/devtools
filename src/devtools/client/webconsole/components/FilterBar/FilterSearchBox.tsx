@@ -20,7 +20,7 @@ export function FilterSearchBox() {
   const [searchString, _setSearchString] = useState("");
   const setSearchString = (value: string) => {
     _setSearchString(value);
-    dispatch(actions.filterTextSet(value));
+    dispatch(actions.filterTextUpdated(value));
   };
   const onChange = (e: ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value);
   const clearInput = () => setSearchString("");

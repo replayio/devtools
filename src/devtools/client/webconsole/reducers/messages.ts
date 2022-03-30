@@ -19,7 +19,6 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
-import type { WebconsoleFiltersState } from "./filters";
 
 type MessageId = string;
 type Command = string;
@@ -113,11 +112,31 @@ interface FilteredMessagesCount {
 
 type FilterCountKeys = keyof FilteredMessagesCount;
 
+// Matches the fields in `DEFAULT_FILTERS_VALUES`
+export interface FiltersState {
+  text: string;
+  error: boolean;
+  warn: boolean;
+  log: boolean;
+  info: boolean;
+  debug: boolean;
+  css: boolean;
+  net: boolean;
+  nodemodules: boolean;
+}
+
+export type FilterBooleanFields = Exclude<keyof FiltersState, "text">;
+
+// Already defined in `constants.js`, and don't want to duplicate for now
+const initialFiltersState: FiltersState = constants.DEFAULT_FILTERS_VALUES;
+
 export interface MessageState {
   /** History of the user's entered commands */
   commandHistory: Command[];
   /** Lookup table of all the messages added to the console */
   messages: EntityState<Message>;
+  /** Active filters for messages */
+  filters: FiltersState;
   /** IDs for all visible messages, in order */
   visibleMessages: MessageId[];
   /** Counters for filtered-out messages, by cause */
@@ -150,11 +169,16 @@ const logpointMessagesAdapter = createEntityAdapter<LogpointMessageEntry>({
   selectId: entry => entry.key,
 });
 
-export const initialMessageState = (overrides?: Partial<MessageState>): MessageState =>
-  Object.freeze(
+export const initialMessageState = (overrides: Partial<MessageState> = {}): MessageState => {
+  // Realistically, we only expect filters and commandHistory
+  // See ui/setup/dynamic/devtools.ts
+  const { filters = {}, ...otherOverrides } = overrides;
+
+  return Object.freeze(
     Object.assign(
       {
         messages: messagesAdapter.getInitialState(),
+        filters: { ...initialFiltersState, ...filters },
         visibleMessages: [],
         filteredMessagesCount: getDefaultFiltersCounter(),
         messagesUiById: [],
@@ -168,9 +192,10 @@ export const initialMessageState = (overrides?: Partial<MessageState>): MessageS
         overflow: false,
         messagesLoaded: false,
       },
-      overrides
+      otherOverrides
     )
   );
+};
 
 // Dispatched manually elsewhere in the codebase, so typed here for reference
 interface PausedAction extends AnyAction {
@@ -186,13 +211,10 @@ const messagesSlice = createSlice({
     messagesLoaded(state) {
       state.messagesLoaded = true;
     },
-    messagesAdded(
-      state,
-      action: PayloadAction<{ messages: Message[]; filtersState: WebconsoleFiltersState }>
-    ) {
-      const { messages, filtersState } = action.payload;
+    messagesAdded(state, action: PayloadAction<Message[]>) {
+      const messages = action.payload;
       messages.forEach(message => {
-        addMessage(message, state as MessageState, filtersState);
+        addMessage(message, state as MessageState);
 
         if (message.type === "command") {
           state.commandHistory = appendToHistory(message.messageText, state.commandHistory);
@@ -237,15 +259,23 @@ const messagesSlice = createSlice({
     },
     //  This is only here to force recalculation after filters are updated
     // TODO Find a way to rework `visibleMessages` as derived data and remove this
-    filterStateUpdated(state, action: PayloadAction<WebconsoleFiltersState>) {
-      return setVisibleMessages({
-        // @ts-ignore Doesn't like `WritableDraft<ValueFront>`
-        messagesState: state,
-        filtersState: action.payload,
-      });
-    },
+    filterStateUpdated(state, action: PayloadAction<FiltersState>) {},
     consoleOverflowed(state) {
       state.overflow = true;
+    },
+    filterToggled(state, action: PayloadAction<FilterBooleanFields>) {
+      state.filters[action.payload] = !state.filters[action.payload];
+      setVisibleMessages(
+        // Doesn't like `WritableDraft<MessagesState>` due to `ValueFront`
+        state as MessageState
+      );
+    },
+    filterTextUpdated(state, action: PayloadAction<string>) {
+      state.filters.text = action.payload;
+      setVisibleMessages(
+        // Doesn't like `WritableDraft<MessagesState>` due to `ValueFront`
+        state as MessageState
+      );
     },
   },
   extraReducers: builder => {
@@ -275,6 +305,8 @@ export const {
   messageOpened,
   messagesAdded,
   messagesLoaded,
+  filterTextUpdated,
+  filterToggled,
 } = messagesSlice.actions;
 
 export const messages = messagesSlice.reducer;
@@ -285,11 +317,7 @@ export const messages = messagesSlice.reducer;
  * because it actually runs inside of `createSlice` and Immer.
  */
 // eslint-disable-next-line complexity
-function addMessage(
-  newMessage: Message,
-  state: MessageState,
-  filtersState: WebconsoleFiltersState
-): MessageState {
+function addMessage(newMessage: Message, state: MessageState): MessageState {
   if (newMessage.type === constants.MESSAGE_TYPE.NULL_MESSAGE) {
     // When the message has a NULL type, we don't add it.
     return state;
@@ -330,7 +358,7 @@ function addMessage(
   const addedMessage = Object.freeze(newMessage);
   messagesAdapter.upsertOne(state.messages, addedMessage);
 
-  const { visible, cause } = getMessageVisibility(addedMessage, filtersState);
+  const { visible, cause } = getMessageVisibility(addedMessage, state.filters);
 
   if (visible) {
     state.visibleMessages.push(newMessage.id);
@@ -348,7 +376,7 @@ function addMessage(
 
 interface MessagesFilters {
   messagesState: MessageState;
-  filtersState: WebconsoleFiltersState;
+  filtersState: FiltersState;
 }
 
 // TODO Turn this into derived state instead, so that we don't have to
@@ -362,20 +390,14 @@ interface MessagesFilters {
  * Be aware that this function MUTATES the `state` argument, which is okay
  * because it actually runs inside of `createSlice` and Immer.
  */
-function setVisibleMessages({
-  messagesState,
-  filtersState,
-  forceTimestampSort = false,
-}: MessagesFilters & {
-  forceTimestampSort?: boolean;
-}) {
+function setVisibleMessages(messagesState: MessageState, forceTimestampSort = false) {
   const messagesToShow: MessageId[] = [];
   const filtered = getDefaultFiltersCounter();
 
   for (const [id, maybeMessage] of Object.entries(messagesState.messages.entities)) {
     // Appease TS, which thinks it could be undefined
     const message = maybeMessage!;
-    const { visible, cause } = getMessageVisibility(message, filtersState);
+    const { visible, cause } = getMessageVisibility(message, messagesState.filters);
 
     if (visible) {
       messagesToShow.push(id);
@@ -439,10 +461,7 @@ interface MessageVisibility {
  * what causes it to be hidden
  */
 // eslint-disable-next-line complexity
-function getMessageVisibility(
-  message: Message,
-  filtersState: WebconsoleFiltersState
-): MessageVisibility {
+function getMessageVisibility(message: Message, filtersState: FiltersState): MessageVisibility {
   // Some messages can't be filtered out
   // So, always return visible: true for those.
   if (isUnfilterable(message)) {
@@ -490,24 +509,24 @@ function isUnfilterable(message: Message): boolean {
 /**
  * Returns true if the message is in node modules and should be hidden
  */
-function passNodeModuleFilters(message: Message, filters: WebconsoleFiltersState): boolean {
+function passNodeModuleFilters(message: Message, filters: FiltersState): boolean {
   return (
     !!message.frame?.source?.includes("node_modules") &&
-    filters[FILTERS.NODEMODULES as keyof WebconsoleFiltersState] == false
+    filters[FILTERS.NODEMODULES as keyof FiltersState] == false
   );
 }
 
 /**
  * Returns true if the message shouldn't be hidden because of levels filter state
  */
-function passLevelFilters(message: Message, filters: WebconsoleFiltersState) {
+function passLevelFilters(message: Message, filters: FiltersState) {
   // The message passes the filter if it is not a console call,
   // or if its level matches the state of the corresponding filter.
   return (
     (message.source !== MESSAGE_SOURCE.CONSOLE_API &&
       message.source !== MESSAGE_SOURCE.JAVASCRIPT) ||
     message.type !== MESSAGE_TYPE.LOG ||
-    filters[message.level as keyof WebconsoleFiltersState] === true
+    filters[message.level as keyof FiltersState] === true
   );
 }
 
@@ -516,7 +535,7 @@ type StringMatcher = (str: string) => boolean;
 /**
  * Returns true if the message shouldn't be hidden because of search filter state
  */
-function passSearchFilters(message: Message, filters: WebconsoleFiltersState): boolean {
+function passSearchFilters(message: Message, filters: FiltersState): boolean {
   const trimmed = (filters.text || "").trim().toLocaleLowerCase();
 
   // "-"-prefix switched to exclude mode

@@ -100,12 +100,6 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
     const lastMessageId = ids[ids.length - 1];
     const lastMessage = entities[lastMessageId]!;
 
-    // [...this.props.messages.values()] seems slow
-    // we should have a separate messageList somewhere we can check OR
-    // use a memoization function to be able to get the last message quickly
-    // const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
-    // const lastMessage = this.props.messages.entities[]
-
     if (messagesDelta <= 0 || lastMessage.type !== constants.MESSAGE_TYPE.RESULT) {
       return;
     }

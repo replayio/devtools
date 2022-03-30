@@ -12,7 +12,7 @@ import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
-import { WebconsoleFiltersState } from "devtools/client/webconsole/reducers/filters";
+
 import { LayoutState } from "./layout";
 
 // TODO Ideally this should be inferred from store setup
@@ -24,7 +24,6 @@ export interface UIState {
   consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
   eventListenerBreakpoints: any;
-  filters: WebconsoleFiltersState;
   inspector: InspectorState;
   layout: LayoutState;
   markup: MarkupState;
