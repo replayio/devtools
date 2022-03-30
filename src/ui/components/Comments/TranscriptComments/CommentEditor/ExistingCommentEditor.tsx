@@ -1,12 +1,12 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
-import { Comment, Reply } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import { useGetUserId } from "ui/hooks/users";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 import debounce from "lodash/debounce";
+import { CommentData } from "../types";
 
 const LoomComment = connect(null, { setModal: actions.setModal })(
   ({ setModal, loom }: { loom: string; setModal: typeof actions.setModal }) => {
@@ -23,35 +23,18 @@ const LoomComment = connect(null, { setModal: actions.setModal })(
 );
 
 type ExistingCommentEditorProps = PropsFromRedux & {
-  comment: Comment | Reply;
   editable: boolean;
-  type: "comment" | "reply";
+  data: CommentData;
+  onSubmit: (data: CommentData, inputValue: string) => void;
 };
 
-function ExistingCommentEditor({
-  comment,
-  clearPendingComment,
-  editable,
-  editItem,
-  type,
-}: ExistingCommentEditorProps) {
+function ExistingCommentEditor({ editable, editItem, data, onSubmit }: ExistingCommentEditorProps) {
+  const { comment, type } = data;
   const { userId } = useGetUserId();
-  const updateComment = hooks.useUpdateComment();
-  const updateCommentReply = hooks.useUpdateCommentReply();
   const commentsLocalStorage = useCommentsLocalStorage({
     type: "existing",
     commentId: comment.id,
   });
-
-  const handleSubmit = async (inputValue: string) => {
-    if (type === "comment") {
-      await updateComment(comment.id, inputValue, (comment as Comment).position);
-    } else if (type === "reply") {
-      await updateCommentReply(comment.id, inputValue);
-    }
-    commentsLocalStorage.clear();
-    clearPendingComment();
-  };
 
   const loom = comment.content.match(/loom\.com\/share\/(\S*?)(\"|\?)/)?.[1];
   if (loom) {
@@ -69,7 +52,10 @@ function ExistingCommentEditor({
       <CommentEditor
         editable={editable}
         comment={comment}
-        handleSubmit={handleSubmit}
+        handleSubmit={inputValue => {
+          commentsLocalStorage.clear();
+          onSubmit(data, inputValue);
+        }}
         onCreate={({ editor }) => {
           const storedComment = commentsLocalStorage.get();
           if (storedComment) {
