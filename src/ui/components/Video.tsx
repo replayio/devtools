@@ -90,7 +90,7 @@ function Video({
       {showCommentTool ? (
         <CommentsOverlay>
           <CommentLoader recordingId={recordingId} />
-          {(mouseTargetsLoading || stalled) && (
+          {((isNodePickerActive && mouseTargetsLoading) || stalled) && (
             <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
               <Spinner className="w-4 animate-spin" />
             </div>
