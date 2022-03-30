@@ -21,6 +21,7 @@ export const getFilteredMessagesCount = (state: UIState) => state.messages.filte
 export const getMessagesLoaded = (state: UIState) => state.messages.messagesLoaded;
 export const getLastMessageId = (state: UIState) =>
   state.messages.messages.ids[state.messages.messages.ids.length - 1];
+export const getAllFilters = (state: UIState) => state.messages.filters;
 
 export function getAllMessagesById(state: UIState) {
   return state.messages.messages;

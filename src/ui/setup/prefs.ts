@@ -70,13 +70,16 @@ export function updatePrefs(state: UIState, oldState: UIState) {
     });
   }
 
-  if (state.filters && oldState.filters) {
-    updateWebconsolePref("filterError", (state: UIState) => state.filters.error);
-    updateWebconsolePref("filterWarn", (state: UIState) => state.filters.warn);
-    updateWebconsolePref("filterInfo", (state: UIState) => state.filters.info);
-    updateWebconsolePref("filterDebug", (state: UIState) => state.filters.debug);
-    updateWebconsolePref("filterLog", (state: UIState) => state.filters.log);
-    updateWebconsolePref("filterNodeModules", (state: UIState) => state.filters.nodemodules);
+  if (state.messages?.filters && oldState.messages?.filters) {
+    updateWebconsolePref("filterError", (state: UIState) => state.messages.filters.error);
+    updateWebconsolePref("filterWarn", (state: UIState) => state.messages.filters.warn);
+    updateWebconsolePref("filterInfo", (state: UIState) => state.messages.filters.info);
+    updateWebconsolePref("filterDebug", (state: UIState) => state.messages.filters.debug);
+    updateWebconsolePref("filterLog", (state: UIState) => state.messages.filters.log);
+    updateWebconsolePref(
+      "filterNodeModules",
+      (state: UIState) => state.messages.filters.nodemodules
+    );
   }
 
   maybeUpdateReplaySessions(state);

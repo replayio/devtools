@@ -39,7 +39,7 @@ function FilterSettings({
   filters,
   filteredMessagesCount,
   shouldLogExceptions,
-  filterToggle,
+  filterToggled,
   logExceptions,
 }) {
   function getCount(filterKey) {
@@ -62,7 +62,7 @@ function FilterSettings({
         count={getCount(FILTERS.ERROR)}
         onClick={() => {
           trackEvent("console.settings.toggle_error");
-          filterToggle(FILTERS.ERROR);
+          filterToggled(FILTERS.ERROR);
         }}
         selected={filters[FILTERS.ERROR]}
         id="show-errors"
@@ -73,7 +73,7 @@ function FilterSettings({
         count={getCount(FILTERS.WARN)}
         onClick={() => {
           trackEvent("console.settings.toggle_warn");
-          filterToggle(FILTERS.WARN);
+          filterToggled(FILTERS.WARN);
         }}
         selected={filters[FILTERS.WARN]}
         id="show-warnings"
@@ -84,7 +84,7 @@ function FilterSettings({
         count={getCount(FILTERS.LOG)}
         onClick={() => {
           trackEvent("console.settings.toggle_logs");
-          filterToggle(FILTERS.LOG);
+          filterToggled(FILTERS.LOG);
         }}
         selected={filters[FILTERS.LOG]}
         id="show-logs"
@@ -102,7 +102,7 @@ export default connect(
     shouldLogExceptions: selectors.getShouldLogExceptions(state),
   }),
   {
-    filterToggle: actions.filterToggle,
+    filterToggled: actions.filterToggled,
     logExceptions: actions.logExceptions,
   }
 )(FilterSettings);

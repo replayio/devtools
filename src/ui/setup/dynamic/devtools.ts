@@ -116,7 +116,22 @@ export default async function DevTools(store: AppStore) {
   const initialConsoleState = getConsoleInitialState();
 
   const commandHistory = await asyncStore.commandHistory;
-  const messages = initialMessageState({ commandHistory });
+  const messages = initialMessageState({
+    commandHistory,
+    // Ref: devtools/client/webconsole/constants
+    filters: {
+      error: consolePrefs.filterError,
+      warn: consolePrefs.filterWarn,
+      info: consolePrefs.filterInfo,
+      debug: consolePrefs.filterDebug,
+      log: consolePrefs.filterLog,
+      // Note: the UI exposes this as "Hide node_modules", so we invert the pref
+      nodemodules: consolePrefs.filterNodeModules,
+      text: "",
+      css: false,
+      net: false,
+    },
+  });
 
   const initialState = {
     messages,

@@ -3,12 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { filters } = require("devtools/client/webconsole/reducers/filters");
 const { messages } = require("devtools/client/webconsole/reducers/messages");
 const { ui } = require("devtools/client/webconsole/reducers/ui");
 
 exports.reducers = {
-  filters,
   messages,
   consoleUI: ui,
 };

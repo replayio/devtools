@@ -1,7 +1,7 @@
 Test.describe(`Test source mapping of console errors.`, async () => {
   await Test.toggleExceptionLogging();
   await Test.selectConsole();
-  Test.app.actions.filterToggle("warn");
+  Test.app.actions.filterToggled("warn");
 
   // These tests should be more exhaustive...
   await Test.waitForMessage("console.trace() ConsoleTrace");
