@@ -62,7 +62,7 @@ function Wrapper({
     return (
       <div className="static-tooltip-content space-x-2" style={{ background: AWESOME_BACKGROUND }}>
         <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
-        <div className="flex flex-col">
+        <div className="flex flex-col items-start">
           {!loading ? <div className="font-bold">Click to add a print statement</div> : null}
           <div>{children}</div>
         </div>
@@ -106,10 +106,10 @@ export default function LineNumberTooltip({
 
   const setHoveredLineNumber = ({
     lineNumber,
-    lineNode,
+    lineNumberNode,
   }: {
     lineNumber: number;
-    lineNode: HTMLElement;
+    lineNumberNode: HTMLElement;
   }) => {
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
@@ -133,7 +133,7 @@ export default function LineNumberTooltip({
       }
     }, 200);
     dispatch(updateHoveredLineNumber(lineNumber));
-    setTargetNode(lineNode);
+    setTargetNode(lineNumberNode);
   };
   const clearHoveredLineNumber = () => {
     setTargetNode(null);

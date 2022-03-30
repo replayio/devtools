@@ -34,18 +34,25 @@ function emitLineMouseEnter(codeMirror, target) {
   const row = lineNode.parentElement;
 
   const lineNumberNode = getLineNumberNode(row);
-  const lineNumber = safeJsonParse(lineNumberNode.textContent);
+  const lineNumber = safeJsonParse(lineNumberNode.childNodes[0].nodeValue);
 
   target.addEventListener(
     "mouseleave",
-    event => dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode }),
+    () => {
+      const gutterButton = lineNumberNode.querySelector(".CodeMirror-gutter-wrapper button");
+
+      // Don't trigger a mouse leave event if the user ends up hovering on the gutter button.
+      if (gutterButton && !gutterButton.matches(":hover")) {
+        dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode });
+      }
+    },
     {
       capture: true,
       once: true,
     }
   );
 
-  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode });
+  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode, lineNumberNode });
 }
 
 export function onLineMouseOver(codeMirror) {

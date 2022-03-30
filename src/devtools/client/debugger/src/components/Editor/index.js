@@ -51,7 +51,6 @@ import {
   hasDocument,
   onTokenMouseOver,
   onLineMouseOver,
-  onGutterMouseOver,
   startOperation,
   endOperation,
   clearDocuments,
@@ -136,7 +135,6 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
     codeMirrorWrapper.addEventListener("mouseover", onLineMouseOver(codeMirror));
-    codeMirrorWrapper.addEventListener("mouseover", onGutterMouseOver(codeMirror));
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
