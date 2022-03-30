@@ -27,7 +27,8 @@ export const useCommentsLocalStorage = (mode: Mode) => {
   };
 
   const getComment = (): string | null => {
-    return localStorage.getItem(storeKey);
+    return "";
+    // return localStorage.getItem(storeKey);
   };
 
   const clearComment = (): void => {
