@@ -33,9 +33,10 @@ function getDeleteDescription(replyCount: number) {
 type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
   isRoot: boolean;
+  setIsEditing: (isEditing: boolean) => void;
 };
 
-function CommentActions({ comment, editItem, isRoot, setHoveredComment }: CommentActionsProps) {
+function CommentActions({ comment, isRoot, setHoveredComment, setIsEditing }: CommentActionsProps) {
   const recordingId = hooks.useGetRecordingId();
   const { userId } = hooks.useGetUserId();
   const deleteComment = hooks.useDeleteComment();
@@ -79,9 +80,8 @@ function CommentActions({ comment, editItem, isRoot, setHoveredComment }: Commen
   const editComment = (e: React.MouseEvent) => {
     e.stopPropagation();
     setExpanded(false);
+    setIsEditing(true);
     trackEvent("comments.start_edit");
-
-    editItem(comment);
   };
 
   const button = (
@@ -116,7 +116,6 @@ function CommentActions({ comment, editItem, isRoot, setHoveredComment }: Commen
 }
 
 const connector = connect(null, {
-  editItem: actions.editItem,
   setHoveredComment: actions.setHoveredComment,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

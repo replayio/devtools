@@ -95,9 +95,11 @@ function BorderBridge({
 function CommentItemHeader({
   comment,
   showOptions,
+  setIsEditing,
 }: {
   comment: Comment | Reply;
   showOptions: boolean;
+  setIsEditing: (isEditing: boolean) => void;
 }) {
   const [relativeDate, setRelativeDate] = useState("");
 
@@ -123,7 +125,13 @@ function CommentItemHeader({
           {relativeDate}
         </span>
       </div>
-      {showOptions ? <CommentActions comment={comment} isRoot={"replies" in comment} /> : null}
+      {showOptions ? (
+        <CommentActions
+          comment={comment}
+          isRoot={"replies" in comment}
+          setIsEditing={setIsEditing}
+        />
+      ) : null}
     </div>
   );
 }
@@ -137,10 +145,21 @@ function CommentItem({
   editable: boolean;
   onSubmit: (data: CommentData, inputValue: string) => void;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
   return (
     <div className="group space-y-1.5">
-      <CommentItemHeader comment={data.comment} showOptions={!editable} />
-      <ExistingCommentEditor data={data} onSubmit={onSubmit} editable={editable} />
+      <CommentItemHeader
+        comment={data.comment}
+        showOptions={!editable}
+        setIsEditing={setIsEditing}
+      />
+      <ExistingCommentEditor
+        data={data}
+        onSubmit={onSubmit}
+        editable={editable}
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+      />
     </div>
   );
 }
@@ -175,7 +194,6 @@ function CommentCard({
   comments,
   currentTime,
   executionPoint,
-  pendingComment,
   clearPendingComment,
   setModal,
   seekToComment,
@@ -261,7 +279,7 @@ function CommentCard({
         <CommentTarget comment={comment} />
         <CommentItem
           data={{ type: "comment", comment }}
-          editable={!isUpdating && pendingComment?.comment.id === comment.id}
+          editable={!isUpdating}
           onSubmit={onSubmit}
         />
 
@@ -269,7 +287,7 @@ function CommentCard({
           <div key={replyKeys[i]}>
             <CommentItem
               data={{ type: "reply", comment: reply }}
-              editable={!isUpdating && pendingComment?.comment.id === comment.id}
+              editable={!isUpdating}
               onSubmit={onSubmit}
             />
           </div>
@@ -332,7 +350,6 @@ const connector = connect(
     pendingComment: selectors.getPendingComment(state),
   }),
   {
-    editItem: actions.editItem,
     seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
     setModal: actions.setModal,

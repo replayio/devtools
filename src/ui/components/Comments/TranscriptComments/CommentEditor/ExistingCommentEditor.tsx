@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
-import { Comment } from "ui/state/comments";
 import { useGetUserId } from "ui/hooks/users";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 import debounce from "lodash/debounce";
@@ -25,11 +25,19 @@ const LoomComment = connect(null, { setModal: actions.setModal })(
 type ExistingCommentEditorProps = PropsFromRedux & {
   editable: boolean;
   data: CommentData;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
   onSubmit: (data: CommentData, inputValue: string) => void;
 };
 
-function ExistingCommentEditor({ editable, editItem, data, onSubmit }: ExistingCommentEditorProps) {
-  const { comment, type } = data;
+function ExistingCommentEditor({
+  editable,
+  isEditing,
+  setIsEditing,
+  data,
+  onSubmit,
+}: ExistingCommentEditorProps) {
+  const { comment } = data;
   const { userId } = useGetUserId();
   const commentsLocalStorage = useCommentsLocalStorage({
     type: "existing",
@@ -45,15 +53,16 @@ function ExistingCommentEditor({ editable, editItem, data, onSubmit }: ExistingC
     <div
       onDoubleClick={() => {
         if (comment.user.id === userId) {
-          editItem(comment);
+          setIsEditing(true);
         }
       }}
     >
       <CommentEditor
-        editable={editable}
+        editable={editable && isEditing}
         comment={comment}
         handleSubmit={inputValue => {
           commentsLocalStorage.clear();
+          setIsEditing(false);
           onSubmit(data, inputValue);
         }}
         onCreate={({ editor }) => {
@@ -73,8 +82,8 @@ function ExistingCommentEditor({ editable, editItem, data, onSubmit }: ExistingC
 
 const connector = connect(null, {
   clearPendingComment: actions.clearPendingComment,
-  editItem: actions.editItem,
 });
+
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(ExistingCommentEditor);
