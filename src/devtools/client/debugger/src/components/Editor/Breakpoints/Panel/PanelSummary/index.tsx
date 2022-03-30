@@ -24,7 +24,7 @@ import { AnalysisPayload } from "ui/state/app";
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
-  analysisPoints: AnalysisPayload;
+  analysisPoints?: AnalysisPayload;
   breakpoint: any;
   executionPoint: any;
   isHot: boolean;
@@ -93,8 +93,6 @@ function PanelSummary({
 
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
-    const hits = analysisPoints.error ? "10k" : prefs.maxHitsDisplayed;
-
     return (
       <div className="summary flex items-center rounded-t bg-errorBgcolor text-errorColor">
         <Popup

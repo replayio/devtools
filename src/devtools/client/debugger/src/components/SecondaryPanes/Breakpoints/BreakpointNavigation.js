@@ -34,7 +34,7 @@ function BreakpointNavigation({
 
   let prev, next;
 
-  if (executionPoint && analysisPoints.error && analysisPoints.data.length > 0) {
+  if (executionPoint && analysisPoints?.error && analysisPoints?.data.length > 0) {
     prev = findLast(analysisPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
@@ -58,7 +58,7 @@ function BreakpointNavigation({
       {!isEmpty ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
-      {!analysisPoints.error ? (
+      {analysisPoints && !analysisPoints.error ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : (
         <div className="flex-grow" />

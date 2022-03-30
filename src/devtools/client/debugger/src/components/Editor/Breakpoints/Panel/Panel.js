@@ -41,14 +41,15 @@ function Panel({
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const dismissNag = hooks.useDismissNag();
-  const error = analysisPoints.error;
   const pausedOnHit =
-    !error &&
+    analysisPoints &&
+    !analysisPoints.error &&
     !!analysisPoints?.data.find(
       ({ point, time }) => point == executionPoint && time == currentTime
     );
   const isHot =
-    analysisPoints && (error || (analysisPoints?.data.length || 0) > prefs.maxHitsDisplayed);
+    analysisPoints &&
+    (analysisPoints.error || (analysisPoints.data.length || 0) > prefs.maxHitsDisplayed);
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
