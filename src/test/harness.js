@@ -26,10 +26,20 @@ function waitForElapsedTime(time, ms) {
   }
 }
 
-const WaitTimeout = 1000 * 10;
+function isLongTimeout() {
+  return new URL(window.location.href).searchParams.get("longTimeout");
+}
+
+function defaultWaitTimeout() {
+  return 1000 * isLongTimeout() ? 120 : 10;
+}
 
 export async function waitUntil(fn, options) {
-  const { timeout, waitingFor } = { timeout: WaitTimeout, waitingFor: "unknown", ...options };
+  const { timeout, waitingFor } = {
+    timeout: defaultWaitTimeout(),
+    waitingFor: "unknown",
+    ...options,
+  };
   const start = Date.now();
   while (true) {
     const rv = fn();
