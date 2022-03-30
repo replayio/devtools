@@ -31,7 +31,7 @@ function isLongTimeout() {
 }
 
 function defaultWaitTimeout() {
-  return 1000 * isLongTimeout() ? 120 : 10;
+  return 1000 * (isLongTimeout() ? 120 : 10);
 }
 
 export async function waitUntil(fn, options) {
