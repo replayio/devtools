@@ -1,29 +1,18 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import hooks from "ui/hooks";
-import { actions } from "ui/actions";
+
 import { Comment, Reply } from "ui/state/comments";
 import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
-import useAuth0 from "ui/utils/useAuth0";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 import debounce from "lodash/debounce";
+import { CommentData } from "../types";
 
-interface NewCommentEditorProps extends PropsFromRedux {
-  data:
-    | {
-        type: "new_reply";
-        comment: Reply;
-      }
-    | {
-        type: "new_comment";
-        comment: Comment;
-      };
+interface NewCommentEditorProps {
+  data: CommentData;
+  onSubmit: (data: CommentData, inputValue: string) => void;
 }
 
-function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEditorProps) {
-  const { isAuthenticated } = useAuth0();
-  const addComment = hooks.useAddComment();
-  const addCommentReply = hooks.useAddCommentReply();
+function NewCommentEditor({ onSubmit, data }: NewCommentEditorProps) {
   const commentsLocalStorage = useCommentsLocalStorage(
     data.type === "new_reply"
       ? {
@@ -33,45 +22,14 @@ function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEdi
       : "video"
   );
 
-  const handleSubmit = async (inputValue: string) => {
-    if (!isAuthenticated) {
-      setModal("login");
-      return;
-    }
-
-    if (data.type == "new_reply") {
-      await handleReplySave(data.comment, inputValue);
-    } else {
-      await handleNewSave(data.comment, inputValue);
-    }
-
-    commentsLocalStorage.clear();
-    clearPendingComment();
-  };
-
-  const handleReplySave = async (comment: Reply, inputValue: string) => {
-    const reply = {
-      ...comment,
-      content: inputValue,
-    };
-
-    addCommentReply(reply);
-  };
-
-  const handleNewSave = async (comment: Comment, inputValue: string) => {
-    const newComment = {
-      ...comment,
-      content: inputValue,
-    };
-
-    addComment(newComment);
-  };
-
   return (
     <CommentEditor
       editable={true}
       comment={data.comment}
-      handleSubmit={handleSubmit}
+      handleSubmit={inputValue => {
+        onSubmit(data, inputValue);
+        commentsLocalStorage.clear();
+      }}
       onCreate={({ editor }) => {
         const storedComment = commentsLocalStorage.get();
         editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
@@ -84,9 +42,4 @@ function NewCommentEditor({ clearPendingComment, data, setModal }: NewCommentEdi
   );
 }
 
-const connector = connect(null, {
-  clearPendingComment: actions.clearPendingComment,
-  setModal: actions.setModal,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(NewCommentEditor);
+export default NewCommentEditor;
