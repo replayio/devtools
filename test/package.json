@@ -7,7 +7,7 @@
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "@recordreplay/recordings-cli": "^0.4.1",
+    "@replayio/replay": "^0.1.0",
     "eslint": "^8.5.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",
