@@ -28,6 +28,7 @@ const defaultState = {
   onlyTarget: process.env.onlyTarget,
   skippedTests: process.env.SKIPPED_TESTS,
   testTimeout: 240,
+  longTimeout: false,
 
   // Runtime state
   count: 1,
@@ -50,6 +51,7 @@ const usage = `
     --timeout N: Use a timeout of N seconds for tests (default 240).
     --target TARGET: Only run tests using given TARGET
     --server ADDRESS: Set server to connect to (default wss://dispatch.replay.io).
+    --long-timeout: Use longer timeouts when running tests.
 `;
 function processArgs(state, argv) {
   for (let i = 2; i < argv.length; i++) {
@@ -78,6 +80,9 @@ function processArgs(state, argv) {
         break;
       case "--server":
         state.dispatchServer = argv[++i];
+        break;
+      case "--long-timeout":
+        state.longTimeout = true;
         break;
       case "--help":
       case "-h":
