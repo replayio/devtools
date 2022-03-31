@@ -5,7 +5,7 @@ import {
   getSelectedPrimaryPanel,
   getShowCommandPalette,
 } from "ui/reducers/layout";
-import { dismissLocalNag, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
+import { dismissLocalNag, getReplaySession, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
 import {
   ViewMode,
   PrimaryPanelName,
@@ -127,8 +127,7 @@ export function setConsoleFilterDrawerExpanded(
 
 export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
   return async dispatch => {
-    const replaySessions = await asyncStore.replaySessions;
-    const session = replaySessions[recordingId];
+    const session = await getReplaySession(recordingId);
 
     if (recordingId && session) {
       const { viewMode, showVideoPanel, toolboxLayout, selectedPrimaryPanel } = session;

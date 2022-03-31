@@ -18,10 +18,10 @@ import { makeShallowQuery } from "../utils/resource";
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
 import { asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
+import { getReplaySession } from "ui/setup/prefs";
 
 export const getInitialTabsState = async () => {
-  const sessions = await asyncStore.replaySessions;
-  const session = sessions[getRecordingId()];
+  const session = await getReplaySession(getRecordingId());
 
   return { tabs: session?.tabs || [] };
 };

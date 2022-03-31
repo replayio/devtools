@@ -6,6 +6,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { Recording } from "ui/types";
 import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
+import { getReplaySession } from "ui/setup/prefs";
 
 const syncInitialLayoutState: LayoutState = {
   consoleFilterDrawerExpanded: true,
@@ -45,7 +46,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     return syncInitialLayoutState;
   }
 
-  const session = (await asyncStore.replaySessions)[recordingId];
+  const session = await getReplaySession(recordingId);
 
   if (!session) {
     return {

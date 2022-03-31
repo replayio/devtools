@@ -11,7 +11,7 @@ import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { isInTrimSpan, isSameTimeStampedPointRange } from "ui/utils/timeline";
+import { isInTrimSpan } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";

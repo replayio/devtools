@@ -2,18 +2,34 @@ import { CommentsState } from "ui/state/comments";
 import { CommentsAction } from "ui/actions/comments";
 import { UIState } from "ui/state";
 import cloneDeep from "lodash/cloneDeep";
+import { getRecordingId } from "ui/utils/recording";
+import { getReplaySession } from "ui/setup/prefs";
 
 export const PENDING_COMMENT_ID = "PENDING";
 
-function initialCommentsState(): CommentsState {
+export async function getInitialCommentsState(): Promise<CommentsState> {
+  const recordingId = getRecordingId()!;
+
+  if (!recordingId) {
+    return {
+      hoveredComment: null,
+      pendingComment: null,
+    };
+  }
+
+  const session = await getReplaySession(recordingId);
+
   return {
     hoveredComment: null,
-    pendingComment: null,
+    pendingComment: session?.pendingComment || null,
   };
 }
 
 export default function update(
-  state = initialCommentsState(),
+  state: CommentsState = {
+    hoveredComment: null,
+    pendingComment: null,
+  },
   action: CommentsAction
 ): CommentsState {
   switch (action.type) {

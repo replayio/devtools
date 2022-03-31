@@ -14,6 +14,8 @@ import {
 import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
+import { getPendingComment } from "ui/reducers/comments";
+import { RecordingId } from "@recordreplay/protocol";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -89,6 +91,10 @@ async function getReplaySessions() {
   return await asyncStore.replaySessions;
 }
 
+export async function getReplaySession(recordingId: RecordingId) {
+  return (await asyncStore.replaySessions)[recordingId];
+}
+
 export enum LocalNag {
   // Yank the user's select left sidebar panel to show the explorer (sources + outline)
   // on the first time they switch to the DevTools view, so they don't miss it.
@@ -159,6 +165,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPanel: getSelectedPanel(state),
     localNags: [...(previousReplaySession?.localNags || [])],
     tabs: persistTabs(getTabs(state)) || [],
+    pendingComment: getPendingComment(state),
   };
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };

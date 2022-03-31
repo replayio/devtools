@@ -15,10 +15,9 @@ import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { sanityCheckMiddleware, sanitize } from "ui/utils/sanitize";
 import appReducer from "ui/reducers/app";
+import commentsReducer from "ui/reducers/comments";
 import layoutReducer from "ui/reducers/layout";
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
-import { AppState } from "ui/state/app";
-import { LayoutState } from "ui/state/layout";
 
 import { promise } from "ui/setup/redux/middleware/promise";
 import { context } from "ui/setup/redux/middleware/context";
@@ -33,6 +32,7 @@ type UIStateReducers = {
 // slice reducers we know will be added, to get the right state type.
 let reducers = {
   app: appReducer,
+  comments: commentsReducer,
   layout: layoutReducer,
   tabs: tabsReducer,
 } as unknown as UIStateReducers;
