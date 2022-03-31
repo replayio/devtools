@@ -59,7 +59,8 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
 
   async componentDidMount() {
     // Used in the test harness for starting playback recording.
-    gToolbox.timeline = this;
+    const { startPlayback, seekToTime } = this.props;
+    gToolbox.timeline = { startPlayback, seekToTime };
     this.props.updateTimelineDimensions();
   }
 

@@ -331,6 +331,11 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
+    example: "doc_rr_basic.html",
+    script: "video_playback.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/spawn.js",
     script: "node_spawn-01.js",
     targets: ["node"],

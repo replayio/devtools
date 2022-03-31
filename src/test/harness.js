@@ -608,12 +608,19 @@ async function toggleMappedSources() {
   return clickElement(".mapped-source button");
 }
 
-async function playbackRecording() {
+async function seekToTime(time) {
+  const timeline = await waitUntil(() => gToolbox.timeline, {
+    waitingFor: "timeline to be visible",
+  });
+  timeline.seekToTime(time);
+  await waitForPausedNoSource();
+}
+
+async function startPlayback() {
   const timeline = await waitUntil(() => gToolbox.timeline, {
     waitingFor: "timeline to be visible",
   });
   timeline.startPlayback();
-  await waitUntil(() => !timeline.state.playback, { waitingFor: "playback to start" });
 }
 
 async function findMarkupNode(text) {
@@ -899,7 +906,8 @@ const testCommands = {
   addEventListenerLogpoints,
   toggleExceptionLogging,
   toggleMappedSources,
-  playbackRecording,
+  startPlayback,
+  seekToTime,
   findMarkupNode,
   toggleMarkupNode,
   searchMarkup,
