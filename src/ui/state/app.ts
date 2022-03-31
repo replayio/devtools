@@ -100,8 +100,14 @@ export interface AppState {
   currentPoint: ExecutionPoint | null;
 }
 
-export interface AnalysisPoints {
-  [key: string]: PointDescription[] | "error";
+export type AnalysisPoints = Record<string, AnalysisPayload>;
+export type AnalysisPayload = {
+  data: PointDescription[];
+  error: AnalysisError | null;
+};
+export enum AnalysisError {
+  TooManyPoints = "too-many-points",
+  Default = "default",
 }
 
 interface Events {
@@ -125,4 +131,8 @@ export interface Canvas {
   scale: number;
   top: number;
   width: number;
+}
+
+export enum ProtocolError {
+  TooManyPoints = 55,
 }

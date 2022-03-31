@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
 import React, { useEffect, useState } from "react";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
@@ -42,11 +41,15 @@ function Panel({
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const dismissNag = hooks.useDismissNag();
-  const error = analysisPoints === "error";
   const pausedOnHit =
-    !error &&
-    !!analysisPoints?.find(({ point, time }) => point == executionPoint && time == currentTime);
-  const isHot = analysisPoints && (error || (analysisPoints?.length || 0) > prefs.maxHitsDisplayed);
+    analysisPoints &&
+    !analysisPoints.error &&
+    !!analysisPoints?.data.find(
+      ({ point, time }) => point == executionPoint && time == currentTime
+    );
+  const isHot =
+    analysisPoints &&
+    (analysisPoints.error || (analysisPoints.data.length || 0) > prefs.maxHitsDisplayed);
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);

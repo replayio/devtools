@@ -14,9 +14,9 @@ import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/
 import { UIState } from "ui/state";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { PointDescription } from "@recordreplay/protocol";
 import { HoveredItem } from "ui/state/timeline";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
+import { AnalysisPayload } from "ui/state/app";
 
 function Points({
   analysisPoints,
@@ -24,15 +24,15 @@ function Points({
   breakpoint,
 }: {
   breakpoint: any;
-  analysisPoints: PointDescription[];
+  analysisPoints: AnalysisPayload;
   hoveredItem: HoveredItem | null;
 }) {
   const executionPoint = useSelector(getExecutionPoint);
-  let displayedPoints = [...analysisPoints];
+  let displayedPoints = [...analysisPoints.data];
 
   // Even if we're over maxHitsDisplayed, we should still display a single paused
   // point if the user happens to be paused on that this breakpoint.
-  if (analysisPoints.length > prefs.maxHitsDisplayed && executionPoint) {
+  if (analysisPoints.data.length > prefs.maxHitsDisplayed && executionPoint) {
     displayedPoints = displayedPoints.filter(
       point => BigInt(point.point) == BigInt(executionPoint)
     );
@@ -112,7 +112,7 @@ function BreakpointTimeline({
           <div className="progress-line preview-min" style={{ width: hoverPercent }} />
           <div className="progress-line" style={{ width: `${percent}%` }} />
           <UnloadedRegions />
-          {analysisPoints && analysisPoints !== "error" ? (
+          {analysisPoints && !analysisPoints.error ? (
             <Points
               analysisPoints={analysisPoints}
               breakpoint={breakpoint}

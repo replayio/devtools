@@ -74,6 +74,7 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
 export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
   location: Location;
   condition: string;
+  errorKey?: number;
 };
 export type SetEventsForType = Action<"set_events"> & {
   events: (MouseEvent | KeyboardEvent | ReplayNavigationEvent)[];
@@ -288,11 +289,16 @@ export function setAnalysisPoints(
   };
 }
 
-export function setAnalysisError(location: Location, condition = ""): SetAnalysisErrorAction {
+export function setAnalysisError(
+  location: Location,
+  condition = "",
+  errorKey?: number
+): SetAnalysisErrorAction {
   return {
     type: "set_analysis_error",
     location,
     condition,
+    errorKey,
   };
 }
 
