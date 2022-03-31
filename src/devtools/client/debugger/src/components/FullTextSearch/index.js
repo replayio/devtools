@@ -17,6 +17,7 @@ import {
 import { trackEvent } from "ui/utils/telemetry";
 import { FullTextFilter } from "./FullTextFilter";
 import { FullTextResults } from "./FullTextResults";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { search } from "./search";
 
 function sanitizeQuery(query) {
@@ -31,6 +32,7 @@ export class FullTextSearch extends Component {
       status: "DONE",
       query: "",
       matchesBySource: [],
+      includeNodeModules: true,
     },
   };
 
@@ -56,6 +58,7 @@ export class FullTextSearch extends Component {
 
   onKeyDown = e => {
     const { sourcesById, setFullTextQuery, query } = this.props;
+    const { includeNodeModules } = this.state;
 
     if (e.key === "ArrowDown") {
       trackEvent("project_search.go_to_first_result");
@@ -81,7 +84,7 @@ export class FullTextSearch extends Component {
     setFullTextQuery(sanitizedQuery);
     this.setState({ focusedItem: null });
     if (sanitizedQuery && query !== this.state.query && sanitizedQuery.length >= 3) {
-      search(sanitizedQuery, sourcesById, updateResults);
+      search(sanitizedQuery, sourcesById, updateResults, includeNodeModules);
       return sanitizedQuery;
     }
 
@@ -100,7 +103,7 @@ export class FullTextSearch extends Component {
 
   render() {
     const { query, setFullTextQuery, focused, focusFullTextInput } = this.props;
-    const { results, focusedItem } = this.state;
+    const { results, focusedItem, includeNodeModules } = this.state;
     return (
       <div ref={this.searchRef} className="search-container">
         <div className="project-text-search">
@@ -115,6 +118,14 @@ export class FullTextSearch extends Component {
               focusFullTextInput={focusFullTextInput}
             />
           </div>
+          <label className="p-2 space-x-2 select-none" htmlFor="node-modules">
+            <Checkbox
+              id="node-modules"
+              value={includeNodeModules}
+              onChange={e => this.setState({ includeNodeModules: !includeNodeModules })}
+            />
+            <span>Include node modules</span>
+          </label>
           <FullTextResults
             onItemSelect={item => this.selectMatchItem(item)}
             focusedItem={focusedItem}
