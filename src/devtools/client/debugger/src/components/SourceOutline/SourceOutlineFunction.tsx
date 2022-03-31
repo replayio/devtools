@@ -28,7 +28,7 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
         </Redacted>
       </div>
       {func.hits !== undefined && (
-        <div className="rounded bg-gray-100 px-2 text-gray-600">{func.hits}</div>
+        <div className="rounded bg-themeMenuHighlight px-2 text-bodyColor">{func.hits}</div>
       )}
     </li>
   );

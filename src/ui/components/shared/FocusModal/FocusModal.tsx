@@ -20,7 +20,7 @@ function FocusingModal({ hideModal }: PropsFromRedux) {
   const isAtFocusLimit = useSelector(getIsAtFocusSoftLimit);
 
   const msg = isAtFocusLimit ? (
-    <p>{`Looks like you're making a precise selection. You're paused at ${getFormattedTime(
+    <p>{`Looks like you're making a precise selection at ${getFormattedTime(
       currentTime,
       true
     )}.`}</p>
