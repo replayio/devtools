@@ -39,10 +39,10 @@ const formatMatchesBySource = (matches, sourcesById) => {
   return filteredResults.map(([source, matches]) => formatSourceMatches(source, matches));
 };
 
-export async function search(query, sourcesById, updateResults) {
+export async function search(query, sourcesById, updateResults, includeNodeModules) {
   trackEvent("project_search.search");
 
-  const sourceIds = getSourceIDsToSearch(sourcesById);
+  const sourceIds = getSourceIDsToSearch(sourcesById, includeNodeModules);
 
   updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
 

@@ -85,13 +85,22 @@ export function isPrettyURL(url) {
   return url ? url.endsWith(":formatted") : false;
 }
 
-export function isThirdParty(source) {
+export function isBowerComponent(source) {
   if (!source?.url) {
     return false;
   }
 
   const { url } = source;
-  return url.includes("node_modules") || url.includes("bower_components");
+  return url.includes("bower_components");
+}
+
+export function isNodeModule(source) {
+  if (!source?.url) {
+    return false;
+  }
+
+  const { url } = source;
+  return url.includes("node_modules");
 }
 
 export function getPrettySourceURL(url) {
@@ -411,7 +420,7 @@ export function getPlainUrl(url) {
   return queryStart !== -1 ? url.slice(0, queryStart) : url;
 }
 
-export function getSourceIDsToSearch(sourcesById) {
+export function getSourceIDsToSearch(sourcesById, includeNodeModules) {
   const sourceIds = [];
   for (const sourceId in sourcesById) {
     if (ThreadFront.isMinifiedSource(sourceId)) {
@@ -422,7 +431,10 @@ export function getSourceIDsToSearch(sourcesById) {
       continue;
     }
     const source = sourcesById[sourceId];
-    if (isThirdParty(source)) {
+    if (isBowerComponent(source)) {
+      continue;
+    }
+    if (!includeNodeModules && isNodeModule(source)) {
       continue;
     }
     sourceIds.push(sourceId);
