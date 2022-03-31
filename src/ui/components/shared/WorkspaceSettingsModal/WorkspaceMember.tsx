@@ -23,11 +23,11 @@ const memberRoleLabels: Record<WorkspaceUserRole, string> = {
 };
 
 function getMemberRole(member: WorkspaceUser) {
-  return (
-    (member.roles?.includes("admin") && "admin") ||
-    (member.roles?.includes("debugger") && "debugger") ||
-    "viewer"
-  );
+  return member.roles?.includes("debugger") ? "debugger" : "viewer";
+}
+
+function getIsAdmin(member: WorkspaceUser) {
+  return member.roles?.includes("admin") || false;
 }
 
 function WorkspaceMemberRoleOption({
@@ -36,25 +36,24 @@ function WorkspaceMemberRoleOption({
   onSelect,
 }: {
   value: WorkspaceUserRole;
-  selected: WorkspaceUserRole;
+  selected: boolean;
   onSelect: (value: WorkspaceUserRole) => void;
 }) {
-  const isSelected = selected === value;
   return (
     <label
       className={classnames("permissions-dropdown-item block", {
-        "font-bold": isSelected,
+        "font-bold": selected,
       })}
     >
       <input
-        type="radio"
+        type={value == "admin" ? "checkbox" : "radio"}
         name="workspaceUserRole"
-        className="h-0 w-0 opacity-0"
+        className="appearance-none checked:bg-blue-500 indeterminate:bg-gray-300"
         value={value}
-        checked={isSelected}
-        onChange={e => e.target.checked && onSelect(value)}
+        checked={selected}
+        onChange={e => onSelect(value)}
       />
-      <span>{memberRoleLabels[value]}</span>
+      <span className="pl-2">{memberRoleLabels[value]}</span>
     </label>
   );
 }
@@ -69,6 +68,7 @@ function WorkspaceMemberRoles({
   onClick: () => void;
 }) {
   const role: WorkspaceUserRole = getMemberRole(member);
+  const memberIsAdmin = getIsAdmin(member);
   const { updateWorkspaceMemberRole } = hooks.useUpdateWorkspaceMemberRole();
   const [selectedRole, setSelectedRole] = useState<WorkspaceUserRole>(role);
 
@@ -76,15 +76,22 @@ function WorkspaceMemberRoles({
 
   const selectRole = (updated: WorkspaceUserRole) => {
     onClick();
-    const roles: WorkspaceUserRole[] = ["viewer"];
-    if (updated === "admin") {
-      roles.push("debugger");
-      roles.push("admin");
-    } else if (updated === "debugger") {
-      roles.push("debugger");
+    let roles: WorkspaceUserRole[];
+
+    if (updated !== "admin") {
+      roles = [updated];
+      if (memberIsAdmin) {
+        roles.push("admin");
+      }
+    } else {
+      roles = [role];
+      if (!memberIsAdmin) {
+        roles.push("admin");
+      }
     }
 
     setSelectedRole(updated);
+
     updateWorkspaceMemberRole({
       variables: {
         id: member.membershipId,
@@ -98,10 +105,14 @@ function WorkspaceMemberRoles({
 
   return (
     <div>
-      <WorkspaceMemberRoleOption value="viewer" onSelect={selectRole} selected={selectedRole} />
-      <WorkspaceMemberRoleOption value="debugger" onSelect={selectRole} selected={selectedRole} />
+      <WorkspaceMemberRoleOption value="viewer" onSelect={selectRole} selected={role == "viewer"} />
+      <WorkspaceMemberRoleOption
+        value="debugger"
+        onSelect={selectRole}
+        selected={role == "debugger"}
+      />
       {isAdmin ? (
-        <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={selectedRole} />
+        <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={memberIsAdmin} />
       ) : null}
     </div>
   );
