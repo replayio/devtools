@@ -1,11 +1,12 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useDispatch } from "react-redux";
 
 import { Comment, Reply } from "ui/state/comments";
-import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
+import CommentEditor, { PERSIST_COMMENT_DEBOUNCE_DELAY } from "./CommentEditor";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 import debounce from "lodash/debounce";
 import { CommentData } from "../types";
+import { updatePendingCommentContent } from "ui/actions/comments";
 
 interface NewCommentEditorProps {
   data: CommentData;
@@ -21,22 +22,16 @@ function NewCommentEditor({ onSubmit, data }: NewCommentEditorProps) {
         }
       : "video"
   );
+  const dispatch = useDispatch();
 
   return (
     <CommentEditor
       editable={true}
       comment={data.comment}
-      handleSubmit={inputValue => {
-        onSubmit(data, inputValue);
-        commentsLocalStorage.clear();
-      }}
-      onCreate={({ editor }) => {
-        const storedComment = commentsLocalStorage.get();
-        editor.commands.setContent(storedComment ? JSON.parse(storedComment) : null);
-      }}
+      handleSubmit={inputValue => onSubmit(data, inputValue)}
       onUpdate={debounce(({ editor }) => {
-        commentsLocalStorage.set(JSON.stringify(editor.getJSON()));
-      }, PERSIST_COMM_DEBOUNCE_DELAY)}
+        dispatch(updatePendingCommentContent(editor.getJSON()));
+      }, PERSIST_COMMENT_DEBOUNCE_DELAY)}
       handleCancel={() => commentsLocalStorage.clear()}
     />
   );

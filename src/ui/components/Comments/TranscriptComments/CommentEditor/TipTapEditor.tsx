@@ -12,7 +12,7 @@ interface TipTapEditorProps {
   autofocus: boolean;
   blur: () => void;
   close: () => void;
-  content: string;
+  content: string | object;
   editable: boolean;
   handleSubmit: (text: string) => void;
   handleCancel: () => void;
@@ -24,7 +24,10 @@ interface TipTapEditorProps {
   onUpdate: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
 }
 
-const tryToParse = (content: string): any => {
+const tryToParse = (content: string | object): any => {
+  if (typeof content === "object") {
+    return content;
+  }
   try {
     return JSON.parse(content);
   } catch {

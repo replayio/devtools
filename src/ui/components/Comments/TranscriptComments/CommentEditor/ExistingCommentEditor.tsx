@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
-import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
+import CommentEditor, { PERSIST_COMMENT_DEBOUNCE_DELAY } from "./CommentEditor";
 import { useGetUserId } from "ui/hooks/users";
 import { useCommentsLocalStorage } from "./useCommentsLocalStorage";
 import debounce from "lodash/debounce";
@@ -70,7 +70,7 @@ function ExistingCommentEditor({
         }}
         onUpdate={debounce(({ editor }) => {
           commentsLocalStorage.set(JSON.stringify(editor.getJSON()));
-        }, PERSIST_COMM_DEBOUNCE_DELAY)}
+        }, PERSIST_COMMENT_DEBOUNCE_DELAY)}
         handleCancel={() => {
           commentsLocalStorage.clear();
           setIsEditing(false);
