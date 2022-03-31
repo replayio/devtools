@@ -21,7 +21,7 @@ export function UploadRecordingTrialEnd({
   }
 
   return (
-    <div className="absolute top-0 z-10 -translate-y-1/2 transform rounded-lg bg-white p-2 px-3 shadow-lg">
+    <div className="absolute top-0 z-10 -translate-y-1/2 transform rounded-lg bg-yellow-300 p-2 px-3 text-black shadow-lg">
       Your trial is expiring in {expiresIn} days
     </div>
   );
