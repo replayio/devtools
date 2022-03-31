@@ -39,7 +39,7 @@ function ResizeMask({
       (draggingTarget === FocusOperation.resizeEnd && currentTime > focusRegion!.endTime)
     ) {
       dispatch(setTimelineState({ currentTime: hoverTime! }));
-      dispatch(setTimelineToTime(hoverTime, true));
+      dispatch(setTimelineToTime(hoverTime));
     }
   };
 

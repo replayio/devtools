@@ -150,7 +150,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
         if (!seek(event.point, mouseTime, false)) {
           // if seeking to the new point failed because it is in an unloaded region,
           // we reset the timeline to the current time
-          setTimelineToTime(ThreadFront.currentTime, true);
+          setTimelineToTime(ThreadFront.currentTime);
           setTimelineState({ currentTime: ThreadFront.currentTime });
         }
         clearPendingComment();

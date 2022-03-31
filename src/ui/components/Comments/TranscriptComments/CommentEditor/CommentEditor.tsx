@@ -85,11 +85,6 @@ function CommentEditor({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    pendingComment: selectors.getPendingComment(state),
-  }),
-  { clearPendingComment: actions.clearPendingComment }
-);
+const connector = connect(null, { clearPendingComment: actions.clearPendingComment });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommentEditor);

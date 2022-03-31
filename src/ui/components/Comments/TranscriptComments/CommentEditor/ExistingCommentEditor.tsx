@@ -1,5 +1,5 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import CommentEditor, { PERSIST_COMM_DEBOUNCE_DELAY } from "./CommentEditor";
 import { useGetUserId } from "ui/hooks/users";
@@ -21,7 +21,7 @@ const LoomComment = connect(null, { setModal: actions.setModal })(
   }
 );
 
-type ExistingCommentEditorProps = PropsFromRedux & {
+type ExistingCommentEditorProps = {
   data: CommentData;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
@@ -80,10 +80,4 @@ function ExistingCommentEditor({
   );
 }
 
-const connector = connect(null, {
-  clearPendingComment: actions.clearPendingComment,
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(ExistingCommentEditor);
+export default ExistingCommentEditor;

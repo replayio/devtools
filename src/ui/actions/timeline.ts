@@ -21,7 +21,6 @@ import {
   getFocusRegion,
   getZoomRegion,
 } from "ui/reducers/timeline";
-import { getPendingComment } from "ui/reducers/comments";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
@@ -476,7 +475,7 @@ export function goToNextPaint(): UIThunkAction {
 }
 
 export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
-  return (dispatch, getState) => {
+  return dispatch => {
     const { target } = hoveredItem;
 
     const hoverEnabledForTarget = (features as any)[`${target}Hover`];
@@ -486,9 +485,7 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
 
     dispatch({ type: "set_hovered_item", hoveredItem });
 
-    // Don't update the video if user is adding a new comment.
-    const updateGraphics = !getPendingComment(getState());
-    dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
+    dispatch(setTimelineToTime(hoveredItem?.time || null));
   };
 }
 
