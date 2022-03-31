@@ -10,6 +10,9 @@ import { trackEvent } from "ui/utils/telemetry";
 import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { getSelectedSource } from "devtools/client/debugger/src/reducers/sources";
+import { features } from "ui/utils/prefs";
+import { Keyboard } from "@recordreplay/playwright";
+import { toggleFocusMode } from "ui/actions/timeline";
 
 function setupShortcuts() {
   return usesWindow(win => {
@@ -30,6 +33,7 @@ function KeyboardShortcuts({
   selectedSource,
   toolboxLayout,
   toggleCommandPalette,
+  toggleFocusMode,
   togglePaneCollapse,
   viewMode,
 }: PropsFromRedux) {
@@ -77,6 +81,14 @@ function KeyboardShortcuts({
       paletteInput.focus();
     }
   };
+  const toggleTheme = (e: KeyboardEvent) => {
+    e.preventDefault();
+    features.darkMode = !features.darkMode;
+  };
+  const toggleEditFocusMode = (e: KeyboardEvent) => {
+    e.preventDefault();
+    toggleFocusMode();
+  };
 
   // The shortcuts have to be reassigned every time the dependencies change,
   // otherwise we end up with a stale prop.
@@ -84,11 +96,15 @@ function KeyboardShortcuts({
     addShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
     addShortcut("CmdOrCtrl+B", toggleLeftSidebar);
     addShortcut("CmdOrCtrl+K", togglePalette);
+    addShortcut("Shift+T", toggleTheme);
+    addShortcut("Shift+F", toggleEditFocusMode);
 
     return () => {
       removeShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
       removeShortcut("CmdOrCtrl+B", toggleLeftSidebar);
       removeShortcut("CmdOrCtrl+K", togglePalette);
+      removeShortcut("Shift+T", toggleTheme);
+      removeShortcut("Shift+F", toggleEditFocusMode);
     };
   }, [viewMode, selectedSource]);
 
@@ -108,6 +124,7 @@ const connector = connect(
     setViewMode: actions.setViewMode,
     togglePaneCollapse: actions.togglePaneCollapse,
     toggleCommandPalette: actions.toggleCommandPalette,
+    toggleFocusMode: actions.toggleFocusMode,
     showCommandPaletteInEditor: deselectSource,
   }
 );
