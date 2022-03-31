@@ -165,8 +165,9 @@ function onWarp(store: UIStore) {
   };
 }
 
-function onPaused({ time }: PauseEventArgs): UIThunkAction {
+function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
   return async dispatch => {
+    updateUrl({ point, time, hasFrames });
     dispatch(setTimelineState({ currentTime: time, playback: null }));
   };
 }
@@ -264,7 +265,6 @@ export function seek(
       return false;
     }
 
-    updateUrl({ point, time, hasFrames });
     dispatch({ type: "CLEAR_FRAME_POSITIONS" });
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
