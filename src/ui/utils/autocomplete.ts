@@ -3,8 +3,10 @@ import {
   isIdentifier as _isIdentifier,
   isMemberExpression as _isMemberExpression,
   isStringLiteral as _isStringLiteral,
+  isCallExpression as _isCallExpression,
   StringLiteral,
   Identifier,
+  CallExpression,
 } from "@babel/types";
 import generate from "@babel/generator";
 import { ValueFront } from "protocol/thread";
@@ -85,6 +87,13 @@ function isIdentifier(expression: string) {
 function isMemberExpression(expression: string) {
   try {
     return _isMemberExpression(parseExpression(expression));
+  } catch (e) {
+    return false;
+  }
+}
+function isCallExpression(expression: string) {
+  try {
+    return _isCallExpression(parseExpression(expression));
   } catch (e) {
     return false;
   }
@@ -231,21 +240,24 @@ export function getCursorIndex(value: string) {
     return 0;
   }
 }
-export function insertAutocompleteMatch(value: string, match: string) {
+export function insertAutocompleteMatch(value: string, match: string, isArgument: boolean = false) {
   const propertyExpression = getPropertyExpression(value);
+  let autocompletedExpression: string;
 
   if (propertyExpression) {
     const { left, computed } = propertyExpression;
 
     if (computed) {
-      return `${left}["${match}"]`;
+      autocompletedExpression = `${left}["${match}"]`;
     } else {
-      return `${left}.${match}`;
+      autocompletedExpression = `${left}.${match}`;
     }
   } else {
     // For variable autocomplete.
-    return match;
+    autocompletedExpression = match;
   }
+
+  return isArgument ? autocompleteLastArgument(value, autocompletedExpression) : autocompletedExpression;
 }
 export async function getAutocompleteMatches(input: string, scope: Scope) {
   const propertyExpression = getPropertyExpression(input);
@@ -282,4 +294,21 @@ export function getRemainingCompletedTextAfterCursor(value: string, match: strin
   }
 
   return match.slice(propertyExpression.right.length);
+}
+export function autocompleteLastArgument(expression: string, newLastArg: string) {
+  const partialLastArg = getLastExpression(expression);
+  return expression.replace(new RegExp(`${partialLastArg}$`), newLastArg);
+}
+export function getLastExpression(exp: string) {
+  const expression = `console.log(${exp}${PROPERTY_PLACEHOLDER})`;
+
+  if (isCallExpression(expression)) {
+    const parsed = parseExpression(expression) as CallExpression;
+    const rv = parsed.arguments[parsed.arguments.length - 1] as Identifier;
+    const _rv = rv.name.slice(0, -PROPERTY_PLACEHOLDER.length);
+    
+    return _rv;
+  }
+
+  return exp;
 }

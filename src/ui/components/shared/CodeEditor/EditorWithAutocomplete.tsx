@@ -29,6 +29,7 @@ const DISMISS_KEYS = [
 const DEFAULT_OPTIONS = {
   minLeft: 0,
   autofocus: false,
+  isArgument: false,
 };
 
 type EditorWithAutocompleteOptions = AutocompleteMatchesOptions | ControlledCodeMirrorOptions;
@@ -61,7 +62,7 @@ export function EditorWithAutocomplete({
     moveAutocompleteCursor,
     resetAutocompleteIndex,
     setHideAutocomplete,
-  } = useAutocomplete(value, onPreviewAvailable);
+  } = useAutocomplete(value, onPreviewAvailable, options.isArgument);
 
   const autocomplete = () => setValue(applySelectedMatch());
   const onSelection = (obj?: any) => {
