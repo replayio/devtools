@@ -63,6 +63,10 @@ type Scope = {
 //  be trying to type or find the autocomplete match to.
 const PROPERTY_PLACEHOLDER = "fakeProperty";
 
+function escapeRegex(string: string) {
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+}
+
 // Trims quotation marks from the string. This allows us to match
 // bracket notation properties regardless of whether the user has quotation
 // marks or not. i.e., `foo["ba` vs `foo[ba` will both show "bar" as
@@ -230,18 +234,21 @@ export function getPropertyExpression(str: string): PropertyExpression | null {
 }
 
 // Used to figure out the earliest cursor position of the current autocomplete target.
-export function getCursorIndex(value: string) {
-  const propertyExpression = getPropertyExpression(value);
+export function getCursorIndex(value: string, isArgument: boolean) {
+  const propertyExpression = getPropertyExpression(isArgument ? getLastExpression(value) : value);
+  let index;
 
   if (propertyExpression) {
     // +1 to account for the `.` or `[`
-    return propertyExpression.left.length + 1;
+    index = propertyExpression.left.length + 1;
   } else {
-    return 0;
+    index = 0;
   }
+
+  return isArgument ? value.length - getLastExpression(value).length + index : index;
 }
 export function insertAutocompleteMatch(value: string, match: string, isArgument: boolean = false) {
-  const propertyExpression = getPropertyExpression(value);
+  const propertyExpression = getPropertyExpression(isArgument ? getLastExpression(value) : value);
   let autocompletedExpression: string;
 
   if (propertyExpression) {
@@ -257,7 +264,9 @@ export function insertAutocompleteMatch(value: string, match: string, isArgument
     autocompletedExpression = match;
   }
 
-  return isArgument ? autocompleteLastArgument(value, autocompletedExpression) : autocompletedExpression;
+  return isArgument
+    ? autocompleteLastArgument(value, autocompletedExpression)
+    : autocompletedExpression;
 }
 export async function getAutocompleteMatches(input: string, scope: Scope) {
   const propertyExpression = getPropertyExpression(input);
@@ -297,17 +306,15 @@ export function getRemainingCompletedTextAfterCursor(value: string, match: strin
 }
 export function autocompleteLastArgument(expression: string, newLastArg: string) {
   const partialLastArg = getLastExpression(expression);
-  return expression.replace(new RegExp(`${partialLastArg}$`), newLastArg);
+  return expression.replace(new RegExp(`${escapeRegex(partialLastArg)}$`), newLastArg);
 }
 export function getLastExpression(exp: string) {
   const expression = `console.log(${exp}${PROPERTY_PLACEHOLDER})`;
 
   if (isCallExpression(expression)) {
     const parsed = parseExpression(expression) as CallExpression;
-    const rv = parsed.arguments[parsed.arguments.length - 1] as Identifier;
-    const _rv = expression.slice(rv.start!, rv.end! - PROPERTY_PLACEHOLDER.length);
-    
-    return _rv;
+    const lastArgNode = parsed.arguments[parsed.arguments.length - 1] as Identifier;
+    return expression.slice(lastArgNode.start!, lastArgNode.end! - PROPERTY_PLACEHOLDER.length);
   }
 
   return exp;

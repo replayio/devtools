@@ -152,7 +152,7 @@ export function EditorWithAutocomplete({
         <AutocompleteMatches
           options={options}
           containerRect={containerNode.current!.getBoundingClientRect()}
-          leftOffset={getCursorIndex(value)}
+          leftOffset={getCursorIndex(value, options.isArgument)}
           matches={matches}
           selectedIndex={autocompleteIndex}
           onMatchClick={autocomplete}
