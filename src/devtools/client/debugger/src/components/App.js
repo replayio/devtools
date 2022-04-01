@@ -164,10 +164,6 @@ class Debugger extends Component {
     }
   }
 
-  renderLayout = () => {
-    return <EditorPane />;
-  };
-
   renderShortcutsModal() {
     const additionalClass = isMacOS ? "mac" : "";
 
@@ -190,7 +186,7 @@ class Debugger extends Component {
     return (
       <>
         <A11yIntention>
-          {this.renderLayout()}
+          <EditorPane />
           {quickOpenEnabled === true && (
             <QuickOpenModal
               shortcutsModalEnabled={this.state.shortcutsModalEnabled}

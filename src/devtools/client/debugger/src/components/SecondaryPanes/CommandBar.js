@@ -4,6 +4,7 @@
 
 //
 
+import PropTypes from "prop-types";
 import React, { Component } from "react";
 
 import { connect } from "../../utils/connect";
@@ -17,9 +18,11 @@ import {
 import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
 import CommandBarButton from "../shared/Button/CommandBarButton";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { appinfo } from "devtools/shared/services";
+import isThisHour from "date-fns/isThisHour";
 
 const isMacOS = appinfo.OS === "Darwin";
 
@@ -69,6 +72,31 @@ function formatKey(action) {
 }
 
 class CommandBar extends Component {
+  commandBarNode;
+
+  componentWillUnmount() {
+    const shortcuts = this.shortcuts;
+    COMMANDS.forEach(action => shortcuts.off(getKey(action)));
+    if (isMacOS) {
+      COMMANDS.forEach(action => shortcuts.off(getKeyForOS("WINNT", action)));
+    }
+  }
+
+  componentDidMount() {
+    this.shortcuts = new KeyShortcuts({ window, target: this.commandBarNode });
+    const shortcuts = this.shortcuts;
+
+    COMMANDS.forEach(action => shortcuts.on(getKey(action), e => this.handleEvent(e, action)));
+
+    if (isMacOS) {
+      // The Mac supports both the Windows Function keys
+      // as well as the Mac non-Function keys
+      COMMANDS.forEach(action =>
+        shortcuts.on(getKeyForOS("WINNT", action), e => this.handleEvent(e, action))
+      );
+    }
+  }
+
   handleEvent(e, action) {
     const { cx } = this.props;
     e.preventDefault();
@@ -204,7 +232,11 @@ class CommandBar extends Component {
   }
 
   render() {
-    return <div className="command-bar">{this.renderReplayButtons()}</div>;
+    return (
+      <div className="command-bar" ref={node => (this.commandBarNode = node)}>
+        {this.renderReplayButtons()}
+      </div>
+    );
   }
 }
 
