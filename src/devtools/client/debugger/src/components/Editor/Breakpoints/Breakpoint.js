@@ -11,11 +11,25 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
-import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
+import { isBreakable } from "../../../utils/breakpoint";
 
-const breakpointSvg = document.createElement("div");
-breakpointSvg.innerHTML =
-  '<svg viewBox="0 0 60 15" width="60" height="15"><path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z"/></svg>';
+const BreakpointMarker = ({ onContextMenu, onClick, onMouseEnter, onMouseLeave }) => {
+  return (
+    <div
+      className={classnames("editor new-breakpoint", {
+        "folding-enabled": features.codeFolding,
+      })}
+      onContextMenu={onContextMenu}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <svg viewBox="0 0 60 15" width="60" height="15">
+        <path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z" />
+      </svg>
+    </div>
+  );
+};
 
 class Breakpoint extends PureComponent {
   componentDidMount() {
@@ -32,20 +46,14 @@ class Breakpoint extends PureComponent {
   }
 
   makeMarker() {
-    const bp = breakpointSvg.cloneNode(true);
-
-    bp.className = classnames("editor new-breakpoint", {
-      "folding-enabled": features.codeFolding,
-    });
-
-    bp.onmousedown = this.onClick;
-    bp.onmouseenter = this.onMouseEnter;
-    bp.onmouseleave = this.onMouseLeave;
-
-    // NOTE: flow does not know about oncontextmenu
-    bp.oncontextmenu = this.onContextMenu;
-
-    return bp;
+    return (
+      <BreakpointMarker
+        onContextMenu={this.onContextMenu}
+        onClick={this.onClick}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+      />
+    );
   }
 
   onClick = event => {

@@ -8,7 +8,6 @@ import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { commentKey } from "ui/utils/comments";
-import uniqBy from "lodash/uniqBy";
 
 export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();
@@ -37,9 +36,9 @@ export default function Transcript() {
   }
 
   return (
-    <div className="right-sidebar">
-      <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item comments">Comments</div>
+    <div className="sidebar">
+      <div className="sidebar-toolbar">
+        <div className="sidebar-toolbar-item comments">Comments</div>
       </div>
       <div className="transcript-list flex h-full flex-grow flex-col items-center overflow-auto overflow-x-hidden bg-bodyBgcolor text-xs">
         {displayedComments.length > 0 ? (

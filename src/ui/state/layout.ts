@@ -10,7 +10,6 @@ export type LayoutState = {
 };
 
 export type ViewMode = "dev" | "non-dev";
-export const TOGGLE_DELAY = 300;
 export const VIEWER_PANELS = ["events", "comments"] as const;
 type ViewerPrimaryPanelName = typeof VIEWER_PANELS[number];
 export type PrimaryPanelName = "explorer" | "debugger" | "search" | ViewerPrimaryPanelName;

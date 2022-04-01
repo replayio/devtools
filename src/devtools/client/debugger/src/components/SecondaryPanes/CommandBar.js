@@ -4,7 +4,6 @@
 
 //
 
-import PropTypes from "prop-types";
 import React, { Component } from "react";
 
 import { connect } from "../../utils/connect";
@@ -70,28 +69,6 @@ function formatKey(action) {
 }
 
 class CommandBar extends Component {
-  componentWillUnmount() {
-    const shortcuts = this.context.shortcuts;
-    COMMANDS.forEach(action => shortcuts.off(getKey(action)));
-    if (isMacOS) {
-      COMMANDS.forEach(action => shortcuts.off(getKeyForOS("WINNT", action)));
-    }
-  }
-
-  componentDidMount() {
-    const shortcuts = this.context.shortcuts;
-
-    COMMANDS.forEach(action => shortcuts.on(getKey(action), e => this.handleEvent(e, action)));
-
-    if (isMacOS) {
-      // The Mac supports both the Windows Function keys
-      // as well as the Mac non-Function keys
-      COMMANDS.forEach(action =>
-        shortcuts.on(getKeyForOS("WINNT", action), e => this.handleEvent(e, action))
-      );
-    }
-  }
-
   handleEvent(e, action) {
     const { cx } = this.props;
     e.preventDefault();
@@ -230,10 +207,6 @@ class CommandBar extends Component {
     return <div className="command-bar">{this.renderReplayButtons()}</div>;
   }
 }
-
-CommandBar.contextTypes = {
-  shortcuts: PropTypes.object,
-};
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),

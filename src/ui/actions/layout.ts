@@ -12,7 +12,6 @@ import {
   SecondaryPanelName,
   VIEWER_PANELS,
   ToolboxLayout,
-  TOGGLE_DELAY,
 } from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -71,13 +70,6 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     //Update viewToggleMode to start toggle animation
     dispatch(setViewToggleMode(viewMode));
 
-    // Delay updating the viewMode in redux so that the toggle can fully animate
-    // before re-rendering all of devtools in the new viewMode.
-    const delayPromise = new Promise<void>(resolve => {
-      setTimeout(() => resolve(), TOGGLE_DELAY);
-    });
-
-    await delayPromise;
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
     // if selectedPrimaryPanel is one that should only be visible in dev mode.
     const selectedPrimaryPanel = getSelectedPrimaryPanel(getState());

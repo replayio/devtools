@@ -36,7 +36,6 @@ const { appinfo } = Services;
 const isMacOS = appinfo.OS === "Darwin";
 
 import QuickOpenModal from "./QuickOpenModal";
-import SidePanel from "ui/components/SidePanel";
 import { EditorPane } from "./Editor/EditorPane";
 
 class Debugger extends Component {
@@ -165,39 +164,8 @@ class Debugger extends Component {
     }
   }
 
-  renderEndPane() {
-    const { toolboxLayout } = this.props;
-
-    if (toolboxLayout == "ide") {
-      return <EditorPane toolboxLayout={toolboxLayout} />;
-    }
-
-    return null;
-  }
-
   renderLayout = () => {
-    const { startPanelCollapsed, toolboxLayout } = this.props;
-
-    const isIde = toolboxLayout == "ide";
-    const onResize = pxString => {
-      prefs.sidePanelSize = pxString;
-    };
-
-    return (
-      <div className="horizontal-panels">
-        <SplitBox
-          startPanel={!startPanelCollapsed && <SidePanel />}
-          endPanel={this.renderEndPane()}
-          initialSize={prefs.sidePanelSize}
-          maxSize={isIde ? "80%" : "100%"}
-          minSize={isIde ? "200px" : "100%"}
-          onControlledPanelResized={onResize}
-          splitterSize={8}
-          style={{ width: "100%", overflow: "hidden" }}
-          vert={true}
-        />
-      </div>
-    );
+    return <EditorPane />;
   };
 
   renderShortcutsModal() {
@@ -218,6 +186,7 @@ class Debugger extends Component {
 
   render() {
     const { quickOpenEnabled } = this.props;
+
     return (
       <>
         <A11yIntention>
@@ -244,7 +213,6 @@ Debugger.childContextTypes = {
 function DebuggerLoader(props) {
   const wrapperNode = useRef();
   const { loading: loadingSettings } = useGetUserSettings();
-
   return (
     <div className="debugger" ref={wrapperNode}>
       {loadingSettings ? null : <Debugger {...props} wrapper={wrapperNode.current} />}

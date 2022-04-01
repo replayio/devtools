@@ -1,0 +1,27 @@
+.sidebar {
+  background: var(--tab-bgcolor-alt-subtle);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.sidebar-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--theme-splitter-color);
+  margin-bottom: 0;
+}
+
+.sidebar-toolbar-item {
+  font-size: 15px;
+  line-height: 19px;
+  font-weight: 400;
+  color: var(--body-color);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 8px;
+}
