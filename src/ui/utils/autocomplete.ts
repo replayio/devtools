@@ -305,7 +305,7 @@ export function getLastExpression(exp: string) {
   if (isCallExpression(expression)) {
     const parsed = parseExpression(expression) as CallExpression;
     const rv = parsed.arguments[parsed.arguments.length - 1] as Identifier;
-    const _rv = rv.name.slice(0, -PROPERTY_PLACEHOLDER.length);
+    const _rv = expression.slice(rv.start!, rv.end! - PROPERTY_PLACEHOLDER.length);
     
     return _rv;
   }
