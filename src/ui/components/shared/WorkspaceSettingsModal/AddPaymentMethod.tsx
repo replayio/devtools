@@ -13,6 +13,11 @@ export const getValue = (form: HTMLFormElement, field: string) => {
   }
 };
 
+function hasStripeState(state: string) {
+  const el = document.querySelector("#stripe-card-element");
+  return el ? el.classList.contains(`StripeElement--${state}`) : false;
+}
+
 export function EnterPaymentMethod({
   onCancel,
   onSave,
@@ -26,6 +31,7 @@ export function EnterPaymentMethod({
 }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
+  const [stripeError, setStripeError] = useState<string>();
   const stripe = useStripe();
   const elements = useElements();
   const { prepareWorkspacePaymentMethod, loading } = hooks.usePrepareWorkspacePaymentMethod();
@@ -33,6 +39,24 @@ export function EnterPaymentMethod({
   useEffect(() => {
     stripePromise.catch(() => setError("Unable to add a payment method at this time."));
   }, [stripePromise]);
+
+  useEffect(() => {
+    const cardElement = elements?.getElement(CardElement);
+
+    function updateStripeError() {
+      if (hasStripeState("complete")) {
+        setStripeError("");
+      } else if (hasStripeState("invalid")) {
+        setStripeError("Payment method is invalid");
+      }
+    }
+
+    cardElement?.on("blur", updateStripeError);
+
+    return () => {
+      cardElement?.off("blur", updateStripeError);
+    };
+  }, [elements, setStripeError]);
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -57,6 +81,12 @@ export function EnterPaymentMethod({
 
     if (!cardElement) {
       console.error("Unable to find card element");
+      return;
+    }
+
+    if (!hasStripeState("complete")) {
+      setStripeError("Payment method is invalid");
+      cardElement.focus();
       return;
     }
 
@@ -104,7 +134,12 @@ export function EnterPaymentMethod({
   return (
     <form className="space-y-4" onSubmit={ev => handleSubmit(ev)}>
       <FieldRow>
-        <CardElement className="col-span-3" options={{ hidePostalCode: true }} />
+        {stripeError ? <p className="col-span-3 text-red-500">{stripeError}</p> : null}
+        <CardElement
+          className="col-span-3"
+          options={{ hidePostalCode: true }}
+          id="stripe-card-element"
+        />
       </FieldRow>
       <InputField id="fullName" required label="Cardholder Name" autoComplete="name" />
       <InputField id="line1" required label="Address" autoComplete="street-address" />
