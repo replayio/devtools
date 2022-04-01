@@ -151,7 +151,8 @@ function AppUtilities({ children }: { children: ReactNode }) {
       await getAccessTokenSilently({ ignoreCache: true });
     } catch {
       pingTelemetry("devtools-auth-error-refresh-fail");
-      router.push("/login");
+      const returnToPath = window.location.pathname + window.location.search;
+      router.push({ pathname: "/login", query: { returnTo: returnToPath } });
     }
   };
 
