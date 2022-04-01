@@ -127,6 +127,8 @@ import "ui/utils/sourcemapVisualizer.css";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import { useRouter } from "next/router";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
+import { useAuth0 } from "@auth0/auth0-react";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 interface AuthProps {
   apiKey?: string;
@@ -135,20 +137,30 @@ interface AuthProps {
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-function AppUtilities({
-  children,
-  apiKey,
-  head,
-}: { children: ReactNode; head: ReactNode } & AuthProps) {
+function AppUtilities({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const { getAccessTokenSilently } = useAuth0();
+
+  const handleAuthError = async () => {
+    if (router.pathname.startsWith("/login")) {
+      return;
+    }
+
+    try {
+      pingTelemetry("devtools-auth-error-refresh");
+      await getAccessTokenSilently({ ignoreCache: true });
+    } catch {
+      pingTelemetry("devtools-auth-error-refresh-fail");
+      router.push("/login");
+    }
+  };
+
   return (
-    <tokenManager.Auth0Provider apiKey={apiKey}>
-      {head}
-      <ApolloWrapper>
-        <IntercomProvider appId={"k7f741xx"} autoBoot>
-          <ConfirmProvider>{children}</ConfirmProvider>
-        </IntercomProvider>
-      </ApolloWrapper>
-    </tokenManager.Auth0Provider>
+    <ApolloWrapper onAuthError={handleAuthError}>
+      <IntercomProvider appId={"k7f741xx"} autoBoot>
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </IntercomProvider>
+    </ApolloWrapper>
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
@@ -204,9 +216,12 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
     head = <props.Component {...props.pageProps} headOnly />;
   }
   return (
-    <AppUtilities apiKey={apiKey} head={head}>
-      <Routing {...props} />
-    </AppUtilities>
+    <tokenManager.Auth0Provider apiKey={apiKey}>
+      {head}
+      <AppUtilities>
+        <Routing {...props} />
+      </AppUtilities>
+    </tokenManager.Auth0Provider>
   );
 };
 
