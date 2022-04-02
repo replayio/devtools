@@ -20,13 +20,7 @@ import { PopupBlockedError } from "ui/components/shared/Error";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
-export function ApolloWrapper({
-  children,
-  onAuthError,
-}: {
-  children: ReactNode;
-  onAuthError?: () => void;
-}) {
+export function ApolloWrapper({ children }: { children: ReactNode }) {
   const { loading, token, error } = useToken();
 
   const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
@@ -47,7 +41,7 @@ export function ApolloWrapper({
     }
 
     const retryLink = createRetryLink();
-    const errorLink = createErrorLink(onAuthError);
+    const errorLink = createErrorLink();
     const mockLink = createMockLink(mocks);
 
     return (
@@ -73,9 +67,7 @@ export function ApolloWrapper({
     }
   }
 
-  return (
-    <ApolloProvider client={createApolloClient(token, onAuthError)}>{children}</ApolloProvider>
-  );
+  return <ApolloProvider client={createApolloClient(token)}>{children}</ApolloProvider>;
 }
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
@@ -96,12 +88,9 @@ export async function mutate({
   return await apolloClient.mutate({ variables, mutation, refetchQueries });
 }
 
-export const createApolloClient = memoizeLast(function (
-  token: string | undefined,
-  onAuthError?: () => void
-) {
+export const createApolloClient = memoizeLast(function (token: string | undefined) {
   const retryLink = createRetryLink();
-  const errorLink = createErrorLink(onAuthError);
+  const errorLink = createErrorLink();
   const httpLink = createHttpLink(token);
 
   const options: any = {
@@ -175,14 +164,10 @@ function createHttpLink(token: string | undefined) {
   });
 }
 
-function createErrorLink(onAuthError?: () => void) {
+function createErrorLink() {
   return onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       console.error("[Apollo GraphQL error]", graphQLErrors);
-
-      if (onAuthError && graphQLErrors.some(e => e.extensions?.code === "UNAUTHENTICATED")) {
-        onAuthError();
-      }
     } else if (networkError) {
       console.warn("[Apollo Network error]", networkError);
     }
