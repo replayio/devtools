@@ -1,23 +1,28 @@
 import "../src/test-prep";
 
+import { useAuth0 } from "@auth0/auth0-react";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
+import { useRouter } from "next/router";
 import NextApp from "next/app";
 import React, { ReactNode, useEffect, useState } from "react";
-import { Provider } from "react-redux";
 import { IntercomProvider } from "react-use-intercom";
-import tokenManager from "ui/utils/tokenManager";
-import { ApolloWrapper } from "ui/utils/apolloClient";
+import { Provider } from "react-redux";
+import { Store } from "redux";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
 import { bootstrapApp } from "ui/setup";
-import "image/image.css";
-import "image/icon.css";
-import { Store } from "redux";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
+import { InstallRouteListener } from "ui/utils/routeListener";
+import { useLaunchDarkly } from "ui/utils/launchdarkly";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
+import tokenManager from "ui/utils/tokenManager";
+import { ApolloWrapper } from "ui/utils/apolloClient";
 
+import "image/image.css";
+import "image/icon.css";
 import "tailwindcss/tailwind.css";
 import "../src/base.css";
 import "devtools/client/debugger/src/components/variables.css";
@@ -124,9 +129,6 @@ import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/components/Views/NonDevView.css";
 import "ui/utils/sourcemapVisualizer.css";
-import { InstallRouteListener } from "ui/utils/routeListener";
-import { useRouter } from "next/router";
-import { useLaunchDarkly } from "ui/utils/launchdarkly";
 
 interface AuthProps {
   apiKey?: string;
@@ -135,20 +137,31 @@ interface AuthProps {
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
-function AppUtilities({
-  children,
-  apiKey,
-  head,
-}: { children: ReactNode; head: ReactNode } & AuthProps) {
+function AppUtilities({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const { getAccessTokenSilently } = useAuth0();
+
+  const handleAuthError = async () => {
+    if (router.pathname.startsWith("/login")) {
+      return;
+    }
+
+    try {
+      pingTelemetry("devtools-auth-error-refresh");
+      await getAccessTokenSilently({ ignoreCache: true });
+    } catch {
+      pingTelemetry("devtools-auth-error-refresh-fail");
+      const returnToPath = window.location.pathname + window.location.search;
+      router.push({ pathname: "/login", query: { returnTo: returnToPath } });
+    }
+  };
+
   return (
-    <tokenManager.Auth0Provider apiKey={apiKey}>
-      {head}
-      <ApolloWrapper>
-        <IntercomProvider appId={"k7f741xx"} autoBoot>
-          <ConfirmProvider>{children}</ConfirmProvider>
-        </IntercomProvider>
-      </ApolloWrapper>
-    </tokenManager.Auth0Provider>
+    <ApolloWrapper onAuthError={handleAuthError}>
+      <IntercomProvider appId={"k7f741xx"} autoBoot>
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </IntercomProvider>
+    </ApolloWrapper>
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
@@ -202,9 +215,12 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
     head = <props.Component {...props.pageProps} headOnly />;
   }
   return (
-    <AppUtilities apiKey={apiKey} head={head}>
-      <Routing {...props} />
-    </AppUtilities>
+    <tokenManager.Auth0Provider apiKey={apiKey}>
+      {head}
+      <AppUtilities>
+        <Routing {...props} />
+      </AppUtilities>
+    </tokenManager.Auth0Provider>
   );
 };
 
