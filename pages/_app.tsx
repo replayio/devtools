@@ -139,10 +139,14 @@ const maintenanceMode = false;
 
 function AppUtilities({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   const handleAuthError = async () => {
-    if (router.pathname.startsWith("/login")) {
+    // This handler attempts to handle the scenario in which the frontend and
+    // our auth client think the user has a valid auth session but the backend
+    // disagrees. In this case, we should refresh the token so we can continue
+    // or, if that fails, return to the login page so the user can resume.
+    if (!isAuthenticated || router.pathname.startsWith("/login")) {
       return;
     }
 
