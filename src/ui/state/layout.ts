@@ -5,7 +5,6 @@ export type LayoutState = {
   selectedPrimaryPanel: PrimaryPanelName;
   selectedPanel: SecondaryPanelName;
   viewMode: ViewMode;
-  viewToggleMode: ViewMode;
   toolboxLayout: ToolboxLayout;
 };
 

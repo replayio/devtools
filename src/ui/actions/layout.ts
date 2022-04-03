@@ -33,9 +33,6 @@ type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 };
 type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
-
-type SetViewToggleModeAction = Action<"set_view_toggle_mode"> & { viewToggleMode: ViewMode };
-
 export type LayoutAction =
   | SetConsoleFilterDrawerExpandedAction
   | SetSelectedPanelAction
@@ -43,8 +40,7 @@ export type LayoutAction =
   | SetShowCommandPaletteAction
   | SetToolboxLayoutAction
   | SetShowVideoPanelAction
-  | SetViewModeAction
-  | SetViewToggleModeAction;
+  | SetViewModeAction;
 
 export function setShowCommandPalette(value: boolean): SetShowCommandPaletteAction {
   return { type: "set_show_command_palette", value };
@@ -66,9 +62,6 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
       await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
       dispatch(setSelectedPrimaryPanel("explorer"));
     }
-
-    //Update viewToggleMode to start toggle animation
-    dispatch(setViewToggleMode(viewMode));
 
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
     // if selectedPrimaryPanel is one that should only be visible in dev mode.
@@ -99,9 +92,6 @@ export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
 
     dispatch({ type: "set_toolbox_layout", layout });
   };
-}
-export function setViewToggleMode(viewToggleMode: ViewMode): SetViewToggleModeAction {
-  return { type: "set_view_toggle_mode", viewToggleMode };
 }
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
