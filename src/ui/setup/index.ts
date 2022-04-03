@@ -46,7 +46,7 @@ export async function bootstrapApp() {
   window.store = store;
 
   registerStoreObserver(store, updatePrefs);
-  setupAppHelper(store);
+  await setupAppHelper(store);
 
   const theme = getTheme(store.getState());
   document.body.parentElement!.className = theme || "";
