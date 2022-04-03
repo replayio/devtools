@@ -1,6 +1,9 @@
 import { selector } from "devtools/client/inspector/rules/types";
 import React from "react";
+import { useSelector } from "react-redux";
 import { useFeature } from "ui/hooks/settings";
+import { getTheme } from "ui/reducers/app";
+import { AppTheme } from "ui/state/app";
 
 const logoSizes = {
   xs: "h-4",
@@ -40,11 +43,12 @@ export default function ReplayLogo({
   wide?: boolean;
   size?: keyof typeof logoSizes;
 }) {
+  const theme = useSelector(getTheme);
   const height = logoSizes[size];
-  const { value: isDarkMode } = useFeature("darkMode");
+  const isDark = theme === "dark";
 
   if (wide) {
-    const src = isDarkMode ? "/images/logo-wide-dark.svg" : "/images/logo-wide.svg";
+    const src = isDark ? "/images/logo-wide-dark.svg" : "/images/logo-wide.svg";
     return <img className={`${height} w-auto`} src={src} />;
   }
 

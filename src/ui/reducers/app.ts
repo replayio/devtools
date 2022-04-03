@@ -2,6 +2,7 @@ import {
   AnalysisError,
   AnalysisPayload,
   AppState,
+  AppTheme,
   EventKind,
   ProtocolError,
   ReplayEvent,
@@ -15,6 +16,7 @@ import { isInTrimSpan } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";
+import { prefs } from "ui/utils/prefs";
 
 export const initialAppState: AppState = {
   analysisPoints: {},
@@ -39,7 +41,7 @@ export const initialAppState: AppState = {
   recordingTarget: null,
   recordingWorkspace: null,
   sessionId: null,
-  theme: "theme-light",
+  theme: prefs.theme as AppTheme,
   trialExpired: false,
   unexpectedError: null,
   uploading: null,

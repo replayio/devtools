@@ -21,6 +21,7 @@ import {
   EventKind,
   ReplayEvent,
   ReplayNavigationEvent,
+  AppTheme,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -43,9 +44,8 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 import { getShowVideoPanel } from "ui/reducers/layout";
-import { getIsInFocusMode } from "ui/reducers/timeline";
 import { toggleFocusMode } from "./timeline";
-import { features } from "ui/utils/prefs";
+import { getTheme } from "ui/reducers/app";
 
 export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -55,7 +55,7 @@ export type SetDisplayedLoadingProgressAction = Action<"set_displayed_loading_pr
 export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finished: boolean };
 export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
-export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
+export type UpdateThemeAction = Action<"update_theme"> & { theme: AppTheme };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
@@ -244,8 +244,16 @@ function setIndexing(indexing: number): IndexingAction {
   return { type: "indexing", indexing };
 }
 
-export function updateTheme(theme: string): UpdateThemeAction {
+export function updateTheme(theme: AppTheme): UpdateThemeAction {
   return { type: "update_theme", theme };
+}
+
+export function toggleTheme(): UIThunkAction {
+  return (dispatch, getState) => {
+    const theme = getTheme(getState());
+    const newTheme = theme == "dark" ? "light" : "dark";
+    dispatch(updateTheme(newTheme));
+  };
 }
 
 export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
@@ -432,7 +440,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       const showVideoPanel = getShowVideoPanel(getState());
       dispatch(setShowVideoPanel(!showVideoPanel));
     } else if (key === "toggle_dark_mode") {
-      features.darkMode = !features.darkMode;
+      dispatch(toggleTheme());
     } else if (key === "pin_to_bottom") {
       dispatch(setToolboxLayout("bottom"));
     } else if (key === "pin_to_left") {
@@ -441,8 +449,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("ide"));
     }
 
-    {
-      dispatch(hideCommandPalette());
-    }
+    dispatch(hideCommandPalette());
   };
 }

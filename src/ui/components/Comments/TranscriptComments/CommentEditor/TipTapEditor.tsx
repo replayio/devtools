@@ -78,6 +78,7 @@ const TipTapEditor = ({
                 onSubmit(JSON.stringify(editor.getJSON()));
                 return true;
               },
+
               Enter: ({ editor }) => {
                 onSubmit(JSON.stringify(editor.getJSON()));
                 return true;

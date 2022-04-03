@@ -10,7 +10,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { getSelectedSource } from "devtools/client/debugger/src/reducers/sources";
-import { features } from "ui/utils/prefs";
 import { isEditableElement } from "ui/utils/key-shortcuts";
 
 function setupShortcuts() {
@@ -35,6 +34,7 @@ function KeyboardShortcuts({
   toggleFocusMode,
   togglePaneCollapse,
   viewMode,
+  toggleTheme,
 }: PropsFromRedux) {
   const addShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
     if (!globalShortcuts) {
@@ -80,10 +80,10 @@ function KeyboardShortcuts({
       paletteInput.focus();
     }
   };
-  const toggleTheme = (e: KeyboardEvent) => {
+  const onToggleTheme = (e: KeyboardEvent) => {
     if (!e.target || !isEditableElement(e.target)) {
       e.preventDefault();
-      features.darkMode = !features.darkMode;
+      toggleTheme();
     }
   };
   const toggleEditFocusMode = (e: KeyboardEvent) => {
@@ -99,14 +99,14 @@ function KeyboardShortcuts({
     addShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
     addShortcut("CmdOrCtrl+B", toggleLeftSidebar);
     addShortcut("CmdOrCtrl+K", togglePalette);
-    addShortcut("Shift+T", toggleTheme);
+    addShortcut("Shift+T", onToggleTheme);
     addShortcut("Shift+F", toggleEditFocusMode);
 
     return () => {
       removeShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
       removeShortcut("CmdOrCtrl+B", toggleLeftSidebar);
       removeShortcut("CmdOrCtrl+K", togglePalette);
-      removeShortcut("Shift+T", toggleTheme);
+      removeShortcut("Shift+T", onToggleTheme);
       removeShortcut("Shift+F", toggleEditFocusMode);
     };
   }, [viewMode, selectedSource]);
@@ -129,6 +129,7 @@ const connector = connect(
     toggleCommandPalette: actions.toggleCommandPalette,
     toggleFocusMode: actions.toggleFocusMode,
     showCommandPaletteInEditor: deselectSource,
+    toggleTheme: actions.toggleTheme,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -68,6 +68,8 @@ export interface UploadInfo {
   total?: string;
 }
 
+export type AppTheme = "light" | "dark";
+
 export interface AppState {
   analysisPoints: AnalysisPoints;
   awaitingSourcemaps: boolean;
@@ -90,7 +92,7 @@ export interface AppState {
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
   sessionId: SessionId | null;
-  theme: string;
+  theme: AppTheme;
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;

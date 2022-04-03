@@ -1,10 +1,12 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import hooks from "ui/hooks";
 import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
 import { CheckboxRow } from "./CheckboxRow";
-import { useFeature } from "ui/hooks/settings";
 import { trackEvent } from "ui/utils/telemetry";
+import { toggleTheme } from "ui/actions/app";
+import { getTheme } from "ui/reducers/app";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
@@ -103,11 +105,12 @@ function PrivacyPreferences() {
 }
 
 function UiPreferences() {
-  const { value: enableDarkMode, update: updateEnableDarkMode } = useFeature("darkMode");
+  const theme = useSelector(getTheme);
+  const dispatch = useDispatch();
 
   const handleDarkModeToggle = () => {
-    trackEvent("feature.dark_mode", { enabled: !enableDarkMode });
-    updateEnableDarkMode(!enableDarkMode);
+    trackEvent("feature.dark_mode", { enabled: theme !== "dark" });
+    dispatch(toggleTheme());
   };
 
   return (
@@ -119,7 +122,11 @@ function UiPreferences() {
           data-private
           htmlFor="enableDarkMode"
         >
-          <Checkbox id="enableDarkMode" checked={enableDarkMode} onChange={handleDarkModeToggle} />
+          <Checkbox
+            id="enableDarkMode"
+            checked={theme === "dark"}
+            onChange={handleDarkModeToggle}
+          />
           <div>Enable Dark Mode</div>
         </label>
       </div>
