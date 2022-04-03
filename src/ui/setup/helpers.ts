@@ -1,7 +1,8 @@
 import { UIStore } from "ui/actions";
 import { getRecordingId } from "ui/utils/recording";
-import { prefs, features } from "ui/utils/prefs";
+import { prefs, features, asyncStore } from "ui/utils/prefs";
 import { triggerEvent, sendMessage } from "protocol/socket";
+import { getReplaySession, ReplaySession } from "./prefs";
 
 declare global {
   interface Window {
@@ -11,11 +12,13 @@ declare global {
     store: UIStore;
     prefs: typeof prefs;
     features: typeof features;
+    asyncStore: typeof asyncStore;
     dumpPrefs: () => string;
     dumpBasicProcessing: () => void;
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
+    replaySession: Promise<ReplaySession> | undefined;
     triggerEvent: typeof triggerEvent;
     sendMessage: typeof sendMessage;
   }
@@ -39,14 +42,17 @@ function dumpBasicProcessing() {
   console.table(stats);
 }
 
-export function setupAppHelper(store: UIStore) {
+export async function setupAppHelper(store: UIStore) {
   const recordingId = getRecordingId();
+  const replaySession = recordingId ? await getReplaySession(recordingId) : undefined;
 
   window.app = {
     store,
     prefs,
     features,
+    asyncStore,
     triggerEvent,
+    replaySession,
     sendMessage: (cmd, args = {}, pauseId) =>
       sendMessage(cmd, args, window.sessionId, pauseId as any),
 
