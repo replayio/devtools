@@ -10,6 +10,7 @@ import {
   getToolboxLayout,
   getShowVideoPanel,
   getViewMode,
+  getLocalNags,
 } from "ui/reducers/layout";
 import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
@@ -122,29 +123,6 @@ export async function isLocalNagDismissed(nag: LocalNag) {
   return replaySession.localNags.includes(nag);
 }
 
-// This allows us to insert a local nag on a per session (replay) basis.
-export async function dismissLocalNag(nag: LocalNag) {
-  const recordingId = getRecordingId();
-
-  // Bail if we're not in a recording.
-  if (!recordingId) {
-    return;
-  }
-
-  const previousReplaySessions = await getReplaySessions();
-  const previousReplaySession = previousReplaySessions[recordingId];
-
-  const updatedReplaySession = {
-    ...previousReplaySession,
-    localNags: [
-      ...previousReplaySession.localNags,
-      ...(!previousReplaySession.localNags.includes(nag) ? [nag] : []),
-    ],
-  };
-
-  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: updatedReplaySession };
-}
-
 async function maybeUpdateReplaySessions(state: UIState) {
   const recordingId = getRecordingId();
 
@@ -154,7 +132,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
   }
 
   const previousReplaySessions = await getReplaySessions();
-  const previousReplaySession = previousReplaySessions[recordingId];
 
   const currentReplaySession = {
     viewMode: getViewMode(state),
@@ -163,7 +140,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     showVideoPanel: getShowVideoPanel(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
     selectedPanel: getSelectedPanel(state),
-    localNags: [...(previousReplaySession?.localNags || [])],
+    localNags: getLocalNags(state),
     tabs: persistTabs(getTabs(state)) || [],
     pendingComment: getPendingComment(state),
   };
