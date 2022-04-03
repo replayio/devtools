@@ -13,7 +13,6 @@ const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
   viewMode: "non-dev",
-  viewToggleMode: "non-dev",
   showVideoPanel: true,
   toolboxLayout: "ide",
   selectedPanel: "console",
@@ -67,7 +66,6 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
         ? session.consoleFilterDrawerExpanded
         : consoleFilterDrawerExpanded,
     viewMode: initialViewMode,
-    viewToggleMode: initialViewMode,
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
@@ -96,10 +94,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return { ...state, viewMode: action.viewMode };
     }
 
-    case "set_view_toggle_mode": {
-      return { ...state, viewToggleMode: action.viewToggleMode };
-    }
-
     case "set_show_video_panel": {
       return { ...state, showVideoPanel: action.showVideoPanel };
     }
@@ -126,6 +120,5 @@ export const getShowCommandPalette = (state: UIState) => state.layout.showComman
 export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selectedPrimaryPanel;
 export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 export const getViewMode = (state: UIState) => state.layout.viewMode;
-export const getViewToggleMode = (state: UIState) => state.layout.viewToggleMode;
 export const getShowVideoPanel = (state: UIState) => state.layout.showVideoPanel;
 export const getToolboxLayout = (state: UIState) => state.layout.toolboxLayout;

@@ -63,10 +63,16 @@ export async function waitUntil(fn, options) {
 
 function start() {
   app.actions.setViewMode("dev");
-  return waitUntil(() => isFullyLoaded() && app.selectors.getViewMode() == "dev", {
-    timeout: 1000 * 120,
-    waitingFor: "the page to load",
-  });
+  return waitUntil(
+    () =>
+      isFullyLoaded() &&
+      app.selectors.getViewMode() == "dev" &&
+      document.querySelector(".webconsole-app"),
+    {
+      timeout: 1000 * 120,
+      waitingFor: "the page to load",
+    }
+  );
 }
 
 function finish() {

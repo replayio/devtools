@@ -122,7 +122,6 @@ function SecondaryToolbox({
   recordingTarget,
   hasReactComponents,
 }: PropsFromRedux) {
-  const showVideoPanel = useSelector(getShowVideoPanel);
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
@@ -139,7 +138,7 @@ function SecondaryToolbox({
           toolboxLayout={toolboxLayout}
         />
         <div className="flex">
-          {!showVideoPanel || true ? <ShowVideoButton /> : null}
+          <ShowVideoButton />
           <ToolboxOptions />
         </div>
       </header>
@@ -158,7 +157,6 @@ const connector = connect(
   (state: UIState) => ({
     selectedPanel: selectors.getSelectedPanel(state),
     recordingTarget: selectors.getRecordingTarget(state),
-    showVideoPanel: selectors.getShowVideoPanel(state),
     hasReactComponents: selectors.hasReactComponents(state),
     toolboxLayout: selectors.getToolboxLayout(state),
   }),

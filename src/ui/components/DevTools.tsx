@@ -1,22 +1,14 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  Children,
-  ReactChildren,
-  ReactElement,
-  useMemo,
-} from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { useEffect, useState, useRef, useMemo } from "react";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { clearTrialExpired, createSession } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
-import NonDevView from "./Views/NonDevView";
 import WaitForReduxSlice from "./WaitForReduxSlice";
 import ReplayLogo from "./shared/ReplayLogo";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 import {
   endUploadWaitTracking,
@@ -28,8 +20,14 @@ import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
 import useAuth0 from "ui/utils/useAuth0";
 import { KeyModifiers } from "./KeyModifiers";
-
-const DevView = React.lazy(() => import("./Views/DevView"));
+import Toolbar from "./Toolbar";
+import Timeline from "./Timeline";
+import SidePanel from "./SidePanel";
+import Video from "./Video";
+import { prefs } from "ui/utils/prefs";
+import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
+import { getViewMode } from "ui/reducers/layout";
+const Viewer = React.lazy(() => import("./Viewer"));
 
 type _DevToolsProps = PropsFromRedux & DevToolsProps;
 
@@ -55,6 +53,39 @@ function ViewLoader() {
   );
 }
 
+function Body() {
+  const sidePanelCollapsed = useSelector(getPaneCollapse);
+  const viewMode = useSelector(getViewMode);
+
+  return (
+    <div className="vertical-panels pr-2">
+      <div className="flex h-full flex-row overflow-hidden bg-chrome">
+        <Toolbar />
+        <SplitBox
+          startPanel={<SidePanel />}
+          endPanel={
+            viewMode === "dev" ? (
+              <React.Suspense fallback={<ViewLoader />}>
+                <Viewer />
+              </React.Suspense>
+            ) : (
+              <Video />
+            )
+          }
+          initialSize={prefs.sidePanelSize as `${number}px`}
+          maxSize={sidePanelCollapsed ? "0" : "80%"}
+          minSize={sidePanelCollapsed ? "0" : "240px"}
+          onControlledPanelResized={(num: number) => (prefs.sidePanelSize = `${num}px`)}
+          splitterSize={8}
+          style={{ width: "100%", overflow: "hidden" }}
+          vert={true}
+        />
+      </div>
+      <Timeline />
+    </div>
+  );
+}
+
 function _DevTools({
   clearTrialExpired,
   createSession,
@@ -74,7 +105,7 @@ function _DevTools({
   );
 
   useEffect(() => {
-    import("./Views/DevView");
+    import("./Viewer");
   }, []);
   useEffect(() => {
     // We only track anonymous usage for recording by non-internal users so that
@@ -122,13 +153,7 @@ function _DevTools({
   return (
     <KeyModifiers>
       <Header />
-      {viewMode == "dev" ? (
-        <React.Suspense fallback={<ViewLoader />}>
-          <DevView />
-        </React.Suspense>
-      ) : (
-        <NonDevView />
-      )}
+      <Body />
       {showCommandPalette ? <CommandPaletteModal /> : null}
       <KeyboardShortcuts />
     </KeyModifiers>

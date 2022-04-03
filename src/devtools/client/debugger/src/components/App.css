@@ -14,7 +14,9 @@ button {
   width: 0;
 }
 
-#toolbox-content-debugger .tree-indent {
+.sources-list .tree-indent,
+.scopes-list .tree-indent,
+.preview-popup .tree-indent {
   width: 16px;
   margin-inline-start: 0;
   border-inline-start: 0;

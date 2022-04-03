@@ -1,21 +1,19 @@
 import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import StatusDropdown from "./shared/StatusDropdown";
 import { useFeature } from "ui/hooks/settings";
+import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import { useSelector } from "react-redux";
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 
-type SidePanelProps = PropsFromRedux;
-
-function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
+export default function SidePanel() {
   const { value: resolveRecording } = useFeature("resolveRecording");
+  const selectedPrimaryPanel = useSelector(getSelectedPrimaryPanel);
 
   let sidepanel;
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
@@ -53,11 +51,7 @@ function SidePanel({ selectedPrimaryPanel }: SidePanelProps) {
     );
   }
 
-  return <div className="w-full overflow-hidden rounded-lg bg-bodyBgcolor">{sidepanel}</div>;
+  return (
+    <div className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">{sidepanel}</div>
+  );
 }
-
-const connector = connect((state: UIState) => ({
-  selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(SidePanel);

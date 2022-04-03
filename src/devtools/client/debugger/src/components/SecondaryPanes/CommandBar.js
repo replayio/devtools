@@ -18,9 +18,11 @@ import {
 import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
 import CommandBarButton from "../shared/Button/CommandBarButton";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { appinfo } from "devtools/shared/services";
+import isThisHour from "date-fns/isThisHour";
 
 const isMacOS = appinfo.OS === "Darwin";
 
@@ -70,8 +72,10 @@ function formatKey(action) {
 }
 
 class CommandBar extends Component {
+  commandBarNode;
+
   componentWillUnmount() {
-    const shortcuts = this.context.shortcuts;
+    const shortcuts = this.shortcuts;
     COMMANDS.forEach(action => shortcuts.off(getKey(action)));
     if (isMacOS) {
       COMMANDS.forEach(action => shortcuts.off(getKeyForOS("WINNT", action)));
@@ -79,7 +83,8 @@ class CommandBar extends Component {
   }
 
   componentDidMount() {
-    const shortcuts = this.context.shortcuts;
+    this.shortcuts = new KeyShortcuts({ window, target: this.commandBarNode });
+    const shortcuts = this.shortcuts;
 
     COMMANDS.forEach(action => shortcuts.on(getKey(action), e => this.handleEvent(e, action)));
 
@@ -227,13 +232,13 @@ class CommandBar extends Component {
   }
 
   render() {
-    return <div className="command-bar">{this.renderReplayButtons()}</div>;
+    return (
+      <div className="command-bar" ref={node => (this.commandBarNode = node)}>
+        {this.renderReplayButtons()}
+      </div>
+    );
   }
 }
-
-CommandBar.contextTypes = {
-  shortcuts: PropTypes.object,
-};
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),

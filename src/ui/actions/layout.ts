@@ -12,7 +12,6 @@ import {
   SecondaryPanelName,
   VIEWER_PANELS,
   ToolboxLayout,
-  TOGGLE_DELAY,
 } from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -34,9 +33,6 @@ type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
 };
 type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
-
-type SetViewToggleModeAction = Action<"set_view_toggle_mode"> & { viewToggleMode: ViewMode };
-
 export type LayoutAction =
   | SetConsoleFilterDrawerExpandedAction
   | SetSelectedPanelAction
@@ -44,8 +40,7 @@ export type LayoutAction =
   | SetShowCommandPaletteAction
   | SetToolboxLayoutAction
   | SetShowVideoPanelAction
-  | SetViewModeAction
-  | SetViewToggleModeAction;
+  | SetViewModeAction;
 
 export function setShowCommandPalette(value: boolean): SetShowCommandPaletteAction {
   return { type: "set_show_command_palette", value };
@@ -68,16 +63,6 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
       dispatch(setSelectedPrimaryPanel("explorer"));
     }
 
-    //Update viewToggleMode to start toggle animation
-    dispatch(setViewToggleMode(viewMode));
-
-    // Delay updating the viewMode in redux so that the toggle can fully animate
-    // before re-rendering all of devtools in the new viewMode.
-    const delayPromise = new Promise<void>(resolve => {
-      setTimeout(() => resolve(), TOGGLE_DELAY);
-    });
-
-    await delayPromise;
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
     // if selectedPrimaryPanel is one that should only be visible in dev mode.
     const selectedPrimaryPanel = getSelectedPrimaryPanel(getState());
@@ -107,9 +92,6 @@ export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
 
     dispatch({ type: "set_toolbox_layout", layout });
   };
-}
-export function setViewToggleMode(viewToggleMode: ViewMode): SetViewToggleModeAction {
-  return { type: "set_view_toggle_mode", viewToggleMode };
 }
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
