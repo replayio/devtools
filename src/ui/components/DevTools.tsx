@@ -105,6 +105,9 @@ function _DevTools({
   );
 
   useEffect(() => {
+    import("./Viewer");
+  }, []);
+  useEffect(() => {
     // We only track anonymous usage for recording by non-internal users so that
     // test runner cases (e.g. QA Wolf) are excluded.
     // Wait until we start rendering the DevTools component before potentially registering
