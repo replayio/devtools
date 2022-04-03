@@ -1,7 +1,6 @@
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
 import { LayoutAction } from "ui/actions/layout";
-import { asyncStore } from "../utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { Recording } from "ui/types";
 import { getRecording } from "ui/hooks/recordings";
@@ -16,6 +15,7 @@ const syncInitialLayoutState: LayoutState = {
   showVideoPanel: true,
   toolboxLayout: "ide",
   selectedPanel: "console",
+  localNags: [],
 };
 
 const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => {
@@ -70,6 +70,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
+    localNags: "localNags" in session ? session.localNags : [],
   };
 }
 
@@ -106,6 +107,15 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return { ...state, consoleFilterDrawerExpanded: action.expanded };
     }
 
+    case "dismiss_local_nag": {
+      return {
+        ...state,
+        localNags: state.localNags.includes(action.nag)
+          ? state.localNags
+          : [...state.localNags, action.nag],
+      };
+    }
+
     default: {
       return state;
     }
@@ -122,3 +132,4 @@ export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 export const getViewMode = (state: UIState) => state.layout.viewMode;
 export const getShowVideoPanel = (state: UIState) => state.layout.showVideoPanel;
 export const getToolboxLayout = (state: UIState) => state.layout.toolboxLayout;
+export const getLocalNags = (state: UIState) => state.layout.localNags;

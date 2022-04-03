@@ -1,11 +1,12 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { Action } from "redux";
 import {
+  getLocalNags,
   getSelectedPanel,
   getSelectedPrimaryPanel,
   getShowCommandPalette,
 } from "ui/reducers/layout";
-import { dismissLocalNag, getReplaySession, isLocalNagDismissed, LocalNag } from "ui/setup/prefs";
+import { getReplaySession, LocalNag } from "ui/setup/prefs";
 import {
   ViewMode,
   PrimaryPanelName,
@@ -32,6 +33,7 @@ type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
   showVideoPanel: boolean;
 };
 type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
+type DismissLocalNagAction = Action<"dismiss_local_nag"> & { nag: LocalNag };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 export type LayoutAction =
   | SetConsoleFilterDrawerExpandedAction
@@ -40,7 +42,8 @@ export type LayoutAction =
   | SetShowCommandPaletteAction
   | SetToolboxLayoutAction
   | SetShowVideoPanelAction
-  | SetViewModeAction;
+  | SetViewModeAction
+  | DismissLocalNagAction;
 
 export function setShowCommandPalette(value: boolean): SetShowCommandPaletteAction {
   return { type: "set_show_command_palette", value };
@@ -54,12 +57,19 @@ export function toggleCommandPalette(): UIThunkAction {
     dispatch(setShowCommandPalette(!showCommandPalette));
   };
 }
+
+export function dismissLocalNag(nag: LocalNag): DismissLocalNagAction {
+  return { type: "dismiss_local_nag", nag };
+}
+
 export function setViewMode(viewMode: ViewMode): UIThunkAction {
   return async (dispatch, getState) => {
+    const localNags = getLocalNags(getState());
+
     // There's a possible race condition here so it's important to handle the nag logic first.
     // Otherwise, it's possible for the nag to not be properly dismissed.
-    if (viewMode === "dev" && !(await isLocalNagDismissed(LocalNag.YANK_TO_SOURCE))) {
-      await dismissLocalNag(LocalNag.YANK_TO_SOURCE);
+    if (viewMode === "dev" && !localNags.includes(LocalNag.YANK_TO_SOURCE)) {
+      dispatch(dismissLocalNag(LocalNag.YANK_TO_SOURCE));
       dispatch(setSelectedPrimaryPanel("explorer"));
     }
 

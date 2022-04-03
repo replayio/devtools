@@ -1,3 +1,5 @@
+import { LocalNag } from "ui/setup/prefs";
+
 export type LayoutState = {
   consoleFilterDrawerExpanded: boolean;
   showCommandPalette: boolean;
@@ -6,6 +8,7 @@ export type LayoutState = {
   selectedPanel: SecondaryPanelName;
   viewMode: ViewMode;
   toolboxLayout: ToolboxLayout;
+  localNags: LocalNag[];
 };
 
 export type ViewMode = "dev" | "non-dev";
