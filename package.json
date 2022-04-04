@@ -34,7 +34,7 @@
     "@auth0/auth0-react": "1.2.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
-    "@recordreplay/protocol": "^0.19.0",
+    "@recordreplay/protocol": "^0.21.0",
     "@redux-devtools/extension": "^3.2.2",
     "@reduxjs/toolkit": "^1.8.0",
     "@sentry/react": "^6.19.2",
