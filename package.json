@@ -40,7 +40,7 @@
     "@sentry/react": "^6.19.2",
     "@sentry/tracing": "^6.19.2",
     "@stripe/react-stripe-js": "^1.7.0",
-    "@stripe/stripe-js": "^1.25.0",
+    "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
     "@tiptap/extension-mention": "^2.0.0-beta.95",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
