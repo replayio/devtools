@@ -5,6 +5,7 @@ import AppContainerPortal from "../AppContainerPortal";
 
 export type AutocompleteMatchesOptions = {
   minLeft: number;
+  isArgument: boolean;
 };
 
 function Match({
