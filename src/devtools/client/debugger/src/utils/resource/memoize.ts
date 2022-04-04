@@ -6,16 +6,23 @@
 
 import { shallowEqual } from "./compare";
 
+type Mapper<T, Result> = (input: T, identity: any, args: unknown) => Result;
+
+interface MemoizeCacheEntry<T, Result> {
+  input: T;
+  output: Result;
+}
+
 /**
  * Wraps a 'mapper' function to create a shallow-equality memoized version
  * of the mapped result. The returned function will return the same value
  * even if the input object is different, as long as the identity is the same
  * and the mapped result is shallow-equal to the most recent mapped value.
  */
-export function memoizeResourceShallow(map) {
-  const cache = new WeakMap();
+export function memoizeResourceShallow<T, Result>(map: Mapper<T, Result>) {
+  const cache = new WeakMap<any, MemoizeCacheEntry<T, Result>>();
 
-  const fn = (input, identity, args) => {
+  const fn = (input: T, identity: any, args: unknown) => {
     let existingEntry = cache.get(identity);
 
     if (!existingEntry || existingEntry.input !== input) {
@@ -42,6 +49,7 @@ export function memoizeResourceShallow(map) {
 
     return existingEntry.output;
   };
+  // @ts-ignore
   fn.needsArgs = map.needsArgs;
   return fn;
 }
