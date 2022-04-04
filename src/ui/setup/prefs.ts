@@ -1,6 +1,6 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
-import { prefs, asyncStore } from "ui/utils/prefs";
+import { prefs, asyncStore, features } from "ui/utils/prefs";
 import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
@@ -17,6 +17,7 @@ import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getPendingComment } from "ui/reducers/comments";
 import { RecordingId } from "@recordreplay/protocol";
+import { getTheme } from "ui/reducers/app";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -62,6 +63,7 @@ export function updatePrefs(state: UIState, oldState: UIState) {
   }
 
   updatePref("viewMode", getViewMode);
+  updatePref("theme", getTheme);
 
   updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
   updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);

@@ -14,6 +14,8 @@ import {
   URLEncodedToPlaintext,
 } from "./content";
 import classNames from "classnames";
+import { useSelector } from "react-redux";
+import { getTheme } from "ui/reducers/app";
 
 const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
   const [copied, setCopied] = useState(false);
@@ -55,6 +57,7 @@ const HttpBody = ({
   contentType: string;
   filename: string;
 }) => {
+  const theme = useSelector(getTheme);
   const raw = useMemo(() => {
     return BodyPartsToArrayBuffer(bodyParts, contentType);
   }, [bodyParts]);
@@ -64,7 +67,16 @@ const HttpBody = ({
   }, [raw]);
 
   if (displayable.as === Displayable.JSON) {
-    return <ReactJson src={displayable.content} shouldCollapse={() => true} />;
+    return (
+      <ReactJson
+        style={{ backgroundColor: "none" }}
+        theme={theme == "light" ? "rjv-default" : "tube"}
+        src={displayable.content}
+        shouldCollapse={false}
+        displayDataTypes={false}
+        displayObjectSize={false}
+      />
+    );
   }
   if (displayable.as === Displayable.Text) {
     return (

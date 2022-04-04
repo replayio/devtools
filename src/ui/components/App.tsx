@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, createContext } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
 import AppErrors from "./shared/Error";
@@ -21,7 +21,6 @@ import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import FocusModal from "./shared/FocusModal/FocusModal";
-import { useFeature } from "ui/hooks/settings";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
@@ -93,7 +92,7 @@ function App({ children, modal }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const { value: enableDarkMode } = useFeature("darkMode");
+  const theme = useSelector(selectors.getTheme);
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
@@ -126,8 +125,8 @@ function App({ children, modal }: AppProps) {
   }, []);
 
   useEffect(() => {
-    document.body.parentElement!.className = enableDarkMode ? "theme-dark" : "theme-light";
-  }, [enableDarkMode]);
+    document.body.parentElement!.className = `theme-${theme}`;
+  }, [theme]);
 
   if (auth.isLoading || userInfo.loading) {
     return <LoadingScreen />;

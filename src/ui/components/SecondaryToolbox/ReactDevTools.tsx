@@ -1,12 +1,12 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import { createBridge, createStore, initialize, Store, Wall } from "react-devtools-inline/frontend";
 import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
-import { getCurrentPoint } from "ui/reducers/app";
+import { getCurrentPoint, getTheme } from "ui/reducers/app";
 import {
   getAnnotations,
   getProtocolCheckFailed,
@@ -17,7 +17,6 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
-import { useFeature } from "ui/hooks/settings";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -238,7 +237,7 @@ function ReactDevtoolsPanel({
   protocolCheckFailed,
   reactInitPoint,
 }: PropsFromRedux) {
-  const { value: enableDarkMode } = useFeature("darkMode");
+  const theme = useSelector(getTheme);
 
   if (currentPoint === null) {
     return null;
@@ -294,7 +293,7 @@ function ReactDevtoolsPanel({
 
   return (
     <ReactDevTools
-      browserTheme={enableDarkMode ? "dark" : "light"}
+      browserTheme={theme}
       enabledInspectedElementContextMenu={false}
       overrideTab="components"
       showTabBar={false}

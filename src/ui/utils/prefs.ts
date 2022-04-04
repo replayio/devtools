@@ -16,10 +16,10 @@ pref("devtools.disableLogRocket", false);
 pref("devtools.listenForMetrics", false);
 pref("devtools.disableCache", false);
 pref("devtools.sidePanelSize", "240px");
+pref("devtools.theme", "light");
 
 // app features
 pref("devtools.features.columnBreakpoints", false);
-pref("devtools.features.darkMode", false);
 pref("devtools.features.httpBodies", true);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.commentAttachments", false);
@@ -43,13 +43,13 @@ export const prefs = new PrefsHelper("devtools", {
   sidePanelSize: ["String", "sidePanelSize"],
   listenForMetrics: ["Bool", "listenForMetrics"],
   disableCache: ["Bool", "disableCache"],
+  theme: ["String", "theme"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
   useMultipleControllers: ["Bool", "useMultipleControllers"],
   multipleControllerUseSnapshots: ["Bool", "multipleControllerUseSnapshots"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
-  darkMode: ["Bool", "darkMode"],
   httpBodies: ["Bool", "httpBodies"],
   videoPlayback: ["Bool", "videoPlayback"],
   commentAttachments: ["Bool", "commentAttachments"],
