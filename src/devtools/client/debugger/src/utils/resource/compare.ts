@@ -4,6 +4,8 @@
 
 //
 
+export type ComparisonFunction<T = unknown> = (a: T, b: T) => boolean;
+
 export function strictEqual(value: unknown, other: unknown) {
   return value === other;
 }
