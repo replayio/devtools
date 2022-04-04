@@ -246,7 +246,7 @@ function updateUrl({
   url.searchParams.set("point", point);
   url.searchParams.set("time", `${time}`);
   url.searchParams.set("hasFrames", `${hasFrames}`);
-  window.history.pushState({}, "", url.toString());
+  window.history.replaceState({}, "", url.toString());
 }
 
 export function seek(
