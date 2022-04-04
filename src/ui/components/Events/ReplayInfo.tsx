@@ -8,13 +8,10 @@ import MaterialIcon from "../shared/MaterialIcon";
 import Icon from "../shared/Icon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import * as actions from "ui/actions/app";
-import {
-  showDurationWarning,
-  showEnvironmentVariablesWarning,
-  getRecordingId,
-} from "ui/utils/recording";
+import { showDurationWarning, getRecordingId } from "ui/utils/recording";
+import { getRecordingTarget } from "ui/reducers/app";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
@@ -36,6 +33,8 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
 function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
   const { isAuthenticated } = useAuth0();
+  const recordingTarget = useSelector(getRecordingTarget);
+  const showEnvironmentVariables = recordingTarget == "node";
 
   if (!recording) {
     return null;
@@ -58,7 +57,6 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-
         <div className="group">
           {isAuthenticated ? (
             <Row>
@@ -85,11 +83,10 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             </div>
           </Row>
         </div>
-
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
-        {showEnvironmentVariablesWarning(recording) ? <EnvironmentVariablesRow /> : null}
+        {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
         {showDurationWarning(recording) ? <DurationWarningRow /> : null}
       </div>
     </div>
