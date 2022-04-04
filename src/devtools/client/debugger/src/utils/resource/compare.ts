@@ -4,11 +4,11 @@
 
 //
 
-export function strictEqual(value, other) {
+export function strictEqual(value: unknown, other: unknown) {
   return value === other;
 }
 
-export function shallowEqual(value, other) {
+export function shallowEqual(value: unknown, other: unknown) {
   return (
     value === other ||
     (Array.isArray(value) && Array.isArray(other) && arrayShallowEqual(value, other)) ||
@@ -16,11 +16,11 @@ export function shallowEqual(value, other) {
   );
 }
 
-export function arrayShallowEqual(value, other) {
+export function arrayShallowEqual(value: unknown[], other: unknown[]) {
   return value.length === other.length && value.every((k, i) => k === other[i]);
 }
 
-function objectShallowEqual(value, other) {
+function objectShallowEqual(value: Record<string, unknown>, other: Record<string, unknown>) {
   const existingKeys = Object.keys(other);
   const keys = Object.keys(value);
 
@@ -31,6 +31,6 @@ function objectShallowEqual(value, other) {
   );
 }
 
-function isObject(value) {
+function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && !!value;
 }
