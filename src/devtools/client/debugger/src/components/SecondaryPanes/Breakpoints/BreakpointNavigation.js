@@ -134,7 +134,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
       : [];
 
     status = `${points.length}/${analysisPoints.data.length}`;
-    maxStatusLength = `${analysisPoints.length}/${analysisPoints.data.length}`.length;
+    maxStatusLength = `${analysisPoints.data.length}/${analysisPoints.data.length}`.length;
   }
 
   return (
