@@ -11,7 +11,7 @@ import { EmptyObject, BaseResource, ResourceState } from "./core";
  * A query 'cache' function that uses the identity of the arguments object to
  * cache data for the query itself.
  */
-export function queryCacheWeak<T extends BaseResource, Result extends BaseResult>(
+export function queryCacheWeak<T extends BaseResource, Result extends CacheResult>(
   handler: CacheHandler<T, Result>
 ) {
   const cache = new WeakMap();
@@ -33,7 +33,7 @@ export function queryCacheWeak<T extends BaseResource, Result extends BaseResult
  * A query 'cache' function that uses shallow comparison to cache the most
  * recent calculated result based on the value of the argument.
  */
-export function queryCacheShallow<T extends BaseResource, Result extends BaseResult>(
+export function queryCacheShallow<T extends BaseResource, Result extends CacheResult>(
   handler: CacheHandler<T, Result>
 ) {
   let latestEntry: CacheEntry<T, Result> | null = null;
@@ -51,7 +51,7 @@ export function queryCacheShallow<T extends BaseResource, Result extends BaseRes
  * A query 'cache' function that uses strict comparison to cache the most
  * recent calculated result based on the value of the argument.
  */
-export function queryCacheStrict<T extends BaseResource, Result extends BaseResult>(
+export function queryCacheStrict<T extends BaseResource, Result extends CacheResult>(
   handler: CacheHandler<T, Result>
 ) {
   let latestEntry: CacheEntry<T, Result> | null = null;
@@ -65,35 +65,36 @@ export function queryCacheStrict<T extends BaseResource, Result extends BaseResu
   });
 }
 
-type CacheHandler<T extends BaseResource, Result extends BaseResult> = (
+export type CacheHandler<T extends BaseResource, Result extends CacheResult> = (
   state: ResourceState<T>,
   context: CacheContext,
   result: Result | null
 ) => Result;
 
-interface CacheContext {
+export interface CacheContext {
   args: unknown;
   identMap: WeakMap<Record<string, unknown>, EmptyObject>;
 }
 
-interface CacheEntry<T extends BaseResource, Result> {
+export interface CacheEntry<T extends BaseResource, Result> {
   context: CacheContext;
   state: ResourceState<T>;
   result: Result;
 }
 
-interface BaseResult {
-  reduced: unknown;
+export interface CacheResult<MappedResult = unknown, ReducedResult = unknown> {
+  mapped: MappedResult[];
+  reduced: ReducedResult;
 }
 
-interface CacheInfo<T extends BaseResource, Result extends BaseResult> {
+export interface CacheInfo<T extends BaseResource, Result extends CacheResult> {
   handler: CacheHandler<T, Result>;
   getEntry: (args: unknown) => CacheEntry<T, Result> | null;
   setEntry: (args: unknown, entry: CacheEntry<T, Result>) => void;
   compareArgs: ComparisonFunction<unknown>;
 }
 
-function makeCacheFunction<T extends BaseResource, Result extends BaseResult>(
+function makeCacheFunction<T extends BaseResource, Result extends CacheResult>(
   info: CacheInfo<T, Result>
 ) {
   const { handler, compareArgs, getEntry, setEntry } = info;

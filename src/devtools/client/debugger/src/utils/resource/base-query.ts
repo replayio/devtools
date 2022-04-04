@@ -4,39 +4,81 @@
 
 //
 
-import { getResourceValues, getValidatedResource, makeIdentity } from "./core";
-import { arrayShallowEqual } from "./compare";
+import {
+  getResourceValues,
+  getValidatedResource,
+  makeIdentity,
+  BaseResource,
+  ResourceState,
+  EmptyObject,
+  ResourceId,
+} from "./core";
+import { arrayShallowEqual, ComparisonFunction } from "./compare";
+import type { Mapper } from "./memoize";
+import type { CacheContext, CacheHandler, CacheResult } from "./query-cache";
 
-export function makeMapWithArgs(map) {
-  const wrapper = (resource, identity, args) => map(resource, identity, args);
+export function makeMapWithArgs<T extends BaseResource, Result>(map: Mapper<T, Result>) {
+  const wrapper = (resource: ResourceState<T>, identity: any, args: unknown) =>
+    // @ts-ignore
+    map(resource, identity, args);
   wrapper.needsArgs = true;
   return wrapper;
 }
 
-export function makeResourceQuery({ cache, filter, map, reduce, resultCompare }) {
+export function makeResourceQuery<
+  T extends BaseResource,
+  MapResult,
+  ReduceResult,
+  FinalCacheResult extends CacheResult = CacheResult<MapResult, ReduceResult>
+>({
+  cache,
+  filter,
+  map,
+  reduce,
+  resultCompare,
+}: {
+  cache: (cacheHandler: CacheHandler<T, CacheResult>) => CacheResult;
+  filter: (values: Record<string, T>, args: unknown) => ResourceId[];
+  map: Mapper<T, MapResult>;
+  reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;
+  resultCompare: ComparisonFunction<ReduceResult>;
+}): FinalCacheResult {
   const loadResource = makeResourceMapper(map);
 
-  return cache((state, context, existing) => {
-    const ids = filter(getResourceValues(state), context.args);
-    const mapped = ids.map(id => loadResource(state, id, context));
+  // @ts-ignore
+  return cache(
+    // @ts-ignore
+    (
+      state: ResourceState<T>,
+      context: CacheContext,
+      // @ts-ignore
+      existing: FinalCacheResult
+      // @ts-ignore
+    ): FinalCacheResult => {
+      const ids = filter(getResourceValues(state), context.args);
+      const mapped = ids.map(id => loadResource(state, id, context));
 
-    if (existing && arrayShallowEqual(existing.mapped, mapped)) {
-      // If the items are exactly the same as the existing ones, we return
-      // early to reuse the existing result.
-      return existing;
+      if (existing && arrayShallowEqual(existing.mapped, mapped)) {
+        // If the items are exactly the same as the existing ones, we return
+        // early to reuse the existing result.
+        return existing;
+      }
+
+      const reduced = reduce(mapped, ids, context.args);
+
+      // @ts-ignore
+      if (existing && resultCompare(existing.reduced, reduced)) {
+        return existing;
+      }
+
+      return { mapped, reduced } as FinalCacheResult;
     }
-
-    const reduced = reduce(mapped, ids, context.args);
-
-    if (existing && resultCompare(existing.reduced, reduced)) {
-      return existing;
-    }
-
-    return { mapped, reduced };
-  });
+  );
 }
 
-function makeResourceMapper(map) {
+function makeResourceMapper<T extends BaseResource, MapResult>(
+  map: Mapper<T, MapResult> & { needsArgs?: boolean }
+) {
   return map.needsArgs ? makeResourceArgsMapper(map) : makeResourceNoArgsMapper(map);
 }
 
@@ -46,18 +88,25 @@ function makeResourceMapper(map) {
  * _and_ the arguments being passed to the query. That means they need extra
  * logic when loading those resources.
  */
-function makeResourceArgsMapper(map) {
-  const mapper = (value, identity, context) =>
+function makeResourceArgsMapper<T extends BaseResource, MapResult>(map: Mapper<T, MapResult>) {
+  const mapper = (value: T, identity: EmptyObject, context: CacheContext) =>
     map(value, getIdentity(context.identMap, identity), context.args);
-  return (state, id, context) => getCachedResource(state, id, context, mapper);
+  return (state: ResourceState<T>, id: ResourceId, context: CacheContext) =>
+    getCachedResource(state, id, context, mapper);
 }
 
-function makeResourceNoArgsMapper(map) {
-  const mapper = (value, identity, context) => map(value, identity);
-  return (state, id, context) => getCachedResource(state, id, context, mapper);
+function makeResourceNoArgsMapper<T extends BaseResource, MapResult>(map: Mapper<T, MapResult>) {
+  const mapper = (value: T, identity: EmptyObject, context: CacheContext) => map(value, identity);
+  return (state: ResourceState<T>, id: ResourceId, context: CacheContext) =>
+    getCachedResource(state, id, context, mapper);
 }
 
-function getCachedResource(state, id, context, map) {
+function getCachedResource<T extends BaseResource, MapResult>(
+  state: ResourceState<T>,
+  id: ResourceId,
+  context: CacheContext,
+  map: (value: T, identity: EmptyObject, context: CacheContext) => MapResult
+) {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);
@@ -66,7 +115,7 @@ function getCachedResource(state, id, context, map) {
   return map(validatedState.values[id], validatedState.identity[id], context);
 }
 
-function getIdentity(identMap, identity) {
+function getIdentity(identMap: WeakMap<any, EmptyObject>, identity: any) {
   let ident = identMap.get(identity);
   if (!ident) {
     ident = makeIdentity();

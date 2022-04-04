@@ -5,8 +5,13 @@
 //
 
 import { shallowEqual } from "./compare";
+import { BaseResource } from "./core";
 
-type Mapper<T, Result> = (input: T, identity: any, args: unknown) => Result;
+export type Mapper<T extends BaseResource, Result> = (
+  input: T,
+  identity: any,
+  args?: unknown
+) => Result;
 
 interface MemoizeCacheEntry<T, Result> {
   input: T;
@@ -19,7 +24,7 @@ interface MemoizeCacheEntry<T, Result> {
  * even if the input object is different, as long as the identity is the same
  * and the mapped result is shallow-equal to the most recent mapped value.
  */
-export function memoizeResourceShallow<T, Result>(map: Mapper<T, Result>) {
+export function memoizeResourceShallow<T extends BaseResource, Result>(map: Mapper<T, Result>) {
   const cache = new WeakMap<any, MemoizeCacheEntry<T, Result>>();
 
   const fn = (input: T, identity: any, args: unknown) => {
