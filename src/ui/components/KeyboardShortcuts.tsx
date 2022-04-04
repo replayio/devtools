@@ -11,8 +11,7 @@ import { deselectSource } from "devtools/client/debugger/src/actions/sources/sel
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { getSelectedSource } from "devtools/client/debugger/src/reducers/sources";
 import { features } from "ui/utils/prefs";
-import { Keyboard } from "@recordreplay/playwright";
-import { toggleFocusMode } from "ui/actions/timeline";
+import { isEditableElement } from "ui/utils/key-shortcuts";
 
 function setupShortcuts() {
   return usesWindow(win => {
@@ -82,12 +81,16 @@ function KeyboardShortcuts({
     }
   };
   const toggleTheme = (e: KeyboardEvent) => {
-    e.preventDefault();
-    features.darkMode = !features.darkMode;
+    if (!e.target || !isEditableElement(e.target)) {
+      e.preventDefault();
+      features.darkMode = !features.darkMode;
+    }
   };
   const toggleEditFocusMode = (e: KeyboardEvent) => {
-    e.preventDefault();
-    toggleFocusMode();
+    if (!e.target || !isEditableElement(e.target)) {
+      e.preventDefault();
+      toggleFocusMode();
+    }
   };
 
   // The shortcuts have to be reassigned every time the dependencies change,
