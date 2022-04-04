@@ -4,17 +4,24 @@
 
 //
 
-import { getValidatedResource, getResourceValues } from "./core";
+import {
+  getValidatedResource,
+  getResourceValues,
+  BaseResource,
+  ResourceState,
+  ResourceId,
+  EmptyObject,
+} from "./core";
 
-export function hasResource(state, id) {
+export function hasResource<T extends BaseResource>(state: ResourceState<T>, id: ResourceId) {
   return !!getValidatedResource(state, id);
 }
 
-export function getResourceIds(state) {
+export function getResourceIds<T extends BaseResource>(state: ResourceState<T>) {
   return Object.keys(getResourceValues(state));
 }
 
-export function getResource(state, id) {
+export function getResource<T extends BaseResource>(state: ResourceState<T>, id: ResourceId) {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);
@@ -22,7 +29,11 @@ export function getResource(state, id) {
   return validatedState.values[id];
 }
 
-export function getMappedResource(state, id, map) {
+export function getMappedResource<T extends BaseResource, Result>(
+  state: ResourceState<T>,
+  id: ResourceId,
+  map: (value: T, identity: EmptyObject) => Result
+) {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);

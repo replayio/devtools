@@ -4,17 +4,19 @@
 
 //
 
-type EmptyObject = {
+export type EmptyObject = {
   [K in any]: never;
 };
 
-interface BaseResource {
-  id: string;
+export type ResourceId = string;
+
+export interface BaseResource {
+  id: ResourceId;
 }
 
-interface ResourceState<T extends BaseResource> {
-  identity: Record<string, EmptyObject>;
-  values: Record<string, T>;
+export interface ResourceState<T extends BaseResource> {
+  identity: Record<ResourceId, EmptyObject>;
+  values: Record<ResourceId, T>;
 }
 
 export function createInitial<T extends BaseResource>(): ResourceState<T> {
@@ -51,7 +53,7 @@ export function insertResources<T extends BaseResource>(state: ResourceState<T>,
 
 export function removeResources<T extends BaseResource>(
   state: ResourceState<T>,
-  resources: (string | BaseResource)[]
+  resources: (ResourceId | BaseResource)[]
 ) {
   if (resources.length === 0) {
     return state;
@@ -135,7 +137,10 @@ export function makeIdentity(): EmptyObject {
   return {};
 }
 
-export function getValidatedResource<T extends BaseResource>(state: ResourceState<T>, id: string) {
+export function getValidatedResource<T extends BaseResource>(
+  state: ResourceState<T>,
+  id: ResourceId
+) {
   const value = state.values[id];
   const identity = state.identity[id];
   if ((value && !identity) || (!value && identity)) {
