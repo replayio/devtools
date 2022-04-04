@@ -37,7 +37,7 @@ export function makeResourceQuery<
   reduce,
   resultCompare,
 }: {
-  cache: (cacheHandler: CacheHandler<T, CacheResult>) => CacheResult;
+  cache: (cacheHandler: CacheHandler<T, MapResult, ReduceResult>) => ReduceResult;
   filter: (values: Record<string, T>, args: unknown) => ResourceId[];
   map: Mapper<T, MapResult>;
   reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;

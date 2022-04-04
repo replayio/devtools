@@ -11,10 +11,13 @@ import { EmptyObject, BaseResource, ResourceState } from "./core";
  * A query 'cache' function that uses the identity of the arguments object to
  * cache data for the query itself.
  */
-export function queryCacheWeak<T extends BaseResource, Result extends CacheResult>(
-  handler: CacheHandler<T, Result>
-) {
-  const cache = new WeakMap();
+export function queryCacheWeak<
+  T extends BaseResource,
+  MapResult = unknown,
+  ReduceResult = unknown,
+  Result extends CacheResult<MapResult, ReduceResult> = CacheResult<MapResult, ReduceResult>
+>(handler: CacheHandler<T, MapResult, ReduceResult>) {
+  const cache = new WeakMap<any, Result>();
   return makeCacheFunction({
     handler,
     // The WeakMap will only return entries for the exact object,
@@ -33,15 +36,19 @@ export function queryCacheWeak<T extends BaseResource, Result extends CacheResul
  * A query 'cache' function that uses shallow comparison to cache the most
  * recent calculated result based on the value of the argument.
  */
-export function queryCacheShallow<T extends BaseResource, Result extends CacheResult>(
-  handler: CacheHandler<T, Result>
-) {
+export function queryCacheShallow<
+  T extends BaseResource,
+  MapResult = unknown,
+  ReduceResult = unknown,
+  Result extends CacheResult<MapResult, ReduceResult> = CacheResult<MapResult, ReduceResult>
+>(handler: CacheHandler<T, unknown, unknown>) {
   let latestEntry: CacheEntry<T, Result> | null = null;
   return makeCacheFunction({
     handler,
     compareArgs: shallowEqual,
     getEntry: () => latestEntry,
     setEntry: (args, entry) => {
+      // @ts-ignore
       latestEntry = entry;
     },
   });
@@ -51,32 +58,37 @@ export function queryCacheShallow<T extends BaseResource, Result extends CacheRe
  * A query 'cache' function that uses strict comparison to cache the most
  * recent calculated result based on the value of the argument.
  */
-export function queryCacheStrict<T extends BaseResource, Result extends CacheResult>(
-  handler: CacheHandler<T, Result>
-) {
+export function queryCacheStrict<
+  T extends BaseResource,
+  MapResult = unknown,
+  ReduceResult = unknown,
+  Result extends CacheResult<MapResult, ReduceResult> = CacheResult<MapResult, ReduceResult>
+>(handler: CacheHandler<T, unknown, unknown>) {
   let latestEntry: CacheEntry<T, Result> | null = null;
   return makeCacheFunction({
     handler,
     compareArgs: strictEqual,
     getEntry: () => latestEntry,
     setEntry: (args, entry) => {
+      // @ts-ignore
       latestEntry = entry;
     },
   });
 }
 
-export type CacheHandler<T extends BaseResource, Result extends CacheResult> = (
-  state: ResourceState<T>,
-  context: CacheContext,
-  result: Result | null
-) => Result;
+export type CacheHandler<
+  T extends BaseResource,
+  MapResult,
+  ReduceResult,
+  Result = CacheResult<MapResult, ReduceResult>
+> = (state: ResourceState<T>, context: CacheContext, result: Result | null) => Result;
 
 export interface CacheContext {
   args: unknown;
   identMap: WeakMap<Record<string, unknown>, EmptyObject>;
 }
 
-export interface CacheEntry<T extends BaseResource, Result> {
+export interface CacheEntry<T extends BaseResource, Result extends CacheResult> {
   context: CacheContext;
   state: ResourceState<T>;
   result: Result;
@@ -87,15 +99,23 @@ export interface CacheResult<MappedResult = unknown, ReducedResult = unknown> {
   reduced: ReducedResult;
 }
 
-export interface CacheInfo<T extends BaseResource, Result extends CacheResult> {
-  handler: CacheHandler<T, Result>;
-  getEntry: (args: unknown) => CacheEntry<T, Result> | null;
-  setEntry: (args: unknown, entry: CacheEntry<T, Result>) => void;
+export interface CacheInfo<
+  T extends BaseResource,
+  MapResult = unknown,
+  ReduceResult = unknown,
+  FinalCacheResult extends CacheResult<MapResult, ReduceResult> = CacheResult<
+    MapResult,
+    ReduceResult
+  >
+> {
+  handler: CacheHandler<T, MapResult, ReduceResult>;
+  getEntry: (args: unknown) => CacheEntry<T, FinalCacheResult> | null;
+  setEntry: (args: unknown, entry: CacheEntry<T, FinalCacheResult>) => void;
   compareArgs: ComparisonFunction<unknown>;
 }
 
-function makeCacheFunction<T extends BaseResource, Result extends CacheResult>(
-  info: CacheInfo<T, Result>
+function makeCacheFunction<T extends BaseResource, MapResult = unknown, ReduceResult = unknown>(
+  info: CacheInfo<T, MapResult, ReduceResult>
 ) {
   const { handler, compareArgs, getEntry, setEntry } = info;
 
