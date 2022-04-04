@@ -11,10 +11,8 @@ function LoginModal() {
     <Modal>
       <Dialog style={{ animation: "linearFadeIn ease 200ms", width: 400 }}>
         <DialogLogo />
-        <DialogTitle>Free Trial Expired</DialogTitle>
-        <DialogDescription>
-          This replay is unavailable because it was recorded after your team's free trial expired.
-        </DialogDescription>
+        <DialogTitle>Sign In Required</DialogTitle>
+        <DialogDescription>You need to be signed in to leave a comment</DialogDescription>
         <DialogActions>
           <PrimaryButton color="blue" onClick={loginAndReturn}>
             Sign In
