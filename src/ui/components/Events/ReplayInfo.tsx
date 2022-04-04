@@ -10,7 +10,11 @@ import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import { showDurationWarning, getRecordingId } from "ui/utils/recording";
+import {
+  showDurationWarning,
+  showEnvironmentVariablesWarning,
+  getRecordingId,
+} from "ui/utils/recording";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
@@ -85,13 +89,25 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
-        {showDurationWarning(recording) ? <WarningRow /> : null}
+        {showEnvironmentVariablesWarning(recording) ? <EnvironmentVariablesRow /> : null}
+        {showDurationWarning(recording) ? <DurationWarningRow /> : null}
       </div>
     </div>
   );
 }
 
-function WarningRow() {
+function EnvironmentVariablesRow() {
+  return (
+    <div className="group">
+      <Row>
+        <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+        <div>ENV VARIABLES, Y'ALL!</div>
+      </Row>
+    </div>
+  );
+}
+
+function DurationWarningRow() {
   return (
     <div className="group">
       <Row>
