@@ -5,6 +5,8 @@ import { extractIdAndSlug, SLUG_SEPARATOR } from "./helpers";
 
 const WARNING_MS = 60 * 2 * 1000;
 export const showDurationWarning = (recording: Recording) => recording.duration > WARNING_MS;
+export const showEnvironmentVariablesWarning = (recording: Recording) =>
+  recording.duration > WARNING_MS; // note to Jaril -- this is where I'm going to do the check, for now it's the same as the duration warning
 
 export function getRecordingURL(recording: Recording): string {
   let id = recording.id;
