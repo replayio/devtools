@@ -20,12 +20,14 @@ export function setBreakableLines(cx, sourceId) {
   };
 }
 
-export function setBreakpointHitCounts(sourceId, onFailure) {
+export function setBreakpointHitCounts(sourceId, lineNumber, onFailure) {
   return async (dispatch, getState) => {
     const actors = getSourceActorsForSource(getState(), sourceId);
 
     return Promise.all(
-      actors.map(actor => dispatch(loadSourceActorBreakpointHitCounts({ id: actor.id, onFailure })))
+      actors.map(actor =>
+        dispatch(loadSourceActorBreakpointHitCounts({ id: actor.id, lineNumber, onFailure }))
+      )
     );
   };
 }

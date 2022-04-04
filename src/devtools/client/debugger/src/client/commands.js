@@ -6,6 +6,7 @@
 
 import { prepareSourcePayload, createFrame } from "./create";
 import { clientEvents } from "./events";
+import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const { fetchEventTypePoints } = require("protocol/logpoint");
@@ -332,9 +333,20 @@ async function getSourceActorBreakableLines({ actor }) {
   return positions.map(({ line }) => line);
 }
 
-async function getSourceActorBreakpointHitCounts({ actor, id }, onFailure) {
+async function getSourceActorBreakpointHitCounts({ id }, lineNumber, onFailure) {
   const locations = await ThreadFront.getBreakpointPositionsCompressed(id);
-  return ThreadFront.getHitCounts(id, locations).catch(onFailure);
+  // See `source-actors` where MAX_LINE_HITS_TO_FETCH is defined for an
+  // explanation of the bounds here.
+  const lowerBound = Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH;
+  const upperBound = lowerBound + MAX_LINE_HITS_TO_FETCH;
+  const locationsToFetch = locations.filter(
+    location => location.line >= lowerBound && location.line < upperBound
+  );
+  return {
+    min: lowerBound,
+    max: upperBound,
+    ...(await ThreadFront.getHitCounts(id, locationsToFetch).catch(onFailure)),
+  };
 }
 
 function getFrontByID(actorID) {

@@ -12,7 +12,6 @@ import {
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
-import compact from "lodash/compact";
 
 export function insertSourceActor(item) {
   return insertSourceActors([item]);
@@ -76,24 +75,34 @@ export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorB
   },
 });
 
+export const MAX_LINE_HITS_TO_FETCH = 1000;
+// This will fetch hitCounts in chunks of lines. So if line 4 is request, lines
+// 1-500 will be fetched. If line 501 is request, lines 500-1000 will be
+// fetched.
 export const loadSourceActorBreakpointHitCounts = memoizeableAction(
   "loadSourceActorBreakpointHitCounts",
   {
-    createKey: ({ id }, { getState }) => {
+    createKey: ({ id, lineNumber }, { getState }) => {
       const state = getState();
-      return compact([
+      // We need to refetch if: we are beyond the maximum number of line hits fetchable
+      // Or the focusRegion has changed
+      const key = [
         id,
+        Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH,
         state.timeline.focusRegion?.startTime,
         state.timeline.focusRegion?.endTime,
-      ]).join("-");
+      ].join("-");
+      return key;
     },
-    getValue: ({ id }, { getState }) => getSourceActorBreakpointHitCounts(getState(), id),
-    action: async ({ id, onFailure }, { dispatch, getState, client }) => {
+    getValue: ({ id, lineNumber }, { getState }) =>
+      getSourceActorBreakpointHitCounts(getState(), id, lineNumber),
+    action: async ({ id, lineNumber, onFailure }, { dispatch, getState, client }) => {
       await dispatch({
         type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
         id,
         [PROMISE]: client.getSourceActorBreakpointHitCounts(
           getSourceActor(getState(), id),
+          lineNumber,
           onFailure
         ),
       });

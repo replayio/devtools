@@ -47,7 +47,8 @@ export function SourceOutline({
 
   useEffect(() => {
     if (selectedSource) {
-      dispatch(setBreakpointHitCounts(selectedSource.id));
+      // We start by loading the first N lines of hits, where N is the line limit.
+      dispatch(setBreakpointHitCounts(selectedSource.id, 1));
     }
   }, [selectedSource?.id]);
 

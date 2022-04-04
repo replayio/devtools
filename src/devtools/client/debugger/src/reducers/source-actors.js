@@ -116,7 +116,25 @@ function updateBreakpointHitCounts(state, action) {
     return state;
   }
 
-  return updateResources(state, [{ id: sourceId, breakpointHitCounts: action.value.hits }]);
+  const {
+    min: currentMin,
+    max: currentMax,
+    breakpointHitCounts: currentBreakpointHitCounts,
+  } = {
+    min: Infinity,
+    max: 0,
+    breakpointHitCounts: [],
+    ...state.values[sourceId],
+  };
+
+  return updateResources(state, [
+    {
+      id: sourceId,
+      breakpointHitCounts: [...currentBreakpointHitCounts, ...action.value.hits],
+      min: Math.min(currentMin, action.value.min),
+      max: Math.max(currentMax, action.value.max),
+    },
+  ]);
 }
 
 function clearBreakpointHitCounts(state) {
@@ -193,8 +211,15 @@ export function getAllThreadsBySource(state) {
   return queryThreadsBySourceObject(state.sourceActors);
 }
 
-export function getSourceActorBreakpointHitCounts(state, id) {
-  const { breakpointHitCounts } = getResource(state.sourceActors, id);
+export function getSourceActorBreakpointHitCounts(state, id, lineNumber) {
+  const { breakpointHitCounts, min, max } = getResource(state.sourceActors, id);
+  // It's important for `memoizableAction` that we don't return a promise for a
+  // different line range (for instance, returning a promise when line 1001 is
+  // requested, even though we are only currently loading lines 1-1000). This is
+  // why we keep track of the min and max requested.
+  if (!breakpointHitCounts || max < lineNumber || min > lineNumber) {
+    return null;
+  }
 
   return asSettled(breakpointHitCounts);
 }
