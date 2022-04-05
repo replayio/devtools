@@ -4,8 +4,7 @@
 
 //  "use strict";
 
-const { moduleExpression } = require("@babel/types");
-const asyncStorage = require("./async-storage");
+export const asyncStorage = require("./async-storage");
 
 /*
  * asyncStoreHelper wraps asyncStorage so that it is easy to define project
@@ -16,7 +15,7 @@ const asyncStorage = require("./async-storage");
  *   asyncStore.a         // => asyncStorage.getItem("r._a")
  *   asyncStore.a = 2     // => asyncStorage.setItem("r._a", 2)
  */
-function asyncStoreHelper(root, mappings) {
+export function asyncStoreHelper(root, mappings) {
   let store = {};
 
   function getMappingKey(key) {
@@ -52,5 +51,3 @@ function asyncStoreHelper(root, mappings) {
 
   return store;
 }
-
-module.exports = { asyncStoreHelper };
