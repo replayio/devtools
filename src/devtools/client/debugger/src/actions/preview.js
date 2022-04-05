@@ -78,7 +78,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       path: expression,
       contents: result,
     });
-    const properties = await root.loadChildren();
+    await root.loadChildren();
 
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should
@@ -94,7 +94,6 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       previewId,
       value: {
         resultGrip: result,
-        properties,
         root,
       },
     });

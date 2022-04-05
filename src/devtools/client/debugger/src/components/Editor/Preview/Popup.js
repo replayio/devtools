@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import React, { Component } from "react";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
@@ -134,14 +132,9 @@ export class Popup extends Component {
 
   getPreviewType() {
     const {
-      preview: { root, properties },
+      preview: { root },
     } = this.props;
-    if (
-      root.isPrimitive() ||
-      (root.type === "value" && root.isFunction()) ||
-      !Array.isArray(properties) ||
-      properties.length === 0
-    ) {
+    if (root.isPrimitive() || (root.type === "value" && root.isFunction())) {
       return "tooltip";
     }
 
