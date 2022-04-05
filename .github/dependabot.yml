@@ -10,3 +10,6 @@ updates:
     open-pull-requests-limit: 15
     pull-request-branch-name:
       separator: "-"
+    ignore:
+    - dependency-name: "react-devtools-inline"
+    - dependency-name: "react-dom"
