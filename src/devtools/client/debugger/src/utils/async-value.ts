@@ -4,36 +4,64 @@
 
 //
 
-export function pending() {
+type PendingStatus = { state: "pending" };
+type FulfilledStatus<FulfilledValue> = { state: "fulfilled"; value: FulfilledValue };
+type RejectedStatus<RejectedValue = unknown> = { state: "rejected"; value: RejectedValue };
+
+type AsyncValue<FulfilledValue, RejectedValue = unknown> =
+  | PendingStatus
+  | FulfilledStatus<FulfilledValue>
+  | RejectedStatus<RejectedValue>;
+
+export function pending(): PendingStatus {
   return { state: "pending" };
 }
-export function fulfilled(value) {
+export function fulfilled<T>(value: T): FulfilledStatus<T> {
   return { state: "fulfilled", value };
 }
-export function rejected(value) {
+export function rejected<T>(value: T): RejectedStatus<T> {
   return { state: "rejected", value };
 }
 
-export function asSettled(value) {
-  return value && value.state !== "pending" ? value : null;
+export function asSettled<FulfilledValue, RejectedValue = unknown>(
+  statusEntry: AsyncValue<FulfilledValue, RejectedValue>
+) {
+  if (statusEntry) {
+    if (isFulfilled<FulfilledValue>(statusEntry)) {
+      return statusEntry.value;
+    } else if (isRejected<RejectedValue>(statusEntry)) {
+      return statusEntry.value;
+    }
+  }
+
+  return null;
+
+  // return value && value.state !== "pending" ? value : null;
 }
 
-export function isPending(value) {
-  return value.state === "pending";
+export function isPending(statusEntry: any): statusEntry is PendingStatus {
+  return statusEntry.state === "pending";
 }
-export function isFulfilled(value) {
-  return value.state === "fulfilled";
+export function isFulfilled<T>(statusEntry: any): statusEntry is FulfilledStatus<T> {
+  return statusEntry.state === "fulfilled";
 }
-export function isRejected(value) {
-  return value.state === "rejected";
+export function isRejected<T>(statusEntry: any): statusEntry is RejectedStatus<T> {
+  return statusEntry.state === "rejected";
 }
 
-export function asyncActionAsValue(action) {
+type AsyncAction<FulfilledValue, RejectedValue = unknown> =
+  | { status: "start" }
+  | { status: "error"; error: RejectedValue }
+  | { status: "done"; value: FulfilledValue };
+
+export function asyncActionAsValue<FulfilledValue, RejectedValue = unknown>(
+  action: AsyncAction<FulfilledValue, RejectedValue>
+) {
   if (action.status === "start") {
     return pending();
   }
   if (action.status === "error") {
-    return rejected(action.error);
+    return rejected<RejectedValue>(action.error);
   }
-  return fulfilled(action.value);
+  return fulfilled<FulfilledValue>(action.value);
 }
