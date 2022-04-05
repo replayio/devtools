@@ -8,7 +8,7 @@ type PendingStatus = { state: "pending" };
 type FulfilledStatus<FulfilledValue> = { state: "fulfilled"; value: FulfilledValue };
 type RejectedStatus<RejectedValue = unknown> = { state: "rejected"; value: RejectedValue };
 
-type AsyncValue<FulfilledValue, RejectedValue = unknown> =
+export type AsyncValue<FulfilledValue, RejectedValue = unknown> =
   | PendingStatus
   | FulfilledStatus<FulfilledValue>
   | RejectedStatus<RejectedValue>;
