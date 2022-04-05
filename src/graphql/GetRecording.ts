@@ -95,6 +95,7 @@ export interface GetRecording_recording {
   ownerNeedsInvite: boolean;
   userRole: string;
   operations: any | null;
+  resolution: any | null;
   comments: GetRecording_recording_comments[];
   owner: GetRecording_recording_owner | null;
   workspace: GetRecording_recording_workspace | null;
