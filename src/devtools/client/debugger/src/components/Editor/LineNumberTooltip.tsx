@@ -117,7 +117,7 @@ export default function LineNumberTooltip({
       if (lineNumber === lastHoveredLineNumber.current) {
         if (codeHeatMaps) {
           dispatch(
-            setBreakpointHitCounts(source.id, () => {
+            setBreakpointHitCounts(source!.id, () => {
               setCodeHeatMaps(false);
               dispatch(runAnalysisOnLine(lineNumber));
             })
