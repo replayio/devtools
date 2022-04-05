@@ -38,6 +38,7 @@ import {
   getSourceActors,
   getBreakableLinesForSourceActors,
   getSourceActorBreakpointHitCounts,
+  SourceActor,
 } from "./source-actors";
 import uniq from "lodash/uniq";
 
@@ -48,19 +49,6 @@ export interface Location {
   sourceId: string;
   sourceUrl: string;
   // other fields? sourceId?
-}
-
-export interface SourceActor {
-  actor: string;
-  id: string;
-  introductionType?: unknown;
-  introductionUrl?: string;
-  source: string;
-  sourceMapURL?: string;
-  thread: string;
-  url: string;
-  breakableLines?: unknown | null;
-  breakpointPositions?: Map<unknown, unknown>;
 }
 
 export interface SourceContent {
@@ -467,7 +455,6 @@ const getSourcesState = (state: UIState) => state.sources;
 
 export function getSourceThreads(state: UIState, source: Source) {
   return uniq(
-    // @ts-expect-error TODO Fix this when source-actors is TS-ified
     getSourceActors(state, state.sources.actors[source.id]).map(
       (actor: SourceActor) => actor.thread
     )
@@ -669,7 +656,8 @@ export function getSelectedSourceId(state: UIState) {
 }
 
 export function getHitCountsForSource(state: UIState, sourceId: string): HitCount[] {
-  return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId]);
+  // @ts-ignore TODO Fix string[]/string mismatch
+  return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId])!;
 }
 
 export function getHitCountsForSelectedSource(state: UIState) {
@@ -708,12 +696,10 @@ export function canLoadSource(state: UIState, sourceId: string) {
   }
 
   const actors = getSourceActorsForSource(state, sourceId);
-  // @ts-expect-error Fix this when source-actors is TS-ified
   return actors.length != 0;
 }
 
 export function isSourceWithMap(state: UIState, id: string): boolean {
-  // @ts-expect-error Fix this when source-actors is TS-ified
   return getSourceActorsForSource(state, id).some(sourceActor => sourceActor.sourceMapURL);
 }
 
