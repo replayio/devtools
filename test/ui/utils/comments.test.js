@@ -7,34 +7,37 @@ describe("commentKeys", () => {
     const secondsAgo = freezeTime(Date.now());
 
     const optimisticResponse = [
-      { user: { id: "1" }, createdAt: secondsAgo(5) },
-      { user: { id: "1" }, createdAt: secondsAgo(30) },
-      { user: { id: "1" }, createdAt: secondsAgo(15) },
+      { id: "A", user: { id: "1" }, createdAt: secondsAgo(5) },
+      { id: "B", user: { id: "1" }, createdAt: secondsAgo(30) },
+      { id: "C", user: { id: "1" }, createdAt: secondsAgo(15) },
     ];
     const serverResponse = [
-      { user: { id: "1" }, createdAt: secondsAgo(6) },
-      { user: { id: "1" }, createdAt: secondsAgo(28) },
-      { user: { id: "1" }, createdAt: secondsAgo(14) },
+      { id: "A", user: { id: "1" }, createdAt: secondsAgo(6) },
+      { id: "B", user: { id: "1" }, createdAt: secondsAgo(28) },
+      { id: "C", user: { id: "1" }, createdAt: secondsAgo(14) },
     ];
 
-    // Notice the one-indexing, because 0 is falsey and sometimes that leads to subtle bugs
-    expect(commentKeys(optimisticResponse)).toEqual(["3", "1", "2"]);
-    expect(commentKeys(serverResponse)).toEqual(["3", "1", "2"]);
+    // Compare comment IDs, since the "createdAt" timestamps are expected to change.
+    expect(optimisticResponse.map(({ id }) => id)).toEqual(["A", "B", "C"]);
+    expect(serverResponse.map(({ id }) => id)).toEqual(["A", "B", "C"]);
   });
 
   test("includes source location and point if present", () => {
     const secondsAgo = freezeTime(Date.now());
 
     const comments = [
-      { user: { id: "1" }, createdAt: secondsAgo(1), point: "1" },
+      { id: "A", user: { id: "1" }, createdAt: secondsAgo(1), point: "123" },
       {
+        id: "B",
         user: { id: "1" },
         createdAt: secondsAgo(2),
-        point: "2",
-        sourceLocation: { sourceId: "abc", line: 10 },
+        point: "234",
+        sourceLocation: { sourceId: "abc", line: 567 },
       },
     ];
 
-    expect(commentKeys(comments)).toEqual(["2-1", "1-2-abc-10"]);
+    const keys = commentKeys(comments);
+    expect(keys[0]).toContain("123");
+    expect(keys[1]).toContain("234-abc-567");
   });
 });
