@@ -4,7 +4,7 @@
 
 //
 
-import { asSettled } from "../utils/async-value";
+import { asSettled, asyncActionAsValue } from "../utils/async-value";
 import {
   createInitial,
   insertResources,
@@ -18,7 +18,6 @@ import {
   makeReduceAllQuery,
 } from "../utils/resource";
 
-import { asyncActionAsValue } from "ui/setup/redux/middleware/promise";
 
 const initial = createInitial();
 

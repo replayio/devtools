@@ -27,3 +27,13 @@ export function isFulfilled(value) {
 export function isRejected(value) {
   return value.state === "rejected";
 }
+
+export function asyncActionAsValue(action) {
+  if (action.status === "start") {
+    return pending();
+  }
+  if (action.status === "error") {
+    return rejected(action.error);
+  }
+  return fulfilled(action.value);
+}
