@@ -59,18 +59,14 @@ describe("Web Console UI", () => {
     const filterInput = await findByPlaceholderText("Filter Output");
 
     // There are five message with "circle" in the description. Filter by text.
-    act(() => {
-      userEvent.type(filterInput, "cir");
-    });
+    await userEvent.type(filterInput, "cir");
 
     const filteredListItems = getListItems();
     expect(filteredListItems.length).toBe(5);
 
     // Clear out the text filter
     const clearTextButton = await findByRole("button", { name: "close" });
-    act(() => {
-      userEvent.click(clearTextButton);
-    });
+    await userEvent.click(clearTextButton);
 
     const loadedListItems2 = getListItems();
     expect(loadedListItems2.length).toBe(loadedListItems.length);
@@ -80,16 +76,12 @@ describe("Web Console UI", () => {
       name: /^Logs/,
     });
 
-    act(() => {
-      userEvent.click(logsCheckbox);
-    });
+    await userEvent.click(logsCheckbox);
 
     const filteredListItems2 = getListItems();
     expect(filteredListItems2.length).toBe(0);
 
-    act(() => {
-      userEvent.click(logsCheckbox);
-    });
+    await userEvent.click(logsCheckbox);
 
     const loadedListItems3 = getListItems();
     expect(loadedListItems3.length).toBe(loadedListItems.length);
