@@ -8,9 +8,10 @@ import MaterialIcon from "../shared/MaterialIcon";
 import Icon from "../shared/Icon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
+import { getRecordingTarget } from "ui/reducers/app";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
@@ -32,6 +33,8 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
 function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
   const { isAuthenticated } = useAuth0();
+  const recordingTarget = useSelector(getRecordingTarget);
+  const showEnvironmentVariables = recordingTarget == "node";
 
   if (!recording) {
     return null;
@@ -54,7 +57,6 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-
         <div className="group">
           {isAuthenticated ? (
             <Row>
@@ -69,33 +71,49 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           ) : null}
         </div>
         <div className="group">
-          <Row>
-            <Icon
-              filename="external"
-              className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
-            />
-            <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
-              <a href={recording.url} target="_blank" rel="noopener noreferrer">
-                {getDisplayedUrl(recording.url)}
-              </a>
-            </div>
-          </Row>
+          {recording.url ? (
+            <Row>
+              <Icon
+                filename="external"
+                className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
+              />
+              <div
+                className="overflow-hidden overflow-ellipsis whitespace-pre"
+                title={recording.url}
+              >
+                <a href={recording.url} target="_blank" rel="noopener noreferrer">
+                  {getDisplayedUrl(recording.url)}
+                </a>
+              </div>
+            </Row>
+          ) : null}
         </div>
-
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
         ) : null}
-        {showDurationWarning(recording) ? <WarningRow /> : null}
+        {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
+        {showDurationWarning(recording) ? <DurationWarningRow /> : null}
       </div>
     </div>
   );
 }
 
-function WarningRow() {
+function EnvironmentVariablesRow() {
   return (
     <div className="group">
       <Row>
-        <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+        <Icon filename="warning" className="bg-iconColor" />
+        <div>This node recording contains all environment variables</div>
+      </Row>
+    </div>
+  );
+}
+
+function DurationWarningRow() {
+  return (
+    <div className="group">
+      <Row>
+        <Icon filename="warning" className="bg-iconColor" />
         <div>This replay is over two minutes, which can cause delays</div>
       </Row>
     </div>
@@ -110,6 +128,10 @@ function OperationsRow({
   onClick: () => void;
 }) {
   const uniqueDomains = getUniqueDomains(operations);
+
+  if (uniqueDomains.length == 0) {
+    return;
+  }
 
   return (
     <div className="group">
