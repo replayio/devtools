@@ -260,12 +260,6 @@ function update(state = initialSourcesState(), action: AnyAction) {
         },
       };
     }
-    case "NAVIGATE":
-      return {
-        ...initialSourcesState(),
-        epoch: state.epoch + 1,
-      };
-
     case "SET_FOCUSED_SOURCE_ITEM":
       return { ...state, focusedItem: action.item };
 

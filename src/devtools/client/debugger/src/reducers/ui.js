@@ -96,10 +96,6 @@ function update(state = createUIState(), action) {
       return { ...state, cursorPosition: action.cursorPosition };
     }
 
-    case "NAVIGATE": {
-      return { ...state, activeSearch: null, highlightedLineRange: {} };
-    }
-
     default: {
       return state;
     }

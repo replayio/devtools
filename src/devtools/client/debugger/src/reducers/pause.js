@@ -187,22 +187,6 @@ function update(state = createPauseState(), action) {
     case "EVALUATE_EXPRESSION":
       return { ...state, command: action.status === "start" ? "expression" : null };
 
-    case "NAVIGATE": {
-      const navigateCounter = state.cx.navigateCounter + 1;
-      return {
-        ...state,
-        cx: {
-          navigateCounter,
-        },
-        threadcx: {
-          navigateCounter,
-          pauseCounter: 0,
-          isPaused: false,
-        },
-        ...resumedPauseState,
-      };
-    }
-
     case "SET_EXPANDED_SCOPE": {
       const { path, expanded } = action;
       const expandedScopes = new Set(state.expandedScopes);
@@ -213,10 +197,6 @@ function update(state = createPauseState(), action) {
       }
       return { ...state, expandedScopes };
     }
-
-    case "BATCH":
-      action.updates.forEach(u => (state = update(state, u)));
-      return state;
   }
 
   return state;

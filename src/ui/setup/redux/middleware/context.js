@@ -47,13 +47,9 @@ function actionLogData(action) {
 }
 
 function logAction(action) {
-  if (action.type == "BATCH") {
-    action.updates.forEach(logAction);
-  } else {
-    const data = actionLogData(action);
-    const status = action.status ? ` [${action.status}]` : "";
-    log(`Debugger ${action.type}${data}${status}`);
-  }
+  const data = actionLogData(action);
+  const status = action.status ? ` [${action.status}]` : "";
+  log(`Debugger ${action.type}${data}${status}`);
 }
 
 // Middleware which looks for actions that have a cx property and ignores

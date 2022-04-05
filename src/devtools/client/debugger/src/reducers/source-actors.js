@@ -42,11 +42,6 @@ export default function update(state = initial, action) {
       break;
     }
 
-    case "NAVIGATE": {
-      state = initial;
-      break;
-    }
-
     case "SET_SOURCE_ACTOR_BREAKPOINT_COLUMNS":
       state = updateBreakpointColumns(state, action);
       break;
