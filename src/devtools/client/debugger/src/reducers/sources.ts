@@ -276,7 +276,8 @@ export const resourceAsSourceBase = memoizeResourceShallow(
 
 const resourceAsSourceWithContent = memoizeResourceShallow(({ content, ...source }: Source) => ({
   ...source,
-  content: asSettled(content),
+  // @ts-ignore Ignore async value errors for now
+  content: asSettled(content!),
 }));
 
 /*
@@ -658,6 +659,7 @@ export function getSourceWithContent(state: UIState, id: string) {
 }
 export function getSourceContent(state: UIState, id: string) {
   const { content } = getResource(state.sources.sources, id);
+  // @ts-ignore Ignore async value errors for now
   return asSettled(content);
 }
 
@@ -785,6 +787,7 @@ export function getTextAtLocation(state: UIState, id: string, location: Location
   if (!content) {
     return null;
   }
+  // @ts-ignore Ignore async value errors for now
   const text = getTextAtPosition(id, content, { ...location, column: 0 });
 
   return text;
