@@ -16,4 +16,20 @@ describe("getLibraryFromUrl", () => {
       getLibraryFromUrl({ source: { url: "https://www.foo.com/bar/shared/react.js" } })
     ).toEqual("React");
   });
+
+  test("NextJS library", () => {
+    expect(
+      getLibraryFromUrl({
+        source: { url: "https://www.foo.com/_next/static/chunks/framework-f82aae7a1453fce0.js" },
+      })
+    ).toEqual("NextJS");
+  });
+
+  test("NextJS bundle application", () => {
+    expect(
+      getLibraryFromUrl({
+        source: { url: "https://www.foo.com/_next/static/chunks/pages/_app-foobarbaz.js" },
+      })
+    ).toEqual(null);
+  });
 });
