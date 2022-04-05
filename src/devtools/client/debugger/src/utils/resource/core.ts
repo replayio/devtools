@@ -4,14 +4,29 @@
 
 //
 
-export function createInitial() {
+export type EmptyObject = {
+  [K in any]: never;
+};
+
+export type ResourceId = string;
+
+export interface BaseResource {
+  id: ResourceId;
+}
+
+export interface ResourceState<T extends BaseResource> {
+  identity: Record<ResourceId, EmptyObject>;
+  values: Record<ResourceId, T>;
+}
+
+export function createInitial<T extends BaseResource>(): ResourceState<T> {
   return {
     identity: {},
     values: {},
   };
 }
 
-export function insertResources(state, resources) {
+export function insertResources<T extends BaseResource>(state: ResourceState<T>, resources: T[]) {
   if (resources.length === 0) {
     return state;
   }
@@ -36,7 +51,10 @@ export function insertResources(state, resources) {
   return state;
 }
 
-export function removeResources(state, resources) {
+export function removeResources<T extends BaseResource>(
+  state: ResourceState<T>,
+  resources: (ResourceId | BaseResource)[]
+) {
   if (resources.length === 0) {
     return state;
   }
@@ -64,7 +82,10 @@ export function removeResources(state, resources) {
   return state;
 }
 
-export function updateResources(state, resources) {
+export function updateResources<T extends BaseResource>(
+  state: ResourceState<T>,
+  resources: (BaseResource & Partial<T>)[]
+) {
   if (resources.length === 0) {
     return state;
   }
@@ -89,7 +110,9 @@ export function updateResources(state, resources) {
         continue;
       }
 
+      // @ts-ignore No guarantee keys in objects, etc
       if (subset[field] !== existing[field]) {
+        // @ts-ignore
         updated[field] = subset[field];
       }
     }
@@ -110,11 +133,14 @@ export function updateResources(state, resources) {
   return state;
 }
 
-export function makeIdentity() {
+export function makeIdentity(): EmptyObject {
   return {};
 }
 
-export function getValidatedResource(state, id) {
+export function getValidatedResource<T extends BaseResource>(
+  state: ResourceState<T>,
+  id: ResourceId
+) {
   const value = state.values[id];
   const identity = state.identity[id];
   if ((value && !identity) || (!value && identity)) {
@@ -124,6 +150,6 @@ export function getValidatedResource(state, id) {
   return value ? state : null;
 }
 
-export function getResourceValues(state) {
+export function getResourceValues<T extends BaseResource>(state: ResourceState<T>) {
   return state.values;
 }
