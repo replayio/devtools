@@ -7,6 +7,7 @@
     "dev": "next dev -p 8080 ",
     "export": "next build && next export -o dist",
     "test": "jest",
+    "test:watch": "jest --watch",
     "start": "next start -p 8080",
     "build": "next build",
     "lint": "next lint",
