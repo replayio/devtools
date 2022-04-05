@@ -8,7 +8,7 @@ type PendingStatus = { state: "pending" };
 type FulfilledStatus<FulfilledValue> = { state: "fulfilled"; value: FulfilledValue };
 type RejectedStatus<RejectedValue = unknown> = { state: "rejected"; value: RejectedValue };
 
-type AsyncValue<FulfilledValue, RejectedValue = unknown> =
+export type AsyncValue<FulfilledValue, RejectedValue = unknown> =
   | PendingStatus
   | FulfilledStatus<FulfilledValue>
   | RejectedStatus<RejectedValue>;
@@ -26,6 +26,9 @@ export function rejected<T>(value: T): RejectedStatus<T> {
 export function asSettled<FulfilledValue, RejectedValue = unknown>(
   statusEntry: AsyncValue<FulfilledValue, RejectedValue>
 ) {
+  // Originally, the logic was:
+  // `return value && value.state !== "pending" ? value : null;`
+  // Updated to if/else to support better TS inference
   if (statusEntry) {
     if (isFulfilled<FulfilledValue>(statusEntry)) {
       return statusEntry.value;
@@ -35,8 +38,6 @@ export function asSettled<FulfilledValue, RejectedValue = unknown>(
   }
 
   return null;
-
-  // return value && value.state !== "pending" ? value : null;
 }
 
 export function isPending(statusEntry: any): statusEntry is PendingStatus {
