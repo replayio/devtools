@@ -71,17 +71,22 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           ) : null}
         </div>
         <div className="group">
-          <Row>
-            <Icon
-              filename="external"
-              className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
-            />
-            <div className="overflow-hidden overflow-ellipsis whitespace-pre" title={recording.url}>
-              <a href={recording.url} target="_blank" rel="noopener noreferrer">
-                {getDisplayedUrl(recording.url)}
-              </a>
-            </div>
-          </Row>
+          {recording.url != "" ? (
+            <Row>
+              <Icon
+                filename="external"
+                className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
+              />
+              <div
+                className="overflow-hidden overflow-ellipsis whitespace-pre"
+                title={recording.url}
+              >
+                <a href={recording.url} target="_blank" rel="noopener noreferrer">
+                  {getDisplayedUrl(recording.url)}
+                </a>
+              </div>
+            </Row>
+          ) : null}
         </div>
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />
@@ -97,8 +102,8 @@ function EnvironmentVariablesRow() {
   return (
     <div className="group">
       <Row>
-        <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
-        <div>ENV VARIABLES, Y'ALL!</div>
+        <Icon filename="warning" className="bg-iconColor" />
+        <div>This node recording contains all environment variables</div>
       </Row>
     </div>
   );
@@ -108,7 +113,7 @@ function DurationWarningRow() {
   return (
     <div className="group">
       <Row>
-        <MaterialIcon iconSize="xl">warning_amber</MaterialIcon>
+        <Icon filename="warning" className="bg-iconColor" />
         <div>This replay is over two minutes, which can cause delays</div>
       </Row>
     </div>
@@ -123,6 +128,10 @@ function OperationsRow({
   onClick: () => void;
 }) {
   const uniqueDomains = getUniqueDomains(operations);
+
+  if (uniqueDomains.length == 0) {
+    return;
+  }
 
   return (
     <div className="group">
