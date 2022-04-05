@@ -108,7 +108,7 @@ const libraryMap = [
   },
   {
     label: "NextJS",
-    pattern: /[\._]next/i,
+    pattern: /[\._]next(?!\/static\/chunks\/pages\/)/i,
   },
   // FB's internal ReactDOM filename
   {
