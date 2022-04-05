@@ -46,10 +46,6 @@ function update(state = initialBreakpointsState(), action) {
       return { ...state, breakpoints: {}, requestedBreakpoints: {} };
     }
 
-    case "NAVIGATE": {
-      return initialBreakpointsState();
-    }
-
     case "SET_XHR_BREAKPOINT": {
       return addXHRBreakpoint(state, action);
     }

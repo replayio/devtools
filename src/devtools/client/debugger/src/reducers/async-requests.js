@@ -14,9 +14,7 @@ const initialAsyncRequestState = [];
 function update(state = initialAsyncRequestState, action) {
   const { seqId } = action;
 
-  if (action.type === "NAVIGATE") {
-    return initialAsyncRequestState;
-  } else if (seqId) {
+  if (seqId) {
     let newState;
     if (action.status === "start") {
       newState = [...state, seqId];

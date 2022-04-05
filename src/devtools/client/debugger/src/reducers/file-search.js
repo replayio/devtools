@@ -59,10 +59,6 @@ function update(state = createFileSearchState(), action) {
       };
     }
 
-    case "NAVIGATE": {
-      return { ...state, query: "", searchResults: emptySearchResults };
-    }
-
     default: {
       return state;
     }

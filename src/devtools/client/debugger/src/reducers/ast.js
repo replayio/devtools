@@ -48,14 +48,6 @@ function update(state = initialASTState(), action) {
       return { ...state };
     }
 
-    case "NAVIGATE": {
-      return initialASTState();
-    }
-
-    case "BATCH":
-      action.updates.forEach(u => (state = update(state, u)));
-      return state;
-
     default: {
       return state;
     }

@@ -36,12 +36,6 @@ export default function update(state = initialThreadsState(), action) {
         traits: action.traits,
         isWebExtension: action.isWebExtension,
       };
-
-    case "NAVIGATE":
-      return {
-        ...initialThreadsState(),
-        mainThread: action.mainThread,
-      };
     default:
       return state;
   }
