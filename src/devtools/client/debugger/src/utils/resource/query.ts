@@ -91,7 +91,7 @@ export function makeStrictQuery<T extends BaseResource, MapResult, ReduceResult>
  */
 export function makeIdQuery<T extends BaseResource, MapResult>(
   map: Mapper<T, MapResult>
-): CacheResult<MapResult, MapResult[]> {
+): (resource: ResourceState<T>) => CacheResult<MapResult, MapResult[]> {
   return makeWeakQuery({
     // @ts-ignore
     filter: (state, ids: ResourceId[]) => ids,
@@ -108,7 +108,7 @@ export function makeIdQuery<T extends BaseResource, MapResult>(
  */
 export function makeLoadQuery<T extends BaseResource, MapResult>(
   map: Mapper<T, MapResult>
-): CacheResult<MapResult, Record<string, MapResult>> {
+): (resource: ResourceState<T>) => CacheResult<MapResult, Record<string, MapResult>> {
   return makeWeakQuery({
     // @ts-ignore
     filter: (state, ids: ResourceId[]) => ids,

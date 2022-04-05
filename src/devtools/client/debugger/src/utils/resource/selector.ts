@@ -32,7 +32,7 @@ export function getResource<T extends BaseResource>(state: ResourceState<T>, id:
 export function getMappedResource<T extends BaseResource, Result>(
   state: ResourceState<T>,
   id: ResourceId,
-  map: (value: T, identity: EmptyObject) => Result
+  map: (value: T, identity: any, args?: any) => Result
 ) {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {

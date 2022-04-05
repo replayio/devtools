@@ -42,7 +42,7 @@ export function makeResourceQuery<
   map: Mapper<T, MapResult>;
   reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;
   resultCompare: ComparisonFunction<ReduceResult>;
-}): FinalCacheResult {
+}): (resource: ResourceState<T>) => ReduceResult {
   const loadResource = makeResourceMapper(map);
 
   // @ts-ignore
