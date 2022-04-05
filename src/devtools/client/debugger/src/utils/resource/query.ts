@@ -20,16 +20,16 @@ export function filterAllIds<T>(values: Record<string, T>) {
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export function makeWeakQuery<T extends BaseResource, MapResult, ReduceResult>({
+export function makeWeakQuery<T extends BaseResource, MapResult, ReduceResult, Args = unknown>({
   filter,
   map,
   reduce,
 }: {
-  filter: (values: Record<string, T>, args: unknown) => ResourceId[];
+  filter: (values: Record<string, T>, args: Args) => ResourceId[];
   map: Mapper<T, MapResult>;
   reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;
 }) {
-  return makeResourceQuery({
+  return makeResourceQuery<T, MapResult, ReduceResult, Args>({
     // @ts-ignore
     cache: queryCacheWeak,
     filter,
@@ -43,12 +43,12 @@ export function makeWeakQuery<T extends BaseResource, MapResult, ReduceResult>({
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export function makeShallowQuery<T extends BaseResource, MapResult, ReduceResult>({
+export function makeShallowQuery<T extends BaseResource, MapResult, ReduceResult, Args = unknown>({
   filter,
   map,
   reduce,
 }: {
-  filter: (values: Record<string, T>, args: unknown) => ResourceId[];
+  filter: (values: Record<string, T>, args: Args) => ResourceId[];
   map: Mapper<T, MapResult>;
   reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;
 }) {
@@ -66,12 +66,12 @@ export function makeShallowQuery<T extends BaseResource, MapResult, ReduceResult
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export function makeStrictQuery<T extends BaseResource, MapResult, ReduceResult>({
+export function makeStrictQuery<T extends BaseResource, MapResult, ReduceResult, Args = unknown>({
   filter,
   map,
   reduce,
 }: {
-  filter: (values: Record<string, T>, args: unknown) => ResourceId[];
+  filter: (values: Record<string, T>, args: Args) => ResourceId[];
   map: Mapper<T, MapResult>;
   reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;
 }) {
@@ -89,10 +89,10 @@ export function makeStrictQuery<T extends BaseResource, MapResult, ReduceResult>
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export function makeIdQuery<T extends BaseResource, MapResult>(
+export function makeIdQuery<T extends BaseResource, MapResult, Args = unknown[]>(
   map: Mapper<T, MapResult>
-): (resource: ResourceState<T>) => CacheResult<MapResult, MapResult[]> {
-  return makeWeakQuery({
+) {
+  return makeWeakQuery<T, MapResult, MapResult[], Args>({
     // @ts-ignore
     filter: (state, ids: ResourceId[]) => ids,
     map: (r, identity) =>
@@ -106,10 +106,8 @@ export function makeIdQuery<T extends BaseResource, MapResult>(
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export function makeLoadQuery<T extends BaseResource, MapResult>(
-  map: Mapper<T, MapResult>
-): (resource: ResourceState<T>) => CacheResult<MapResult, Record<string, MapResult>> {
-  return makeWeakQuery({
+export function makeLoadQuery<T extends BaseResource, MapResult>(map: Mapper<T, MapResult>) {
+  return makeWeakQuery<T, MapResult, Record<string, MapResult>>({
     // @ts-ignore
     filter: (state, ids: ResourceId[]) => ids,
     map: (r, identity) =>
@@ -164,11 +162,11 @@ export function makeReduceQuery<T extends BaseResource, MapResult, ReduceResult>
  * Create a query function that accepts an argument and can filter the
  * resource items to a subset before mapping each resulting resource.
  */
-export function makeReduceAllQuery<T extends BaseResource, MapResult, ReduceResult>(
+export function makeReduceAllQuery<T extends BaseResource, MapResult, ReduceResult, Args = unknown>(
   map: Mapper<T, MapResult>,
   reduce: (mapped: MapResult[], ids: string[], args: unknown) => ReduceResult
 ) {
-  return makeStrictQuery({
+  return makeStrictQuery<T, MapResult, ReduceResult, Args>({
     filter: filterAllIds,
     map,
     reduce,
