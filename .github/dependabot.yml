@@ -11,5 +11,5 @@ updates:
     pull-request-branch-name:
       separator: "-"
     ignore:
-    - dependency-name: "react-devtools-inline"
-    - dependency-name: "react-dom"
+      - dependency-name: "react-devtools-inline"
+      - dependency-name: "react-dom"
