@@ -130,7 +130,7 @@ function OperationsRow({
   const uniqueDomains = getUniqueDomains(operations);
 
   if (uniqueDomains.length == 0) {
-    return;
+    return null;
   }
 
   return (
