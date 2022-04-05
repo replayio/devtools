@@ -41,7 +41,7 @@ import {
 } from "./source-actors";
 import uniq from "lodash/uniq";
 
-interface Location {
+export interface Location {
   url: string;
   line?: number;
   column?: number;
@@ -49,7 +49,7 @@ interface Location {
   // other fields? sourceId?
 }
 
-interface SourceActor {
+export interface SourceActor {
   actor: string;
   id: string;
   introductionType?: unknown;
@@ -62,7 +62,7 @@ interface SourceActor {
   breakpointPositions?: Map<unknown, unknown>;
 }
 
-interface Source {
+export interface Source {
   // TODO Fix this when `async-value` gets updated
   content: { state: string; value?: string; contentType?: string; type?: "text" } | null;
   extensionName?: string;
@@ -216,6 +216,7 @@ function update(state = initialSourcesState(), action: AnyAction) {
       if (action.status === "done") {
         const { id, url } = action.source;
         const { isBlackBoxed } = action.value;
+        // TODO This should be outside of a reducer
         updateBlackBoxList(url, isBlackBoxed);
         return updateBlackboxFlag(state, id, isBlackBoxed);
       }
@@ -255,10 +256,6 @@ function update(state = initialSourcesState(), action: AnyAction) {
 
     case "SOURCES_LOADED":
       return { ...state, sourcesLoading: false };
-
-    case "BATCH":
-      action.updates.forEach(u => (state = update(state, u)));
-      return state;
   }
 
   return state;
@@ -437,10 +434,12 @@ function updateBlackBoxList(url: string, isBlackBoxed: boolean) {
   } else if (isBlackBoxed) {
     tabs.push(url);
   }
+  // @ts-expect-error Check on actual prefs usage here
   prefs.tabsBlackBoxed = tabs;
 }
 
-export function getBlackBoxList() {
+export function getBlackBoxList(): string[] {
+  // @ts-expect-error Check on actual prefs usage here
   return prefs.tabsBlackBoxed || [];
 }
 
@@ -458,6 +457,7 @@ const getSourcesState = (state: UIState) => state.sources;
 
 export function getSourceThreads(state: UIState, source: Source) {
   return uniq(
+    // @ts-expect-error TODO Fix this when source-actors is TS-ified
     getSourceActors(state, state.sources.actors[source.id]).map(
       (actor: SourceActor) => actor.thread
     )
