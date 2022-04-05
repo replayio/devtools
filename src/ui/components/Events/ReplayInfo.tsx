@@ -71,7 +71,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           ) : null}
         </div>
         <div className="group">
-          {recording.url != "" ? (
+          {recording.url ? (
             <Row>
               <Icon
                 filename="external"
