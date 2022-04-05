@@ -21,23 +21,28 @@ export function getResourceIds<T extends BaseResource>(state: ResourceState<T>) 
   return Object.keys(getResourceValues(state));
 }
 
-export function getResource<T extends BaseResource>(state: ResourceState<T>, id: ResourceId) {
-  const validatedState = getValidatedResource(state, id);
+export function getResource<T extends BaseResource>(
+  state: ResourceState<T>,
+  id: ResourceId | [ResourceId]
+) {
+  const finalId = Array.isArray(id) ? id[0] : id;
+  const validatedState = getValidatedResource(state, finalId);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);
   }
-  return validatedState.values[id];
+  return validatedState.values[finalId];
 }
 
 export function getMappedResource<T extends BaseResource, Result>(
   state: ResourceState<T>,
-  id: ResourceId,
+  id: ResourceId | [ResourceId],
   map: (value: T, identity: any, args?: any) => Result
 ) {
-  const validatedState = getValidatedResource(state, id);
+  const finalId = Array.isArray(id) ? id[0] : id;
+  const validatedState = getValidatedResource(state, finalId);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);
   }
 
-  return map(validatedState.values[id], validatedState.identity[id]);
+  return map(validatedState.values[finalId], validatedState.identity[finalId]);
 }
