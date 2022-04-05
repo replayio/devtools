@@ -98,7 +98,7 @@ export function SourcemapToggle({
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSourceWithContent(state),
+    selectedSource: getSelectedSourceWithContent(state)!,
     alternateSource: getAlternateSource(state),
   }),
   {

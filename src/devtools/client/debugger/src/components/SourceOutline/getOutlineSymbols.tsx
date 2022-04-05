@@ -1,10 +1,10 @@
 import { fuzzySearch } from "../../utils/function";
 import { groupBy, keyBy } from "lodash";
 import { SourceSymbols, ClassSymbol, FunctionSymbol } from "../../types";
-import { HitCounts } from "../../reducers/sources";
+import { HitCount } from "../../reducers/sources";
 import { features } from "ui/utils/prefs";
 
-function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCounts) {
+function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCount[]) {
   return functions.map(functionSymbol => {
     const { start, end } = functionSymbol.location;
 
@@ -26,7 +26,7 @@ function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCoun
 export function getOutlineSymbols(
   symbols: null | SourceSymbols,
   filter: string,
-  hitCounts: HitCounts | null
+  hitCounts: HitCount[] | null
 ) {
   if (!symbols || symbols.loading) {
     return null;

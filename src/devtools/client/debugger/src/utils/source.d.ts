@@ -1,5 +1,5 @@
 import { SourceId } from "@recordreplay/protocol";
-import { Source } from "../reducers/sources";
+import { Source, SourceContent, Location } from "../reducers/sources";
 
 export function getSourcemapVisualizerURL(
   selectedSource: Source,
@@ -9,3 +9,13 @@ export function getUniqueAlternateSourceId(sourceId: SourceId): {
   sourceId?: SourceId;
   why?: "no-sourcemap" | "not-unique";
 };
+
+export function getTextAtPosition(
+  sourceId: string,
+  asyncContent: SourceContent,
+  location: Location
+): string;
+
+export function getPrettySourceURL(url: string): string;
+
+export function getPlainUrl(url: string): string;

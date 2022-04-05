@@ -140,7 +140,7 @@ function QuickActions({
 
   return (
     <div
-      className="absolute z-50 flex flex-row space-x-px transform -right-1 translate-x-full"
+      className="absolute -right-1 z-50 flex translate-x-full transform flex-row space-x-px"
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
       style={{ top: `-${(1 / 2) * (18 - height)}px` }}
@@ -209,7 +209,7 @@ const connector = connect(
   (state: UIState) => ({
     indexed: selectors.getIndexed(state),
     cx: selectors.getThreadContext(state),
-    breakpoints: getBreakpointsForSource(state, getSelectedSource(state).id),
+    breakpoints: getBreakpointsForSource(state, getSelectedSource(state)!.id),
   }),
   {
     runAnalysisOnLine: runAnalysisOnLine,

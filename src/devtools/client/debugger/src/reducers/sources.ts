@@ -43,9 +43,10 @@ import uniq from "lodash/uniq";
 
 export interface Location {
   url: string;
-  line?: number;
+  line: number;
   column?: number;
-  sourceId?: string;
+  sourceId: string;
+  sourceUrl: string;
   // other fields? sourceId?
 }
 
@@ -62,9 +63,18 @@ export interface SourceActor {
   breakpointPositions?: Map<unknown, unknown>;
 }
 
+export interface SourceContent {
+  state: "pending" | "fulfilled" | "rejected";
+  value?: {
+    contentType: string;
+    type: string;
+    value: string;
+  };
+}
+
 export interface Source {
   // TODO Fix this when `async-value` gets updated
-  content: { state: string; value?: string; contentType?: string; type?: "text" } | null;
+  content: SourceContent | null;
   extensionName?: string;
   id: string;
   introductionType?: unknown;
@@ -94,6 +104,11 @@ export interface SourcesState {
   chromeAndExtensionsEnabled: boolean;
   focusedItem: unknown;
   sourcesLoading: boolean;
+}
+
+export interface HitCount {
+  location: Location;
+  hits: number;
 }
 
 export function initialSourcesState(): SourcesState {
@@ -375,17 +390,17 @@ function updateLoadedState(state: SourcesState, action: SourceTextLoadedAction) 
     return state;
   }
 
-  let content: Source["content"] = null;
+  let content: SourceContent | null = null;
   if (action.status === "start") {
-    content = pending();
+    content = pending() as SourceContent;
   } else if (action.status === "error") {
-    content = rejected(action.error);
+    content = rejected(action.error) as SourceContent;
   } else if (typeof action.value.text === "string") {
     content = fulfilled({
       type: "text",
       value: action.value.text,
       contentType: action.value.contentType,
-    });
+    }) as SourceContent;
   }
 
   return {
@@ -558,7 +573,7 @@ export function getPrettySource(state: UIState, id: string) {
     return;
   }
 
-  return getOriginalSourceByURL(state, getPrettySourceURL(source.url));
+  return getOriginalSourceByURL(state, getPrettySourceURL(source.url!));
 }
 
 export function hasPrettySource(state: UIState, id: string) {
@@ -657,7 +672,7 @@ export function getSelectedSourceId(state: UIState) {
   return source && source.id;
 }
 
-export function getHitCountsForSource(state: UIState, sourceId: string) {
+export function getHitCountsForSource(state: UIState, sourceId: string): HitCount[] {
   return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId]);
 }
 

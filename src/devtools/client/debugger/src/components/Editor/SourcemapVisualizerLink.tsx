@@ -33,7 +33,7 @@ function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromR
 }
 
 const connector = connect((state: UIState) => ({
-  selectedSource: getSelectedSourceWithContent(state),
+  selectedSource: getSelectedSourceWithContent(state)!,
   alternateSource: getAlternateSource(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
