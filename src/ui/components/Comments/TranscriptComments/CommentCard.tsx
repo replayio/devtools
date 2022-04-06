@@ -266,8 +266,7 @@ function CommentCard({
     <div
       className={classNames(
         `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor",
-        { "opacity-50": isUpdating }
+        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor"
       )}
       onMouseDown={e => {
         seekToComment(comment);
