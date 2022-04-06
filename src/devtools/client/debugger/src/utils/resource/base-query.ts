@@ -29,7 +29,6 @@ export function makeResourceQuery<
   T extends BaseResource,
   MapResult,
   ReduceResult,
-  Args = unknown,
   FinalCacheResult extends CacheResult = CacheResult<MapResult, ReduceResult>
 >({
   cache,
@@ -39,11 +38,11 @@ export function makeResourceQuery<
   resultCompare,
 }: {
   cache: (cacheHandler: CacheHandler<T, MapResult, ReduceResult>) => ReduceResult;
-  filter: (values: Record<string, T>, args: Args) => ResourceId[];
+  filter: (values: Record<string, T>, args: unknown) => ResourceId[];
   map: Mapper<T, MapResult>;
   reduce: (mapped: MapResult[], ids: ResourceId[], args: unknown) => ReduceResult;
   resultCompare: ComparisonFunction<ReduceResult>;
-}): (resource: ResourceState<T>, args?: Args) => ReduceResult {
+}): (resource: ResourceState<T>) => ReduceResult {
   const loadResource = makeResourceMapper(map);
 
   // @ts-ignore
@@ -56,7 +55,6 @@ export function makeResourceQuery<
       existing: FinalCacheResult
       // @ts-ignore
     ): FinalCacheResult => {
-      // @ts-ignore context args is unknown
       const ids = filter(getResourceValues(state), context.args);
       const mapped = ids.map(id => loadResource(state, id, context));
 

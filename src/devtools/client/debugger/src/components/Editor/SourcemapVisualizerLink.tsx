@@ -8,7 +8,6 @@ import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/so
 import { trackEvent } from "ui/utils/telemetry";
 
 function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromRedux) {
-  // @ts-ignore possible undefined mismatch
   const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
   if (!href) {
     return null;
@@ -35,7 +34,7 @@ function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromR
 
 const connector = connect((state: UIState) => ({
   selectedSource: getSelectedSourceWithContent(state)!,
-  alternateSource: getAlternateSource(state)!,
+  alternateSource: getAlternateSource(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

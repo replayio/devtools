@@ -10,7 +10,6 @@ import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import type { SourcesState } from "devtools/client/debugger/src/reducers/sources";
-import type { SourceActorsState } from "devtools/client/debugger/src/reducers/source-actors";
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
@@ -35,6 +34,5 @@ export interface UIState {
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
   sources: SourcesState;
-  sourceActors: SourceActorsState;
   timeline: TimelineState;
 }
