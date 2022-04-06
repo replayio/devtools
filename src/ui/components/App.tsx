@@ -33,6 +33,12 @@ import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
 
 function AppModal({ modal }: { modal: ModalType }) {
+  const loadingFinished = useSelector(selectors.getLoadingFinished);
+  
+  if (!loadingFinished) {
+    return null;
+  }
+
   switch (modal) {
     case "sharing": {
       return <SharingModal />;
