@@ -252,8 +252,29 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
-export const getIndexing = (state: UIState) => state.app.indexing;
-export const getIndexed = (state: UIState) => state.app.indexing == 100;
+export const getIndexingProgress = (state: UIState) => {
+  const regions = getLoadedRegions(state);
+
+  if (!regions) {
+    return null;
+  }
+
+  const indexedProgress = regions.indexed.reduce(
+    (sum, region) => sum + (region.end.time - region.begin.time),
+    0
+  );
+  const loadingProgress = regions.loading.reduce(
+    (sum, region) => sum + (region.end.time - region.begin.time),
+    0
+  );
+
+  console.log({indexedProgress, loadingProgress});
+  
+  return indexedProgress / loadingProgress * 100;
+};
+export const getIsIndexed = (state: UIState) => {
+  return getIndexingProgress(state) === 100;
+}
 export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;

@@ -9,6 +9,7 @@ import {
   KeyboardEventKind,
   MouseEventKind,
   ExecutionPoint,
+  TimeStampedPointRange,
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
@@ -70,6 +71,12 @@ export interface UploadInfo {
 
 export type AppTheme = "light" | "dark";
 
+interface LoadedRegions {
+  loading: TimeStampedPointRange[];
+  loaded: TimeStampedPointRange[];
+  indexed: TimeStampedPointRange[];
+}
+
 export interface AppState {
   mode: AppMode;
   analysisPoints: AnalysisPoints;
@@ -83,7 +90,7 @@ export interface AppState {
   indexing: number;
   initializedPanels: PanelName[];
   isNodePickerActive: boolean;
-  loadedRegions: loadedRegions | null;
+  loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;
   loadingPageTipIndex: number;

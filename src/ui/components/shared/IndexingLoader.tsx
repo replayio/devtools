@@ -1,52 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { connect, ConnectedProps } from "react-redux";
+import { useSelector } from "react-redux";
+import { getIndexingProgress } from "ui/reducers/app";
+import { getViewMode } from "ui/reducers/layout";
 
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
-
-function IndexingLoader({
-  progressPercentage,
-  viewMode,
-}: Pick<PropsFromRedux, "progressPercentage" | "viewMode">) {
+export default function IndexingLoader() {
+  const progress = useSelector(getIndexingProgress);
+  const viewMode = useSelector(getViewMode);
   const [isDone, setDone] = useState(false);
 
   // Set the indexing loader to done immediately, if
   // the loader just mounted and is at 100
   useEffect(() => {
-    if (progressPercentage == 100) {
+    if (progress == 100) {
       setDone(true);
     }
   }, []);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    if (!isDone && progressPercentage == 100) {
+    if (!isDone && progress == 100) {
       timeout = setTimeout(() => setDone(true), 2000);
     }
 
     return () => clearTimeout(timeout);
-  }, [progressPercentage]);
+  }, [progress]);
 
-  if (isDone || progressPercentage === null || viewMode == "non-dev") {
+  if (progress === null || viewMode == "non-dev") {
     return null;
   }
 
+  console.log({ progress });
+
   return (
-    <div className="absolute h-7 w-7" title={`Indexing (${progressPercentage.toFixed()}%)`}>
+    <div className="absolute h-7 w-7" title={`Indexing (${progress.toFixed()}%)`}>
       <CircularProgressbar
-        value={progressPercentage}
+        value={progress}
         strokeWidth={14}
-        styles={buildStyles({ pathColor: `#0074E8`, trailColor: `transparent` })}
+        styles={buildStyles({ pathColor: `#0074E8`, trailColor: `gray` })}
       />
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  progressPercentage: selectors.getIndexing(state),
-  viewMode: selectors.getViewMode(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(IndexingLoader);
