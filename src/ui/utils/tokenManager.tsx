@@ -112,6 +112,10 @@ class TokenManager {
     }
   }
 
+  getState() {
+    return this.currentState;
+  }
+
   getToken() {
     return this.deferredState.promise;
   }
