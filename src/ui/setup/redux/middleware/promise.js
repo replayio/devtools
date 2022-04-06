@@ -8,6 +8,21 @@ import fromPairs from "lodash/fromPairs";
 import toPairs from "lodash/toPairs";
 import { executeSoon } from "../../../../devtools/client/debugger/src/utils/DevToolsUtils";
 
+import {
+  pending,
+  rejected,
+  fulfilled,
+} from "../../../../devtools/client/debugger/src/utils/async-value";
+export function asyncActionAsValue(action) {
+  if (action.status === "start") {
+    return pending();
+  }
+  if (action.status === "error") {
+    return rejected(action.error);
+  }
+  return fulfilled(action.value);
+}
+
 let seqIdVal = 1;
 
 function seqIdGen() {

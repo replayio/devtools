@@ -14,40 +14,13 @@ interface Location {
   // other fields? sourceId?
 }
 
-interface SourceActor {
-  actor: string;
-  id: string;
-  introductionType?: unknown;
-  introductionUrl?: string;
-  source: string;
-  sourceMapURL?: string;
-  thread: string;
-  url: string;
-  breakableLines?: unknown | null;
-  breakpointPositions?: Map<unknown, unknown>
-}
-
-interface Source {
-  content: string | null;
-  extensionName?: string;
-  id: string;
-  introductionType?: unknown;
-  introductionUrl?: string;
-  isBlackBoxed: boolean;
-  isExtension: boolean;
-  isOriginal: boolean;
-  isPrettyPrinted: boolean;
-  relativeUrl?: string;
-  url?: string;
-}
-
 // Several types TBD here
 interface SourcesState {
   sources: ResourceCache<UnknownSources>,
   urls: Record<string, SourceId[]>,
   plainUrls: Record<string, string[]>,
   content: Record<unknown, unknown>,
-  actors: Record<string, SourceActorId[]>,
+  actors: Record<string, SourceActorId>,
   breakpointPositions: Record<SourceId, UnknownBreakpoints>,
   breakableLines: Record<SourceId, number[]>,
   epoch: number,

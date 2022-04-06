@@ -38,7 +38,6 @@ import {
   getSourceActors,
   getBreakableLinesForSourceActors,
   getSourceActorBreakpointHitCounts,
-  SourceActor,
 } from "./source-actors";
 import uniq from "lodash/uniq";
 
@@ -49,6 +48,19 @@ export interface Location {
   sourceId: string;
   sourceUrl: string;
   // other fields? sourceId?
+}
+
+export interface SourceActor {
+  actor: string;
+  id: string;
+  introductionType?: unknown;
+  introductionUrl?: string;
+  source: string;
+  sourceMapURL?: string;
+  thread: string;
+  url: string;
+  breakableLines?: unknown | null;
+  breakpointPositions?: Map<unknown, unknown>;
 }
 
 export interface SourceContent {
@@ -264,8 +276,7 @@ export const resourceAsSourceBase = memoizeResourceShallow(
 
 const resourceAsSourceWithContent = memoizeResourceShallow(({ content, ...source }: Source) => ({
   ...source,
-  // @ts-ignore Ignore async value errors for now
-  content: asSettled(content!),
+  content: asSettled(content),
 }));
 
 /*
@@ -455,6 +466,7 @@ const getSourcesState = (state: UIState) => state.sources;
 
 export function getSourceThreads(state: UIState, source: Source) {
   return uniq(
+    // @ts-expect-error TODO Fix this when source-actors is TS-ified
     getSourceActors(state, state.sources.actors[source.id]).map(
       (actor: SourceActor) => actor.thread
     )
@@ -646,7 +658,6 @@ export function getSourceWithContent(state: UIState, id: string) {
 }
 export function getSourceContent(state: UIState, id: string) {
   const { content } = getResource(state.sources.sources, id);
-  // @ts-ignore Ignore async value errors for now
   return asSettled(content);
 }
 
@@ -656,8 +667,7 @@ export function getSelectedSourceId(state: UIState) {
 }
 
 export function getHitCountsForSource(state: UIState, sourceId: string): HitCount[] {
-  // @ts-ignore TODO Fix string[]/string mismatch
-  return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId])!;
+  return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId]);
 }
 
 export function getHitCountsForSelectedSource(state: UIState) {
@@ -696,10 +706,12 @@ export function canLoadSource(state: UIState, sourceId: string) {
   }
 
   const actors = getSourceActorsForSource(state, sourceId);
+  // @ts-expect-error Fix this when source-actors is TS-ified
   return actors.length != 0;
 }
 
 export function isSourceWithMap(state: UIState, id: string): boolean {
+  // @ts-expect-error Fix this when source-actors is TS-ified
   return getSourceActorsForSource(state, id).some(sourceActor => sourceActor.sourceMapURL);
 }
 
@@ -773,7 +785,6 @@ export function getTextAtLocation(state: UIState, id: string, location: Location
   if (!content) {
     return null;
   }
-  // @ts-ignore Ignore async value errors for now
   const text = getTextAtPosition(id, content, { ...location, column: 0 });
 
   return text;
