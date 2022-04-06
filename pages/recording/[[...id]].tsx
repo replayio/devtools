@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { connect, ConnectedProps, useStore } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useStore } from "react-redux";
 import { isTest } from "ui/utils/environment";
 import { getAccessibleRecording, setExpectedError } from "ui/actions/session";
 import { Recording as RecordingInfo } from "ui/types";
@@ -18,6 +18,7 @@ import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
 import { GetStaticProps } from "next/types";
 import { extractIdAndSlug } from "ui/utils/helpers";
+import { setModal } from "ui/actions/app";
 
 interface MetadataProps {
   metadata?: {
@@ -112,6 +113,8 @@ function RecordingPage({
   head,
 }: PropsFromRedux & { head?: React.ReactNode }) {
   const store = useStore();
+  const { query } = useRouter();
+  const dispatch = useDispatch();
   const recordingId = useGetRecordingId();
   const rawRecordingId = useGetRawRecordingIdWithSlug();
   useRecordingSlug(recordingId);
@@ -132,6 +135,10 @@ function RecordingPage({
     async function getRecording() {
       await setup(store);
       setRecording(await getAccessibleRecording(recordingId));
+
+      if (Array.isArray(query.id) && query.id[query.id.length - 1] === "share") {
+        dispatch(setModal("sharing", { recordingId }));
+      }
     }
     getRecording();
   }, [recordingId, rawRecordingId, store, getAccessibleRecording, setExpectedError]);
@@ -182,6 +189,7 @@ export async function getStaticPaths() {
 type SSRProps = MetadataProps & { headOnly?: boolean };
 
 export default function SSRRecordingPage({ headOnly, metadata }: SSRProps) {
+  const router = useRouter();
   let head: React.ReactNode = <RecordingHead metadata={metadata} />;
 
   if (headOnly) {
