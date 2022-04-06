@@ -27,7 +27,7 @@ export default function Transcript() {
       displayedComments.push(pendingComment.comment);
     }
 
-    const sortedComments = sortBy(displayedComments, ["time", "createdAt"]);
+    const sortedComments = sortBy(displayedComments, ["point", "createdAt"]);
     return sortedComments;
   }, [comments, pendingComment]);
 
