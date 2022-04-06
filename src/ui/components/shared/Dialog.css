@@ -7,4 +7,5 @@
   height: max-content;
   padding: 24px;
   width: max-content;
+  backdrop-filter: blur(8px);
 }
