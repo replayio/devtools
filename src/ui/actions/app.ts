@@ -23,6 +23,7 @@ import {
   ReplayNavigationEvent,
   AppTheme,
   AppMode,
+  LoadedRegions,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -98,7 +99,7 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
   workspace: Workspace;
 };
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
-  parameters: loadedRegions;
+  parameters: LoadedRegions;
 };
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;
@@ -172,6 +173,10 @@ export function setupApp(store: UIStore) {
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return (dispatch, getState) => {
+    if (level === "executionIndexed") {
+      return;
+    }
+
     let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {
       return;
@@ -190,11 +195,7 @@ export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UI
     const processedProgress = endPoint - unprocessedProgress;
     const percentProgress = (processedProgress / endPoint) * 100;
 
-    if (level === "basic") {
-      dispatch(setLoading(percentProgress));
-    } else {
-      dispatch(setIndexing(percentProgress));
-    }
+    dispatch(setLoading(percentProgress));
   };
 }
 

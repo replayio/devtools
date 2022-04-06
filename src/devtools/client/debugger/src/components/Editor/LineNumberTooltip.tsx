@@ -81,7 +81,7 @@ export default function LineNumberTooltip({
   const isMetaActive = keyModifiers.meta;
   const [codeHeatMaps, setCodeHeatMaps] = useState(features.codeHeatMaps);
 
-  const indexed = useSelector(selectors.getIndexed);
+  const indexed = useSelector(selectors.getIsIndexed);
   const hitCounts = useSelector(getHitCountsForSelectedSource);
   const source = useSelector(getSelectedSource);
   const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);

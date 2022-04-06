@@ -153,7 +153,7 @@ const mapStateToProps = (state, { breakpoint }) => ({
     breakpoint.location,
     breakpoint.options.condition
   ),
-  indexed: selectors.getIndexed(state),
+  indexed: selectors.getIsIndexed(state),
   executionPoint: selectors.getExecutionPoint(state),
 });
 

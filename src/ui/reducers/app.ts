@@ -252,8 +252,37 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
-export const getIndexing = (state: UIState) => state.app.indexing;
-export const getIndexed = (state: UIState) => state.app.indexing == 100;
+export const getIndexingProgress = (state: UIState) => {
+  const regions = getLoadedRegions(state);
+
+  if (!regions) {
+    return null;
+  }
+
+  const { loading, indexed } = regions;
+
+  const indexedProgress = indexed
+    .filter(indexedRegion => {
+      // It's possible for the indexedProgress to not be a subset of
+      // loadingRegions. This acts as a guard if that should happen.
+      // Todo: Investigate this on the backend.
+      return loading.some(
+        loadingRegion =>
+          indexedRegion.begin.time >= loadingRegion.begin.time &&
+          indexedRegion.end.time <= loadingRegion.end.time
+      );
+    })
+    .reduce((sum, region) => sum + (region.end.time - region.begin.time), 0);
+  const loadingProgress = loading.reduce(
+    (sum, region) => sum + (region.end.time - region.begin.time),
+    0
+  );
+
+  return (indexedProgress / loadingProgress) * 100 || 0;
+};
+export const getIsIndexed = (state: UIState) => {
+  return getIndexingProgress(state) === 100;
+};
 export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
