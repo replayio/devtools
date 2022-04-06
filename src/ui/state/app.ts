@@ -71,6 +71,7 @@ export interface UploadInfo {
 export type AppTheme = "light" | "dark";
 
 export interface AppState {
+  mode: AppMode;
   analysisPoints: AnalysisPoints;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
@@ -111,6 +112,7 @@ export enum AnalysisError {
   TooManyPoints = "too-many-points",
   Default = "default",
 }
+export type AppMode = "devtools" | "sourcemap-visualizer";
 
 interface Events {
   [key: string]: ReplayEvent[];

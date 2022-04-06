@@ -19,6 +19,7 @@ import { getSelectedPanel, getViewMode } from "./layout";
 import { prefs } from "ui/utils/prefs";
 
 export const initialAppState: AppState = {
+  mode: "devtools",
   analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
@@ -217,6 +218,13 @@ export default function update(
       return {
         ...state,
         currentPoint: action.currentPoint,
+      };
+    }
+
+    case "set_app_mode": {
+      return {
+        ...state,
+        mode: action.mode,
       };
     }
 
