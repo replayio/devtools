@@ -187,6 +187,7 @@ function updateBreakpointHitCounts(
     max: currentMax,
     breakpointHitCounts: currentBreakpointHitCounts,
   } = {
+    // Provide min/max defaults that will "lose" any comparison later
     min: Infinity,
     max: 0,
     // @ts-ignore always overwritten
@@ -318,7 +319,7 @@ export function getSourceActorBreakpointColumns(state: UIState, id: string, line
 export const getBreakableLinesForSourceActors = makeWeakQuery<
   SourceActor,
   SourceActor["breakableLines"],
-  unknown[],
+  number[],
   string[]
 >({
   filter: (state, ids: string[]) => ids,
@@ -330,6 +331,6 @@ export const getBreakableLinesForSourceActors = makeWeakQuery<
           acc = acc.concat(item.value);
         }
         return acc;
-      }, [] as unknown[])
+      }, [] as number[])
     ),
 });
