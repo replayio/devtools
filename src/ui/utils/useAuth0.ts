@@ -67,5 +67,5 @@ export default function useAuth0() {
     return TEST_AUTH;
   }
 
-  return { ...auth, loginAndReturn };
+  return { ...auth, isLoading: auth.isLoading && token, loginAndReturn };
 }
