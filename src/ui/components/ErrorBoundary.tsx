@@ -1,11 +1,11 @@
-import React, { Component, ReactNode } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
+import React, { ReactNode } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { UnexpectedError } from "ui/state/app";
 import { getUnexpectedError } from "ui/reducers/app";
 import { setUnexpectedError } from "ui/actions/session";
 import { isDevelopment } from "ui/utils/environment";
 import { BlankViewportWrapper } from "./shared/Viewport";
+import * as Sentry from "@sentry/react";
 
 export const ReplayUpdatedError: UnexpectedError = {
   message: "Replay updated",
@@ -13,12 +13,13 @@ export const ReplayUpdatedError: UnexpectedError = {
   action: "refresh",
 };
 
-class ErrorBoundary extends Component<PropsFromRedux & { children: ReactNode }> {
-  componentDidCatch(error: any, errorInfo: any) {
-    const { setUnexpectedError } = this.props;
+export default function ErrorBoundary({ children }: { children: ReactNode }) {
+  const unexpectedError = useSelector(getUnexpectedError);
+  const dispatch = useDispatch();
 
+  const onError = (error: Error) => {
     if (error.name === "ChunkLoadError") {
-      return setUnexpectedError(ReplayUpdatedError, true);
+      return dispatch(setUnexpectedError(ReplayUpdatedError, true));
     }
 
     if (isDevelopment()) {
@@ -30,21 +31,11 @@ class ErrorBoundary extends Component<PropsFromRedux & { children: ReactNode }> 
       content: "An unexpected error occurred. Please refresh the page.",
       action: "refresh",
     });
-  }
+  };
 
-  render() {
-    const { unexpectedError } = this.props;
-    return unexpectedError ? <BlankViewportWrapper /> : this.props.children;
-  }
+  return (
+    <Sentry.ErrorBoundary onError={onError}>
+      {unexpectedError ? <BlankViewportWrapper /> : children}
+    </Sentry.ErrorBoundary>
+  );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    unexpectedError: getUnexpectedError(state),
-  }),
-  {
-    setUnexpectedError,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(ErrorBoundary);
