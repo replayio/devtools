@@ -259,22 +259,30 @@ export const getIndexingProgress = (state: UIState) => {
     return null;
   }
 
-  const indexedProgress = regions.indexed.reduce(
-    (sum, region) => sum + (region.end.time - region.begin.time),
-    0
-  );
-  const loadingProgress = regions.loading.reduce(
+  const { loading, indexed } = regions;
+
+  const indexedProgress = indexed
+    .filter(indexedRegion => {
+      // It's possible for the indexedProgress to not be a subset of
+      // loadingRegions. This acts as a guard if that should happen.
+      // Todo: Investigate this on the backend.
+      return loading.some(
+        loadingRegion =>
+          indexedRegion.begin.time >= loadingRegion.begin.time &&
+          indexedRegion.end.time <= loadingRegion.end.time
+      );
+    })
+    .reduce((sum, region) => sum + (region.end.time - region.begin.time), 0);
+  const loadingProgress = loading.reduce(
     (sum, region) => sum + (region.end.time - region.begin.time),
     0
   );
 
-  console.log({indexedProgress, loadingProgress});
-  
-  return indexedProgress / loadingProgress * 100;
+  return (indexedProgress / loadingProgress) * 100 || 0;
 };
 export const getIsIndexed = (state: UIState) => {
   return getIndexingProgress(state) === 100;
-}
+};
 export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;

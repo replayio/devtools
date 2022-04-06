@@ -23,6 +23,7 @@ import {
   ReplayNavigationEvent,
   AppTheme,
   AppMode,
+  LoadedRegions,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
@@ -98,7 +99,7 @@ export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
   workspace: Workspace;
 };
 export type SetLoadedRegions = Action<"set_loaded_regions"> & {
-  parameters: loadedRegions;
+  parameters: LoadedRegions;
 };
 export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
   loading: boolean;

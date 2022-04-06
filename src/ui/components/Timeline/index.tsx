@@ -36,7 +36,6 @@ import { Focuser } from "./Focuser";
 import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
 import { EditFocusButton } from "./EditFocusButton";
-import { UnloadedRegions } from "./UnloadedRegions";
 import { MouseDownMask } from "./MouseDownMask";
 
 function getIsSecondaryHighlighted(
@@ -377,7 +376,6 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
                 style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
               />
               <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
-              <UnloadedRegions />
               {this.renderPreviewMarkers()}
               <Comments />
               {this.renderUnfocusedRegion()}

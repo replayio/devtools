@@ -3,7 +3,6 @@ import {
   PointDescription,
   Location,
   MouseEvent,
-  loadedRegions,
   KeyboardEvent,
   NavigationEvent,
   KeyboardEventKind,
@@ -71,7 +70,7 @@ export interface UploadInfo {
 
 export type AppTheme = "light" | "dark";
 
-interface LoadedRegions {
+export interface LoadedRegions {
   loading: TimeStampedPointRange[];
   loaded: TimeStampedPointRange[];
   indexed: TimeStampedPointRange[];
