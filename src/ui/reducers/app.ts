@@ -17,6 +17,7 @@ import { compareBigInt } from "ui/utils/helpers";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";
 import { prefs } from "ui/utils/prefs";
+import { getSystemColorSchemePreference } from "ui/utils/environment";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -247,7 +248,8 @@ const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
   };
 };
 
-export const getTheme = (state: UIState) => state.app.theme;
+export const getTheme = (state: UIState) =>
+  state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;

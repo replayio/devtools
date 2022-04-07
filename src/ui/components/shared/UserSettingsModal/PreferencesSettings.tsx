@@ -4,9 +4,10 @@ import hooks from "ui/hooks";
 import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
 import { CheckboxRow } from "./CheckboxRow";
-import { trackEvent } from "ui/utils/telemetry";
-import { toggleTheme } from "ui/actions/app";
 import { getTheme } from "ui/reducers/app";
+import { updateTheme } from "ui/actions/app";
+import { SelectMenu } from "../Forms";
+import { AppTheme } from "ui/state/app";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
@@ -105,30 +106,29 @@ function PrivacyPreferences() {
 }
 
 function UiPreferences() {
-  const theme = useSelector(getTheme);
   const dispatch = useDispatch();
+  const theme = useSelector(getTheme);
 
-  const handleDarkModeToggle = () => {
-    trackEvent("feature.dark_mode", { enabled: theme !== "dark" });
-    dispatch(toggleTheme());
+  const setSelected = (value: AppTheme) => {
+    dispatch(updateTheme(value));
   };
 
   return (
     <div className="space-y-4">
       <div className="text-lg">Appearance</div>
-      <div className="flex flex-col space-y-2 p-1">
-        <label
-          className="flex cursor-pointer items-center space-x-2"
-          data-private
-          htmlFor="enableDarkMode"
-        >
-          <Checkbox
-            id="enableDarkMode"
-            checked={theme === "dark"}
-            onChange={handleDarkModeToggle}
+      <div className="flex flex-col space-y-4 p-1">
+        <div>Theme</div>
+        <div className="w-1/2">
+          <SelectMenu
+            options={[
+              { name: "Dark", id: "dark" },
+              { name: "Light", id: "light" },
+              { name: "System", id: "system" },
+            ]}
+            selected={theme}
+            setSelected={str => setSelected(str as AppTheme)}
           />
-          <div>Enable Dark Mode</div>
-        </label>
+        </div>
       </div>
     </div>
   );

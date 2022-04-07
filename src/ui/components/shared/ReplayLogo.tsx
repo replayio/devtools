@@ -45,10 +45,9 @@ export default function ReplayLogo({
 }) {
   const theme = useSelector(getTheme);
   const height = logoSizes[size];
-  const isDark = theme === "dark";
 
   if (wide) {
-    const src = isDark ? "/images/logo-wide-dark.svg" : "/images/logo-wide.svg";
+    const src = theme === "dark" ? "/images/logo-wide-dark.svg" : "/images/logo-wide.svg";
     return <img className={`${height} w-auto`} src={src} />;
   }
 
