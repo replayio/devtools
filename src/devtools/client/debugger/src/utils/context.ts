@@ -31,6 +31,8 @@ import { getThreadContext } from "../selectors";
 import type { UIState } from "ui/state";
 import type { Context } from "../reducers/pause";
 
+export function validateNavigateContext(state: UIState, cx: Context) {}
+
 export class ContextError extends Error {}
 
 export function validateContext(state: UIState, cx: Context) {
