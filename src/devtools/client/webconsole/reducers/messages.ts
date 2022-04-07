@@ -23,7 +23,7 @@ import { assert, compareNumericStrings } from "protocol/utils";
 type MessageId = string;
 type Command = string;
 
-interface Frame {
+export interface Frame {
   column: number;
   line: number;
   source: string;

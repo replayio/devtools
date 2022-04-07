@@ -28,12 +28,12 @@ import { getThreadContext } from "../selectors";
 // A ThreadContext is invalidated if the target navigates, or if the current
 // thread changes, pauses, or resumes.
 
+import type { UIState } from "ui/state";
+import type { Context } from "../reducers/pause";
+
 export class ContextError extends Error {}
 
-export function validateNavigateContext(state, cx) {}
-
-export function validateContext(state, cx) {
-  validateNavigateContext(state, cx);
+export function validateContext(state: UIState, cx: Context) {
   const newcx = getThreadContext(state);
   if (cx.pauseCounter && cx.pauseCounter != newcx.pauseCounter) {
     console.warn("Current thread has paused or resumed");

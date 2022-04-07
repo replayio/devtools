@@ -17,6 +17,7 @@ import { toggleBlackBox } from "./blackbox";
 import { syncBreakpoint } from "../breakpoints";
 import { loadSourceText } from "./loadSourceText";
 import { selectLocation, setBreakableLines } from "../sources";
+import type { Context } from "../../reducers/pause";
 
 import { getRawSourceURL, isInlineScript } from "../../utils/source";
 import {
@@ -37,13 +38,6 @@ import { ContextError } from "../../utils/context";
 
 import { ThreadFront } from "protocol/thread";
 import { SourceActor } from "../../reducers/source-actors";
-
-// TODO Replace this when the `pause` reducer is converted
-interface TempThreadContext {
-  navigateCounter: number;
-  isPaused: boolean;
-  pauseCounter: number;
-}
 
 interface SourceData {
   source: {
@@ -68,7 +62,7 @@ interface SourceInfo {
 
 // If a request has been made to show this source, go ahead and
 // select it.
-function checkSelectedSource(cx: TempThreadContext, sourceId: string): UIThunkAction {
+function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
     const pendingLocation = getPendingSelectedLocation(state);
@@ -98,7 +92,7 @@ function checkSelectedSource(cx: TempThreadContext, sourceId: string): UIThunkAc
   };
 }
 
-function checkPendingBreakpoints(cx: TempThreadContext, sourceId: string): UIThunkAction {
+function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   return async (dispatch, getState) => {
     // source may have been modified by selectLocation
     const source = getSource(getState(), sourceId);
@@ -134,7 +128,7 @@ function checkPendingBreakpoints(cx: TempThreadContext, sourceId: string): UIThu
   };
 }
 
-function restoreBlackBoxedSources(cx: TempThreadContext, sources: Source[]): UIThunkAction {
+function restoreBlackBoxedSources(cx: Context, sources: Source[]): UIThunkAction {
   return async dispatch => {
     const tabs = getBlackBoxList();
     if (tabs.length == 0) {
@@ -310,13 +304,13 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
   };
 }
 
-function addSources(cx: TempThreadContext, sources: Source[]): UIThunkAction {
+function addSources(cx: Context, sources: Source[]): UIThunkAction {
   return (dispatch, getState) => {
     dispatch({ type: "ADD_SOURCES", cx, sources });
   };
 }
 
-function checkNewSources(cx: TempThreadContext, sources: Source[]): UIThunkAction {
+function checkNewSources(cx: Context, sources: Source[]): UIThunkAction {
   return async (dispatch, getState) => {
     for (const source of sources) {
       dispatch(checkSelectedSource(cx, source.id));
