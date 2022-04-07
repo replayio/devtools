@@ -8,7 +8,7 @@ import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { removeUrlParameters } from "ui/utils/environment";
+import { removeUrlParameters, url } from "ui/utils/environment";
 import { setExpectedError } from "ui/actions/session";
 import LoadingScreen from "../shared/LoadingScreen";
 import Sidebar from "./Sidebar";
@@ -75,6 +75,10 @@ function LibraryLoader(props: PropsFromRedux) {
       LogRocket.createSession({ userInfo, auth0User: auth.user, userSettings });
     }
   }, [auth, userInfo, userSettings, userSettingsLoading]);
+
+  if (url.searchParams.get("giantExplosion")) {
+    throw new Error("Did I do it? Did I break the frontend?");
+  }
 
   if (loading1 || loading2 || loading3) {
     return <LoadingScreen />;
