@@ -37,6 +37,7 @@ export const GET_RECORDING = gql`
       workspace {
         id
         name
+        hasPaymentMethod
         subscription {
           status
           trialEnds
