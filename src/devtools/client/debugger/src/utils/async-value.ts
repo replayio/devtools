@@ -24,12 +24,16 @@ export function rejected<T>(value: T): RejectedStatus<T> {
 }
 
 export function asSettled<FulfilledValue, RejectedValue = unknown>(
-  statusEntry: AsyncValue<FulfilledValue, RejectedValue>
+  statusEntry: AsyncValue<FulfilledValue, RejectedValue> | FulfilledValue
 ) {
   // Original logic was:
   // `return value && value.state !== "pending" ? value : null;`
   // I've refactored to `if/else` to better capture types behavior
-  if (typeof statusEntry?.state === "string") {
+  if (
+    typeof statusEntry === "object" &&
+    "state" in statusEntry &&
+    typeof statusEntry?.state === "string"
+  ) {
     if (!isPending(statusEntry)) {
       return statusEntry;
     }
