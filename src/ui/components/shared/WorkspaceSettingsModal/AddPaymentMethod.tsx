@@ -136,8 +136,30 @@ export function EnterPaymentMethod({
       <FieldRow>
         {stripeError ? <p className="col-span-3 text-red-500">{stripeError}</p> : null}
         <CardElement
-          className="col-span-3"
-          options={{ hidePostalCode: true }}
+          className="col-span-3 p-1"
+          options={{
+            hidePostalCode: true,
+            style: {
+              base: {
+                iconColor: "#c4f0ff",
+                color: "var(--body-color)",
+                fontWeight: "500",
+                fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
+                fontSize: "16px",
+                fontSmoothing: "antialiased",
+                ":-webkit-autofill": {
+                  color: "blue",
+                },
+                "::placeholder": {
+                  color: "orange",
+                },
+              },
+              invalid: {
+                iconColor: "brown",
+                color: "green",
+              },
+            },
+          }}
           id="stripe-card-element"
         />
       </FieldRow>
