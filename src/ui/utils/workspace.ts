@@ -16,22 +16,20 @@ export function subscriptionEndsIn(workspace: Workspace, date?: Date | number) {
   const subscription = workspace.subscription;
 
   if (!subscription) {
-    return 0;
+    return Infinity;
   }
 
   if (
     subscription.status === WorkspaceSubscriptionStatus.Canceled ||
     subscription.status === WorkspaceSubscriptionStatus.Incomplete
   ) {
-    return subscription.effectiveUntil
-      ? differenceInCalendarDays(new Date(subscription.effectiveUntil), date)
-      : 0;
+    return differenceInCalendarDays(new Date(subscription.effectiveUntil), date);
   }
 
   if (subscription.status === WorkspaceSubscriptionStatus.Active) {
-    // TODO: Use the following when effective_until is always populated
-    // return !workspace.hasPaymentMethod ? subscription.effectiveUntil : Infinity;
-    return Infinity;
+    return !workspace.hasPaymentMethod
+      ? differenceInCalendarDays(new Date(subscription.effectiveUntil), date)
+      : Infinity;
   }
 
   return differenceInCalendarDays(new Date(subscription.trialEnds!), date);
@@ -40,7 +38,7 @@ export function subscriptionEndsIn(workspace: Workspace, date?: Date | number) {
 export function subscriptionExpired(workspace: Workspace, date?: Date) {
   const expiresIn = subscriptionEndsIn(workspace, date);
 
-  return expiresIn <= 0;
+  return expiresIn < 0;
 }
 
 export function decodeWorkspaceId(workspaceId: string | null) {
