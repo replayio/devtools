@@ -8,11 +8,13 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
+import { getHoveredLineNumberLocation } from "ui/reducers/app";
+import { UIState } from "ui/state";
 import { AnalysisPayload } from "ui/state/app";
 import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
-import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
+import { getHitCountsForLineNumber, getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
 import StaticTooltip from "./StaticTooltip";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
@@ -68,6 +70,45 @@ function Wrapper({
   return <div className="static-tooltip-content bg-gray-700">{children}</div>;
 }
 
+const useLineHits = () => {
+  const dispatch = useDispatch();
+  const { line } = useSelector(getHoveredLineNumberLocation) || { line: null };
+  const [codeHeatMaps, setCodeHeatMaps] = useState(features.codeHeatMaps);
+  const heatMapHitCounts = useSelector((state: UIState) => getHitCountsForLineNumber(state, line));
+  const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
+  const source = useSelector(getSelectedSource);
+  const lastHoveredLineNumber = useRef<number | null>(null);
+
+  let analysisPointsCount: number | undefined;
+
+  useEffect(() => {
+    lastHoveredLineNumber.current = line;
+    setTimeout(() => {
+      if (line === lastHoveredLineNumber.current) {
+        if (codeHeatMaps) {
+          dispatch(
+            setBreakpointHitCounts(source!.id, line, () => {
+              setCodeHeatMaps(false);
+              dispatch(runAnalysisOnLine(line));
+            })
+          );
+        } else {
+          dispatch(runAnalysisOnLine(line));
+        }
+      }
+    }, 200);
+  }, [line]);
+
+  if (codeHeatMaps) {
+    analysisPointsCount = heatMapHitCounts?.hits;
+  } else {
+    analysisPointsCount = analysisPoints?.data.length;
+  }
+    
+
+  return { hits: analysisPointsCount };
+}
+
 export default function LineNumberTooltip({
   editor,
   keyModifiers,
@@ -77,27 +118,10 @@ export default function LineNumberTooltip({
 }) {
   const dispatch = useDispatch();
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
-  const lastHoveredLineNumber = useRef<number | null>(null);
   const isMetaActive = keyModifiers.meta;
-  const [codeHeatMaps, setCodeHeatMaps] = useState(features.codeHeatMaps);
-
   const indexed = useSelector(selectors.getIsIndexed);
-  const hitCounts = useSelector(getHitCountsForSelectedSource);
-  const source = useSelector(getSelectedSource);
   const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
-
-  let analysisPointsCount: number | undefined;
-
-  if (codeHeatMaps) {
-    if (lastHoveredLineNumber.current && hitCounts) {
-      const lineHitCounts = hitCounts.filter(
-        hitCount => hitCount.location.line === lastHoveredLineNumber.current
-      );
-      analysisPointsCount = lineHitCounts?.[0]?.hits;
-    }
-  } else {
-    analysisPointsCount = analysisPoints?.data.length;
-  }
+  const { hits } = useLineHits();
 
   const setHoveredLineNumber = ({
     lineNumber,
@@ -106,27 +130,6 @@ export default function LineNumberTooltip({
     lineNumber: number;
     lineNumberNode: HTMLElement;
   }) => {
-    // The gutter re-renders when we click the line number to add
-    // a breakpoint. That triggers a second gutterLineEnter event
-    // for the same line number. In that case, we shouldn't run
-    // the analysis again.
-    if (lineNumber !== lastHoveredLineNumber.current) {
-      lastHoveredLineNumber.current = lineNumber;
-    }
-    setTimeout(() => {
-      if (lineNumber === lastHoveredLineNumber.current) {
-        if (codeHeatMaps) {
-          dispatch(
-            setBreakpointHitCounts(source!.id, lineNumber, () => {
-              setCodeHeatMaps(false);
-              dispatch(runAnalysisOnLine(lineNumber));
-            })
-          );
-        } else {
-          dispatch(runAnalysisOnLine(lineNumber));
-        }
-      }
-    }, 200);
     dispatch(updateHoveredLineNumber(lineNumber));
     setTargetNode(lineNumberNode);
   };
@@ -145,19 +148,19 @@ export default function LineNumberTooltip({
   }, []);
 
   useEffect(() => {
-    if (analysisPointsCount) {
+    if (hits) {
       trackEvent(
-        analysisPointsCount ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits"
+        hits ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits"
       );
-      trackEvent("breakpoint.preview_hits", { hitsCount: analysisPointsCount || null });
+      trackEvent("breakpoint.preview_hits", { hitsCount: hits || null });
     }
-  }, [analysisPointsCount]);
+  }, [hits]);
 
   if (!targetNode || isMetaActive) {
     return null;
   }
 
-  if (!indexed || analysisPointsCount === undefined) {
+  if (!indexed || hits === undefined) {
     return (
       <StaticTooltip targetNode={targetNode}>
         <Wrapper loading>{!indexed ? "Indexing…" : "Loading…"}</Wrapper>
@@ -165,7 +168,7 @@ export default function LineNumberTooltip({
     );
   }
 
-  const { text, showWarning } = getTextAndWarning(analysisPoints, analysisPointsCount);
+  const { text, showWarning } = getTextAndWarning(analysisPoints, hits);
   return (
     <StaticTooltip targetNode={targetNode}>
       <Wrapper showWarning={showWarning}>{text}</Wrapper>

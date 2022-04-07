@@ -664,6 +664,10 @@ export function getHitCountsForSelectedSource(state: UIState) {
   const id = getSelectedSourceId(state)!;
   return getHitCountsForSource(state, id);
 }
+export function getHitCountsForLineNumber(state: UIState, line: number | null) {
+  const hits = getHitCountsForSelectedSource(state);
+  return hits.find(hit => hit.location.line === line);
+}
 
 export const getDisplayedSources = createSelector(
   (state: UIState) => state.sources.sources,
