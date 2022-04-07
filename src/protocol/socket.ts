@@ -61,12 +61,29 @@ export function initSocket(store: UIStore, address: string) {
     return;
   }
 
-  socket = new WebSocket(address);
+  const onopen = makeInfallible(onSocketOpen);
+  const onclose = makeInfallible(() => store.dispatch(onSocketClose()));
+  const onerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt, false)));
+  const oninitialerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt, true)));
+  const onmessage = makeInfallible(onSocketMessage);
 
-  socket.onopen = makeInfallible(onSocketOpen);
-  socket.onclose = makeInfallible(() => store.dispatch(onSocketClose()));
-  socket.onerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt)));
-  socket.onmessage = makeInfallible(onSocketMessage);
+  const handleOpen = () => {
+    socket.onerror = onerror;
+    socket.onclose = onclose;
+    socket.onmessage = onmessage;
+    onopen();
+  };
+  const handleOpenError = () => {
+    // If the first attempt fails, try one more time.
+    socket = new WebSocket(address);
+    socket.onopen = handleOpen;
+    socket.onerror = oninitialerror;
+  };
+
+  // First attempt at opening socket.
+  socket = new WebSocket(address);
+  socket.onopen = handleOpen;
+  socket.onerror = handleOpenError;
 }
 
 export function sendMessage<M extends CommandMethods>(
@@ -182,14 +199,24 @@ function onSocketClose(): UIThunkAction {
   };
 }
 
-function onSocketError(evt: Event): UIThunkAction {
+function onSocketError(evt: Event, initial: boolean): UIThunkAction {
   console.error("Socket Error", evt);
   // If the socket has errored, the connection will close. So let's set `willClose`
   // so that we show _this_ error message, and not the `onSocketClose` error message
   willClose = true;
   return dispatch => {
     log("Socket Error");
-    if (Date.now() - lastReceivedMessageTime < 300000) {
+    if (initial) {
+      dispatch(
+        setUnexpectedError({
+          message: "Unable to establish socket connection",
+          content:
+            "A connection to our server could not be established. Please check your connection.",
+          action: "refresh",
+          ...evt,
+        })
+      );
+    } else if (Date.now() - lastReceivedMessageTime < 300000) {
       dispatch(
         setUnexpectedError({
           message: "Unexpected socket error",
