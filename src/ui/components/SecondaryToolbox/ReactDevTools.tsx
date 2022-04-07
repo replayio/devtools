@@ -18,14 +18,9 @@ import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
-import type {
-  ReactDevTools as ReactDevToolsType,
-  createBridge as createBridgeType,
-  createStore as createStoreType,
-  initialize as initializeType,
-  Store,
-  Wall,
-} from "react-devtools-inline/frontend";
+import type { Store, Wall } from "react-devtools-inline/frontend";
+
+type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -216,16 +211,14 @@ class ReplayWall implements Wall {
 }
 
 function createReactDevTools(
-  reactDevToolsInlineModule: any,
+  reactDevToolsInlineModule: ReactDevToolsInlineModule,
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodePickerOpts) => void,
   disablePicker: () => void,
   onShutdown: () => void
-): ReactDevToolsType {
-  const createBridge: typeof createBridgeType = reactDevToolsInlineModule.createBridge;
-  const createStore: typeof createStoreType = reactDevToolsInlineModule.createStore;
-  const initialize: typeof initializeType = reactDevToolsInlineModule.initialize;
+) {
+  const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
   const target = { postMessage() {} };
   const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
@@ -277,7 +270,8 @@ function ReactDevtoolsPanel({
   const theme = useSelector(getTheme);
 
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
-  const [reactDevToolsInlineModule, setReactDevToolsInlineModule] = useState(null);
+  const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
+    useState<ReactDevToolsInlineModule | null>(null);
 
   useEffect(() => {
     loadReactDevToolsInlineModuleFromProtocol(setReactDevToolsInlineModule);
