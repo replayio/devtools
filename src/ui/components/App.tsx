@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, createContext } from "react";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
 import AppErrors from "./shared/Error";
@@ -10,10 +10,10 @@ import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import UserSettingsModal from "./shared/UserSettingsModal";
 import OnboardingModal from "./shared/OnboardingModal/index";
-import { isTest } from "ui/utils/environment";
+import { getSystemColorSchemePreference, isTest } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { ModalType } from "ui/state/app";
+import { AppTheme, ModalType } from "ui/state/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "./shared/LoadingScreen";
@@ -31,10 +31,11 @@ import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
+import { updateTheme } from "ui/actions/app";
 
 function AppModal({ modal }: { modal: ModalType }) {
   const loadingFinished = useSelector(selectors.getLoadingFinished);
-  
+
   if (!loadingFinished) {
     return null;
   }

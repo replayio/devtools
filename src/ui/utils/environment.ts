@@ -139,3 +139,7 @@ export function getDisplayedUrl(url: string) {
   const { hostname, pathname } = urlObj;
   return `${hostname}${pathname}`;
 }
+
+export function getSystemColorSchemePreference() {
+  return window.matchMedia("(prefers-color-scheme:dark)") ? "dark" : "light";
+}
