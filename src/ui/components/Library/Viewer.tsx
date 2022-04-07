@@ -7,8 +7,10 @@ import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
-import TeamTrialEnd from "./TeamTrialEnd";
 import styles from "./Library.module.css";
+import { useSelector } from "react-redux";
+import { getWorkspaceId } from "ui/reducers/app";
+import TeamTrialEnd from "./TeamTrialEnd";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -76,6 +78,7 @@ function ViewerContent({
   recordings: Recording[];
   workspaceName: string | React.ReactNode;
 }) {
+  const currentWorkspaceId = useSelector(getWorkspaceId);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showMore, toggleShowMore] = useState(false);
@@ -126,7 +129,7 @@ function ViewerContent({
       <ViewerHeader>
         {HeaderLeft}
         <div className="flex flex-row items-center space-x-3">
-          <TeamTrialEnd />
+          {currentWorkspaceId ? <TeamTrialEnd currentWorkspaceId={currentWorkspaceId} /> : null}
           {isEditing ? (
             <>
               <BatchActionDropdown
