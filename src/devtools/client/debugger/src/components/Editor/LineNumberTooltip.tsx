@@ -8,7 +8,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
-import { AnalysisPayload } from "ui/state/app";
+import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
@@ -25,7 +25,10 @@ export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #E
 
 function getTextAndWarning(analysisPoints?: AnalysisPayload, analysisPointsCount?: number) {
   if (analysisPoints?.error) {
-    return { text: "10k+ hits", showWarning: false };
+    return {
+      text: analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error",
+      showWarning: false,
+    };
   }
 
   const points = analysisPointsCount || 0;
