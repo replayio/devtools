@@ -19,3 +19,7 @@ export function getTextAtPosition(
 export function getPrettySourceURL(url: string): string;
 
 export function getPlainUrl(url: string): string;
+
+export function getRawSourceURL(url: string): string;
+
+export function isInlineScript(source: { introductionType?: string | null }): boolean;
