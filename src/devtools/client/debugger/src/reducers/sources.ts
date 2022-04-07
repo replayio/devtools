@@ -62,11 +62,11 @@ export interface SourceContent {
 
 export interface Source {
   // TODO Fix this when `async-value` gets updated
-  content: SourceContent | null;
-  extensionName?: string;
+  content?: SourceContent | null;
+  extensionName?: string | null;
   id: string;
-  introductionType?: unknown;
-  introductionUrl?: string;
+  introductionType?: string | null;
+  introductionUrl?: string | null;
   isBlackBoxed: boolean;
   isExtension: boolean;
   isOriginal: boolean;
@@ -742,7 +742,6 @@ export function getBreakableLines(state: UIState, sourceId: string): number[] | 
 
   // We pull generated file breakable lines directly from the source actors
   // so that breakable lines can be added as new source actors on HTML loads.
-  // @ts-expect-error Fix this when source-actors is TS_ified
   return getBreakableLinesForSourceActors(state.sourceActors, state.sources.actors[sourceId]);
 }
 

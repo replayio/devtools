@@ -65,8 +65,8 @@ export function SourceOutline({
   const handleSelectSymbol = useCallback(
     (symbol: ClassSymbol | FunctionSymbol) => {
       selectLocation(cx, {
-        sourceId: selectedSource.id,
-        sourceUrl: selectedSource.url,
+        sourceId: selectedSource!.id,
+        sourceUrl: selectedSource!.url!,
         line: symbol.location.start.line,
         column: symbol.location.start.column,
       });

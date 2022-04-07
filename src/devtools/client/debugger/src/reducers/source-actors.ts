@@ -24,8 +24,9 @@ import type { HitCount } from "./sources";
 export interface SourceActor {
   actor: string;
   id: string;
-  introductionType?: unknown;
-  introductionUrl?: string;
+  introductionType?: string | null;
+  introductionUrl?: string | null;
+  isBlackBoxed?: boolean;
   source: string;
   sourceMapURL?: string;
   thread: string;
@@ -34,7 +35,7 @@ export interface SourceActor {
   max?: number;
   breakableLines?: AsyncValue<number[]> | null;
   breakpointPositions?: Map<number, AsyncValue<number[]>>;
-  breakpointHitCounts: HitCount[] | null;
+  breakpointHitCounts?: HitCount[] | null;
 }
 
 export type SourceActorsState = ResourceState<SourceActor>;
@@ -187,6 +188,7 @@ function updateBreakpointHitCounts(
     max: currentMax,
     breakpointHitCounts: currentBreakpointHitCounts,
   } = {
+    // Provide min/max defaults that will "lose" any comparison later
     min: Infinity,
     max: 0,
     // @ts-ignore always overwritten
@@ -318,7 +320,7 @@ export function getSourceActorBreakpointColumns(state: UIState, id: string, line
 export const getBreakableLinesForSourceActors = makeWeakQuery<
   SourceActor,
   SourceActor["breakableLines"],
-  unknown[],
+  number[],
   string[]
 >({
   filter: (state, ids: string[]) => ids,
@@ -330,6 +332,6 @@ export const getBreakableLinesForSourceActors = makeWeakQuery<
           acc = acc.concat(item.value);
         }
         return acc;
-      }, [] as unknown[])
+      }, [] as number[])
     ),
 });
