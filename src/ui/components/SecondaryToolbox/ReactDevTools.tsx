@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
@@ -17,10 +17,12 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
-import { consoleOverflowed } from "devtools/client/webconsole/reducers/messages";
 
 import type {
   ReactDevTools as ReactDevToolsType,
+  createBridge as createBridgeType,
+  createStore as createStoreType,
+  initialize as initializeType,
   Store,
   Wall,
 } from "react-devtools-inline/frontend";
@@ -213,15 +215,17 @@ class ReplayWall implements Wall {
   }
 }
 
-async function createReactDevTools(
+function createReactDevTools(
   reactDevToolsInlineModule: any,
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodePickerOpts) => void,
   disablePicker: () => void,
   onShutdown: () => void
-) {
-  const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
+): ReactDevToolsType {
+  const createBridge: typeof createBridgeType = reactDevToolsInlineModule.createBridge;
+  const createStore: typeof createStoreType = reactDevToolsInlineModule.createStore;
+  const initialize: typeof initializeType = reactDevToolsInlineModule.initialize;
 
   const target = { postMessage() {} };
   const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
@@ -239,21 +243,12 @@ async function createReactDevTools(
   return ReactDevTools;
 }
 
-type ReactDevToolsStateUpdaterFunction = (reactDevTools: ReactDevToolsType | null) => void;
-
-async function createReactDevToolsForBridgeProtocol(
-  stateUpdater: ReactDevToolsStateUpdaterFunction,
-  annotations: Annotation[],
-  currentPoint: ExecutionPoint,
-  enablePicker: (opts: NodePickerOpts) => void,
-  disablePicker: () => void,
-  onShutdown: () => void
-) {
-  // React DevTools (RD) changed its internal data structure slightly in a minor update.
-  // The result is that Replay sessions recorded with older versions of RD don't play well in newer versions.
-  // We can work around this by checking RD's "bridge protocol" version (which we also store)
-  // and loading the appropriate frontend version to match.
-  // For more information see https://github.com/facebook/react/issues/24219
+// React DevTools (RD) changed its internal data structure slightly in a minor update.
+// The result is that Replay sessions recorded with older versions of RD don't play well in newer versions.
+// We can work around this by checking RD's "bridge protocol" version (which we also store)
+// and loading the appropriate frontend version to match.
+// For more information see https://github.com/facebook/react/issues/24219
+async function loadReactDevToolsInlineModuleFromProtocol(stateUpdaterCallback: Function) {
   const response = await ThreadFront.evaluate({
     asyncIndex: 0,
     text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
@@ -261,30 +256,14 @@ async function createReactDevToolsForBridgeProtocol(
   const json: any = await response?.returned?.getJSON();
   const version = json?.data?.version || 0;
 
-  let ReactDevTools = null;
+  let reactDevToolsInlineModule = null;
   if (version >= 2) {
-    const reactDevToolsInlineModule = await import("react-devtools-inline/frontend");
-    ReactDevTools = await createReactDevTools(
-      reactDevToolsInlineModule,
-      annotations,
-      currentPoint,
-      enablePicker,
-      disablePicker,
-      onShutdown
-    );
+    reactDevToolsInlineModule = await import("react-devtools-inline/frontend");
   } else {
-    const reactDevToolsInlineModule = await import("react-devtools-inline_4_17_0/frontend");
-    ReactDevTools = await createReactDevTools(
-      reactDevToolsInlineModule,
-      annotations,
-      currentPoint,
-      enablePicker,
-      disablePicker,
-      onShutdown
-    );
+    reactDevToolsInlineModule = await import("react-devtools-inline_4_17_0/frontend");
   }
 
-  stateUpdater(ReactDevTools);
+  stateUpdaterCallback(reactDevToolsInlineModule);
 }
 
 function ReactDevtoolsPanel({
@@ -296,34 +275,18 @@ function ReactDevtoolsPanel({
   reactInitPoint,
 }: PropsFromRedux) {
   const theme = useSelector(getTheme);
-  const [ReactDevTools, setReactDevTools] = useState<ReactDevToolsType>(null);
 
-  const initializationRef = useRef<boolean>(false);
+  // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
+  const [reactDevToolsInlineModule, setReactDevToolsInlineModule] = useState(null);
 
-  // Lazy-load the right version of react-devtools-inline based on embedded metadata.
-  // Eventually this lazy-loading code could be done with Suspense, but for now use an effect.
-  //
-  // TODO This lint disabling shouldn't be necessary; omitting the dependencies array (in favor of a ref) is valid.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (initializationRef.current) {
-      // Only initialize the DevTools UI once, once conditions have been met.
-      return;
-    }
+    loadReactDevToolsInlineModuleFromProtocol(setReactDevToolsInlineModule);
+  }, []);
 
-    if (currentPoint !== null) {
-      initializationRef.current = true;
-
-      createReactDevToolsForBridgeProtocol(
-        setReactDevTools,
-        annotations,
-        currentPoint,
-        enablePicker,
-        disablePicker,
-        onShutdown
-      );
-    }
-  });
+  // We can't render anything meaningful until we know which module to load.
+  if (reactDevToolsInlineModule === null) {
+    return null;
+  }
 
   if (currentPoint === null) {
     return null;
@@ -369,9 +332,14 @@ function ReactDevtoolsPanel({
     );
   }
 
-  if (ReactDevTools === null) {
-    return null;
-  }
+  const ReactDevTools = createReactDevTools(
+    reactDevToolsInlineModule,
+    annotations,
+    currentPoint,
+    enablePicker,
+    disablePicker,
+    onShutdown
+  );
 
   return (
     <ReactDevTools
