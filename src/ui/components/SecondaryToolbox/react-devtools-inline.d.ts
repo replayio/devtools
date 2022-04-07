@@ -187,3 +187,7 @@ https: declare module "react-devtools-inline/frontend" {
     bridgeAndStore: { bridge?: FrontentBridge; store?: Store }
   ): typeof ReactDevTools;
 }
+
+https: declare module "react-devtools-inline_4_17_0/frontend" {
+  export * from "@types/react-devtools-inline/frontend";
+}

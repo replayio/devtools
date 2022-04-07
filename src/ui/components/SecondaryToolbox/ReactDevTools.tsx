@@ -1,6 +1,6 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { createBridge, createStore, initialize, Store, Wall } from "react-devtools-inline/frontend";
 import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
@@ -17,6 +17,10 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
+
+import type { Store, Wall } from "react-devtools-inline/frontend";
+
+type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -207,12 +211,15 @@ class ReplayWall implements Wall {
 }
 
 function createReactDevTools(
+  reactDevToolsInlineModule: ReactDevToolsInlineModule,
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodePickerOpts) => void,
   disablePicker: () => void,
   onShutdown: () => void
 ) {
+  const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
+
   const target = { postMessage() {} };
   const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
   const bridge = createBridge(target, wall);
@@ -229,6 +236,28 @@ function createReactDevTools(
   return ReactDevTools;
 }
 
+// React DevTools (RD) changed its internal data structure slightly in a minor update.
+// The result is that Replay sessions recorded with older versions of RD don't play well in newer versions.
+// We can work around this by checking RD's "bridge protocol" version (which we also store)
+// and loading the appropriate frontend version to match.
+// For more information see https://github.com/facebook/react/issues/24219
+async function loadReactDevToolsInlineModuleFromProtocol(stateUpdaterCallback: Function) {
+  const response = await ThreadFront.evaluate({
+    asyncIndex: 0,
+    text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
+  });
+  const json: any = await response?.returned?.getJSON();
+  const version = json?.data?.version;
+
+  // We should only load the DevTools module once we know which protocol version it requires.
+  // If we don't have a version yet, it probably means we're too early in the Replay session.
+  if (version >= 2) {
+    stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+  } else if (version === 1) {
+    stateUpdaterCallback(await import("react-devtools-inline_4_17_0/frontend"));
+  }
+}
+
 function ReactDevtoolsPanel({
   annotations,
   currentPoint,
@@ -238,6 +267,19 @@ function ReactDevtoolsPanel({
   reactInitPoint,
 }: PropsFromRedux) {
   const theme = useSelector(getTheme);
+
+  // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
+  const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
+    useState<ReactDevToolsInlineModule | null>(null);
+
+  // Try to load the DevTools module whenever the current point changes.
+  // Eventually we'll reach a point that has the DevTools protocol embedded.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (reactDevToolsInlineModule === null) {
+      loadReactDevToolsInlineModuleFromProtocol(setReactDevToolsInlineModule);
+    }
+  });
 
   if (currentPoint === null) {
     return null;
@@ -270,6 +312,7 @@ function ReactDevtoolsPanel({
   }
 
   const isReady =
+    reactDevToolsInlineModule !== null &&
     reactInitPoint !== null &&
     currentPoint !== null &&
     compareNumericStrings(reactInitPoint, currentPoint) <= 0;
@@ -284,6 +327,7 @@ function ReactDevtoolsPanel({
   }
 
   const ReactDevTools = createReactDevTools(
+    reactDevToolsInlineModule,
     annotations,
     currentPoint,
     enablePicker,
