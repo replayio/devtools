@@ -250,6 +250,7 @@ const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
 
 export const getTheme = (state: UIState) =>
   state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
+export const getThemePreference = (state: UIState) => state.app.theme;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;

@@ -4,7 +4,7 @@ import hooks from "ui/hooks";
 import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
 import { CheckboxRow } from "./CheckboxRow";
-import { getTheme } from "ui/reducers/app";
+import { getTheme, getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/actions/app";
 import { SelectMenu } from "../Forms";
 import { AppTheme } from "ui/state/app";
@@ -107,7 +107,7 @@ function PrivacyPreferences() {
 
 function UiPreferences() {
   const dispatch = useDispatch();
-  const theme = useSelector(getTheme);
+  const theme = useSelector(getThemePreference);
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));

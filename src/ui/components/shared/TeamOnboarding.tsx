@@ -281,7 +281,6 @@ function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
     slide = <DownloadingPage {...{ onFinished }} />;
   }
 
-  console.log("hello", current);
   return (
     <OnboardingModalContainer {...{ randomNumber }} theme="light">
       <OnboardingContentWrapper>{slide}</OnboardingContentWrapper>

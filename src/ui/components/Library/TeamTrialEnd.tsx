@@ -13,8 +13,6 @@ export default function TeamTrialEnd({ currentWorkspaceId }: { currentWorkspaceI
   const router = useRouter();
   const { userId: localUserId } = hooks.useGetUserId();
 
-  console.log("hello");
-
   if (loading) {
     return null;
   }
