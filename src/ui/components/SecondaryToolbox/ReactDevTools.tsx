@@ -1,6 +1,6 @@
 import React from "react";
+import { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { createBridge, createStore, initialize, Store, Wall } from "react-devtools-inline/frontend";
 import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
@@ -17,6 +17,13 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
+import { consoleOverflowed } from "devtools/client/webconsole/reducers/messages";
+
+import type {
+  ReactDevTools as ReactDevToolsType,
+  Store,
+  Wall,
+} from "react-devtools-inline/frontend";
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -206,13 +213,16 @@ class ReplayWall implements Wall {
   }
 }
 
-function createReactDevTools(
+async function createReactDevTools(
+  reactDevToolsInlineModule: any,
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodePickerOpts) => void,
   disablePicker: () => void,
   onShutdown: () => void
 ) {
+  const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
+
   const target = { postMessage() {} };
   const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
   const bridge = createBridge(target, wall);
@@ -229,6 +239,54 @@ function createReactDevTools(
   return ReactDevTools;
 }
 
+type ReactDevToolsStateUpdaterFunction = (reactDevTools: ReactDevToolsType | null) => void;
+
+async function createReactDevToolsForBridgeProtocol(
+  stateUpdater: ReactDevToolsStateUpdaterFunction,
+  annotations: Annotation[],
+  currentPoint: ExecutionPoint,
+  enablePicker: (opts: NodePickerOpts) => void,
+  disablePicker: () => void,
+  onShutdown: () => void
+) {
+  // React DevTools (RD) changed its internal data structure slightly in a minor update.
+  // The result is that Replay sessions recorded with older versions of RD don't play well in newer versions.
+  // We can work around this by checking RD's "bridge protocol" version (which we also store)
+  // and loading the appropriate frontend version to match.
+  // For more information see https://github.com/facebook/react/issues/24219
+  const response = await ThreadFront.evaluate({
+    asyncIndex: 0,
+    text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
+  });
+  const json: any = await response?.returned?.getJSON();
+  const version = json?.data?.version || 0;
+
+  let ReactDevTools = null;
+  if (version >= 2) {
+    const reactDevToolsInlineModule = await import("react-devtools-inline/frontend");
+    ReactDevTools = await createReactDevTools(
+      reactDevToolsInlineModule,
+      annotations,
+      currentPoint,
+      enablePicker,
+      disablePicker,
+      onShutdown
+    );
+  } else {
+    const reactDevToolsInlineModule = await import("react-devtools-inline_4_17_0/frontend");
+    ReactDevTools = await createReactDevTools(
+      reactDevToolsInlineModule,
+      annotations,
+      currentPoint,
+      enablePicker,
+      disablePicker,
+      onShutdown
+    );
+  }
+
+  stateUpdater(ReactDevTools);
+}
+
 function ReactDevtoolsPanel({
   annotations,
   currentPoint,
@@ -238,6 +296,34 @@ function ReactDevtoolsPanel({
   reactInitPoint,
 }: PropsFromRedux) {
   const theme = useSelector(getTheme);
+  const [ReactDevTools, setReactDevTools] = useState<ReactDevToolsType>(null);
+
+  const initializationRef = useRef<boolean>(false);
+
+  // Lazy-load the right version of react-devtools-inline based on embedded metadata.
+  // Eventually this lazy-loading code could be done with Suspense, but for now use an effect.
+  //
+  // TODO This lint disabling shouldn't be necessary; omitting the dependencies array (in favor of a ref) is valid.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (initializationRef.current) {
+      // Only initialize the DevTools UI once, once conditions have been met.
+      return;
+    }
+
+    if (currentPoint !== null) {
+      initializationRef.current = true;
+
+      createReactDevToolsForBridgeProtocol(
+        setReactDevTools,
+        annotations,
+        currentPoint,
+        enablePicker,
+        disablePicker,
+        onShutdown
+      );
+    }
+  });
 
   if (currentPoint === null) {
     return null;
@@ -283,13 +369,9 @@ function ReactDevtoolsPanel({
     );
   }
 
-  const ReactDevTools = createReactDevTools(
-    annotations,
-    currentPoint,
-    enablePicker,
-    disablePicker,
-    onShutdown
-  );
+  if (ReactDevTools === null) {
+    return null;
+  }
 
   return (
     <ReactDevTools
