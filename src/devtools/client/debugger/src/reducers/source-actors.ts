@@ -24,8 +24,9 @@ import type { HitCount } from "./sources";
 export interface SourceActor {
   actor: string;
   id: string;
-  introductionType?: unknown;
-  introductionUrl?: string;
+  introductionType?: string | null;
+  introductionUrl?: string | null;
+  isBlackBoxed?: boolean;
   source: string;
   sourceMapURL?: string;
   thread: string;
@@ -34,7 +35,7 @@ export interface SourceActor {
   max?: number;
   breakableLines?: AsyncValue<number[]> | null;
   breakpointPositions?: Map<number, AsyncValue<number[]>>;
-  breakpointHitCounts: HitCount[] | null;
+  breakpointHitCounts?: HitCount[] | null;
 }
 
 export type SourceActorsState = ResourceState<SourceActor>;

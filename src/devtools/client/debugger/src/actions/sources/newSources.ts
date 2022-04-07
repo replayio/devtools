@@ -9,6 +9,8 @@
  * @module actions/sources
  */
 
+import type { UIThunkAction } from "ui/actions";
+
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
 import { toggleBlackBox } from "./blackbox";
@@ -28,14 +30,45 @@ import {
   isSourceLoadingOrLoaded,
 } from "../../selectors";
 
+import type { Source } from "../../reducers/sources";
+
 import sourceQueue from "../../utils/source-queue";
 import { ContextError } from "../../utils/context";
 
 import { ThreadFront } from "protocol/thread";
+import { SourceActor } from "../../reducers/source-actors";
+
+// TODO Replace this when the `pause` reducer is converted
+interface TempThreadContext {
+  navigateCounter: number;
+  isPaused: boolean;
+  pauseCounter: number;
+}
+
+interface SourceData {
+  source: {
+    actor: string;
+    sourceMapURL?: string;
+    url: string;
+    extensionName?: string;
+    introductionUrl?: string;
+    introductionType?: string;
+    isBlackBoxed?: boolean;
+  };
+  thread: string;
+  id?: string;
+  url?: string;
+  isServiceWorker?: boolean;
+}
+
+interface SourceInfo {
+  type: "generated" | "original";
+  data: SourceData;
+}
 
 // If a request has been made to show this source, go ahead and
 // select it.
-function checkSelectedSource(cx, sourceId) {
+function checkSelectedSource(cx: TempThreadContext, sourceId: string): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
     const pendingLocation = getPendingSelectedLocation(state);
@@ -65,7 +98,7 @@ function checkSelectedSource(cx, sourceId) {
   };
 }
 
-function checkPendingBreakpoints(cx, sourceId) {
+function checkPendingBreakpoints(cx: TempThreadContext, sourceId: string): UIThunkAction {
   return async (dispatch, getState) => {
     // source may have been modified by selectLocation
     const source = getSource(getState(), sourceId);
@@ -101,24 +134,24 @@ function checkPendingBreakpoints(cx, sourceId) {
   };
 }
 
-function restoreBlackBoxedSources(cx, sources) {
+function restoreBlackBoxedSources(cx: TempThreadContext, sources: Source[]): UIThunkAction {
   return async dispatch => {
     const tabs = getBlackBoxList();
     if (tabs.length == 0) {
       return;
     }
     for (const source of sources) {
-      if (tabs.includes(source.url) && !source.isBlackBoxed) {
+      if (tabs.includes(source.url!) && !source.isBlackBoxed) {
         dispatch(toggleBlackBox(cx, source));
       }
     }
   };
 }
 
-export function newQueuedSources(sourceInfo) {
+export function newQueuedSources(sourceInfo: SourceInfo[]): UIThunkAction<Promise<void>> {
   return async dispatch => {
-    const generated = [];
-    const original = [];
+    const generated: SourceData[] = [];
+    const original: SourceData[] = [];
     for (const source of sourceInfo) {
       if (source.type === "generated") {
         generated.push(source.data);
@@ -136,27 +169,27 @@ export function newQueuedSources(sourceInfo) {
   };
 }
 
-export function newOriginalSource(sourceInfo) {
+export function newOriginalSource(sourceInfo: SourceData): UIThunkAction<Promise<Source>> {
   return async dispatch => {
     const sources = await dispatch(newOriginalSources([sourceInfo]));
     return sources[0];
   };
 }
-export function newOriginalSources(sourceInfo) {
+export function newOriginalSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
   return async (dispatch, getState) => {
     const state = getState();
     const seen = new Set();
-    const sources = [];
+    const sources: Source[] = [];
 
     for (const { id, url } of sourceInfo) {
-      if (seen.has(id) || getSource(state, id)) {
+      if (seen.has(id) || getSource(state, id!)) {
         continue;
       }
 
       seen.add(id);
 
       sources.push({
-        id,
+        id: id!,
         url,
         relativeUrl: url,
         isPrettyPrinted: false,
@@ -182,26 +215,26 @@ export function newOriginalSources(sourceInfo) {
   };
 }
 
-export function newGeneratedSource(sourceInfo) {
+export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promise<Source>> {
   return async dispatch => {
     const sources = await dispatch(newGeneratedSources([sourceInfo]));
     return sources[0];
   };
 }
-export function newGeneratedSources(sourceInfo) {
+export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
   return async (dispatch, getState, { client }) => {
-    const resultIds = [];
-    const newSourcesObj = {};
-    const newSourceActors = [];
+    const resultIds: string[] = [];
+    const newSourcesObj: Record<string, Source> = {};
+    const newSourceActors: SourceActor[] = [];
 
     for (const { thread, isServiceWorker, source, id } of sourceInfo) {
-      const newId = id || makeSourceId(source, isServiceWorker);
+      const newId: string = id || makeSourceId(source, isServiceWorker);
 
       const kind = ThreadFront.getSourceKind(source.actor);
       const isPrettyPrinted = kind == "prettyPrinted";
       const isOriginal = kind == "sourceMapped";
 
-      let url = source.url;
+      let url: string | undefined = source.url;
       if (kind == "inlineScript") {
         // Ignore inline scripts. We should see an HTML page script that includes
         // these plus the rest of the HTML.
@@ -277,13 +310,13 @@ export function newGeneratedSources(sourceInfo) {
   };
 }
 
-function addSources(cx, sources) {
+function addSources(cx: TempThreadContext, sources: Source[]): UIThunkAction {
   return (dispatch, getState) => {
     dispatch({ type: "ADD_SOURCES", cx, sources });
   };
 }
 
-function checkNewSources(cx, sources) {
+function checkNewSources(cx: TempThreadContext, sources: Source[]): UIThunkAction {
   return async (dispatch, getState) => {
     for (const source of sources) {
       dispatch(checkSelectedSource(cx, source.id));
@@ -295,7 +328,7 @@ function checkNewSources(cx, sources) {
   };
 }
 
-export function ensureSourceActor(thread, sourceActor) {
+export function ensureSourceActor(thread: string, sourceActor: string): UIThunkAction {
   return async function (dispatch, getState, { client }) {
     await sourceQueue.flush();
     if (hasSourceActor(getState(), sourceActor)) {
