@@ -1,21 +1,21 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import { useDispatch } from "react-redux";
+import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import { subscriptionEndsIn } from "ui/utils/workspace";
 import { TrialEnd } from "../shared/TrialEnd";
 
-function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
+export default function TeamTrialEnd({ currentWorkspaceId }: { currentWorkspaceId: string }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const { members } = hooks.useGetWorkspaceMembers(currentWorkspaceId!);
+  const dispatch = useDispatch();
+  const { members } = hooks.useGetWorkspaceMembers(currentWorkspaceId);
   const router = useRouter();
   const { userId: localUserId } = hooks.useGetUserId();
 
-  // There's no workspace ID if they are in their personal library.
-  if (loading || !currentWorkspaceId) {
+  console.log("hello");
+
+  if (loading) {
     return null;
   }
 
@@ -30,7 +30,7 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
   const onClick = isAdmin
     ? () => {
         router.push(`/team/${currentWorkspaceId}/settings/billing`);
-        setModal("workspace-settings");
+        dispatch(setModal("workspace-settings"));
       }
     : undefined;
 
@@ -45,12 +45,3 @@ function TeamTrialEnd({ currentWorkspaceId, setModal }: PropsFromRedux) {
     />
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
-  }),
-  { setModal: actions.setModal }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(TeamTrialEnd);
