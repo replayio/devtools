@@ -4,21 +4,8 @@
 
 //
 import type { UIState } from "ui/state";
-import { Location } from "@recordreplay/protocol";
-import { UIThunkAction } from "ui/actions";
-import { WiredFrame } from "protocol/thread/pause";
-
-export interface UrlLocation extends Location {
-  sourceUrl: string;
-}
-
-export interface SelectedFrame {
-  id: string;
-  protocolId: string;
-  asyncIndex: number;
-  displayName: string;
-  location: UrlLocation;
-}
+import type { UrlLocation } from "../reducers/pause";
+export type { UrlLocation } from "../reducers/pause";
 
 export * from "../reducers/sources";
 export * from "../reducers/tabs";
