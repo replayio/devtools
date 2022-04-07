@@ -247,16 +247,15 @@ async function loadReactDevToolsInlineModuleFromProtocol(stateUpdaterCallback: F
     text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
   });
   const json: any = await response?.returned?.getJSON();
-  const version = json?.data?.version || 0;
+  const version = json?.data?.version;
 
-  let reactDevToolsInlineModule = null;
+  // We should only load the DevTools module once we know which protocol version it requires.
+  // If we don't have a version yet, it probably means we're too early in the Replay session.
   if (version >= 2) {
-    reactDevToolsInlineModule = await import("react-devtools-inline/frontend");
-  } else {
-    reactDevToolsInlineModule = await import("react-devtools-inline_4_17_0/frontend");
+    stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+  } else if (version === 1) {
+    stateUpdaterCallback(await import("react-devtools-inline_4_17_0/frontend"));
   }
-
-  stateUpdaterCallback(reactDevToolsInlineModule);
 }
 
 function ReactDevtoolsPanel({
@@ -273,14 +272,14 @@ function ReactDevtoolsPanel({
   const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
     useState<ReactDevToolsInlineModule | null>(null);
 
+  // Try to load the DevTools module whenever the current point changes.
+  // Eventually we'll reach a point that has the DevTools protocol embedded.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    loadReactDevToolsInlineModuleFromProtocol(setReactDevToolsInlineModule);
-  }, []);
-
-  // We can't render anything meaningful until we know which module to load.
-  if (reactDevToolsInlineModule === null) {
-    return null;
-  }
+    if (reactDevToolsInlineModule === null) {
+      loadReactDevToolsInlineModuleFromProtocol(setReactDevToolsInlineModule);
+    }
+  });
 
   if (currentPoint === null) {
     return null;
@@ -313,6 +312,7 @@ function ReactDevtoolsPanel({
   }
 
   const isReady =
+    reactDevToolsInlineModule !== null &&
     reactInitPoint !== null &&
     currentPoint !== null &&
     compareNumericStrings(reactInitPoint, currentPoint) <= 0;
