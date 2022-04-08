@@ -10,6 +10,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 const { trackEvent } = require("ui/utils/telemetry");
 
 import BreakpointTimeline from "./BreakpointTimeline";
+import { PanelStatus } from "./PanelStatus";
 
 function BreakpointNavigation({
   executionPoint,
@@ -79,7 +80,7 @@ function BreakpointNavigation({
           </button>
         )}
         {!editing && (
-          <BreakpointNavigationStatus
+          <PanelStatus
             indexed={indexed}
             executionPoint={lastExecutionPoint}
             analysisPoints={analysisPoints}
@@ -111,38 +112,6 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
       >
         <div className="img rewind" style={{ transform: "rotate(180deg)" }} />
       </button>
-    </div>
-  );
-}
-
-function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed }) {
-  let status = "";
-  let maxStatusLength = 0;
-  if (!indexed) {
-    status = "Indexing";
-  } else if (!analysisPoints || !executionPoint) {
-    status = "Loading";
-  } else if (analysisPoints.error) {
-    // This error is currently caused by how the backend limits the returned
-    // hits to 10k. Lines with more than 10k hits don't get returned.
-    status = "10k+ hits";
-  } else if (analysisPoints.data.length == 0) {
-    status = "No hits";
-  } else {
-    const points = analysisPoints
-      ? analysisPoints.data.filter(point => BigInt(point.point) <= BigInt(executionPoint))
-      : [];
-
-    status = `${points.length}/${analysisPoints.data.length}`;
-    maxStatusLength = `${analysisPoints.data.length}/${analysisPoints.data.length}`.length;
-  }
-
-  return (
-    <div className={classnames("breakpoint-navigation-status-container")}>
-      <div className="text-breakpointStatus rounded-2xl bg-breakpointStatusBG px-3 py-0.5">
-        <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
-        {status}
-      </div>
     </div>
   );
 }
