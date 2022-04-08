@@ -141,5 +141,7 @@ export function getDisplayedUrl(url: string) {
 }
 
 export function getSystemColorSchemePreference() {
-  return window.matchMedia("(prefers-color-scheme:dark)") ? "dark" : "light";
+  const prefersDarkTheme = window.matchMedia("(prefers-color-scheme:dark)").matches
+
+  return prefersDarkTheme ? "dark" : "light";
 }
