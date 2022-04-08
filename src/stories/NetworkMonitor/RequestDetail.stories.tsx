@@ -20,6 +20,7 @@ export const Basic = Template.bind({});
 
 Basic.args = {
   request: {
+    cause: "fetch",
     documentType: "application/octet-stream",
     domain: "assets.website-files.com",
     end: 984,

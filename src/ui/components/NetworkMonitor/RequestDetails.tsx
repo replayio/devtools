@@ -171,7 +171,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
     { name: "URL", value: <FormattedUrl url={request.url} /> },
     { name: "Request Method", value: request.method },
     { name: "Status Code", value: String(request.status) },
-    { name: "Type", value: request.documentType },
+    { name: "Type", value: request.documentType || request.cause || "unknown" },
     { name: "Start", value: `${request.start}ms` },
   ];
   if (request.firstByte) {
@@ -193,7 +193,7 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
     <>
       <div
         className={classNames(
-          "flex cursor-pointer items-center py-1 font-bold justify-between pr-2"
+          "flex cursor-pointer items-center justify-between py-1 pr-2 font-bold"
         )}
         onClick={() => setRequestExpanded(!requestExpanded)}
       >

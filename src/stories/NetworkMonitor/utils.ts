@@ -79,6 +79,7 @@ export const requestSummary = (
   contentType: string = "application/json"
 ): RequestSummary => {
   return {
+    cause: "fetch",
     domain: "replay.io",
     documentType: "html",
     end: 1700,

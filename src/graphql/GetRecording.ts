@@ -31,6 +31,7 @@ export interface GetRecording_recording_workspace {
   __typename: "Workspace";
   id: string;
   name: string;
+  hasPaymentMethod: boolean;
   subscription: GetRecording_recording_workspace_subscription | null;
 }
 

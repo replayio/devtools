@@ -53,7 +53,7 @@ export default function Table({
       },
       {
         Header: "Type",
-        accessor: "documentType" as const,
+        accessor: (req: RequestSummary) => req.documentType || req.cause,
         className: "",
         width: 125,
       },

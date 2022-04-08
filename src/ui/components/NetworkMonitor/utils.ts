@@ -27,8 +27,9 @@ export enum CanonicalRequestType {
 }
 
 export type RequestSummary = {
+  cause: string | undefined;
   domain: string;
-  documentType: string;
+  documentType: string | undefined;
   end: number | undefined;
   firstByte: number | undefined;
   hasResponseBody: boolean;
@@ -153,8 +154,9 @@ export const partialRequestsToCompleteSummaries = (
       const request = r.events.request;
       const response = r.events.response;
       const requestDone = r.events["request-done"];
-      const documentType = response ? getDocumentType(response.event.responseHeaders) : "unknown";
+      const documentType = response ? getDocumentType(response.event.responseHeaders) : undefined;
       return {
+        cause: request.event.requestCause,
         documentType,
         domain: host(request.event.requestUrl),
         firstByte: response?.time,
