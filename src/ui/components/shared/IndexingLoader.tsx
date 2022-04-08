@@ -16,7 +16,7 @@ export default function IndexingLoader() {
       <CircularProgressbar
         value={progress}
         strokeWidth={14}
-        styles={buildStyles({ pathColor: `#0074E8`, trailColor: `gray` })}
+        styles={buildStyles({ pathColor: `#0074E8`, trailColor: `var(--theme-base-100)` })}
       />
     </div>
   );
