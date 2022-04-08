@@ -131,13 +131,35 @@ export function EnterPaymentMethod({
     return <p className="text-red-500">{error}</p>;
   }
 
+  const bodyColor = window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue("--body-color");
+
   return (
     <form className="space-y-4" onSubmit={ev => handleSubmit(ev)}>
       <FieldRow>
         {stripeError ? <p className="col-span-3 text-red-500">{stripeError}</p> : null}
         <CardElement
-          className="col-span-3"
-          options={{ hidePostalCode: true }}
+          className="col-span-3 p-1"
+          options={{
+            hidePostalCode: true,
+            style: {
+              base: {
+                iconColor: bodyColor,
+                color: bodyColor,
+                ":-webkit-autofill": {
+                  color: bodyColor,
+                },
+                "::placeholder": {
+                  color: bodyColor,
+                },
+              },
+              invalid: {
+                iconColor: "red",
+                color: "red",
+              },
+            },
+          }}
           id="stripe-card-element"
         />
       </FieldRow>

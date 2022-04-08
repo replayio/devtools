@@ -155,7 +155,7 @@
 }
 
 .timeline .progress-line.preview-max {
-  border-top-color: #a6d4fa; /* primary accent color at 40% opacity */
+  border-top-color: #a6d4fa;
 }
 
 .timeline .unloaded-regions,
