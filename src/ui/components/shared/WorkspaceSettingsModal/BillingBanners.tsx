@@ -46,8 +46,8 @@ export function BillingBanners({
       <Banner icon={<MaterialIcon iconSize="xl">access_time</MaterialIcon>} type="warning">
         {past ? (
           <div className="flex flex-row justify-between">
-            <span>Subscription expired.</span>
-            <button className="text-blue-500 underline" onClick={onResubscribe}>
+            <span>Subscription expired</span>
+            <button className="text-black underline" onClick={onResubscribe}>
               {workspace.hasPaymentMethod ? "Resume Subscription" : "Add payment method"}
             </button>
           </div>
