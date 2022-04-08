@@ -158,17 +158,19 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   }
 
   return (
-    <PortalDropdown
-      buttonContent={<DropdownButton>{summary}</DropdownButton>}
-      buttonStyle={"overflow-hidden"}
-      setExpanded={setExpanded}
-      expanded={expanded}
-      distance={0}
-      position="bottom-right"
-    >
-      <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
-        {privacyOptions}
-      </Dropdown>
-    </PortalDropdown>
+    <>
+      <PortalDropdown
+        buttonContent={<DropdownButton>{summary}</DropdownButton>}
+        buttonStyle={"overflow-hidden"}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        distance={0}
+        position="bottom-right"
+      >
+        <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
+          {privacyOptions}
+        </Dropdown>
+      </PortalDropdown>
+    </>
   );
 }

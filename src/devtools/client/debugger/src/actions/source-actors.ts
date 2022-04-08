@@ -2,21 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { UIThunkAction } from "ui/actions";
 
 import {
   getSourceActor,
   getSourceActorBreakableLines,
   getSourceActorBreakpointColumns,
   getSourceActorBreakpointHitCounts,
+  SourceActor,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 
-export function insertSourceActor(item) {
+export function insertSourceActor(item: SourceActor) {
   return insertSourceActors([item]);
 }
-export function insertSourceActors(items) {
+export function insertSourceActors(items: SourceActor[]): UIThunkAction {
   return function (dispatch) {
     dispatch({
       type: "INSERT_SOURCE_ACTORS",
@@ -25,10 +26,10 @@ export function insertSourceActors(items) {
   };
 }
 
-export function removeSourceActor(item) {
+export function removeSourceActor(item: SourceActor) {
   return removeSourceActors([item]);
 }
-export function removeSourceActors(items) {
+export function removeSourceActors(items: SourceActor[]): UIThunkAction {
   return function (dispatch) {
     dispatch({ type: "REMOVE_SOURCE_ACTORS", items });
   };
@@ -37,7 +38,7 @@ export function removeSourceActors(items) {
 export const loadSourceActorBreakpointColumns = memoizeableAction(
   "loadSourceActorBreakpointColumns",
   {
-    createKey: ({ id, line }) => `${id}:${line}`,
+    createKey: ({ id, line }: { id: string; line: number }) => `${id}:${line}`,
     getValue: ({ id, line }, thunkArgs) =>
       getSourceActorBreakpointColumns(thunkArgs.getState(), id, line),
     action: async ({ id, line }, thunkArgs) => {
@@ -62,7 +63,7 @@ export const loadSourceActorBreakpointColumns = memoizeableAction(
 );
 
 export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorBreakableLines", {
-  createKey: args => args.id,
+  createKey: (args: { id: string }) => args.id,
   getValue: ({ id }, thunkArgs) => getSourceActorBreakableLines(thunkArgs.getState(), id),
   action: async ({ id }, thunkArgs) => {
     await thunkArgs.dispatch({
@@ -82,7 +83,10 @@ export const MAX_LINE_HITS_TO_FETCH = 1000;
 export const loadSourceActorBreakpointHitCounts = memoizeableAction(
   "loadSourceActorBreakpointHitCounts",
   {
-    createKey: ({ id, lineNumber }, { getState }) => {
+    createKey: (
+      { id, lineNumber }: { id: string; lineNumber: number; onFailure?: Function },
+      { getState }
+    ) => {
       const state = getState();
       // We need to refetch if: we are beyond the maximum number of line hits fetchable
       // Or the focusRegion has changed

@@ -16,7 +16,7 @@ pref("devtools.disableLogRocket", false);
 pref("devtools.listenForMetrics", false);
 pref("devtools.disableCache", false);
 pref("devtools.sidePanelSize", "240px");
-pref("devtools.theme", "light");
+pref("devtools.theme", "system");
 
 // app features
 pref("devtools.features.columnBreakpoints", false);
@@ -44,6 +44,7 @@ export const prefs = new PrefsHelper("devtools", {
   listenForMetrics: ["Bool", "listenForMetrics"],
   disableCache: ["Bool", "disableCache"],
   theme: ["String", "theme"],
+  colorScheme: ["String", "colorScheme"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

@@ -1,10 +1,12 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import Modal from "ui/components/shared/NewModal";
 import { CopyButton } from "./ReplayLink";
 import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
+import { OperationsData } from "ui/types";
+import { getUniqueDomains } from "ui/components/UploadScreen/Privacy";
 import { CollaboratorRequest, Recording } from "ui/types";
 import { actions } from "ui/actions";
 import Collaborators from "./Collaborators";
@@ -13,6 +15,7 @@ import PrivacyDropdown from "./PrivacyDropdown";
 import { AvatarImage } from "ui/components/Avatar";
 import { PrimaryButton } from "../Button";
 import { useHasNoRole } from "ui/hooks/recordings";
+import { getRecordingTarget } from "ui/reducers/app";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -95,7 +98,34 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   );
 }
 
+function SecurityWarnings({
+  operations,
+  onClick,
+}: {
+  operations: OperationsData;
+  onClick: () => void;
+}) {
+  const uniqueDomains = getUniqueDomains(operations);
+
+  if (uniqueDomains.length == 0) {
+    return null;
+  }
+
+  return (
+    <div className="group">
+      <div className="text-xs">{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
+    </div>
+  );
+}
+
+function EnvironmentVariablesRow() {
+  return <div className="text-xs">This node recording contains all env variables</div>;
+}
+
 function SharingModal({ recording, hideModal }: SharingModalProps) {
+  const recordingTarget = useSelector(getRecordingTarget);
+  const showEnvironmentVariables = recordingTarget == "node";
+
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
@@ -104,15 +134,17 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
       >
         <CollaboratorsSection recording={recording} />
         <section className="flex flex-row items-center justify-between space-x-2 bg-menuHoverBgcolor p-8">
-          <div className="flex flex-row items-center space-x-3 overflow-hidden">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-200 font-bold">
-              <MaterialIcon className="text-purple-600" iconSize="xl">
+          <div className="flex flex-row items-start space-x-3 overflow-hidden">
+            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
+              <MaterialIcon className="text-blue-600" iconSize="xl">
                 people
               </MaterialIcon>
             </div>
             <div className="flex flex-col space-y-1 overflow-hidden">
               <div className="font-bold">Privacy Settings</div>
               <PrivacyDropdown {...{ recording }} />
+              <SecurityWarnings operations={recording.operations} onClick={() => {}} />
+              {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
             </div>
           </div>
           <CopyButton recording={recording} />

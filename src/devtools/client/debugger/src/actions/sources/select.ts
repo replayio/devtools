@@ -9,6 +9,10 @@
  * @module actions/sources
  */
 
+import type { UIState } from "ui/state";
+import type { Context } from "../../reducers/pause";
+import type { Location, Source } from "../../reducers/sources";
+
 import { tabExists } from "../../reducers/tabs";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
 import { setSymbols } from "./symbols";
@@ -36,15 +40,27 @@ import {
   getThreadContext,
   getContext,
 } from "../../selectors";
+import { UIThunkAction } from "ui/actions";
 
-export const setSelectedLocation = (cx, source, location) => ({
+type PartialLocation = Parameters<typeof createLocation>[0];
+
+export const setSelectedLocation = (cx: Context, source: Source, location: Location) => ({
   type: "SET_SELECTED_LOCATION",
   cx,
   source,
   location,
 });
 
-export const setPendingSelectedLocation = (cx, url, options) => ({
+interface PendingSelectedLocationOptions {
+  line: number;
+  column: number;
+}
+
+export const setPendingSelectedLocation = (
+  cx: Context,
+  url: string,
+  options?: PendingSelectedLocationOptions
+) => ({
   type: "SET_PENDING_SELECTED_LOCATION",
   cx,
   url,
@@ -52,7 +68,7 @@ export const setPendingSelectedLocation = (cx, url, options) => ({
   column: options ? options.column : null,
 });
 
-export const clearSelectedLocation = cx => ({
+export const clearSelectedLocation = (cx: Context) => ({
   type: "CLEAR_SELECTED_LOCATION",
   cx,
 });
@@ -68,7 +84,11 @@ export const clearSelectedLocation = cx => ({
  * @memberof actions/sources
  * @static
  */
-export function selectSourceURL(cx, url, options) {
+export function selectSourceURL(
+  cx: Context,
+  url: string,
+  options: PendingSelectedLocationOptions
+): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState) => {
     const source = getSourceByURL(getState(), url);
     if (!source) {
@@ -85,15 +105,21 @@ export function selectSourceURL(cx, url, options) {
  * @memberof actions/sources
  * @static
  */
-export function selectSource(cx, sourceId, options = {}, openSourcesTab) {
+export function selectSource(
+  cx: Context,
+  sourceId: string,
+  options: PartialLocation = {} as PartialLocation,
+  openSourcesTab?: boolean
+): UIThunkAction {
   return async dispatch => {
+    // @ts-ignore Unknown Mixpanel event?
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location, openSourcesTab));
   };
 }
 
-export function deselectSource() {
+export function deselectSource(): UIThunkAction {
   return (dispatch, getState) => {
     const cx = getThreadContext(getState());
     dispatch(clearSelectedLocation(cx));
@@ -104,9 +130,14 @@ export function deselectSource() {
  * @memberof actions/sources
  * @static
  */
-export function selectLocation(cx, location, openSourcesTab = true) {
+export function selectLocation(
+  cx: Context,
+  location: PartialLocation,
+  openSourcesTab = true
+): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState, { client }) => {
     const currentSource = getSelectedSource(getState());
+    // @ts-ignore MixpanelEvent mismatch
     trackEvent("sources.select_location");
 
     if (!client) {
@@ -130,6 +161,7 @@ export function selectLocation(cx, location, openSourcesTab = true) {
       dispatch(addTab(source));
     }
 
+    // @ts-ignore Partial Location mismatch
     dispatch(setSelectedLocation(cx, source, location));
     const layout = getToolboxLayout(getState());
 
@@ -167,7 +199,11 @@ export function selectLocation(cx, location, openSourcesTab = true) {
  * @memberof actions/sources
  * @static
  */
-export function selectSpecificLocation(cx, location, openSourcesTab) {
+export function selectSpecificLocation(
+  cx: Context,
+  location: PartialLocation,
+  openSourcesTab?: boolean
+) {
   return selectLocation(cx, location, openSourcesTab);
 }
 
@@ -178,7 +214,10 @@ export function selectSpecificLocation(cx, location, openSourcesTab) {
 // Then, if we're currently paused in this source, we perform the pause again to
 // refresh all the debugger's state, this will also open the alternate source.
 // Otherwise, we only open the alternate source in the editor.
-export function showAlternateSource(oldSourceId, newSourceId) {
+export function showAlternateSource(
+  oldSourceId: string,
+  newSourceId: string
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     if (ThreadFront.isSourceMappedSource(oldSourceId)) {
       ThreadFront.preferSource(newSourceId, true);

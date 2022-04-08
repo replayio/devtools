@@ -83,7 +83,7 @@ export interface Subscription {
   createdAt: string;
   seatCount: number;
   effectiveFrom?: string;
-  effectiveUntil?: string;
+  effectiveUntil: string;
   createdBy: User;
   status: WorkspaceSubscriptionStatus;
   trialEnds: string | null;

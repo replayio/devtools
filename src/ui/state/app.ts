@@ -68,7 +68,7 @@ export interface UploadInfo {
   total?: string;
 }
 
-export type AppTheme = "light" | "dark";
+export type AppTheme = "light" | "dark" | "system";
 
 export interface LoadedRegions {
   loading: TimeStampedPointRange[];

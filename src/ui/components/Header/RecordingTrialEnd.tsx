@@ -8,7 +8,7 @@ export function RecordingTrialEnd() {
   const { recording, loading } = hooks.useGetRecording(recordingId);
 
   const workspace = recording?.workspace;
-  if (loading || !workspace || !inUnpaidFreeTrial(workspace)) {
+  if (loading || !workspace || !inUnpaidFreeTrial(workspace) || workspace.hasPaymentMethod) {
     return null;
   }
 

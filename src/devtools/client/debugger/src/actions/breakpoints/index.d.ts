@@ -16,3 +16,8 @@ export function _addBreakpointAtLine(
   disabled: boolean,
   breakable: boolean
 ): UIThunkAction;
+export function syncBreakpoint(
+  cx: Context,
+  sourceId: string,
+  pendingBreakpoint: Breakpoint
+): UIThunkAction;

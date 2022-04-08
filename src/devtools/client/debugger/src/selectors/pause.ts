@@ -2,12 +2,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-import { getSelectedLocation } from "../reducers/sources";
+import type { UIState } from "ui/state";
 
 import { createSelector } from "reselect";
 
-export function getSelectedFrame(state) {
+export function getSelectedFrame(state: UIState) {
   const { selectedFrameId, frames } = state.pause;
   if (!selectedFrameId || !frames) {
     return null;
@@ -30,6 +29,6 @@ export const getVisibleSelectedFrame = createSelector(getSelectedFrame, selected
   };
 });
 
-export function getFramePositions(state) {
+export function getFramePositions(state: UIState) {
   return state.pause.replayFramePositions;
 }

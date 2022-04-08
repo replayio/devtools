@@ -41,7 +41,6 @@ interface Source {
   url?: string;
 }
 
-// Several types TBD here
 interface SourcesState {
   sources: ResourceCache<UnknownSources>,
   urls: Record<string, SourceId[]>,
