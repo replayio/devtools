@@ -180,7 +180,7 @@ https: declare module "react-devtools-inline/frontend" {
   export function createBridge(contentWindow: Target, wall?: Wall): FrontendBridge;
   export function createStore(
     bridge: FrontendBridge,
-    config?: { supportsNativeInspection?: boolean }
+    config?: { checkBridgeProtocolCompatibility?: boolean; supportsNativeInspection?: boolean }
   ): Store;
   export function initialize(
     contentWindow: Target,
