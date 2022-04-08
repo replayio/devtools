@@ -223,7 +223,10 @@ function createReactDevTools(
   const target = { postMessage() {} };
   const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
   const bridge = createBridge(target, wall);
-  const store = createStore(bridge, { supportsNativeInspection: true });
+  const store = createStore(bridge, {
+    checkBridgeProtocolCompatibility: false,
+    supportsNativeInspection: true,
+  });
   wall.store = store;
   const ReactDevTools = initialize(target, { bridge, store });
 
