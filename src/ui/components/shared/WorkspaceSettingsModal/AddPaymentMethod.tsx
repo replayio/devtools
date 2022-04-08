@@ -131,6 +131,10 @@ export function EnterPaymentMethod({
     return <p className="text-red-500">{error}</p>;
   }
 
+  const bodyColor = window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue("--body-color");
+
   return (
     <form className="space-y-4" onSubmit={ev => handleSubmit(ev)}>
       <FieldRow>
@@ -141,22 +145,18 @@ export function EnterPaymentMethod({
             hidePostalCode: true,
             style: {
               base: {
-                iconColor: "#c4f0ff",
-                color: "var(--body-color)",
-                fontWeight: "500",
-                fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
-                fontSize: "16px",
-                fontSmoothing: "antialiased",
+                iconColor: bodyColor,
+                color: bodyColor,
                 ":-webkit-autofill": {
-                  color: "blue",
+                  color: bodyColor,
                 },
                 "::placeholder": {
-                  color: "orange",
+                  color: bodyColor,
                 },
               },
               invalid: {
-                iconColor: "brown",
-                color: "green",
+                iconColor: "red",
+                color: "red",
               },
             },
           }}
