@@ -145,6 +145,11 @@ export default class KeyShortcuts {
   }
 
   handleEvent(event: KeyboardEvent) {
+    if (event.defaultPrevented) {
+      // Something else (e.g. React DevTools) has already claimed this event.
+      return;
+    }
+
     for (const [key, shortcut] of this.keys) {
       if (this.doesEventMatchShortcut(event, shortcut)) {
         this.eventEmitter.emit(key, event);
