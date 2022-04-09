@@ -1,6 +1,6 @@
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
-import { prefs, asyncStore, features } from "ui/utils/prefs";
+import { prefs, asyncStore } from "ui/utils/prefs";
 import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
@@ -18,6 +18,8 @@ import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getPendingComment } from "ui/reducers/comments";
 import { RecordingId } from "@recordreplay/protocol";
 import { getTheme } from "ui/reducers/app";
+import { getAllFilters } from "devtools/client/webconsole/selectors";
+import { getRecording } from "ui/hooks/recordings";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -74,19 +76,6 @@ export function updatePrefs(state: UIState, oldState: UIState) {
       return state.consoleUI.timestampsVisible;
     });
   }
-
-  if (state.messages?.filters && oldState.messages?.filters) {
-    updateWebconsolePref("filterError", (state: UIState) => state.messages.filters.error);
-    updateWebconsolePref("filterWarn", (state: UIState) => state.messages.filters.warn);
-    updateWebconsolePref("filterInfo", (state: UIState) => state.messages.filters.info);
-    updateWebconsolePref("filterDebug", (state: UIState) => state.messages.filters.debug);
-    updateWebconsolePref("filterLog", (state: UIState) => state.messages.filters.log);
-    updateWebconsolePref(
-      "filterNodeModules",
-      (state: UIState) => state.messages.filters.nodemodules
-    );
-  }
-
   maybeUpdateReplaySessions(state);
 }
 
@@ -97,6 +86,26 @@ async function getReplaySessions() {
 export async function getReplaySession(recordingId: RecordingId) {
   return (await asyncStore.replaySessions)[recordingId];
 }
+
+export const getLocalReplaySessionPrefs = async () => {
+  const recordingId = getRecordingId();
+
+  // If we're in the library, there are no preferences to fetch.
+  if (!recordingId) {
+    return null;
+  }
+
+  let recording;
+  try {
+    recording = await getRecording(recordingId);
+  } catch (e) {
+    return null;
+  }
+
+  const session = await getReplaySession(recordingId);
+
+  return session;
+};
 
 export enum LocalNag {
   // Yank the user's select left sidebar panel to show the explorer (sources + outline)
@@ -145,6 +154,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     localNags: getLocalNags(state),
     tabs: persistTabs(getTabs(state)) || [],
     pendingComment: getPendingComment(state),
+    consoleFilters: getAllFilters(state),
   };
 
   asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
