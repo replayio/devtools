@@ -22,6 +22,7 @@ import {
   fetchRequestBody,
   hideRequestDetails,
   showRequestDetails,
+  fetchFrames,
 } from "ui/actions/network";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import LoadingProgressBar from "../shared/LoadingProgressBar";
@@ -103,6 +104,7 @@ export const NetworkMonitor = ({
                 currentTime={currentTime}
                 onRowSelect={row => {
                   trackEvent("net_monitor.select_request_row");
+                  dispatch(fetchFrames(row.point));
 
                   if (row.hasResponseBody) {
                     dispatch(fetchResponseBody(row.id, row.point.point));
