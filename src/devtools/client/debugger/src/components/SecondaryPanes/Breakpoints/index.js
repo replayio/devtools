@@ -99,6 +99,13 @@ class Breakpoints extends Component {
   }
 }
 
-export default connect(state => ({
-  selectedSource: getSelectedSource(state),
-}))(Breakpoints);
+export default connect(
+  state => ({
+    selectedSource: getSelectedSource(state),
+  }),
+  {
+    seek: actions.removeBreakpoint,
+    removeBreakpoint: actions.removeBreakpoint,
+    removeBreakpointsInSource: actions.removeBreakpointsInSource,
+  }
+)(Breakpoints);

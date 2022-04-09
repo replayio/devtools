@@ -1,20 +1,11 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
+import { useSelector } from "react-redux";
 import { getLogpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
-import actions from "../../actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-type LogpointsProps = PropsFromRedux & {
-  logExceptions: boolean;
-};
-
-function LogpointsPane({
-  logpointSources,
-  removeLogpoint,
-  removeLogpointsInSource,
-}: LogpointsProps) {
+export default function LogpointsPane() {
+  const logpointSources = useSelector(getLogpointSources);
   const emptyContent = (
     <>
       {`Click on the `}
@@ -30,22 +21,6 @@ function LogpointsPane({
       type="print-statement"
       emptyContent={emptyContent}
       breakpointSources={logpointSources}
-      onRemoveBreakpoint={removeLogpoint}
-      onRemoveBreakpoints={removeLogpointsInSource}
     />
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    logpointSources: getLogpointSources(state),
-  }),
-  {
-    removeLogpoint: actions.removeLogpoint,
-    removeLogpointsInSource: actions.removeLogpointsInSource,
-  }
-);
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(LogpointsPane);
