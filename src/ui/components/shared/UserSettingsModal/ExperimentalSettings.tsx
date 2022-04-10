@@ -3,13 +3,13 @@ import hooks from "ui/hooks";
 import { CheckboxRow } from "./CheckboxRow";
 import { CombinedExperimentalUserSettings } from "ui/types";
 import { useFeature } from "ui/hooks/settings";
+import Icon from "ui/components/shared/Icon";
 
 type ExperimentalKey = keyof CombinedExperimentalUserSettings;
 interface ExperimentalSetting {
   label: string;
   description: string;
   key: ExperimentalKey;
-  secret?: boolean;
 }
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
@@ -39,18 +39,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableBreakpointPanelAutocomplete",
   },
   {
-    label: "Multiple Controllers",
-    description: "Runs the replay across many machines",
-    key: "useMultipleControllers",
-    secret: true,
-  },
-  {
-    label: "Replay Snapshots",
-    description: "Use snapshots to restore from a prior replay",
-    key: "multipleControllerUseSnapshots",
-    secret: true,
-  },
-  {
     label: "Code Heatmaps ",
     description: "Calculate hit counts for editor files all at once",
     key: "codeHeatMaps",
@@ -59,6 +47,19 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Resolve recording",
     description: "Mark a recording as resolved",
     key: "enableResolveRecording",
+  },
+];
+
+const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
+  {
+    label: "Multiple Controllers",
+    description: "Runs the replay across many machines",
+    key: "useMultipleControllers",
+  },
+  {
+    label: "Replay Snapshots",
+    description: "Use snapshots to restore from a prior replay",
+    key: "multipleControllerUseSnapshots",
   },
 ];
 
@@ -83,40 +84,8 @@ function Experiment({
   );
 }
 
-function useGetShowSecretSettings() {
-  const [showSecretSettings, setShowSecretSettings] = useState(false);
-  const [shiftCount, setShiftCount] = useState(0);
-
-  useEffect(() => {
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  });
-
-  function onKeyDown(e: KeyboardEvent) {
-    if (showSecretSettings) {
-      return;
-    }
-
-    if (e.key !== "Shift") {
-      return setShiftCount(0);
-    }
-
-    if (shiftCount == 9) {
-      return setShowSecretSettings(true);
-    }
-
-    setShiftCount(shiftCount + 1);
-  }
-
-  return showSecretSettings;
-}
-
 export default function ExperimentalSettings({}) {
   const { userSettings, loading } = hooks.useGetUserSettings();
-  const showSecretSettings = useGetShowSecretSettings();
 
   // TODO: This is bad and should be updated with a better generalized hook
   const updateEventLink = hooks.useUpdateUserSetting("enableEventLink");
@@ -183,7 +152,7 @@ export default function ExperimentalSettings({}) {
       <div className="flex flex-col space-y-2 p-1">
         {EXPERIMENTAL_SETTINGS.map(
           setting =>
-            (!setting.secret || showSecretSettings) && (
+            !setting.secret && (
               <Experiment
                 onChange={onChange}
                 key={setting.key}
@@ -192,6 +161,24 @@ export default function ExperimentalSettings({}) {
               />
             )
         )}
+        <div>
+          <div className="my-4  flex items-center ">
+            <Icon
+              filename="warning"
+              className="mr-2"
+              style={{ backgroundColor: "var(--theme-toolbar-color)" }}
+            />
+            Increased risk of backend errors
+          </div>
+          {RISKY_EXPERIMENTAL_SETTINGS.map(setting => (
+            <Experiment
+              onChange={onChange}
+              key={setting.key}
+              setting={setting}
+              checked={!!settings[setting.key]}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
