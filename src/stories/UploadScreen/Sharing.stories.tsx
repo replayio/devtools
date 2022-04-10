@@ -17,7 +17,7 @@ export const OnlyMyLibrary = Template.bind({});
 
 OnlyMyLibrary.args = {
   workspaces: [],
-  selectedWorkspaceId: "My Library",
+  selectedWorkspaceId: "Your Library",
   isPublic: false,
 };
 
