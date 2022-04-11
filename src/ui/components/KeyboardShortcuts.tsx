@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import React, { useEffect, useMemo } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
@@ -69,23 +68,36 @@ function KeyboardShortcuts({
     }
   };
 
-  // The shortcuts have to be reassigned every time the dependencies change,
-  // otherwise we end up with a stale prop.
+  const globalKeyboardShortcuts = useMemo(() => {
+    // The shortcuts have to be reassigned every time the dependencies change,
+    // otherwise we end up with a stale prop.
+
+    const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
+      "CmdOrCtrl+Shift+F": openFullTextSearch,
+      "CmdOrCtrl+B": toggleLeftSidebar,
+      "CmdOrCtrl+K": togglePalette,
+
+      // Should be ignored when an editable element is focused
+      "Shift+T": onToggleTheme,
+      "Shift+F": toggleEditFocusMode,
+    };
+
+    return shortcuts;
+    // TODO We're getting "hooks exhaustive deps" warnings here
+    // due to the callbacks, but the code is valid as-is.
+  }, [viewMode, selectedSource]);
+
   useEffect(() => {
-    addGlobalShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
-    addGlobalShortcut("CmdOrCtrl+B", toggleLeftSidebar);
-    addGlobalShortcut("CmdOrCtrl+K", togglePalette);
-    addGlobalShortcut("Shift+T", onToggleTheme);
-    addGlobalShortcut("Shift+F", toggleEditFocusMode);
+    for (let [keyCombo, eventHandler] of Object.entries(globalKeyboardShortcuts)) {
+      addGlobalShortcut(keyCombo, eventHandler);
+    }
 
     return () => {
-      removeGlobalShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
-      removeGlobalShortcut("CmdOrCtrl+B", toggleLeftSidebar);
-      removeGlobalShortcut("CmdOrCtrl+K", togglePalette);
-      removeGlobalShortcut("Shift+T", onToggleTheme);
-      removeGlobalShortcut("Shift+F", toggleEditFocusMode);
+      for (let [keyCombo, eventHandler] of Object.entries(globalKeyboardShortcuts)) {
+        removeGlobalShortcut(keyCombo, eventHandler);
+      }
     };
-  }, [viewMode, selectedSource]);
+  }, [globalKeyboardShortcuts]);
 
   return null;
 }
