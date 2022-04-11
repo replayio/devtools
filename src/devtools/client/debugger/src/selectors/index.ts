@@ -41,7 +41,7 @@ export * from "./debugLine";
 
 export declare function getThreadContext(state: UIState): any;
 
-export declare function getActiveSearch(state: UIState): any;
+export declare function getActiveSearch(state: UIState): string;
 export declare function getContext(state: UIState): any;
 export declare function getCursorPosition(state: UIState): any;
 export declare function getDebugLineLocation(state: UIState): UrlLocation | undefined;
