@@ -5,3 +5,9 @@ export const prefs: {
   removeObserver: (domain: string, observer: (prefs: any) => void) => void;
 };
 export const pref: (key: string, value: any) => void;
+
+export default {
+  appinfo: {
+    get OS(): "Linux" | "WINNT" | "Darwin" | "Unknown";,
+  },
+};
