@@ -32,6 +32,7 @@ export const initialAppState: AppState = {
   indexing: 0,
   initializedPanels: [],
   isNodePickerActive: false,
+  isNodePickerInitializing: false,
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
@@ -182,6 +183,13 @@ export default function update(
       return {
         ...state,
         isNodePickerActive: action.active,
+      };
+    }
+
+    case "set_is_node_picker_initializing": {
+      return {
+        ...state,
+        isNodePickerInitializing: action.initializing,
       };
     }
 
@@ -341,6 +349,7 @@ export const getFlatEvents = (state: UIState) => {
     : filteredEvents;
 };
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
+export const getIsNodePickerInitializing = (state: UIState) => state.app.isNodePickerInitializing;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;

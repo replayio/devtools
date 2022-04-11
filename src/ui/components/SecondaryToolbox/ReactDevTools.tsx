@@ -12,7 +12,7 @@ import {
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
-import { setIsNodePickerActive } from "ui/actions/app";
+import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/actions/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
@@ -33,6 +33,7 @@ class ReplayWall implements Wall {
 
   constructor(
     private enablePicker: (opts: NodePickerOpts) => void,
+    private initializePicker: () => void,
     private disablePicker: () => void,
     private onShutdown: () => void
   ) {}
@@ -123,11 +124,14 @@ class ReplayWall implements Wall {
         }
 
         case "startInspectingNative": {
+          this.initializePicker();
+
           ThreadFront.ensureCurrentPause();
           await ThreadFront.currentPause!.createWaiter;
           const rv = await ThreadFront.currentPause!.loadMouseTargets();
 
           if (!rv) {
+            this.disablePicker();
             this._listener?.({ event: "stopInspectingNative", payload: true });
             break;
           }
@@ -215,13 +219,14 @@ function createReactDevTools(
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodePickerOpts) => void,
+  initializePicker: () => void,
   disablePicker: () => void,
   onShutdown: () => void
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
   const target = { postMessage() {} };
-  const wall = new ReplayWall(enablePicker, disablePicker, onShutdown);
+  const wall = new ReplayWall(enablePicker, initializePicker, disablePicker, onShutdown);
   const bridge = createBridge(target, wall);
   const store = createStore(bridge, {
     checkBridgeProtocolCompatibility: false,
@@ -265,6 +270,7 @@ function ReactDevtoolsPanel({
   annotations,
   currentPoint,
   setIsNodePickerActive,
+  setIsNodePickerInitializing,
   setHasReactComponents,
   protocolCheckFailed,
   reactInitPoint,
@@ -290,11 +296,17 @@ function ReactDevtoolsPanel({
 
   function enablePicker(opts: NodePickerOpts) {
     setIsNodePickerActive(true);
+    setIsNodePickerInitializing(false);
     NodePicker.enable(opts);
+  }
+  function initializePicker() {
+    setIsNodePickerActive(false);
+    setIsNodePickerInitializing(true);
   }
   function disablePicker() {
     NodePicker.disable();
     setIsNodePickerActive(false);
+    setIsNodePickerInitializing(false);
   }
 
   function onShutdown() {
@@ -334,6 +346,7 @@ function ReactDevtoolsPanel({
     annotations,
     currentPoint,
     enablePicker,
+    initializePicker,
     disablePicker,
     onShutdown
   );
@@ -361,7 +374,7 @@ const connector = connect(
     protocolCheckFailed: getProtocolCheckFailed(state),
     reactInitPoint: getReactInitPoint(state),
   }),
-  { setIsNodePickerActive, setHasReactComponents }
+  { setIsNodePickerActive, setIsNodePickerInitializing, setHasReactComponents }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ReactDevtoolsPanel);

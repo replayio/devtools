@@ -12,6 +12,7 @@ import Spinner from "./shared/Spinner";
 import MaterialIcon from "./shared/MaterialIcon";
 import { setShowVideoPanel } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
+import Tooltip from "./shared/Tooltip";
 
 const HideVideoButton: FC = () => {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ function Video({
   currentTime,
   playback,
   isNodePickerActive,
+  isNodePickerInitializing,
   pendingComment,
   recordingTarget,
   stalled,
@@ -73,12 +75,13 @@ function Video({
   // first. This updates the isNodePickerActive value and makes it look like the node picker is
   // inactive when we check it here.
   const onMouseDown = () => {
-    if (isNodePickerActive || pendingComment) {
+    if (isNodePickerActive || isNodePickerInitializing || pendingComment) {
       return;
     }
   };
 
-  const showCommentTool = isPaused && !isNodeTarget && !isNodePickerActive;
+  const showCommentTool =
+    isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
   return (
     <div id="video" className="relative bg-toolbarBackground">
       <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
@@ -97,6 +100,7 @@ function Video({
           )}
         </CommentsOverlay>
       ) : null}
+      {isNodePickerInitializing ? <Tooltip label="Loading..." targetID="video" /> : null}
       <div id="highlighter-root"></div>
       {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>
@@ -106,6 +110,7 @@ function Video({
 const connector = connect((state: UIState) => ({
   pendingComment: selectors.getPendingComment(state),
   isNodePickerActive: selectors.getIsNodePickerActive(state),
+  isNodePickerInitializing: selectors.getIsNodePickerInitializing(state),
   currentTime: selectors.getCurrentTime(state),
   playback: selectors.getPlayback(state),
   recordingTarget: selectors.getRecordingTarget(state),
