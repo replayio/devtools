@@ -85,6 +85,9 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
   location: Location | null;
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
+export type SetIsNodePickerInitializing = Action<"set_is_node_picker_initializing"> & {
+  initializing: boolean;
+};
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
 export type SetVideoUrl = Action<"set_video_url"> & { videoUrl: string };
 export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId | null };
@@ -121,6 +124,7 @@ export type AppActions =
   | SetEventsForType
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
+  | SetIsNodePickerInitializing
   | SetCanvas
   | SetMouseTargetsLoading
   | SetVideoUrl
@@ -329,6 +333,10 @@ export function setHoveredLineNumberLocation(
 
 export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
   return { type: "set_is_node_picker_active", active };
+}
+
+export function setIsNodePickerInitializing(initializing: boolean): SetIsNodePickerInitializing {
+  return { type: "set_is_node_picker_initializing", initializing };
 }
 
 export function setVideoUrl(videoUrl: string): SetVideoUrl {

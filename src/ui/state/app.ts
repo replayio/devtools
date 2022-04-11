@@ -89,6 +89,7 @@ export interface AppState {
   indexing: number;
   initializedPanels: PanelName[];
   isNodePickerActive: boolean;
+  isNodePickerInitializing: boolean;
   loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;
