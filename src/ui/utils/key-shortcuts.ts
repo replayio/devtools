@@ -1,6 +1,7 @@
 import Services from "devtools/shared/services";
 import EventEmitter from "devtools/shared/event-emitter";
 import { KeyCodes } from "devtools/client/shared/keycodes";
+import { usesWindow } from "../../ssr";
 
 const isOSX = Services.appinfo.OS === "Darwin";
 
@@ -311,3 +312,30 @@ export default class KeyShortcuts {
     );
   }
 }
+
+function setupGlobalShortcuts() {
+  return usesWindow(win => {
+    if (!win) {
+      return null;
+    }
+    const shortcuts = new KeyShortcuts();
+    shortcuts.attach(window.document);
+    return shortcuts;
+  });
+}
+
+export const globalShortcuts = setupGlobalShortcuts();
+
+export const addGlobalShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
+  if (!globalShortcuts) {
+    return;
+  }
+  globalShortcuts.on(key, callback);
+};
+
+export const removeGlobalShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
+  if (!globalShortcuts) {
+    return;
+  }
+  globalShortcuts.off(key, callback);
+};

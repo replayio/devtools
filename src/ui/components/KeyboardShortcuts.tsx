@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import { usesWindow } from "../../ssr";
+
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
@@ -10,18 +10,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { getSelectedSource } from "devtools/client/debugger/src/reducers/sources";
-import { isEditableElement } from "ui/utils/key-shortcuts";
-
-function setupShortcuts() {
-  return usesWindow(win => {
-    if (!win) {
-      return null;
-    }
-    return new KeyShortcuts({ window: win, target: win.document });
-  });
-}
-
-const globalShortcuts = setupShortcuts();
+import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 
 function KeyboardShortcuts({
   showCommandPaletteInEditor,
@@ -36,19 +25,6 @@ function KeyboardShortcuts({
   viewMode,
   toggleTheme,
 }: PropsFromRedux) {
-  const addShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
-    if (!globalShortcuts) {
-      return;
-    }
-    globalShortcuts.on(key, callback);
-  };
-  const removeShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
-    if (!globalShortcuts) {
-      return;
-    }
-    globalShortcuts.off(key, callback);
-  };
-
   const openFullTextSearch = (e: KeyboardEvent) => {
     e.preventDefault();
     if (viewMode !== "dev") {
@@ -96,18 +72,18 @@ function KeyboardShortcuts({
   // The shortcuts have to be reassigned every time the dependencies change,
   // otherwise we end up with a stale prop.
   useEffect(() => {
-    addShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
-    addShortcut("CmdOrCtrl+B", toggleLeftSidebar);
-    addShortcut("CmdOrCtrl+K", togglePalette);
-    addShortcut("Shift+T", onToggleTheme);
-    addShortcut("Shift+F", toggleEditFocusMode);
+    addGlobalShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
+    addGlobalShortcut("CmdOrCtrl+B", toggleLeftSidebar);
+    addGlobalShortcut("CmdOrCtrl+K", togglePalette);
+    addGlobalShortcut("Shift+T", onToggleTheme);
+    addGlobalShortcut("Shift+F", toggleEditFocusMode);
 
     return () => {
-      removeShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
-      removeShortcut("CmdOrCtrl+B", toggleLeftSidebar);
-      removeShortcut("CmdOrCtrl+K", togglePalette);
-      removeShortcut("Shift+T", onToggleTheme);
-      removeShortcut("Shift+F", toggleEditFocusMode);
+      removeGlobalShortcut("CmdOrCtrl+Shift+F", openFullTextSearch);
+      removeGlobalShortcut("CmdOrCtrl+B", toggleLeftSidebar);
+      removeGlobalShortcut("CmdOrCtrl+K", togglePalette);
+      removeGlobalShortcut("Shift+T", onToggleTheme);
+      removeGlobalShortcut("Shift+F", toggleEditFocusMode);
     };
   }, [viewMode, selectedSource]);
 
