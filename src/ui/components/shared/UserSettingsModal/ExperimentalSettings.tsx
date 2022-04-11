@@ -45,21 +45,16 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   },
   {
     label: "Resolve recording",
-    description: "Mark a recording as resolved",
+    description: "Mark a replay as resolved",
     key: "enableResolveRecording",
   },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "Multiple Controllers",
-    description: "Runs the replay across many machines",
-    key: "useMultipleControllers",
-  },
-  {
-    label: "Replay Snapshots",
-    description: "Use snapshots to restore from a prior replay",
-    key: "multipleControllerUseSnapshots",
+    label: "Ten Minute Replays",
+    description: "Supports replaying longer recordings",
+    key: "tenMinuteReplays",
   },
 ];
 
@@ -99,12 +94,9 @@ export default function ExperimentalSettings({}) {
     useFeature("columnBreakpoints");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
     useFeature("networkRequestComments");
-  const { value: enableUseMultipleControllers, update: updateEnableUseMultipleControllers } =
-    useFeature("useMultipleControllers");
-  const {
-    value: enableMultipleControllerUseSnapshots,
-    update: updateEnableMultipleControllerUseSnapshots,
-  } = useFeature("multipleControllerUseSnapshots");
+  const { value: enableTenMinuteReplays, update: updateEnableTenMinuteReplays } =
+    useFeature("tenMinuteReplays");
+
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
@@ -120,10 +112,8 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableNetworkRequestComments") {
       updateEnableNetworkRequestComments(!enableNetworkRequestComments);
-    } else if (key == "useMultipleControllers") {
-      updateEnableUseMultipleControllers(!enableUseMultipleControllers);
-    } else if (key == "multipleControllerUseSnapshots") {
-      updateEnableMultipleControllerUseSnapshots(!enableMultipleControllerUseSnapshots);
+    } else if (key == "tenMinuteReplays") {
+      updateEnableTenMinuteReplays(!enableTenMinuteReplays);
     } else if (key == "codeHeatMaps") {
       updateCodeHeatMaps(!codeHeatMaps);
     } else if (key == "enableResolveRecording") {
@@ -136,8 +126,7 @@ export default function ExperimentalSettings({}) {
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
-    useMultipleControllers: enableUseMultipleControllers,
-    multipleControllerUseSnapshots: enableMultipleControllerUseSnapshots,
+    tenMinuteReplays: enableTenMinuteReplays,
     enableResolveRecording,
   };
 
@@ -150,17 +139,14 @@ export default function ExperimentalSettings({}) {
   return (
     <div className="space-y-6 overflow-auto">
       <div className="flex flex-col space-y-2 p-1">
-        {EXPERIMENTAL_SETTINGS.map(
-          setting =>
-            !setting.secret && (
-              <Experiment
-                onChange={onChange}
-                key={setting.key}
-                setting={setting}
-                checked={!!settings[setting.key]}
-              />
-            )
-        )}
+        {EXPERIMENTAL_SETTINGS.map(setting => (
+          <Experiment
+            onChange={onChange}
+            key={setting.key}
+            setting={setting}
+            checked={!!settings[setting.key]}
+          />
+        ))}
         <div>
           <div className="my-4  flex items-center ">
             <Icon
@@ -168,7 +154,7 @@ export default function ExperimentalSettings({}) {
               className="mr-2"
               style={{ backgroundColor: "var(--theme-toolbar-color)" }}
             />
-            Increased risk of backend errors
+            Increased chance of session errors and performance issues.
           </div>
           {RISKY_EXPERIMENTAL_SETTINGS.map(setting => (
             <Experiment

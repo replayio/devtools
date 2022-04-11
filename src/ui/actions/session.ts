@@ -155,8 +155,8 @@ export function createSession(recordingId: string): UIThunkAction {
       const experimentalSettings: ExperimentalSettings = {
         listenForMetrics: !!window.app.prefs.listenForMetrics,
         disableCache: !!window.app.prefs.disableCache,
-        useMultipleControllers: !!window.app.features.useMultipleControllers,
-        multipleControllerUseSnapshots: !!window.app.features.multipleControllerUseSnapshots,
+        useMultipleControllers: !!window.app.features.tenMinuteReplays,
+        multipleControllerUseSnapshots: !!window.app.features.tenMinuteReplays,
       };
 
       dispatch(showLoadingProgress());

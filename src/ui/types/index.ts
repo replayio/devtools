@@ -19,8 +19,7 @@ export type LocalExperimentalUserSettings = {
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
-  useMultipleControllers: boolean;
-  multipleControllerUseSnapshots: boolean;
+  tenMinuteReplays: boolean;
   enableResolveRecording: boolean;
 };
 
