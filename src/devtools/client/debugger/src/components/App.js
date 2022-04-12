@@ -27,24 +27,12 @@ import { getToolboxLayout } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import Services from "devtools/shared/services";
 
-const globalShortcuts = new KeyShortcuts({ window, target: document });
-
-const { appinfo } = Services;
-
-const isMacOS = appinfo.OS === "Darwin";
-
-import QuickOpenModal from "./QuickOpenModal";
 import { EditorPane } from "./Editor/EditorPane";
 
 class Debugger extends Component {
-  state = {
-    shortcutsModalEnabled: false,
-  };
-
   getChildContext = () => {
-    return { globalShortcuts, shortcuts: this.shortcuts, l10n: L10N };
+    return { shortcuts: this.shortcuts, l10n: L10N };
   };
 
   constructor(props) {
@@ -53,29 +41,7 @@ class Debugger extends Component {
   }
 
   componentDidMount() {
-    globalShortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
-    globalShortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
-    globalShortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-
-    globalShortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
-    globalShortcuts.on("Cmd+/", this.onCommandSlash);
-
-    this.shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
-    this.shortcuts.on("Escape", this.onEscape);
-
     this.props.refreshCodeMirror();
-  }
-
-  componentWillUnmount() {
-    globalShortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
-    globalShortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
-    globalShortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
-
-    globalShortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
-    globalShortcuts.off("Cmd+/", this.onCommandSlash);
-
-    this.shortcuts.off("Ctrl+G", this.toggleLineQuickOpenModal);
-    this.shortcuts.off("Escape", this.onEscape);
   }
 
   componentDidUpdate(prevProps) {
@@ -88,73 +54,6 @@ class Debugger extends Component {
     }
   }
 
-  onEscape = e => {
-    const { activeSearch, closeActiveSearch, closeQuickOpen, quickOpenEnabled } = this.props;
-    const { shortcutsModalEnabled } = this.state;
-    const anyTrue = activeSearch || quickOpenEnabled || shortcutsModalEnabled;
-
-    if (anyTrue) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    if (activeSearch) {
-      closeActiveSearch();
-    }
-
-    if (quickOpenEnabled) {
-      closeQuickOpen();
-    }
-
-    if (shortcutsModalEnabled) {
-      this.toggleShortcutsModal();
-    }
-  };
-
-  onCommandSlash = () => {
-    this.toggleShortcutsModal();
-  };
-
-  isHorizontal() {
-    return this.props.orientation === "horizontal";
-  }
-
-  toggleFunctionQuickOpenModal = e => {
-    this.toggleQuickOpenModal(e, "@");
-  };
-
-  toggleProjectFunctionQuickOpenModal = e => {
-    this.toggleQuickOpenModal(e, "@", true);
-  };
-
-  toggleLineQuickOpenModal = e => {
-    this.toggleQuickOpenModal(e, ":");
-  };
-
-  toggleSourceQuickOpenModal = e => {
-    this.toggleQuickOpenModal(e, "");
-  };
-
-  toggleQuickOpenModal = (e, query, project = false) => {
-    const { quickOpenEnabled, openQuickOpen, closeQuickOpen } = this.props;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (quickOpenEnabled === true) {
-      closeQuickOpen();
-      return;
-    }
-
-    openQuickOpen(query, project);
-  };
-
-  toggleShortcutsModal() {
-    this.setState(prevState => ({
-      shortcutsModalEnabled: !prevState.shortcutsModalEnabled,
-    }));
-  }
-
   // Important so that the tabs chevron updates appropriately when
   // the user resizes the left or right columns
   triggerEditorPaneResize() {
@@ -164,36 +63,11 @@ class Debugger extends Component {
     }
   }
 
-  renderShortcutsModal() {
-    const additionalClass = isMacOS ? "mac" : "";
-
-    if (!features.shortcuts) {
-      return;
-    }
-
-    return (
-      <ShortcutsModal
-        additionalClass={additionalClass}
-        enabled={this.state.shortcutsModalEnabled}
-        handleClose={() => this.toggleShortcutsModal()}
-      />
-    );
-  }
-
   render() {
-    const { quickOpenEnabled } = this.props;
-
     return (
       <>
         <A11yIntention>
           <EditorPane />
-          {quickOpenEnabled === true && (
-            <QuickOpenModal
-              shortcutsModalEnabled={this.state.shortcutsModalEnabled}
-              toggleShortcutsModal={() => this.toggleShortcutsModal()}
-            />
-          )}
-          {this.renderShortcutsModal()}
         </A11yIntention>
       </>
     );
@@ -217,9 +91,6 @@ function DebuggerLoader(props) {
 }
 
 const mapStateToProps = state => ({
-  activeSearch: getActiveSearch(state),
-  orientation: getOrientation(state),
-  quickOpenEnabled: getQuickOpenEnabled(state),
   selectedPanel: getSelectedPanel(state),
   selectedSource: getSelectedSource(state),
   toolboxLayout: getToolboxLayout(state),
@@ -227,9 +98,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  closeActiveSearch: actions.closeActiveSearch,
-  openQuickOpen: actions.openQuickOpen,
-  closeQuickOpen: actions.closeQuickOpen,
   refreshCodeMirror: actions.refreshCodeMirror,
   setUnexpectedError,
 })(DebuggerLoader);

@@ -9,7 +9,10 @@ import {
   openQuickOpen as openQuickOpenAction,
   setQuickOpenQuery,
   closeQuickOpen,
+  getQuickOpenEnabled,
 } from "../reducers/quick-open";
+import { setViewMode } from "ui/actions/layout";
+import { getViewMode } from "ui/reducers/layout";
 
 // TODO This is a workaround solely to allow dispatching without errors.
 // Additionally, the Redux team recommends against action type unions.
@@ -26,5 +29,18 @@ export function openQuickOpen(query = "", project = false): UIThunkAction {
     dispatch(loadGlobalFunctions());
 
     return dispatch(openQuickOpenAction({ query, project }));
+  };
+}
+
+export function toggleQuickOpen(query = "", project = false): UIThunkAction {
+  return (dispatch, getState) => {
+    const quickOpenEnabled = getQuickOpenEnabled(getState());
+
+    if (quickOpenEnabled) {
+      dispatch(closeQuickOpen());
+      return;
+    }
+
+    dispatch(openQuickOpen(query, project));
   };
 }

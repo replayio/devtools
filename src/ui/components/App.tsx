@@ -12,6 +12,7 @@ import UserSettingsModal from "./shared/UserSettingsModal";
 import OnboardingModal from "./shared/OnboardingModal/index";
 import { getSystemColorSchemePreference, isTest } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
+import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { UIState } from "ui/state";
 import { AppTheme, ModalType } from "ui/state/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
@@ -26,6 +27,7 @@ import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
 import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
+import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
@@ -95,7 +97,7 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-function App({ children, modal }: AppProps) {
+function App({ children, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
@@ -152,6 +154,7 @@ function App({ children, modal }: AppProps) {
     <div id="app-container">
       {children}
       {modal ? <AppModal modal={modal} /> : null}
+      {quickOpenEnabled === true && <QuickOpenModal />}
       <ConfirmRenderer />
       <AppErrors />
     </div>
@@ -160,6 +163,8 @@ function App({ children, modal }: AppProps) {
 
 const connector = connect((state: UIState) => ({
   modal: selectors.getModal(state),
+  // Only read quick open state if it exists, to ensure safe loads
+  quickOpenEnabled: !!state.quickOpen && getQuickOpenEnabled(state),
 }));
 export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
 

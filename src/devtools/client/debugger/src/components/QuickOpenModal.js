@@ -23,6 +23,8 @@ import {
   isSymbolsLoading,
   getContext,
 } from "../selectors";
+import { setViewMode } from "ui/actions/layout";
+import { getViewMode } from "ui/reducers/layout";
 import { memoizeLast } from "../utils/memoizeLast";
 import { scrollList } from "../utils/result-list";
 import {
@@ -64,14 +66,6 @@ export class QuickOpenModal extends Component {
       results = results.slice(0, maxResults);
     }
     this.setState({ results });
-  }
-
-  componentDidMount() {
-    const { shortcutsModalEnabled, toggleShortcutsModal } = this.props;
-
-    if (shortcutsModalEnabled) {
-      toggleShortcutsModal();
-    }
   }
 
   componentDidUpdate(prevProps) {
@@ -258,7 +252,7 @@ export class QuickOpenModal extends Component {
   };
 
   gotoLocation = location => {
-    const { cx, selectSpecificLocation, selectedSource } = this.props;
+    const { cx, selectSpecificLocation, selectedSource, viewMode, setViewMode } = this.props;
 
     if (location != null) {
       const selectedSourceId = selectedSource ? selectedSource.id : "";
@@ -268,6 +262,10 @@ export class QuickOpenModal extends Component {
         line: location.line,
         column: location.column,
       });
+
+      if (viewMode === "non-dev") {
+        setViewMode("dev");
+      }
       this.closeModal();
     }
   };
@@ -399,7 +397,7 @@ export class QuickOpenModal extends Component {
     return (
       <Modal
         width="500px"
-        additionalClass={"rounded-lg"}
+        additionalClass={"rounded-lg text-xs"}
         in={enabled}
         handleClose={this.closeModal}
       >
@@ -459,6 +457,7 @@ function mapStateToProps(state) {
     globalFunctions: getGlobalFunctions(state) || [],
     globalFunctionsLoading: isGlobalFunctionsLoading(state),
     tabs,
+    viewMode: getViewMode(state),
   };
 }
 
@@ -468,4 +467,5 @@ export default connect(mapStateToProps, {
   setQuickOpenQuery: actions.setQuickOpenQuery,
   highlightLineRange: actions.highlightLineRange,
   closeQuickOpen: actions.closeQuickOpen,
+  setViewMode,
 })(QuickOpenModal);
