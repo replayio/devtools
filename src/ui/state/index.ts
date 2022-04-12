@@ -5,6 +5,8 @@ import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-m
 import { BreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { ChangesState } from "devtools/client/inspector/changes/reducers/changes";
 import { CommentsState } from "./comments";
+import type { EventListenersState } from "devtools/client/debugger/src/selectors";
+import type { FileSearchState } from "devtools/client/debugger/src/selectors";
 import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
 import { InspectorState } from "devtools/client/inspector/state";
@@ -34,7 +36,8 @@ export interface UIState {
   computed: ComputedState;
   consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
-  eventListenerBreakpoints: any;
+  eventListenerBreakpoints: EventListenersState;
+  fileSearch: FileSearchState;
   inspector: InspectorState;
   layout: LayoutState;
   markup: MarkupState;

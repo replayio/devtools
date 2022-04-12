@@ -4,21 +4,46 @@
 
 //
 
+import type { AnyAction } from "@reduxjs/toolkit";
+import { TimeStampedPoint } from "@recordreplay/protocol";
+
+import type { UIState } from "ui/state";
+
 import { prefs } from "../utils/prefs";
 
-export function initialEventListenerState() {
+type ActiveEventListener = string;
+type EventListenerEvent = { name: string; id: ActiveEventListener };
+type EventListenerCategory = {
+  name: string;
+  events: EventListenerEvent[];
+};
+
+export type EventListenerPoint = TimeStampedPoint & { frame: any[] };
+export type EventTypePoints = Record<string, EventListenerPoint[]>;
+
+export interface EventListenersState {
+  active: string[];
+  categories: EventListenerCategory[];
+  expanded: string[];
+  eventTypePoints: EventTypePoints;
+  logEventBreakpoints: boolean;
+  loadingInitialPoints: boolean;
+  loadingAdditionalPoints: boolean;
+}
+
+export function initialEventListenerState(): EventListenersState {
   return {
     active: [],
     categories: [],
     expanded: [],
-    logEventBreakpoints: prefs.logEventBreakpoints,
+    logEventBreakpoints: prefs.logEventBreakpoints as boolean,
     eventTypePoints: {},
     loadingInitialPoints: true,
     loadingAdditionalPoints: true,
   };
 }
 
-function update(state = initialEventListenerState(), action) {
+function update(state = initialEventListenerState(), action: AnyAction) {
   switch (action.type) {
     case "LOADING_ADDITIONAL_EVENT_LISTENER_POINTS":
       return { ...state, loadingAdditionalPoints: false };
@@ -44,27 +69,27 @@ function update(state = initialEventListenerState(), action) {
   }
 }
 
-export function getActiveEventListeners(state) {
+export function getActiveEventListeners(state: UIState) {
   return state.eventListenerBreakpoints.active;
 }
 
-export function getEventListenerBreakpointTypes(state) {
+export function getEventListenerBreakpointTypes(state: UIState) {
   return state.eventListenerBreakpoints.categories;
 }
 
-export function getEventListenerExpanded(state) {
+export function getEventListenerExpanded(state: UIState) {
   return state.eventListenerBreakpoints.expanded;
 }
 
-export function getEventListenerPoints(state) {
+export function getEventListenerPoints(state: UIState) {
   return state.eventListenerBreakpoints.eventTypePoints;
 }
 
-export function isLoadingAdditionalPoints(state) {
+export function isLoadingAdditionalPoints(state: UIState) {
   return state.eventListenerBreakpoints.loadingAdditionalPoints;
 }
 
-export function isLoadingInitialPoints(state) {
+export function isLoadingInitialPoints(state: UIState) {
   return state.eventListenerBreakpoints.loadingInitialPoints;
 }
 
