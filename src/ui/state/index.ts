@@ -1,6 +1,8 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
 import { ASTState } from "devtools/client/debugger/src/reducers/ast";
+import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
+import { BreakpointsState } from "devtools/client/debugger/src/selectors";
 import { CommentsState } from "./comments";
 import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
@@ -23,6 +25,8 @@ import { LayoutState } from "./layout";
 export interface UIState {
   app: AppState;
   ast: ASTState;
+  boxModel: BoxModelState;
+  breakpoints: BreakpointsState;
   classList: ClassListState;
   comments: CommentsState;
   computed: ComputedState;

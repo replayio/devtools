@@ -29,7 +29,7 @@ type FunctionDeclaration = SymbolDeclaration & {
   index: number;
 };
 
-type CallDeclaration = SymbolDeclaration & {
+export type CallDeclaration = SymbolDeclaration & {
   values: string[];
 };
 
