@@ -38,7 +38,7 @@
     "@recordreplay/protocol": "^0.21.0",
     "@redux-devtools/extension": "^3.2.2",
     "@reduxjs/toolkit": "^1.8.1",
-    "@sentry/react": "^6.19.4",
+    "@sentry/react": "^6.19.6",
     "@sentry/tracing": "^6.19.6",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.26.0",
