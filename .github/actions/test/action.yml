@@ -24,4 +24,3 @@ runs:
         RECORD_REPLAY_PLAYWRIGHT_HEADLESS: true
         RECORD_REPLAY_VERBOSE: 1
         SHOULD_RECORD_EXAMPLES: true
-        DEBUG: pw:browser*

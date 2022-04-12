@@ -9,39 +9,42 @@ const { getExample } = require("./src/getExample");
 const { runTest } = require("./src/runTest");
 const { bootstrap } = require("./src/state");
 
+const VERBOSE_SKIPPING = false;
+
 async function runMatchingTests(state) {
   for (let i = 0; i < Manifest.length; i++) {
-    const log = msg => console.log(msg);
     const { disabled, example, script, targets } = Manifest[i];
+    const skipBecause = why =>
+      VERBOSE_SKIPPING && console.log(`Skipping ${example} because ${why}`);
     const test = script;
     if (state.stripeCount && (i % state.stripeCount) + 1 != state.stripeIndex) {
-      log(`it does not match stripe`);
+      skipBecause(`it does not match stripe`);
       continue;
     }
 
     if (disabled) {
-      log(`it is disabled`);
+      skipBecause(`it is disabled`);
       continue;
     }
 
     for (const target of targets) {
       if (state.onlyTarget && target != state.onlyTarget) {
-        log(`different target`);
+        skipBecause(`different target`);
         continue;
       }
 
       if (process.platform == "darwin" && target == "chromium") {
-        log(`chromium is not supported on mac`);
+        skipBecause(`chromium is not supported on mac`);
         continue;
       }
 
       if (state.patterns.length && state.patterns.every(pattern => !test.includes(pattern))) {
-        log(`does not match pattern`);
+        skipBecause(`does not match pattern`);
         continue;
       }
 
       if (state.skippedTests?.includes(test)) {
-        log(`excluded by SKIPPED_TESTS`);
+        skipBecause(`excluded by SKIPPED_TESTS`);
         continue;
       }
 

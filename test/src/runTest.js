@@ -9,6 +9,7 @@ async function recordBrowser(state, test, testPath, browserName) {
   console.log(`Recording Test:`, test, browserName);
 
   let success, why;
+  const logs = [];
   const browser = await playwright[browserName].launch({
     executablePath: state.browserPath,
     headless: state.headless,
@@ -19,7 +20,7 @@ async function recordBrowser(state, test, testPath, browserName) {
 
   try {
     await page.goto(testPath);
-    page.on("console", async msg => console.log(`${test}:`, msg.text()));
+    page.on("console", async msg => logs.push(`${test}: ${msg.text()}`));
     const result = await waitUntilMessage(page, "TestFinished", state.testTimeout * 1000);
     success = result.success;
     why = result.why;
@@ -33,7 +34,11 @@ async function recordBrowser(state, test, testPath, browserName) {
     await browser.close();
   }
 
-  console.log(`Finished test:${test} success:${success}`, why);
+  console.log(`Finished test:${test} success:${success}`, why || "");
+
+  if (!success) {
+    console.log(logs.join("\n"));
+  }
 
   return { success, why };
 }

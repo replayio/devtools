@@ -14,5 +14,3 @@ runs:
       shell: bash
     - run: node ${{ github.action_path }}/../../../test/mock/run.js
       shell: bash
-      env:
-        DEBUG: "pw:api"

@@ -48,12 +48,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Waiting for 200 from the Vercel Preview
-        uses: patrickedqvist/wait-for-vercel-preview@v1.1.1
+        uses: patrickedqvist/wait-for-vercel-preview@v1.2.0
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 500
-          check_interval: 30
+          max_timeout: 480
+          check_interval: 60
           environment: ${{ fromJSON('["", "production"]')[github.ref == 'refs/heads/master'] }}
     outputs:
       url: ${{ steps.waitFor200.outputs.url }}
@@ -129,7 +129,6 @@ jobs:
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           RECORD_REPLAY_PATH: ./firefox/Nightly.app/Contents/MacOS/firefox
-          DEBUG: pw:browser*
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
