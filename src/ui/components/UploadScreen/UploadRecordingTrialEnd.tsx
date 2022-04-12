@@ -1,6 +1,7 @@
 import React from "react";
 import { Workspace } from "ui/types";
 import { subscriptionEndsIn, inUnpaidFreeTrial } from "ui/utils/workspace";
+import { TrialEnd } from "../shared/TrialEnd";
 
 export function UploadRecordingTrialEnd({
   workspaces,
@@ -21,8 +22,10 @@ export function UploadRecordingTrialEnd({
   }
 
   return (
-    <div className="absolute top-0 z-10 -translate-y-1/2 transform rounded-lg bg-yellow-300 p-2 px-3 text-black shadow-lg">
-      Your trial is expiring in {expiresIn} days
-    </div>
+    <TrialEnd
+      expiresIn={expiresIn}
+      color="yellow"
+      className="absolute top-0 z-10 -translate-y-1/2 p-2 px-3"
+    />
   );
 }
