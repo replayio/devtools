@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import classnames from "classnames";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "../actions";
@@ -27,17 +27,23 @@ function ToolbarButton({
   icon,
   label,
   name,
+  onClick,
+  showBadge,
 }: {
   icon: string;
   label: string;
   name: PrimaryPanelName;
+  onClick?: () => void;
+  showBadge?: boolean;
 }) {
-  const isPaused = useSelector(selectors.hasFrames);
   const selectedPrimaryPanel = useSelector(selectors.getSelectedPrimaryPanel);
   const panelCollapsed = useSelector(selectors.getPaneCollapse);
   const dispatch = useDispatch();
 
-  const onClick = (panelName: PrimaryPanelName) => {
+  const handleClick = (panelName: PrimaryPanelName) => {
+    if (onClick) {
+      onClick();
+    }
     if (panelCollapsed || (selectedPrimaryPanel == panelName && !panelCollapsed)) {
       trackEvent(`toolbox.toggle_sidebar`);
       dispatch(actions.togglePaneCollapse());
@@ -55,7 +61,6 @@ function ToolbarButton({
       <div
         className={classnames("toolbar-panel-button", name, {
           active: selectedPrimaryPanel == name,
-          paused: isPaused,
         })}
       >
         <IconWithTooltip
@@ -68,37 +73,45 @@ function ToolbarButton({
             </MaterialIcon>
           }
           content={label}
-          handleClick={() => onClick(name)}
+          handleClick={() => handleClick(name)}
         />
       </div>
-      {isPaused && name == "debugger" ? (
-        <div className="border-1.5 absolute top-1 left-3 mr-2 mb-1 h-2 w-2 rounded-full border-toolbarBackground bg-secondaryAccent" />
+      {showBadge ? (
+        <div className="absolute top-1 left-3 mr-2 mb-1 h-2 w-2 rounded-full bg-secondaryAccent" />
       ) : null}
     </div>
   );
 }
 
-function Toolbar({ viewMode }: PropsFromRedux) {
+export default function Toolbar() {
+  const isPaused = useSelector(selectors.hasFrames);
+  const viewMode = useSelector(selectors.getViewMode);
+  const [hideCommentsBadge, setHideCommentsBadge] = useState(false);
+
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar space-y-1">
         <ToolbarButton icon="info" label="Replay Info" name="events" />
-        <ToolbarButton icon="forum" label="Comments" name="comments" />
+        <ToolbarButton
+          icon="forum"
+          label="Comments"
+          name="comments"
+          showBadge={!hideCommentsBadge}
+          onClick={() => setHideCommentsBadge(true)}
+        />
         {viewMode == "dev" ? (
           <>
             <ToolbarButton icon="description" name="explorer" label="Source Explorer" />
             <ToolbarButton icon="search" name="search" label="Search" />
-            <ToolbarButton icon="motion_photos_paused" name="debugger" label="Pause Information" />
+            <ToolbarButton
+              icon="motion_photos_paused"
+              name="debugger"
+              label="Pause Information"
+              showBadge={isPaused}
+            />
           </>
         ) : null}
       </div>
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  viewMode: selectors.getViewMode(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Toolbar);
