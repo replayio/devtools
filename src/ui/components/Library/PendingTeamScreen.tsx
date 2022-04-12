@@ -3,7 +3,6 @@ import { PendingWorkspaceInvitation } from "ui/types";
 import { getDisplayedUrl } from "ui/utils/environment";
 import PendingTeamPrompt from "./PendingTeamPrompt";
 import { getDurationString, getRelativeDate } from "./RecordingRow";
-import styles from "./Library.module.css";
 
 const MOCK_DATA = [
   { date: "2021-12-01T18:37:44.077Z", user: { name: "Jaril" } },

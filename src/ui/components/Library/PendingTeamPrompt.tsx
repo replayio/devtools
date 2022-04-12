@@ -8,7 +8,6 @@ import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
 import { useConfirm } from "../shared/Confirm";
-import styles from "./Library.module.css";
 
 type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
 
