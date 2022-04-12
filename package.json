@@ -94,7 +94,7 @@
     "slugify": "^1.6.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.8",
+    "@babel/core": "^7.17.9",
     "@babel/generator": "^7.17.7",
     "@babel/parser": "^7.17.8",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
