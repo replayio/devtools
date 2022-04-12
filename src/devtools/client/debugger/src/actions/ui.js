@@ -22,6 +22,7 @@ import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { searchContents } from "./file-search";
 import { copyToTheClipboard } from "../utils/clipboard";
 import { isFulfilled } from "../utils/async-value";
+import { closeQuickOpen } from "../reducers/quick-open";
 
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
@@ -45,7 +46,7 @@ export function setActiveSearch(activeSearch) {
     }
 
     if (getQuickOpenEnabled(getState())) {
-      dispatch({ type: "CLOSE_QUICK_OPEN" });
+      dispatch(closeQuickOpen());
     }
 
     dispatch({

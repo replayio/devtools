@@ -1,7 +1,9 @@
-const Services = require("devtools/shared/services");
+import Services from "devtools/shared/services";
+import EventEmitter from "devtools/shared/event-emitter";
+import { KeyCodes } from "devtools/client/shared/keycodes";
+import { usesWindow } from "../../ssr";
+
 const isOSX = Services.appinfo.OS === "Darwin";
-const EventEmitter = require("devtools/shared/event-emitter");
-const { KeyCodes } = require("devtools/client/shared/keycodes");
 
 // List of electron keys mapped to DOM API (DOM_VK_*) key code
 const ElectronKeysMapping: Record<string, string> = {
@@ -214,7 +216,7 @@ export default class KeyShortcuts {
         // When Alt is involved, some platforms (macOS) give different printable characters
         // for the `key` value, like `®` for the key `R`.  In this case, prefer matching by
         // `keyCode` instead.
-        shortcut.keyCode = KeyCodes[`DOM_VK_${key.toUpperCase()}`];
+        shortcut.keyCode = KeyCodes[`DOM_VK_${key.toUpperCase()}` as keyof typeof KeyCodes];
         shortcut.keyCodeString = key;
       } else {
         // Match any single character
@@ -223,7 +225,7 @@ export default class KeyShortcuts {
     } else if (key && key in ElectronKeysMapping) {
       // Maps the others manually to DOM API DOM_VK_*
       key = ElectronKeysMapping[key];
-      shortcut.keyCode = KeyCodes[key];
+      shortcut.keyCode = KeyCodes[key as keyof typeof KeyCodes];
       // Used only to stringify the shortcut
       shortcut.keyCodeString = key;
       shortcut.key = key;
@@ -310,3 +312,30 @@ export default class KeyShortcuts {
     );
   }
 }
+
+function setupGlobalShortcuts() {
+  return usesWindow(win => {
+    if (!win) {
+      return null;
+    }
+    const shortcuts = new KeyShortcuts();
+    shortcuts.attach(window.document);
+    return shortcuts;
+  });
+}
+
+export const globalShortcuts = setupGlobalShortcuts();
+
+export const addGlobalShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
+  if (!globalShortcuts) {
+    return;
+  }
+  globalShortcuts.on(key, callback);
+};
+
+export const removeGlobalShortcut = (key: string, callback: (e: KeyboardEvent) => void) => {
+  if (!globalShortcuts) {
+    return;
+  }
+  globalShortcuts.off(key, callback);
+};
