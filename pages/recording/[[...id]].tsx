@@ -19,6 +19,7 @@ import setup from "ui/setup/dynamic/devtools";
 import { GetStaticProps } from "next/types";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { setModal } from "ui/actions/app";
+import useToken from "ui/utils/useToken";
 
 interface MetadataProps {
   metadata?: {
@@ -112,6 +113,7 @@ function RecordingPage({
   setExpectedError,
   head,
 }: PropsFromRedux & { head?: React.ReactNode }) {
+  const token = useToken();
   const store = useStore();
   const { query } = useRouter();
   const dispatch = useDispatch();
@@ -141,7 +143,7 @@ function RecordingPage({
       }
     }
     getRecording();
-  }, [recordingId, rawRecordingId, store, getAccessibleRecording, setExpectedError]);
+  }, [recordingId, rawRecordingId, store, getAccessibleRecording, setExpectedError, token.token]);
 
   if (!recording || typeof window === "undefined") {
     return (

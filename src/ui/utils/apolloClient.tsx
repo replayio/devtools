@@ -18,7 +18,7 @@ import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
 
-const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
+let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
 export function ApolloWrapper({
   children,
@@ -78,6 +78,11 @@ export function ApolloWrapper({
   );
 }
 
+export async function resetCache() {
+  const apolloClient = await clientWaiter.promise;
+  return await apolloClient.resetStore();
+}
+
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.query({ variables, query });
@@ -100,6 +105,11 @@ export const createApolloClient = memoizeLast(function (
   token: string | undefined,
   onAuthError?: () => void
 ) {
+  let previousWaiter = clientWaiter;
+  clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
+
+  clientWaiter.promise.then(previousWaiter.resolve);
+
   const retryLink = createRetryLink();
   const errorLink = createErrorLink(onAuthError);
   const httpLink = createHttpLink(token);
