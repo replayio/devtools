@@ -8,6 +8,7 @@ import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
 import { useConfirm } from "../shared/Confirm";
+import styles from "./Library.module.css";
 
 type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
 
@@ -47,7 +48,9 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
 
   return (
     <div className="absolute top-0 left-0 grid h-full w-full items-center">
-      <div className="mx-auto flex max-w-lg flex-col space-y-4 rounded-md bg-white py-8 px-12 shadow-lg">
+      <div
+        className={`mx-auto flex max-w-lg flex-col space-y-4 rounded-md bg-white py-8 px-12 shadow-lg ${styles.libraryWrapper}`}
+      >
         <div className="flex flex-col space-y-1">
           <div className="text-lg">
             You were invited to <strong>{name}</strong>

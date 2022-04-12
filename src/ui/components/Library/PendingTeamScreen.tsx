@@ -3,6 +3,7 @@ import { PendingWorkspaceInvitation } from "ui/types";
 import { getDisplayedUrl } from "ui/utils/environment";
 import PendingTeamPrompt from "./PendingTeamPrompt";
 import { getDurationString, getRelativeDate } from "./RecordingRow";
+import styles from "./Library.module.css";
 
 const MOCK_DATA = [
   { date: "2021-12-01T18:37:44.077Z", user: { name: "Jaril" } },
@@ -85,7 +86,9 @@ export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceIn
   const { name } = workspace;
 
   return (
-    <div className="-5 flex flex-col space-y-5 overflow-auto bg-gray-100 px-8 py-6">
+    <div
+      className={`-5 flex flex-col space-y-5 overflow-auto bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
+    >
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-center space-x-2 text-2xl font-semibold">
           <span>{name}</span>
