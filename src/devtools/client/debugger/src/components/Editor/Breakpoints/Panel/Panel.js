@@ -37,6 +37,10 @@ function Panel({
   clearHoveredItem,
 }) {
   const [editing, setEditing] = useState(false);
+
+  {
+    /* nosemgrep typescript.react.best-practice.react-props-in-state.react-props-in-state */
+  }
   const [showCondition, setShowCondition] = useState(!!breakpoint.options.condition);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
