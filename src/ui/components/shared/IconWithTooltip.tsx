@@ -42,7 +42,7 @@ function IconTooltip({ targetNode, children }: { targetNode: HTMLElement; childr
   let style = { top: `${top}px`, left: `${left}px` };
 
   return ReactDOM.createPortal(
-    <div className="icon-tooltip absolute z-10 ml-10 mt-1" style={style}>
+    <div className="icon-tooltip absolute z-10 ml-10 mt-0.5" style={style}>
       <div className="rounded-md bg-gray-700 py-1 px-2 text-sm text-white">{children}</div>
     </div>,
     document.body
