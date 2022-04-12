@@ -397,7 +397,7 @@ export class QuickOpenModal extends Component {
     return (
       <Modal
         width="500px"
-        additionalClass={"rounded-lg"}
+        additionalClass={"rounded-lg text-xs"}
         in={enabled}
         handleClose={this.closeModal}
       >
