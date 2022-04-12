@@ -84,7 +84,7 @@
     "react-table": "^7.7.0",
     "react-tooltip": "^4.2.21",
     "react-transition-group": "^4.4.2",
-    "react-use-intercom": "^1.5.0",
+    "react-use-intercom": "^1.5.1",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "reactjs-popup": "^2.0.5",
