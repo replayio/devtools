@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 15
     pull-request-branch-name:
       separator: "-"
