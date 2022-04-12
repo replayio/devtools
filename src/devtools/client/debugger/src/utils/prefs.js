@@ -28,6 +28,7 @@ pref("devtools.debugger.scopes-visible", true);
 pref("devtools.debugger.component-visible", false);
 pref("devtools.debugger.workers-visible", false);
 pref("devtools.debugger.breakpoints-visible", true);
+pref("devtools.debugger.logpoints-visible", true);
 pref("devtools.debugger.event-listeners-visible", false);
 pref("devtools.debugger.start-panel-collapsed", false);
 pref("devtools.debugger.end-panel-collapsed", false);
@@ -91,6 +92,7 @@ export const prefs = new PrefsHelper("devtools", {
   componentVisible: ["Bool", "debugger.component-visible"],
   workersVisible: ["Bool", "debugger.workers-visible"],
   breakpointsVisible: ["Bool", "debugger.breakpoints-visible"],
+  breakpointsVisible: ["Bool", "debugger.logpoints-visible"],
   eventListenersVisible: ["Bool", "debugger.event-listeners-visible"],
   startPanelCollapsed: ["Bool", "debugger.start-panel-collapsed"],
   endPanelCollapsed: ["Bool", "debugger.end-panel-collapsed"],

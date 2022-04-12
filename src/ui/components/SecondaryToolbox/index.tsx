@@ -6,7 +6,6 @@ import WebConsoleApp from "devtools/client/webconsole/components/App";
 
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
-import { actions } from "../../actions";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { UIState } from "ui/state";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
@@ -21,10 +20,11 @@ import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { StartablePanelName } from "ui/utils/devtools-toolbox";
 import ReplayLogo from "../shared/ReplayLogo";
-import { getShowVideoPanel } from "ui/reducers/layout";
+import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
+import { getRecordingTarget } from "ui/reducers/app";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -115,18 +115,17 @@ function InspectorPanel() {
   );
 }
 
-function SecondaryToolbox({
-  selectedPanel,
-  setSelectedPanel,
-  toolboxLayout,
-  recordingTarget,
-  hasReactComponents,
-}: PropsFromRedux) {
+export default function SecondaryToolbox() {
+  const selectedPanel = useSelector(getSelectedPanel);
+  const recordingTarget = useSelector(getRecordingTarget);
+  const hasReactComponents = useSelector(selectors.hasReactComponents);
+  const toolboxLayout = useSelector(getToolboxLayout);
+  const dispatch = useDispatch();
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
   if (selectedPanel === "react-components" && !(userSettings.showReact && hasReactComponents)) {
-    setSelectedPanel("console");
+    dispatch(setSelectedPanel("console"));
   }
 
   return (
@@ -152,16 +151,3 @@ function SecondaryToolbox({
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    selectedPanel: selectors.getSelectedPanel(state),
-    recordingTarget: selectors.getRecordingTarget(state),
-    hasReactComponents: selectors.hasReactComponents(state),
-    toolboxLayout: selectors.getToolboxLayout(state),
-  }),
-  { setSelectedPanel: actions.setSelectedPanel, setShowVideoPanel: actions.setShowVideoPanel }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(SecondaryToolbox);

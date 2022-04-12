@@ -4,7 +4,7 @@
 
 //
 
-import React, { useState } from "react";
+import React from "react";
 
 import { getTopFrame, getFramesLoading } from "../../selectors";
 import LogpointsPane from "./LogpointsPane";
@@ -17,13 +17,19 @@ import FrameTimeline from "./FrameTimeline";
 import Scopes from "./Scopes";
 import { useSelector } from "react-redux";
 import { UIState } from "ui/state";
+import { useDebuggerPrefs } from "../../utils/prefs";
 
 export default function SecondaryPanes() {
   const hasFrames = useSelector((state: UIState) => !!getTopFrame(state));
   const framesLoading = useSelector(getFramesLoading);
-  const [showBreakpoints, setShowBreakpoints] = useState(true);
-  const [showLogpoints, setShowLogpoints] = useState(true);
-  const [showScopes, setShowScopes] = useState(true);
+  const { value: scopesExpanded, update: updateScopesExpanded } =
+    useDebuggerPrefs("scopes-visible");
+  const { value: callstackVisible, update: updateCallstackVisible } =
+    useDebuggerPrefs("call-stack-visible");
+  const { value: breakpointsVisible, update: updateBreakpointsVisible } =
+    useDebuggerPrefs("breakpoints-visible");
+  const { value: logpointsVisible, update: updateLogpointsVisible } =
+    useDebuggerPrefs("logpoints-visible");
 
   return (
     <div className="secondary-panes-wrapper">
@@ -33,24 +39,24 @@ export default function SecondaryPanes() {
         <AccordionPane
           header="Breakpoints"
           className="breakpoints-pane"
-          expanded={showBreakpoints}
-          onToggle={() => setShowBreakpoints(!showBreakpoints)}
+          expanded={breakpointsVisible}
+          onToggle={() => updateBreakpointsVisible(!breakpointsVisible)}
         >
           <BreakpointsPane />
         </AccordionPane>
         <AccordionPane
           header="Print Statements"
           className="breakpoints-pane"
-          expanded={showLogpoints}
-          onToggle={() => setShowLogpoints(!showLogpoints)}
+          expanded={logpointsVisible}
+          onToggle={() => updateLogpointsVisible(!logpointsVisible)}
         >
           <LogpointsPane />
         </AccordionPane>
         <AccordionPane
           header="Call Stack"
           className="call-stack-pane"
-          expanded={showScopes}
-          onToggle={() => setShowScopes(!showScopes)}
+          expanded={callstackVisible}
+          onToggle={() => updateCallstackVisible(!callstackVisible)}
         >
           {hasFrames || framesLoading ? (
             <Frames panel="debugger" />
@@ -63,8 +69,8 @@ export default function SecondaryPanes() {
         <AccordionPane
           header="Scopes"
           className="scopes-pane"
-          expanded={showScopes}
-          onToggle={() => setShowScopes(!showScopes)}
+          expanded={scopesExpanded}
+          onToggle={() => updateScopesExpanded(!scopesExpanded)}
         >
           {hasFrames ? (
             <Scopes />

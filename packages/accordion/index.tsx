@@ -106,7 +106,7 @@ export function AccordionPane({
 
   return (
     <div
-      className={classNames("group relative h-full w-full", { className })}
+      className={classNames("group relative h-full w-full", className)}
       style={{
         height,
         minHeight: _expanded ? MIN_HEIGHT : "auto",
