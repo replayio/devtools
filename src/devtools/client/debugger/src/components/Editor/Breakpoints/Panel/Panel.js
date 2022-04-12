@@ -38,7 +38,7 @@ function Panel({
 }) {
   const [editing, setEditing] = useState(false);
   const [showCondition, setShowCondition] = useState(Boolean(breakpoint.options.condition)); // nosemgrep
-  const [width, setWidth] = useState(getPanelWidth(editor));
+  const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const dismissNag = hooks.useDismissNag();
   const pausedOnHit =
