@@ -2,36 +2,38 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import type { AnyAction } from "@reduxjs/toolkit";
 
 const {
   UPDATE_LAYOUT,
   UPDATE_OFFSET_PARENT,
 } = require("devtools/client/inspector/boxmodel/actions/index");
 
-const INITIAL_BOX_MODEL = {
+export interface BoxModelState {
+  layout: Record<string, unknown>;
+  offsetParent: unknown | null;
+}
+
+const INITIAL_BOX_MODEL: BoxModelState = {
   layout: {},
   offsetParent: null,
 };
 
-const reducers = {
-  [UPDATE_LAYOUT](boxModel, { layout }) {
-    return Object.assign({}, boxModel, {
-      layout,
-    });
-  },
-
-  [UPDATE_OFFSET_PARENT](boxModel, { offsetParent }) {
-    return Object.assign({}, boxModel, {
-      offsetParent,
-    });
-  },
-};
-
-module.exports = function (boxModel = INITIAL_BOX_MODEL, action) {
-  const reducer = reducers[action.type];
-  if (!reducer) {
-    return boxModel;
+module.exports = function (state = INITIAL_BOX_MODEL, action: AnyAction) {
+  switch (action.type) {
+    case UPDATE_LAYOUT: {
+      return {
+        ...state,
+        layout: action.layout,
+      };
+    }
+    case UPDATE_OFFSET_PARENT: {
+      return {
+        ...state,
+        offsetParent: action.offsetParent,
+      };
+    }
+    default:
+      return state;
   }
-  return reducer(boxModel, action);
 };
