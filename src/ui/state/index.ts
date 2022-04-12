@@ -1,5 +1,6 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
+import { ASTState } from "devtools/client/debugger/src/reducers/ast";
 import { CommentsState } from "./comments";
 import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
@@ -21,6 +22,7 @@ import { LayoutState } from "./layout";
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
   app: AppState;
+  ast: ASTState;
   classList: ClassListState;
   comments: CommentsState;
   computed: ComputedState;
