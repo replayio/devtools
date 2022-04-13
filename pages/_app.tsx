@@ -5,7 +5,7 @@ import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
 import NextApp from "next/app";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { IntercomProvider } from "react-use-intercom";
 import { Provider } from "react-redux";
 import { Store } from "redux";
@@ -19,7 +19,7 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 import tokenManager from "ui/utils/tokenManager";
-import { ApolloWrapper, resetCache } from "ui/utils/apolloClient";
+import { ApolloWrapper } from "ui/utils/apolloClient";
 
 import "image/image.css";
 import "image/icon.css";
@@ -128,7 +128,6 @@ import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/utils/sourcemapVisualizer.css";
-import useToken from "ui/utils/useToken";
 
 interface AuthProps {
   apiKey?: string;
@@ -180,13 +179,8 @@ function AppUtilities({ children }: { children: ReactNode }) {
   );
 }
 function Routing({ Component, pageProps }: AppProps) {
-  const token = useToken();
   const [store, setStore] = useState<Store | null>(null);
   const { getFeatureFlag } = useLaunchDarkly();
-
-  useMemo(() => {
-    resetCache();
-  }, [token.token]);
 
   useEffect(() => {
     bootstrapApp().then((store: Store) => setStore(store));

@@ -78,11 +78,6 @@ export function ApolloWrapper({
   );
 }
 
-export async function resetCache() {
-  const apolloClient = await clientWaiter.promise;
-  return await apolloClient.resetStore();
-}
-
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.query({ variables, query });
