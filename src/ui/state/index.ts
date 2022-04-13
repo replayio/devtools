@@ -25,6 +25,7 @@ import type { SourceTreeState } from "devtools/client/debugger/src/reducers/sour
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
+import type { ThreadsState } from "devtools/client/debugger/src/reducers/threads";
 import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
@@ -61,5 +62,6 @@ export interface UIState {
   sourceTree: SourceTreeState;
   tabs: TabsState;
   timeline: TimelineState;
+  threads: ThreadsState;
   ui: UISliceState;
 }
