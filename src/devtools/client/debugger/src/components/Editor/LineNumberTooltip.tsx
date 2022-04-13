@@ -3,6 +3,7 @@ import { isNumber } from "lodash";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHoveredLineNumberLocation } from "ui/actions/app";
+import { clearHoveredItem } from "ui/actions/timeline";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -102,50 +103,50 @@ export default function LineNumberTooltip({
     analysisPointsCount = analysisPoints?.data.length;
   }
 
-  const setHoveredLineNumber = ({
-    lineNumber,
-    lineNumberNode,
-  }: {
-    lineNumber: number;
-    lineNumberNode: HTMLElement;
-  }) => {
-    // The gutter re-renders when we click the line number to add
-    // a breakpoint. That triggers a second gutterLineEnter event
-    // for the same line number. In that case, we shouldn't run
-    // the analysis again.
-    if (lineNumber !== lastHoveredLineNumber.current) {
-      lastHoveredLineNumber.current = lineNumber;
-    }
-    setTimeout(() => {
-      if (lineNumber === lastHoveredLineNumber.current) {
-        if (codeHeatMaps) {
-          dispatch(
-            setBreakpointHitCounts(source!.id, lineNumber, () => {
-              setCodeHeatMaps(false);
-              dispatch(runAnalysisOnLine(lineNumber));
-            })
-          );
-        } else {
-          dispatch(runAnalysisOnLine(lineNumber));
-        }
-      }
-    }, 200);
-    dispatch(updateHoveredLineNumber(lineNumber));
-    setTargetNode(lineNumberNode);
-  };
-  const clearHoveredLineNumber = () => {
-    setTargetNode(null);
-    dispatch(setHoveredLineNumberLocation(null));
-  };
-
   useEffect(() => {
+    const setHoveredLineNumber = ({
+      lineNumber,
+      lineNumberNode,
+    }: {
+      lineNumber: number;
+      lineNumberNode: HTMLElement;
+    }) => {
+      // The gutter re-renders when we click the line number to add
+      // a breakpoint. That triggers a second gutterLineEnter event
+      // for the same line number. In that case, we shouldn't run
+      // the analysis again.
+      if (lineNumber !== lastHoveredLineNumber.current) {
+        lastHoveredLineNumber.current = lineNumber;
+      }
+      setTimeout(() => {
+        if (lineNumber === lastHoveredLineNumber.current) {
+          if (codeHeatMaps) {
+            dispatch(
+              setBreakpointHitCounts(source!.id, lineNumber, () => {
+                setCodeHeatMaps(false);
+                dispatch(runAnalysisOnLine(lineNumber));
+              })
+            );
+          } else {
+            dispatch(runAnalysisOnLine(lineNumber));
+          }
+        }
+      }, 200);
+      dispatch(updateHoveredLineNumber(lineNumber));
+      setTargetNode(lineNumberNode);
+    };
+    const clearHoveredLineNumber = () => {
+      setTargetNode(null);
+      dispatch(setHoveredLineNumberLocation(null));
+    };
+
     editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
     editor.codeMirror.on("lineMouseLeave", clearHoveredLineNumber);
     return () => {
       editor.codeMirror.off("lineMouseEnter", setHoveredLineNumber);
       editor.codeMirror.off("lineMouseLeave", clearHoveredLineNumber);
     };
-  }, []);
+  }, [codeHeatMaps, dispatch, editor.codeMirror, source]);
 
   useEffect(() => {
     if (analysisPointsCount) {
