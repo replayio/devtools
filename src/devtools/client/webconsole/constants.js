@@ -50,9 +50,9 @@ const FILTERS = {
 const DEFAULT_FILTERS_VALUES = {
   [FILTERS.TEXT]: "",
   [FILTERS.ERROR]: true,
-  [FILTERS.WARN]: true,
+  [FILTERS.WARN]: false,
   [FILTERS.LOG]: true,
-  [FILTERS.INFO]: true,
+  [FILTERS.INFO]: false,
   [FILTERS.DEBUG]: true,
   [FILTERS.CSS]: false,
   [FILTERS.NET]: false,
