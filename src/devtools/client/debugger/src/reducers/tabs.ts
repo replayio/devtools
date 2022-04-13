@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { AnyAction } from "@reduxjs/toolkit";
+import type { UIState } from "ui/state";
 
 /**
  * Tabs reducer
@@ -19,38 +20,47 @@ import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } f
 import { asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import { getReplaySession } from "ui/setup/prefs";
+import type { Source } from "./sources";
+
+export interface Tab {
+  sourceId: string | null;
+  framework?: string | null;
+  isOriginal?: boolean;
+  url: string;
+}
+
+export interface TabsState {
+  tabs: Tab[];
+}
+
+const EMPTY_TABS: Tab[] = [];
 
 export const getInitialTabsState = async () => {
-  const session = await getReplaySession(getRecordingId());
+  const session = await getReplaySession(getRecordingId()!);
 
-  return { tabs: session?.tabs || [] };
+  return { tabs: session?.tabs ?? EMPTY_TABS };
 };
 
 function initialTabState() {
   return { tabs: [] };
 }
 
-function resetTabState(state) {
-  const tabs = persistTabs(state.tabs);
-  return { tabs };
-}
-
-function update(state = initialTabState(), action) {
+function update(state: TabsState = initialTabState(), action: AnyAction) {
   switch (action.type) {
     case "ADD_TAB":
     case "UPDATE_TAB":
-      return updateTabList(state, action);
+      return updateTabList(state, action as any);
 
     case "MOVE_TAB":
-      return moveTabInList(state, action);
+      return moveTabInList(state, action as any);
     case "MOVE_TAB_BY_SOURCE_ID":
-      return moveTabInListBySourceId(state, action);
+      return moveTabInListBySourceId(state, action as any);
 
     case "CLOSE_TAB":
-      return removeSourceFromTabList(state, action);
+      return removeSourceFromTabList(state, action as any);
 
     case "CLOSE_TABS":
-      return removeSourcesFromTabList(state, action);
+      return removeSourcesFromTabList(state, action as any);
 
     case "ADD_SOURCE":
       return addVisibleTabs(state, [action.source]);
@@ -76,7 +86,7 @@ function update(state = initialTabState(), action) {
  * @memberof reducers/tabs
  * @static
  */
-export function getNewSelectedSourceId(state, tabList) {
+export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
   const selectedLocation = state.sources.selectedLocation;
   const availableTabs = state.tabs.tabs;
   if (!selectedLocation) {
@@ -88,7 +98,7 @@ export function getNewSelectedSourceId(state, tabList) {
     return "";
   }
 
-  const matchingTab = availableTabs.find(tab => isSimilarTab(tab, selectedTab.url));
+  const matchingTab = availableTabs.find(tab => isSimilarTab(tab, selectedTab.url!));
 
   if (matchingTab) {
     const sources = state.sources.sources;
@@ -96,7 +106,7 @@ export function getNewSelectedSourceId(state, tabList) {
       return "";
     }
 
-    const selectedSource = getSpecificSourceByURL(state, selectedTab.url);
+    const selectedSource = getSpecificSourceByURL(state, selectedTab.url!);
 
     if (selectedSource) {
       return selectedSource.id;
@@ -106,7 +116,7 @@ export function getNewSelectedSourceId(state, tabList) {
   }
 
   const tabUrls = tabList.map(t => t.url);
-  const leftNeighborIndex = Math.max(tabUrls.indexOf(selectedTab.url) - 1, 0);
+  const leftNeighborIndex = Math.max(tabUrls.indexOf(selectedTab.url!) - 1, 0);
   const lastAvailbleTabIndex = availableTabs.length - 1;
   const newSelectedTabIndex = Math.min(leftNeighborIndex, lastAvailbleTabIndex);
   const availableTab = availableTabs[newSelectedTabIndex];
@@ -122,15 +132,15 @@ export function getNewSelectedSourceId(state, tabList) {
   return "";
 }
 
-function matchesSource(tab, source) {
+function matchesSource(tab: Tab, source: Source) {
   return tab.sourceId === source.id || matchesUrl(tab, source);
 }
 
-function matchesUrl(tab, source) {
+function matchesUrl(tab: Tab, source: Source) {
   return tab.url === source.url;
 }
 
-function addSelectedSource(state, source) {
+function addSelectedSource(state: TabsState, source: Source) {
   if (
     state.tabs
       .filter(({ sourceId }) => sourceId)
@@ -141,13 +151,12 @@ function addSelectedSource(state, source) {
   }
 
   return updateTabList(state, {
-    url: source.url,
-    framework: null,
+    url: source.url!,
     sourceId: source.id,
   });
 }
 
-function addVisibleTabs(state, sources) {
+function addVisibleTabs(state: TabsState, sources: Source[]) {
   const tabCount = state.tabs.filter(({ sourceId }) => sourceId).length;
   const tabs = state.tabs
     .map(tab => {
@@ -166,13 +175,13 @@ function addVisibleTabs(state, sources) {
   return { tabs };
 }
 
-function removeSourceFromTabList(state, { source }) {
+function removeSourceFromTabList(state: TabsState, { source }: { source: Source }) {
   const { tabs } = state;
   const newTabs = tabs.filter(tab => !matchesSource(tab, source));
   return { tabs: newTabs };
 }
 
-function removeSourcesFromTabList(state, { sources }) {
+function removeSourcesFromTabList(state: TabsState, { sources }: { sources: Source[] }) {
   const { tabs } = state;
 
   const newTabs = sources.reduce(
@@ -188,7 +197,7 @@ function removeSourcesFromTabList(state, { sources }) {
  * @memberof reducers/tabs
  * @static
  */
-function updateTabList(state, { url, sourceId }) {
+function updateTabList(state: TabsState, { url, sourceId }: { url: string; sourceId: string }) {
   let { tabs } = state;
   // Set currentIndex to -1 for URL-less tabs so that they aren't
   // filtered by isSimilarTab
@@ -202,14 +211,20 @@ function updateTabList(state, { url, sourceId }) {
   return { ...state, tabs };
 }
 
-function moveTabInList(state, { url, tabIndex: newIndex }) {
+function moveTabInList(
+  state: TabsState,
+  { url, tabIndex: newIndex }: { url: string; tabIndex: number }
+) {
   let { tabs } = state;
   const currentIndex = tabs.findIndex(tab => tab.url == url);
   tabs = move(tabs, currentIndex, newIndex);
   return { tabs };
 }
 
-function moveTabInListBySourceId(state, { sourceId, tabIndex: newIndex }) {
+function moveTabInListBySourceId(
+  state: TabsState,
+  { sourceId, tabIndex: newIndex }: { sourceId: string; tabIndex: number }
+) {
   let { tabs } = state;
   const currentIndex = tabs.findIndex(tab => tab.sourceId == sourceId);
   tabs = move(tabs, currentIndex, newIndex);
@@ -218,26 +233,26 @@ function moveTabInListBySourceId(state, { sourceId, tabIndex: newIndex }) {
 
 // Selectors
 
-export const getTabs = state => state?.tabs.tabs || [];
+export const getTabs = (state: UIState) => state?.tabs.tabs ?? EMPTY_TABS;
 
 export const getSourceTabs = createSelector(
-  state => state.tabs,
+  (state: UIState) => state.tabs,
   ({ tabs }) => tabs.filter(tab => tab.sourceId)
 );
 
-export const getSourcesForTabs = state => {
+export const getSourcesForTabs = (state: UIState) => {
   const tabs = getSourceTabs(state);
   const sources = getSources(state);
   return querySourcesForTabs(sources, tabs);
 };
 
 const querySourcesForTabs = makeShallowQuery({
-  filter: (_, tabs) => tabs.map(({ sourceId }) => sourceId),
+  filter: (_, tabs: Tab[]) => tabs.map(({ sourceId }) => sourceId!),
   map: resourceAsSourceBase,
   reduce: items => items,
 });
 
-export function tabExists(state, sourceId) {
+export function tabExists(state: UIState, sourceId: string) {
   return !!getSourceTabs(state).find(tab => tab.sourceId == sourceId);
 }
 

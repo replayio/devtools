@@ -1,8 +1,5 @@
-export interface EditorTab {
-  url: string;
-  sourceId: string | null;
-  isOriginal: boolean;
-}
+import { TablePropGetter } from "react-table";
+import type { Tab } from "../reducers/tabs";
 
 export function getTabMenuItems() {
   return {
@@ -63,11 +60,11 @@ export function getTabMenuItems() {
   };
 }
 
-export function isSimilarTab(tab: EditorTab, url: string, isOriginal: boolean) {
+export function isSimilarTab(tab: Tab, url: string, isOriginal?: boolean) {
   return tab.url === url && tab.isOriginal === isOriginal;
 }
 
-export function persistTabs(tabs: EditorTab[]) {
+export function persistTabs(tabs: Tab[]) {
   return [...tabs]
     .filter(tab => tab.url)
     .map(tab => {
