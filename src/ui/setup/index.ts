@@ -16,6 +16,7 @@ import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getInitialLayoutState } from "ui/reducers/layout";
 import { getInitialTabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { getInitialCommentsState } from "ui/reducers/comments";
+import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 declare global {
   interface Window {
     store: UIStore;
@@ -29,9 +30,10 @@ export type AppDispatch = typeof store.dispatch;
 export async function bootstrapApp() {
   const initialState = {
     app: initialAppState,
-    layout: await getInitialLayoutState(),
-    tabs: await getInitialTabsState(),
     comments: await getInitialCommentsState(),
+    layout: await getInitialLayoutState(),
+    messages: await initialMessageState(),
+    tabs: await getInitialTabsState(),
   };
 
   const store = bootstrapStore(initialState);
