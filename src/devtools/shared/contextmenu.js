@@ -53,12 +53,6 @@ function createPopup(doc) {
   return popup;
 }
 
-/*
-if (!inToolbox()) {
-Menu.prototype.createPopup = createPopup;
-}
-*/
-
 function onShown(menu, popup) {
   popup.childNodes.forEach((menuItemNode, i) => {
     let item = menu.items[i];
@@ -88,12 +82,7 @@ function showMenu(evt, items) {
       menu.append(menuItem);
     });
 
-  if (inToolbox()) {
-    menu.popup(evt.screenX, evt.screenY, window.parent.document);
-    return;
-  }
-
-  menu.on("open", (_, popup) => onShown(menu, popup));
+  menu.on("open", (_, popup) => onShown(menu, popup, document));
   menu.popup(evt.clientX, evt.clientY, document);
 }
 

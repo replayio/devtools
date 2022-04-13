@@ -15,6 +15,7 @@ const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
 const FrameView = require("devtools/client/shared/components/Frame");
+import { showMenu, buildMenu } from "devtools/shared/contextmenu";
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
@@ -312,6 +313,28 @@ class Message extends React.Component {
     );
   }
 
+  onContextMenu = async e => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log(e);
+    const smokeAndMirrorsIndex = 1;
+    const msg = JSON.stringify(await this.props.message.parameters[smokeAndMirrorsIndex].getJSON(), null, 2);
+
+    const items = [
+      {
+        item: {
+          ...{
+            label: "Copy Object",
+            disabled: false,
+            click: () => navigator.clipboard.writeText(msg),
+          },
+        },
+      },
+    ];
+
+    showMenu(e, buildMenu(items));
+  };
+
   // eslint-disable-next-line complexity
   render() {
     if (this.state && this.state.error) {
@@ -445,6 +468,7 @@ class Message extends React.Component {
       {
         className: topLevelClasses.join(" "),
         ...mouseEvents,
+        onContextMenu: this.onContextMenu,
         "data-message-id": messageId,
         "aria-live": type === MESSAGE_TYPE.COMMAND ? "off" : "polite",
         ref: node => (this.messageNode = node),
