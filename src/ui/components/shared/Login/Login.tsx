@@ -1,9 +1,8 @@
 import { gql } from "@apollo/client";
-import React, { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-
+import React, { ReactNode, useEffect, useState } from "react";
 import { query } from "ui/utils/apolloClient";
-import { setUserInBrowserPrefs } from "ui/utils/browser";
+import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
 import { getLoginReferrerParam } from "ui/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
@@ -39,8 +38,8 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
 
     if (resp.data?.auth.connection) {
       loginWithRedirect({
-        connection: resp.data.auth.connection,
         appState: { returnTo: window.location.pathname + window.location.search },
+        connection: resp.data.auth.connection,
       });
     } else {
       setError(resp.errors?.find(e => e.message)?.message || true);
@@ -83,13 +82,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function SocialLogin({
-  onShowSSOLogin,
-  onLogin,
-}: {
-  onShowSSOLogin: () => void;
-  onLogin: () => void;
-}) {
+function LoginMessaging() {
   const referrer = getLoginReferrerParam();
 
   // Custom screen for when the user is seeing the login screen and this is the first
@@ -104,20 +97,11 @@ function SocialLogin({
           </a>
         </div>
       </div>
-      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
-        Sign in with Google
-      </PrimaryLgButton>
-      <button
-        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
-        onClick={onShowSSOLogin}
-      >
-        Enterprise Users: Sign in with SSO
-      </button>
     </div>;
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
       <div className="space-y-4 self-start text-base">
         {isTeamMemberInvite() ? (
@@ -133,6 +117,20 @@ function SocialLogin({
           </>
         )}
       </div>
+    </>
+  );
+}
+
+function SocialLogin({
+  onShowSSOLogin,
+  onLogin,
+}: {
+  onShowSSOLogin: () => void;
+  onLogin: () => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <LoginMessaging />
       <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
         Sign in with Google
       </PrimaryLgButton>
@@ -142,6 +140,21 @@ function SocialLogin({
       >
         Enterprise Users: Sign in with SSO
       </button>
+    </div>
+  );
+}
+
+function ReplayBrowserLogin() {
+  const onLogin = () => {
+    requestBrowserLogin();
+  };
+
+  return (
+    <div className="space-y-6">
+      <LoginMessaging />
+      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
+        Sign in
+      </PrimaryLgButton>
     </div>
   );
 }
@@ -163,8 +176,8 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
 
   const onLogin = () =>
     loginWithRedirect({
-      connection: "google-oauth2",
       appState: { returnTo: returnToPath },
+      connection: "google-oauth2",
     });
 
   useEffect(() => {
@@ -174,7 +187,9 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
   return (
     <OnboardingModalContainer theme="light">
       <OnboardingContentWrapper overlay>
-        {sso ? (
+        {global.__IS_RECORD_REPLAY_RUNTIME__ ? (
+          <ReplayBrowserLogin />
+        ) : sso ? (
           <SSOLogin onLogin={onLogin} />
         ) : (
           <SocialLogin onShowSSOLogin={() => setSSO(true)} onLogin={onLogin} />
