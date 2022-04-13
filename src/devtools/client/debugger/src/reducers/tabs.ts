@@ -11,13 +11,11 @@ import type { UIState } from "ui/state";
  */
 
 import { createSelector } from "reselect";
-import move from "lodash-move";
 
-import { isSimilarTab, persistTabs } from "../utils/tabs";
+import { isSimilarTab } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
-import { asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import { getReplaySession } from "ui/setup/prefs";
 import type { Source } from "./sources";
@@ -211,13 +209,30 @@ function updateTabList(state: TabsState, { url, sourceId }: { url: string; sourc
   return { ...state, tabs };
 }
 
+// Source: https://github.com/sindresorhus/array-move/blob/main/index.js
+function arrayMove(array: any[], fromIndex: number, toIndex: number) {
+  let resultArray = array;
+  const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
+
+  if (startIndex >= 0 && startIndex < array.length) {
+    const endIndex = toIndex < 0 ? array.length + toIndex : toIndex;
+
+    resultArray = array.slice();
+
+    const [item] = resultArray.splice(fromIndex, 1);
+    resultArray.splice(endIndex, 0, item);
+  }
+
+  return resultArray;
+}
+
 function moveTabInList(
   state: TabsState,
   { url, tabIndex: newIndex }: { url: string; tabIndex: number }
 ) {
   let { tabs } = state;
   const currentIndex = tabs.findIndex(tab => tab.url == url);
-  tabs = move(tabs, currentIndex, newIndex);
+  tabs = arrayMove(tabs, currentIndex, newIndex);
   return { tabs };
 }
 
@@ -227,7 +242,7 @@ function moveTabInListBySourceId(
 ) {
   let { tabs } = state;
   const currentIndex = tabs.findIndex(tab => tab.sourceId == sourceId);
-  tabs = move(tabs, currentIndex, newIndex);
+  tabs = arrayMove(tabs, currentIndex, newIndex);
   return { tabs };
 }
 
