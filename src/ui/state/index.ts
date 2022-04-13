@@ -16,6 +16,7 @@ import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { PauseState } from "devtools/client/debugger/src/selectors";
+import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { SourcesState } from "devtools/client/debugger/src/reducers/sources";
 import type { SourceActorsState } from "devtools/client/debugger/src/reducers/source-actors";
 import { NetworkState } from "ui/reducers/network";
@@ -44,6 +45,7 @@ export interface UIState {
   messages: MessageState;
   network: NetworkState;
   pause: PauseState;
+  pendingBreakpoints: PendingBreakpointsState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
