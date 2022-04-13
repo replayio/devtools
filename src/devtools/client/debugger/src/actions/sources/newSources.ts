@@ -33,7 +33,6 @@ import {
 
 import type { Source } from "../../reducers/sources";
 
-import sourceQueue from "../../utils/source-queue";
 import { ContextError } from "../../utils/context";
 
 import { ThreadFront } from "protocol/thread";
@@ -319,17 +318,5 @@ function checkNewSources(cx: Context, sources: Source[]): UIThunkAction {
     dispatch(restoreBlackBoxedSources(cx, sources));
 
     return sources;
-  };
-}
-
-export function ensureSourceActor(thread: string, sourceActor: string): UIThunkAction {
-  return async function (dispatch, getState, { client }) {
-    await sourceQueue.flush();
-    if (hasSourceActor(getState(), sourceActor)) {
-      return Promise.resolve();
-    }
-
-    const sources = await client.fetchSources(thread);
-    await dispatch(newGeneratedSources(sources));
   };
 }
