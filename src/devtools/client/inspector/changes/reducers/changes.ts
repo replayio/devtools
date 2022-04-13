@@ -2,9 +2,35 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import type { AnyAction } from "@reduxjs/toolkit";
 
-const { RESET_CHANGES, TRACK_CHANGE } = require("devtools/client/inspector/changes/actions/index");
+// @ts-ignore
+import { RESET_CHANGES, TRACK_CHANGE } from "devtools/client/inspector/changes/actions/index";
+
+interface Rule {
+  ruleId: string;
+  id: string;
+  isNew: boolean;
+  typeName: string;
+  conditionText?: string;
+  name?: string;
+  keyText?: string;
+  selectors: unknown[];
+  ancestors: Rule[];
+  children: unknown[];
+  add: unknown[];
+  remove: unknown[];
+  parent: string | null;
+  ruleIndex?: number;
+}
+
+type RuleRecord = Record<string, Rule>;
+
+interface Change {
+  rules: RuleRecord;
+}
+
+export type ChangesState = Record<string, Change>;
 
 /**
  * Return a deep clone of the given state object.
@@ -12,7 +38,7 @@ const { RESET_CHANGES, TRACK_CHANGE } = require("devtools/client/inspector/chang
  * @param {Object} state
  * @return {Object}
  */
-function cloneState(state = {}) {
+function cloneState(state: ChangesState = {}) {
   return Object.entries(state).reduce((sources, [sourceId, source]) => {
     sources[sourceId] = {
       ...source,
@@ -26,11 +52,11 @@ function cloneState(state = {}) {
         };
 
         return rules;
-      }, {}),
+      }, {} as RuleRecord),
     };
 
     return sources;
-  }, {});
+  }, {} as ChangesState);
 }
 
 /**
@@ -59,14 +85,15 @@ function cloneState(state = {}) {
  * @return {Object}
  *         Entry for the CSS rule created the given collection of rules.
  */
-function createRule(ruleData, rules) {
+function createRule(ruleData: Partial<Rule>, rules: RuleRecord) {
   // Append the rule data to the flattened CSS rule tree with its ancestors.
-  const ruleAncestry = [...ruleData.ancestors, { ...ruleData }];
+  const ruleAncestry = [...ruleData.ancestors!, { ...ruleData }];
 
   return (
     ruleAncestry
       .map((rule, index) => {
         // Ensure each rule has ancestors excluding itself (expand the flattened rule tree).
+        // @ts-ignore
         rule.ancestors = ruleAncestry.slice(0, index);
         // Ensure each rule has a selector text.
         // For the purpose of displaying in the UI, we treat at-rules as selectors.
@@ -74,7 +101,7 @@ function createRule(ruleData, rules) {
           rule.selectors = [`${rule.typeName} ${rule.conditionText || rule.name || rule.keyText}`];
         }
 
-        return rule.id;
+        return rule.id!;
       })
       // Then, create new entries in the rules collection and assign dependencies.
       .map((ruleId, index, array) => {
@@ -84,10 +111,11 @@ function createRule(ruleData, rules) {
 
         // Create an entry for this ruleId if one does not exist.
         if (!rules[ruleId]) {
+          // @ts-ignore
           rules[ruleId] = {
             ruleId,
             isNew: false,
-            selectors,
+            selectors: selectors!,
             add: [],
             remove: [],
             children: [],
@@ -108,11 +136,11 @@ function createRule(ruleData, rules) {
         return rules[ruleId];
       })
       // Finally, return the last rule in the array which is the rule we set out to create.
-      .pop()
+      .pop()!
   );
 }
 
-function removeRule(ruleId, rules) {
+function removeRule(ruleId: string, rules: RuleRecord) {
   const rule = rules[ruleId];
 
   // First, remove this rule's id from its parent's list of children
@@ -164,7 +192,7 @@ function removeRule(ruleId, rules) {
  *    }
  *    ... // more sources
  */
-const INITIAL_STATE = {};
+const INITIAL_STATE: ChangesState = {};
 
 const reducers = {
   /**
@@ -193,7 +221,7 @@ const reducers = {
    *   from the store. Its parent rule is removed as well if it too ends up unchanged.
    */
   // eslint-disable-next-line complexity
-  [TRACK_CHANGE](state, { change }) {
+  [TRACK_CHANGE](state: ChangesState, { change }: AnyAction) {
     const defaults = {
       selector: null,
       source: {},
@@ -214,7 +242,7 @@ const reducers = {
     // Copy or create collection of all rules ever changed in this source.
     const rules = Object.assign({}, source.rules);
     // Reference or create object identifying the rule for this change.
-    const rule = rules[ruleId]
+    const rule: Rule = rules[ruleId]
       ? rules[ruleId]
       : createRule({ id: change.id, selectors: [selector], ancestors, ruleIndex }, rules);
 
@@ -241,7 +269,7 @@ const reducers = {
       for (const decl of change.remove) {
         // Find the position of any added declaration which matches the incoming
         // declaration to be removed.
-        const addIndex = rule.add.findIndex(addDecl => {
+        const addIndex = rule.add.findIndex((addDecl: any) => {
           return (
             addDecl.index === decl.index &&
             addDecl.property === decl.property &&
@@ -252,7 +280,7 @@ const reducers = {
         // Find the position of any removed declaration which matches the incoming
         // declaration to be removed. It's possible to get duplicate remove operations
         // when, for example, disabling a declaration then deleting it.
-        const removeIndex = rule.remove.findIndex(removeDecl => {
+        const removeIndex = rule.remove.findIndex((removeDecl: any) => {
           return (
             removeDecl.index === decl.index &&
             removeDecl.property === decl.property &&
@@ -276,7 +304,7 @@ const reducers = {
         // Update the indexes of previously tracked declarations which follow this removed
         // one so future tracking continues to point to the right declarations.
         if (change.type === "declaration-remove") {
-          rule.add = rule.add.map(addDecl => {
+          rule.add = rule.add.map((addDecl: any) => {
             if (addDecl.index > decl.index) {
               addDecl.index--;
             }
@@ -284,7 +312,7 @@ const reducers = {
             return addDecl;
           });
 
-          rule.remove = rule.remove.map(removeDecl => {
+          rule.remove = rule.remove.map((removeDecl: any) => {
             if (removeDecl.index > decl.index) {
               removeDecl.index--;
             }
@@ -299,7 +327,7 @@ const reducers = {
       for (const decl of change.add) {
         // Find the position of any removed declaration which matches the incoming
         // declaration to be added.
-        const removeIndex = rule.remove.findIndex(removeDecl => {
+        const removeIndex = rule.remove.findIndex((removeDecl: any) => {
           return (
             removeDecl.index === decl.index &&
             removeDecl.value === decl.value &&
@@ -309,7 +337,7 @@ const reducers = {
 
         // Find the position of any added declaration which matches the incoming
         // declaration to be added in case we need to replace it.
-        const addIndex = rule.add.findIndex(addDecl => {
+        const addIndex = rule.add.findIndex((addDecl: any) => {
           return addDecl.index === decl.index && addDecl.property === decl.property;
         });
 
@@ -353,12 +381,12 @@ const reducers = {
     return state;
   },
 
-  [RESET_CHANGES](state) {
+  [RESET_CHANGES]() {
     return INITIAL_STATE;
   },
 };
 
-module.exports = function (state = INITIAL_STATE, action) {
+module.exports = function (state = INITIAL_STATE, action: AnyAction) {
   const reducer = reducers[action.type];
   if (!reducer) {
     return state;

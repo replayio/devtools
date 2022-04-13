@@ -9,6 +9,10 @@
  * @module reducers/breakpoints
  */
 
+import { Location } from "@recordreplay/protocol";
+import type { AnyAction } from "@reduxjs/toolkit";
+import type { UIState } from "ui/state";
+
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 import { getSelectedSource } from "../selectors";
 
@@ -16,7 +20,16 @@ import { getSelectedSource } from "../selectors";
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
 
-export function initialBreakpointsState() {
+import type { Breakpoint } from "./types";
+export type { Breakpoint } from "./types";
+
+export interface BreakpointsState {
+  breakpoints: Record<string, Breakpoint>;
+  requestedBreakpoints: Record<string, unknown>;
+  breakpointsDisabled: boolean;
+}
+
+export function initialBreakpointsState(): BreakpointsState {
   return {
     breakpoints: {},
     requestedBreakpoints: {},
@@ -24,7 +37,7 @@ export function initialBreakpointsState() {
   };
 }
 
-function update(state = initialBreakpointsState(), action) {
+function update(state = initialBreakpointsState(), action: AnyAction) {
   switch (action.type) {
     case "SET_REQUESTED_BREAKPOINT": {
       return setRequestedBreakpoint(state, action);
@@ -45,53 +58,33 @@ function update(state = initialBreakpointsState(), action) {
     case "REMOVE_BREAKPOINTS": {
       return { ...state, breakpoints: {}, requestedBreakpoints: {} };
     }
-
-    case "SET_XHR_BREAKPOINT": {
-      return addXHRBreakpoint(state, action);
-    }
-
-    case "REMOVE_XHR_BREAKPOINT": {
-      return removeXHRBreakpoint(state, action);
-    }
-
-    case "UPDATE_XHR_BREAKPOINT": {
-      return updateXHRBreakpoint(state, action);
-    }
-
-    case "ENABLE_XHR_BREAKPOINT": {
-      return updateXHRBreakpoint(state, action);
-    }
-
-    case "DISABLE_XHR_BREAKPOINT": {
-      return updateXHRBreakpoint(state, action);
-    }
   }
 
   return state;
 }
 
-function setRequestedBreakpoint(state, { location }) {
+function setRequestedBreakpoint(state: BreakpointsState, { location }: AnyAction) {
   assert(!location.column, "location should have no column");
   const requestedId = getLocationKey(location);
   const requestedBreakpoints = { ...state.requestedBreakpoints, [requestedId]: location };
   return { ...state, requestedBreakpoints };
 }
 
-function setBreakpoint(state, { breakpoint }) {
+function setBreakpoint(state: BreakpointsState, { breakpoint }: AnyAction) {
   const location = breakpoint.location;
   const id = getLocationKey(location);
   const breakpoints = { ...state.breakpoints, [id]: breakpoint };
-  return { ...removeRequestedBreakpoint(state, { location }), breakpoints };
+  return { ...removeRequestedBreakpoint(state, { location } as any), breakpoints };
 }
 
-function removeRequestedBreakpoint(state, { location }) {
+function removeRequestedBreakpoint(state: BreakpointsState, { location }: AnyAction) {
   const requestedId = getLocationKey({ ...location, column: undefined });
   const requestedBreakpoints = { ...state.requestedBreakpoints };
   delete requestedBreakpoints[requestedId];
   return { ...state, requestedBreakpoints };
 }
 
-function removeBreakpoint(state, { location }) {
+function removeBreakpoint(state: BreakpointsState, { location }: AnyAction) {
   const id = getLocationKey(location);
   const breakpoints = { ...state.breakpoints };
   delete breakpoints[id];
@@ -101,19 +94,19 @@ function removeBreakpoint(state, { location }) {
 // Selectors
 // TODO: these functions should be moved out of the reducer
 
-export function getBreakpointsMap(state) {
+export function getBreakpointsMap(state: UIState) {
   return state.breakpoints.breakpoints;
 }
 
-export function getBreakpointCount(state) {
+export function getBreakpointCount(state: UIState) {
   return getBreakpointsList(state).length;
 }
 
-export function getLogpointCount(state) {
+export function getLogpointCount(state: UIState) {
   return getBreakpointsList(state).filter(bp => isLogpoint(bp)).length;
 }
 
-export function getBreakpoint(state, location) {
+export function getBreakpoint(state: UIState, location?: Location) {
   if (!location) {
     return undefined;
   }
@@ -122,13 +115,13 @@ export function getBreakpoint(state, location) {
   return breakpoints[getLocationKey(location)];
 }
 
-export function getBreakpointsDisabled(state) {
+export function getBreakpointsDisabled(state: UIState) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.every(breakpoint => breakpoint.disabled);
 }
 
-export function getBreakpointsForSourceId(state, line) {
-  const { id: sourceId } = getSelectedSource(state);
+export function getBreakpointsForSourceId(state: UIState, line?: number) {
+  const { id: sourceId } = getSelectedSource(state)!;
 
   if (!sourceId) {
     return [];
@@ -137,7 +130,7 @@ export function getBreakpointsForSourceId(state, line) {
   return getBreakpointsForSource(state, sourceId, line);
 }
 
-export function getBreakpointsForSource(state, sourceId, line) {
+export function getBreakpointsForSource(state: UIState, sourceId: string, line?: number) {
   if (!sourceId) {
     return [];
   }
@@ -149,23 +142,24 @@ export function getBreakpointsForSource(state, sourceId, line) {
   });
 }
 
-export function getBreakpointForLocation(state, location) {
+export function getBreakpointForLocation(state: UIState, location?: Location) {
   if (!location) {
     return undefined;
   }
 
   return getBreakpointsList(state).find(bp => {
     const loc = bp.location;
+    // @ts-ignore
     return isMatchingLocation(loc, location);
   });
 }
 
-export function hasLogpoint(state, location) {
+export function hasLogpoint(state: UIState, location?: Location) {
   const breakpoint = getBreakpoint(state, location);
   return breakpoint && breakpoint.options.logValue;
 }
 
-export function getLogpointsForSource(state, sourceId) {
+export function getLogpointsForSource(state: UIState, sourceId: string) {
   if (!sourceId) {
     return [];
   }

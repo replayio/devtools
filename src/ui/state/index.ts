@@ -1,6 +1,12 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
+import { ASTState } from "devtools/client/debugger/src/reducers/ast";
+import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
+import { BreakpointsState } from "devtools/client/debugger/src/selectors";
+import type { ChangesState } from "devtools/client/inspector/changes/reducers/changes";
 import { CommentsState } from "./comments";
+import type { EventListenersState } from "devtools/client/debugger/src/selectors";
+import type { FileSearchState } from "devtools/client/debugger/src/selectors";
 import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
 import { InspectorState } from "devtools/client/inspector/state";
@@ -21,12 +27,17 @@ import { LayoutState } from "./layout";
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
   app: AppState;
+  ast: ASTState;
+  boxModel: BoxModelState;
+  breakpoints: BreakpointsState;
+  changes: ChangesState;
   classList: ClassListState;
   comments: CommentsState;
   computed: ComputedState;
   consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
-  eventListenerBreakpoints: any;
+  eventListenerBreakpoints: EventListenersState;
+  fileSearch: FileSearchState;
   inspector: InspectorState;
   layout: LayoutState;
   markup: MarkupState;
