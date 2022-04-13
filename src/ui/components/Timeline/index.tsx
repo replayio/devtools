@@ -128,8 +128,10 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       clearPendingComment,
       setTimelineToTime,
       setTimelineState,
+      currentTime,
       focusRegion,
     } = this.props;
+    const { isDragging } = this.state;
     // if the user clicked on a comment marker, we already seek to the comment's
     // execution point, so we don't want to seek a second time here
     const clickedOnCommentMarker =
@@ -140,9 +142,18 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime) &&
       !isFocusing;
 
+    // We don't want the timeline to navigate when the user's dragging the focus handlebars, unless
+    // the currentTime is outside the new zoomRegion.
+    if (
+      isDragging &&
+      focusRegion &&
+      (currentTime < focusRegion.startTime || currentTime > focusRegion.endTime)
+    ) {
+      return;
+    }
+
     trackEvent("timeline.progress_select");
     this.setState({ isDragging: false });
-
     if (!(hoverTime === null || clickedOnCommentMarker || clickedOnUnfocusedRegion)) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
