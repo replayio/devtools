@@ -9,7 +9,7 @@ import { bindActionCreators } from "redux";
 const { ThreadFront } = require("protocol/thread");
 
 import { setupCommands, clientCommands } from "./commands";
-import { setupEvents, clientEvents } from "./events";
+import { setupEvents } from "./events";
 
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 import actions from "../actions";
@@ -17,6 +17,7 @@ import * as selectors from "../selectors";
 
 import { updatePrefs } from "../utils/bootstrap";
 import { initialBreakpointsState } from "../reducers/breakpoints";
+import { prepareSourcePayload } from "./create";
 
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
@@ -32,15 +33,18 @@ let boundActions;
 let store;
 
 async function setupDebugger() {
+  const sourceInfos = [];
   await ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
-    clientEvents.newSource(ThreadFront, {
-      source: {
+    sourceInfos.push({
+      type: "generated",
+      data: prepareSourcePayload({
         actor: sourceId,
         url,
         sourceMapURL,
-      },
+      }),
     })
   );
+  await store.dispatch(actions.newQueuedSources(sourceInfos));
   store.dispatch({ type: "SOURCES_LOADED" });
 }
 
