@@ -1,5 +1,5 @@
 import { UIThunkAction } from "ui/actions";
-import { Breakpoint } from "../../reducers/breakpoints";
+import { PendingBreakpoint } from "../../reducers/types";
 
 export interface Context {
   isPaused: boolean;

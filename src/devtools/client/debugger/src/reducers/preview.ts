@@ -3,14 +3,22 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import uniqueId from "lodash/uniqueId";
+import type { AnyAction } from "@reduxjs/toolkit";
+import type { UIState } from "ui/state";
 
-export function initialPreviewState() {
+import type { Preview } from "./types";
+
+export interface PreviewState {
+  preview: (Preview & { previewId: string }) | null;
+}
+
+export function initialPreviewState(): PreviewState {
   return {
     preview: null,
   };
 }
 
-function update(state = initialPreviewState(), action) {
+function update(state = initialPreviewState(), action: AnyAction) {
   switch (action.type) {
     case "CLEAR_PREVIEW": {
       if (action.previewId !== state.preview?.previewId) {
@@ -47,10 +55,7 @@ function update(state = initialPreviewState(), action) {
   return state;
 }
 
-// NOTE: we'd like to have the app state fully typed
-// https://github.com/firefox-devtools/debugger/blob/master/src/reducers/sources.js#L179-L185
-
-export function getPreview(state) {
+export function getPreview(state: UIState) {
   return state.preview.preview;
 }
 

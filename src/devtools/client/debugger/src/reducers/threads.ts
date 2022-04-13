@@ -2,18 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { AnyAction } from "@reduxjs/toolkit";
+import type { UIState } from "ui/state";
 
-/**
- * Threads reducer
- * @module reducers/threads
- */
+import type { Thread } from "./types";
 
-import { createSelector } from "reselect";
+export interface ThreadsState {
+  isWebExtension: boolean;
+  mainThread: Thread;
+  threads: Thread[];
+  traits: Record<string, unknown>;
+}
 
-import { features } from "../utils/prefs";
-
-export function initialThreadsState() {
+export function initialThreadsState(): ThreadsState {
   return {
     threads: [],
     mainThread: {
@@ -27,7 +28,7 @@ export function initialThreadsState() {
   };
 }
 
-export default function update(state = initialThreadsState(), action) {
+export default function update(state = initialThreadsState(), action: AnyAction) {
   switch (action.type) {
     case "CONNECT":
       return {
@@ -41,10 +42,10 @@ export default function update(state = initialThreadsState(), action) {
   }
 }
 
-export function getMainThread(state) {
+export function getMainThread(state: UIState) {
   return state.threads.mainThread;
 }
 
-export function getDebuggeeUrl(state) {
+export function getDebuggeeUrl(state: UIState) {
   return getMainThread(state).url;
 }

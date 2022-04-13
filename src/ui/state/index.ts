@@ -1,6 +1,7 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
 import { ASTState } from "devtools/client/debugger/src/reducers/ast";
+import type { AsyncRequestsState } from "devtools/client/debugger/src/reducers/async-requests";
 import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { BreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { ChangesState } from "devtools/client/inspector/changes/reducers/changes";
@@ -16,11 +17,17 @@ import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { PauseState } from "devtools/client/debugger/src/selectors";
+import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
+import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import type { SourcesState } from "devtools/client/debugger/src/reducers/sources";
 import type { SourceActorsState } from "devtools/client/debugger/src/reducers/source-actors";
+import type { SourceTreeState } from "devtools/client/debugger/src/reducers/source-tree";
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
+import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
+import type { ThreadsState } from "devtools/client/debugger/src/reducers/threads";
 import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
+import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
 
@@ -28,6 +35,7 @@ import { LayoutState } from "./layout";
 export interface UIState {
   app: AppState;
   ast: ASTState;
+  asyncRequests: AsyncRequestsState;
   boxModel: BoxModelState;
   breakpoints: BreakpointsState;
   changes: ChangesState;
@@ -44,10 +52,16 @@ export interface UIState {
   messages: MessageState;
   network: NetworkState;
   pause: PauseState;
+  pendingBreakpoints: PendingBreakpointsState;
+  preview: PreviewState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
   sources: SourcesState;
   sourceActors: SourceActorsState;
+  sourceTree: SourceTreeState;
+  tabs: TabsState;
   timeline: TimelineState;
+  threads: ThreadsState;
+  ui: UISliceState;
 }

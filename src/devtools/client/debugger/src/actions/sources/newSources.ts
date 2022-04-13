@@ -102,7 +102,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
     const pendingBreakpoints = getPendingBreakpointsForSource(
       getState(),
       source,
-      ThreadFront.recordingId
+      ThreadFront.recordingId!
     );
 
     if (pendingBreakpoints.length === 0) {
