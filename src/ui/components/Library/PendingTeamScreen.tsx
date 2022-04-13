@@ -85,7 +85,7 @@ export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceIn
   const { name } = workspace;
 
   return (
-    <div className="-5 flex flex-col space-y-5 overflow-auto bg-gray-100 px-8 py-6">
+    <div className="-5 flex flex-col space-y-5 overflow-auto px-8 py-6">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-center space-x-2 text-2xl font-semibold">
           <span>{name}</span>
