@@ -133,17 +133,6 @@ interface AuthProps {
   apiKey?: string;
 }
 
-// We need to ensure that we always pass the same handleAuthError function
-// to ApolloWrapper, otherwise it will create a new apolloClient every time
-// and parts of the UI will reset (https://github.com/RecordReplay/devtools/issues/6168).
-// But handleAuthError needs access to the current values from useAuth0(),
-// so we use a constant wrapper around the _handleAuthError() function that
-// will be recreated with the current values.
-let _handleAuthError: () => Promise<void>;
-function handleAuthError() {
-  _handleAuthError?.();
-}
-
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
@@ -151,7 +140,7 @@ function AppUtilities({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
-  _handleAuthError = async () => {
+  const handleAuthError = async () => {
     // This handler attempts to handle the scenario in which the frontend and
     // our auth client think the user has a valid auth session but the backend
     // disagrees. In this case, we should refresh the token so we can continue

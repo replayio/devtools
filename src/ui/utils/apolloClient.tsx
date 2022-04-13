@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect, useRef } from "react";
 import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
 import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
@@ -28,6 +28,7 @@ export function ApolloWrapper({
   onAuthError?: () => void;
 }) {
   const { loading, token, error } = useToken();
+  const clientRef = useRef(createApolloClient(token, onAuthError));
 
   const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
 
@@ -73,9 +74,7 @@ export function ApolloWrapper({
     }
   }
 
-  return (
-    <ApolloProvider client={createApolloClient(token, onAuthError)}>{children}</ApolloProvider>
-  );
+  return <ApolloProvider client={clientRef.current}>{children}</ApolloProvider>;
 }
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
