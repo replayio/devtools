@@ -1,6 +1,7 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
 import { ASTState } from "devtools/client/debugger/src/reducers/ast";
+import type { AsyncRequestsState } from "devtools/client/debugger/src/reducers/async-requests";
 import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { BreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { ChangesState } from "devtools/client/inspector/changes/reducers/changes";
@@ -32,6 +33,7 @@ import { LayoutState } from "./layout";
 export interface UIState {
   app: AppState;
   ast: ASTState;
+  asyncRequests: AsyncRequestsState;
   boxModel: BoxModelState;
   breakpoints: BreakpointsState;
   changes: ChangesState;
