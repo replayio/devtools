@@ -9,7 +9,7 @@ import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
 import { InspectorActiveTab } from "devtools/client/inspector/state";
 import { decodeWorkspaceId } from "./workspace";
-import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/PanelSummary";
+import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/Panel";
 
 type MixpanelEvent =
   | ["breakpoint.add_comment"]

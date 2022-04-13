@@ -1,4 +1,5 @@
 import { TimeRange, Location } from "@recordreplay/protocol";
+import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
 
 export interface ZoomRegion {
   endTime: number;
@@ -34,12 +35,7 @@ export interface HoveredItem {
   target: "timeline" | "console" | "widget" | "transcript";
   point?: string;
   time?: number;
-  location?: HoveredLocation;
-}
-
-interface HoveredLocation extends Location {
-  line: number;
-  column: number;
+  location?: SourceLocation;
 }
 
 export enum FocusOperation {

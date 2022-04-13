@@ -18,6 +18,9 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";
 import { prefs } from "ui/utils/prefs";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
+import { Breakpoint } from "devtools/client/debugger/src/selectors";
+import { string } from "prop-types";
+import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -306,18 +309,21 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
+export const getAnalysisPointsForBreakpoint = (state: UIState, breakpoint: Breakpoint) => {
+  return getAnalysisPointsForLocation(state, breakpoint.location, breakpoint.options.condition);
+};
 export const getAnalysisPointsForLocation = (
   state: UIState,
-  location: Location | null,
-  condition = ""
+  location: SourceLocation | null,
+  condition: string | null | undefined = ""
 ) => {
   if (!location) {
-    return undefined;
+    return null;
   }
 
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
-  return points ? getPointsInTrimSpan(state, points) : undefined;
+  return points ? getPointsInTrimSpan(state, points) : null;
 };
 
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;

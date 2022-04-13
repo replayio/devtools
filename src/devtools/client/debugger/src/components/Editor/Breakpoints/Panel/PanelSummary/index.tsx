@@ -1,13 +1,11 @@
-import React, { Dispatch, SetStateAction } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { Dispatch, SetStateAction, useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import CommentButton from "./CommentButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Popup from "./Popup";
 import hooks from "ui/hooks";
 import { UIState } from "ui/state";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 
 const { prefs } = require("ui/utils/prefs");
 
@@ -19,41 +17,54 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
 import classNames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
+import { HitsContext, Input, PanelErrors } from "../Panel";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { getAnalysisPointsForBreakpoint } from "ui/reducers/app";
+import { createFloatingCodeComment, createFrameComment } from "ui/actions/comments";
 import { AnalysisPayload } from "ui/state/app";
 
-export type Input = "condition" | "logValue";
-
-type PanelSummaryProps = PropsFromRedux & {
-  analysisPoints?: AnalysisPayload;
+type PanelSummaryProps = {
   breakpoint: any;
-  executionPoint: any;
-  isHot: boolean;
-  pausedOnHit: boolean;
   setInputToFocus: Dispatch<SetStateAction<Input>>;
   toggleEditingOn: () => void;
 };
 
-function PanelSummary({
-  analysisPoints,
+const useGetIsPausedOnHit = (analysisPoints?: AnalysisPayload) => {
+  const currentTime = useSelector(getCurrentTime);
+  const executionPoint = useSelector(getExecutionPoint);
+  const pausedOnHit =
+    !!analysisPoints &&
+    !analysisPoints.error &&
+    !!analysisPoints?.data.find(
+      ({ point, time }) => point == executionPoint && time == currentTime
+    );
+
+  return pausedOnHit;
+};
+
+export default function PanelSummary({
   breakpoint,
-  createFloatingCodeComment,
-  createFrameComment,
-  currentTime,
-  executionPoint,
-  isHot,
-  pausedOnHit,
   setInputToFocus,
   toggleEditingOn,
 }: PanelSummaryProps) {
+  const dispatch = useDispatch();
+  const analysisPoints = useSelector((state: UIState) =>
+    getAnalysisPointsForBreakpoint(state, breakpoint)
+  )!;
+  const executionPoint = useSelector(getExecutionPoint)!;
+  const currentTime = useSelector(getCurrentTime);
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const { user } = useAuth0();
   const { userId } = useGetUserId();
   const recordingId = useGetRecordingId();
+  const isPausedOnHit = useGetIsPausedOnHit(analysisPoints);
+  const { error } = useContext(HitsContext);
+
+  const isHot = error === PanelErrors.TooManyPoints || error === PanelErrors.MaxHits;
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
-
-  const isLoaded = Boolean(analysisPoints && !isHot);
-  const isEditable = isLoaded && isTeamDeveloper;
+  const isEditable = isTeamDeveloper && !isHot;
 
   const focusInput = (input: Input) => {
     if (isEditable) {
@@ -71,22 +82,26 @@ function PanelSummary({
 
     trackEvent("breakpoint.add_comment");
 
-    if (pausedOnHit) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        null,
-        { ...user, userId },
-        recordingId,
-        breakpoint
+    if (isPausedOnHit) {
+      dispatch(
+        createFrameComment(
+          currentTime,
+          executionPoint,
+          null,
+          { ...user, userId },
+          recordingId,
+          breakpoint
+        )
       );
     } else {
-      createFloatingCodeComment(
-        currentTime,
-        executionPoint,
-        { ...user, id: userId },
-        recordingId,
-        breakpoint
+      dispatch(
+        createFloatingCodeComment(
+          currentTime,
+          executionPoint,
+          { ...user, id: userId },
+          recordingId,
+          breakpoint
+        )
       );
     }
   };
@@ -116,14 +131,14 @@ function PanelSummary({
           it was hit {prefs.maxHitsDisplayed}+ times
         </Popup>
         <div className="button-container flex items-center">
-          <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+          <CommentButton addComment={addComment} pausedOnHit={isPausedOnHit} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
+    <div className={classNames("summary flex items-center text-gray-500", { enabled: isEditable })}>
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
@@ -147,21 +162,8 @@ function PanelSummary({
         ) : null}
       </div>
       <div className="button-container flex items-center">
-        <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+        <CommentButton addComment={addComment} pausedOnHit={isPausedOnHit} />
       </div>
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    currentTime: selectors.getCurrentTime(state),
-  }),
-  {
-    createFrameComment: actions.createFrameComment,
-    createFloatingCodeComment: actions.createFloatingCodeComment,
-  }
-);
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(PanelSummary);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import classnames from "classnames";
 import findLast from "lodash/findLast";
 import find from "lodash/find";
@@ -11,6 +11,7 @@ const { trackEvent } = require("ui/utils/telemetry");
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
+import { HitsContext } from "../../Editor/Breakpoints/Panel/Panel";
 
 function BreakpointNavigation({
   executionPoint,
@@ -24,6 +25,7 @@ function BreakpointNavigation({
   setZoomedBreakpoint = () => {},
 }) {
   const [lastExecutionPoint, setLastExecutionPoint] = useState(0);
+  const { hits, error } = useContext(HitsContext);
 
   const navigateToPoint = point => {
     trackEvent("breakpoint.navigate");
@@ -31,11 +33,10 @@ function BreakpointNavigation({
       seek(point.point, point.time, true);
     }
   };
-  const isEmpty = analysisPoints && (analysisPoints.error || analysisPoints.data.length == 0);
 
   let prev, next;
 
-  if (executionPoint && !analysisPoints?.error && analysisPoints?.data.length > 0) {
+  if (executionPoint && error && hits > 0) {
     prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = find(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
@@ -47,19 +48,17 @@ function BreakpointNavigation({
   }, [executionPoint]);
 
   useEffect(() => {
-    if (analysisPoints) {
-      trackEvent(analysisPoints.data.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
-        hits: analysisPoints.data.length,
+    if (hits) {
+      trackEvent(hits > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
+        hits: hits,
       });
     }
-  }, [analysisPoints]);
+  }, [hits]);
 
   return (
-    <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
-      {!isEmpty ? (
-        <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
-      ) : null}
-      {analysisPoints && !analysisPoints.error ? (
+    <div className={classnames("breakpoint-navigation", { empty: hits === 0 })}>
+      <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
+      {!error ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : (
         <div className="flex-grow" />

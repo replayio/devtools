@@ -40,7 +40,7 @@ export function getLocationKey(location: SourceLocation & { scriptId?: string })
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
 }
 
-export function getLocationAndConditionKey(location: SourceLocation, condition: string) {
+export function getLocationAndConditionKey(location: SourceLocation, condition: string | null) {
   return `${getLocationKey(location)}:${condition}`;
 }
 

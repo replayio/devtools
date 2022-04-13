@@ -1,35 +1,58 @@
+import { useContext } from "react";
 import { useSelector } from "react-redux";
 import { getIsIndexed } from "ui/reducers/app";
-import { AnalysisError, AnalysisPayload } from "ui/state/app";
+import { AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";
+import { HitsContext } from "../../Editor/Breakpoints/Panel/Panel";
+
+const createStatusString = (
+  hits: number | null,
+  executionPoint: string | null,
+  analysisPoints: AnalysisPayload
+) => {
+  const denominator = hits;
+  let numerator = "…";
+
+  if (analysisPoints && executionPoint) {
+    numerator =
+      "" +
+      analysisPoints.data.reduce(
+        (acc, point) => (BigInt(point.point) <= BigInt(executionPoint) ? acc + 1 : acc),
+        0
+      );
+  }
+
+  return `${numerator}/${denominator}`;
+};
 
 export function PanelStatus({ analysisPoints }: { analysisPoints: AnalysisPayload }) {
-  const executionPoint = useSelector(getExecutionPoint);
   const isIndexed = useSelector(getIsIndexed);
-  let status = "";
-  let maxStatusLength = 0;
+  const { error, loading, hits } = useContext(HitsContext);
+  const executionPoint = useSelector(getExecutionPoint);
+
+  let status: string | HTMLDivElement = "…";
+  let maxCharLength = 0;
 
   if (!isIndexed) {
     status = "Indexing";
-  } else if (!analysisPoints || !executionPoint) {
+  } else if (error) {
+    status = "Error";
+  } else if (loading) {
     status = "Loading";
-  } else if (analysisPoints.error) {
-    status = analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error";
-  } else if (analysisPoints.data.length == 0) {
+  } else if (hits === 0) {
     status = "No hits";
-  } else {
-    const points = analysisPoints
-      ? analysisPoints.data.filter(point => BigInt(point.point) <= BigInt(executionPoint))
-      : [];
-
-    status = `${points.length}/${analysisPoints.data.length}`;
-    maxStatusLength = `${analysisPoints.data.length}/${analysisPoints.data.length}`.length;
+  } else if (hits) {
+    // This number will be used to figure out the max character length we will
+    // have to accommodate for this status component, so that we can set its minimum
+    // width to it and minimize layout shifting.
+    maxCharLength = `${hits}/${hits}`.length;
+    status = createStatusString(hits, executionPoint, analysisPoints);
   }
 
   return (
     <div className="breakpoint-navigation-status-container">
       <div className="text-breakpointStatus rounded-2xl bg-breakpointStatusBG px-3 py-0.5">
-        <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
+        <div className="text-center" style={{ minWidth: `${maxCharLength}ch` }}></div>
         {status}
       </div>
     </div>

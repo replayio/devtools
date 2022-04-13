@@ -1,5 +1,3 @@
-import { PointDescription } from "@recordreplay/protocol";
-import { isNumber } from "lodash";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHoveredLineNumberLocation } from "ui/actions/app";
@@ -24,7 +22,7 @@ const {
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
-function getTextAndWarning(analysisPoints?: AnalysisPayload, analysisPointsCount?: number) {
+function getTextAndWarning(analysisPoints: AnalysisPayload | null, analysisPointsCount?: number) {
   if (analysisPoints?.error) {
     return {
       text: analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error",
