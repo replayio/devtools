@@ -1,5 +1,6 @@
 import React, { ReactNode, useState, useEffect } from "react";
 import { DocumentNode } from "graphql";
+import * as Sentry from "@sentry/browser";
 import { defer } from "protocol/utils";
 import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import {
@@ -178,12 +179,14 @@ function createHttpLink(token: string | undefined) {
 function createErrorLink(onAuthError?: () => void) {
   return onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
+      Sentry.captureException(graphQLErrors);
       console.error("[Apollo GraphQL error]", graphQLErrors);
 
       if (onAuthError && graphQLErrors.some(e => e.extensions?.code === "UNAUTHENTICATED")) {
         onAuthError();
       }
     } else if (networkError) {
+      Sentry.captureException(networkError);
       console.warn("[Apollo Network error]", networkError);
     }
   });
