@@ -21,6 +21,7 @@ import type { PendingBreakpointsState } from "devtools/client/debugger/src/selec
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import type { SourcesState } from "devtools/client/debugger/src/reducers/sources";
 import type { SourceActorsState } from "devtools/client/debugger/src/reducers/source-actors";
+import type { SourceTreeState } from "devtools/client/debugger/src/reducers/source-tree";
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
@@ -57,6 +58,7 @@ export interface UIState {
   rules: RulesState;
   sources: SourcesState;
   sourceActors: SourceActorsState;
+  sourceTree: SourceTreeState;
   tabs: TabsState;
   timeline: TimelineState;
   ui: UISliceState;
