@@ -128,9 +128,6 @@ function update(state = initialASTState(), action: AnyAction) {
   }
 }
 
-// NOTE: we'd like to have the app state fully typed
-// https://github.com/firefox-devtools/debugger/blob/master/src/reducers/sources.js#L179-L185
-
 interface PartialSource {
   id: string;
 }

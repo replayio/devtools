@@ -65,7 +65,7 @@ export function getPendingBreakpointList(state: UIState, recordingId: string) {
 
 export function getPendingBreakpointsForSource(
   state: UIState,
-  source: { url: string },
+  source: { url?: string },
   recordingId: string
 ) {
   return getPendingBreakpointList(state, recordingId).filter(pendingBreakpoint => {
