@@ -5,7 +5,7 @@ import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
 import NextApp from "next/app";
-import React, { ReactNode, useEffect, useLayoutEffect, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { IntercomProvider } from "react-use-intercom";
 import { Provider } from "react-redux";
 import { Store } from "redux";
@@ -184,7 +184,7 @@ function Routing({ Component, pageProps }: AppProps) {
   const [store, setStore] = useState<Store | null>(null);
   const { getFeatureFlag } = useLaunchDarkly();
 
-  useLayoutEffect(() => {
+  useMemo(() => {
     resetCache();
   }, [token.token]);
 
