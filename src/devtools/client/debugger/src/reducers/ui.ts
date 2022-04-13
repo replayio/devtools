@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { AnyAction } from "@reduxjs/toolkit";
+import type { UIState } from "ui/state";
 
 /**
  * UI reducer
@@ -10,23 +11,49 @@
  */
 
 import { prefs } from "../utils/prefs";
+import type { Source } from "./sources";
+import type { Location } from "@recordreplay/protocol";
+import type { Range } from "./types";
 
-export const createUIState = () => ({
+type ActiveSearchType = "project" | "file";
+
+type SelectedPrimaryPaneTabType = "sources" | "outline";
+
+export interface UISliceState {
+  selectedPrimaryPaneTab: SelectedPrimaryPaneTabType;
+  activeSearch?: ActiveSearchType | null;
+  fullTextSearchQuery: string;
+  fullTextSearchFocus: boolean;
+  shownSource?: Source | null;
+  startPanelCollapsed: boolean;
+  endPanelCollapsed: boolean;
+  sourcesCollapsed: boolean;
+  frameworkGroupingOn: boolean;
+  viewport?: Range | null;
+  cursorPosition?: Location | null;
+  highlightedLineRange?: {
+    start?: number;
+    end?: number;
+    sourceId?: number;
+  };
+}
+
+export const createUIState = (): UISliceState => ({
   selectedPrimaryPaneTab: "sources",
   activeSearch: null,
   fullTextSearchQuery: "",
   fullTextSearchFocus: false,
   shownSource: null,
-  startPanelCollapsed: prefs.startPanelCollapsed,
-  endPanelCollapsed: prefs.endPanelCollapsed,
-  sourcesCollapsed: prefs.sourcesCollapsed,
-  frameworkGroupingOn: prefs.frameworkGroupingOn,
+  startPanelCollapsed: prefs.startPanelCollapsed as boolean,
+  endPanelCollapsed: prefs.endPanelCollapsed as boolean,
+  sourcesCollapsed: prefs.sourcesCollapsed as boolean,
+  frameworkGroupingOn: prefs.frameworkGroupingOn as boolean,
   highlightedLineRange: undefined,
   viewport: null,
   cursorPosition: null,
 });
 
-function update(state = createUIState(), action) {
+function update(state = createUIState(), action: AnyAction) {
   switch (action.type) {
     case "TOGGLE_ACTIVE_SEARCH": {
       return { ...state, activeSearch: action.value };
@@ -102,17 +129,16 @@ function update(state = createUIState(), action) {
   }
 }
 
-export const getSelectedPrimaryPaneTab = state => state.ui.selectedPrimaryPaneTab;
-export const getActiveSearch = state => state.ui.activeSearch;
-export const getFrameworkGroupingState = state => state.ui.frameworkGroupingOn;
-export const getShownSource = state => state.ui.shownSource;
-export const getPaneCollapse = state => state.ui.startPanelCollapsed;
-export const getSourcesCollapsed = state => state.ui.sourcesCollapsed;
-export const getHighlightedLineRange = state => state.ui.highlightedLineRange;
-export const getOrientation = state => state.ui.orientation;
-export const getViewport = state => state.ui.viewport;
-export const getCursorPosition = state => state.ui.cursorPosition;
-export const getFullTextSearchQuery = state => state.ui.fullTextSearchQuery;
-export const getFullTextSearchFocus = state => state.ui.fullTextSearchFocus;
+export const getSelectedPrimaryPaneTab = (state: UIState) => state.ui.selectedPrimaryPaneTab;
+export const getActiveSearch = (state: UIState) => state.ui.activeSearch;
+export const getFrameworkGroupingState = (state: UIState) => state.ui.frameworkGroupingOn;
+export const getShownSource = (state: UIState) => state.ui.shownSource;
+export const getPaneCollapse = (state: UIState) => state.ui.startPanelCollapsed;
+export const getSourcesCollapsed = (state: UIState) => state.ui.sourcesCollapsed;
+export const getHighlightedLineRange = (state: UIState) => state.ui.highlightedLineRange;
+export const getViewport = (state: UIState) => state.ui.viewport;
+export const getCursorPosition = (state: UIState) => state.ui.cursorPosition;
+export const getFullTextSearchQuery = (state: UIState) => state.ui.fullTextSearchQuery;
+export const getFullTextSearchFocus = (state: UIState) => state.ui.fullTextSearchFocus;
 
 export default update;

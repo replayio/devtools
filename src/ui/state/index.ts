@@ -24,6 +24,7 @@ import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
+import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
 
@@ -56,4 +57,5 @@ export interface UIState {
   sourceActors: SourceActorsState;
   tabs: TabsState;
   timeline: TimelineState;
+  ui: UISliceState;
 }

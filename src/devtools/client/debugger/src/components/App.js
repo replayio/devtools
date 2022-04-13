@@ -16,7 +16,6 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 import {
   getActiveSearch,
-  getOrientation,
   getPaneCollapse,
   getQuickOpenEnabled,
   getSelectedSource,
