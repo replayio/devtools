@@ -1,13 +1,6 @@
 import { bindActionCreators, Store } from "redux";
 
-import {
-  sessionError,
-  uploadedData,
-  CommandMethods,
-  CommandParams,
-  CommandResult,
-  CommandHasPauseId,
-} from "@recordreplay/protocol";
+import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
@@ -41,7 +34,6 @@ const {
 
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
-import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
 import { assert } from "protocol/utils";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 import network from "ui/reducers/network";
@@ -116,12 +108,8 @@ export default async function DevTools(store: AppStore) {
   const initialConsoleState = getConsoleInitialState();
 
   const commandHistory = await asyncStore.commandHistory;
-  const messages = await initialMessageState({
-    commandHistory,
-  });
 
   const initialState = {
-    messages,
     ...initialDebuggerState,
     ...initialConsoleState,
   };
