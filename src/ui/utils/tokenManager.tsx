@@ -41,9 +41,7 @@ class TokenManager {
 
     if (typeof window !== "undefined") {
       listenForAccessToken(token => {
-        if (token) {
-          this.setExternalAuth(token);
-        }
+        this.setExternalAuth(token);
       });
     }
   }

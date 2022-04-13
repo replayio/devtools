@@ -23,8 +23,8 @@ export function setAccessTokenInBrowserPrefs(token: string | null) {
 
 export function listenForAccessToken(callback: (accessToken: string) => void) {
   window.addEventListener("WebChannelMessageToContent", (ev: any) => {
-    const token = ev.detail?.message?.token;
-    if (token) {
+    const { error, token } = ev.detail?.message || {};
+    if (!error) {
       callback(token);
     }
   });
