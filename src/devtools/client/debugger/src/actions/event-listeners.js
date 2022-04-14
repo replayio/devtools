@@ -7,11 +7,9 @@
 import uniq from "lodash/uniq";
 import remove from "lodash/remove";
 import difference from "lodash/difference";
-
+import { ThreadFront } from "protocol/thread";
 const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 import * as selectors from "../selectors";
-
-import { features } from "ui/utils/prefs";
 
 const INITIAL_EVENT_BREAKPOINTS = [
   "event.keyboard.input",
@@ -98,29 +96,30 @@ export function removeEventListenerExpanded(category) {
 }
 
 export function getEventListenerBreakpointTypes() {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, _, { client }) => {
     const categories = await getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
     const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
+
     dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
   };
 }
 
-export function loadAdditionalPoints() {
+export function loadAdditionalCounts() {
   return async (dispatch, getState, { client }) => {
-    if (!selectors.isLoadingAdditionalPoints(getState())) {
+    if (!selectors.isLoadingAdditionalCounts(getState())) {
       return;
     }
 
-    dispatch({ type: "LOADING_ADDITIONAL_EVENT_LISTENER_POINTS" });
+    dispatch({ type: "LOADING_ADDITIONAL_EVENT_LISTENER_COUNTS" });
     const eventBreakpoints = selectors.getEventListenerBreakpointTypes(getState());
     const eventIds = eventBreakpoints.reduce(
       (acc, e) => [...acc, ...e.events.map(event => event.id)],
       []
     );
-    const otherEventBreakpoints = difference(eventIds, INITIAL_EVENT_BREAKPOINTS);
-    const eventTypePoints = await client.fetchEventTypePoints(otherEventBreakpoints);
-    dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
+
+    const eventTypeCounts = await ThreadFront.getEventHandlerCounts(eventIds);
+    dispatch({ type: "RECEIVE_EVENT_LISTENER_COUNTS", eventTypeCounts });
   };
 }

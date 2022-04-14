@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import React, { Component } from "react";
 import classnames from "classnames";
 
@@ -12,7 +10,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
-import { features, prefs } from "ui/utils/prefs";
+import { prefs } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import Spinner from "ui/components/shared/Spinner";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
@@ -27,7 +25,7 @@ class EventListeners extends Component {
   };
 
   componentDidMount() {
-    this.props.loadAdditionalPoints();
+    this.props.loadAdditionalCounts();
   }
 
   hasMatch(eventOrCategoryName, searchText) {
@@ -149,18 +147,16 @@ class EventListeners extends Component {
   }
 
   renderCategoryItem(category, index) {
-    const { eventTypePoints } = this.props;
+    const { eventTypeCounts } = this.props;
     const { expandedCategories } = this.props;
 
     const expanded = expandedCategories.includes(category.name);
 
     const categoryEvents = category.events || [];
-    const events = expanded
-      ? categoryEvents.filter(event => eventTypePoints[event.id]?.length > 0)
-      : [];
+    const events = expanded ? categoryEvents.filter(event => eventTypeCounts[event.id] > 0) : [];
 
     const categoryCount = categoryEvents
-      .map(event => eventTypePoints[event.id]?.length || 0)
+      .map(event => eventTypeCounts[event.id] || 0)
       .reduce((sum, count) => sum + count, 0);
 
     if (categoryCount == 0) {
@@ -178,7 +174,7 @@ class EventListeners extends Component {
   }
 
   renderCategories() {
-    const { categories, isLoadingInitialPoints, isLoadingAdditionalPoints } = this.props;
+    const { categories, isLoadingInitialPoints, isLoadingAdditionalCounts } = this.props;
 
     const commonCategories = categories.filter(category =>
       ["Keyboard", "Mouse"].includes(category.name)
@@ -191,7 +187,7 @@ class EventListeners extends Component {
     return (
       <div className="flex flex-col space-y-1.5">
         {this.renderCategoriesSection("Common Events", isLoadingInitialPoints, commonCategories)}
-        {this.renderCategoriesSection("Other Events", isLoadingAdditionalPoints, otherCategories)}
+        {this.renderCategoriesSection("Other Events", isLoadingAdditionalCounts, otherCategories)}
       </div>
     );
   }
@@ -293,15 +289,15 @@ class EventListeners extends Component {
   }
 
   renderListenerEvent(event, category) {
-    const { activeEventListeners, eventTypePoints } = this.props;
+    const { activeEventListeners, eventTypeCounts } = this.props;
     const { searchText } = this.state;
 
-    const points = eventTypePoints[event.id];
-    if (!points || points.length == 0) {
+    const count = eventTypeCounts[event.id];
+    if (!count || count == 0) {
       return null;
     }
 
-    const isHot = points.length > prefs.maxHitsEditable || points.length > maxAnalysisPoints;
+    const isHot = count > prefs.maxHitsEditable || count > maxAnalysisPoints;
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (
@@ -322,7 +318,7 @@ class EventListeners extends Component {
               {searchText ? this.renderCategory(category) : null}
               {event.name}
             </span>
-            <CountPill>{points.length}</CountPill>
+            <CountPill>{count}</CountPill>
           </label>
         </div>
       </li>
@@ -346,9 +342,9 @@ const mapStateToProps = state => ({
   activeEventListeners: selectors.getActiveEventListeners(state),
   categories: selectors.getEventListenerBreakpointTypes(state),
   expandedCategories: selectors.getEventListenerExpanded(state),
-  eventTypePoints: selectors.getEventListenerPoints(state),
+  eventTypeCounts: selectors.getEventListenerCounts(state),
   isLoadingInitialPoints: selectors.isLoadingInitialPoints(state),
-  isLoadingAdditionalPoints: selectors.isLoadingAdditionalPoints(state),
+  isLoadingAdditionalCounts: selectors.isLoadingAdditionalCounts(state),
 });
 
 export default connect(mapStateToProps, {
@@ -356,5 +352,5 @@ export default connect(mapStateToProps, {
   removeEventListeners: actions.removeEventListenerBreakpoints,
   addEventListenerExpanded: actions.addEventListenerExpanded,
   removeEventListenerExpanded: actions.removeEventListenerExpanded,
-  loadAdditionalPoints: actions.loadAdditionalPoints,
+  loadAdditionalCounts: actions.loadAdditionalCounts,
 })(EventListeners);
