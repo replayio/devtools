@@ -19,18 +19,27 @@ export function safeJsonParse(text) {
 
 export const getLineNumberNode = target => target.querySelector(".CodeMirror-linenumber");
 const isHoveredOnLine = target => !!target.closest(".CodeMirror-line");
+const isHoveredOnGutter = target => !!target.closest(".CodeMirror-gutter-wrapper");
+// This is some real ugly dom traversal but CodeMirror makes it difficult to do anything else.
+// If you do find yourself in the unfortunate situation of debugging something around here,
+// make sure you have your elements panel locked and loaded.
+const getLineNodeFromGutterTarget = target =>
+  target.closest(".CodeMirror-gutter-wrapper").parentElement.querySelector(".CodeMirror-line");
 
 function isValidTarget(target) {
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
-  return isHoveredOnLine(target) && !isNonBreakableLineNode && !isTooltip;
+  return (
+    (isHoveredOnLine(target) || isHoveredOnGutter(target)) && !isNonBreakableLineNode && !isTooltip
+  );
 }
 
 function emitLineMouseEnter(codeMirror, target) {
   trackEventOnce("editor.mouse_over");
-
-  const lineNode = target.closest(".CodeMirror-line");
+  const lineNode = isHoveredOnLine(target)
+    ? target.closest(".CodeMirror-line")
+    : getLineNodeFromGutterTarget(target);
   const row = lineNode.parentElement;
 
   const lineNumberNode = getLineNumberNode(row);
