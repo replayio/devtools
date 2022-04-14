@@ -12,6 +12,7 @@ import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 import { getSelectedSource } from "../../../selectors";
 import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
+import { actions } from "ui/actions";
 
 class Breakpoints extends Component {
   state = {
@@ -99,6 +100,13 @@ class Breakpoints extends Component {
   }
 }
 
-export default connect(state => ({
-  selectedSource: getSelectedSource(state),
-}))(Breakpoints);
+export default connect(
+  state => ({
+    selectedSource: getSelectedSource(state),
+  }),
+  {
+    seek: actions.removeBreakpoint,
+    removeBreakpoint: actions.removeBreakpoint,
+    removeBreakpointsInSource: actions.removeBreakpointsInSource,
+  }
+)(Breakpoints);
