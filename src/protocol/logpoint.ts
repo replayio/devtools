@@ -6,13 +6,7 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import {
-  AnalysisEntry,
-  ExecutionPoint,
-  Location,
-  PointDescription,
-  ProtocolClient,
-} from "@recordreplay/protocol";
+import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
 import { assert, compareNumericStrings } from "./utils";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { PrimitiveValue } from "./thread/value";
