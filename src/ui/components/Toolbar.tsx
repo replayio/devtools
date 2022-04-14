@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import classnames from "classnames";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { UIState } from "ui/state";
 
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryPanelName } from "ui/state/layout";
 import classNames from "classnames";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import hooks from "ui/hooks";
+import { useGetRecordingId } from "ui/hooks/recordings";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
@@ -28,13 +28,11 @@ function ToolbarButton({
   icon,
   label,
   name,
-  onClick,
   showBadge,
 }: {
   icon: string;
   label: string;
   name: PrimaryPanelName;
-  onClick?: () => void;
   showBadge?: boolean;
 }) {
   const selectedPrimaryPanel = useSelector(selectors.getSelectedPrimaryPanel);
@@ -42,9 +40,6 @@ function ToolbarButton({
   const dispatch = useDispatch();
 
   const handleClick = (panelName: PrimaryPanelName) => {
-    if (onClick) {
-      onClick();
-    }
     if (panelCollapsed || (selectedPrimaryPanel == panelName && !panelCollapsed)) {
       trackEvent(`toolbox.toggle_sidebar`);
       dispatch(actions.togglePaneCollapse());
@@ -88,13 +83,21 @@ export default function Toolbar() {
   const isPaused = useSelector(selectors.hasFrames);
   const viewMode = useSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useSelector(getSelectedPrimaryPanel);
-  const [hideCommentsBadge, setHideCommentsBadge] = useState(false);
+  const [showCommentsBadge, setShowCommentsBadge] = useState(false);
+  const recordingId = useGetRecordingId();
+  const { comments, loading } = hooks.useGetComments(recordingId);
 
   useEffect(() => {
-    if (selectedPrimaryPanel === "comments" && !hideCommentsBadge) {
-      setHideCommentsBadge(true);
+    if (!loading && comments.length > 0) {
+      setShowCommentsBadge(true);
     }
-  }, [selectedPrimaryPanel, hideCommentsBadge]);
+  }, [loading, comments.length]);
+
+  useEffect(() => {
+    if (selectedPrimaryPanel === "comments" && showCommentsBadge) {
+      setShowCommentsBadge(false);
+    }
+  }, [selectedPrimaryPanel, showCommentsBadge]);
 
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
@@ -104,8 +107,7 @@ export default function Toolbar() {
           icon="forum"
           label="Comments"
           name="comments"
-          showBadge={!hideCommentsBadge}
-          onClick={() => setHideCommentsBadge(true)}
+          showBadge={showCommentsBadge}
         />
         {viewMode == "dev" ? (
           <>
