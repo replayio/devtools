@@ -2,16 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { UIState } from "ui/state";
 
 import { createSelector } from "reselect";
 
 export const getBreakpointsList = createSelector(
-  state => state.breakpoints.breakpoints,
+  (state: UIState) => state.breakpoints.breakpoints,
   breakpoints => Object.values(breakpoints)
 );
 
-export const getRequestedBreakpointLocations = state => state.breakpoints.requestedBreakpoints;
+export const getRequestedBreakpointLocations = (state: UIState) =>
+  state.breakpoints.requestedBreakpoints;
 
 export const getRequestedBreakpointsList = createSelector(
   getRequestedBreakpointLocations,

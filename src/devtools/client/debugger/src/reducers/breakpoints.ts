@@ -25,7 +25,7 @@ export type { Breakpoint } from "./types";
 
 export interface BreakpointsState {
   breakpoints: Record<string, Breakpoint>;
-  requestedBreakpoints: Record<string, unknown>;
+  requestedBreakpoints: Record<string, Location>;
   breakpointsDisabled: boolean;
 }
 
