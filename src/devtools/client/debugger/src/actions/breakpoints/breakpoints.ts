@@ -39,13 +39,7 @@ export function removeBreakpointsAtLine(
 
 export function removeBreakpoint(cx: Context, breakpoint: Breakpoint): UIThunkAction {
   return async dispatch => {
-    if (isLogpoint(breakpoint)) {
-      // Keep the breakpoint while removing the log value from its options,
-      // so that the print statement remains.
-      dispatch(removeBreakpointOption(cx, breakpoint, "shouldPause"));
-    } else {
-      dispatch(_removeBreakpoint(cx, breakpoint));
-    }
+    dispatch(_removeBreakpoint(cx, breakpoint));
   };
 }
 

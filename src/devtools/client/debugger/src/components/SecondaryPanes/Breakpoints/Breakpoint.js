@@ -32,10 +32,10 @@ class Breakpoint extends PureComponent {
   };
 
   removeBreakpoint = event => {
-    const { cx, onRemoveBreakpoint, breakpoint } = this.props;
+    const { cx, removeBreakpoint, breakpoint } = this.props;
     event.stopPropagation();
 
-    onRemoveBreakpoint(cx, breakpoint);
+    removeBreakpoint(cx, breakpoint);
   };
 
   isCurrentlyPausedAtBreakpoint() {
@@ -103,4 +103,5 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   selectSpecificLocation: actions.selectSpecificLocation,
+  removeBreakpoint: actions.removeBreakpoint,
 })(Breakpoint);

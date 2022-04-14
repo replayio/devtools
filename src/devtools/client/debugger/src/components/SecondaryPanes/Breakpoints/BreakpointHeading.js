@@ -32,10 +32,10 @@ class BreakpointHeading extends PureComponent {
   }
 
   removeBreakpoint = event => {
-    const { cx, source, onRemoveBreakpoints } = this.props;
+    const { cx, source, removeBreakpointsInSource } = this.props;
     event.stopPropagation();
 
-    onRemoveBreakpoints(cx, source);
+    removeBreakpointsInSource(cx, source);
   };
 
   onClick = () => {
@@ -77,4 +77,5 @@ const mapStateToProps = (state, { source, breakpoint }) => ({
 
 export default connect(mapStateToProps, {
   selectSource: actions.selectSource,
+  removeBreakpointsInSource: actions.removeBreakpointsInSource,
 })(BreakpointHeading);
