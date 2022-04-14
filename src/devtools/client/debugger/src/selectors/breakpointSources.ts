@@ -2,36 +2,38 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { UIState } from "ui/state";
+import type { Breakpoint } from "../reducers/types";
+import type { Source } from "../reducers/sources";
 
 import sortBy from "lodash/sortBy";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
-import {
-  getSources,
-  getBreakpointsList,
-  getSelectedSource,
-  resourceAsSourceBase,
-} from "../selectors";
+import { getSources, getBreakpointsList, getSelectedSource, resourceAsSourceBase } from ".";
 import { getFilename } from "../utils/source";
 import { makeShallowQuery } from "../utils/resource";
 import { isBreakable, isLogpoint, sortSelectedBreakpoints } from "../utils/breakpoint";
 
-function getBreakpointsForSource(source, selectedSource, breakpoints) {
-  return sortSelectedBreakpoints(breakpoints, selectedSource).filter(
-    bp => bp.location.sourceId == source.id
-  );
+function getBreakpointsForSource(
+  source: Source,
+  selectedSource: Source,
+  breakpoints: Breakpoint[]
+) {
+  return sortSelectedBreakpoints(breakpoints).filter(bp => bp.location.sourceId == source.id);
 }
 
-export const findBreakpointSources = state => {
+export const findBreakpointSources = (state: UIState) => {
   const breakpoints = getBreakpointsList(state);
   const sources = getSources(state);
-  const selectedSource = getSelectedSource(state);
+  const selectedSource = getSelectedSource(state)!;
   return queryBreakpointSources(sources, { breakpoints, selectedSource });
 };
 
 const queryBreakpointSources = makeShallowQuery({
-  filter: (_, { breakpoints, selectedSource }) => uniq(breakpoints.map(bp => bp.location.sourceId)),
+  filter: (
+    _,
+    { breakpoints, selectedSource }: { breakpoints: Breakpoint[]; selectedSource: Source }
+  ) => uniq(breakpoints.map(bp => bp.location.sourceId)),
   map: resourceAsSourceBase,
   reduce: sources => {
     const filtered = sources.filter(source => source && !source.isBlackBoxed);
@@ -47,7 +49,7 @@ export const getBreakpointSources = createSelector(
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints).filter(bp =>
+        breakpoints: getBreakpointsForSource(source, selectedSource!, breakpoints).filter(bp =>
           isBreakable(bp)
         ),
       }))
@@ -63,7 +65,7 @@ export const getLogpointSources = createSelector(
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints).filter(bp =>
+        breakpoints: getBreakpointsForSource(source, selectedSource!, breakpoints).filter(bp =>
           isLogpoint(bp)
         ),
       }))

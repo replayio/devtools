@@ -23,3 +23,5 @@ export function getPlainUrl(url: string): string;
 export function getRawSourceURL(url: string): string;
 
 export function isInlineScript(source: { introductionType?: string | null }): boolean;
+
+export function getFilename(source: Source, rawSourceURL?: string): string;

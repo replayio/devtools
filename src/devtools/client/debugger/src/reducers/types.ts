@@ -83,10 +83,10 @@ export type SourceActorLocation = {
  * @static
  */
 export type SourceLocation = {
-  readonly sourceId: SourceId;
-  readonly line: number;
-  readonly column?: number;
-  readonly sourceUrl?: string;
+  sourceId: SourceId;
+  line: number;
+  column?: number;
+  sourceUrl?: string;
 };
 export type MappedLocation = {
   readonly location: SourceLocation;
@@ -154,6 +154,7 @@ export type BreakpointOptions = {
   condition?: string | null;
   logValue?: string | null;
   logGroupId?: string | null;
+  shouldPause?: boolean;
 };
 export type BreakpointActor = {
   readonly actor: ActorId;

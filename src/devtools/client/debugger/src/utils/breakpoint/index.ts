@@ -8,12 +8,23 @@ import assert from "../assert";
 import { features } from "../prefs";
 import sortBy from "lodash/sortBy";
 
+import type { Location } from "@recordreplay/protocol";
+import type { UIState } from "ui/state";
+import type { SourceActor } from "../../reducers/source-actors";
+import type {
+  Breakpoint,
+  PendingBreakpoint,
+  SourceLocation,
+  SourceActorLocation,
+  PendingLocation,
+} from "../../reducers/types";
+
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
 
 // Return the first argument that is a string, or null if nothing is a
 // string.
-export function firstString(...args) {
+export function firstString(...args: any[]) {
   for (const arg of args) {
     if (typeof arg === "string") {
       return arg;
@@ -23,26 +34,26 @@ export function firstString(...args) {
 }
 
 // The ID for a Breakpoint is derived from its location in its Source.
-export function getLocationKey(location) {
+export function getLocationKey(location: SourceLocation & { scriptId?: string }) {
   const { sourceId, line, column } = location;
   const columnString = column || "";
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
 }
 
-export function getLocationAndConditionKey(location, condition) {
+export function getLocationAndConditionKey(location: SourceLocation, condition: string) {
   return `${getLocationKey(location)}:${condition}`;
 }
 
-export function isMatchingLocation(location1, location2) {
+export function isMatchingLocation(location1?: SourceLocation, location2?: SourceLocation) {
   return location1 && location2 && getLocationKey(location1) === getLocationKey(location2);
 }
 
-export function getLocationWithoutColumn(location) {
+export function getLocationWithoutColumn(location: Location) {
   const { sourceId, line } = location;
   return `${sourceId}:${line}`;
 }
 
-export function makePendingLocationId(location) {
+export function makePendingLocationId(location: SourceLocation) {
   assertPendingLocation(location);
   const { sourceUrl, line, column } = location;
   const sourceUrlString = sourceUrl || "";
@@ -51,7 +62,7 @@ export function makePendingLocationId(location) {
   return `${ThreadFront.recordingId}:${sourceUrlString}:${line}:${columnString}`;
 }
 
-export function makeBreakpointLocation(state, location) {
+export function makeBreakpointLocation(state: UIState, location: SourceLocation) {
   const source = getSource(state, location.sourceId);
   if (!source) {
     throw new Error("no source");
@@ -59,7 +70,7 @@ export function makeBreakpointLocation(state, location) {
   const breakpointLocation = {
     line: location.line,
     column: location.column,
-  };
+  } as SourceLocation;
   if (source.url) {
     breakpointLocation.sourceUrl = source.url;
   } else {
@@ -68,7 +79,7 @@ export function makeBreakpointLocation(state, location) {
   return breakpointLocation;
 }
 
-export function makeSourceActorLocation(sourceActor, location) {
+export function makeSourceActorLocation(sourceActor: SourceActor, location: Location) {
   return {
     sourceActor,
     line: location.line,
@@ -77,27 +88,27 @@ export function makeSourceActorLocation(sourceActor, location) {
 }
 
 // The ID for a BreakpointActor is derived from its location in its SourceActor.
-export function makeBreakpointActorId(location) {
+export function makeBreakpointActorId(location: SourceActorLocation) {
   const { sourceActor, line, column } = location;
   const columnString = column || "";
   return `${sourceActor}:${line}:${columnString}`;
 }
 
-export function assertBreakpoint(breakpoint) {
+export function assertBreakpoint(breakpoint: Breakpoint) {
   assertLocation(breakpoint.location);
 }
 
-export function assertPendingBreakpoint(pendingBreakpoint) {
+export function assertPendingBreakpoint(pendingBreakpoint: PendingBreakpoint) {
   assertPendingLocation(pendingBreakpoint.location);
 }
 
-export function assertLocation(location) {
+export function assertLocation(location: SourceLocation) {
   assertPendingLocation(location);
   const { sourceId } = location;
   assert(!!sourceId, "location must have a source id");
 }
 
-export function assertPendingLocation(location) {
+export function assertPendingLocation(location: PendingLocation) {
   assert(!!location, "location must exist");
 
   const { sourceUrl } = location;
@@ -109,7 +120,7 @@ export function assertPendingLocation(location) {
 }
 
 // syncing
-export function breakpointAtLocation(breakpoints, { line, column }) {
+export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }: Location) {
   return breakpoints.find(breakpoint => {
     const sameLine = breakpoint.location.line === line;
     if (!sameLine) {
@@ -126,17 +137,17 @@ export function breakpointAtLocation(breakpoints, { line, column }) {
   });
 }
 
-export function breakpointExists(state, location) {
+export function breakpointExists(state: UIState, location: Location) {
   const currentBp = getBreakpoint(state, location);
   return currentBp && !currentBp.disabled;
 }
 
-function createPendingLocation(location) {
+function createPendingLocation(location: SourceLocation) {
   const { sourceUrl, line, column } = location;
   return { sourceUrl, line, column };
 }
 
-export function createPendingBreakpoint(bp) {
+export function createPendingBreakpoint(bp: Breakpoint) {
   const pendingLocation = createPendingLocation(bp.location);
 
   assertPendingLocation(pendingLocation);
@@ -149,11 +160,11 @@ export function createPendingBreakpoint(bp) {
   };
 }
 
-export function getSelectedText(breakpoint) {
+export function getSelectedText(breakpoint: Breakpoint) {
   return breakpoint.text;
 }
 
-export function sortSelectedBreakpoints(breakpoints) {
+export function sortSelectedBreakpoints(breakpoints: Breakpoint[]) {
   return sortBy(breakpoints, [
     // Priority: line number, undefined column, column number
     breakpoint => breakpoint.location.line,
@@ -163,5 +174,5 @@ export function sortSelectedBreakpoints(breakpoints) {
   ]);
 }
 
-export const isBreakable = bp => bp?.options.shouldPause;
-export const isLogpoint = bp => bp?.options.logValue;
+export const isBreakable = (bp?: Breakpoint) => !!bp?.options.shouldPause;
+export const isLogpoint = (bp?: Breakpoint) => !!bp?.options.logValue;
