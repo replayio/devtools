@@ -122,6 +122,7 @@ export const getFocusedRequests = (state: UIState) => {
 
 export const getFormattedFrames = createSelector(getFrames, getSources, (frames, sources) => {
   return Object.keys(frames).reduce((acc: Record<string, WiredFrame[]>, frame) => {
+    // @ts-ignore WiredFrame vs SelectedFrame mismatch
     return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources) };
   }, {});
 });

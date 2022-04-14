@@ -75,9 +75,11 @@ export interface Source {
   url?: string;
 }
 
+export type SourceResources = ResourceState<Source>;
+
 // Several types TBD here
 export interface SourcesState {
-  sources: ResourceState<Source>;
+  sources: SourceResources;
   urls: Record<string, ResourceId[]>;
   plainUrls: Record<string, string[]>;
   content: Record<string, unknown>;
