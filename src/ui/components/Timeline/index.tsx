@@ -95,10 +95,6 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     }
   };
 
-  onMouseDown = () => {
-    this.setState({ isDragging: true });
-  };
-
   onPlayerMouseMove = (e: MouseEvent | React.MouseEvent) => {
     const { hoverTime, setTimelineToTime, setTimelineState, isFocusing, focusRegion } = this.props;
     const mouseTime = this.getMouseTime(e);
@@ -154,7 +150,6 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     }
 
     trackEvent("timeline.progress_select");
-    this.setState({ isDragging: false });
     if (!(hoverTime === null || clickedOnCommentMarker || clickedOnUnfocusedRegion)) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
@@ -376,7 +371,6 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
               onMouseMove={e => this.onPlayerMouseMove(e)}
               onMouseUp={e => this.onPlayerMouseUp(e)}
               onMouseEnter={this.onPlayerMouseEnter}
-              onMouseDown={this.onMouseDown}
             >
               <div className="progress-line full" />
               <div
