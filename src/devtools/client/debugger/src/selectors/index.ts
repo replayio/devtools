@@ -39,6 +39,7 @@ export * from "./visibleColumnBreakpoints";
 export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
 export * from "./debugLine";
 
+// TODO These declarations are still masking some usages
 export declare function getThreadContext(state: UIState): any;
 
 export declare function getActiveSearch(state: UIState): string;
