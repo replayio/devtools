@@ -4,7 +4,7 @@ Test.describe(`Test basic breakpoint functionality.`, async () => {
   await addBreakpoint("doc_rr_basic.html", 21);
 
   await rewindToLine(21);
-  await checkEvaluateInTopFrame("number", 10);
+  await checkEvaluateInTopFrame("number", 11);
   await rewindToLine(21);
   await checkEvaluateInTopFrame("number", 9);
   await rewindToLine(21);
