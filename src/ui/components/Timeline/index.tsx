@@ -147,7 +147,8 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
     if (
       isDragging &&
       focusRegion &&
-      (currentTime < focusRegion.startTime || currentTime > focusRegion.endTime)
+      currentTime >= focusRegion.startTime &&
+      currentTime <= focusRegion.endTime
     ) {
       return;
     }
