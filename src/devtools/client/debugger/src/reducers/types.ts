@@ -83,10 +83,10 @@ export type SourceActorLocation = {
  * @static
  */
 export type SourceLocation = {
-  sourceId: SourceId;
-  line: number;
-  column?: number;
-  sourceUrl?: string;
+  readonly sourceId: SourceId;
+  readonly line: number;
+  readonly column?: number;
+  readonly sourceUrl?: string;
 };
 export type MappedLocation = {
   readonly location: SourceLocation;

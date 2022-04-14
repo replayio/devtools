@@ -62,21 +62,27 @@ export function makePendingLocationId(location: SourceLocation) {
   return `${ThreadFront.recordingId}:${sourceUrlString}:${line}:${columnString}`;
 }
 
-export function makeBreakpointLocation(state: UIState, location: SourceLocation) {
+export function makeBreakpointLocation(state: UIState, location: SourceLocation): SourceLocation {
   const source = getSource(state, location.sourceId);
   if (!source) {
     throw new Error("no source");
   }
-  const breakpointLocation = {
+
+  let sourceUrl;
+  let sourceId;
+
+  if (source.url) {
+    sourceUrl = source.url;
+  } else {
+    sourceId = getSourceActorsForSource(state, source.id)[0].id;
+  }
+
+  return {
     line: location.line,
     column: location.column,
-  } as SourceLocation;
-  if (source.url) {
-    breakpointLocation.sourceUrl = source.url;
-  } else {
-    breakpointLocation.sourceId = getSourceActorsForSource(state, source.id)[0].id;
-  }
-  return breakpointLocation;
+    sourceUrl,
+    sourceId,
+  };
 }
 
 export function makeSourceActorLocation(sourceActor: SourceActor, location: Location) {
