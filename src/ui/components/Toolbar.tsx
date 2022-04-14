@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classnames from "classnames";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "../actions";
@@ -12,6 +12,7 @@ import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryPanelName } from "ui/state/layout";
 import classNames from "classnames";
+import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
@@ -86,7 +87,14 @@ function ToolbarButton({
 export default function Toolbar() {
   const isPaused = useSelector(selectors.hasFrames);
   const viewMode = useSelector(selectors.getViewMode);
+  const selectedPrimaryPanel = useSelector(getSelectedPrimaryPanel);
   const [hideCommentsBadge, setHideCommentsBadge] = useState(false);
+
+  useEffect(() => {
+    if (selectedPrimaryPanel === "comments" && !hideCommentsBadge) {
+      setHideCommentsBadge(true);
+    }
+  }, [selectedPrimaryPanel, hideCommentsBadge]);
 
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
