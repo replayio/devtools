@@ -154,6 +154,7 @@ export type BreakpointOptions = {
   condition?: string | null;
   logValue?: string | null;
   logGroupId?: string | null;
+  shouldPause?: boolean;
 };
 export type BreakpointActor = {
   readonly actor: ActorId;

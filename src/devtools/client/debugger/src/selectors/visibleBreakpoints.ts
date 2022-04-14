@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import { createSelector } from "reselect";
 import uniqBy from "lodash/uniqBy";
 
@@ -11,6 +9,7 @@ import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
 import { getSelectedSource } from "../reducers/sources";
 
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
+import { Breakpoint } from "../reducers/types";
 
 /*
  * Finds the breakpoints, which appear in the selected source.
@@ -55,7 +54,8 @@ export const getFirstVisibleBreakpoints = createSelector(
       return [];
     }
 
-    const allBreakpoints = [...breakpoints, ...requestedBreakpoints];
-    return uniqBy(sortSelectedBreakpoints(allBreakpoints, selectedSource), bp => bp.location.line);
+    // @ts-ignore Breakpoint location field mismatch
+    const allBreakpoints: Breakpoint[] = [...breakpoints, ...requestedBreakpoints!];
+    return uniqBy(sortSelectedBreakpoints(allBreakpoints), bp => bp.location.line);
   }
 );

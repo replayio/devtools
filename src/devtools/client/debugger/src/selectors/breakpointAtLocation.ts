@@ -2,20 +2,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { UIState } from "ui/state";
+
+import type { Source } from "../reducers/sources";
+import type { Breakpoint, Position } from "../reducers/types";
 
 import { getSelectedSource } from "../reducers/sources";
 import { getBreakpointsList } from "./breakpoints";
 
-function getColumn(column, selectedSource) {
+function getColumn(column: number, selectedSource: Source) {
   return column;
 }
 
-function getLocation(bp, selectedSource) {
+function getLocation(bp: Breakpoint, selectedSource: Source) {
   return bp.location;
 }
 
-function getBreakpointsForSource(state, selectedSource) {
+function getBreakpointsForSource(state: UIState, selectedSource: Source) {
   const breakpoints = getBreakpointsList(state);
 
   return breakpoints.filter(bp => {
@@ -24,7 +27,11 @@ function getBreakpointsForSource(state, selectedSource) {
   });
 }
 
-function findBreakpointAtLocation(breakpoints, selectedSource, { line, column }) {
+function findBreakpointAtLocation(
+  breakpoints: Breakpoint[],
+  selectedSource: Source,
+  { line, column }: Position
+) {
   return breakpoints.find(breakpoint => {
     const location = getLocation(breakpoint, selectedSource);
     const sameLine = location.line === line;
@@ -41,7 +48,7 @@ function findBreakpointAtLocation(breakpoints, selectedSource, { line, column })
 }
 
 // returns the closest active column breakpoint
-function findClosestPosition(positions, column) {
+function findClosestPosition(positions?: Position[], column?: number) {
   if (!positions || positions.length == 0) {
     return null;
   }
@@ -67,7 +74,7 @@ function findClosestPosition(positions, column) {
  * This is useful for finding a breakpoint when the
  * user clicks in the gutter or on a token.
  */
-export function getBreakpointAtLocation(state, location) {
+export function getBreakpointAtLocation(state: UIState, location: Position) {
   const selectedSource = getSelectedSource(state);
   if (!selectedSource) {
     throw new Error("no selectedSource");
@@ -77,7 +84,7 @@ export function getBreakpointAtLocation(state, location) {
   return findBreakpointAtLocation(breakpoints, selectedSource, location);
 }
 
-export function getBreakpointsAtLine(state, line) {
+export function getBreakpointsAtLine(state: UIState, line: number) {
   const selectedSource = getSelectedSource(state);
   if (!selectedSource) {
     throw new Error("no selectedSource");
