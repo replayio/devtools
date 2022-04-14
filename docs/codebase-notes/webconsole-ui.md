@@ -22,7 +22,7 @@
         - Uses: `getAllFilters`, `getFilteredMessagesCount`, `getShouldLogExceptions`
         - Dispatches: `filterToggle`, `logExceptions`
       - `<EventListeners>`
-        - Uses: `getActiveEventListeners`, `getEventListenerBreakpointTypes`, `getEventListenerExpanded`, `getEventListenerPoints`, `isLoadingInitialPoints`, `isLoadingAdditionalPoints`
+        - Uses: `getActiveEventListeners`, `getEventListenerBreakpointTypes`, `getEventListenerExpanded`, `getEventListenerPoints`, `isLoadingInitialPoints`, `isLoadingAdditionalCounts`
         - Dispatches: `addEventListenerBreakpoints`, `removeEventListenerBreakpoints`, `addEventListenerExpanded`, `removeEventListenerExpanded`, `loadAdditionalPoints`
       - `<ConsoleSettings>`
         - Uses: `getAllFilters`, `getAllUI`

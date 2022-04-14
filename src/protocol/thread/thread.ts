@@ -486,6 +486,27 @@ class _ThreadFront {
     );
   }
 
+  async getEventHandlerCounts(eventTypes: string[]) {
+    return Object.fromEntries(
+      await Promise.all(
+        eventTypes.map(async eventType => [
+          eventType,
+          await ThreadFront.getEventHandlerCount(eventType),
+        ])
+      )
+    );
+  }
+
+  async getEventHandlerCount(eventType: string) {
+    await this.waitForSession();
+    const { count } = await sendMessage(
+      "Debugger.getEventHandlerCount",
+      { eventType },
+      this.sessionId!
+    );
+    return count;
+  }
+
   getBreakpointPositionsCompressed(
     sourceId: SourceId,
     range?: { start: SourceLocation; end: SourceLocation }
