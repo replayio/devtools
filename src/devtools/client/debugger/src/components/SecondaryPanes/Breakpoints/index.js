@@ -106,7 +106,5 @@ export default connect(
   }),
   {
     seek: actions.removeBreakpoint,
-    removeBreakpoint: actions.removeBreakpoint,
-    removeBreakpointsInSource: actions.removeBreakpointsInSource,
   }
 )(Breakpoints);
