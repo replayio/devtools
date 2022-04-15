@@ -33,6 +33,10 @@ Next, download and install the [Replay browser](https://www.replay.io/). The bro
 
 Everybody's welcome to join us [on Discord](https://replay.io/discord/). We can help with getting started with the project, finding issues to work on and chatting about the future of DevTools.
 
+### Contributing to the project
+
+We encourage everybody to contribute to the project! If you're just getting started, we recommend looking through and grabbing [any of these issues](https://github.com/RecordReplay/devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22). Feel free to ping any of the maintainers [on Discord](https://replay.io/discord/) if you have any questions!
+
 ### Running tests:
 
 To run the end-to-end tests make sure that devtools is running locally on port 8080 and run:
