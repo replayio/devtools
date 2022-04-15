@@ -62,9 +62,17 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
     );
   }
 
+  // Right now there's no guarantee that once progress (basic processing progress)
+  // is at 100% that we're ready to close the loading screen and show the replay.
+  // It's possible that we're waiting on other things still (see
+  // jumpToInitialPausePoint). In that scenario, the loading progress bar appears
+  // to stall at 100%. This doesn't do much to fix it since it will still stall,
+  // but at least it will stall at <100%.
+  const adjustedProgress = Math.min(progress || 0, 90);
+
   return (
     <LoadingScreenTemplate showTips={!!progress}>
-      {progress ? <ProgressBar progress={progress} /> : null}
+      {progress ? <ProgressBar progress={adjustedProgress} /> : null}
     </LoadingScreenTemplate>
   );
 }
