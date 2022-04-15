@@ -31,6 +31,6 @@
 
 ### How to leave helpful comments
 
-**When leaving comments, make a clear distinction between an observation, vs a non-blocking nitpick, vs a blocking comment.** 
+**When leaving comments, make a clear distinction between an observation, vs a non-blocking nitpick, vs a blocking comment.**
 
 - In general, style comments should not be blocking comments unless the reviewer feels strongly about it — in which case they should explicitly indicate the reasons for that opinion.
