@@ -120,7 +120,6 @@ const doSend = makeInfallible(msg => {
 });
 
 function onSocketOpen() {
-  console.log("Socket Open");
   gPendingMessages.forEach(msg => doSend(msg));
   gPendingMessages.length = 0;
   gSocketOpen = true;

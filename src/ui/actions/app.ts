@@ -165,7 +165,6 @@ export function setupApp(store: UIStore) {
   });
 
   ThreadFront.ensureProcessed("executionIndexed").then(() => {
-    console.log("indexed");
     store.dispatch(setIndexing(100));
   });
 
