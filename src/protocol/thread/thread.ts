@@ -292,6 +292,11 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
+      // TODO Remove this once we have a better region loading indicator
+      // Log loaded regions to help with diagnostics.
+      console.debug("LoadedRegions", parameters);
+      listenerCallback(parameters);
+    });
       listenerCallback(parameters);
     });
 
