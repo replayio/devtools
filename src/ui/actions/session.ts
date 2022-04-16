@@ -165,7 +165,7 @@ export function createSession(recordingId: string): UIThunkAction {
 
       const { sessionId } = await sendMessage("Recording.createSession", {
         recordingId,
-        loadPoint || undefined,
+        loadPoint: loadPoint || undefined,
         experimentalSettings,
       });
 
