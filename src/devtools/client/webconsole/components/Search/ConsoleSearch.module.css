@@ -1,0 +1,11 @@
+.SearchBar {
+  width: 100%;
+  height: var(--editor-searchbar-height);
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--theme-splitter-color);
+}
+
+.SearchInput {
+  flex: 1;
+}
