@@ -39,14 +39,13 @@ function DeletedScreen({ url }: { url: string }) {
       <Modal>
         <div
           className="relative flex flex-col justify-between space-y-4 overflow-y-auto rounded-md bg-modalBgcolor p-9 text-base shadow-lg items-center"
-          style={{ width: "400px"}}
+          style={{ width: "400px" }}
         >
-          <ReplayLogo size="sm"/>
+          <ReplayLogo size="sm" />
           <h2 className="text-2xl font-bold ">{`Replay discarded`}</h2>
           <div className="space-y-2 text-md">
             <div>{`Hang tight while we load your library...`}</div>
           </div>
-          
         </div>
       </Modal>
     </div>
