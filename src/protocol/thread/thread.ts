@@ -294,7 +294,6 @@ class _ThreadFront {
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
       // TODO Remove this once we have a better region loading indicator
       // Log loaded regions to help with diagnostics.
-      console.log("LoadedRegions", parameters);
       listenerCallback(parameters);
     });
 
