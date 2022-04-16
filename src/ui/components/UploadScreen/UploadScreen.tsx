@@ -13,6 +13,7 @@ import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
+import ReplayLogo from "../shared/ReplayLogo";
 import { decodeWorkspaceId } from "ui/utils/workspace";
 import Icon from "../shared/Icon";
 
@@ -34,14 +35,15 @@ function DeletedScreen({ url }: { url: string }) {
   });
 
   return (
-    <div className="h-full w-full" style={{ background: "white" }}>
+    <div className="h-full w-full">
       <Modal>
         <div
-          className="relative flex flex-col justify-between space-y-4 overflow-y-auto rounded-md bg-white p-9 text-base shadow-lg"
+          className="relative flex flex-col justify-between space-y-4 overflow-y-auto rounded-md bg-modalBgcolor p-9 text-base shadow-lg items-center"
           style={{ width: "400px"}}
         >
+          <ReplayLogo size="sm"/>
           <h2 className="text-2xl font-bold ">{`Replay discarded`}</h2>
-          <div className="space-y-2 text-md text-gray-500">
+          <div className="space-y-2 text-md">
             <div>{`Hang tight while we load your library...`}</div>
           </div>
           
