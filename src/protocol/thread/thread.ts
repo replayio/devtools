@@ -297,8 +297,6 @@ class _ThreadFront {
       console.debug("LoadedRegions", parameters);
       listenerCallback(parameters);
     });
-      listenerCallback(parameters);
-    });
 
     await client.Session.listenForLoadChanges({}, sessionId);
   }
