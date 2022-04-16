@@ -161,8 +161,11 @@ export function createSession(recordingId: string): UIThunkAction {
 
       dispatch(showLoadingProgress());
 
+      const loadPoint = new URL(window.location.href).searchParams.get("point");
+
       const { sessionId } = await sendMessage("Recording.createSession", {
         recordingId,
+        loadPoint,
         experimentalSettings,
       });
 
