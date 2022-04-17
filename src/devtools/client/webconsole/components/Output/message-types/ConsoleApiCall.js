@@ -30,7 +30,7 @@ ConsoleApiCall.defaultProps = {
   open: false,
 };
 
-function ConsoleApiCall(props) {
+export default function ConsoleApiCall(props) {
   const {
     dispatch,
     message,
@@ -206,5 +206,3 @@ function formatReps(options = {}) {
       }, [])
   );
 }
-
-module.exports = ConsoleApiCall;

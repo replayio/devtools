@@ -4,35 +4,17 @@
 
 "use strict";
 
-// React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
 
-const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+import PaywallMessage from "./message-types/PaywallMessage";
+import ConsoleApiCall from "./message-types/ConsoleApiCall";
+import ConsoleCommand from "./message-types/ConsoleCommand";
+import DefaultRenderer from "./message-types/DefaultRenderer";
+import EvaluationResult from "./message-types/EvaluationResult";
+import PageError from "./message-types/PageError";
 
-const componentMap = new Map([
-  [
-    "PaywallMessage",
-    require("devtools/client/webconsole/components/Output/message-types/PaywallMessage"),
-  ],
-  [
-    "ConsoleApiCall",
-    require("devtools/client/webconsole/components/Output/message-types/ConsoleApiCall"),
-  ],
-  [
-    "ConsoleCommand",
-    require("devtools/client/webconsole/components/Output/message-types/ConsoleCommand"),
-  ],
-  [
-    "DefaultRenderer",
-    require("devtools/client/webconsole/components/Output/message-types/DefaultRenderer"),
-  ],
-  [
-    "EvaluationResult",
-    require("devtools/client/webconsole/components/Output/message-types/EvaluationResult"),
-  ],
-  ["PageError", require("devtools/client/webconsole/components/Output/message-types/PageError")],
-]);
+const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
 class MessageContainer extends React.Component {
   static get propTypes() {
@@ -82,32 +64,30 @@ class MessageContainer extends React.Component {
 
 function getMessageComponent(message) {
   if (!message) {
-    return componentMap.get("DefaultRenderer");
+    return DefaultRenderer;
   }
 
   switch (message.source) {
     case MESSAGE_SOURCE.CONSOLE_API:
-      return message.paywall
-        ? componentMap.get("PaywallMessage")
-        : componentMap.get("ConsoleApiCall");
+      return message.paywall ? PaywallMessage : ConsoleApiCall;
     case MESSAGE_SOURCE.JAVASCRIPT:
       switch (message.type) {
         case MESSAGE_TYPE.COMMAND:
-          return componentMap.get("ConsoleCommand");
+          return ConsoleCommand;
         case MESSAGE_TYPE.RESULT:
-          return componentMap.get("EvaluationResult");
+          return EvaluationResult;
         // @TODO this is probably not the right behavior, but works for now.
         // Chrome doesn't distinguish between page errors and log messages. We
         // may want to remove the PageError component and just handle errors
         // with ConsoleApiCall.
         case MESSAGE_TYPE.LOG:
-          return componentMap.get("PageError");
+          return PageError;
         default:
-          return componentMap.get("DefaultRenderer");
+          return DefaultRenderer;
       }
   }
 
-  return componentMap.get("DefaultRenderer");
+  return DefaultRenderer;
 }
 
 module.exports.MessageContainer = MessageContainer;

@@ -25,7 +25,7 @@ EvaluationResult.defaultProps = {
   open: false,
 };
 
-function EvaluationResult(props) {
+export default function EvaluationResult(props) {
   const { dispatch, message, timestampsVisible, maybeScrollToBottom, open, isPaused } = props;
 
   const {
@@ -92,5 +92,3 @@ function EvaluationResult(props) {
     isPaused,
   });
 }
-
-module.exports = EvaluationResult;

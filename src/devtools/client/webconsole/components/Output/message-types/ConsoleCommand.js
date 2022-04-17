@@ -19,7 +19,7 @@ ConsoleCommand.propTypes = {
 /**
  * Displays input from the console.
  */
-function ConsoleCommand(props) {
+export default function ConsoleCommand(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
   const { indent, source, type, level, timeStamp, executionPointTime } = message;
   const messageText = trimCode(message.messageText);
@@ -44,8 +44,6 @@ function ConsoleCommand(props) {
     dispatch,
   });
 }
-
-module.exports = ConsoleCommand;
 
 /**
  * Trim user input to avoid blank lines before and after messages
