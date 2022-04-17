@@ -1,9 +1,7 @@
-import { PointDescription } from "@recordreplay/protocol";
-import { isNumber } from "lodash";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHoveredLineNumberLocation } from "ui/actions/app";
-import { clearHoveredItem } from "ui/actions/timeline";
+
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";

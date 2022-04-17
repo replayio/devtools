@@ -22,11 +22,6 @@ import { getExecutionPoint } from "../../reducers/pause";
 import { PointDescription } from "@recordreplay/protocol";
 import { seek } from "ui/actions/timeline";
 
-const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
-const {
-  updateHoveredLineNumber,
-} = require("devtools/client/debugger/src/actions/breakpoints/index");
-
 const QuickActionButton: FC<{
   showNag: boolean;
   children: ReactNode;
@@ -182,7 +177,7 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
       editor.codeMirror.off("lineMouseEnter", onLineEnter);
       editor.codeMirror.off("lineMouseLeave", onLineLeave);
     };
-  }, []);
+  }, [editor]);
 
   if (!targetNode || !hoveredLineNumber) {
     return null;
@@ -211,11 +206,7 @@ const connector = connect(
     cx: selectors.getThreadContext(state),
     breakpoints: getBreakpointsForSource(state, getSelectedSource(state)!.id),
   }),
-  {
-    runAnalysisOnLine: runAnalysisOnLine,
-    setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
-    updateHoveredLineNumber: updateHoveredLineNumber,
-  }
+  {}
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ToggleWidgetButton);
