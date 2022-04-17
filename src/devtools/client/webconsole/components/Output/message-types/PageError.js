@@ -25,7 +25,7 @@ PageError.defaultProps = {
   open: false,
 };
 
-function PageError(props) {
+export default function PageError(props) {
   const {
     dispatch,
     message,
@@ -89,5 +89,3 @@ function PageError(props) {
     isFirstMessageForPoint,
   });
 }
-
-module.exports = PageError;

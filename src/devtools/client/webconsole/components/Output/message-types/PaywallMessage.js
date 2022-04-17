@@ -19,7 +19,7 @@ PaywallMessage.propTypes = {
 /**
  * Displays input from the console.
  */
-function PaywallMessage(props) {
+export default function PaywallMessage(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
   const { indent, source, level, timeStamp, executionPointTime } = message;
 
@@ -42,5 +42,3 @@ function PaywallMessage(props) {
     dispatch,
   });
 }
-
-module.exports = PaywallMessage;
