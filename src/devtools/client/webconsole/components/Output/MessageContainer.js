@@ -58,7 +58,7 @@ export class MessageContainer extends React.Component {
   render() {
     const message = this.props.message;
     const MessageComponent = getMessageComponent(message);
-    return MessageComponent(Object.assign({ message }, this.props));
+    return <MessageComponent {...this.props} message={message} />;
   }
 }
 
