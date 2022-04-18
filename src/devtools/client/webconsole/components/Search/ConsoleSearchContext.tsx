@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { Actions, State } from "./useSearch";
+import type { Actions, State } from "./useConsoleSearch";
 
 // Storing state and dispatch in separate contexts allows parts of the tree to access the (state) dispatch function
 // without re-rendering when the state value changes.

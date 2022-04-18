@@ -96,14 +96,13 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
   }
 
   scrollCurrentSearchResultIntoView() {
-    const { currentIndex, results, visible } = this.context;
+    const { index, results, visible } = this.context;
 
     if (!visible) {
       return;
     }
 
-    const message =
-      currentIndex >= 0 && currentIndex < results.length ? results[currentIndex] : null;
+    const message = index >= 0 && index < results.length ? results[index] : null;
 
     // Only programmatically scroll after changes to the selected search result.
     if (this._prevSearchResultMessage === message || message === null) {

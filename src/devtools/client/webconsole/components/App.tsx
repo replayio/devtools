@@ -9,13 +9,13 @@ import Warning from "ui/components/shared/Warning";
 import { MouseEventHandler } from "react";
 import { useSelector } from "react-redux";
 import JSTerm from "./Input/JSTerm";
-import { ConsoleSearch, ActionsContext, StateContext, useSearch } from "./Search/";
+import { ConsoleSearch, ActionsContext, StateContext, useConsoleSearch } from "./Search/";
 
 /**
  * Console root Application component.
  */
 const App = (): JSX.Element => {
-  const [state, actions] = useSearch();
+  const [state, actions] = useConsoleSearch();
 
   // @ts-ignore
   const consoleOverflow = useSelector(state => state.messages.overflow);

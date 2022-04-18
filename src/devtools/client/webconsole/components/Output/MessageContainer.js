@@ -65,13 +65,8 @@ export class MessageContainer extends React.Component {
     const MessageComponent = getMessageComponent(message);
 
     let topLevelClassName = null;
-    const { currentIndex, results, visible } = this.context;
-    if (
-      visible &&
-      currentIndex >= 0 &&
-      currentIndex < results.length &&
-      message === results[currentIndex]
-    ) {
+    const { index, results, visible } = this.context;
+    if (visible && index >= 0 && index < results.length && message === results[index]) {
       topLevelClassName = styles.CurrentSearchResult;
     }
 

@@ -1,216 +1,118 @@
-import { useEffect, useMemo, useReducer, useRef, useTransition } from "react";
-import { useStore } from "react-redux";
-import { selectors } from "ui/reducers";
-import { Message } from "../../reducers/messages";
+import { useDeferredValue, useMemo, useReducer, useRef } from "react";
 
-export type Actions = {
-  hide: () => void;
+const EMPTY_ARRAY: any[] = [];
+
+export type State<Item> = {
+  index: number;
+  query: string;
+  results: Item[];
+};
+
+export type Action<Item> =
+  | { type: "goToNext" }
+  | { type: "goToPrevious" }
+  | { type: "updateQuery"; query: string }
+  | { type: "updateResults"; index: number; results: Item[] };
+
+export type Actions<Item> = {
   goToNext: () => void;
   goToPrevious: () => void;
   search: (query: string) => void;
-  show: () => void;
 };
 
-export type State = {
-  _messages: Message[];
-  currentIndex: number;
-  query: string;
-  results: Message[];
-  visible: boolean;
-};
-
-type UpdateMessagesAction = { type: "updateMessages"; messages: Message[] };
-type UpdateQueryAction = { type: "updateQuery"; query: string };
-
-type Action =
-  | { type: "hide" }
-  | { type: "goToNext" }
-  | { type: "goToPrevious" }
-  | { type: "updateSearchResults" }
-  | { type: "show" }
-  | UpdateMessagesAction
-  | UpdateQueryAction;
-
-const EMPTY_ARRAY: Message[] = [];
-
-const initialState: State = {
-  _messages: [],
-  currentIndex: -1,
-  query: "",
-  results: EMPTY_ARRAY,
-  visible: false,
-};
-
-let lastSearchQuery: string = "";
-let lastSearchMessages: Message[] = [];
-let lastSearchCurrentIndex: number = -1;
-let lastSearchResults: Message[] = [];
-
-// Low budget memoization since we're searching in a reducer (which may run more than once).
-// TODO [bvaughn] Rethink the approach of searching in a reducer vs in an effect/event handler.
-function memoizedSearch(state: State): [Message[], number] {
-  const { _messages: messages, currentIndex, query, results } = state;
-
-  const prevSelectedMessage =
-    currentIndex >= 0 && results.length > 0 ? results[currentIndex] : null;
-
-  if (lastSearchQuery === query && lastSearchMessages === messages) {
-    return [lastSearchResults, lastSearchCurrentIndex];
-  }
-
-  lastSearchMessages = messages;
-  lastSearchQuery = query;
-
-  if (!query) {
-    lastSearchResults = [];
-    lastSearchCurrentIndex = -1;
-  } else {
-    lastSearchResults = [];
-    lastSearchCurrentIndex = -1;
-
-    const needle = query.toLocaleLowerCase();
-
-    messages.forEach(message => {
-      let matches = false;
-      if (typeof message.messageText === "string" && message.messageText.includes(needle)) {
-        matches = true;
-      } else {
-        matches = message.parameters?.some(parameter => {
-          if (parameter.isPrimitive()) {
-            if (String(parameter.primitive()).toLocaleLowerCase().includes(needle)) {
-              return true;
-            }
-          }
-          return false;
-        });
-      }
-
-      if (matches) {
-        lastSearchResults.push(message);
-
-        if (message === prevSelectedMessage) {
-          // If previously focused result is still in matches, update currentIndex to match.
-          lastSearchCurrentIndex = lastSearchResults.length - 1;
-        }
-      }
-    });
-  }
-
-  // If our new search doesn't contain the previously focused result, reset the index.
-  if (lastSearchCurrentIndex < 0) {
-    lastSearchCurrentIndex = 0;
-  }
-
-  return [lastSearchResults, lastSearchCurrentIndex];
-}
-
-function reducer(state: State, action: Action): State {
+function reducer<Item>(state: State<Item>, action: Action<Item>): State<Item> {
   switch (action.type) {
-    case "hide": {
-      return {
-        ...state,
-        visible: false,
-      };
-    }
     case "goToNext": {
-      const { currentIndex, results } = state;
+      const { index, results } = state;
       return {
         ...state,
-        currentIndex: currentIndex < results.length - 1 ? currentIndex + 1 : 0,
+        index: index < results.length - 1 ? index + 1 : 0,
       };
     }
     case "goToPrevious": {
-      const { currentIndex, results } = state;
+      const { index, results } = state;
       return {
         ...state,
-        currentIndex: currentIndex > 0 ? currentIndex - 1 : results.length - 1,
-      };
-    }
-    case "updateSearchResults": {
-      const [results, currentIndex] = memoizedSearch(state);
-      return {
-        ...state,
-        currentIndex,
-        results,
-      };
-    }
-    case "updateMessages": {
-      const messages = (action as UpdateMessagesAction).messages;
-      return {
-        ...state,
-        _messages: messages,
+        index: index > 0 ? index - 1 : results.length - 1,
       };
     }
     case "updateQuery": {
-      const query = (action as UpdateQueryAction).query;
       return {
         ...state,
-        query,
+        query: action.query,
       };
     }
-    case "show": {
+    case "updateResults": {
       return {
         ...state,
-        visible: true,
+        index: action.index,
+        results: action.results,
       };
-    }
-    default: {
-      return state;
     }
   }
 }
 
-export default function useSearch(): [State, Actions] {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [_, startTransition] = useTransition();
+export default function useSearch<Item>(
+  items: Item[],
+  stableSearch: (query: string, items: Item[]) => Item[]
+): [State<Item>, Actions<Item>] {
+  const [state, dispatch] = useReducer<React.Reducer<State<Item>, Action<Item>>>(reducer, {
+    index: -1,
+    results: [],
+    query: "",
+  });
 
-  // When messages/visibleMessages change, schedule a (low-pri) update to re-run search logic.
-  const prevMessages = useRef<Message[]>(null as any);
-  const store = useStore();
-  useEffect(() => {
-    const updateStateIfMessagesHaveChanged = () => {
-      const state = store.getState();
-      const messages = selectors.getMessages(state);
-      if (messages !== prevMessages.current) {
-        prevMessages.current = messages;
-        startTransition(() => {
-          dispatch({ type: "updateMessages", messages });
-          dispatch({ type: "updateSearchResults" });
-        });
+  // Let React update search text at high priority and results at lower priority;
+  // this keeps the search text input updating quick and feeling responsive to user input.
+  const deferredQuery = useDeferredValue(state.query);
+
+  const prevItemsRef = useRef<Item[] | null>(null);
+  const prevQueryRef = useRef<string | null>(null);
+
+  // Any time our search inputs change, re-run the search function.
+  if (prevItemsRef.current !== items || prevQueryRef.current !== deferredQuery) {
+    const prevResults = state.results;
+    const results = deferredQuery ? stableSearch(deferredQuery, items) : EMPTY_ARRAY;
+
+    prevItemsRef.current = items;
+    prevQueryRef.current = deferredQuery;
+
+    let prevIndex = state.index;
+    let index = -1;
+
+    // Update the selected index based on the new results.
+    if (results.length > 0) {
+      const prevItem =
+        prevIndex >= 0 && prevIndex < prevResults.length ? prevResults[prevIndex] : null;
+      if (prevItem) {
+        index = results.indexOf(prevItem);
       }
-    };
 
-    // Check if Messages have changed between render and this effect.
-    updateStateIfMessagesHaveChanged();
+      if (index < 0) {
+        index = 0;
+      }
+    }
 
-    return store.subscribe(updateStateIfMessagesHaveChanged);
-  }, [store]);
+    dispatch({ type: "updateResults", index, results });
+  }
 
-  const actions = useMemo(
+  const actions = useMemo<Actions<Item>>(
     () => ({
-      hide: () => {
-        dispatch({ type: "hide" });
-      },
-      goToNext: () => {
-        dispatch({ type: "goToNext" });
-      },
-      goToPrevious: () => {
-        dispatch({ type: "goToPrevious" });
-      },
-      search: (query: string) => {
-        // Query text updates with high priority so the input feels snappy.
-        dispatch({ type: "updateQuery", query });
-        startTransition(() => {
-          // Search results are updated in a slightly lower priority.
-          dispatch({ type: "updateSearchResults" });
-        });
-      },
-      show: () => {
-        dispatch({ type: "show" });
-      },
+      goToNext: () => dispatch({ type: "goToNext" }),
+      goToPrevious: () => dispatch({ type: "goToPrevious" }),
+      search: (query: string) => dispatch({ type: "updateQuery", query }),
     }),
     []
   );
 
-  return [state, actions];
+  const externalState = useMemo<State<Item>>(
+    () => ({
+      index: state.index,
+      query: state.query,
+      results: state.results,
+    }),
+    [state]
+  );
+
+  return [externalState, actions];
 }
