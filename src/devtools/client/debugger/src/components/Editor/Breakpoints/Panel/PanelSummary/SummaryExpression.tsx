@@ -6,6 +6,8 @@ import Popup from "./Popup";
 import hooks from "ui/hooks";
 const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 const { prefs } = require("ui/utils/prefs");
+import { Nag } from "ui/hooks/users";
+import { shouldShowNag } from "ui/utils/user";
 
 export interface SummaryExpressionProps {
   value: string;
@@ -36,6 +38,15 @@ function Expression({ value, isEditable }: { value: string; isEditable: boolean 
 
 export function SummaryExpression({ isEditable, value }: SummaryExpressionProps & {}) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
+
+  // first-run special messaging
+  const { nags } = hooks.useGetUserInfo();
+  if (
+    shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT) ||
+    shouldShowNag(nags, Nag.FIRST_BREAKPOINT_SAVE)
+  ) {
+    value = "🦄 " + value;
+  }
 
   return isEditable ? (
     <div className="group flex space-x-1 px-1 hover:text-primaryAccent">
