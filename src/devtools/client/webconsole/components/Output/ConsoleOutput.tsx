@@ -4,10 +4,8 @@
 "use strict";
 
 import React from "react";
-import ReactDOM from "react-dom";
 import { Dispatch } from "@reduxjs/toolkit";
 import { connect, ConnectedProps } from "react-redux";
-import PropTypes from "prop-types";
 
 import { actions } from "ui/actions";
 import { isVisible } from "ui/utils/dom";

@@ -8,8 +8,6 @@ const dom = require("react-dom-factories");
 
 DefaultRenderer.displayName = "DefaultRenderer";
 
-function DefaultRenderer(props) {
+export default function DefaultRenderer(props) {
   return dom.div({}, "This message type is not supported yet.");
 }
-
-module.exports = DefaultRenderer;
