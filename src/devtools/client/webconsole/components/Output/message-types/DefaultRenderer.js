@@ -4,8 +4,6 @@
 
 "use strict";
 
-const dom = require("react-dom-factories");
-
 export default function DefaultRenderer(props) {
-  return dom.div({}, "This message type is not supported yet.");
+  return <div>This message type is not supported yet.</div>;
 }
