@@ -37,9 +37,6 @@ function GripMessageBody(props) {
     maybeScrollToBottom,
   } = props;
 
-  // TODO [bvaughn] Respect search query by wrapping matches in a <mark> tag,
-  // TODO [bvaughn] Highlight the current match specifically.
-
   let styleObject;
   if (userProvidedStyle && userProvidedStyle !== "") {
     styleObject = cleanupStyle(userProvidedStyle, nodename => document.createElement(nodename));
