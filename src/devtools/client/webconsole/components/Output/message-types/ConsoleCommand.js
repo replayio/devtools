@@ -8,7 +8,6 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 const Message = require("devtools/client/webconsole/components/Output/Message");
-ConsoleCommand.displayName = "ConsoleCommand";
 
 ConsoleCommand.propTypes = {
   message: PropTypes.object.isRequired,
