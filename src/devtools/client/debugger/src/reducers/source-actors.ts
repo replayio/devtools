@@ -105,7 +105,7 @@ export default function update(state = initial, action: AnyAction) {
       state = updateBreakpointHitCounts(state, action as SetSourceActorBreakpointHitCountsAction);
       break;
 
-    case "set_trim_region":
+    case "set_loaded_regions":
       state.values = clearBreakpointHitCounts(state);
       break;
 
@@ -199,7 +199,7 @@ function updateBreakpointHitCounts(
   return updateResources(state, [
     {
       id: sourceId,
-      breakpointHitCounts: [...currentBreakpointHitCounts!, ...action.value.hits],
+      breakpointHitCounts: [...(currentBreakpointHitCounts || []), ...action.value.hits],
       min: Math.min(currentMin, action.value.min),
       max: Math.max(currentMax, action.value.max),
     },
