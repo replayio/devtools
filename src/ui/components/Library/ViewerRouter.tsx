@@ -85,8 +85,15 @@ function ViewerRouter(props: ViewerRouterProps) {
   const { currentWorkspaceId, setUnexpectedError, setWorkspaceId } = props;
 
   useEffect(() => {
-    if (currentWorkspaceId === null && !features.library && !loading && !nonPendingLoading) {
+    if (
+      currentWorkspaceId === null &&
+      userId &&
+      !features.library &&
+      !loading &&
+      !nonPendingLoading
+    ) {
       if (!workspaces.length) {
+        sendTelemetryEvent("UnableToFindTeam", { userId: userId || "No User" });
         // This shouldn't be reachable because the library can only be disabled
         // by a workspace setting which means the user must be in a workspace
         setUnexpectedError({
@@ -107,6 +114,7 @@ function ViewerRouter(props: ViewerRouterProps) {
     setUnexpectedError,
     setWorkspaceId,
     workspaces,
+    userId,
   ]);
 
   if (loading) {
