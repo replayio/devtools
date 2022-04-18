@@ -151,26 +151,28 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
-  const onLineEnter = ({
-    lineNumberNode,
-    lineNumber,
-  }: {
-    lineNumberNode: HTMLElement;
-    lineNumber: number;
-  }) => {
-    setHoveredLineNumber(lineNumber);
-    setTargetNode(lineNumberNode);
-  };
-  const onLineLeave = () => {
-    setTargetNode(null);
-    setHoveredLineNumber(null);
-  };
   const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
   const onMouseDown = (e: React.MouseEvent) => {
     // This keeps the cursor in CodeMirror from moving after clicking on the button.
     e.stopPropagation();
   };
+
   useEffect(() => {
+    const onLineEnter = ({
+      lineNumberNode,
+      lineNumber,
+    }: {
+      lineNumberNode: HTMLElement;
+      lineNumber: number;
+    }) => {
+      setHoveredLineNumber(lineNumber);
+      setTargetNode(lineNumberNode);
+    };
+    const onLineLeave = () => {
+      setTargetNode(null);
+      setHoveredLineNumber(null);
+    };
+
     editor.codeMirror.on("lineMouseEnter", onLineEnter);
     editor.codeMirror.on("lineMouseLeave", onLineLeave);
     return () => {
