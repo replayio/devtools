@@ -5,6 +5,7 @@
 import { createSelector } from "reselect";
 
 import type { UIState } from "ui/state";
+import { isTimeInRegions } from "ui/utils/timeline";
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
@@ -49,11 +50,7 @@ export const getVisibleMessages = createSelector(
       }
 
       // Filter out messages that haven't yet been loaded.
-      if (
-        !loadedRegions!.loaded.some(
-          region => executionPointTime >= region.begin.time && executionPointTime <= region.end.time
-        )
-      ) {
+      if (!isTimeInRegions(executionPointTime, loadedRegions!.loaded)) {
         return false;
       }
 

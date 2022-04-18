@@ -11,12 +11,13 @@ function search(query: string, messages: Message[]): Message[] {
 
   const needle = query.toLocaleLowerCase();
   messages.forEach(message => {
-    console.log(message.id, 'messageText:', message.messageText);
-    if (typeof message.messageText === "string" && message.messageText.toLocaleLowerCase().includes(needle)) {
+    if (
+      typeof message.messageText === "string" &&
+      message.messageText.toLocaleLowerCase().includes(needle)
+    ) {
       results.push(message);
     } else {
       message.parameters?.some(parameter => {
-        console.log(message.id, 'parameter:', parameter);
         if (parameter.isPrimitive()) {
           if (String(parameter.primitive()).toLocaleLowerCase().includes(needle)) {
             results.push(message);

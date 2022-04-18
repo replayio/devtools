@@ -66,6 +66,8 @@ export class MessageContainer extends React.Component {
 
     let topLevelClassName = null;
     const { index, results, visible } = this.context;
+
+    // Highlight this row if the console search UI is visible/active and it is the currently selected result.
     if (visible && index >= 0 && index < results.length && message === results[index]) {
       topLevelClassName = styles.CurrentSearchResult;
     }
