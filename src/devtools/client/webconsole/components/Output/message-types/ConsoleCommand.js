@@ -13,13 +13,15 @@ ConsoleCommand.propTypes = {
   message: PropTypes.object.isRequired,
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
+  topLevelClassName: PropTypes.string,
 };
 
 /**
  * Displays input from the console.
  */
 export default function ConsoleCommand(props) {
-  const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
+  const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch, topLevelClassName } =
+    props;
   const { indent, source, type, level, timeStamp, executionPointTime } = message;
   const messageText = trimCode(message.messageText);
 
@@ -31,7 +33,7 @@ export default function ConsoleCommand(props) {
     source,
     type,
     level,
-    topLevelClasses: [],
+    topLevelClasses: topLevelClassName ? [topLevelClassName] : [],
     messageBody,
     indent,
     timeStamp,

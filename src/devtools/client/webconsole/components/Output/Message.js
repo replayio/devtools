@@ -106,7 +106,9 @@ class Message extends React.Component {
       this.props.pausedExecutionPoint !== nextProps.pausedExecutionPoint ||
       this.props.isPaused !== nextProps.isPaused ||
       this.props.timestampsVisible !== nextProps.timestampsVisible ||
-      this.props.open !== nextProps.open
+      this.props.open !== nextProps.open ||
+      // This is a hack to work around the memoization limitations of this component.
+      this.props.topLevelClasses.join(",") !== nextProps.topLevelClasses.join(",")
     );
   }
 

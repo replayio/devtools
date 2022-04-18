@@ -121,7 +121,6 @@
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
   color: var(--console-message-color);
-  background-color: var(--console-message-background);
 }
 
 @media (min-width: 1000px) {

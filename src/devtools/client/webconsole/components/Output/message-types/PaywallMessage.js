@@ -13,20 +13,22 @@ PaywallMessage.propTypes = {
   message: PropTypes.object.isRequired,
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
+  topLevelClassName: PropTypes.string,
 };
 
 /**
  * Displays input from the console.
  */
 export default function PaywallMessage(props) {
-  const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
+  const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch, topLevelClassName } =
+    props;
   const { indent, source, level, timeStamp, executionPointTime } = message;
 
   return React.createElement(Message, {
     source,
     type: "paywall",
     level,
-    topLevelClasses: [],
+    topLevelClasses: topLevelClassName ? [topLevelClassName] : [],
     messageBody: React.createElement("span", {
       className: "text-gray-500 font-bold",
       children: "Evaluations are only available for Developers in the Team plan.",

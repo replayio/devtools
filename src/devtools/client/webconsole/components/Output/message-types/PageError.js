@@ -17,6 +17,7 @@ PageError.propTypes = {
   open: PropTypes.bool,
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
+  topLevelClassName: PropTypes.string,
 };
 
 PageError.defaultProps = {
@@ -34,6 +35,7 @@ export default function PageError(props) {
     maybeScrollToBottom,
     pausedExecutionPoint,
     isFirstMessageForPoint,
+    topLevelClassName,
   } = props;
   const {
     id: messageId,
@@ -71,7 +73,7 @@ export default function PageError(props) {
     source,
     type,
     level,
-    topLevelClasses: [],
+    topLevelClasses: topLevelClassName ? [topLevelClassName] : [],
     indent: message.indent,
     messageBody,
     repeat,

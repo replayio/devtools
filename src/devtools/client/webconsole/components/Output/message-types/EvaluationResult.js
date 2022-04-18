@@ -17,6 +17,7 @@ EvaluationResult.propTypes = {
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
   open: PropTypes.bool,
+  topLevelClassName: PropTypes.string,
 };
 
 EvaluationResult.defaultProps = {
@@ -24,7 +25,15 @@ EvaluationResult.defaultProps = {
 };
 
 export default function EvaluationResult(props) {
-  const { dispatch, message, timestampsVisible, maybeScrollToBottom, open, isPaused } = props;
+  const {
+    dispatch,
+    message,
+    timestampsVisible,
+    maybeScrollToBottom,
+    open,
+    isPaused,
+    topLevelClassName,
+  } = props;
 
   const {
     source,
@@ -65,6 +74,9 @@ export default function EvaluationResult(props) {
   }
 
   const topLevelClasses = ["cm-s-mozilla"];
+  if (topLevelClassName) {
+    topLevelClasses.push(topLevelClassName);
+  }
 
   return React.createElement(Message, {
     dispatch,
