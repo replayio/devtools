@@ -11,8 +11,6 @@ const Message = require("devtools/client/webconsole/components/Output/Message");
 const GripMessageBody =
   require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 
-EvaluationResult.displayName = "EvaluationResult";
-
 EvaluationResult.propTypes = {
   dispatch: PropTypes.func.isRequired,
   message: PropTypes.object.isRequired,

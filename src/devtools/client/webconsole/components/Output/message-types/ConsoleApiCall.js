@@ -14,7 +14,6 @@ const ConsoleTable = require("devtools/client/webconsole/components/Output/Conso
 const { isGroupType, l10n } = require("devtools/client/webconsole/utils/messages");
 
 const Message = require("devtools/client/webconsole/components/Output/Message");
-ConsoleApiCall.displayName = "ConsoleApiCall";
 
 ConsoleApiCall.propTypes = {
   dispatch: PropTypes.func.isRequired,

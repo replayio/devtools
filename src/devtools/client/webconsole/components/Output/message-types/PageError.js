@@ -12,8 +12,6 @@ const { createPrimitiveValueFront } = require("protocol/thread");
 
 const { REPS, MODE } = require("devtools/packages/devtools-reps");
 
-PageError.displayName = "PageError";
-
 PageError.propTypes = {
   message: PropTypes.object.isRequired,
   open: PropTypes.bool,
