@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import hooks from "ui/hooks";
 import { CheckboxRow } from "./CheckboxRow";
 import { CombinedExperimentalUserSettings } from "ui/types";
@@ -96,6 +96,8 @@ export default function ExperimentalSettings({}) {
     useFeature("networkRequestComments");
   const { value: enableTenMinuteReplays, update: updateEnableTenMinuteReplays } =
     useFeature("tenMinuteReplays");
+  const { value: enableAdvancedTimeline, update: updateEnableAdvancedTimeline } =
+    useFeature("advancedTimeline");
 
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =

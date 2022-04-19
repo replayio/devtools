@@ -28,6 +28,7 @@ pref("devtools.features.tenMinuteReplays", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
+pref("devtools.features.advancedTimeline", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -56,6 +57,7 @@ export const features = new PrefsHelper("devtools.features", {
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
   codeHeatMaps: ["Bool", "codeHeatMaps"],
   resolveRecording: ["Bool", "resolveRecording"],
+  advancedTimeline: ["Bool", "advancedTimeline"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

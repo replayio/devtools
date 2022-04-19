@@ -37,6 +37,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
 import { EditFocusButton } from "./EditFocusButton";
 import { MouseDownMask } from "./MouseDownMask";
+import OgreTimeline from "../OgreTimeline";
 
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
@@ -372,6 +373,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
               onMouseUp={e => this.onPlayerMouseUp(e)}
               onMouseEnter={this.onPlayerMouseEnter}
             >
+              <OgreTimeline />
               <div className="progress-line full" />
               <div
                 className="progress-line preview-max"
