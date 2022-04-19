@@ -16,4 +16,4 @@ jobs:
       - name: Install Deps
         run: npm install
       - name: Trunk Check
-        uses: trunk-io/trunk-action@v0.4.0-beta
+        uses: trunk-io/trunk-action@v1.0.0
