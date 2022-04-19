@@ -3,11 +3,13 @@ cli:
   version: 0.10.0-beta
 lint:
   enabled:
-    - actionlint@1.6.8
+    - actionlint@1.6.12
     - eslint@8.13.0
-    - gitleaks@8.3.0
+    - gitleaks@8.7.1
     - markdownlint@0.31.1
-    - prettier@2.5.1
+    - prettier@2.6.2
+    - stylelint-fmt@14.7.1
+    - stylelint@14.7.1
   ignore:
     - linters: [ALL]
       paths:
