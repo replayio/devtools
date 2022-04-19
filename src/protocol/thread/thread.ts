@@ -928,6 +928,8 @@ class _ThreadFront {
     onConsoleOverflow: () => void
   ) {
     const sessionId = await this.waitForSession();
+    // Wait for basic processing to start before fetching console messages.
+    await this.ensureProcessed("basic");
 
     const messagesLoaded = client.Console.findMessages({}, sessionId).then(({ overflow }) => {
       if (overflow) {
