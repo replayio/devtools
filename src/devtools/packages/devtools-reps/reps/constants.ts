@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 export const MODE = {
-  TINY: Symbol("TINY"),
-  SHORT: Symbol("SHORT"),
   LONG: Symbol("LONG"),
+  SHORT: Symbol("SHORT"),
+  TINY: Symbol("TINY"),
 };

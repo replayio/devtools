@@ -18,8 +18,8 @@ export const UiState = (overrides: Partial<WebconsoleUIState> = {}) => {
 };
 
 const webconsoleUISlice = createSlice({
-  name: "consoleUI",
   initialState,
+  name: "consoleUI",
   reducers: {
     toggleTimestamps(state) {
       state.timestampsVisible = !state.timestampsVisible;

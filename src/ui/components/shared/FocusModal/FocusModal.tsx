@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import { actions } from "ui/actions";
-import MaterialIcon from "../MaterialIcon";
+import * as selectors from "ui/reducers/app";
 import {
   getFocusRegion,
   getCurrentTime,
   getIsAtFocusSoftLimit,
   getZoomRegion,
 } from "ui/reducers/timeline";
-import { DisabledButton, PrimaryButton } from "../Button";
+import { UIState } from "ui/state";
 import { getFormattedTime } from "ui/utils/timeline";
+
+import { DisabledButton, PrimaryButton } from "../Button";
+import MaterialIcon from "../MaterialIcon";
 
 function FocusingModal({ hideModal }: PropsFromRedux) {
   const currentTime = useSelector(getCurrentTime);

@@ -4,8 +4,8 @@
 
 //
 
-import get from "lodash/get";
 import findIndex from "lodash/findIndex";
+import get from "lodash/get";
 
 // eslint-disable-next-line max-len
 import { getFrameUrl } from "./getFrameUrl";
@@ -14,12 +14,12 @@ function collapseLastFrames(frames) {
   const index = findIndex(frames, frame => getFrameUrl(frame).match(/webpack\/bootstrap/i));
 
   if (index == -1) {
-    return { newFrames: frames, lastGroup: [] };
+    return { lastGroup: [], newFrames: frames };
   }
 
   const newFrames = frames.slice(0, index);
   const lastGroup = frames.slice(index);
-  return { newFrames, lastGroup };
+  return { lastGroup, newFrames };
 }
 
 export function collapseFrames(frames) {

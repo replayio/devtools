@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
+import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { User } from "ui/types";
-import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
+import React, { useEffect } from "react";
+import { User } from "ui/types";
+import useAuth0 from "ui/utils/useAuth0";
+
 import { GitHubLink } from "./githubLink";
 import { ReplayLink } from "./replayLink";
-import useAuth0 from "ui/utils/useAuth0";
 
 interface TipTapEditorProps {
   autofocus: boolean;
@@ -33,10 +34,10 @@ const tryToParse = (content: string | object): any => {
   } catch {
     // Our comments were not always JSON, they used to be stored as markdown
     // In that case, we just render the raw markdown.
-    const textContent = content ? [{ type: "text", text: content }] : [];
+    const textContent = content ? [{ text: content, type: "text" }] : [];
     return {
+      content: [{ content: textContent, type: "paragraph" }],
       type: "doc",
-      content: [{ type: "paragraph", content: textContent }],
     };
   }
 };
@@ -64,6 +65,10 @@ const TipTapEditor = ({
 
   const editor = useEditor(
     {
+      autofocus,
+      content: tryToParse(content),
+      editable,
+      editorProps: { attributes: { class: "focus:outline-none" } },
       extensions: [
         StarterKit,
         GitHubLink,
@@ -71,7 +76,6 @@ const TipTapEditor = ({
         // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
         Placeholder.configure({ placeholder }),
         Extension.create({
-          name: "submitOnEnter",
           addKeyboardShortcuts() {
             return {
               "Cmd-Enter": ({ editor }) => {
@@ -91,14 +95,11 @@ const TipTapEditor = ({
               },
             };
           },
+          name: "submitOnEnter",
         }),
       ],
-      editorProps: { attributes: { class: "focus:outline-none" } },
-      content: tryToParse(content),
       onCreate,
       onUpdate,
-      editable,
-      autofocus,
     },
     [isAuthenticated]
   );

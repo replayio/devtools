@@ -1,6 +1,3 @@
-import { MODE } from "./reps/constants";
-import { REPS, getRep, Rep } from "./reps/rep";
-import { getGripPreviewItems } from "./reps/rep-utils";
 import ObjectInspector from "./object-inspector/components/ObjectInspector";
 import {
   ValueItem,
@@ -9,6 +6,9 @@ import {
   Item,
   KeyValueItem,
 } from "./object-inspector/utils";
+import { MODE } from "./reps/constants";
+import { REPS, getRep, Rep } from "./reps/rep";
+import { getGripPreviewItems } from "./reps/rep-utils";
 
 export type { Item };
 export {

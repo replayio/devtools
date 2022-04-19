@@ -1,3 +1,4 @@
+import { filter } from "fuzzaldrin-plus";
 import clamp from "lodash/clamp";
 import React, { ChangeEvent, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -6,10 +7,10 @@ import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { ExperimentalUserSettings } from "ui/types";
+
 import CommandButton from "./CommandButton";
-import SearchInput from "./SearchInput";
-import { filter } from "fuzzaldrin-plus";
 import styles from "./CommandPalette.module.css";
+import SearchInput from "./SearchInput";
 
 export type Command = {
   key: CommandKey;
@@ -189,8 +190,8 @@ const connector = connect(
     hasReactComponents: selectors.hasReactComponents(state),
   }),
   {
-    hideCommandPalette: actions.hideCommandPalette,
     executeCommand: actions.executeCommand,
+    hideCommandPalette: actions.hideCommandPalette,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

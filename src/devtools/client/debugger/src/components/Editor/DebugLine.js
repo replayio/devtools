@@ -4,6 +4,9 @@
 
 //
 import { PureComponent } from "react";
+
+import { getPauseReason, getDebugLineLocation } from "../../selectors";
+import { connect } from "../../utils/connect";
 import {
   toEditorLine,
   toEditorColumn,
@@ -12,10 +15,8 @@ import {
   endOperation,
   getTokenEnd,
 } from "../../utils/editor";
-import { isException } from "../../utils/pause";
 import { getIndentation } from "../../utils/indentation";
-import { connect } from "../../utils/connect";
-import { getPauseReason, getDebugLineLocation } from "../../selectors";
+import { isException } from "../../utils/pause";
 
 export class DebugLine extends PureComponent {
   debugExpression;
@@ -93,12 +94,12 @@ export class DebugLine extends PureComponent {
   getTextClasses(why) {
     if (why && isException(why)) {
       return {
-        markTextClass: "debug-expression-error",
         lineClass: "new-debug-line-error",
+        markTextClass: "debug-expression-error",
       };
     }
 
-    return { markTextClass: "debug-expression", lineClass: "new-debug-line" };
+    return { lineClass: "new-debug-line", markTextClass: "debug-expression" };
   }
 
   render() {

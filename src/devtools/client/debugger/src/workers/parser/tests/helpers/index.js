@@ -7,9 +7,9 @@
 import fs from "fs";
 import path from "path";
 
+import * as asyncValue from "../../../../utils/async-value";
 import { makeMockSourceAndContent } from "../../../../utils/test-mockup";
 import { setSource } from "../../sources";
-import * as asyncValue from "../../../../utils/async-value";
 
 export function getFixture(name, type = "js") {
   return fs.readFileSync(path.join(__dirname, `../fixtures/${name}.${type}`), "utf8");
@@ -29,9 +29,9 @@ function getSourceContent(name, type = "js") {
   }
 
   return {
+    contentType,
     type: "text",
     value: text,
-    contentType,
   };
 }
 
@@ -48,9 +48,9 @@ export function getSourceWithContent(name, type) {
 export function populateSource(name, type) {
   const { content, ...source } = getSourceWithContent(name, type);
   setSource({
+    contentType: content.contentType,
     id: source.id,
     text: content.value,
-    contentType: content.contentType,
   });
   return {
     ...source,
@@ -71,9 +71,9 @@ export function getOriginalSourceWithContent(name, type) {
 export function populateOriginalSource(name, type) {
   const { content, ...source } = getOriginalSourceWithContent(name, type);
   setSource({
+    contentType: content.contentType,
     id: source.id,
     text: content.value,
-    contentType: content.contentType,
   });
   return {
     ...source,

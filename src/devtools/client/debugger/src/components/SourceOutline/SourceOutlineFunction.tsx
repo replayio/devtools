@@ -1,8 +1,9 @@
-import React from "react";
 import classnames from "classnames";
+import React from "react";
 import { Redacted } from "ui/components/Redacted";
-import PreviewFunction from "../shared/PreviewFunction";
+
 import { FunctionSymbol } from "../../types";
+import PreviewFunction from "../shared/PreviewFunction";
 
 export const SourceOutlineFunction = React.memo(function OutlineFunction({
   isFocused,
@@ -16,8 +17,8 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
   return (
     <li
       className={classnames("outline-list__element cursor-pointer", {
-        indent: !!func.klass,
         focused: isFocused,
+        indent: !!func.klass,
       })}
       onClick={onSelect ? () => onSelect(func) : undefined}
     >

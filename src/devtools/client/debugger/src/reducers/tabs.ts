@@ -3,6 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { AnyAction } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
+import { getReplaySession } from "ui/setup/prefs";
 import type { UIState } from "ui/state";
 
 /**
@@ -10,14 +12,12 @@ import type { UIState } from "ui/state";
  * @module reducers/tabs
  */
 
-import { createSelector } from "reselect";
+import { getRecordingId } from "ui/utils/recording";
 
-import { isSimilarTab } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
+import { isSimilarTab } from "../utils/tabs";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
-import { getRecordingId } from "ui/utils/recording";
-import { getReplaySession } from "ui/setup/prefs";
 import type { Source } from "./sources";
 
 export interface Tab {
@@ -149,8 +149,8 @@ function addSelectedSource(state: TabsState, source: Source) {
   }
 
   return updateTabList(state, {
-    url: source.url!,
     sourceId: source.id,
+    url: source.url!,
   });
 }
 
@@ -202,7 +202,7 @@ function updateTabList(state: TabsState, { url, sourceId }: { url: string; sourc
   const currentIndex = url ? tabs.findIndex(tab => isSimilarTab(tab, url)) : -1;
 
   if (currentIndex === -1) {
-    const newTab = { url, sourceId };
+    const newTab = { sourceId, url };
     tabs = [newTab, ...tabs];
   }
 

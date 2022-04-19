@@ -6,8 +6,8 @@
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
-const { maybeEscapePropertyName, wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
+const { maybeEscapePropertyName, wrapRender } = require("./rep-utils");
 
 /**
  * Property for Obj (local JS objects), Grip (remote JS objects)
@@ -15,14 +15,16 @@ const { MODE } = require("./constants");
  * It's used to render object properties.
  */
 PropRep.propTypes = {
-  // Property name.
-  name: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   // Equal character rendered between property name and value.
   equal: PropTypes.string,
+
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
-  onDOMNodeMouseOver: PropTypes.func,
+
+  // Property name.
+  name: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
   // Normally a PropRep will quote a property name that isn't valid
   // when unquoted; but this flag can be used to suppress the
@@ -54,11 +56,11 @@ function PropRep(props) {
   } else {
     key = Rep({
       ...props,
-      key: `nodeName-${index}`,
       className: "nodeName",
-      object: name,
-      mode: mode || MODE.TINY,
       defaultRep: Grip,
+      key: `nodeName-${index}`,
+      mode: mode || MODE.TINY,
+      object: name,
     });
   }
 

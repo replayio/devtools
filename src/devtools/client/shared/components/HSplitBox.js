@@ -23,19 +23,29 @@
 //     |                       |                     |
 //     +-----------------------+---------------------+
 
-const { Component } = require("react");
-const PropTypes = require("prop-types");
-const dom = require("react-dom-factories");
 const { assert } = require("devtools/shared/DevToolsUtils");
+const PropTypes = require("prop-types");
+const { Component } = require("react");
+const dom = require("react-dom-factories");
 
 class HSplitBox extends Component {
   static get propTypes() {
     return {
-      // The contents of the start pane.
-      start: PropTypes.any.isRequired,
-
       // The contents of the end pane.
       end: PropTypes.any.isRequired,
+
+      minEndWidth: PropTypes.any,
+
+      // A minimum css width value for the start and end panes.
+      minStartWidth: PropTypes.any,
+
+      // A callback fired when the user drags the splitter to resize the relative
+      // pane widths. The function is passed the startWidth value that would put
+      // the splitter underneath the users mouse.
+      onResize: PropTypes.func.isRequired,
+
+      // The contents of the start pane.
+      start: PropTypes.any.isRequired,
 
       // The relative width of the start pane, expressed as a number between 0 and
       // 1. The relative width of the end pane is 1 - startWidth. For example,
@@ -43,23 +53,14 @@ class HSplitBox extends Component {
       // .25, the start panel will take up 1/4 width and the end panel will take
       // up 3/4 width.
       startWidth: PropTypes.number,
-
-      // A minimum css width value for the start and end panes.
-      minStartWidth: PropTypes.any,
-      minEndWidth: PropTypes.any,
-
-      // A callback fired when the user drags the splitter to resize the relative
-      // pane widths. The function is passed the startWidth value that would put
-      // the splitter underneath the users mouse.
-      onResize: PropTypes.func.isRequired,
     };
   }
 
   static get defaultProps() {
     return {
-      startWidth: 0.5,
-      minStartWidth: "20px",
       minEndWidth: "20px",
+      minStartWidth: "20px",
+      startWidth: 0.5,
     };
   }
 

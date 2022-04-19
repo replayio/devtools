@@ -1,14 +1,14 @@
 import React from "react";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import classnames from "classnames";
-import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const { getAnalysisPointsForLocation } = selectors;
-import { actions } from "ui/actions";
-import { Circle } from "ui/components/Timeline/Marker";
-import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
+import { actions } from "ui/actions";
+import { Circle } from "ui/components/Timeline/Marker";
+import { selectors } from "ui/reducers";
 
 function toBigInt(num) {
   return num ? BigInt(num) : undefined;
@@ -40,10 +40,10 @@ function BreakpointTimelinePoint({
 }) {
   const onMouseEnter = () =>
     setHoveredItem({
-      target: "widget",
-      point: point.point,
-      time: point.time,
       location: breakpoint.location,
+      point: point.point,
+      target: "widget",
+      time: point.time,
     });
 
   const onMouseLeave = e => {
@@ -62,11 +62,11 @@ function BreakpointTimelinePoint({
   return (
     <div
       className={classnames("breakpoint-navigation-timeline-point", {
-        past: toBigInt(point.point) < toBigInt(executionPoint),
         future: toBigInt(point.point) > toBigInt(executionPoint),
+        past: toBigInt(point.point) < toBigInt(executionPoint),
         pause: toBigInt(point.point) == toBigInt(executionPoint),
         "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
-        "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
+        "secondary-highlight": hasSecondaryHighlighted({ breakpoint, hoveredItem }),
       })}
       title={`${index + 1}/${analysisPoints?.data.length}`}
       onClick={onClick}
@@ -115,8 +115,8 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
   }),
   {
+    clearHoveredItem: actions.clearHoveredItem,
     seek: actions.seek,
     setHoveredItem: actions.setHoveredItem,
-    clearHoveredItem: actions.clearHoveredItem,
   }
 )(MemoizedBreakpointTimelinePoint);

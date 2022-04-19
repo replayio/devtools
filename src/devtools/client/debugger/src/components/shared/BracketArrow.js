@@ -4,14 +4,14 @@
 
 //
 
-import React from "react";
 import classNames from "classnames";
+import React from "react";
 
 const BracketArrow = ({ orientation, left, top, bottom }) => {
   return (
     <div
       className={classNames("bracket-arrow", orientation || "up")}
-      style={{ left, top, bottom }}
+      style={{ bottom, left, top }}
     />
   );
 };

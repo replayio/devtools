@@ -4,13 +4,12 @@
 
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-
 const ComputedProperty = require("devtools/client/inspector/boxmodel/components/ComputedProperty");
 const Types = require("devtools/client/inspector/boxmodel/types");
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const PropTypes = require("prop-types");
+const React = require("react");
+const dom = require("react-dom-factories");
 
 const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
 const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
@@ -107,8 +106,8 @@ class BoxModelProperties extends React.PureComponent {
         },
         dom.span({
           className: "layout-properties-expander theme-twisty",
-          open: this.state.isOpen,
           onClick: this.onToggleExpander,
+          open: this.state.isOpen,
         }),
         "Box Model Properties"
       ),

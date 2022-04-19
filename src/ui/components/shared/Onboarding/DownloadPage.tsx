@@ -1,7 +1,8 @@
 import React from "react";
+import { trackEvent } from "ui/utils/telemetry";
+
 import { DisabledLgButton, PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { OnboardingActions, OnboardingBody, OnboardingHeader } from "../Onboarding/index";
-import { trackEvent } from "ui/utils/telemetry";
 
 function DownloadButtonContent({ text, imgUrl }: { text: string; imgUrl: string }) {
   return (

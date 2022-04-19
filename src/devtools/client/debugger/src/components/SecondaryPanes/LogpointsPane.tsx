@@ -1,11 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getLogpointSources } from "../../selectors/breakpointSources";
-import Breakpoints from "./Breakpoints";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+
 import { removeLogpoint, removeLogpointsInSource } from "../../actions/breakpoints/logpoints";
-import { Context } from "../../selectors";
 import { Breakpoint, Source } from "../../reducers/types";
+import { Context } from "../../selectors";
+import { getLogpointSources } from "../../selectors/breakpointSources";
+
+import Breakpoints from "./Breakpoints";
 
 export default function LogpointsPane() {
   const dispatch = useDispatch();

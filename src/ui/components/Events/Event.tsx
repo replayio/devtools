@@ -1,8 +1,10 @@
-import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import classNames from "classnames";
+import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
+
 import MaterialIcon from "../shared/MaterialIcon";
+
 import Matches from "./Matches";
 
 type EventProps = {
@@ -14,10 +16,10 @@ type EventProps = {
 };
 
 const EVENT_KINDS: { [key: string]: EventKind } = {
-  keydown: { icon: "keyboard", label: "Key Down", key: "event.keyboard.keydown" },
-  keyup: { icon: "keyboard", label: "Key Up", key: "event.keyboard.keyup" },
-  keypress: { icon: "keyboard", label: "Key Press", key: "event.keyboard.keypress" },
-  mousedown: { icon: "ads_click", label: "Click", key: "event.mouse.click" },
+  keydown: { icon: "keyboard", key: "event.keyboard.keydown", label: "Key Down" },
+  keypress: { icon: "keyboard", key: "event.keyboard.keypress", label: "Key Press" },
+  keyup: { icon: "keyboard", key: "event.keyboard.keyup", label: "Key Up" },
+  mousedown: { icon: "ads_click", key: "event.mouse.click", label: "Click" },
   navigation: { icon: "navigation", label: "Navigation" },
 };
 
@@ -72,8 +74,8 @@ export default function Event({
         "event user-select-none mb-1 mt-1 flex flex-row items-center justify-between",
         "group block w-full cursor-pointer rounded-lg py-1 pl-3 pr-2 hover:bg-themeMenuHighlight focus:outline-none",
         {
-          "text-lightGrey": currentTime < time,
           "font-semibold text-primaryAccent": isPaused,
+          "text-lightGrey": currentTime < time,
         }
       )}
     >

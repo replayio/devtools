@@ -1,9 +1,9 @@
+import clamp from "lodash/clamp";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
-import clamp from "lodash/clamp";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useSelector(getLoadedRegions);

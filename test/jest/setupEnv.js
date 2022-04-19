@@ -2,8 +2,8 @@
 require("fake-indexeddb/auto");
 require("@testing-library/jest-dom");
 
-import { doInstall } from "../../test/mock/src/mockEnvironment";
 import { basicMessageHandlers, basicBindings } from "../../test/mock/src/handlers";
+import { doInstall } from "../../test/mock/src/mockEnvironment";
 
 // Code throws if there's no dispatchUrl set
 process.env.NEXT_PUBLIC_DISPATCH_URL = "wss://dummy.example.com";
@@ -25,8 +25,8 @@ doInstall({
 
 delete window.performance;
 window.performance = {
-  mark: () => {},
-  measure: () => {},
   getEntriesByName: () => [],
   getEntriesByType: () => [],
+  mark: () => {},
+  measure: () => {},
 };

@@ -4,6 +4,7 @@
 
 //
 import type { UIState } from "ui/state";
+
 import type { UrlLocation } from "../reducers/pause";
 export type { UrlLocation } from "../reducers/pause";
 

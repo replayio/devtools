@@ -6,12 +6,11 @@
 
 import * as t from "@babel/types";
 
-import createSimplePath from "./utils/simple-path";
 import { traverseAst } from "./utils/ast";
-import { isFunction, getCode, getFunctionParameterNames } from "./utils/helpers";
-
-import { inferClassName } from "./utils/inferClassName";
 import getFunctionName from "./utils/getFunctionName";
+import { isFunction, getCode, getFunctionParameterNames } from "./utils/helpers";
+import { inferClassName } from "./utils/inferClassName";
+import createSimplePath from "./utils/simple-path";
 
 let symbolDeclarations = new Map();
 
@@ -26,15 +25,19 @@ function extractSymbol(path, symbols, state) {
     const index = state.fnCounts[name]++;
 
     symbols.functions.push({
-      name,
-      klass: inferClassName(path),
-      location: path.node.loc,
-      parameterNames: getFunctionParameterNames(path),
       identifier: path.node.id,
       // indicates the occurence of the function in a file
       // e.g { name: foo, ... index: 4 } is the 4th foo function
       // in the file
       index,
+
+      klass: inferClassName(path),
+
+      location: path.node.loc,
+
+      name,
+
+      parameterNames: getFunctionParameterNames(path),
     });
   }
 
@@ -44,12 +47,12 @@ function extractSymbol(path, symbols, state) {
       const moduleName = path.node.arguments[0]?.value;
       const loc = path.node.arguments[2]?.loc;
       const location = {
-        start: { line: loc.start.line + 1, column: 0 },
         end: loc.end,
+        start: { column: 0, line: loc.start.line + 1 },
       };
       symbols.functions.push({
-        name: moduleName,
         location,
+        name: moduleName,
       });
     }
   }
@@ -65,22 +68,22 @@ function extractSymbol(path, symbols, state) {
   if (t.isClassDeclaration(path)) {
     const { loc, superClass } = path.node;
     symbols.classes.push({
+      location: loc,
       name: path.node.id.name,
       parent: superClass
         ? {
-            name: t.isMemberExpression(superClass) ? getCode(superClass) : superClass.name,
             location: superClass.loc,
+            name: t.isMemberExpression(superClass) ? getCode(superClass) : superClass.name,
           }
         : null,
-      location: loc,
     });
   }
 }
 
 function extractSymbols(sourceId) {
   const symbols = {
-    functions: [],
     classes: [],
+    functions: [],
     hasJsx: false,
     hasTypes: false,
     loading: false,

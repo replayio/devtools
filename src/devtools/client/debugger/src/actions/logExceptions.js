@@ -5,8 +5,9 @@
 //
 
 import { PROMISE } from "ui/setup/redux/middleware/promise";
-const { getShouldLogExceptions } = require("../reducers/pause");
+
 const { clientCommands } = require("../client/commands");
+const { getShouldLogExceptions } = require("../reducers/pause");
 
 export function setupExceptions(store) {
   if (getShouldLogExceptions(store.getState())) {
@@ -22,9 +23,9 @@ export function setupExceptions(store) {
 export function logExceptions(shouldLogExceptions) {
   return (dispatch, getState, { client }) => {
     return dispatch({
-      type: "LOG_EXCEPTIONS",
-      shouldLogExceptions,
       [PROMISE]: client.logExceptions(shouldLogExceptions),
+      shouldLogExceptions,
+      type: "LOG_EXCEPTIONS",
     });
   };
 }

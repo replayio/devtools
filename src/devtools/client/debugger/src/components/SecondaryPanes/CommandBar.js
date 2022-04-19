@@ -4,10 +4,14 @@
 
 //
 
+import isThisHour from "date-fns/isThisHour";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import { appinfo } from "devtools/shared/services";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
+import { trackEvent } from "ui/utils/telemetry";
 
-import { connect } from "../../utils/connect";
+import actions from "../../actions";
 import {
   getIsWaitingOnBreak,
   getThreadContext,
@@ -15,14 +19,9 @@ import {
   getFramePositions,
   hasFrames,
 } from "../../selectors";
+import { connect } from "../../utils/connect";
 import { formatKeyShortcut } from "../../utils/text";
-import actions from "../../actions";
 import CommandBarButton from "../shared/Button/CommandBarButton";
-import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import { trackEvent } from "ui/utils/telemetry";
-
-import { appinfo } from "devtools/shared/services";
-import isThisHour from "date-fns/isThisHour";
 
 const isMacOS = appinfo.OS === "Darwin";
 
@@ -31,24 +30,24 @@ const isMacOS = appinfo.OS === "Darwin";
 const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"];
 
 const KEYS = {
-  WINNT: {
-    resume: "F8",
-    stepOver: "F10",
-    stepIn: "F11",
-    stepOut: "Shift+F11",
-  },
   Darwin: {
     resume: "Cmd+\\",
-    stepOver: "Cmd+'",
     stepIn: "Cmd+;",
     stepOut: "Cmd+Shift+:",
     stepOutDisplay: "Cmd+Shift+;",
+    stepOver: "Cmd+'",
   },
   Linux: {
     resume: "F8",
-    stepOver: "F10",
     stepIn: "F11",
     stepOut: "Shift+F11",
+    stepOver: "F10",
+  },
+  WINNT: {
+    resume: "F8",
+    stepIn: "F11",
+    stepOut: "Shift+F11",
+    stepOver: "F10",
   },
 };
 
@@ -83,7 +82,7 @@ class CommandBar extends Component {
   }
 
   componentDidMount() {
-    this.shortcuts = new KeyShortcuts({ window, target: this.commandBarNode });
+    this.shortcuts = new KeyShortcuts({ target: this.commandBarNode, window });
     const shortcuts = this.shortcuts;
 
     COMMANDS.forEach(action => shortcuts.on(getKey(action), e => this.handleEvent(e, action)));
@@ -250,9 +249,9 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   resume: actions.resume,
+  reverseStepOver: actions.reverseStepOver,
+  rewind: actions.rewind,
   stepIn: actions.stepIn,
   stepOut: actions.stepOut,
   stepOver: actions.stepOver,
-  rewind: actions.rewind,
-  reverseStepOver: actions.reverseStepOver,
 })(CommandBar);

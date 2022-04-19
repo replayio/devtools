@@ -6,12 +6,12 @@ import { Workspace, WorkspaceSettings } from "ui/types";
 export function getDefaultOrganizationSettings(): WorkspaceSettings {
   return {
     features: {
-      user: {
-        library: true,
-        autoJoin: null,
-      },
       recording: {
         public: true,
+      },
+      user: {
+        autoJoin: null,
+        library: true,
       },
     },
     motd: null,

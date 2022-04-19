@@ -4,7 +4,9 @@
 
 import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
+
 import { Inspector } from "../../inspector";
+
 const EventEmitter = require("devtools/shared/event-emitter");
 
 export interface ClassInfo {
@@ -97,7 +99,7 @@ export default class ClassList {
       // Use the proxy node to get a clean list of classes.
       this.classListProxyNode.className = this.currentNode.className;
       const nodeClasses = [...new Set([...this.classListProxyNode.classList])].map(name => {
-        return { name, isApplied: true };
+        return { isApplied: true, name };
       });
 
       CLASSES.set(this.currentNode, nodeClasses);

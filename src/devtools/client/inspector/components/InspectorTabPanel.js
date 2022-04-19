@@ -4,9 +4,9 @@
 
 "use strict";
 
+const PropTypes = require("prop-types");
 const { Component } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
 
 // Shortcuts
 const { div } = dom;
@@ -62,8 +62,8 @@ class InspectorTabPanel extends Component {
 
   render() {
     return div({
-      ref: "content",
       className: "devtools-inspector-tab-panel",
+      ref: "content",
     });
   }
 }

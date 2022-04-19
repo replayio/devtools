@@ -4,8 +4,9 @@
 
 //
 
-import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
+
 import {
   getSource,
   getSourceFromId,
@@ -13,9 +14,7 @@ import {
   getSourcesEpoch,
   getSourceActorsForSource,
 } from "../../selectors";
-
 import { fulfilled } from "../../utils/async-value";
-
 import { memoizeableAction } from "../../utils/memoizableAction";
 
 export async function loadSource(state, source, thunkArgs) {
@@ -43,18 +42,18 @@ export async function loadSource(state, source, thunkArgs) {
   const contentType = response.contentType || "text/javascript";
   const text = response.source || "";
 
-  parser.setSource(source.id, { type: "text", value: text, contentType });
+  parser.setSource(source.id, { contentType, type: "text", value: text });
 
-  return { text, contentType };
+  return { contentType, text };
 }
 
 async function loadSourceTextPromise(cx, source, thunkArgs) {
   const epoch = getSourcesEpoch(thunkArgs.getState());
   await thunkArgs.dispatch({
-    type: "LOAD_SOURCE_TEXT",
-    sourceId: source.id,
-    epoch,
     [PROMISE]: loadSource(thunkArgs.getState(), source, thunkArgs),
+    epoch,
+    sourceId: source.id,
+    type: "LOAD_SOURCE_TEXT",
   });
 }
 
@@ -66,6 +65,11 @@ export function loadSourceById(cx, sourceId) {
 }
 
 export const loadSourceText = memoizeableAction("loadSourceText", {
+  action: ({ cx, source }, thunkArgs) => loadSourceTextPromise(cx, source, thunkArgs),
+  createKey: ({ source }, thunkArgs) => {
+    const epoch = getSourcesEpoch(thunkArgs.getState());
+    return `${epoch}:${source.id}`;
+  },
   getValue: ({ source }, thunkArgs) => {
     source = source ? getSource(thunkArgs.getState(), source.id) : null;
     if (!source) {
@@ -82,9 +86,4 @@ export const loadSourceText = memoizeableAction("loadSourceText", {
     // propagate that error upward.
     return fulfilled(source);
   },
-  createKey: ({ source }, thunkArgs) => {
-    const epoch = getSourcesEpoch(thunkArgs.getState());
-    return `${epoch}:${source.id}`;
-  },
-  action: ({ cx, source }, thunkArgs) => loadSourceTextPromise(cx, source, thunkArgs),
 });

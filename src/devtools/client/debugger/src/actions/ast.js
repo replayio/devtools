@@ -1,11 +1,12 @@
-import { ThreadFront } from "protocol/thread";
-import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
-import { formatProjectFunctions } from "../utils/quick-open";
-import { getSources } from "../reducers/sources";
 import {
   getGlobalFunctions,
   isGlobalFunctionsLoading,
 } from "devtools/client/debugger/src/reducers/ast";
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
+import { ThreadFront } from "protocol/thread";
+
+import { getSources } from "../reducers/sources";
+import { formatProjectFunctions } from "../utils/quick-open";
 
 export function loadGlobalFunctions() {
   return async (dispatch, getState) => {
@@ -32,8 +33,8 @@ export function loadGlobalFunctions() {
     });
 
     dispatch({
-      type: "SET_GLOBAL_FUNCTIONS",
       globalFns,
+      type: "SET_GLOBAL_FUNCTIONS",
     });
   };
 }

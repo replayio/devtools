@@ -14,10 +14,6 @@ async function initAuthRequest(key: string) {
   }
 
   const resp = await fetch(api, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       query: `
         mutation InitAutRequest($key: String!) {
@@ -32,6 +28,10 @@ async function initAuthRequest(key: string) {
         key,
       },
     }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
   });
 
   const json = await resp.json();
@@ -62,10 +62,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader(
       "Set-Cookie",
       cookie.serialize("replay-browser-auth", JSON.stringify({ id, verifier: serverKey }), {
-        secure: process.env.NODE_ENV === "production",
         httpOnly: true,
-        path: "/",
         maxAge: 5 * 60 * 1000,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
       })
     );
     res.redirect(url);

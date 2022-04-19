@@ -1,6 +1,7 @@
 import * as LDClient from "launchdarkly-js-client-sdk";
 import { useEffect, useState } from "react";
 import { UserInfo } from "ui/hooks/users";
+
 import { isDevelopment } from "./environment";
 
 const DEFAULT_FLAGS = {
@@ -39,7 +40,7 @@ function useLaunchDarkly() {
     return client.variation(name, DEFAULT_FLAGS[name]);
   }
 
-  return { ready, getFeatureFlag };
+  return { getFeatureFlag, ready };
 }
 
 export { initLaunchDarkly, useLaunchDarkly };

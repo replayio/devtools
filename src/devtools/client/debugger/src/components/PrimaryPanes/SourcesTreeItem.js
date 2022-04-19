@@ -4,15 +4,12 @@
 
 //
 
-import React, { Component } from "react";
-import { connect } from "../../utils/connect";
 import classnames from "classnames";
 import { showMenu } from "devtools/shared/contextmenu";
-
-import SourceIcon from "../shared/SourceIcon";
-import AccessibleImage from "../shared/AccessibleImage";
+import React, { Component } from "react";
 import { Redacted } from "ui/components/Redacted";
 
+import actions from "../../actions";
 import {
   getGeneratedSourceByURL,
   getHasSiblingOfSameName,
@@ -21,8 +18,9 @@ import {
   getExtensionNameBySourceUrl,
   getSourceContent,
 } from "../../selectors";
-import actions from "../../actions";
-
+import { isFulfilled } from "../../utils/async-value";
+import { copyToTheClipboard } from "../../utils/clipboard";
+import { connect } from "../../utils/connect";
 import {
   getSourceQueryString,
   isUrlExtension,
@@ -30,9 +28,9 @@ import {
   shouldBlackbox,
 } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
-import { copyToTheClipboard } from "../../utils/clipboard";
 import { downloadFile } from "../../utils/utils";
-import { isFulfilled } from "../../utils/async-value";
+import AccessibleImage from "../shared/AccessibleImage";
+import SourceIcon from "../shared/SourceIcon";
 
 class SourceTreeItem extends Component {
   componentDidMount() {
@@ -66,21 +64,21 @@ class SourceTreeItem extends Component {
 
       if (!Array.isArray(contents)) {
         const copySourceUri2 = {
+          accesskey: copySourceUri2Key,
+          click: () => copyToTheClipboard(contents.url),
+          disabled: false,
           id: "node-menu-copy-source",
           label: copySourceUri2Label,
-          accesskey: copySourceUri2Key,
-          disabled: false,
-          click: () => copyToTheClipboard(contents.url),
         };
 
         const { cx, source } = this.props;
         if (source) {
           const blackBoxMenuItem = {
+            accesskey: source.isBlackBoxed ? "U" : "B",
+            click: () => this.props.toggleBlackBox(cx, source),
+            disabled: !shouldBlackbox(source),
             id: "node-menu-blackbox",
             label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
-            accesskey: source.isBlackBoxed ? "U" : "B",
-            disabled: !shouldBlackbox(source),
-            click: () => this.props.toggleBlackBox(cx, source),
           };
           menuOptions.push(copySourceUri2, blackBoxMenuItem);
         }
@@ -113,17 +111,17 @@ class SourceTreeItem extends Component {
     const { setExpanded } = this.props;
 
     menuOptions.push({
+      click: () => setExpanded(item, false, true),
+      disabled: false,
       id: "node-menu-collapse-all",
       label: "Collapse all",
-      disabled: false,
-      click: () => setExpanded(item, false, true),
     });
 
     menuOptions.push({
+      click: () => setExpanded(item, true, true),
+      disabled: false,
       id: "node-menu-expand-all",
       label: "Expand all",
-      disabled: false,
-      click: () => setExpanded(item, true, true),
     });
   };
 
@@ -252,16 +250,16 @@ const mapStateToProps = (state, props) => {
   const { source, item } = props;
   return {
     cx: getContext(state),
-    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-    hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
-    sourceContent: source ? getSourceContentValue(state, source) : null,
     extensionName:
       (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,
+    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
+    hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
+    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+    sourceContent: source ? getSourceContentValue(state, source) : null,
   };
 };
 
 export default connect(mapStateToProps, {
-  toggleBlackBox: actions.toggleBlackBox,
   loadSourceText: actions.loadSourceText,
+  toggleBlackBox: actions.toggleBlackBox,
 })(SourceTreeItem);

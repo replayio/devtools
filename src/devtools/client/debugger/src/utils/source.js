@@ -12,16 +12,19 @@
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
 import { endTruncateStr } from "./utils";
+
 import { truncateMiddleText } from "../utils/text";
 import { parse as parseURL } from "../utils/url";
 import { memoizeLast } from "../utils/memoizeLast";
+
 export { isMinified } from "./isMinified";
-import { getURL, getFileExtension } from "./sources-tree";
+
 import sortBy from "lodash/sortBy";
-import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
+import { assert } from "protocol/utils";
 
 import { isFulfilled } from "./async-value";
+import { getURL, getFileExtension } from "./sources-tree";
 
 export const sourceTypes = {
   coffee: "coffeescript",
@@ -211,18 +214,18 @@ export function getFileURL(source, truncate = true) {
 }
 
 const contentTypeModeMap = {
-  "text/javascript": { name: "javascript" },
-  "text/typescript": { name: "javascript", typescript: true },
   "text/coffeescript": { name: "coffeescript" },
-  "text/typescript-jsx": {
-    name: "jsx",
-    base: { name: "javascript", typescript: true },
-  },
+  "text/html": { name: "htmlmixed" },
+  "text/javascript": { name: "javascript" },
   "text/jsx": { name: "jsx" },
-  "text/x-elm": { name: "elm" },
+  "text/typescript": { name: "javascript", typescript: true },
+  "text/typescript-jsx": {
+    base: { name: "javascript", typescript: true },
+    name: "jsx",
+  },
   "text/x-clojure": { name: "clojure" },
   "text/x-clojurescript": { name: "clojure" },
-  "text/html": { name: "htmlmixed" },
+  "text/x-elm": { name: "elm" },
 };
 
 export function getSourcePath(url) {

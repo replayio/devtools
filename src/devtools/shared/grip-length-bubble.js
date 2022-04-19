@@ -2,20 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-const PropTypes = require("prop-types");
-
-const { wrapRender } = require("devtools/packages/devtools-reps/reps/rep-utils");
-const { MODE } = require("devtools/packages/devtools-reps/reps/constants");
 const { ModePropType } = require("devtools/packages/devtools-reps/reps/array");
-
+const { MODE } = require("devtools/packages/devtools-reps/reps/constants");
+const { wrapRender } = require("devtools/packages/devtools-reps/reps/rep-utils");
+const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { span } = dom;
 
 GripLengthBubble.propTypes = {
-  object: PropTypes.object.isRequired,
-  maxLengthMap: PropTypes.instanceOf(Map).isRequired,
   getLength: PropTypes.func.isRequired,
+  maxLengthMap: PropTypes.instanceOf(Map).isRequired,
   mode: ModePropType,
+  object: PropTypes.object.isRequired,
   visibilityThreshold: PropTypes.number,
 };
 

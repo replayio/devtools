@@ -1,4 +1,5 @@
 import { assert } from "protocol/utils";
+
 import { IItem, Item, LabelAndValue } from ".";
 
 export class LoadingItem implements IItem {

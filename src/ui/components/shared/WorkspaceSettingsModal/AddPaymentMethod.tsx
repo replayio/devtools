@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
+
 import { Button } from "../Button";
+
+import { CountrySelect } from "./CountrySelect";
 import { FieldRow } from "./FieldRow";
 import { InputField } from "./InputField";
-import { CountrySelect } from "./CountrySelect";
 
 export const getValue = (form: HTMLFormElement, field: string) => {
   const input = form.elements.namedItem(field);
@@ -68,7 +70,6 @@ export function EnterPaymentMethod({
     const cardElement = elements.getElement(CardElement);
     const form = ev.currentTarget;
     const billing_details = {
-      name: getValue(form, "fullName"),
       address: {
         city: getValue(form, "city"),
         country: getValue(form, "country"),
@@ -77,6 +78,7 @@ export function EnterPaymentMethod({
         postal_code: getValue(form, "postalCode"),
         state: getValue(form, "state"),
       },
+      name: getValue(form, "fullName"),
     };
 
     if (!cardElement) {
@@ -108,8 +110,8 @@ export function EnterPaymentMethod({
         resp.data.prepareWorkspacePaymentMethod.paymentSecret,
         {
           payment_method: {
-            card: cardElement,
             billing_details,
+            card: cardElement,
           },
         }
       );
@@ -145,18 +147,18 @@ export function EnterPaymentMethod({
             hidePostalCode: true,
             style: {
               base: {
-                iconColor: bodyColor,
-                color: bodyColor,
                 ":-webkit-autofill": {
                   color: bodyColor,
                 },
                 "::placeholder": {
                   color: bodyColor,
                 },
+                color: bodyColor,
+                iconColor: bodyColor,
               },
               invalid: {
-                iconColor: "red",
                 color: "red",
+                iconColor: "red",
               },
             },
           }}

@@ -1,10 +1,12 @@
-import React, { PureComponent } from "react";
 import classnames from "classnames";
-const { connect } = require("devtools/client/debugger/src/utils/connect");
-const { getContext } = require("devtools/client/debugger/src/selectors");
-import PanelForm, { SubmitButton } from "./PanelForm";
 import actions from "devtools/client/debugger/src/actions";
+import React, { PureComponent } from "react";
 import { UIState } from "ui/state";
+
+import PanelForm, { SubmitButton } from "./PanelForm";
+
+const { getContext } = require("devtools/client/debugger/src/selectors");
+const { connect } = require("devtools/client/debugger/src/utils/connect");
 
 interface Props {
   showCondition: boolean;
@@ -28,10 +30,10 @@ class PanelEditor extends PureComponent<Props, State> {
     const { breakpoint } = props;
 
     this.state = {
-      logValue: breakpoint.options.logValue,
       condition: breakpoint.options.condition || "",
-      logSyntaxError: null,
       conditionSyntaxError: null,
+      logSyntaxError: null,
+      logValue: breakpoint.options.logValue,
     };
   }
 
@@ -88,13 +90,13 @@ class PanelEditor extends PureComponent<Props, State> {
       >
         <PanelForm
           {...{
+            condition,
+            conditionSyntaxError,
+            inputToFocus,
             logSyntaxError,
             logValue,
-            conditionSyntaxError,
-            condition,
             showCondition,
             toggleEditingOff,
-            inputToFocus,
           }}
           handleSetBreakpoint={this.handleSetBreakpoint}
           setLogValue={this.setLogValue}

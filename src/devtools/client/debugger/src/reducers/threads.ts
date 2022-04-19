@@ -16,15 +16,15 @@ export interface ThreadsState {
 
 export function initialThreadsState(): ThreadsState {
   return {
-    threads: [],
+    isWebExtension: false,
     mainThread: {
       actor: "",
-      url: "",
-      type: "mainThread",
       name: "",
+      type: "mainThread",
+      url: "",
     },
+    threads: [],
     traits: {},
-    isWebExtension: false,
   };
 }
 
@@ -33,9 +33,9 @@ export default function update(state = initialThreadsState(), action: AnyAction)
     case "CONNECT":
       return {
         ...state,
+        isWebExtension: action.isWebExtension,
         mainThread: action.mainThread,
         traits: action.traits,
-        isWebExtension: action.isWebExtension,
       };
     default:
       return state;

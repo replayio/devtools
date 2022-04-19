@@ -4,10 +4,10 @@
 // Run this from the devtools root directory.
 
 const Manifest = require("./manifest");
-const { elapsedTime } = require("./src/utils");
 const { getExample } = require("./src/getExample");
 const { runTest } = require("./src/runTest");
 const { bootstrap } = require("./src/state");
+const { elapsedTime } = require("./src/utils");
 
 const VERBOSE_SKIPPING = false;
 

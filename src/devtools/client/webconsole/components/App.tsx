@@ -1,13 +1,14 @@
+import FilterBar from "devtools/client/webconsole/components/FilterBar/FilterBar";
+import ConsoleOutput from "devtools/client/webconsole/components/Output/ConsoleOutput";
 import React, { KeyboardEvent } from "react";
 
 // We directly require Components that we know are going to be used right away
-import ConsoleOutput from "devtools/client/webconsole/components/Output/ConsoleOutput";
-import FilterBar from "devtools/client/webconsole/components/FilterBar/FilterBar";
-import { ConsoleNag } from "ui/components/shared/Nags/Nags";
-import { FilterDrawer } from "./FilterDrawer";
-import Warning from "ui/components/shared/Warning";
 import { MouseEventHandler } from "react";
 import { useSelector } from "react-redux";
+import { ConsoleNag } from "ui/components/shared/Nags/Nags";
+import Warning from "ui/components/shared/Warning";
+
+import { FilterDrawer } from "./FilterDrawer";
 import JSTerm from "./Input/JSTerm";
 import { ConsoleSearch, ActionsContext, StateContext, useConsoleSearch } from "./Search/";
 

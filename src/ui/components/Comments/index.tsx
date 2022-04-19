@@ -1,13 +1,13 @@
+import sortBy from "lodash/sortBy";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-
 import hooks from "ui/hooks";
-import CommentMarker from "./CommentMarker";
-import { selectors } from "../../reducers";
-import sortBy from "lodash/sortBy";
-
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
+
+import { selectors } from "../../reducers";
+
+import CommentMarker from "./CommentMarker";
 
 function Comments({ pendingComment, hoveredItem }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
@@ -51,9 +51,9 @@ function Comments({ pendingComment, hoveredItem }: PropsFromRedux) {
 }
 
 const connector = connect((state: UIState) => ({
-  playback: selectors.getPlayback(state),
-  pendingComment: selectors.getPendingComment(state),
   hoveredItem: selectors.getHoveredItem(state),
+  pendingComment: selectors.getPendingComment(state),
+  playback: selectors.getPlayback(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

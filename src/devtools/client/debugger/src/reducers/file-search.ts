@@ -39,20 +39,20 @@ export interface FileSearchState {
 }
 
 const emptySearchResults: SearchResults = Object.freeze({
-  matches: [],
-  matchIndex: -1,
-  index: -1,
   count: 0,
+  index: -1,
+  matchIndex: -1,
+  matches: [],
 });
 
 export const createFileSearchState = (): FileSearchState => ({
-  query: "",
-  searchResults: emptySearchResults,
   modifiers: {
     caseSensitive: prefs.fileSearchCaseSensitive as boolean,
-    wholeWord: prefs.fileSearchWholeWord as boolean,
     regexMatch: prefs.fileSearchRegexMatch as boolean,
+    wholeWord: prefs.fileSearchWholeWord as boolean,
   },
+  query: "",
+  searchResults: emptySearchResults,
 });
 
 function update(state = createFileSearchState(), action: AnyAction) {

@@ -1,8 +1,9 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { AvatarImage } from "../Avatar";
 import { useGetUserInfo } from "ui/hooks/users";
+
+import { AvatarImage } from "../Avatar";
 
 function SidebarFooter({ setModal }: PropsFromRedux) {
   const { name, picture } = useGetUserInfo();

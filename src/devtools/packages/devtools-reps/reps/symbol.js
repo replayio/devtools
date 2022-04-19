@@ -7,7 +7,6 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 const { getGripType, wrapRender } = require("./rep-utils");
-
 const { rep: StringRep } = require("./string");
 
 const MAX_STRING_LENGTH = 50;
@@ -26,9 +25,9 @@ function SymbolRep(props) {
   let symbolText = name || "";
   if (name && name.type && name.type === "longString") {
     symbolText = StringRep({
+      cropLimit: MAX_STRING_LENGTH,
       object: symbolText,
       shouldCrop: true,
-      cropLimit: MAX_STRING_LENGTH,
       useQuotes: false,
     });
   }

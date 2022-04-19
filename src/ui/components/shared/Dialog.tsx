@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { HTMLProps } from "react";
+
 import ReplayLogo from "./ReplayLogo";
 
 export type DialogPropTypes = HTMLProps<HTMLDivElement>;

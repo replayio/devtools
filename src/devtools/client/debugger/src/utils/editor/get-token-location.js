@@ -12,7 +12,7 @@ export function getTokenLocation(codeMirror, tokenEl) {
   });
 
   return {
-    line: line + 1,
     column: ch,
+    line: line + 1,
   };
 }

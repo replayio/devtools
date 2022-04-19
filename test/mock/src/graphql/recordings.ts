@@ -1,6 +1,7 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
 import { Recording, RecordingRole, WorkspaceSubscriptionStatus } from "ui/types";
+
 import { cloneResponse } from "./utils";
 
 const mockRecording = {
@@ -11,18 +12,18 @@ const mockRecording = {
   id: "mock-recording-id",
   isInitialized: true,
   operations: { scriptDomains: [] },
+  owner: {
+    id: "00000000-0000-0000-0000-000000000000",
+    internal: false,
+    name: "Mock User",
+    picture: "",
+  },
   ownerNeedsInvite: false,
   private: false,
   title: "Mock Title",
   url: "https://mock.org",
   userRole: RecordingRole.None,
   workspace: null,
-  owner: {
-    id: "00000000-0000-0000-0000-000000000000",
-    name: "Mock User",
-    picture: "",
-    internal: false,
-  },
 };
 
 export function createRecordingOwnerUserIdMock(opts: {
@@ -38,10 +39,10 @@ export function createRecordingOwnerUserIdMock(opts: {
       data: opts.user
         ? {
             recording: {
-              uuid: opts.recordingId,
               owner: {
                 id: opts.user.id,
               },
+              uuid: opts.recordingId,
             },
           }
         : null,

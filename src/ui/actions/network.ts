@@ -7,12 +7,13 @@ import {
   requestBodyData,
   ExecutionPoint,
 } from "@recordreplay/protocol";
-import { ThreadFront } from "protocol/thread";
-import { AppDispatch } from "ui/setup";
 import { createFrame } from "devtools/client/debugger/src/client/create";
-import { UIThunkAction } from ".";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+import { ThreadFront } from "protocol/thread";
 import { getLoadedRegions } from "ui/reducers/app";
+import { AppDispatch } from "ui/setup";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+
+import { UIThunkAction } from ".";
 
 type NewNetworkRequestsAction = {
   type: "NEW_NETWORK_REQUESTS";
@@ -57,15 +58,15 @@ export type NetworkAction =
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData
 ): NewResponseBodyPartsAction => ({
-  type: "NEW_RESPONSE_BODY_PARTS",
   payload: { responseBodyParts },
+  type: "NEW_RESPONSE_BODY_PARTS",
 });
 
 export const newRequestBodyParts = (
   requestBodyParts: requestBodyData
 ): NewRequestBodyPartsAction => ({
-  type: "NEW_REQUEST_BODY_PARTS",
   payload: { requestBodyParts },
+  type: "NEW_REQUEST_BODY_PARTS",
 });
 
 export const newNetworkRequests = ({
@@ -75,8 +76,8 @@ export const newNetworkRequests = ({
   requests: RequestInfo[];
   events: RequestEventInfo[];
 }): NewNetworkRequestsAction => ({
+  payload: { events, requests },
   type: "NEW_NETWORK_REQUESTS",
-  payload: { requests, events },
 });
 
 export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
@@ -114,16 +115,16 @@ export function fetchFrames(tsPoint: TimeStampedPoint): UIThunkAction {
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
     const formattedFrames = await Promise.all(frames?.map((frame, i) => createFrame(frame, i)));
     dispatch({
-      type: "SET_FRAMES",
       payload: { frames: formattedFrames, point: tsPoint.point },
+      type: "SET_FRAMES",
     });
   };
 }
 
 export function showRequestDetails(requestId: RequestId) {
   return {
-    type: "SHOW_REQUEST_DETAILS",
     requestId,
+    type: "SHOW_REQUEST_DETAILS",
   };
 }
 

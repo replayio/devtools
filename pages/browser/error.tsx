@@ -9,8 +9,8 @@ const BrowserError = () => {
   return (
     <ExpectedErrorScreen
       error={{
-        message: "Unexpected recording error",
         content: Array.isArray(message) ? message[0] : message,
+        message: "Unexpected recording error",
       }}
     />
   );

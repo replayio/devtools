@@ -1,9 +1,10 @@
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
-import { skipTelemetry } from "./environment";
 import { Recording } from "ui/types";
-import { prefs } from "./prefs";
+
+import { skipTelemetry } from "./environment";
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
+import { prefs } from "./prefs";
 import { pingTelemetry } from "./replay-telemetry";
 
 const timings: Record<string, number> = {};
@@ -25,10 +26,6 @@ export function setupTelemetry() {
   }
 
   Sentry.init({
-    dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
-    integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: 1.0,
-    release: process.env.REPLAY_RELEASE ? process.env.REPLAY_RELEASE : "development",
     beforeSend(event) {
       if (event) {
         const exceptionValue = event?.exception?.values?.[0].value;
@@ -39,6 +36,10 @@ export function setupTelemetry() {
 
       return event;
     },
+    dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
+    integrations: [new Integrations.BrowserTracing()],
+    release: process.env.REPLAY_RELEASE ? process.env.REPLAY_RELEASE : "development",
+    tracesSampleRate: 1.0,
   });
 }
 
@@ -58,10 +59,10 @@ export type TelemetryUser = {
 let telemetryUser: TelemetryUser | undefined;
 
 export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
-  telemetryUser = { id, email, internal };
+  telemetryUser = { email, id, internal };
   Sentry.setTag("userInternal", internal);
   if (id && email) {
-    Sentry.setUser({ id, email });
+    Sentry.setUser({ email, id });
     Sentry.setTag("userEmail", email);
     Sentry.setTag("anonymous", false);
   } else {

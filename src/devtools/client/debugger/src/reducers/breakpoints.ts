@@ -13,12 +13,12 @@ import { Location } from "@recordreplay/protocol";
 import type { AnyAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
-import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 import { getSelectedSource } from "../selectors";
 
 // eslint-disable-next-line max-len
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
+import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 
 import type { Breakpoint } from "./types";
 export type { Breakpoint } from "./types";
@@ -32,8 +32,8 @@ export interface BreakpointsState {
 export function initialBreakpointsState(): BreakpointsState {
   return {
     breakpoints: {},
-    requestedBreakpoints: {},
     breakpointsDisabled: false,
+    requestedBreakpoints: {},
   };
 }
 

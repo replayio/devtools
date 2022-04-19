@@ -36,6 +36,22 @@ define(function (require, exports, module) {
       return children;
     },
 
+    getKey: function (object) {
+      return object instanceof ObjectProperty ? object.name : null;
+    },
+
+    getLabel: function (object) {
+      return object instanceof ObjectProperty ? object.name : null;
+    },
+
+    getType: function (object) {
+      return object instanceof ObjectProperty ? typeof object.value : typeof object;
+    },
+
+    getValue: function (object) {
+      return object instanceof ObjectProperty ? object.value : null;
+    },
+
     hasChildren: function (object) {
       if (object instanceof ObjectProperty) {
         object = object.value;
@@ -54,22 +70,6 @@ define(function (require, exports, module) {
       }
 
       return Object.keys(object).length > 0;
-    },
-
-    getLabel: function (object) {
-      return object instanceof ObjectProperty ? object.name : null;
-    },
-
-    getValue: function (object) {
-      return object instanceof ObjectProperty ? object.value : null;
-    },
-
-    getKey: function (object) {
-      return object instanceof ObjectProperty ? object.name : null;
-    },
-
-    getType: function (object) {
-      return object instanceof ObjectProperty ? typeof object.value : typeof object;
     },
   };
 

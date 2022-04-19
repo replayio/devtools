@@ -1,9 +1,10 @@
 import React from "react";
-import hooks from "ui/hooks";
-import { CheckboxRow } from "./CheckboxRow";
-import { CombinedExperimentalUserSettings } from "ui/types";
-import { useFeature } from "ui/hooks/settings";
 import Icon from "ui/components/shared/Icon";
+import hooks from "ui/hooks";
+import { useFeature } from "ui/hooks/settings";
+import { CombinedExperimentalUserSettings } from "ui/types";
+
+import { CheckboxRow } from "./CheckboxRow";
 
 type ExperimentalKey = keyof CombinedExperimentalUserSettings;
 interface ExperimentalSetting {
@@ -14,47 +15,47 @@ interface ExperimentalSetting {
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "React DevTools",
     description: "Inspect the React component tree",
     key: "showReact",
+    label: "React DevTools",
   },
   {
-    label: "Event Link",
     description: "Jump from an event to a line of code",
     key: "enableEventLink",
+    label: "Event Link",
   },
   {
-    label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
+    label: "Column Breakpoints",
   },
   {
-    label: "Network Request Comments",
     description: "Leave comments on a network request",
     key: "enableNetworkRequestComments",
+    label: "Network Request Comments",
   },
   {
-    label: "Breakpoint Panel Autocomplete",
     description: "Show autocomplete in the breakpoint panel",
     key: "enableBreakpointPanelAutocomplete",
+    label: "Breakpoint Panel Autocomplete",
   },
   {
-    label: "Code Heatmaps ",
     description: "Calculate hit counts for editor files all at once",
     key: "codeHeatMaps",
+    label: "Code Heatmaps ",
   },
   {
-    label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
+    label: "Resolve recording",
   },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "Ten Minute Replays",
     description: "Supports replaying longer recordings",
     key: "tenMinuteReplays",
+    label: "Ten Minute Replays",
   },
 ];
 
@@ -128,8 +129,8 @@ export default function ExperimentalSettings({}) {
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
-    tenMinuteReplays: enableTenMinuteReplays,
     enableResolveRecording,
+    tenMinuteReplays: enableTenMinuteReplays,
   };
 
   const settings = { ...userSettings, ...localSettings };

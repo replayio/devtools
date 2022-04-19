@@ -1,24 +1,23 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { connect, ConnectedProps, useSelector } from "react-redux";
 import { ExecutionPoint, ObjectId } from "@recordreplay/protocol";
+import Highlighter from "highlighter/highlighter";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
-import { UIState } from "ui/state";
-import { Annotation } from "ui/state/reactDevTools";
+import React from "react";
+import { useEffect, useState } from "react";
+import type { Store, Wall } from "react-devtools-inline/frontend";
+import { connect, ConnectedProps, useSelector } from "react-redux";
+import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/actions/app";
+import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import { getCurrentPoint, getTheme } from "ui/reducers/app";
 import {
   getAnnotations,
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
-import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/actions/app";
-import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
-import Highlighter from "highlighter/highlighter";
+import { UIState } from "ui/state";
+import { Annotation } from "ui/state/reactDevTools";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
-
-import type { Store, Wall } from "react-devtools-inline/frontend";
 
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 
@@ -69,8 +68,8 @@ class ReplayWall implements Wall {
             this._listener?.({
               event: "inspectedElement",
               payload: {
-                responseID: payload.requestID,
                 id: payload.id,
+                responseID: payload.requestID,
                 type: "no-change",
               },
             });
@@ -139,6 +138,7 @@ class ReplayWall implements Wall {
           const nodeToElementId = await this.mapNodesToElements();
 
           this.enablePicker({
+            enabledNodeIds: [...nodeToElementId.keys()],
             onHovering: nodeId => {
               const elementId = nodeId && nodeToElementId.get(nodeId);
               elementId && this._listener?.({ event: "selectFiber", payload: elementId });
@@ -146,7 +146,6 @@ class ReplayWall implements Wall {
             onPicked: _ => {
               this._listener?.({ event: "stopInspectingNative", payload: true });
             },
-            enabledNodeIds: [...nodeToElementId.keys()],
           });
 
           break;
@@ -374,7 +373,7 @@ const connector = connect(
     protocolCheckFailed: getProtocolCheckFailed(state),
     reactInitPoint: getReactInitPoint(state),
   }),
-  { setIsNodePickerActive, setIsNodePickerInitializing, setHasReactComponents }
+  { setHasReactComponents, setIsNodePickerActive, setIsNodePickerInitializing }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ReactDevtoolsPanel);

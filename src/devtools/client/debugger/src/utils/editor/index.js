@@ -101,7 +101,7 @@ export function fromEditorColumn(lineText, column) {
 }
 
 export function scrollToColumn(codeMirror, line, column) {
-  const { top, left } = codeMirror.charCoords({ line, ch: column }, "local");
+  const { top, left } = codeMirror.charCoords({ ch: column, line }, "local");
 
   if (!isVisible(codeMirror, top, left)) {
     const scroller = codeMirror.getScrollerElement();
@@ -142,8 +142,8 @@ export function getLocationsInViewport(
   // Get scroll position
   if (!codeMirror) {
     return {
-      start: { line: 0, column: 0 },
-      end: { line: 0, column: 0 },
+      end: { column: 0, line: 0 },
+      start: { column: 0, line: 0 },
     };
   }
   const charWidth = codeMirror.defaultCharWidth();
@@ -164,13 +164,13 @@ export function getLocationsInViewport(
   // without removing and re-adding them as they leave the
   // viewport while a user is scrolling through the file
   return {
-    start: {
-      line: 0,
-      column: leftColumn || 0,
-    },
     end: {
-      line: Number.POSITIVE_INFINITY,
       column: rightCharacter,
+      line: Number.POSITIVE_INFINITY,
+    },
+    start: {
+      column: leftColumn || 0,
+      line: 0,
     },
   };
 }
@@ -198,9 +198,9 @@ export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
   const lineText = codeMirror.doc.getLine(line);
 
   return {
-    sourceId,
-    line: fromEditorLine(line),
     column: fromEditorColumn(lineText, ch),
+    line: fromEditorLine(line),
+    sourceId,
   };
 }
 
@@ -234,8 +234,8 @@ export function getCursorColumn(codeMirror) {
 
 export function getTokenEnd(codeMirror, line, column) {
   const token = codeMirror.getTokenAt({
-    line,
     ch: column,
+    line,
   });
   const tokenString = token.string;
 

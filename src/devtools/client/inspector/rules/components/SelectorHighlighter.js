@@ -4,13 +4,12 @@
 
 "use strict";
 
+const Types = require("devtools/client/inspector/rules/types");
+const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
+const PropTypes = require("prop-types");
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
-
-const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
-const Types = require("devtools/client/inspector/rules/types");
 
 class SelectorHighlighter extends PureComponent {
   static get propTypes() {

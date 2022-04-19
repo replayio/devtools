@@ -1,9 +1,10 @@
-import React, { FC } from "react";
+import classNames from "classnames";
 import { Declarations } from "devtools/client/inspector/rules/components/Declarations";
-import { RuleState } from "../state/rules";
 import Selector from "devtools/client/inspector/rules/components/Selector";
 import { SourceLink } from "devtools/client/inspector/rules/components/SourceLink";
-import classNames from "classnames";
+import React, { FC } from "react";
+
+import { RuleState } from "../state/rules";
 
 type RuleProps = {
   showSelectorEditor: Function;
@@ -19,8 +20,8 @@ export const Rule: FC<RuleProps> = ({
   return (
     <div
       className={classNames("ruleview-rule devtools-monospace", {
-        unmatched: isUnmatched,
         uneditable: isUserAgentStyle,
+        unmatched: isUnmatched,
       })}
       data-rule-id={id}
     >
@@ -32,7 +33,7 @@ export const Rule: FC<RuleProps> = ({
       />
       <div className="ruleview-code">
         <div>
-          <Selector {...{ id, isUserAgentStyle, selector, showSelectorEditor, type, query }} />
+          <Selector {...{ id, isUserAgentStyle, query, selector, showSelectorEditor, type }} />
           <span className="ruleview-ruleopen">{" {"}</span>
         </div>
         <Declarations declarations={declarations} query={query} />

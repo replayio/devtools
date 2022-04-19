@@ -17,52 +17,52 @@ const MBps = M * Bps;
 /* eslint-disable key-spacing */
 module.exports = [
   {
-    id: "GPRS",
     download: 50 * KBps,
-    upload: 20 * KBps,
+    id: "GPRS",
     latency: 500,
+    upload: 20 * KBps,
   },
   {
-    id: "Regular 2G",
     download: 250 * KBps,
-    upload: 50 * KBps,
+    id: "Regular 2G",
     latency: 300,
+    upload: 50 * KBps,
   },
   {
-    id: "Good 2G",
     download: 450 * KBps,
-    upload: 150 * KBps,
+    id: "Good 2G",
     latency: 150,
+    upload: 150 * KBps,
   },
   {
-    id: "Regular 3G",
     download: 750 * KBps,
-    upload: 250 * KBps,
+    id: "Regular 3G",
     latency: 100,
+    upload: 250 * KBps,
   },
   {
-    id: "Good 3G",
     download: 1.5 * MBps,
-    upload: 750 * KBps,
+    id: "Good 3G",
     latency: 40,
+    upload: 750 * KBps,
   },
   {
-    id: "Regular 4G / LTE",
     download: 4 * MBps,
-    upload: 3 * MBps,
+    id: "Regular 4G / LTE",
     latency: 20,
+    upload: 3 * MBps,
   },
   {
-    id: "DSL",
     download: 2 * MBps,
-    upload: 1 * MBps,
+    id: "DSL",
     latency: 5,
+    upload: 1 * MBps,
   },
   {
-    id: "Wi-Fi",
     download: 30 * MBps,
-    upload: 15 * MBps,
+    id: "Wi-Fi",
     latency: 2,
+    upload: 15 * MBps,
   },
 ];
 /* eslint-enable key-spacing */

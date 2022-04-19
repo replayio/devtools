@@ -4,8 +4,8 @@
 
 //
 
-import * as t from "@babel/types";
 import generate from "@babel/generator";
+import * as t from "@babel/types";
 
 export function isFunction(node) {
   return (
@@ -39,8 +39,8 @@ export function getComments(ast) {
     return [];
   }
   return ast.comments.map(comment => ({
-    name: comment.location,
     location: comment.loc,
+    name: comment.location,
   }));
 }
 
@@ -94,18 +94,18 @@ export function getVariables(dec) {
     return dec.id.elements
       .filter(element => element)
       .map(element => ({
+        location: element.loc,
         name: t.isAssignmentPattern(element)
           ? element.left.name
           : element.name || (element.argument && element.argument.name),
-        location: element.loc,
       }))
       .filter(({ name }) => name);
   }
 
   return [
     {
-      name: dec.id.name,
       location: dec.loc,
+      name: dec.id.name,
     },
   ];
 }
@@ -131,9 +131,9 @@ function getIdentifiers(items) {
     } else if (t.isIdentifier(item)) {
       const { start, end } = item.loc;
       ids.push({
-        name: item.name,
         expression: item.name,
-        location: { start, end },
+        location: { end, start },
+        name: item.name,
       });
     }
   });

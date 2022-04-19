@@ -97,8 +97,8 @@ function updateCursor(cm, state, keepSelection) {
   state.posFrom = cm.getCursor("head");
 
   if (!keepSelection) {
-    state.posTo = { line: 0, ch: 0 };
-    state.posFrom = { line: 0, ch: 0 };
+    state.posTo = { ch: 0, line: 0 };
+    state.posFrom = { ch: 0, line: 0 };
   }
 }
 
@@ -131,7 +131,7 @@ function doSearch(ctx, rev, query, keepSelection, modifiers, focusFirstResult = 
   if (!cm) {
     return;
   }
-  const defaultIndex = { line: -1, ch: -1 };
+  const defaultIndex = { ch: -1, line: -1 };
 
   return cm.operation(function () {
     if (!query || isWhitespace(query)) {
@@ -202,7 +202,7 @@ function searchNext(ctx, rev, query, newQuery, modifiers) {
 
     let cursor = getSearchCursor(cm, state.query, pos, modifiers);
 
-    const location = rev ? { line: cm.lastLine(), ch: null } : { line: cm.firstLine(), ch: 0 };
+    const location = rev ? { ch: null, line: cm.lastLine() } : { ch: 0, line: cm.firstLine() };
 
     if (!cursor.find(rev) && state.query) {
       cursor = getSearchCursor(cm, state.query, location, modifiers);
@@ -220,7 +220,7 @@ function searchNext(ctx, rev, query, newQuery, modifiers) {
 function findNextOnLine(ctx, rev, query, newQuery, modifiers, line, ch) {
   const { cm, ed } = ctx;
   cm.operation(function () {
-    const pos = { line: line - 1, ch };
+    const pos = { ch, line: line - 1 };
     let cursor = getSearchCursor(cm, query, pos, modifiers);
 
     if (!cursor.find(rev) && query) {
@@ -249,7 +249,7 @@ export function removeOverlay(ctx, query) {
   const state = getSearchState(ctx.cm, query);
   ctx.cm.removeOverlay(state.overlay);
   const { line, ch } = ctx.cm.getCursor();
-  ctx.cm.doc.setSelection({ line, ch }, { line, ch }, { scroll: false });
+  ctx.cm.doc.setSelection({ ch, line }, { ch, line }, { scroll: false });
 }
 
 /**

@@ -29,6 +29,73 @@ function TooltipToggle(tooltip) {
 module.exports.TooltipToggle = TooltipToggle;
 
 TooltipToggle.prototype = {
+  _onMouseMove: function (event) {
+    if (event.target !== this._lastHovered) {
+      this._lastHovered = event.target;
+
+      this.win.clearTimeout(this.toggleTimer);
+      this.toggleTimer = this.win.setTimeout(() => {
+        this.tooltip.hide();
+        this.isValidHoverTarget(event.target).then(
+          target => {
+            if (target === null || !this._baseNode) {
+              // bail out if no target or if the toggle has been destroyed.
+              return;
+            }
+            this.tooltip.show(target);
+          },
+          reason => {
+            console.error("isValidHoverTarget rejected with unexpected reason:");
+            console.error(reason);
+          }
+        );
+      }, this._toggleDelay);
+    }
+  },
+
+  _onMouseOut: function (event) {
+    // Only hide the tooltip if the mouse leaves baseNode.
+    if (event && this._baseNode && this._baseNode.contains(event.relatedTarget)) {
+      return;
+    }
+
+    this._lastHovered = null;
+    this.win.clearTimeout(this.toggleTimer);
+    this.toggleTimer = this.win.setTimeout(() => {
+      this.tooltip.hide();
+    }, this._toggleDelay);
+  },
+
+  _onTooltipMouseOut() {
+    this.win.clearTimeout(this.toggleTimer);
+    this.toggleTimer = this.win.setTimeout(() => {
+      this.tooltip.hide();
+    }, this._toggleDelay);
+  },
+
+  _onTooltipMouseOver() {
+    this.win.clearTimeout(this.toggleTimer);
+  },
+
+  destroy: function () {
+    this.stop();
+  },
+
+  /**
+   * Is the given target DOMNode a valid node for toggling the tooltip on hover.
+   * This delegates to the user-defined _targetNodeCb callback.
+   * @return {Promise} a promise that will resolve the anchor to use for the
+   *         tooltip or null if no valid target was found.
+   */
+  async isValidHoverTarget(target) {
+    const res = await this._targetNodeCb(target, this.tooltip);
+    if (res) {
+      return res.nodeName ? res : target;
+    }
+
+    return null;
+  },
+
   /**
    * Start tracking mouse movements on the provided baseNode to show the
    * tooltip.
@@ -114,72 +181,5 @@ TooltipToggle.prototype = {
     this._baseNode = null;
     this._targetNodeCb = null;
     this._lastHovered = null;
-  },
-
-  _onMouseMove: function (event) {
-    if (event.target !== this._lastHovered) {
-      this._lastHovered = event.target;
-
-      this.win.clearTimeout(this.toggleTimer);
-      this.toggleTimer = this.win.setTimeout(() => {
-        this.tooltip.hide();
-        this.isValidHoverTarget(event.target).then(
-          target => {
-            if (target === null || !this._baseNode) {
-              // bail out if no target or if the toggle has been destroyed.
-              return;
-            }
-            this.tooltip.show(target);
-          },
-          reason => {
-            console.error("isValidHoverTarget rejected with unexpected reason:");
-            console.error(reason);
-          }
-        );
-      }, this._toggleDelay);
-    }
-  },
-
-  /**
-   * Is the given target DOMNode a valid node for toggling the tooltip on hover.
-   * This delegates to the user-defined _targetNodeCb callback.
-   * @return {Promise} a promise that will resolve the anchor to use for the
-   *         tooltip or null if no valid target was found.
-   */
-  async isValidHoverTarget(target) {
-    const res = await this._targetNodeCb(target, this.tooltip);
-    if (res) {
-      return res.nodeName ? res : target;
-    }
-
-    return null;
-  },
-
-  _onMouseOut: function (event) {
-    // Only hide the tooltip if the mouse leaves baseNode.
-    if (event && this._baseNode && this._baseNode.contains(event.relatedTarget)) {
-      return;
-    }
-
-    this._lastHovered = null;
-    this.win.clearTimeout(this.toggleTimer);
-    this.toggleTimer = this.win.setTimeout(() => {
-      this.tooltip.hide();
-    }, this._toggleDelay);
-  },
-
-  _onTooltipMouseOver() {
-    this.win.clearTimeout(this.toggleTimer);
-  },
-
-  _onTooltipMouseOut() {
-    this.win.clearTimeout(this.toggleTimer);
-    this.toggleTimer = this.win.setTimeout(() => {
-      this.tooltip.hide();
-    }, this._toggleDelay);
-  },
-
-  destroy: function () {
-    this.stop();
   },
 };

@@ -7,8 +7,8 @@
  */
 export const CSS_ANGLEUNIT = {
   deg: "deg",
-  rad: "rad",
   grad: "grad",
+  rad: "rad",
   turn: "turn",
 };
 

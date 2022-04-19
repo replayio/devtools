@@ -4,14 +4,15 @@
 
 //
 import React, { PureComponent } from "react";
-import { connect } from "../../../utils/connect";
-import actions from "../../../actions";
-import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
-import { getHasSiblingOfSameName, getContext } from "../../../selectors";
-import { features } from "../../../utils/prefs";
-import { getExecutionPoint } from "../../../reducers/pause";
-import { CloseButton } from "../../shared/Button";
 import { Redacted } from "ui/components/Redacted";
+
+import actions from "../../../actions";
+import { getExecutionPoint } from "../../../reducers/pause";
+import { getHasSiblingOfSameName, getContext } from "../../../selectors";
+import { connect } from "../../../utils/connect";
+import { features } from "../../../utils/prefs";
+import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
+import { CloseButton } from "../../shared/Button";
 
 class BreakpointHeading extends PureComponent {
   onContextMenu = e => {
@@ -71,8 +72,8 @@ class BreakpointHeading extends PureComponent {
 
 const mapStateToProps = (state, { source, breakpoint }) => ({
   cx: getContext(state),
-  hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
   executionPoint: getExecutionPoint(state),
+  hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
 });
 
 export default connect(mapStateToProps, {

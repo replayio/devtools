@@ -1,15 +1,15 @@
-const Services = require("devtools/shared/services");
-import React, { FC, useCallback, useMemo, useState } from "react";
-
-import Accordion from "devtools/client/shared/components/Accordion";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
-
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
+import Accordion from "devtools/client/shared/components/Accordion";
+import React, { FC, useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { RulesState, RuleState } from "../state/rules";
+
 import { RuleInheritance } from "../models/rule";
+import { RulesState, RuleState } from "../state/rules";
+
+const Services = require("devtools/shared/services");
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
@@ -118,8 +118,8 @@ export const RulesApp: FC<RulesAppProps> = ({
     (rules: RuleState[]) => {
       type FCProps<C> = C extends FC<infer P> ? P : never;
       const componentProps: FCProps<typeof Rules> = {
-        rules,
         query: rulesQuery,
+        rules,
         ...ruleProps,
       };
 
@@ -129,10 +129,10 @@ export const RulesApp: FC<RulesAppProps> = ({
           componentProps,
           header: getStr("rule.pseudoElement"),
           id: "rules-section-pseudoelement",
-          opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
           onToggle: (opened: boolean) => {
             Services.prefs.setBoolPref(SHOW_PSEUDO_ELEMENTS_PREF, opened);
           },
+          opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
         },
       ];
 

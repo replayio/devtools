@@ -9,6 +9,11 @@
  * @module actions/breakpoints
  */
 
+import { getFilename } from "devtools/client/debugger/src/utils/source";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { trackEvent } from "ui/utils/telemetry";
+
 import {
   getBreakpointsList,
   getSelectedSource,
@@ -19,6 +24,8 @@ import {
   getThreadContext,
 } from "../../selectors";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
+
+import { setBreakpointPositions } from "./breakpointPositions";
 import {
   addBreakpoint,
   _removeBreakpoint,
@@ -26,11 +33,6 @@ import {
   disableBreakpoint,
   runAnalysis,
 } from "./modify";
-import { setBreakpointPositions } from "./breakpointPositions";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
-import { getFilename } from "devtools/client/debugger/src/utils/source";
-import { trackEvent } from "ui/utils/telemetry";
 
 // this will need to be changed so that addCLientBreakpoint is removed
 
@@ -110,15 +112,15 @@ export function toggleBreakpointAtLine(cx, line) {
       return;
     }
 
-    const bp = getBreakpointAtLocation(state, { line, column: undefined });
+    const bp = getBreakpointAtLocation(state, { column: undefined, line });
     if (bp) {
       return dispatch(_removeBreakpoint(cx, bp));
     }
     return dispatch(
       addBreakpoint(cx, {
+        line,
         sourceId: selectedSource.id,
         sourceUrl: selectedSource.url,
-        line,
       })
     );
   };
@@ -136,10 +138,10 @@ export function runAnalysisOnLine(line) {
 
     const options = { logValue: "dummyValue" };
     const location = {
-      sourceId: source.id,
-      sourceUrl: source.url,
       column: undefined,
       line,
+      sourceId: source.id,
+      sourceUrl: source.url,
     };
 
     return dispatch(runAnalysis(cx, location, options));
@@ -152,16 +154,16 @@ export function updateHoveredLineNumber(line) {
     const source = getSelectedSource(state);
 
     const initialLocation = {
-      sourceId: source.id,
-      sourceUrl: source.url,
       column: undefined,
       line,
+      sourceId: source.id,
+      sourceUrl: source.url,
     };
 
     // Set the initial location here as a placeholder to be checked after any async activity.
     dispatch(actions.setHoveredLineNumberLocation(initialLocation));
 
-    await dispatch(setBreakpointPositions({ sourceId: source.id, line }));
+    await dispatch(setBreakpointPositions({ line, sourceId: source.id }));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     // It's possible that after the `await` above the user is either 1) hovered off of the
@@ -187,10 +189,10 @@ export function _addBreakpointAtLine(cx, line, shouldLog = false, disabled = fal
     trackEvent("breakpoint.add");
 
     const breakpointLocation = {
-      sourceId: source.id,
-      sourceUrl: source.url,
       column: undefined,
       line,
+      sourceId: source.id,
+      sourceUrl: source.url,
     };
 
     const options = { shouldPause };
@@ -213,10 +215,10 @@ export function addBreakpointAtColumn(cx, location) {
       return;
     }
     const breakpointLocation = {
-      sourceId: source.id,
-      sourceUrl: source.url,
       column: column,
       line: line,
+      sourceId: source.id,
+      sourceUrl: source.url,
     };
 
     const options = {

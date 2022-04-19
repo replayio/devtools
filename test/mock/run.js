@@ -1,6 +1,8 @@
 const { spawnSync } = require("child_process");
-const manifest = require("./manifest");
+
 const { listAllRecordings, uploadRecording } = require("@replayio/replay");
+
+const manifest = require("./manifest");
 
 const devtools = `${__dirname}/../..`;
 let scriptsToRun = [];
@@ -36,11 +38,11 @@ async function main() {
       `${devtools}/node_modules/.bin/ts-node`,
       ["-r", "tsconfig-paths/register", `test/mock/scripts/${script}`],
       {
-        stdio: "inherit",
         cwd: devtools,
         env: {
           ...process.env,
         },
+        stdio: "inherit",
       }
     );
     if (rv.status || rv.signal || rv.error) {

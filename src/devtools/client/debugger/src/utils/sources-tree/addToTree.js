@@ -4,6 +4,8 @@
 
 //
 
+import { getURL } from "./getURL";
+import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
 import {
   nodeHasChildren,
   isPathDirectory,
@@ -12,8 +14,6 @@ import {
   createSourceNode,
   createDirectoryNode,
 } from "./utils";
-import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
-import { getURL } from "./getURL";
 
 function createNodeInTree(part, path, tree, index) {
   const node = createDirectoryNode(part, path, []);

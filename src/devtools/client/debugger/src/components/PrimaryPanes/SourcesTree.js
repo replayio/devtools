@@ -6,10 +6,10 @@
 
 // Dependencies
 import React, { Component } from "react";
+import { trackEvent } from "ui/utils/telemetry";
 
-import { connect } from "../../utils/connect";
-
-// Selectors
+import actions from "../../actions";
+import { getGeneratedSourceByURL } from "../../reducers/sources";
 import {
   getShownSource,
   getSelectedSource,
@@ -20,17 +20,14 @@ import {
   getFocusedSourceItem,
   getContext,
 } from "../../selectors";
+import { connect } from "../../utils/connect";
 
-import { getGeneratedSourceByURL } from "../../reducers/sources";
+// Selectors
 
 // Actions
-import actions from "../../actions";
 
 // Components
-import SourcesTreeItem from "./SourcesTreeItem";
-import ManagedTree from "../shared/ManagedTree";
-
-// Utils
+import { getRawSourceURL } from "../../utils/source";
 import {
   createTree,
   getDirectories,
@@ -41,8 +38,11 @@ import {
   updateTree,
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
-import { getRawSourceURL } from "../../utils/source";
-import { trackEvent } from "ui/utils/telemetry";
+import ManagedTree from "../shared/ManagedTree";
+
+import SourcesTreeItem from "./SourcesTreeItem";
+
+// Utils
 
 function shouldAutoExpand(depth, item, debuggeeUrl) {
   if (depth !== 1) {
@@ -92,8 +92,8 @@ class SourcesTree extends Component {
       // to project root, debuggee url or lack of sources
       return this.setState(
         createTree({
-          sources: nextProps.sources,
           debuggeeUrl: nextProps.debuggeeUrl,
+          sources: nextProps.sources,
         })
       );
     }
@@ -113,11 +113,11 @@ class SourcesTree extends Component {
     if (nextProps.sources != this.props.sources) {
       this.setState(
         updateTree({
+          debuggeeUrl,
           newSources: nextProps.sources,
           prevSources: sources,
-          debuggeeUrl,
-          uncollapsedTree,
           sourceTree,
+          uncollapsedTree,
         })
       );
     }
@@ -223,12 +223,12 @@ class SourcesTree extends Component {
       itemHeight: 21,
       key: this.isEmpty() ? "empty" : "full",
       listItems,
+      onActivate: this.onActivate,
       onCollapse: this.onCollapse,
       onExpand: this.onExpand,
       onFocus: this.onFocus,
-      onActivate: this.onActivate,
-      renderItem: this.renderItem,
       preventBlur: true,
+      renderItem: this.renderItem,
     };
 
     return <ManagedTree {...treeProps} />;
@@ -269,19 +269,19 @@ const mapStateToProps = (state, props) => {
 
   return {
     cx: getContext(state),
-    sourcesLoading: getSourcesLoading(state),
-    shownSource: shownSource,
-    selectedSource: selectedSource,
     debuggeeUrl: getDebuggeeUrl(state),
     expanded: getExpandedState(state),
     focused: getFocusedSourceItem(state),
-    sources: sources,
+    selectedSource: selectedSource,
+    shownSource: shownSource,
     sourceCount: Object.values(sources).length,
+    sources: sources,
+    sourcesLoading: getSourcesLoading(state),
   };
 };
 
 export default connect(mapStateToProps, {
+  focusItem: actions.focusItem,
   selectSource: actions.selectSource,
   setExpandedState: actions.setExpandedState,
-  focusItem: actions.focusItem,
 })(SourcesTree);

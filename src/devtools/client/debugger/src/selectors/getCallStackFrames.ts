@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { UIState } from "ui/state";
-import type { SelectedFrame } from "../reducers/pause";
-
-import type { SourceResources, Source } from "../reducers/sources";
-import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
-import { getFrames } from "../reducers/pause";
-import { annotateFrames } from "../utils/pause/frames";
 import get from "lodash/get";
 import { createSelector } from "reselect";
+import type { UIState } from "ui/state";
+
+import type { SelectedFrame } from "../reducers/pause";
+import { getFrames } from "../reducers/pause";
+import type { SourceResources, Source } from "../reducers/sources";
+import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
+import { annotateFrames } from "../utils/pause/frames";
 
 function getLocation(frame: SelectedFrame) {
   return frame.location;

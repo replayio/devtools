@@ -6,14 +6,13 @@
 
 import React from "react";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
-const { connect } = require("react-redux");
-const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 
+const { FILTERS } = require("devtools/client/webconsole/constants");
+const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
+const { connect } = require("react-redux");
 const { actions } = require("ui/actions");
 const { selectors } = require("ui/reducers");
 const { trackEvent } = require("ui/utils/telemetry");
-
-const { FILTERS } = require("devtools/client/webconsole/constants");
 
 export const ToggleRow = ({ children, selected, onClick, id }) => {
   return (

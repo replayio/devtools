@@ -1,13 +1,12 @@
-import React, { ComponentProps } from "react";
-
 import { Story, Meta } from "@storybook/react";
-
+import React, { ComponentProps } from "react";
 import RequestTable from "ui/components/NetworkMonitor/RequestTable";
+
 import { requestSummary } from "./utils";
 
 export default {
-  title: "Network Monitor/Request Table",
   component: RequestTable,
+  title: "Network Monitor/Request Table",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof RequestTable>> = args => <RequestTable {...args} />;

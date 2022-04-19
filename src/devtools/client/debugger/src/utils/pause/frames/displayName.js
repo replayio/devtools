@@ -38,11 +38,8 @@ const displayNameMap = {
     tryCatch: "Async",
   },
   Backbone: {
-    "extend/child": "Create Class",
     ".create": "Create Model",
-  },
-  jQuery: {
-    "jQuery.event.dispatch": "Dispatch Event",
+    "extend/child": "Create Class",
   },
   React: {
     // eslint-disable-next-line max-len
@@ -56,6 +53,9 @@ const displayNameMap = {
   Webpack: {
     // eslint-disable-next-line camelcase
     __webpack_require__: "Bootstrap",
+  },
+  jQuery: {
+    "jQuery.event.dispatch": "Dispatch Event",
   },
 };
 

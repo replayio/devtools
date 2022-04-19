@@ -4,11 +4,12 @@
 
 //
 
-import React, { HTMLProps, PureComponent, ReactNode } from "react";
 import classnames from "classnames";
-import { Item, documentHasSelection } from "../utils";
-import { trackEvent } from "ui/utils/telemetry";
 import { DebuggerLocation } from "devtools/client/webconsole/actions";
+import React, { HTMLProps, PureComponent, ReactNode } from "react";
+import { trackEvent } from "ui/utils/telemetry";
+
+import { Item, documentHasSelection } from "../utils";
 
 export interface ObjectInspectorItemProps {
   item: Item;
@@ -51,7 +52,6 @@ class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
       this.props;
 
     const parentElementProps: HTMLProps<HTMLDivElement> = {
-      key: item.path,
       className: classnames("node object-node", {
         focused,
         lessen:
@@ -59,6 +59,7 @@ class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
           item.type === "value" &&
           (item.isPrototype() || (dimTopLevelWindow === true && item.isWindow() && depth === 0)),
       }),
+      key: item.path,
       onClick: e => {
         // If this click happened because the user selected some text, bail out.
         // Note that if the user selected some text before and then clicks here,
@@ -83,8 +84,8 @@ class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
         e.stopPropagation();
         onDoubleClick(item, {
           depth,
-          focused,
           expanded,
+          focused,
         });
       };
     }
@@ -114,8 +115,8 @@ class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
 
                 onLabelClick(item, {
                   depth,
-                  focused,
                   expanded,
+                  focused,
                   setExpanded: this.props.setExpanded,
                 });
               }

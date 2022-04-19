@@ -7,17 +7,17 @@ import { getTokenLocation } from "./get-token-location";
 describe("getTokenLocation", () => {
   const codemirror = {
     coordsChar: jest.fn(() => ({
-      line: 1,
       ch: "C",
+      line: 1,
     })),
   };
   const token = {
     getBoundingClientRect() {
       return {
+        height: 10,
         left: 10,
         top: 20,
         width: 10,
-        height: 10,
       };
     },
   };

@@ -35,7 +35,7 @@ function getImageDimensions(doc, imageUrl) {
     imgObj.onload = () => {
       imgObj.onload = null;
       const { naturalWidth, naturalHeight } = imgObj;
-      resolve({ naturalWidth, naturalHeight });
+      resolve({ naturalHeight, naturalWidth });
     };
     imgObj.src = imageUrl;
   });
@@ -110,7 +110,7 @@ function setImageTooltip(tooltip, doc, imageUrl, options) {
     height += parseFloat(LABEL_HEIGHT);
   }
 
-  tooltip.setContentSize({ width, height });
+  tooltip.setContentSize({ height, width });
 }
 
 /*
@@ -130,7 +130,7 @@ function setBrokenImageTooltip(tooltip, doc) {
 
   tooltip.panel.innerHTML = "";
   tooltip.panel.appendChild(div);
-  tooltip.setContentSize({ width: "auto", height: "auto" });
+  tooltip.setContentSize({ height: "auto", width: "auto" });
 }
 
 module.exports.getImageDimensions = getImageDimensions;

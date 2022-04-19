@@ -4,11 +4,11 @@
 
 "use strict";
 
+const { editableItem } = require("devtools/client/shared/inplace-editor");
 const Services = require("devtools/shared/services");
+const PropTypes = require("prop-types");
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 const LONG_TEXT_ROTATE_LIMIT = 3;
 const HIGHLIGHT_RULE_PREF = Services.prefs.getBoolPref(
@@ -76,12 +76,12 @@ class BoxModelEditable extends PureComponent {
         {
           className: "boxmodel-editable",
           "data-box": box,
-          tabIndex: box === level && focusable ? 0 : -1,
-          title: property,
           onMouseOver: this.onMouseOver,
           ref: span => {
             this.boxModelEditable = span;
           },
+          tabIndex: box === level && focusable ? 0 : -1,
+          title: property,
         },
         textContent
       )

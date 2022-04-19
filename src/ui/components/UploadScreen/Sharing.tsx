@@ -1,11 +1,13 @@
+import classNames from "classnames";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import hooks from "ui/hooks";
-import TeamSelect from "./TeamSelect";
 import { Workspace } from "ui/types";
-import { Toggle } from "../shared/Forms";
-import SettingsPreview from "./SettingsPreview";
-import classNames from "classnames";
 import { isPublicDisabled } from "ui/utils/org";
+
+import { Toggle } from "../shared/Forms";
+
+import SettingsPreview from "./SettingsPreview";
+import TeamSelect from "./TeamSelect";
 
 export const MY_LIBRARY = "Your Library";
 export const personalWorkspace = { id: MY_LIBRARY, name: MY_LIBRARY };
@@ -38,7 +40,7 @@ function EditableSettings({
   return (
     <div className="grid w-full grid-cols-2 gap-5 text-base">
       {workspaces.length ? (
-        <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
+        <TeamSelect {...{ handleWorkspaceSelect, selectedWorkspaceId, workspaces }} />
       ) : null}
       <div
         className={classNames(

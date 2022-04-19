@@ -4,9 +4,9 @@
 
 "use strict";
 
+const PropTypes = require("prop-types");
 const { Component } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
 
 // Shortcuts
 const { button } = dom;
@@ -18,18 +18,23 @@ const { button } = dom;
 class SidebarToggle extends Component {
   static get propTypes() {
     return {
-      // Set to true if collapsed.
-      collapsed: PropTypes.bool.isRequired,
-      // Tooltip text used when the button indicates expanded state.
-      collapsePaneTitle: PropTypes.string.isRequired,
-      // Tooltip text used when the button indicates collapsed state.
-      expandPaneTitle: PropTypes.string.isRequired,
-      // Click callback
-      onClick: PropTypes.func.isRequired,
       // align toggle button to right
       alignRight: PropTypes.bool,
+
       // if set to true toggle-button rotate 90
       canVerticalSplit: PropTypes.bool,
+
+      // Tooltip text used when the button indicates expanded state.
+      collapsePaneTitle: PropTypes.string.isRequired,
+
+      // Set to true if collapsed.
+      collapsed: PropTypes.bool.isRequired,
+
+      // Tooltip text used when the button indicates collapsed state.
+      expandPaneTitle: PropTypes.string.isRequired,
+
+      // Click callback
+      onClick: PropTypes.func.isRequired,
     };
   }
 
@@ -76,8 +81,8 @@ class SidebarToggle extends Component {
 
     return button({
       className: classNames.join(" "),
-      title: title,
       onClick: this.onClick,
+      title: title,
     });
   }
 }

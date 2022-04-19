@@ -4,9 +4,8 @@
 
 "use strict";
 
-const dom = require("react-dom-factories");
-
 const { l10n } = require("devtools/client/webconsole/utils/messages");
+const dom = require("react-dom-factories");
 const messageToggleDetails = l10n.getStr("messageToggleDetails");
 
 function CollapseButton(props) {

@@ -1,19 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Editor from "./index";
-import EditorTabs from "./Tabs";
-import EditorFooter from "./Footer";
-
-import WelcomeBox from "../WelcomeBox";
-
-import { Redacted } from "ui/components/Redacted";
-import useWidthObserver from "ui/utils/useWidthObserver";
-import { waitForEditor } from "../../utils/editor/create-editor";
 import { setUnexpectedError } from "ui/actions/session";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
+import { Redacted } from "ui/components/Redacted";
 import { getToolboxLayout } from "ui/reducers/layout";
+import useWidthObserver from "ui/utils/useWidthObserver";
+
 import { getSelectedSource } from "../../reducers/sources";
+import { waitForEditor } from "../../utils/editor/create-editor";
+import WelcomeBox from "../WelcomeBox";
+
+import EditorFooter from "./Footer";
+import EditorTabs from "./Tabs";
+
+import Editor from "./index";
 
 export const EditorPane = () => {
   const [loadingEditor, setLoadingEditor] = useState(true);

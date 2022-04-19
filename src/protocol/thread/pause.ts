@@ -15,15 +15,17 @@ import {
   repaintGraphicsResult,
   getAllBoundingClientRectsResult,
 } from "@recordreplay/protocol";
+
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
-import { ValueFront } from "./value";
-import { ThreadFront } from "./thread";
+
+import { NodeBoundsFront } from "./bounds";
 import { NodeFront } from "./node";
 import { RuleFront } from "./rule";
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";
-import { NodeBoundsFront } from "./bounds";
+import { ThreadFront } from "./thread";
+import { ValueFront } from "./value";
 
 const pausesById = new Map<PauseId, Pause>();
 
@@ -230,13 +232,13 @@ export class Pause {
         for (const p of properties || []) {
           const flags = "flags" in p ? p.flags! : 7;
           newProperties.push({
-            name: p.name,
-            value: new ValueFront(this, p),
-            writable: !!(flags & 1),
             configurable: !!(flags & 2),
             enumerable: !!(flags & 4),
             get: p.get ? new ValueFront(this, { object: p.get }) : undefined,
+            name: p.name,
             set: p.set ? new ValueFront(this, { object: p.set }) : undefined,
+            value: new ValueFront(this, p),
+            writable: !!(flags & 1),
           });
         }
         (object as WiredObject).preview!.properties = newProperties;
@@ -262,8 +264,8 @@ export class Pause {
           const { target, handler } = proxyState;
 
           (object as WiredObject).preview!.proxyState = {
-            target: new ValueFront(this, target),
             handler: new ValueFront(this, handler),
+            target: new ValueFront(this, target),
           };
         }
 
@@ -343,7 +345,7 @@ export class Pause {
       }
     }
 
-    return { scopes: scopeChain, originalScopesUnavailable };
+    return { originalScopesUnavailable, scopes: scopeChain };
   }
 
   sendMessage<P, R>(
@@ -363,15 +365,15 @@ export class Pause {
 
   async getObjectProperty(object: ObjectId, property: string) {
     const { result } = await this.sendMessage(client.Pause.getObjectProperty, {
-      object,
       name: property,
+      object,
     });
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return {
-      returned: returned ? new ValueFront(this, returned) : undefined,
       exception: exception ? new ValueFront(this, exception) : undefined,
       failed,
+      returned: returned ? new ValueFront(this, returned) : undefined,
     };
   }
 
@@ -380,15 +382,15 @@ export class Pause {
     await this.createWaiter;
     const { result } = frameId
       ? await this.sendMessage(client.Pause.evaluateInFrame, {
-          frameId,
           expression,
-          useOriginalScopes: true,
+          frameId,
           pure,
+          useOriginalScopes: true,
         })
       : await this.sendMessage(client.Pause.evaluateInGlobal, { expression, pure });
     const { returned, exception, failed, data } = result;
     this.addData(data);
-    return { returned, exception, failed } as EvaluationResult;
+    return { exception, failed, returned } as EvaluationResult;
   }
 
   // Synchronously get a DOM front for an object whose preview is known.

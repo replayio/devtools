@@ -5,12 +5,12 @@
 //
 
 import React, { PureComponent } from "react";
+
+import actions from "../../../actions";
+import { getPreview, getThreadContext } from "../../../selectors";
 import { connect } from "../../../utils/connect";
 
 import Popup from "./Popup";
-
-import { getPreview, getThreadContext } from "../../../selectors";
-import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
 
 class Preview extends PureComponent {

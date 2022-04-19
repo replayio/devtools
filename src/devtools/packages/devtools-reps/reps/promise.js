@@ -7,20 +7,20 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 // Dependencies
-const { getGripType, isGrip, wrapRender } = require("./rep-utils");
-
-const PropRep = require("./prop-rep");
 const { MODE } = require("./constants");
+const PropRep = require("./prop-rep");
+const { getGripType, isGrip, wrapRender } = require("./rep-utils");
 
 /**
  * Renders a DOM Promise object.
  */
 PromiseRep.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
-  onDOMNodeMouseOver: PropTypes.func,
+
+  object: PropTypes.object.isRequired,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
 };
 
@@ -29,8 +29,8 @@ function PromiseRep(props) {
   const { promiseState } = object;
 
   const config = {
-    "data-link-actor-id": object.actor,
     className: "objectBox objectBox-object",
+    "data-link-actor-id": object.actor,
   };
 
   if (props.mode === MODE.TINY) {
@@ -95,10 +95,10 @@ function getProps(props, promiseState) {
     res = res.concat(
       PropRep({
         ...props,
+        equal: ": ",
         mode: MODE.TINY,
         name: `<${key}>`,
         object: object.getGrip ? object.getGrip() : object,
-        equal: ": ",
         suppressQuotes: true,
       })
     );

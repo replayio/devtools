@@ -1,9 +1,12 @@
 import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
+
 import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
+
 import Nodes from "./Nodes";
+
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 

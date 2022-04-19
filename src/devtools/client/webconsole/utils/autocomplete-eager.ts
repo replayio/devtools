@@ -15,8 +15,8 @@ export async function getEvaluatedProperties(
     const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
       frameId,
-      text: expression,
       pure: true,
+      text: expression,
     });
     if (returned && !(failed || exception)) {
       await returned.traversePrototypeChainAsync(
@@ -45,8 +45,8 @@ async function eagerEvaluateExpression(
     const { returned, exception, failed } = await ThreadFront.evaluate({
       asyncIndex,
       frameId,
-      text: expression,
       pure: true,
+      text: expression,
     });
     if (returned && !(failed || exception)) {
       return returned;

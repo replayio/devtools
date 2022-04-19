@@ -1,11 +1,13 @@
 import React from "react";
 import { SubscriptionWithPricing, Workspace } from "ui/types";
+import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
+
 import { Button } from "../Button";
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
+
 import { BillingBanners } from "./BillingBanners";
 import { PlanDetails } from "./PlanDetails";
 import { isSubscriptionCancelled, formatPaymentMethod, Views } from "./utils";
-import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
 function TrialDetails({
   workspace,

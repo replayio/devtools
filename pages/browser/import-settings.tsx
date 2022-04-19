@@ -1,6 +1,7 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 import { getButtonClasses } from "ui/components/shared/Button";
+import { LoginLink } from "ui/components/shared/Login/Login";
 import {
   OnboardingActions,
   OnboardingBody,
@@ -9,7 +10,6 @@ import {
   OnboardingHeader,
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
-import { LoginLink } from "ui/components/shared/Login/Login";
 
 function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();

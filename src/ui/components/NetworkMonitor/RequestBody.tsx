@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { getSelectedRequestBody } from "ui/reducers/network";
+
 import HttpBody from "./HttpBody";
 import { findHeader, RequestSummary } from "./utils";
 

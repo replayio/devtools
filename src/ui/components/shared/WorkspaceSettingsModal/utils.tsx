@@ -47,50 +47,50 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
     case "test-beta-v1":
       return {
         billingSchedule: null,
+        discount: 0,
         displayName: "Beta Tester Appreciation",
         seatPrice: 0,
-        discount: 0,
         trial: isTrial(subscription),
       };
     case "team-v1":
     case "test-team-v1":
       return {
         billingSchedule: "monthly",
+        discount: 0,
         displayName: "Team",
         seatPrice: 20,
-        discount: 0,
         trial: isTrial(subscription),
       };
     case "team-annual-v1":
       return {
         billingSchedule: "annual",
+        discount: 0.1,
         displayName: "Team",
         seatPrice: 20,
-        discount: 0.1,
         trial: isTrial(subscription),
       };
     case "org-v1":
       return {
         billingSchedule: "monthly",
+        discount: 0,
         displayName: "Organization",
         seatPrice: 75,
-        discount: 0,
         trial: isTrial(subscription),
       };
     case "org-annual-v1":
       return {
         billingSchedule: "annual",
+        discount: 0.1,
         displayName: "Organization",
         seatPrice: 75,
-        discount: 0.1,
         trial: isTrial(subscription),
       };
     case "ent-v1":
       return {
         billingSchedule: "contract",
+        discount: 0,
         displayName: "Enterprise",
         seatPrice: 0,
-        discount: 0,
         trial: false,
       };
   }
@@ -129,7 +129,7 @@ export const cycleCharge = (planPricing: SubscriptionWithPricing): string => {
 };
 
 export function formatCurrency(amount: number) {
-  const formatter = new Intl.NumberFormat("en-us", { style: "currency", currency: "USD" });
+  const formatter = new Intl.NumberFormat("en-us", { currency: "USD", style: "currency" });
   return formatter.format(amount);
 }
 

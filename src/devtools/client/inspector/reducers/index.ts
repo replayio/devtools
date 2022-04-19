@@ -6,6 +6,7 @@
 
 import { InspectorAction } from "../actions";
 import { initialInspectorState, InspectorState } from "../state";
+
 const { prefs } = require("devtools/client/inspector/prefs");
 
 export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");

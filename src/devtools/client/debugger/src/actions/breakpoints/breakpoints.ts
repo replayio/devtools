@@ -1,7 +1,7 @@
 import { SourceId } from "@recordreplay/protocol";
 import { UIThunkAction } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
-import { _addBreakpointAtLine, Context } from ".";
+
 import {
   Breakpoint,
   getBreakpointsForSource,
@@ -10,7 +10,10 @@ import {
 import { Source } from "../../reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isLogpoint } from "../../utils/breakpoint";
+
 import { _removeBreakpoint, removeBreakpointOption, removeRequestedBreakpoint } from "./modify";
+
+import { _addBreakpointAtLine, Context } from ".";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
@@ -30,7 +33,7 @@ export function removeBreakpointsAtLine(
   return (dispatch, getState) => {
     trackEvent("breakpoint.remove");
 
-    dispatch(removeRequestedBreakpoint({ sourceId, line }));
+    dispatch(removeRequestedBreakpoint({ line, sourceId }));
     const breakpoints = getBreakpointsForSource(getState(), sourceId, line);
 
     breakpoints.map(bp => dispatch(removeBreakpoint(cx, bp)));

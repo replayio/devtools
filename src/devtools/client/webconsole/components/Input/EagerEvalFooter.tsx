@@ -1,6 +1,7 @@
-import React, { FC, useEffect, useRef, useState } from "react";
-import { ValueFront } from "protocol/thread";
 import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
+import { ValueFront } from "protocol/thread";
+import React, { FC, useEffect, useRef, useState } from "react";
+
 import { useEagerEvaluateExpression } from "../../utils/autocomplete-eager";
 
 function useEagerEvalPreview(expression: string) {
@@ -58,10 +59,10 @@ const EagerEvalFooter: FC<{ expression: string; completedExpression: string | nu
     <div
       className="message result flex items-center font-mono"
       style={{
-        padding: "4px 8px 4px 4px",
-        borderTop: "1px solid var(--theme-background",
         borderBottom: "0px",
+        borderTop: "1px solid var(--theme-background",
         minHeight: "var(--editor-footer-height)",
+        padding: "4px 8px 4px 4px",
       }}
     >
       {expression ? (
@@ -69,9 +70,9 @@ const EagerEvalFooter: FC<{ expression: string; completedExpression: string | nu
           <div
             className="icon"
             style={{
-              width: `1.5rem`,
-              marginInlineStart: `var(--console-icon-horizontal-offset)`,
               marginInlineEnd: `calc(4px - var(--console-icon-horizontal-offset))`,
+              marginInlineStart: `var(--console-icon-horizontal-offset)`,
+              width: `1.5rem`,
             }}
           />
           <Preview expression={completedExpression || expression} />

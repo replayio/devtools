@@ -45,10 +45,10 @@ function cloneState(state: ChangesState = {}) {
       rules: Object.entries(source.rules).reduce((rules, [ruleId, rule]) => {
         rules[ruleId] = {
           ...rule,
-          selectors: rule.selectors.slice(0),
-          children: rule.children.slice(0),
           add: rule.add.slice(0),
+          children: rule.children.slice(0),
           remove: rule.remove.slice(0),
+          selectors: rule.selectors.slice(0),
         };
 
         return rules;
@@ -113,13 +113,13 @@ function createRule(ruleData: Partial<Rule>, rules: RuleRecord) {
         if (!rules[ruleId]) {
           // @ts-ignore
           rules[ruleId] = {
-            ruleId,
-            isNew: false,
-            selectors: selectors!,
             add: [],
-            remove: [],
             children: [],
+            isNew: false,
             parent: null,
+            remove: [],
+            ruleId,
+            selectors: selectors!,
           };
         }
 
@@ -195,6 +195,10 @@ function removeRule(ruleId: string, rules: RuleRecord) {
 const INITIAL_STATE: ChangesState = {};
 
 const reducers = {
+  [RESET_CHANGES]() {
+    return INITIAL_STATE;
+  },
+
   /**
    * CSS changes are collected on the server by the ChangesActor which dispatches them to
    * the client as atomic operations: a rule/declaration updated, added or removed.
@@ -223,11 +227,11 @@ const reducers = {
   // eslint-disable-next-line complexity
   [TRACK_CHANGE](state: ChangesState, { change }: AnyAction) {
     const defaults = {
+      add: [],
+      ancestors: [],
+      remove: [],
       selector: null,
       source: {},
-      ancestors: [],
-      add: [],
-      remove: [],
     };
 
     change = { ...defaults, ...change };
@@ -244,7 +248,7 @@ const reducers = {
     // Reference or create object identifying the rule for this change.
     const rule: Rule = rules[ruleId]
       ? rules[ruleId]
-      : createRule({ id: change.id, selectors: [selector], ancestors, ruleIndex }, rules);
+      : createRule({ ancestors, id: change.id, ruleIndex, selectors: [selector] }, rules);
 
     // Mark the rule if it was created at runtime as a result of an "Add Rule" action.
     if (change.type === "rule-add") {
@@ -379,10 +383,6 @@ const reducers = {
     }
 
     return state;
-  },
-
-  [RESET_CHANGES]() {
-    return INITIAL_STATE;
   },
 };
 

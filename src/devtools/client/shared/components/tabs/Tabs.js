@@ -32,30 +32,31 @@ define(function (require, exports, module) {
   class Tabs extends Component {
     static get propTypes() {
       return {
-        className: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.object]),
         activeTab: PropTypes.number,
-        onMount: PropTypes.func,
-        onBeforeChange: PropTypes.func,
-        onAfterChange: PropTypes.func,
         children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired,
-        showAllTabsMenu: PropTypes.bool,
+        className: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.object]),
+        onAfterChange: PropTypes.func,
         onAllTabsMenuClick: PropTypes.func,
-
-        // To render a sidebar toggle button before the tab menu provide a function that
-        // returns a React component for the button.
-        renderSidebarToggle: PropTypes.func,
+        onBeforeChange: PropTypes.func,
+        onMount: PropTypes.func,
         // Set true will only render selected panel on DOM. It's complete
         // opposite of the created array, and it's useful if panels content
         // is unpredictable and update frequently.
         renderOnlySelected: PropTypes.bool,
+
+        // To render a sidebar toggle button before the tab menu provide a function that
+        // returns a React component for the button.
+        renderSidebarToggle: PropTypes.func,
+
+        showAllTabsMenu: PropTypes.bool,
       };
     }
 
     static get defaultProps() {
       return {
         activeTab: 0,
-        showAllTabsMenu: false,
         renderOnlySelected: false,
+        showAllTabsMenu: false,
       };
     }
 
@@ -250,8 +251,8 @@ define(function (require, exports, module) {
       });
 
       const newState = Object.assign({}, this.state, {
-        created,
         activeTab: index,
+        created,
       });
 
       this.setState(newState, () => {
@@ -305,14 +306,14 @@ define(function (require, exports, module) {
             },
             dom.a(
               {
-                id: id ? id + "-tab" : "tab-" + index,
-                tabIndex: isTabSelected ? 0 : -1,
-                title,
                 "aria-controls": id ? id + "-panel" : "panel-" + index,
                 "aria-selected": isTabSelected,
-                role: "tab",
+                id: id ? id + "-tab" : "tab-" + index,
                 onClick: this.onClickTab.bind(this, index),
                 onMouseDown: this.onMouseDown.bind(this),
+                role: "tab",
+                tabIndex: isTabSelected ? 0 : -1,
+                title,
               },
               title,
               badge && !isTabSelected && showBadge()
@@ -373,8 +374,8 @@ define(function (require, exports, module) {
           // tab. It's faster than 'display:none' because it avoids triggering frame
           // destruction and reconstruction. 'width' is not changed to avoid relayout.
           const style = {
-            visibility: selected ? "visible" : "hidden",
             height: selected ? "100%" : "0",
+            visibility: selected ? "visible" : "hidden",
           };
 
           // Allows lazy loading panels by creating them only if they are selected,
@@ -386,12 +387,12 @@ define(function (require, exports, module) {
 
           return dom.div(
             {
+              "aria-labelledby": id ? id + "-tab" : "tab-" + index,
+              className: selected ? "tab-panel-box" : "tab-panel-box hidden",
               id: id ? id + "-panel" : "panel-" + index,
               key: id,
-              style: style,
-              className: selected ? "tab-panel-box" : "tab-panel-box hidden",
               role: "tabpanel",
-              "aria-labelledby": id ? id + "-tab" : "tab-" + index,
+              style: style,
             },
             selected || isCreated ? panel : null
           );
@@ -418,10 +419,10 @@ define(function (require, exports, module) {
   class Panel extends Component {
     static get propTypes() {
       return {
-        id: PropTypes.string.isRequired,
-        className: PropTypes.string,
-        title: PropTypes.string.isRequired,
         children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired,
+        className: PropTypes.string,
+        id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
       };
     }
 

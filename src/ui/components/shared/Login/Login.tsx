@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import React, { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-
+import React, { ReactNode, useEffect, useState } from "react";
 import { query } from "ui/utils/apolloClient";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { getLoginReferrerParam } from "ui/utils/environment";
@@ -41,8 +40,8 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
 
     if (resp.data?.auth.connection) {
       loginWithRedirect({
-        connection: resp.data.auth.connection,
         appState: { returnTo: window.location.pathname + window.location.search },
+        connection: resp.data.auth.connection,
       });
     } else {
       setError(resp.errors?.find(e => e.message)?.message || true);
@@ -141,8 +140,8 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
 
   const onLogin = () =>
     loginWithRedirect({
-      connection: "google-oauth2",
       appState: { returnTo: returnToPath },
+      connection: "google-oauth2",
     });
 
   useEffect(() => {

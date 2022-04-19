@@ -4,13 +4,11 @@
 
 "use strict";
 
-const Services = require("devtools/shared/services");
-
 const { HighlighterEnvironment } = require("devtools/server/actors/highlighters");
-
 const {
   CanvasFrameAnonymousContentHelper,
 } = require("devtools/server/actors/highlighters/utils/markup");
+const Services = require("devtools/shared/services");
 
 /**
  * HighlighterRenderer is the base class that implements the rendering surface for a
@@ -138,8 +136,8 @@ class HighlighterRenderer {
 
   postMessage(topic, data = {}) {
     this.messageManager.sendAsyncMessage(`${this._msgName}:event`, {
-      topic,
       data,
+      topic,
     });
   }
 

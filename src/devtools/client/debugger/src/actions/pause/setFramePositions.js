@@ -4,8 +4,9 @@
 
 //
 
-import { getSourceByActorId, getSelectedFrame } from "../../selectors";
 import zip from "lodash/zip";
+
+import { getSourceByActorId, getSelectedFrame } from "../../selectors";
 
 const { ThreadFront } = require("protocol/thread");
 
@@ -29,12 +30,12 @@ export function setFramePositions() {
     const locations = await Promise.all(
       positions.map(async ({ frame }) => {
         const { line, column } = await ThreadFront.getPreferredLocation(frame);
-        return { line, column, sourceId };
+        return { column, line, sourceId };
       })
     );
 
     const combinedPositions = zip(positions, locations).map(([{ point, time }, location]) => {
-      return { point, time, location };
+      return { location, point, time };
     });
 
     if (frame != getSelectedFrame(getState())) {
@@ -42,8 +43,8 @@ export function setFramePositions() {
     }
 
     dispatch({
-      type: "SET_FRAME_POSITIONS",
       positions: combinedPositions,
+      type: "SET_FRAME_POSITIONS",
       unexecuted: [],
     });
   };

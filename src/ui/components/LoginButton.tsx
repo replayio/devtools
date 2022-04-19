@@ -1,8 +1,8 @@
+import { useRouter } from "next/router";
 import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import Avatar from "ui/components/Avatar";
 import { handleIntercomLogout } from "ui/utils/intercom";
-import { useRouter } from "next/router";
+import useAuth0 from "ui/utils/useAuth0";
 
 const LoginButton = () => {
   const { loginAndReturn, isAuthenticated, logout, user } = useAuth0();

@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+
 import Modal from "./NewModal";
 
 function LoomModal({ hideModal, modalOptions }: PropsFromRedux) {
@@ -11,12 +12,12 @@ function LoomModal({ hideModal, modalOptions }: PropsFromRedux) {
   }
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <div className="overflow-hidden rounded-lg" style={{ width: "940px", height: "680px" }}>
-        <div style={{ position: "relative", paddingBottom: "62.93706293706294%", height: 0 }}>
+      <div className="overflow-hidden rounded-lg" style={{ height: "680px", width: "940px" }}>
+        <div style={{ height: 0, paddingBottom: "62.93706293706294%", position: "relative" }}>
           <iframe
             src={`https://www.loom.com/embed/${modalOptions.loom}`}
             allowFullScreen
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+            style={{ height: "100%", left: 0, position: "absolute", top: 0, width: "100%" }}
           ></iframe>
         </div>
       </div>

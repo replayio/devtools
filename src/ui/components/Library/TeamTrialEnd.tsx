@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
 import { subscriptionEndsIn } from "ui/utils/workspace";
+
 import { TrialEnd } from "../shared/TrialEnd";
 
 export default function TeamTrialEnd({ currentWorkspaceId }: { currentWorkspaceId: string }) {

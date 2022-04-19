@@ -9,8 +9,8 @@ import React, {
   useRef,
   FC,
 } from "react";
-import { HANDLE_HEIGHT, BORDER_HEIGHT, MIN_HEIGHT } from "./constants";
 
+import { HANDLE_HEIGHT, BORDER_HEIGHT, MIN_HEIGHT } from "./constants";
 import {
   collapseSection,
   containerResize,
@@ -57,8 +57,8 @@ function ResizeHandle({
         isResizing ? "border-blue-400" : ""
       )}
       style={{
-        cursor: "ns-resize",
         borderBottomWidth: `${HANDLE_HEIGHT}px`,
+        cursor: "ns-resize",
         top: `${BORDER_HEIGHT - HANDLE_HEIGHT}px`,
       }}
       onMouseDown={onResizeStart}
@@ -187,14 +187,14 @@ export const Accordion: FC<{
     children as ReactElement<typeof AccordionPane>[],
     (child, index) => {
       const childProps = {
-        index,
-        dispatch,
         _expanded: !getIsCollapsed(state, index),
-        toggleCollapsed: () => toggleCollapsed(index),
+        dispatch,
         height: getHeight(state, index),
+        index,
+        isBeingResized: isResizing && resizingParams?.initialIndex === index,
         isResizable: getIsIndexResizable(state, index),
         onResizeStart: (e: React.MouseEvent) => onResizeStart(e, index),
-        isBeingResized: isResizing && resizingParams?.initialIndex === index,
+        toggleCollapsed: () => toggleCollapsed(index),
       };
 
       return React.cloneElement(child, childProps);

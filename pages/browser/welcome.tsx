@@ -1,5 +1,5 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
   OnboardingActions,

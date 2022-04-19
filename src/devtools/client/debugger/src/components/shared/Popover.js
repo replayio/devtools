@@ -3,10 +3,10 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
+import classNames from "classnames";
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
-import classNames from "classnames";
 import BracketArrow from "./BracketArrow";
 import SmartGap from "./SmartGap";
 
@@ -19,9 +19,9 @@ class Popover extends Component {
   state = {
     coords: {
       left: 0,
-      top: 0,
       orientation: "down",
       targetMid: { x: 0, y: 0 },
+      top: 0,
     },
   };
   firstRender = true;
@@ -165,9 +165,9 @@ class Popover extends Component {
 
     return {
       left: popoverLeft,
-      top,
       orientation,
       targetMid,
+      top,
     };
   }
 
@@ -186,9 +186,9 @@ class Popover extends Component {
 
     return {
       left,
-      top,
       orientation: enoughRoomForTooltipAbove ? "up" : "down",
       targetMid: { x: 0, y: 0 },
+      top,
     };
   }
 
@@ -224,11 +224,11 @@ class Popover extends Component {
     let arrowProps = {};
 
     if (orientation === "up") {
-      arrowProps = { orientation: "down", bottom: 10, left };
+      arrowProps = { bottom: 10, left, orientation: "down" };
     } else if (orientation === "down") {
-      arrowProps = { orientation: "up", top: -2, left };
+      arrowProps = { left, orientation: "up", top: -2 };
     } else {
-      arrowProps = { orientation: "left", top, left: -4 };
+      arrowProps = { left: -4, orientation: "left", top };
     }
 
     return <BracketArrow {...arrowProps} />;
@@ -243,7 +243,7 @@ class Popover extends Component {
         className={classNames("popover", `orientation-${orientation}`, {
           up: orientation === "up",
         })}
-        style={{ top, left }}
+        style={{ left, top }}
         ref={c => {
           this.$popover = c;
           this.$popoverPreview = c && c.querySelector(".preview-popup");
@@ -260,7 +260,7 @@ class Popover extends Component {
     return (
       <div
         className={classNames("tooltip", `orientation-${orientation}`)}
-        style={{ top, left, zIndex: 20 }}
+        style={{ left, top, zIndex: 20 }}
         ref={c => (this.$tooltip = c)}
       >
         {this.getChildren()}

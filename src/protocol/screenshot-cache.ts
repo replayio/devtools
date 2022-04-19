@@ -1,7 +1,8 @@
+import { ScreenShot } from "@recordreplay/protocol";
+
+import { client } from "./socket";
 import { ThreadFront } from "./thread";
 import { defer } from "./utils";
-import { client } from "./socket";
-import { ScreenShot } from "@recordreplay/protocol";
 
 export class DownloadCancelledError extends Error {}
 
@@ -52,7 +53,7 @@ export class ScreenshotCache {
     }
 
     const { promise, resolve, reject } = defer<ScreenShot>();
-    this.queuedDownloadForPreview = { point, paintHash, promise, resolve, reject };
+    this.queuedDownloadForPreview = { paintHash, point, promise, reject, resolve };
 
     this.startQueuedDownloadIfPossible();
 
@@ -124,7 +125,7 @@ export class ScreenshotCache {
   private async download(point: string, resizeHeight?: number): Promise<ScreenShot> {
     const screen = (
       await client.Graphics.getPaintContents(
-        { point, mimeType: "image/jpeg", resizeHeight },
+        { mimeType: "image/jpeg", point, resizeHeight },
         ThreadFront.sessionId!
       )
     ).screen;

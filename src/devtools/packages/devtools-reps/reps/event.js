@@ -7,21 +7,21 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 // Reps
-const { isGrip, wrapRender } = require("./rep-utils");
-
 const { MODE } = require("./constants");
 const { rep } = require("./grip");
 const PropRep = require("./prop-rep");
+const { isGrip, wrapRender } = require("./rep-utils");
 
 /**
  * Renders DOM event objects.
  */
 Event.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
-  onDOMNodeMouseOver: PropTypes.func,
+
+  object: PropTypes.object.isRequired,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
 };
 
@@ -74,11 +74,11 @@ function getProperties(props) {
       elements.push(
         PropRep({
           ...props,
+          equal: ": ",
           key: name,
           mode: MODE.TINY,
           name,
           object: preview.get(name),
-          equal: ": ",
         })
       );
     }

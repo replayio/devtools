@@ -10,9 +10,9 @@ const actionTypes = {
 
 function changeNetworkThrottling(enabled, profile) {
   return {
-    type: actionTypes.CHANGE_NETWORK_THROTTLING,
     enabled,
     profile,
+    type: actionTypes.CHANGE_NETWORK_THROTTLING,
   };
 }
 

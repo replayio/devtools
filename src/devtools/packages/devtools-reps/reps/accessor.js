@@ -3,18 +3,19 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
-const { button, span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { wrapRender } = require("./rep-utils");
+const { button, span } = require("react-dom-factories");
+
 const { MODE } = require("./constants");
+const { wrapRender } = require("./rep-utils");
 
 /**
  * Renders an object. An object is represented by a list of its
  * properties enclosed in curly brackets.
  */
 Accessor.propTypes = {
-  object: PropTypes.object.isRequired,
   mode: PropTypes.oneOf(Object.values(MODE)),
+  object: PropTypes.object.isRequired,
 };
 
 function Accessor(props) {
@@ -28,9 +29,9 @@ function Accessor(props) {
       },
       Rep({
         ...props,
-        object: evaluation.getterValue,
-        mode: props.mode || MODE.TINY,
         defaultRep: Grip,
+        mode: props.mode || MODE.TINY,
+        object: evaluation.getterValue,
       })
     );
   }
@@ -38,11 +39,11 @@ function Accessor(props) {
   if (hasGetter(object) && onInvokeGetterButtonClick) {
     return button({
       className: "invoke-getter",
-      title: "Invoke getter",
       onClick: event => {
         onInvokeGetterButtonClick();
         event.stopPropagation();
       },
+      title: "Invoke getter",
     });
   }
 

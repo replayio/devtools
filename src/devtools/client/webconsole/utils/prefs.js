@@ -4,8 +4,8 @@
 
 "use strict";
 
-import Services from "devtools/shared/services";
 import { PrefsHelper } from "devtools/client/shared/prefs";
+import Services from "devtools/shared/services";
 
 // TODO Can this file just be deleted entirely?
 
@@ -19,10 +19,10 @@ pref("console.timestampsVisible", false);
 pref("console.input.context", true);
 
 export const prefs = new PrefsHelper("console", {
-  persistLogs: ["Bool", "persistLogs"],
-  inputHistoryCount: ["Bool", "inputHistoryCount"],
   editor: ["Bool", "input.editor"],
+  inputContext: ["Bool", "input.context"],
+  inputHistoryCount: ["Bool", "inputHistoryCount"],
+  persistLogs: ["Bool", "persistLogs"],
   timestampMessages: ["Bool", "timestampMessages"],
   timestampsVisible: ["Bool", "timestampsVisible"],
-  inputContext: ["Bool", "input.context"],
 });

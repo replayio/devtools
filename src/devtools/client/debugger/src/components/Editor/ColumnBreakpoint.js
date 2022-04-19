@@ -3,15 +3,16 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
 import classnames from "classnames";
-import { connect } from "../../utils/connect";
-import actions from "../../actions";
-
-import { getDocument } from "../../utils/editor";
-import Panel from "./Breakpoints/Panel/index";
+import React, { Component } from "react";
 import { features } from "ui/utils/prefs";
+
+import actions from "../../actions";
 import { isLogpoint } from "../../utils/breakpoint";
+import { connect } from "../../utils/connect";
+import { getDocument } from "../../utils/editor";
+
+import Panel from "./Breakpoints/Panel/index";
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -66,7 +67,7 @@ class ColumnBreakpoint extends Component {
       onContextMenu: this.onContextMenu,
     });
 
-    this.bookmark = doc.setBookmark({ line: line - 1, ch: column }, { widget });
+    this.bookmark = doc.setBookmark({ ch: column, line: line - 1 }, { widget });
   };
 
   clearColumnBreakpoint = () => {

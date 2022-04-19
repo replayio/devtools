@@ -1,9 +1,11 @@
 import React from "react";
-import { ComputedPropertyState } from "../state";
-import ComputedProperty from "./ComputedProperty";
-import { setComputedPropertyExpanded } from "../actions";
-import { UIState } from "ui/state";
 import { connect, ConnectedProps } from "react-redux";
+import { UIState } from "ui/state";
+
+import { setComputedPropertyExpanded } from "../actions";
+import { ComputedPropertyState } from "../state";
+
+import ComputedProperty from "./ComputedProperty";
 
 function isHidden(property: ComputedPropertyState, search: string, showBrowserStyles: boolean) {
   if (property.selectors.length === 0 && !showBrowserStyles) {
@@ -69,8 +71,8 @@ function ComputedProperties(props: PropsFromRedux) {
 }
 
 const mapStateToProps = (state: UIState) => ({
-  properties: state.computed.properties,
   expandedProperties: state.computed.expandedProperties,
+  properties: state.computed.properties,
   search: state.computed.search,
   showBrowserStyles: state.computed.showBrowserStyles,
 });

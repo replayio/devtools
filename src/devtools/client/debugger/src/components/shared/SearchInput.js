@@ -4,12 +4,11 @@
 
 //
 
+import classnames from "classnames";
 import React, { Component } from "react";
 
-import { CloseButton } from "./Button";
-
 import AccessibleImage from "./AccessibleImage";
-import classnames from "classnames";
+import { CloseButton } from "./Button";
 
 const arrowBtn = (onClick, type, className, tooltip) => {
   const props = {
@@ -36,8 +35,8 @@ class SearchInput extends Component {
     expanded: false,
     hasPrefix: false,
     selectedItemId: "",
-    size: "",
     showClose: true,
+    size: "",
   };
 
   constructor(props) {
@@ -198,21 +197,21 @@ class SearchInput extends Component {
     } = this.props;
 
     const inputProps = {
+      "aria-activedescendant": expanded && selectedItemId ? `${selectedItemId}-title` : "",
+      "aria-autocomplete": "list",
+      "aria-controls": "result-list",
       className: classnames({
         empty: showErrorEmoji,
       }),
+      onBlur: e => this.onBlur(e),
       onChange,
+      onFocus: e => this.onFocus(e),
       onKeyDown: e => this.onKeyDown(e),
       onKeyUp,
-      onFocus: e => this.onFocus(e),
-      onBlur: e => this.onBlur(e),
-      "aria-autocomplete": "list",
-      "aria-controls": "result-list",
-      "aria-activedescendant": expanded && selectedItemId ? `${selectedItemId}-title` : "",
       placeholder,
-      value: query,
-      spellCheck: false,
       ref: c => (this.$input = c),
+      spellCheck: false,
+      value: query,
     };
 
     return (

@@ -1,5 +1,5 @@
-import React, { FC } from "react";
 import { SearchBox } from "devtools/client/inspector/rules/components/SearchBox";
+import React, { FC } from "react";
 
 type ToolbarProps = {
   rulesQuery: string;

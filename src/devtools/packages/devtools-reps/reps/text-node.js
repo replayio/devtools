@@ -3,22 +3,23 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // ReactJS
-const { button, span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
+const { button, span } = require("react-dom-factories");
 
 // Reps
-const { isGrip, cropString, wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
+const { isGrip, cropString, wrapRender } = require("./rep-utils");
 
 /**
  * Renders DOM #text node.
  */
 TextNode.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
-  onDOMNodeMouseOver: PropTypes.func,
+
+  object: PropTypes.object.isRequired,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
 };
 
@@ -32,8 +33,8 @@ function TextNode(props) {
   } = props;
 
   const baseConfig = {
-    "data-link-actor-id": grip.actor,
     className: "objectBox objectBox-textNode",
+    "data-link-actor-id": grip.actor,
   };
   let inspectIcon;
   const isInTree = grip.preview && grip.preview.isConnected === true;
@@ -55,9 +56,10 @@ function TextNode(props) {
       inspectIcon = button({
         className: "open-inspector",
         draggable: false,
+
+        onClick: e => onInspectIconClick(grip, e),
         // TODO: Localize this with "openNodeInInspector" when Bug 1317038 lands
         title: "Click to select the node in the inspector",
-        onClick: e => onInspectIconClick(grip, e),
       });
     }
   }

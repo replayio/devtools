@@ -25,8 +25,8 @@ export function Tooltip({ hoverTime, zoomRegion, timelineWidth, isFocusing }: Pr
 
 const connector = connect((state: UIState) => ({
   hoverTime: selectors.getHoverTime(state),
-  zoomRegion: selectors.getZoomRegion(state),
   isFocusing: selectors.getIsFocusing(state),
+  zoomRegion: selectors.getZoomRegion(state),
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;

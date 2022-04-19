@@ -9,4 +9,4 @@ declare global {
   }
 }
 
-window.app.inspector = { prefs, features };
+window.app.inspector = { features, prefs };

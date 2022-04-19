@@ -1,7 +1,11 @@
-import React from "react";
 import { ValueFront } from "protocol/thread/value";
+import { assert } from "protocol/utils";
+import React from "react";
+
 import { MODE } from "../../reps/constants";
 import ErrorRep from "../../reps/error";
+import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+
 import {
   ContainerItem,
   GetterItem,
@@ -14,8 +18,6 @@ import {
   LoadingItem,
   renderRep,
 } from ".";
-import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
-import { assert } from "protocol/utils";
 
 export class ValueItem implements IItem {
   readonly type = "value";
@@ -132,14 +134,14 @@ export class ValueItem implements IItem {
     const value = this.contents;
     const previewValues = value.previewValueMap();
     const rv: Item[] = [...previewValues.entries()].map(
-      ([name, contents]) => new ValueItem({ parent: this, name, contents })
+      ([name, contents]) => new ValueItem({ contents, name, parent: this })
     );
     const knownProperties = new Set(previewValues.keys());
     value.traversePrototypeChain(current => {
       const getters = current.previewGetters();
       for (const [name, getterFn] of getters.entries()) {
         if (!knownProperties.has(name)) {
-          rv.push(new GetterItem({ parent: this, name, getterFn }));
+          rv.push(new GetterItem({ getterFn, name, parent: this }));
           knownProperties.add(name);
         }
       }
@@ -162,20 +164,20 @@ export class ValueItem implements IItem {
       const elements = value.previewContainerEntries()!.map(({ key, value }, i) => {
         if (key) {
           return new KeyValueItem({
+            key,
             name: i.toString(),
             path: `${this.path}/<entries>/${i}`,
-            key,
             value,
           });
         } else {
           return new ValueItem({
+            contents: value,
             name: i.toString(),
             path: `${this.path}/<entries>/${i}`,
-            contents: value,
           });
         }
       });
-      rv.unshift(new ContainerItem({ parent: this, name: "<entries>", contents: elements }));
+      rv.unshift(new ContainerItem({ contents: elements, name: "<entries>", parent: this }));
     }
 
     if (value.className() === "Promise") {
@@ -183,9 +185,9 @@ export class ValueItem implements IItem {
       if (result) {
         const { state, value } = result;
         if (value) {
-          rv.unshift(new ValueItem({ parent: this, name: "<value>", contents: value }));
+          rv.unshift(new ValueItem({ contents: value, name: "<value>", parent: this }));
         }
-        rv.unshift(new ValueItem({ parent: this, name: "<state>", contents: state }));
+        rv.unshift(new ValueItem({ contents: state, name: "<state>", parent: this }));
       }
     }
 
@@ -193,13 +195,13 @@ export class ValueItem implements IItem {
       const result = value.previewProxyState();
       if (result) {
         const { target, handler } = result;
-        rv.unshift(new ValueItem({ parent: this, name: "<handler>", contents: handler }));
-        rv.unshift(new ValueItem({ parent: this, name: "<target>", contents: target }));
+        rv.unshift(new ValueItem({ contents: handler, name: "<handler>", parent: this }));
+        rv.unshift(new ValueItem({ contents: target, name: "<target>", parent: this }));
       }
     } else {
       const prototypeValue = value.previewPrototypeValue();
       if (prototypeValue) {
-        rv.push(new ValueItem({ parent: this, name: "<prototype>", contents: prototypeValue }));
+        rv.push(new ValueItem({ contents: prototypeValue, name: "<prototype>", parent: this }));
       }
     }
 

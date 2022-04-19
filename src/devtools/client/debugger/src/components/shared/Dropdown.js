@@ -3,8 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
 import classnames from "classnames";
+import React, { Component } from "react";
 
 export class Dropdown extends Component {
   toggleDropdown;

@@ -5,11 +5,12 @@
 //
 
 import React, { Component } from "react";
-import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
-import { connect } from "../../utils/connect";
 import { getLocationKey } from "../../utils/breakpoint";
+import { connect } from "../../utils/connect";
+
+import ColumnBreakpoint from "./ColumnBreakpoint";
 
 // eslint-disable-next-line max-len
 
@@ -39,9 +40,9 @@ class ColumnBreakpoints extends Component {
 }
 
 const mapStateToProps = state => ({
+  columnBreakpoints: visibleColumnBreakpoints(state),
   cx: getContext(state),
   selectedSource: getSelectedSource(state),
-  columnBreakpoints: visibleColumnBreakpoints(state),
 });
 
 export default connect(mapStateToProps)(ColumnBreakpoints);

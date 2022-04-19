@@ -1,7 +1,9 @@
 import { string } from "prop-types";
 import { UIState } from "ui/state";
-import { Source } from "./source";
+
 import { Frame } from "../reducers/sources";
+
+import { Source } from "./source";
 
 export interface Context {
   isPaused: boolean;

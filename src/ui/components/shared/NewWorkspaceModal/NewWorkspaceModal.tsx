@@ -13,13 +13,15 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
-import { features } from "ui/utils/prefs";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
+import { features } from "ui/utils/prefs";
+
+import { useConfirm } from "../Confirm";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
+
 import InvitationLink from "./InvitationLink";
-import { useConfirm } from "../Confirm";
 
 function ModalButton({
   children,
@@ -203,7 +205,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
           <NextButton
             onNext={handleSave}
             didUserConfirm={() => Promise.resolve(true)}
-            {...{ current, total, setCurrent, hideModal, allowNext }}
+            {...{ allowNext, current, hideModal, setCurrent, total }}
           />
         ) : (
           <DisabledNextButton />
@@ -252,7 +254,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
 
     setErrorMessage(null);
     setIsLoading(true);
-    inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
+    inviteNewWorkspaceMember({ variables: { email: inputValue, workspaceId: newWorkspace!.id } });
   };
   const didUserConfirm = () => {
     if (!inputValue) {
@@ -260,10 +262,10 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
     }
 
     return confirmDestructive({
-      message: "Continue without sending invitations?",
+      acceptLabel: "Continue anyways",
       description:
         "You started to invite someone, but didn't press the invite button. Are you sure you want to proceed?",
-      acceptLabel: "Continue anyways",
+      message: "Continue without sending invitations?",
     });
   };
 
@@ -296,7 +298,7 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
       <div className="grid">
         <NextButton
           allowNext={true}
-          {...{ current, total, setCurrent, hideModal, didUserConfirm }}
+          {...{ current, didUserConfirm, hideModal, setCurrent, total }}
         />
       </div>
     </>
@@ -349,10 +351,10 @@ function OnboardingModal(props: PropsFromRedux) {
   let slide;
   const newProps = {
     ...props,
+    current,
+    newWorkspace,
     setCurrent,
     setNewWorkspace,
-    newWorkspace,
-    current,
     total: 4,
   };
 

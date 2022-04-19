@@ -4,6 +4,11 @@
 
 //
 
+import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
+import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+
+import { selectSource, selectLocation } from "../actions/sources/select";
+import { closeQuickOpen } from "../reducers/quick-open";
 import {
   getActiveSearch,
   getPaneCollapse,
@@ -16,19 +21,15 @@ import {
   getSelectedLocation,
   getContext,
 } from "../selectors";
-import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { selectSource, selectLocation } from "../actions/sources/select";
-import { getEditor, getLocationsInViewport } from "../utils/editor";
-import { searchContents } from "./file-search";
-import { copyToTheClipboard } from "../utils/clipboard";
 import { isFulfilled } from "../utils/async-value";
-import { closeQuickOpen } from "../reducers/quick-open";
-
-import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
+import { copyToTheClipboard } from "../utils/clipboard";
+import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
 
+import { searchContents } from "./file-search";
+
 export function setPrimaryPaneTab(tabName) {
-  return { type: "SET_PRIMARY_PANE_TAB", tabName };
+  return { tabName, type: "SET_PRIMARY_PANE_TAB" };
 }
 
 export function closeActiveSearch() {
@@ -82,8 +83,8 @@ export function ensureSourcesIsVisible() {
     // sees those panels
     if (getPaneCollapse(getState())) {
       dispatch({
-        type: "TOGGLE_PANE",
         paneCollapsed: false,
+        type: "TOGGLE_PANE",
       });
     }
 
@@ -91,15 +92,15 @@ export function ensureSourcesIsVisible() {
     // sees the sources panel.
     if (getSelectedPrimaryPanel(getState()) !== "explorer") {
       dispatch({
-        type: "set_selected_primary_panel",
         panel: "explorer",
+        type: "set_selected_primary_panel",
       });
     }
 
     if (getSourcesCollapsed(getState())) {
       dispatch({
-        type: "TOGGLE_SOURCES",
         sourcesCollapsed: false,
+        type: "TOGGLE_SOURCES",
       });
     }
   };
@@ -108,7 +109,7 @@ export function ensureSourcesIsVisible() {
 export function openSourceLink(sourceId, line, column) {
   return async (dispatch, getState) => {
     const cx = getContext(getState());
-    const location = { sourceId, line, column };
+    const location = { column, line, sourceId };
 
     dispatch(showSource(cx, sourceId));
     await dispatch(selectSource(cx, sourceId, location));
@@ -131,27 +132,27 @@ export function showSource(cx, sourceId, openSourcesTab = true) {
 export function togglePaneCollapse() {
   return (dispatch, getState) => {
     const paneCollapsed = getPaneCollapse(getState());
-    dispatch({ type: "TOGGLE_PANE", paneCollapsed: !paneCollapsed });
+    dispatch({ paneCollapsed: !paneCollapsed, type: "TOGGLE_PANE" });
   };
 }
 
 export function toggleSourcesCollapse() {
   return (dispatch, getState) => {
     const sourcesCollapsed = getSourcesCollapsed(getState());
-    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: !sourcesCollapsed });
+    dispatch({ sourcesCollapsed: !sourcesCollapsed, type: "TOGGLE_SOURCES" });
   };
 }
 
 export function expandSourcesPane() {
   return dispatch => {
-    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: false });
+    dispatch({ sourcesCollapsed: false, type: "TOGGLE_SOURCES" });
   };
 }
 
 export function highlightLineRange(location) {
   return {
-    type: "HIGHLIGHT_LINES",
     location,
+    type: "HIGHLIGHT_LINES",
   };
 }
 
@@ -176,7 +177,7 @@ export function updateViewport() {
 }
 
 export function updateCursorPosition(cursorPosition) {
-  return { type: "SET_CURSOR_POSITION", cursorPosition };
+  return { cursorPosition, type: "SET_CURSOR_POSITION" };
 }
 
 export function copyToClipboard(source) {
@@ -228,9 +229,9 @@ export function refreshCodeMirror() {
 }
 
 export function setFullTextQuery(query) {
-  return { type: "SET_FULLTEXT_SEARCH", query };
+  return { query, type: "SET_FULLTEXT_SEARCH" };
 }
 
 export function focusFullTextInput(focus) {
-  return { type: "FOCUS_FULLTEXT_SEARCH", focus };
+  return { focus, type: "FOCUS_FULLTEXT_SEARCH" };
 }

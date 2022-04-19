@@ -82,9 +82,9 @@ const libraryMap = [
     pattern: /rxjs/i,
   },
   {
+    contextPattern: /zone\.js/,
     label: "Angular",
     pattern: /angular(?!.*\/app\/)/i,
-    contextPattern: /zone\.js/,
   },
   {
     label: "Redux",

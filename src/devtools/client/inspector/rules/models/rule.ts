@@ -2,17 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const CssLogic = require("devtools/shared/inspector/css-logic");
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
+import { parseNamedDeclarations } from "devtools/shared/css/parsing-utils";
 import { NodeFront } from "protocol/thread/node";
 import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
+
 import CSSProperties from "../../css-properties";
-import { parseNamedDeclarations } from "devtools/shared/css/parsing-utils";
 import { Inspector } from "../../inspector";
+
 import ElementStyle from "./element-style";
+
+const CssLogic = require("devtools/shared/inspector/css-logic");
 const Services = require("devtools/shared/services");
 
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
@@ -163,8 +166,8 @@ export default class Rule {
     return {
       getUniqueSelector: this.getUniqueSelector,
       matchedSelectors: this.matchedSelectors,
-      selectors: this.domRule.selectors,
       selectorText: /* this.keyframes ? this.domRule.keyText : */ this.selectorText,
+      selectors: this.domRule.selectors,
     };
   }
 

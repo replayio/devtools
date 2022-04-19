@@ -5,7 +5,6 @@
 "use strict";
 
 const { AutoRefreshHighlighter } = require("devtools/server/actors/highlighters/auto-refresh");
-const { apply } = require("devtools/shared/layout/dom-matrix-2d");
 const {
   CANVAS_SIZE,
   DEFAULT_COLOR,
@@ -21,6 +20,7 @@ const {
   createNode,
   getComputedStyle,
 } = require("devtools/server/actors/highlighters/utils/markup");
+const { apply } = require("devtools/shared/layout/dom-matrix-2d");
 const {
   getAbsoluteScrollOffsetsForNode,
   getCurrentZoom,
@@ -31,13 +31,13 @@ const {
 } = require("devtools/shared/layout/utils");
 
 const FLEXBOX_LINES_PROPERTIES = {
+  alignItems: {
+    lineDash: [0, 0],
+  },
   edge: {
     lineDash: [5, 3],
   },
   item: {
-    lineDash: [0, 0],
-  },
-  alignItems: {
     lineDash: [0, 0],
   },
 };
@@ -114,11 +114,11 @@ class FlexboxHighlighter extends AutoRefreshHighlighter {
     });
 
     const root = createNode(this.win, {
-      parent: container,
       attributes: {
-        id: "root",
         class: "root",
+        id: "root",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
@@ -126,15 +126,15 @@ class FlexboxHighlighter extends AutoRefreshHighlighter {
     // to draw which wouldn't be possible with HTML or SVG without having to insert and
     // remove the whole markup on every update.
     createNode(this.win, {
-      parent: root,
-      nodeType: "canvas",
       attributes: {
-        id: "canvas",
         class: "canvas",
-        hidden: "true",
-        width: CANVAS_SIZE,
         height: CANVAS_SIZE,
+        hidden: "true",
+        id: "canvas",
+        width: CANVAS_SIZE,
       },
+      nodeType: "canvas",
+      parent: root,
       prefix: this.ID_CLASS_PREFIX,
     });
 
@@ -826,7 +826,6 @@ function getFlexData(container) {
         crossStart: line.crossStart,
         firstBaselineOffset: line.firstBaselineOffset,
         growthState: line.growthState,
-        lastBaselineOffset: line.lastBaselineOffset,
         items: line.getItems().map(item => {
           return {
             crossMaxSize: item.crossMaxSize,
@@ -839,6 +838,7 @@ function getFlexData(container) {
             rect: getRectFromFlexItemValues(item, container),
           };
         }),
+        lastBaselineOffset: line.lastBaselineOffset,
       };
     }),
   };

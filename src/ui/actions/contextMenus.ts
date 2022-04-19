@@ -18,7 +18,7 @@ type OpenContextMenu = Action<"open_context_menu"> & { contextMenu: ContextMenu 
 type CloseContextMenu = Action<"close_context_menu">;
 
 export function openContextMenu(contextMenu: ContextMenu): OpenContextMenu {
-  return { type: "open_context_menu", contextMenu };
+  return { contextMenu, type: "open_context_menu" };
 }
 
 export function closeContextMenu(): CloseContextMenu {

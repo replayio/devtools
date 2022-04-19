@@ -1,7 +1,8 @@
-import { useSelector } from "react-redux";
-import { getCommandHistory } from "../../selectors/messages";
 import clamp from "lodash/clamp";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+
+import { getCommandHistory } from "../../selectors/messages";
 
 export default function useEvaluationHistory(setValue: (newValue: string) => void) {
   const commandHistory = useSelector(getCommandHistory);

@@ -4,10 +4,12 @@
 
 //
 
+import { ValueItem, ContainerItem } from "devtools/packages/devtools-reps";
+
+import { simplifyDisplayName } from "../../pause/frames";
+
 import { getBindingVariables } from "./getVariables";
 import { getFramePopVariables, getThisVariable } from "./utils";
-import { simplifyDisplayName } from "../../pause/frames";
-import { ValueItem, ContainerItem } from "devtools/packages/devtools-reps";
 
 function getScopeTitle(type, scope) {
   if (type === "block" && scope.block && scope.block.displayName) {
@@ -60,9 +62,9 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
       const title = getScopeTitle(type, scope) || "";
       vars.sort((a, b) => a.name.localeCompare(b.name));
       return new ContainerItem({
+        contents: vars,
         name: title,
         path: key,
-        contents: vars,
       });
     }
   } else if (scope.object) {
@@ -75,9 +77,9 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
     }
     */
     return new ValueItem({
+      contents: value,
       name: value.className(),
       path: key,
-      contents: value,
     });
   }
 
@@ -90,9 +92,9 @@ export function mergeScopes(scope, parentScope, item, parentItem) {
     contents.sort((a, b) => a.name.localeCompare(b.name));
 
     return new ContainerItem({
+      contents,
       name: parentItem.name,
       path: parentItem.path,
-      contents,
     });
   }
 }

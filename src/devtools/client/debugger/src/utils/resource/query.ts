@@ -5,12 +5,10 @@
 //
 
 import { makeResourceQuery } from "./base-query";
-
-import { queryCacheWeak, queryCacheShallow, queryCacheStrict, CacheResult } from "./query-cache";
-
-import { memoizeResourceShallow, Mapper } from "./memoize";
 import { shallowEqual } from "./compare";
 import { BaseResource, ResourceState, ResourceId } from "./core";
+import { memoizeResourceShallow, Mapper } from "./memoize";
+import { queryCacheWeak, queryCacheShallow, queryCacheStrict, CacheResult } from "./query-cache";
 
 export function filterAllIds<T>(values: Record<string, T>) {
   return Object.keys(values);

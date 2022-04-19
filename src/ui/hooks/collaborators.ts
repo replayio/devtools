@@ -2,6 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { RecordingId } from "@recordreplay/protocol";
 import { AddCollaborator, AddCollaboratorVariables } from "graphql/AddCollaborator";
 import { DeleteCollaborator, DeleteCollaboratorVariables } from "graphql/DeleteCollaborator";
+
 import { useGetRecording } from "./recordings";
 import { useGetUserId } from "./users";
 
@@ -53,9 +54,9 @@ export function useAddNewCollaborator(onCompleted: () => void, onError: () => vo
       }
     `,
     {
-      refetchQueries: ["GetOwnerAndCollaborators"],
       onCompleted,
       onError,
+      refetchQueries: ["GetOwnerAndCollaborators"],
     }
   );
 
@@ -63,5 +64,5 @@ export function useAddNewCollaborator(onCompleted: () => void, onError: () => vo
     console.error("Apollo error while adding a collaborator", error);
   }
 
-  return { addNewCollaborator, loading, error };
+  return { addNewCollaborator, error, loading };
 }

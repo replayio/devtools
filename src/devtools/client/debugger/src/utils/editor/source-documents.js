@@ -4,9 +4,8 @@
 
 //
 
-import { getMode } from "../source";
-
 import { isMinified } from "../isMinified";
+import { getMode } from "../source";
 
 let sourceDocs = {};
 

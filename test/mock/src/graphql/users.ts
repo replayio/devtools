@@ -1,5 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
+
 import { cloneResponse } from "./utils";
 
 export function createGetUserMock(opts: { user?: { id: string; uuid: string } }): MockedResponse[] {
@@ -14,7 +15,7 @@ export function createGetUserMock(opts: { user?: { id: string; uuid: string } })
     motd: null,
     nags: [],
     unsubscribedEmailTypes: [],
-    user: { id: opts.user?.id || "1", picture: null, name: "Mock User" },
+    user: { id: opts.user?.id || "1", name: "Mock User", picture: null },
   };
   const getUser = {
     request: {

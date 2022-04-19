@@ -1,9 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import { removeBreakpoint, removeBreakpointsInSource } from "../../actions/breakpoints/breakpoints";
 import { Source } from "../../reducers/types";
 import { Breakpoint, Context } from "../../selectors";
 import { getBreakpointSources } from "../../selectors/breakpointSources";
+
 import Breakpoints from "./Breakpoints";
 
 export default function BreakpointsPane() {

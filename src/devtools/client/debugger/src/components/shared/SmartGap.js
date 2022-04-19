@@ -121,10 +121,10 @@ export default function SmartGap({ token, preview, type, gapHeight, coords, offs
       xmlns="http://www.w3.org/2000/svg"
       style={{
         height,
-        width,
-        position: "absolute",
         marginLeft: optionalMarginLeft,
         marginTop: optionalMarginTop,
+        position: "absolute",
+        width,
       }}
     >
       <polygon points={coordinates} fill="transparent" />

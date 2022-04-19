@@ -1,61 +1,62 @@
 import { TablePropGetter } from "react-table";
+
 import type { Tab } from "../reducers/tabs";
 
 export function getTabMenuItems() {
   return {
-    closeTab: {
-      id: "node-menu-close-tab",
-      label: "Close tab",
-      accesskey: "c",
-      disabled: false,
-    },
-    closeOtherTabs: {
-      id: "node-menu-close-other-tabs",
-      label: "Close other tabs",
-      accesskey: "o",
-      disabled: false,
-    },
-    closeTabsToEnd: {
-      id: "node-menu-close-tabs-to-end",
-      label: "Close tabs to the right",
-      accesskey: "e",
-      disabled: false,
-    },
     closeAllTabs: {
-      id: "node-menu-close-all-tabs",
-      label: "Close all tabs",
       accesskey: "a",
       disabled: false,
+      id: "node-menu-close-all-tabs",
+      label: "Close all tabs",
     },
-    showSource: {
-      id: "node-menu-show-source",
-      label: "Reveal in tree",
-      accesskey: "r",
+    closeOtherTabs: {
+      accesskey: "o",
       disabled: false,
+      id: "node-menu-close-other-tabs",
+      label: "Close other tabs",
     },
-    copyToClipboard: {
-      id: "node-menu-copy-to-clipboard",
-      label: "Copy to clipboard",
-      accesskey: "C",
+    closeTab: {
+      accesskey: "c",
       disabled: false,
+      id: "node-menu-close-tab",
+      label: "Close tab",
+    },
+    closeTabsToEnd: {
+      accesskey: "e",
+      disabled: false,
+      id: "node-menu-close-tabs-to-end",
+      label: "Close tabs to the right",
     },
     copySourceUri2: {
-      id: "node-menu-copy-source-url",
-      label: "Copy source URI",
       accesskey: "u",
       disabled: false,
+      id: "node-menu-copy-source-url",
+      label: "Copy source URI",
     },
-    toggleBlackBox: {
-      id: "node-menu-blackbox",
-      label: "Blackbox source",
-      accesskey: "B",
+    copyToClipboard: {
+      accesskey: "C",
       disabled: false,
+      id: "node-menu-copy-to-clipboard",
+      label: "Copy to clipboard",
     },
     prettyPrint: {
-      id: "node-menu-pretty-print",
-      label: "Pretty print source",
       accesskey: "p",
       disabled: false,
+      id: "node-menu-pretty-print",
+      label: "Pretty print source",
+    },
+    showSource: {
+      accesskey: "r",
+      disabled: false,
+      id: "node-menu-show-source",
+      label: "Reveal in tree",
+    },
+    toggleBlackBox: {
+      accesskey: "B",
+      disabled: false,
+      id: "node-menu-blackbox",
+      label: "Blackbox source",
     },
   };
 }

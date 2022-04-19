@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React from "react";
 import hooks from "ui/hooks";
 import { Subscription } from "ui/types";
+
 import { formatPaymentMethod } from "./utils";
 
 export function DeleteConfirmation({
@@ -18,8 +19,8 @@ export function DeleteConfirmation({
   const handleDeletePaymentMethod = () =>
     deleteWorkspacePaymentMethod({
       variables: {
-        workspaceId,
         paymentMethodId: subscription.paymentMethods![0].id,
+        workspaceId,
       },
     }).then(onDone);
 

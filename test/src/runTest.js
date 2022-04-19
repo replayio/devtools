@@ -1,9 +1,11 @@
 const path = require("path");
+
 const playwright = require("@recordreplay/playwright");
 const cli = require("@replayio/replay");
 const _ = require("lodash");
-const { sendTelemetryEvent, waitUntilMessage, elapsedTime } = require("./utils");
+
 const { recordNode } = require("./recordNode");
+const { sendTelemetryEvent, waitUntilMessage, elapsedTime } = require("./utils");
 
 async function recordBrowser(state, test, testPath, browserName) {
   console.log(`Recording Test:`, test, browserName);
@@ -71,11 +73,11 @@ async function upload(state, test) {
 
 async function onFinish(state, { test, target, success, testPath, why, recordingId }) {
   sendTelemetryEvent("E2EFinished", {
-    test,
     action: process.env.GITHUB_ACTION,
     branch: process.env.GITHUB_REF_NAME,
     sha: process.env.GITHUB_SHA,
     success,
+    test,
     why,
   });
 
@@ -103,7 +105,7 @@ async function runTest(state, test, exampleRecordingId, target) {
     testPath += "&longTimeout=1";
   }
 
-  let success, why, recordingId;
+  let recordingId, success, why;
   if (target == "gecko" || target == "chromium") {
     const browserName = target == "gecko" ? "firefox" : "chromium";
     const result = await recordBrowser(state, test, testPath, browserName);
@@ -112,7 +114,7 @@ async function runTest(state, test, exampleRecordingId, target) {
     await recordNode(state, path.join(__dirname, "../examples/node", test));
   }
 
-  await onFinish(state, { test, target, success, why, testPath, recordingId });
+  await onFinish(state, { recordingId, success, target, test, testPath, why });
 
   return recordingId;
 }

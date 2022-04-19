@@ -1,5 +1,5 @@
-import { Workspace, WorkspaceSubscriptionStatus } from "ui/types";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
+import { Workspace, WorkspaceSubscriptionStatus } from "ui/types";
 
 export function inUnpaidFreeTrial(workspace: Workspace) {
   const subscription = workspace.subscription;

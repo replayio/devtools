@@ -1,10 +1,11 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
-import VideoComment from "./VideoComment";
+import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
+
+import VideoComment from "./VideoComment";
 
 function findComment({
   hasuraComments,
@@ -48,16 +49,16 @@ function CommentsOverlay({
   }
 
   const { top, left, width, height, scale } = canvas;
-  const comments = findComment({ hasuraComments, pendingComment, currentTime });
+  const comments = findComment({ currentTime, hasuraComments, pendingComment });
 
   return (
     <div
       className="canvas-overlay"
       style={{
-        top: top,
-        left: left,
-        width: width * scale - 2,
         height: height * scale - 2,
+        left: left,
+        top: top,
+        width: width * scale - 2,
       }}
     >
       <div className="canvas-comments">
@@ -71,9 +72,9 @@ function CommentsOverlay({
 }
 
 const connector = connect((state: UIState) => ({
+  canvas: selectors.getCanvas(state),
   currentTime: selectors.getCurrentTime(state),
   pendingComment: selectors.getPendingComment(state),
-  canvas: selectors.getCanvas(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

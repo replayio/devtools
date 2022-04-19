@@ -43,17 +43,17 @@ const ATTRIBUTE_TYPES = new Map([
     "cite",
     {
       blockquote: { namespaceURI: HTML_NS, type: TYPE_URI },
-      q: { namespaceURI: HTML_NS, type: TYPE_URI },
       del: { namespaceURI: HTML_NS, type: TYPE_URI },
       ins: { namespaceURI: HTML_NS, type: TYPE_URI },
+      q: { namespaceURI: HTML_NS, type: TYPE_URI },
     },
   ],
   ["classid", { object: { namespaceURI: HTML_NS, type: TYPE_URI } }],
   [
     "codebase",
     {
-      object: { namespaceURI: HTML_NS, type: TYPE_URI },
       applet: { namespaceURI: HTML_NS, type: TYPE_URI },
+      object: { namespaceURI: HTML_NS, type: TYPE_URI },
     },
   ],
   [
@@ -109,17 +109,17 @@ const ATTRIBUTE_TYPES = new Map([
     {
       a: { namespaceURI: HTML_NS, type: TYPE_URI },
       area: { namespaceURI: HTML_NS, type: TYPE_URI },
+      base: { namespaceURI: HTML_NS, type: TYPE_URI },
       link: [
         {
-          namespaceURI: WILDCARD,
-          type: TYPE_CSS_RESOURCE_URI,
           isValid: attributes => {
             return getAttribute(attributes, "rel") === "stylesheet";
           },
+          namespaceURI: WILDCARD,
+          type: TYPE_CSS_RESOURCE_URI,
         },
         { namespaceURI: WILDCARD, type: TYPE_URI },
       ],
-      base: { namespaceURI: HTML_NS, type: TYPE_URI },
     },
   ],
   [
@@ -132,9 +132,9 @@ const ATTRIBUTE_TYPES = new Map([
   [
     "longdesc",
     {
-      img: { namespaceURI: HTML_NS, type: TYPE_URI },
       frame: { namespaceURI: HTML_NS, type: TYPE_URI },
       iframe: { namespaceURI: HTML_NS, type: TYPE_URI },
+      img: { namespaceURI: HTML_NS, type: TYPE_URI },
     },
   ],
   ["manifest", { html: { namespaceURI: HTML_NS, type: TYPE_URI } }],
@@ -156,13 +156,13 @@ const ATTRIBUTE_TYPES = new Map([
   [
     "src",
     {
-      script: { namespaceURI: WILDCARD, type: TYPE_JS_RESOURCE_URI },
-      input: { namespaceURI: HTML_NS, type: TYPE_URI },
+      audio: { namespaceURI: HTML_NS, type: TYPE_URI },
+      embed: { namespaceURI: HTML_NS, type: TYPE_URI },
       frame: { namespaceURI: HTML_NS, type: TYPE_URI },
       iframe: { namespaceURI: HTML_NS, type: TYPE_URI },
       img: { namespaceURI: HTML_NS, type: TYPE_URI },
-      audio: { namespaceURI: HTML_NS, type: TYPE_URI },
-      embed: { namespaceURI: HTML_NS, type: TYPE_URI },
+      input: { namespaceURI: HTML_NS, type: TYPE_URI },
+      script: { namespaceURI: WILDCARD, type: TYPE_JS_RESOURCE_URI },
       source: { namespaceURI: HTML_NS, type: TYPE_URI },
       track: { namespaceURI: HTML_NS, type: TYPE_URI },
       video: { namespaceURI: HTML_NS, type: TYPE_URI },
@@ -200,31 +200,6 @@ const ATTRIBUTE_TYPES = new Map([
 ]);
 
 var parsers = {
-  [TYPE_URI]: function (attributeValue) {
-    return [
-      {
-        type: TYPE_URI,
-        value: attributeValue,
-      },
-    ];
-  },
-  [TYPE_URI_LIST]: function (attributeValue) {
-    const data = splitBy(attributeValue, " ");
-    for (const token of data) {
-      if (!token.type) {
-        token.type = TYPE_URI;
-      }
-    }
-    return data;
-  },
-  [TYPE_JS_RESOURCE_URI]: function (attributeValue) {
-    return [
-      {
-        type: TYPE_JS_RESOURCE_URI,
-        value: attributeValue,
-      },
-    ];
-  },
   [TYPE_CSS_RESOURCE_URI]: function (attributeValue) {
     return [
       {
@@ -246,6 +221,31 @@ var parsers = {
     for (const token of data) {
       if (!token.type) {
         token.type = TYPE_IDREF;
+      }
+    }
+    return data;
+  },
+  [TYPE_JS_RESOURCE_URI]: function (attributeValue) {
+    return [
+      {
+        type: TYPE_JS_RESOURCE_URI,
+        value: attributeValue,
+      },
+    ];
+  },
+  [TYPE_URI]: function (attributeValue) {
+    return [
+      {
+        type: TYPE_URI,
+        value: attributeValue,
+      },
+    ];
+  },
+  [TYPE_URI_LIST]: function (attributeValue) {
+    const data = splitBy(attributeValue, " ");
+    for (const token of data) {
+      if (!token.type) {
+        token.type = TYPE_URI;
       }
     }
     return data;
@@ -341,8 +341,8 @@ function getAttribute(attributes, attributeName) {
 function splitBy(value, splitChar) {
   const data = [];
 
-  let i = 0,
-    buffer = "";
+  let buffer = "",
+    i = 0;
   while (i <= value.length) {
     if (i === value.length && buffer) {
       data.push({ value: buffer });

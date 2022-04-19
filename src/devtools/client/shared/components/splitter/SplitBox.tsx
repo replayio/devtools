@@ -1,7 +1,7 @@
-import { CSSProperties, FC, ReactNode, useEffect, useRef, useState } from "react";
-import { debounce } from "devtools/shared/debounce";
 import cx from "classnames";
 import Draggable from "devtools/client/shared/components/splitter/Draggable";
+import { debounce } from "devtools/shared/debounce";
+import { CSSProperties, FC, ReactNode, useEffect, useRef, useState } from "react";
 
 const dispatchResize = debounce(() => window.dispatchEvent(new Event("resize")), 50, {});
 
@@ -137,8 +137,8 @@ const SplitBox: FC<SplitterProps> = ({
       className={cx(
         "split-box",
         {
-          vert: vert,
           horz: !vert,
+          vert: vert,
         },
         className
       )}

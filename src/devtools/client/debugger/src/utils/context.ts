@@ -3,8 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 //
 
-import { getThreadContext } from "../selectors";
-
 // Context encapsulates the main parameters of the current redux state, which
 // impact most other information tracked by the debugger.
 //
@@ -29,7 +27,9 @@ import { getThreadContext } from "../selectors";
 // thread changes, pauses, or resumes.
 
 import type { UIState } from "ui/state";
+
 import type { Context } from "../reducers/pause";
+import { getThreadContext } from "../selectors";
 
 export function validateNavigateContext(state: UIState, cx: Context) {}
 

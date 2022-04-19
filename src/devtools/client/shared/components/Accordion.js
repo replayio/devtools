@@ -4,14 +4,13 @@
 
 "use strict";
 
-const { Component, createElement } = require("react");
 const PropTypes = require("prop-types");
+const { Component, createElement } = require("react");
 const { ul, li, h2, div, span } = require("react-dom-factories");
 
 class Accordion extends Component {
   static get propTypes() {
     return {
-      style: PropTypes.object,
       // A list of all items to be rendered using an Accordion component.
       items: PropTypes.arrayOf(
         PropTypes.shape({
@@ -30,6 +29,8 @@ class Accordion extends Component {
           opened: PropTypes.bool.isRequired,
         })
       ).isRequired,
+
+      style: PropTypes.object,
     };
   }
 
@@ -142,22 +143,25 @@ class Accordion extends Component {
 
     return li(
       {
-        key: id,
-        id,
-        className: `accordion-item ${className}`.trim(),
         "aria-labelledby": headerId,
+        className: `accordion-item ${className}`.trim(),
+        id,
+        key: id,
       },
       h2(
         {
-          id: headerId,
-          className: "accordion-header",
-          tabIndex: 0,
           "aria-expanded": opened,
           // If the header contains buttons, make sure the heading name only
           // contains the "header" text and not the button text
           "aria-label": header,
-          onKeyDown: this.onHeaderKeyDown,
+
+          className: "accordion-header",
+
+          id: headerId,
+
           onClick: this.onHeaderClick,
+          onKeyDown: this.onHeaderKeyDown,
+          tabIndex: 0,
         },
         span({
           className: `theme-twisty${opened ? " open" : ""}`,

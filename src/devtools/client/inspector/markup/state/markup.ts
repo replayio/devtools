@@ -1,5 +1,5 @@
-import { NodeFront } from "protocol/thread/node";
 import { Attr } from "@recordreplay/protocol";
+import { NodeFront } from "protocol/thread/node";
 
 export interface NodeInfo {
   // A list of the node's attributes.

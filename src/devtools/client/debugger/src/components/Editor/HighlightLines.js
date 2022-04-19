@@ -3,11 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { Component } from "react";
-import range from "lodash/range";
 import isEmpty from "lodash/isEmpty";
-import { connect } from "../../utils/connect";
+import range from "lodash/range";
+import { Component } from "react";
+
 import { getHighlightedLineRange } from "../../selectors";
+import { connect } from "../../utils/connect";
 
 class HighlightLines extends Component {
   highlightLineRange;

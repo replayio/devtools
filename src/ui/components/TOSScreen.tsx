@@ -1,5 +1,6 @@
 import React from "react";
 import { useAcceptTOS } from "ui/hooks/users";
+
 import { PrimaryButton } from "./shared/Button";
 import ExternalLink from "./shared/ExternalLink";
 import { BubbleViewportWrapper } from "./shared/Viewport";

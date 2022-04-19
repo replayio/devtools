@@ -13,7 +13,7 @@ function workerTask(worker, method) {
   return function (...args) {
     return new Promise((resolve, reject) => {
       const id = msgId++;
-      worker.postMessage({ id, method, args });
+      worker.postMessage({ args, id, method });
 
       const listener = ({ data: result }) => {
         if (result.id !== id) {
@@ -41,7 +41,7 @@ function workerHandler(publicInterface) {
     if (response instanceof Promise) {
       response
         .then(val => self.postMessage({ id, response: val }))
-        .catch(error => self.postMessage({ id, error }));
+        .catch(error => self.postMessage({ error, id }));
     } else {
       self.postMessage({ id, response });
     }

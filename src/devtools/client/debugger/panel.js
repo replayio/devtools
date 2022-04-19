@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { assert } from "protocol/utils";
-import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
+import { openDocLink } from "devtools/client/shared/link";
+import { assert } from "protocol/utils";
 import { setSelectedPanel } from "ui/actions/layout";
 
 export class DebuggerPanel {
@@ -27,10 +27,10 @@ export class DebuggerPanel {
   getVarsForTests() {
     assert(this.isReady, "DebuggerPanel not ready");
     return {
-      store: this._store,
-      selectors: this._selectors,
       actions: this._actions,
       client: this._client,
+      selectors: this._selectors,
+      store: this._store,
     };
   }
 
@@ -116,7 +116,7 @@ export class DebuggerPanel {
 
   async selectSource(sourceId, line, column, openSourcesTab) {
     const cx = this._selectors.getContext(this._getState());
-    const location = { sourceId, line, column };
+    const location = { column, line, sourceId };
 
     this._actions.showSource(cx, sourceId, openSourcesTab);
     await this._actions.selectSource(cx, sourceId, location, openSourcesTab);

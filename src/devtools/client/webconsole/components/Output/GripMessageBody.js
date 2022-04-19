@@ -4,22 +4,21 @@
 "use strict";
 
 // React
-import React from "react";
-import PropTypes from "prop-types";
 import { MESSAGE_TYPE } from "devtools/client/webconsole/constants";
 import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
-
 import { MODE } from "devtools/packages/devtools-reps";
+import PropTypes from "prop-types";
+import React from "react";
 
 GripMessageBody.displayName = "GripMessageBody";
 
 GripMessageBody.propTypes = {
-  grip: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]).isRequired,
-  userProvidedStyle: PropTypes.string,
-  useQuotes: PropTypes.bool,
   escapeWhitespace: PropTypes.bool,
-  type: PropTypes.string,
+  grip: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]).isRequired,
   maybeScrollToBottom: PropTypes.func,
+  type: PropTypes.string,
+  useQuotes: PropTypes.bool,
+  userProvidedStyle: PropTypes.string,
 };
 
 GripMessageBody.defaultProps = {
@@ -44,17 +43,17 @@ function GripMessageBody(props) {
 
   const objectInspectorProps = {
     autoExpandDepth: shouldAutoExpandObjectInspector(props) ? 1 : 0,
-    mode,
-    maybeScrollToBottom,
     dispatch,
+    maybeScrollToBottom,
+    mode,
   };
 
   if (grip.isString()) {
     Object.assign(objectInspectorProps, {
-      useQuotes,
-      transformEmptyString: true,
       escapeWhitespace,
       style: styleObject,
+      transformEmptyString: true,
+      useQuotes,
     });
   }
 

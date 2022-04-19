@@ -1,6 +1,6 @@
-import { ThreadFront } from "protocol/thread";
-import { getDevicePixelRatio } from "protocol/graphics";
 import Highlighter from "highlighter/highlighter";
+import { getDevicePixelRatio } from "protocol/graphics";
+import { ThreadFront } from "protocol/thread";
 
 export interface NodePickerOpts {
   onHovering?: (nodeId: string | null) => void;

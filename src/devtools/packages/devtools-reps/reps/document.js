@@ -21,8 +21,8 @@ function Document(props) {
   const location = getLocation(grip);
   return span(
     {
-      "data-link-actor-id": grip.id(),
       className: "objectBox objectBox-document",
+      "data-link-actor-id": grip.id(),
     },
     getTitle(grip),
     location ? span({ className: "location" }, ` ${location}`) : null

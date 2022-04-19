@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useSearch } from ".";
+
 import { Message } from "../../reducers/messages";
 import { getMessages } from "../../selectors";
 
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
+
+import { useSearch } from ".";
 
 function search(query: string, messages: Message[]): Message[] {
   const results: Message[] = [];

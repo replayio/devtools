@@ -1,17 +1,18 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 
-import { ThreadFront } from "./thread";
-import { assert, binarySearch, defer, Deferred } from "./utils";
-import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
-import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
-import { client } from "./socket";
+import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
+import { Canvas } from "ui/state/app";
+
+import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
+import { client } from "./socket";
+import { ThreadFront } from "./thread";
+import { assert, binarySearch, defer, Deferred } from "./utils";
 import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
@@ -106,7 +107,7 @@ export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, paintHash: "" }];
+const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ paintHash: "", point: "0", time: 0 }];
 
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
@@ -126,7 +127,7 @@ const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
 function onPaints({ paints }: paintPoints) {
   paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
-    insertEntrySorted(gPaintPoints, { point, time, paintHash });
+    insertEntrySorted(gPaintPoints, { paintHash, point, time });
 
     if (gAllNecessaryPaintDataReceived) {
       // We are all set on the loading front, no need to proactively grab these
@@ -322,7 +323,7 @@ export function addLastScreen(screen: ScreenShot | null, point: string, time: nu
   if (screen) {
     addScreenShot(screen);
     const paintHash = screen.hash;
-    insertEntrySorted(gPaintPoints, { point, time, paintHash });
+    insertEntrySorted(gPaintPoints, { paintHash, point, time });
   }
 }
 
@@ -416,7 +417,7 @@ export async function getGraphicsAtTime(
     }
   }
 
-  return { screen, mouse };
+  return { mouse, screen };
 }
 
 //////////////////////////////
@@ -502,7 +503,7 @@ function drawClick(cx: CanvasRenderingContext2D, x: number, y: number) {
 
 function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | null | undefined) {
   const maxScale = 1 / (gDevicePixelRatio || 1);
-  let bounds = { height: 0, width: 0, left: 0, top: 0, scale: 1 };
+  let bounds = { height: 0, left: 0, scale: 1, top: 0, width: 0 };
 
   if (image && image.width > 0 && image.height > 0) {
     bounds.width = image.width;
@@ -609,7 +610,7 @@ async function getScreenshotDimensions(screen: ScreenShot) {
     img.onload = resolve;
     img.src = `data:${screen.mimeType};base64,${screen.data}`;
   });
-  return { width: img.width, height: img.height };
+  return { height: img.height, width: img.width };
 }
 
 export async function getFirstMeaningfulPaint(limit: number = 10) {

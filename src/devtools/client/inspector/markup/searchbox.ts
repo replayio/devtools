@@ -49,8 +49,8 @@ export default class MarkupSearchbox {
 
   createSearchBoxShortcuts() {
     this.searchboxShortcuts = new KeyShortcuts({
-      window: document.defaultView,
       target: this.markupPanel,
+      window: document.defaultView,
     });
     const key = "CmdOrCtrl+F";
     this.searchboxShortcuts.on(key, (event: KeyboardEvent) => {

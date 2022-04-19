@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { selectLocation } from "../sources";
 import { getContext } from "../../selectors";
+import { selectLocation } from "../sources";
 
 //sets pause preview location for frame timeline scrubber
 export function setPreviewPausedLocation(location) {
@@ -13,8 +13,8 @@ export function setPreviewPausedLocation(location) {
     dispatch(selectLocation(cx, location));
 
     dispatch({
-      type: "SET_PREVIEW_PAUSED_LOCATION",
       location,
+      type: "SET_PREVIEW_PAUSED_LOCATION",
     });
   };
 }

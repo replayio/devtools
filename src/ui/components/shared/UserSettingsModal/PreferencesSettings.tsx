@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import hooks from "ui/hooks";
-import Checkbox from "../Forms/Checkbox";
-import { EmailSubscription } from "ui/hooks/users";
-import { CheckboxRow } from "./CheckboxRow";
-import { getTheme, getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/actions/app";
-import { SelectMenu } from "../Forms";
+import hooks from "ui/hooks";
+import { EmailSubscription } from "ui/hooks/users";
+import { getTheme, getThemePreference } from "ui/reducers/app";
 import { AppTheme } from "ui/state/app";
+
+import { SelectMenu } from "../Forms";
+import Checkbox from "../Forms/Checkbox";
+
+import { CheckboxRow } from "./CheckboxRow";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
@@ -121,9 +123,9 @@ function UiPreferences() {
         <div className="w-1/2">
           <SelectMenu
             options={[
-              { name: "Dark", id: "dark" },
-              { name: "Light", id: "light" },
-              { name: "System", id: "system" },
+              { id: "dark", name: "Dark" },
+              { id: "light", name: "Light" },
+              { id: "system", name: "System" },
             ]}
             selected={theme}
             setSelected={str => setSelected(str as AppTheme)}

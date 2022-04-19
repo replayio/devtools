@@ -12,11 +12,11 @@ const attribute = (exports.attribute = {
 });
 
 exports.markup = {
-  // Whether or not to collapse the attributes for nodes.
-  collapseAttributes: PropTypes.bool,
-
   // The max length of the attribute value prior to truncating the attributes.
   collapseAttributeLength: PropTypes.number,
+
+  // Whether or not to collapse the attributes for nodes.
+  collapseAttributes: PropTypes.bool,
 
   // The root node to display in the DOM view.
   rootNode: PropTypes.string,

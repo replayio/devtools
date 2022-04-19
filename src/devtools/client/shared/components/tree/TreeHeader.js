@@ -18,12 +18,14 @@ define(function (require, exports, module) {
     // See also TreeView component for detailed info about properties.
     static get propTypes() {
       return {
-        // Custom tree decorator
-        decorator: PropTypes.object,
-        // True if the header should be visible
-        header: PropTypes.bool,
         // Array with column definition
         columns: PropTypes.array,
+
+        // Custom tree decorator
+        decorator: PropTypes.object,
+
+        // True if the header should be visible
+        header: PropTypes.bool,
       };
     }
 
@@ -82,10 +84,10 @@ define(function (require, exports, module) {
           td(
             {
               className: classNames.join(" "),
-              style: cellStyle,
-              role: "presentation",
               id: col.id,
               key: col.id,
+              role: "presentation",
+              style: cellStyle,
             },
             visible
               ? div(

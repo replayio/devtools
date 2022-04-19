@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { act } from "react-dom/test-utils";
 import { filterCommonTestWarnings, render } from "test/testUtils";
-import useSearch from "./useSearch";
 
+import useSearch from "./useSearch";
 import type { Actions, State } from "./useSearch";
 
 type Item = {

@@ -7,8 +7,8 @@ const PropTypes = require("prop-types");
 const { button, span } = require("react-dom-factories");
 
 // Reps
-const { getGripType, isGrip, cropString, wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
+const { getGripType, isGrip, cropString, wrapRender } = require("./rep-utils");
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
@@ -30,23 +30,23 @@ function FunctionRep(props) {
     jumpToDefinitionButton = button({
       className: "jump-definition",
       draggable: false,
-      title: "Jump to definition",
       onClick: async e => {
         // Stop the event propagation so we don't trigger ObjectInspector
         // expand/collapse.
         e.stopPropagation();
         onViewSourceInDebugger({
-          url,
-          line: location.line,
           column: location.column,
+          line: location.line,
+          url,
         });
       },
+      title: "Jump to definition",
     });
   }
 
   const elProps = {
-    "data-link-actor-id": grip.id(),
     className: "objectBox objectBox-function",
+    "data-link-actor-id": grip.id(),
     // Set dir="ltr" to prevent parentheses from
     // appearing in the wrong direction
     dir: "ltr",
@@ -183,9 +183,11 @@ function supportsObject(grip, noGrip = false) {
 // Exports from this module
 
 module.exports = {
-  rep: wrapRender(FunctionRep),
-  supportsObject,
   cleanFunctionName,
   // exported for testing purpose.
   getFunctionName,
+
+  rep: wrapRender(FunctionRep),
+
+  supportsObject,
 };

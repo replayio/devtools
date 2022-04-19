@@ -5,16 +5,18 @@
 // Dependencies
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
-const { cropString, cropMultipleLines, wrapRender } = require("./rep-utils");
+
 const { MODE } = require("./constants");
+const { cropString, cropMultipleLines, wrapRender } = require("./rep-utils");
 
 /**
  * Renders DOM comment node.
  */
 CommentNode.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
+
+  object: PropTypes.object.isRequired,
 };
 
 function CommentNode(props) {

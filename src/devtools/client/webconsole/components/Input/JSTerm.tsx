@@ -1,15 +1,17 @@
-import React, { useContext, useRef, useState } from "react";
 import { Editor } from "codemirror";
+import React, { useContext, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { evaluateExpression, paywallExpression } from "../../actions/input";
-import EagerEvalFooter from "./EagerEvalFooter";
-import useEvaluationHistory from "./useEvaluationHistory";
-import { getIsInLoadedRegion, getPlayback } from "ui/reducers/timeline";
 import {
   EditorWithAutocomplete,
   Keys,
 } from "ui/components/shared/CodeEditor/EditorWithAutocomplete";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { getIsInLoadedRegion, getPlayback } from "ui/reducers/timeline";
+
+import { evaluateExpression, paywallExpression } from "../../actions/input";
+
+import EagerEvalFooter from "./EagerEvalFooter";
+import useEvaluationHistory from "./useEvaluationHistory";
 
 const getJsTermApi = (
   editor: Editor,
@@ -18,6 +20,7 @@ const getJsTermApi = (
 ) => {
   return {
     editor,
+    execute,
     setValue: (newValue = "") => {
       // In order to get the autocomplete popup to work properly, we need to set the
       // editor text and the cursor in the same operation. If we don't, the text change
@@ -29,12 +32,11 @@ const getJsTermApi = (
         // Set the cursor at the end of the input.
         const lines = newValue.split("\n");
         editor.setCursor({
-          line: lines.length - 1,
           ch: lines[lines.length - 1].length,
+          line: lines.length - 1,
         });
       });
     },
-    execute,
     showAutocomplete,
   };
 };

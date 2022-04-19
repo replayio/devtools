@@ -1,38 +1,24 @@
 import { assert } from "protocol/utils";
+
 import { createReducer, ReducerObject } from "../../shared/reducer-object";
 import { MarkupAction } from "../actions/markup";
 import { MarkupState, MarkupTree } from "../state/markup";
+
 const Services = require("devtools/shared/services");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
 const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";
 
 const INITIAL_MARKUP: MarkupState = {
-  collapseAttributes: Services.prefs.getBoolPref(ATTR_COLLAPSE_ENABLED_PREF),
   collapseAttributeLength: Services.prefs.getIntPref(ATTR_COLLAPSE_LENGTH_PREF),
+  collapseAttributes: Services.prefs.getBoolPref(ATTR_COLLAPSE_ENABLED_PREF),
   rootNode: null,
-  selectedNode: null,
   scrollIntoViewNode: null,
+  selectedNode: null,
   tree: {},
 };
 
 const reducers: ReducerObject<MarkupState, MarkupAction> = {
-  ["RESET"]() {
-    return { ...INITIAL_MARKUP };
-  },
-
-  ["NEW_ROOT"](markup, { rootNode }) {
-    return {
-      ...markup,
-      tree: {
-        [rootNode.id]: rootNode,
-      },
-      rootNode: rootNode.id,
-      selectedNode: null,
-      scrollIntoViewNode: null,
-    };
-  },
-
   ["ADD_CHILDREN"](markup, { parentNodeId, children }) {
     const parentNodeInfo = markup.tree[parentNodeId];
     assert(parentNodeInfo, "parent node not found in markup state");
@@ -63,20 +49,20 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
     }
   },
 
-  ["UPDATE_NODE_EXPANDED"](markup, { nodeId, isExpanded }) {
-    const nodeInfo = markup.tree[nodeId];
-    assert(nodeInfo, "node not found in markup state");
-
+  ["NEW_ROOT"](markup, { rootNode }) {
     return {
       ...markup,
+      rootNode: rootNode.id,
+      scrollIntoViewNode: null,
+      selectedNode: null,
       tree: {
-        ...markup.tree,
-        [nodeId]: {
-          ...nodeInfo,
-          isExpanded,
-        },
+        [rootNode.id]: rootNode,
       },
     };
+  },
+
+  ["RESET"]() {
+    return { ...INITIAL_MARKUP };
   },
 
   ["UPDATE_CHILDREN_LOADING"](markup, { nodeId, isLoadingChildren }) {
@@ -95,10 +81,19 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
     };
   },
 
-  ["UPDATE_SELECTED_NODE"](markup, { selectedNode }) {
+  ["UPDATE_NODE_EXPANDED"](markup, { nodeId, isExpanded }) {
+    const nodeInfo = markup.tree[nodeId];
+    assert(nodeInfo, "node not found in markup state");
+
     return {
       ...markup,
-      selectedNode,
+      tree: {
+        ...markup.tree,
+        [nodeId]: {
+          ...nodeInfo,
+          isExpanded,
+        },
+      },
     };
   },
 
@@ -106,6 +101,13 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
     return {
       ...markup,
       scrollIntoViewNode,
+    };
+  },
+
+  ["UPDATE_SELECTED_NODE"](markup, { selectedNode }) {
+    return {
+      ...markup,
+      selectedNode,
     };
   },
 };

@@ -4,12 +4,12 @@
 
 //
 
-import { getSymbols, clearSymbols } from "./getSymbols";
-import { clearASTs } from "./utils/ast";
-import { setSource, clearSources } from "./sources";
-import { hasSyntaxError } from "./validate";
-
 import { workerHandler } from "devtools/shared/worker-utils";
+
+import { getSymbols, clearSymbols } from "./getSymbols";
+import { setSource, clearSources } from "./sources";
+import { clearASTs } from "./utils/ast";
+import { hasSyntaxError } from "./validate";
 
 function clearState() {
   clearASTs();
@@ -19,8 +19,8 @@ function clearState() {
 }
 
 self.onmessage = workerHandler({
-  getSymbols,
   clearState,
+  getSymbols,
   hasSyntaxError,
   setSource,
 });

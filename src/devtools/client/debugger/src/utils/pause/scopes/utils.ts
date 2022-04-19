@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { ValueFront } from "protocol/thread/value";
 import { Item, ValueItem } from "devtools/packages/devtools-reps";
+import { ValueFront } from "protocol/thread/value";
 
 export function getFramePopVariables(why: any, path: string) {
   const vars = [];
@@ -15,9 +15,9 @@ export function getFramePopVariables(why: any, path: string) {
     if (Object.prototype.hasOwnProperty.call(frameFinished, "throw")) {
       vars.push(
         new ValueItem({
+          contents: frameFinished.throw,
           name: "<exception>",
           path: `${path}/<exception>`,
-          contents: frameFinished.throw,
         })
       );
     }
@@ -30,9 +30,9 @@ export function getFramePopVariables(why: any, path: string) {
       if (typeof returned !== "object" || returned.type !== "undefined") {
         vars.push(
           new ValueItem({
+            contents: returned,
             name: "<return>",
             path: `${path}/<return>`,
-            contents: returned,
           })
         );
       }
@@ -48,9 +48,9 @@ export function getThisVariable(this_: ValueFront, path: string) {
   }
 
   return new ValueItem({
+    contents: this_,
     name: "<this>",
     path: `${path}/<this>`,
-    contents: this_,
   });
 }
 

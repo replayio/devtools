@@ -1,13 +1,12 @@
-import React, { ComponentProps } from "react";
-
 import { Story, Meta } from "@storybook/react";
-
+import React, { ComponentProps } from "react";
 import NetworkMonitor from "ui/components/NetworkMonitor";
+
 import { requestProps } from "./utils";
 
 export default {
-  title: "Network Monitor/Network Monitor",
   component: NetworkMonitor,
+  title: "Network Monitor/Network Monitor",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof NetworkMonitor>> = args => <NetworkMonitor {...args} />;

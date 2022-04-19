@@ -4,6 +4,7 @@
 
 //
 
+import { arrayShallowEqual, ComparisonFunction } from "./compare";
 import {
   getResourceValues,
   getValidatedResource,
@@ -13,7 +14,6 @@ import {
   EmptyObject,
   ResourceId,
 } from "./core";
-import { arrayShallowEqual, ComparisonFunction } from "./compare";
 import type { Mapper } from "./memoize";
 import type { CacheContext, CacheHandler, CacheResult } from "./query-cache";
 

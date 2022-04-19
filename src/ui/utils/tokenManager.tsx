@@ -1,9 +1,10 @@
 import { Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0-react";
 import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
-import React, { ReactNode } from "react";
-import { assert, defer, Deferred } from "protocol/utils";
 import { useRouter } from "next/router";
+import { assert, defer, Deferred } from "protocol/utils";
+import React, { ReactNode } from "react";
+
 import { listenForAccessToken } from "./browser";
 
 const domain = "webreplay.us.auth0.com";
@@ -131,7 +132,7 @@ class TokenManager {
   }
 
   private setExternalAuth(token: string) {
-    this.setState({ token, external: true }, this.deferredState);
+    this.setState({ external: true, token }, this.deferredState);
   }
 
   private async update(refresh: boolean) {

@@ -72,7 +72,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
   );
 
   if (!workspaceId) {
-    return { members: [], loading: false };
+    return { loading: false, members: [] };
   }
 
   if (error) {
@@ -86,24 +86,24 @@ export function useGetWorkspaceMembers(workspaceId: string) {
     workspaceUsers = members.edges.map(({ node }: any) => {
       if (node.__typename === "WorkspacePendingEmailMember") {
         return {
+          createdAt: node.createdAt,
+          email: node.email,
           membershipId: node.id,
           pending: true,
-          email: node.email,
-          createdAt: node.createdAt,
           roles: node.roles,
         };
       } else {
         return {
           membershipId: node.id,
-          userId: node.user.id,
           pending: node.__typename === "WorkspacePendingUserMember",
-          user: node.user,
           roles: node.roles,
+          user: node.user,
+          userId: node.user.id,
         };
       }
     });
   }
-  return { members: workspaceUsers, loading };
+  return { loading, members: workspaceUsers };
 }
 
 export function useInviteNewWorkspaceMember(onCompleted: () => void) {
@@ -123,7 +123,7 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
         }
       }
     `,
-    { refetchQueries: ["GetWorkspaceMembers"], onCompleted, onError }
+    { onCompleted, onError, refetchQueries: ["GetWorkspaceMembers"] }
   );
 
   return inviteNewWorkspaceMember;
@@ -178,8 +178,8 @@ export function useAcceptPendingInvitation(onCompleted: () => void) {
       }
     `,
     {
-      refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
       onCompleted,
+      refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
     }
   );
 
@@ -199,8 +199,8 @@ export function useRejectPendingInvitation(onCompleted: () => void) {
       }
     `,
     {
-      refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
       onCompleted,
+      refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
     }
   );
 

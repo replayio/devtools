@@ -21,9 +21,9 @@ export class ParserDispatcher extends WorkerDispatcher {
 
   async setSource(sourceId, content) {
     const astSource = {
+      contentType: content.contentType || null,
       id: sourceId,
       text: content.value,
-      contentType: content.contentType || null,
     };
 
     log(`WorkerDispatch Parser setSource`);

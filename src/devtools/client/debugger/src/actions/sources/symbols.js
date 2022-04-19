@@ -2,26 +2,29 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { selectors } from "ui/reducers";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
-import { parser } from "devtools/client/debugger/src/utils/bootstrap";
-import { loadSourceText } from "./loadSourceText";
 
-import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
+import { memoizeableAction } from "../../utils/memoizableAction";
+
+import { loadSourceText } from "./loadSourceText";
 
 async function doSetSymbols(source, thunkArgs) {
   const sourceId = source.id;
   await thunkArgs.dispatch(loadSourceText({ source }));
 
   await thunkArgs.dispatch({
-    type: "SET_SYMBOLS",
-    sourceId,
     [PROMISE]: parser.getSymbols(sourceId),
+    sourceId,
+    type: "SET_SYMBOLS",
   });
 }
 
 export const setSymbols = memoizeableAction("setSymbols", {
+  action: ({ source }, thunkArgs) => doSetSymbols(source, thunkArgs),
+  createKey: ({ source }) => source.id,
   getValue: ({ source }, thunkArgs) => {
     const symbols = selectors.getSymbols(thunkArgs.getState(), source);
     if (!symbols || symbols.loading) {
@@ -30,6 +33,4 @@ export const setSymbols = memoizeableAction("setSymbols", {
 
     return fulfilled(symbols);
   },
-  createKey: ({ source }) => source.id,
-  action: ({ source }, thunkArgs) => doSetSymbols(source, thunkArgs),
 });

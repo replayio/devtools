@@ -46,7 +46,7 @@ class SwatchCubicBezierTooltip extends SwatchBasedEditorTooltip {
     container.className = "cubic-bezier-container";
 
     this.tooltip.panel.appendChild(container);
-    this.tooltip.setContentSize({ width: 510, height: 370 });
+    this.tooltip.setContentSize({ height: 370, width: 510 });
 
     await this.tooltip.once("shown");
     return new CubicBezierWidget(container, bezier);

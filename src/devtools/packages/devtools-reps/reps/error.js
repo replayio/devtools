@@ -7,10 +7,10 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 // Utils
-const { getGripType, isGrip, wrapRender } = require("./rep-utils");
-const { cleanFunctionName } = require("./function");
-const { isLongString } = require("./string");
 const { MODE } = require("./constants");
+const { cleanFunctionName } = require("./function");
+const { getGripType, isGrip, wrapRender } = require("./rep-utils");
+const { isLongString } = require("./string");
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
@@ -18,9 +18,10 @@ const IGNORED_SOURCE_URLS = ["debugger eval code"];
  * Renders Error objects.
  */
 ErrorRep.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
+
+  object: PropTypes.object.isRequired,
   // An optional function that will be used to render the Error stacktrace.
   renderStacktrace: PropTypes.func,
 };
@@ -60,8 +61,8 @@ function ErrorRep(props) {
 
   return span(
     {
-      "data-link-actor-id": object.id(),
       className: "objectBox-stackTrace",
+      "data-link-actor-id": object.id(),
     },
     content
   );
@@ -98,9 +99,9 @@ function getStacktraceElements(props, preview) {
         // Don't trigger ObjectInspector expand/collapse.
         e.stopPropagation();
         props.onViewSourceInDebugger({
-          url: filename,
-          line: lineNumber,
           column: columnNumber,
+          line: lineNumber,
+          url: filename,
         });
       };
     }
@@ -109,16 +110,16 @@ function getStacktraceElements(props, preview) {
       "\t",
       span(
         {
-          key: `fn${index}`,
           className: "objectBox-stackTrace-fn",
+          key: `fn${index}`,
         },
         cleanFunctionName(functionName)
       ),
       " ",
       span(
         {
-          key: `location${index}`,
           className: "objectBox-stackTrace-location",
+          key: `location${index}`,
           onClick: onLocationClick,
           title: onLocationClick ? `View source in debugger → ${location}` : undefined,
         },

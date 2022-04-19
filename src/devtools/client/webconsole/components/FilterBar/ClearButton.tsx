@@ -1,13 +1,12 @@
+import { getAllMessagesById } from "devtools/client/webconsole/selectors/messages";
 import React, { useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
-
 import Icon from "ui/components/shared/Icon";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const actions = require("devtools/client/webconsole/actions/index");
-import { getAllMessagesById } from "devtools/client/webconsole/selectors/messages";
+const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
 type Message = {
   type: string;

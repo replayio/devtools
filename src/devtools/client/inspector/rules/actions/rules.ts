@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Action } from "redux";
+
 import Rule, { SourceLink } from "../models/rule";
 import TextProperty from "../models/text-property";
 import { DeclarationState, RuleState } from "../state/rules";
@@ -30,8 +31,8 @@ export type RulesAction =
  */
 export function updateAddRuleEnabled(enabled: boolean): UpdateAddRuleEnabledAction {
   return {
-    type: "UPDATE_ADD_RULE_ENABLED",
     enabled,
+    type: "UPDATE_ADD_RULE_ENABLED",
   };
 }
 
@@ -45,8 +46,8 @@ export function updateHighlightedSelector(
   highlightedSelector: string
 ): UpdateHighlightedSelectorAction {
   return {
-    type: "UPDATE_HIGHLIGHTED_SELECTOR",
     highlightedSelector,
+    type: "UPDATE_HIGHLIGHTED_SELECTOR",
   };
 }
 
@@ -58,8 +59,8 @@ export function updateHighlightedSelector(
  */
 export function updateRules(rules: Rule[] | null): UpdateRulesAction {
   return {
-    type: "UPDATE_RULES",
     rules: rules?.map(rule => getRuleState(rule)),
+    type: "UPDATE_RULES",
   };
 }
 
@@ -73,9 +74,9 @@ export function updateRules(rules: Rule[] | null): UpdateRulesAction {
  */
 export function updateSourceLink(ruleId: string, sourceLink: SourceLink): UpdateSourceLinkAction {
   return {
-    type: "UPDATE_SOURCE_LINK",
     ruleId,
     sourceLink,
+    type: "UPDATE_SOURCE_LINK",
   };
 }
 

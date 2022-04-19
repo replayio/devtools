@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+
 const playwright = require("@recordreplay/playwright");
 const cli = require("@replayio/replay");
 const _ = require("lodash");
@@ -15,14 +16,14 @@ async function recordToCloud(state, browserName, exampleUrl) {
   }
 
   const browser = await playwright[browserName].launch({
-    executablePath: state.browserPath,
-    headless: state.headless,
     env: {
       ...process.env,
-      RECORD_REPLAY_SERVER: state.dispatchServer,
       RECORD_REPLAY_API_KEY: state.replayApiKey,
       RECORD_REPLAY_RECORDING_ID_FILE: state.exampleRecordingIdFile,
+      RECORD_REPLAY_SERVER: state.dispatchServer,
     },
+    executablePath: state.browserPath,
+    headless: state.headless,
   });
 
   const context = await browser.newContext();
@@ -47,13 +48,13 @@ async function recordToFile(state, browserName, example) {
   console.log(`Recording Example:`, example, browserName);
 
   const browser = await playwright[browserName].launch({
-    executablePath: state.browserPath,
-    headless: state.headless,
     env: {
       ...process.env,
       RECORD_REPLAY_DRIVER: state.driverPath,
       RECORD_REPLAY_VERBOSE: state.diverPath ? "1" : undefined,
     },
+    executablePath: state.browserPath,
+    headless: state.headless,
   });
 
   const context = await browser.newContext();

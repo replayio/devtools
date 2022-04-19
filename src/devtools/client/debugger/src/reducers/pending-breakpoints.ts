@@ -5,14 +5,14 @@
 import type { AnyAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
+import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpoint";
+
 import { PendingBreakpoint } from "./types";
 
 /**
  * Pending breakpoints reducer
  * @module reducers/pending-breakpoints
  */
-
-import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpoint";
 
 export type PendingBreakpointsState = Record<string, PendingBreakpoint>;
 

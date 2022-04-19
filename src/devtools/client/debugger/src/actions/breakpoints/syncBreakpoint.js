@@ -4,10 +4,10 @@
 
 //
 
-import { setSymbols } from "../sources/symbols";
-import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpoint";
-
 import { getSource } from "../../selectors";
+import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpoint";
+import { setSymbols } from "../sources/symbols";
+
 import { addBreakpoint } from ".";
 
 async function findNewLocation(cx, { name, offset, index }, location, source, dispatch) {
@@ -21,10 +21,10 @@ async function findNewLocation(cx, { name, offset, index }, location, source, di
   }
 
   return {
-    line,
     column: location.column,
-    sourceUrl: source.url,
+    line,
     sourceId: source.id,
+    sourceUrl: source.url,
   };
 }
 
@@ -42,7 +42,7 @@ export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
     const previousLocation = { ...location, sourceId };
     const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, dispatch);
 
-    dispatch({ type: "REMOVE_PENDING_BREAKPOINT", location });
+    dispatch({ location, type: "REMOVE_PENDING_BREAKPOINT" });
 
     return dispatch(
       addBreakpoint(cx, newLocation, pendingBreakpoint.options, pendingBreakpoint.disabled)

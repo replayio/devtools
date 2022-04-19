@@ -3,8 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { AnyAction, Action } from "@reduxjs/toolkit";
-
 import type { UIState } from "ui/state";
+
 import { asSettled, asyncActionAsValue, AsyncValue } from "../utils/async-value";
 import {
   createInitial,
@@ -19,6 +19,7 @@ import {
   makeReduceAllQuery,
 } from "../utils/resource";
 import type { ResourceState } from "../utils/resource/core";
+
 import type { HitCount } from "./sources";
 
 export interface SourceActor {
@@ -85,8 +86,8 @@ export default function update(state = initial, action: AnyAction) {
         state,
         items.map(item => ({
           ...item,
-          breakpointPositions: new Map(),
           breakableLines: null,
+          breakpointPositions: new Map(),
         }))
       );
       break;
@@ -149,7 +150,7 @@ function updateBreakpointColumns(
   const breakpointPositions = new Map(getResource(state, sourceId).breakpointPositions!);
   breakpointPositions.set(line, value);
 
-  return updateResources(state, [{ id: sourceId, breakpointPositions }]);
+  return updateResources(state, [{ breakpointPositions, id: sourceId }]);
 }
 
 function updateBreakableLines(
@@ -164,7 +165,7 @@ function updateBreakableLines(
     return state;
   }
 
-  return updateResources(state, [{ id: sourceId, breakableLines: value }]);
+  return updateResources(state, [{ breakableLines: value, id: sourceId }]);
 }
 
 function updateBreakpointHitCounts(
@@ -188,20 +189,22 @@ function updateBreakpointHitCounts(
     max: currentMax,
     breakpointHitCounts: currentBreakpointHitCounts,
   } = {
-    // Provide min/max defaults that will "lose" any comparison later
-    min: Infinity,
-    max: 0,
     // @ts-ignore always overwritten
     breakpointHitCounts: [],
+
+    max: 0,
+
+    // Provide min/max defaults that will "lose" any comparison later
+    min: Infinity,
     ...state.values[sourceId],
   };
 
   return updateResources(state, [
     {
-      id: sourceId,
       breakpointHitCounts: [...(currentBreakpointHitCounts || []), ...action.value.hits],
-      min: Math.min(currentMin, action.value.min),
+      id: sourceId,
       max: Math.max(currentMax, action.value.max),
+      min: Math.min(currentMin, action.value.min),
     },
   ]);
 }
@@ -275,7 +278,7 @@ const queryThreadsBySourceObject = makeReduceAllQuery<
   Pick<SourceActor, "thread" | "source">,
   Record<string, string[]>
 >(
-  actor => ({ thread: actor.thread, source: actor.source }),
+  actor => ({ source: actor.source, thread: actor.thread }),
   actors =>
     actors.reduce((acc, { source, thread }) => {
       let sourceThreads = acc[source];

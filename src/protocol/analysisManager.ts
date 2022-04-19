@@ -12,6 +12,7 @@ import {
   SessionId,
 } from "@recordreplay/protocol";
 import { sendMessage, addEventListener } from "protocol/socket";
+
 import { assert } from "./utils";
 
 export interface AnalysisParams {
@@ -55,9 +56,9 @@ class AnalysisManager {
     const { analysisId } = await sendMessage(
       "Analysis.createAnalysis",
       {
+        effectful: params.effectful,
         mapper: params.mapper,
         reducer: params.reducer,
-        effectful: params.effectful,
       },
       params.sessionId
     );
@@ -146,10 +147,10 @@ class AnalysisManager {
       const batchPoints = allPoints.slice(i, i + MaxPointsPerBatch);
 
       const batchParams: AnalysisParams = {
-        sessionId: params.sessionId,
-        mapper: params.mapper,
         effectful: true,
+        mapper: params.mapper,
         points: batchPoints.map(p => p.point),
+        sessionId: params.sessionId,
       };
 
       await this.runAnalysis(batchParams, handler);

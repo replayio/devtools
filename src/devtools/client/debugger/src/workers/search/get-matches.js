@@ -24,7 +24,7 @@ export default function getMatches(query, text, modifiers) {
         throw new Error("no singleMatch");
       }
 
-      matchedLocations.push({ line: i, ch: singleMatch.index });
+      matchedLocations.push({ ch: singleMatch.index, line: i });
 
       // When the match is an empty string the regexQuery.lastIndex will not
       // change resulting in an infinite loop so we need to check for this and

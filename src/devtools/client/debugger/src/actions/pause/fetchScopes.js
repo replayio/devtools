@@ -4,8 +4,9 @@
 
 //
 
-import { getSelectedFrame, getFrameScope } from "../../selectors";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+
+import { getSelectedFrame, getFrameScope } from "../../selectors";
 
 export function fetchScopes(cx) {
   return async function (dispatch, getState, { client }) {
@@ -15,11 +16,11 @@ export function fetchScopes(cx) {
     }
 
     const scopes = dispatch({
-      type: "ADD_SCOPES",
-      cx,
-      thread: cx.thread,
-      frame,
       [PROMISE]: client.getFrameScopes(frame),
+      cx,
+      frame,
+      thread: cx.thread,
+      type: "ADD_SCOPES",
     });
   };
 }

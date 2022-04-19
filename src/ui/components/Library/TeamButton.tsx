@@ -1,15 +1,16 @@
+import classNames from "classnames";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
-import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import SidebarButton from "./SidebarButton";
-import classNames from "classnames";
+import * as selectors from "ui/reducers/app";
+import { UIState } from "ui/state";
 import { Workspace } from "ui/types";
-import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
+import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
+
+import SidebarButton from "./SidebarButton";
 
 function TeamButton({
   text,
@@ -89,7 +90,7 @@ const connector = connect(
   (state: UIState) => ({
     currentWorkspaceId: selectors.getWorkspaceId(state),
   }),
-  { setWorkspaceId: actions.setWorkspaceId, setModal: actions.setModal }
+  { setModal: actions.setModal, setWorkspaceId: actions.setWorkspaceId }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(TeamButton);

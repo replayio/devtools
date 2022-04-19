@@ -29,8 +29,8 @@ function findClosestofSymbol(declarations, location) {
     if (
       currNode.name === "anonymous" ||
       !containsPosition(currNode.location, {
-        line: location.line,
         column: location.column || 0,
+        line: location.line,
       })
     ) {
       return found;

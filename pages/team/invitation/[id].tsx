@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
 import { useRouter } from "next/router";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setExpectedError } from "ui/actions/session";
 import Login from "ui/components/shared/Login/Login";
@@ -21,10 +21,10 @@ export default function Share() {
   function onError() {
     dispatch(
       setExpectedError({
-        message: "This team invitation code is invalid",
+        action: "library",
         content:
           "There seems to be a problem with your team invitation link. Please ask your team administrator to send you an up-to-date link.",
-        action: "library",
+        message: "This team invitation code is invalid",
       })
     );
   }

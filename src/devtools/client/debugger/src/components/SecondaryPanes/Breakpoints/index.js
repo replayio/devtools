@@ -4,15 +4,17 @@
 
 //
 
+import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
 import React, { Component } from "react";
+import { actions } from "ui/actions";
+
+import { getSelectedSource } from "../../../selectors";
+import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 import { connect } from "../../../utils/connect";
+import { createHeadlessEditor } from "../../../utils/editor/create-editor";
+
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
-import { createHeadlessEditor } from "../../../utils/editor/create-editor";
-import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
-import { getSelectedSource } from "../../../selectors";
-import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
-import { actions } from "ui/actions";
 
 class Breakpoints extends Component {
   state = {

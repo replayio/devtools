@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHoveredLineNumberLocation } from "ui/actions/app";
-
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -11,29 +10,31 @@ import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
+
 import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
+
 import StaticTooltip from "./StaticTooltip";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
-const { setBreakpointHitCounts } = require("devtools/client/debugger/src/actions/sources");
 const {
   updateHoveredLineNumber,
 } = require("devtools/client/debugger/src/actions/breakpoints/index");
+const { setBreakpointHitCounts } = require("devtools/client/debugger/src/actions/sources");
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
 function getTextAndWarning(analysisPoints?: AnalysisPayload, analysisPointsCount?: number) {
   if (analysisPoints?.error) {
     return {
-      text: analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error",
       showWarning: false,
+      text: analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error",
     };
   }
 
   const points = analysisPointsCount || 0;
   const text = `${points} hit${points == 1 ? "" : "s"}`;
   const showWarning = points > prefs.maxHitsDisplayed;
-  return { text, showWarning };
+  return { showWarning, text };
 }
 
 function Wrapper({

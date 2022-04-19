@@ -8,8 +8,8 @@
 
 const SHEET_TYPE = {
   agent: "AGENT_SHEET",
-  user: "USER_SHEET",
   author: "AUTHOR_SHEET",
+  user: "USER_SHEET",
 };
 
 /**
@@ -140,6 +140,16 @@ function getAdjustedQuads(boundaryWindow, node, region, { ignoreZoom, ignoreScro
   for (const quad of quads) {
     const bounds = quad.getBounds();
     adjustedQuads.push({
+      bounds: {
+        bottom: bounds.bottom * scale + yOffset,
+        height: bounds.height * scale,
+        left: bounds.left * scale + xOffset,
+        right: bounds.right * scale + xOffset,
+        top: bounds.top * scale + yOffset,
+        width: bounds.width * scale,
+        x: bounds.x * scale + xOffset,
+        y: bounds.y * scale + yOffset,
+      },
       p1: {
         w: quad.p1.w * scale,
         x: quad.p1.x * scale + xOffset,
@@ -163,16 +173,6 @@ function getAdjustedQuads(boundaryWindow, node, region, { ignoreZoom, ignoreScro
         x: quad.p4.x * scale + xOffset,
         y: quad.p4.y * scale + yOffset,
         z: quad.p4.z * scale,
-      },
-      bounds: {
-        bottom: bounds.bottom * scale + yOffset,
-        height: bounds.height * scale,
-        left: bounds.left * scale + xOffset,
-        right: bounds.right * scale + xOffset,
-        top: bounds.top * scale + yOffset,
-        width: bounds.width * scale,
-        x: bounds.x * scale + xOffset,
-        y: bounds.y * scale + yOffset,
       },
     });
   }
@@ -208,10 +208,10 @@ function getRect(boundaryWindow, node, contentWindow) {
   // Go up in the tree of frames to determine the correct rectangle.
   // clientRect is read-only, we need to be able to change properties.
   const rect = {
-    top: clientRect.top + contentWindow.pageYOffset,
-    left: clientRect.left + contentWindow.pageXOffset,
-    width: clientRect.width,
     height: clientRect.height,
+    left: clientRect.left + contentWindow.pageXOffset,
+    top: clientRect.top + contentWindow.pageYOffset,
+    width: clientRect.width,
   };
 
   // We iterate through all the parent windows.
@@ -288,16 +288,16 @@ function getNodeBounds(boundaryWindow, node) {
   const height = node.offsetHeight * scale;
 
   return {
+    bottom: yOffset + height,
+    height,
+    left: xOffset,
     p1: { x: xOffset, y: yOffset },
     p2: { x: xOffset + width, y: yOffset },
     p3: { x: xOffset + width, y: yOffset + height },
     p4: { x: xOffset, y: yOffset + height },
-    top: yOffset,
     right: xOffset + width,
-    bottom: yOffset + height,
-    left: xOffset,
+    top: yOffset,
     width,
-    height,
   };
 }
 exports.getNodeBounds = getNodeBounds;

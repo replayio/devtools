@@ -4,11 +4,10 @@
 
 "use strict";
 
-const EventEmitter = require("devtools/shared/event-emitter");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-
 const { colorUtils } = require("devtools/shared/css/color");
 const { labColors } = require("devtools/shared/css/color-db");
+const EventEmitter = require("devtools/shared/event-emitter");
+const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const L10N = new LocalizationHelper(
   "devtools/shared/locales/accessibility.properties",
@@ -19,15 +18,15 @@ const ARROW_KEYS = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 const [ArrowUp, ArrowRight, ArrowDown, ArrowLeft] = ARROW_KEYS;
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const SLIDER = {
-  hue: {
-    MIN: "0",
-    MAX: "128",
-    STEP: "1",
-  },
   alpha: {
-    MIN: "0",
     MAX: "1",
+    MIN: "0",
     STEP: "0.01",
+  },
+  hue: {
+    MAX: "128",
+    MIN: "0",
+    STEP: "1",
   },
 };
 
@@ -511,7 +510,7 @@ class Spectrum {
 }
 
 function hsvToRgb(h, s, v, a) {
-  let r, g, b;
+  let b, g, r;
 
   const i = Math.floor(h * 6);
   const f = h * 6 - i;

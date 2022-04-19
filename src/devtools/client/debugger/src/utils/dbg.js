@@ -11,10 +11,10 @@ function getCM() {
 
 export function setupDebuggerHelper() {
   const dbg = {
-    prefs,
     asyncStore,
     features,
     getCM,
+    prefs,
   };
   return dbg;
 }

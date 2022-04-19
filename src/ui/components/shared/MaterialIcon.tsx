@@ -2,13 +2,13 @@ import classnames from "classnames";
 import React from "react";
 
 const SIZE_STYLES = {
-  xs: "text-xs",
-  sm: "text-sm",
-  base: "text-base",
-  lg: "text-lg",
-  xl: "text-xl",
   "2xl": "text-2xl",
   "4xl": "text-4xl",
+  base: "text-base",
+  lg: "text-lg",
+  sm: "text-sm",
+  xl: "text-xl",
+  xs: "text-xs",
 } as const;
 
 type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {

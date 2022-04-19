@@ -16,17 +16,17 @@ import {
 } from "..";
 
 const makeResource = id => ({
+  data: 42,
   id,
   name: `name-${id}`,
-  data: 42,
   obj: {},
 });
 
 const mapName = resource => resource.name;
 const mapWithIdent = (resource, identity) => ({
-  resource,
   identity,
   obj: {},
+  resource,
 });
 
 const clone = v => JSON.parse(JSON.stringify(v));
@@ -141,8 +141,8 @@ describe("resource CRUD operations", () => {
 
       const state = updateResources(initialState, [
         {
-          id: r1.id,
           data: 21,
+          id: r1.id,
         },
         {
           id: r2.id,

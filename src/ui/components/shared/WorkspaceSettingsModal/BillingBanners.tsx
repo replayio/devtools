@@ -1,9 +1,11 @@
 import React from "react";
 import { Subscription, Workspace } from "ui/types";
+
 import MaterialIcon from "../MaterialIcon";
+
 import { Banner } from "./Banner";
-import { isSubscriptionCancelled } from "./utils";
 import { formatDate } from "./formatDate";
+import { isSubscriptionCancelled } from "./utils";
 
 export function BillingBanners({
   confirmed,

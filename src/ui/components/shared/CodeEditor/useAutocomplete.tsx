@@ -1,4 +1,10 @@
+import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
+import { getSelectedFrame, SelectedFrame } from "devtools/client/debugger/src/selectors";
+import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
+import uniq from "lodash/uniq";
 import { useCallback, useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import { UIState } from "ui/state";
 import {
   fuzzyFilter,
   getAutocompleteMatches,
@@ -7,12 +13,6 @@ import {
   insertAutocompleteMatch,
   normalizeString,
 } from "ui/utils/autocomplete";
-import uniq from "lodash/uniq";
-import { useSelector } from "react-redux";
-import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
-import { UIState } from "ui/state";
-import { getSelectedFrame, SelectedFrame } from "devtools/client/debugger/src/selectors";
-import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
 
 // turns an async getMatches function into a hook
 function useGetAsyncMatches(
@@ -134,12 +134,12 @@ export default function useAutocomplete(
   });
 
   return {
+    applySelectedMatch,
     autocompleteIndex: selectedIndex,
     matches,
-    shouldShowAutocomplete: getShouldShowAutocomplete(expression, isHidden, matches),
-    applySelectedMatch,
     moveAutocompleteCursor,
     resetAutocompleteIndex: () => setSelectedIndex(0),
     setHideAutocomplete: setIsHidden,
+    shouldShowAutocomplete: getShouldShowAutocomplete(expression, isHidden, matches),
   };
 }

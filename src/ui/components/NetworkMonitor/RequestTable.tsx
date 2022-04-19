@@ -1,11 +1,12 @@
-import React from "react";
-import styles from "./RequestTable.module.css";
 import classNames from "classnames";
-import { RequestSummary } from "./utils";
-import { HeaderGroups } from "./HeaderGroups";
-import { RequestRow } from "./RequestRow";
+import React from "react";
 import { Row, TableInstance } from "react-table";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { HeaderGroups } from "./HeaderGroups";
+import { RequestRow } from "./RequestRow";
+import styles from "./RequestTable.module.css";
+import { RequestSummary } from "./utils";
 
 const RequestTable = ({
   className,
@@ -36,10 +37,7 @@ const RequestTable = ({
 
   return (
     <div
-      className={classNames(
-        "no-scrollbar min-w-full overflow-scroll bg-bodyBgcolor",
-        className
-      )}
+      className={classNames("no-scrollbar min-w-full overflow-scroll bg-bodyBgcolor", className)}
     >
       {/* Relative here helps with when the timeline goes past the last request*/}
       <div

@@ -19,12 +19,14 @@ export function queryCacheWeak<
 >(handler: CacheHandler<T, MapResult, ReduceResult>) {
   const cache = new WeakMap<any, Result>();
   return makeCacheFunction({
-    handler,
     // The WeakMap will only return entries for the exact object,
     // so there is no need to compare at all.
     compareArgs: () => true,
+
     // @ts-ignore
     getEntry: args => cache.get(args) || null,
+
+    handler,
     setEntry: (args, entry) => {
       // @ts-ignore
       cache.set(args, entry);
@@ -44,9 +46,9 @@ export function queryCacheShallow<
 >(handler: CacheHandler<T, unknown, unknown>) {
   let latestEntry: CacheEntry<T, Result> | null = null;
   return makeCacheFunction({
-    handler,
     compareArgs: shallowEqual,
     getEntry: () => latestEntry,
+    handler,
     setEntry: (args, entry) => {
       // @ts-ignore
       latestEntry = entry;
@@ -66,9 +68,9 @@ export function queryCacheStrict<
 >(handler: CacheHandler<T, unknown, unknown>) {
   let latestEntry: CacheEntry<T, Result> | null = null;
   return makeCacheFunction({
-    handler,
     compareArgs: strictEqual,
     getEntry: () => latestEntry,
+    handler,
     setEntry: (args, entry) => {
       // @ts-ignore
       latestEntry = entry;
@@ -143,8 +145,8 @@ function makeCacheFunction<T extends BaseResource, MapResult = unknown, ReduceRe
       } else {
         entry = {
           context,
-          state,
           result,
+          state,
         };
         setEntry(args, entry);
       }

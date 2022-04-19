@@ -54,10 +54,10 @@ export function onMessageHover(type, message) {
   return dispatch => {
     if (type == "mouseenter") {
       const hoveredItem = {
-        target: "console",
-        point: message.executionPoint,
-        time: message.executionPointTime,
         location: message.frame,
+        point: message.executionPoint,
+        target: "console",
+        time: message.executionPointTime,
       };
       dispatch(setHoveredItem(hoveredItem));
     }

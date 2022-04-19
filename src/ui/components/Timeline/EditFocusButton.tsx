@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFocusMode } from "ui/actions/timeline";
 import { getIsFocusing } from "ui/reducers/app";
 import { getIsInFocusMode } from "ui/reducers/timeline";
+
 import MaterialIcon from "../shared/MaterialIcon";
 
 export const EditFocusButton = () => {

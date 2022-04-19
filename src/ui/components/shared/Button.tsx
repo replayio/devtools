@@ -7,14 +7,14 @@ type ColorScale = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 type Colors = "gray" | "blue" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "white";
 
 const STANDARD_CLASSES = {
-  sm: "inline-flex flex-shrink-0 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded",
-  md: "inline-flex flex-shrink-0 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md",
-  lg: "inline-flex flex-shrink-0 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md",
-  xl: "inline-flex flex-shrink-0 items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
   "2xl":
     "inline-flex flex-shrink-0 items-center px-6 py-3 border border-transparent text-base font-medium rounded-md",
   "3xl":
     "inline-flex flex-shrink-0 items-center px-6 py-3 border border-transparent text-2xl font-medium rounded-md",
+  lg: "inline-flex flex-shrink-0 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md",
+  md: "inline-flex flex-shrink-0 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md",
+  sm: "inline-flex flex-shrink-0 items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded",
+  xl: "inline-flex flex-shrink-0 items-center px-4 py-2 border border-transparent text-base font-medium rounded-md",
 };
 
 function getColorCode(color: Colors, num: ColorScale) {
@@ -47,7 +47,7 @@ function getTextClass(color: Colors) {
 }
 
 function getColorClasses(color: Colors, style: ButtonStyles) {
-  let textStyle, bgStyle;
+  let bgStyle, textStyle;
 
   if (style === "primary") {
     textStyle = getTextClass("white");

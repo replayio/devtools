@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { trackEvent } from "ui/utils/telemetry";
-import { getRecordingURL } from "ui/utils/recording";
 import { Recording } from "ui/types";
+import { getRecordingURL } from "ui/utils/recording";
+import { trackEvent } from "ui/utils/telemetry";
 
 export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);

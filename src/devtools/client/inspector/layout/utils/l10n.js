@@ -8,8 +8,8 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/layout.properties");
 
 module.exports = {
-  getStr: (...args) => L10N.getStr(...args),
   getFormatStr: (...args) => L10N.getFormatStr(...args),
   getFormatStrWithNumbers: (...args) => L10N.getFormatStrWithNumbers(...args),
+  getStr: (...args) => L10N.getStr(...args),
   numberWithDecimals: (...args) => L10N.numberWithDecimals(...args),
 };

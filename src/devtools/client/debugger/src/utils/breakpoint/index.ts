@@ -2,14 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { ThreadFront } from "protocol/thread";
-import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
-import assert from "../assert";
-import { features } from "../prefs";
-import sortBy from "lodash/sortBy";
-
 import type { Location } from "@recordreplay/protocol";
+import sortBy from "lodash/sortBy";
+import { ThreadFront } from "protocol/thread";
 import type { UIState } from "ui/state";
+
 import type { SourceActor } from "../../reducers/source-actors";
 import type {
   Breakpoint,
@@ -18,6 +15,9 @@ import type {
   SourceActorLocation,
   PendingLocation,
 } from "../../reducers/types";
+import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
+import assert from "../assert";
+import { features } from "../prefs";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
@@ -78,18 +78,18 @@ export function makeBreakpointLocation(state: UIState, location: SourceLocation)
   }
 
   return {
-    line: location.line,
     column: location.column,
-    sourceUrl,
+    line: location.line,
     sourceId,
+    sourceUrl,
   };
 }
 
 export function makeSourceActorLocation(sourceActor: SourceActor, location: Location) {
   return {
-    sourceActor,
-    line: location.line,
     column: location.column,
+    line: location.line,
+    sourceActor,
   };
 }
 
@@ -150,7 +150,7 @@ export function breakpointExists(state: UIState, location: Location) {
 
 function createPendingLocation(location: SourceLocation) {
   const { sourceUrl, line, column } = location;
-  return { sourceUrl, line, column };
+  return { column, line, sourceUrl };
 }
 
 export function createPendingBreakpoint(bp: Breakpoint) {
@@ -159,10 +159,10 @@ export function createPendingBreakpoint(bp: Breakpoint) {
   assertPendingLocation(pendingLocation);
 
   return {
-    options: bp.options,
+    astLocation: bp.astLocation,
     disabled: bp.disabled,
     location: pendingLocation,
-    astLocation: bp.astLocation,
+    options: bp.options,
   };
 }
 

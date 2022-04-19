@@ -1,16 +1,16 @@
+import classNames from "classnames";
+import sortedLastIndex from "lodash/sortedLastIndex";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-
 import { actions } from "ui/actions";
+import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import sortedLastIndex from "lodash/sortedLastIndex";
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
+import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
-import { trackEvent } from "ui/utils/telemetry";
-import classNames from "classnames";
-import hooks from "ui/hooks";
+
+const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (

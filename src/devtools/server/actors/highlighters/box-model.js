@@ -14,14 +14,14 @@ const {
   isNodeValid,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
-const { getCurrentZoom } = require("devtools/shared/layout/utils");
 const {
   getNodeDisplayName,
   getNodeGridFlexType,
 } = require("devtools/server/actors/inspector/utils");
+const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
 const nodeConstants = require("devtools/shared/dom-node-constants");
 const { LocalizationHelper } = require("devtools/shared/l10n");
+const { getCurrentZoom } = require("devtools/shared/layout/utils");
 const STRINGS_URI = "devtools/shared/locales/highlighters.properties";
 const L10N = new LocalizationHelper(STRINGS_URI);
 const { refreshGraphics } = require("protocol/graphics");
@@ -124,63 +124,63 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
 
     // Build the root wrapper, used to adapt to the page zoom.
     const rootWrapper = createNode(this.win, {
-      parent: highlighterContainer,
       attributes: {
-        id: "root",
         class: "root",
+        id: "root",
         role: "presentation",
       },
+      parent: highlighterContainer,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Building the SVG element with its polygons and lines
 
     const svg = createSVGNode(this.win, {
-      nodeType: "svg",
-      parent: rootWrapper,
       attributes: {
-        id: "elements",
-        width: "100%",
         height: "100%",
         hidden: "true",
+        id: "elements",
         role: "presentation",
+        width: "100%",
       },
+      nodeType: "svg",
+      parent: rootWrapper,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const regions = createSVGNode(this.win, {
-      nodeType: "g",
-      parent: svg,
       attributes: {
         class: "regions",
         role: "presentation",
       },
+      nodeType: "g",
+      parent: svg,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     for (const region of BOX_MODEL_REGIONS) {
       createSVGNode(this.win, {
-        nodeType: "path",
-        parent: regions,
         attributes: {
           class: region,
           id: region,
           role: "presentation",
         },
+        nodeType: "path",
+        parent: regions,
         prefix: this.ID_CLASS_PREFIX,
       });
     }
 
     for (const side of BOX_MODEL_SIDES) {
       createSVGNode(this.win, {
-        nodeType: "line",
-        parent: svg,
         attributes: {
           class: "guide-" + side,
           id: "guide-" + side,
-          "stroke-width": GUIDE_STROKE_WIDTH,
           role: "presentation",
+          "stroke-width": GUIDE_STROKE_WIDTH,
         },
+        nodeType: "line",
+        parent: svg,
         prefix: this.ID_CLASS_PREFIX,
       });
     }
@@ -188,94 +188,94 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     // Building the nodeinfo bar markup
 
     const infobarContainer = createNode(this.win, {
-      parent: rootWrapper,
       attributes: {
         class: "infobar-container",
+        hidden: "true",
         id: "infobar-container",
         position: "top",
-        hidden: "true",
       },
+      parent: rootWrapper,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const infobar = createNode(this.win, {
-      parent: infobarContainer,
       attributes: {
         class: "infobar",
       },
+      parent: infobarContainer,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const texthbox = createNode(this.win, {
-      parent: infobar,
       attributes: {
         class: "infobar-text",
       },
+      parent: infobar,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-tagname",
         id: "infobar-tagname",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-id",
         id: "infobar-id",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-classes",
         id: "infobar-classes",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-pseudo-classes",
         id: "infobar-pseudo-classes",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-dimensions",
         id: "infobar-dimensions",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-grid-type",
         id: "infobar-grid-type",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: texthbox,
       attributes: {
         class: "infobar-flex-type",
         id: "infobar-flex-type",
       },
+      nodeType: "span",
+      parent: texthbox,
       prefix: this.ID_CLASS_PREFIX,
     });
 
@@ -418,10 +418,6 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     }
 
     const quad = {
-      p1: { x: Infinity, y: Infinity },
-      p2: { x: -Infinity, y: Infinity },
-      p3: { x: -Infinity, y: -Infinity },
-      p4: { x: Infinity, y: -Infinity },
       bounds: {
         bottom: -Infinity,
         height: 0,
@@ -432,6 +428,10 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
         x: 0,
         y: 0,
       },
+      p1: { x: Infinity, y: Infinity },
+      p2: { x: -Infinity, y: Infinity },
+      p3: { x: -Infinity, y: -Infinity },
+      p4: { x: Infinity, y: -Infinity },
     };
 
     for (const q of quads) {

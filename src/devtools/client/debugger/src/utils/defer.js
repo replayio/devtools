@@ -12,5 +12,5 @@ export default function defer() {
     reject = _rej;
   });
 
-  return { resolve, reject, promise };
+  return { promise, reject, resolve };
 }

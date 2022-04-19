@@ -21,9 +21,9 @@ export function getBindingVariables(bindings: any, parentName: string) {
   for (const { name, value } of bindings) {
     rv.push(
       new ValueItem({
+        contents: value,
         name,
         path: `${parentName}/${name}`,
-        contents: value,
       })
     );
   }

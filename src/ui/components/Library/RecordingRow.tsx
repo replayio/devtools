@@ -1,18 +1,20 @@
-import React, { MouseEvent } from "react";
-import { Recording } from "ui/types";
+import { RecordingId } from "@recordreplay/protocol";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import React, { MouseEvent } from "react";
 import LazyLoad from "react-lazyload";
-import hooks from "ui/hooks";
-import { Redacted } from "../Redacted";
-import { RecordingId } from "@recordreplay/protocol";
-import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import hooks from "ui/hooks";
+import { useGetUserPermissions } from "ui/hooks/users";
+import { Recording } from "ui/types";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
+
+import { Redacted } from "../Redacted";
+
 import styles from "./Library.module.css";
-import { useGetUserPermissions } from "ui/hooks/users";
+import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);

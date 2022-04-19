@@ -4,9 +4,10 @@
 
 //
 
-import { ThunkExtraArgs } from "ui/utils/thunk";
 import type { UIThunkAction } from "ui/actions";
 import type { AppStore, AppDispatch } from "ui/setup/store";
+import { ThunkExtraArgs } from "ui/utils/thunk";
+
 import type { Context } from "../reducers/pause";
 
 import { asSettled, AsyncValue, isRejected } from "./async-value";

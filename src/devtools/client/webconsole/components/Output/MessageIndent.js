@@ -14,8 +14,8 @@ const IN_WARNING_GROUP_INDENT = getIndentElement(1, "warning-indent");
 
 function getIndentElement(indent, className) {
   return dom.span({
-    "data-indent": indent,
     className: `indent${className ? " " + className : ""}`,
+    "data-indent": indent,
     style: {
       width: indent * INDENT_WIDTH,
     },

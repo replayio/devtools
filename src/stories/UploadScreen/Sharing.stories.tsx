@@ -1,12 +1,11 @@
-import React, { ComponentProps } from "react";
-
 import { Story, Meta } from "@storybook/react";
+import React, { ComponentProps } from "react";
 import Sharing from "ui/components/UploadScreen/Sharing";
 import { getDefaultOrganizationSettings } from "ui/utils/org";
 
 export default {
-  title: "UploadScreen/Sharing",
   component: Sharing,
+  title: "UploadScreen/Sharing",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof Sharing>> = args => (
@@ -16,9 +15,9 @@ const Template: Story<ComponentProps<typeof Sharing>> = args => (
 export const OnlyMyLibrary = Template.bind({});
 
 OnlyMyLibrary.args = {
-  workspaces: [],
-  selectedWorkspaceId: "My Library",
   isPublic: false,
+  selectedWorkspaceId: "My Library",
+  workspaces: [],
 };
 
 export const OnlyOrganization = Template.bind({});
@@ -28,14 +27,14 @@ OnlyOrganization.args = {
   selectedWorkspaceId: "org1",
   workspaces: [
     {
-      id: "org1",
-      name: "Organization",
-      isOrganization: true,
-      settings: getDefaultOrganizationSettings(),
-      isDomainLimitedCode: false,
       domain: "domain.com",
       hasPaymentMethod: false,
+      id: "org1",
       invitationCode: "",
+      isDomainLimitedCode: false,
+      isOrganization: true,
+      name: "Organization",
+      settings: getDefaultOrganizationSettings(),
     },
   ],
 };
@@ -47,25 +46,25 @@ OrgLibraryDisabled.args = {
   selectedWorkspaceId: "org1",
   workspaces: [
     {
+      domain: "domain.com",
+      hasPaymentMethod: false,
       id: "org1",
-      name: "Organization",
+      invitationCode: "",
+      isDomainLimitedCode: false,
       isOrganization: true,
+      name: "Organization",
       settings: {
         features: {
-          user: {
-            library: false,
-            autoJoin: null,
-          },
           recording: {
             public: true,
+          },
+          user: {
+            autoJoin: null,
+            library: false,
           },
         },
         motd: null,
       },
-      isDomainLimitedCode: false,
-      domain: "domain.com",
-      hasPaymentMethod: false,
-      invitationCode: "",
     },
   ],
 };
@@ -77,25 +76,25 @@ OrgPublicDisabled.args = {
   selectedWorkspaceId: "org1",
   workspaces: [
     {
+      domain: "domain.com",
+      hasPaymentMethod: false,
       id: "org1",
-      name: "Organization",
+      invitationCode: "",
+      isDomainLimitedCode: false,
       isOrganization: true,
+      name: "Organization",
       settings: {
         features: {
-          user: {
-            library: true,
-            autoJoin: null,
-          },
           recording: {
             public: false,
+          },
+          user: {
+            autoJoin: null,
+            library: true,
           },
         },
         motd: null,
       },
-      isDomainLimitedCode: false,
-      domain: "domain.com",
-      hasPaymentMethod: false,
-      invitationCode: "",
     },
   ],
 };
@@ -107,25 +106,25 @@ OrgLibraryAndPublicDisabled.args = {
   selectedWorkspaceId: "org1",
   workspaces: [
     {
+      domain: "domain.com",
+      hasPaymentMethod: false,
       id: "org1",
-      name: "Organization",
+      invitationCode: "",
+      isDomainLimitedCode: false,
       isOrganization: true,
+      name: "Organization",
       settings: {
         features: {
-          user: {
-            library: false,
-            autoJoin: null,
-          },
           recording: {
             public: false,
+          },
+          user: {
+            autoJoin: null,
+            library: false,
           },
         },
         motd: null,
       },
-      isDomainLimitedCode: false,
-      domain: "domain.com",
-      hasPaymentMethod: false,
-      invitationCode: "",
     },
   ],
 };
@@ -137,24 +136,24 @@ NoOrgs.args = {
   selectedWorkspaceId: "team2",
   workspaces: [
     {
-      id: "team1",
-      name: "Team 1",
-      isOrganization: true,
-      settings: getDefaultOrganizationSettings(),
-      isDomainLimitedCode: false,
       domain: "domain.com",
       hasPaymentMethod: false,
+      id: "team1",
       invitationCode: "",
+      isDomainLimitedCode: false,
+      isOrganization: true,
+      name: "Team 1",
+      settings: getDefaultOrganizationSettings(),
     },
     {
-      id: "team2",
-      name: "Team 2",
-      isOrganization: true,
-      settings: getDefaultOrganizationSettings(),
-      isDomainLimitedCode: false,
       domain: "domain.com",
       hasPaymentMethod: false,
+      id: "team2",
       invitationCode: "",
+      isDomainLimitedCode: false,
+      isOrganization: true,
+      name: "Team 2",
+      settings: getDefaultOrganizationSettings(),
     },
   ],
 };

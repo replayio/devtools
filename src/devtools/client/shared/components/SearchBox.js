@@ -6,11 +6,10 @@
 
 "use strict";
 
-const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const { trackEvent } = require("ui/utils/telemetry");
-
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 
 class SearchBox extends PureComponent {
@@ -38,8 +37,8 @@ class SearchBox extends PureComponent {
     super(props);
 
     this.state = {
-      value: props.value || "",
       focused: false,
+      value: props.value || "",
     };
 
     this.autocompleteRef = createRef();
@@ -201,8 +200,8 @@ class SearchBox extends PureComponent {
         onKeyDown: this.onKeyDown,
         placeholder,
         ref: this.inputRef,
-        value,
         type: "search",
+        value,
       }),
       showLearnMoreLink &&
         MDNLink({

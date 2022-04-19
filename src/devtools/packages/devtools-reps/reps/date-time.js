@@ -26,8 +26,8 @@ function DateTime(props) {
 
     date = span(
       {
-        "data-link-actor-id": grip.id(),
         className: "objectBox",
+        "data-link-actor-id": grip.id(),
       },
       getTitle(grip),
       span({ className: "Date" }, dateObject.toString())

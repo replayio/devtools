@@ -1,11 +1,12 @@
+import { Attr } from "@recordreplay/protocol";
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { Attr } from "@recordreplay/protocol";
+
 import { NodeInfo } from "../state/markup";
 
-const { truncateString } = require("devtools/shared/inspector/utils");
 const { parseAttribute } = require("devtools/client/shared/node-attribute-parser");
+const { truncateString } = require("devtools/shared/inspector/utils");
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;
@@ -74,8 +75,8 @@ class NodeAttribute extends PureComponent<NodeAttributeProps & PropsFromRedux> {
 
 const mapStateToProps = (state: UIState) => {
   return {
-    collapseAttributes: state.markup.collapseAttributes,
     collapseAttributeLength: state.markup.collapseAttributeLength,
+    collapseAttributes: state.markup.collapseAttributes,
   };
 };
 const connector = connect(mapStateToProps);

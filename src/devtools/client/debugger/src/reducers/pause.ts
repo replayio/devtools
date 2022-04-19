@@ -10,17 +10,18 @@
  * @module reducers/pause
  */
 
-import type { Action } from "@reduxjs/toolkit";
 import type { Location, Scope } from "@recordreplay/protocol";
+import type { Action } from "@reduxjs/toolkit";
 import type { AnyAction } from "@reduxjs/toolkit";
-import type { UIState } from "ui/state";
-import type { Source } from "./sources";
-
-import { prefs } from "../utils/prefs";
-import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
+import type { UIState } from "ui/state";
+
+import { getSelectedFrame, getFramePositions } from "../selectors/pause";
+import { prefs } from "../utils/prefs";
+
+import type { Source } from "./sources";
 import { getSelectedSourceWithContent, getSource } from "./sources";
 
 export interface Context {
@@ -79,29 +80,29 @@ function createPauseState(): PauseState {
     cx: {
       navigateCounter: 0,
     },
+    pausePreviewLocation: null,
     threadcx: {
-      navigateCounter: 0,
       isPaused: false,
+      navigateCounter: 0,
       pauseCounter: 0,
     },
-    pausePreviewLocation: null,
     ...resumedPauseState,
-    isWaitingOnBreak: false,
     command: null,
-    lastCommand: null,
-    previousLocation: null,
     expandedScopes: new Set(),
+    isWaitingOnBreak: false,
+    lastCommand: null,
     lastExpandedScopes: [],
+    previousLocation: null,
     shouldLogExceptions: prefs.logExceptions as boolean,
   };
 }
 
 const resumedPauseState = {
+  executionPoint: null,
+  frameScopes: {},
   frames: null,
   framesLoading: false,
-  frameScopes: {},
   selectedFrameId: null,
-  executionPoint: null,
   why: null,
 };
 
@@ -121,19 +122,19 @@ function update(state = createPauseState(), action: AnyAction) {
         ...state,
         threadcx: {
           ...state.threadcx,
-          pauseCounter: state.threadcx.pauseCounter + 1,
           isPaused: true,
+          pauseCounter: state.threadcx.pauseCounter + 1,
         },
       };
       return {
         ...state,
-        isWaitingOnBreak: false,
-        selectedFrameId: frame ? frame.id : undefined,
+        executionPoint,
+        frameScopes: { ...resumedPauseState.frameScopes },
         frames: frame ? [frame] : undefined,
         framesLoading: true,
-        frameScopes: { ...resumedPauseState.frameScopes },
+        isWaitingOnBreak: false,
+        selectedFrameId: frame ? frame.id : undefined,
         why,
-        executionPoint,
       };
     }
 
@@ -143,8 +144,8 @@ function update(state = createPauseState(), action: AnyAction) {
       return {
         ...state,
         frames,
-        selectedFrameId,
         framesLoading: false,
+        selectedFrameId,
       };
     }
 
@@ -168,8 +169,8 @@ function update(state = createPauseState(), action: AnyAction) {
       const frameScopes = {
         ...state.frameScopes,
         [selectedFrameId]: {
-          pending: status !== "done",
           originalScopesUnavailable: !!value?.originalScopesUnavailable,
+          pending: status !== "done",
           scope: value?.scopes,
         },
       };
@@ -214,8 +215,8 @@ function update(state = createPauseState(), action: AnyAction) {
           ...state,
           threadcx: {
             ...state.threadcx,
-            pauseCounter: state.threadcx.pauseCounter + 1,
             isPaused: false,
+            pauseCounter: state.threadcx.pauseCounter + 1,
           },
         };
         return {
@@ -233,8 +234,8 @@ function update(state = createPauseState(), action: AnyAction) {
         ...state,
         threadcx: {
           ...state.threadcx,
-          pauseCounter: state.threadcx.pauseCounter + 1,
           isPaused: false,
+          pauseCounter: state.threadcx.pauseCounter + 1,
         },
       };
       return {
@@ -278,8 +279,8 @@ function getPauseLocation(state: PauseState, action: CommandAction) {
   }
 
   return {
-    location: frame.location,
     generatedLocation: frame.generatedLocation,
+    location: frame.location,
   };
 }
 

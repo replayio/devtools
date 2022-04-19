@@ -9,11 +9,11 @@
  * @module actions/sources
  */
 
-import { recordEvent } from "../../utils/telemetry";
-import { features } from "../../utils/prefs";
-import { getSourceActorsForSource } from "../../selectors";
-
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+
+import { getSourceActorsForSource } from "../../selectors";
+import { features } from "../../utils/prefs";
+import { recordEvent } from "../../utils/telemetry";
 
 async function blackboxActors(state, client, sourceId, isBlackBoxed, range) {
   for (const actor of getSourceActorsForSource(state, sourceId)) {
@@ -31,10 +31,10 @@ export function toggleBlackBox(cx, source) {
     }
 
     return dispatch({
-      type: "BLACKBOX",
+      [PROMISE]: blackboxActors(getState(), client, source.id, isBlackBoxed),
       cx,
       source,
-      [PROMISE]: blackboxActors(getState(), client, source.id, isBlackBoxed),
+      type: "BLACKBOX",
     });
   };
 }

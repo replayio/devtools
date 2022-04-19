@@ -6,9 +6,9 @@
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
-const { wrapRender, ellipsisElement } = require("./rep-utils");
-const PropRep = require("./prop-rep");
 const { MODE } = require("./constants");
+const PropRep = require("./prop-rep");
+const { wrapRender, ellipsisElement } = require("./rep-utils");
 
 const DEFAULT_TITLE = "Object";
 
@@ -17,9 +17,10 @@ const DEFAULT_TITLE = "Object";
  * properties enclosed in curly brackets.
  */
 ObjectRep.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
+
+  object: PropTypes.object.isRequired,
   title: PropTypes.string,
 };
 
@@ -104,11 +105,11 @@ function propIterator(props, object, max) {
     elements.push(
       PropRep({
         ...props,
+        equal: ": ",
         key: name,
         mode: MODE.TINY,
         name,
         object: value,
-        equal: ": ",
       })
     );
     propertiesNumber++;

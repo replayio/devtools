@@ -4,18 +4,18 @@
 
 "use strict";
 
-const { createRef, Component } = require("react");
 const PropTypes = require("prop-types");
+const { createRef, Component } = require("react");
 const dom = require("react-dom-factories");
 
 class Draggable extends Component {
   static get propTypes() {
     return {
+      className: PropTypes.string,
       onMove: PropTypes.func.isRequired,
       onStart: PropTypes.func,
       onStop: PropTypes.func,
       style: PropTypes.object,
-      className: PropTypes.string,
     };
   }
 
@@ -68,11 +68,11 @@ class Draggable extends Component {
 
   render() {
     return dom.div({
+      className: this.props.className,
+      onMouseDown: this.startDragging,
       ref: this.draggableEl,
       role: "presentation",
       style: this.props.style,
-      className: this.props.className,
-      onMouseDown: this.startDragging,
     });
   }
 }

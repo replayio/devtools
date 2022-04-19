@@ -1,5 +1,5 @@
-const path = require("path");
 const { fork } = require("child_process");
+const path = require("path");
 
 const e2eTestPrefix = "e2e/";
 const mockTestPrefix = "mock/";
@@ -40,39 +40,39 @@ function loadTests() {
   const e2eTests = e2eManifest
     .filter(({ targets }) => !onlyTarget || targets.includes(onlyTarget))
     .map(({ script, disabled }) => ({
-      type: "test",
+      debuggable: false,
       id: e2eTestPrefix + script,
       label: script,
-      debuggable: false,
       skipped: !!disabled,
+      type: "test",
     }));
 
   const mockManifest = require("./mock/manifest");
   const mockTests = mockManifest.map(script => ({
-    type: "test",
+    debuggable: false,
     id: mockTestPrefix + script,
     label: script,
-    debuggable: false,
+    type: "test",
   }));
 
   process.send({
-    type: "suite",
-    id: "root",
-    label: "RecordReplay",
     children: [
       {
-        type: "suite",
+        children: e2eTests,
         id: "e2e",
         label: "E2E",
-        children: e2eTests,
+        type: "suite",
       },
       {
-        type: "suite",
+        children: mockTests,
         id: "mock",
         label: "Mock",
-        children: mockTests,
+        type: "suite",
       },
     ],
+    id: "root",
+    label: "RecordReplay",
+    type: "suite",
   });
 }
 
@@ -111,15 +111,15 @@ function runTests(runScript, runArgs, testPrefix, startRegex, finishRegex) {
       let match = startRegex.exec(output);
       if (match) {
         if (currentTest) {
-          process.send({ type: "test", test: currentTest, state: "failed" });
+          process.send({ state: "failed", test: currentTest, type: "test" });
         }
         currentTest = testPrefix + match[1];
-        process.send({ type: "test", test: currentTest, state: "running" });
+        process.send({ state: "running", test: currentTest, type: "test" });
       }
       match = finishRegex.exec(output);
       if (match && currentTest) {
         const success = match[2] !== "false";
-        process.send({ type: "test", test: currentTest, state: success ? "passed" : "failed" });
+        process.send({ state: success ? "passed" : "failed", test: currentTest, type: "test" });
         currentTest = "";
       }
     };
@@ -137,7 +137,7 @@ function runTests(runScript, runArgs, testPrefix, startRegex, finishRegex) {
 
     childProc.on("exit", () => {
       if (currentTest) {
-        process.send({ type: "test", test: currentTest, state: "failed" });
+        process.send({ state: "failed", test: currentTest, type: "test" });
       }
       resolve();
     });

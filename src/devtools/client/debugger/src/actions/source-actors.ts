@@ -3,6 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 import {
   getSourceActor,
@@ -12,7 +13,6 @@ import {
   SourceActor,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
-import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 export function insertSourceActor(item: SourceActor) {
   return insertSourceActors([item]);
@@ -20,8 +20,8 @@ export function insertSourceActor(item: SourceActor) {
 export function insertSourceActors(items: SourceActor[]): UIThunkAction {
   return function (dispatch) {
     dispatch({
-      type: "INSERT_SOURCE_ACTORS",
       items,
+      type: "INSERT_SOURCE_ACTORS",
     });
   };
 }
@@ -31,49 +31,49 @@ export function removeSourceActor(item: SourceActor) {
 }
 export function removeSourceActors(items: SourceActor[]): UIThunkAction {
   return function (dispatch) {
-    dispatch({ type: "REMOVE_SOURCE_ACTORS", items });
+    dispatch({ items, type: "REMOVE_SOURCE_ACTORS" });
   };
 }
 
 export const loadSourceActorBreakpointColumns = memoizeableAction(
   "loadSourceActorBreakpointColumns",
   {
-    createKey: ({ id, line }: { id: string; line: number }) => `${id}:${line}`,
-    getValue: ({ id, line }, thunkArgs) =>
-      getSourceActorBreakpointColumns(thunkArgs.getState(), id, line),
     action: async ({ id, line }, thunkArgs) => {
       await thunkArgs.dispatch({
-        type: "SET_SOURCE_ACTOR_BREAKPOINT_COLUMNS",
-        sourceId: id,
-        line,
         [PROMISE]: (async () => {
           const positions = await thunkArgs.client.getSourceActorBreakpointPositions(
             getSourceActor(thunkArgs.getState(), id),
             {
-              start: { line, column: 0 },
-              end: { line: line + 1, column: 0 },
+              end: { column: 0, line: line + 1 },
+              start: { column: 0, line },
             }
           );
 
           return positions[line] || [];
         })(),
+        line,
+        sourceId: id,
+        type: "SET_SOURCE_ACTOR_BREAKPOINT_COLUMNS",
       });
     },
+    createKey: ({ id, line }: { id: string; line: number }) => `${id}:${line}`,
+    getValue: ({ id, line }, thunkArgs) =>
+      getSourceActorBreakpointColumns(thunkArgs.getState(), id, line),
   }
 );
 
 export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorBreakableLines", {
-  createKey: (args: { id: string }) => args.id,
-  getValue: ({ id }, thunkArgs) => getSourceActorBreakableLines(thunkArgs.getState(), id),
   action: async ({ id }, thunkArgs) => {
     await thunkArgs.dispatch({
-      type: "SET_SOURCE_ACTOR_BREAKABLE_LINES",
-      sourceId: id,
       [PROMISE]: thunkArgs.client.getSourceActorBreakableLines(
         getSourceActor(thunkArgs.getState(), id)
       ),
+      sourceId: id,
+      type: "SET_SOURCE_ACTOR_BREAKABLE_LINES",
     });
   },
+  createKey: (args: { id: string }) => args.id,
+  getValue: ({ id }, thunkArgs) => getSourceActorBreakableLines(thunkArgs.getState(), id),
 });
 
 export const MAX_LINE_HITS_TO_FETCH = 1000;
@@ -83,6 +83,17 @@ export const MAX_LINE_HITS_TO_FETCH = 1000;
 export const loadSourceActorBreakpointHitCounts = memoizeableAction(
   "loadSourceActorBreakpointHitCounts",
   {
+    action: async ({ id, lineNumber, onFailure }, { dispatch, getState, client }) => {
+      await dispatch({
+        [PROMISE]: client.getSourceActorBreakpointHitCounts(
+          getSourceActor(getState(), id),
+          lineNumber,
+          onFailure
+        ),
+        id,
+        type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
+      });
+    },
     createKey: (
       { id, lineNumber }: { id: string; lineNumber: number; onFailure?: Function },
       { getState }
@@ -100,16 +111,5 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
     },
     getValue: ({ id, lineNumber }, { getState }) =>
       getSourceActorBreakpointHitCounts(getState(), id, lineNumber),
-    action: async ({ id, lineNumber, onFailure }, { dispatch, getState, client }) => {
-      await dispatch({
-        type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
-        id,
-        [PROMISE]: client.getSourceActorBreakpointHitCounts(
-          getSourceActor(getState(), id),
-          lineNumber,
-          onFailure
-        ),
-      });
-    },
   }
 );

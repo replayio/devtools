@@ -1,5 +1,7 @@
 import { ObjectId, Rect } from "@recordreplay/protocol";
+
 import { DisallowEverythingProxyHandler } from "../utils";
+
 import { Pause } from "./pause";
 
 // Used by the highlighter when showing the bounding client rect of a node

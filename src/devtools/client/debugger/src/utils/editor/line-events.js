@@ -52,7 +52,7 @@ function emitLineMouseEnter(codeMirror, target) {
 
       // Don't trigger a mouse leave event if the user ends up hovering on the gutter button.
       if (gutterButton && !gutterButton.matches(":hover")) {
-        dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode });
+        dispatch(codeMirror, "lineMouseLeave", { lineNode, lineNumber });
       }
     },
     {
@@ -61,7 +61,7 @@ function emitLineMouseEnter(codeMirror, target) {
     }
   );
 
-  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode, lineNumberNode });
+  dispatch(codeMirror, "lineMouseEnter", { lineNode, lineNumber, lineNumberNode });
 }
 
 export function onLineMouseOver(codeMirror) {

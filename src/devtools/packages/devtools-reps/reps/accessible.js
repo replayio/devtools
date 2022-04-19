@@ -14,12 +14,12 @@ const { rep: StringRep } = require("./string");
  * Renders Accessible object.
  */
 Accessible.propTypes = {
-  object: PropTypes.object.isRequired,
   inspectIconTitle: PropTypes.string,
   nameMaxLength: PropTypes.number,
+  object: PropTypes.object.isRequired,
   onAccessibleClick: PropTypes.func,
-  onAccessibleMouseOver: PropTypes.func,
   onAccessibleMouseOut: PropTypes.func,
+  onAccessibleMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
   roleFirst: PropTypes.bool,
   separatorText: PropTypes.string,
@@ -40,16 +40,16 @@ function Accessible(props) {
   const elements = getElements(object, nameMaxLength, roleFirst, separatorText);
   const isInTree = object.preview && object.preview.isConnected === true;
   const baseConfig = {
-    "data-link-actor-id": object.actor,
     className: "objectBox objectBox-accessible",
+    "data-link-actor-id": object.actor,
   };
 
   let inspectIcon;
   if (isInTree) {
     if (onAccessibleClick) {
       Object.assign(baseConfig, {
-        onClick: _ => onAccessibleClick(object),
         className: `${baseConfig.className} clickable`,
+        onClick: _ => onAccessibleClick(object),
       });
     }
 
@@ -68,7 +68,6 @@ function Accessible(props) {
     if (onInspectIconClick) {
       inspectIcon = button({
         className: "open-accessibility-inspector",
-        title: inspectIconTitle,
         onClick: e => {
           if (onAccessibleClick) {
             e.stopPropagation();
@@ -76,6 +75,7 @@ function Accessible(props) {
 
           onInspectIconClick(object, e);
         },
+        title: inspectIconTitle,
       });
     }
   }
@@ -90,8 +90,8 @@ function getElements(grip, nameMaxLength, roleFirst = false, separatorText = ": 
     elements.push(
       StringRep({
         className: "accessible-name",
-        object: name,
         cropLimit: nameMaxLength,
+        object: name,
       }),
       span({ className: "separator" }, separatorText)
     );

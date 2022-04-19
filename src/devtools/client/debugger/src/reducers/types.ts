@@ -3,8 +3,8 @@
 // https://hg.mozilla.org/mozilla-central/file/fd9f980e368173439465e38f6257557500f45c02/devtools/client/debugger/src/types.js
 // Converted with: https://flow-to-ts.netlify.app
 
-import type { SourceActor } from "./source-actors";
 import type { CallDeclaration } from "./ast";
+import type { SourceActor } from "./source-actors";
 
 export type SourceActorId = string;
 

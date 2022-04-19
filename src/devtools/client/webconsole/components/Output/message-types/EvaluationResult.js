@@ -5,18 +5,18 @@
 "use strict";
 
 // React & Redux
-const React = require("react");
-const PropTypes = require("prop-types");
 const Message = require("devtools/client/webconsole/components/Output/Message");
+const PropTypes = require("prop-types");
+const React = require("react");
 const GripMessageBody =
   require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 
 EvaluationResult.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  message: PropTypes.object.isRequired,
-  timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
+  message: PropTypes.object.isRequired,
   open: PropTypes.bool,
+  timestampsVisible: PropTypes.bool.isRequired,
   topLevelClassName: PropTypes.string,
 };
 

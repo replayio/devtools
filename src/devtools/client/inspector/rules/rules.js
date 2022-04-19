@@ -14,7 +14,6 @@ const StyleInspectorMenu = require("devtools/client/inspector/shared/style-inspe
 const { advanceValidate } = require("devtools/client/inspector/shared/utils");
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
 const { InplaceEditor } = require("devtools/client/shared/inplace-editor");
-
 const {
   updateClasses,
   updateClassPanelExpanded,
@@ -351,8 +350,8 @@ class RulesView {
       this.store.dispatch(updateHighlightedSelector(selector));
 
       await highlighter.show(this.selection.nodeFront, {
-        hideInfoBar: true,
         hideGuides: true,
+        hideInfoBar: true,
         selector,
       });
 
@@ -490,7 +489,6 @@ class RulesView {
    */
   showSelectorEditor(element, ruleId) {
     new InplaceEditor({
-      element,
       done: async (value, commit) => {
         if (!value || !commit) {
           return;
@@ -506,6 +504,7 @@ class RulesView {
 
         await this.elementStyle.modifySelector(ruleId, value);
       },
+      element,
     });
   }
 

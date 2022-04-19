@@ -36,8 +36,8 @@ function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
 }
 
 const connector = connect(null, {
-  setWorkspaceId: actions.setWorkspaceId,
   setModal: actions.setModal,
+  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(TeamPage);

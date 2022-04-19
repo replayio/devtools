@@ -5,9 +5,9 @@
 import type { UIState } from "ui/state";
 
 import type { Source } from "../reducers/sources";
+import { getSelectedSource } from "../reducers/sources";
 import type { Breakpoint, Position } from "../reducers/types";
 
-import { getSelectedSource } from "../reducers/sources";
 import { getBreakpointsList } from "./breakpoints";
 
 function getColumn(column: number, selectedSource: Source) {

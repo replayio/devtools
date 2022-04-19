@@ -1,13 +1,14 @@
-import React, { MouseEventHandler } from "react";
-import { getVisiblePosition } from "../../utils/timeline";
-import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
-import { actions } from "../../actions";
-import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@recordreplay/protocol";
+import classnames from "classnames";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import { timelineMarkerWidth as pointWidth } from "../../constants";
+import React, { MouseEventHandler } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { actions } from "../../actions";
+import { timelineMarkerWidth as pointWidth } from "../../constants";
+import { getVisiblePosition } from "../../utils/timeline";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
@@ -69,10 +70,10 @@ class Marker extends React.Component<MarkerProps> {
   onMouseEnter = () => {
     const { point, time, location, setHoveredItem } = this.props;
     const hoveredItem: HoveredItem = {
-      point,
-      time,
       location,
+      point,
       target: "timeline",
+      time,
     };
 
     setHoveredItem(hoveredItem);
@@ -91,9 +92,9 @@ class Marker extends React.Component<MarkerProps> {
       <a
         tabIndex={0}
         className={classnames("marker", {
+          paused: time === currentTime,
           "primary-highlight": isPrimaryHighlighted,
           "secondary-highlight": isSecondaryHighlighted,
-          paused: time === currentTime,
         })}
         style={{
           left: `calc(${offsetPercent}% - ${pointWidth / 2}px)`,
@@ -109,9 +110,9 @@ class Marker extends React.Component<MarkerProps> {
 }
 
 const connector = connect(null, {
-  setHoveredItem: actions.setHoveredItem,
-  seek: actions.seek,
   clearHoveredItem: actions.clearHoveredItem,
+  seek: actions.seek,
+  setHoveredItem: actions.setHoveredItem,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

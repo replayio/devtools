@@ -1,5 +1,7 @@
 import { SourceId } from "@recordreplay/protocol";
+
 import { Source, SourceContent, Location } from "../reducers/sources";
+
 import { AsyncValue } from "./async-value";
 
 export function getSourcemapVisualizerURL(

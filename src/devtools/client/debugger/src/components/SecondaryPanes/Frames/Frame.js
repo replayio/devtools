@@ -3,18 +3,18 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-
 import classNames from "classnames";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { Redacted } from "ui/components/Redacted";
+import { trackEvent } from "ui/utils/telemetry";
 
-import AccessibleImage from "../../shared/AccessibleImage";
 import { formatDisplayName } from "../../../utils/pause/frames";
 import { getFilename, getFileURL } from "../../../utils/source";
-import FrameMenu from "./FrameMenu";
+import AccessibleImage from "../../shared/AccessibleImage";
+
 import FrameIndent from "./FrameIndent";
-import { trackEvent } from "ui/utils/telemetry";
-import { Redacted } from "ui/components/Redacted";
+import FrameMenu from "./FrameMenu";
 
 function FrameTitle({ frame, options = {}, l10n }) {
   const displayName = formatDisplayName(frame, options, l10n);
@@ -50,9 +50,9 @@ FrameLocation.displayName = "FrameLocation";
 
 export default class FrameComponent extends Component {
   static defaultProps = {
+    disableContextMenu: false,
     hideLocation: false,
     shouldMapDisplayName: true,
-    disableContextMenu: false,
   };
 
   get isSelectable() {
@@ -75,7 +75,7 @@ export default class FrameComponent extends Component {
     FrameMenu(
       frame,
       frameworkGroupingOn,
-      { copyStackTrace, toggleFrameworkGrouping, toggleBlackBox },
+      { copyStackTrace, toggleBlackBox, toggleFrameworkGrouping },
       event,
       cx
     );

@@ -3,15 +3,15 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // ReactJS
-const { button, span } = require("react-dom-factories");
+const nodeConstants = require("devtools/shared/dom-node-constants");
 const PropTypes = require("prop-types");
+const { createPrimitiveValueFront } = require("protocol/thread");
+const { button, span } = require("react-dom-factories");
 
 // Utils
+const { MODE } = require("./constants");
 const { isGrip, wrapRender } = require("./rep-utils");
 const { rep: StringRep, isLongString } = require("./string");
-const { MODE } = require("./constants");
-const nodeConstants = require("devtools/shared/dom-node-constants");
-const { createPrimitiveValueFront } = require("protocol/thread");
 
 const MAX_ATTRIBUTE_LENGTH = 50;
 
@@ -19,13 +19,14 @@ const MAX_ATTRIBUTE_LENGTH = 50;
  * Renders DOM element node.
  */
 ElementNode.propTypes = {
-  object: PropTypes.object.isRequired,
   inspectIconTitle: PropTypes.string,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
+
+  object: PropTypes.object.isRequired,
   onDOMNodeClick: PropTypes.func,
-  onDOMNodeMouseOver: PropTypes.func,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
 };
 
@@ -44,15 +45,15 @@ function ElementNode(props) {
   const isInTree = object.isNodeConnected() === true;
 
   const baseConfig = {
-    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-node",
+    "data-link-actor-id": object.id(),
   };
   let inspectIcon;
   if (isInTree) {
     if (onDOMNodeClick) {
       Object.assign(baseConfig, {
-        onClick: _ => onDOMNodeClick(object),
         className: `${baseConfig.className} clickable`,
+        onClick: _ => onDOMNodeClick(object),
       });
     }
 
@@ -71,8 +72,7 @@ function ElementNode(props) {
     if (onInspectIconClick) {
       inspectIcon = button({
         className: "open-inspector",
-        // TODO: Localize this with "openNodeInInspector" when Bug 1317038 lands
-        title: inspectIconTitle || "Click to select the node in the inspector",
+
         onClick: e => {
           if (onDOMNodeClick) {
             e.stopPropagation();
@@ -80,6 +80,8 @@ function ElementNode(props) {
 
           onInspectIconClick(object, e);
         },
+        // TODO: Localize this with "openNodeInInspector" when Bug 1317038 lands
+        title: inspectIconTitle || "Click to select the node in the inspector",
       });
     }
   }
@@ -146,8 +148,8 @@ function getElements(grip, mode) {
       span({ className: "attrEqual" }, "="),
       StringRep({
         className: "attrValue",
-        object: createPrimitiveValueFront(value),
         cropLimit: MAX_ATTRIBUTE_LENGTH,
+        object: createPrimitiveValueFront(value),
         title,
       })
     );
@@ -170,7 +172,7 @@ function supportsObject(object) {
 
 // Exports from this module
 module.exports = {
+  MAX_ATTRIBUTE_LENGTH,
   rep: wrapRender(ElementNode),
   supportsObject,
-  MAX_ATTRIBUTE_LENGTH,
 };

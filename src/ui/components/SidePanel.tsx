@@ -1,12 +1,14 @@
-import React, { useState } from "react";
-import Transcript from "ui/components/Transcript";
-import Events from "ui/components/Events";
-import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
-import StatusDropdown from "./shared/StatusDropdown";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import Events from "ui/components/Events";
+import Transcript from "ui/components/Transcript";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { useSelector } from "react-redux";
+
+import ReplayInfo from "./Events/ReplayInfo";
+import StatusDropdown from "./shared/StatusDropdown";
+
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
@@ -32,19 +34,19 @@ export default function SidePanel() {
       <Accordion
         items={[
           {
-            header: "Info",
             buttons: resolveRecording ? <StatusDropdown /> : null,
             className: "replay-info",
             component: <ReplayInfo />,
-            opened: !replayInfoCollapsed,
+            header: "Info",
             onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+            opened: !replayInfoCollapsed,
           },
           {
-            header: "Events",
             className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
             component: <Events />,
-            opened: !eventsCollapsed,
+            header: "Events",
             onToggle: () => setEventsCollapsed(!eventsCollapsed),
+            opened: !eventsCollapsed,
           },
         ]}
       />

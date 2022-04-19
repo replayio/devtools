@@ -1,11 +1,5 @@
 // Perform some analysis to find and describe automated tests that were recorded.
 
-import { Pause, ThreadFront, ValueFront } from "./thread";
-import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
-import { Helpers } from "./logpoint";
-import { assert } from "protocol/utils";
-import { client } from "./socket";
-import { comparePoints, pointPrecedes } from "./execution-point-utils";
 import {
   AnalysisEntry,
   ExecutionPoint,
@@ -13,6 +7,13 @@ import {
   Location,
   PointDescription,
 } from "@recordreplay/protocol";
+import { assert } from "protocol/utils";
+
+import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import { comparePoints, pointPrecedes } from "./execution-point-utils";
+import { Helpers } from "./logpoint";
+import { client } from "./socket";
+import { Pause, ThreadFront, ValueFront } from "./thread";
 
 // Information about a jest test which ran in the recording.
 interface JestTestInfo {
@@ -114,10 +115,10 @@ class JestTestState {
 
   async loadTests() {
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
-      mapper: JestTestMapper,
       effectful: true,
       locations: this.invokeCallbackLocations.map(location => ({ location })),
+      mapper: JestTestMapper,
+      sessionId: this.sessionId,
     };
 
     const analysisResults: AnalysisEntry[] = [];
@@ -185,10 +186,10 @@ class JestTestState {
     }
 
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
-      mapper: JestExceptionMapper,
       effectful: true,
+      mapper: JestExceptionMapper,
       points: failureExceptionPoints.map(p => p.point),
+      sessionId: this.sessionId,
     };
 
     const analysisResults: AnalysisEntry[] = [];
@@ -232,10 +233,10 @@ class JestTestState {
   // Get the points where test failures occurred.
   private async getFailurePoints(): Promise<PointDescription[]> {
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
-      mapper: "",
       effectful: true,
       locations: [{ location: this.catchBlockLocation }],
+      mapper: "",
+      sessionId: this.sessionId,
     };
 
     const handler: AnalysisHandler<void> = {};
@@ -250,10 +251,10 @@ class JestTestState {
   // Get a sorted array of the points where exceptions were thrown.
   private async getExceptionPoints(): Promise<PointDescription[]> {
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
-      mapper: "",
       effectful: true,
       exceptionPoints: true,
+      mapper: "",
+      sessionId: this.sessionId,
     };
 
     const handler: AnalysisHandler<void> = {};
@@ -310,7 +311,7 @@ async function getBreakpointLocationOnLine(
   const breakpointPositions = await ThreadFront.getBreakpointPositionsCompressed(sourceId);
   for (const { line, columns } of breakpointPositions) {
     if (line == targetLine && columns.length) {
-      return { sourceId, line, column: columns[0] };
+      return { column: columns[0], line, sourceId };
     }
   }
   return null;
@@ -411,12 +412,12 @@ async function findJestTests() {
       const pause = ThreadFront.ensurePause(startPoint.point, startPoint.time);
       const pauseId = await pause.pauseIdWaiter.promise;
       TestMessageHandlers.onTestMessage?.({
-        source: "ConsoleAPI",
-        level: "info",
-        text: `JestTest ${name}`,
-        point: startPoint,
-        pauseId,
         data: {},
+        level: "info",
+        pauseId,
+        point: startPoint,
+        source: "ConsoleAPI",
+        text: `JestTest ${name}`,
       });
     })
   );
@@ -435,12 +436,12 @@ async function findJestTests() {
       const pause = ThreadFront.ensurePause(errorPoint.point, errorPoint.time);
       const pauseId = await pause.pauseIdWaiter.promise;
       TestMessageHandlers.onTestMessage?.({
-        source: "ConsoleAPI",
-        level: "error",
-        text: `JestFailure ${errorText}`,
-        point: errorPoint,
-        pauseId,
         data: {},
+        level: "error",
+        pauseId,
+        point: errorPoint,
+        source: "ConsoleAPI",
+        text: `JestFailure ${errorText}`,
       });
     })
   );

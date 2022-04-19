@@ -4,8 +4,9 @@
 
 //
 
-import { createParentMap } from "./utils";
 import flattenDeep from "lodash/flattenDeep";
+
+import { createParentMap } from "./utils";
 
 function findSourceItem(sourceTree, source) {
   function _traverse(subtree) {

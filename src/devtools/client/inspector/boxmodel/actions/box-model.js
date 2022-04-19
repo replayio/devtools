@@ -15,8 +15,8 @@ module.exports = {
    */
   updateLayout(layout) {
     return {
-      type: UPDATE_LAYOUT,
       layout,
+      type: UPDATE_LAYOUT,
     };
   },
 
@@ -25,8 +25,8 @@ module.exports = {
    */
   updateOffsetParent(offsetParent) {
     return {
-      type: UPDATE_OFFSET_PARENT,
       offsetParent,
+      type: UPDATE_OFFSET_PARENT,
     };
   },
 };

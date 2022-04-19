@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-
-import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+
 import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
 export default function TypesDropdown({

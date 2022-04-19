@@ -4,17 +4,10 @@
 
 //
 
-import React, { Component } from "react";
-import { connect } from "../../../utils/connect";
 import PropTypes from "prop-types";
-
-import FrameComponent from "./Frame";
-import Group from "./Group";
+import React, { Component } from "react";
 
 import actions from "../../../actions";
-import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
-import { copyToTheClipboard } from "../../../utils/clipboard";
-
 import {
   getFrameworkGroupingState,
   getSelectedFrame,
@@ -22,6 +15,12 @@ import {
   getThreadContext,
   getFramesLoading,
 } from "../../../selectors";
+import { copyToTheClipboard } from "../../../utils/clipboard";
+import { connect } from "../../../utils/connect";
+import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
+
+import FrameComponent from "./Frame";
+import Group from "./Group";
 
 const NUM_FRAMES_SHOWN = 7;
 
@@ -134,13 +133,13 @@ Frames.contextTypes = { l10n: PropTypes.object };
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
+  disableContextMenu: false,
+  disableFrameTruncate: false,
+  displayFullUrl: false,
   frames: getCallStackFrames(state),
   framesLoading: getFramesLoading(state),
   frameworkGroupingOn: getFrameworkGroupingState(state),
   selectedFrame: getSelectedFrame(state),
-  disableFrameTruncate: false,
-  disableContextMenu: false,
-  displayFullUrl: false,
 });
 
 export default connect(mapStateToProps, {

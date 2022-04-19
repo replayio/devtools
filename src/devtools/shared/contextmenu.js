@@ -142,6 +142,6 @@ function buildMenu(items) {
 }
 
 module.exports = {
-  showMenu,
   buildMenu,
+  showMenu,
 };

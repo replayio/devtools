@@ -4,9 +4,10 @@
 
 //
 
-import { getExecutionPoint, getResumePoint, getFramePositions } from "../../selectors";
 import { getLoadedRegions } from "ui/reducers/app";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+
+import { getExecutionPoint, getResumePoint, getFramePositions } from "../../selectors";
 import { recordEvent } from "../../utils/telemetry";
 
 import { setFramePositions } from "./setFramePositions";
@@ -37,10 +38,10 @@ export function command(cx, type) {
       dispatch({ type: "CLEAR_FRAME_POSITIONS" });
     }
     return dispatch({
-      type: "COMMAND",
+      [PROMISE]: client[type](nextPoint, getLoadedRegions(getState())),
       command: type,
       cx,
-      [PROMISE]: client[type](nextPoint, getLoadedRegions(getState())),
+      type: "COMMAND",
     });
   };
 }

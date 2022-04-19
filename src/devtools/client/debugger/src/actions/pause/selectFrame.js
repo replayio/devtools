@@ -4,10 +4,11 @@
 
 //
 
+import assert from "../../utils/assert";
 import { selectLocation } from "../sources";
+
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
-import assert from "../../utils/assert";
 
 /**
  * @memberof actions/pause
@@ -24,10 +25,10 @@ export function selectFrame(cx, frame) {
     }
 
     dispatch({
-      type: "SELECT_FRAME",
       cx,
-      thread: cx.thread,
       frame,
+      thread: cx.thread,
+      type: "SELECT_FRAME",
     });
 
     client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);

@@ -1,16 +1,17 @@
-import React, { MouseEventHandler } from "react";
-import { SVG } from "image/svg";
 import classnames from "classnames";
+import { SVG } from "image/svg";
+import React, { MouseEventHandler } from "react";
+
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 
 const images = {
+  comment: SVG.Comment,
   next: SVG.NextButton,
-  previous: SVG.NextButton,
   pause: SVG.ReplayPause,
   play: SVG.ReplayResume,
-  comment: SVG.Comment,
+  previous: SVG.NextButton,
 };
 
 interface CommandButtonProps {

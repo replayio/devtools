@@ -1,6 +1,7 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { GET_USER_SETTINGS } from "ui/graphql/settings";
 import { ExperimentalUserSettings } from "ui/types";
+
 import { cloneResponse } from "./utils";
 
 export function createUserSettingsMock(): MockedResponse[] {
@@ -20,8 +21,8 @@ export function createUserSettingsMock(): MockedResponse[] {
       data: {
         viewer: {
           apiKeys: [],
-          settings,
           defaultWorkspace: null,
+          settings,
         },
       },
     },

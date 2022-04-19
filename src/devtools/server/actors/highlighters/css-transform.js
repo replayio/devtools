@@ -44,23 +44,23 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
 
     // The root wrapper is used to unzoom the highlighter when needed.
     const rootWrapper = createNode(this.win, {
-      parent: container,
       attributes: {
-        id: "root",
         class: "root",
+        id: "root",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const svg = createSVGNode(this.win, {
+      attributes: {
+        height: "100%",
+        hidden: "true",
+        id: "elements",
+        width: "100%",
+      },
       nodeType: "svg",
       parent: rootWrapper,
-      attributes: {
-        id: "elements",
-        hidden: "true",
-        width: "100%",
-        height: "100%",
-      },
       prefix: this.ID_CLASS_PREFIX,
     });
 
@@ -68,27 +68,27 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
     this.markerId = "arrow-marker-" + MARKER_COUNTER;
     MARKER_COUNTER++;
     const marker = createSVGNode(this.win, {
-      nodeType: "marker",
-      parent: svg,
       attributes: {
         id: this.markerId,
-        markerWidth: "10",
         markerHeight: "5",
-        orient: "auto",
         markerUnits: "strokeWidth",
+        markerWidth: "10",
+        orient: "auto",
         refX: "10",
         refY: "5",
         viewBox: "0 0 10 10",
       },
+      nodeType: "marker",
+      parent: svg,
       prefix: this.ID_CLASS_PREFIX,
     });
     createSVGNode(this.win, {
-      nodeType: "path",
-      parent: marker,
       attributes: {
         d: "M 0 0 L 10 5 L 0 10 z",
         fill: "#08C",
       },
+      nodeType: "path",
+      parent: marker,
     });
 
     const shapesGroup = createSVGNode(this.win, {
@@ -98,34 +98,34 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
 
     // Create the 2 polygons (transformed and untransformed)
     createSVGNode(this.win, {
+      attributes: {
+        class: "untransformed",
+        id: "untransformed",
+      },
       nodeType: "polygon",
       parent: shapesGroup,
-      attributes: {
-        id: "untransformed",
-        class: "untransformed",
-      },
       prefix: this.ID_CLASS_PREFIX,
     });
     createSVGNode(this.win, {
+      attributes: {
+        class: "transformed",
+        id: "transformed",
+      },
       nodeType: "polygon",
       parent: shapesGroup,
-      attributes: {
-        id: "transformed",
-        class: "transformed",
-      },
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Create the arrows
     for (const nb of ["1", "2", "3", "4"]) {
       createSVGNode(this.win, {
-        nodeType: "line",
-        parent: shapesGroup,
         attributes: {
-          id: "line" + nb,
           class: "line",
+          id: "line" + nb,
           "marker-end": "url(#" + this.markerId + ")",
         },
+        nodeType: "line",
+        parent: shapesGroup,
         prefix: this.ID_CLASS_PREFIX,
       });
     }

@@ -1,5 +1,7 @@
 import React from "react";
+
 import MaterialIcon from "../shared/MaterialIcon";
+
 import TypesDropdown from "./TypesDropdown";
 import { CanonicalRequestType } from "./utils";
 

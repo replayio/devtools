@@ -4,10 +4,10 @@
 
 "use strict";
 
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const PropTypes = require("prop-types");
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
 const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
@@ -59,9 +59,9 @@ class ComputedProperty extends PureComponent {
         referenceElementType
       ),
       getNodeRep(referenceElement, {
-        onInspectIconClick: () => setSelectedNode(referenceElement, { reason: "box-model" }),
-        onDOMNodeMouseOver: () => onShowBoxModelHighlighterForNode(referenceElement),
         onDOMNodeMouseOut: () => onHideBoxModelHighlighter(),
+        onDOMNodeMouseOver: () => onShowBoxModelHighlighterForNode(referenceElement),
+        onInspectIconClick: () => setSelectedNode(referenceElement, { reason: "box-model" }),
       })
     );
   }
@@ -73,19 +73,19 @@ class ComputedProperty extends PureComponent {
       {
         className: "computed-property-view",
         "data-property-name": name,
-        tabIndex: "0",
         ref: container => {
           this.container = container;
         },
+        tabIndex: "0",
       },
       dom.div(
         { className: "computed-property-name-container" },
         dom.div(
           {
             className: "computed-property-name theme-fg-color3",
+            onClick: this.onFocus,
             tabIndex: "",
             title: name,
-            onClick: this.onFocus,
           },
           name
         )
@@ -96,8 +96,8 @@ class ComputedProperty extends PureComponent {
           {
             className: "computed-property-value theme-fg-color1",
             dir: "ltr",
-            tabIndex: "",
             onClick: this.onFocus,
+            tabIndex: "",
           },
           value
         ),

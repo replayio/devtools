@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+
 import { PrimaryLgButton } from "../Button";
 import { OnboardingActions, OnboardingBody, OnboardingHeader } from "../Onboarding/index";
 

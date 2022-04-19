@@ -10,11 +10,11 @@ const PropTypes = require("prop-types");
  * A CSS class.
  */
 export const classes = {
-  // The CSS class name.
-  name: PropTypes.string,
-
   // Whether or not the CSS class is applied.
   isApplied: PropTypes.bool,
+
+  // The CSS class name.
+  name: PropTypes.string,
 };
 
 /**
@@ -188,7 +188,7 @@ export const rule = {
 };
 
 export const rules = {
-  isAddRuleEnabled: PropTypes.bool.isRequired,
   highlightedSelector: PropTypes.string.isRequired,
+  isAddRuleEnabled: PropTypes.bool.isRequired,
   rules: PropTypes.arrayOf(PropTypes.shape(rule)),
 };

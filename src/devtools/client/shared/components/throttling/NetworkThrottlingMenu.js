@@ -4,15 +4,14 @@
 
 "use strict";
 
-const { PureComponent } = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-
 const throttlingProfiles = require("devtools/client/shared/components/throttling/profiles");
 const Types = require("devtools/client/shared/components/throttling/types");
 
 // Localization
 const { LocalizationHelper } = require("devtools/shared/l10n");
+const PropTypes = require("prop-types");
+const { PureComponent } = require("react");
+const dom = require("react-dom-factories");
 const L10N = new LocalizationHelper("devtools/client/locales/network-throttling.properties");
 const NO_THROTTLING_LABEL = L10N.getStr("responsive.noThrottling");
 
@@ -38,20 +37,20 @@ class NetworkThrottlingMenu extends PureComponent {
 
     const menuItems = throttlingProfiles.map(profile => {
       return {
-        label: profile.id,
-        type: "checkbox",
         checked: networkThrottling.enabled && profile.id == networkThrottling.profile,
         click: () => onChangeNetworkThrottling(true, profile.id),
+        label: profile.id,
+        type: "checkbox",
       };
     });
 
     menuItems.unshift("-");
 
     menuItems.unshift({
-      label: NO_THROTTLING_LABEL,
-      type: "checkbox",
       checked: !networkThrottling.enabled,
       click: () => onChangeNetworkThrottling(false, ""),
+      label: NO_THROTTLING_LABEL,
+      type: "checkbox",
     });
 
     showMenu(menuItems, { button: event.target });
@@ -65,10 +64,10 @@ class NetworkThrottlingMenu extends PureComponent {
 
     return dom.button(
       {
-        id: "network-throttling-menu",
         className: "devtools-button devtools-dropdown-button",
-        title: selectedProfile,
+        id: "network-throttling-menu",
         onClick: this.onShowThrottlingMenu,
+        title: selectedProfile,
       },
       dom.span({ className: "title" }, selectedProfile)
     );

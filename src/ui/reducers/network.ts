@@ -4,17 +4,17 @@ import {
   RequestInfo,
   ResponseBodyData,
 } from "@recordreplay/protocol";
-
-import { UIState } from "ui/state";
-import { NetworkAction } from "ui/actions/network";
-import { WiredFrame } from "protocol/thread/pause";
-import { createSelector } from "reselect";
 import { getSources } from "devtools/client/debugger/src/reducers/sources";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
-import { getFocusRegion } from "./timeline";
+import { WiredFrame } from "protocol/thread/pause";
+import { createSelector } from "reselect";
+import { NetworkAction } from "ui/actions/network";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
+import { UIState } from "ui/state";
+
+import { getFocusRegion } from "./timeline";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -30,9 +30,9 @@ const initialState = (): NetworkState => ({
   events: [],
   frames: {},
   loading: true,
+  requestBodies: {},
   requests: [],
   responseBodies: {},
-  requestBodies: {},
   selectedRequestId: null,
 });
 

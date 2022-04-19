@@ -1,14 +1,14 @@
 import Selection, { SelectionReason } from "devtools/client/framework/selection";
-import { Inspector } from "../inspector";
-
-import { ThreadFront } from "protocol/thread";
 import Highlighter from "highlighter/highlighter";
-import { selectors } from "ui/reducers";
+import { ThreadFront } from "protocol/thread";
+import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
+import { selectors } from "ui/reducers";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
+import { Inspector } from "../inspector";
+
 import { reset, newRoot, expandNode, updateNodeExpanded, selectionChanged } from "./actions/markup";
-import { assert } from "protocol/utils";
 
 class MarkupView {
   inspector: Inspector | null;
@@ -74,10 +74,10 @@ class MarkupView {
 
   getMarkupProps() {
     return {
-      onSelectNode: this.onSelectNode,
-      onToggleNodeExpanded: this.onToggleNodeExpanded,
       onMouseEnterNode: this.onMouseEnterNode,
       onMouseLeaveNode: this.onMouseLeaveNode,
+      onSelectNode: this.onSelectNode,
+      onToggleNodeExpanded: this.onToggleNodeExpanded,
     };
   }
 

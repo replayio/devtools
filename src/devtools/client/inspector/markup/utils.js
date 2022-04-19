@@ -147,8 +147,8 @@ function parseAttributeValues(attr, doc) {
 }
 
 module.exports = {
-  flashElementOn,
   flashElementOff,
+  flashElementOn,
   getAutocompleteMaxWidth,
   isFlexDisplayType,
   isGridDisplayType,

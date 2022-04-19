@@ -1,6 +1,8 @@
 import { UIState } from "ui/state";
-import { getVisibleSelectedFrame, getSourceWithContent, getPausePreviewLocation } from ".";
+
 import { hasDocument } from "../utils/editor";
+
+import { getVisibleSelectedFrame, getSourceWithContent, getPausePreviewLocation } from ".";
 
 export function getDebugLineLocation(state: UIState) {
   const frame = getVisibleSelectedFrame(state);

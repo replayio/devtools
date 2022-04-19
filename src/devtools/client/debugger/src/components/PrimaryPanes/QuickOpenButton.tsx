@@ -2,6 +2,7 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
+
 const { openQuickOpen } = require("devtools/client/debugger/src/actions/quick-open");
 
 function QuickOpenButton({ openQuickOpen }: PropsFromRedux) {

@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { colorUtils } = require("devtools/shared/css/color");
 const Spectrum = require("devtools/client/shared/widgets/Spectrum");
 const SwatchBasedEditorTooltip = require("devtools/client/shared/widgets/tooltip/SwatchBasedEditorTooltip");
+const { colorUtils } = require("devtools/shared/css/color");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 const { openDocLink } = require("devtools/client/shared/link");

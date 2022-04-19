@@ -1,11 +1,18 @@
+import { useRouter } from "next/router";
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { removeUrlParameters } from "ui/utils/environment";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
+import { trackEvent } from "ui/utils/telemetry";
+
 import { PrimaryLgButton } from "./Button";
 import { TextInput } from "./Forms";
+import InvitationLink from "./NewWorkspaceModal/InvitationLink";
+import { DownloadingPage } from "./Onboarding/DownloadingPage";
+import { DownloadPage } from "./Onboarding/DownloadPage";
 import {
   OnboardingActions,
   OnboardingBody,
@@ -16,13 +23,7 @@ import {
   NextButton,
   OnboardingModalContainer,
 } from "./Onboarding/index";
-import InvitationLink from "./NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "./WorkspaceSettingsModal/WorkspaceSettingsModal";
-import { trackEvent } from "ui/utils/telemetry";
-import { removeUrlParameters } from "ui/utils/environment";
-import { DownloadPage } from "./Onboarding/DownloadPage";
-import { DownloadingPage } from "./Onboarding/DownloadingPage";
-import { useRouter } from "next/router";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -122,7 +123,7 @@ function TeamNamePage({
         {inputError ? <div className="text-red-500">{inputError}</div> : null}
       </div>
       <OnboardingActions>
-        <NextButton onNext={handleSave} {...{ current, setCurrent, hideModal, allowNext }} />
+        <NextButton onNext={handleSave} {...{ allowNext, current, hideModal, setCurrent }} />
       </OnboardingActions>
     </>
   );
@@ -173,7 +174,7 @@ function TeamMemberInvitationPage({
 
     setErrorMessage(null);
     setIsLoading(true);
-    inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
+    inviteNewWorkspaceMember({ variables: { email: inputValue, workspaceId: newWorkspace!.id } });
     trackEvent("onboarding.invited_team_member");
   };
 

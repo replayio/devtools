@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSelector } from "reselect";
 import uniqBy from "lodash/uniqBy";
+import { createSelector } from "reselect";
+
+import { getSelectedSource } from "../reducers/sources";
+import { Breakpoint } from "../reducers/types";
+import { sortSelectedBreakpoints } from "../utils/breakpoint";
 
 import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
-import { getSelectedSource } from "../reducers/sources";
-
-import { sortSelectedBreakpoints } from "../utils/breakpoint";
-import { Breakpoint } from "../reducers/types";
 
 /*
  * Finds the breakpoints, which appear in the selected source.

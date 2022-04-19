@@ -23,24 +23,24 @@ export interface QuickOpenState {
 
 export const initialQuickOpenState: QuickOpenState = {
   enabled: false,
+  project: false,
   query: "",
   searchType: "sources",
-  project: false,
 };
 
 const quickOpenSlice = createSlice({
-  name: "quickOpen",
   initialState: initialQuickOpenState,
+  name: "quickOpen",
   reducers: {
+    closeQuickOpen(state) {
+      return initialQuickOpenState;
+    },
     openQuickOpen(state, action: PayloadAction<{ query: string; project: boolean }>) {
       const { query, project } = action.payload;
       state.enabled = true;
       state.project = project;
       state.query = query;
       state.searchType = parseQuickOpenQuery(query);
-    },
-    closeQuickOpen(state) {
-      return initialQuickOpenState;
     },
     setQuickOpenQuery(state, action: PayloadAction<string>) {
       const query = action.payload;

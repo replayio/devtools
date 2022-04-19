@@ -51,10 +51,10 @@ async function spawnAsync(command, args, options) {
 }
 
 function defer() {
-  let resolve, reject;
+  let reject, resolve;
   const promise = new Promise((res, rej) => {
     resolve = res;
     reject = rej;
   });
-  return { promise, resolve, reject };
+  return { promise, reject, resolve };
 }

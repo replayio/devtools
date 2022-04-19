@@ -4,8 +4,10 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
+
 import { OnboardingContent, OnboardingModalContainer } from "../Onboarding/index";
 import Spinner from "../Spinner";
+
 import DownloadReplayModal from "./DownloadReplayModal";
 
 function ModalLoader() {

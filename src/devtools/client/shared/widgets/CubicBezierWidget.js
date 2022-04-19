@@ -25,13 +25,13 @@
 
 "use strict";
 
-const EventEmitter = require("devtools/shared/event-emitter");
 const {
   PREDEFINED,
   PRESETS,
   DEFAULT_PRESET_CATEGORY,
 } = require("devtools/client/shared/widgets/CubicBezierPresets");
 const { getCSSLexer } = require("devtools/shared/css/lexer");
+const EventEmitter = require("devtools/shared/event-emitter");
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 
 /**
@@ -149,11 +149,11 @@ BezierCanvas.prototype = {
     const xy = this.bezier.coordinates;
 
     const defaultSettings = {
-      handleColor: "#666",
-      handleThickness: 0.008,
       bezierColor: "#4C9ED9",
       bezierThickness: 0.015,
       drawHandles: true,
+      handleColor: "#666",
+      handleThickness: 0.008,
     };
 
     for (const setting in settings) {

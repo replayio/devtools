@@ -1,14 +1,15 @@
+import {
+  EventTypePoints,
+  getEventListenerPoints,
+} from "devtools/client/debugger/src/reducers/event-listeners";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { ReplayEvent } from "ui/state/app";
-import {
-  EventTypePoints,
-  getEventListenerPoints,
-} from "devtools/client/debugger/src/reducers/event-listeners";
-import Match from "./Match";
+
 import { EventKindKey, getReplayEvent } from "./Event";
+import Match from "./Match";
 
 // In Tom's example, the farthest a mouse click event was from the replay captured click
 // (which is a mousedown) was 24ms. Based on that, 100 should be a comfortable window to

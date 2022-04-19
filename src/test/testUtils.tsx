@@ -1,14 +1,13 @@
+import { MockedProvider, MockedResponse } from "@apollo/client/testing";
 import * as rtl from "@testing-library/react";
 import type { RenderOptions } from "@testing-library/react";
 import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
-import { MockedProvider, MockedResponse } from "@apollo/client/testing";
-import { v4 as uuid } from "uuid";
-import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
-
-import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
+import { bootstrapStore } from "ui/setup/store";
+import type { UIState } from "ui/state";
+import { v4 as uuid } from "uuid";
 
 import {
   createRecordingOwnerUserIdMock,

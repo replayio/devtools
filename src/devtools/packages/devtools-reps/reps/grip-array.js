@@ -3,14 +3,13 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
+const { lengthBubble } = require("devtools/shared/grip-length-bubble");
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
-const { lengthBubble } = require("devtools/shared/grip-length-bubble");
-const { interleave, wrapRender, ellipsisElement } = require("./rep-utils");
-const { MODE } = require("./constants");
-
 const { ModePropType } = require("./array");
+const { MODE } = require("./constants");
+const { interleave, wrapRender, ellipsisElement } = require("./rep-utils");
 const DEFAULT_TITLE = "Array";
 
 /**
@@ -18,13 +17,14 @@ const DEFAULT_TITLE = "Array";
  * and the max number of rendered items depends on the current mode.
  */
 GripArray.propTypes = {
-  object: PropTypes.object.isRequired,
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: ModePropType,
-  provider: PropTypes.object,
-  onDOMNodeMouseOver: PropTypes.func,
+
+  object: PropTypes.object.isRequired,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
+  provider: PropTypes.object,
 };
 
 function GripArray(props) {
@@ -36,8 +36,8 @@ function GripArray(props) {
   };
 
   const config = {
-    "data-link-actor-id": object.actor,
     className: "objectBox objectBox-array",
+    "data-link-actor-id": object.actor,
   };
 
   const title = getTitle(props, object);
@@ -76,8 +76,8 @@ function GripArray(props) {
 
   return span(
     {
-      "data-link-actor-id": object.actor,
       className: "objectBox objectBox-array",
+      "data-link-actor-id": object.actor,
     },
     title,
     span(
@@ -115,10 +115,10 @@ function getTitle(props, object) {
   let title = props.title || object.class || DEFAULT_TITLE;
 
   const length = lengthBubble({
-    object,
-    mode: props.mode,
-    maxLengthMap,
     getLength,
+    maxLengthMap,
+    mode: props.mode,
+    object,
   });
 
   if (props.mode === MODE.TINY) {
@@ -192,8 +192,8 @@ function arrayIterator(props, grip, max) {
       res.push(
         Rep({
           ...props,
-          object,
           mode: MODE.TINY,
+          object,
           // Do not propagate title to array items reps
           title: undefined,
         })
@@ -233,8 +233,8 @@ maxLengthMap.set(MODE.LONG, 10);
 
 // Exports from this module
 module.exports = {
+  getLength,
+  maxLengthMap,
   rep: wrapRender(GripArray),
   supportsObject,
-  maxLengthMap,
-  getLength,
 };

@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
 import classnames from "classnames";
-import findLast from "lodash/findLast";
-import find from "lodash/find";
-import { compareNumericStrings } from "protocol/utils";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
+import find from "lodash/find";
+import findLast from "lodash/findLast";
+import { compareNumericStrings } from "protocol/utils";
+import React, { useEffect, useState } from "react";
+import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-const { trackEvent } = require("ui/utils/telemetry");
+import { selectors } from "ui/reducers";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
+
+const { trackEvent } = require("ui/utils/telemetry");
 
 function BreakpointNavigation({
   executionPoint,
@@ -33,7 +34,7 @@ function BreakpointNavigation({
   };
   const isEmpty = analysisPoints && (analysisPoints.error || analysisPoints.data.length == 0);
 
-  let prev, next;
+  let next, prev;
 
   if (executionPoint && !analysisPoints?.error && analysisPoints?.data.length > 0) {
     prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
@@ -73,7 +74,7 @@ function BreakpointNavigation({
                 ? "border-primaryAccent text-primaryAccent"
                 : "border-gray-500 text-gray-500"
             )}
-            style={{ height: "1.25rem", borderRadius: "100%" }}
+            style={{ borderRadius: "100%", height: "1.25rem" }}
             onClick={() => setShowCondition(!showCondition)}
           >
             <MaterialIcon>filter_list</MaterialIcon>
@@ -122,8 +123,8 @@ const mapStateToProps = (state, { breakpoint }) => ({
     breakpoint.location,
     breakpoint.options.condition
   ),
-  indexed: selectors.getIsIndexed(state),
   executionPoint: selectors.getExecutionPoint(state),
+  indexed: selectors.getIsIndexed(state),
 });
 
 export default connect(mapStateToProps, {

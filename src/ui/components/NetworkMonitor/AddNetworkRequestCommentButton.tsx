@@ -4,6 +4,7 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { useGetUserId } from "ui/hooks/users";
 import useAuth0 from "ui/utils/useAuth0";
+
 import { RequestSummary } from "./utils";
 
 export default function AddNetworkRequestCommentButton({ request }: { request: RequestSummary }) {

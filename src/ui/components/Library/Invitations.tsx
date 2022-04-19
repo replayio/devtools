@@ -1,6 +1,6 @@
+import sortBy from "lodash/sortBy";
 import React from "react";
 import hooks from "ui/hooks";
-import sortBy from "lodash/sortBy";
 
 import TeamButton from "./TeamButton";
 

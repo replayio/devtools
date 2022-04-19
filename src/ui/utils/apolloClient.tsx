@@ -1,7 +1,3 @@
-import React, { ReactNode, useState, useEffect } from "react";
-import { DocumentNode } from "graphql";
-import { defer } from "protocol/utils";
-import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import {
   ApolloClient,
   ApolloProvider,
@@ -11,12 +7,16 @@ import {
   HttpLink,
   ApolloError,
 } from "@apollo/client";
-import { MockedProvider, MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
+import { MockedProvider, MockedResponse, MockLink } from "@apollo/client/testing";
+import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
+import { DocumentNode } from "graphql";
+import { defer } from "protocol/utils";
+import React, { ReactNode, useState, useEffect } from "react";
+import { PopupBlockedError } from "ui/components/shared/Error";
 import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
-import { PopupBlockedError } from "ui/components/shared/Error";
 
 let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -80,7 +80,7 @@ export function ApolloWrapper({
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
   const apolloClient = await clientWaiter.promise;
-  return await apolloClient.query({ variables, query });
+  return await apolloClient.query({ query, variables });
 }
 
 export async function mutate({
@@ -93,7 +93,7 @@ export async function mutate({
   refetchQueries?: any;
 }) {
   const apolloClient = await clientWaiter.promise;
-  return await apolloClient.mutate({ variables, mutation, refetchQueries });
+  return await apolloClient.mutate({ mutation, refetchQueries, variables });
 }
 
 export const createApolloClient = memoizeLast(function (
@@ -137,23 +137,8 @@ export function extractGraphQLError(error: ApolloError | undefined): string | un
 function createApolloCache() {
   return new InMemoryCache({
     typePolicies: {
-      Query: {
-        fields: {
-          viewer: {
-            merge: true,
-          },
-        },
-      },
       AuthenticatedUser: {
         merge: true,
-      },
-      Recording: {
-        keyFields: ["uuid"],
-        fields: {
-          comments: {
-            merge: false,
-          },
-        },
       },
       Comment: {
         fields: {
@@ -161,6 +146,21 @@ function createApolloCache() {
             merge: false,
           },
         },
+      },
+      Query: {
+        fields: {
+          viewer: {
+            merge: true,
+          },
+        },
+      },
+      Recording: {
+        fields: {
+          comments: {
+            merge: false,
+          },
+        },
+        keyFields: ["uuid"],
       },
     },
   });
@@ -174,9 +174,9 @@ function createHttpLink(token: string | undefined) {
 
   const uri = process.env.NEXT_PUBLIC_API_URL;
   return new HttpLink({
-    uri,
-    headers,
     fetch,
+    headers,
+    uri,
   });
 }
 

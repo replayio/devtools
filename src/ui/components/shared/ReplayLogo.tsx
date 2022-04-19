@@ -6,15 +6,15 @@ import { getTheme } from "ui/reducers/app";
 import { AppTheme } from "ui/state/app";
 
 const logoSizes = {
-  xs: "h-4",
-  sm: "h-8",
-  md: "h-16",
   lg: "h-32",
+  md: "h-16",
+  sm: "h-8",
+  xs: "h-4",
 };
 const logoColors = {
-  white: "#FFF",
   fuschia: "#F02D5E",
   gray: "var(--cool-gray-500)",
+  white: "#FFF",
 };
 
 const Logo = () => (

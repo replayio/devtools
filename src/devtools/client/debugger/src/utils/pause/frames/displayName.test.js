@@ -4,8 +4,9 @@
 
 //
 
-import { formatCopyName, formatDisplayName, simplifyDisplayName } from "./displayName";
 import { makeMockFrame, makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
+
+import { formatCopyName, formatDisplayName, simplifyDisplayName } from "./displayName";
 
 describe("formatCopyName", () => {
   it("simple", () => {
@@ -51,8 +52,8 @@ describe("formatting display names", () => {
     const source = makeMockSource("entry.js");
     const frame = {
       ...makeMockFrame(undefined, source),
-      originalDisplayName: "originalFn",
       displayName: "fn",
+      originalDisplayName: "originalFn",
     };
 
     expect(formatDisplayName(frame, undefined)).toEqual("originalFn");
@@ -76,7 +77,23 @@ describe("formatting display names", () => {
 
 describe("simplifying display names", () => {
   const cases = {
+    annonymousProperty: [["jQuery.each(^)", "each"]],
+
+    arrayProperty: [
+      ["this.eventPool_[createObject]", "createObject"],
+      ["jQuery.each(^)/jQuery.fn[o]", "o"],
+      ["viewport[get+D]", "get+D"],
+      ["arr[0]", "0"],
+    ],
+
     defaultCase: [["define", "define"]],
+
+    functionProperty: [
+      ["fromYUI._attach/<.", "_attach"],
+      ["Y.ClassNameManager<", "ClassNameManager"],
+      ["fromExtJS.setVisible/cb<", "cb"],
+      ["fromDojo.registerWin/<", "registerWin"],
+    ],
 
     objectProperty: [
       ["z.foz", "foz"],
@@ -89,22 +106,6 @@ describe("simplifying display names", () => {
       ["orion.textview.TextView</addHandler", "addHandler"],
       ["this.eventPool_.createObject", "createObject"],
     ],
-
-    arrayProperty: [
-      ["this.eventPool_[createObject]", "createObject"],
-      ["jQuery.each(^)/jQuery.fn[o]", "o"],
-      ["viewport[get+D]", "get+D"],
-      ["arr[0]", "0"],
-    ],
-
-    functionProperty: [
-      ["fromYUI._attach/<.", "_attach"],
-      ["Y.ClassNameManager<", "ClassNameManager"],
-      ["fromExtJS.setVisible/cb<", "cb"],
-      ["fromDojo.registerWin/<", "registerWin"],
-    ],
-
-    annonymousProperty: [["jQuery.each(^)", "each"]],
   };
 
   Object.keys(cases).forEach(type => {

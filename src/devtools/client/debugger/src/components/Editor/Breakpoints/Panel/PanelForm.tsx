@@ -1,8 +1,9 @@
-import React from "react";
 import classnames from "classnames";
-import { PanelInput } from "./PanelInput";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import React from "react";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { PanelInput } from "./PanelInput";
 
 export function SubmitButton({
   handleSetBreakpoint,

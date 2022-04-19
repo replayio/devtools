@@ -7,10 +7,11 @@
 
 // A button that toggles a doorhanger menu.
 
-const Services = require("devtools/shared/services");
 const flags = require("devtools/shared/flags");
-const { createRef, PureComponent } = require("react");
+const Services = require("devtools/shared/services");
 const PropTypes = require("prop-types");
+const { createRef, PureComponent } = require("react");
+const { createPortal } = require("react-dom");
 const dom = require("react-dom-factories");
 const { button } = dom;
 
@@ -18,7 +19,6 @@ const isMacOS = Services.appinfo.OS === "Darwin";
 
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { focusableSelector } = require("devtools/client/shared/focus");
-const { createPortal } = require("react-dom");
 
 // Return a copy of |obj| minus |fields|.
 const omit = (obj, fields) => {
@@ -32,42 +32,42 @@ const omit = (obj, fields) => {
 class MenuButton extends PureComponent {
   static get propTypes() {
     return {
-      // The toolbox document that will be used for rendering the menu popup.
-      toolboxDoc: PropTypes.object,
-
-      // A text content for the button.
-      label: PropTypes.string,
+      // The menu content.
+      children: PropTypes.any,
 
       // URL of the icon to associate with the MenuButton. (Optional)
       // e.g. chrome://devtools/skin/image/foo.svg
       icon: PropTypes.string,
 
+      // A text content for the button.
+      label: PropTypes.string,
+
       // An optional ID to assign to the menu's container tooltip object.
       menuId: PropTypes.string,
-
-      // The preferred side of the anchor element to display the menu.
-      // Defaults to "bottom".
-      menuPosition: PropTypes.string.isRequired,
 
       // The offset of the menu from the anchor element.
       // Defaults to -5.
       menuOffset: PropTypes.number.isRequired,
 
-      // The menu content.
-      children: PropTypes.any,
+      // The preferred side of the anchor element to display the menu.
+      // Defaults to "bottom".
+      menuPosition: PropTypes.string.isRequired,
 
       // Callback function to be invoked when the button is clicked.
       onClick: PropTypes.func,
 
       // Callback function to be invoked when the child panel is closed.
       onCloseButton: PropTypes.func,
+
+      // The toolbox document that will be used for rendering the menu popup.
+      toolboxDoc: PropTypes.object,
     };
   }
 
   static get defaultProps() {
     return {
-      menuPosition: "bottom",
       menuOffset: -5,
+      menuPosition: "bottom",
     };
   }
 
@@ -137,9 +137,9 @@ class MenuButton extends PureComponent {
 
   initializeTooltip() {
     const tooltipProps = {
+      isMenuTooltip: true,
       type: "doorhanger",
       useXulWrapper: true,
-      isMenuTooltip: true,
     };
 
     if (this.props.menuId) {
@@ -376,9 +376,9 @@ class MenuButton extends PureComponent {
       // Pass through any props set on the button, except the ones we handle
       // here.
       ...omit(this.props, Object.keys(MenuButton.propTypes)),
-      onClick: this.onClick,
       "aria-expanded": this.state.expanded,
       "aria-haspopup": "menu",
+      onClick: this.onClick,
       ref: this.buttonRef,
     };
 

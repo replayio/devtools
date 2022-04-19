@@ -1,5 +1,6 @@
-import React, { ChangeEvent, KeyboardEvent, useContext } from "react";
 import SearchInput from "devtools/client/debugger/src/components/shared/SearchInput";
+import React, { ChangeEvent, KeyboardEvent, useContext } from "react";
+
 import styles from "./ConsoleSearch.module.css";
 import { ActionsContext, StateContext } from "./ConsoleSearchContext";
 

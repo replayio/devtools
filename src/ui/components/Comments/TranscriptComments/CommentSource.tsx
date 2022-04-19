@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { createLabels } from "ui/actions/comments";
 import { actions } from "ui/actions";
+import { createLabels } from "ui/actions/comments";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
 
 type PropsFromParent = {

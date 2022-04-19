@@ -7,6 +7,6 @@ const { messages } = require("devtools/client/webconsole/reducers/messages");
 const { ui } = require("devtools/client/webconsole/reducers/ui");
 
 exports.reducers = {
-  messages,
   consoleUI: ui,
+  messages,
 };

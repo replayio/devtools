@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Action } from "redux";
+
 import { ClassInfo } from "../models/class-list";
 
 type UpdateClassesAction = Action<"UPDATE_CLASSES"> & { classes: ClassInfo[] };
@@ -19,8 +20,8 @@ export type ClassListAction = UpdateClassesAction | UpdateClassPanelExpandedActi
  */
 export function updateClasses(classes: ClassInfo[]) {
   return {
-    type: "UPDATE_CLASSES",
     classes,
+    type: "UPDATE_CLASSES",
   };
 }
 
@@ -32,7 +33,7 @@ export function updateClasses(classes: ClassInfo[]) {
  */
 export function updateClassPanelExpanded(isClassPanelExpanded: boolean) {
   return {
-    type: "UPDATE_CLASS_PANEL_EXPANDED",
     isClassPanelExpanded,
+    type: "UPDATE_CLASS_PANEL_EXPANDED",
   };
 }

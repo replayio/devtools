@@ -1,12 +1,12 @@
-import { Comment } from "ui/state/comments";
 import { gql, useMutation } from "@apollo/client";
-import { Remark } from "ui/state/comments";
-import { GET_COMMENTS } from "ui/graphql/comments";
-import { trackEvent } from "ui/utils/telemetry";
-import omit from "lodash/omit";
-import { GET_USER_ID } from "ui/graphql/users";
 import { AddComment, AddCommentVariables } from "graphql/AddComment";
 import { GetComments } from "graphql/GetComments";
+import omit from "lodash/omit";
+import { GET_COMMENTS } from "ui/graphql/comments";
+import { GET_USER_ID } from "ui/graphql/users";
+import { Comment } from "ui/state/comments";
+import { Remark } from "ui/state/comments";
+import { trackEvent } from "ui/utils/telemetry";
 
 export default function useAddComment() {
   const [addComment, { error }] = useMutation<AddComment, AddCommentVariables>(
@@ -30,20 +30,14 @@ export default function useAddComment() {
     trackEvent("comments.create");
 
     return addComment({
-      variables: {
-        input: {
-          ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),
-          recordingId: comment.recordingId,
-        },
-      },
       optimisticResponse: {
         addComment: {
-          success: true,
-          comment: {
-            id: comment["id"],
-            __typename: "Comment",
-          },
           __typename: "AddComment",
+          comment: {
+            __typename: "Comment",
+            id: comment["id"],
+          },
+          success: true,
         },
       },
       update: (cache, { data }) => {
@@ -62,16 +56,16 @@ export default function useAddComment() {
 
         const newComment = {
           ...comment,
+          __typename: "Comment",
           id: commentId,
           primaryLabel: comment.primaryLabel || null,
           secondaryLabel: comment.secondaryLabel || null,
           user: {
+            __typename: "User",
             id: userId,
             name: comment.user.name,
             picture: comment.user.picture,
-            __typename: "User",
           },
-          __typename: "Comment",
         };
         const newData = {
           ...cacheData,
@@ -85,10 +79,16 @@ export default function useAddComment() {
         };
 
         cache.writeQuery({
+          data: newData,
           query: GET_COMMENTS,
           variables: { recordingId: comment.recordingId },
-          data: newData,
         });
+      },
+      variables: {
+        input: {
+          ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),
+          recordingId: comment.recordingId,
+        },
       },
     });
   };

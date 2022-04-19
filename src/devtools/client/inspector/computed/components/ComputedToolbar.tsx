@@ -1,8 +1,10 @@
 import React, { FormEvent, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
-const { debounce } = require("devtools/shared/debounce");
+
 import { setComputedPropertySearch, setShowBrowserStyles } from "../actions";
+
+const { debounce } = require("devtools/shared/debounce");
 
 function ComputedToolbar(props: PropsFromRedux) {
   const { setComputedPropertySearch, setShowBrowserStyles } = props;

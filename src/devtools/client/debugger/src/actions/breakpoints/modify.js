@@ -3,8 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { ThreadFront } from "protocol/thread";
-
-import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
+import { selectors } from "ui/reducers";
+import { trackEvent } from "ui/utils/telemetry";
 
 import {
   getBreakpoint,
@@ -17,14 +17,11 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
-
-import { selectors } from "ui/reducers";
-
-import { setBreakpointPositions } from "./breakpointPositions";
-
+import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
-import { trackEvent } from "ui/utils/telemetry";
+
+import { setBreakpointPositions } from "./breakpointPositions";
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -58,9 +55,9 @@ export function enableBreakpoint(cx, initialBreakpoint) {
     }
 
     dispatch({
-      type: "SET_BREAKPOINT",
-      cx,
       breakpoint: { ...breakpoint, disabled: false },
+      cx,
+      type: "SET_BREAKPOINT",
     });
 
     await client.setBreakpoint(breakpoint.location, breakpoint.options);
@@ -78,13 +75,13 @@ export function addBreakpoint(
   return async (dispatch, getState, { client }) => {
     const { sourceId, column, line } = initialLocation;
 
-    dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
+    dispatch({ location: { line, sourceId }, type: "SET_REQUESTED_BREAKPOINT" });
 
-    await dispatch(setBreakpointPositions({ sourceId, line }));
+    await dispatch(setBreakpointPositions({ line, sourceId }));
 
     // check if the user deleted the requested breakpoint in the meantime
     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
-    if (!(getLocationKey({ sourceId, line }) in requestedBreakpointLocations)) {
+    if (!(getLocationKey({ line, sourceId }) in requestedBreakpointLocations)) {
       return;
     }
 
@@ -112,13 +109,13 @@ export function addBreakpoint(
 
     const id = getLocationKey(location);
     const breakpoint = {
-      id,
-      disabled,
-      options,
-      location,
       astLocation,
-      text,
+      disabled,
+      id,
+      location,
+      options,
       originalText,
+      text,
     };
 
     if (shouldCancel()) {
@@ -126,9 +123,9 @@ export function addBreakpoint(
     }
 
     dispatch({
-      type: "SET_BREAKPOINT",
-      cx,
       breakpoint,
+      cx,
+      type: "SET_BREAKPOINT",
     });
 
     if (disabled) {
@@ -165,7 +162,7 @@ export function runAnalysis(cx, initialLocation, options) {
 }
 
 export function removeRequestedBreakpoint(location) {
-  return { type: "REMOVE_REQUESTED_BREAKPOINT", location };
+  return { location, type: "REMOVE_REQUESTED_BREAKPOINT" };
 }
 
 export function _removeBreakpoint(cx, initialBreakpoint) {
@@ -176,9 +173,9 @@ export function _removeBreakpoint(cx, initialBreakpoint) {
     }
 
     dispatch({
-      type: "REMOVE_BREAKPOINT",
       cx,
       location: breakpoint.location,
+      type: "REMOVE_BREAKPOINT",
     });
 
     // If the breakpoint is disabled then it is not installed in the server.
@@ -195,9 +192,9 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
     for (const { location } of breakpoints) {
       if (location.sourceId == target.sourceId && comparePosition(location, target)) {
         dispatch({
-          type: "REMOVE_BREAKPOINT",
           cx,
           location,
+          type: "REMOVE_BREAKPOINT",
         });
       }
     }
@@ -207,9 +204,9 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
     for (const { location } of pending) {
       if (location.sourceUrl == target.sourceUrl && comparePosition(location, target)) {
         dispatch({
-          type: "REMOVE_PENDING_BREAKPOINT",
           cx,
           location,
+          type: "REMOVE_PENDING_BREAKPOINT",
         });
       }
     }
@@ -227,9 +224,9 @@ export function disableBreakpoint(cx, initialBreakpoint) {
     }
 
     dispatch({
-      type: "SET_BREAKPOINT",
-      cx,
       breakpoint: { ...breakpoint, disabled: true },
+      cx,
+      type: "SET_BREAKPOINT",
     });
 
     await client.removeBreakpoint(breakpoint.location);
@@ -242,9 +239,9 @@ export function removeBreakpointOption(cx, breakpoint, option) {
     delete newOptions[option];
 
     dispatch({
-      type: "SET_BREAKPOINT",
-      cx,
       breakpoint: { ...breakpoint, options: newOptions },
+      cx,
+      type: "SET_BREAKPOINT",
     });
 
     await client.setBreakpoint(breakpoint.location, newOptions);
@@ -263,9 +260,9 @@ export function setBreakpointOptions(cx, location, options = {}) {
     trackEvent("breakpoint.edit");
 
     dispatch({
-      type: "SET_BREAKPOINT",
-      cx,
       breakpoint,
+      cx,
+      type: "SET_BREAKPOINT",
     });
 
     await client.setBreakpoint(breakpoint.location, breakpoint.options);

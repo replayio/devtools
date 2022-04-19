@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+import { BlankViewportWrapper } from "ui/components/shared/Viewport";
+import UploadScreen from "ui/components/UploadScreen";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserSettings } from "ui/hooks/settings";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
-import UploadScreen from "ui/components/UploadScreen";
-import { BlankViewportWrapper } from "ui/components/shared/Viewport";
 
 function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
   const recordingId = useGetRecordingId();

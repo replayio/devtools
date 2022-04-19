@@ -58,8 +58,8 @@ export default function useSearch<Item>(
 ): [State<Item>, Actions<Item>] {
   const [state, dispatch] = useReducer<React.Reducer<State<Item>, Action<Item>>>(reducer, {
     index: -1,
-    results: [],
     query: "",
+    results: [],
   });
 
   // Let React update search text at high priority and results at lower priority;
@@ -93,14 +93,14 @@ export default function useSearch<Item>(
       }
     }
 
-    dispatch({ type: "updateResults", index, results });
+    dispatch({ index, results, type: "updateResults" });
   }
 
   const actions = useMemo<Actions<Item>>(
     () => ({
       goToNext: () => dispatch({ type: "goToNext" }),
       goToPrevious: () => dispatch({ type: "goToPrevious" }),
-      search: (query: string) => dispatch({ type: "updateQuery", query }),
+      search: (query: string) => dispatch({ query, type: "updateQuery" }),
     }),
     []
   );

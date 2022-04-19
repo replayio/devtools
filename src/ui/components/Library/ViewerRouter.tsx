@@ -1,17 +1,18 @@
 import React, { useEffect } from "react";
-import Viewer from "./Viewer";
-
 import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import hooks from "ui/hooks";
-import Spinner from "../shared/Spinner";
-import { PendingTeamScreen } from "./PendingTeamScreen";
-import { MY_LIBRARY } from "../UploadScreen/Sharing";
-import { actions } from "ui/actions";
-import { BlankViewportWrapper } from "../shared/Viewport";
-import Base64Image from "../shared/Base64Image";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
+
+import Base64Image from "../shared/Base64Image";
+import Spinner from "../shared/Spinner";
+import { BlankViewportWrapper } from "../shared/Viewport";
+import { MY_LIBRARY } from "../UploadScreen/Sharing";
+
+import { PendingTeamScreen } from "./PendingTeamScreen";
+import Viewer from "./Viewer";
 
 function ViewerLoader() {
   return (
@@ -29,7 +30,7 @@ function MyLibrary({ searchString }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY, searchString }} />;
+  return <Viewer {...{ recordings, searchString, workspaceName: MY_LIBRARY }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
@@ -64,12 +65,12 @@ function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRoute
     <Viewer
       {...{
         recordings,
+        searchString,
         workspaceName: workspace.logo ? (
           <Base64Image src={workspace.logo} className="max-h-12" />
         ) : (
           workspace.name
         ),
-        searchString,
       }}
     />
   );
@@ -97,8 +98,8 @@ function ViewerRouter(props: ViewerRouterProps) {
         // This shouldn't be reachable because the library can only be disabled
         // by a workspace setting which means the user must be in a workspace
         setUnexpectedError({
-          message: "Unexpected error",
           content: "Unable to find an active team",
+          message: "Unexpected error",
         });
 
         return;
@@ -134,7 +135,7 @@ const connector = connect(
   (state: UIState) => ({
     currentWorkspaceId: selectors.getWorkspaceId(state),
   }),
-  { setWorkspaceId: actions.setWorkspaceId, setUnexpectedError: actions.setUnexpectedError }
+  { setUnexpectedError: actions.setUnexpectedError, setWorkspaceId: actions.setWorkspaceId }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ViewerRouter);

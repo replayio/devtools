@@ -142,7 +142,7 @@ class SimplePath {
     }
 
     return new SimplePath(
-      this._ancestors.slice(0, -1).concat([{ node, key, index: siblingIndex }])
+      this._ancestors.slice(0, -1).concat([{ index: siblingIndex, key, node }])
     );
   }
 }

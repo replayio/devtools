@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-
-import { Story, Meta } from "@storybook/react";
 import { Accordion, AccordionItem, AccordionPane } from "@recordreplay/accordion";
+import { Story, Meta } from "@storybook/react";
+import React, { useState } from "react";
 
 const lorem = [
   "Sed ut perspiciatis",
@@ -63,8 +62,8 @@ const lorem = [
 ];
 
 export default {
-  title: "Utilities/NewAccordion",
   component: Accordion,
+  title: "Utilities/NewAccordion",
 } as Meta;
 
 function MockAccordionContent({ size }: { size: number }) {
@@ -107,13 +106,13 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
   return (
     <div
       style={{
-        maxWidth: "500px",
-        height: "600px",
         borderRadius: "8px",
-        resize: "vertical",
-        overflow: "hidden",
         boxShadow:
           "0.2px 0px 2.2px rgba(0, 0, 0, 0.02), 0.5px 0px 5.3px rgba(0, 0, 0, 0.028), 0.9px 0px 10px rgba(0, 0, 0, 0.035), 1.6px 0px 17.9px rgba(0, 0, 0, 0.042), 2.9px 0px 33.4px rgba(0, 0, 0, 0.05), 7px 0px 80px rgba(0, 0, 0, 0.07)",
+        height: "600px",
+        maxWidth: "500px",
+        overflow: "hidden",
+        resize: "vertical",
       }}
     >
       <Accordion>{panes}</Accordion>
@@ -124,25 +123,25 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
 export const UnderOver = Template.bind({});
 UnderOver.args = {
   items: [
-    { size: 10, expanded: false },
-    { size: 50, expanded: false },
+    { expanded: false, size: 10 },
+    { expanded: false, size: 50 },
   ],
 };
 
 export const OverOver = Template.bind({});
 OverOver.args = {
   items: [
-    { size: 25, expanded: false },
-    { size: 50, expanded: false },
+    { expanded: false, size: 25 },
+    { expanded: false, size: 50 },
   ],
 };
 
 export const OverOverOver = Template.bind({});
 OverOverOver.args = {
   items: [
-    { size: 25, expanded: false },
-    { size: 50, expanded: false },
-    { size: 50, expanded: false },
+    { expanded: false, size: 25 },
+    { expanded: false, size: 50 },
+    { expanded: false, size: 50 },
   ],
 };
 
@@ -150,25 +149,25 @@ export const OverOverOverOver = Template.bind({});
 OverOverOverOver.args = {
   items: [
     { size: 25 },
-    { size: 50, expanded: false },
-    { size: 50, expanded: false },
-    { size: 50, expanded: false },
+    { expanded: false, size: 50 },
+    { expanded: false, size: 50 },
+    { expanded: false, size: 50 },
   ],
 };
 
 export const OverExpandedOver = Template.bind({});
 OverExpandedOver.args = {
   items: [
-    { size: 10, expanded: true },
-    { size: 50, expanded: false },
+    { expanded: true, size: 10 },
+    { expanded: false, size: 50 },
   ],
 };
 
 export const OverOverOverExpanded = Template.bind({});
 OverOverOverExpanded.args = {
   items: [
-    { size: 25, expanded: false },
-    { size: 50, expanded: false },
-    { size: 50, expanded: true },
+    { expanded: false, size: 25 },
+    { expanded: false, size: 50 },
+    { expanded: true, size: 50 },
   ],
 };

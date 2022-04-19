@@ -6,26 +6,25 @@
 
 import { bindActionCreators } from "redux";
 
-const { ThreadFront } = require("protocol/thread");
+import actions from "../actions";
+import { initialBreakpointsState } from "../reducers/breakpoints";
+import * as selectors from "../selectors";
+import { updatePrefs } from "../utils/bootstrap";
+import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 
 import { setupCommands, clientCommands } from "./commands";
+import { prepareSourcePayload } from "./create";
 import { setupEvents } from "./events";
 
-import { asyncStore, verifyPrefSchema } from "../utils/prefs";
-import actions from "../actions";
-import * as selectors from "../selectors";
-
-import { updatePrefs } from "../utils/bootstrap";
-import { initialBreakpointsState } from "../reducers/breakpoints";
-import { prepareSourcePayload } from "./create";
+const { ThreadFront } = require("protocol/thread");
 
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const breakpoints = initialBreakpointsState();
 
   return {
-    pendingBreakpoints,
     breakpoints,
+    pendingBreakpoints,
   };
 }
 
@@ -36,12 +35,12 @@ async function setupDebugger() {
   const sourceInfos = [];
   await ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
     sourceInfos.push({
-      type: "generated",
       data: prepareSourcePayload({
         actor: sourceId,
-        url,
         sourceMapURL,
+        url,
       }),
+      type: "generated",
     })
   );
   await store.dispatch(actions.newQueuedSources(sourceInfos));
@@ -61,5 +60,5 @@ export function bootstrap(_store) {
 }
 
 export function onConnect() {
-  return { store, actions: boundActions, selectors, client: clientCommands };
+  return { actions: boundActions, client: clientCommands, selectors, store };
 }

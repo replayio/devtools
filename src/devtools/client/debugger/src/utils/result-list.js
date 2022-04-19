@@ -19,7 +19,7 @@ export function scrollList(resultList, index) {
       // https://nolanlawson.com/2018/09/25/accurately-measuring-layout-on-the-web/
       requestAnimationFrame(() => {
         setTimeout(() => {
-          resultEl.scrollIntoView({ block: "nearest", behavior: "auto" });
+          resultEl.scrollIntoView({ behavior: "auto", block: "nearest" });
         });
       });
     } else {

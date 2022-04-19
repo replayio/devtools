@@ -1,5 +1,6 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
+
 import { timelineMarkerWidth } from "../constants";
 
 // calculate pixel distance from two times
@@ -111,7 +112,7 @@ export function getNewZoomRegion({
     newStart = recordingDuration - newLength;
   }
 
-  return { start: newStart, end: newEnd };
+  return { end: newEnd, start: newStart };
 }
 
 // Format a time value to mm:ss

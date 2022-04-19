@@ -1,11 +1,10 @@
+import classnames from "classnames";
 import React, { useEffect, useState } from "react";
 import Modal from "ui/components/shared/Modal";
-import SettingsNavigation from "./SettingsNavigation";
+
 import SettingsBody from "./SettingsBody";
-
+import SettingsNavigation from "./SettingsNavigation";
 import { Settings } from "./types";
-
-import classnames from "classnames";
 
 export default function SettingsModal<T extends string, P extends Record<string, unknown>>({
   tab,
@@ -44,7 +43,7 @@ export default function SettingsModal<T extends string, P extends Record<string,
   return (
     <div className={classnames("settings-modal", { "settings-modal-large": size === "lg" })}>
       <Modal>
-        <SettingsNavigation {...{ hiddenTabs, settings, selectedTab, setSelectedTab, title }} />
+        <SettingsNavigation {...{ hiddenTabs, selectedTab, setSelectedTab, settings, title }} />
         <SettingsBody selectedSetting={selectedSetting} panelProps={panelProps} />
       </Modal>
     </div>

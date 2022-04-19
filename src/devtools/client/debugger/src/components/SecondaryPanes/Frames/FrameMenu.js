@@ -4,8 +4,9 @@
 
 //
 import { showMenu } from "devtools/shared/contextmenu";
-import { copyToTheClipboard } from "../../../utils/clipboard";
 import kebabCase from "lodash/kebabCase";
+
+import { copyToTheClipboard } from "../../../utils/clipboard";
 
 const blackboxString = "blackboxContextItem.blackbox";
 const unblackboxString = "blackboxContextItem.unblackbox";
@@ -15,11 +16,11 @@ function formatMenuElement(labelString, click, disabled = false) {
   const accesskey = L10N.getStr(`${labelString}.accesskey`);
   const id = `node-menu-${kebabCase(label)}`;
   return {
+    accesskey,
+    click,
+    disabled,
     id,
     label,
-    accesskey,
-    disabled,
-    click,
   };
 }
 

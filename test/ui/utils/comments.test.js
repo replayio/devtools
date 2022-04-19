@@ -7,14 +7,14 @@ describe("commentKeys", () => {
     const secondsAgo = freezeTime(Date.now());
 
     const optimisticResponse = [
-      { id: "A", user: { id: "1" }, createdAt: secondsAgo(5) },
-      { id: "B", user: { id: "1" }, createdAt: secondsAgo(30) },
-      { id: "C", user: { id: "1" }, createdAt: secondsAgo(15) },
+      { createdAt: secondsAgo(5), id: "A", user: { id: "1" } },
+      { createdAt: secondsAgo(30), id: "B", user: { id: "1" } },
+      { createdAt: secondsAgo(15), id: "C", user: { id: "1" } },
     ];
     const serverResponse = [
-      { id: "A", user: { id: "1" }, createdAt: secondsAgo(6) },
-      { id: "B", user: { id: "1" }, createdAt: secondsAgo(28) },
-      { id: "C", user: { id: "1" }, createdAt: secondsAgo(14) },
+      { createdAt: secondsAgo(6), id: "A", user: { id: "1" } },
+      { createdAt: secondsAgo(28), id: "B", user: { id: "1" } },
+      { createdAt: secondsAgo(14), id: "C", user: { id: "1" } },
     ];
 
     // Compare comment IDs, since the "createdAt" timestamps are expected to change.
@@ -26,13 +26,13 @@ describe("commentKeys", () => {
     const secondsAgo = freezeTime(Date.now());
 
     const comments = [
-      { id: "A", user: { id: "1" }, createdAt: secondsAgo(1), point: "123" },
+      { createdAt: secondsAgo(1), id: "A", point: "123", user: { id: "1" } },
       {
-        id: "B",
-        user: { id: "1" },
         createdAt: secondsAgo(2),
+        id: "B",
         point: "234",
-        sourceLocation: { sourceId: "abc", line: 567 },
+        sourceLocation: { line: 567, sourceId: "abc" },
+        user: { id: "1" },
       },
     ];
 

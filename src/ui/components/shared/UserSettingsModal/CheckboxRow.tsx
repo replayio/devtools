@@ -1,4 +1,5 @@
 import React from "react";
+
 import Checkbox from "../Forms/Checkbox";
 
 type CheckboxRowProps = React.HTMLProps<HTMLInputElement> & {
@@ -10,7 +11,7 @@ export function CheckboxRow({ id, checked, onChange, label, description }: Check
   return (
     <label
       className="grid cursor-pointer items-center"
-      style={{ gridTemplateColumns: "auto minmax(0, 1fr)", gap: "0 0.5rem" }}
+      style={{ gap: "0 0.5rem", gridTemplateColumns: "auto minmax(0, 1fr)" }}
       data-private
       htmlFor={id}
     >

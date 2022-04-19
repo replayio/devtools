@@ -1,13 +1,13 @@
+import sortBy from "lodash/sortBy";
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { selectors } from "ui/reducers";
-import sortBy from "lodash/sortBy";
-import hooks from "ui/hooks";
-import { Comment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
-import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
+import { selectors } from "ui/reducers";
+import { Comment } from "ui/state/comments";
 import { commentKey } from "ui/utils/comments";
+import useAuth0 from "ui/utils/useAuth0";
 
 export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();

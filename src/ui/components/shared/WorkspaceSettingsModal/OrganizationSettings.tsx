@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
 import { PartialWorkspaceSettingsFeatures, WorkspaceSettings } from "ui/types";
+
 import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
@@ -26,8 +27,8 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   const [message, setMessage] = useDebounceState(workspace?.settings?.motd || undefined, motd =>
     updateWorkspaceSettings({
       variables: {
-        workspaceId,
         motd,
+        workspaceId,
       },
     })
   );
@@ -35,8 +36,8 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   const updateFeature = (features: PartialWorkspaceSettingsFeatures) => {
     updateWorkspaceSettings({
       variables: {
-        workspaceId,
         features,
+        workspaceId,
       },
     });
   };

@@ -235,6 +235,6 @@ function getChangesStylesheet(state, filter) {
 }
 
 module.exports = {
-  getChangesTree,
   getChangesStylesheet,
+  getChangesTree,
 };

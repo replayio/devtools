@@ -1,5 +1,6 @@
-import React, { FC } from "react";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
+import React, { FC } from "react";
+
 import { RuleState } from "../state/rules";
 
 type RulesProps = {

@@ -1,7 +1,7 @@
-import React, { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import classnames from "classnames";
+import React, { Fragment } from "react";
 
 interface MenuOption {
   name: string;

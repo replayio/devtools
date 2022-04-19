@@ -1,7 +1,8 @@
-import React from "react";
 import classnames from "classnames";
-import { isFunctionSymbol } from "./SourceOutline";
 import { ClassSymbol, FunctionSymbol } from "devtools/client/debugger/src/types";
+import React from "react";
+
+import { isFunctionSymbol } from "./SourceOutline";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 
 export const SourceOutlineClass = React.memo(function OutlineClassFunctions({

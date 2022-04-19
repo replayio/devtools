@@ -76,8 +76,8 @@ function cssTokenizerWithLineColumn(string) {
 
     if (prevToken) {
       prevToken.loc.end = {
-        line: lineNumber,
         column: columnNumber,
+        line: lineNumber,
       };
     }
 
@@ -90,8 +90,8 @@ function cssTokenizerWithLineColumn(string) {
       prevToken = undefined;
     } else {
       const startLoc = {
-        line: lineNumber,
         column: columnNumber,
+        line: lineNumber,
       };
       token.loc = { start: startLoc };
 
@@ -231,12 +231,12 @@ function parseCommentDeclarations(isCssPropertyKnown, commentText, startOffset, 
  */
 function getEmptyDeclaration() {
   return {
+    colonOffsets: false,
     name: "",
-    value: "",
+    offsets: [undefined, undefined],
     priority: "",
     terminator: "",
-    offsets: [undefined, undefined],
-    colonOffsets: false,
+    value: "",
   };
 }
 
@@ -568,7 +568,7 @@ function parsePseudoClassesAndAttributes(value) {
 
       if (hasColon && !functionCount) {
         if (current) {
-          result.push({ value: current, type: SELECTOR_PSEUDO_CLASS });
+          result.push({ type: SELECTOR_PSEUDO_CLASS, value: current });
         }
 
         current = "";
@@ -577,7 +577,7 @@ function parsePseudoClassesAndAttributes(value) {
     } else if (token.tokenType === "symbol" && token.text === ":") {
       if (!hasColon) {
         if (current) {
-          result.push({ value: current, type: SELECTOR_ELEMENT });
+          result.push({ type: SELECTOR_ELEMENT, value: current });
         }
 
         current = "";
@@ -593,7 +593,7 @@ function parsePseudoClassesAndAttributes(value) {
 
       if (hasColon && functionCount == 1) {
         if (current) {
-          result.push({ value: current, type: SELECTOR_PSEUDO_CLASS });
+          result.push({ type: SELECTOR_PSEUDO_CLASS, value: current });
         }
 
         current = "";
@@ -605,7 +605,7 @@ function parsePseudoClassesAndAttributes(value) {
     } else if (token.tokenType === "symbol" && token.text === "[") {
       if (!hasAttribute && !functionCount) {
         if (current) {
-          result.push({ value: current, type: SELECTOR_ELEMENT });
+          result.push({ type: SELECTOR_ELEMENT, value: current });
         }
 
         current = "";
@@ -618,7 +618,7 @@ function parsePseudoClassesAndAttributes(value) {
 
       if (hasAttribute && !functionCount) {
         if (current) {
-          result.push({ value: current, type: SELECTOR_ATTRIBUTE });
+          result.push({ type: SELECTOR_ATTRIBUTE, value: current });
         }
 
         current = "";
@@ -630,7 +630,7 @@ function parsePseudoClassesAndAttributes(value) {
   }
 
   if (current) {
-    result.push({ value: current, type: SELECTOR_ELEMENT });
+    result.push({ type: SELECTOR_ELEMENT, value: current });
   }
 
   return result;
@@ -651,8 +651,8 @@ function parsePseudoClassesAndAttributes(value) {
 function parseSingleValue(isCssPropertyKnown, value) {
   const declaration = parseDeclarations(isCssPropertyKnown, "a: " + value + ";")[0];
   return {
-    value: declaration ? declaration.value : "",
     priority: declaration ? declaration.priority : "",
+    value: declaration ? declaration.value : "",
   };
 }
 

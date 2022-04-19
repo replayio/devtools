@@ -1,10 +1,9 @@
-const React = require("react");
-const PropTypes = require("prop-types");
-const { COLOR, FONT_FAMILY, URI } = require("devtools/client/shared/output-parser");
-
 const Color = require("devtools/client/inspector/rules/components/value/Color");
 const FontFamily = require("devtools/client/inspector/rules/components/value/FontFamily");
 const Url = require("devtools/client/inspector/rules/components/value/Url");
+const { COLOR, FONT_FAMILY, URI } = require("devtools/client/shared/output-parser");
+const PropTypes = require("prop-types");
+const React = require("react");
 
 class DeclarationValue extends React.PureComponent {
   static get propTypes() {
@@ -41,8 +40,8 @@ class DeclarationValue extends React.PureComponent {
           });
         case URI:
           return React.createElement(Url, {
-            key: value,
             href: v.href,
+            key: value,
             value,
           });
       }

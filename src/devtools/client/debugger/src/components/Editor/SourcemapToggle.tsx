@@ -1,15 +1,15 @@
+import { Switch } from "@headlessui/react";
+import { SourceId } from "@recordreplay/protocol";
+import classNames from "classnames";
+import { ThreadFront } from "protocol/thread";
 import React, { Dispatch, SetStateAction } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { setModal } from "ui/actions/app";
 import { UIState } from "ui/state";
+
+import actions from "../../actions";
 import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
-import actions from "../../actions";
-import { connect, ConnectedProps } from "react-redux";
-
-import { Switch } from "@headlessui/react";
-import classNames from "classnames";
-import { setModal } from "ui/actions/app";
-import { ThreadFront } from "protocol/thread";
-import { SourceId } from "@recordreplay/protocol";
 import { getUniqueAlternateSourceId } from "../../utils/source";
 
 function SourcemapError({ onClick }: { onClick: () => void }) {
@@ -98,12 +98,12 @@ export function SourcemapToggle({
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSourceWithContent(state)!,
     alternateSource: getAlternateSource(state),
+    selectedSource: getSelectedSourceWithContent(state)!,
   }),
   {
-    showAlternateSource: actions.showAlternateSource,
     setModal,
+    showAlternateSource: actions.showAlternateSource,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -1,12 +1,11 @@
+import classnames from "classnames";
+import Highlighter from "highlighter/highlighter";
+import { getDevicePixelRatio } from "protocol/graphics";
+import { ThreadFront } from "protocol/thread";
+import { EventEmitter } from "protocol/utils";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-
-import { EventEmitter } from "protocol/utils";
-import classnames from "classnames";
-import { ThreadFront } from "protocol/thread";
-import { getDevicePixelRatio } from "protocol/graphics";
-import Highlighter from "highlighter/highlighter";
 
 export const nodePicker: any = {};
 

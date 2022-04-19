@@ -1,13 +1,14 @@
+import classNames from "classnames";
+import clamp from "lodash/clamp";
 import React, { FC, MouseEventHandler, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
-import clamp from "lodash/clamp";
-import { FocusOperation, ZoomRegion } from "ui/state/timeline";
-import { getVisiblePosition } from "ui/utils/timeline";
-import classNames from "classnames";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
+import { selectors } from "ui/reducers";
+import { FocusOperation, ZoomRegion } from "ui/state/timeline";
 import { trackEvent } from "ui/utils/telemetry";
+import { getVisiblePosition } from "ui/utils/timeline";
+
 import { MouseDownMask } from "./MouseDownMask";
 
 const getPosition = (time: number, zoom: ZoomRegion) => {
@@ -126,7 +127,7 @@ function TrimSpan({
   const draggers = <Draggers {...{ dragging, onDragStart }} />;
   const { startTime, endTime } = focusRegion;
 
-  return <Span {...{ startTime, endTime, zoomRegion, draggers }} />;
+  return <Span {...{ draggers, endTime, startTime, zoomRegion }} />;
 }
 
 export const Focuser: FC<{ setIsDragging: (isDragging: boolean) => void }> = ({
@@ -149,7 +150,7 @@ export const Focuser: FC<{ setIsDragging: (isDragging: boolean) => void }> = ({
 
   useEffect(() => {
     if (!focusRegion) {
-      const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
+      const focusRegion = { endTime: zoomRegion.endTime, startTime: 0 };
       dispatch(actions.setFocusRegion(focusRegion));
     }
 
@@ -166,8 +167,8 @@ export const Focuser: FC<{ setIsDragging: (isDragging: boolean) => void }> = ({
         <TrimSpan
           {...{
             focusRegion,
-            zoomRegion,
             onDragStart,
+            zoomRegion,
           }}
           dragging={!!draggingTarget}
         />

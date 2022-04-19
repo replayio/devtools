@@ -4,17 +4,15 @@
 
 "use strict";
 
+const BoxModel = require("devtools/client/inspector/boxmodel/components/BoxModel");
+const BoxModelTypes = require("devtools/client/inspector/boxmodel/types");
+const Accordion = require("devtools/client/shared/components/Accordion");
+const { LocalizationHelper } = require("devtools/shared/l10n");
 const Services = require("devtools/shared/services");
+const PropTypes = require("prop-types");
 const React = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-
-const Accordion = require("devtools/client/shared/components/Accordion");
-const BoxModel = require("devtools/client/inspector/boxmodel/components/BoxModel");
-
-const BoxModelTypes = require("devtools/client/inspector/boxmodel/types");
 
 const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
 const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
@@ -51,10 +49,10 @@ class LayoutApp extends React.PureComponent {
       contentClassName: "layout-content",
       header: "Box Model",
       id: "layout-section-boxmodel",
-      opened: Services.prefs.getBoolPref(BOXMODEL_OPENED_PREF),
       onToggle: opened => {
         Services.prefs.setBoolPref(BOXMODEL_OPENED_PREF, opened);
       },
+      opened: Services.prefs.getBoolPref(BOXMODEL_OPENED_PREF),
     };
   }
 
@@ -65,10 +63,10 @@ class LayoutApp extends React.PureComponent {
       contentClassName: "layout-content",
       header: "Grid",
       id: "layout-grid-section",
-      opened: Services.prefs.getBoolPref(GRID_OPENED_PREF),
       onToggle: opened => {
         Services.prefs.setBoolPref(GRID_OPENED_PREF, opened);
       },
+      opened: Services.prefs.getBoolPref(GRID_OPENED_PREF),
     };
   }
 

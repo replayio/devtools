@@ -3,6 +3,7 @@ import React from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";
+
 import MaterialIcon from "../MaterialIcon";
 
 // This is very arbitrary but we need it to keep the editor
@@ -32,9 +33,9 @@ function NagHat({
         "flex select-none items-center space-x-2 py-1 px-2 leading-tight text-white"
       )}
       style={{
-        boxShadow: "rgb(184 0 89 / 50%) 0px 0px 4px inset",
         background:
           "linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF",
+        boxShadow: "rgb(184 0 89 / 50%) 0px 0px 4px inset",
       }}
     >
       <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>

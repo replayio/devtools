@@ -1,5 +1,5 @@
-import React from "react";
 import cx from "classnames";
+import React from "react";
 import { NetworkTab } from "ui/components/NetworkMonitor/RequestDetails";
 
 type Tab = {

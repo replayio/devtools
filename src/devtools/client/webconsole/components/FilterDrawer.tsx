@@ -1,7 +1,7 @@
-import React, { FC } from "react";
-import FilterSettings from "devtools/client/webconsole/components/FilterBar/FilterSettings";
-import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
+import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
+import FilterSettings from "devtools/client/webconsole/components/FilterBar/FilterSettings";
+import React, { FC } from "react";
 import { useSelector } from "react-redux";
 import { getConsoleFilterDrawerExpanded } from "ui/reducers/layout";
 

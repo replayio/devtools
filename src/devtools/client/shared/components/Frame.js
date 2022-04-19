@@ -4,21 +4,21 @@
 
 "use strict";
 
-const { Component } = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const {
-  getUnicodeUrl,
-  getUnicodeUrlPath,
-  getUnicodeHostname,
-} = require("devtools/client/shared/unicode-url");
 const {
   getSourceNames,
   parseURL,
   getSourceMappedFile,
 } = require("devtools/client/shared/source-utils");
-const { LocalizationHelper } = require("devtools/shared/l10n");
+const {
+  getUnicodeUrl,
+  getUnicodeUrlPath,
+  getUnicodeHostname,
+} = require("devtools/client/shared/unicode-url");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const PropTypes = require("prop-types");
+const { Component } = require("react");
+const dom = require("react-dom-factories");
 
 const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
 
@@ -27,35 +27,42 @@ class Frame extends Component {
     return {
       // SavedFrame, or an object containing all the required properties.
       frame: PropTypes.shape({
-        functionDisplayName: PropTypes.string,
-        source: PropTypes.string.isRequired,
-        line: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         column: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        functionDisplayName: PropTypes.string,
+        line: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        source: PropTypes.string.isRequired,
       }).isRequired,
-      // Clicking on the frame link -- probably should link to the debugger.
-      onClick: PropTypes.func,
-      // Option to display a function name before the source link.
-      showFunctionName: PropTypes.bool,
-      // Option to display a function name even if it's anonymous.
-      showAnonymousFunctionName: PropTypes.bool,
-      // Option to display a host name after the source link.
-      showHost: PropTypes.bool,
-      // Option to display a host name if the filename is empty or just '/'
-      showEmptyPathAsHost: PropTypes.bool,
-      // Option to display a full source instead of just the filename.
-      showFullSourceUrl: PropTypes.bool,
+
       // The source of the message
       messageSource: PropTypes.string,
+
+      // Clicking on the frame link -- probably should link to the debugger.
+      onClick: PropTypes.func,
+
+      // Option to display a function name even if it's anonymous.
+      showAnonymousFunctionName: PropTypes.bool,
+
+      // Option to display a host name if the filename is empty or just '/'
+      showEmptyPathAsHost: PropTypes.bool,
+
+      // Option to display a full source instead of just the filename.
+      showFullSourceUrl: PropTypes.bool,
+
+      // Option to display a function name before the source link.
+      showFunctionName: PropTypes.bool,
+
+      // Option to display a host name after the source link.
+      showHost: PropTypes.bool,
     };
   }
 
   static get defaultProps() {
     return {
-      showFunctionName: false,
       showAnonymousFunctionName: false,
-      showHost: false,
       showEmptyPathAsHost: false,
       showFullSourceUrl: false,
+      showFunctionName: false,
+      showHost: false,
     };
   }
 
@@ -71,10 +78,10 @@ class Frame extends Component {
     };
     if (isSourceMapped) {
       newState.frame = {
-        source: url,
-        line,
         column,
         functionDisplayName: this.props.frame.functionDisplayName,
+        line,
+        source: url,
       };
     }
 
@@ -90,11 +97,11 @@ class Frame extends Component {
   getSourceForClick(frame) {
     const { source, line, column, sourceId } = frame;
     return {
-      url: source,
-      line,
       column,
       functionDisplayName: this.props.frame.functionDisplayName,
+      line,
       sourceId,
+      url: source,
     };
   }
 
@@ -150,8 +157,8 @@ class Frame extends Component {
     }
 
     const attributes = {
-      "data-url": long,
       className: "frame-link",
+      "data-url": long,
     };
 
     if (showFunctionName) {
@@ -164,8 +171,8 @@ class Frame extends Component {
         elements.push(
           dom.span(
             {
-              key: "function-display-name",
               className: "frame-link-function-display-name",
+              key: "function-display-name",
             },
             functionDisplayName
           ),
@@ -184,8 +191,8 @@ class Frame extends Component {
     sourceElements.push(
       dom.span(
         {
-          key: "filename",
           className: "frame-link-filename",
+          key: "filename",
         },
         displaySource
       )
@@ -199,8 +206,8 @@ class Frame extends Component {
       sourceElements.push(
         dom.span(
           {
-            key: "line",
             className: "frame-link-line",
+            key: "line",
           },
           lineInfo
         )
@@ -218,8 +225,8 @@ class Frame extends Component {
 
     const sourceInnerEl = dom.span(
       {
-        key: "source-inner",
         className: "frame-link-source-inner",
+        key: "source-inner",
         title: isLinkable ? tooltipMessage : tooltip,
       },
       sourceElements
@@ -230,22 +237,22 @@ class Frame extends Component {
     if (isLinkable) {
       sourceEl = dom.a(
         {
+          className: "frame-link-source",
+          draggable: false,
+          href: source,
           onClick: e => {
             e.preventDefault();
             e.stopPropagation();
             onClick(this.getSourceForClick({ ...frame, source, sourceId }));
           },
-          href: source,
-          className: "frame-link-source",
-          draggable: false,
         },
         sourceInnerEl
       );
     } else {
       sourceEl = dom.span(
         {
-          key: "source",
           className: "frame-link-source",
+          key: "source",
         },
         sourceInnerEl
       );
@@ -257,8 +264,8 @@ class Frame extends Component {
       elements.push(
         dom.span(
           {
-            key: "host",
             className: "frame-link-host",
+            key: "host",
           },
           unicodeHost
         )

@@ -109,6 +109,6 @@ function getUnicodeUrl(url) {
 
 module.exports = {
   getUnicodeHostname,
-  getUnicodeUrlPath,
   getUnicodeUrl,
+  getUnicodeUrlPath,
 };

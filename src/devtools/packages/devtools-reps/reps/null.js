@@ -4,6 +4,7 @@
 
 // Dependencies
 const { span } = require("react-dom-factories");
+
 const { wrapRender } = require("./rep-utils");
 
 /**

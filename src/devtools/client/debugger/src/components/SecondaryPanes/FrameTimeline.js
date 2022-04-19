@@ -4,15 +4,14 @@
 
 //
 
+import classnames from "classnames";
 import React, { Component } from "react";
+import ReactTooltip from "react-tooltip";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { trackEvent } from "ui/utils/telemetry";
 
 import { connect } from "../../utils/connect";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-
-import classnames from "classnames";
-import ReactTooltip from "react-tooltip";
-import { trackEvent } from "ui/utils/telemetry";
 
 function getBoundingClientRect(element) {
   if (!element) {
@@ -26,9 +25,9 @@ class FrameTimeline extends Component {
   _timeline;
 
   state = {
+    lastDisplayIndex: 0,
     scrubbing: false,
     scrubbingProgress: 0,
-    lastDisplayIndex: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -158,7 +157,7 @@ class FrameTimeline extends Component {
       <div
         data-tip="Frame Progress"
         data-for="frame-timeline-tooltip"
-        className={classnames("frame-timeline-container", { scrubbing, paused: framePositions })}
+        className={classnames("frame-timeline-container", { paused: framePositions, scrubbing })}
       >
         <div
           className="frame-timeline-bar"
@@ -167,7 +166,7 @@ class FrameTimeline extends Component {
         >
           <div
             className="frame-timeline-progress"
-            style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
+            style={{ maxWidth: "calc(100% - 2px)", width: `${progress}%` }}
           />
         </div>
         {framePositions && (
@@ -180,14 +179,14 @@ class FrameTimeline extends Component {
 
 export default connect(
   state => ({
-    framePositions: selectors.getFramePositions(state),
-    selectedLocation: selectors.getSelectedLocation(state),
-    selectedFrame: selectors.getSelectedFrame(state),
     executionPoint: selectors.getExecutionPoint(state),
+    framePositions: selectors.getFramePositions(state),
+    selectedFrame: selectors.getSelectedFrame(state),
+    selectedLocation: selectors.getSelectedLocation(state),
   }),
   {
+    clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
     seek: actions.seek,
     setPreviewPausedLocation: actions.setPreviewPausedLocation,
-    clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
   }
 )(FrameTimeline);

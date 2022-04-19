@@ -3,26 +3,27 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
+const { lengthBubble } = require("devtools/shared/grip-length-bubble");
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
-const { lengthBubble } = require("devtools/shared/grip-length-bubble");
-const { interleave, isGrip, wrapRender, ellipsisElement } = require("./rep-utils");
-const PropRep = require("./prop-rep");
-const { MODE } = require("./constants");
 const { ModePropType } = require("./array");
+const { MODE } = require("./constants");
+const PropRep = require("./prop-rep");
+const { interleave, isGrip, wrapRender, ellipsisElement } = require("./rep-utils");
 
 /**
  * Renders an map. A map is represented by a list of its
  * entries enclosed in curly brackets.
  */
 GripMap.propTypes = {
-  object: PropTypes.object,
+  isInterestingEntry: PropTypes.func,
+
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: ModePropType,
-  isInterestingEntry: PropTypes.func,
-  onDOMNodeMouseOver: PropTypes.func,
+  object: PropTypes.object,
   onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
   onInspectIconClick: PropTypes.func,
   title: PropTypes.string,
 };
@@ -31,8 +32,8 @@ function GripMap(props) {
   const { mode, object } = props;
 
   const config = {
-    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-object",
+    "data-link-actor-id": object.id(),
   };
 
   const title = getTitle(props, object);
@@ -71,10 +72,10 @@ function getTitle(props, object) {
     },
     title,
     lengthBubble({
-      object,
-      mode: props.mode,
-      maxLengthMap,
       getLength,
+      maxLengthMap,
+      mode: props.mode,
+      object,
       showZeroLength: true,
     })
   );

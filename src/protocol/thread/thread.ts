@@ -36,13 +36,15 @@ import {
   responseBodyData,
   requestBodyData,
 } from "@recordreplay/protocol";
-import { client, log, addEventListener, sendMessage } from "../socket";
-import { defer, assert, EventEmitter, ArrayMap } from "../utils";
-import { MappedLocationCache } from "../mapped-location-cache";
-import { ValueFront } from "./value";
-import { Pause } from "./pause";
 import uniqueId from "lodash/uniqueId";
 import { repaint } from "protocol/graphics";
+
+import { MappedLocationCache } from "../mapped-location-cache";
+import { client, log, addEventListener, sendMessage } from "../socket";
+import { defer, assert, EventEmitter, ArrayMap } from "../utils";
+
+import { Pause } from "./pause";
+import { ValueFront } from "./value";
 
 declare global {
   interface Window {
@@ -327,7 +329,7 @@ class _ThreadFront {
     this.currentPointHasFrames = !!hasFrames;
     this.currentPause = null;
     this.asyncPauses.length = 0;
-    this.emit("paused", { point, hasFrames, time });
+    this.emit("paused", { hasFrames, point, time });
 
     this._precacheResumeTargets();
   }
@@ -345,7 +347,7 @@ class _ThreadFront {
     this.currentPointHasFrames = hasFrames;
     this.currentPause = pause;
     this.asyncPauses.length = 0;
-    this.emit("paused", { point, hasFrames, time });
+    this.emit("paused", { hasFrames, point, time });
 
     this._precacheResumeTargets();
   }
@@ -361,7 +363,7 @@ class _ThreadFront {
     });
     client.Debugger.addNewSourceListener(source => {
       let { sourceId, kind, url, generatedSourceIds } = source;
-      this.sources.set(sourceId, { kind, url, generatedSourceIds });
+      this.sources.set(sourceId, { generatedSourceIds, kind, url });
       if (url) {
         this.urlSources.add(url, sourceId);
       }
@@ -389,7 +391,7 @@ class _ThreadFront {
     const searchId = uniqueId("search-");
     this.searchWaiters.set(searchId, onMatches);
     try {
-      await client.Debugger.searchSourceContents({ searchId, query, sourceIds } as any, sessionId);
+      await client.Debugger.searchSourceContents({ query, searchId, sourceIds } as any, sessionId);
     } finally {
       this.searchWaiters.delete(searchId);
     }
@@ -405,7 +407,7 @@ class _ThreadFront {
 
     try {
       // await client.Debugger.searchFunctions({ searchId, query }, sessionId);
-      await client.Debugger.searchFunctions({ searchId, query, sourceIds }, sessionId);
+      await client.Debugger.searchFunctions({ query, searchId, sourceIds }, sessionId);
     } finally {
       this.fnSearchWaiters.delete(searchId);
     }
@@ -473,7 +475,7 @@ class _ThreadFront {
       { sourceId },
       this.sessionId
     );
-    return { contents, contentType };
+    return { contentType, contents };
   }
 
   async getHitCounts(sourceId: SourceId, locations: SameLineSourceLocations[]) {
@@ -481,7 +483,7 @@ class _ThreadFront {
     return sendMessage(
       // @ts-ignore
       "Debugger.getHitCounts",
-      { sourceId, locations, maxHits: 10000 },
+      { locations, maxHits: 10000, sourceId },
       this.sessionId!
     );
   }
@@ -529,7 +531,7 @@ class _ThreadFront {
     const begin = range ? range.start : undefined;
     const end = range ? range.end : undefined;
     const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
-      { sourceId, begin, end },
+      { begin, end, sourceId },
       this.sessionId
     );
     return lineLocations;
@@ -544,9 +546,9 @@ class _ThreadFront {
         await Promise.all(
           sourceIds.map(async sourceId => {
             await ThreadFront.getBreakpointPositionsCompressed(sourceId);
-            const location = { sourceId, line, column };
+            const location = { column, line, sourceId };
             const { breakpointId } = await client.Debugger.setBreakpoint(
-              { location, condition },
+              { condition, location },
               this.sessionId!
             );
             if (breakpointId) {
@@ -841,8 +843,8 @@ class _ThreadFront {
       resumeTarget = await this._findResumeTarget(point, command);
     } catch {
       this.emit("paused", {
-        point: this.currentPoint,
         hasFrames: this.currentPointHasFrames,
+        point: this.currentPoint,
         time: this.currentTime,
       });
     }
@@ -886,14 +888,14 @@ class _ThreadFront {
   blackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
       assert(this.sessionId, "no sessionId");
-      await client.Debugger.blackboxSource({ sourceId, begin, end }, this.sessionId);
+      await client.Debugger.blackboxSource({ begin, end, sourceId }, this.sessionId);
     });
   }
 
   unblackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
       assert(this.sessionId, "no sessionId");
-      await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);
+      await client.Debugger.unblackboxSource({ begin, end, sourceId }, this.sessionId);
     });
   }
 
@@ -1051,10 +1053,10 @@ class _ThreadFront {
     }
 
     return {
-      sourceUrl,
-      sourceId: preferredLocation.sourceId,
-      line: preferredLocation.line,
       column: preferredLocation.column,
+      line: preferredLocation.line,
+      sourceId: preferredLocation.sourceId,
+      sourceUrl,
     };
   }
 
@@ -1131,9 +1133,9 @@ class _ThreadFront {
     // Prefer original sources over generated sources, except when overridden
     // through user action.
     if (this.preferredGeneratedSources.has(generatedId)) {
-      return { sourceId: generatedId, alternateId: originalId };
+      return { alternateId: originalId, sourceId: generatedId };
     }
-    return { sourceId: originalId, alternateId: generatedId };
+    return { alternateId: generatedId, sourceId: originalId };
   }
 
   // Get the set of chosen sources from a list of source IDs which might

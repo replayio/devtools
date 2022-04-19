@@ -4,8 +4,9 @@
 
 //
 
-import { getTokenLocation } from ".";
 import isEqual from "lodash/isEqual";
+
+import { getTokenLocation } from ".";
 
 function isValidToken(target) {
   if (!target || !target.innerText || target.closest(".toggle-widget")) {

@@ -8,7 +8,6 @@ const { span } = require("react-dom-factories");
 
 // Reps
 const { isGrip, wrapRender } = require("./rep-utils");
-
 const String = require("./string").rep;
 
 /**
@@ -22,8 +21,8 @@ function ObjectWithText(props) {
   const grip = props.object;
   return span(
     {
-      "data-link-actor-id": grip.actor,
       className: `objectTitle objectBox objectBox-${getType(grip)}`,
+      "data-link-actor-id": grip.actor,
     },
     `${getType(grip)} `,
     getDescription(grip)

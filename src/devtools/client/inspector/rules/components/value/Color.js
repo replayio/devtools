@@ -1,6 +1,6 @@
+const PropTypes = require("prop-types");
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
 
 class Color extends PureComponent {
   static get propTypes() {

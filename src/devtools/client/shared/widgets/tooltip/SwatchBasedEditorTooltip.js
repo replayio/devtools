@@ -37,8 +37,8 @@ class SwatchBasedEditorTooltip {
       // close the tooltip by clicking out
       // It will also close on <escape> and <enter>
       this.tooltip = new HTMLTooltip(document, {
-        type: "arrow",
         consumeOutsideClicks: true,
+        type: "arrow",
         useXulWrapper: true,
       });
     }

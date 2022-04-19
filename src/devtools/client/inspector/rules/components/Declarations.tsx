@@ -1,5 +1,6 @@
-import React, { FC } from "react";
 import { Declaration } from "devtools/client/inspector/rules/components/Declaration";
+import React, { FC } from "react";
+
 import { DeclarationState } from "../state/rules";
 
 type DeclarationsProps = {

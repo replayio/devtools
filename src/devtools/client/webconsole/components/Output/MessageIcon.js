@@ -4,16 +4,16 @@
 
 "use strict";
 
+const { l10n } = require("devtools/client/webconsole/utils/messages");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const { l10n } = require("devtools/client/webconsole/utils/messages");
 
 const l10nLevels = {
+  debug: "level.debug",
   error: "level.error",
-  warn: "level.warn",
   info: "level.info",
   log: "level.log",
-  debug: "level.debug",
+  warn: "level.warn",
 };
 
 // Store common icons so they can be used without recreating the element
@@ -33,9 +33,9 @@ function getIconElement(level, onRewindClick, type) {
 
   {
     return dom.span({
+      "aria-live": "off",
       className: classnames.join(" "),
       title,
-      "aria-live": "off",
     });
   }
 }

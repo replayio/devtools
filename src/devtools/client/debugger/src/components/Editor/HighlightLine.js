@@ -4,16 +4,16 @@
 
 //
 import { Component } from "react";
-import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
-import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 
-import { connect } from "../../utils/connect";
 import {
   getVisibleSelectedFrame,
   getSelectedLocation,
   getSelectedSourceWithContent,
   getPauseCommand,
 } from "../../selectors";
+import { connect } from "../../utils/connect";
+import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
+import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 
 function isDebugLine(selectedFrame, selectedLocation) {
   if (!selectedFrame) {

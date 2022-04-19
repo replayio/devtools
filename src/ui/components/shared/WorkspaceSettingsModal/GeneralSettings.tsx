@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
+
 import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
@@ -47,7 +48,7 @@ const useImageUpload = (
     });
   };
 
-  return { img, err, onUpload };
+  return { err, img, onUpload };
 };
 
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
@@ -57,8 +58,8 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { img, err, onUpload } = useImageUpload(workspace?.logo, 50, logo =>
     updateWorkspaceLogo({
       variables: {
-        workspaceId,
         logo,
+        workspaceId,
       },
     })
   );
@@ -69,8 +70,8 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
       name &&
       updateWorkspaceSettings({
         variables: {
-          workspaceId,
           name,
+          workspaceId,
         },
       })
   );

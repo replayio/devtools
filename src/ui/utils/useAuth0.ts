@@ -1,24 +1,25 @@
 import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
 import { useGetUserInfo } from "ui/hooks/users";
+
 import { setAccessTokenInBrowserPrefs } from "./browser";
 import { isTest, isMock } from "./environment";
 import useToken from "./useToken";
 
 const TEST_AUTH = {
-  isLoading: false,
+  getAccessTokenSilently: () => Promise.resolve(),
   isAuthenticated: true,
-  user: {
-    sub: "auth0|60351bdaa6afe80068af126e",
-    name: "e2e-testing@replay.io",
-    email: "e2e-testing@replay.io",
-    picture:
-      "https://s.gravatar.com/avatar/579464588a2bb4fb0bc1bae7d2df22ae?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fe2.png",
-  },
+  isLoading: false,
   loginAndReturn: () => {},
   loginWithRedirect: () => {},
   logout: () => {},
-  getAccessTokenSilently: () => Promise.resolve(),
+  user: {
+    email: "e2e-testing@replay.io",
+    name: "e2e-testing@replay.io",
+    picture:
+      "https://s.gravatar.com/avatar/579464588a2bb4fb0bc1bae7d2df22ae?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fe2.png",
+    sub: "auth0|60351bdaa6afe80068af126e",
+  },
 };
 
 export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
@@ -42,14 +43,9 @@ export default function useAuth0() {
 
   if (external && token) {
     return {
-      isLoading: loading,
+      getAccessTokenSilently: () => Promise.resolve(),
       isAuthenticated: true,
-      user: loading
-        ? undefined
-        : {
-            sub: "external-auth",
-            email,
-          },
+      isLoading: loading,
       loginAndReturn,
       loginWithRedirect: auth.loginWithRedirect,
       logout: (options?: LogoutOptions) => {
@@ -58,7 +54,12 @@ export default function useAuth0() {
         }
         auth.logout(options);
       },
-      getAccessTokenSilently: () => Promise.resolve(),
+      user: loading
+        ? undefined
+        : {
+            email,
+            sub: "external-auth",
+          },
     };
   }
 

@@ -52,10 +52,10 @@ export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
       }
     `,
     {
-      refetchQueries: ["GetNonPendingWorkspaces"],
       onCompleted: data => {
         onCompleted(data.createWorkspace.workspace);
       },
+      refetchQueries: ["GetNonPendingWorkspaces"],
     }
   );
 
@@ -105,7 +105,7 @@ export function useGetPendingWorkspaces() {
       })
     );
   }
-  return { pendingWorkspaces, loading };
+  return { loading, pendingWorkspaces };
 }
 
 export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; loading: boolean } {
@@ -113,8 +113,8 @@ export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; l
   const { workspaces, loading } = useGetNonPendingWorkspaces();
 
   return {
-    workspace: workspaces.find(ws => ws.id === workspaceId),
     loading,
+    workspace: workspaces.find(ws => ws.id === workspaceId),
   };
 }
 
@@ -238,7 +238,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
     });
   }
 
-  return { workspaces, loading };
+  return { loading, workspaces };
 }
 
 export function useUpdateWorkspaceCodeDomainLimitations() {
@@ -290,7 +290,7 @@ export function useGetWorkspaceApiKeys(workspaceId: string) {
     }
   );
 
-  return { data, loading, error };
+  return { data, error, loading };
 }
 
 export function useAddWorkspaceApiKey() {
@@ -301,7 +301,7 @@ export function useAddWorkspaceApiKey() {
     refetchQueries: ["GetWorkspaceApiKeys"],
   });
 
-  return { addWorkspaceApiKey, loading, error };
+  return { addWorkspaceApiKey, error, loading };
 }
 
 export function useDeleteWorkspaceApiKey() {
@@ -312,7 +312,7 @@ export function useDeleteWorkspaceApiKey() {
     refetchQueries: ["GetWorkspaceApiKeys"],
   });
 
-  return { deleteWorkspaceApiKey, loading, error };
+  return { deleteWorkspaceApiKey, error, loading };
 }
 
 export function useUpdateWorkspaceMemberRole() {
@@ -323,7 +323,7 @@ export function useUpdateWorkspaceMemberRole() {
     refetchQueries: ["GetWorkspaceMembers"],
   });
 
-  return { updateWorkspaceMemberRole, loading, error };
+  return { error, loading, updateWorkspaceMemberRole };
 }
 
 export function useActivateWorkspaceSubscription(workspaceId: string) {
@@ -335,7 +335,7 @@ export function useActivateWorkspaceSubscription(workspaceId: string) {
     variables: { workspaceId },
   });
 
-  return { activateWorkspaceSubscription, loading, error };
+  return { activateWorkspaceSubscription, error, loading };
 }
 
 export function useGetWorkspaceSubscription(workspaceId: string) {
@@ -345,7 +345,7 @@ export function useGetWorkspaceSubscription(workspaceId: string) {
     variables: { workspaceId },
   });
 
-  return { data, loading, error, refetch };
+  return { data, error, loading, refetch };
 }
 
 export function useCancelWorkspaceSubscription() {
@@ -356,7 +356,7 @@ export function useCancelWorkspaceSubscription() {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
 
-  return { cancelWorkspaceSubscription, loading, error };
+  return { cancelWorkspaceSubscription, error, loading };
 }
 
 export function usePrepareWorkspacePaymentMethod() {
@@ -367,7 +367,7 @@ export function usePrepareWorkspacePaymentMethod() {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
 
-  return { prepareWorkspacePaymentMethod, loading, error };
+  return { error, loading, prepareWorkspacePaymentMethod };
 }
 
 export function useSetWorkspaceDefaultPaymentMethod() {
@@ -378,7 +378,7 @@ export function useSetWorkspaceDefaultPaymentMethod() {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
 
-  return { setWorkspaceDefaultPaymentMethod, loading, error };
+  return { error, loading, setWorkspaceDefaultPaymentMethod };
 }
 
 export function useDeleteWorkspacePaymentMethod() {
@@ -389,5 +389,5 @@ export function useDeleteWorkspacePaymentMethod() {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
 
-  return { deleteWorkspacePaymentMethod, loading, error };
+  return { deleteWorkspacePaymentMethod, error, loading };
 }

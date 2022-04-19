@@ -1,9 +1,10 @@
+import memoize from "lodash/memoize";
 import React from "react";
+import { RedactedSpan } from "ui/components/Redacted";
+
 import actions from "../../../actions";
 import { getContext } from "../../../selectors";
 import { connect } from "../../../utils/connect";
-import memoize from "lodash/memoize";
-import { RedactedSpan } from "ui/components/Redacted";
 
 const highlightText = memoize(
   (text = "", editor) => {

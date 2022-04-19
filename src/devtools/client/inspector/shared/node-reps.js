@@ -18,8 +18,8 @@ function getNodeRep(nodeFront, props = {}) {
   const { rep } = ElementNode.supportsObject(object) ? ElementNode : TextNode;
 
   return rep({
-    object,
     mode: MODE.TINY,
+    object,
     ...props,
   });
 }

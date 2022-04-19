@@ -12,10 +12,9 @@ import {
   getBreakpointPositionsForSource,
   getSourceActorsForSource,
 } from "../../selectors";
-
+import { fulfilled } from "../../utils/async-value";
 import { getLocationKey } from "../../utils/breakpoint";
 import { memoizeableAction } from "../../utils/memoizableAction";
-import { fulfilled } from "../../utils/async-value";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
 
 function filterByUniqLocation(positions) {
@@ -29,8 +28,8 @@ function convertToList(results, source) {
   for (const line in results) {
     for (const column of results[line]) {
       positions.push({
-        line: Number(line),
         column,
+        line: Number(line),
         sourceId: id,
         sourceUrl: url,
       });
@@ -91,9 +90,9 @@ async function _setBreakpointPositions(sourceId, line, thunkArgs) {
   }
 
   thunkArgs.dispatch({
-    type: "ADD_BREAKPOINT_POSITIONS",
-    source,
     positions,
+    source,
+    type: "ADD_BREAKPOINT_POSITIONS",
   });
 }
 
@@ -104,6 +103,12 @@ function generatedSourceActorKey(state, sourceId) {
 }
 
 export const setBreakpointPositions = memoizeableAction("setBreakpointPositions", {
+  action: async ({ sourceId, line }, thunkArgs) =>
+    _setBreakpointPositions(sourceId, line, thunkArgs),
+  createKey({ sourceId, line }, thunkArgs) {
+    const key = generatedSourceActorKey(thunkArgs.getState(), sourceId);
+    return line ? `${key}-${line}` : key;
+  },
   getValue: ({ sourceId, line }, thunkArgs) => {
     const positions = getBreakpointPositionsForSource(thunkArgs.getState(), sourceId);
     if (!positions) {
@@ -118,10 +123,4 @@ export const setBreakpointPositions = memoizeableAction("setBreakpointPositions"
 
     return fulfilled(positions);
   },
-  createKey({ sourceId, line }, thunkArgs) {
-    const key = generatedSourceActorKey(thunkArgs.getState(), sourceId);
-    return line ? `${key}-${line}` : key;
-  },
-  action: async ({ sourceId, line }, thunkArgs) =>
-    _setBreakpointPositions(sourceId, line, thunkArgs),
 });

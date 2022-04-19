@@ -4,18 +4,19 @@
 
 //
 import { bindActionCreators } from "redux";
-import { copyToTheClipboard } from "../../../utils/clipboard";
+
 import actions from "../../../actions";
+import { copyToTheClipboard } from "../../../utils/clipboard";
 import { getRawSourceURL, getSourcemapVisualizerURL, shouldBlackbox } from "../../../utils/source";
 
 // menu items
 
 const copySourceUri2Item = (selectedSource, editorActions) => ({
+  accesskey: "u",
+  click: () => copyToTheClipboard(getRawSourceURL(selectedSource.url)),
+  disabled: !selectedSource.url,
   id: "node-menu-copy-source-url",
   label: "Copy source URI",
-  accesskey: "u",
-  disabled: !selectedSource.url,
-  click: () => copyToTheClipboard(getRawSourceURL(selectedSource.url)),
 });
 
 const jumpToMappedLocationItem = (
@@ -25,43 +26,43 @@ const jumpToMappedLocationItem = (
   hasMappedLocation,
   editorActions
 ) => ({
+  accesskey: "m",
+  click: () => editorActions.jumpToMappedLocation(cx, location),
+  disabled: !hasMappedLocation,
   id: "node-menu-jump",
   label: L10N.getFormatStr(
     "editor.jumpToMappedLocation1",
     selectedSource.isOriginal ? "generated" : "original"
   ),
-  accesskey: "m",
-  disabled: !hasMappedLocation,
-  click: () => editorActions.jumpToMappedLocation(cx, location),
 });
 
 const showSourceMenuItem = (cx, selectedSource, editorActions) => ({
+  accesskey: "r",
+  click: () => editorActions.showSource(cx, selectedSource.id),
+  disabled: !selectedSource.url,
   id: "node-menu-show-source",
   label: "Reveal in tree",
-  accesskey: "r",
-  disabled: !selectedSource.url,
-  click: () => editorActions.showSource(cx, selectedSource.id),
 });
 
 const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
+  accesskey: selectedSource.isBlackBoxed ? "U" : "B",
+  click: () => editorActions.toggleBlackBox(cx, selectedSource),
+  disabled: !shouldBlackbox(selectedSource),
   id: "node-menu-blackbox",
   label: selectedSource.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
-  accesskey: selectedSource.isBlackBoxed ? "U" : "B",
-  disabled: !shouldBlackbox(selectedSource),
-  click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
 const sourceMapItem = (cx, selectedSource, alternateSource, editorActions) => ({
-  id: "node-menu-source-map",
-  label: "Visualize source map",
   accesskey: selectedSource.isBlackBoxed ? "U" : "B",
-  disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource),
   click: () => {
     const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
     if (href) {
       window.open(href, "_blank");
     }
   },
+  disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource),
+  id: "node-menu-source-map",
+  label: "Visualize source map",
 });
 
 export function editorMenuItems({ cx, editorActions, selectedSource, alternateSource }) {

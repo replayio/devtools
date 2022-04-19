@@ -4,12 +4,11 @@
 
 "use strict";
 
-const React = require("react");
-const { Provider } = require("react-redux");
-
+const { resetChanges, trackChange } = require("devtools/client/inspector/changes/actions/changes");
 const ChangesApp = require("devtools/client/inspector/changes/components/ChangesApp");
 const { getChangesStylesheet } = require("devtools/client/inspector/changes/selectors/changes");
-const { resetChanges, trackChange } = require("devtools/client/inspector/changes/actions/changes");
+const React = require("react");
+const { Provider } = require("react-redux");
 
 class ChangesView {
   constructor(inspector, window) {

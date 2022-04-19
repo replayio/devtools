@@ -4,7 +4,7 @@
 
 import { find, searchSourceForHighlight, getMatchIndex, removeOverlay } from "./source-search";
 
-const getCursor = jest.fn(() => ({ line: 90, ch: 54 }));
+const getCursor = jest.fn(() => ({ ch: 54, line: 90 }));
 const cursor = {
   find: jest.fn(),
   from: jest.fn(),
@@ -18,12 +18,12 @@ const modifiers = {
 };
 
 const getCM = () => ({
-  operation: jest.fn(cb => cb()),
   addOverlay: jest.fn(),
-  removeOverlay: jest.fn(),
+  firstLine: jest.fn(),
   getCursor,
   getSearchCursor,
-  firstLine: jest.fn(),
+  operation: jest.fn(cb => cb()),
+  removeOverlay: jest.fn(),
   state: {},
 });
 
@@ -45,10 +45,10 @@ describe("source-search", () => {
       expect(ctx.cm.getCursor).toHaveBeenCalledWith("anchor");
       expect(ctx.cm.getCursor).toHaveBeenCalledWith("head");
       const search = {
-        query: "test",
-        posTo: { line: 0, ch: 0 },
-        posFrom: { line: 0, ch: 0 },
         overlay: { token: expect.any(Function) },
+        posFrom: { ch: 0, line: 0 },
+        posTo: { ch: 0, line: 0 },
+        query: "test",
         results: [],
       };
       expect(ctx.cm.state).toEqual({ search });
@@ -57,10 +57,10 @@ describe("source-search", () => {
     it("clears a previous overlay", () => {
       const ctx = { cm: getCM() };
       ctx.cm.state.search = {
-        query: "foo",
-        posTo: null,
-        posFrom: null,
         overlay: { token: expect.any(Function) },
+        posFrom: null,
+        posTo: null,
+        query: "foo",
         results: [],
       };
       find(ctx, "test", true, modifiers);
@@ -72,10 +72,10 @@ describe("source-search", () => {
     it("clears for empty queries", () => {
       const ctx = { cm: getCM() };
       ctx.cm.state.search = {
-        query: "foo",
-        posTo: null,
-        posFrom: null,
         overlay: null,
+        posFrom: null,
+        posTo: null,
+        query: "foo",
         results: [],
       };
       find(ctx, "", true, modifiers);
@@ -90,16 +90,16 @@ describe("source-search", () => {
   describe("searchSourceForHighlight", () => {
     it("calls into CodeMirror APIs and sets the correct selection", () => {
       const line = 15;
-      const from = { line, ch: 1 };
-      const to = { line, ch: 5 };
+      const from = { ch: 1, line };
+      const to = { ch: 5, line };
       const cm = {
         ...getCM(),
-        setSelection: jest.fn(),
         getSearchCursor: () => ({
           find: () => true,
           from: () => from,
           to: () => to,
         }),
+        setSelection: jest.fn(),
       };
       const ed = { alignLine: jest.fn() };
       const ctx = { cm, ed };
@@ -156,20 +156,20 @@ describe("source-search", () => {
     it("calls CodeMirror APIs: removeOverlay, getCursor & setSelection", () => {
       const ctx = {
         cm: {
-          removeOverlay: jest.fn(),
-          getCursor,
-          state: {},
           doc: {
             setSelection: jest.fn(),
           },
+          getCursor,
+          removeOverlay: jest.fn(),
+          state: {},
         },
       };
       removeOverlay(ctx, "test");
       expect(ctx.cm.removeOverlay).toHaveBeenCalled();
       expect(ctx.cm.getCursor).toHaveBeenCalled();
       expect(ctx.cm.doc.setSelection).toHaveBeenCalledWith(
-        { line: 90, ch: 54 },
-        { line: 90, ch: 54 },
+        { ch: 54, line: 90 },
+        { ch: 54, line: 90 },
         { scroll: false }
       );
     });

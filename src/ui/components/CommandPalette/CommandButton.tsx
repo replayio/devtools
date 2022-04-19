@@ -1,8 +1,9 @@
+import cx from "classnames";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import React, { FC, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import cx from "classnames";
 import { actions } from "ui/actions";
+
 import { Command } from "./CommandPalette";
 import styles from "./CommandPalette.module.css";
 

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setLoadingFinished } from "ui/actions/app";
-
 import useAuth0 from "ui/utils/useAuth0";
 
 import Library from "../Library/index";

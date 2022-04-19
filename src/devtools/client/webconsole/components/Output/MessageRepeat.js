@@ -4,10 +4,10 @@
 
 "use strict";
 
+const { l10n } = require("devtools/client/webconsole/utils/messages");
+const { PluralForm } = require("devtools/shared/plural-form");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const { PluralForm } = require("devtools/shared/plural-form");
-const { l10n } = require("devtools/client/webconsole/utils/messages");
 const messageRepeatsTooltip = "#1 repeat;#1 repeats";
 
 MessageRepeat.displayName = "MessageRepeat";

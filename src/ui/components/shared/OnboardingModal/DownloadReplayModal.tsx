@@ -4,6 +4,7 @@ import { actions } from "ui/actions";
 import { Nag, useDismissNag } from "ui/hooks/users";
 import { removeUrlParameters } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
 import { DownloadPage } from "../Onboarding/DownloadPage";
@@ -67,9 +68,9 @@ function DownloadReplayModal({ hideModal, children }: PropsFromRedux & { childre
     content = (
       <InitialScreen
         {...{
-          onSkipToLibrary,
-          onNext,
           hideModal,
+          onNext,
+          onSkipToLibrary,
         }}
       >
         {children}

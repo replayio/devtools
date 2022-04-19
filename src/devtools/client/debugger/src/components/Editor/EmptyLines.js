@@ -4,9 +4,10 @@
 
 //
 
-import { connect } from "../../utils/connect";
 import { Component } from "react";
+
 import { getSelectedBreakableLines } from "../../selectors";
+import { connect } from "../../utils/connect";
 import { fromEditorLine } from "../../utils/editor";
 
 class EmptyLines extends Component {

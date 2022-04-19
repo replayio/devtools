@@ -1,7 +1,9 @@
 import React, { useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { getNode, getRootNodeId } from "../selectors/markup";
+import { cancelBubbling, preventDefault } from "ui/utils/key-shortcuts";
+import useKeyShortcuts from "ui/utils/use-key-shortcuts";
+
 import {
   onDownKey,
   onLeftKey,
@@ -10,10 +12,10 @@ import {
   onRightKey,
   onUpKey,
 } from "../actions/markup";
-import useKeyShortcuts from "ui/utils/use-key-shortcuts";
-import { cancelBubbling, preventDefault } from "ui/utils/key-shortcuts";
-import Node from "./Node";
+import { getNode, getRootNodeId } from "../selectors/markup";
+
 import { MarkupProps } from "./MarkupApp";
+import Node from "./Node";
 
 function Nodes(props: MarkupProps & PropsFromRedux) {
   const { node, onUpKey, onDownKey, onLeftKey, onRightKey, onPageUpKey, onPageDownKey } = props;
@@ -27,12 +29,12 @@ function Nodes(props: MarkupProps & PropsFromRedux) {
   }
   useKeyShortcuts(
     {
-      Up: cancelBubbling(preventDefault(onUpKey)),
       Down: cancelBubbling(preventDefault(onDownKey)),
       Left: cancelBubbling(preventDefault(onLeftKeyEnsureFocus)),
-      Right: cancelBubbling(preventDefault(onRightKey)),
-      PageUp: cancelBubbling(preventDefault(onPageUpKey)),
       PageDown: cancelBubbling(preventDefault(onPageDownKey)),
+      PageUp: cancelBubbling(preventDefault(onPageUpKey)),
+      Right: cancelBubbling(preventDefault(onRightKey)),
+      Up: cancelBubbling(preventDefault(onUpKey)),
     },
     ref
   );
@@ -61,12 +63,12 @@ const mapStateToProps = (state: UIState) => ({
   node: getNode(state, getRootNodeId(state)),
 });
 const mapDispatchToProps = {
-  onUpKey,
   onDownKey,
   onLeftKey,
-  onRightKey,
-  onPageUpKey,
   onPageDownKey,
+  onPageUpKey,
+  onRightKey,
+  onUpKey,
 };
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;

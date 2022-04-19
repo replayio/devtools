@@ -1,9 +1,11 @@
-import React from "react";
 import classNames from "classnames";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import escapeHtml from "escape-html";
-import Popup from "./Popup";
+import React from "react";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
+
+import Popup from "./Popup";
+
 const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 const { prefs } = require("ui/utils/prefs");
 

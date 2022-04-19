@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { UIStore } from "ui/actions";
+
 import CSSProperties from "../css-properties";
 import { Inspector } from "../inspector";
 

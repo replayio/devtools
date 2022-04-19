@@ -3,16 +3,17 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { UIThunkAction } from "ui/actions";
+import { setViewMode } from "ui/actions/layout";
+import { getViewMode } from "ui/reducers/layout";
 
-import { loadGlobalFunctions } from "./ast";
 import {
   openQuickOpen as openQuickOpenAction,
   setQuickOpenQuery,
   closeQuickOpen,
   getQuickOpenEnabled,
 } from "../reducers/quick-open";
-import { setViewMode } from "ui/actions/layout";
-import { getViewMode } from "ui/reducers/layout";
+
+import { loadGlobalFunctions } from "./ast";
 
 // TODO This is a workaround solely to allow dispatching without errors.
 // Additionally, the Redux team recommends against action type unions.
@@ -28,7 +29,7 @@ export function openQuickOpen(query = "", project = false): UIThunkAction {
   return dispatch => {
     dispatch(loadGlobalFunctions());
 
-    return dispatch(openQuickOpenAction({ query, project }));
+    return dispatch(openQuickOpenAction({ project, query }));
   };
 }
 

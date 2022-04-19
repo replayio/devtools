@@ -4,10 +4,10 @@
 
 "use strict";
 
-const DevToolsUtils = require("devtools/shared/DevToolsUtils");
-const { getCurrentZoom, getViewportDimensions } = require("devtools/shared/layout/utils");
 const { moveInfobar, createNode } = require("devtools/server/actors/highlighters/utils/markup");
+const DevToolsUtils = require("devtools/shared/DevToolsUtils");
 const { truncateString } = require("devtools/shared/inspector/utils");
+const { getCurrentZoom, getViewportDimensions } = require("devtools/shared/layout/utils");
 
 const STRINGS_URI = "devtools/shared/locales/accessibility.properties";
 DevToolsUtils.defineLazyGetter(this, "L10N", () => new LocalizationHelper(STRINGS_URI));
@@ -92,7 +92,7 @@ class Infobar {
   _moveInfobar(container) {
     // Position the infobar using accessible's bounds
     const { left: x, top: y, bottom, width } = this.bounds;
-    const infobarBounds = { x, y, bottom, width };
+    const infobarBounds = { bottom, width, x, y };
 
     moveInfobar(container, infobarBounds, this.win);
   }
@@ -105,51 +105,51 @@ class Infobar {
    */
   buildMarkup(root) {
     const container = createNode(this.win, {
-      parent: root,
       attributes: {
-        class: "infobar-container",
-        id: "infobar-container",
         "aria-hidden": "true",
+        class: "infobar-container",
         hidden: "true",
+        id: "infobar-container",
       },
+      parent: root,
       prefix: this.prefix,
     });
 
     const infobar = createNode(this.win, {
-      parent: container,
       attributes: {
         class: "infobar",
         id: "infobar",
       },
+      parent: container,
       prefix: this.prefix,
     });
 
     const infobarText = createNode(this.win, {
-      parent: infobar,
       attributes: {
         class: "infobar-text",
         id: "infobar-text",
       },
+      parent: infobar,
       prefix: this.prefix,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: infobarText,
       attributes: {
         class: "infobar-role",
         id: "infobar-role",
       },
+      nodeType: "span",
+      parent: infobarText,
       prefix: this.prefix,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: infobarText,
       attributes: {
         class: "infobar-name",
         id: "infobar-name",
       },
+      nodeType: "span",
+      parent: infobarText,
       prefix: this.prefix,
     });
 
@@ -355,11 +355,11 @@ class XULWindowInfobar extends Infobar {
     super.buildMarkup(root, createNode);
 
     createNode(this.win, {
-      parent: this.getElement("infobar"),
       attributes: {
         class: "arrow",
         id: "arrow",
       },
+      parent: this.getElement("infobar"),
       prefix: this.prefix,
     });
   }
@@ -427,12 +427,12 @@ class Audit {
 
   buildMarkup(root) {
     const audit = createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "infobar-audit",
         id: "infobar-audit",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
 
@@ -507,53 +507,53 @@ class AuditReport {
 class ContrastRatio extends AuditReport {
   buildMarkup(root) {
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "contrast-ratio-label",
         id: "contrast-ratio-label",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "contrast-ratio-error",
         id: "contrast-ratio-error",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
       text: L10N.getStr("accessibility.contrast.ratio.error"),
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "contrast-ratio",
         id: "contrast-ratio-min",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "contrast-ratio-separator",
         id: "contrast-ratio-separator",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
 
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "contrast-ratio",
         id: "contrast-ratio-max",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
   }
@@ -614,10 +614,10 @@ class ContrastRatio extends AuditReport {
     if (contrastRatio.value) {
       const { value, color, score, backgroundColor } = contrastRatio;
       this._fillAndStyleContrastValue(els.min, {
-        value,
+        backgroundColor,
         className: score,
         color,
-        backgroundColor,
+        value,
       });
       return true;
     }
@@ -625,17 +625,17 @@ class ContrastRatio extends AuditReport {
     const { min, max, color, backgroundColorMin, backgroundColorMax, scoreMin, scoreMax } =
       contrastRatio;
     this._fillAndStyleContrastValue(els.min, {
-      value: min,
+      backgroundColor: backgroundColorMin,
       className: scoreMin,
       color,
-      backgroundColor: backgroundColorMin,
+      value: min,
     });
     els.separator.removeAttribute("hidden");
     this._fillAndStyleContrastValue(els.max, {
-      value: max,
+      backgroundColor: backgroundColorMax,
       className: scoreMax,
       color,
-      backgroundColor: backgroundColorMax,
+      value: max,
     });
 
     return true;
@@ -654,8 +654,8 @@ class Keyboard extends AuditReport {
     return {
       [FOCUSABLE_NO_SEMANTICS]: "accessibility.keyboard.issue.semantics",
       [FOCUSABLE_POSITIVE_TABINDEX]: "accessibility.keyboard.issue.tabindex",
-      [INTERACTIVE_NO_ACTION]: "accessibility.keyboard.issue.action",
       [INTERACTIVE_NOT_FOCUSABLE]: "accessibility.keyboard.issue.focusable",
+      [INTERACTIVE_NO_ACTION]: "accessibility.keyboard.issue.action",
       [MOUSE_INTERACTIVE_ONLY]: "accessibility.keyboard.issue.mouse.only",
       [NO_FOCUS_VISIBLE]: "accessibility.keyboard.issue.focus.visible",
     };
@@ -663,12 +663,12 @@ class Keyboard extends AuditReport {
 
   buildMarkup(root) {
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "audit",
         id: "keyboard",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
   }
@@ -737,12 +737,12 @@ class TextLabel extends AuditReport {
 
   buildMarkup(root) {
     createNode(this.win, {
-      nodeType: "span",
-      parent: root,
       attributes: {
         class: "audit",
         id: "text-label",
       },
+      nodeType: "span",
+      parent: root,
       prefix: this.prefix,
     });
   }
@@ -830,7 +830,7 @@ function getBounds(win, { x, y, w, h, zoom }) {
   const width = right - left;
   const height = bottom - top;
 
-  return { left, right, top, bottom, width, height };
+  return { bottom, height, left, right, top, width };
 }
 
 exports.MAX_STRING_LENGTH = MAX_STRING_LENGTH;

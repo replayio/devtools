@@ -9,20 +9,23 @@ const helper = new LocalizationHelper("devtools/client/locales/webconsole.proper
 
 const l10n = {
   /**
-   * Generates a formatted timestamp string for displaying in console messages.
+   * Retrieve a localized string formatted with values coming from the given
+   * array.
    *
-   * @param integer [milliseconds]
-   *        Optional, allows you to specify the timestamp in milliseconds since
-   *        the UNIX epoch.
+   * @param string name
+   *        The string name you want from the Web Console string bundle.
+   * @param array array
+   *        The array of values you want in the formatted string.
    * @return string
-   *         The timestamp formatted for display.
+   *         The formatted local string.
    */
-  timestampString: function (milliseconds) {
-    const d = new Date(milliseconds ? milliseconds : null);
-    const minutes = d.getMinutes();
-    const seconds = d.getSeconds();
-    const parameters = [minutes, seconds];
-    return l10n.getFormatStr("timestampFormat", parameters);
+  getFormatStr: function (name, array) {
+    try {
+      return helper.getFormatStr(name, ...array);
+    } catch (ex) {
+      console.error("Failed to format string: " + name);
+      throw ex;
+    }
   },
 
   /**
@@ -43,23 +46,20 @@ const l10n = {
   },
 
   /**
-   * Retrieve a localized string formatted with values coming from the given
-   * array.
+   * Generates a formatted timestamp string for displaying in console messages.
    *
-   * @param string name
-   *        The string name you want from the Web Console string bundle.
-   * @param array array
-   *        The array of values you want in the formatted string.
+   * @param integer [milliseconds]
+   *        Optional, allows you to specify the timestamp in milliseconds since
+   *        the UNIX epoch.
    * @return string
-   *         The formatted local string.
+   *         The timestamp formatted for display.
    */
-  getFormatStr: function (name, array) {
-    try {
-      return helper.getFormatStr(name, ...array);
-    } catch (ex) {
-      console.error("Failed to format string: " + name);
-      throw ex;
-    }
+  timestampString: function (milliseconds) {
+    const d = new Date(milliseconds ? milliseconds : null);
+    const minutes = d.getMinutes();
+    const seconds = d.getSeconds();
+    const parameters = [minutes, seconds];
+    return l10n.getFormatStr("timestampFormat", parameters);
   },
 };
 

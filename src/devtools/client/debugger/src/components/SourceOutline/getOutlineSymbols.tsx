@@ -1,8 +1,9 @@
-import { fuzzySearch } from "../../utils/function";
 import { groupBy, keyBy } from "lodash";
-import { SourceSymbols, ClassSymbol, FunctionSymbol } from "../../types";
-import { HitCount } from "../../reducers/sources";
 import { features } from "ui/utils/prefs";
+
+import { HitCount } from "../../reducers/sources";
+import { SourceSymbols, ClassSymbol, FunctionSymbol } from "../../types";
+import { fuzzySearch } from "../../utils/function";
 
 function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCount[]) {
   return functions.map(functionSymbol => {

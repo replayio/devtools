@@ -1,5 +1,7 @@
 import { Rule } from "@recordreplay/protocol";
+
 import { assert, DisallowEverythingProxyHandler } from "../utils";
+
 import { Pause, WiredObject } from "./pause";
 
 // Manages interaction with a CSSRule.

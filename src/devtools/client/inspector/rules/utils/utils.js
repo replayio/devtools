@@ -82,49 +82,49 @@ function getNodeInfo(node, elementStyle) {
   if (declaration && classList.contains("ruleview-propertyname")) {
     type = VIEW_NODE_PROPERTY_TYPE;
     value = {
-      property: node.textContent,
-      value: getPropertyNameAndValue(node).value,
       enabled: declaration.enabled,
       overridden: declaration.overridden,
+      property: node.textContent,
       pseudoElement: rule.pseudoElement,
       sheetHref: rule.domRule.href,
       textProperty: declaration,
+      value: getPropertyNameAndValue(node).value,
     };
   } else if (declaration && classList.contains("ruleview-propertyvalue")) {
     type = VIEW_NODE_VALUE_TYPE;
     value = {
-      property: getPropertyNameAndValue(node).name,
-      value: node.textContent,
       enabled: declaration.enabled,
       overridden: declaration.overridden,
+      property: getPropertyNameAndValue(node).name,
       pseudoElement: rule.pseudoElement,
       sheetHref: rule.domRule.href,
       textProperty: declaration,
+      value: node.textContent,
     };
   } else if (declaration && classList.contains("ruleview-font-family")) {
     const { name: propertyName, value: propertyValue } = getPropertyNameAndValue(node);
     type = VIEW_NODE_FONT_TYPE;
     value = {
-      property: propertyName,
-      value: propertyValue,
       enabled: declaration.enabled,
       overridden: declaration.overridden,
+      property: propertyName,
       pseudoElement: rule.pseudoElement,
       sheetHref: rule.domRule.href,
       textProperty: declaration,
+      value: propertyValue,
     };
   } else if (declaration && classList.contains("ruleview-shape-point")) {
     type = VIEW_NODE_SHAPE_POINT_TYPE;
     value = {
-      property: getPropertyNameAndValue(node).name,
-      value: node.textContent,
       enabled: declaration.enabled,
       overridden: declaration.overridden,
+      point: getShapePoint(node),
+      property: getPropertyNameAndValue(node).name,
       pseudoElement: rule.pseudoElement,
       sheetHref: rule.domRule.href,
       textProperty: declaration,
       toggleActive: getShapeToggleActive(node),
-      point: getShapePoint(node),
+      value: node.textContent,
     };
   } else if (declaration && classList.contains("ruleview-unused-warning")) {
     type = VIEW_NODE_INACTIVE_CSS;
@@ -142,13 +142,13 @@ function getNodeInfo(node, elementStyle) {
   ) {
     type = VIEW_NODE_VARIABLE_TYPE;
     value = {
-      property: getPropertyNameAndValue(node).name,
-      value: node.textContent,
       enabled: declaration.enabled,
       overridden: declaration.overridden,
+      property: getPropertyNameAndValue(node).name,
       pseudoElement: rule.pseudoElement,
       sheetHref: rule.domRule.href,
       textProperty: declaration,
+      value: node.textContent,
       variable: node.dataset.variable,
     };
   } else if (
@@ -158,14 +158,14 @@ function getNodeInfo(node, elementStyle) {
   ) {
     type = VIEW_NODE_IMAGE_URL_TYPE;
     value = {
-      property: getPropertyNameAndValue(node).name,
-      value: node.parentNode.textContent,
-      url: node.href,
       enabled: declaration.enabled,
       overridden: declaration.overridden,
+      property: getPropertyNameAndValue(node).name,
       pseudoElement: rule.pseudoElement,
       sheetHref: rule.domRule.href,
       textProperty: declaration,
+      url: node.href,
+      value: node.parentNode.textContent,
     };
   } else if (
     classList.contains("ruleview-selector-unmatched") ||

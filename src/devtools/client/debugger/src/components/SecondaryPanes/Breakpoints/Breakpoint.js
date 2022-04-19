@@ -4,18 +4,18 @@
 
 //
 
-import React, { PureComponent } from "react";
-import { connect } from "../../../utils/connect";
-import { createSelector } from "reselect";
 import classnames from "classnames";
+import React, { PureComponent } from "react";
+import { createSelector } from "reselect";
 
 import actions from "../../../actions";
-import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpoint";
-import { features } from "../../../utils/prefs";
 import { getSelectedFrame, getContext } from "../../../selectors";
+import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpoint";
+import { connect } from "../../../utils/connect";
+import { features } from "../../../utils/prefs";
+import { CloseButton } from "../../shared/Button";
 
 import BreakpointOptions from "./BreakpointOptions";
-import { CloseButton } from "../../shared/Button";
 
 class Breakpoint extends PureComponent {
   get selectedLocation() {

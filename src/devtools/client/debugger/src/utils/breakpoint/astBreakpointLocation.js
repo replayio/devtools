@@ -8,7 +8,7 @@ import { findClosestFunction } from "../ast";
 
 export function getASTLocation(source, symbols, location) {
   if (!symbols || symbols.loading) {
-    return { name: undefined, offset: location, index: 0 };
+    return { index: 0, name: undefined, offset: location };
   }
 
   const scope = findClosestFunction(symbols, location);
@@ -17,12 +17,12 @@ export function getASTLocation(source, symbols, location) {
     // also do column offsets
     const line = location.line - scope.location.start.line;
     return {
-      name: scope.name,
-      offset: { line, column: undefined },
       index: scope.index,
+      name: scope.name,
+      offset: { column: undefined, line },
     };
   }
-  return { name: undefined, offset: location, index: 0 };
+  return { index: 0, name: undefined, offset: location };
 }
 
 export function findFunctionByName(symbols, name, index) {

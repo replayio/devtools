@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { ReplayEvent } from "ui/state/app";
+
 import Marker from "./Marker";
 
 function EventMarker({
@@ -27,9 +28,9 @@ function EventMarker({
 }
 
 const connector = connect((state: UIState) => ({
-  zoomRegion: selectors.getZoomRegion(state),
   currentTime: selectors.getCurrentTime(state),
   overlayWidth: selectors.getTimelineDimensions(state).width,
+  zoomRegion: selectors.getZoomRegion(state),
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;

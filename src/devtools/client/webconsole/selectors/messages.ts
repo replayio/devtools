@@ -3,17 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from "reselect";
-
 import type { UIState } from "ui/state";
 import { isTimeInRegions } from "ui/utils/timeline";
+
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
+const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
+const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { isError } = require("devtools/client/webconsole/utils/messages");
 const { pointPrecedes } = require("protocol/execution-point-utils");
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { getCurrentTime, getFocusRegion } = require("ui/reducers/timeline");
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 const { isInTrimSpan } = require("ui/utils/timeline");
 
 export const getAllMessagesUiById = (state: UIState) => state.messages.messagesUiById;

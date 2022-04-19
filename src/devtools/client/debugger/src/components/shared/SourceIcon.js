@@ -5,8 +5,10 @@
 //
 
 import React, { PureComponent } from "react";
-import AccessibleImage from "./AccessibleImage";
+
 import { getSourceClassnames } from "../../utils/source";
+
+import AccessibleImage from "./AccessibleImage";
 
 export default class SourceIcon extends PureComponent {
   render() {

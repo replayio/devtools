@@ -1,6 +1,7 @@
-const fs = require("fs");
-const { tmpFile } = require("./utils");
 const { spawnSync } = require("child_process");
+const fs = require("fs");
+
+const { tmpFile } = require("./utils");
 
 function getRecordingId(file) {
   try {

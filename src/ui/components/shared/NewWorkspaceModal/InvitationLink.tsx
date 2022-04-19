@@ -56,7 +56,7 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
       return;
     }
     updateWorkspaceCodeDomainLimitations({
-      variables: { workspaceId: workspace.id, isLimited: !workspace.isDomainLimitedCode },
+      variables: { isLimited: !workspace.isDomainLimitedCode, workspaceId: workspace.id },
     });
   };
 

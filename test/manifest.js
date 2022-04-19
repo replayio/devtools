@@ -46,11 +46,14 @@ module.exports = [
     targets: ["gecko"],
   },
   {
-    example: "doc_navigate.html",
-    script: "breakpoints-07.js",
-    targets: ["gecko", "chromium"],
     // Disabled because the test contains a navigation that playwright doesn't handle well
     disabled: true,
+
+    example: "doc_navigate.html",
+
+    script: "breakpoints-07.js",
+
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/control_flow.js",
@@ -142,12 +145,15 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
-    example: "cra/dist/index.html",
-    script: "sourcemap_stacktrace.js",
-    targets: ["gecko", "chromium"],
     // Disabled because we can't record the example in CI
     // https://github.com/RecordReplay/gecko-dev/issues/726
     disabled: true,
+
+    example: "cra/dist/index.html",
+
+    script: "sourcemap_stacktrace.js",
+
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/basic.js",
@@ -222,13 +228,16 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
+    // Disabled because of https://github.com/RecordReplay/backend/issues/4483
+    disabled: true,
+
     example: "doc_prod_bundle.html",
+
     script: "object_preview-05.js",
+
     // Not supported on chromium, needs source maps.
     // https://github.com/RecordReplay/chromium/issues/5
     targets: ["gecko"],
-    // Disabled because of https://github.com/RecordReplay/backend/issues/4483
-    disabled: true,
   },
   {
     example: "node/objects.js",
@@ -318,12 +327,15 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
-    example: "cra/dist/index.html",
-    script: "react_devtools.js",
-    targets: ["gecko", "chromium"],
     // Disabled because we can't record the example in CI
     // https://github.com/RecordReplay/gecko-dev/issues/726
     disabled: true,
+
+    example: "cra/dist/index.html",
+
+    script: "react_devtools.js",
+
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_control_flow.html",

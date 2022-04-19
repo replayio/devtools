@@ -1,10 +1,6 @@
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
 module.exports = {
-  // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
-  // (see https://github.com/vercel/next.js/pull/34500)
-  experimental: {},
-
   eslint: {
     // which folders to run ESLint on during production builds (next build)
     dirs: ["src", "pages", "packages"],
@@ -13,39 +9,13 @@ module.exports = {
     ignoreDuringBuilds: true,
   },
 
-  productionBrowserSourceMaps: true,
-
-  async redirects() {
-    return [
-      {
-        source: "/view",
-        has: [
-          {
-            type: "query",
-            key: "id",
-          },
-        ],
-        destination: "/recording/:id",
-        permanent: true,
-      },
-      {
-        source: "/",
-        has: [
-          {
-            type: "query",
-            key: "id",
-          },
-        ],
-        destination: "/recording/:id",
-        permanent: true,
-      },
-    ];
-  },
+  // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
+  // (see https://github.com/vercel/next.js/pull/34500)
+  experimental: {},
 
   async headers() {
     return [
       {
-        source: "/(.*)",
         headers: [
           {
             key: "X-Frame-Options",
@@ -57,6 +27,36 @@ module.exports = {
               "frame-ancestors 'self' https://*.replay.io/; report-uri https://o437061.ingest.sentry.io/api/5399075/security/?sentry_key=41c20dff316f42fea692ef4f0d055261",
           },
         ],
+        source: "/(.*)",
+      },
+    ];
+  },
+
+  productionBrowserSourceMaps: true,
+
+  async redirects() {
+    return [
+      {
+        destination: "/recording/:id",
+        has: [
+          {
+            key: "id",
+            type: "query",
+          },
+        ],
+        permanent: true,
+        source: "/view",
+      },
+      {
+        destination: "/recording/:id",
+        has: [
+          {
+            key: "id",
+            type: "query",
+          },
+        ],
+        permanent: true,
+        source: "/",
       },
     ];
   },
@@ -71,7 +71,7 @@ module.exports = {
       }));
     };
 
-    config.plugins.push(new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }));
+    config.plugins.push(new RetryChunkLoadPlugin({ maxRetries: 2, retryDelay: 1000 }));
 
     // Check for circular imports and throw errors, but only if the
     // env variable is set.  Should only be true if manually defined
@@ -81,9 +81,9 @@ module.exports = {
 
       config.plugins.push(
         new CircularDependencyPlugin({
+          cwd: process.cwd(),
           exclude: /node_modules/,
           failOnError: true,
-          cwd: process.cwd(),
         })
       );
     }
@@ -94,9 +94,9 @@ module.exports = {
       config.optimization.splitChunks = {
         cacheGroups: {
           commons: {
-            name: "commons",
             chunks: "initial",
             minChunks: 20,
+            name: "commons",
             priority: 20,
           },
         },
@@ -108,13 +108,13 @@ module.exports = {
     };
 
     config.module.rules.push({
-      test: /\.properties$/,
       loader: "raw-loader",
+      test: /\.properties$/,
     });
 
     config.module.rules.push({
-      test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
+      test: /\.svg$/i,
       use: ["@svgr/webpack"],
     });
 

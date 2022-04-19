@@ -1,9 +1,9 @@
-import { CommentsState } from "ui/state/comments";
-import { CommentsAction } from "ui/actions/comments";
-import { UIState } from "ui/state";
 import cloneDeep from "lodash/cloneDeep";
-import { getRecordingId } from "ui/utils/recording";
+import { CommentsAction } from "ui/actions/comments";
 import { getReplaySession } from "ui/setup/prefs";
+import { UIState } from "ui/state";
+import { CommentsState } from "ui/state/comments";
+import { getRecordingId } from "ui/utils/recording";
 
 export const PENDING_COMMENT_ID = "PENDING";
 

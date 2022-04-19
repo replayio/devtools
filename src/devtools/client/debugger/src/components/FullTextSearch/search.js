@@ -1,13 +1,10 @@
-import { trackEvent } from "ui/utils/telemetry";
-import { ThreadFront } from "protocol/thread";
-import groupBy from "lodash/groupBy";
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
-
+import groupBy from "lodash/groupBy";
+import { ThreadFront } from "protocol/thread";
 import { sliceCodePoints } from "ui/utils/codePointString";
+import { trackEvent } from "ui/utils/telemetry";
 
 const formatSourceMatches = (source, matches) => ({
-  type: "RESULT",
-  sourceId: source.id,
   filepath: source.url,
   matches: matches.map(match => {
     // We have to do this array dance to navigate the string in unicode "code points"
@@ -19,15 +16,17 @@ const formatSourceMatches = (source, matches) => ({
       match.contextEnd.column
     );
     return {
-      type: "MATCH",
       column: match.location.column,
       line: match.location.line,
-      sourceId: source.id,
       match: matchStr,
       matchIndex: match.context.indexOf(matchStr),
+      sourceId: source.id,
+      type: "MATCH",
       value: match.context,
     };
   }),
+  sourceId: source.id,
+  type: "RESULT",
 });
 
 const formatMatchesBySource = (matches, sourcesById) => {
@@ -44,7 +43,7 @@ export async function search(query, sourcesById, updateResults, includeNodeModul
 
   const sourceIds = getSourceIDsToSearch(sourcesById, includeNodeModules);
 
-  updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
+  updateResults(() => ({ matchesBySource: [], query, status: "LOADING" }));
 
   await ThreadFront.searchSources({ query, sourceIds }, matches => {
     updateResults(prevResults => {

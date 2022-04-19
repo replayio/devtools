@@ -1,11 +1,12 @@
-import React, { ComponentProps } from "react";
 import { Story, Meta } from "@storybook/react";
+import React, { ComponentProps } from "react";
 import { _ResponseBody as ResponseBody } from "ui/components/NetworkMonitor/ResponseBody";
+
 import { requestSummary } from "./utils";
 
 export default {
-  title: "Network Monitor/Response Body",
   component: ResponseBody,
+  title: "Network Monitor/Response Body",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof ResponseBody>> = args => <ResponseBody {...args} />;

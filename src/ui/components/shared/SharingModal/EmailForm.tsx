@@ -1,10 +1,11 @@
+import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
 import { RecordingId } from "@recordreplay/protocol";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import hooks from "ui/hooks";
-import Spinner from "../Spinner";
-import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
 import { validateEmail } from "ui/utils/helpers";
+
 import { TextInput } from "../Forms";
+import Spinner from "../Spinner";
 
 type ActionStatus = "pending" | "loading" | "error" | "completed";
 
@@ -103,7 +104,7 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
     }
 
     addNewCollaborator({
-      variables: { recordingId, email: inputValue },
+      variables: { email: inputValue, recordingId },
     });
     setStatus("loading");
   };
@@ -114,7 +115,7 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
       {showAutocomplete ? (
         <div className="autocomplete bg-white">
           <div className="content">{inputValue}</div>
-          <AutocompleteAction {...{ status, handleSubmit }} />
+          <AutocompleteAction {...{ handleSubmit, status }} />
         </div>
       ) : null}
     </form>

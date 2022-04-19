@@ -3,15 +3,15 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
-import Breakpoint from "./Breakpoint";
-
 import {
   getSelectedSource,
   getFirstVisibleBreakpoints,
 } from "devtools/client/debugger/src/selectors";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { connect } from "devtools/client/debugger/src/utils/connect";
+import React, { Component } from "react";
+
+import Breakpoint from "./Breakpoint";
 
 class Breakpoints extends Component {
   render() {

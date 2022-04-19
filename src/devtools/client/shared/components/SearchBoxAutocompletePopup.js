@@ -4,9 +4,9 @@
 
 "use strict";
 
+const PropTypes = require("prop-types");
 const { Component } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
 
 class SearchBoxAutocompletePopup extends Component {
   static get propTypes() {
@@ -125,12 +125,12 @@ class SearchBoxAutocompletePopup extends Component {
             }
             return dom.li(
               {
-                key: i,
+                className: itemClassList.join(" "),
                 "data-index": i,
                 "data-value": item.value,
-                className: itemClassList.join(" "),
-                ref: isSelected ? "selected" : null,
+                key: i,
                 onMouseDown: this.onMouseDown,
+                ref: isSelected ? "selected" : null,
               },
               item.displayValue
             );

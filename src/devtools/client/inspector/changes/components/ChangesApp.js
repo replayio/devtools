@@ -4,15 +4,14 @@
 
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { connect } = require("react-redux");
-
 const CSSDeclaration = require("devtools/client/inspector/changes/components/CSSDeclaration");
 const { getChangesTree } = require("devtools/client/inspector/changes/selectors/changes");
 const { getSourceForDisplay } = require("devtools/client/inspector/changes/utils/changes-utils");
 const { getStr } = require("devtools/client/inspector/changes/utils/l10n");
+const PropTypes = require("prop-types");
+const React = require("react");
+const dom = require("react-dom-factories");
+const { connect } = require("react-redux");
 
 class ChangesApp extends React.PureComponent {
   static get propTypes() {
@@ -68,8 +67,8 @@ class ChangesApp extends React.PureComponent {
       .sort((a, b) => a.index > b.index)
       .map(({ property, value, index }) => {
         return React.createElement(CSSDeclaration, {
-          key: "remove-" + property + index,
           className: "level diff-remove",
+          key: "remove-" + property + index,
           property,
           value,
         });
@@ -80,8 +79,8 @@ class ChangesApp extends React.PureComponent {
       .sort((a, b) => a.index > b.index)
       .map(({ property, value, index }) => {
         return React.createElement(CSSDeclaration, {
-          key: "add-" + property + index,
           className: "level diff-add",
+          key: "add-" + property + index,
           property,
           value,
         });
@@ -94,9 +93,9 @@ class ChangesApp extends React.PureComponent {
     const diffClass = rule.isNew ? "diff-add" : "";
     return dom.div(
       {
-        key: ruleId,
         className: "changes__rule devtools-monospace",
         "data-rule-id": ruleId,
+        key: ruleId,
         style: {
           "--diff-level": level,
         },
@@ -143,8 +142,8 @@ class ChangesApp extends React.PureComponent {
       elements.push(
         dom.div(
           {
-            key: selector,
             className: `level changes__selector ${diffClass}`,
+            key: selector,
             title: selector,
           },
           selector,
@@ -164,9 +163,9 @@ class ChangesApp extends React.PureComponent {
 
       return dom.div(
         {
-          key: sourceId,
-          "data-source-id": sourceId,
           className: "source",
+          "data-source-id": sourceId,
+          key: sourceId,
         },
         dom.div(
           {

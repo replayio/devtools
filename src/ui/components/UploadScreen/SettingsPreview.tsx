@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React from "react";
 import { Workspace } from "ui/types";
 import { getOrganizationSettings } from "ui/utils/org";
+
 import { MY_LIBRARY, personalWorkspace } from "./Sharing";
 
 const getIconAndText = (
@@ -14,21 +15,21 @@ const getIconAndText = (
 } => {
   if (isPublic) {
     return {
-      text: "This replay can be viewed by anyone with the link",
       icon: "public",
+      text: "This replay can be viewed by anyone with the link",
     };
   }
 
   if (selectedWorkspaceId === MY_LIBRARY) {
     return {
-      text: `Only you can view this`,
       icon: "person",
+      text: `Only you can view this`,
     };
   }
 
   return {
-    text: `Shared privately with ${workspaceName}`,
     icon: "groups",
+    text: `Shared privately with ${workspaceName}`,
   };
 };
 

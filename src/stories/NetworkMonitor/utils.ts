@@ -9,8 +9,6 @@ export const eventsFor = (
 ): RequestEventInfo[] => {
   return [
     {
-      id,
-      time: 0,
       event: {
         kind: "request",
         requestCause: "app.js:31",
@@ -30,10 +28,10 @@ export const eventsFor = (
         requestMethod: method,
         requestUrl: url,
       },
+      id,
+      time: 0,
     },
     {
-      id,
-      time: Math.floor(1000 * Math.random()),
       event: {
         kind: "response",
         responseFromCache: false,
@@ -67,6 +65,8 @@ export const eventsFor = (
         responseStatus: status,
         responseStatusText: "test",
       },
+      id,
+      time: Math.floor(1000 * Math.random()),
     },
   ];
 };
@@ -80,22 +80,22 @@ export const requestSummary = (
 ): RequestSummary => {
   return {
     cause: "fetch",
-    domain: "replay.io",
     documentType: "html",
+    domain: "replay.io",
     end: 1700,
     firstByte: 1600,
-    hasResponseBody: true,
     hasRequestBody: true,
+    hasResponseBody: true,
     id,
     method,
     name: "replay.io",
     point: { point: "0", time: 0 },
     queryParams: [["foo", "bar"]],
-    triggerPoint: { point: "0", time: 0 },
     requestHeaders: [{ name: "foo", value: "bar" }],
     responseHeaders: [{ name: "content-type", value: contentType }],
     start: 0,
     status,
+    triggerPoint: { point: "0", time: 0 },
     type: CanonicalRequestType.FETCH_XHR,
     url,
   };
@@ -111,8 +111,8 @@ export const requestProps = (
     events: eventsFor(id, url, status, method),
     info: {
       id,
-      time: Number(id),
       point: "1",
+      time: Number(id),
       triggerPoint: undefined,
     },
   };

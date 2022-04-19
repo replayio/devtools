@@ -13,8 +13,8 @@ import { openDocLink } from "devtools/client/shared/link";
 function MDNLink({ url, title }) {
   return a({
     className: "devtools-button learn-more-link",
-    title,
     onClick: e => onLearnMoreClick(e, url),
+    title,
   });
 }
 

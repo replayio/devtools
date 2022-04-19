@@ -1,5 +1,6 @@
-import { requiresWindow } from "./ssr";
 import { clear as clearAsyncStorage } from "devtools/shared/async-storage";
+
+import { requiresWindow } from "./ssr";
 
 requiresWindow(win => {
   const url = new URL(win.location.href);

@@ -1,7 +1,7 @@
-import { RecordingId } from "@recordreplay/protocol";
 import { gql, useMutation } from "@apollo/client";
-import { GET_COMMENTS } from "ui/graphql/comments";
+import { RecordingId } from "@recordreplay/protocol";
 import { DeleteCommentReply, DeleteCommentReplyVariables } from "graphql/DeleteCommentReply";
+import { GET_COMMENTS } from "ui/graphql/comments";
 
 export default function useDeleteCommentReply() {
   const [deleteCommentReply, { error }] = useMutation<
@@ -23,9 +23,8 @@ export default function useDeleteCommentReply() {
 
   return (commentReplyId: string, recordingId: RecordingId) => {
     deleteCommentReply({
-      variables: { commentReplyId },
       optimisticResponse: {
-        deleteCommentReply: { success: true, __typename: "DeleteCommentReply" },
+        deleteCommentReply: { __typename: "DeleteCommentReply", success: true },
       },
       update: cache => {
         const data: any = cache.readQuery({
@@ -56,11 +55,12 @@ export default function useDeleteCommentReply() {
         };
 
         cache.writeQuery({
+          data: newData,
           query: GET_COMMENTS,
           variables: { recordingId },
-          data: newData,
         });
       },
+      variables: { commentReplyId },
     });
   };
 }

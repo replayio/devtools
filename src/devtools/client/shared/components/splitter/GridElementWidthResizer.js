@@ -4,18 +4,18 @@
 
 "use strict";
 
-const React = require("react");
-const PropTypes = require("prop-types");
 const Draggable = require("devtools/client/shared/components/splitter/Draggable");
+const PropTypes = require("prop-types");
+const React = require("react");
 
 class GridElementWidthResizer extends React.Component {
   static get propTypes() {
     return {
-      getControlledElementNode: PropTypes.func.isRequired,
-      enabled: PropTypes.bool,
-      position: PropTypes.string.isRequired,
       className: PropTypes.string,
+      enabled: PropTypes.bool,
+      getControlledElementNode: PropTypes.func.isRequired,
       onResizeEnd: PropTypes.func,
+      position: PropTypes.string.isRequired,
     };
   }
 
@@ -26,10 +26,10 @@ class GridElementWidthResizer extends React.Component {
     this.onStopMove = this.onStopMove.bind(this);
     this.onMove = this.onMove.bind(this);
     this.state = {
-      dragging: false,
-      isRTLElement: false,
       defaultCursor: null,
       defaultWidth: null,
+      dragging: false,
+      isRTLElement: false,
     };
   }
 
@@ -61,12 +61,12 @@ class GridElementWidthResizer extends React.Component {
     doc.firstElementChild.classList.add("dragging");
 
     this.setState({
+      defaultCursor,
+      defaultWidth,
       dragging: true,
       isRTLElement:
         controlledElementNode.ownerDocument.defaultView.getComputedStyle(controlledElementNode)
           .direction === "rtl",
-      defaultCursor,
-      defaultWidth,
     });
   }
 
@@ -121,9 +121,9 @@ class GridElementWidthResizer extends React.Component {
 
     return React.createElement(Draggable, {
       className: classNames.join(" "),
+      onMove: this.onMove,
       onStart: this.onStartMove,
       onStop: this.onStopMove,
-      onMove: this.onMove,
     });
   }
 }

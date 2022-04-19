@@ -6,6 +6,7 @@
 
 import fromPairs from "lodash/fromPairs";
 import toPairs from "lodash/toPairs";
+
 import { executeSoon } from "../../../../devtools/client/debugger/src/utils/DevToolsUtils";
 
 let seqIdVal = 1;
@@ -45,8 +46,8 @@ function promiseMiddleware(storeApi) {
         error => {
           storeApi.dispatch({
             ...action,
-            status: "error",
             error: error.message || error,
+            status: "error",
           });
           return Promise.reject(error);
         }

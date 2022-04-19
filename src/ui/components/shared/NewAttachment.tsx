@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
+import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+
 import Modal from "./NewModal";
 
 function addLoomComment(loom: string) {
   return JSON.stringify({
-    type: "doc",
     content: [
       {
+        content: [{ text: loom, type: "text" }],
         type: "paragraph",
-        content: [{ type: "text", text: loom }],
       },
     ],
+    type: "doc",
   });
 }
 
@@ -68,8 +69,8 @@ const connector = connect(
     modalOptions: selectors.getModalOptions(state),
   }),
   {
-    setModal: actions.setModal,
     hideModal: actions.hideModal,
+    setModal: actions.setModal,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -4,12 +4,11 @@
 
 //
 
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-
+import flatten from "lodash/flatten";
 import times from "lodash/times";
 import zip from "lodash/zip";
-import flatten from "lodash/flatten";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 import { RedactedSpan } from "ui/components/Redacted";
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];

@@ -1,8 +1,9 @@
 import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
-import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
+import useAuth0 from "ui/utils/useAuth0";
+
 import { PrimaryButton } from "./Button";
+import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
 
 function LoginModal() {
   const { loginAndReturn } = useAuth0();

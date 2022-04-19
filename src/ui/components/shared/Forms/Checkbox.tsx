@@ -14,7 +14,7 @@ export default function Checkbox({
         "h-4 w-4 cursor-pointer rounded border-checkboxBorder bg-checkbox text-primaryAccent focus:ring-primaryAccent",
         className
       )}
-      {...{ id, checked, onChange }}
+      {...{ checked, id, onChange }}
     />
   );
 }

@@ -1,14 +1,15 @@
+import { Editor } from "@tiptap/react";
+import classNames from "classnames";
 import React, { useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { Comment, Reply } from "ui/state/comments";
-
 import { User } from "ui/types";
-import TipTapEditor from "./TipTapEditor";
+
 import { FocusContext } from "../CommentCard";
-import classNames from "classnames";
-import { Editor } from "@tiptap/react";
+
+import TipTapEditor from "./TipTapEditor";
 
 export const PERSIST_COMMENT_DEBOUNCE_DELAY = 500;
 

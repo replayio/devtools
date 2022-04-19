@@ -16,6 +16,7 @@ import {
 } from "ui/state/layout";
 import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { UIThunkAction } from ".";
 
 type SetConsoleFilterDrawerExpandedAction = Action<"set_console_filter_drawer_expanded"> & {
@@ -59,7 +60,7 @@ export function toggleCommandPalette(): UIThunkAction {
 }
 
 export function dismissLocalNag(nag: LocalNag): DismissLocalNagAction {
-  return { type: "dismiss_local_nag", nag };
+  return { nag, type: "dismiss_local_nag" };
 }
 
 export function setViewMode(viewMode: ViewMode): UIThunkAction {
@@ -87,7 +88,7 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
 export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
   trackEvent("toolbox.secondary.video_toggle");
 
-  return { type: "set_show_video_panel", showVideoPanel };
+  return { showVideoPanel, type: "set_show_video_panel" };
 }
 
 export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
@@ -100,21 +101,21 @@ export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
       dispatch(setSelectedPanel("console"));
     }
 
-    dispatch({ type: "set_toolbox_layout", layout });
+    dispatch({ layout, type: "set_toolbox_layout" });
   };
 }
 export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAction {
-  return { type: "set_selected_panel", panel };
+  return { panel, type: "set_selected_panel" };
 }
 
 export function setSelectedPrimaryPanel(panel: PrimaryPanelName): SetSelectedPrimaryPanelAction {
-  return { type: "set_selected_primary_panel", panel };
+  return { panel, type: "set_selected_primary_panel" };
 }
 
 export function setConsoleFilterDrawerExpanded(
   expanded: boolean
 ): SetConsoleFilterDrawerExpandedAction {
-  return { type: "set_console_filter_drawer_expanded", expanded };
+  return { expanded, type: "set_console_filter_drawer_expanded" };
 }
 
 export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {

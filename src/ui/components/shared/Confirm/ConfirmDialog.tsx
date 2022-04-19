@@ -1,3 +1,6 @@
+import classNames from "classnames";
+import React, { useEffect, useRef } from "react";
+
 import { Button, SecondaryButton } from "../Button";
 import {
   Dialog,
@@ -7,8 +10,6 @@ import {
   DialogPropTypes,
   DialogTitle,
 } from "../Dialog";
-import React, { useEffect, useRef } from "react";
-import classNames from "classnames";
 
 export type ConfirmOptions = {
   acceptLabel: string;

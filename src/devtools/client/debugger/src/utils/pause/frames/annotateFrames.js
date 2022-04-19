@@ -5,8 +5,8 @@
 //
 
 import flatMap from "lodash/flatMap";
-import zip from "lodash/zip";
 import range from "lodash/range";
+import zip from "lodash/zip";
 
 import { getFrameUrl } from "./getFrameUrl";
 import { getLibraryFromUrl } from "./getLibraryFromUrl";

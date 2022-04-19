@@ -1,10 +1,11 @@
-import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { User } from "ui/state/session";
-import { useGetUserId } from "./users";
-import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
+import { RecordingId } from "@recordreplay/protocol";
 import { GetActiveSessions, GetActiveSessionsVariables } from "graphql/GetActiveSessions";
 import { filter } from "lodash";
+import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
+import { User } from "ui/state/session";
+
+import { useGetUserId } from "./users";
 
 interface SessionUser extends User {
   sessionId?: string;
@@ -19,8 +20,8 @@ export function useGetActiveSessions(recordingId: RecordingId) {
   const { data, error, loading } = useQuery<GetActiveSessions, GetActiveSessionsVariables>(
     GET_ACTIVE_SESSIONS,
     {
-      variables: { recordingId },
       pollInterval: 5000,
+      variables: { recordingId },
     }
   );
 
@@ -33,7 +34,7 @@ export function useGetActiveSessions(recordingId: RecordingId) {
   }
 
   if (!data) {
-    return { loading, error };
+    return { error, loading };
   }
 
   // Don't show the user's own sessions.
@@ -51,5 +52,5 @@ export function useGetActiveSessions(recordingId: RecordingId) {
       .filter(i => i.name !== null) as SessionUser[]
   ).sort();
 
-  return { users, loading };
+  return { loading, users };
 }

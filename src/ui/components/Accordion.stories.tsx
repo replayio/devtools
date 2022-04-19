@@ -1,7 +1,5 @@
-import React from "react";
-
 import { Story, Meta } from "@storybook/react";
-
+import React from "react";
 import Accordion, { AccordionItem } from "ui/components/Accordion";
 
 const lorem = [
@@ -64,14 +62,13 @@ const lorem = [
 ];
 
 export default {
-  title: "Utilities/Accordion",
   component: Accordion,
+  title: "Utilities/Accordion",
 } as Meta;
 
 const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = args => {
   let items = args.items?.map((item, i) => {
     return {
-      header: `Section ${i + 1}`,
       component: (
         <ul>
           {lorem.slice(item.size).map((sentence, idx) => (
@@ -81,17 +78,18 @@ const Template: Story<{ items: Partial<AccordionItem & { size: number }>[] }> = 
           ))}
         </ul>
       ),
+      header: `Section ${i + 1}`,
       ...item,
     };
   });
   return (
     <div
       style={{
-        maxWidth: "500px",
-        height: "600px",
         borderRadius: "8px",
         boxShadow:
           "0.2px 0px 2.2px rgba(0, 0, 0, 0.02), 0.5px 0px 5.3px rgba(0, 0, 0, 0.028), 0.9px 0px 10px rgba(0, 0, 0, 0.035), 1.6px 0px 17.9px rgba(0, 0, 0, 0.042), 2.9px 0px 33.4px rgba(0, 0, 0, 0.05), 7px 0px 80px rgba(0, 0, 0, 0.07)",
+        height: "600px",
+        maxWidth: "500px",
       }}
     >
       <Accordion items={items} />
@@ -106,12 +104,12 @@ OverflowingAllOpen.args = {
 
 export const UnderflowingSomeClosed = Template.bind({});
 UnderflowingSomeClosed.args = {
-  items: [{ size: 10 }, { size: 50, collapsed: true }, { size: 20, collapsed: true }],
+  items: [{ size: 10 }, { collapsed: true, size: 50 }, { collapsed: true, size: 20 }],
 };
 
 export const OverflowingSomeClosed = Template.bind({});
 OverflowingSomeClosed.args = {
-  items: [{ size: 10 }, { size: 50, collapsed: true }, { size: 20 }],
+  items: [{ size: 10 }, { collapsed: true, size: 50 }, { size: 20 }],
 };
 
 export const VeryDifferentLengths = Template.bind({});

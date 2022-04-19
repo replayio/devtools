@@ -1,6 +1,7 @@
-import React, { ReactNode, useEffect, useRef } from "react";
 import classNames from "classnames";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import AppContainerPortal from "../AppContainerPortal";
 
 export type AutocompleteMatchesOptions = {
@@ -58,7 +59,7 @@ export default function AutocompleteMatches({
 
   return (
     <AppContainerPortal>
-      <div className="absolute z-10 -translate-y-full transform" style={{ top, left }}>
+      <div className="absolute z-10 -translate-y-full transform" style={{ left, top }}>
         <div
           className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter text-menuColor bg-menuBgcolor py-1 font-mono shadow-sm"
           style={{

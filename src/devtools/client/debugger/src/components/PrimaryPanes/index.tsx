@@ -4,7 +4,10 @@
 
 //
 
+import { Accordion, AccordionPane } from "@recordreplay/accordion";
 import React from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { UIState } from "ui/state";
 
 import actions from "../../actions";
 import {
@@ -13,14 +16,11 @@ import {
   getContext,
   getSourcesCollapsed,
 } from "../../selectors";
-
-import Outline from "../SourceOutline/SourceOutline";
-import SourcesTree from "./SourcesTree";
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
-import QuickOpenButton from "./QuickOpenButton";
-import { Accordion, AccordionPane } from "@recordreplay/accordion";
 import { useDebuggerPrefs } from "../../utils/prefs";
+import Outline from "../SourceOutline/SourceOutline";
+
+import QuickOpenButton from "./QuickOpenButton";
+import SourcesTree from "./SourcesTree";
 
 function PrimaryPanes(props: PropsFromRedux) {
   const { value: outlineExpanded, update: updateOutlineExpanded } =
@@ -61,9 +61,9 @@ const mapStateToProps = (state: UIState) => {
 };
 
 const connector = connect(mapStateToProps, {
-  setPrimaryPaneTab: actions.setPrimaryPaneTab,
-  setActiveSearch: actions.setActiveSearch,
   closeActiveSearch: actions.closeActiveSearch,
+  setActiveSearch: actions.setActiveSearch,
+  setPrimaryPaneTab: actions.setPrimaryPaneTab,
   toggleSourcesCollapse: actions.toggleSourcesCollapse,
 });
 

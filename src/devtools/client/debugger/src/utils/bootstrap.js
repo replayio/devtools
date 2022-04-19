@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import * as search from "../workers/search";
-import { ParserDispatcher } from "../workers/parser";
-
 import * as selectors from "../selectors";
+import { ParserDispatcher } from "../workers/parser";
+import * as search from "../workers/search";
+
 import { asyncStore } from "./prefs";
 
 export let parser;

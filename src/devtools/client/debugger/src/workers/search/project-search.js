@@ -25,11 +25,11 @@ export function findSourceMatches(sourceId, content, queryText) {
   return getMatches(queryText, text, modifiers).map(({ line, ch }) => {
     const { value, matchIndex } = truncateLine(lines[line], ch);
     return {
-      sourceId,
-      line: line + 1,
       column: ch,
-      matchIndex,
+      line: line + 1,
       match: queryText,
+      matchIndex,
+      sourceId,
       value,
     };
   });

@@ -3,8 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
-const { span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
+const { span } = require("react-dom-factories");
 
 const { getGripType, wrapRender } = require("./rep-utils");
 

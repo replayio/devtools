@@ -1,9 +1,10 @@
+import * as Sentry from "@sentry/react";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
-import * as Sentry from "@sentry/react";
-import { skipTelemetry } from "./environment";
-import { Recording, ExperimentalUserSettings } from "ui/types";
 import { UserInfo } from "ui/hooks/users";
+import { Recording, ExperimentalUserSettings } from "ui/types";
+
+import { skipTelemetry } from "./environment";
 
 let setup = false;
 
@@ -45,9 +46,9 @@ export default {
     // only identify the session if there is a logged in user
     if (auth0User) {
       LogRocket.identify(auth0User.sub, {
-        name: auth0User.name,
         email: auth0User.email,
         id: auth0User.email,
+        name: auth0User.name,
       });
     }
   },

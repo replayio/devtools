@@ -1,8 +1,9 @@
 import uniq from "lodash/uniq";
 import React, { Dispatch, SetStateAction } from "react";
 import { useGetRecording } from "ui/hooks/recordings";
-import { getRecordingId } from "ui/utils/recording";
 import { OperationsData } from "ui/types";
+import { getRecordingId } from "ui/utils/recording";
+
 import ExternalLink from "../shared/ExternalLink";
 import MaterialIcon from "../shared/MaterialIcon";
 

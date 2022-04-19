@@ -3,12 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
-const { span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { wrapRender } = require("./rep-utils");
-const { MODE } = require("./constants");
-
 const { createPrimitiveValueFront } = require("protocol/thread");
+const { span } = require("react-dom-factories");
+
+const { MODE } = require("./constants");
+const { wrapRender } = require("./rep-utils");
 
 const ModePropType = PropTypes.oneOf(
   // @TODO Change this to Object.values when supported in Node's version of V8

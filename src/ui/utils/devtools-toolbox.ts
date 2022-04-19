@@ -1,13 +1,12 @@
+import { DebuggerPanel } from "devtools/client/debugger/panel";
+import Selection from "devtools/client/framework/selection";
+import { Inspector } from "devtools/client/inspector/inspector";
+import * as inspectorReducers from "devtools/client/inspector/reducers";
 import Highlighter from "highlighter/highlighter";
 import { ThreadFront } from "protocol/thread";
 import { defer, EventEmitter } from "protocol/utils";
 import { actions, UIStore } from "ui/actions";
 import { extendStore } from "ui/setup/store";
-import * as inspectorReducers from "devtools/client/inspector/reducers";
-
-import { DebuggerPanel } from "devtools/client/debugger/panel";
-import { Inspector } from "devtools/client/inspector/inspector";
-import Selection from "devtools/client/framework/selection";
 
 export type StartablePanelName = "debugger" | "inspector" | "react-components";
 

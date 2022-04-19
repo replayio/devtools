@@ -24,10 +24,12 @@ const ISSUE_TYPE = {
     FOCUSABLE_NO_SEMANTICS: "FOCUSABLE_NO_SEMANTICS",
     // Tab index greater than 0 is provided.
     FOCUSABLE_POSITIVE_TABINDEX: "FOCUSABLE_POSITIVE_TABINDEX",
-    // Interactive accesible objects do not have an associated action.
-    INTERACTIVE_NO_ACTION: "INTERACTIVE_NO_ACTION",
+
     // Interative accessible objcets are not focusable.
     INTERACTIVE_NOT_FOCUSABLE: "INTERACTIVE_NOT_FOCUSABLE",
+
+    // Interactive accesible objects do not have an associated action.
+    INTERACTIVE_NO_ACTION: "INTERACTIVE_NO_ACTION",
     // Accessible objects can only be interacted with a mouse.
     MOUSE_INTERACTIVE_ONLY: "MOUSE_INTERACTIVE_ONLY",
     // Focusable accessible objects have no focus styling.
@@ -89,20 +91,26 @@ const SCORES = {
 
 // List of simulation types.
 const SIMULATION_TYPE = {
-  // Low red color blindness
-  PROTANOMALY: "PROTANOMALY",
-  // Low green color blindness
-  DEUTERANOMALY: "DEUTERANOMALY",
-  // Low blue color blindness
-  TRITANOMALY: "TRITANOMALY",
-  // No red color blindness
-  PROTANOPIA: "PROTANOPIA",
-  // No green color blindness
-  DEUTERANOPIA: "DEUTERANOPIA",
-  // No blue color blindness
-  TRITANOPIA: "TRITANOPIA",
   // Low contrast
   CONTRAST_LOSS: "CONTRAST_LOSS",
+
+  // Low green color blindness
+  DEUTERANOMALY: "DEUTERANOMALY",
+
+  // No green color blindness
+  DEUTERANOPIA: "DEUTERANOPIA",
+
+  // Low red color blindness
+  PROTANOMALY: "PROTANOMALY",
+
+  // No red color blindness
+  PROTANOPIA: "PROTANOPIA",
+
+  // Low blue color blindness
+  TRITANOMALY: "TRITANOMALY",
+
+  // No blue color blindness
+  TRITANOPIA: "TRITANOPIA",
 };
 
 exports.accessibility = {

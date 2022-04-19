@@ -65,7 +65,7 @@ export default class Editor {
 
   setCursor({ line, ch }, align) {
     this.alignLine(line, align);
-    this.editor.setCursor({ line: line, ch: ch });
+    this.editor.setCursor({ ch: ch, line: line });
   }
 
   setMode(value) {
@@ -117,8 +117,8 @@ export default class Editor {
 
     let topLine =
       {
-        center: Math.max(line - halfVisible, 0),
         bottom: Math.max(line - linesVisible + offset, 0),
+        center: Math.max(line - halfVisible, 0),
         top: Math.max(line - offset, 0),
       }[align || "top"] || offset;
 
@@ -132,7 +132,7 @@ export default class Editor {
    * @memberof utils/source-editor
    */
   setFirstVisibleLine(line) {
-    const { top } = this.editor.charCoords({ line, ch: 0 }, "local");
+    const { top } = this.editor.charCoords({ ch: 0, line }, "local");
     this.editor.scrollTo(0, top);
   }
 }

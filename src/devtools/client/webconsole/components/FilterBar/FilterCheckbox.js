@@ -9,20 +9,20 @@ const dom = require("react-dom-factories");
 FilterCheckbox.displayName = "FilterCheckbox";
 
 FilterCheckbox.propTypes = {
-  label: PropTypes.string.isRequired,
-  title: PropTypes.string,
   checked: PropTypes.bool.isRequired,
+  label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  title: PropTypes.string,
 };
 
 function FilterCheckbox(props) {
   const { checked, label, title, onChange } = props;
   return dom.label(
-    { title, className: "filter-checkbox" },
+    { className: "filter-checkbox", title },
     dom.input({
-      type: "checkbox",
       checked,
       onChange,
+      type: "checkbox",
     }),
     label
   );

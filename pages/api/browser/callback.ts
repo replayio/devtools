@@ -26,10 +26,6 @@ async function fulfillAuthRequest(id: string, token: string) {
   }
 
   const resp = await fetch(api, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       query: `
         mutation FulfillAutRequest($secret: String!, $id: String!, $token: String!) {
@@ -39,11 +35,15 @@ async function fulfillAuthRequest(id: string, token: string) {
         }
       `,
       variables: {
-        secret,
         id,
+        secret,
         token,
       },
     }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
   });
 
   const json = await resp.json();
@@ -61,17 +61,17 @@ async function fulfillAuthRequest(id: string, token: string) {
 
 async function fetchToken(code: string, verifier: string): Promise<Token> {
   const resp = await fetch("https://webreplay.us.auth0.com/oauth/token", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
     body: JSON.stringify({
       audience: "https://api.replay.io",
-      grant_type: "authorization_code",
       client_id: "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo",
-      scope: "openid profile offline_access",
-      code_verifier: verifier,
       code,
+      code_verifier: verifier,
+      grant_type: "authorization_code",
       redirect_uri: getAppUrl("/api/browser/callback"),
+      scope: "openid profile offline_access",
     }),
+    headers: { "content-type": "application/json" },
+    method: "POST",
   });
 
   const token = await resp.json();

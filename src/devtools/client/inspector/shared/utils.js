@@ -180,9 +180,10 @@ function translateNodeFrontToGrip(nodeFront) {
       attributesLength: attributes.length,
       isAfterPseudoElement: nodeFront.isAfterPseudoElement,
       isBeforePseudoElement: nodeFront.isBeforePseudoElement,
-      isMarkerPseudoElement: nodeFront.isMarkerPseudoElement,
       // All the grid containers are assumed to be in the DOM tree.
       isConnected: true,
+
+      isMarkerPseudoElement: nodeFront.isMarkerPseudoElement,
       // nodeName is already lowerCased in Node grips
       nodeName: nodeFront.nodeName.toLowerCase(),
       nodeType: nodeFront.nodeType,

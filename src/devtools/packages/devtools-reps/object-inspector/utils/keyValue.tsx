@@ -1,7 +1,10 @@
 import { ValueFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { IItem, isValueLoaded, Item, LabelAndValue, ValueItem } from ".";
+
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+
+import { IItem, isValueLoaded, Item, LabelAndValue, ValueItem } from ".";
+
 const PropRep = require("../../reps/prop-rep");
 
 export class KeyValueItem implements IItem {
@@ -31,11 +34,11 @@ export class KeyValueItem implements IItem {
         <span>
           {PropRep({
             ...props,
+            equal: " \u2192 ",
             name: this.key,
             object: this.value,
-            equal: " \u2192 ",
-            title: null,
             suppressQuotes: false,
+            title: null,
           })}
         </span>
       ),
@@ -44,8 +47,8 @@ export class KeyValueItem implements IItem {
 
   getChildren(): Item[] {
     return [
-      new ValueItem({ parent: this, name: "<key>", contents: this.key }),
-      new ValueItem({ parent: this, name: "<value>", contents: this.value }),
+      new ValueItem({ contents: this.key, name: "<key>", parent: this }),
+      new ValueItem({ contents: this.value, name: "<value>", parent: this }),
     ];
   }
 

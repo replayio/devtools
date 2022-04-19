@@ -1,4 +1,5 @@
 import { Location } from "@recordreplay/protocol";
+
 import { Breakpoint } from "../../actions/breakpoints";
 import { PendingBreakpoint } from "../../reducers/types";
 

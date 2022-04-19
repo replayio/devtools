@@ -4,8 +4,8 @@
 
 "use strict";
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
@@ -22,8 +22,8 @@ class RulePreviewTooltip {
 
     // Initialize tooltip structure.
     this._tooltip = new HTMLTooltip(doc, {
-      type: "arrow",
       consumeOutsideClicks: true,
+      type: "arrow",
       useXulWrapper: true,
     });
 
@@ -39,7 +39,7 @@ class RulePreviewTooltip {
 
     this._tooltip.panel.innerHTML = "";
     this._tooltip.panel.appendChild(this.container);
-    this._tooltip.setContentSize({ width: "auto", height: "auto" });
+    this._tooltip.setContentSize({ height: "auto", width: "auto" });
   }
 
   /**

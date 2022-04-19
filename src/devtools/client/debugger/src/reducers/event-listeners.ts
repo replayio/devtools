@@ -4,9 +4,8 @@
 
 //
 
-import type { AnyAction } from "@reduxjs/toolkit";
 import { TimeStampedPoint } from "@recordreplay/protocol";
-
+import type { AnyAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
 import { prefs } from "../utils/prefs";
@@ -37,12 +36,12 @@ export function initialEventListenerState(): EventListenersState {
   return {
     active: [],
     categories: [],
-    expanded: [],
-    logEventBreakpoints: prefs.logEventBreakpoints as boolean,
     eventTypeCounts: {},
     eventTypePoints: {},
-    loadingInitialPoints: true,
+    expanded: [],
     loadingAdditionalCounts: true,
+    loadingInitialPoints: true,
+    logEventBreakpoints: prefs.logEventBreakpoints as boolean,
   };
 }
 
@@ -60,15 +59,15 @@ function update(state = initialEventListenerState(), action: AnyAction) {
     case "RECEIVE_EVENT_LISTENER_POINTS":
       return {
         ...state,
-        loadingInitialPoints: false,
         eventTypePoints: { ...state.eventTypePoints, ...action.eventTypePoints },
+        loadingInitialPoints: false,
       };
 
     case "RECEIVE_EVENT_LISTENER_COUNTS":
       return {
         ...state,
-        loadingAdditionalCounts: false,
         eventTypeCounts: { ...state.eventTypeCounts, ...action.eventTypeCounts },
+        loadingAdditionalCounts: false,
       };
 
     case "UPDATE_EVENT_LISTENER_EXPANDED":

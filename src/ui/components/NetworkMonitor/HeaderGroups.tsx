@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import styles from "./RequestTable.module.css";
 import classNames from "classnames";
+import React, { useState } from "react";
 import { Column, HeaderGroup } from "react-table";
-import { RequestSummary } from "./utils";
+
 import { ContextMenu } from "../ContextMenu";
+
 import ColumnsDropdown from "./ColumnsDropdown";
+import styles from "./RequestTable.module.css";
+import { RequestSummary } from "./utils";
 
 interface MenuLocation {
   x: number;

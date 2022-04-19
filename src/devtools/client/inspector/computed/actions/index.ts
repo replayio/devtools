@@ -1,10 +1,11 @@
 import { Action, ThunkAction } from "@reduxjs/toolkit";
+import { ThunkExtraArgs } from "ui/utils/thunk";
+
+import CSSProperties from "../../css-properties";
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
-import CSSProperties from "../../css-properties";
-
-import { ThunkExtraArgs } from "ui/utils/thunk";
 import { InspectorState } from "../state";
+
 const { OutputParser } = require("devtools/client/shared/output-parser");
 
 type SetComputedPropertiesAction = Action<"set_computed_properties"> & {
@@ -32,23 +33,23 @@ export type InspectorThunkAction<TReturn = void> = ThunkAction<
 export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
   return async dispatch => {
     const properties = await createComputedProperties(elementStyle);
-    return dispatch({ type: "set_computed_properties", properties });
+    return dispatch({ properties, type: "set_computed_properties" });
   };
 }
 
 export function setComputedPropertySearch(search: string): SetComputedPropertySearchAction {
-  return { type: "set_computed_property_search", search };
+  return { search, type: "set_computed_property_search" };
 }
 
 export function setShowBrowserStyles(show: boolean): SetShowBrowserStylesAction {
-  return { type: "set_show_browser_styles", show };
+  return { show, type: "set_show_browser_styles" };
 }
 
 export function setComputedPropertyExpanded(
   property: string,
   expanded: boolean
 ): SetComputedPropertyExpandedAction {
-  return { type: "set_computed_property_expanded", property, expanded };
+  return { expanded, property, type: "set_computed_property_expanded" };
 }
 
 async function createComputedProperties(
@@ -106,12 +107,12 @@ async function createComputedProperties(
           if (property.name === name) {
             const parsedValue = outputParser.parseCssProperty(name, property.value);
             selectors.push({
-              value: property.value,
+              overridden: !!property.overridden,
               parsedValue,
               selector,
               stylesheet,
               stylesheetURL,
-              overridden: !!property.overridden,
+              value: property.value,
             });
           }
         }
@@ -122,9 +123,9 @@ async function createComputedProperties(
 
     properties.push({
       name,
-      value,
       parsedValue,
       selectors,
+      value,
     });
   }
 

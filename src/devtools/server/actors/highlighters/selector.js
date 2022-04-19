@@ -4,8 +4,8 @@
 
 "use strict";
 
-const { isNodeValid } = require("devtools/server/actors/highlighters/utils/markup");
 const { BoxModelHighlighter } = require("devtools/server/actors/highlighters/box-model");
+const { isNodeValid } = require("devtools/server/actors/highlighters/utils/markup");
 
 // How many maximum nodes can be highlighted at the same time by the
 // SelectorHighlighter
@@ -22,7 +22,17 @@ function SelectorHighlighter(highlighterEnv) {
 }
 
 SelectorHighlighter.prototype = {
-  typeName: "SelectorHighlighter",
+  destroy: function () {
+    this.hide();
+    this.highlighterEnv = null;
+  },
+
+  hide: function () {
+    for (const highlighter of this._highlighters) {
+      highlighter.destroy();
+    }
+    this._highlighters = [];
+  },
 
   /**
    * Show BoxModelHighlighter on each node that matches that provided selector.
@@ -68,16 +78,6 @@ SelectorHighlighter.prototype = {
     return true;
   },
 
-  hide: function () {
-    for (const highlighter of this._highlighters) {
-      highlighter.destroy();
-    }
-    this._highlighters = [];
-  },
-
-  destroy: function () {
-    this.hide();
-    this.highlighterEnv = null;
-  },
+  typeName: "SelectorHighlighter",
 };
 exports.SelectorHighlighter = SelectorHighlighter;

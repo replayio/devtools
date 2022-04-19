@@ -84,40 +84,40 @@ class AccessibleHighlighter extends AutoRefreshHighlighter {
   _buildMarkup() {
     const container = createNode(this.win, {
       attributes: {
-        class: "highlighter-container",
         "aria-hidden": "true",
+        class: "highlighter-container",
       },
     });
 
     const root = createNode(this.win, {
-      parent: container,
       attributes: {
-        id: "root",
         class: "root",
+        id: "root",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Build the SVG element.
     const svg = createSVGNode(this.win, {
-      nodeType: "svg",
-      parent: root,
       attributes: {
-        id: "elements",
-        width: "100%",
         height: "100%",
         hidden: "true",
+        id: "elements",
+        width: "100%",
       },
+      nodeType: "svg",
+      parent: root,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     createSVGNode(this.win, {
-      nodeType: "path",
-      parent: svg,
       attributes: {
         class: "bounds",
         id: "bounds",
       },
+      nodeType: "path",
+      parent: svg,
       prefix: this.ID_CLASS_PREFIX,
     });
 

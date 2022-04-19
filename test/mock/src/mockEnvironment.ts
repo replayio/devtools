@@ -47,19 +47,19 @@ export function doInstall(options: MockOptionsJSON) {
       InternalError: { code: 1, message: "Internal error" },
       MissingDescription: { code: 28, message: "No description added for recording" },
     },
-    makeResult(result: any) {
-      return { result };
-    },
-    makeError(error: Error) {
-      return { error };
-    },
+    bindings: options.bindings,
     emitEvent(method: string, params: any) {
       setImmediate(() => {
         const event = { method, params };
         receiveMessageCallback({ data: JSON.stringify(event) });
       });
     },
-    bindings: options.bindings,
+    makeError(error: Error) {
+      return { error };
+    },
+    makeResult(result: any) {
+      return { result };
+    },
   };
 
   const messageHandlers: Record<string, MockHandler> = {};
@@ -76,9 +76,6 @@ export function doInstall(options: MockOptionsJSON) {
 
   window.mockEnvironment = {
     graphqlMocks: options.graphqlMocks,
-    setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
-      receiveMessageCallback = callback;
-    },
     sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
       if (!messageHandlers[msg.method]) {
@@ -108,19 +105,22 @@ export function doInstall(options: MockOptionsJSON) {
             console.error(`Mock message handler error ${e}`);
             error = helpers.Errors.InternalError;
           }
-          const response = { id: msg.id, error };
+          const response = { error, id: msg.id };
           setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
         }
       );
+    },
+    setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
+      receiveMessageCallback = callback;
     },
   };
 }
 
 export async function installMockEnvironment(page: Page, options: MockOptions) {
   const optionsJSON: MockOptionsJSON = {
+    bindings: options.bindings,
     graphqlMocks: options.graphqlMocks,
     messageHandlers: {},
-    bindings: options.bindings,
   };
   for (const name of Object.keys(options.messageHandlers)) {
     optionsJSON.messageHandlers[name] = options.messageHandlers[name].toString();

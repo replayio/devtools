@@ -7,17 +7,19 @@
 // messages associated with the logpoint atomically.
 
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
-import { assert, compareNumericStrings } from "./utils";
-import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
-import { PrimitiveValue } from "./thread/value";
-import { logpointGetFrameworkEventListeners } from "./event-listeners";
-import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
-import { getAnalysisPointsForLocation } from "ui/reducers/app";
-import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { onConsoleOverflow } from "ui/actions/session";
+import { getAnalysisPointsForLocation } from "ui/reducers/app";
 import { ProtocolError } from "ui/state/app";
+
+import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import { logpointGetFrameworkEventListeners } from "./event-listeners";
+import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
+import { PrimitiveValue } from "./thread/value";
+import { assert, compareNumericStrings } from "./utils";
+
 const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.
@@ -227,7 +229,7 @@ export async function setLogpoint(
   await ThreadFront.ensureAllSources();
   const sourceIds = ThreadFront.getCorrespondingSourceIds(location.sourceId);
   const { line, column } = location;
-  const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
+  const locations = sourceIds.map(sourceId => ({ column, line, sourceId }));
   setMultiSourceLogpoint(logGroupId, locations, text, condition, showInConsole);
 }
 
@@ -255,13 +257,13 @@ async function setMultiSourceLogpoint(
     locations.map(({ sourceId }) => ThreadFront.getBreakpointPositionsCompressed(sourceId))
   );
 
-  const mapper = formatLogpoint({ text, condition });
+  const mapper = formatLogpoint({ condition, text });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
-    mapper,
     effectful: true,
     locations: locations.map(location => ({ location })),
+    mapper,
+    sessionId,
   };
   const points: PointDescription[] = [];
   const results: AnalysisEntry[] = [];
@@ -358,7 +360,7 @@ export function setLogpointByURL(
   if (sourceIds.length === 0) {
     return;
   }
-  const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
+  const locations = sourceIds.map(sourceId => ({ column, line, sourceId }));
   setMultiSourceLogpoint(logGroupId, locations, text, condition, showInConsole);
 }
 
@@ -373,10 +375,10 @@ export async function fetchEventTypePoints(eventTypes: EventId[]) {
       const collectedPoints: PointDescription[] = [];
       await analysisManager.runAnalysis(
         {
-          sessionId,
-          mapper: `return [{ key: input.point, value: input }];`,
           effectful: false,
           eventHandlerEntryPoints: [{ eventType }],
+          mapper: `return [{ key: input.point, value: input }];`,
+          sessionId,
         },
         {
           onAnalysisPoints: points => collectedPoints.push(...points),
@@ -457,10 +459,10 @@ export async function setEventLogpoint(
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
-    mapper,
     effectful: true,
     eventHandlerEntryPoints: eventTypes.map(eventType => ({ eventType })),
+    mapper,
+    sessionId,
   };
   const handler: AnalysisHandler<void> = {
     onAnalysisResult: result => showLogpointsResult(logGroupId, result),
@@ -494,10 +496,10 @@ async function findFrameworkListeners(
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
-    mapper,
     effectful: true,
     locations: locations.map(location => ({ location, onStackFrame: point })),
+    mapper,
+    sessionId,
   };
   const handler: AnalysisHandler<void> = {
     onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),
@@ -523,10 +525,10 @@ export async function setExceptionLogpoint(logGroupId: string) {
 
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
-    mapper,
     effectful: true,
     exceptionPoints: true,
+    mapper,
+    sessionId,
   };
   const handler: AnalysisHandler<void> = {
     onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),

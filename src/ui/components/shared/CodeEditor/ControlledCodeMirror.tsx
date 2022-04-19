@@ -28,19 +28,19 @@ const ControlledCodeMirror: FC<{
 }> = ({ value, onKeyPress, setValue, onSelection, onEditorMount, options = DEFAULT_OPTIONS }) => {
   const codemirrorOptions = {
     autofocus: options.autofocus,
+    disableSearchAddon: true,
     enableCodeFolding: false,
     lineNumbers: false,
     lineWrapping: true,
     mode: {
-      name: "javascript",
       globalVars: true,
+      name: "javascript",
     },
-    theme: "mozilla",
+    readOnly: false,
     styleActiveLine: false,
     tabIndex: "0",
-    readOnly: false,
+    theme: "mozilla",
     viewportMargin: Infinity,
-    disableSearchAddon: true,
   } as const;
 
   const onKeyPressRef = useRef(onKeyPress);

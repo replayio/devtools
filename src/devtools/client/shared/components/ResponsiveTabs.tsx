@@ -128,8 +128,8 @@ export const ResponsiveTabs = ({
             key={tab.key}
             ref={ref => (tabsRef.current[indicesOrder[idx]] = ref!)}
             style={{
-              pointerEvents: idx < visibleItemsCount ? "auto" : "none",
               opacity: idx < visibleItemsCount ? 1 : 0,
+              pointerEvents: idx < visibleItemsCount ? "auto" : "none",
             }}
           >
             {tab}

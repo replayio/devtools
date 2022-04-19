@@ -3,21 +3,21 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { Component, createRef } from "react";
-import { connect } from "../../utils/connect";
-import actions from "../../actions";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
+import { trackEvent } from "ui/utils/telemetry";
 
-import { getEditor } from "../../utils/editor";
+import actions from "../../actions";
 import {
   getContext,
   getSources,
   getFullTextSearchQuery,
   getFullTextSearchFocus,
 } from "../../selectors";
+import { connect } from "../../utils/connect";
+import { getEditor } from "../../utils/editor";
 
-import { trackEvent } from "ui/utils/telemetry";
 import { FullTextFilter } from "./FullTextFilter";
 import { FullTextResults } from "./FullTextResults";
-import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { search } from "./search";
 
 function sanitizeQuery(query) {
@@ -29,10 +29,10 @@ export class FullTextSearch extends Component {
   state = {
     focusedItem: null,
     results: {
-      status: "DONE",
-      query: "",
-      matchesBySource: [],
       includeNodeModules: true,
+      matchesBySource: [],
+      query: "",
+      status: "DONE",
     },
   };
 
@@ -45,9 +45,9 @@ export class FullTextSearch extends Component {
     trackEvent("project_search.select");
 
     selectSpecificLocation(cx, {
-      sourceId: matchItem.sourceId,
-      line: matchItem.line,
       column: matchItem.column,
+      line: matchItem.line,
+      sourceId: matchItem.sourceId,
     });
 
     setTimeout(
@@ -140,14 +140,14 @@ export class FullTextSearch extends Component {
 
 const mapStateToProps = state => ({
   cx: getContext(state),
-  sourcesById: getSources(state).values,
-  query: getFullTextSearchQuery(state),
   focused: getFullTextSearchFocus(state),
+  query: getFullTextSearchQuery(state),
+  sourcesById: getSources(state).values,
 });
 
 export default connect(mapStateToProps, {
-  focusFullTextInput: actions.focusFullTextInput,
-  setFullTextQuery: actions.setFullTextQuery,
-  selectSpecificLocation: actions.selectSpecificLocation,
   doSearchForHighlight: actions.doSearchForHighlight,
+  focusFullTextInput: actions.focusFullTextInput,
+  selectSpecificLocation: actions.selectSpecificLocation,
+  setFullTextQuery: actions.setFullTextQuery,
 })(FullTextSearch);

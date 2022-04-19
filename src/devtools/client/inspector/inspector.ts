@@ -4,20 +4,18 @@
 
 // "use strict";
 
+import BoxModel from "devtools/client/inspector/boxmodel/box-model";
+import MarkupView from "devtools/client/inspector/markup/markup";
+import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
 import EventEmitter from "devtools/shared/event-emitter";
+import Highlighter from "highlighter/highlighter";
 import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
-
-import MarkupView from "devtools/client/inspector/markup/markup";
-import BoxModel from "devtools/client/inspector/boxmodel/box-model";
-import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
+import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
 import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
-
-import Highlighter from "highlighter/highlighter";
-import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
 type InspectorEvent =
   | "ready" // Fired when the inspector panel is opened for the first time and ready to use
@@ -126,8 +124,8 @@ export class Inspector {
     assert(this.selection, "selection object not found");
 
     return {
-      setSelectedNode: this.selection.setNodeFront,
       onShowBoxModelHighlighterForNode: this.onShowBoxModelHighlighterForNode,
+      setSelectedNode: this.selection.setNodeFront,
     };
   }
 

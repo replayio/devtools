@@ -1,15 +1,16 @@
 import React from "react";
 import { useGetUserInfo } from "ui/hooks/users";
 import { Workspace } from "ui/types";
+
 import Invitations from "./Invitations";
+import styles from "./Library.module.css";
 import NewTeamButton from "./NewTeamButton";
 import SidebarFooter from "./SidebarFooter";
 import TeamButton from "./TeamButton";
-import styles from "./Library.module.css";
 
 export default function Sidebar({ nonPendingWorkspaces }: { nonPendingWorkspaces: Workspace[] }) {
   const { features } = useGetUserInfo();
-  const userLibrary = { id: null, name: "Your Library", members: [] };
+  const userLibrary = { id: null, members: [], name: "Your Library" };
 
   // This corresponds with tailwind colors: thumb is gray-500 and track is gray-800
   const scrollbarStyle = { scrollbarColor: "#6B7280 #1F2937" };

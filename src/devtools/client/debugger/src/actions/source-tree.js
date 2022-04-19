@@ -4,9 +4,9 @@
 //
 
 export function setExpandedState(expanded) {
-  return { type: "SET_EXPANDED_STATE", expanded };
+  return { expanded, type: "SET_EXPANDED_STATE" };
 }
 
 export function focusItem(item) {
-  return { type: "SET_FOCUSED_SOURCE_ITEM", item };
+  return { item, type: "SET_FOCUSED_SOURCE_ITEM" };
 }

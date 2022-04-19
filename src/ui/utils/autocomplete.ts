@@ -1,3 +1,4 @@
+import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import {
   isIdentifier as _isIdentifier,
@@ -8,11 +9,10 @@ import {
   Identifier,
   CallExpression,
 } from "@babel/types";
-import generate from "@babel/generator";
-import { ValueFront } from "protocol/thread";
-import { WiredObject } from "protocol/thread/pause";
 import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/utils";
 import { filter } from "fuzzaldrin-plus";
+import { ValueFront } from "protocol/thread";
+import { WiredObject } from "protocol/thread/pause";
 
 type PropertyExpression = {
   left: string;
@@ -207,9 +207,9 @@ export function getPropertyExpression(str: string): PropertyExpression | null {
     }
 
     return {
+      computed: false,
       left: generate(parsed.object).code,
       right: parsed.property.name.slice(0, -PROPERTY_PLACEHOLDER.length),
-      computed: false,
     };
   } else if (isBracketNotation(str)) {
     const placeholderStr = tryToAutocompleteComputedProperty(str);
@@ -224,9 +224,9 @@ export function getPropertyExpression(str: string): PropertyExpression | null {
     }
 
     return {
+      computed: true,
       left: generate(parsed.object).code,
       right: getPropertyValue(parsed.property),
-      computed: true,
     };
   }
 

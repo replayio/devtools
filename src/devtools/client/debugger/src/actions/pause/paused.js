@@ -3,12 +3,13 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
+import { trackEvent } from "ui/utils/telemetry";
 
+import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
 import { selectLocation } from "../sources";
+
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
-import { trackEvent } from "ui/utils/telemetry";
 
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;
@@ -19,7 +20,7 @@ export function fetchFrames(cx) {
     try {
       frames = await client.getFrames();
     } catch (e) {}
-    dispatch({ type: "FETCHED_FRAMES", frames, cx });
+    dispatch({ cx, frames, type: "FETCHED_FRAMES" });
   };
 }
 
@@ -35,7 +36,7 @@ function fetchAsyncFrames(cx) {
       if (!asyncFrames.length) {
         break;
       }
-      dispatch({ type: "ADD_ASYNC_FRAMES", asyncFrames, cx });
+      dispatch({ asyncFrames, cx, type: "ADD_ASYNC_FRAMES" });
     }
   };
 }
@@ -49,7 +50,7 @@ function fetchAsyncFrames(cx) {
  */
 export function paused({ executionPoint, time }) {
   return async function (dispatch, getState) {
-    dispatch({ type: "PAUSED", executionPoint, time });
+    dispatch({ executionPoint, time, type: "PAUSED" });
     trackEvent("paused");
 
     // Get a context capturing the newly paused and selected thread.

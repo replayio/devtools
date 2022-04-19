@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setShowVideoPanel } from "ui/actions/layout";
 import { getShowVideoPanel } from "ui/reducers/layout";
+
 import Icon from "../shared/Icon";
 
 export const ToolboxButton: FC<{ title?: string; onClick?: () => void }> = ({

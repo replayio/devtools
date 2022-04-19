@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import hooks from "ui/hooks";
-import { PendingWorkspaceInvitation } from "ui/types";
-import { PrimaryButton, SecondaryButton } from "../shared/Button";
-
 import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
 import * as actions from "ui/actions/app";
+import hooks from "ui/hooks";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
+import { PendingWorkspaceInvitation } from "ui/types";
+
+import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import { useConfirm } from "../shared/Confirm";
 
 type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
@@ -27,8 +27,8 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
   };
   const handleDecline = () => {
     confirmDestructive({
-      message: "Are you sure you want to decline this invitation?",
       acceptLabel: "Decline invitation",
+      message: "Are you sure you want to decline this invitation?",
     }).then(confirmed => {
       if (confirmed) {
         declinePendingInvitation({ variables: { workspaceId: id } });

@@ -5,13 +5,13 @@
 "use strict";
 
 import React from "react";
-const { connect } = require("react-redux");
 
+const { FILTERS } = require("devtools/client/webconsole/constants");
+const { connect } = require("react-redux");
 const { actions } = require("ui/actions");
 const { selectors } = require("ui/reducers");
 const { trackEvent } = require("ui/utils/telemetry");
 
-const { FILTERS } = require("devtools/client/webconsole/constants");
 const { ToggleRow } = require("./ConsoleSettings");
 
 export function CountPill({ children }) {
@@ -97,8 +97,8 @@ function FilterSettings({
 
 export default connect(
   state => ({
-    filters: selectors.getAllFilters(state),
     filteredMessagesCount: selectors.getFilteredMessagesCount(state),
+    filters: selectors.getAllFilters(state),
     shouldLogExceptions: selectors.getShouldLogExceptions(state),
   }),
   {

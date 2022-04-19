@@ -1,12 +1,13 @@
 import React, { Dispatch, ReactNode, SetStateAction, useState } from "react";
-import PortalDropdown from "../PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
+import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { Recording, Workspace } from "ui/types";
-import hooks from "ui/hooks";
-import MaterialIcon from "../MaterialIcon";
-import { trackEvent } from "ui/utils/telemetry";
 import { isPublicDisabled } from "ui/utils/org";
+import { trackEvent } from "ui/utils/telemetry";
+
+import MaterialIcon from "../MaterialIcon";
+import PortalDropdown from "../PortalDropdown";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>

@@ -1,4 +1,5 @@
 import { UIThunkAction } from "ui/actions";
+
 import { PendingBreakpoint } from "../../reducers/types";
 
 export interface Context {

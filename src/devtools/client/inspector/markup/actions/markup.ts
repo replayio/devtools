@@ -1,20 +1,22 @@
-import { Action } from "redux";
-import { assert, defer, Deferred } from "protocol/utils";
+import Selection, { SelectionReason } from "devtools/client/framework/selection";
+import Highlighter from "highlighter/highlighter";
 import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
-import Selection, { SelectionReason } from "devtools/client/framework/selection";
-import { NodeInfo } from "../state/markup";
+import { assert, defer, Deferred } from "protocol/utils";
+import { Action } from "redux";
 import { UIThunkAction } from "ui/actions";
+import { UIState } from "ui/state";
+
 import {
   getNodeInfo,
   getParentNodeId,
   getSelectedNodeId,
   isNodeExpanded,
 } from "../selectors/markup";
-import { UIState } from "ui/state";
-import Highlighter from "highlighter/highlighter";
-const { DOCUMENT_TYPE_NODE, TEXT_NODE } = require("devtools/shared/dom-node-constants");
+import { NodeInfo } from "../state/markup";
+
 const { features } = require("devtools/client/inspector/prefs");
+const { DOCUMENT_TYPE_NODE, TEXT_NODE } = require("devtools/shared/dom-node-constants");
 
 export type ResetAction = Action<"RESET">;
 export type NewRootAction = Action<"NEW_ROOT"> & { rootNode: NodeInfo };
@@ -76,8 +78,8 @@ export function newRoot(): UIThunkAction {
       return;
     }
     dispatch({
-      type: "NEW_ROOT",
       rootNode,
+      type: "NEW_ROOT",
     });
     if (rootNodeWaiter) {
       rootNodeWaiter.resolve();
@@ -103,9 +105,9 @@ export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): U
     }
 
     dispatch({
-      type: "ADD_CHILDREN",
-      parentNodeId: parentFront.objectId(),
       children,
+      parentNodeId: parentFront.objectId(),
+      type: "ADD_CHILDREN",
     });
   };
 }
@@ -116,9 +118,9 @@ export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): U
  */
 export function updateNodeExpanded(nodeId: string, isExpanded: boolean): UpdateNodeExpandedAction {
   return {
-    type: "UPDATE_NODE_EXPANDED",
-    nodeId,
     isExpanded,
+    nodeId,
+    type: "UPDATE_NODE_EXPANDED",
   };
 }
 
@@ -127,9 +129,9 @@ export function updateChildrenLoading(
   isLoadingChildren: boolean
 ): UpdateChildrenLoadingAction {
   return {
-    type: "UPDATE_CHILDREN_LOADING",
-    nodeId,
     isLoadingChildren,
+    nodeId,
+    type: "UPDATE_CHILDREN_LOADING",
   };
 }
 
@@ -138,8 +140,8 @@ export function updateChildrenLoading(
  */
 export function updateSelectedNode(selectedNode: string | null): UpdateSelectedNodeAction {
   return {
-    type: "UPDATE_SELECTED_NODE",
     selectedNode,
+    type: "UPDATE_SELECTED_NODE",
   };
 }
 
@@ -148,8 +150,8 @@ export function updateSelectedNode(selectedNode: string | null): UpdateSelectedN
  */
 export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoViewNodeAction {
   return {
-    type: "UPDATE_SCROLL_INTO_VIEW_NODE",
     scrollIntoViewNode,
+    type: "UPDATE_SCROLL_INTO_VIEW_NODE",
   };
 }
 
@@ -436,6 +438,7 @@ async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promis
     isDisplayed: await node.isDisplayed(),
     isExpanded,
     isInlineTextChild: !!node.inlineTextChild,
+    isLoadingChildren: false,
     isScrollable: node.isScrollable,
     namespaceURI: node.namespaceURI,
     parentNodeId: parentNode?.objectId(),
@@ -443,6 +446,5 @@ async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promis
     tagName: node.tagName,
     type: node.nodeType,
     value: node.getNodeValue(),
-    isLoadingChildren: false,
   };
 }

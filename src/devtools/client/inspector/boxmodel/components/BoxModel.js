@@ -4,15 +4,13 @@
 
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-
 const BoxModelInfo = require("devtools/client/inspector/boxmodel/components/BoxModelInfo");
 const BoxModelMain = require("devtools/client/inspector/boxmodel/components/BoxModelMain");
 const BoxModelProperties = require("devtools/client/inspector/boxmodel/components/BoxModelProperties");
-
 const Types = require("devtools/client/inspector/boxmodel/types");
+const PropTypes = require("prop-types");
+const React = require("react");
+const dom = require("react-dom-factories");
 
 class BoxModel extends React.PureComponent {
   static get propTypes() {
@@ -23,8 +21,8 @@ class BoxModel extends React.PureComponent {
       onShowBoxModelHighlighter: PropTypes.func.isRequired,
       onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
       onShowRulePreviewTooltip: PropTypes.func.isRequired,
-      showBoxModelProperties: PropTypes.bool.isRequired,
       setSelectedNode: PropTypes.func.isRequired,
+      showBoxModelProperties: PropTypes.bool.isRequired,
     };
   }
 
@@ -56,22 +54,22 @@ class BoxModel extends React.PureComponent {
     return dom.div(
       {
         className: "boxmodel-container",
-        tabIndex: 0,
+        onKeyDown: this.onKeyDown,
         ref: div => {
           this.boxModelContainer = div;
         },
-        onKeyDown: this.onKeyDown,
+        tabIndex: 0,
       },
       React.createElement(BoxModelMain, {
         boxModel,
         boxModelContainer: this.boxModelContainer,
-        ref: boxModelMain => {
-          this.boxModelMain = boxModelMain;
-        },
         onHideBoxModelHighlighter,
         onShowBoxModelEditor,
         onShowBoxModelHighlighter,
         onShowRulePreviewTooltip,
+        ref: boxModelMain => {
+          this.boxModelMain = boxModelMain;
+        },
       }),
       React.createElement(BoxModelInfo, {
         boxModel,
@@ -79,9 +77,9 @@ class BoxModel extends React.PureComponent {
       showBoxModelProperties
         ? React.createElement(BoxModelProperties, {
             boxModel,
-            setSelectedNode,
             onHideBoxModelHighlighter,
             onShowBoxModelHighlighterForNode,
+            setSelectedNode,
           })
         : null
     );

@@ -1,5 +1,5 @@
-import { Component } from "react";
 import { DebuggerLocation } from "devtools/client/webconsole/actions";
+import { Component } from "react";
 
 export interface SmartTraceStackFrame {
   filename: string;

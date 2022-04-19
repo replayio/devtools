@@ -4,8 +4,9 @@
 
 //
 
-import { parse } from "../url";
 import { getUnicodeHostname, getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
+
+import { parse } from "../url";
 
 export function getFilenameFromURL(url) {
   const { pathname } = parse(url);
@@ -26,7 +27,7 @@ export function getFilenameFromPath(pathname) {
 }
 
 const NoDomain = "(no domain)";
-const def = { path: "", group: "", filename: "" };
+const def = { filename: "", group: "", path: "" };
 
 export function getURL(source, defaultDomain = "") {
   const { url } = source;
@@ -46,35 +47,35 @@ export function getURL(source, defaultDomain = "") {
     case "resource:":
       return {
         ...def,
-        path: pathname,
         filename,
         group: `${protocol}//${host || ""}`,
+        path: pathname,
       };
 
     case "webpack:":
     case "ng:":
       return {
         ...def,
-        path: pathname,
         filename,
         group: `${protocol}//`,
+        path: pathname,
       };
 
     case "about:":
       // An about page is a special case
       return {
         ...def,
-        path: "/",
         filename,
         group: url,
+        path: "/",
       };
 
     case "data:":
       return {
         ...def,
-        path: "/",
-        group: NoDomain,
         filename: url,
+        group: NoDomain,
+        path: "/",
       };
 
     case "":
@@ -82,16 +83,16 @@ export function getURL(source, defaultDomain = "") {
         // use file protocol for a URL like "/foo/bar.js"
         return {
           ...def,
-          path: pathname,
           filename,
           group: "file://",
+          path: pathname,
         };
       } else if (!host) {
         return {
           ...def,
-          path: url,
-          group: defaultDomain || "",
           filename,
+          group: defaultDomain || "",
+          path: url,
         };
       }
       break;
@@ -100,16 +101,16 @@ export function getURL(source, defaultDomain = "") {
     case "https:":
       return {
         ...def,
-        path: pathname,
         filename,
         group: getUnicodeHostname(host),
+        path: pathname,
       };
   }
 
   return {
     ...def,
-    path: pathname,
-    group: protocol ? `${protocol}//` : "",
     filename,
+    group: protocol ? `${protocol}//` : "",
+    path: pathname,
   };
 }

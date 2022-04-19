@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { HTMLProps } from "react";
+
 import MaterialIcon from "./MaterialIcon";
 
 export default function Modal({
@@ -33,8 +34,8 @@ export default function Modal({
     >
       <div
         className={classNames("absolute h-full w-full bg-black", {
-          "opacity-10": maskTransparency === "translucent",
           "opacity-0": maskTransparency === "transparent",
+          "opacity-10": maskTransparency === "translucent",
         })}
         onClick={onMaskClick}
       />

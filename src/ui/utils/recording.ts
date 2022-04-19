@@ -1,6 +1,8 @@
 import slugify from "slugify";
 import { Recording } from "ui/types";
+
 import { usesWindow } from "../../ssr";
+
 import { extractIdAndSlug, SLUG_SEPARATOR } from "./helpers";
 
 const WARNING_MS = 60 * 2 * 1000;

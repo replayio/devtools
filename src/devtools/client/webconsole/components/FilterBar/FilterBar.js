@@ -7,9 +7,9 @@
 import React from "react";
 
 // Constants
-import FilterSearchBox from "./FilterSearchBox";
 import ClearButton from "./ClearButton";
 import { FilterDrawerToggle } from "./FilterDrawerToggle";
+import FilterSearchBox from "./FilterSearchBox";
 
 function FilterBar() {
   return (

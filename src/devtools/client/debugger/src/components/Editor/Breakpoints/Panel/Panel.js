@@ -2,21 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { useEffect, useRef, useState } from "react";
 import classnames from "classnames";
-import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
-import Widget from "./Widget";
-import { connect } from "react-redux";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import PanelSummary from "./PanelSummary";
-import FirstEditNag from "./FirstEditNag";
+import React, { useEffect, useRef, useState } from "react";
+import { connect } from "react-redux";
+import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { selectors } from "ui/reducers";
 import { prefs } from "ui/utils/prefs";
+
+import FirstEditNag from "./FirstEditNag";
+import PanelEditor from "./PanelEditor";
+import PanelSummary from "./PanelSummary";
+import Widget from "./Widget";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -119,7 +120,7 @@ function Panel({
               toggleEditingOn={toggleEditingOn}
             />
           )}
-          <BreakpointNavigation {...{ breakpoint, editing, showCondition, setShowCondition }} />
+          <BreakpointNavigation {...{ breakpoint, editing, setShowCondition, showCondition }} />
         </div>
       </div>
     </Widget>
@@ -137,7 +138,7 @@ export default connect(
     executionPoint: getExecutionPoint(state),
   }),
   {
-    setHoveredItem: actions.setHoveredItem,
     clearHoveredItem: actions.clearHoveredItem,
+    setHoveredItem: actions.setHoveredItem,
   }
 )(Panel);

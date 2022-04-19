@@ -1,5 +1,6 @@
 import React from "react";
 import { Subscription } from "ui/types";
+
 import { formatDate } from "./formatDate";
 import { isTrial } from "./utils";
 

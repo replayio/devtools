@@ -1,6 +1,7 @@
 import { FrameworkEventListener } from "protocol/event-listeners";
 import { NodeFront, WiredEventListener } from "protocol/thread/node";
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
 

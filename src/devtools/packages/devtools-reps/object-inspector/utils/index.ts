@@ -1,11 +1,14 @@
-import { ValueItem } from "./value";
-import { KeyValueItem } from "./keyValue";
+import { Pause, ValueFront } from "protocol/thread";
+
 import { MODE } from "../../reps/constants";
-import { LoadingItem } from "./loading";
+import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+
 import { ContainerItem } from "./container";
 import { GetterItem } from "./getter";
-import { Pause, ValueFront } from "protocol/thread";
-import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+import { KeyValueItem } from "./keyValue";
+import { LoadingItem } from "./loading";
+import { ValueItem } from "./value";
+
 const {
   REPS: { Rep, Grip },
 } = require("../../reps/rep");

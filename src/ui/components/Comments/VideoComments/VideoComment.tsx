@@ -1,10 +1,10 @@
-import React from "react";
-import { selectors } from "ui/reducers";
-import classnames from "classnames";
-import { actions } from "ui/actions";
-import { UIState } from "ui/state";
-import { connect, ConnectedProps } from "react-redux";
 import { ChatAltIcon } from "@heroicons/react/solid";
+import classnames from "classnames";
+import React from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
 
 const MARKER_DIAMETER = 28;
 const MARKER_RADIUS = 14;
@@ -29,13 +29,13 @@ function VideoComment({
     <div
       className={`canvas-comment`}
       style={{
-        top: position.y * scale - MARKER_RADIUS,
         left: position.x * scale - MARKER_RADIUS,
+        top: position.y * scale - MARKER_RADIUS,
       }}
     >
       <div
         className="flex items-center justify-center"
-        style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
+        style={{ height: `${MARKER_DIAMETER}px`, width: `${MARKER_DIAMETER}px` }}
       >
         {isHighlighted ? (
           <span className="pointer-events-none absolute inline-flex h-full w-full animate-ping rounded-full bg-secondaryAccent opacity-75" />
@@ -46,7 +46,7 @@ function VideoComment({
           )}
           onMouseEnter={() => setHoveredComment(comment.id)}
           onMouseLeave={() => setHoveredComment(null)}
-          style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
+          style={{ height: `${MARKER_DIAMETER}px`, width: `${MARKER_DIAMETER}px` }}
         />
         <ChatAltIcon className="pointer-events-none absolute h-3.5 w-3.5 text-white	" />
       </div>
@@ -56,9 +56,9 @@ function VideoComment({
 
 const connector = connect(
   (state: UIState) => ({
-    pendingComment: selectors.getPendingComment(state),
     canvas: selectors.getCanvas(state),
     hoveredComment: selectors.getHoveredComment(state),
+    pendingComment: selectors.getPendingComment(state),
   }),
   { setHoveredComment: actions.setHoveredComment }
 );

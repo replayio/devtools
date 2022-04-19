@@ -21,7 +21,7 @@ export function defer<T>() {
     resolve = res;
     reject = rej;
   });
-  return { promise, resolve, reject };
+  return { promise, reject, resolve };
 }
 
 export const waitForTime = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
@@ -70,6 +70,24 @@ function NotAllowed() {
 }
 
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
+  apply() {
+    NotAllowed();
+  },
+
+  construct() {
+    NotAllowed();
+    return {};
+  },
+
+  defineProperty() {
+    NotAllowed();
+    return false;
+  },
+
+  deleteProperty() {
+    NotAllowed();
+    return false;
+  },
   // getPrototypeOf() {
   //   NotAllowed();
   // },
@@ -80,38 +98,23 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   get() {
     return undefined;
   },
-  apply() {
-    NotAllowed();
-  },
-  construct() {
-    NotAllowed();
-    return {};
-  },
   getOwnPropertyDescriptor() {
     NotAllowed();
     return undefined;
-  },
-  ownKeys() {
-    NotAllowed();
-    return [];
   },
   isExtensible() {
     NotAllowed();
     return false;
   },
-  setPrototypeOf() {
+  ownKeys() {
     NotAllowed();
-    return false;
+    return [];
   },
   preventExtensions() {
     NotAllowed();
     return true;
   },
-  defineProperty() {
-    NotAllowed();
-    return false;
-  },
-  deleteProperty() {
+  setPrototypeOf() {
     NotAllowed();
     return false;
   },

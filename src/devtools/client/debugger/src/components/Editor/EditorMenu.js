@@ -4,12 +4,9 @@
 
 //
 
-import { Component } from "react";
-import { connect } from "../../utils/connect";
 import { showMenu } from "devtools/shared/contextmenu";
+import { Component } from "react";
 
-import { getSourceLocationFromMouseEvent } from "../../utils/editor";
-import { isPretty } from "../../utils/source";
 import {
   getPrettySource,
   getIsPaused,
@@ -17,6 +14,9 @@ import {
   isSourceWithMap,
   getAlternateSource,
 } from "../../selectors";
+import { connect } from "../../utils/connect";
+import { getSourceLocationFromMouseEvent } from "../../utils/editor";
+import { isPretty } from "../../utils/source";
 
 import { editorMenuItems, editorItemActions } from "./menus/editor";
 
@@ -50,15 +50,15 @@ class EditorMenu extends Component {
     showMenu(
       event,
       editorMenuItems({
+        alternateSource,
         cx,
         editorActions,
-        selectedSource,
-        alternateSource,
         hasMappedLocation,
-        location,
         isPaused,
-        selectionText: editor.codeMirror.getSelection().trim(),
         isTextSelected: editor.codeMirror.somethingSelected(),
+        location,
+        selectedSource,
+        selectionText: editor.codeMirror.getSelection().trim(),
       })
     );
   }
@@ -69,14 +69,14 @@ class EditorMenu extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  cx: getThreadContext(state),
-  isPaused: getIsPaused(state),
   alternateSource: getAlternateSource(state),
+  cx: getThreadContext(state),
   hasMappedLocation:
     (props.selectedSource.isOriginal ||
       isSourceWithMap(state, props.selectedSource.id) ||
       isPretty(props.selectedSource)) &&
     !getPrettySource(state, props.selectedSource.id),
+  isPaused: getIsPaused(state),
 });
 
 const mapDispatchToProps = dispatch => ({

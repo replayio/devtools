@@ -6,11 +6,10 @@
 
 "use strict";
 
-const React = require("react");
-const PropTypes = require("prop-types");
-const dom = require("react-dom-factories");
-
 const Sidebar = require("devtools/client/shared/components/Sidebar");
+const PropTypes = require("prop-types");
+const React = require("react");
+const dom = require("react-dom-factories");
 
 // Shortcuts
 const { div } = dom;
@@ -21,25 +20,30 @@ const { div } = dom;
 class Tabbar extends React.Component {
   static get propTypes() {
     return {
+      activeTabId: PropTypes.string,
       children: PropTypes.array,
       menuDocument: PropTypes.object,
       onSelect: PropTypes.func,
-      showAllTabsMenu: PropTypes.bool,
-      activeTabId: PropTypes.string,
       renderOnlySelected: PropTypes.bool,
+      showAllTabsMenu: PropTypes.bool,
       sidebarToggleButton: PropTypes.shape({
-        // Set to true if collapsed.
-        collapsed: PropTypes.bool.isRequired,
-        // Tooltip text used when the button indicates expanded state.
-        collapsePaneTitle: PropTypes.string.isRequired,
-        // Tooltip text used when the button indicates collapsed state.
-        expandPaneTitle: PropTypes.string.isRequired,
-        // Click callback
-        onClick: PropTypes.func.isRequired,
         // align toggle button to right
         alignRight: PropTypes.bool,
+
         // if set to true toggle-button rotate 90
         canVerticalSplit: PropTypes.bool,
+
+        // Tooltip text used when the button indicates expanded state.
+        collapsePaneTitle: PropTypes.string.isRequired,
+
+        // Set to true if collapsed.
+        collapsed: PropTypes.bool.isRequired,
+
+        // Tooltip text used when the button indicates collapsed state.
+        expandPaneTitle: PropTypes.string.isRequired,
+
+        // Click callback
+        onClick: PropTypes.func.isRequired,
       }),
     };
   }
@@ -111,9 +115,9 @@ class Tabbar extends React.Component {
     const tabs = this.state.tabs.slice();
 
     if (index >= 0) {
-      tabs.splice(index, 0, { id, title, panel, url });
+      tabs.splice(index, 0, { id, panel, title, url });
     } else {
-      tabs.push({ id, title, panel, url });
+      tabs.push({ id, panel, title, url });
     }
 
     const newState = Object.assign({}, this.state, {
@@ -144,9 +148,9 @@ class Tabbar extends React.Component {
 
     for (const { id, index, panel, selected, title, url } of this.queuedTabs) {
       if (index >= 0) {
-        tabs.splice(index, 0, { id, title, panel, url });
+        tabs.splice(index, 0, { id, panel, title, url });
       } else {
-        tabs.push({ id, title, panel, url });
+        tabs.push({ id, panel, title, url });
       }
 
       if (selected) {
@@ -291,10 +295,10 @@ class Tabbar extends React.Component {
     this.state.tabs.forEach(tab => {
       menu.append(
         new MenuItem({
-          label: tab.title,
-          type: "checkbox",
           checked: this.getCurrentTabId() === tab.id,
           click: () => this.select(tab.id),
+          label: tab.title,
+          type: "checkbox",
         })
       );
     });
@@ -310,9 +314,9 @@ class Tabbar extends React.Component {
   renderTab(tab) {
     if (typeof tab.panel === "function") {
       return tab.panel({
+        id: tab.id,
         key: tab.id,
         title: tab.title,
-        id: tab.id,
         url: tab.url,
       });
     }
@@ -328,12 +332,12 @@ class Tabbar extends React.Component {
       React.createElement(
         Sidebar,
         {
+          activeTab: this.state.activeTab,
+          onAfterChange: this.onTabChanged,
           onAllTabsMenuClick: this.onAllTabsMenuClick,
           renderOnlySelected: this.props.renderOnlySelected,
           showAllTabsMenu: this.props.showAllTabsMenu,
           sidebarToggleButton: this.props.sidebarToggleButton,
-          activeTab: this.state.activeTab,
-          onAfterChange: this.onTabChanged,
         },
         tabs
       )

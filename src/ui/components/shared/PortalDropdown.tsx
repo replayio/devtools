@@ -1,6 +1,6 @@
 import React, { CSSProperties, RefObject, useRef, useState, useCallback } from "react";
-
 import { createPortal } from "react-dom";
+
 import { DropdownProps } from "./Dropdown";
 
 interface PortalDropdownProps extends DropdownProps {
@@ -97,11 +97,11 @@ function getContentPosition(
       case "top-right":
         return { bottom: height - top + distance + "px", left: left + "px" };
       case "bottom-right":
-        return { top: bottom + distance + "px", left: left + "px" };
+        return { left: left + "px", top: bottom + distance + "px" };
       case "top-left":
         return { bottom: height - top + distance + "px", right: width - right + "px" };
       case "bottom-left":
-        return { top: bottom + distance + "px", right: width - right + "px" };
+        return { right: width - right + "px", top: bottom + distance + "px" };
     }
   }
 
@@ -127,7 +127,7 @@ function getViewportOverflows(doc: ClientRect, dropdown?: ClientRect): ViewportO
 }
 
 function adjustPosition(position: Position, overflow: Direction) {
-  const oppositeMap = { top: "bottom", bottom: "top" };
+  const oppositeMap = { bottom: "top", top: "bottom" };
 
   return position.replace(overflow, oppositeMap[overflow]) as Position;
 }

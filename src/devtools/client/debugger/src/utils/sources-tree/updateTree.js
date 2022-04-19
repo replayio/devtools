@@ -6,8 +6,8 @@
 
 import { addToTree } from "./addToTree";
 import { collapseTree } from "./collapseTree";
-import { createDirectoryNode, createParentMap } from "./utils";
 import { getDomain } from "./treeOrder";
+import { createDirectoryNode, createParentMap } from "./utils";
 
 function getSourcesToAdd(newSources, prevSources) {
   const sourcesToAdd = [];
@@ -46,8 +46,8 @@ export function updateTree({ newSources, prevSources, debuggeeUrl, uncollapsedTr
   const newSourceTree = collapseTree(uncollapsedTree);
 
   return {
-    uncollapsedTree,
-    sourceTree: newSourceTree,
     parentMap: createParentMap(newSourceTree),
+    sourceTree: newSourceTree,
+    uncollapsedTree,
   };
 }

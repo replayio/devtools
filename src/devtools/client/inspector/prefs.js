@@ -1,5 +1,4 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
-
 import Services from "devtools/shared/services";
 
 const { pref } = Services;
@@ -26,9 +25,9 @@ pref("devtools.inspector.show_pseudo_elements", false);
 pref("devtools.inspector.features.show-whitespace-nodes", false);
 
 export const prefs = new PrefsHelper("devtools.inspector", {
+  activeTab: ["String", "active-tab"],
   sidebarSize: ["Int", "sidebar-size"],
   splitSidebarSize: ["Int", "split-sidebar-size"],
-  activeTab: ["String", "active-tab"],
 });
 
 export const features = new PrefsHelper("devtools.inspector.features", {

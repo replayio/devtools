@@ -18,12 +18,12 @@ define(function (require, exports, module) {
     // See TreeView component for detailed property explanation.
     static get propTypes() {
       return {
-        value: PropTypes.any,
         decorator: PropTypes.object,
+        enableInput: PropTypes.bool,
         id: PropTypes.string.isRequired,
         member: PropTypes.object.isRequired,
         renderValue: PropTypes.func.isRequired,
-        enableInput: PropTypes.bool,
+        value: PropTypes.any,
       };
     }
 
@@ -101,17 +101,17 @@ define(function (require, exports, module) {
       if (enableInput && this.state.inputEnabled && type !== "object") {
         classNames.push("inputEnabled");
         cellElement = input({
+          "aria-labelledby": id,
           autoFocus: true,
           onBlur: this.updateInputEnabled,
           readOnly: true,
           value,
-          "aria-labelledby": id,
         });
       } else {
         cellElement = span(
           {
-            onClick: type !== "object" ? this.updateInputEnabled : null,
             "aria-labelledby": id,
+            onClick: type !== "object" ? this.updateInputEnabled : null,
           },
           renderValue(props)
         );

@@ -3,18 +3,17 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
 import classNames from "classnames";
-
-import { getLibraryFromUrl } from "../../../utils/pause/frames";
-
-import FrameMenu from "./FrameMenu";
-import AccessibleImage from "../../shared/AccessibleImage";
-import FrameComponent from "./Frame";
+import React, { Component } from "react";
 
 import actions from "../../../actions";
+import { getLibraryFromUrl } from "../../../utils/pause/frames";
+import AccessibleImage from "../../shared/AccessibleImage";
 import Badge from "../../shared/Badge";
+
+import FrameComponent from "./Frame";
 import FrameIndent from "./FrameIndent";
+import FrameMenu from "./FrameMenu";
 
 function FrameLocation({ frame, expanded }) {
   const library = frame.library || getLibraryFromUrl(frame);
@@ -59,7 +58,7 @@ export default class Group extends Component {
     FrameMenu(
       frame,
       frameworkGroupingOn,
-      { copyStackTrace, toggleFrameworkGrouping, toggleBlackBox },
+      { copyStackTrace, toggleBlackBox, toggleFrameworkGrouping },
       event,
       cx
     );

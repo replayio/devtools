@@ -39,7 +39,7 @@ export default function IconWithTooltip({ icon, content, handleClick }: IconWith
 
 function IconTooltip({ targetNode, children }: { targetNode: HTMLElement; children: string }) {
   const { top, left } = targetNode.getBoundingClientRect();
-  let style = { top: `${top}px`, left: `${left}px` };
+  let style = { left: `${left}px`, top: `${top}px` };
 
   return ReactDOM.createPortal(
     <div className="icon-tooltip absolute z-10 ml-10 mt-1" style={style}>

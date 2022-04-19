@@ -1,6 +1,7 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+
 const actions = require("devtools/client/webconsole/actions/index");
 
 function TextInput(props: React.HTMLProps<HTMLInputElement>) {

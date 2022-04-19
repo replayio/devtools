@@ -9,8 +9,8 @@ const {
   XULWindowInfobar,
 } = require("devtools/server/actors/highlighters/utils/accessibility");
 const { createNode, isNodeValid } = require("devtools/server/actors/highlighters/utils/markup");
-const { getCurrentZoom, loadSheet } = require("devtools/shared/layout/utils");
 const { TEXT_NODE } = require("devtools/shared/dom-node-constants");
+const { getCurrentZoom, loadSheet } = require("devtools/shared/layout/utils");
 
 /**
  * Stylesheet used for highlighter styling of accessible objects in chrome. It
@@ -242,18 +242,18 @@ class XULWindowAccessibleHighlighter {
     loadSheet(doc.ownerGlobal, ACCESSIBLE_BOUNDS_SHEET);
 
     this.container = createNode(this.win, {
-      parent: doc.body || doc.documentElement,
       attributes: {
-        class: "highlighter-container",
         "aria-hidden": "true",
+        class: "highlighter-container",
       },
+      parent: doc.body || doc.documentElement,
     });
 
     this.bounds = createNode(this.win, {
-      parent: this.container,
       attributes: {
         class: "accessible-bounds",
       },
+      parent: this.container,
     });
 
     this.accessibleInfobar.buildMarkup(this.container);

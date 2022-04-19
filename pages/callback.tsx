@@ -1,8 +1,8 @@
-import React from "react";
 import { useRouter } from "next/router";
+import React from "react";
 import { useEffect } from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
+import useAuth0 from "ui/utils/useAuth0";
 
 export default function Connection() {
   const auth0 = useAuth0();

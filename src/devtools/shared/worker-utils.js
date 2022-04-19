@@ -10,6 +10,10 @@ function WorkerDispatcher() {
 }
 
 WorkerDispatcher.prototype = {
+  invoke(method, ...args) {
+    return this.task(method)(...args);
+  },
+
   start(workerFactory, workerName) {
     this.worker = workerFactory();
     this.worker.onerror = () => {
@@ -52,9 +56,9 @@ WorkerDispatcher.prototype = {
 
       const id = this.msgId++;
       this.worker.postMessage({
+        calls: items.map(item => item[0]),
         id,
         method,
-        calls: items.map(item => item[0]),
       });
 
       const listener = ({ data: result }) => {
@@ -85,10 +89,6 @@ WorkerDispatcher.prototype = {
     };
 
     return (...args) => push(args);
-  },
-
-  invoke(method, ...args) {
-    return this.task(method)(...args);
   },
 };
 

@@ -3,16 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
 const {
   l10n,
   getArrayTypeNames,
   getDescriptorValue,
 } = require("devtools/client/webconsole/utils/messages");
-
 const { MODE } = require("devtools/packages/devtools-reps");
-
+const React = require("react");
+const dom = require("react-dom-factories");
 const GripMessageBody =
   require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 const PropTypes = require("prop-types");
@@ -25,8 +23,8 @@ class ConsoleTable extends React.Component {
   static get propTypes() {
     return {
       dispatch: PropTypes.func.isRequired,
-      parameters: PropTypes.array.isRequired,
       id: PropTypes.string.isRequired,
+      parameters: PropTypes.array.isRequired,
     };
   }
 
@@ -43,8 +41,8 @@ class ConsoleTable extends React.Component {
         dom.div(
           {
             className: "new-consoletable-header",
-            role: "columnheader",
             key,
+            role: "columnheader",
             title: value,
           },
           value
@@ -67,18 +65,18 @@ class ConsoleTable extends React.Component {
           typeof cellValue === "undefined"
             ? ""
             : React.createElement(GripMessageBody, {
+                dispatch,
                 grip: cellValue,
                 mode: MODE.SHORT,
                 useQuotes: false,
-                dispatch,
               });
 
         cells.push(
           dom.div(
             {
-              role: "gridcell",
               className,
               key,
+              role: "gridcell",
             },
             cellContent
           )
@@ -125,7 +123,7 @@ function getValueAndHeadersGrip(parameters) {
 
   const valueGrip = valueFront && valueFront.getGrip ? valueFront.getGrip() : valueFront;
 
-  return { valueGrip, headersGrip };
+  return { headersGrip, valueGrip };
 }
 
 function getParametersDataType(parameters = null) {

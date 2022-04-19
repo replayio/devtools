@@ -1,12 +1,12 @@
-import differenceInMinutes from "date-fns/differenceInMinutes";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
-import differenceInWeeks from "date-fns/differenceInWeeks";
+import differenceInMinutes from "date-fns/differenceInMinutes";
 import differenceInMonths from "date-fns/differenceInMonths";
+import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInYears from "date-fns/differenceInYears";
-import { Comment, Reply } from "ui/state/comments";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import sortBy from "lodash/sortBy";
+import { Comment, Reply } from "ui/state/comments";
 
 export function formatRelativeTime(date: Date) {
   const minutes = differenceInMinutes(Date.now(), date);

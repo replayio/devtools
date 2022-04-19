@@ -21,8 +21,8 @@ function StyleSheet(props) {
 
   return span(
     {
-      "data-link-actor-id": grip.actor,
       className: "objectBox objectBox-object",
+      "data-link-actor-id": grip.actor,
     },
     getTitle(grip),
     span({ className: "objectPropValue" }, getLocation(grip))

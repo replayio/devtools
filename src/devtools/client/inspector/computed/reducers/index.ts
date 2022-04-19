@@ -1,25 +1,17 @@
 import { createReducer, ReducerObject } from "../../shared/reducer-object";
-import { ComputedState } from "../state";
 import { ComputedAction } from "../actions";
+import { ComputedState } from "../state";
 
 const INITIAL_COMPUTED: ComputedState = {
+  expandedProperties: new Set<string>(),
   properties: [],
   search: "",
   showBrowserStyles: false,
-  expandedProperties: new Set<string>(),
 };
 
 const reducers: ReducerObject<ComputedState, ComputedAction> = {
   set_computed_properties(state, { properties }) {
     return { ...state, properties };
-  },
-
-  set_computed_property_search(state, { search }) {
-    return { ...state, search };
-  },
-
-  set_show_browser_styles(state, { show }) {
-    return { ...state, showBrowserStyles: show };
   },
 
   set_computed_property_expanded(state, { property, expanded }) {
@@ -32,6 +24,14 @@ const reducers: ReducerObject<ComputedState, ComputedAction> = {
     }
 
     return { ...state, expandedProperties };
+  },
+
+  set_computed_property_search(state, { search }) {
+    return { ...state, search };
+  },
+
+  set_show_browser_styles(state, { show }) {
+    return { ...state, showBrowserStyles: show };
   },
 };
 

@@ -1,24 +1,23 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-
-import { AvatarImage } from "ui/components/Avatar";
-import { handleIntercomLogout } from "ui/utils/intercom";
-import useAuth0 from "ui/utils/useAuth0";
-import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
+import { AvatarImage } from "ui/components/Avatar";
+import hooks from "ui/hooks";
+import { useGetUserInfo } from "ui/hooks/users";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
-import { useGetUserInfo } from "ui/hooks/users";
+import { handleIntercomLogout } from "ui/utils/intercom";
+import useAuth0 from "ui/utils/useAuth0";
 
 import APIKeys from "../APIKeys";
 import ExternalLink from "../ExternalLink";
 import SettingsModal from "../SettingsModal";
-import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
+import { Settings } from "../SettingsModal/types";
 
-import PreferencesSettings from "./PreferencesSettings";
 import ExperimentalSettings from "./ExperimentalSettings";
+import PreferencesSettings from "./PreferencesSettings";
 
 function Support() {
   return (
@@ -125,35 +124,35 @@ function UserAPIKeys() {
 
 const getSettings = (): Settings<SettingsTabTitle, {}> => [
   {
-    title: "Personal",
-    icon: "person",
     component: Personal,
+    icon: "person",
+    title: "Personal",
   },
   {
-    title: "Preferences",
-    icon: "tune",
     component: PreferencesSettings,
+    icon: "tune",
+    title: "Preferences",
   },
   {
-    title: "API Keys",
-    icon: "vpn_key",
     component: UserAPIKeys,
+    icon: "vpn_key",
+    title: "API Keys",
   },
 
   {
-    title: "Experimental",
-    icon: "biotech",
     component: ExperimentalSettings,
+    icon: "biotech",
+    title: "Experimental",
   },
   {
-    title: "Support",
-    icon: "support",
     component: Support,
+    icon: "support",
+    title: "Support",
   },
   {
-    title: "Legal",
-    icon: "gavel",
     component: Legal,
+    icon: "gavel",
+    title: "Legal",
   },
 ];
 

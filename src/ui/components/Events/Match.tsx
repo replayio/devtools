@@ -4,6 +4,7 @@ import React, { MouseEvent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
+
 import MaterialIcon from "../shared/MaterialIcon";
 
 const getTimestamp = (ms: number) => {
@@ -45,9 +46,9 @@ function Match({
 }
 
 const connector = connect(() => ({}), {
-  setViewMode: actions.setViewMode,
   openSourceLink,
   seek: actions.seek,
+  setViewMode: actions.setViewMode,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(Match);

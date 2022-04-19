@@ -8,12 +8,12 @@ const Services = require("devtools/shared/services");
 
 function generalEvent(groupID, eventType) {
   return {
-    id: `event.${groupID}.${eventType}`,
-    type: "event",
-    name: eventType,
-    message: `DOM '${eventType}' event`,
     eventType,
     filter: "general",
+    id: `event.${groupID}.${eventType}`,
+    message: `DOM '${eventType}' event`,
+    name: eventType,
+    type: "event",
   };
 }
 function nodeEvent(groupID, eventType) {
@@ -31,65 +31,64 @@ function mediaNodeEvent(groupID, eventType) {
 function globalEvent(groupID, eventType) {
   return {
     ...generalEvent(groupID, eventType),
-    message: `Global '${eventType}' event`,
     filter: "global",
+    message: `Global '${eventType}' event`,
   };
 }
 function xhrEvent(groupID, eventType) {
   return {
     ...generalEvent(groupID, eventType),
-    message: `XHR '${eventType}' event`,
     filter: "xhr",
+    message: `XHR '${eventType}' event`,
   };
 }
 
 function webSocketEvent(groupID, eventType) {
   return {
     ...generalEvent(groupID, eventType),
-    message: `WebSocket '${eventType}' event`,
     filter: "websocket",
+    message: `WebSocket '${eventType}' event`,
   };
 }
 
 function workerEvent(eventType) {
   return {
     ...generalEvent("worker", eventType),
-    message: `Worker '${eventType}' event`,
     filter: "worker",
+    message: `Worker '${eventType}' event`,
   };
 }
 
 function timerEvent(type, operation, name, notificationType) {
   return {
     id: `timer.${type}.${operation}`,
-    type: "simple",
-    name,
     message: name,
+    name,
     notificationType,
+    type: "simple",
   };
 }
 
 function animationEvent(operation, name, notificationType) {
   return {
     id: `animationframe.${operation}`,
-    type: "simple",
-    name,
     message: name,
+    name,
     notificationType,
+    type: "simple",
   };
 }
 
 const AVAILABLE_BREAKPOINTS = [
   {
-    name: "Animation",
     items: [
       animationEvent("request", "Request Animation Frame", "requestAnimationFrame"),
       animationEvent("cancel", "Cancel Animation Frame", "cancelAnimationFrame"),
       animationEvent("fire", "Animation Frame fired", "requestAnimationFrameCallback"),
     ],
+    name: "Animation",
   },
   {
-    name: "Clipboard",
     items: [
       generalEvent("clipboard", "copy"),
       generalEvent("clipboard", "cut"),
@@ -98,9 +97,9 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("clipboard", "beforecut"),
       generalEvent("clipboard", "beforepaste"),
     ],
+    name: "Clipboard",
   },
   {
-    name: "Control",
     items: [
       generalEvent("control", "resize"),
       generalEvent("control", "scroll"),
@@ -112,9 +111,9 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("control", "submit"),
       generalEvent("control", "reset"),
     ],
+    name: "Control",
   },
   {
-    name: "DOM Mutation",
     items: [
       // Deprecated DOM events.
       nodeEvent("dom-mutation", "DOMActivate"),
@@ -133,13 +132,13 @@ const AVAILABLE_BREAKPOINTS = [
       // DOM load events.
       nodeEvent("dom-mutation", "DOMContentLoaded"),
     ],
+    name: "DOM Mutation",
   },
   {
-    name: "Device",
     items: [globalEvent("device", "deviceorientation"), globalEvent("device", "devicemotion")],
+    name: "Device",
   },
   {
-    name: "Drag and Drop",
     items: [
       generalEvent("drag-and-drop", "drag"),
       generalEvent("drag-and-drop", "dragstart"),
@@ -149,9 +148,9 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("drag-and-drop", "dragleave"),
       generalEvent("drag-and-drop", "drop"),
     ],
+    name: "Drag and Drop",
   },
   {
-    name: "Keyboard",
     items: [
       Services.prefs && Services.prefs.getBoolPref("dom.input_events.beforeinput.enabled")
         ? generalEvent("keyboard", "beforeinput")
@@ -161,9 +160,9 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("keyboard", "keyup"),
       generalEvent("keyboard", "keypress"),
     ].filter(Boolean),
+    name: "Keyboard",
   },
   {
-    name: "Load",
     items: [
       globalEvent("load", "load"),
       // TODO: Disabled pending fixes for bug 1569775.
@@ -174,9 +173,9 @@ const AVAILABLE_BREAKPOINTS = [
       globalEvent("load", "hashchange"),
       globalEvent("load", "popstate"),
     ],
+    name: "Load",
   },
   {
-    name: "Media",
     items: [
       mediaNodeEvent("media", "play"),
       mediaNodeEvent("media", "pause"),
@@ -201,9 +200,9 @@ const AVAILABLE_BREAKPOINTS = [
       mediaNodeEvent("media", "loadeddata"),
       mediaNodeEvent("media", "waiting"),
     ],
+    name: "Media",
   },
   {
-    name: "Mouse",
     items: [
       generalEvent("mouse", "auxclick"),
       generalEvent("mouse", "click"),
@@ -219,9 +218,9 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("mouse", "wheel"),
       generalEvent("mouse", "contextmenu"),
     ],
+    name: "Mouse",
   },
   {
-    name: "Pointer",
     items: [
       generalEvent("pointer", "pointerover"),
       generalEvent("pointer", "pointerout"),
@@ -234,9 +233,9 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("pointer", "gotpointercapture"),
       generalEvent("pointer", "lostpointercapture"),
     ],
+    name: "Pointer",
   },
   {
-    name: "Timer",
     items: [
       timerEvent("timeout", "set", "setTimeout", "setTimeout"),
       timerEvent("timeout", "clear", "clearTimeout", "clearTimeout"),
@@ -245,27 +244,27 @@ const AVAILABLE_BREAKPOINTS = [
       timerEvent("interval", "clear", "clearInterval", "clearInterval"),
       timerEvent("interval", "fire", "setInterval fired", "setIntervalCallback"),
     ],
+    name: "Timer",
   },
   {
-    name: "Touch",
     items: [
       generalEvent("touch", "touchstart"),
       generalEvent("touch", "touchmove"),
       generalEvent("touch", "touchend"),
       generalEvent("touch", "touchcancel"),
     ],
+    name: "Touch",
   },
   {
-    name: "WebSocket",
     items: [
       webSocketEvent("websocket", "open"),
       webSocketEvent("websocket", "message"),
       webSocketEvent("websocket", "error"),
       webSocketEvent("websocket", "close"),
     ],
+    name: "WebSocket",
   },
   {
-    name: "Worker",
     items: [
       workerEvent("message"),
       workerEvent("messageerror"),
@@ -273,9 +272,9 @@ const AVAILABLE_BREAKPOINTS = [
       // Service Worker events.
       globalEvent("serviceworker", "fetch"),
     ],
+    name: "Worker",
   },
   {
-    name: "XHR",
     items: [
       xhrEvent("xhr", "readystatechange"),
       xhrEvent("xhr", "load"),
@@ -286,6 +285,7 @@ const AVAILABLE_BREAKPOINTS = [
       xhrEvent("xhr", "progress"),
       xhrEvent("xhr", "timeout"),
     ],
+    name: "XHR",
   },
 ];
 
@@ -409,11 +409,11 @@ function getAvailableEventBreakpoints() {
   const available = [];
   for (const { name, items } of AVAILABLE_BREAKPOINTS) {
     available.push({
-      name,
       events: items.map(item => ({
         id: item.id,
         name: item.name,
       })),
+      name,
     });
   }
   return available;

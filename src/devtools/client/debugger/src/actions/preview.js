@@ -2,10 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { isConsole } from "../utils/preview";
-import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { createPrimitiveValueFront } from "protocol/thread";
 import { ValueItem } from "devtools/packages/devtools-reps";
+import { createPrimitiveValueFront } from "protocol/thread";
 
 import {
   getPreview,
@@ -13,6 +11,8 @@ import {
   getSelectedSource,
   getSelectedFrame,
 } from "../selectors";
+import { getExpressionFromCoords } from "../utils/editor/get-expression";
+import { isConsole } from "../utils/preview";
 
 export function updatePreview(cx, target, tokenPos, codeMirror) {
   return (dispatch, getState) => {
@@ -74,9 +74,9 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     }
 
     const root = new ValueItem({
+      contents: result,
       name: expression,
       path: expression,
-      contents: result,
     });
     await root.loadChildren();
 
@@ -89,9 +89,9 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     }
 
     dispatch({
-      type: "COMPLETE_PREVIEW",
       cx,
       previewId,
+      type: "COMPLETE_PREVIEW",
       value: {
         resultGrip: result,
         root,
@@ -103,9 +103,9 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
 export function clearPreview(cx, previewId) {
   return (dispatch, getState) => {
     return dispatch({
-      type: "CLEAR_PREVIEW",
       cx,
       previewId,
+      type: "CLEAR_PREVIEW",
     });
   };
 }

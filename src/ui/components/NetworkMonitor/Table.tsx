@@ -7,6 +7,7 @@ import {
   useTable,
   TableInstance,
 } from "react-table";
+
 import { CanonicalRequestType, partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 
 export default function Table({
@@ -30,8 +31,8 @@ export default function Table({
         Header: "Status",
         // https://github.com/tannerlinsley/react-table/discussions/2664
         accessor: "status" as const,
-        width: 50,
         maxWidth: 100,
+        width: 50,
       },
       {
         Header: "Name",
@@ -48,8 +49,8 @@ export default function Table({
       {
         Header: "Method",
         accessor: "method" as const,
-        width: 50,
         maxWidth: 100,
+        width: 50,
       },
       {
         Header: "Type",
@@ -71,9 +72,9 @@ export default function Table({
 
   const defaultColumn = useMemo(
     () => ({
+      maxWidth: 1000,
       minWidth: 60,
       width: 200,
-      maxWidth: 1000,
     }),
     []
   );
@@ -91,5 +92,5 @@ export default function Table({
     useResizeColumns
   );
 
-  return children({ table: tableInstance, data, ...props });
+  return children({ data, table: tableInstance, ...props });
 }

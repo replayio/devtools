@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+
 const { toEditorLine } = require("devtools/client/debugger/src/utils/editor");
 
 interface WidgetProps {

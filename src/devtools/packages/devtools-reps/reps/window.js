@@ -7,9 +7,8 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 // Reps
-const { getGripType, isGrip, getURLDisplayString, wrapRender } = require("./rep-utils");
-
 const { MODE } = require("./constants");
+const { getGripType, isGrip, getURLDisplayString, wrapRender } = require("./rep-utils");
 
 /**
  * Renders a grip representing a window.
@@ -24,8 +23,8 @@ function WindowRep(props) {
   const { mode, object } = props;
 
   const config = {
-    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-Window",
+    "data-link-actor-id": object.id(),
   };
 
   if (mode === MODE.TINY) {

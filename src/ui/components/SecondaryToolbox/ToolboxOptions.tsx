@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ToolboxLayout } from "ui/state/layout";
-import { getToolboxLayout } from "ui/reducers/layout";
 import { setToolboxLayout } from "ui/actions/layout";
-import Icon from "../shared/Icon";
-import { ToolboxButton } from "./ToolboxButton";
-import PortalDropdown from "../shared/PortalDropdown";
-import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { ToolboxLayout } from "ui/state/layout";
 
-const LAYOUT_ICONS = { ide: "dock-bottom-right", left: "dock-left", bottom: "dock-bottom" };
+import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import Icon from "../shared/Icon";
+import PortalDropdown from "../shared/PortalDropdown";
+
+import { ToolboxButton } from "./ToolboxButton";
+
+const LAYOUT_ICONS = { bottom: "dock-bottom", ide: "dock-bottom-right", left: "dock-left" };
 
 function ToolboxOption({
   label,

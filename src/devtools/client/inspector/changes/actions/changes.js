@@ -15,8 +15,8 @@ module.exports = {
 
   trackChange(change) {
     return {
-      type: TRACK_CHANGE,
       change,
+      type: TRACK_CHANGE,
     };
   },
 };

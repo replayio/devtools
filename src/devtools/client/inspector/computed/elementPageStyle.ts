@@ -1,4 +1,5 @@
 import { UIStore } from "ui/actions";
+
 import { getRules } from "../rules/selectors/rules";
 
 interface SelectorInfo {
@@ -30,15 +31,15 @@ export class ElementPageStyle {
         if (declaration.name === property) {
           selectorInfos.push({
             name: property,
-            value: declaration.value,
-            sourceText: rule.selector.selectorText,
             overridden: declaration.isOverridden,
             rule: {
-              type: rule.type,
               parentStyleSheet: {
                 href: rule.sourceLink.title || "",
               },
+              type: rule.type,
             },
+            sourceText: rule.selector.selectorText,
+            value: declaration.value,
           });
         }
       }

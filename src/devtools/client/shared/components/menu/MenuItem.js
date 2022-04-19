@@ -7,8 +7,8 @@
 
 // A command in a menu.
 
-const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const { text } = require("react-dom-factories");
 const { button, li, span } = dom;
@@ -117,13 +117,13 @@ class MenuItem extends PureComponent {
     const children = [];
     if (this.props.label) {
       children.push(
-        span({ key: "label", className: "label", ref: this.labelRef }, this.props.label)
+        span({ className: "label", key: "label", ref: this.labelRef }, this.props.label)
       );
     }
 
     if (typeof this.props.accelerator !== "undefined") {
       const acceleratorLabel = span(
-        { key: "accelerator", className: "accelerator" },
+        { className: "accelerator", key: "accelerator" },
         this.props.accelerator
       );
       children.push(acceleratorLabel);

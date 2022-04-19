@@ -4,13 +4,14 @@
 
 //
 
-import { PureComponent } from "react";
 import classnames from "classnames";
-import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
+import { PureComponent } from "react";
+import { actions } from "ui/actions";
+
 import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
 
 const breakpointSvg = document.createElement("div");

@@ -4,6 +4,7 @@
 
 "use strict";
 
+const { getComputedStyle } = require("devtools/server/actors/highlighters/utils/markup");
 const {
   apply,
   getNodeTransformationMatrix,
@@ -15,7 +16,6 @@ const {
   translate,
 } = require("devtools/shared/layout/dom-matrix-2d");
 const { getCurrentZoom, getViewportDimensions } = require("devtools/shared/layout/utils");
-const { getComputedStyle } = require("devtools/server/actors/highlighters/utils/markup");
 
 // A set of utility functions for highlighters that render their content to a <canvas>
 // element.
@@ -355,8 +355,8 @@ function getCurrentMatrix(element, window, { ignoreWritingModeAndTextDirection }
 
   // Adjust as needed to match the writing mode and text direction of the element.
   const size = {
-    width: element.offsetWidth - borderLeft - borderRight - paddingLeft - paddingRight,
     height: element.offsetHeight - borderTop - borderBottom - paddingTop - paddingBottom,
+    width: element.offsetWidth - borderLeft - borderRight - paddingLeft - paddingRight,
   };
 
   if (!ignoreWritingModeAndTextDirection) {

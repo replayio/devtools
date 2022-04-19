@@ -1,16 +1,16 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
 import { initSocket, client } from "protocol/socket";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useStore } from "react-redux";
 import { UIStore } from "ui/actions";
-import { ExpectedError } from "ui/state/app";
 import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
 import { getAccessibleRecording, showLoadingProgress } from "ui/actions/session";
-import tokenManager from "ui/utils/tokenManager";
-import { useGetRecordingId } from "ui/hooks/recordings";
-import renderSourcemap from "ui/utils/sourcemapVisualizer";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { ExpectedError } from "ui/state/app";
+import renderSourcemap from "ui/utils/sourcemapVisualizer";
+import tokenManager from "ui/utils/tokenManager";
 
 type SourcemapResult =
   | {
@@ -81,7 +81,7 @@ async function loadSourceMap(
       { sourceId: generatedSourceId },
       sessionId
     );
-    return { source, map, url };
+    return { map, source, url };
   } catch (error: any) {
     return { error: error.message || "Failed to load sourcemap" };
   }
@@ -141,15 +141,15 @@ export default function SourceMapLoader() {
 
   if ("error" in sourcemapResult) {
     const error: ExpectedError = {
-      message: "Error",
       content: sourcemapResult.error,
+      message: "Error",
     };
     return <ExpectedErrorScreen error={error} />;
   }
   if (!sourcemapResult.map) {
     const error: ExpectedError = {
-      message: "No sourcemap",
       content: "There is no sourcemap for this source",
+      message: "No sourcemap",
     };
     return <ExpectedErrorScreen error={error} />;
   }

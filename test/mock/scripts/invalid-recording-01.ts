@@ -1,8 +1,8 @@
 // Test that trying to access an inaccessible recording shows an appropriate error.
 
-import { runTest, devtoolsURL } from "../src/runTest";
-import { installMockEnvironment } from "../src/mockEnvironment";
+import { Page } from "@recordreplay/playwright";
 import { v4 as uuid } from "uuid";
+
 import {
   createRecordingOwnerUserIdMock,
   createGetRecordingMock,
@@ -10,7 +10,8 @@ import {
   createGetUserMock,
 } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
-import { Page } from "@recordreplay/playwright";
+import { installMockEnvironment } from "../src/mockEnvironment";
+import { runTest, devtoolsURL } from "../src/runTest";
 
 const recordingId = uuid();
 const userId = uuid();
@@ -26,6 +27,6 @@ const bindings = basicBindings();
 
 runTest("invalidRecordingID", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
+  await installMockEnvironment(page, { bindings, graphqlMocks, messageHandlers });
   await page.textContent("text=Sorry, you don't have permission!");
 });

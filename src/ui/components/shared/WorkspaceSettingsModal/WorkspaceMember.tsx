@@ -1,14 +1,15 @@
 import classnames from "classnames";
 import React, { useState, useEffect } from "react";
-import hooks from "ui/hooks";
-import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
-import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
-import { useConfirm } from "../Confirm";
 import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+import hooks from "ui/hooks";
+import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
+
+import { useConfirm } from "../Confirm";
+import MaterialIcon from "../MaterialIcon";
 
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
@@ -162,9 +163,9 @@ export function NonRegisteredWorkspaceMember({
   const handleDelete = () => {
     setExpanded(false);
     confirmDestructive({
-      message: "Remove team member?",
-      description: `Are you sure you want to remove ${member.email} from this team?`,
       acceptLabel: "Remove them",
+      description: `Are you sure you want to remove ${member.email} from this team?`,
+      message: "Remove team member?",
     }).then(confirmed => {
       if (confirmed) {
         deleteUserFromWorkspace({ variables: { membershipId: member.membershipId } });
@@ -174,7 +175,7 @@ export function NonRegisteredWorkspaceMember({
 
   return (
     <li className="flex flex-row items-center space-x-1.5">
-      <div className="grid items-center justify-center" style={{ width: "28px", height: "28px" }}>
+      <div className="grid items-center justify-center" style={{ height: "28px", width: "28px" }}>
         <MaterialIcon iconSize="xl">mail_outline</MaterialIcon>
       </div>
       <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
@@ -290,7 +291,7 @@ function WorkspaceMember({
       <AvatarImage
         src={member.user!.picture}
         className="avatar rounded-full"
-        style={{ width: "28px", height: "28px" }}
+        style={{ height: "28px", width: "28px" }}
       />
       <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre" data-private>
         {member.user!.name}
@@ -307,8 +308,8 @@ function WorkspaceMember({
 }
 
 const connector = connect(() => ({}), {
-  setWorkspaceId: actions.setWorkspaceId,
   hideModal: actions.hideModal,
+  setWorkspaceId: actions.setWorkspaceId,
 });
 export type PropsFromRedux = ConnectedProps<typeof connector>;
 

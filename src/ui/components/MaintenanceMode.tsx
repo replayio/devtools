@@ -1,4 +1,5 @@
 import React from "react";
+
 import ReplayLogo from "./shared/ReplayLogo";
 
 export default function MaintenanceModeScreen() {

@@ -1,13 +1,11 @@
-import React, { ComponentProps } from "react";
-
 import { Story, Meta } from "@storybook/react";
-
+import React, { ComponentProps } from "react";
 import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 
 export default {
-  title: "Network Monitor/Request Details",
   component: RequestDetails,
+  title: "Network Monitor/Request Details",
 } as Meta;
 
 const Template: Story<ComponentProps<typeof RequestDetails>> = args => (
@@ -25,9 +23,13 @@ Basic.args = {
     domain: "assets.website-files.com",
     end: 984,
     firstByte: 1200,
-    hasResponseBody: true,
     hasRequestBody: true,
+    hasResponseBody: true,
     id: "1",
+    method: "GET",
+    name: "613b96978e0f48b736fbb935_SpaceGrotesk-Bold.woff2",
+    point: { point: "1947111322047004550402308086694092", time: 984 },
+    queryParams: [],
     requestHeaders: [
       { name: "Host", value: "assets.website-files.com" },
       {
@@ -73,13 +75,9 @@ Basic.args = {
       { name: "age", value: "936035" },
       { name: "X-Firefox-Spdy", value: "h2" },
     ],
-    method: "GET",
-    name: "613b96978e0f48b736fbb935_SpaceGrotesk-Bold.woff2",
-    point: { point: "1947111322047004550402308086694092", time: 984 },
-    queryParams: [],
-    triggerPoint: undefined,
-    status: 200,
     start: 984,
+    status: 200,
+    triggerPoint: undefined,
     type: CanonicalRequestType.FETCH_XHR,
     url: "https://assets.website-files.com/613b96978e0f483f60fbb8c0/613b96978e0f48b736fbb935_SpaceGrotesk-Bold.woff2",
   },

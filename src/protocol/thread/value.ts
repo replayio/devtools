@@ -1,4 +1,5 @@
 import { assert, DisallowEverythingProxyHandler } from "../utils";
+
 import { EvaluationResult, Pause, WiredObject } from "./pause";
 import { ThreadFront } from "./thread";
 
@@ -49,8 +50,8 @@ export class ValueFront {
       } else {
         // Tolerate references to unknown objects.
         this._object = {
-          objectId: protocolValue.object,
           className: "Unknown",
+          objectId: protocolValue.object,
         };
       }
     } else if ("unserializableNumber" in protocolValue) {

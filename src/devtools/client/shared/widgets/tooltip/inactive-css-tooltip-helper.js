@@ -39,7 +39,7 @@ class InactiveCssTooltipHelper {
     doc.l10n.resumeObserving();
 
     // Size the content.
-    tooltip.setContentSize({ width: 267, height: Infinity });
+    tooltip.setContentSize({ height: Infinity, width: 267 });
   }
 
   /**
@@ -87,7 +87,7 @@ class InactiveCssTooltipHelper {
     templateNode.innerHTML = `
     <div class="devtools-tooltip-inactive-css">
       <p data-l10n-id="${msgId}"
-         data-l10n-args='${JSON.stringify({ property, display })}'>
+         data-l10n-args='${JSON.stringify({ display, property })}'>
         <strong></strong>
       </p>
       <p data-l10n-id="${fixId}">

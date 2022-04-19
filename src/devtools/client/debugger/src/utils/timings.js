@@ -19,15 +19,15 @@ function getTimes(name) {
 
 function getStats(times) {
   if (times.length == 0) {
-    return { times: [], avg: null, median: null };
+    return { avg: null, median: null, times: [] };
   }
   const avg = times.reduce((sum, time) => time + sum, 0) / times.length;
   const sortedtimings = [...times].sort((a, b) => a - b);
   const median = sortedtimings[times.length / 2];
   return {
-    times,
     avg: +avg.toPrecision(2),
     median: +median.toPrecision(2),
+    times,
   };
 }
 

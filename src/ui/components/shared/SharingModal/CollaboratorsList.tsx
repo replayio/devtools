@@ -1,8 +1,9 @@
 import React from "react";
-import { Recording, User } from "ui/types";
-import hooks from "ui/hooks";
-import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
+import hooks from "ui/hooks";
+import { Recording, User } from "ui/types";
+
+import MaterialIcon from "../MaterialIcon";
 
 export interface CollaboratorDbData {
   collaborationId: string;
@@ -29,7 +30,7 @@ function Collaborator({
   if (collaborator.email) {
     iconAndName = (
       <>
-        <div className="rounded-full bg-gray-300" style={{ padding: "5px", marginRight: "8px" }}>
+        <div className="rounded-full bg-gray-300" style={{ marginRight: "8px", padding: "5px" }}>
           <MaterialIcon className="align-middle text-white" iconSize="xl">
             mail_outline
           </MaterialIcon>

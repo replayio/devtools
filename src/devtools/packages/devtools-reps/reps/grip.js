@@ -7,9 +7,9 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 // Dependencies
-const { interleave, isGrip, wrapRender } = require("./rep-utils");
-const PropRep = require("./prop-rep");
 const { MODE } = require("./constants");
+const PropRep = require("./prop-rep");
+const { interleave, isGrip, wrapRender } = require("./rep-utils");
 
 /**
  * Renders generic grip. Grip is client representation
@@ -17,15 +17,16 @@ const { MODE } = require("./constants");
  * for this rep component.
  */
 GripRep.propTypes = {
-  object: PropTypes.object.isRequired,
+  isInterestingProp: PropTypes.func,
+
   // @TODO Change this to Object.values when supported in Node's version of V8
   mode: PropTypes.oneOf(Object.keys(MODE).map(key => MODE[key])),
-  isInterestingProp: PropTypes.func,
-  title: PropTypes.string,
-  onDOMNodeMouseOver: PropTypes.func,
-  onDOMNodeMouseOut: PropTypes.func,
-  onInspectIconClick: PropTypes.func,
   noGrip: PropTypes.bool,
+  object: PropTypes.object.isRequired,
+  onDOMNodeMouseOut: PropTypes.func,
+  onDOMNodeMouseOver: PropTypes.func,
+  onInspectIconClick: PropTypes.func,
+  title: PropTypes.string,
 };
 
 const DEFAULT_TITLE = "Object";
@@ -34,8 +35,8 @@ function GripRep(props) {
   const { mode = MODE.SHORT, object } = props;
 
   const config = {
-    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-object",
+    "data-link-actor-id": object.id(),
   };
 
   if (mode === MODE.TINY) {
@@ -55,8 +56,8 @@ function GripRep(props) {
         hasProperties
           ? span(
               {
-                key: "more",
                 className: "more-ellipsis",
+                key: "more",
                 title: "more…",
               },
               "…"

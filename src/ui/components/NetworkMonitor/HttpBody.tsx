@@ -1,8 +1,12 @@
-import styles from "./HttpBody.module.css";
 import { BodyData } from "@recordreplay/protocol";
+import classNames from "classnames";
 import { useMemo, useState } from "react";
 import ReactJson from "react-json-view";
+import { useSelector } from "react-redux";
+import { getTheme } from "ui/reducers/app";
+
 import MaterialIcon from "../shared/MaterialIcon";
+
 import BodyDownload from "./BodyDownload";
 import {
   BodyPartsToArrayBuffer,
@@ -13,9 +17,7 @@ import {
   TextBody,
   URLEncodedToPlaintext,
 } from "./content";
-import classNames from "classnames";
-import { useSelector } from "react-redux";
-import { getTheme } from "ui/reducers/app";
+import styles from "./HttpBody.module.css";
 
 const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
   const [copied, setCopied] = useState(false);

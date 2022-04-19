@@ -5,6 +5,7 @@
 
 import { makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
 
+import { addToTree } from "./addToTree";
 import {
   createDirectoryNode,
   getRelativePath,
@@ -13,7 +14,6 @@ import {
   isNotJavaScript,
   getPathWithoutThread,
 } from "./utils";
-import { addToTree } from "./addToTree";
 
 describe("sources tree", () => {
   describe("isExactUrlMatch", () => {

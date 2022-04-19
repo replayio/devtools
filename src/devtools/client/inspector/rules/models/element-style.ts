@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Services = require("devtools/shared/services");
 import Rule from "devtools/client/inspector/rules/models/rule";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import { NodeFront } from "protocol/thread/node";
@@ -10,9 +9,13 @@ import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
+
 import CSSProperties from "../../css-properties";
 import RulesView from "../rules";
+
 import TextProperty, { ComputedProperty } from "./text-property";
+
+const Services = require("devtools/shared/services");
 
 // const { promiseWarn } = require("devtools/client/inspector/shared/utils");
 
@@ -256,7 +259,7 @@ export default class ElementStyle {
       return false;
     }
 
-    this.rules?.push(new Rule(this, { rule: ruleFront, inherited, pseudoElement }));
+    this.rules?.push(new Rule(this, { inherited, pseudoElement, rule: ruleFront }));
     return true;
   }
 

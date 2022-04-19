@@ -4,12 +4,11 @@
 
 "use strict";
 
+const Types = require("devtools/client/inspector/boxmodel/types");
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const PropTypes = require("prop-types");
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-
-const Types = require("devtools/client/inspector/boxmodel/types");
 
 const SHARED_STRINGS_URI = "devtools/client/locales/shared.properties";
 const SHARED_L10N = new LocalizationHelper(SHARED_STRINGS_URI);

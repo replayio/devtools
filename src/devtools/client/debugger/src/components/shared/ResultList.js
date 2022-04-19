@@ -3,15 +3,15 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
 import classnames from "classnames";
+import React, { Component } from "react";
 
 import AccessibleImage from "./AccessibleImage";
 
 export default class ResultList extends Component {
   static defaultProps = {
-    size: "small",
     role: "listbox",
+    size: "small",
   };
 
   renderListItem = (item, index) => {
@@ -21,16 +21,16 @@ export default class ResultList extends Component {
 
     const { selectItem, selected } = this.props;
     const props = {
-      onClick: event => selectItem(event, item, index),
-      key: `${item.id}${item.value}${index}`,
-      ref: String(index),
-      title: item.value,
-      "aria-labelledby": `${item.id}-title`,
       "aria-describedby": `${item.id}-subtitle`,
-      role: "option",
+      "aria-labelledby": `${item.id}-title`,
       className: classnames("result-item", {
         selected: index === selected,
       }),
+      key: `${item.id}${item.value}${index}`,
+      onClick: event => selectItem(event, item, index),
+      ref: String(index),
+      role: "option",
+      title: item.value,
     };
 
     return (

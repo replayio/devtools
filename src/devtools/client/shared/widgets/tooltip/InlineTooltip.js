@@ -24,17 +24,25 @@ function InlineTooltip(doc) {
 }
 
 InlineTooltip.prototype = {
-  /**
-   * Show the tooltip. It might be wise to append some content first if you
-   * don't want the tooltip to be empty.
-   *
-   * @param {Node} anchor
-   *        Which node below which the tooltip should be shown.
-   */
-  show(anchor) {
-    anchor.parentNode.insertBefore(this.panel, anchor.nextSibling);
+  _getTopWindow: function () {
+    return this.doc.defaultView;
+  },
 
-    this.emit("shown");
+  /**
+   * Clears the HTML content of the tooltip panel
+   */
+  clear() {
+    this.panel.innerHTML = "";
+  },
+
+  get content() {
+    return this.panel.firstChild;
+  },
+
+  destroy() {
+    this.hide();
+    this.doc = null;
+    this.panel = null;
   },
 
   /**
@@ -60,13 +68,6 @@ InlineTooltip.prototype = {
   },
 
   /**
-   * Clears the HTML content of the tooltip panel
-   */
-  clear() {
-    this.panel.innerHTML = "";
-  },
-
-  /**
    * Set the content of this tooltip. Will first clear the tooltip and then
    * append the new content element.
    *
@@ -79,18 +80,17 @@ InlineTooltip.prototype = {
     this.panel.appendChild(content);
   },
 
-  get content() {
-    return this.panel.firstChild;
-  },
+  /**
+   * Show the tooltip. It might be wise to append some content first if you
+   * don't want the tooltip to be empty.
+   *
+   * @param {Node} anchor
+   *        Which node below which the tooltip should be shown.
+   */
+  show(anchor) {
+    anchor.parentNode.insertBefore(this.panel, anchor.nextSibling);
 
-  _getTopWindow: function () {
-    return this.doc.defaultView;
-  },
-
-  destroy() {
-    this.hide();
-    this.doc = null;
-    this.panel = null;
+    this.emit("shown");
   },
 };
 

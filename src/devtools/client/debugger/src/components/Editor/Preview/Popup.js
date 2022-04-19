@@ -2,15 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component } from "react";
-import { connect } from "devtools/client/debugger/src/utils/connect";
-import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
 import actions from "devtools/client/debugger/src/actions";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import { connect } from "devtools/client/debugger/src/utils/connect";
 import {
   highlightDomElement,
   unHighlightDomElement,
 } from "devtools/client/webconsole/actions/toolbox";
-import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
+import React, { Component } from "react";
+
 import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
 
@@ -101,8 +102,8 @@ export class Popup extends Component {
     return (
       <div className="preview-popup">
         {Rep({
-          object: resultGrip,
           mode: MODE.LONG,
+          object: resultGrip,
           openLink,
         })}
       </div>
@@ -178,12 +179,12 @@ const mapStateToProps = state => ({
 const { selectSourceURL, openLink, openElementInInspectorCommand, clearPreview } = actions;
 
 const mapDispatchToProps = {
-  selectSourceURL,
-  openLink,
-  openElementInInspector: openElementInInspectorCommand,
-  highlightDomElement,
-  unHighlightDomElement,
   clearPreview,
+  highlightDomElement,
+  openElementInInspector: openElementInInspectorCommand,
+  openLink,
+  selectSourceURL,
+  unHighlightDomElement,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Popup);

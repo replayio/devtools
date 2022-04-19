@@ -160,7 +160,7 @@ function detectIndentation(textIteratorFn) {
     return null;
   }
 
-  return { tabs: false, spaces: freqIndent };
+  return { spaces: freqIndent, tabs: false };
 }
 
 exports.EXPAND_TAB = EXPAND_TAB;

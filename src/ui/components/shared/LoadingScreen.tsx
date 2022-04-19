@@ -7,9 +7,10 @@ import {
   getUploading,
 } from "ui/reducers/app";
 import { UIState } from "ui/state";
+
 import { LoadingTips } from "./LoadingTips";
-import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
+import { BubbleViewportWrapper } from "./Viewport";
 
 export function LoadingScreenTemplate({
   children,
@@ -37,7 +38,7 @@ export function ProgressBar({ progress }: { progress: number }) {
     <div className="relative h-1.5 w-full overflow-hidden rounded-lg bg-themeBase-90 p-0">
       <div
         className="t-0 absolute h-full bg-primaryAccent"
-        style={{ width: `${progress}%`, transitionDuration: "400ms" }}
+        style={{ transitionDuration: "400ms", width: `${progress}%` }}
       />
     </div>
   );
@@ -78,10 +79,10 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
 }
 
 const connector = connect((state: UIState) => ({
-  uploading: getUploading(state),
   awaitingSourcemaps: getAwaitingSourcemaps(state),
-  progress: getDisplayedLoadingProgress(state),
   finished: getLoadingFinished(state),
+  progress: getDisplayedLoadingProgress(state),
+  uploading: getUploading(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

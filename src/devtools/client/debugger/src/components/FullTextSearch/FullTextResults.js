@@ -1,5 +1,7 @@
 import React from "react";
+
 import ManagedTree from "../shared/ManagedTree";
+
 import { FullTextItem } from "./FullTextItem";
 import { FullTextSummary } from "./FullTextSummary";
 

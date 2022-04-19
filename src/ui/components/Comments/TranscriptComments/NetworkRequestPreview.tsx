@@ -5,7 +5,6 @@ import { showRequestDetails } from "ui/actions/network";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSummaryById } from "ui/reducers/network";
 import { UIState } from "ui/state";
-
 import { trackEvent } from "ui/utils/telemetry";
 
 export default function NetworkRequestPreview({ networkRequestId }: { networkRequestId: string }) {

@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { CSSProperties, ReactNode } from "react";
+
 import BubbleBackground from "./Onboarding/BubbleBackground";
 
 function FullViewportWrapper({

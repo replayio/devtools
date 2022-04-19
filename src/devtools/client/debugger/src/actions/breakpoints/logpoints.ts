@@ -1,12 +1,15 @@
 import { UIThunkAction } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
-import { _addBreakpointAtLine, Context } from ".";
+
 import { Breakpoint, getBreakpointsForSourceId } from "../../reducers/breakpoints";
 import { getLogpointsForSource } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isBreakable } from "../../utils/breakpoint";
+
 import { _removeBreakpoint, removeBreakpointOption, removeRequestedBreakpoint } from "./modify";
+
+import { _addBreakpointAtLine, Context } from ".";
 
 export function removeLogpointsInSource(cx: Context, source: Source): UIThunkAction {
   return async (dispatch, getState) => {

@@ -5,8 +5,8 @@
 //
 
 import { parse } from "../../utils/url";
-
 import { isPretty } from "../source";
+
 import { getURL } from "./getURL";
 const IGNORED_URLS = ["debugger eval code", "XStringBundle"];
 
@@ -101,19 +101,19 @@ export function partIsFile(index, parts, url) {
 
 export function createDirectoryNode(name, path, contents) {
   return {
-    type: "directory",
+    contents,
     name,
     path,
-    contents,
+    type: "directory",
   };
 }
 
 export function createSourceNode(name, path, contents) {
   return {
-    type: "source",
+    contents,
     name,
     path,
-    contents,
+    type: "source",
   };
 }
 

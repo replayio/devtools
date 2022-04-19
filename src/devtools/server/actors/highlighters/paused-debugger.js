@@ -27,8 +27,6 @@ function PausedDebuggerOverlay(highlighterEnv, options = {}) {
 }
 
 PausedDebuggerOverlay.prototype = {
-  typeName: "PausedDebuggerOverlay",
-
   ID_CLASS_PREFIX: "paused-dbg-",
 
   _buildMarkup() {
@@ -41,79 +39,79 @@ PausedDebuggerOverlay.prototype = {
 
     // Wrapper element.
     const wrapper = createNode(window, {
-      parent: container,
       attributes: {
-        id: "root",
         class: "root",
         hidden: "true",
+        id: "root",
         overlay: "true",
       },
+      parent: container,
       prefix,
     });
 
     const toolbar = createNode(window, {
-      parent: wrapper,
       attributes: {
-        id: "toolbar",
         class: "toolbar",
+        id: "toolbar",
       },
+      parent: wrapper,
       prefix,
     });
 
     createNode(window, {
+      attributes: {
+        class: "reason",
+        id: "reason",
+      },
       nodeType: "span",
       parent: toolbar,
-      attributes: {
-        id: "reason",
-        class: "reason",
-      },
       prefix,
     });
 
     createNode(window, {
-      parent: toolbar,
       attributes: {
-        id: "divider",
         class: "divider",
+        id: "divider",
       },
+      parent: toolbar,
       prefix,
     });
 
     const stepWrapper = createNode(window, {
-      parent: toolbar,
       attributes: {
-        id: "step-button-wrapper",
         class: "step-button-wrapper",
+        id: "step-button-wrapper",
       },
+      parent: toolbar,
       prefix,
     });
 
     createNode(window, {
+      attributes: {
+        class: "step-button",
+        id: "step-button",
+      },
       nodeType: "button",
       parent: stepWrapper,
-      attributes: {
-        id: "step-button",
-        class: "step-button",
-      },
       prefix,
     });
 
     const resumeWrapper = createNode(window, {
-      parent: toolbar,
       attributes: {
-        id: "resume-button-wrapper",
         class: "resume-button-wrapper",
+        id: "resume-button-wrapper",
       },
+      parent: toolbar,
       prefix,
     });
 
     createNode(window, {
+      attributes: {
+        class: "resume-button",
+        id: "resume-button",
+      },
       nodeType: "button",
       parent: resumeWrapper,
-      attributes: {
-        id: "resume-button",
-        class: "resume-button",
-      },
       prefix,
     });
 
@@ -125,6 +123,41 @@ PausedDebuggerOverlay.prototype = {
     this.markup.destroy();
     this.env = null;
     this.lastTarget = null;
+  },
+
+  getElement(id) {
+    return this.markup.getElement(this.ID_CLASS_PREFIX + id);
+  },
+
+  handleEvent(e) {
+    switch (e.type) {
+      case "mousedown":
+        this.onClick(e.target);
+        break;
+      case "DOMMouseScroll":
+        // Prevent scrolling. That's because we only took a screenshot of the viewport, so
+        // scrolling out of the viewport wouldn't draw the expected things. In the future
+        // we can take the screenshot again on scroll, but for now it doesn't seem
+        // important.
+        e.preventDefault();
+        break;
+
+      case "mousemove":
+        this.onMouseMove(e.target);
+        break;
+    }
+  },
+
+  hide() {
+    if (this.env.isXUL) {
+      return;
+    }
+
+    const { pageListenerTarget } = this.env;
+    pageListenerTarget.removeEventListener("mousemove", this);
+
+    // Hide the overlay.
+    this.getElement("root").setAttribute("hidden", "true");
   },
 
   onClick(target) {
@@ -167,29 +200,6 @@ PausedDebuggerOverlay.prototype = {
     }
   },
 
-  handleEvent(e) {
-    switch (e.type) {
-      case "mousedown":
-        this.onClick(e.target);
-        break;
-      case "DOMMouseScroll":
-        // Prevent scrolling. That's because we only took a screenshot of the viewport, so
-        // scrolling out of the viewport wouldn't draw the expected things. In the future
-        // we can take the screenshot again on scroll, but for now it doesn't seem
-        // important.
-        e.preventDefault();
-        break;
-
-      case "mousemove":
-        this.onMouseMove(e.target);
-        break;
-    }
-  },
-
-  getElement(id) {
-    return this.markup.getElement(this.ID_CLASS_PREFIX + id);
-  },
-
   show(node, options = {}) {
     if (this.env.isXUL || !options.reason) {
       return false;
@@ -227,16 +237,6 @@ PausedDebuggerOverlay.prototype = {
     return true;
   },
 
-  hide() {
-    if (this.env.isXUL) {
-      return;
-    }
-
-    const { pageListenerTarget } = this.env;
-    pageListenerTarget.removeEventListener("mousemove", this);
-
-    // Hide the overlay.
-    this.getElement("root").setAttribute("hidden", "true");
-  },
+  typeName: "PausedDebuggerOverlay",
 };
 exports.PausedDebuggerOverlay = PausedDebuggerOverlay;

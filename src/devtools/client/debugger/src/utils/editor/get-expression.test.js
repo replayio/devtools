@@ -5,6 +5,7 @@
 //
 
 import CodeMirror from "codemirror";
+
 import { getExpressionFromCoords } from "./get-expression";
 
 describe("get-expression", () => {
@@ -33,130 +34,130 @@ describe("get-expression", () => {
   describe("getExpressionFromCoords", () => {
     xit("returns null when location.line is greater than the lineCount", () => {
       const cm = CodeMirror(document.body, {
-        value: "let Line1;\n" + "let Line2;\n",
         mode: "javascript",
+        value: "let Line1;\n" + "let Line2;\n",
       });
 
       const result = getExpressionFromCoords(cm, {
-        line: 3,
         column: 1,
+        line: 3,
       });
       expect(result).toBeNull();
     });
 
     xit("gets the expression using CodeMirror.getTokenAt", () => {
       const codemirrorMock = {
-        lineCount: () => 100,
-        getTokenAt: jest.fn(() => ({ start: 0, end: 0 })),
         doc: {
           getLine: () => "",
         },
+        getTokenAt: jest.fn(() => ({ end: 0, start: 0 })),
+        lineCount: () => 100,
       };
-      getExpressionFromCoords(codemirrorMock, { line: 1, column: 1 });
+      getExpressionFromCoords(codemirrorMock, { column: 1, line: 1 });
       expect(codemirrorMock.getTokenAt).toHaveBeenCalled();
     });
 
     xit("requests the correct line and column from codeMirror", () => {
       const codemirrorMock = {
-        lineCount: () => 100,
-        getTokenAt: jest.fn(() => ({ start: 0, end: 1 })),
         doc: {
           getLine: jest.fn(() => ""),
         },
+        getTokenAt: jest.fn(() => ({ end: 1, start: 0 })),
+        lineCount: () => 100,
       };
-      getExpressionFromCoords(codemirrorMock, { line: 20, column: 5 });
+      getExpressionFromCoords(codemirrorMock, { column: 5, line: 20 });
       // getExpressionsFromCoords uses one based line indexing
       // CodeMirror uses zero based line indexing
       expect(codemirrorMock.getTokenAt).toHaveBeenCalledWith({
-        line: 19,
         ch: 5,
+        line: 19,
       });
       expect(codemirrorMock.doc.getLine).toHaveBeenCalledWith(19);
     });
 
     xit("when called with column 0 returns null", () => {
       const cm = CodeMirror(document.body, {
-        value: "foo bar;\n",
         mode: "javascript",
+        value: "foo bar;\n",
       });
 
       const result = getExpressionFromCoords(cm, {
-        line: 1,
         column: 0,
+        line: 1,
       });
       expect(result).toBeNull();
     });
 
     xit("gets the expression when first token on the line", () => {
       const cm = CodeMirror(document.body, {
-        value: "foo bar;\n",
         mode: "javascript",
+        value: "foo bar;\n",
       });
 
       const result = getExpressionFromCoords(cm, {
-        line: 1,
         column: 1,
+        line: 1,
       });
       if (!result) {
         throw new Error("no result");
       }
       expect(result.expression).toEqual("foo");
-      expect(result.location.start).toEqual({ line: 1, column: 0 });
-      expect(result.location.end).toEqual({ line: 1, column: 3 });
+      expect(result.location.start).toEqual({ column: 0, line: 1 });
+      expect(result.location.end).toEqual({ column: 3, line: 1 });
     });
 
     xit("includes previous tokens in the expression", () => {
       const cm = CodeMirror(document.body, {
-        value: "foo.bar;\n",
         mode: "javascript",
+        value: "foo.bar;\n",
       });
 
       const result = getExpressionFromCoords(cm, {
-        line: 1,
         column: 5,
+        line: 1,
       });
       if (!result) {
         throw new Error("no result");
       }
       expect(result.expression).toEqual("foo.bar");
-      expect(result.location.start).toEqual({ line: 1, column: 0 });
-      expect(result.location.end).toEqual({ line: 1, column: 7 });
+      expect(result.location.start).toEqual({ column: 0, line: 1 });
+      expect(result.location.end).toEqual({ column: 7, line: 1 });
     });
 
     xit("includes multiple previous tokens in the expression", () => {
       const cm = CodeMirror(document.body, {
-        value: "foo.bar.baz;\n",
         mode: "javascript",
+        value: "foo.bar.baz;\n",
       });
 
       const result = getExpressionFromCoords(cm, {
-        line: 1,
         column: 10,
+        line: 1,
       });
       if (!result) {
         throw new Error("no result");
       }
       expect(result.expression).toEqual("foo.bar.baz");
-      expect(result.location.start).toEqual({ line: 1, column: 0 });
-      expect(result.location.end).toEqual({ line: 1, column: 11 });
+      expect(result.location.start).toEqual({ column: 0, line: 1 });
+      expect(result.location.end).toEqual({ column: 11, line: 1 });
     });
 
     xit("does not include tokens not part of the expression", () => {
       const cm = CodeMirror(document.body, {
-        value: "foo bar.baz;\n",
         mode: "javascript",
+        value: "foo bar.baz;\n",
       });
 
       const result = getExpressionFromCoords(cm, {
-        line: 1,
         column: 10,
+        line: 1,
       });
       if (!result) {
         throw new Error("no result");
       }
       expect(result.expression).toEqual("bar.baz");
-      expect(result.location.start).toEqual({ line: 1, column: 4 });
-      expect(result.location.end).toEqual({ line: 1, column: 11 });
+      expect(result.location.start).toEqual({ column: 4, line: 1 });
+      expect(result.location.end).toEqual({ column: 11, line: 1 });
     });
   });
 });

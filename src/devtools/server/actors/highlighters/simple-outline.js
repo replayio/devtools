@@ -9,7 +9,6 @@ const {
   addPseudoClassLock,
   removePseudoClassLock,
 } = require("devtools/server/actors/highlighters/utils/markup");
-
 const { loadSheet } = require("devtools/shared/layout/utils");
 
 // SimpleOutlineHighlighter's stylesheet
@@ -46,6 +45,16 @@ SimpleOutlineHighlighter.prototype = {
   },
 
   /**
+   * Hide the highlighter, the outline and the infobar.
+   */
+  hide: function () {
+    if (this.currentNode) {
+      removePseudoClassLock(this.currentNode, HIGHLIGHTED_PSEUDO_CLASS);
+      this.currentNode = null;
+    }
+  },
+
+  /**
    * Show the highlighter on a given node
    * @param {DOMNode} node
    */
@@ -57,16 +66,6 @@ SimpleOutlineHighlighter.prototype = {
       addPseudoClassLock(node, HIGHLIGHTED_PSEUDO_CLASS);
     }
     return true;
-  },
-
-  /**
-   * Hide the highlighter, the outline and the infobar.
-   */
-  hide: function () {
-    if (this.currentNode) {
-      removePseudoClassLock(this.currentNode, HIGHLIGHTED_PSEUDO_CLASS);
-      this.currentNode = null;
-    }
   },
 };
 exports.SimpleOutlineHighlighter = SimpleOutlineHighlighter;

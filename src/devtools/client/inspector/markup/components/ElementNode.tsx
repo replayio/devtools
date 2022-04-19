@@ -1,6 +1,7 @@
-import React, { PureComponent, MouseEvent } from "react";
-import { NodeInfo } from "../state/markup";
 import { Attr } from "@recordreplay/protocol";
+import React, { PureComponent, MouseEvent } from "react";
+
+import { NodeInfo } from "../state/markup";
 
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
@@ -11,15 +12,15 @@ const { HTML_VOID_ELEMENTS } = require("../constants");
 // element markup and their respective title tooltip text.
 const DISPLAY_TYPES: { [key: string]: string | undefined } = {
   flex: "This element behaves like a block element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
+  "flow-root":
+    "This element generates a block element box that establishes a new block formatting context.",
+  grid: "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
   "inline-flex":
     "This element behaves like an inline element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
-  grid: "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
   "inline-grid":
     "This element behaves like an inline element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
   subgrid:
     "This element lays out its content according to the grid model but defers the definition of its rows and/or columns to its parent grid container.",
-  "flow-root":
-    "This element generates a block element box that establishes a new block formatting context.",
   contents: "This element doesn’t produce a specific box by itself, but renders its contents.",
 };
 

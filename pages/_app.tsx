@@ -1,25 +1,25 @@
 import "../src/test-prep";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
-import { useRouter } from "next/router";
 import NextApp from "next/app";
+import Head from "next/head";
+import { useRouter } from "next/router";
 import React, { ReactNode, useEffect, useState } from "react";
-import { IntercomProvider } from "react-use-intercom";
 import { Provider } from "react-redux";
+import { IntercomProvider } from "react-use-intercom";
 import { Store } from "redux";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
-import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";
-import { bootstrapApp } from "ui/setup";
-import { ConfirmProvider } from "ui/components/shared/Confirm";
+import ErrorBoundary from "ui/components/ErrorBoundary";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
-import { InstallRouteListener } from "ui/utils/routeListener";
+import { ConfirmProvider } from "ui/components/shared/Confirm";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+import { bootstrapApp } from "ui/setup";
+import { ApolloWrapper } from "ui/utils/apolloClient";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
+import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
-import { ApolloWrapper } from "ui/utils/apolloClient";
 
 import "image/image.css";
 import "image/icon.css";

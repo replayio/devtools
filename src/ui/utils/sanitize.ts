@@ -1,21 +1,21 @@
 import { Pause, ValueFront } from "protocol/thread";
-import { NodeFront } from "protocol/thread/node";
-import { StyleSheetFront } from "protocol/thread/styleSheet";
-import { StyleFront } from "protocol/thread/style";
-import { RuleFront } from "protocol/thread/rule";
 import { NodeBoundsFront } from "protocol/thread/bounds";
+import { NodeFront } from "protocol/thread/node";
+import { RuleFront } from "protocol/thread/rule";
+import { StyleFront } from "protocol/thread/style";
+import { StyleSheetFront } from "protocol/thread/styleSheet";
 import { Dispatch, Middleware } from "redux";
-import { UIState } from "ui/state";
 import { UIAction } from "ui/actions";
+import { UIState } from "ui/state";
 
 const forbiddenClasses: Record<string, any> = {
-  Pause,
-  ValueFront,
-  NodeFront,
-  StyleSheetFront,
-  StyleFront,
-  RuleFront,
   NodeBoundsFront,
+  NodeFront,
+  Pause,
+  RuleFront,
+  StyleFront,
+  StyleSheetFront,
+  ValueFront,
 };
 
 const excludedActions = [

@@ -1,7 +1,8 @@
-import { Action } from "redux";
 import { ExecutionPoint } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
+import { Action } from "redux";
 import { Annotation } from "ui/state/reactDevTools";
+
 import { UIStore, UIThunkAction } from ".";
 
 export type AddAnnotationsAction = Action<"add_annotations"> & { annotations: Annotation[] };
@@ -20,9 +21,9 @@ export function setupReactDevTools(store: UIStore) {
     store.dispatch(
       addAnnotations(
         annotations.map(({ point, time, contents }) => ({
+          message: JSON.parse(contents),
           point,
           time,
-          message: JSON.parse(contents),
         }))
       )
     );
@@ -30,11 +31,11 @@ export function setupReactDevTools(store: UIStore) {
 }
 
 export function setHasReactComponents(hasReactComponents: boolean): SetHasReactComponentsAction {
-  return { type: "set_has_react_components", hasReactComponents };
+  return { hasReactComponents, type: "set_has_react_components" };
 }
 
 export function addAnnotations(annotations: Annotation[]): AddAnnotationsAction {
-  return { type: "add_annotations", annotations };
+  return { annotations, type: "add_annotations" };
 }
 
 export function setProtocolCheckFailed(): UIThunkAction {

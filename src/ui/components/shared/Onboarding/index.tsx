@@ -9,9 +9,11 @@ import React, {
   useState,
 } from "react";
 import { actions } from "ui/actions";
+
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
+
 import BubbleBackground from "./BubbleBackground";
 
 const OnboardingContext = React.createContext({ theme: "dark" });

@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-
 import { assert } from "protocol/utils";
+import React, { useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import { isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
@@ -46,10 +45,10 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   useEffect(() => {
     if (error) {
       sendTelemetryEvent("DevtoolsGraphQLError", {
+        environment: isDevelopment() ? "dev" : "prod",
+        message: error,
         source: "useGetWorkspaceSubscription",
         workspaceId,
-        message: error,
-        environment: isDevelopment() ? "dev" : "prod",
       });
     }
   });
@@ -68,8 +67,8 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
         assert(subscription.paymentMethods?.[0]?.id, "Payment method was not found");
         await activateWorkspaceSubscription({
           variables: {
-            planKey,
             paymentMethodBillingId: subscription.paymentMethods[0].id,
+            planKey,
           },
         });
       } else {
@@ -78,8 +77,8 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       }
     } catch (e: any) {
       sendTelemetryEvent("devtools-billing", {
-        workspaceId: workspace.id,
         errorMessage: e.message,
+        workspaceId: workspace.id,
       });
 
       setErrorMessage(
@@ -104,15 +103,15 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       if (resubscribe) {
         await activateWorkspaceSubscription({
           variables: {
-            planKey,
             paymentMethodBillingId,
+            planKey,
           },
         });
       }
     } catch (e: any) {
       sendTelemetryEvent("devtools-billing", {
-        workspaceId: workspace.id,
         errorMessage: e.message,
+        workspaceId: workspace.id,
       });
 
       setErrorMessage(

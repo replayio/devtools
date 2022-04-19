@@ -4,10 +4,12 @@
 
 //
 
-import React, { Component } from "react";
-import Modal from "./shared/Modal";
 import classnames from "classnames";
+import React, { Component } from "react";
+
 import { formatKeyShortcut } from "../utils/text";
+
+import Modal from "./shared/Modal";
 
 export class ShortcutsModal extends Component {
   renderPrettyCombos(combo) {

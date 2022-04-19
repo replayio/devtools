@@ -4,11 +4,11 @@
 
 "use strict";
 
-const React = require("react");
-const PropTypes = require("prop-types");
-const dom = require("react-dom-factories");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 const Frame = require("devtools/client/shared/components/Frame");
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const PropTypes = require("prop-types");
+const React = require("react");
+const dom = require("react-dom-factories");
 
 const l10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
@@ -32,8 +32,8 @@ class AsyncFrameClass extends React.Component {
 class StackTrace extends React.Component {
   static get propTypes() {
     return {
-      stacktrace: PropTypes.array.isRequired,
       onViewSourceInDebugger: PropTypes.func.isRequired,
+      stacktrace: PropTypes.array.isRequired,
     };
   }
 
@@ -50,8 +50,8 @@ class StackTrace extends React.Component {
         frames.push(
           "\t",
           React.createElement(AsyncFrameClass, {
-            key: `${i}-asyncframe`,
             asyncCause: s.asyncCause,
+            key: `${i}-asyncframe`,
           }),
           "\n"
         );
@@ -61,17 +61,17 @@ class StackTrace extends React.Component {
       frames.push(
         "\t",
         React.createElement(Frame, {
-          key: `${i}-frame`,
           frame: {
-            functionDisplayName: s.functionName,
-            source,
-            line: s.lineNumber,
             column: s.columnNumber,
+            functionDisplayName: s.functionName,
+            line: s.lineNumber,
+            source,
           },
-          showFunctionName: true,
+          key: `${i}-frame`,
+          onClick: onViewSourceInDebugger,
           showAnonymousFunctionName: true,
           showFullSourceUrl: true,
-          onClick: onViewSourceInDebugger,
+          showFunctionName: true,
         }),
         "\n"
       );

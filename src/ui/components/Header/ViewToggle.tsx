@@ -1,20 +1,20 @@
+import classnames from "classnames";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import classnames from "classnames";
-import hooks from "ui/hooks";
-import { isTest } from "ui/utils/environment";
 import { setViewMode } from "ui/actions/layout";
-import { ViewMode } from "ui/state/layout";
+import hooks from "ui/hooks";
 import { getViewMode } from "ui/reducers/layout";
+import { ViewMode } from "ui/state/layout";
+import { isTest } from "ui/utils/environment";
 
 const MODES = [
   {
-    mode: "non-dev",
     label: "Viewer",
+    mode: "non-dev",
   },
   {
-    mode: "dev",
     label: "DevTools",
+    mode: "dev",
   },
 ] as const;
 

@@ -4,10 +4,11 @@
 
 //
 
-import parseScriptTags from "parse-script-tags";
 import * as babelParser from "@babel/parser";
 import * as t from "@babel/types";
 import isEmpty from "lodash/isEmpty";
+import parseScriptTags from "parse-script-tags";
+
 import { getSource } from "../sources";
 
 let ASTs = new Map();
@@ -21,8 +22,6 @@ function _parse(code, opts) {
 
 const sourceOptions = {
   generated: {
-    sourceType: "unambiguous",
-    tokens: true,
     plugins: [
       "jsx",
       "doExpressions",
@@ -36,10 +35,10 @@ const sourceOptions = {
       "functionSent",
       "react-jsx",
     ],
-  },
-  original: {
     sourceType: "unambiguous",
     tokens: true,
+  },
+  original: {
     plugins: [
       "jsx",
       "doExpressions",
@@ -56,6 +55,8 @@ const sourceOptions = {
       "dynamicImport",
       "react-jsx",
     ],
+    sourceType: "unambiguous",
+    tokens: true,
   },
 };
 

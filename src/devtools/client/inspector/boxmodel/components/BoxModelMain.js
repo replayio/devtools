@@ -4,15 +4,13 @@
 
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
+const BoxModelEditable = require("devtools/client/inspector/boxmodel/components/BoxModelEditable");
+const Types = require("devtools/client/inspector/boxmodel/types");
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 const { LocalizationHelper } = require("devtools/shared/l10n");
-
-const BoxModelEditable = require("devtools/client/inspector/boxmodel/components/BoxModelEditable");
-
-const Types = require("devtools/client/inspector/boxmodel/types");
+const PropTypes = require("prop-types");
+const React = require("react");
+const dom = require("react-dom-factories");
 
 const SHARED_STRINGS_URI = "devtools/client/locales/shared.properties";
 const SHARED_L10N = new LocalizationHelper(SHARED_STRINGS_URI);
@@ -65,12 +63,19 @@ class BoxModelMain extends React.PureComponent {
     const isContentBox = this.getContextBox();
 
     this.layouts = {
-      position: new Map([
-        [KeyCodes.DOM_VK_ESCAPE, this.positionLayout],
-        [KeyCodes.DOM_VK_DOWN, this.marginLayout],
-        [KeyCodes.DOM_VK_RETURN, this.positionEditable],
-        [KeyCodes.DOM_VK_UP, null],
-        ["click", this.positionLayout],
+      border: new Map([
+        [KeyCodes.DOM_VK_ESCAPE, this.borderLayout],
+        [KeyCodes.DOM_VK_DOWN, this.paddingLayout],
+        [KeyCodes.DOM_VK_RETURN, this.borderEditable],
+        [KeyCodes.DOM_VK_UP, this.marginLayout],
+        ["click", this.borderLayout],
+      ]),
+      content: new Map([
+        [KeyCodes.DOM_VK_ESCAPE, this.contentLayout],
+        [KeyCodes.DOM_VK_DOWN, null],
+        [KeyCodes.DOM_VK_RETURN, this.contentEditable],
+        [KeyCodes.DOM_VK_UP, this.paddingLayout],
+        ["click", this.contentLayout],
       ]),
       margin: new Map([
         [KeyCodes.DOM_VK_ESCAPE, this.marginLayout],
@@ -79,13 +84,6 @@ class BoxModelMain extends React.PureComponent {
         [KeyCodes.DOM_VK_UP, displayPosition ? this.positionLayout : null],
         ["click", this.marginLayout],
       ]),
-      border: new Map([
-        [KeyCodes.DOM_VK_ESCAPE, this.borderLayout],
-        [KeyCodes.DOM_VK_DOWN, this.paddingLayout],
-        [KeyCodes.DOM_VK_RETURN, this.borderEditable],
-        [KeyCodes.DOM_VK_UP, this.marginLayout],
-        ["click", this.borderLayout],
-      ]),
       padding: new Map([
         [KeyCodes.DOM_VK_ESCAPE, this.paddingLayout],
         [KeyCodes.DOM_VK_DOWN, isContentBox ? this.contentLayout : null],
@@ -93,12 +91,12 @@ class BoxModelMain extends React.PureComponent {
         [KeyCodes.DOM_VK_UP, this.borderLayout],
         ["click", this.paddingLayout],
       ]),
-      content: new Map([
-        [KeyCodes.DOM_VK_ESCAPE, this.contentLayout],
-        [KeyCodes.DOM_VK_DOWN, null],
-        [KeyCodes.DOM_VK_RETURN, this.contentEditable],
-        [KeyCodes.DOM_VK_UP, this.paddingLayout],
-        ["click", this.contentLayout],
+      position: new Map([
+        [KeyCodes.DOM_VK_ESCAPE, this.positionLayout],
+        [KeyCodes.DOM_VK_DOWN, this.marginLayout],
+        [KeyCodes.DOM_VK_RETURN, this.positionEditable],
+        [KeyCodes.DOM_VK_UP, null],
+        ["click", this.positionLayout],
       ]),
     };
   }
@@ -286,9 +284,9 @@ class BoxModelMain extends React.PureComponent {
     }
 
     this.props.onShowBoxModelHighlighter({
+      onlyRegionArea: true,
       region,
       showOnly: region,
-      onlyRegionArea: true,
     });
 
     event.preventDefault();
@@ -431,23 +429,23 @@ class BoxModelMain extends React.PureComponent {
               box: "content",
               focusable,
               level,
+              onShowBoxModelEditor,
+              onShowRulePreviewTooltip,
               property: "width",
               ref: editable => {
                 this.contentEditable = editable;
               },
               textContent: width,
-              onShowBoxModelEditor,
-              onShowRulePreviewTooltip,
             }),
             dom.span({}, "\u00D7"),
             React.createElement(BoxModelEditable, {
               box: "content",
               focusable,
               level,
-              property: "height",
-              textContent: height,
               onShowBoxModelEditor,
               onShowRulePreviewTooltip,
+              property: "height",
+              textContent: height,
             })
           )
         : dom.p(
@@ -459,13 +457,13 @@ class BoxModelMain extends React.PureComponent {
       {
         className: "boxmodel-main devtools-monospace",
         "data-box": "position",
+        onClick: this.onLevelClick,
+        onKeyDown: this.onKeyDown,
+        onMouseOut: this.props.onHideBoxModelHighlighter,
+        onMouseOver: this.onHighlightMouseOver,
         ref: div => {
           this.positionLayout = div;
         },
-        onClick: this.onLevelClick,
-        onKeyDown: this.onKeyDown,
-        onMouseOver: this.onHighlightMouseOver,
-        onMouseOut: this.props.onHideBoxModelHighlighter,
       },
       displayPosition
         ? dom.span(
@@ -491,10 +489,10 @@ class BoxModelMain extends React.PureComponent {
           {
             className: "boxmodel-margins",
             "data-box": "margin",
-            title: "margin",
             ref: div => {
               this.marginLayout = div;
             },
+            title: "margin",
           },
           dom.span(
             {
@@ -508,10 +506,10 @@ class BoxModelMain extends React.PureComponent {
             {
               className: "boxmodel-borders",
               "data-box": "border",
-              title: "border",
               ref: div => {
                 this.borderLayout = div;
               },
+              title: "border",
             },
             dom.span(
               {
@@ -525,18 +523,18 @@ class BoxModelMain extends React.PureComponent {
               {
                 className: "boxmodel-paddings",
                 "data-box": "padding",
-                title: "padding",
                 ref: div => {
                   this.paddingLayout = div;
                 },
+                title: "padding",
               },
               dom.div({
                 className: "boxmodel-contents",
                 "data-box": "content",
-                title: "content",
                 ref: div => {
                   this.contentLayout = div;
                 },
+                title: "content",
               })
             )
           )
@@ -548,13 +546,13 @@ class BoxModelMain extends React.PureComponent {
             direction: "top",
             focusable,
             level,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
             property: "position-top",
             ref: editable => {
               this.positionEditable = editable;
             },
             textContent: positionTop,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
           })
         : null,
       displayPosition
@@ -563,10 +561,10 @@ class BoxModelMain extends React.PureComponent {
             direction: "right",
             focusable,
             level,
-            property: "position-right",
-            textContent: positionRight,
             onShowBoxModelEditor,
             onShowRulePreviewTooltip,
+            property: "position-right",
+            textContent: positionRight,
           })
         : null,
       displayPosition
@@ -575,10 +573,10 @@ class BoxModelMain extends React.PureComponent {
             direction: "bottom",
             focusable,
             level,
-            property: "position-bottom",
-            textContent: positionBottom,
             onShowBoxModelEditor,
             onShowRulePreviewTooltip,
+            property: "position-bottom",
+            textContent: positionBottom,
           })
         : null,
       displayPosition
@@ -587,10 +585,10 @@ class BoxModelMain extends React.PureComponent {
             direction: "left",
             focusable,
             level,
-            property: "position-left",
-            textContent: positionLeft,
             onShowBoxModelEditor,
             onShowRulePreviewTooltip,
+            property: "position-left",
+            textContent: positionLeft,
           })
         : null,
       React.createElement(BoxModelEditable, {
@@ -598,129 +596,129 @@ class BoxModelMain extends React.PureComponent {
         direction: "top",
         focusable,
         level,
+        onShowBoxModelEditor,
+        onShowRulePreviewTooltip,
         property: "margin-top",
         ref: editable => {
           this.marginEditable = editable;
         },
         textContent: marginTop,
-        onShowBoxModelEditor,
-        onShowRulePreviewTooltip,
       }),
       React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "right",
         focusable,
         level,
-        property: "margin-right",
-        textContent: marginRight,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "margin-right",
+        textContent: marginRight,
       }),
       React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "bottom",
         focusable,
         level,
-        property: "margin-bottom",
-        textContent: marginBottom,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "margin-bottom",
+        textContent: marginBottom,
       }),
       React.createElement(BoxModelEditable, {
         box: "margin",
         direction: "left",
         focusable,
         level,
-        property: "margin-left",
-        textContent: marginLeft,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "margin-left",
+        textContent: marginLeft,
       }),
       React.createElement(BoxModelEditable, {
         box: "border",
         direction: "top",
         focusable,
         level,
+        onShowBoxModelEditor,
+        onShowRulePreviewTooltip,
         property: "border-top-width",
         ref: editable => {
           this.borderEditable = editable;
         },
         textContent: borderTop,
-        onShowBoxModelEditor,
-        onShowRulePreviewTooltip,
       }),
       React.createElement(BoxModelEditable, {
         box: "border",
         direction: "right",
         focusable,
         level,
-        property: "border-right-width",
-        textContent: borderRight,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "border-right-width",
+        textContent: borderRight,
       }),
       React.createElement(BoxModelEditable, {
         box: "border",
         direction: "bottom",
         focusable,
         level,
-        property: "border-bottom-width",
-        textContent: borderBottom,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "border-bottom-width",
+        textContent: borderBottom,
       }),
       React.createElement(BoxModelEditable, {
         box: "border",
         direction: "left",
         focusable,
         level,
-        property: "border-left-width",
-        textContent: borderLeft,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "border-left-width",
+        textContent: borderLeft,
       }),
       React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "top",
         focusable,
         level,
+        onShowBoxModelEditor,
+        onShowRulePreviewTooltip,
         property: "padding-top",
         ref: editable => {
           this.paddingEditable = editable;
         },
         textContent: paddingTop,
-        onShowBoxModelEditor,
-        onShowRulePreviewTooltip,
       }),
       React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "right",
         focusable,
         level,
-        property: "padding-right",
-        textContent: paddingRight,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "padding-right",
+        textContent: paddingRight,
       }),
       React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "bottom",
         focusable,
         level,
-        property: "padding-bottom",
-        textContent: paddingBottom,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "padding-bottom",
+        textContent: paddingBottom,
       }),
       React.createElement(BoxModelEditable, {
         box: "padding",
         direction: "left",
         focusable,
         level,
-        property: "padding-left",
-        textContent: paddingLeft,
         onShowBoxModelEditor,
         onShowRulePreviewTooltip,
+        property: "padding-left",
+        textContent: paddingLeft,
       }),
       contentBox
     );

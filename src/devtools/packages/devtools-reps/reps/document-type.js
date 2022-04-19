@@ -22,8 +22,8 @@ function DocumentType(props) {
     object && object.preview && object.preview.nodeName ? ` ${object.preview.nodeName}` : "";
   return span(
     {
-      "data-link-actor-id": props.object.actor,
       className: "objectBox objectBox-document",
+      "data-link-actor-id": props.object.actor,
     },
     `<!DOCTYPE${name}>`
   );

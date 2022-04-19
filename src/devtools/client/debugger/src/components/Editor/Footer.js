@@ -4,8 +4,10 @@
 
 //
 import React, { PureComponent } from "react";
-import { connect } from "../../utils/connect";
+
 import { getSelectedSourceWithContent } from "../../selectors";
+import { connect } from "../../utils/connect";
+
 import SourcemapToggle from "./SourcemapToggle";
 import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
 
@@ -13,7 +15,7 @@ class SourceFooter extends PureComponent {
   constructor() {
     super();
 
-    this.state = { cursorPosition: { line: 0, column: 0 } };
+    this.state = { cursorPosition: { column: 0, line: 0 } };
   }
 
   componentDidUpdate() {
@@ -42,7 +44,7 @@ class SourceFooter extends PureComponent {
 
   onCursorChange = event => {
     const { line, ch } = event.doc.getCursor();
-    this.setState({ cursorPosition: { line, column: ch } });
+    this.setState({ cursorPosition: { column: ch, line } });
   };
 
   renderCursorPosition() {

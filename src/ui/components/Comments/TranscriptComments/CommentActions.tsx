@@ -1,14 +1,14 @@
+import classNames from "classnames";
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { Comment, Reply } from "ui/state/comments";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
-import classNames from "classnames";
-import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { trackEvent } from "ui/utils/telemetry";
 import { useConfirm } from "ui/components/shared/Confirm";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+import hooks from "ui/hooks";
+import { Comment, Reply } from "ui/state/comments";
+import { trackEvent } from "ui/utils/telemetry";
 
 function getDeleteMessage(replyCount: number) {
   if (replyCount > 1) {
@@ -59,9 +59,9 @@ function CommentActions({ comment, isRoot, setHoveredComment, setIsEditing }: Co
     const description = `${getDeleteDescription(replyCount)}. Are you sure you want to proceed?`;
 
     confirmDestructive({
-      message,
-      description,
       acceptLabel: "Delete comment",
+      description,
+      message,
     }).then(confirmed => {
       if (!confirmed) {
         return;

@@ -5,6 +5,13 @@
 //
 
 import {
+  getSelectedSourceWithContent,
+  getFileSearchModifiers,
+  getFileSearchQuery,
+  getFileSearchResults,
+} from "../selectors";
+import { isFulfilled } from "../utils/async-value";
+import {
   clearSearch,
   find,
   findNext,
@@ -14,15 +21,7 @@ import {
 } from "../utils/editor";
 import { getMatches } from "../workers/search";
 
-import {
-  getSelectedSourceWithContent,
-  getFileSearchModifiers,
-  getFileSearchQuery,
-  getFileSearchResults,
-} from "../selectors";
-
 import { closeActiveSearch, clearHighlightLineRange, setActiveSearch } from "./ui";
-import { isFulfilled } from "../utils/async-value";
 
 export function doSearch(cx, query, editor) {
   return (dispatch, getState) => {
@@ -48,28 +47,28 @@ export function doSearchForHighlight(query, editor, line, ch) {
 
 export function setFileSearchQuery(cx, query) {
   return {
-    type: "UPDATE_FILE_SEARCH_QUERY",
     cx,
     query,
+    type: "UPDATE_FILE_SEARCH_QUERY",
   };
 }
 
 export function toggleFileSearchModifier(cx, modifier) {
-  return { type: "TOGGLE_FILE_SEARCH_MODIFIER", cx, modifier };
+  return { cx, modifier, type: "TOGGLE_FILE_SEARCH_MODIFIER" };
 }
 
 export function updateSearchResults(cx, characterIndex, line, matches) {
   const matchIndex = matches.findIndex(elm => elm.line === line && elm.ch === characterIndex);
 
   return {
-    type: "UPDATE_SEARCH_RESULTS",
     cx,
     results: {
-      matches,
-      matchIndex,
       count: matches.length,
       index: characterIndex,
+      matchIndex,
+      matches,
     },
+    type: "UPDATE_SEARCH_RESULTS",
   };
 }
 
@@ -89,7 +88,7 @@ export function searchContents(cx, query, editor, focusFirstResult = true) {
     }
     const selectedContent = selectedSource.content.value;
 
-    const ctx = { ed: editor, cm: editor.codeMirror };
+    const ctx = { cm: editor.codeMirror, ed: editor };
 
     if (!query) {
       clearSearch(ctx.cm, query);
@@ -119,7 +118,7 @@ export function searchContentsForHighlight(query, editor, line, ch) {
       return;
     }
 
-    const ctx = { ed: editor, cm: editor.codeMirror };
+    const ctx = { cm: editor.codeMirror, ed: editor };
     searchSourceForHighlight(ctx, false, query, true, modifiers, line, ch);
   };
 }
@@ -130,7 +129,7 @@ export function traverseResults(cx, rev, editor) {
       return;
     }
 
-    const ctx = { ed: editor, cm: editor.codeMirror };
+    const ctx = { cm: editor.codeMirror, ed: editor };
 
     const query = getFileSearchQuery(getState());
     const modifiers = getFileSearchModifiers(getState());
@@ -158,7 +157,7 @@ export function closeFileSearch(cx, editor) {
   return (dispatch, getState) => {
     if (editor) {
       const query = getFileSearchQuery(getState());
-      const ctx = { ed: editor, cm: editor.codeMirror };
+      const ctx = { cm: editor.codeMirror, ed: editor };
       removeOverlay(ctx, query);
     }
 

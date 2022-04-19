@@ -18,9 +18,9 @@ define(function (require, exports, module) {
     static get propTypes() {
       return {
         id: PropTypes.string.isRequired,
-        title: PropTypes.string,
         member: PropTypes.object.isRequired,
         renderSuffix: PropTypes.func,
+        title: PropTypes.string,
       };
     }
 
@@ -44,14 +44,14 @@ define(function (require, exports, module) {
       return dom.td(
         {
           className: "treeLabelCell",
-          title,
+          key: "default",
+          role: "presentation",
           style: {
             // Compute indentation dynamically. The deeper the item is
             // inside the hierarchy, the bigger is the left padding.
             "--tree-label-cell-indent": `${level * 16}px`,
           },
-          key: "default",
-          role: "presentation",
+          title,
         },
         dom.span({
           className: iconClassList.join(" "),
@@ -59,10 +59,10 @@ define(function (require, exports, module) {
         }),
         dom.span(
           {
-            className: "treeLabel " + member.type + "Label",
-            title,
             "aria-labelledby": id,
+            className: "treeLabel " + member.type + "Label",
             "data-level": level,
+            title,
           },
           member.name
         ),

@@ -4,12 +4,12 @@
 
 "use strict";
 
-const Services = require("devtools/shared/services");
-const EventEmitter = require("devtools/shared/event-emitter");
 const {
   VIEW_NODE_VALUE_TYPE,
   VIEW_NODE_SHAPE_POINT_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
+const EventEmitter = require("devtools/shared/event-emitter");
+const Services = require("devtools/shared/services");
 
 const DEFAULT_HIGHLIGHTER_COLOR = "#9400FF";
 const SUBGRID_PARENT_ALPHA = 0.5;
@@ -362,7 +362,7 @@ class HighlightersOverlay {
       // Save flexbox highlighter state.
       const { url } = this.target;
       const selector = await node.getUniqueSelector();
-      this.state.flexbox = { selector, options, url };
+      this.state.flexbox = { options, selector, url };
       this.flexboxHighlighterShown = node;
 
       // Emit the NodeFront of the flexbox container element that the flexbox highlighter
@@ -559,7 +559,7 @@ class HighlightersOverlay {
       // Save grid highlighter state.
       const { url } = this.target;
       const selector = await node.getUniqueSelector();
-      this.state.grids.set(node, { selector, options, url });
+      this.state.grids.set(node, { options, selector, url });
 
       // Emit the NodeFront of the grid container element that the grid highlighter was
       // shown for, and its options for testing the highlighter setting options.

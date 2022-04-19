@@ -1,8 +1,10 @@
-import React from "react";
 import classnames from "classnames";
-import { Setting, Settings } from "./types";
+import React from "react";
+
 import MaterialIcon from "../MaterialIcon";
+
 import { SettingsHeader } from "./SettingsBody";
+import { Setting, Settings } from "./types";
 
 interface SettingNavigationItemProps<T extends string, P extends Record<string, unknown>> {
   setting: Setting<T, P>;
@@ -50,7 +52,7 @@ export default function SettingNavigation<T extends string, P extends Record<str
         {settings
           .filter(setting => !hiddenTabs || !hiddenTabs.includes(setting.title))
           .map((setting, index) => (
-            <SettingNavigationItem {...{ setting, selectedTab, setSelectedTab }} key={index} />
+            <SettingNavigationItem {...{ selectedTab, setSelectedTab, setting }} key={index} />
           ))}
       </ul>
     </nav>

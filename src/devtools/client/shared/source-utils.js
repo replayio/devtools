@@ -61,17 +61,17 @@ function parseURL(location) {
     // sdk/url, which is subtly different.  So, work around some
     // important differences here.
     url = {
-      href: url.href,
-      protocol: url.protocol,
+      hash: url.hash,
       host: url.host,
       hostname: url.hostname,
-      port: url.port || null,
-      pathname: url.pathname,
-      search: url.search,
-      hash: url.hash,
-      username: url.username,
-      password: url.password,
+      href: url.href,
       origin: url.origin,
+      password: url.password,
+      pathname: url.pathname,
+      port: url.port || null,
+      protocol: url.protocol,
+      search: url.search,
+      username: url.username,
     };
 
     // Definitions:
@@ -120,7 +120,7 @@ function getSourceNames(source) {
     return data;
   }
 
-  let short, long, host;
+  let host, long, short;
   const sourceStr = source ? String(source) : "";
 
   // If `data:...` uri
@@ -130,7 +130,7 @@ function getSourceNames(source) {
       // The `short` name for a data URI becomes `data:` followed by the actual
       // encoded content, omitting the MIME type, and charset.
       short = `data:${sourceStr.substring(commaIndex + 1)}`.slice(0, 100);
-      const result = { short, long: sourceStr };
+      const result = { long: sourceStr, short };
       gSourceNamesStore.set(source, result);
       return result;
     }
@@ -169,7 +169,7 @@ function getSourceNames(source) {
     short = long.slice(0, 100);
   }
 
-  const result = { short, long, host };
+  const result = { host, long, short };
   gSourceNamesStore.set(source, result);
   return result;
 }

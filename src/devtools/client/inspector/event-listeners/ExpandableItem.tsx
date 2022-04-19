@@ -14,8 +14,8 @@ export const ExpandableItem: FC<ExpandableItemProps> = ({ header, children }) =>
       <div className="grid auto-cols-max grid-flow-col items-center gap-1">
         <span
           className={cx("theme-twisty bg-center", {
-            "opacity-0": !hasChildren,
             "cursor-pointer": hasChildren,
+            "opacity-0": !hasChildren,
             open: isExpanded,
           })}
           onClick={() => setIsExpanded(!isExpanded)}

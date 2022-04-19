@@ -1,9 +1,11 @@
-import React from "react";
 import { ValueFront } from "protocol/thread";
-import Spinner from "ui/components/shared/Spinner";
-import { Item, LabelAndValue, ValueItem } from ".";
-import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 import { assert } from "protocol/utils";
+import React from "react";
+import Spinner from "ui/components/shared/Spinner";
+
+import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+
+import { Item, LabelAndValue, ValueItem } from ".";
 
 function getterValueKey(object: ValueFront, property: string) {
   return `${object.getPause()?.pauseId}:${object.objectId()}:${property}`;
@@ -35,8 +37,8 @@ export class GetterItem {
     this.loadingState = getterValues.get(getterValueKey(this.object, this.name));
     if (this.loadingState instanceof ValueFront) {
       this.valueItem = new ValueItem({
-        name: this.name,
         contents: this.loadingState,
+        name: this.name,
         path: this.path,
       });
     }
@@ -94,9 +96,9 @@ export class GetterItem {
     const onClick = (e: React.MouseEvent) => {
       e.stopPropagation();
       props.onViewSourceInDebugger({
-        url,
-        line: location.line,
         column: location.column,
+        line: location.line,
+        url,
       });
     };
     return (

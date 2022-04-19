@@ -1,21 +1,21 @@
+import { LayoutAction } from "ui/actions/layout";
+import { getRecording } from "ui/hooks/recordings";
+import { getReplaySession } from "ui/setup/prefs";
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
-import { LayoutAction } from "ui/actions/layout";
-import { trackEvent } from "ui/utils/telemetry";
 import { Recording } from "ui/types";
-import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
-import { getReplaySession } from "ui/setup/prefs";
+import { trackEvent } from "ui/utils/telemetry";
 
 const syncInitialLayoutState: LayoutState = {
   consoleFilterDrawerExpanded: true,
-  showCommandPalette: false,
+  localNags: [],
+  selectedPanel: "console",
   selectedPrimaryPanel: "events",
-  viewMode: "non-dev",
+  showCommandPalette: false,
   showVideoPanel: true,
   toolboxLayout: "ide",
-  selectedPanel: "console",
-  localNags: [],
+  viewMode: "non-dev",
 };
 
 const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => {
@@ -65,12 +65,12 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
       "consoleFilterDrawerExpanded" in session
         ? session.consoleFilterDrawerExpanded
         : consoleFilterDrawerExpanded,
-    viewMode: initialViewMode,
+    localNags: "localNags" in session ? session.localNags : [],
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
     showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
-    localNags: "localNags" in session ? session.localNags : [],
+    viewMode: initialViewMode,
   };
 }
 

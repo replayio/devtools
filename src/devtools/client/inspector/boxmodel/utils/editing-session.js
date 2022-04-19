@@ -26,26 +26,14 @@ function EditingSession({ inspector, doc, elementRules }) {
 }
 
 EditingSession.prototype = {
-  /**
-   * Gets the value of a single property from the CSS rule.
-   *
-   * @param  {StyleRuleFront} rule
-   *         The CSS rule.
-   * @param  {String} property
-   *         The name of the property.
-   * @return {String} the value.
-   */
-  getPropertyFromRule: function (rule, property) {
-    // Use the parsed declarations in the StyleRuleFront object if available.
-    const index = this.getPropertyIndex(property, rule);
-    if (index !== -1) {
-      return rule.declarations[index].value;
-    }
+  destroy: function () {
+    this._modifications.clear();
 
-    // Fallback to parsing the cssText locally otherwise.
-    const dummyStyle = this._element.style;
-    dummyStyle.cssText = rule.cssText;
-    return dummyStyle.getPropertyValue(property);
+    this._cssProperties = null;
+    this._doc = null;
+    this._inspector = null;
+    this._modifications = null;
+    this._rules = null;
   },
 
   /**
@@ -77,6 +65,28 @@ EditingSession.prototype = {
   },
 
   /**
+   * Gets the value of a single property from the CSS rule.
+   *
+   * @param  {StyleRuleFront} rule
+   *         The CSS rule.
+   * @param  {String} property
+   *         The name of the property.
+   * @return {String} the value.
+   */
+  getPropertyFromRule: function (rule, property) {
+    // Use the parsed declarations in the StyleRuleFront object if available.
+    const index = this.getPropertyIndex(property, rule);
+    if (index !== -1) {
+      return rule.declarations[index].value;
+    }
+
+    // Fallback to parsing the cssText locally otherwise.
+    const dummyStyle = this._element.style;
+    dummyStyle.cssText = rule.cssText;
+    return dummyStyle.getPropertyValue(property);
+  },
+
+  /**
    * Get the index of a given css property name in a CSS rule.
    * Or -1, if there are no properties in the rule yet.
    *
@@ -93,6 +103,40 @@ EditingSession.prototype = {
     }
 
     return elementStyleRule.declarations.findIndex(p => p.name === name);
+  },
+
+  /**
+   * Reverts all of the property changes made by this instance.
+   *
+   * @return {Promise} Resolves when all properties have been reverted.
+   */
+  async revert() {
+    // Revert each property that we modified previously, one by one. See
+    // setProperties for information about why.
+    for (const [property, value] of this._modifications) {
+      const modifications = this._rules[0].startModifyingProperties(this._inspector.cssProperties);
+
+      // Find the index of the property to be reverted.
+      let index = this.getPropertyIndex(property);
+
+      if (value != "") {
+        // If the property doesn't exist anymore, insert at the beginning of the
+        // rule.
+        if (index === -1) {
+          index = 0;
+        }
+        modifications.setProperty(index, property, value, "");
+      } else {
+        // If the property doesn't exist anymore, no need to remove it. It had
+        // not been added after all.
+        if (index === -1) {
+          continue;
+        }
+        modifications.removeProperty(index, property);
+      }
+
+      await modifications.apply();
+    }
   },
 
   /**
@@ -135,50 +179,6 @@ EditingSession.prototype = {
 
       await modifications.apply();
     }
-  },
-
-  /**
-   * Reverts all of the property changes made by this instance.
-   *
-   * @return {Promise} Resolves when all properties have been reverted.
-   */
-  async revert() {
-    // Revert each property that we modified previously, one by one. See
-    // setProperties for information about why.
-    for (const [property, value] of this._modifications) {
-      const modifications = this._rules[0].startModifyingProperties(this._inspector.cssProperties);
-
-      // Find the index of the property to be reverted.
-      let index = this.getPropertyIndex(property);
-
-      if (value != "") {
-        // If the property doesn't exist anymore, insert at the beginning of the
-        // rule.
-        if (index === -1) {
-          index = 0;
-        }
-        modifications.setProperty(index, property, value, "");
-      } else {
-        // If the property doesn't exist anymore, no need to remove it. It had
-        // not been added after all.
-        if (index === -1) {
-          continue;
-        }
-        modifications.removeProperty(index, property);
-      }
-
-      await modifications.apply();
-    }
-  },
-
-  destroy: function () {
-    this._modifications.clear();
-
-    this._cssProperties = null;
-    this._doc = null;
-    this._inspector = null;
-    this._modifications = null;
-    this._rules = null;
   },
 };
 

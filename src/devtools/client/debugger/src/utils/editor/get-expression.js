@@ -9,12 +9,12 @@ export function tokenAtTextPosition(cm, { line, column }) {
     return null;
   }
 
-  const token = cm.getTokenAt({ line: line - 1, ch: column });
+  const token = cm.getTokenAt({ ch: column, line: line - 1 });
   if (!token) {
     return null;
   }
 
-  return { startColumn: token.start, endColumn: token.end, type: token.type };
+  return { endColumn: token.end, startColumn: token.start, type: token.type };
 }
 
 // The strategy of querying codeMirror tokens was borrowed
@@ -31,8 +31,8 @@ export function getExpressionFromCoords(cm, coord) {
   const line = cm.doc.getLine(coord.line - 1);
   while (startHighlight > 1 && line.charAt(startHighlight - 1) === ".") {
     const tokenBefore = tokenAtTextPosition(cm, {
-      line: coord.line,
       column: startHighlight - 1,
+      line: coord.line,
     });
 
     if (!tokenBefore || !tokenBefore.type) {
@@ -54,8 +54,8 @@ export function getExpressionFromCoords(cm, coord) {
   }
 
   const location = {
-    start: { line: lineNumber, column: startHighlight },
-    end: { line: lineNumber, column: endHighlight },
+    end: { column: endHighlight, line: lineNumber },
+    start: { column: startHighlight, line: lineNumber },
   };
   return { expression, location };
 }

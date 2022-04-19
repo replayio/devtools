@@ -1,4 +1,5 @@
 import { UIThunkAction } from "ui/actions";
+
 import { Breakpoint } from "../../reducers/breakpoints";
 
 export interface Context {

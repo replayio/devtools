@@ -1,5 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { Editor } from "codemirror";
+
 import { usesWindow } from "../../ssr";
 
 export interface MockEnvironment {
@@ -103,7 +104,7 @@ export function getPausePointParams() {
   const hasFrames = hasFramesParam ? hasFramesParam == "true" : false;
 
   if (pointParam && timeParam) {
-    return { point, time, hasFrames };
+    return { hasFrames, point, time };
   }
 
   return null;

@@ -5,13 +5,16 @@ import {
   Rect,
   Quads,
 } from "@recordreplay/protocol";
-import { client } from "../socket";
-import { Pause, WiredObject } from "./pause";
-import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
-import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
-import { ValueFront } from "./value";
-import { RuleFront } from "./rule";
 import uniqBy from "lodash/uniqBy";
+
+import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
+import { client } from "../socket";
+import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
+
+import { Pause, WiredObject } from "./pause";
+import { RuleFront } from "./rule";
+import { ValueFront } from "./value";
+
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 export interface WiredEventListener {
@@ -54,11 +57,11 @@ export class NodeFront {
     // Additional data that can be loaded for the node.
     this._frameworkListenersWaiter = null;
     this._waiters = {
+      bounds: null,
       computedStyle: null,
-      rules: null,
       listeners: null,
       quads: null,
-      bounds: null,
+      rules: null,
     };
 
     this._quads = null;
@@ -285,7 +288,7 @@ export class NodeFront {
         );
         this._waiters.rules.resolve(
           uniqueRules.map(({ rule, pseudoElement }) => {
-            return { rule: this._pause.getRuleFront(rule), pseudoElement };
+            return { pseudoElement, rule: this._pause.getRuleFront(rule) };
           })
         );
       } catch (e) {

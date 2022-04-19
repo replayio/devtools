@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+
 import Marker from "./Marker";
 
 function MessageMarker({
@@ -32,9 +33,9 @@ function MessageMarker({
 }
 
 const connector = connect((state: UIState) => ({
-  zoomRegion: selectors.getZoomRegion(state),
   currentTime: selectors.getCurrentTime(state),
   overlayWidth: selectors.getTimelineDimensions(state).width,
+  zoomRegion: selectors.getZoomRegion(state),
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;

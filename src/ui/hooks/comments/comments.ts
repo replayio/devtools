@@ -1,14 +1,14 @@
-import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
-import { Comment, CommentPosition, Reply } from "ui/state/comments";
-import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
+import { RecordingId } from "@recordreplay/protocol";
+import { GetComments, GetCommentsVariables } from "graphql/GetComments";
 import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
 import {
   UpdateCommentReplyContent,
   UpdateCommentReplyContentVariables,
 } from "graphql/UpdateCommentReplyContent";
-import { GetComments, GetCommentsVariables } from "graphql/GetComments";
+import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
+import { Comment, CommentPosition, Reply } from "ui/state/comments";
+import { query } from "ui/utils/apolloClient";
 
 export function useGetComments(recordingId: RecordingId): {
   comments: Comment[];
@@ -16,8 +16,8 @@ export function useGetComments(recordingId: RecordingId): {
   error?: ApolloError;
 } {
   const { data, loading, error } = useQuery<GetComments, GetCommentsVariables>(GET_COMMENTS, {
-    variables: { recordingId },
     pollInterval: 5000,
+    variables: { recordingId },
   });
 
   if (error) {
@@ -29,13 +29,13 @@ export function useGetComments(recordingId: RecordingId): {
     replies: comment.replies.map((reply: any) => ({
       ...reply,
       hasFrames: comment.hasFrames,
-      sourceLocation: comment.sourceLocation,
-      time: comment.time,
       point: comment.point,
       position: comment.position,
+      sourceLocation: comment.sourceLocation,
+      time: comment.time,
     })),
   }));
-  return { comments, loading, error };
+  return { comments, error, loading };
 }
 
 export function useUpdateComment() {
@@ -58,22 +58,22 @@ export function useUpdateComment() {
 
   return (commentId: string, newContent: string, position: CommentPosition | null) =>
     updateCommentContent({
-      variables: { commentId, newContent, position },
       optimisticResponse: {
         updateComment: {
-          success: true,
           __typename: "UpdateComment",
+          success: true,
         },
       },
       update: cache => {
         cache.modify({
-          id: cache.identify({ id: commentId, __typename: "Comment" }),
           fields: {
             content: () => newContent,
             position: () => position,
           },
+          id: cache.identify({ __typename: "Comment", id: commentId }),
         });
       },
+      variables: { commentId, newContent, position },
     });
 }
 
@@ -97,19 +97,19 @@ export function useUpdateCommentReply() {
 
   return (commentId: string, newContent: string) =>
     updateCommentReplyContent({
-      variables: { commentId, newContent },
       optimisticResponse: {
         updateCommentReply: {
-          success: true,
           __typename: "UpdateCommentReply",
+          success: true,
         },
       },
       update: cache => {
         cache.modify({
-          id: cache.identify({ id: commentId, __typename: "CommentReply" }),
           fields: { content: () => newContent },
+          id: cache.identify({ __typename: "CommentReply", id: commentId }),
         });
       },
+      variables: { commentId, newContent },
     });
 }
 

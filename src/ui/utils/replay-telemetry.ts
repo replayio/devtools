@@ -1,11 +1,11 @@
 export async function pingTelemetry(event: string, tags: any = {}) {
   try {
     const response = await fetch("https://telemetry.replay.io/", {
-      method: "POST",
+      body: JSON.stringify({ event, ...tags }),
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ event, ...tags }),
+      method: "POST",
     });
     if (!response.ok) {
       console.error(`Sent telemetry event ${event} but got status code ${response.status}`);

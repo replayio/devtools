@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { getButtonClasses } from "./Button";
 import Modal, { ModalCloseButton } from "./NewModal";
 

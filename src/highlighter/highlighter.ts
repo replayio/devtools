@@ -4,10 +4,10 @@
 
 // Adapter for using server-side highlighter code.
 
-import { ThreadFront } from "protocol/thread/thread";
-import { NodeFront } from "protocol/thread/node";
-import { NodeBoundsFront } from "protocol/thread/bounds";
 import { BoxModelHighlighter } from "devtools/server/actors/highlighters/box-model";
+import { NodeBoundsFront } from "protocol/thread/bounds";
+import { NodeFront } from "protocol/thread/node";
+import { ThreadFront } from "protocol/thread/thread";
 
 class Highlighter {
   private boxModelHighlighter: BoxModelHighlighter | undefined;

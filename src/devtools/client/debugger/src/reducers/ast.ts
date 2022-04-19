@@ -3,7 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { AnyAction } from "@reduxjs/toolkit";
-
 import { UIState } from "ui/state";
 
 type AstPosition = { line: number; column: number };
@@ -78,10 +77,10 @@ export interface ASTState {
 
 export function initialASTState(): ASTState {
   return {
-    symbols: {},
-    projectSymbolsLoading: null,
     globalFunctions: null,
     loadingGlobalFunctions: false,
+    projectSymbolsLoading: null,
+    symbols: {},
   };
 }
 
@@ -113,8 +112,8 @@ function update(state = initialASTState(), action: AnyAction) {
     case "SET_GLOBAL_FUNCTIONS": {
       return {
         ...state,
-        loadingGlobalFunctions: false,
         globalFunctions: action.globalFns,
+        loadingGlobalFunctions: false,
       };
     }
 

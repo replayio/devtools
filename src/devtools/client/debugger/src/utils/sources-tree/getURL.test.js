@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { getURL } from "./getURL";
 import { makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
+
+import { getURL } from "./getURL";
 
 function createMockSource(props) {
   const rv = {
@@ -11,10 +12,10 @@ function createMockSource(props) {
     ...Object.assign(
       {
         id: "server1.conn13.child1/39",
-        url: "",
-        sourceMapURL: "",
         isBlackBoxed: false,
         isPrettyPrinted: false,
+        sourceMapURL: "",
+        url: "",
       },
       props
     ),
@@ -54,8 +55,8 @@ describe("getUrl", () => {
   it("handles url with no file extension for filename", function () {
     const urlObject = getURL(
       createMockSource({
-        url: "https://a/c",
         id: "c",
+        url: "https://a/c",
       })
     );
     expect(urlObject.filename).toBe("c");
@@ -64,8 +65,8 @@ describe("getUrl", () => {
   it("handles url with no name for filename", function () {
     const urlObject = getURL(
       createMockSource({
-        url: "https://a/",
         id: "c",
+        url: "https://a/",
       })
     );
     expect(urlObject.filename).toBe("(index)");
@@ -74,8 +75,8 @@ describe("getUrl", () => {
   it("separates resources by protocol and host", () => {
     const urlObject = getURL(
       createMockSource({
-        url: "moz-extension://xyz/123",
         id: "c2",
+        url: "moz-extension://xyz/123",
       })
     );
     expect(urlObject.group).toBe("moz-extension://xyz");
@@ -84,8 +85,8 @@ describe("getUrl", () => {
   it("creates a group name for webpack", () => {
     const urlObject = getURL(
       createMockSource({
-        url: "webpack:///src/component.jsx",
         id: "c3",
+        url: "webpack:///src/component.jsx",
       })
     );
     expect(urlObject.group).toBe("webpack://");
@@ -94,8 +95,8 @@ describe("getUrl", () => {
   it("creates a group name for angular source", () => {
     const urlObject = getURL(
       createMockSource({
-        url: "ng://src/component.jsx",
         id: "c3",
+        url: "ng://src/component.jsx",
       })
     );
     expect(urlObject.group).toBe("ng://");

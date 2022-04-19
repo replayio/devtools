@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { getIsIndexed } from "ui/reducers/app";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
+
 import { getExecutionPoint } from "../../../selectors";
 
 export function PanelStatus({ analysisPoints }: { analysisPoints: AnalysisPayload }) {

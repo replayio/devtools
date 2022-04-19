@@ -4,9 +4,8 @@
 
 "use strict";
 
-const { createRef, PureComponent } = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
+const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
+const Types = require("devtools/client/inspector/rules/types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
 const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
 const {
@@ -15,19 +14,19 @@ const {
   SELECTOR_ELEMENT,
   SELECTOR_PSEUDO_CLASS,
 } = require("devtools/shared/css/parsing-utils");
-const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
-
-const Types = require("devtools/client/inspector/rules/types");
+const PropTypes = require("prop-types");
+const { createRef, PureComponent } = require("react");
+const dom = require("react-dom-factories");
 
 class Selector extends PureComponent {
   static get propTypes() {
     return {
       id: PropTypes.string.isRequired,
       isUserAgentStyle: PropTypes.bool.isRequired,
+      query: PropTypes.string.isRequired,
       selector: PropTypes.shape(Types.selector).isRequired,
       showSelectorEditor: PropTypes.func.isRequired,
       type: PropTypes.number.isRequired,
-      query: PropTypes.string.isRequired,
     };
   }
 
@@ -102,8 +101,8 @@ class Selector extends PureComponent {
 
             return dom.span(
               {
-                key: value,
                 className: selectorSpanClass,
+                key: value,
               },
               value
             );

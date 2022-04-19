@@ -26,6 +26,8 @@ const {
   getComputedStyle,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
+const { stringifyGridFragments } = require("devtools/server/actors/utils/css-grid-utils");
+const { LocalizationHelper } = require("devtools/shared/l10n");
 const { apply } = require("devtools/shared/layout/dom-matrix-2d");
 const {
   getCurrentZoom,
@@ -33,8 +35,6 @@ const {
   getWindowDimensions,
   setIgnoreLayoutChanges,
 } = require("devtools/shared/layout/utils");
-const { stringifyGridFragments } = require("devtools/server/actors/utils/css-grid-utils");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const STRINGS_URI = "devtools/shared/locales/highlighters.properties";
 const L10N = new LocalizationHelper(STRINGS_URI);
@@ -47,22 +47,22 @@ const GRID_FONT_FAMILY = "sans-serif";
 const GRID_AREA_NAME_FONT_SIZE = "20";
 
 const GRID_LINES_PROPERTIES = {
-  edge: {
-    lineDash: [0, 0],
+  areaEdge: {
     alpha: 1,
+    lineDash: [0, 0],
+    lineWidth: 3,
+  },
+  edge: {
+    alpha: 1,
+    lineDash: [0, 0],
   },
   explicit: {
-    lineDash: [5, 3],
     alpha: 0.75,
+    lineDash: [5, 3],
   },
   implicit: {
-    lineDash: [2, 2],
     alpha: 0.5,
-  },
-  areaEdge: {
-    lineDash: [0, 0],
-    alpha: 1,
-    lineWidth: 3,
+    lineDash: [2, 2],
   },
 };
 
@@ -261,11 +261,11 @@ class CssGridHighlighter extends AutoRefreshHighlighter {
     });
 
     const root = createNode(this.win, {
-      parent: container,
       attributes: {
-        id: "root",
         class: "root",
+        id: "root",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
@@ -273,195 +273,195 @@ class CssGridHighlighter extends AutoRefreshHighlighter {
     // which wouldn't be possible with HTML or SVG without having to insert and remove
     // the whole markup on every update.
     createNode(this.win, {
-      parent: root,
-      nodeType: "canvas",
       attributes: {
-        id: "canvas",
         class: "canvas",
-        hidden: "true",
-        width: CANVAS_SIZE,
         height: CANVAS_SIZE,
+        hidden: "true",
+        id: "canvas",
+        width: CANVAS_SIZE,
       },
+      nodeType: "canvas",
+      parent: root,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Build the SVG element.
     const svg = createSVGNode(this.win, {
-      nodeType: "svg",
-      parent: root,
       attributes: {
-        id: "elements",
-        width: "100%",
         height: "100%",
         hidden: "true",
+        id: "elements",
+        width: "100%",
       },
+      nodeType: "svg",
+      parent: root,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const regions = createSVGNode(this.win, {
-      nodeType: "g",
-      parent: svg,
       attributes: {
         class: "regions",
       },
+      nodeType: "g",
+      parent: svg,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     createSVGNode(this.win, {
-      nodeType: "path",
-      parent: regions,
       attributes: {
         class: "areas",
         id: "areas",
       },
+      nodeType: "path",
+      parent: regions,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     createSVGNode(this.win, {
-      nodeType: "path",
-      parent: regions,
       attributes: {
         class: "cells",
         id: "cells",
       },
+      nodeType: "path",
+      parent: regions,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Build the grid area infobar markup.
     const areaInfobarContainer = createNode(this.win, {
-      parent: container,
       attributes: {
         class: "area-infobar-container",
+        hidden: "true",
         id: "area-infobar-container",
         position: "top",
-        hidden: "true",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const areaInfobar = createNode(this.win, {
-      parent: areaInfobarContainer,
       attributes: {
         class: "infobar",
       },
+      parent: areaInfobarContainer,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const areaTextbox = createNode(this.win, {
-      parent: areaInfobar,
       attributes: {
         class: "infobar-text",
       },
+      parent: areaInfobar,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: areaTextbox,
       attributes: {
         class: "area-infobar-name",
         id: "area-infobar-name",
       },
+      nodeType: "span",
+      parent: areaTextbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: areaTextbox,
       attributes: {
         class: "area-infobar-dimensions",
         id: "area-infobar-dimensions",
       },
+      nodeType: "span",
+      parent: areaTextbox,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Build the grid cell infobar markup.
     const cellInfobarContainer = createNode(this.win, {
-      parent: container,
       attributes: {
         class: "cell-infobar-container",
+        hidden: "true",
         id: "cell-infobar-container",
         position: "top",
-        hidden: "true",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const cellInfobar = createNode(this.win, {
-      parent: cellInfobarContainer,
       attributes: {
         class: "infobar",
       },
+      parent: cellInfobarContainer,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const cellTextbox = createNode(this.win, {
-      parent: cellInfobar,
       attributes: {
         class: "infobar-text",
       },
+      parent: cellInfobar,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: cellTextbox,
       attributes: {
         class: "cell-infobar-position",
         id: "cell-infobar-position",
       },
+      nodeType: "span",
+      parent: cellTextbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: cellTextbox,
       attributes: {
         class: "cell-infobar-dimensions",
         id: "cell-infobar-dimensions",
       },
+      nodeType: "span",
+      parent: cellTextbox,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     // Build the grid line infobar markup.
     const lineInfobarContainer = createNode(this.win, {
-      parent: container,
       attributes: {
         class: "line-infobar-container",
+        hidden: "true",
         id: "line-infobar-container",
         position: "top",
-        hidden: "true",
       },
+      parent: container,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const lineInfobar = createNode(this.win, {
-      parent: lineInfobarContainer,
       attributes: {
         class: "infobar",
       },
+      parent: lineInfobarContainer,
       prefix: this.ID_CLASS_PREFIX,
     });
 
     const lineTextbox = createNode(this.win, {
-      parent: lineInfobar,
       attributes: {
         class: "infobar-text",
       },
+      parent: lineInfobar,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: lineTextbox,
       attributes: {
         class: "line-infobar-number",
         id: "line-infobar-number",
       },
+      nodeType: "span",
+      parent: lineTextbox,
       prefix: this.ID_CLASS_PREFIX,
     });
     createNode(this.win, {
-      nodeType: "span",
-      parent: lineTextbox,
       attributes: {
         class: "line-infobar-names",
         id: "line-infobar-names",
       },
+      nodeType: "span",
+      parent: lineTextbox,
       prefix: this.ID_CLASS_PREFIX,
     });
 
@@ -1760,8 +1760,8 @@ class CssGridHighlighter extends AutoRefreshHighlighter {
 
     const container = this.getElement("area-infobar-container");
     moveInfobar(container, bounds, this.win, {
-      position: "bottom",
       hideIfOffscreen: true,
+      position: "bottom",
     });
   }
 
@@ -1785,8 +1785,8 @@ class CssGridHighlighter extends AutoRefreshHighlighter {
 
     const container = this.getElement("cell-infobar-container");
     moveInfobar(container, bounds, this.win, {
-      position: "top",
       hideIfOffscreen: true,
+      position: "top",
     });
   }
 

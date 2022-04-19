@@ -49,30 +49,30 @@ const createDefaultSection = ({
   initialHeight: number | undefined;
 }) => {
   return {
-    expanded,
     displayedHeight: initialHeight || 0,
+    expanded,
   };
 };
 
 // Actions
 
 export function expandSection(index: number): ExpandSectionAction {
-  return { type: "expand_section", index };
+  return { index, type: "expand_section" };
 }
 export function collapseSection(index: number): CollapseSectionAction {
-  return { type: "collapse_section", index };
+  return { index, type: "collapse_section" };
 }
 export function startResizing(index: number, initialY: number): StartResizingAction {
-  return { type: "start_resizing", index, initialY };
+  return { index, initialY, type: "start_resizing" };
 }
 export function endResizing(): EndResizingAction {
   return { type: "end_resizing" };
 }
 export function resize(currentY: number): ResizeAction {
-  return { type: "resize", currentY };
+  return { currentY, type: "resize" };
 }
 export function containerResize(height: number): ContainerResizeAction {
-  return { type: "container_resize", height };
+  return { height, type: "container_resize" };
 }
 
 // Selectors
@@ -138,7 +138,7 @@ export function getInitialState(
     sections.push(createDefaultSection(expandedState[i]));
   }
 
-  return { sections, resizingParams: null, containerHeight: null, domHeight: null };
+  return { containerHeight: null, domHeight: null, resizingParams: null, sections };
 }
 
 export function reducer(state: AccordionState, action: AccordionAction) {
@@ -183,7 +183,7 @@ export function reducer(state: AccordionState, action: AccordionAction) {
       return {
         ...state,
         containerHeight: state.domHeight,
-        resizingParams: { initialIndex: index, index: indexToResize, initialY, originalSections },
+        resizingParams: { index: indexToResize, initialIndex: index, initialY, originalSections },
       };
     }
     case "end_resizing": {

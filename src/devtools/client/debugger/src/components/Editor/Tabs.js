@@ -4,16 +4,16 @@
 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
-import { connect } from "../../utils/connect";
-
-import Tab from "./Tab";
-
-import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
-import { isPretty } from "../../utils/source";
-import actions from "../../actions";
-import { trackEvent } from "ui/utils/telemetry";
-import CommandPaletteButton from "./CommandPaletteButton";
 import { getToolboxLayout } from "ui/reducers/layout";
+import { trackEvent } from "ui/utils/telemetry";
+
+import actions from "../../actions";
+import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
+import { connect } from "../../utils/connect";
+import { isPretty } from "../../utils/source";
+
+import CommandPaletteButton from "./CommandPaletteButton";
+import Tab from "./Tab";
 
 class Tabs extends PureComponent {
   _draggedSource;
@@ -58,7 +58,7 @@ class Tabs extends PureComponent {
   }
 
   get draggedSource() {
-    return this._draggedSource == null ? { url: null, id: null } : this._draggedSource;
+    return this._draggedSource == null ? { id: null, url: null } : this._draggedSource;
   }
 
   set draggedSource(source) {
@@ -168,9 +168,9 @@ class Tabs extends PureComponent {
 }
 
 const mapStateToProps = state => ({
+  isPaused: getIsPaused(state),
   selectedSource: getSelectedSource(state),
   tabSources: getSourcesForTabs(state),
-  isPaused: getIsPaused(state),
   toolboxLayout: getToolboxLayout(state),
 });
 

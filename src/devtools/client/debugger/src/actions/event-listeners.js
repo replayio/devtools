@@ -4,12 +4,14 @@
 
 //
 
-import uniq from "lodash/uniq";
-import remove from "lodash/remove";
 import difference from "lodash/difference";
+import remove from "lodash/remove";
+import uniq from "lodash/uniq";
 import { ThreadFront } from "protocol/thread";
-const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
+
 import * as selectors from "../selectors";
+
+const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 
 const INITIAL_EVENT_BREAKPOINTS = [
   "event.keyboard.input",
@@ -35,7 +37,7 @@ export async function setupEventListeners(store) {
 
 function updateEventListeners(newEvents) {
   return async (dispatch, getState, { client }) => {
-    dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
+    dispatch({ active: newEvents, type: "UPDATE_EVENT_LISTENERS" });
     await client.setEventListenerBreakpoints(newEvents);
   };
 }
@@ -48,8 +50,8 @@ function setEventListeners(newEvents) {
 
 async function updateExpanded(dispatch, newExpanded) {
   dispatch({
-    type: "UPDATE_EVENT_LISTENER_EXPANDED",
     expanded: newExpanded,
+    type: "UPDATE_EVENT_LISTENER_EXPANDED",
   });
 }
 
@@ -98,11 +100,11 @@ export function removeEventListenerExpanded(category) {
 export function getEventListenerBreakpointTypes() {
   return async (dispatch, _, { client }) => {
     const categories = await getAvailableEventBreakpoints();
-    dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
+    dispatch({ categories, type: "RECEIVE_EVENT_LISTENER_TYPES" });
 
     const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
 
-    dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
+    dispatch({ eventTypePoints, type: "RECEIVE_EVENT_LISTENER_POINTS" });
   };
 }
 
@@ -120,6 +122,6 @@ export function loadAdditionalCounts() {
     );
 
     const eventTypeCounts = await ThreadFront.getEventHandlerCounts(eventIds);
-    dispatch({ type: "RECEIVE_EVENT_LISTENER_COUNTS", eventTypeCounts });
+    dispatch({ eventTypeCounts, type: "RECEIVE_EVENT_LISTENER_COUNTS" });
   };
 }

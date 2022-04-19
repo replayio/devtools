@@ -1,10 +1,10 @@
+import { ThreadFront } from "protocol/thread";
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { ThreadFront } from "protocol/thread";
-import { prefs } from "../utils/prefs";
-import { selectors } from "../reducers";
-
 import { UIState } from "ui/state";
+
+import { selectors } from "../reducers";
+import { prefs } from "../utils/prefs";
 
 type SkeletonProps = PropsFromRedux & {
   setFinishedLoading(finished: boolean): void;

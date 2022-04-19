@@ -5,7 +5,6 @@
 "use strict";
 
 const Menu = require("devtools/client/framework/menu");
-
 const { getStr } = require("devtools/client/inspector/changes/utils/l10n");
 
 /**
@@ -25,9 +24,9 @@ class ChangesContextMenu extends Menu {
 
   show(event) {
     this._openMenu({
-      target: event.target,
       screenX: event.screenX,
       screenY: event.screenY,
+      target: event.target,
     });
   }
 
@@ -38,11 +37,11 @@ class ChangesContextMenu extends Menu {
 
     // Copy option
     const menuitemCopy = new MenuItem({
-      id: "changes-contextmenu-copy",
-      label: getStr("changes.contextmenu.copy"),
       accesskey: getStr("changes.contextmenu.copy.accessKey"),
       click: this.onCopy,
       disabled: !this._hasTextSelected(),
+      id: "changes-contextmenu-copy",
+      label: getStr("changes.contextmenu.copy"),
     });
     this.append(menuitemCopy);
 
@@ -54,18 +53,18 @@ class ChangesContextMenu extends Menu {
       // Copy Rule option
       this.append(
         new MenuItem({
+          click: () => this.onCopyRule(ruleId, true),
           id: "changes-contextmenu-copy-rule",
           label: getStr("changes.contextmenu.copyRule"),
-          click: () => this.onCopyRule(ruleId, true),
         })
       );
 
       // Copy Declaration option. Visible only if there is a declaration element target.
       this.append(
         new MenuItem({
+          click: () => this.onCopyDeclaration(declEl),
           id: "changes-contextmenu-copy-declaration",
           label: getStr("changes.contextmenu.copyDeclaration"),
-          click: () => this.onCopyDeclaration(declEl),
           visible: !!declEl,
         })
       );
@@ -79,10 +78,10 @@ class ChangesContextMenu extends Menu {
 
     // Select All option
     const menuitemSelectAll = new MenuItem({
-      id: "changes-contextmenu-select-all",
-      label: getStr("changes.contextmenu.selectAll"),
       accesskey: getStr("changes.contextmenu.selectAll.accessKey"),
       click: this.onSelectAll,
+      id: "changes-contextmenu-select-all",
+      label: getStr("changes.contextmenu.selectAll"),
     });
     this.append(menuitemSelectAll);
 

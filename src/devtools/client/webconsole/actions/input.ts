@@ -4,20 +4,19 @@
 
 "use strict";
 
-import type { ThunkDispatch } from "redux-thunk";
 import { Pause } from "protocol/thread";
+import type { ThunkDispatch } from "redux-thunk";
 import { UIAction, UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
-const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
-const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
-const { assert } = require("protocol/utils");
-
 const messagesActions = require("devtools/client/webconsole/actions/messages");
+const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
+const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
+const { assert } = require("protocol/utils");
 
 type EvaluateJSAsyncOptions = {
   asyncIndex?: number;
@@ -52,15 +51,15 @@ async function dispatchExpression(
   dispatch(
     messagesActions.messagesAdd([
       new ConsoleCommand({
-        messageText: expression,
-        timeStamp: Date.now(),
         evalId,
         executionPoint: pause.point,
         executionPointTime: pause.time,
+        messageText: expression,
+        timeStamp: Date.now(),
       }),
     ])
   );
-  dispatch({ type: EVALUATE_EXPRESSION, expression });
+  dispatch({ expression, type: EVALUATE_EXPRESSION });
 
   return evalId;
 }
@@ -73,14 +72,14 @@ export function paywallExpression(expression: string, reason = "team-user"): UIT
     dispatch(
       messagesActions.messagesAdd([
         new PaywallMessage({
+          evalId,
+          executionPoint: pause.point,
+          executionPointTime: pause.time,
           paywall: {
             reason,
           },
           source: MESSAGE_SOURCE.CONSOLE_API,
           timeStamp: Date.now(),
-          evalId,
-          executionPoint: pause.point,
-          executionPointTime: pause.time,
         }),
       ])
     );
@@ -105,9 +104,9 @@ export function evaluateExpression(expression: string): UIThunkAction {
     dispatch(
       messagesActions.messagesAdd([
         {
-          type: "evaluationResult",
-          result: createPrimitiveValueFront("Loading...", pause),
           evalId,
+          result: createPrimitiveValueFront("Loading...", pause),
+          type: "evaluationResult",
         },
       ])
     );
@@ -115,8 +114,8 @@ export function evaluateExpression(expression: string): UIThunkAction {
     try {
       const response: EvaluationResponse = await evaluateJSAsync(expression, {
         asyncIndex,
-        frameId,
         forConsoleMessage: true,
+        frameId,
       });
       response.evalId = evalId;
 
@@ -129,9 +128,9 @@ export function evaluateExpression(expression: string): UIThunkAction {
 
       return dispatch(
         onExpressionEvaluated({
-          type: "evaluationResult",
-          result: createPrimitiveValueFront(msg, pause),
           evalId,
+          result: createPrimitiveValueFront(msg, pause),
+          type: "evaluationResult",
         })
       );
     }
@@ -175,8 +174,8 @@ async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptio
   const { returned, exception, failed } = await ThreadFront.evaluate({
     asyncIndex,
     frameId,
-    text: expression,
     pure,
+    text: expression,
   });
 
   let v;
@@ -192,8 +191,8 @@ async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptio
   }
 
   return {
-    type: "evaluationResult",
     result: v,
+    type: "evaluationResult",
   };
 }
 
@@ -219,7 +218,7 @@ function onExpressionEvaluated(response: EvaluationResponse): UIThunkAction {
 }
 
 module.exports = {
+  eagerEvalExpression,
   evaluateExpression,
   paywallExpression,
-  eagerEvalExpression,
 };

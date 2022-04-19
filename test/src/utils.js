@@ -1,7 +1,7 @@
 /* Copyright 2020 Record Replay Inc. */
 
-const os = require("os");
 const https = require("https");
+const os = require("os");
 
 function tmpFile() {
   return os.tmpdir() + "/" + ((Math.random() * 1e9) | 0);
@@ -47,13 +47,13 @@ function sendTelemetryEvent(telemetryEvent, tags) {
   }
 
   const options = {
-    hostname: "telemetry.replay.io",
-    por: 443,
-    path: "/",
-    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    hostname: "telemetry.replay.io",
+    method: "POST",
+    path: "/",
+    por: 443,
   };
   try {
     const request = https.request(options, () => {});
@@ -79,8 +79,8 @@ function elapsedTime(state) {
 
 module.exports = {
   elapsedTime,
-  tmpFile,
   sendTelemetryEvent,
-  waitUntilMessage,
+  tmpFile,
   waitUntil,
+  waitUntilMessage,
 };

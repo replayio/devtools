@@ -2,19 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { endTruncateStr } from "./utils";
 import {
   isPretty,
   getTruncatedFileName,
   getSourceClassnames,
   getSourceQueryString,
 } from "./source";
+import { endTruncateStr } from "./utils";
 
 export const MODIFIERS = {
-  "@": "functions",
   "#": "variables",
   ":": "goto",
   "?": "shortcuts",
+  "@": "functions",
 };
 
 export function parseQuickOpenQuery(query) {
@@ -53,24 +53,24 @@ export function formatSourcesForList(source, tabUrls) {
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
   const value = relativeUrlWithQuery;
   return {
-    value,
-    title,
-    subtitle,
     icon: tabUrls.has(source.url)
       ? "tab result-item-icon"
       : `result-item-icon ${getSourceClassnames(source)}`,
     id: source.id,
+    subtitle,
+    title,
     url: source.url,
+    value,
   };
 }
 
 export function formatSymbol(symbol) {
   return {
     id: `${symbol.name}:${symbol.location.start.line}`,
-    title: symbol.name,
-    subtitle: `${symbol.location.start.line}`,
-    value: symbol.name,
     location: symbol.location,
+    subtitle: `${symbol.location.start.line}`,
+    title: symbol.name,
+    value: symbol.name,
   };
 }
 
@@ -84,11 +84,11 @@ export function formatProjectFunctions(functions, displayedSources) {
 
       return {
         id: `${name}:${loc.line}:${loc.column}`,
-        title: name,
-        subtitle: loc.line,
-        secondaryTitle: getTruncatedFileName(source),
-        value: name,
         location: { start: loc },
+        secondaryTitle: getTruncatedFileName(source),
+        subtitle: loc.line,
+        title: name,
+        value: name,
       };
     })
     .flat()

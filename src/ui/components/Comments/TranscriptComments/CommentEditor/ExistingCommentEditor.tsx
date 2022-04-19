@@ -1,9 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
-import CommentEditor from "./CommentEditor";
 import { useGetUserId } from "ui/hooks/users";
+
 import { CommentData } from "../types";
+
+import CommentEditor from "./CommentEditor";
 
 const LoomComment = connect(null, { setModal: actions.setModal })(
   ({ setModal, loom }: { loom: string; setModal: typeof actions.setModal }) => {

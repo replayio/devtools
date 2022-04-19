@@ -32,8 +32,8 @@ const getNodeDisplayName = function (rawNode) {
  */
 function getNodeGridFlexType(node) {
   return {
-    grid: getNodeGridType(node),
     flex: getNodeFlexType(node),
+    grid: getNodeGridType(node),
   };
 }
 
@@ -261,8 +261,8 @@ const imageToImageData = async function (node, maxDim) {
   return {
     data: imageData,
     size: {
-      naturalWidth: imgWidth,
       naturalHeight: imgHeight,
+      naturalWidth: imgWidth,
       resized: resizeRatio !== 1,
     },
   };
@@ -428,10 +428,10 @@ async function getBackgroundColor({ rawNode: node, walker }) {
 
   const bgColor = await getBackgroundFor(node, {
     bounds,
-    win,
     convertBoundsRelativeToViewport: false,
-    size: props.size,
     isBoldText: props.isBoldText,
+    size: props.size,
+    win,
   });
   removeSheetForBackgroundCalculation(win);
 
@@ -444,7 +444,6 @@ async function getBackgroundColor({ rawNode: node, walker }) {
 
 module.exports = {
   allAnonymousContentTreeWalkerFilter,
-  isWhitespaceTextNode,
   findGridParentContainerForNode,
   getBackgroundColor,
   getClosestBackgroundColor,
@@ -453,6 +452,7 @@ module.exports = {
   getNodeGridFlexType,
   imageToImageData,
   isNodeDead,
+  isWhitespaceTextNode,
   nodeDocument,
   scrollbarTreeWalkerFilter,
   standardTreeWalkerFilter,

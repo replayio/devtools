@@ -1,7 +1,9 @@
 import React from "react";
 import { SubscriptionWithPricing } from "ui/types";
-import ExternalLink from "../ExternalLink";
+
 import { Button } from "../Button";
+import ExternalLink from "../ExternalLink";
+
 import { PlanDetails } from "./PlanDetails";
 
 export function PricingPage({

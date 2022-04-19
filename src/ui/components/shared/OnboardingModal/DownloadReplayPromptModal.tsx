@@ -1,4 +1,5 @@
 import React from "react";
+
 import DownloadReplayModal from "./DownloadReplayModal";
 
 export default function DownloadReplayPromptModal() {

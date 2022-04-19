@@ -26,7 +26,7 @@ export async function getFrameworkEventListeners(node: NodeFront) {
       return contents.isObject() && contents.className() == "Function";
     })
     .map(([name, contents]) => {
-      return { handler: contents, type: name, capture: false, tags: "React" };
+      return { capture: false, handler: contents, tags: "React", type: name };
     });
 }
 

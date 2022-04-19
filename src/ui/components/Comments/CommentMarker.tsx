@@ -1,13 +1,12 @@
+import classnames from "classnames";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
-
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getMarkerLeftOffset } from "ui/utils/timeline";
+import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { Comment, PendingComment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
+import { getMarkerLeftOffset } from "ui/utils/timeline";
 
 const markerWidth = 19;
 
@@ -22,10 +21,10 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
     const { timelineDimensions, zoomRegion } = this.props;
 
     return getMarkerLeftOffset({
-      time: time,
-      overlayWidth: timelineDimensions.width,
-      zoom: zoomRegion,
       markerWidth: markerWidth,
+      overlayWidth: timelineDimensions.width,
+      time: time,
+      zoom: zoomRegion,
     });
   }
 
@@ -78,9 +77,9 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
 
 const connector = connect(
   (state: UIState) => ({
+    currentTime: selectors.getCurrentTime(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
-    currentTime: selectors.getCurrentTime(state),
   }),
   {
     seekToComment: actions.seekToComment,

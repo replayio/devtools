@@ -11,7 +11,7 @@ const { ThreadFront } = require("protocol/thread");
 
 export function prepareSourcePayload(source) {
   clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
-  return { thread: ThreadFront.actor, source };
+  return { source, thread: ThreadFront.actor };
 }
 
 export async function createFrame(frame, index = 0, asyncIndex = 0) {
@@ -21,35 +21,35 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
 
   const { sourceId, line, column } = await ThreadFront.getPreferredLocation(frame.location);
   const location = {
-    sourceId: clientCommands.getSourceForActor(sourceId),
-    line,
     column,
+    line,
+    sourceId: clientCommands.getSourceForActor(sourceId),
   };
 
   let alternateLocation;
   const alternate = await ThreadFront.getAlternateLocation(frame.location);
   if (alternate) {
     alternateLocation = {
-      sourceId: clientCommands.getSourceForActor(alternate.sourceId),
-      line: alternate.line,
       column: alternate.column,
+      line: alternate.line,
+      sourceId: clientCommands.getSourceForActor(alternate.sourceId),
     };
   }
 
   const displayName = frame.functionName || `(${frame.type})`;
 
   return {
-    id: `${asyncIndex}:${index}`,
-    protocolId: frame.frameId,
+    alternateLocation,
+    asyncCause: asyncIndex && index == 0 ? "async" : undefined,
     asyncIndex,
     displayName,
-    location,
-    alternateLocation,
-    this: frame.this,
-    source: null,
+    id: `${asyncIndex}:${index}`,
     index,
-    asyncCause: asyncIndex && index == 0 ? "async" : undefined,
+    location,
+    protocolId: frame.frameId,
+    source: null,
     state: "on-stack",
+    this: frame.this,
   };
 }
 
@@ -60,7 +60,7 @@ export function makeSourceId(source, isServiceWorker) {
 export function createPause(packet) {
   return {
     ...packet,
-    frame: createFrame(packet.frame),
     executionPoint: packet.executionPoint,
+    frame: createFrame(packet.frame),
   };
 }

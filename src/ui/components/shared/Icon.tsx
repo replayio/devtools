@@ -1,8 +1,8 @@
 import React from "react";
 
 const SIZES = {
-  small: { height: "16px", width: "16px" },
   medium: { height: "20px", width: "20px" },
+  small: { height: "16px", width: "16px" },
 };
 export default function Icon({
   filename,

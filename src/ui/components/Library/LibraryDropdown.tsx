@@ -1,8 +1,10 @@
-import React from "react";
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
-import MaterialIcon from "../shared/MaterialIcon";
+import React from "react";
+
 import Icon from "../shared/Icon";
+import MaterialIcon from "../shared/MaterialIcon";
+
 import styles from "./Library.module.css";
 
 // This should be the standard dropdown component for the Library

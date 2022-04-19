@@ -1,5 +1,6 @@
-import { getLibraryFromUrl } from "./getLibraryFromUrl";
 import { makeMockFrameWithURL } from "devtools/client/debugger/src/utils/test-mockup";
+
+import { getLibraryFromUrl } from "./getLibraryFromUrl";
 
 describe("getLibraryFromUrl", () => {
   test("FB ReactDOM", () => {

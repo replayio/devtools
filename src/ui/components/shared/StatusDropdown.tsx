@@ -1,13 +1,14 @@
 import React, { ReactNode, useState } from "react";
-import PortalDropdown from "./PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
-import MaterialIcon from "./MaterialIcon";
-import Confetti from "./Confetti";
 import {
   useGetRecording,
   useGetRecordingId,
   useUpdateRecordingResolution,
 } from "ui/hooks/recordings";
+
+import Confetti from "./Confetti";
+import MaterialIcon from "./MaterialIcon";
+import PortalDropdown from "./PortalDropdown";
 
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
   return (

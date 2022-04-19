@@ -1,9 +1,9 @@
 // Check that unloaded regions in the recording are reflected in the UI.
 
-import { runTest, devtoolsURL } from "../src/runTest";
-import { waitUntil } from "../../../src/test/harness";
-import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
+import { Page } from "@recordreplay/playwright";
 import { v4 as uuid } from "uuid";
+
+import { waitUntil } from "../../../src/test/harness";
 import {
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
@@ -13,21 +13,22 @@ import {
   createGetActiveSessionsMock,
 } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
-import { Page } from "@recordreplay/playwright";
+import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
+import { runTest, devtoolsURL } from "../src/runTest";
 
 const recordingId = uuid();
 const userId = uuid();
 const user = { id: userId, uuid: userId };
 const recording = {
   id: recordingId,
-  url: "http://mock.test",
   title: "Mock Test",
+  url: "http://mock.test",
 };
 const graphqlMocks = [
   ...createUserSettingsMock(),
   ...createRecordingOwnerUserIdMock({ recordingId, user }),
   ...createGetUserMock({ user }),
-  ...createGetRecordingMock({ recordingId, recording }),
+  ...createGetRecordingMock({ recording, recordingId }),
   ...createEmptyCommentsMock({ recordingId }),
   ...createGetActiveSessionsMock({ recordingId }),
 ];
@@ -61,7 +62,7 @@ const messageHandlers = {
 
 runTest("unloadRecording", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
+  await installMockEnvironment(page, { bindings, graphqlMocks, messageHandlers });
   await page.click("text=Devtools");
   await waitUntil(async () => {
     const bar = await page.$(".progress-bar");
