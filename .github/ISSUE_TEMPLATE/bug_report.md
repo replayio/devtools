@@ -19,4 +19,4 @@ assignees: ''
 
 * Screenshots:
 * Video (Loom):
-* Replay:
+* Replay ([replay.io/record-bugs](https://replay.io/record-bugs) for instructions):
