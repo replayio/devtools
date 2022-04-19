@@ -137,7 +137,6 @@ describe("useConsoleSearch", () => {
   it("should search visible Messages", async () => {
     await render();
 
-    console.log('search => "message"');
     act(() => {
       lastCommitedSearchActions?.search("message");
     });
@@ -150,7 +149,6 @@ describe("useConsoleSearch", () => {
       ]
     `);
 
-    console.log('search => "another"');
     act(() => {
       lastCommitedSearchActions?.search("another");
     });
