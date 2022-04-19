@@ -23,6 +23,7 @@ ConsoleApiCall.propTypes = {
   maybeScrollToBottom: PropTypes.func,
   isPrimaryHighlighted: PropTypes.bool.isRequired,
   shouldScrollIntoView: PropTypes.bool.isRequired,
+  topLevelClassName: PropTypes.string,
 };
 
 ConsoleApiCall.defaultProps = {
@@ -43,6 +44,7 @@ export default function ConsoleApiCall(props) {
     isFirstMessageForPoint,
     isPrimaryHighlighted,
     shouldScrollIntoView,
+    topLevelClassName,
   } = props;
   const {
     id: messageId,
@@ -130,6 +132,9 @@ export default function ConsoleApiCall(props) {
 
   const collapsible = isGroupType(type) || (level === "error" && Array.isArray(stacktrace));
   const topLevelClasses = ["cm-s-mozilla"];
+  if (topLevelClassName) {
+    topLevelClasses.push(topLevelClassName);
+  }
   return React.createElement(Message, {
     messageId,
     executionPoint,

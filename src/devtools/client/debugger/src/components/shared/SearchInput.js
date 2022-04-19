@@ -32,6 +32,7 @@ class SearchInput extends Component {
   $input;
 
   static defaultProps = {
+    className: "",
     expanded: false,
     hasPrefix: false,
     selectedItemId: "",
@@ -183,6 +184,7 @@ class SearchInput extends Component {
 
   render() {
     const {
+      className,
       expanded,
       handleClose,
       onChange,
@@ -214,7 +216,7 @@ class SearchInput extends Component {
     };
 
     return (
-      <div className="search-outline">
+      <div className={`search-outline ${className || ""}`}>
         <div
           className={classnames("search-field rounded-lg", size)}
           role="combobox"

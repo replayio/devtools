@@ -145,3 +145,7 @@ export function getPointIsInLoadedRegion(loadedRegions: TimeStampedPointRange[],
     r => BigInt(point) >= BigInt(r.begin.point) && BigInt(point) <= BigInt(r.end.point)
   );
 }
+
+export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[]): boolean {
+  return !!regions?.some(region => time >= region.begin.time && time <= region.end.time);
+}

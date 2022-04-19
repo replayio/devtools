@@ -5,6 +5,7 @@
 import { createSelector } from "reselect";
 
 import type { UIState } from "ui/state";
+import { isTimeInRegions } from "ui/utils/timeline";
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
@@ -35,15 +36,26 @@ export const getVisibleMessages = createSelector(
   getAllMessagesById,
   (state: UIState) => state.messages.visibleMessages,
   getFocusRegion,
-  (messages, visibleMessages, focusRegion) => {
-    const msgs = visibleMessages;
+  (state: UIState) => state.app.loadedRegions,
+  (messages, visibleMessages, focusRegion, loadedRegions) => {
+    const msgs = visibleMessages.filter(messageId => {
+      const message = messages.entities[messageId]!;
+      const executionPointTime = message.executionPointTime!;
 
-    if (focusRegion) {
-      return msgs.filter(id => {
-        const msg = messages.entities[id]!;
-        return isInTrimSpan(msg.executionPointTime, focusRegion);
-      });
-    }
+      // Filter out messages that aren't within the focused region.
+      if (focusRegion) {
+        if (!isInTrimSpan(executionPointTime, focusRegion)) {
+          return false;
+        }
+      }
+
+      // Filter out messages that haven't yet been loaded.
+      if (!isTimeInRegions(executionPointTime, loadedRegions!.loaded)) {
+        return false;
+      }
+
+      return true;
+    });
 
     return msgs;
   }

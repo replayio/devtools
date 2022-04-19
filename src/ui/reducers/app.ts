@@ -12,7 +12,7 @@ import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { isInTrimSpan } from "ui/utils/timeline";
+import { isInTrimSpan, isTimeInRegions } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { getSelectedPanel, getViewMode } from "./layout";
@@ -357,10 +357,7 @@ export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettin
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
-  typeof time !== "number" ||
-  !!getLoadedRegions(state)?.loaded.some(
-    region => time >= region.begin.time && time <= region.end.time
-  );
+  typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
 export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;

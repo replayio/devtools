@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Editor } from "codemirror";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -79,6 +79,7 @@ export default function JSTerm() {
     setHistoryIndex(0);
   };
 
+  // TODO [bvaughn] Refocus JSTerm <input> when SearchInput is hidden
   return (
     <div>
       <div className="relative">
@@ -88,7 +89,7 @@ export default function JSTerm() {
           aria-live="off"
           tabIndex={-1}
         >
-          <div className="ml-3 console-chevron h-3 w-3 mr-1" />
+          <div className="console-chevron ml-3 mr-1 h-3 w-3" />
           {isInLoadedRegion ? (
             <EditorWithAutocomplete
               onEditorMount={(editor: Editor, showAutocomplete?: (show: boolean) => void) =>
@@ -113,5 +114,5 @@ function InaccessibleEditor() {
   const playback = useSelector(getPlayback);
   const msg = playback ? "Console evaluations are disabled during playback" : "Loading…";
 
-  return <div className="flex items-center h-full italic text-gray-400">{msg}</div>;
+  return <div className="flex h-full items-center italic text-gray-400">{msg}</div>;
 }

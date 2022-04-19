@@ -14,6 +14,9 @@ import DefaultRenderer from "./message-types/DefaultRenderer";
 import EvaluationResult from "./message-types/EvaluationResult";
 import PageError from "./message-types/PageError";
 
+import styles from "./MessageContainer.module.css";
+import { StateContext } from "../Search";
+
 const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
 export class MessageContainer extends React.Component {
@@ -32,6 +35,8 @@ export class MessageContainer extends React.Component {
       shouldScrollIntoView: PropTypes.bool.isRequired,
     };
   }
+
+  static contextType = StateContext;
 
   static get defaultProps() {
     return {
@@ -58,7 +63,18 @@ export class MessageContainer extends React.Component {
   render() {
     const message = this.props.message;
     const MessageComponent = getMessageComponent(message);
-    return <MessageComponent {...this.props} message={message} />;
+
+    let topLevelClassName = null;
+    const { index, results, visible } = this.context;
+
+    // Highlight this row if the console search UI is visible/active and it is the currently selected result.
+    if (visible && index >= 0 && index < results.length && message === results[index]) {
+      topLevelClassName = styles.CurrentSearchResult;
+    }
+
+    return (
+      <MessageComponent {...this.props} message={message} topLevelClassName={topLevelClassName} />
+    );
   }
 }
 

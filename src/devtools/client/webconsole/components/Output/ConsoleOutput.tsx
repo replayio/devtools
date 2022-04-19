@@ -16,6 +16,8 @@ import { MessageContainer } from "devtools/client/webconsole/components/Output/M
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 
 import constants from "devtools/client/webconsole/constants";
+import { StateContext } from "../Search";
+import { Message } from "../../reducers/messages";
 
 function mapStateToProps(state: UIState) {
   return {
@@ -44,10 +46,16 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 class ConsoleOutput extends React.Component<PropsFromRedux> {
   outputNode = React.createRef<HTMLDivElement>();
 
+  _scrollTimeoutID: number | null = null;
+  _prevSearchResultMessage: Message | null = null;
+
+  static contextType = StateContext;
+
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
       scrollToBottom(this.outputNode.current!);
     }
+    this.scrollCurrentSearchResultIntoView();
   }
 
   componentDidUpdate(prevProps: PropsFromRedux) {
@@ -59,17 +67,12 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
     }
 
     this.maybeScrollToResult(prevProps);
+    this.scrollCurrentSearchResultIntoView();
   }
 
-  scrollToClosestMessage() {
-    const { closestMessage } = this.props;
-
-    if (!closestMessage) {
-      return;
-    }
-
+  ensureMessageIsInView(message: Message) {
     const element: HTMLElement = this.outputNode.current!.querySelector(
-      `.message[data-message-id="${closestMessage.id}"]`
+      `.message[data-message-id="${message.id}"]`
     )!;
 
     if (!element) {
@@ -81,9 +84,42 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       return;
     }
 
+    if (this._scrollTimeoutID) {
+      clearTimeout(this._scrollTimeoutID);
+    }
+
     // Chrome sometimes ignores element.scrollIntoView() here,
     // calling it with a little delay fixes it
-    setTimeout(() => element.scrollIntoView({ block: "center", behavior: "smooth" }));
+    this._scrollTimeoutID = setTimeout(() =>
+      element.scrollIntoView({ block: "center", behavior: "smooth" })
+    );
+  }
+
+  scrollCurrentSearchResultIntoView() {
+    const { index, results, visible } = this.context;
+
+    if (!visible) {
+      return;
+    }
+
+    const message = index >= 0 && index < results.length ? results[index] : null;
+
+    // Only programmatically scroll after changes to the selected search result.
+    if (this._prevSearchResultMessage === message || message === null) {
+      return;
+    }
+
+    this._prevSearchResultMessage = message;
+
+    this.ensureMessageIsInView(message);
+  }
+
+  scrollToClosestMessage() {
+    const { closestMessage } = this.props;
+
+    if (closestMessage) {
+      this.ensureMessageIsInView(closestMessage);
+    }
   }
 
   maybeScrollToResult(prevProps: PropsFromRedux) {
@@ -151,36 +187,29 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       loadedRegions,
     } = this.props;
 
-    const messageNodes = visibleMessages
-      .filter(messageId => {
-        const time = messages.entities[messageId]!.executionPointTime!;
-        return loadedRegions!.loaded.some(
-          region => time >= region.begin.time && time <= region.end.time
-        );
-      })
-      .map((messageId, i) => {
-        const message = messages.entities[messageId]!;
-        // @ts-ignore ExecutionPoint/string mismatch
-        const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
-        const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
+    const messageNodes = visibleMessages.map((messageId, i) => {
+      const message = messages.entities[messageId]!;
+      // @ts-ignore ExecutionPoint/string mismatch
+      const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
+      const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
-        return React.createElement(MessageContainer, {
-          dispatch,
-          key: messageId,
-          messageId,
-          message,
-          open: messagesUi.includes(messageId),
-          // TODO Reconsider this when we rebuild message grouping
-          payload: undefined,
-          timestampsVisible,
+      return React.createElement(MessageContainer, {
+        dispatch,
+        key: messageId,
+        messageId,
+        message,
+        open: messagesUi.includes(messageId),
+        // TODO Reconsider this when we rebuild message grouping
+        payload: undefined,
+        timestampsVisible,
 
-          pausedExecutionPoint,
-          isPaused: closestMessage?.id == messageId,
-          isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
-          isPrimaryHighlighted,
-          shouldScrollIntoView,
-        });
+        pausedExecutionPoint,
+        isPaused: closestMessage?.id == messageId,
+        isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
+        isPrimaryHighlighted,
+        shouldScrollIntoView,
       });
+    });
 
     return (
       <div className="webconsole-output" ref={this.outputNode} role="main">
