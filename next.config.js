@@ -8,6 +8,9 @@ module.exports = {
   eslint: {
     // which folders to run ESLint on during production builds (next build)
     dirs: ["src", "pages", "packages"],
+
+    // We rely on Trunk's hold-the-line functionality.
+    ignoreDuringBuilds: true,
   },
 
   productionBrowserSourceMaps: true,
