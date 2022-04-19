@@ -8,12 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache Linters/Formatters
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/trunk
-          key: trunk-${{ runner.os }}
       - name: Install Deps
         run: npm install
       - name: Trunk Check
-        uses: trunk-io/trunk-action@v1.0.0
+        uses: trunk-io/trunk-action@v1.0.1
