@@ -1,22 +1,24 @@
-import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
-import { findHeader, RequestSummary } from "./utils";
-import styles from "./RequestDetails.module.css";
 import classNames from "classnames";
-import sortBy from "lodash/sortBy";
-import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
-import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
+import PanelTabs from "devtools/client/shared/components/PanelTabs";
+import sortBy from "lodash/sortBy";
 import { WiredFrame } from "protocol/thread/pause";
-import ResponseBody from "./ResponseBody";
-import { useFeature } from "ui/hooks/settings";
-import RequestBody from "./RequestBody";
-import { getLoadedRegions } from "ui/reducers/app";
+import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
-import { hideRequestDetails } from "ui/actions/network";
-import { getFormattedFrames } from "ui/reducers/network";
 import { actions } from "ui/actions";
+import { hideRequestDetails } from "ui/actions/network";
+import { useFeature } from "ui/hooks/settings";
+import { getLoadedRegions } from "ui/reducers/app";
+import { getFormattedFrames } from "ui/reducers/network";
+import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+
+import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
+
 import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
+import RequestBody from "./RequestBody";
+import styles from "./RequestDetails.module.css";
+import ResponseBody from "./ResponseBody";
+import { findHeader, RequestSummary } from "./utils";
 
 interface Detail {
   name: string;
@@ -77,6 +79,16 @@ function FormattedUrl({ url }: { url: string }) {
 }
 
 const DetailTable = ({ className, details }: { className?: string; details: Detail[] }) => {
+  if (details.length === 0) {
+    return (
+      <div className={classNames(className, "flex flex-col")}>
+        <div className={classNames(styles.row, "cursor-pointer py-1 hover:bg-toolbarBackground")}>
+          No entries
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={classNames(className, "flex flex-col")}>
       {details.map((h, i) => (
@@ -99,6 +111,10 @@ export const TriangleToggle = ({ open }: { open: boolean }) => (
 );
 
 const parseCookie = (str: string): Record<string, string> => {
+  if (str.trim() === "") {
+    return {};
+  }
+
   return str
     .split(";")
     .map(v => v.split("="))
