@@ -1,7 +1,7 @@
 .loading-progress-bar {
   height: 2px;
   background: var(--primary-accent);
-  position: absolute;
+  position: sticky;
   transition-duration: 200ms;
   top: 0px;
 }
