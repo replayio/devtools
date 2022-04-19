@@ -1,5 +1,6 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
 import { useSelector } from "react-redux";
+import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 
@@ -35,6 +36,11 @@ const Spans = ({ regions, color }: { regions: TimeStampedPointRange[]; color: st
 
 export default function OgreTimeline() {
   const loadedRegions = useSelector(getLoadedRegions)!;
+  const { value: showAdvancedTimeline } = useFeature("advancedTimeline");
+
+  if (!showAdvancedTimeline) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col space-y-1 absolute -top-3 w-full">
