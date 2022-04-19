@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { clearTrialExpired, createSession } from "ui/actions/session";
+import { createSession, clearTrialExpired } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
