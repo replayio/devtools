@@ -83,81 +83,87 @@ function CommentTool({
   const { userId } = useGetUserId();
   const captionNode = useRef<HTMLDivElement | null>(null);
 
-  const addListeners = () => {
+  // Re-register the listener on every update to prevent the props used by the handler functions from being stale.
+  useEffect(() => {
     const videoNode = document.getElementById("graphics");
-
     if (videoNode) {
+      const onMouseDown = (evt: MouseEvent) => {
+        if (!pendingComment || !document.activeElement) {
+          return;
+        }
+
+        const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
+        // this uses `[id="..."]` because comment ids can have "="s in them!
+        const isEditorFocused = !!document.activeElement.closest(
+          `[id="${pendingCommentEditorId}"]`
+        );
+
+        // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
+        if (isEditorFocused) {
+          evt.preventDefault();
+        }
+      };
+      const onClickInCanvas = async (e: MouseEvent) => {
+        if (e.target !== document.querySelector("canvas#graphics")) {
+          return;
+        }
+
+        // If there's no pending comment at that point and time, create one
+        // with the mouse click as its position.
+        if (!pendingComment) {
+          createFrameComment(
+            currentTime,
+            executionPoint,
+            mouseEventCanvasPosition(e),
+            { ...user, id: userId },
+            recordingId
+          );
+          return;
+        }
+
+        // If there's a pending comment (not a reply), change its position.
+        if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
+          const newComment = { ...pendingComment };
+          newComment.comment.position = mouseEventCanvasPosition(e);
+
+          setPendingComment(newComment);
+          setSelectedPrimaryPanel("comments");
+        }
+      };
+
+      const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
+      const onMouseLeave = () => {
+        setMousePosition(null);
+      };
+
       videoNode.classList.add("location-marker");
+
       videoNode.addEventListener("mousedown", onMouseDown);
       videoNode.addEventListener("mouseup", onClickInCanvas);
       videoNode.addEventListener("mousemove", onMouseMove);
       videoNode.addEventListener("mouseleave", onMouseLeave);
+
+      return () => {
+        videoNode.classList.remove("location-marker");
+
+        videoNode.removeEventListener("mousedown", onMouseDown);
+        videoNode.removeEventListener("mouseup", onClickInCanvas);
+        videoNode.removeEventListener("mousemove", onMouseMove);
+        videoNode.removeEventListener("mouseleave", onMouseLeave);
+      };
     }
-  };
-  const removeListeners = () => {
-    const videoNode = document.getElementById("graphics");
-
-    if (videoNode) {
-      videoNode.classList.remove("location-marker");
-      videoNode.removeEventListener("mousedown", onMouseDown);
-      videoNode.removeEventListener("mouseup", onClickInCanvas);
-      videoNode.removeEventListener("mousemove", onMouseMove);
-      videoNode.removeEventListener("mouseleave", onMouseLeave);
-    }
-  };
-  const onMouseDown = (evt: MouseEvent) => {
-    if (!pendingComment || !document.activeElement) {
-      return;
-    }
-
-    const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
-    // this uses `[id="..."]` because comment ids can have "="s in them!
-    const isEditorFocused = !!document.activeElement.closest(`[id="${pendingCommentEditorId}"]`);
-
-    // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
-    if (isEditorFocused) {
-      evt.preventDefault();
-    }
-  };
-  const onClickInCanvas = async (e: MouseEvent) => {
-    if (e.target !== document.querySelector("canvas#graphics")) {
-      return;
-    }
-
-    // If there's no pending comment at that point and time, create one
-    // with the mouse click as its position.
-    if (!pendingComment) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        mouseEventCanvasPosition(e),
-        { ...user, id: userId },
-        recordingId
-      );
-      return;
-    }
-
-    // If there's a pending comment (not a reply), change its position.
-    if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
-      const newComment = { ...pendingComment };
-      newComment.comment.position = mouseEventCanvasPosition(e);
-
-      setPendingComment(newComment);
-      setSelectedPrimaryPanel("comments");
-    }
-  };
-
-  const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
-  const onMouseLeave = () => {
-    setMousePosition(null);
-  };
-
-  // Re-register the listener on every update to prevent the props used by
-  // the handler functions from being stale.
-  useEffect(() => {
-    addListeners();
-    return () => removeListeners();
-  }, [currentTime, executionPoint, pendingComment, comments]);
+  }, [
+    comments,
+    createFrameComment,
+    currentTime,
+    executionPoint,
+    pendingComment,
+    recordingId,
+    setPendingComment,
+    setSelectedPrimaryPanel,
+    user,
+    userId,
+  ]);
 
   if (
     !mousePosition ||

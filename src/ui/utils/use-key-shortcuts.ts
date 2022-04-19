@@ -1,28 +1,31 @@
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import KeyShortcuts, { KeyboardEventListener } from "./key-shortcuts";
 
 export default function useKeyShortcuts(
   initialShortcuts: Record<string, KeyboardEventListener>,
   ref?: RefObject<EventTarget>
 ) {
-  // This will create exactly one KeyShortcuts instance per component instance.
-  // It may seem tempting to use `useMemo` for this, but the React documentation
-  // explicitly states that it shouldn't be relied on to run only once.
-  const [shortcuts] = useState(() => new KeyShortcuts(initialShortcuts));
+  const memoizedShortcutsRef = useRef<KeyShortcuts>(null as unknown as KeyShortcuts);
+  if (memoizedShortcutsRef.current === null) {
+    memoizedShortcutsRef.current = new KeyShortcuts(initialShortcuts);
+  }
 
-  // This will run once after the first render and whenever ref.current changes
+  const prevTargetRef = useRef<EventTarget | null>(null);
+
+  // Attach shortcut on-mount and re-attach whenever ref.current changes
   useEffect(() => {
-    if (ref) {
-      if (ref.current) {
-        shortcuts.attach(ref.current);
+    const target = ref ? ref.current : document.body;
+    if (prevTargetRef.current !== target) {
+      if (target) {
+        memoizedShortcutsRef.current.attach(target);
       } else {
-        shortcuts.detach();
+        memoizedShortcutsRef.current.detach();
       }
-    } else {
-      shortcuts.attach(document.body);
     }
-  }, [ref?.current]);
+
+    prevTargetRef.current = target;
+  });
 
   // This will run when the component is unmounted
-  useEffect(() => () => shortcuts.destroy(), []);
+  useEffect(() => () => memoizedShortcutsRef.current.destroy(), []);
 }

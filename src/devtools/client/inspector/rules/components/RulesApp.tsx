@@ -50,7 +50,14 @@ export const RulesApp: FC<RulesAppProps> = ({
       showNewDeclarationEditor,
       showSelectorEditor,
     }),
-    []
+    [
+      onToggleDeclaration,
+      onToggleSelectorHighlighter,
+      showDeclarationNameEditor,
+      showDeclarationValueEditor,
+      showNewDeclarationEditor,
+      showSelectorEditor,
+    ]
   );
 
   const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {

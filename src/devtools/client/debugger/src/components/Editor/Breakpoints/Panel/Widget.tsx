@@ -13,6 +13,7 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(() => {
     if (loading) {
       const _node = document.createElement("div");
@@ -31,7 +32,7 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
     return () => {
       _widget.clear();
     };
-  }, [loading]);
+  }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!node) {
     return null;

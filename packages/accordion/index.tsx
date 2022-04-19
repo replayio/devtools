@@ -102,6 +102,9 @@ export function AccordionPane({
   // do this by intercepting the expanded state in the Accordion so we only have one
   // expanded prop (the one from the Accordion) being considered by the AccordionPane.
   // https://gist.github.com/jaril/dfad5343f141c175d767d21cd6fdaab2
+  //
+  // TODO [jcmorrow] Fix react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => dispatch(expanded ? expandSection(index!) : collapseSection(index!)), [expanded]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "../../protocol/graphics";
 import { setVideoNode } from "../../protocol/videoNode";
@@ -63,13 +63,24 @@ function Video({
   }, []);
 
   // Seek and resume playback if playing when swapping between Viewer and DevTools
+  const didSeekOnMountRef = useRef(false);
   useEffect(() => {
+    if (didSeekOnMountRef.current) {
+      return;
+    }
+
+    didSeekOnMountRef.current = true;
+
     if (playback) {
       refreshGraphics();
       VideoPlayer.seek(currentTime);
       VideoPlayer.play();
     }
-  }, []);
+
+    return () => {
+      didSeekOnMountRef.current = false;
+    };
+  });
 
   // This is intentionally mousedown. Otherwise, the NodePicker's mouseup callback fires
   // first. This updates the isNodePickerActive value and makes it look like the node picker is

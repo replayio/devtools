@@ -102,6 +102,7 @@ function Library({
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
+  // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(function handleDeletedTeam() {
     // After rendering null, update the workspaceId to display the user's library
     // instead of the non-existent team.
@@ -109,7 +110,9 @@ function Library({
       setWorkspaceId(null);
       updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(function handleOnboardingModals() {
     if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
       trackEvent("onboarding.team_invite");
@@ -121,7 +124,7 @@ function Library({
       trackEvent("onboarding.demo_replay_prompt");
       setModal("first-replay");
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // FIXME [ryanjduffy]: Backwards compatibility for ?replayinvite=true flow
   if (isTeamLeaderInvite()) {

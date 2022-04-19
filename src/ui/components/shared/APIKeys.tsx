@@ -134,11 +134,10 @@ export default function APIKeys({
     [apiKeys]
   );
 
-  // focus the input on mount (when the ref is valued) and when returning to the
-  // form (when keyValue changes)
+  // focus the input on mount and when returning to the form (when keyValue changes)
   useEffect(() => {
     labelRef.current?.focus();
-  }, [labelRef.current, keyValue]);
+  }, [keyValue]);
 
   return (
     <div className="flex h-0 flex-auto flex-col space-y-8">

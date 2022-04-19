@@ -108,13 +108,13 @@ const TipTapEditor = ({
     if (editable) {
       editor?.commands.focus("end");
     }
-  }, [editable]);
+  }, [editable, editor]);
 
   useEffect(() => {
     if (takeFocus) {
       editor?.commands.focus("end");
     }
-  }, [takeFocus]);
+  }, [editor, takeFocus]);
 
   return (
     <div

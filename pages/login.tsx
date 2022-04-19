@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     dispatch(clearExpectedError());
-  }, []);
+  }, [dispatch]);
 
   return <Login returnToPath={"" + router.query.returnTo} />;
 }

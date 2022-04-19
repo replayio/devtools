@@ -29,6 +29,7 @@ export default function Share() {
     );
   }
 
+  // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(
     function handleTeamInvitationCode() {
       // The auth0 object is not reliable until the token has finished loading,
@@ -45,7 +46,7 @@ export default function Share() {
         push({ pathname: "/login", query: { returnTo: returnToPath } });
       }
     },
-    [loading]
+    [loading] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return null;

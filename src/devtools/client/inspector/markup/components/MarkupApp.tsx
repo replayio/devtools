@@ -20,10 +20,12 @@ function setupLegacyComponents(inspector: Inspector) {
   new HTMLBreadcrumbs(inspector);
 }
 
-function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
-  const isMarkupEmpty = (props.markupRootNode?.children?.length || 0) == 0;
+type PropsFromParent = { inspector: Inspector };
 
-  useEffect(() => setupLegacyComponents(props.inspector), []);
+function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromParent) {
+  const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
+
+  useEffect(() => setupLegacyComponents(inspector), [inspector]);
 
   return (
     <div className="devtools-inspector-tab-panel">
@@ -61,7 +63,7 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
         <div id="markup-box" className="devtools-monospace bg-bodyBgcolor">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
-              {<Nodes {...props.inspector.markup.getMarkupProps()} />}
+              {<Nodes {...inspector.markup.getMarkupProps()} />}
             </div>
           </div>
           {isMarkupEmpty ? <LoadingProgressBar /> : null}

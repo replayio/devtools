@@ -77,7 +77,7 @@ function PrivacyPreferences() {
 
   useEffect(() => {
     setDisableLogRocket(userSettings.disableLogRocket);
-  }, [loading]);
+  }, [userSettings]);
 
   if (loading) {
     return null;

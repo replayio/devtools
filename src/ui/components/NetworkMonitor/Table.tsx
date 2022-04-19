@@ -66,7 +66,7 @@ export default function Table({
   );
   const data = useMemo(
     () => partialRequestsToCompleteSummaries(requests, events, types),
-    [requests, types]
+    [events, requests, types]
   );
 
   const defaultColumn = useMemo(

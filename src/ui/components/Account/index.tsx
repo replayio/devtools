@@ -13,7 +13,7 @@ export default function Account() {
 
   useEffect(() => {
     dispatch(setLoadingFinished(true));
-  }, [])
+  }, [dispatch]);
 
   if (isLoading) {
     return null;

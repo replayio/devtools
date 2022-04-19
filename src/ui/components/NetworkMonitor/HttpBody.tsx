@@ -60,7 +60,7 @@ const HttpBody = ({
   const theme = useSelector(getTheme);
   const raw = useMemo(() => {
     return BodyPartsToArrayBuffer(bodyParts, contentType);
-  }, [bodyParts]);
+  }, [contentType, bodyParts]);
 
   const displayable = useMemo(() => {
     return StringToObjectMaybe(URLEncodedToPlaintext(RawToUTF8(raw)));
