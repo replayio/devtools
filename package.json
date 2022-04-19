@@ -11,7 +11,7 @@
     "start": "next start -p 8080",
     "build": "next build",
     "lint": "trunk check",
-    "lint:fix": "trunk fmt",
+    "lint:fix": "trunk check --fix",
     "typecheck": "tsc",
     "typecheck:watch": "npm run typecheck -- --watch",
     "build-e2e-cra-test": "node public/test/examples/cra/build",
