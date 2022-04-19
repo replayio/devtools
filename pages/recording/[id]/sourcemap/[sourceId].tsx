@@ -98,11 +98,13 @@ function SourcemapVisualizer({
 }) {
   const dispatch = useDispatch();
 
+  // TODO [hbenl] Fix react-hooks/exhaustive-deps
+  // Is this really something we only want to do on-mount (even if source/map/url change)?
   useEffect(() => {
     document.body.className = "sourcemap-visualizer";
     dispatch(setAppMode("sourcemap-visualizer"));
     renderSourcemap(source, map, url, document);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -131,7 +133,7 @@ export default function SourceMapLoader() {
 
   useEffect(() => {
     loadSourceMap(recordingId, sourceId, store).then(setSourcemapResult);
-  }, []);
+  }, [recordingId, sourceId, store]);
 
   if (!sourcemapResult) {
     return <LoadingScreen />;

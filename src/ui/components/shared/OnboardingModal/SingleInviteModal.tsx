@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
@@ -29,7 +29,7 @@ function SingleInviteModalLoader(props: PropsFromRedux) {
     if (!loading && pendingWorkspaces && !workspace) {
       setWorkspace(pendingWorkspaces[0]);
     }
-  }, [pendingWorkspaces]);
+  }, [loading, pendingWorkspaces, workspace]);
 
   if (!workspace) {
     return <ModalLoader />;
@@ -50,9 +50,17 @@ function AutoAccept(props: SingleInviteModalProps) {
     setAccepted(true);
   });
 
+  const didMountRef = useRef(false);
+
   useEffect(() => {
+    if (didMountRef.current) {
+      return;
+    }
+
+    didMountRef.current = true;
+
     acceptPendingInvitation({ variables: { workspaceId: workspace.id } });
-  }, []);
+  });
 
   if (!accepted) {
     return <ModalLoader />;

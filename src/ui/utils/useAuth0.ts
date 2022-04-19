@@ -23,9 +23,8 @@ const TEST_AUTH = {
 
 export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
 
-/**
- * A wrapper around useAuth0() that returns dummy data in tests
- */
+// TODO [hbenl, ryanjduffy] This function should `useMemo` to memoize the "user" object it returns.
+// As it is, this hooks prevents components like CommentTool from limiting how often their effects run.
 export default function useAuth0() {
   const router = useRouter();
   const auth = useOrigAuth0();

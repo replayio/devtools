@@ -8,7 +8,7 @@ import type { ExperimentalUserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 import { features } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 import {
   UpdateUserDefaultWorkspace,
@@ -62,6 +62,8 @@ export function useGetUserSettings() {
   const { isAuthenticated } = useAuth0();
   const { data, error, loading } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
 
+  const userSettings = useMemo(() => convertUserSettings(data), [data]);
+
   if (isTest()) {
     return { userSettings: testSettings, loading: false };
   }
@@ -79,7 +81,7 @@ export function useGetUserSettings() {
     return { userSettings: emptySettings, error, loading };
   }
 
-  return { userSettings: convertUserSettings(data), error, loading };
+  return { userSettings, error, loading };
 }
 
 export const useFeature = (prefKey: keyof typeof features) => {

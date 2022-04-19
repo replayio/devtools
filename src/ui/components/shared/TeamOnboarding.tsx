@@ -103,7 +103,7 @@ function TeamNamePage({
 
   useEffect(() => {
     textInputRef.current?.focus();
-  }, [textInputRef.current]);
+  }, []);
 
   return (
     <>

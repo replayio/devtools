@@ -14,35 +14,48 @@ type SkeletonProps = PropsFromRedux & {
 
 function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode }: SkeletonProps) {
   const [displayedProgress, setDisplayedProgress] = useState(0);
-  const key = useRef<any>(null);
-
-  useEffect(() => {
-    return () => clearTimeout(key.current);
-  }, []);
 
   useEffect(() => {
     if (displayedProgress == 100) {
       // This gives the Loader component some time (300ms) to bring the progress
       // bar to 100% before unmounting this loader and showing the application.
-      setTimeout(async () => {
+      let timeoutID: NodeJS.Timeout | null = setTimeout(async () => {
+        timeoutID = null;
+
         await ThreadFront.initializedWaiter.promise;
         setFinishedLoading(true);
       }, 300);
-    }
 
+      return () => {
+        if (timeoutID !== null) {
+          clearTimeout(timeoutID);
+        }
+      };
+    }
+  }, [displayedProgress, setFinishedLoading]);
+
+  useEffect(() => {
     // This handles the artificial progress bump. It has a randomized increment
     // whose effect is decayed as the progress approaches 100/100. Whenever the
     // underlying progress is higher than the artificial progress, we update to use
     // the underlying progress. Expected behavior assuming no underlying progress is:
     // 10s (50%) 20s (70%) 30s (85%) 45s (95%) 60s (98%)
-    key.current = setTimeout(() => {
+    let timeoutID: NodeJS.Timeout | null = setTimeout(() => {
+      timeoutID = null;
+
       const increment = Math.random();
       const decayed = increment * ((100 - displayedProgress) / 40);
       const newDisplayedProgress = Math.max(displayedProgress + decayed, progress);
 
       setDisplayedProgress(newDisplayedProgress);
     }, 200);
-  }, [displayedProgress]);
+
+    return () => {
+      if (timeoutID != null) {
+        clearTimeout(timeoutID);
+      }
+    };
+  }, [displayedProgress, progress]);
 
   return (
     <div className="loader">

@@ -12,6 +12,7 @@ const TEXT = {
 
 type Step = keyof typeof TEXT;
 
+// TODO [jaril] Fix react-hooks/exhaustive-deps
 export default function FirstEditNag({ editing }: { editing: boolean }) {
   const [step, setStep] = useState<Step | null>(null);
   const { nags } = hooks.useGetUserInfo();
@@ -27,7 +28,7 @@ export default function FirstEditNag({ editing }: { editing: boolean }) {
     if (step === "savePrompt" && !shouldShowNag(nags, Nag.FIRST_BREAKPOINT_SAVE)) {
       setStep("success");
     }
-  }, [nags, editing]);
+  }, [nags, editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!step) {
     return null;

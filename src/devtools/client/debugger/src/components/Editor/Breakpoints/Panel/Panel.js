@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
@@ -52,13 +52,17 @@ function Panel({
     (analysisPoints.error || (analysisPoints.data.length || 0) > prefs.maxHitsDisplayed);
 
   useEffect(() => {
-    editor.editor.on("refresh", updateWidth);
-    dismissNag(Nag.FIRST_BREAKPOINT_ADD);
+    const updateWidth = () => setWidth(getPanelWidth(editor));
 
+    editor.editor.on("refresh", updateWidth);
     return () => {
       editor.editor.off("refresh", updateWidth);
     };
-  }, []);
+  }, [editor]);
+
+  useEffect(() => {
+    dismissNag(Nag.FIRST_BREAKPOINT_ADD);
+  }, [dismissNag]);
 
   const toggleEditingOn = () => {
     dismissNag(Nag.FIRST_BREAKPOINT_EDIT);
@@ -69,8 +73,6 @@ function Panel({
     dismissNag(Nag.FIRST_BREAKPOINT_SAVE);
     setEditing(false);
   };
-
-  const updateWidth = () => setWidth(getPanelWidth(editor));
 
   const onMouseEnter = () => {
     const hoveredItem = {

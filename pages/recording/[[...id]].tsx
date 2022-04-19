@@ -143,7 +143,16 @@ function RecordingPage({
       }
     }
     getRecording();
-  }, [recordingId, rawRecordingId, store, getAccessibleRecording, setExpectedError, token.token]);
+  }, [
+    dispatch,
+    getAccessibleRecording,
+    query.id,
+    rawRecordingId,
+    recordingId,
+    setExpectedError,
+    store,
+    token.token,
+  ]);
 
   if (!recording || typeof window === "undefined") {
     return (

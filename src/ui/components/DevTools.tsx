@@ -127,18 +127,18 @@ function _DevTools({
       userIsAuthor: !!userIsAuthor,
       workspaceUuid: recording?.workspace?.id || null,
     });
-  }, [loading]);
+  });
 
   useEffect(() => {
     createSession(recordingId);
     return () => clearTrialExpired();
-  }, [clearTrialExpired, recordingId]);
+  }, [clearTrialExpired, createSession, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
       endUploadWaitTracking(sessionId!);
     }
-  }, [uploadComplete, loadingFinished]);
+  }, [loadingFinished, uploadComplete, sessionId]);
 
   useEffect(() => {
     if (recording && document.title !== recording.title) {

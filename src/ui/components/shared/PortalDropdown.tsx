@@ -16,14 +16,6 @@ type ViewportOverflows = Direction[];
 export default function PortalDropdown(props: PortalDropdownProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [dropdownNode, setDropdownNode] = useState<HTMLDivElement | null>(null);
-  const dropdownRef = useCallback(
-    node => {
-      if (node !== null) {
-        setDropdownNode(node);
-      }
-    },
-    [props.expanded]
-  );
 
   const expand = (e: React.MouseEvent) => {
     if (e.button === 0) {
@@ -66,7 +58,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
               <div
                 className={`content ${position}`}
                 style={{ ...style, ...contentPosition }}
-                ref={dropdownRef}
+                ref={setDropdownNode}
               >
                 {children}
               </div>

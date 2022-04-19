@@ -48,76 +48,77 @@ function KeyboardShortcuts({
   toggleFocusMode,
   togglePaneCollapse,
   viewMode,
-  toggleTheme,
+  toggleThemeAction,
   toggleQuickOpen,
   closeOpenModalsOnEscape,
 }: PropsFromRedux) {
-  const openFullTextSearch = (e: KeyboardEvent) => {
-    e.preventDefault();
-    if (viewMode !== "dev") {
-      setViewMode("dev");
-    }
-    trackEvent("key_shortcut.full_text_search");
-    setSelectedPrimaryPanel("search");
-    focusFullTextInput(true);
-  };
-  const toggleLeftSidebar = (e: KeyboardEvent) => {
-    e.preventDefault();
-
-    trackEvent("key_shortcut.toggle_left_sidebar");
-    togglePaneCollapse();
-  };
-  const togglePalette = (e: KeyboardEvent) => {
-    e.preventDefault();
-    trackEvent("key_shortcut.show_command_palette");
-
-    if (viewMode === "dev" && !selectedSource && toolboxLayout === "ide") {
-      // Show the command palette in the editor
-      showCommandPaletteInEditor();
-    } else {
-      toggleCommandPalette();
-    }
-
-    const paletteInput = getCommandPaletteInput();
-    if (paletteInput) {
-      paletteInput.focus();
-    }
-  };
-  const onToggleTheme = (e: KeyboardEvent) => {
-    if (!e.target || !isEditableElement(e.target)) {
-      e.preventDefault();
-      toggleTheme();
-    }
-  };
-  const toggleEditFocusMode = (e: KeyboardEvent) => {
-    if (!e.target || !isEditableElement(e.target)) {
-      e.preventDefault();
-      toggleFocusMode();
-    }
-  };
-
-  const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    toggleQuickOpen(query, project);
-  };
-
-  const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
-    toggleQuickOpenModal(e, "@");
-  };
-
-  const toggleProjectFunctionQuickOpenModal = (e: KeyboardEvent) => {
-    toggleQuickOpenModal(e, "@", true);
-  };
-
-  const toggleLineQuickOpenModal = (e: KeyboardEvent) => {
-    toggleQuickOpenModal(e, ":");
-  };
-
   const globalKeyboardShortcuts = useMemo(() => {
-    // The shortcuts have to be reassigned every time the dependencies change,
-    // otherwise we end up with a stale prop.
+    const openFullTextSearch = (e: KeyboardEvent) => {
+      e.preventDefault();
+      if (viewMode !== "dev") {
+        setViewMode("dev");
+      }
+      trackEvent("key_shortcut.full_text_search");
+      setSelectedPrimaryPanel("search");
+      focusFullTextInput(true);
+    };
+
+    const toggleEditFocusMode = (e: KeyboardEvent) => {
+      if (!e.target || !isEditableElement(e.target)) {
+        e.preventDefault();
+        toggleFocusMode();
+      }
+    };
+
+    const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
+      toggleQuickOpenModal(e, "@");
+    };
+
+    const toggleLeftSidebar = (e: KeyboardEvent) => {
+      e.preventDefault();
+
+      trackEvent("key_shortcut.toggle_left_sidebar");
+      togglePaneCollapse();
+    };
+
+    const toggleLineQuickOpenModal = (e: KeyboardEvent) => {
+      toggleQuickOpenModal(e, ":");
+    };
+
+    const togglePalette = (e: KeyboardEvent) => {
+      e.preventDefault();
+      trackEvent("key_shortcut.show_command_palette");
+
+      if (viewMode === "dev" && !selectedSource && toolboxLayout === "ide") {
+        // Show the command palette in the editor
+        showCommandPaletteInEditor();
+      } else {
+        toggleCommandPalette();
+      }
+
+      const paletteInput = getCommandPaletteInput();
+      if (paletteInput) {
+        paletteInput.focus();
+      }
+    };
+
+    const toggleProjectFunctionQuickOpenModal = (e: KeyboardEvent) => {
+      toggleQuickOpenModal(e, "@", true);
+    };
+
+    const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      toggleQuickOpen(query, project);
+    };
+
+    const toggleTheme = (e: KeyboardEvent) => {
+      if (!e.target || !isEditableElement(e.target)) {
+        e.preventDefault();
+        toggleThemeAction();
+      }
+    };
 
     const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
       "CmdOrCtrl+Shift+F": openFullTextSearch,
@@ -125,7 +126,7 @@ function KeyboardShortcuts({
       "CmdOrCtrl+K": togglePalette,
 
       // Should be ignored when an editable element is focused
-      "Shift+T": onToggleTheme,
+      "Shift+T": toggleTheme,
       "Shift+F": toggleEditFocusMode,
 
       // Quick Open-related toggles
@@ -141,9 +142,21 @@ function KeyboardShortcuts({
     };
 
     return shortcuts;
-    // TODO We're getting "hooks exhaustive deps" warnings here
-    // due to the callbacks, but the code is valid as-is.
-  }, [viewMode, selectedSource]);
+  }, [
+    showCommandPaletteInEditor,
+    setSelectedPrimaryPanel,
+    focusFullTextInput,
+    setViewMode,
+    selectedSource,
+    toolboxLayout,
+    toggleCommandPalette,
+    toggleFocusMode,
+    togglePaneCollapse,
+    viewMode,
+    toggleThemeAction,
+    toggleQuickOpen,
+    closeOpenModalsOnEscape,
+  ]);
 
   useEffect(() => {
     for (let [keyCombo, eventHandler] of Object.entries(globalKeyboardShortcuts)) {
@@ -175,7 +188,7 @@ const connector = connect(
     toggleCommandPalette: actions.toggleCommandPalette,
     toggleFocusMode: actions.toggleFocusMode,
     showCommandPaletteInEditor: deselectSource,
-    toggleTheme: actions.toggleTheme,
+    toggleThemeAction: actions.toggleTheme,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
   }

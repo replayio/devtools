@@ -93,9 +93,9 @@ export function NextButton({
     // allowNext to true is finished. This allows us to do mutations
     // in between navigations.
     if (allowNext && nextClicked) {
-      setCurrent(current + 1);
+      setCurrent(current => current + 1);
     }
-  }, [allowNext, nextClicked]);
+  }, [allowNext, nextClicked, setCurrent]);
 
   const inferLoading = nextClicked && !allowNext;
   const buttonText = inferLoading ? "Loading" : text || "Next";

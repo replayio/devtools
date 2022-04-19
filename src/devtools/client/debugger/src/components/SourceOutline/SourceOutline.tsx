@@ -36,13 +36,14 @@ export function SourceOutline({
   );
   const [focusedSymbol, setFocusedSymbol] = useState<ClassSymbol | FunctionSymbol | null>(null);
   const listRef = useRef<any>();
+
   const closestSymbolIndex = useMemo(() => {
     if (!cursorPosition) {
       return;
     }
     const symbol = findClosestEnclosedSymbol(symbols, cursorPosition);
     return outlineSymbols?.findIndex(a => a === symbol);
-  }, [cursorPosition, outlineSymbols, symbols, listRef]);
+  }, [cursorPosition, outlineSymbols, symbols]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -50,8 +51,9 @@ export function SourceOutline({
       // We start by loading the first N lines of hits, where N is the line limit.
       dispatch(setBreakpointHitCounts(selectedSource.id, 1));
     }
-  }, [selectedSource?.id]);
+  }, [dispatch, selectedSource]);
 
+  // TODO [jasonLaster] Fix react-hooks/exhaustive-deps
   useEffect(() => {
     if (outlineSymbols && closestSymbolIndex) {
       const symbol = outlineSymbols[closestSymbolIndex];
@@ -60,7 +62,7 @@ export function SourceOutline({
         listRef.current.scrollToItem(closestSymbolIndex, "center");
       }
     }
-  }, [closestSymbolIndex]);
+  }, [closestSymbolIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectSymbol = useCallback(
     (symbol: ClassSymbol | FunctionSymbol) => {
@@ -72,7 +74,7 @@ export function SourceOutline({
       });
       setFocusedSymbol(symbol);
     },
-    [selectedSource, cx]
+    [selectLocation, selectedSource, cx]
   );
 
   const MemoizedOutlineItem = useCallback(

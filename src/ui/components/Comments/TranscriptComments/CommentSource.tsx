@@ -24,6 +24,7 @@ function CommentSource({
     secondary: comment.secondaryLabel,
   });
 
+  // TODO [hbenl] Fix react-hooks/exhaustive-deps
   useEffect(() => {
     async function updateLabels() {
       setLabels(await createLabels(comment.sourceLocation!));
@@ -31,7 +32,7 @@ function CommentSource({
     if (comment.sourceLocation && !labels.primary && !labels.secondary) {
       updateLabels();
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSelectSource = () => {
     setViewMode("dev");

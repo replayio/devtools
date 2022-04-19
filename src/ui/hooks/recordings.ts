@@ -42,6 +42,7 @@ import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
 } from "graphql/GetWorkspaceRecordings";
+import { useMemo } from "react";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -170,7 +171,8 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
     console.error("Apollo error while getting the recording", error);
   }
 
-  const recording = convertRecording(data?.recording);
+  const recording = useMemo(() => convertRecording(data?.recording), [data]);
+
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
 

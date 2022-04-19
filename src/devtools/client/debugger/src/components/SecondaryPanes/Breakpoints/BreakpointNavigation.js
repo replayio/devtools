@@ -44,7 +44,7 @@ function BreakpointNavigation({
     if (executionPoint && lastExecutionPoint !== executionPoint) {
       setLastExecutionPoint(executionPoint);
     }
-  }, [executionPoint]);
+  }, [executionPoint, lastExecutionPoint]);
 
   useEffect(() => {
     if (analysisPoints) {
