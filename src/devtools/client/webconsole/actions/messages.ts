@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as Sentry from "@sentry/browser";
 import type { UIStore, UIThunkAction } from "ui/actions";
-
-import { getAllFilters } from "../selectors/messages";
 
 import {
   prepareMessage,
@@ -15,8 +14,8 @@ import { Pause, ThreadFront } from "protocol/thread";
 import { LogpointHandlers } from "protocol/logpoint";
 import { TestMessageHandlers } from "protocol/find-tests";
 import { onConsoleOverflow } from "ui/actions/session";
-
 import type { Message, Frame, ExecutionPoint } from "@recordreplay/protocol";
+
 import type { Message as InternalMessage } from "../reducers/messages";
 import {
   messageEvaluationsCleared,
@@ -42,7 +41,7 @@ export function setupMessages(store: UIStore) {
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),
     () => store.dispatch(onConsoleOverflow())
-  ).then(() => store.dispatch(messagesLoaded()));
+  ).then(() => store.dispatch(messagesLoaded()), Sentry.captureException);
 }
 
 function convertStack(stack: string[], { frames }: { frames?: Frame[] }) {
