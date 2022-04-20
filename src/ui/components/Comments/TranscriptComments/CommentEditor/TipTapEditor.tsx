@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { User } from "ui/types";
@@ -56,14 +56,15 @@ const TipTapEditor = ({
 }: TipTapEditorProps) => {
   const { isAuthenticated } = useAuth0();
 
-  const onSubmit = (newContent: string) => {
-    handleSubmit(newContent);
-    blur();
-    close();
-  };
+  // Memoize the Editor config prevents unnecessary re-renders of the "@tiptap/react" editor components.
+  const editorConfig = useMemo(() => {
+    const onSubmit = (newContent: string) => {
+      handleSubmit(newContent);
+      blur();
+      close();
+    };
 
-  const editor = useEditor(
-    {
+    return {
       extensions: [
         StarterKit,
         GitHubLink,
@@ -99,9 +100,20 @@ const TipTapEditor = ({
       onUpdate,
       editable,
       autofocus,
-    },
-    [isAuthenticated]
-  );
+    };
+  }, [
+    autofocus,
+    blur,
+    close,
+    content,
+    editable,
+    handleCancel,
+    handleSubmit,
+    onCreate,
+    onUpdate,
+    placeholder,
+  ]);
+  const editor = useEditor(editorConfig, [isAuthenticated]);
 
   useEffect(() => {
     editor?.setEditable(editable);

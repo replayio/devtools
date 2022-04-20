@@ -5,6 +5,7 @@ import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
+import { formatRelativeTime } from "ui/utils/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
@@ -14,9 +15,7 @@ import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 
 import { AvatarImage } from "ui/components/Avatar";
-import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { trackEvent } from "ui/utils/telemetry";
-import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { features } from "ui/utils/prefs";
 import { getFocusRegion } from "ui/reducers/timeline";
@@ -46,7 +45,7 @@ function PendingCommentCard({
   return (
     <div
       className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeBase-90 transition`}
-      onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
+      onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
       onMouseDown={() => {
         trackEvent("comments.focus");
@@ -221,10 +220,9 @@ function CommentCard({
   const updateComment = hooks.useUpdateComment();
   const updateCommentReply = hooks.useUpdateCommentReply();
 
-  const replyKeys = commentKeys(comment.replies);
   const onAttachmentClick = () =>
     setModal("attachment", {
-      comment: { ...comment, content: "", parentId: comment.id, id: PENDING_COMMENT_ID },
+      comment: { ...comment, content: "", parentId: comment.id },
     });
 
   const onSubmit = async (data: CommentData, inputValue: string) => {
@@ -249,7 +247,7 @@ function CommentCard({
     clearPendingComment();
   };
 
-  if (comment.id === PENDING_COMMENT_ID) {
+  if (comment.isUnpublished) {
     return (
       <PendingCommentCard
         comment={comment}
@@ -291,8 +289,8 @@ function CommentCard({
           isUpdating={isUpdating}
         />
 
-        {comment.replies?.map((reply: Reply, i: number) => (
-          <div key={replyKeys[i]}>
+        {comment.replies?.map((reply: Reply) => (
+          <div key={reply.id}>
             <CommentItem
               data={{ type: "reply", comment: reply }}
               onSubmit={onSubmit}
@@ -317,8 +315,8 @@ function CommentCard({
                   createdAt: new Date().toISOString(),
                   updatedAt: new Date().toISOString(),
                   content: "",
+                  isUnpublished: true,
                   parentId: comment.id,
-                  id: PENDING_COMMENT_ID,
                 },
               }}
               onSubmit={onSubmit}

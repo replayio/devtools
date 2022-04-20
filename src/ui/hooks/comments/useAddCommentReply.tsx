@@ -3,7 +3,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import { GET_USER_ID } from "ui/graphql/users";
 import { GET_COMMENTS } from "ui/graphql/comments";
 import { Reply } from "ui/state/comments";
-import { PENDING_COMMENT_ID } from "ui/reducers/comments";
+
 import { useGetRecordingId } from "../recordings";
 import { AddCommentReply, AddCommentReplyVariables } from "graphql/AddCommentReply";
 import { GetComments } from "graphql/GetComments";
@@ -41,7 +41,7 @@ export default function useAddCommentReply() {
         addCommentReply: {
           success: true,
           commentReply: {
-            id: PENDING_COMMENT_ID,
+            id: reply.id,
             __typename: "CommentReply",
           },
           __typename: "AddCommentReply",
@@ -85,7 +85,7 @@ export default function useAddCommentReply() {
           ...parentComment,
           replies: [
             ...parentComment.replies.filter(
-              (r: any) => r.id !== PENDING_COMMENT_ID && r.id !== commentReply!.id
+              (r: any) => !r.isUnpublished && r.id !== commentReply!.id
             ),
             newReply,
           ],

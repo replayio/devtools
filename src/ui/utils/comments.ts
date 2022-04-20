@@ -36,14 +36,6 @@ export function formatRelativeTime(date: Date) {
   return "Now";
 }
 
-export function commentKeys(comments: (Comment | Reply)[]): string[] {
-  return comments.map((c, i) => commentKey(c));
-}
-
-export function commentKey(comment: Comment | Reply): string {
-  return compact([comment.createdAt, commentIdentifiers(comment)]).join("-");
-}
-
 function orderedByApproximatelyCreatedAt(comments: (Comment | Reply)[]): number[] {
   const indices = range(comments.length);
   const permutation = sortBy(indices, [i => Number(Date.parse(comments[i].createdAt))]);
