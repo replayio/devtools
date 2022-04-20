@@ -72,6 +72,24 @@ class OI extends PureComponent<ObjectInspectorProps> {
     this.activeItem = this.props.activeItem;
   }
 
+  componentDidMount() {
+    this.ensureRootsLoaded();
+  }
+
+  // TODO [hbenl] this should not be necessary: the ObjectInspector should only
+  // be rendered with a root ValueItem that has already been loaded.
+  // However currently (at least) the console doesn't ensure that this is the case,
+  // so we need this workaround for now.
+  async ensureRootsLoaded() {
+    const rootsToLoad = this.getRoots().filter(
+      (root): root is ValueItem => root.type === "value" && !root.loaded
+    );
+    if (rootsToLoad.length > 0) {
+      await Promise.all(rootsToLoad.map(root => root.contents.load()));
+      this.forceUpdate();
+    }
+  }
+
   getRoots = (): Item[] =>
     this.props.roots instanceof Function ? this.props.roots() : this.props.roots;
 
@@ -98,23 +116,24 @@ class OI extends PureComponent<ObjectInspectorProps> {
     } else {
       this.expandedPaths.delete(item.path);
     }
-    this.forceUpdate();
 
     if (!expand) {
+      this.forceUpdate();
       return;
     }
 
     if (item.type === "getter" && item.valueItem) {
       item = item.valueItem;
     }
-    if (item.type === "value" && item.needsToLoadChildren()) {
+    if ("childrenLoaded" in item && !item.childrenLoaded) {
       try {
         await item.loadChildren();
       } catch {
         this.expandedPaths.delete(item.path);
       }
-      this.forceUpdate();
     }
+
+    this.forceUpdate();
   };
 
   expand = (item: Item): Promise<void> => this.setExpanded(item, true);

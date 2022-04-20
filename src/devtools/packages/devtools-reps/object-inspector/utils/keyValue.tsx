@@ -2,15 +2,15 @@ import { ValueFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { IItem, isValueLoaded, Item, LabelAndValue, ValueItem } from ".";
 import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
-const PropRep = require("../../reps/prop-rep");
+import PropRep from "../../reps/prop-rep";
 
 export class KeyValueItem implements IItem {
   readonly type = "key-value";
-  name: string;
-  path: string;
-  key: ValueFront;
-  value: ValueFront;
-  childrenLoaded: boolean;
+  readonly name: string;
+  readonly path: string;
+  readonly key: ValueFront;
+  readonly value: ValueFront;
+  readonly childrenLoaded: boolean;
 
   constructor(opts: { name: string; path: string; key: ValueFront; value: ValueFront }) {
     this.name = opts.name;
@@ -47,6 +47,10 @@ export class KeyValueItem implements IItem {
       new ValueItem({ parent: this, name: "<key>", contents: this.key }),
       new ValueItem({ parent: this, name: "<value>", contents: this.value }),
     ];
+  }
+
+  async loadChildren() {
+    await Promise.all([this.key.loadIfNecessary(), this.value.loadIfNecessary()]);
   }
 
   shouldUpdate(prevItem: Item) {

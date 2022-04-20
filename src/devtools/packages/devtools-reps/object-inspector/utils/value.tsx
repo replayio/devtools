@@ -19,11 +19,12 @@ import { assert } from "protocol/utils";
 
 export class ValueItem implements IItem {
   readonly type = "value";
-  name: string | undefined;
-  path: string;
-  contents: ValueFront;
-  isInCurrentPause?: boolean;
-  private childrenLoaded: boolean;
+  readonly name: string | undefined;
+  readonly path: string;
+  readonly contents: ValueFront;
+  readonly isInCurrentPause?: boolean;
+  readonly loaded: boolean;
+  readonly childrenLoaded: boolean;
 
   constructor(
     opts: { name?: string; contents: ValueFront; isInCurrentPause?: boolean } & (
@@ -35,16 +36,9 @@ export class ValueItem implements IItem {
     this.path = "path" in opts ? opts.path : `${opts.parent.path}/${opts.name}`;
     this.contents = opts.contents;
     this.isInCurrentPause = opts.isInCurrentPause;
+    this.loaded = isValueLoaded(this.contents);
     this.childrenLoaded =
-      !this.needsToLoad() && getChildValues(this.contents).every(value => isValueLoaded(value));
-  }
-
-  needsToLoad(): boolean {
-    return !isValueLoaded(this.contents);
-  }
-
-  needsToLoadChildren(): boolean {
-    return !this.childrenLoaded;
+      this.loaded && getChildValues(this.contents).every(value => isValueLoaded(value));
   }
 
   isPrimitive(): boolean {
@@ -125,7 +119,7 @@ export class ValueItem implements IItem {
   }
 
   getChildren(): Item[] {
-    if (this.needsToLoad()) {
+    if (!this.childrenLoaded) {
       return [new LoadingItem({ parent: this })];
     }
 
@@ -216,10 +210,19 @@ export class ValueItem implements IItem {
     await Promise.all(getChildValues(this.contents).map(value => value.loadIfNecessary()));
   }
 
+  recreate() {
+    return new ValueItem({
+      contents: this.contents,
+      isInCurrentPause: this.isInCurrentPause,
+      name: this.name,
+      path: this.path,
+    });
+  }
+
   shouldUpdate(prevItem: Item) {
     assert(this.type === prevItem.type, "OI items for the same path must have the same type");
     return (
-      this.needsToLoadChildren() !== prevItem.needsToLoadChildren() ||
+      this.childrenLoaded !== prevItem.childrenLoaded ||
       this.isInCurrentPause !== prevItem.isInCurrentPause
     );
   }
