@@ -5,9 +5,22 @@ import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";
 
 const TEXT = {
-  editPrompt: "Edit your first print statement",
-  savePrompt: "Add some local variables",
-  success: "Check the console",
+  editPrompt: "Click below to edit your first print statement",
+  savePrompt: "You can add variables here too",
+  success: (
+    <>
+      <span className="flex">Now check the console!</span>
+
+      <span className="flex grow justify-end">
+        <a
+          href="https://www.notion.so/replayio/Print-statements-1dcf7c3a8414423aab122ea7c4a41661"
+          target="_blank"
+        >
+          Learn more
+        </a>
+      </span>
+    </>
+  ),
 };
 
 type Step = keyof typeof TEXT;
@@ -43,7 +56,7 @@ export default function FirstEditNag({ editing }: { editing: boolean }) {
       }}
     >
       <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
-      <div className="text-xs font-bold">{TEXT[step]}</div>
+      <div className="flex grow text-xs font-bold">{TEXT[step]}</div>
     </div>
   );
 }

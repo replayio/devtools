@@ -53,20 +53,14 @@ export function EditorNag() {
     return null;
   }
 
-  return (
-    <NagHat
-      mainText="Ready to add your first print statement?"
-      subText="Click on a line number in the gutter"
-      nagType={Nag.FIRST_BREAKPOINT_ADD}
-    />
-  );
+  return <NagHat subText="Now hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
 }
 
 export function ConsoleNag() {
   return (
     <NagHat
       mainText="Want to see something cool?"
-      subText="Try fast forwarding or rewinding to a console log"
+      subText="Try fast-forwarding or rewinding to a console log"
       nagType={Nag.FIRST_CONSOLE_NAVIGATE}
     />
   );
