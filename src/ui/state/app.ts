@@ -21,6 +21,7 @@ export type ModalOptionsType = {
   view?: string;
   loom?: string;
   comment?: Reply;
+  instructions?: string;
 } | null;
 export type ModalType =
   | "sharing"

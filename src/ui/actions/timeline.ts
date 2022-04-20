@@ -511,6 +511,19 @@ export function setFocusRegion(focusRegion: {
   return { type: "set_trim_region", focusRegion };
 }
 
+export function setFocusAroundTime(time: number, maxTime: number): UIThunkAction {
+  return (dispatch, getState) => {
+    const state = getState();
+    const zoomRegion = getZoomRegion(state);
+
+    const duration = zoomRegion.endTime;
+    const startTime = Math.max(time - maxTime / 2, 0);
+    const endTime = Math.min(time + maxTime / 2, duration);
+
+    dispatch(setFocusRegion({ endTime, startTime }));
+  };
+}
+
 export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
@@ -568,9 +581,9 @@ export function syncFocusedRegion(): UIThunkAction {
   };
 }
 
-export function enterFocusMode(): UIThunkAction {
+export function enterFocusMode(instructions?: string): UIThunkAction {
   return (dispatch, getState) => {
-    dispatch(setModal("focusing"));
+    dispatch(setModal("focusing", { instructions }));
     const state = getState();
     const focusRegion = getFocusRegion(state);
     const zoomRegion = getZoomRegion(state);
@@ -582,7 +595,7 @@ export function enterFocusMode(): UIThunkAction {
   };
 }
 
-export function toggleFocusMode(): UIThunkAction {
+export function toggleFocusMode(instructions?: string): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const isFocusing = getIsFocusing(state);
@@ -592,7 +605,7 @@ export function toggleFocusMode(): UIThunkAction {
       dispatch(hideModal());
     } else {
       trackEvent("timeline.start_focus_edit");
-      dispatch(enterFocusMode());
+      dispatch(enterFocusMode(instructions));
     }
   };
 }
