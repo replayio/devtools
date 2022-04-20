@@ -1,21 +1,24 @@
-import styles from "./HttpBody.module.css";
 import { BodyData } from "@recordreplay/protocol";
+import classNames from "classnames";
 import { useMemo, useState } from "react";
 import ReactJson from "react-json-view";
+import { useSelector } from "react-redux";
+import { getTheme } from "ui/reducers/app";
+
 import MaterialIcon from "../shared/MaterialIcon";
+
 import BodyDownload from "./BodyDownload";
 import {
-  BodyPartsToArrayBuffer,
+  BodyPartsToUInt8Array,
   Displayable,
   RawBody,
+  RawToImageMaybe,
   RawToUTF8,
   StringToObjectMaybe,
   TextBody,
   URLEncodedToPlaintext,
 } from "./content";
-import classNames from "classnames";
-import { useSelector } from "react-redux";
-import { getTheme } from "ui/reducers/app";
+import styles from "./HttpBody.module.css";
 
 const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
   const [copied, setCopied] = useState(false);
@@ -48,6 +51,17 @@ const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
   );
 };
 
+const ImageBodyComponent = ({ raw, data }: { raw: RawBody; data: string }) => {
+  return (
+    <div
+      className={classNames(styles["copy-container"], "relative pr-6")}
+      style={{ width: "fit-content" }}
+    >
+      <img src={`data:${raw.contentType};base64,${data}`} />
+    </div>
+  );
+};
+
 const HttpBody = ({
   bodyParts,
   contentType,
@@ -59,11 +73,11 @@ const HttpBody = ({
 }) => {
   const theme = useSelector(getTheme);
   const raw = useMemo(() => {
-    return BodyPartsToArrayBuffer(bodyParts, contentType);
+    return BodyPartsToUInt8Array(bodyParts, contentType);
   }, [contentType, bodyParts]);
 
   const displayable = useMemo(() => {
-    return StringToObjectMaybe(URLEncodedToPlaintext(RawToUTF8(raw)));
+    return StringToObjectMaybe(URLEncodedToPlaintext(RawToUTF8(RawToImageMaybe(raw))));
   }, [raw]);
 
   if (displayable.as === Displayable.JSON) {
@@ -76,6 +90,13 @@ const HttpBody = ({
         displayDataTypes={false}
         displayObjectSize={false}
       />
+    );
+  }
+  if (displayable.as === Displayable.Image) {
+    return (
+      <>
+        <ImageBodyComponent raw={raw} data={displayable.content} />
+      </>
     );
   }
   if (displayable.as === Displayable.Text) {

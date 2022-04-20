@@ -1,12 +1,14 @@
 import classNames from "classnames";
 import { useEffect, useMemo, useState } from "react";
+
 import MaterialIcon from "../shared/MaterialIcon";
+
 import { RawBody } from "./content";
 
 const BodyDownload = ({ raw, filename }: { raw: RawBody; filename: string }) => {
   const [downloaded, setDownloaded] = useState(false);
   const dataURL = useMemo(
-    () => URL.createObjectURL(new Blob(raw.content, { type: raw.contentType })),
+    () => URL.createObjectURL(new Blob([raw.content.buffer], { type: raw.contentType })),
     [raw]
   );
 
