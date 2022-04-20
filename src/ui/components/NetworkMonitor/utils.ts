@@ -64,8 +64,9 @@ export const RequestTypeOptions: { type: CanonicalRequestType; icon: string; lab
 
 // From https://github.com/RecordReplay/gecko-dev/blob/webreplay-release/devtools/server/actors/replay/network-helpers.jsm#L14
 export const REQUEST_TYPES: Record<string, CanonicalRequestType> = {
-  subdocument: CanonicalRequestType.HTML,
+  document: CanonicalRequestType.HTML,
   objectSubdoc: CanonicalRequestType.HTML,
+  subdocument: CanonicalRequestType.HTML,
 
   fetch: CanonicalRequestType.FETCH_XHR,
   xhr: CanonicalRequestType.FETCH_XHR,
