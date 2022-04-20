@@ -8,15 +8,16 @@ import { useDispatch } from "react-redux";
 
 interface NewCommentEditorProps {
   data: CommentData;
+  editable?: boolean;
   onSubmit: (data: CommentData, inputValue: string) => void;
 }
 
-function NewCommentEditor({ onSubmit, data }: NewCommentEditorProps) {
+function NewCommentEditor({ editable = true, data, onSubmit }: NewCommentEditorProps) {
   const dispatch = useDispatch();
 
   return (
     <CommentEditor
-      editable={true}
+      editable={editable}
       comment={data.comment}
       handleSubmit={inputValue => onSubmit(data, inputValue)}
       onUpdate={debounce(({ editor }) => {

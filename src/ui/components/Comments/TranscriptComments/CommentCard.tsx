@@ -28,6 +28,7 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 type PendingCommentProps = {
   comment: Comment;
   isFocused: boolean;
+  isUpdating: boolean;
   setIsEditorOpen: (isEditorOpen: boolean) => void;
   setHoveredComment: (id: string | null) => void;
   setIsFocused: (b: boolean) => void;
@@ -37,6 +38,7 @@ type PendingCommentProps = {
 function PendingCommentCard({
   comment,
   isFocused,
+  isUpdating,
   setHoveredComment,
   setIsFocused,
   setIsEditorOpen,
@@ -63,7 +65,11 @@ function PendingCommentCard({
               close: () => setIsEditorOpen(false),
             }}
           >
-            <NewCommentEditor data={{ type: "new_comment", comment }} onSubmit={onSubmit} />
+            <NewCommentEditor
+              data={{ comment, type: "new_comment" }}
+              editable={!isUpdating}
+              onSubmit={onSubmit}
+            />
           </FocusContext.Provider>
         </div>
       </div>
@@ -252,6 +258,7 @@ function CommentCard({
       <PendingCommentCard
         comment={comment}
         isFocused={isFocused}
+        isUpdating={isUpdating}
         setHoveredComment={setHoveredComment}
         setIsFocused={setIsFocused}
         setIsEditorOpen={setIsEditorOpen}
