@@ -20,7 +20,7 @@ type ObjectInspectorProps = PropsFromRedux & PropsFromParent;
 function OI(props: ObjectInspectorProps) {
   const { value, isInCurrentPause } = props;
   const path = value.id();
-  const roots = [new ValueItem({ path, contents: value, isInCurrentPause })];
+  const roots = () => [new ValueItem({ contents: value, isInCurrentPause, path })];
 
   return (
     <ObjectInspector
