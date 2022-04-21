@@ -31,7 +31,6 @@ export const initialAppState: AppState = {
   events: {},
   expectedError: null,
   hoveredLineNumberLocation: null,
-  indexing: 0,
   initializedPanels: [],
   isNodePickerActive: false,
   isNodePickerInitializing: false,
@@ -65,10 +64,6 @@ export default function update(
     }
     case "set_recording_duration": {
       return { ...state, recordingDuration: action.duration };
-    }
-
-    case "indexing": {
-      return { ...state, indexing: action.indexing };
     }
 
     case "set_uploading": {
