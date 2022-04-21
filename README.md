@@ -92,7 +92,7 @@ Replace the paths with the appropriate paths within the `backend` repo as approp
 
 This project uses [trunk](https://trunk.io) to lint and format its code. Trunk is installed as a dev dependency so you can invoke it as `npx trunk`.
 
-You can alternatively [install](https://docs.trunk.io/getting-started) the trunk launcher using the command `curl https://get.trunk.io -fsSL | bash`. This will place `trunk` in your PATH. Or you can run `npm install -g @trunkio/launcher`.
+You can alternatively [install](https://docs.trunk.io/getting-started) the trunk launcher using the command `curl https://get.trunk.io -fsSL | bash`. This will place `trunk` in your PATH. Or you can run `npm install -g @trunkio/launcher` to install globally and allow `npm` to manage your `trunk` launcher installation.
 
 #### Linting your changes
 
