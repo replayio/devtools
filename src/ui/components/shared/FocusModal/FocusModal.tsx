@@ -15,20 +15,29 @@ import { getFormattedTime } from "ui/utils/timeline";
 
 function FocusingModal({ hideModal }: PropsFromRedux) {
   const currentTime = useSelector(getCurrentTime);
+  const modalOptions = useSelector(selectors.getModalOptions);
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
   const isAtFocusLimit = useSelector(getIsAtFocusSoftLimit);
 
-  const msg = isAtFocusLimit ? (
-    <p>{`Looks like you're making a precise selection at ${getFormattedTime(
-      currentTime,
-      true
-    )}.`}</p>
-  ) : (
-    <p>
-      Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
-    </p>
-  );
+  let msg;
+
+  if (modalOptions?.instructions) {
+    msg = modalOptions.instructions;
+  } else if (isAtFocusLimit) {
+    msg = (
+      <p>{`Looks like you're making a precise selection at ${getFormattedTime(
+        currentTime,
+        true
+      )}.`}</p>
+    );
+  } else {
+    msg = (
+      <p>
+        Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
+      </p>
+    );
+  }
 
   return (
     <div className="pointer-events-none fixed z-50 grid h-full w-full items-center justify-center">
@@ -46,7 +55,7 @@ function FocusingModal({ hideModal }: PropsFromRedux) {
             <div className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white">
               <MaterialIcon>center_focus_strong</MaterialIcon>
             </div>
-            <div className="text-lg">Edit Focus mode</div>
+            <div className="text-lg">Edit Focus Mode</div>
           </div>
           <div>{msg}</div>
           {isAtFocusLimit && <QuickActions />}

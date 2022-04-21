@@ -39,6 +39,8 @@ import { EditFocusButton } from "./EditFocusButton";
 import { MouseDownMask } from "./MouseDownMask";
 import OgreTimeline from "../OgreTimeline";
 
+import NonLoadingRegions from "./NonLoadingRegions";
+
 function getIsSecondaryHighlighted(
   hoveredItem: HoveredItem | null,
   location: Location | undefined
@@ -127,6 +129,9 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       setTimelineState,
       currentTime,
       focusRegion,
+      nonLoadingTimeRanges,
+      enterFocusMode,
+      setFocusAroundTime,
     } = this.props;
     const { isDragging } = this.state;
     // if the user clicked on a comment marker, we already seek to the comment's
@@ -138,6 +143,9 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       focusRegion &&
       (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime) &&
       !isFocusing;
+    const clickedOnNonLoadingRegion = nonLoadingTimeRanges.some(
+      r => r.start <= mouseTime && r.end >= mouseTime
+    );
 
     // We don't want the timeline to navigate when the user's dragging the focus handlebars, unless
     // the currentTime is outside the new zoomRegion.
@@ -147,6 +155,14 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
       currentTime >= focusRegion.startTime &&
       currentTime <= focusRegion.endTime
     ) {
+      return;
+    }
+
+    if (!isFocusing && clickedOnNonLoadingRegion) {
+      const msg =
+        "We're having difficulties with your replay. Please select a shorter range. 30 seconds or less works best!";
+      enterFocusMode(msg);
+      setFocusAroundTime(mouseTime, 30000);
       return;
     }
 
@@ -386,6 +402,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
               <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
               {this.renderPreviewMarkers()}
               <Comments />
+              <NonLoadingRegions />
               {this.renderUnfocusedRegion()}
               {showCurrentPauseMarker ? (
                 <div className="progress-line-paused" style={{ left: `${percent}%` }} />
@@ -437,6 +454,7 @@ const connector = connect(
     videoUrl: selectors.getVideoUrl(state),
     isFocusing: selectors.getIsFocusing(state),
     focusRegion: selectors.getFocusRegion(state),
+    nonLoadingTimeRanges: selectors.getNonLoadingTimeRanges(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
@@ -448,6 +466,8 @@ const connector = connect(
     stopPlayback: actions.stopPlayback,
     replayPlayback: actions.replayPlayback,
     clearPendingComment: actions.clearPendingComment,
+    enterFocusMode: actions.enterFocusMode,
+    setFocusAroundTime: actions.setFocusAroundTime,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

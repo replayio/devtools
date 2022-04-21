@@ -14,9 +14,11 @@ import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isTimeInRegions } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
-import { getFocusRegion } from "ui/reducers/timeline";
+import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+
 import { getSelectedPanel, getViewMode } from "./layout";
 import { prefs } from "ui/utils/prefs";
+import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 
 export const initialAppState: AppState = {
@@ -298,6 +300,12 @@ export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
+export const getNonLoadingTimeRanges = (state: UIState) => {
+  const loadingRegions = getLoadedRegions(state)?.loading || [];
+  const endTime = getZoomRegion(state).endTime;
+
+  return getNonLoadingRegionTimeRanges(loadingRegions, endTime);
+};
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;
 export const getSessionId = (state: UIState) => state.app.sessionId;
