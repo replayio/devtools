@@ -9,17 +9,14 @@
  * @module actions/sources
  */
 
+import { ThreadFront } from "protocol/thread";
 import type { UIThunkAction } from "ui/actions";
 
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
-import { toggleBlackBox } from "./blackbox";
-import { syncBreakpoint } from "../breakpoints";
-import { loadSourceText } from "./loadSourceText";
-import { selectLocation, setBreakableLines } from "../sources";
 import type { Context } from "../../reducers/pause";
-
-import { getRawSourceURL, isInlineScript } from "../../utils/source";
+import { SourceActor } from "../../reducers/source-actors";
+import type { Source } from "../../reducers/sources";
 import {
   getBlackBoxList,
   getSource,
@@ -30,13 +27,13 @@ import {
   getContext,
   isSourceLoadingOrLoaded,
 } from "../../selectors";
-
-import type { Source } from "../../reducers/sources";
-
 import { ContextError } from "../../utils/context";
+import { getRawSourceURL, isInlineScript } from "../../utils/source";
+import { syncBreakpoint } from "../breakpoints";
+import { selectLocation, setBreakableLines } from "../sources";
 
-import { ThreadFront } from "protocol/thread";
-import { SourceActor } from "../../reducers/source-actors";
+import { toggleBlackBox } from "./blackbox";
+import { loadSourceText } from "./loadSourceText";
 
 interface SourceData {
   source: {
@@ -82,9 +79,9 @@ function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
     if (rawPendingUrl === source.url) {
       await dispatch(
         selectLocation(cx, {
-          sourceId: source.id,
-          line: typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
           column: pendingLocation.column,
+          line: typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
+          sourceId: source.id,
         })
       );
     }
@@ -111,7 +108,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
 
     for (const bp of pendingBreakpoints) {
       const line = bp.location.line;
-      dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
+      dispatch({ location: { line, sourceId }, type: "SET_REQUESTED_BREAKPOINT" });
     }
 
     // load the source text if there is a pending breakpoint for it
@@ -182,16 +179,16 @@ export function newOriginalSources(sourceInfo: SourceData[]): UIThunkAction<Prom
       seen.add(id);
 
       sources.push({
-        id: id!,
-        url,
-        relativeUrl: url,
-        isPrettyPrinted: false,
-        isBlackBoxed: false,
-        introductionUrl: null,
-        introductionType: undefined,
-        isExtension: false,
         extensionName: null,
+        id: id!,
+        introductionType: undefined,
+        introductionUrl: null,
+        isBlackBoxed: false,
+        isExtension: false,
         isOriginal: true,
+        isPrettyPrinted: false,
+        relativeUrl: url,
+        url,
       });
     }
 
@@ -241,16 +238,16 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
 
       if (!getSource(getState(), newId) && !newSourcesObj[newId]) {
         newSourcesObj[newId] = {
-          id: newId,
-          url,
-          relativeUrl: url,
-          isPrettyPrinted,
           extensionName: source.extensionName,
-          introductionUrl: source.introductionUrl,
+          id: newId,
           introductionType: source.introductionType,
+          introductionUrl: source.introductionUrl,
           isBlackBoxed: false,
           isExtension: false,
           isOriginal,
+          isPrettyPrinted,
+          relativeUrl: url,
+          url,
         };
       }
 
@@ -258,15 +255,15 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
       // request a new source list and also get a source event from the server.
       if (!hasSourceActor(getState(), source.actor)) {
         newSourceActors.push({
-          id: source.actor,
           actor: source.actor,
-          thread,
-          source: newId,
-          isBlackBoxed: source.isBlackBoxed,
-          sourceMapURL: source.sourceMapURL,
-          url: source.url,
-          introductionUrl: source.introductionUrl,
+          id: source.actor,
           introductionType: source.introductionType,
+          introductionUrl: source.introductionUrl,
+          isBlackBoxed: source.isBlackBoxed,
+          source: newId,
+          sourceMapURL: source.sourceMapURL,
+          thread,
+          url: source.url,
         });
       }
 
@@ -304,8 +301,8 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
 }
 
 function addSources(cx: Context, sources: Source[]): UIThunkAction {
-  return (dispatch, getState) => {
-    dispatch({ type: "ADD_SOURCES", cx, sources });
+  return dispatch => {
+    dispatch({ cx, sources, type: "ADD_SOURCES" });
   };
 }
 
