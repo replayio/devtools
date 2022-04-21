@@ -54,7 +54,6 @@ export type SetDisplayedLoadingProgressAction = Action<"set_displayed_loading_pr
   progress: number | null;
 };
 export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finished: boolean };
-export type IndexingAction = Action<"indexing"> & { indexing: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: AppTheme };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
@@ -113,7 +112,6 @@ export type AppActions =
   | LoadingAction
   | SetDisplayedLoadingProgressAction
   | SetLoadingFinishedAction
-  | IndexingAction
   | SetSessionIdAction
   | UpdateThemeAction
   | SetInitializedPanelsAction
@@ -162,10 +160,6 @@ export function setupApp(store: UIStore) {
     store.dispatch(onUnprocessedRegions(regions))
   ).then(() => {
     store.dispatch(setLoading(100));
-  });
-
-  ThreadFront.ensureProcessed("executionIndexed").then(() => {
-    store.dispatch(setIndexing(100));
   });
 
   ThreadFront.listenForLoadChanges(parameters => {
@@ -244,10 +238,6 @@ export function setDisplayedLoadingProgress(
 
 export function setLoadingFinished(finished: boolean): SetLoadingFinishedAction {
   return { type: "set_loading_finished", finished };
-}
-
-function setIndexing(indexing: number): IndexingAction {
-  return { type: "indexing", indexing };
 }
 
 export function updateTheme(theme: AppTheme): UpdateThemeAction {
