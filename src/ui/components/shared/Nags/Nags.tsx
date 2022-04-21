@@ -1,5 +1,7 @@
 import classNames from "classnames";
+import { getVisibleMessages } from "devtools/client/webconsole/selectors";
 import React from "react";
+import { useSelector } from "react-redux";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";
@@ -59,6 +61,14 @@ export function EditorNag() {
 }
 
 export function ConsoleNag() {
+  const visibleMessages = useSelector(getVisibleMessages);
+
+  // Don't show the console nag that directs the user to click on one of the console messages
+  // if there aren't any console messages to begin with.
+  if (!visibleMessages.length) {
+    return null;
+  }
+
   return (
     <NagHat
       mainText="Want to see something cool?"
