@@ -4,14 +4,15 @@
 
 "use strict";
 
+import classNames from "classnames";
 import React from "react";
-const { connect } = require("react-redux");
 
+const { FILTERS } = require("devtools/client/webconsole/constants");
+const { connect } = require("react-redux");
 const { actions } = require("ui/actions");
 const { selectors } = require("ui/reducers");
 const { trackEvent } = require("ui/utils/telemetry");
 
-const { FILTERS } = require("devtools/client/webconsole/constants");
 const { ToggleRow } = require("./ConsoleSettings");
 
 export function CountPill({ children }) {
@@ -22,13 +23,22 @@ export function CountPill({ children }) {
   );
 }
 
-function FilterToggle({ children, count, onClick, selected, id }) {
+function FilterToggle({ children, count, onClick, selected, id, errorMsg }) {
   return (
     <ToggleRow onClick={onClick} selected={selected} id={id}>
-      <div className="justify flex items-center justify-between">
+      <div
+        className={classNames("justify flex items-center justify-between", {
+          "text-red-500": !!errorMsg,
+        })}
+      >
         <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre py-0.5">
           {children}
         </span>
+        {!!errorMsg && (
+          <div className="text-base leading-tight" title={errorMsg}>
+            ⚠
+          </div>
+        )}
         {count ? <CountPill>{count}</CountPill> : null}
       </div>
     </ToggleRow>
@@ -41,6 +51,7 @@ function FilterSettings({
   shouldLogExceptions,
   filterToggled,
   logExceptions,
+  exceptionLogpointError,
 }) {
   function getCount(filterKey) {
     return filteredMessagesCount[filterKey];
@@ -53,6 +64,7 @@ function FilterSettings({
           trackEvent("console.settings.toggle_log_exceptions");
           logExceptions(!shouldLogExceptions);
         }}
+        errorMsg={exceptionLogpointError}
         selected={shouldLogExceptions}
         id="show-exceptions"
       >
@@ -97,8 +109,9 @@ function FilterSettings({
 
 export default connect(
   state => ({
-    filters: selectors.getAllFilters(state),
+    exceptionLogpointError: selectors.getExceptionLogpointError(state),
     filteredMessagesCount: selectors.getFilteredMessagesCount(state),
+    filters: selectors.getAllFilters(state),
     shouldLogExceptions: selectors.getShouldLogExceptions(state),
   }),
   {

@@ -162,6 +162,7 @@ export interface MessageState {
   /** Flag that indicates if not all console messages will be displayed. */
   overflow: boolean;
   messagesLoaded: boolean;
+  exceptionLogpointError: string | null;
 }
 
 const MAX_HISTORY_LENGTH = 1000;
@@ -189,6 +190,7 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
         filteredMessagesCount: getDefaultFiltersCounter(),
         messagesUiById: [],
         commandHistory: [],
+        exceptionLogpointError: null,
         logpointMessages: logpointMessagesAdapter.getInitialState(),
         removedLogpointIds: [],
         pausedExecutionPoint: null,
@@ -282,6 +284,12 @@ const messagesSlice = createSlice({
     consoleOverflowed(state) {
       state.overflow = true;
     },
+    exceptionLogpointErrorCleared(state) {
+      state.exceptionLogpointError = null;
+    },
+    exceptionLogpointErrorReceived(state, action: PayloadAction<string>) {
+      state.exceptionLogpointError = action.payload;
+    },
     filterToggled(state, action: PayloadAction<FilterBooleanFields>) {
       state.filters[action.payload] = !state.filters[action.payload];
       setVisibleMessages(
@@ -326,6 +334,8 @@ export const {
   messagesLoaded,
   filterTextUpdated,
   filterToggled,
+  exceptionLogpointErrorCleared,
+  exceptionLogpointErrorReceived,
 } = messagesSlice.actions;
 
 export const messages = messagesSlice.reducer;

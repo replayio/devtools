@@ -126,3 +126,7 @@ export function getMessage(state: UIState, id: string) {
 export function getConsoleOverflow(state: UIState) {
   return state.messages.overflow;
 }
+
+export function getExceptionLogpointError(state: UIState) {
+  return state.messages.exceptionLogpointError;
+}
