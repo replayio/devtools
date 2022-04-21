@@ -190,6 +190,7 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
         filteredMessagesCount: getDefaultFiltersCounter(),
         messagesUiById: [],
         commandHistory: [],
+        exceptionLogpointError: null,
         logpointMessages: logpointMessagesAdapter.getInitialState(),
         removedLogpointIds: [],
         pausedExecutionPoint: null,
@@ -198,7 +199,6 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
         lastMessageId: null,
         overflow: false,
         messagesLoaded: false,
-        exceptionLogpointError: null,
       },
       otherOverrides
     )

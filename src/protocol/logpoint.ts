@@ -7,6 +7,9 @@
 // messages associated with the logpoint atomically.
 
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
+import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
+import { EventId } from "devtools/server/actors/utils/event-breakpoints";
+
 import { assert, compareNumericStrings } from "./utils";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { PrimitiveValue } from "./thread/value";
@@ -15,9 +18,8 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisMana
 import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
-import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { ProtocolError } from "ui/state/app";
-import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
+
 const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.

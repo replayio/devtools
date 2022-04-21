@@ -26,11 +26,19 @@ export function CountPill({ children }) {
 function FilterToggle({ children, count, onClick, selected, id, errorMsg }) {
   return (
     <ToggleRow onClick={onClick} selected={selected} id={id}>
-      <div className={classNames("justify flex items-center justify-between", { "text-red-500": !!errorMsg })}>
+      <div
+        className={classNames("justify flex items-center justify-between", {
+          "text-red-500": !!errorMsg,
+        })}
+      >
         <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre py-0.5">
           {children}
         </span>
-        {!!errorMsg && <div className="text-base leading-tight" title={errorMsg}>⚠</div>}
+        {!!errorMsg && (
+          <div className="text-base leading-tight" title={errorMsg}>
+            ⚠
+          </div>
+        )}
         {count ? <CountPill>{count}</CountPill> : null}
       </div>
     </ToggleRow>
