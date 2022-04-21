@@ -15,7 +15,7 @@ function NagHat({
   subText,
   nagType,
 }: {
-  mainText: string;
+  mainText?: string;
   subText: string;
   nagType: Nag;
 }) {
@@ -39,7 +39,9 @@ function NagHat({
     >
       <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
       <div className="flex flex-col overflow-hidden text-xs">
-        <div className="overflow-hidden overflow-ellipsis whitespace-pre">{mainText}</div>
+        {mainText ? (
+          <div className="overflow-hidden overflow-ellipsis whitespace-pre">{mainText}</div>
+        ) : null}
         <div className="overflow-hidden overflow-ellipsis whitespace-pre font-bold">{subText}</div>
       </div>
     </div>
