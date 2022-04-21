@@ -16,8 +16,8 @@ import { UIStore } from "ui/actions";
 import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
-import { onConsoleOverflow } from "ui/actions/session";
 import { ProtocolError } from "ui/state/app";
+import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.
@@ -536,9 +536,15 @@ export async function setExceptionLogpoint(logGroupId: string) {
   try {
     await analysisManager.runAnalysis(params, handler);
   } catch (e: any) {
+    removeLogpoint(logGroupId);
+    let msg;
     if (e.code === ProtocolError.TooManyPoints) {
-      store.dispatch(onConsoleOverflow());
+      msg = "There are too many exceptions. Please focus and try again.";
+    } else {
+      msg = "An error occured while fetching exceptions. Try again.";
     }
+
+    store.dispatch(exceptionLogpointErrorReceived(msg));
   }
 }
 
