@@ -15,7 +15,7 @@ const TEXT = {
         <a
           href="https://www.notion.so/replayio/Print-statements-1dcf7c3a8414423aab122ea7c4a41661"
           target="_blank"
-          rel="noreferrer"
+          rel="noreferrer noopener"
         >
           Learn more
         </a>
