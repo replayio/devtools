@@ -3,8 +3,9 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { AnyAction, Action } from "@reduxjs/toolkit";
-
+import sortBy from "lodash/sortBy";
 import type { UIState } from "ui/state";
+
 import { asSettled, asyncActionAsValue, AsyncValue } from "../utils/async-value";
 import {
   createInitial,
@@ -19,7 +20,10 @@ import {
   makeReduceAllQuery,
 } from "../utils/resource";
 import type { ResourceState } from "../utils/resource/core";
+
 import type { HitCount } from "./sources";
+
+export type LineRange = { min: number; max: number };
 
 export interface SourceActor {
   actor: string;
@@ -31,8 +35,7 @@ export interface SourceActor {
   sourceMapURL?: string;
   thread: string;
   url: string;
-  min?: number;
-  max?: number;
+  breakpointHitCountLinesKnown?: LineRange[];
   breakableLines?: AsyncValue<number[]> | null;
   breakpointPositions?: Map<number, AsyncValue<number[]>>;
   breakpointHitCounts?: HitCount[] | null;
@@ -164,8 +167,24 @@ function updateBreakableLines(
     return state;
   }
 
-  return updateResources(state, [{ id: sourceId, breakableLines: value }]);
+  return updateResources(state, [{ breakableLines: value, id: sourceId }]);
 }
+
+const mergeRanges = (ranges: LineRange[]): LineRange[] => {
+  return sortBy(ranges, r => r.min).reduce((acc: LineRange[], curr) => {
+    if (!acc.length) {
+      return [curr];
+    }
+    const last = acc.pop()!;
+    if (last.max >= curr.min) {
+      acc.push({ max: Math.max(last.max, curr.max), min: last.min });
+    } else {
+      acc.push(last);
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+};
 
 function updateBreakpointHitCounts(
   state: SourceActorsState,
@@ -184,24 +203,20 @@ function updateBreakpointHitCounts(
   }
 
   const {
-    min: currentMin,
-    max: currentMax,
+    breakpointHitCountLinesKnown: currentLinesKnown,
     breakpointHitCounts: currentBreakpointHitCounts,
   } = {
-    // Provide min/max defaults that will "lose" any comparison later
-    min: Infinity,
-    max: 0,
-    // @ts-ignore always overwritten
-    breakpointHitCounts: [],
     ...state.values[sourceId],
   };
 
   return updateResources(state, [
     {
-      id: sourceId,
+      breakpointHitCountLinesKnown: mergeRanges([
+        ...(currentLinesKnown || []),
+        { max: action.value.max, min: action.value.min },
+      ]),
       breakpointHitCounts: [...(currentBreakpointHitCounts || []), ...action.value.hits],
-      min: Math.min(currentMin, action.value.min),
-      max: Math.max(currentMax, action.value.max),
+      id: sourceId,
     },
   ]);
 }
@@ -293,13 +308,24 @@ export function getAllThreadsBySource(state: UIState) {
   return queryThreadsBySourceObject(state.sourceActors);
 }
 
-export function getSourceActorBreakpointHitCounts(state: UIState, id: string, lineNumber: number) {
-  const { breakpointHitCounts, min, max } = getResource(state.sourceActors, id);
+const rangesInclude = (ranges: LineRange[] | undefined, point: number): boolean => {
+  return Boolean(ranges?.find(range => range.min <= point && range.max >= point));
+};
+
+export function getSourceActorBreakpointHitCounts(
+  state: UIState,
+  id: string,
+  lineNumber: number | undefined
+) {
+  const { breakpointHitCounts, breakpointHitCountLinesKnown } = getResource(state.sourceActors, id);
   // It's important for `memoizableAction` that we don't return a promise for a
   // different line range (for instance, returning a promise when line 1001 is
   // requested, even though we are only currently loading lines 1-1000). This is
   // why we keep track of the min and max requested.
-  if (!breakpointHitCounts || max! < lineNumber || min! > lineNumber) {
+  if (
+    !breakpointHitCounts ||
+    (lineNumber && !rangesInclude(breakpointHitCountLinesKnown, lineNumber))
+  ) {
     return null;
   }
   return breakpointHitCounts;
