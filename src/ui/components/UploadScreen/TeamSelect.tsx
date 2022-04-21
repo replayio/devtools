@@ -36,7 +36,7 @@ export default function TeamSelect({
   let displayedWorkspaces: DisplayedWorkspace[] = [...workspaces].sort();
 
   if (userInfo.features.library) {
-    displayedWorkspaces = [personalWorkspace];
+    displayedWorkspaces = [personalWorkspace, ...displayedWorkspaces];
   }
 
   const handleSelect = (workspace: DisplayedWorkspace) => {

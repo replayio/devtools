@@ -7,8 +7,8 @@
 import { exceptionLogpointErrorCleared } from "devtools/client/webconsole/reducers/messages";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 
-const { clientCommands } = require("../client/commands");
-const { getShouldLogExceptions } = require("../reducers/pause");
+import { clientCommands } from "../client/commands";
+import { getShouldLogExceptions } from "../reducers/pause";
 
 export function setupExceptions(store) {
   if (getShouldLogExceptions(store.getState())) {

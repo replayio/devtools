@@ -541,7 +541,7 @@ export async function setExceptionLogpoint(logGroupId: string) {
     removeLogpoint(logGroupId);
     let msg;
     if (e.code === ProtocolError.TooManyPoints) {
-      msg = "There are too many exceptions. Please focus and try again.";
+      msg = "There are too many exceptions. Please focus to a smaller time range and try again.";
     } else {
       msg = "An error occured while fetching exceptions. Try again.";
     }
