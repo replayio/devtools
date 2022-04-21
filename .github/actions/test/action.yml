@@ -5,7 +5,6 @@ runs:
   steps:
     - name: Install dependencies
       run: npm install
-      working-directory: test
       shell: bash
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
@@ -15,7 +14,7 @@ runs:
       shell: bash
     - run: chmod +x ./replay-node/macOS-replay-node
       shell: bash
-    - run: node ${{ github.action_path }}/../../../test/run.js
+    - run: npm run test-e2e -- --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
