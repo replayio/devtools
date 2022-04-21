@@ -15,7 +15,7 @@ function NagHat({
   subText,
   nagType,
 }: {
-  mainText: string;
+  mainText?: string;
   subText: string;
   nagType: Nag;
 }) {
@@ -39,7 +39,9 @@ function NagHat({
     >
       <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
       <div className="flex flex-col overflow-hidden text-xs">
-        <div className="overflow-hidden overflow-ellipsis whitespace-pre">{mainText}</div>
+        {mainText ? (
+          <div className="overflow-hidden overflow-ellipsis whitespace-pre">{mainText}</div>
+        ) : null}
         <div className="overflow-hidden overflow-ellipsis whitespace-pre font-bold">{subText}</div>
       </div>
     </div>
@@ -53,20 +55,14 @@ export function EditorNag() {
     return null;
   }
 
-  return (
-    <NagHat
-      mainText="Ready to add your first print statement?"
-      subText="Click on a line number in the gutter"
-      nagType={Nag.FIRST_BREAKPOINT_ADD}
-    />
-  );
+  return <NagHat subText="Now hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
 }
 
 export function ConsoleNag() {
   return (
     <NagHat
       mainText="Want to see something cool?"
-      subText="Try fast forwarding or rewinding to a console log"
+      subText="Try fast-forwarding or rewinding to a console log"
       nagType={Nag.FIRST_CONSOLE_NAVIGATE}
     />
   );
