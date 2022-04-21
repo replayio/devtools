@@ -61,6 +61,7 @@ type MixpanelEvent =
   | ["object_inspector.label_click"]
   | ["onboarding.created_team"]
   | ["onboarding.demo_replay_launch"]
+  | ["onboarding.demo_skip"]
   | ["onboarding.demo_replay_prompt"]
   | ["onboarding.download_replay", { OS: "mac" | "linux" | "windows" }]
   | ["onboarding.download_replay_prompt"]
