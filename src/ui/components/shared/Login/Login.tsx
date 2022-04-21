@@ -11,12 +11,10 @@ import useAuth0 from "ui/utils/useAuth0";
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
 
-const LOGIN_TEXT = {
-  default: "Replay captures everything you need for the perfect bug report, all in one link",
-  "first-browser-open":
-    "Replay captures everything you need for the perfect bug report, all in one link",
-} as const;
-type LoginReferrer = keyof typeof LOGIN_TEXT;
+enum LoginReferrer {
+  default = "default",
+  firstBrowserOpen = "first-browser-open",
+}
 
 const GET_CONNECTION = gql`
   query GetConnection($email: String!) {
@@ -92,7 +90,31 @@ function SocialLogin({
   onShowSSOLogin: () => void;
   onLogin: () => void;
 }) {
-  const msg = LOGIN_TEXT[getLoginReferrerParam()];
+  const referrer = getLoginReferrerParam();
+
+  // Custom screen for when the user is seeing the login screen and this is the first
+  // time that they have opened the browser.
+  if (referrer === LoginReferrer.firstBrowserOpen) {
+    <div className="space-y-6">
+      <div className="space-y-4 self-start text-base">
+        <div className="text-center">
+          <p>Replay captures everything you need for the perfect bug report, all in one link</p>
+          <a href="https://replay.io" className="pointer-hand underline">
+            Learn more
+          </a>
+        </div>
+      </div>
+      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
+        Sign in with Google
+      </PrimaryLgButton>
+      <button
+        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
+        onClick={onShowSSOLogin}
+      >
+        Enterprise Users: Sign in with SSO
+      </button>
+    </div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -103,7 +125,7 @@ function SocialLogin({
         ) : (
           <>
             <div className="text-center">
-              <p>{msg}</p>
+              <p>Replay captures everything you need for the perfect bug report, all in one link</p>
               <a href="https://replay.io" className="pointer-hand underline">
                 Learn more
               </a>
