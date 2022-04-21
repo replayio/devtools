@@ -34,6 +34,6 @@ module.exports = {
     // console.log("Processing file: ", src);
     const escapedSrc = src.replace(/`/g, "\\`").replace(/\$(?=\{.*?\})/g, "\\$");
 
-    return `module.exports.default = \`${escapedSrc}\``;
+    return { code: `module.exports.default = \`${escapedSrc}\`` };
   },
 };
