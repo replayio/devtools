@@ -17,6 +17,7 @@ import {
 } from "../Onboarding/index";
 
 export const REPLAY_DEMO_URL = "https://static.replay.io/demo/";
+export const REPLAY_LIBRARY_URL = "https://app.replay.io/";
 
 function FirstReplayModal({ hideModal }: PropsFromRedux) {
   const dismissNag = hooks.useDismissNag();
@@ -26,6 +27,12 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
     hideModal();
     trackEvent("onboarding.demo_replay_launch");
     launchAndRecordUrl(REPLAY_DEMO_URL);
+  };
+
+  const handleSkip = () => {
+    dismissNag(Nag.FIRST_REPLAY_2);
+    hideModal();
+    trackEvent("onboarding.demo_skip");
   };
 
   return (
@@ -40,6 +47,9 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
         <OnboardingActions>
           <PrimaryLgButton color="blue" onClick={handleOpen}>
             {`Ready as I'll ever be, Doc`}
+          </PrimaryLgButton>
+          <PrimaryLgButton color="gray" onClick={handleSkip}>
+            {`Skip`}
           </PrimaryLgButton>
         </OnboardingActions>
       </OnboardingContentWrapper>
