@@ -231,6 +231,7 @@ class _ThreadFront {
 
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
+    assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
 
     if (window.app.prefs.listenForMetrics) {

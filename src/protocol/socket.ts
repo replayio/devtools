@@ -160,7 +160,12 @@ function onSocketMessage(evt: MessageEvent<any>) {
     gMessageWaiters.delete(msg.id);
     if (msg.error) {
       console.warn("Message failed", method, msg.error, msg.data);
-      reject(msg.error);
+
+      const err = new Error(msg.error.message) as any;
+      err.name = "CommandError";
+      err.code = msg.error.code;
+
+      reject(err);
     } else {
       resolve(msg.result);
     }
