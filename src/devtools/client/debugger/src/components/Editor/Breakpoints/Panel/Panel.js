@@ -16,8 +16,8 @@ import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { prefs } from "ui/utils/prefs";
 import { AnalysisError } from "ui/state/app";
+import { prefs } from "ui/utils/prefs";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -50,7 +50,8 @@ function Panel({
     );
   const isHot =
     analysisPoints &&
-    (analysisPoints.error === AnalysisError.TooManyPoints || (analysisPoints.data.length || 0) > prefs.maxHitsDisplayed);
+    (analysisPoints.error === AnalysisError.TooManyPoints ||
+      (analysisPoints.data.length || 0) > prefs.maxHitsDisplayed);
 
   useEffect(() => {
     const updateWidth = () => setWidth(getPanelWidth(editor));
