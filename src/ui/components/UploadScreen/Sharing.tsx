@@ -37,9 +37,7 @@ function EditableSettings({
 
   return (
     <div className="grid w-full grid-cols-2 gap-5 text-base">
-      {workspaces.length ? (
-        <TeamSelect {...{ workspaces, handleWorkspaceSelect, selectedWorkspaceId }} />
-      ) : null}
+      <TeamSelect {...{ handleWorkspaceSelect, selectedWorkspaceId, workspaces }} />
       <div
         className={classNames(
           publicDisabled ? "opacity-60" : undefined,
