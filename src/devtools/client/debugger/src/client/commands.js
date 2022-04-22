@@ -339,12 +339,13 @@ async function getSourceActorBreakpointHitCounts({ id }, lineNumber, onFailure) 
   // explanation of the bounds here.
   const lowerBound = Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH;
   const upperBound = lowerBound + MAX_LINE_HITS_TO_FETCH;
-  const locationsToFetch = locations.filter(
-    location => location.line >= lowerBound && location.line < upperBound
-  );
+  const locationsToFetch = locations
+    .filter(location => location.line >= lowerBound && location.line < upperBound)
+    .map(location => ({ ...location, columns: [location.columns.sort((a, b) => a - b)[0]] }));
+
   return {
-    min: lowerBound,
     max: upperBound,
+    min: lowerBound,
     ...(await ThreadFront.getHitCounts(id, locationsToFetch).catch(onFailure)),
   };
 }

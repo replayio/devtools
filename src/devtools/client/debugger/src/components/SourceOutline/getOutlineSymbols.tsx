@@ -4,7 +4,11 @@ import { SourceSymbols, ClassSymbol, FunctionSymbol } from "../../types";
 import { HitCount } from "../../reducers/sources";
 import { features } from "ui/utils/prefs";
 
-function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCount[]) {
+function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCount[] | null) {
+  if (!hitCounts) {
+    return functions;
+  }
+
   return functions.map(functionSymbol => {
     const { start, end } = functionSymbol.location;
 
@@ -31,8 +35,9 @@ export function getOutlineSymbols(
   if (!symbols || symbols.loading) {
     return null;
   }
+
   let { classes, functions } = symbols;
-  functions = hitCounts ? addHitCountsToFunctions(functions, hitCounts) : functions;
+  functions = addHitCountsToFunctions(functions, hitCounts);
   const classNames = new Set(classes.map(s => s.name));
   const functionsByName = keyBy(functions, "name");
   const filteredFunctions = functions.filter(

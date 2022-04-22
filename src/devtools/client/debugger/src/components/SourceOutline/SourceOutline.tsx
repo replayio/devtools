@@ -164,11 +164,11 @@ const mapStateToProps = (state: UIState) => {
   const symbols = selectedSource ? selectors.getSymbols(state, selectedSource) : null;
   const hitCounts = selectedSource ? getHitCountsForSelectedSource(state) : null;
   return {
+    cursorPosition: selectors.getCursorPosition(state),
     cx: selectors.getContext(state),
-    symbols,
     hitCounts,
     selectedSource: selectedSource,
-    cursorPosition: selectors.getCursorPosition(state),
+    symbols,
   };
 };
 
