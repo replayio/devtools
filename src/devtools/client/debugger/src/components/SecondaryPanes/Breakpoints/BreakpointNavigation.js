@@ -68,10 +68,8 @@ function BreakpointNavigation({
         {editing && (
           <button
             className={classnames(
-              "h-5 w-5 rounded-full border p-px pt-0.5",
-              showCondition
-                ? "border-primaryAccent text-primaryAccent"
-                : "border-gray-500 text-gray-500"
+              "h-5 w-5 rounded-full p-px pt-0.5",
+              showCondition ? "bg-primaryAccent text-white" : "bg-gray-500 text-white"
             )}
             style={{ height: "1.25rem", borderRadius: "100%" }}
             onClick={() => setShowCondition(!showCondition)}
@@ -102,7 +100,7 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
         disabled={prevDisabled}
         onClick={() => navigateToPoint(prev)}
       >
-        <div className="img rewind" />
+        <div className="img rewind-rounded" />
       </button>
       <button
         className={`breakpoint-navigation-command-next ${nextDisabled || !next ? " disabled" : ""}`}
@@ -110,7 +108,7 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
         disabled={nextDisabled}
         onClick={() => navigateToPoint(next)}
       >
-        <div className="img rewind" style={{ transform: "rotate(180deg)" }} />
+        <div className="img rewind-rounded" style={{ transform: "rotate(180deg)" }} />
       </button>
     </div>
   );

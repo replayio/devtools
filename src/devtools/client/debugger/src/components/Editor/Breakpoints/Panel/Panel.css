@@ -156,6 +156,11 @@ non-editing markup */
   background-repeat: repeat-x;
 }
 
+.breakpoint-panel .summary {
+  background: var(--breakpoint-editfield-hover);
+  border-radius: 4px 4px 0 0;
+}
+
 .breakpoint-panel .summary.enabled:hover {
   background: var(--breakpoint-editfield-hover);
 }

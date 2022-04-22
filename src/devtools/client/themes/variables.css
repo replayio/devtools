@@ -181,9 +181,9 @@
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
-  --breakpoint-arrow: var(--theme-comment);
-  --breakpoint-editfield-active: #fff;
-  --breakpoint-editfield-hover: var(--theme-text-field-bgcolor);
+  --breakpoint-arrow: var(--theme-base-60);
+  --breakpoint-editfield-active: var(--theme-base-100);
+  --breakpoint-editfield-hover: var(--theme-base-100);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: var(--theme-highlight-purple);
@@ -410,9 +410,9 @@
 
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);
-  --breakpoint-arrow: #fff;
-  --breakpoint-editfield-active: var(--theme-base-95);
-  --breakpoint-editfield-hover: var(--theme-base-90);
+  --breakpoint-arrow: var(--theme-base-60);
+  --breakpoint-editfield-active: var(--theme-base-100);
+  --breakpoint-editfield-hover: var(--theme-base-100);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: #fff;
