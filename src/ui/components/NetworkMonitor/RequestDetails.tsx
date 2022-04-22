@@ -10,7 +10,7 @@ import { hideRequestDetails } from "ui/actions/network";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFormattedFrames } from "ui/reducers/network";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+import { isPointInRegions } from "ui/utils/timeline";
 
 import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 
@@ -309,7 +309,7 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
     }
   }, [activeTab, activeTabs]);
 
-  if (!(loadedRegions && request && getPointIsInLoadedRegion(loadedRegions, request.point.point))) {
+  if (!(loadedRegions && request && isPointInRegions(loadedRegions, request.point.point))) {
     return <RequestDetailsUnavailable />;
   }
 

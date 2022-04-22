@@ -7,11 +7,12 @@ import {
   requestBodyData,
   ExecutionPoint,
 } from "@recordreplay/protocol";
+import { createFrame } from "devtools/client/debugger/src/client/create";
 import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
-import { createFrame } from "devtools/client/debugger/src/client/create";
+import { isPointInRegions } from "ui/utils/timeline";
+
 import { UIThunkAction } from ".";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 
 type NewNetworkRequestsAction = {
@@ -88,7 +89,7 @@ export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): 
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
-    if (!loadedRegions || !getPointIsInLoadedRegion(loadedRegions.loaded, point)) {
+    if (!loadedRegions || !isPointInRegions(loadedRegions.loaded, point)) {
       return false;
     }
 
@@ -100,7 +101,7 @@ export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): U
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
-    if (!loadedRegions || !getPointIsInLoadedRegion(loadedRegions.loaded, point)) {
+    if (!loadedRegions || !isPointInRegions(loadedRegions.loaded, point)) {
       return;
     }
 

@@ -140,8 +140,8 @@ export function isInTrimSpan(time: number, focusRegion: FocusRegion) {
   return time >= startTime && time <= endTime;
 }
 
-export function getPointIsInLoadedRegion(loadedRegions: TimeStampedPointRange[], point: string) {
-  return loadedRegions.find(
+export function isPointInRegions(regions: TimeStampedPointRange[], point: string) {
+  return regions.find(
     r => BigInt(point) >= BigInt(r.begin.point) && BigInt(point) <= BigInt(r.end.point)
   );
 }
