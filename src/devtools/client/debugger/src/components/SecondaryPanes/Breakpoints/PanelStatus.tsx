@@ -3,6 +3,17 @@ import { getIsIndexed } from "ui/reducers/app";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";
 
+const getPreviousPointsCount = (analysisPoints: AnalysisPayload, executionPoint: string | null) => {
+  if (!executionPoint) {
+    return "…";
+  }
+
+  const previousPoints = analysisPoints.data.filter(
+    point => BigInt(point.point) <= BigInt(executionPoint)
+  );
+  return previousPoints.length;
+};
+
 export function PanelStatus({ analysisPoints }: { analysisPoints: AnalysisPayload }) {
   const executionPoint = useSelector(getExecutionPoint);
   const isIndexed = useSelector(getIsIndexed);
@@ -11,18 +22,16 @@ export function PanelStatus({ analysisPoints }: { analysisPoints: AnalysisPayloa
 
   if (!isIndexed) {
     status = "Indexing";
-  } else if (!analysisPoints || !executionPoint) {
+  } else if (!analysisPoints) {
     status = "Loading";
   } else if (analysisPoints.error) {
     status = analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error";
   } else if (analysisPoints.data.length == 0) {
     status = "No hits";
   } else {
-    const points = analysisPoints
-      ? analysisPoints.data.filter(point => BigInt(point.point) <= BigInt(executionPoint))
-      : [];
+    const pointsCount = getPreviousPointsCount(analysisPoints, executionPoint);
 
-    status = `${points.length}/${analysisPoints.data.length}`;
+    status = `${pointsCount}/${analysisPoints.data.length}`;
     maxStatusLength = `${analysisPoints.data.length}/${analysisPoints.data.length}`.length;
   }
 
