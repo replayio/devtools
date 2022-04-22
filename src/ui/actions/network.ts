@@ -10,7 +10,7 @@ import {
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
-import { isPointInRegions } from "ui/utils/timeline";
+import { isPointInRegions, isTimeInRegions } from "ui/utils/timeline";
 
 import { UIThunkAction } from ".";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -121,10 +121,21 @@ export function fetchFrames(tsPoint: TimeStampedPoint): UIThunkAction {
   };
 }
 
-export function showRequestDetails(requestId: RequestId) {
-  return {
-    type: "SHOW_REQUEST_DETAILS",
-    requestId,
+export function showRequestDetails(requestId: RequestId): UIThunkAction {
+  return (dispatch, getState) => {
+    const state = getState();
+    const request = state.network.requests.find(request => request.id === requestId);
+    const loadedRegions = getLoadedRegions(state);
+
+    // Don't select a request that's not within a loaded region.
+    if (!request || !loadedRegions || !isPointInRegions(loadedRegions.loaded, request.point)) {
+      return;
+    }
+
+    dispatch({
+      requestId,
+      type: "SHOW_REQUEST_DETAILS",
+    });
   };
 }
 

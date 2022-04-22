@@ -72,18 +72,6 @@ export const NetworkMonitor = ({
     }
   });
 
-  useEffect(() => {
-    // If the selected request has been filtered out by the focus region, unselect it.
-    //
-    // TODO I'm not sure this logic is appropriate for the view,
-    // especially a lower level view like NetworkMonitor, to decide.
-    // This pattern results in an unnecessary extra render,
-    // and risks "tearing" (where different views show different behavior).
-    if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
-      dispatch(hideRequestDetails());
-    }
-  }, [requests, selectedRequestId, dispatch]);
-
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
     return (
@@ -101,16 +89,6 @@ export const NetworkMonitor = ({
         let selectedRequest;
         if (selectedRequestId) {
           selectedRequest = data.find(request => request.id === selectedRequestId);
-          if (selectedRequest && loadedRegions) {
-            if (!isTimeInRegions(selectedRequest.point.time, loadedRegions.loaded)) {
-              // Unloaded requests should not be selectable.
-              //
-              // TODO I'm not sure this logic is appropriate for the view,
-              // especially a lower level view like NetworkMonitor, to decide.
-              // This risks "tearing" (where different views show different behavior).
-              selectedRequest = undefined;
-            }
-          }
         }
 
         return (
