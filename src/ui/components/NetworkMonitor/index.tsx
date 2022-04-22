@@ -12,6 +12,8 @@ import {
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
+import { isTimeInRegions } from "ui/utils/timeline";
+
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import { CanonicalRequestType, RequestSummary } from "./utils";
@@ -42,6 +44,7 @@ export const NetworkMonitor = ({
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const loadedRegions = useSelector(getLoadedRegions);
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -71,6 +74,11 @@ export const NetworkMonitor = ({
 
   useEffect(() => {
     // If the selected request has been filtered out by the focus region, unselect it.
+    //
+    // TODO I'm not sure this logic is appropriate for the view,
+    // especially a lower level view like NetworkMonitor, to decide.
+    // This pattern results in an unnecessary extra render,
+    // and risks "tearing" (where different views show different behavior).
     if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
       dispatch(hideRequestDetails());
     }
@@ -93,6 +101,16 @@ export const NetworkMonitor = ({
         let selectedRequest;
         if (selectedRequestId) {
           selectedRequest = data.find(request => request.id === selectedRequestId);
+          if (selectedRequest && loadedRegions) {
+            if (!isTimeInRegions(selectedRequest.point.time, loadedRegions.loaded)) {
+              // Unloaded requests should not be selectable.
+              //
+              // TODO I'm not sure this logic is appropriate for the view,
+              // especially a lower level view like NetworkMonitor, to decide.
+              // This risks "tearing" (where different views show different behavior).
+              selectedRequest = undefined;
+            }
+          }
         }
 
         return (
@@ -101,8 +119,8 @@ export const NetworkMonitor = ({
             <SplitBox
               className="min-h-0 border-t border-splitter"
               initialSize="350px"
-              minSize={selectedRequestId ? "30%" : "100%"}
-              maxSize={selectedRequestId ? "70%" : "100%"}
+              minSize={selectedRequest ? "30%" : "100%"}
+              maxSize={selectedRequest ? "70%" : "100%"}
               startPanel={
                 <RequestTable
                   table={table}
