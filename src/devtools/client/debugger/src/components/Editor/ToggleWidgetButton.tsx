@@ -135,7 +135,7 @@ function QuickActions({
 
   return (
     <div
-      className="absolute -right-1 z-50 flex translate-x-full transform flex-row space-x-px"
+      className="line-action-button absolute -right-1 z-50 flex translate-x-full transform flex-row space-x-px"
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
       style={{ top: `-${(1 / 2) * (18 - height)}px` }}
