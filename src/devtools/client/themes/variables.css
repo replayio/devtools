@@ -411,8 +411,8 @@
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);
   --breakpoint-arrow: var(--theme-base-60);
-  --breakpoint-editfield-active: var(--theme-base-100);
-  --breakpoint-editfield-hover: var(--theme-base-100);
+  --breakpoint-editfield-active: var(--console-message-background);
+  --breakpoint-editfield-hover: var(--console-message-background);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: #fff;
