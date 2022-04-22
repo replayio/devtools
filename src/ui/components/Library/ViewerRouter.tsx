@@ -13,6 +13,8 @@ import { BlankViewportWrapper } from "../shared/Viewport";
 import Base64Image from "../shared/Base64Image";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
+import { LibraryFilters } from "./Library";
+
 function ViewerLoader() {
   return (
     <div className="grid h-full w-full items-center justify-items-center bg-chrome">
@@ -21,7 +23,7 @@ function ViewerLoader() {
   );
 }
 
-function MyLibrary({ searchString }: ViewerRouterProps) {
+function MyLibrary({ filters }: ViewerRouterProps) {
   const { recordings, loading } = hooks.useGetPersonalRecordings();
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -29,7 +31,7 @@ function MyLibrary({ searchString }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY, searchString }} />;
+  return <Viewer {...{ filters, recordings, workspaceName: MY_LIBRARY }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
@@ -50,7 +52,7 @@ function TeamLibrary(props: ViewerRouterProps) {
   }
 }
 
-function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRouterProps) {
+function NonPendingTeamLibrary({ currentWorkspaceId, filters }: ViewerRouterProps) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -63,20 +65,20 @@ function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRoute
   return (
     <Viewer
       {...{
+        filters,
         recordings,
         workspaceName: workspace.logo ? (
           <Base64Image src={workspace.logo} className="max-h-12" />
         ) : (
           workspace.name
         ),
-        searchString,
       }}
     />
   );
 }
 
 type ViewerRouterProps = PropsFromRedux & {
-  searchString: string;
+  filters: LibraryFilters;
 };
 
 function ViewerRouter(props: ViewerRouterProps) {

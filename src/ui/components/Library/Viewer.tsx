@@ -4,6 +4,7 @@ import { RecordingId } from "@recordreplay/protocol";
 import BatchActionDropdown from "./BatchActionDropdown";
 import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
+import { LibraryFilters } from "./Library";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
@@ -47,26 +48,45 @@ function DownloadLinks() {
   );
 }
 
-export default function Viewer({
-  recordings,
-  workspaceName,
-  searchString,
-}: {
-  recordings: Recording[];
-  workspaceName: string | React.ReactNode;
-  searchString: string;
-}) {
-  const filteredRecordings = searchString
+const filterRecordings = (recordings: Recording[], filters: LibraryFilters) => {
+  const { searchString, qualifiers } = filters;
+  let filteredRecordings = recordings;
+
+  filteredRecordings = searchString
     ? recordings.filter(
         r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
       )
     : recordings;
+  filteredRecordings =
+    qualifiers.target && qualifiers.target === "target:node"
+      ? filteredRecordings.filter(r => !r.user)
+      : filteredRecordings;
+  filteredRecordings =
+    (qualifiers.created && new Date(qualifiers.created))
+      ? filteredRecordings.filter(
+          r => new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
+        )
+      : filteredRecordings;
+
+  return filteredRecordings;
+};
+
+export default function Viewer({
+  recordings,
+  workspaceName,
+  filters,
+}: {
+  recordings: Recording[];
+  workspaceName: string | React.ReactNode;
+  filters: LibraryFilters;
+}) {
+  const filteredRecordings = filterRecordings(recordings, filters);
 
   return (
     <div
       className={`flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
     >
-      <ViewerContent {...{ workspaceName, searchString }} recordings={filteredRecordings} />
+      <ViewerContent {...{ workspaceName }} recordings={filteredRecordings} />
     </div>
   );
 }
@@ -82,6 +102,8 @@ function ViewerContent({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showMore, toggleShowMore] = useState(false);
+
+  console.log(recordings);
 
   const shownRecordings = useMemo(() => {
     const sortedRecordings = sortBy(recordings, recording => {

@@ -89,6 +89,36 @@ type LibraryProps = PropsFromRedux & {
   nags: Nag[];
 };
 
+export type LibraryFilters = {
+  searchString: string;
+  qualifiers: {
+    created?: string;
+    target?: string;
+    // created?: `created:${string}`;
+    // target?: `target:${string}`;
+  };
+};
+
+function parseFilterString(str: string): LibraryFilters {
+  const words = str.split(" ");
+
+  // If there are multiple matching entries for the same filter, use the last one.
+  // TODO: Add validation for created and target. It should return null if the user didn't comply with
+  // the expected format.
+  const created = words.filter(w => !!w.match(/^created:/)).pop();
+  const target = words.filter(w => !!w.match(/^target:/)).pop();
+  const searchString = words.filter(w => !w.match(/created:|target:/)).join(" ");
+
+  return { qualifiers: { created, target }, searchString };
+}
+
+function useFilters() {
+  const [displayedSearchString, setFilterString] = useState("");
+  const { searchString, qualifiers } = parseFilterString(displayedSearchString);
+
+  return { displayedSearchString, qualifiers, searchString, setFilterString };
+}
+
 function Library({
   setWorkspaceId,
   setModal,
@@ -98,9 +128,11 @@ function Library({
   nags,
 }: LibraryProps) {
   const router = useRouter();
-  const [searchString, setSearchString] = useState("");
+  const { displayedSearchString, searchString, setFilterString, qualifiers } = useFilters();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
+
+  console.log({ qualifiers, searchString });
 
   // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(function handleDeletedTeam() {
@@ -146,10 +178,10 @@ function Library({
       <Sidebar nonPendingWorkspaces={workspaces} />
       <div className="flex flex-grow flex-col overflow-x-hidden">
         <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
-          <FilterBar searchString={searchString} setSearchString={setSearchString} />
+          <FilterBar searchString={displayedSearchString} setSearchString={setFilterString} />
           <LaunchButton />
         </div>
-        <ViewerRouter searchString={searchString} />
+        <ViewerRouter filters={{ qualifiers, searchString }} />
       </div>
     </main>
   );
