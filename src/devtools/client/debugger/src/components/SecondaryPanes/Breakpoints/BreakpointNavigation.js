@@ -54,6 +54,26 @@ function BreakpointNavigation({
     }
   }, [analysisPoints]);
 
+  if (editing) {
+    return (
+      <div className="breakpoint-navigation">
+        <div className="flex-grow" />
+        <button
+          className={classnames(
+            "h-5 w-5 rounded-full border p-px pt-0.5",
+            showCondition
+              ? "border-primaryAccent text-primaryAccent"
+              : "border-gray-500 text-gray-500"
+          )}
+          style={{ height: "1.25rem", borderRadius: "100%" }}
+          onClick={() => setShowCondition(!showCondition)}
+        >
+          <MaterialIcon>filter_list</MaterialIcon>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
       {!isEmpty ? (
@@ -65,25 +85,11 @@ function BreakpointNavigation({
         <div className="flex-grow" />
       )}
       <div className="text-center">
-        {editing && (
-          <button
-            className={classnames(
-              "h-5 w-5 rounded-full p-px pt-0.5",
-              showCondition ? "bg-primaryAccent text-white" : "bg-gray-500 text-white"
-            )}
-            style={{ height: "1.25rem", borderRadius: "100%" }}
-            onClick={() => setShowCondition(!showCondition)}
-          >
-            <MaterialIcon>filter_list</MaterialIcon>
-          </button>
-        )}
-        {!editing && (
-          <PanelStatus
-            indexed={indexed}
-            executionPoint={lastExecutionPoint}
-            analysisPoints={analysisPoints}
-          />
-        )}
+        <PanelStatus
+          indexed={indexed}
+          executionPoint={lastExecutionPoint}
+          analysisPoints={analysisPoints}
+        />
       </div>
     </div>
   );
