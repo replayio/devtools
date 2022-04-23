@@ -1,10 +1,11 @@
+const fs = require("fs");
 const path = require("path");
 const playwright = require("@recordreplay/playwright");
 const cli = require("@replayio/replay");
 const _ = require("lodash");
+
 const { sendTelemetryEvent, waitUntilMessage, elapsedTime } = require("./utils");
 const { recordNode } = require("./recordNode");
-const fs = require("fs");
 
 async function recordBrowser(state, test, testPath, browserName) {
   console.log(`Recording Test:`, test, browserName);
@@ -18,6 +19,10 @@ async function recordBrowser(state, test, testPath, browserName) {
 
   const websocketLogs = [];
 
+  // GitHub actions should always update Websocket logs while running.
+  // This allows us to run unit tests against these logs and detect protocol changes.
+  const updateWebsocketLogs = process.env.CI || state.updateWebsocketLogs;
+
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -25,14 +30,14 @@ async function recordBrowser(state, test, testPath, browserName) {
     await page.goto(testPath);
     page.on("console", async msg => logs.push(`${test}: ${msg.text()}`));
     page.on("websocket", ws => {
-      if (ws.url() !== "wss://dispatch.replay.io/") {
+      if (ws.url() !== "wss://dispatch.replay.io/" || !updateWebsocketLogs) {
         return;
       }
       ws.on("framereceived", frameData => websocketLogs.push(JSON.parse(frameData.payload)));
     });
 
     const result = await waitUntilMessage(page, "TestFinished", state.testTimeout * 1000);
-    console.log(websocketLogs);
+
     success = result.success;
     why = result.why;
   } catch (e) {
@@ -45,7 +50,10 @@ async function recordBrowser(state, test, testPath, browserName) {
     await browser.close();
   }
 
-  fs.writeFileSync(`./${test}.json`, JSON.stringify(websocketLogs, null, 2));
+  if (updateWebsocketLogs) {
+    fs.writeFileSync(`./public/test/fixtures/${test}.json`, JSON.stringify(websocketLogs, null, 2));
+  }
+
   console.log(`Finished test:${test} success:${success}`, why || "");
 
   if (!success) {

@@ -29,6 +29,7 @@ const defaultState = {
   skippedTests: process.env.SKIPPED_TESTS,
   testTimeout: 240,
   longTimeout: false,
+  updateWebsocketLogs: false,
 
   // Runtime state
   count: 1,
@@ -52,6 +53,7 @@ const usage = `
     --target TARGET: Only run tests using given TARGET
     --server ADDRESS: Set server to connect to (default wss://dispatch.replay.io).
     --long-timeout: Use longer timeouts when running tests.
+    --updateWebsocketLogs: Update fixture data used by Jest tests.
 `;
 function processArgs(state, argv) {
   for (let i = 2; i < argv.length; i++) {
@@ -86,6 +88,9 @@ function processArgs(state, argv) {
         break;
       case "--help":
       case "-h":
+      case "--updateWebsocketLogs":
+        state.updateWebsocketLogs = true;
+        break;
       default:
         console.log(usage);
         process.exit(0);
