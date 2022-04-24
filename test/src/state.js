@@ -2,7 +2,6 @@ const os = require("os");
 const path = require("path");
 const fs = require("fs");
 
-console.log(process.env);
 const defaultState = {
   uploadDestination: "https://app.replay.io",
   testingServer: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080",
@@ -74,6 +73,9 @@ function processArgs(state, argv) {
       case "--record-examples":
         state.shouldRecordExamples = true;
         break;
+      case "--update-fixtures":
+        state.updateFixtures = true;
+        break;
       case "--timeout":
         state.testTimeout = +argv[++i];
         break;
@@ -85,9 +87,6 @@ function processArgs(state, argv) {
         break;
       case "--long-timeout":
         state.longTimeout = true;
-        break;
-      case "--updateWebsocketLogs":
-        state.updateWebsocketLogs = true;
         break;
       case "--help":
       case "-h":
@@ -124,10 +123,16 @@ function validateState(state) {
 
 function bootstrap(argv) {
   let state = { ...defaultState };
+  if (process.env.CI) {
+    console.log(process.env);
+  }
+
   processArgs(state, argv);
   processEnvironmentVariables(state);
   validateState(state);
-  console.log(state);
+  if (process.env.CI) {
+    console.log(state);
+  }
   return state;
 }
 

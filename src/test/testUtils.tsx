@@ -66,7 +66,7 @@ export const filterLoggingInTests = (
 export async function loadFixtureData(testName: string): Promise<UIStore> {
   const fixtureData = JSON.parse(
     readFileSync(
-      join(__dirname, "..", "..", "public", "test", "fixtures", `${testName}.js.json`),
+      join(__dirname, "..", "..", "public", "test", "fixtures", `${testName}.json`),
       "utf8"
     )
   );

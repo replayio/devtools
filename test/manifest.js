@@ -126,6 +126,7 @@ module.exports = [
     example: "doc_rr_console.html",
     script: "console_messages.js",
     targets: ["gecko", "chromium"],
+    saveFixture: true,
   },
   {
     example: "doc_exceptions_bundle.html",

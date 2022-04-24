@@ -7,7 +7,7 @@ const _ = require("lodash");
 const { sendTelemetryEvent, waitUntilMessage, elapsedTime } = require("./utils");
 const { recordNode } = require("./recordNode");
 
-async function recordBrowser(state, test, testPath, browserName) {
+async function recordBrowser(state, test, testPath, browserName, saveFixture) {
   console.log(`Recording Test:`, test, browserName);
 
   let success, why;
@@ -19,10 +19,6 @@ async function recordBrowser(state, test, testPath, browserName) {
 
   const websocketLogs = [];
 
-  // GitHub actions should always update Websocket logs while running.
-  // This allows us to run unit tests against these logs and detect protocol changes.
-  const updateWebsocketLogs = process.env.CI || state.updateWebsocketLogs;
-
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -30,7 +26,7 @@ async function recordBrowser(state, test, testPath, browserName) {
     await page.goto(testPath);
     page.on("console", async msg => logs.push(`${test}: ${msg.text()}`));
     page.on("websocket", ws => {
-      if (ws.url() !== "wss://dispatch.replay.io/" || !updateWebsocketLogs) {
+      if (ws.url() !== "wss://dispatch.replay.io/") {
         return;
       }
       ws.on("framereceived", frameData => websocketLogs.push(JSON.parse(frameData.payload)));
@@ -50,8 +46,11 @@ async function recordBrowser(state, test, testPath, browserName) {
     await browser.close();
   }
 
-  if (updateWebsocketLogs) {
-    fs.writeFileSync(`./public/test/fixtures/${test}.json`, JSON.stringify(websocketLogs, null, 2));
+  if (state.updateFixtures && saveFixture) {
+    fs.writeFileSync(
+      `./public/test/fixtures/${test.substr(0, test.length - 3)}.json`,
+      JSON.stringify(websocketLogs, null, 2)
+    );
   }
 
   console.log(`Finished test:${test} success:${success}`, why || "");
@@ -114,7 +113,7 @@ async function onFinish(state, { test, target, success, testPath, why, recording
   }
 }
 
-async function runTest(state, test, exampleRecordingId, target) {
+async function runTest(state, test, exampleRecordingId, target, saveFixture) {
   let testPath = `${state.testingServer}/recording/${exampleRecordingId}?test=${test}`;
   if (state.dispatchServer != "wss://dispatch.replay.io") {
     testPath += `&dispatch=${state.dispatchServer}`;
@@ -126,7 +125,7 @@ async function runTest(state, test, exampleRecordingId, target) {
   let success, why, recordingId;
   if (target == "gecko" || target == "chromium") {
     const browserName = target == "gecko" ? "firefox" : "chromium";
-    const result = await recordBrowser(state, test, testPath, browserName);
+    const result = await recordBrowser(state, test, testPath, browserName, saveFixture);
     ({ success, why } = result);
   } else {
     await recordNode(state, path.join(__dirname, "../examples/node", test));
