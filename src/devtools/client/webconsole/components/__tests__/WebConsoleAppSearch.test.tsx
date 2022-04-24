@@ -1,11 +1,7 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import userEvent from "@testing-library/user-event";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
-import { ThreadFront } from "protocol/thread";
 import React from "react";
-import { render, createTestStore, filterCommonTestWarnings, screen } from "test/testUtils";
+import { render, loadFixtureData, filterCommonTestWarnings, screen } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
 const useRouter = jest.spyOn(require("next/router"), "useRouter");
@@ -15,49 +11,13 @@ useRouter.mockImplementation(() => ({
   query: { id: "abcd" },
 }));
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-
 describe("WebConsoleApp search", () => {
   filterCommonTestWarnings();
 
   let store: UIStore = null as unknown as UIStore;
 
   beforeEach(async () => {
-    // TODO This is side effectful in a way that affects ThreadFront.setSessionId(); we should clean that up!
-    store = await createTestStore();
-
-    // TODO Replace this with a utilty function; this is not the right session ID.
-    // This is necessary to unblock various event listeners and parsing.
-    // Actual session ID value _probably_ doesn't matter here
-    await ThreadFront.setSessionId("fake");
-
-    const fixtureData = JSON.parse(
-      readFileSync(
-        join(
-          __dirname,
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "..",
-          "public",
-          "test",
-          "fixtures",
-          "console_messages.js.json"
-        ),
-        "utf8"
-      )
-    );
-
-    // Initialize state using exported websocket messages,
-    // sent through the mock environment straight to socket parsing
-    fixtureData.forEach((message: any) => {
-      window.mockEnvironment?.sendSocketMessage(JSON.stringify(message));
-    });
-
-    // Give everything time to settle
-    await sleep(100);
+    store = await loadFixtureData("console_messages");
   });
 
   it("Can search for console messages", async () => {
