@@ -86,11 +86,11 @@ function processArgs(state, argv) {
       case "--long-timeout":
         state.longTimeout = true;
         break;
-      case "--help":
-      case "-h":
       case "--updateWebsocketLogs":
         state.updateWebsocketLogs = true;
         break;
+      case "--help":
+      case "-h":
       default:
         console.log(usage);
         process.exit(0);
