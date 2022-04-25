@@ -13,7 +13,7 @@ const VERBOSE_SKIPPING = false;
 
 async function runMatchingTests(state) {
   for (let i = 0; i < Manifest.length; i++) {
-    const { disabled, example, script, targets } = Manifest[i];
+    const { disabled, example, script, targets, saveFixture } = Manifest[i];
     const skipBecause = why =>
       VERBOSE_SKIPPING && console.log(`Skipping ${example} because ${why}`);
     const test = script;
@@ -55,7 +55,7 @@ async function runMatchingTests(state) {
       );
 
       const startTime = Date.now();
-      await runTest(state, test, exampleRecordingId, target);
+      await runTest(state, test, exampleRecordingId, target, saveFixture);
       state.timings[`${test}-${target}`] = Date.now() - startTime;
       console.log(`[${elapsedTime(state)}] TestFinished:${test} target:${target}`);
     }

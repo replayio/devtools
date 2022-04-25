@@ -31,10 +31,25 @@ let gSocketOpen = false;
 let gPendingMessages: Message[] = [];
 let gNextMessageId = 1;
 
+type CommandResponse =
+  | {
+      id: number;
+      result: unknown;
+      error?: undefined;
+    }
+  | {
+      id: number;
+      result?: undefined;
+      error: {
+        code: number;
+        message: string;
+        data?: unknown;
+      };
+    };
+
 interface MessageWaiter {
   method: string;
-  resolve: (value: any) => void;
-  reject: (reason: any) => void;
+  resolve: (value: CommandResponse) => void;
 }
 
 const gMessageWaiters = new Map<number, MessageWaiter>();
@@ -101,10 +116,21 @@ export function sendMessage<M extends CommandMethods>(
     gPendingMessages.push(msg);
   }
 
-  const { promise, resolve, reject } = defer<any>();
-  gMessageWaiters.set(id, { method, resolve, reject });
+  return new Promise<CommandResponse>(resolve => gMessageWaiters.set(id, { method, resolve })).then(
+    response => {
+      if (response.error) {
+        const { code, message, data } = response.error;
+        console.warn("Message failed", method, { code, message }, data);
 
-  return promise;
+        const err = new Error(message) as any;
+        err.name = "CommandError";
+        err.code = code;
+        throw err;
+      }
+
+      return response.result as any;
+    }
+  );
 }
 
 const doSend = makeInfallible(msg => {
@@ -153,22 +179,12 @@ function onSocketMessage(evt: MessageEvent<any>) {
   const msg = JSON.parse(evt.data);
 
   if (msg.id) {
-    const { method, resolve, reject } = gMessageWaiters.get(msg.id)!;
+    const { method, resolve } = gMessageWaiters.get(msg.id)!;
     window.performance?.mark(`${method}_end`);
     window.performance?.measure(method, `${method}_start`, `${method}_end`);
 
     gMessageWaiters.delete(msg.id);
-    if (msg.error) {
-      console.warn("Message failed", method, msg.error, msg.data);
-
-      const err = new Error(msg.error.message) as any;
-      err.name = "CommandError";
-      err.code = msg.error.code;
-
-      reject(err);
-    } else {
-      resolve(msg.result);
-    }
+    resolve(msg);
   } else if (gEventListeners.has(msg.method)) {
     const handler = gEventListeners.get(msg.method)!;
     handler(msg.params);
