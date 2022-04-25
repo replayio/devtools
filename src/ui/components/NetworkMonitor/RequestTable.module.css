@@ -26,6 +26,14 @@ table.requests {
   color: white;
 }
 
+.row.future {
+  color: var(--grey-10-a40);
+}
+
+.row.unloaded {
+  color: var(--grey-10-a20);
+}
+
 .row.current {
   border-top: 2px solid var(--secondary-accent);
 }

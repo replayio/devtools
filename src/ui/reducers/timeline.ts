@@ -2,7 +2,8 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { TimelineActions } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { TimelineState } from "ui/state/timeline";
-import { getPointIsInLoadedRegion } from "ui/utils/timeline";
+import { isPointInRegions } from "ui/utils/timeline";
+
 import { getLoadedRegions } from "./app";
 
 function initialTimelineState(): TimelineState {
@@ -80,7 +81,7 @@ export const getIsInLoadedRegion = (state: UIState) => {
     return false;
   }
 
-  return getPointIsInLoadedRegion(loadedRegions, currentPausePoint);
+  return isPointInRegions(loadedRegions, currentPausePoint);
 };
 export const getIsAtFocusSoftLimit = (state: UIState) => {
   const focusRegion = getFocusRegion(state);
