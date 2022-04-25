@@ -4,7 +4,6 @@ import type { RenderOptions } from "@testing-library/react";
 import { ThreadFront } from "protocol/thread";
 import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
-
 import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
 import { bootstrapStore } from "ui/setup/store";
