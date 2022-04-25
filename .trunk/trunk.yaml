@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 0.10.0-beta
+  version: 0.10.1-beta
 lint:
   enabled:
     - actionlint@1.6.8
@@ -14,9 +14,3 @@ lint:
         - public
         - src/graphql
         - docs/codebase-notes
-        - test/fixtures
-repo:
-  repo:
-    host: github.com
-    owner: RecordReplay
-    name: devtools
