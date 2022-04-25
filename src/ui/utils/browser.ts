@@ -38,3 +38,14 @@ export function listenForAccessToken(callback: (accessToken: string) => void) {
     })
   );
 }
+
+export function requestBrowserLogin() {
+  window.dispatchEvent(
+    new window.CustomEvent("WebChannelMessageToChrome", {
+      detail: JSON.stringify({
+        id: "record-replay-token",
+        message: { type: "login" },
+      }),
+    })
+  );
+}
