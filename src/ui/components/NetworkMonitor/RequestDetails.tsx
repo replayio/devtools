@@ -37,7 +37,9 @@ export const RequestDetailsUnavailable: FC = () => {
         </div>
       </RequestDetailsTabs>
       <div className="relative flex-grow">
-        <div className="m-2">Request details currently unavailable</div>
+        <div className="m-2">
+          This request happened in a part of the recording which is not currently loaded
+        </div>
       </div>
     </div>
   );
