@@ -14,7 +14,6 @@ export function setupTelemetry() {
     "Current thread has changed",
     "Failed to load Stripe.js",
     "Stripe.js not available",
-    "Received status code 500",
   ];
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.
