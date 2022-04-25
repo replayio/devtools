@@ -183,10 +183,7 @@ export function createValue({
 
 export async function loadFixtureData(testName: string): Promise<UIStore> {
   const fixtureData = JSON.parse(
-    readFileSync(
-      join(__dirname, "..", "..", "public", "test", "fixtures", `${testName}.json`),
-      "utf8"
-    )
+    readFileSync(join(__dirname, "..", "..", "test", "fixtures", `${testName}.json`), "utf8")
   );
 
   const sessionId = fixtureData.find((message: any) => {

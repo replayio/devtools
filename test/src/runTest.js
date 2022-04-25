@@ -48,7 +48,7 @@ async function recordBrowser(state, test, testPath, browserName, saveFixture) {
 
   if (state.updateFixtures && saveFixture) {
     fs.writeFileSync(
-      `./public/test/fixtures/${test.substr(0, test.length - 3)}.json`,
+      `./test/fixtures/${test.substr(0, test.length - 3)}.json`,
       JSON.stringify(websocketLogs, null, 2)
     );
   }
