@@ -1,11 +1,13 @@
+const fs = require("fs");
 const path = require("path");
 const playwright = require("@recordreplay/playwright");
 const cli = require("@replayio/replay");
 const _ = require("lodash");
+
 const { sendTelemetryEvent, waitUntilMessage, elapsedTime } = require("./utils");
 const { recordNode } = require("./recordNode");
 
-async function recordBrowser(state, test, testPath, browserName) {
+async function recordBrowser(state, test, testPath, browserName, saveFixture) {
   console.log(`Recording Test:`, test, browserName);
 
   let success, why;
@@ -15,13 +17,23 @@ async function recordBrowser(state, test, testPath, browserName) {
     headless: state.headless,
   });
 
+  const websocketLogs = [];
+
   const context = await browser.newContext();
   const page = await context.newPage();
 
   try {
     await page.goto(testPath);
     page.on("console", async msg => logs.push(`${test}: ${msg.text()}`));
+    page.on("websocket", ws => {
+      if (ws.url() !== "wss://dispatch.replay.io/") {
+        return;
+      }
+      ws.on("framereceived", frameData => websocketLogs.push(JSON.parse(frameData.payload)));
+    });
+
     const result = await waitUntilMessage(page, "TestFinished", state.testTimeout * 1000);
+
     success = result.success;
     why = result.why;
   } catch (e) {
@@ -32,6 +44,13 @@ async function recordBrowser(state, test, testPath, browserName) {
     await page.close();
     await context.close();
     await browser.close();
+  }
+
+  if (state.updateFixtures && saveFixture) {
+    fs.writeFileSync(
+      `./test/fixtures/${test.substr(0, test.length - 3)}.json`,
+      JSON.stringify(websocketLogs, null, 2)
+    );
   }
 
   console.log(`Finished test:${test} success:${success}`, why || "");
@@ -94,7 +113,7 @@ async function onFinish(state, { test, target, success, testPath, why, recording
   }
 }
 
-async function runTest(state, test, exampleRecordingId, target) {
+async function runTest(state, test, exampleRecordingId, target, saveFixture) {
   let testPath = `${state.testingServer}/recording/${exampleRecordingId}?test=${test}`;
   if (state.dispatchServer != "wss://dispatch.replay.io") {
     testPath += `&dispatch=${state.dispatchServer}`;
@@ -106,7 +125,7 @@ async function runTest(state, test, exampleRecordingId, target) {
   let success, why, recordingId;
   if (target == "gecko" || target == "chromium") {
     const browserName = target == "gecko" ? "firefox" : "chromium";
-    const result = await recordBrowser(state, test, testPath, browserName);
+    const result = await recordBrowser(state, test, testPath, browserName, saveFixture);
     ({ success, why } = result);
   } else {
     await recordNode(state, path.join(__dirname, "../examples/node", test));

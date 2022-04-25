@@ -1,3 +1,6 @@
+import { readFileSync } from "fs";
+import { join } from "path";
+
 import type {
   CallStack,
   loadedRegions,
@@ -17,6 +20,10 @@ import type {
   TimeStampedPointRange,
   Value,
 } from "@recordreplay/protocol";
+import { ThreadFront } from "protocol/thread";
+import { UIStore } from "ui/actions";
+
+import { createTestStore } from "./testUtils";
 
 export const DEFAULT_SOURCE_ID = "fake-source-id";
 export const DEFAULT_SESSION_ID = "fake-session-id";
@@ -172,6 +179,40 @@ export function createValue({
     unserializableNumber,
     value,
   };
+}
+
+export async function loadFixtureData(testName: string): Promise<UIStore> {
+  const fixtureData = JSON.parse(
+    readFileSync(join(__dirname, "..", "..", "test", "fixtures", `${testName}.json`), "utf8")
+  );
+
+  const sessionId = fixtureData.find((message: any) => {
+    if (message.hasOwnProperty("sessionId")) {
+      return message.sessionId;
+    }
+  });
+
+  if (!sessionId) {
+    console.warn("Fixture does not contain a session ID");
+  }
+
+  // TODO This is side effectful in a way that affects ThreadFront.setSessionId(); we should clean that up!
+  const store = await createTestStore();
+
+  // This is necessary to unblock various event listeners and parsing.
+  // Actual session ID value _probably_ doesn't matter here.
+  await ThreadFront.setSessionId(sessionId);
+
+  // Initialize state using exported websocket messages,
+  // sent through the mock environment straight to socket parsing.
+  fixtureData.forEach((message: any) => {
+    window.mockEnvironment?.sendSocketMessage(JSON.stringify(message));
+  });
+
+  // Give everything time to settle
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  return store;
 }
 
 export function sendLoadedRegionsToMockEnvironment(value: loadedRegions): void {
