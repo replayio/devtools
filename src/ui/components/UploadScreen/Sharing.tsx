@@ -31,7 +31,7 @@ function EditableSettings({
   const handleWorkspaceSelect = (id: string) => {
     setIsPublic(isPublic && !isPublicDisabled(workspaces, id));
     setSelectedWorkspaceId(id);
-    const dbWorkspaceId = id === "My Library" ? null : id;
+    const dbWorkspaceId = id === MY_LIBRARY ? null : id;
     updateDefaultWorkspace({ variables: { workspaceId: dbWorkspaceId } });
   };
 
