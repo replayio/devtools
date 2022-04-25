@@ -1,17 +1,26 @@
+import { ThreadFront, ValueFront } from "protocol/thread";
 import React from "react";
 import { act } from "react-dom/test-utils";
+import {
+  DEFAULT_SESSION_ID,
+  createConsoleMessage,
+  createLoadedRegions,
+  createSource,
+  createValue,
+  sendLoadedRegionsToMockEnvironment,
+  sendMessageToMockEnvironment,
+  sendSourceToMockEnvironment,
+  createPointDescription,
+} from "test/testFixtureUtils";
 import {
   createTestStore,
   filterCommonTestWarnings,
   render as testUtilsRender,
 } from "test/testUtils";
-import useConsoleSearch from "./useConsoleSearch";
-import { Message } from "../../reducers/messages";
-
-import type { Actions, State } from "./useConsoleSearch";
 import type { UIStore } from "ui/actions";
-import { ValueFront } from "protocol/thread";
-import { UIState } from "ui/state";
+
+import useConsoleSearch from "./useConsoleSearch";
+import type { Actions, State } from "./useConsoleSearch";
 
 describe("useConsoleSearch", () => {
   filterCommonTestWarnings();
@@ -19,6 +28,7 @@ describe("useConsoleSearch", () => {
   let lastCommitedSearchActions: Actions | null = null;
   let lastCommitedSearchState: State | null = null;
   let messageIdCounter: number = 0;
+  let store: UIStore = null as unknown as UIStore;
   let TestComponent: any;
 
   beforeEach(() => {
@@ -35,107 +45,56 @@ describe("useConsoleSearch", () => {
     };
   });
 
-  // TODO [bvaughn] This is pretty gross; can we collocate this (closer to the Redux code if nothing else)?
-  function createMessage(
-    type: string,
-    messageText: string,
-    parameters: ValueFront[] = []
-  ): Message {
-    return {
-      allowRepeating: false,
-      category: null,
-      errorMessageName: null,
-      exceptionDocURL: null,
-      executionPoint: null,
-      executionHasFrames: false,
-      executionPointTime: 1,
-      groupId: null,
-      id: `${messageIdCounter++}`,
-      indent: 0,
-      innerWindowID: null,
-      level: "",
-      messageText,
-      notes: null,
-      parameters,
-      pauseId: "",
-      repeatId: null,
-      source: "",
-      stacktrace: [],
-      type,
-      lastExecutionPoint: {
-        point: "1",
-        time: 1,
-        messageCount: 0,
-      },
-    };
-  }
+  beforeEach(async () => {
+    store = await createTestStore();
 
-  function createValueFront(value: any): ValueFront {
-    return new ValueFront(null, { value });
-  }
+    // This is necessary to unblock various event listeners and parsing.
+    await ThreadFront.setSessionId(DEFAULT_SESSION_ID);
 
-  async function createStore(messages: Message[] = []): Promise<UIStore> {
-    const messageIDs = messages.map(message => message.id);
-    const idToMessageMap = messages.reduce((map, message) => {
-      return {
-        ...map,
-        [message.id]: message,
-      };
-    }, {});
+    sendSourceToMockEnvironment(
+      createSource({
+        kind: "scriptSource",
+      })
+    );
 
-    const defaultState = (await createTestStore()).getState();
+    sendMessageToMockEnvironment(
+      createConsoleMessage({
+        text: "Plain string message",
+      })
+    );
+    sendMessageToMockEnvironment(
+      createConsoleMessage({
+        argumentValues: [
+          createValue({ value: 123 }),
+          createValue({ value: "string value" }),
+          createValue({ value: true }),
+        ],
+      })
+    );
+    sendMessageToMockEnvironment(
+      createConsoleMessage({
+        text: "Another string message",
+      })
+    );
+    sendMessageToMockEnvironment(
+      createConsoleMessage({
+        argumentValues: [createValue({ value: "another string value" })],
+      })
+    );
 
-    return createTestStore({
-      ...defaultState,
-      app: {
-        ...defaultState.app,
-        loadedRegions: {
-          indexed: [],
-          loaded: [
-            {
-              begin: {
-                point: "0",
-                time: 0,
-              },
-              end: {
-                point: "1000",
-                time: 1000,
-              },
-            },
-          ],
-          loading: [],
-        },
-      },
-      messages: {
-        ...defaultState.messages,
-        messages: {
-          ids: messageIDs,
-          entities: idToMessageMap,
-        },
-        visibleMessages: messageIDs,
-      },
-    });
-  }
+    sendLoadedRegionsToMockEnvironment(
+      createLoadedRegions({
+        beginTime: 0,
+        endTime: 1000,
+      })
+    );
 
-  async function render(store?: UIStore) {
-    if (!store) {
-      store = await createStore([
-        createMessage("logPoint", "Plain string message"),
-        createMessage("logPoint", "", [
-          createValueFront(123),
-          createValueFront("string value"),
-          createValueFront(true),
-        ]),
-        createMessage("logPoint", "Another string message"),
-        createMessage("logPoint", "", [createValueFront("another string value")]),
-      ]);
-    }
-
-    await testUtilsRender(<TestComponent />, { store });
-  }
+    // Give everything time to settle
+    await new Promise(resolve => setTimeout(resolve, 100));
+  });
 
   it("should search visible Messages", async () => {
-    await render();
+    await testUtilsRender(<TestComponent />, { store });
 
     act(() => {
       lastCommitedSearchActions?.search("message");
@@ -144,8 +103,8 @@ describe("useConsoleSearch", () => {
     expect(lastCommitedSearchState?.index).toBe(0);
     expect(lastCommitedSearchState?.results.map(result => result.id)).toMatchInlineSnapshot(`
       Array [
-        "0",
-        "2",
+        "1",
+        "3",
       ]
     `);
 
@@ -156,8 +115,8 @@ describe("useConsoleSearch", () => {
     expect(lastCommitedSearchState?.index).toBe(0);
     expect(lastCommitedSearchState?.results.map(result => result.id)).toMatchInlineSnapshot(`
       Array [
-        "2",
         "3",
+        "4",
       ]
     `);
   });
