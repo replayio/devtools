@@ -1,7 +1,8 @@
 import userEvent from "@testing-library/user-event";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import React from "react";
-import { render, loadFixtureData, filterCommonTestWarnings, screen } from "test/testUtils";
+import { loadFixtureData } from "test/testFixtureUtils";
+import { render, filterCommonTestWarnings, screen } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
 const useRouter = jest.spyOn(require("next/router"), "useRouter");

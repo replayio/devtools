@@ -1,16 +1,14 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import { MockedProvider } from "@apollo/client/testing";
 import * as rtl from "@testing-library/react";
 import type { RenderOptions } from "@testing-library/react";
 import { ThreadFront } from "protocol/thread";
 import React, { PropsWithChildren } from "react";
 import { Provider } from "react-redux";
+
+import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
 import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
-import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
 
 import {
@@ -62,43 +60,6 @@ export const filterLoggingInTests = (
     jest.clearAllMocks();
   });
 };
-
-export async function loadFixtureData(testName: string): Promise<UIStore> {
-  const fixtureData = JSON.parse(
-    readFileSync(
-      join(__dirname, "..", "..", "public", "test", "fixtures", `${testName}.json`),
-      "utf8"
-    )
-  );
-
-  const sessionId = fixtureData.find((message: any) => {
-    if (message.hasOwnProperty("sessionId")) {
-      return message.sessionId;
-    }
-  });
-
-  if (!sessionId) {
-    console.warn("Fixture does not contain a session ID");
-  }
-
-  // TODO This is side effectful in a way that affects ThreadFront.setSessionId(); we should clean that up!
-  const store = await createTestStore();
-
-  // This is necessary to unblock various event listeners and parsing.
-  // Actual session ID value _probably_ doesn't matter here.
-  await ThreadFront.setSessionId(sessionId);
-
-  // Initialize state using exported websocket messages,
-  // sent through the mock environment straight to socket parsing.
-  fixtureData.forEach((message: any) => {
-    window.mockEnvironment?.sendSocketMessage(JSON.stringify(message));
-  });
-
-  // Give everything time to settle
-  await new Promise(resolve => setTimeout(resolve, 100));
-
-  return store;
-}
 
 export const filterCommonTestWarnings = () => {
   // Skip LoadedRegions debug messages
