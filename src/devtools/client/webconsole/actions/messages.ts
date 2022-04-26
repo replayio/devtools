@@ -2,19 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import type { ExecutionPoint, Frame } from "@recordreplay/protocol";
 import * as Sentry from "@sentry/browser";
-import type { UIStore, UIThunkAction } from "ui/actions";
-
+import { IdGenerator } from "devtools/client/webconsole/utils/id-generator";
 import {
   prepareMessage,
   isBrowserInternalMessage,
 } from "devtools/client/webconsole/utils/messages";
-import { IdGenerator } from "devtools/client/webconsole/utils/id-generator";
-import { Pause, ThreadFront } from "protocol/thread";
-import { LogpointHandlers } from "protocol/logpoint";
 import { TestMessageHandlers } from "protocol/find-tests";
+import { LogpointHandlers } from "protocol/logpoint";
+import { Pause, ThreadFront, ValueFront } from "protocol/thread";
+import { WiredMessage } from "protocol/thread/thread";
+import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
-import type { Message, Frame, ExecutionPoint } from "@recordreplay/protocol";
 
 import type { Message as InternalMessage } from "../reducers/messages";
 import {
@@ -63,7 +63,7 @@ function convertStack(stack: string[], { frames }: { frames?: Frame[] }) {
   );
 }
 
-function onConsoleMessage(msg: Message): UIThunkAction {
+function onConsoleMessage(msg: WiredMessage): UIThunkAction {
   return async dispatch => {
     const stacktrace = await convertStack(msg.stack!, msg.data);
     const sourceId = stacktrace?.[0]?.sourceId;
@@ -100,6 +100,10 @@ function onConsoleMessage(msg: Message): UIThunkAction {
         line = location.line;
         column = location.column;
       }
+    }
+
+    if (msg.argumentValues) {
+      await Promise.all(msg.argumentValues.map(value => value.loadIfNecessary()));
     }
 
     const packet = {
@@ -158,9 +162,12 @@ function onLogpointResult(
   time: number,
   { sourceId, line, column }: { sourceId: string; line: number; column: number },
   pause?: Pause,
-  values?: unknown[]
+  values?: ValueFront[]
 ): UIThunkAction {
   return async dispatch => {
+    if (values) {
+      await Promise.all(values.map(value => value.loadIfNecessary()));
+    }
     const packet = {
       errorMessage: "",
       sourceName: await ThreadFront.getSourceURL(sourceId),

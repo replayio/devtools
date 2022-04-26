@@ -1,15 +1,18 @@
-import React, { FC, PureComponent, ReactNode } from "react";
 import classnames from "classnames";
 import { Tree } from "devtools/client/debugger/src/components/shared/tree";
-import ObjectInspectorItem from "./ObjectInspectorItem";
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
-import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
-import { isRegionLoaded } from "ui/reducers/app";
-import { RedactedSpan } from "ui/components/Redacted";
-import { Item, ValueItem, renderRep, shouldRenderRootsInReps, findPause } from "../utils";
 import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
+import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { assert } from "protocol/utils";
+import React, { FC, PureComponent, ReactNode } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { RedactedSpan } from "ui/components/Redacted";
+import { isRegionLoaded } from "ui/reducers/app";
+import { UIState } from "ui/state";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
+
+import { Item, ValueItem, renderRep, shouldRenderRootsInReps, findPause } from "../utils";
+
+import ObjectInspectorItem from "./ObjectInspectorItem";
 
 interface PropsFromParent {
   roots: Item[] | (() => Item[]);
@@ -76,15 +79,14 @@ class OI extends PureComponent<ObjectInspectorProps> {
     this.ensureRootsLoaded();
   }
 
-  // TODO [hbenl] this should not be necessary: the ObjectInspector should only
+  // this should not be necessary: the ObjectInspector should only
   // be rendered with a root ValueItem that has already been loaded.
-  // However currently (at least) the console doesn't ensure that this is the case,
-  // so we need this workaround for now.
   async ensureRootsLoaded() {
     const rootsToLoad = this.getRoots().filter(
       (root): root is ValueItem => root.type === "value" && !root.loaded
     );
     if (rootsToLoad.length > 0) {
+      pingTelemetry("devtools-oi-root-not-loaded");
       await Promise.all(rootsToLoad.map(root => root.contents.load()));
       this.forceUpdate();
     }

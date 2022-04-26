@@ -1,18 +1,14 @@
 // Perform some analysis to find and describe automated tests that were recorded.
 
-import { Pause, ThreadFront, ValueFront } from "./thread";
-import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
-import { Helpers } from "./logpoint";
+import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
 import { assert } from "protocol/utils";
-import { client } from "./socket";
+
+import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 import { comparePoints, pointPrecedes } from "./execution-point-utils";
-import {
-  AnalysisEntry,
-  ExecutionPoint,
-  Message,
-  Location,
-  PointDescription,
-} from "@recordreplay/protocol";
+import { Helpers } from "./logpoint";
+import { client } from "./socket";
+import { Pause, ThreadFront, ValueFront } from "./thread";
+import { WiredMessage } from "./thread/thread";
 
 // Information about a jest test which ran in the recording.
 interface JestTestInfo {
@@ -452,5 +448,5 @@ export async function findAutomatedTests() {
 }
 
 export const TestMessageHandlers: {
-  onTestMessage?: (msg: Message) => void;
+  onTestMessage?: (msg: WiredMessage) => void;
 } = {};
