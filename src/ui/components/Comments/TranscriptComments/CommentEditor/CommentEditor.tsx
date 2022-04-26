@@ -18,21 +18,23 @@ export function getCommentEditorDOMId(comment: Comment | Reply) {
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | Reply;
+  disabled: boolean;
   editable: boolean;
+  handleCancel?: () => void;
   handleSubmit?: (inputValue: string) => void;
   onCreate?: (editor: { editor: Pick<Editor, "commands"> }) => void;
   onUpdate?: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
-  handleCancel?: () => void;
 };
 
 function CommentEditor({
   clearPendingComment,
   comment,
+  disabled,
   editable,
+  handleCancel = () => {},
   handleSubmit = () => {},
   onCreate = () => {},
   onUpdate = () => {},
-  handleCancel = () => {},
 }: CommentEditorProps) {
   const recordingId = hooks.useGetRecordingId();
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
@@ -56,7 +58,7 @@ function CommentEditor({
               blur={blur}
               close={close}
               content={comment.content || ""}
-              editable={editable}
+              editable={editable && !disabled}
               handleCancel={() => {
                 clearPendingComment();
                 handleCancel();

@@ -68,6 +68,7 @@ function PendingCommentCard({
             <NewCommentEditor
               data={{ comment, type: "new_comment" }}
               editable={!isUpdating}
+              isUpdating={isUpdating}
               onSubmit={onSubmit}
             />
           </FocusContext.Provider>
@@ -100,12 +101,14 @@ function BorderBridge({
 
 function CommentItemHeader({
   comment,
-  showOptions,
   setIsEditing,
+  setIsUpdating,
+  showOptions,
 }: {
   comment: Comment | Reply;
-  showOptions: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  setIsUpdating: (value: boolean) => void;
+  showOptions: boolean;
 }) {
   const [relativeDate, setRelativeDate] = useState("");
 
@@ -136,6 +139,7 @@ function CommentItemHeader({
           comment={comment}
           isRoot={"replies" in comment}
           setIsEditing={setIsEditing}
+          setIsUpdating={setIsUpdating}
         />
       ) : null}
     </div>
@@ -146,10 +150,12 @@ function CommentItem({
   data,
   onSubmit,
   isUpdating,
+  setIsUpdating,
 }: {
   data: CommentData;
   onSubmit: (data: CommentData, inputValue: string) => void;
   isUpdating: boolean;
+  setIsUpdating: (value: boolean) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const { userId } = useGetUserId();
@@ -164,13 +170,15 @@ function CommentItem({
     <div className="group space-y-1.5">
       <CommentItemHeader
         comment={data.comment}
-        showOptions={!isEditing && !isUpdating && data.comment.user.id === userId}
         setIsEditing={maybeSetIsUpdating}
+        setIsUpdating={setIsUpdating}
+        showOptions={!isEditing && !isUpdating && data.comment.user.id === userId}
       />
       <ExistingCommentEditor
         data={data}
         onSubmit={onSubmit}
         isEditing={isEditing}
+        isUpdating={isUpdating}
         setIsEditing={maybeSetIsUpdating}
       />
     </div>
@@ -238,17 +246,23 @@ function CommentCard({
       return;
     }
 
+    console.log("<CommentCard> -> setIsUpdating(true)");
     setIsUpdating(true);
     if (type == "new_reply") {
+      console.log("<CommentCard> -> addCommentReply(...)");
       await addCommentReply({ ...comment, content: inputValue });
     } else if (type == "new_comment") {
+      console.log("<CommentCard> -> addComment(...)");
       await addComment({ ...comment, content: inputValue });
     } else if (type === "comment") {
+      console.log("<CommentCard> -> updateComment(...)");
       await updateComment(comment.id, inputValue, (comment as Comment).position);
     } else if (type === "reply") {
+      console.log("<CommentCard> -> updateCommentReply(...)");
       await updateCommentReply(comment.id, inputValue);
     }
 
+    console.log("<CommentCard> -> setIsUpdating(false)");
     setIsUpdating(false);
     clearPendingComment();
   };
@@ -271,7 +285,8 @@ function CommentCard({
     <div
       className={classNames(
         `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor"
+        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor",
+        isUpdating ? "bg-themeBase-90" : ""
       )}
       onMouseDown={e => {
         seekToComment(comment);
@@ -294,6 +309,7 @@ function CommentCard({
           data={{ type: "comment", comment }}
           onSubmit={onSubmit}
           isUpdating={isUpdating}
+          setIsUpdating={setIsUpdating}
         />
 
         {comment.replies?.map((reply: Reply) => (
@@ -302,6 +318,7 @@ function CommentCard({
               data={{ type: "reply", comment: reply }}
               onSubmit={onSubmit}
               isUpdating={isUpdating}
+              setIsUpdating={setIsUpdating}
             />
           </div>
         ))}
@@ -326,6 +343,8 @@ function CommentCard({
                   parentId: comment.id,
                 },
               }}
+              editable={!isUpdating}
+              isUpdating={isUpdating}
               onSubmit={onSubmit}
             />
           </FocusContext.Provider>

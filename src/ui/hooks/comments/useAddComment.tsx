@@ -1,8 +1,8 @@
-import { ApolloError, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
+import { AddComment, AddCommentVariables } from "graphql/AddComment";
+import omit from "lodash/omit";
 import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
-import omit from "lodash/omit";
-import { AddComment, AddCommentVariables } from "graphql/AddComment";
 
 export default function useAddComment() {
   const [addComment] = useMutation<AddComment, AddCommentVariables>(
@@ -24,24 +24,14 @@ export default function useAddComment() {
   return async (comment: Comment) => {
     trackEvent("comments.create");
 
-    return new Promise((resolve, reject) => {
-      addComment({
-        awaitRefetchQueries: true,
-        onCompleted: (data: Comment | {}) => {
-          resolve(data);
+    return addComment({
+      awaitRefetchQueries: true,
+      variables: {
+        input: {
+          ...omit(comment, ["id", "createdAt", "updatedAt", "isUnpublished", "replies", "user"]),
+          recordingId: comment.recordingId,
         },
-        onError: (error: ApolloError) => {
-          console.error("Apollo error while adding a comment:", error);
-
-          reject(error);
-        },
-        variables: {
-          input: {
-            ...omit(comment, ["id", "createdAt", "updatedAt", "isUnpublished", "replies", "user"]),
-            recordingId: comment.recordingId,
-          },
-        },
-      });
+      },
     });
   };
 }
