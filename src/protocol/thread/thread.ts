@@ -36,13 +36,15 @@ import {
   responseBodyData,
   requestBodyData,
 } from "@recordreplay/protocol";
-import { client, log, addEventListener, sendMessage } from "../socket";
-import { defer, assert, EventEmitter, ArrayMap } from "../utils";
-import { MappedLocationCache } from "../mapped-location-cache";
-import { ValueFront } from "./value";
-import { Pause } from "./pause";
 import uniqueId from "lodash/uniqueId";
 import { repaint } from "protocol/graphics";
+
+import { MappedLocationCache } from "../mapped-location-cache";
+import { client, log, addEventListener, sendMessage } from "../socket";
+import { defer, assert, EventEmitter, ArrayMap } from "../utils";
+
+import { Pause } from "./pause";
+import { ValueFront } from "./value";
 
 declare global {
   interface Window {
@@ -925,7 +927,7 @@ class _ThreadFront {
   }
 
   async findConsoleMessages(
-    onConsoleMessage: (pause: Pause, message: Message) => void,
+    onConsoleMessage: (pause: Pause, message: WiredMessage) => void,
     onConsoleOverflow: () => void
   ) {
     const sessionId = await this.waitForSession();
@@ -957,7 +959,7 @@ class _ThreadFront {
       if (message.sourceId) {
         message.sourceId = this.getCorrespondingSourceIds(message.sourceId)[0];
       }
-      onConsoleMessage(pause, message);
+      onConsoleMessage(pause, message as WiredMessage);
     });
 
     return messagesLoaded;
