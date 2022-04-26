@@ -42,7 +42,7 @@ function ErrorRep(props) {
   }
   const content = [];
 
-  if (mode === MODE.TINY) {
+  if (mode === MODE.TINY || !preview.has("message")) {
     content.push(name);
   } else {
     content.push(`${name}: "${preview.get("message").primitive()}"`);
