@@ -5,8 +5,6 @@ import cloneDeep from "lodash/cloneDeep";
 import { getRecordingId } from "ui/utils/recording";
 import { getReplaySession } from "ui/setup/prefs";
 
-export const PENDING_COMMENT_ID = "PENDING";
-
 export async function getInitialCommentsState(): Promise<CommentsState> {
   const recordingId = getRecordingId()!;
 

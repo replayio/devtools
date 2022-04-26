@@ -1,14 +1,14 @@
+import classNames from "classnames";
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { Comment, Reply } from "ui/state/comments";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
-import classNames from "classnames";
-import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { trackEvent } from "ui/utils/telemetry";
 import { useConfirm } from "ui/components/shared/Confirm";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+import hooks from "ui/hooks";
+import { Comment, Reply } from "ui/state/comments";
+import { trackEvent } from "ui/utils/telemetry";
 
 function getDeleteMessage(replyCount: number) {
   if (replyCount > 1) {
@@ -34,10 +34,16 @@ type CommentActionsProps = PropsFromRedux & {
   comment: Comment | Reply;
   isRoot: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  setIsUpdating: (value: boolean) => void;
 };
 
-function CommentActions({ comment, isRoot, setHoveredComment, setIsEditing }: CommentActionsProps) {
-  const recordingId = hooks.useGetRecordingId();
+function CommentActions({
+  comment,
+  isRoot,
+  setHoveredComment,
+  setIsEditing,
+  setIsUpdating,
+}: CommentActionsProps) {
   const { userId } = hooks.useGetUserId();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReply = hooks.useDeleteCommentReply();
@@ -59,20 +65,25 @@ function CommentActions({ comment, isRoot, setHoveredComment, setIsEditing }: Co
     const description = `${getDeleteDescription(replyCount)}. Are you sure you want to proceed?`;
 
     confirmDestructive({
-      message,
-      description,
       acceptLabel: "Delete comment",
-    }).then(confirmed => {
+      description,
+      message,
+    }).then(async confirmed => {
       if (!confirmed) {
         return;
       }
 
       trackEvent("comments.delete");
+
+      setIsUpdating(true);
+
       if (isRoot) {
-        deleteComment(comment.id, recordingId!);
+        await deleteComment(comment.id);
       } else {
-        deleteCommentReply(comment.id, recordingId!);
+        await deleteCommentReply(comment.id!);
       }
+
+      setIsUpdating(false);
     });
 
     setHoveredComment(null);

@@ -6,7 +6,6 @@ import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
-import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { User } from "ui/types";
 import { setSelectedPrimaryPanel } from "./layout";
@@ -58,13 +57,21 @@ export function createComment(
     const primaryLabel = labels?.primary;
     const secondaryLabel = labels?.secondary;
 
+    // If a comment is saved to Apollo, it will be assigned a persisted ID.
+    // Local, pending comments just need stable+unique IDs.
+    // Avoid using createdAt or updatedAt in these IDs though as these values are not stable.
+    const id = sourceLocation
+      ? `${point}-${sourceLocation.sourceId}-${sourceLocation.line}`
+      : `${point}`;
+
     const pendingComment: PendingComment = {
       type: "new_comment",
       comment: {
         content: "",
         createdAt: new Date().toISOString(),
         hasFrames,
-        id: PENDING_COMMENT_ID,
+        id,
+        isUnpublished: true,
         networkRequestId: networkRequestId || null,
         point,
         position,
