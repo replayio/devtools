@@ -35,17 +35,3 @@ export function formatRelativeTime(date: Date) {
   }
   return "Now";
 }
-
-function orderedByApproximatelyCreatedAt(comments: (Comment | Reply)[]): number[] {
-  const indices = range(comments.length);
-  const permutation = sortBy(indices, [i => Number(Date.parse(comments[i].createdAt))]);
-  return indices.map(i => permutation.indexOf(i));
-}
-
-function commentIdentifiers(comment: Comment | Reply): string {
-  return compact([
-    comment.point,
-    comment.sourceLocation?.sourceId,
-    comment.sourceLocation?.line,
-  ]).join("-");
-}
