@@ -126,7 +126,9 @@ export const createApolloClient = memoizeLast(function (
  * Apollo's error reporting is inconsistent and GraphQL errors may appear as
  * network errors containing the GraphQL error in an undocumented property.
  */
-export function extractGraphQLError(error: ApolloError | undefined): string | undefined {
+export function extractGraphQLError(
+  error: Partial<Pick<ApolloError, "graphQLErrors" | "networkError" | "message">> | undefined
+): string | undefined {
   if (!error) {
     return undefined;
   }
@@ -181,9 +183,15 @@ function createHttpLink(token: string | undefined) {
 }
 
 function createErrorLink(onAuthError?: () => void) {
-  return onError(({ graphQLErrors, networkError }) => {
+  return onError(err => {
+    const { graphQLErrors, networkError } = err;
     if (graphQLErrors) {
-      console.error("[Apollo GraphQL error]", graphQLErrors);
+      console.error(
+        "[Apollo GraphQL error]",
+        err.operation.operationName,
+        extractGraphQLError(err),
+        graphQLErrors.length > 1 ? graphQLErrors : graphQLErrors[0]
+      );
 
       if (onAuthError && graphQLErrors.some(e => e.extensions?.code === "UNAUTHENTICATED")) {
         onAuthError();
