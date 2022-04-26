@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
+import { Comment, CommentPosition } from "ui/state/comments";
 import { query } from "ui/utils/apolloClient";
-import { Comment, CommentPosition, Reply } from "ui/state/comments";
 import { GET_COMMENTS_TIME, GET_COMMENTS } from "ui/graphql/comments";
 import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
 import {
@@ -39,46 +39,27 @@ export function useGetComments(recordingId: RecordingId): {
 }
 
 export function useUpdateComment() {
-  const [updateCommentContent, { error }] = useMutation<
-    UpdateCommentContent,
-    UpdateCommentContentVariables
-  >(
+  const [updateCommentContent] = useMutation<UpdateCommentContent, UpdateCommentContentVariables>(
     gql`
       mutation UpdateCommentContent($newContent: String!, $commentId: ID!, $position: JSONObject) {
         updateComment(input: { id: $commentId, content: $newContent, position: $position }) {
           success
         }
       }
-    `
+    `,
+    {
+      refetchQueries: ["GetComments"],
+    }
   );
 
-  if (error) {
-    console.error("Apollo error while updating a comment:", error);
-  }
-
-  return (commentId: string, newContent: string, position: CommentPosition | null) =>
+  return async (commentId: string, newContent: string, position: CommentPosition | null) =>
     updateCommentContent({
       variables: { commentId, newContent, position },
-      optimisticResponse: {
-        updateComment: {
-          success: true,
-          __typename: "UpdateComment",
-        },
-      },
-      update: cache => {
-        cache.modify({
-          id: cache.identify({ id: commentId, __typename: "Comment" }),
-          fields: {
-            content: () => newContent,
-            position: () => position,
-          },
-        });
-      },
     });
 }
 
 export function useUpdateCommentReply() {
-  const [updateCommentReplyContent, { error }] = useMutation<
+  const [updateCommentReplyContent] = useMutation<
     UpdateCommentReplyContent,
     UpdateCommentReplyContentVariables
   >(
@@ -88,28 +69,15 @@ export function useUpdateCommentReply() {
           success
         }
       }
-    `
+    `,
+    {
+      refetchQueries: ["GetComments"],
+    }
   );
 
-  if (error) {
-    console.error("Apollo error while updating a comment:", error);
-  }
-
-  return (commentId: string, newContent: string) =>
+  return async (commentId: string, newContent: string) =>
     updateCommentReplyContent({
       variables: { commentId, newContent },
-      optimisticResponse: {
-        updateCommentReply: {
-          success: true,
-          __typename: "UpdateCommentReply",
-        },
-      },
-      update: cache => {
-        cache.modify({
-          id: cache.identify({ id: commentId, __typename: "CommentReply" }),
-          fields: { content: () => newContent },
-        });
-      },
     });
 }
 
