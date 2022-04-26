@@ -50,9 +50,14 @@ async function runMatchingTests(state) {
 
       console.log(`[${elapsedTime(state)}] TestStart:${test} target:${target}`);
       const exampleRecordingId = await getExample(state, example, target);
-      console.log(
-        `[${elapsedTime(state)}] TestExample:${test} target:${target} ${exampleRecordingId}`
-      );
+      if (exampleRecordingId) {
+        console.log(
+          `[${elapsedTime(state)}] TestExample:${test} target:${target} ${exampleRecordingId}`
+        );
+      } else {
+        console.log(`::error ::Failure Failed to record example ${example}`);
+        return;
+      }
 
       const startTime = Date.now();
       await runTest(state, test, exampleRecordingId, target, saveFixture);
