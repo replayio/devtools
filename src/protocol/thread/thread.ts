@@ -311,6 +311,10 @@ class _ThreadFront {
     await client.Session.findAnnotations({}, sessionId);
   }
 
+  getRecordingTarget(): Promise<RecordingTarget> {
+    return this.recordingTargetWaiter.promise;
+  }
+
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
     log(`TimeWarp ${point}`);
 

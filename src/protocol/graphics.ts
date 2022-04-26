@@ -286,6 +286,10 @@ export function setupGraphics(store: UIStore) {
 }
 
 export async function repaint(force = false) {
+  const recordingTarget = await ThreadFront.getRecordingTarget();
+  if (recordingTarget === "node") {
+    return;
+  }
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
   const point = ThreadFront.currentPoint;
   await ThreadFront.ensureAllSources();
