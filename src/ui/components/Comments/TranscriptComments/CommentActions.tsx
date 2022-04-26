@@ -75,18 +75,14 @@ function CommentActions({
 
       trackEvent("comments.delete");
 
-      console.log("handleDelete() -> setIsUpdating(true)");
       setIsUpdating(true);
 
       if (isRoot) {
-        console.log("handleDelete() -> deleteComment()");
         await deleteComment(comment.id);
       } else {
-        console.log("handleDelete() -> deleteCommentReply()");
         await deleteCommentReply(comment.id!);
       }
 
-      console.log("handleDelete() -> setIsUpdating(false)");
       setIsUpdating(false);
     });
 

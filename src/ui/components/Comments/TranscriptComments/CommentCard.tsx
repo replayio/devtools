@@ -246,23 +246,17 @@ function CommentCard({
       return;
     }
 
-    console.log("<CommentCard> -> setIsUpdating(true)");
     setIsUpdating(true);
     if (type == "new_reply") {
-      console.log("<CommentCard> -> addCommentReply(...)");
       await addCommentReply({ ...comment, content: inputValue });
     } else if (type == "new_comment") {
-      console.log("<CommentCard> -> addComment(...)");
       await addComment({ ...comment, content: inputValue });
     } else if (type === "comment") {
-      console.log("<CommentCard> -> updateComment(...)");
       await updateComment(comment.id, inputValue, (comment as Comment).position);
     } else if (type === "reply") {
-      console.log("<CommentCard> -> updateCommentReply(...)");
       await updateCommentReply(comment.id, inputValue);
     }
 
-    console.log("<CommentCard> -> setIsUpdating(false)");
     setIsUpdating(false);
     clearPendingComment();
   };
