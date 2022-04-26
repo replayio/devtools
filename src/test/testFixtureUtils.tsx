@@ -26,9 +26,12 @@ import { UIStore } from "ui/actions";
 import { createTestStore } from "./testUtils";
 
 export const DEFAULT_SOURCE_ID = "fake-source-id";
+export const DEFAULT_SOURCE_URL = "fake-source-url";
 export const DEFAULT_SESSION_ID = "fake-session-id";
 
 let uidCounter = 0;
+
+type MessageTuple = ["Console.newMessage", Message];
 
 export function createConsoleMessage({
   argumentValues = [],
@@ -56,8 +59,8 @@ export function createConsoleMessage({
   stack?: CallStack;
   text?: string;
   url?: string;
-}): Message {
-  return {
+}): MessageTuple {
+  const value: Message = {
     argumentValues,
     column,
     data,
@@ -71,7 +74,11 @@ export function createConsoleMessage({
     text,
     url,
   };
+
+  return ["Console.newMessage", value];
 }
+
+type LoadedRegionsTuple = ["Session.loadedRegions", loadedRegions];
 
 export function createLoadedRegions({
   beginPoint,
@@ -87,17 +94,19 @@ export function createLoadedRegions({
   endTime: number;
   isIndexed?: boolean;
   isLoaded?: boolean;
-}): loadedRegions {
+}): LoadedRegionsTuple {
   const timeRange: TimeStampedPointRange = {
     begin: createTimeStampedPoint({ point: beginPoint, time: beginTime }),
     end: createTimeStampedPoint({ point: endPoint, time: endTime }),
   };
 
-  return {
+  const value: loadedRegions = {
     indexed: isIndexed ? [timeRange] : [],
     loaded: isLoaded ? [timeRange] : [],
     loading: [timeRange],
   };
+
+  return ["Session.loadedRegions", value];
 }
 
 export function createLocation({
@@ -124,23 +133,27 @@ export function createPointDescription({
   return { frame, point: point || `${time}`, time };
 }
 
+type SourceTuple = ["Debugger.newSource", newSource];
+
 export function createSource({
   generatedSourceIds,
   kind,
   sourceId = DEFAULT_SOURCE_ID,
-  url,
+  url = DEFAULT_SOURCE_URL,
 }: {
   generatedSourceIds?: SourceId[];
   kind: SourceKind;
   sourceId?: SourceId;
   url?: string;
-}): newSource {
-  return {
+}): SourceTuple {
+  const value: newSource = {
     generatedSourceIds,
     kind,
     sourceId,
     url,
   };
+
+  return ["Debugger.newSource", value];
 }
 
 export function createTimeStampedPoint({
@@ -215,34 +228,41 @@ export async function loadFixtureData(testName: string): Promise<UIStore> {
   return store;
 }
 
-export function sendLoadedRegionsToMockEnvironment(value: loadedRegions): void {
-  window.mockEnvironment?.sendSocketMessage(
-    JSON.stringify({
-      method: "Session.loadedRegions",
-      params: value,
-      sessionId: DEFAULT_SESSION_ID,
-    })
-  );
-}
+type Tuple = LoadedRegionsTuple | MessageTuple | SourceTuple;
 
-export function sendMessageToMockEnvironment(value: Message): void {
-  window.mockEnvironment?.sendSocketMessage(
-    JSON.stringify({
-      method: "Console.newMessage",
-      params: {
-        message: value,
-        sessionId: DEFAULT_SESSION_ID,
-      },
-    })
-  );
-}
-
-export function sendSourceToMockEnvironment(value: newSource): void {
-  window.mockEnvironment?.sendSocketMessage(
-    JSON.stringify({
-      method: "Debugger.newSource",
-      params: value,
-      sessionId: DEFAULT_SESSION_ID,
-    })
-  );
+export function sendValuesToMockEnvironment(...values: Array<Tuple>): void {
+  values.forEach(([method, value]) => {
+    switch (method) {
+      case "Session.loadedRegions":
+        window.mockEnvironment?.sendSocketMessage(
+          JSON.stringify({
+            method,
+            params: value,
+            sessionId: DEFAULT_SESSION_ID,
+          })
+        );
+        break;
+      case "Console.newMessage":
+        window.mockEnvironment?.sendSocketMessage(
+          JSON.stringify({
+            method,
+            params: { message: value },
+            sessionId: DEFAULT_SESSION_ID,
+          })
+        );
+        break;
+      case "Debugger.newSource":
+        window.mockEnvironment?.sendSocketMessage(
+          JSON.stringify({
+            method,
+            params: value,
+            sessionId: DEFAULT_SESSION_ID,
+          })
+        );
+        break;
+      default:
+        throw Error(`Unsupported type "${method}"`);
+        break;
+    }
+  });
 }
