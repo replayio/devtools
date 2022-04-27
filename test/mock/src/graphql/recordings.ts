@@ -102,7 +102,7 @@ export function createGetRecordingMock(opts: {
     },
     result: {
       data: {
-        recording: mockRecording,
+        recording: opts.recording ? mockRecording : null,
       },
     },
   };
