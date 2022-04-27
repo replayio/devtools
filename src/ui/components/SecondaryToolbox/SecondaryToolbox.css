@@ -100,3 +100,17 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
 .secondary-toolbox .splitter {
   background-clip: padding-box;
 }
+
+.secondary-toolbox-right-buttons-container {
+  position: relative;
+  overflow: visible;
+}
+
+.secondary-toolbox-scroll-overflow-gradient {
+  position: absolute;
+  top: 0;
+  left: -2rem;
+  width: 2rem;
+  height: 100%;
+  background-image: linear-gradient(to left, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
