@@ -7,10 +7,7 @@ import {
   createLoadedRegions,
   createSource,
   createValue,
-  sendLoadedRegionsToMockEnvironment,
-  sendMessageToMockEnvironment,
-  sendSourceToMockEnvironment,
-  createPointDescription,
+  sendValuesToMockEnvironment,
 } from "test/testFixtureUtils";
 import {
   createTestStore,
@@ -51,38 +48,26 @@ describe("useConsoleSearch", () => {
     // This is necessary to unblock various event listeners and parsing.
     await ThreadFront.setSessionId(DEFAULT_SESSION_ID);
 
-    sendSourceToMockEnvironment(
+    sendValuesToMockEnvironment(
       createSource({
         kind: "scriptSource",
-      })
-    );
-
-    sendMessageToMockEnvironment(
+      }),
       createConsoleMessage({
         text: "Plain string message",
-      })
-    );
-    sendMessageToMockEnvironment(
+      }),
       createConsoleMessage({
         argumentValues: [
           createValue({ value: 123 }),
           createValue({ value: "string value" }),
           createValue({ value: true }),
         ],
-      })
-    );
-    sendMessageToMockEnvironment(
+      }),
       createConsoleMessage({
         text: "Another string message",
-      })
-    );
-    sendMessageToMockEnvironment(
+      }),
       createConsoleMessage({
         argumentValues: [createValue({ value: "another string value" })],
-      })
-    );
-
-    sendLoadedRegionsToMockEnvironment(
+      }),
       createLoadedRegions({
         beginTime: 0,
         endTime: 1000,

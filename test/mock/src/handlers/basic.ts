@@ -48,6 +48,7 @@ export function basicMessageHandlers(): MockHandlerRecord {
     },
     "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Session.loadedRegions", {
+        indexed: [],
         loaded: [
           {
             begin: { point: "0", time: 0 },
