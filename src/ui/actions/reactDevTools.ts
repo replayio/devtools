@@ -17,9 +17,17 @@ export type ReactDevToolsAction =
 
 export function setupReactDevTools(store: UIStore) {
   ThreadFront.getAnnotations(({ annotations }) => {
+    // TODO We're also getting some other annotations here.
+    // It would be nice if we could ask the backend to filter them for us.
+    const reactDevtoolsAnnotations = annotations.filter(annotation => {
+      // `kind` value per React Devtools code in `gecko-dev`
+      return annotation.kind === "react-devtools-bridge";
+    });
+
     store.dispatch(
+      // TODO This action should be named more specific to the React usage
       addAnnotations(
-        annotations.map(({ point, time, contents }) => ({
+        reactDevtoolsAnnotations.map(({ point, time, contents }) => ({
           point,
           time,
           message: JSON.parse(contents),
