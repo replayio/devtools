@@ -42,6 +42,7 @@ const messageHandlers = {
   ...basicMessageHandlers(),
   "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
     h.emitEvent("Session.loadedRegions", {
+      indexed: [],
       loaded: [
         {
           begin: { point: "50000", time: 50000 },
