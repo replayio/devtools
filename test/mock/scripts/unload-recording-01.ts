@@ -27,7 +27,7 @@ const graphqlMocks = [
   ...createUserSettingsMock(),
   ...createRecordingOwnerUserIdMock({ recordingId, user }),
   ...createGetUserMock({ user }),
-  ...createGetRecordingMock({ recordingId, recording }),
+  ...createGetRecordingMock({ recording, recordingId, user }),
   ...createEmptyCommentsMock({ recordingId }),
   ...createGetActiveSessionsMock({ recordingId }),
 ];
