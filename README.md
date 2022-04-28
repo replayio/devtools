@@ -93,7 +93,6 @@ Replace the paths with the appropriate paths within the `backend` repo as approp
 This project uses [trunk](https://trunk.io) to lint and format its code. Trunk is installed as a dev dependency so you can invoke it as `npx trunk`.
 To learn more about `trunk`, check out the [documentation](https://docs.trunk.io).
 
-
 #### Linting your changes
 
 In most cases you can simply run `trunk check` which will autodetect the changes you have made and lint them.
