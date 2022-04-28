@@ -60,6 +60,10 @@
   cursor: pointer;
 }
 
+.command-palette-search input {
+  border: none;
+}
+
 .source-tab .filename {
   display: block;
   white-space: nowrap;
