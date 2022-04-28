@@ -317,10 +317,6 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
-
-  /* Gradient fade */
-  --tab-bar-gradient-opaque: rgba(230, 230, 230, 1);
-  --tab-bar-gradient-transparent: rgba(230, 230, 230, 0);
 }
 
 /* browser specific tweaks */
@@ -547,10 +543,6 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
-
-  /* Gradient fade */
-  --tab-bar-gradient-opaque: rgba(0, 0, 0, 1);
-  --tab-bar-gradient-transparent: rgba(0, 0, 0, 0);
 }
 
 /* browser specific tweaks */
