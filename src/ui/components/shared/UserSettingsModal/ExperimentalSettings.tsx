@@ -48,6 +48,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
   },
+  {
+    description: "Add prefixes to print statements",
+    key: "unicornConsole",
+    label: "Unicorn console",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
@@ -96,8 +101,8 @@ export default function ExperimentalSettings({}) {
     useFeature("networkRequestComments");
   const { value: enableTenMinuteReplays, update: updateEnableTenMinuteReplays } =
     useFeature("tenMinuteReplays");
-  const { value: enableAdvancedTimeline, update: updateEnableAdvancedTimeline } =
-    useFeature("advancedTimeline");
+  const { value: enableUnicornConsole, update: updateEnableUnicornConsole } =
+    useFeature("unicornConsole");
 
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
@@ -120,6 +125,8 @@ export default function ExperimentalSettings({}) {
       updateCodeHeatMaps(!codeHeatMaps);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
+    } else if (key == "unicornConsole") {
+      updateEnableUnicornConsole(!enableUnicornConsole);
     }
   };
 
@@ -128,8 +135,9 @@ export default function ExperimentalSettings({}) {
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
-    tenMinuteReplays: enableTenMinuteReplays,
     enableResolveRecording,
+    tenMinuteReplays: enableTenMinuteReplays,
+    unicornConsole: enableUnicornConsole,
   };
 
   const settings = { ...userSettings, ...localSettings };

@@ -263,9 +263,9 @@ export function setBreakpointOptions(cx, location, options = {}) {
     trackEvent("breakpoint.edit");
 
     dispatch({
-      type: "SET_BREAKPOINT",
-      cx,
       breakpoint,
+      cx,
+      type: "SET_BREAKPOINT",
     });
 
     await client.setBreakpoint(breakpoint.location, breakpoint.options);

@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+import { Location } from "@recordreplay/protocol";
+import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
 import React from "react";
 import { Dispatch } from "@reduxjs/toolkit";
 import { connect, ConnectedProps } from "react-redux";
@@ -19,28 +21,10 @@ import constants from "devtools/client/webconsole/constants";
 import { StateContext } from "../Search";
 import { Message } from "../../reducers/messages";
 
-function mapStateToProps(state: UIState) {
-  return {
-    // @ts-ignore
-    pausedExecutionPoint: selectors.getExecutionPoint(state),
-    closestMessage: selectors.getClosestMessage(state),
-    messages: selectors.getAllMessagesById(state),
-    visibleMessages: selectors.getVisibleMessages(state),
-    messagesUi: selectors.getAllMessagesUiById(state),
-    timestampsVisible: state.consoleUI.timestampsVisible,
-    playback: selectors.getPlayback(state),
-    hoveredItem: selectors.getHoveredItem(state),
-    loadedRegions: selectors.getLoadedRegions(state),
-    lastMessageId: selectors.getLastMessageId(state),
-    messagesCount: selectors.getTotalMessagesCount(state),
-  };
+function compareLocation(locA: SourceLocation, locB: SourceLocation) {
+  return locA.sourceId == locB.sourceId && locA.line == locB.line && locA.column == locB.column;
 }
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-  openLink: actions.openLink,
-  dispatch,
-});
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 class ConsoleOutput extends React.Component<PropsFromRedux> {
@@ -176,15 +160,15 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
 
   render() {
     let {
+      breakpoints,
+      closestMessage,
       dispatch,
-      visibleMessages,
+      hoveredItem,
       messages,
       messagesUi,
-      timestampsVisible,
       pausedExecutionPoint,
-      closestMessage,
-      hoveredItem,
-      loadedRegions,
+      timestampsVisible,
+      visibleMessages,
     } = this.props;
 
     const messageNodes = visibleMessages.map((messageId, i) => {
@@ -193,21 +177,27 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
       const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
-      return React.createElement(MessageContainer, {
-        dispatch,
-        key: messageId,
-        messageId,
-        message,
-        open: messagesUi.includes(messageId),
-        // TODO Reconsider this when we rebuild message grouping
-        payload: undefined,
-        timestampsVisible,
+      const matchingBreakpoint = breakpoints.find(bp =>
+        compareLocation(message.frame as Location, bp.location)
+      );
 
-        pausedExecutionPoint,
-        isPaused: closestMessage?.id == messageId,
+      const prefixBadge = matchingBreakpoint?.options.prefixBadge;
+
+      return React.createElement(MessageContainer, {
+        // TODO Reconsider this when we rebuild message grouping
+        dispatch,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
+        isPaused: closestMessage?.id == messageId,
         isPrimaryHighlighted,
+        key: messageId,
+        message,
+        messageId,
+        open: messagesUi.includes(messageId),
+        pausedExecutionPoint,
+        payload: undefined,
+        prefixBadge,
         shouldScrollIntoView,
+        timestampsVisible,
       });
     });
 
@@ -225,5 +215,28 @@ function scrollToBottom(node: HTMLElement) {
     node.scrollTop = node.scrollHeight;
   }
 }
+
+function mapStateToProps(state: UIState) {
+  return {
+    // @ts-ignore
+    breakpoints: selectors.getBreakpointsList(state),
+    closestMessage: selectors.getClosestMessage(state),
+    hoveredItem: selectors.getHoveredItem(state),
+    lastMessageId: selectors.getLastMessageId(state),
+    messages: selectors.getAllMessagesById(state),
+    messagesCount: selectors.getTotalMessagesCount(state),
+    messagesUi: selectors.getAllMessagesUiById(state),
+    pausedExecutionPoint: selectors.getExecutionPoint(state),
+    playback: selectors.getPlayback(state),
+    timestampsVisible: state.consoleUI.timestampsVisible,
+    visibleMessages: selectors.getVisibleMessages(state),
+  };
+}
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  dispatch,
+  openLink: actions.openLink,
+});
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
 export default connector(ConsoleOutput);

@@ -2,29 +2,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
-const PropTypes = require("prop-types");
-const dom = require("react-dom-factories");
-const { l10n } = require("devtools/client/webconsole/utils/messages");
-
-const l10nLevels = {
-  error: "level.error",
-  warn: "level.warn",
-  info: "level.info",
-  log: "level.log",
-  debug: "level.debug",
+const levels = {
+  debug: "Debug",
+  error: "Error",
+  info: "Info",
+  log: "Log",
+  warn: "Warn",
 };
 
 // Store common icons so they can be used without recreating the element
 // during render.
-const CONSTANT_ICONS = Object.entries(l10nLevels).reduce((acc, [key, l10nLabel]) => {
+const CONSTANT_ICONS = Object.entries(levels).reduce((acc, [key, l10nLabel]) => {
   acc[key] = getIconElement(l10nLabel);
   return acc;
 }, {});
 
 function getIconElement(level, onRewindClick, type) {
-  let title = l10n.getStr(l10nLevels[level] || level);
+  let title = levels[level] || level;
   const classnames = ["icon"];
 
   if (type === "paywall") {
@@ -32,26 +26,51 @@ function getIconElement(level, onRewindClick, type) {
   }
 
   {
-    return dom.span({
-      className: classnames.join(" "),
-      title,
-      "aria-live": "off",
-    });
+    return <span className={classnames.join(" ")} title={title} aria-live="off" />;
   }
 }
 
-MessageIcon.displayName = "MessageIcon";
-MessageIcon.propTypes = {
-  level: PropTypes.string.isRequired,
-  onRewindClick: PropTypes.function,
-  type: PropTypes.string,
-};
-
-function MessageIcon(props) {
-  const { level, onRewindClick, type } = props;
+export function MessageIcon(props) {
+  const { level, onRewindClick, type, prefixBadge } = props;
 
   if (onRewindClick) {
     return getIconElement(level, onRewindClick, type);
+  }
+
+  if (prefixBadge) {
+    const colors = {
+      blue: "#01ACFD",
+      empty: "none",
+      pink: "#FF87DD",
+      yellow: "#FFE870",
+    };
+
+    if (["pink", "yellow", "blue", "empty"].includes(prefixBadge)) {
+      return (
+        <div
+          style={{
+            backgroundColor: colors[prefixBadge],
+            borderRadius: "8px",
+            height: "16px",
+            marginLeft: "5px",
+            marginRight: "5px",
+            marginTop: "4px",
+            width: "16px",
+          }}
+        />
+      );
+    }
+
+    return (
+      <div
+        className={`img ${prefixBadge}`}
+        style={{
+          marginLeft: "5px",
+          marginRight: "5px",
+          marginTop: "4px",
+        }}
+      ></div>
+    );
   }
 
   if (type) {
@@ -60,5 +79,3 @@ function MessageIcon(props) {
 
   return CONSTANT_ICONS[level] || getIconElement(level);
 }
-
-module.exports = MessageIcon;

@@ -229,6 +229,18 @@ export function addBreakpointAtColumn(cx, location) {
   };
 }
 
+export function setBreakpointPrefixBadge(breakpoint, prefixBadge) {
+  const newBreakpoint = {
+    ...breakpoint,
+    options: { ...breakpoint.options, prefixBadge },
+  };
+
+  return {
+    breakpoint: newBreakpoint,
+    type: "SET_BREAKPOINT",
+  };
+}
+
 function getLogValue(source, state, location) {
   const file = getFilename(source);
   const symbols = getSymbols(state, source);

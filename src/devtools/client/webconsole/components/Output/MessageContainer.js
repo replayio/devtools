@@ -22,17 +22,17 @@ const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/con
 export class MessageContainer extends React.Component {
   static get propTypes() {
     return {
-      messageId: PropTypes.string.isRequired,
-      open: PropTypes.bool.isRequired,
-      payload: PropTypes.object,
-      timestampsVisible: PropTypes.bool,
-      repeat: PropTypes.number,
       badge: PropTypes.number,
       indent: PropTypes.number,
       isPaused: PropTypes.bool.isRequired,
-      pausedExecutionPoint: PropTypes.string,
       isPrimaryHighlighted: PropTypes.bool.isRequired,
+      messageId: PropTypes.string.isRequired,
+      open: PropTypes.bool.isRequired,
+      pausedExecutionPoint: PropTypes.string,
+      payload: PropTypes.object,
+      repeat: PropTypes.number,
       shouldScrollIntoView: PropTypes.bool.isRequired,
+      timestampsVisible: PropTypes.bool,
     };
   }
 
@@ -49,6 +49,7 @@ export class MessageContainer extends React.Component {
       "repeat",
       "open",
       "payload",
+      "prefixBadge",
       "timestampsVisible",
       "isPaused",
       "pausedExecutionPoint",
@@ -105,6 +106,3 @@ function getMessageComponent(message) {
 
   return DefaultRenderer;
 }
-
-// Exported so we can test it with unit tests.
-module.exports.getMessageComponent = getMessageComponent;

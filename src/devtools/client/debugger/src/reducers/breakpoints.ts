@@ -32,8 +32,8 @@ export interface BreakpointsState {
 export function initialBreakpointsState(): BreakpointsState {
   return {
     breakpoints: {},
-    requestedBreakpoints: {},
     breakpointsDisabled: false,
+    requestedBreakpoints: {},
   };
 }
 
