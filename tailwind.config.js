@@ -60,8 +60,8 @@ module.exports = {
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
         lightGrey: "var(--light-grey)",
-        loadingBoxes: "var(--loading-boxes)",
         loadingBackground: "var(--loading-background)",
+        loadingBoxes: "var(--loading-boxes)",
       },
       lineHeight: {
         "comment-text": "1.125rem",
