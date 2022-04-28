@@ -112,5 +112,5 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
   left: -2rem;
   width: 2rem;
   height: 100%;
-  background-image: linear-gradient(to left, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  background-image: linear-gradient(to left, var(--tab-bgcolor), rgba(0, 0, 0, 0));
 }
