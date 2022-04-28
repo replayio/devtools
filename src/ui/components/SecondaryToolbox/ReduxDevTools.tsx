@@ -1,11 +1,17 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { Annotation } from "@recordreplay/protocol";
 import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";
+import { ThreadFront } from "protocol/thread";
 import type {
   UpdateStateRequest,
   SplitMessage,
   PageScriptToContentScriptMessageForwardedToMonitors,
 } from "./redux-devtools/api";
+import {
+  getInitialAnnotations,
+  setAnnotationsReceivedHandler,
+} from "./redux-devtools/redux-annotations";
 interface ReduxDevToolsProps {}
 
 type RDTAppStore = NonNullable<Root["store"]>;
@@ -99,20 +105,37 @@ const createDevtoolsAction = <S, A extends Action<unknown>>(
 
 export const ReduxDevToolsPanel = () => {
   const rootRef = useRef<Root | null>(null);
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   useLayoutEffect(() => {
     const rootComponent = rootRef.current!;
     const store = rootComponent.store!;
 
-    console.log("RDT store state: ", store.getState());
+    const initialAnnotations = getInitialAnnotations();
 
-    receivedActions.forEach(originalRequest => {
-      const action = createDevtoolsAction(1, originalRequest);
-      store.dispatch(action!);
+    const processAnnotations = (annotations: Annotation[]) => {
+      annotations.forEach(annotation => {
+        const message = JSON.parse(annotation.contents);
+        const action = createDevtoolsAction(1, message)!;
+        store.dispatch(action);
+      });
+    };
+
+    processAnnotations(initialAnnotations);
+
+    setAnnotations(initialAnnotations);
+
+    setAnnotationsReceivedHandler(newAnnotations => {
+      processAnnotations(newAnnotations);
+      setAnnotations(existingAnnotations => {
+        return existingAnnotations.concat(newAnnotations);
+      });
     });
 
-    console.log("Updated RDT store state: ", store.getState());
-  });
+    // console.log("RDT store state: ", store.getState());
+
+    // console.log("Updated RDT store state: ", store.getState());
+  }, []);
 
   // @ts-ignore
   return <Root ref={rootRef} />;

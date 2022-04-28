@@ -2,6 +2,7 @@ import { Action } from "redux";
 import { ExecutionPoint } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { Annotation } from "ui/state/reactDevTools";
+import { reduxAnnotationsReceived } from "ui/components/SecondaryToolbox/redux-devtools/redux-annotations";
 import { UIStore, UIThunkAction } from ".";
 
 export type AddAnnotationsAction = Action<"add_annotations"> & { annotations: Annotation[] };
@@ -23,6 +24,17 @@ export function setupReactDevTools(store: UIStore) {
       // `kind` value per React Devtools code in `gecko-dev`
       return annotation.kind === "react-devtools-bridge";
     });
+
+    const reduxDevtoolsAnnotations = annotations.filter(annotation => {
+      // `kind` value per React Devtools code in `gecko-dev`
+      const isReduxAnnotation = annotation.kind === "redux-devtools-bridge";
+      // if (isReduxAnnotation) {
+      //   console.log("Found Redux annotation: ", annotation.kind, JSON.parse(annotation.contents));
+      // }
+      return isReduxAnnotation;
+    });
+
+    reduxAnnotationsReceived(reduxDevtoolsAnnotations);
 
     store.dispatch(
       // TODO This action should be named more specific to the React usage
