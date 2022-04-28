@@ -115,6 +115,10 @@ function InspectorPanel() {
   );
 }
 
+function PanelButtonsScrollOverflowGradient() {
+  return <div className="secondary-toolbox-scroll-overflow-gradient"></div>;
+}
+
 export default function SecondaryToolbox() {
   const selectedPanel = useSelector(getSelectedPanel);
   const recordingTarget = useSelector(getRecordingTarget);
@@ -136,7 +140,8 @@ export default function SecondaryToolbox() {
           hasReactComponents={hasReactComponents}
           toolboxLayout={toolboxLayout}
         />
-        <div className="flex">
+        <div className="secondary-toolbox-right-buttons-container flex">
+          <PanelButtonsScrollOverflowGradient />
           <ShowVideoButton />
           <ToolboxOptions />
         </div>
