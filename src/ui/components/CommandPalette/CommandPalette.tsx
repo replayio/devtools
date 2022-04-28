@@ -81,7 +81,7 @@ const DEFAULT_COMMANDS: readonly CommandKey[] = [
 ] as const;
 
 const COMMAND_HEIGHT = 36;
-const ITEMS_TO_SHOW = 4;
+const ITEMS_TO_SHOW = 7;
 
 function getShownCommands(searchString: string, hasReactComponents: boolean) {
   const { userSettings } = hooks.useGetUserSettings();
@@ -157,7 +157,7 @@ function CommandPalette({
 
   return (
     <div
-      className={`${styles.commandPalleteWrapper} flex w-full flex-col overflow-hidden rounded-md bg-tabBgcolor shadow-xl`}
+      className={`${styles.commandPaletteWrapper} flex w-full flex-col overflow-hidden rounded-md shadow-xl`}
     >
       <div className={`${styles.commandPallete} p-3`}>
         <div className="relative flex items-center text-primaryAccent">

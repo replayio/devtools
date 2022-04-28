@@ -318,9 +318,9 @@
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
 
-  /* Gradient fade */
-  --tab-bar-gradient-opaque: rgba(230, 230, 230, 1);
-  --tab-bar-gradient-transparent: rgba(230, 230, 230, 0);
+  /* Loading screen */
+  --loading-boxes: white;
+  --loading-background: var(--chrome);
 }
 
 /* browser specific tweaks */
@@ -548,9 +548,9 @@
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
 
-  /* Gradient fade */
-  --tab-bar-gradient-opaque: rgba(0, 0, 0, 1);
-  --tab-bar-gradient-transparent: rgba(0, 0, 0, 0);
+  /* Loading screen */
+  --loading-boxes: var(--chrome);
+  --loading-background: var(--theme-base-100);
 }
 
 /* browser specific tweaks */

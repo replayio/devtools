@@ -47,7 +47,7 @@ function FocusingModal({ hideModal }: PropsFromRedux) {
         onClick={hideModal}
       />
       <div
-        className="sharing-modal pointer-events-auto relative flex flex-col space-y-0 overflow-hidden rounded-lg text-sm"
+        className="pointer-events-auto relative flex flex-col space-y-0 overflow-hidden rounded-lg bg-themeBase-90 text-sm"
         style={{ width: "460px" }}
       >
         <div className="space-y-4 p-8">
