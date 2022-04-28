@@ -20,6 +20,7 @@ export type SecondaryPanelName =
   | "inspector"
   | "network"
   | "react-components"
+  | "redux-devtools"
   | "debugger";
 export type PanelName = PrimaryPanelName | SecondaryPanelName;
 export type ToolboxLayout = "ide" | "left" | "bottom";

@@ -7,6 +7,7 @@ import WebConsoleApp from "devtools/client/webconsole/components/App";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import ReactDevtoolsPanel from "./ReactDevTools";
+import { ReduxDevToolsPanel } from "./ReduxDevTools";
 import { UIState } from "ui/state";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { Redacted } from "../Redacted";
@@ -78,6 +79,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout
         </PanelButton>
       )}
       {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
+      <PanelButton panel="redux-devtools">Redux</PanelButton>
       <PanelButton panel="network">Network</PanelButton>
     </div>
   );
@@ -151,6 +153,7 @@ export default function SecondaryToolbox() {
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
         {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
+        {selectedPanel === "redux-devtools" ? <ReduxDevToolsPanel /> : null}
         {toolboxLayout !== "ide" && selectedPanel === "debugger" ? <EditorPane /> : null}
       </Redacted>
     </div>
