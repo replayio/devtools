@@ -51,7 +51,7 @@ export const LoadingTips: FC = () => {
 
   return (
     <div className="h-32 w-96 space-y-8">
-      <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-modalBgcolor px-8 py-4 align-middle text-bodyColor">
+      <div className="bg-loadingBoxes flex max-w-lg items-center space-x-4 rounded-lg px-8 py-4 align-middle text-bodyColor">
         <div className="h-16 w-16">
           <Icon />
         </div>

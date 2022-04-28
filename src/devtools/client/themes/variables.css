@@ -317,6 +317,10 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
+
+  /* Loading screen */
+  --loading-boxes: white;
+  --loading-background: var(--chrome);
 }
 
 /* browser specific tweaks */
@@ -543,6 +547,10 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
+
+  /* Loading screen */
+  --loading-boxes: var(--chrome);
+  --loading-background: var(--theme-base-100);
 }
 
 /* browser specific tweaks */
