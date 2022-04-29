@@ -17,12 +17,29 @@ async function recordBrowser(state, test, testPath, browserName, saveFixture) {
     headless: state.headless,
   });
 
+  const apolloLogs = [];
   const websocketLogs = [];
 
   const context = await browser.newContext();
   const page = await context.newPage();
 
   try {
+    if (state.updateFixtures) {
+      page.on("response", async function onResponse(response) {
+        const url = response.url();
+        if (url.startsWith("https://api.replay.io/v1/graphql")) {
+          const request = response.request();
+          const requestData = request.postDataJSON();
+          const responseData = await response.json();
+          apolloLogs.push({
+            requestData,
+            responseData,
+            url,
+          });
+        }
+      });
+    }
+
     await page.goto(testPath);
     page.on("console", async msg => logs.push(`${test}: ${msg.text()}`));
     page.on("websocket", ws => {
@@ -47,9 +64,14 @@ async function recordBrowser(state, test, testPath, browserName, saveFixture) {
   }
 
   if (state.updateFixtures && saveFixture) {
+    const testName = test.substr(0, test.length - 3);
     fs.writeFileSync(
-      `./test/fixtures/${test.substr(0, test.length - 3)}.json`,
+      `./test/fixtures/${testName}.replay.json`,
       JSON.stringify(websocketLogs, null, 2)
+    );
+    fs.writeFileSync(
+      `./test/fixtures/${testName}.apollo.json`,
+      JSON.stringify(apolloLogs, null, 2)
     );
   }
 

@@ -14,3 +14,4 @@ lint:
         - public
         - src/graphql
         - docs/codebase-notes
+        - test/fixtures
