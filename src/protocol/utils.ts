@@ -1,3 +1,6 @@
+import * as Sentry from "@sentry/browser";
+import { isDevelopment } from "ui/utils/environment";
+
 export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
   return (...args: any[]) => {
     try {
@@ -48,7 +51,11 @@ export function clamp(value: number, min: number, max: number) {
 export function assert(condition: any, msg = "Assertion failed!"): asserts condition {
   if (!condition) {
     console.error(msg);
-    throw new Error(msg);
+    if (isDevelopment()) {
+      throw new Error(msg);
+    } else {
+      Sentry.captureException(new Error(msg));
+    }
   }
 }
 
