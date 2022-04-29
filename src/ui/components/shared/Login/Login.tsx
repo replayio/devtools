@@ -1,11 +1,14 @@
 import { gql } from "@apollo/client";
 import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
+import Services from "devtools/shared/services";
 import { query } from "ui/utils/apolloClient";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
 import { getLoginReferrerParam } from "ui/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
+
+const isOSX = Services.appinfo.OS === "Darwin";
 
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
@@ -187,7 +190,7 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
   return (
     <OnboardingModalContainer theme="light">
       <OnboardingContentWrapper overlay>
-        {global.__IS_RECORD_REPLAY_RUNTIME__ ? (
+        {global.__IS_RECORD_REPLAY_RUNTIME__ && isOSX ? (
           <ReplayBrowserLogin />
         ) : sso ? (
           <SSOLogin onLogin={onLogin} />
