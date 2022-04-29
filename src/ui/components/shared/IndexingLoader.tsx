@@ -2,7 +2,6 @@ import React from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useSelector } from "react-redux";
 import { getIndexingProgress } from "ui/reducers/app";
-import { getViewMode } from "ui/reducers/layout";
 
 export default function IndexingLoader() {
   const progress = useSelector(getIndexingProgress);

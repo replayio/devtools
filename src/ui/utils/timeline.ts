@@ -1,5 +1,6 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
+
 import { timelineMarkerWidth } from "../constants";
 
 // calculate pixel distance from two times
@@ -149,3 +150,18 @@ export function isPointInRegions(regions: TimeStampedPointRange[], point: string
 export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[]): boolean {
   return !!regions?.some(region => time >= region.begin.time && time <= region.end.time);
 }
+
+export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) => {
+  const overlapping: TimeStampedPointRange[] = [];
+  a.forEach(aRegion => {
+    b.forEach(bRegion => {
+      if (aRegion.begin.time <= bRegion.end.time && aRegion.end.time >= bRegion.begin.time) {
+        overlapping.push({
+          begin: aRegion.begin.time > bRegion.begin.time ? aRegion.begin : bRegion.begin,
+          end: aRegion.end.time < bRegion.end.time ? aRegion.end : bRegion.end,
+        });
+      }
+    });
+  });
+  return overlapping;
+};

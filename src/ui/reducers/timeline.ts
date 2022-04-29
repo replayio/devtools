@@ -2,24 +2,22 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { TimelineActions } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { TimelineState } from "ui/state/timeline";
-import { isPointInRegions } from "ui/utils/timeline";
-
-import { getLoadedRegions } from "./app";
+import { isPointInRegions, overlap } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
-    zoomRegion: { startTime: 0, endTime: 0, scale: 1 },
     currentTime: 0,
+    focusRegion: null,
     hoverTime: null,
+    hoveredItem: null,
     playback: null,
     playbackPrecachedTime: 0,
-    unprocessedRegions: [],
-    shouldAnimate: true,
     recordingDuration: null,
-    timelineDimensions: { left: 1, top: 1, width: 1 },
-    hoveredItem: null,
-    focusRegion: null,
+    shouldAnimate: true,
     stalled: false,
+    timelineDimensions: { left: 1, top: 1, width: 1 },
+    unprocessedRegions: [],
+    zoomRegion: { startTime: 0, endTime: 0, scale: 1 },
   };
 }
 
@@ -73,16 +71,6 @@ export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
   (state.timeline.focusRegion.startTime !== 0 ||
     state.timeline.focusRegion.endTime !== state.timeline.zoomRegion.endTime);
-export const getIsInLoadedRegion = (state: UIState) => {
-  const currentPausePoint = getExecutionPoint(state);
-  const loadedRegions = getLoadedRegions(state)?.loaded;
-
-  if (!currentPausePoint || !loadedRegions || loadedRegions.length === 0) {
-    return false;
-  }
-
-  return isPointInRegions(loadedRegions, currentPausePoint);
-};
 export const getIsAtFocusSoftLimit = (state: UIState) => {
   const focusRegion = getFocusRegion(state);
 

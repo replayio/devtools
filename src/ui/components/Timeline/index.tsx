@@ -37,7 +37,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import IndexingLoader from "../shared/IndexingLoader";
 import { EditFocusButton } from "./EditFocusButton";
 import { MouseDownMask } from "./MouseDownMask";
-import OgreTimeline from "../OgreTimeline";
+import ProtocolTimeline from "../ProtocolTimeline";
 
 import NonLoadingRegions from "./NonLoadingRegions";
 
@@ -389,7 +389,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
               onMouseUp={e => this.onPlayerMouseUp(e)}
               onMouseEnter={this.onPlayerMouseEnter}
             >
-              <OgreTimeline />
+              <ProtocolTimeline />
               <div className="progress-line full" />
               <div
                 className="progress-line preview-max"

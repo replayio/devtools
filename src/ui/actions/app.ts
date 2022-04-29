@@ -7,6 +7,7 @@ import {
   Location,
   MouseEvent,
   KeyboardEvent,
+  TimeStampedPointRange,
 } from "@recordreplay/protocol";
 import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";

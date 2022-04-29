@@ -1,3 +1,11 @@
+import { Location } from "@recordreplay/protocol";
+import { createSelector } from "@reduxjs/toolkit";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { AppActions } from "ui/actions/app";
+import { SessionActions } from "ui/actions/session";
+import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { UIState } from "ui/state";
 import {
   AnalysisError,
   AnalysisPayload,
@@ -7,19 +15,13 @@ import {
   ProtocolError,
   ReplayEvent,
 } from "ui/state/app";
-import { AppActions } from "ui/actions/app";
-import { UIState } from "ui/state";
-import { SessionActions } from "ui/actions/session";
-import { Location } from "@recordreplay/protocol";
-import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { isInTrimSpan, isTimeInRegions } from "ui/utils/timeline";
-import { compareBigInt } from "ui/utils/helpers";
-import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
-
-import { getSelectedPanel, getViewMode } from "./layout";
-import { prefs } from "ui/utils/prefs";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
+import { compareBigInt } from "ui/utils/helpers";
+import { prefs } from "ui/utils/prefs";
+import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
+
+import { getSelectedPanel, getViewMode } from "./layout";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -79,7 +81,11 @@ export default function update(
         ...action.parameters.loading.map(r => r.end.time),
         state.recordingDuration
       );
-      return { ...state, loadedRegions: action.parameters, recordingDuration };
+      return {
+        ...state,
+        loadedRegions: action.parameters,
+        recordingDuration,
+      };
     }
 
     case "set_expected_error": {
@@ -260,47 +266,71 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
-export const getIndexingProgress = (state: UIState) => {
-  const regions = getLoadedRegions(state);
 
-  if (!regions) {
-    return null;
-  }
-
-  const { loading, indexed } = regions;
-
-  const indexedProgress = indexed
-    .filter(indexedRegion => {
-      // It's possible for the indexedProgress to not be a subset of
-      // loadingRegions. This acts as a guard if that should happen.
-      // Todo: Investigate this on the backend.
-      return loading.some(
-        loadingRegion =>
-          indexedRegion.begin.time >= loadingRegion.begin.time &&
-          indexedRegion.end.time <= loadingRegion.end.time
-      );
-    })
-    .reduce((sum, region) => sum + (region.end.time - region.begin.time), 0);
-  const loadingProgress = loading.reduce(
-    (sum, region) => sum + (region.end.time - region.begin.time),
-    0
-  );
-
-  return (indexedProgress / loadingProgress) * 100 || 0;
-};
-export const getIsIndexed = (state: UIState) => {
-  return getIndexingProgress(state) === 100;
-};
 export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
+export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loadedRegions => {
+  if (!loadedRegions) {
+    return [];
+  }
+  return overlap(loadedRegions.indexed, loadedRegions.loaded);
+});
+export const getIndexingProgress = createSelector(
+  getLoadedRegions,
+  getIndexedAndLoadedRegions,
+  (regions, indexedAndLoaded) => {
+    if (!regions) {
+      return null;
+    }
+
+    const { loading } = regions;
+
+    const indexedProgress = indexedAndLoaded
+      .filter(region => {
+        // It's possible for the indexedProgress to not be a subset of
+        // loadingRegions. This acts as a guard if that should happen.
+        // Todo: Investigate this on the backend.
+        return loading.some(
+          loadingRegion =>
+            region.begin.time >= loadingRegion.begin.time &&
+            region.end.time <= loadingRegion.end.time
+        );
+      })
+      .reduce((sum, region) => sum + (region.end.time - region.begin.time), 0);
+    const loadingProgress = loading.reduce(
+      (sum, region) => sum + (region.end.time - region.begin.time),
+      0
+    );
+
+    return (indexedProgress / loadingProgress) * 100 || 0;
+  }
+);
+export const getIsIndexed = createSelector(
+  getIndexingProgress,
+  indexingProgress => indexingProgress === 100
+);
+
 export const getNonLoadingTimeRanges = (state: UIState) => {
   const loadingRegions = getLoadedRegions(state)?.loading || [];
   const endTime = getZoomRegion(state).endTime;
 
   return getNonLoadingRegionTimeRanges(loadingRegions, endTime);
 };
+export const getIsInLoadedRegion = createSelector(
+  getLoadedRegions,
+  getExecutionPoint,
+  (regions, currentPausePoint) => {
+    const loadedRegions = regions?.loaded;
+
+    if (!currentPausePoint || !loadedRegions || loadedRegions.length === 0) {
+      return false;
+    }
+
+    return isPointInRegions(loadedRegions, currentPausePoint);
+  }
+);
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;
 export const getSessionId = (state: UIState) => state.app.sessionId;
