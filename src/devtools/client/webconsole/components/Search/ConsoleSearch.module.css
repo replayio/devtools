@@ -4,6 +4,7 @@
   display: flex;
   align-items: center;
   border-top: 1px solid var(--theme-splitter-color);
+  background-color: var(--theme-text-field-bgcolor);
 }
 
 .SearchInput {
