@@ -112,7 +112,7 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
     <form className="new-collaborator-form" onSubmit={handleSubmit}>
       <TextInput placeholder="Email address" value={inputValue} onChange={onChange} data-private />
       {showAutocomplete ? (
-        <div className="autocomplete bg-white">
+        <div className="autocomplete bg-themeTextFieldBgcolor text-themeTextFieldColor">
           <div className="content">{inputValue}</div>
           <AutocompleteAction {...{ status, handleSubmit }} />
         </div>
