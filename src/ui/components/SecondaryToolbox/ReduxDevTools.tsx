@@ -3,7 +3,6 @@ import { Annotation } from "@recordreplay/protocol";
 import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { ThreadFront } from "protocol/thread";
 import type { UIState } from "ui/state";
 import type {
   UpdateStateRequest,
@@ -14,7 +13,6 @@ import {
   getInitialAnnotations,
   setAnnotationsReceivedHandler,
 } from "./redux-devtools/redux-annotations";
-interface ReduxDevToolsProps {}
 
 type RDTAppStore = NonNullable<Root["store"]>;
 
@@ -33,47 +31,7 @@ const chunks: {
   >;
 } = {};
 
-const receivedActions: UpdateStateRequest<RDTAppState, Action>[] = [
-  // {
-  //   type: "INIT_INSTANCE",
-  //   source: "@devtools-page",
-  //   instanceId: 1,
-  // },
-  {
-    type: "STATE",
-    payload: {
-      monitorState: {},
-      nextActionId: 1,
-      stagedActionIds: [0],
-      skippedActionIds: [],
-      currentStateIndex: 0,
-      isLocked: false,
-      isPaused: false,
-    },
-    source: "@devtools-page",
-    instanceId: 1,
-    libConfig: {
-      name: "React Redux App",
-      serialize: false,
-      type: "redux",
-    },
-    actionsById:
-      '{"0":{"type":"PERFORM_ACTION","action":{"type":"@@INIT"},"timestamp":1651171950090}}',
-    computedStates: '[{"state":{"counter":{"value":0}}}]',
-    committedState: false,
-  },
-  {
-    type: "ACTION",
-    payload: '{"counter":{"value":1}}',
-    source: "@devtools-page",
-    instanceId: 1,
-    action:
-      '{"type":"PERFORM_ACTION","action":{"type":"counter/increment"},"timestamp":1651171952106,"stack":"performAction@debugger eval code:293:21\\nliftAction@debugger eval code:500:25\\ndispatch@debugger eval code:957:26\\ncreateSerializableStateInvariantMiddleware/</</<@https://un8my.csb.app/node_modules/@reduxjs/toolkit/dist/redux-toolkit.esm.js:739:26\\nmiddleware/</<@https://un8my.csb.app/node_modules/redux-thunk/es/index.js:13:16\\ncreateImmutableStateInvariantMiddleware/</</<@https://un8my.csb.app/node_modules/@reduxjs/toolkit/dist/redux-toolkit.esm.js:662:36\\ndispatch@debugger eval code:10430:80\\nonClick@https://un8my.csb.app/src/features/counter/Counter.js:52:28\\ncallCallback@https://un8my.csb.app/node_modules/react-dom/cjs/react-dom.development.js:188:14\\ninvokeGuardedCallbackDev@https://un8my.csb.app/node_modules/react-dom/cjs/react-dom.development.js:237:16\\ninvokeGuardedCallback@https://un8my.csb.app/node_modules/react-dom/cjs/react-dom.development.js:292:31\\ninvokeGuardedCallbackAndCatchFirstError@https://un8my.csb.app/node_modules/react-dom/cjs/react-dom.development.js:306:25\\nexecuteDispatch@https://un8my.csb.app/node_modules/react-dom/cjs/react-dom.development.js:389:42"}',
-    maxAge: 50,
-    nextActionId: 2,
-  },
-];
-
+// Copied from the guts of the RDT extension logic
 const createDevtoolsAction = <S, A extends Action<unknown>>(
   tabId: number,
   request: UpdateStateRequest<S, A> | SplitMessage
@@ -102,7 +60,6 @@ const createDevtoolsAction = <S, A extends Action<unknown>>(
   }
 
   return action;
-  // window.store.dispatch(action);
 };
 
 export const ReduxDevToolsPanel = () => {
@@ -124,27 +81,22 @@ export const ReduxDevToolsPanel = () => {
   useLayoutEffect(() => {
     const initialAnnotations = getInitialAnnotations();
 
-    // processAnnotations(initialAnnotations);
-
     setAnnotations(initialAnnotations);
 
+    // Replace the setter in the other module so any future additions
+    // get redirected to this component's state
     setAnnotationsReceivedHandler(newAnnotations => {
       processAnnotations(newAnnotations);
       setAnnotations(existingAnnotations => {
         return existingAnnotations.concat(newAnnotations);
       });
     });
-
-    // console.log("RDT store state: ", store.getState());
-
-    // console.log("Updated RDT store state: ", store.getState());
   }, []);
 
   useLayoutEffect(() => {
     const rootComponent = rootRef.current!;
     const store = rootComponent.store!;
 
-    // console.log("Current execution point: ", executionPoint);
     const matchingAnnotationsByTimeRange = annotations.filter(annotation => {
       return currentTimestamp != null && annotation.time < currentTimestamp;
     });
@@ -159,9 +111,12 @@ export const ReduxDevToolsPanel = () => {
       },
     });
 
+    // TODO We ought to be able to do the JSON parsing once ahead of time
     processAnnotations(matchingAnnotationsByTimeRange);
+
+    // TODO This only gets updated when we actually _pause_, not during playback.
   }, [currentTimestamp, annotations]);
 
-  // @ts-ignore
+  // @ts-ignore Weird ref type error
   return <Root ref={rootRef} />;
 };
