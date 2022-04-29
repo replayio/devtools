@@ -2,7 +2,9 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import { Annotation } from "@recordreplay/protocol";
 import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";
+import { useSelector } from "react-redux";
 import { ThreadFront } from "protocol/thread";
+import type { UIState } from "ui/state";
 import type {
   UpdateStateRequest,
   SplitMessage,
@@ -106,22 +108,23 @@ const createDevtoolsAction = <S, A extends Action<unknown>>(
 export const ReduxDevToolsPanel = () => {
   const rootRef = useRef<Root | null>(null);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const currentTimestamp = useSelector((state: UIState) => state.messages.pausedExecutionPointTime);
 
-  useLayoutEffect(() => {
+  const processAnnotations = (annotations: Annotation[]) => {
     const rootComponent = rootRef.current!;
     const store = rootComponent.store!;
 
+    annotations.forEach(annotation => {
+      const message = JSON.parse(annotation.contents);
+      const action = createDevtoolsAction(1, message)!;
+      store.dispatch(action);
+    });
+  };
+
+  useLayoutEffect(() => {
     const initialAnnotations = getInitialAnnotations();
 
-    const processAnnotations = (annotations: Annotation[]) => {
-      annotations.forEach(annotation => {
-        const message = JSON.parse(annotation.contents);
-        const action = createDevtoolsAction(1, message)!;
-        store.dispatch(action);
-      });
-    };
-
-    processAnnotations(initialAnnotations);
+    // processAnnotations(initialAnnotations);
 
     setAnnotations(initialAnnotations);
 
@@ -136,6 +139,28 @@ export const ReduxDevToolsPanel = () => {
 
     // console.log("Updated RDT store state: ", store.getState());
   }, []);
+
+  useLayoutEffect(() => {
+    const rootComponent = rootRef.current!;
+    const store = rootComponent.store!;
+
+    // console.log("Current execution point: ", executionPoint);
+    const matchingAnnotationsByTimeRange = annotations.filter(annotation => {
+      return currentTimestamp != null && annotation.time < currentTimestamp;
+    });
+
+    // TODO THIS IS A TERRIBLE IDEA COME UP WITH SOMETHING BETTER AND YET THIS WORKS
+    // Seemingly reset the DevTools internal knowledge of actions,
+    // so we can re-send in all actions up to this point in the recording
+    store.dispatch({
+      type: "devTools/UPDATE_STATE",
+      request: {
+        type: "LIFTED",
+      },
+    });
+
+    processAnnotations(matchingAnnotationsByTimeRange);
+  }, [currentTimestamp, annotations]);
 
   // @ts-ignore
   return <Root ref={rootRef} />;
