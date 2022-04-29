@@ -7,6 +7,8 @@ import { setLoadingFinished, setModal } from "ui/actions/app";
 import { Recording } from "ui/types";
 import { getRecordingURL } from "ui/utils/recording";
 
+import App from "../App";
+
 const useRouter = jest.spyOn(require("next/router"), "useRouter");
 
 describe("AppModal", () => {
@@ -35,7 +37,6 @@ describe("AppModal", () => {
   });
 
   it("Escape key should dismiss the app modal", async () => {
-    const App = require("ui/components/App").default;
     const { findByText } = await render(<App />, {
       graphqlMocks,
       store,

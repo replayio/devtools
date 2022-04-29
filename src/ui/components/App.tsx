@@ -185,6 +185,6 @@ const connector = connect(
     hideModal: actions.hideModal,
   }
 );
-export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
+export type AppProps = ConnectedProps<typeof connector> & { children?: ReactNode };
 
 export default connector(App);
