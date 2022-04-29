@@ -3,11 +3,12 @@ import * as rtl from "@testing-library/react";
 import type { RenderOptions } from "@testing-library/react";
 import { ThreadFront } from "protocol/thread";
 import React, { PropsWithChildren } from "react";
+import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
-import type { UIState } from "ui/state";
 import type { UIStore } from "ui/actions";
-import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
+import { bootstrapStore } from "ui/setup/store";
+import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
 
 import {
@@ -83,6 +84,7 @@ export const filterCommonTestWarnings = () => {
 // future dependencies, such as wanting to test with react-router, you can extend
 // this interface to accept a path and route and use those in a <MemoryRouter />
 interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
+  graphqlMocks?: any[];
   preloadedState?: Partial<UIState>;
   store?: UIStore;
 }
@@ -96,22 +98,38 @@ export async function createTestStore(preloadedState: Partial<UIState> = {}) {
 
 async function render(
   ui: React.ReactElement,
-  { preloadedState = {}, store, ...renderOptions }: ExtendedRenderOptions = {}
+  {
+    graphqlMocks: graphqlMockOverrides,
+    preloadedState = {},
+    store,
+    ...renderOptions
+  }: ExtendedRenderOptions = {}
 ) {
   if (!store) {
     // Can't await as a param initializer
     store = await createTestStore(preloadedState);
   }
+
+  const mocks = graphqlMockOverrides || graphqlMocks;
+
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
     return (
       <Provider store={store!}>
-        <MockedProvider mocks={graphqlMocks} addTypename={false}>
+        <MockedProvider mocks={mocks} addTypename={false}>
           {children}
         </MockedProvider>
       </Provider>
     );
   }
-  return { store, ...rtl.render(ui, { wrapper: Wrapper, ...renderOptions }) };
+
+  const rtlData = rtl.render(ui, { wrapper: Wrapper, ...renderOptions });
+
+  // Give the Apollo client time to load and resolve its requests.
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  });
+
+  return { store, ...rtlData };
 }
 
 // re-export everything

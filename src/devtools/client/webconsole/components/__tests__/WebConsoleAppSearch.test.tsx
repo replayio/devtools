@@ -18,7 +18,7 @@ describe("WebConsoleApp search", () => {
   let store: UIStore = null as unknown as UIStore;
 
   beforeEach(async () => {
-    store = await loadFixtureData("console_messages");
+    store = (await loadFixtureData("console_messages")).store;
   });
 
   it("Can search for console messages", async () => {
