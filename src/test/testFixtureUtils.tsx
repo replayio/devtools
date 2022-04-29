@@ -213,9 +213,7 @@ export async function loadFixtureData(
       const mock = {
         request: {
           operationName: requestData.operationName,
-          query: gql`
-            ${requestData.query}
-          `,
+          query: gql(requestData.query),
           variables: requestData.variables,
         },
         result: responseData,
