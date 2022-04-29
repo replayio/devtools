@@ -1,17 +1,18 @@
 import { BodyData } from "@recordreplay/protocol";
 
-// These are the types that we know how to display The functions in this file
-// have two jobs:
-// 1. Map the entire world of content types (see
-// http://www.iana.org/assignments/media-types/media-types.xhtml) onto the small
-// number of things that we know how to display
-// 2. When neccessary, change the form that we are holding that content in so
-// that we will be able to display it
+// These are the body types that we know how to display.
+// The functions in this file have two jobs:
+//   1. Map the entire world of content types (see
+//   http://www.iana.org/assignments/media-types/media-types.xhtml) onto the
+//   small number of things that we know how to display
+//   2. When neccessary, change the form of that content so that we will be able
+//   to display it
 
 export enum Displayable {
+  Image,
   JSON,
-  Text,
   Raw,
+  Text,
 }
 
 export type JSONBody = {
@@ -25,7 +26,7 @@ export type JSONBody = {
 
 export type RawBody = {
   as: Displayable.Raw;
-  content: ArrayBuffer[];
+  content: Uint8Array;
   contentType: string;
 };
 
@@ -35,8 +36,13 @@ export type TextBody = {
   contentType: string;
 };
 
-// Here we will probably eventually add stuff like Image.
-export type DisplayableBody = JSONBody | RawBody | TextBody;
+export type ImageBody = {
+  as: Displayable.Image;
+  content: string; // base64 you can feed into a `src` attribute
+  contentType: string;
+};
+
+export type DisplayableBody = JSONBody | RawBody | TextBody | ImageBody;
 
 const TEXTISH_CONTENT_TYPES = [
   "application/javascript",
@@ -47,42 +53,60 @@ const TEXTISH_CONTENT_TYPES = [
   "image/svg+xml",
 ];
 
+const withoutCharset = (contentType: string) => contentType.split(";")[0];
+
 export const shouldTryAndTurnIntoText = (contentType: string): boolean => {
-  const withoutCharset = contentType.split(";")[0];
-  if (withoutCharset.startsWith("text")) {
+  if (contentType.startsWith("text")) {
     return true;
   }
-  if (TEXTISH_CONTENT_TYPES.includes(withoutCharset)) {
+  if (TEXTISH_CONTENT_TYPES.includes(withoutCharset(contentType))) {
     return true;
   }
   return false;
 };
 
-export const Base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+const shouldTryAndConvertToImage = (contentType: string) => contentType.startsWith("image");
+
+const Base64ToUInt8Array = (base64: string): Uint8Array => {
   var binaryString = atob(base64);
   var len = binaryString.length;
   var bytes = new Uint8Array(len);
   for (var i = 0; i < len; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  return bytes.buffer;
+  return bytes;
 };
 
-export const BodyPartsToArrayBuffer = (bodyParts: BodyData[], contentType: string): RawBody => {
+export const BodyPartsToUInt8Array = (bodyParts: BodyData[], contentType: string): RawBody => {
+  let combined = new Uint8Array(bodyParts.reduce((acc, x) => acc + x.length, 0));
+  for (const part of bodyParts) {
+    combined.set(Base64ToUInt8Array(part.value), part.offset);
+  }
   return {
     as: Displayable.Raw,
-    content: bodyParts.map(p => p.value).map(Base64ToArrayBuffer),
+    content: combined,
     contentType,
   };
 };
 
-let utf8decoder = new TextDecoder();
+export const RawToImageMaybe = (input: DisplayableBody): DisplayableBody => {
+  if (input.as === Displayable.Raw && shouldTryAndConvertToImage(input.contentType)) {
+    return {
+      as: Displayable.Image,
+      content: Buffer.from(input.content).toString("base64"),
+      contentType: input.contentType,
+    };
+  } else {
+    return input;
+  }
+};
+
 export const RawToUTF8 = (input: DisplayableBody): DisplayableBody => {
   if (input.as === Displayable.Raw && shouldTryAndTurnIntoText(input.contentType)) {
     return {
       ...input,
       as: Displayable.Text,
-      content: utf8decoder.decode(...input.content),
+      content: new TextDecoder().decode(input.content.buffer),
     };
   } else {
     return input;

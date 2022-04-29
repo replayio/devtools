@@ -2,7 +2,6 @@ const os = require("os");
 const path = require("path");
 const fs = require("fs");
 
-console.log(process.env);
 const defaultState = {
   uploadDestination: "https://app.replay.io",
   testingServer: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080",
@@ -29,6 +28,7 @@ const defaultState = {
   skippedTests: process.env.SKIPPED_TESTS,
   testTimeout: 240,
   longTimeout: false,
+  updateWebsocketLogs: false,
 
   // Runtime state
   count: 1,
@@ -52,6 +52,7 @@ const usage = `
     --target TARGET: Only run tests using given TARGET
     --server ADDRESS: Set server to connect to (default wss://dispatch.replay.io).
     --long-timeout: Use longer timeouts when running tests.
+    --update-fixtures: Update fixture data used by Jest tests.
 `;
 function processArgs(state, argv) {
   for (let i = 2; i < argv.length; i++) {
@@ -71,6 +72,9 @@ function processArgs(state, argv) {
         break;
       case "--record-examples":
         state.shouldRecordExamples = true;
+        break;
+      case "--update-fixtures":
+        state.updateFixtures = true;
         break;
       case "--timeout":
         state.testTimeout = +argv[++i];
@@ -119,10 +123,16 @@ function validateState(state) {
 
 function bootstrap(argv) {
   let state = { ...defaultState };
+  if (process.env.CI) {
+    console.log(process.env);
+  }
+
   processArgs(state, argv);
   processEnvironmentVariables(state);
   validateState(state);
-  console.log(state);
+  if (process.env.CI) {
+    console.log(state);
+  }
   return state;
 }
 

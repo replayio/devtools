@@ -7,7 +7,6 @@ import { Comment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { commentKey } from "ui/utils/comments";
 
 export default function Transcript() {
   const recordingId = hooks.useGetRecordingId();
@@ -19,15 +18,13 @@ export default function Transcript() {
   const { isAuthenticated } = useAuth0();
 
   const displayedComments = useMemo(() => {
-    const displayedComments: Comment[] = [...comments].filter(
-      comment => !pendingComment || commentKey(comment) != commentKey(pendingComment.comment)
-    );
+    const clonedComments: Comment[] = [...comments];
 
     if (pendingComment?.type == "new_comment") {
-      displayedComments.push(pendingComment.comment);
+      clonedComments.push(pendingComment.comment);
     }
 
-    const sortedComments = sortBy(displayedComments, ["point", "createdAt"]);
+    const sortedComments = sortBy(clonedComments, ["point", "createdAt"]);
     return sortedComments;
   }, [comments, pendingComment]);
 
@@ -44,11 +41,7 @@ export default function Transcript() {
         {displayedComments.length > 0 ? (
           <div className="w-full flex-grow overflow-auto bg-bodyBgcolor">
             {displayedComments.map(comment => (
-              <CommentCard
-                comments={displayedComments}
-                comment={comment}
-                key={commentKey(comment)}
-              />
+              <CommentCard key={comment.id} comments={displayedComments} comment={comment} />
             ))}
           </div>
         ) : (

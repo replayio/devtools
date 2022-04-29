@@ -13,6 +13,7 @@
   background: var(--theme-toggle-bgcolor);
   border: 1px solid var(--theme-toggle-bgcolor);
   position: relative;
+  user-select: none;
 }
 
 .view-toggle .handle {

@@ -89,6 +89,7 @@ export default function LineNumberTooltip({
   const hitCounts = useSelector(getHitCountsForSelectedSource);
   const source = useSelector(getSelectedSource);
   const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
+  const breakpoints = useSelector(selectors.getBreakpointsList);
 
   let analysisPointsCount: number | undefined;
 
@@ -157,6 +158,17 @@ export default function LineNumberTooltip({
       trackEvent("breakpoint.preview_hits", { hitsCount: analysisPointsCount || null });
     }
   }, [analysisPointsCount]);
+
+  if (
+  breakpoints.some(
+    b =>
+      !b.disabled &&
+      b.location.sourceId === source?.id &&
+      b.location.line === lastHoveredLineNumber.current
+  )
+  ) {
+    return null;
+  }
 
   if (!targetNode || isMetaActive) {
     return null;

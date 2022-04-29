@@ -36,13 +36,15 @@ import {
   responseBodyData,
   requestBodyData,
 } from "@recordreplay/protocol";
-import { client, log, addEventListener, sendMessage } from "../socket";
-import { defer, assert, EventEmitter, ArrayMap } from "../utils";
-import { MappedLocationCache } from "../mapped-location-cache";
-import { ValueFront } from "./value";
-import { Pause } from "./pause";
 import uniqueId from "lodash/uniqueId";
 import { repaint } from "protocol/graphics";
+
+import { MappedLocationCache } from "../mapped-location-cache";
+import { client, log, addEventListener, sendMessage } from "../socket";
+import { defer, assert, EventEmitter, ArrayMap } from "../utils";
+
+import { Pause } from "./pause";
+import { ValueFront } from "./value";
 
 declare global {
   interface Window {
@@ -60,6 +62,7 @@ export interface Source {
   kind: SourceKind;
   url?: string;
   generatedSourceIds?: SourceId[];
+  contentHash?: string;
 }
 
 export interface PauseEventArgs {
@@ -231,6 +234,7 @@ class _ThreadFront {
 
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
+    assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
 
     if (window.app.prefs.listenForMetrics) {
@@ -308,6 +312,10 @@ class _ThreadFront {
     await client.Session.findAnnotations({}, sessionId);
   }
 
+  getRecordingTarget(): Promise<RecordingTarget> {
+    return this.recordingTargetWaiter.promise;
+  }
+
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
     log(`TimeWarp ${point}`);
 
@@ -360,8 +368,8 @@ class _ThreadFront {
       this.allSourcesWaiter.resolve();
     });
     client.Debugger.addNewSourceListener(source => {
-      let { sourceId, kind, url, generatedSourceIds } = source;
-      this.sources.set(sourceId, { kind, url, generatedSourceIds });
+      let { sourceId, kind, url, generatedSourceIds, contentHash } = source;
+      this.sources.set(sourceId, { contentHash, generatedSourceIds, kind, url });
       if (url) {
         this.urlSources.add(url, sourceId);
       }
@@ -924,7 +932,7 @@ class _ThreadFront {
   }
 
   async findConsoleMessages(
-    onConsoleMessage: (pause: Pause, message: Message) => void,
+    onConsoleMessage: (pause: Pause, message: WiredMessage) => void,
     onConsoleOverflow: () => void
   ) {
     const sessionId = await this.waitForSession();
@@ -956,7 +964,7 @@ class _ThreadFront {
       if (message.sourceId) {
         message.sourceId = this.getCorrespondingSourceIds(message.sourceId)[0];
       }
-      onConsoleMessage(pause, message);
+      onConsoleMessage(pause, message as WiredMessage);
     });
 
     return messagesLoaded;
@@ -1278,21 +1286,51 @@ class _ThreadFront {
 
       const groups = this.getChosenSourceIdsForUrl(source.url);
       assert(groups.length > 0, "no chosen sourceIds found for URL");
-      const sourceIds = groups.map(group => group.sourceId);
-      for (const sourceId of sourceIds) {
-        this.correspondingSourceIds.set(sourceId, sourceIds);
+      const sourceIdGroups = this.groupByContentHash(groups.map(group => group.sourceId));
+      for (const sourceIdGroup of sourceIdGroups.values()) {
+        for (const sourceId of sourceIdGroup) {
+          this.correspondingSourceIds.set(sourceId, sourceIdGroup);
+        }
       }
-      const alternateIds = groups
-        .map(group => group.alternateId)
-        .filter((alternateId): alternateId is SourceId => !!alternateId);
-      for (const alternateId of alternateIds) {
-        this.correspondingSourceIds.set(alternateId, alternateIds);
+      const alternateIdGroups = this.groupByContentHash(
+        groups
+          .map(group => group.alternateId)
+          .filter((alternateId): alternateId is SourceId => !!alternateId)
+      );
+      for (const alternateIdGroup of alternateIdGroups.values()) {
+        for (const alternateId of alternateIdGroup) {
+          this.correspondingSourceIds.set(alternateId, alternateIdGroup);
+        }
       }
 
       if (!this.correspondingSourceIds.has(sourceId)) {
         this.correspondingSourceIds.set(sourceId, [sourceId]);
       }
     }
+  }
+
+  private groupByContentHash(sourceIds: SourceId[]): Map<string, SourceId[]> {
+    const sourceIdsByHash = new ArrayMap<string, SourceId>();
+    for (const sourceId of sourceIds) {
+      const source = this.sources.get(sourceId);
+      assert(source, "no source found for sourceId");
+      let hash = source?.contentHash || "";
+      // source.contentHash is not set for pretty-printed sources, we use
+      // the contentHash of the minified version instead
+      if (source.kind === "prettyPrinted") {
+        assert(
+          source.generatedSourceIds?.length === 1,
+          "a pretty-printed source should have exactly one generated source"
+        );
+        const minifiedSource = this.sources.get(source.generatedSourceIds?.[0]);
+        assert(minifiedSource?.contentHash, "no contentHash found for minified source");
+        hash = "minified:" + minifiedSource?.contentHash;
+      } else {
+        assert(hash, "no contentHash found for source that is not pretty-printed");
+      }
+      sourceIdsByHash.add(hash, sourceId);
+    }
+    return sourceIdsByHash.map;
   }
 
   getCorrespondingSourceIds(sourceId: SourceId) {

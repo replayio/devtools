@@ -13,7 +13,7 @@ function FullViewportWrapper({
   return (
     <main
       className={classNames(
-        "fixed z-50 flex h-full w-full items-center justify-center bg-chrome",
+        "bg-loadingBackground fixed z-50 flex h-full w-full items-center justify-center",
         classnames
       )}
     >

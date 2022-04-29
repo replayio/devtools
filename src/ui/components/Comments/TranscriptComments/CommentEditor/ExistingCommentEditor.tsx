@@ -22,15 +22,17 @@ const LoomComment = connect(null, { setModal: actions.setModal })(
 type ExistingCommentEditorProps = {
   data: CommentData;
   isEditing: boolean;
-  setIsEditing: (isEditing: boolean) => void;
+  isUpdating: boolean;
   onSubmit: (data: CommentData, inputValue: string) => void;
+  setIsEditing: (isEditing: boolean) => void;
 };
 
 function ExistingCommentEditor({
-  isEditing,
-  setIsEditing,
   data,
+  isEditing,
+  isUpdating,
   onSubmit,
+  setIsEditing,
 }: ExistingCommentEditorProps) {
   const { comment } = data;
   const { userId } = useGetUserId();
@@ -50,6 +52,7 @@ function ExistingCommentEditor({
     >
       <CommentEditor
         editable={isEditing}
+        disabled={isUpdating}
         comment={comment}
         handleSubmit={inputValue => {
           setIsEditing(false);

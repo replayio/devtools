@@ -87,6 +87,7 @@
   --grey-10-a20: rgba(249, 249, 250, 0.2);
   --grey-10-a25: rgba(249, 249, 250, 0.25);
   --grey-10-a30: rgba(249, 249, 250, 0.3);
+  --grey-10-a40: rgba(249, 249, 250, 0.4);
   --grey-20: #ededf0;
   --grey-25: #e0e0e2;
   --grey-30: #d7d7db;
@@ -181,9 +182,9 @@
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
-  --breakpoint-arrow: var(--theme-comment);
-  --breakpoint-editfield-active: #fff;
-  --breakpoint-editfield-hover: var(--theme-text-field-bgcolor);
+  --breakpoint-arrow: var(--theme-base-60);
+  --breakpoint-editfield-active: var(--theme-base-100);
+  --breakpoint-editfield-hover: var(--theme-base-100);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: var(--theme-highlight-purple);
@@ -316,6 +317,10 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
+
+  /* Loading screen */
+  --loading-boxes: white;
+  --loading-background: var(--chrome);
 }
 
 /* browser specific tweaks */
@@ -410,9 +415,9 @@
 
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);
-  --breakpoint-arrow: #fff;
-  --breakpoint-editfield-active: var(--theme-base-95);
-  --breakpoint-editfield-hover: var(--theme-base-90);
+  --breakpoint-arrow: var(--theme-base-60);
+  --breakpoint-editfield-active: var(--console-message-background);
+  --breakpoint-editfield-hover: var(--console-message-background);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: #fff;
@@ -542,6 +547,10 @@
   --replaying-paused-marker-fill: var(--secondary-accent);
   --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
+
+  /* Loading screen */
+  --loading-boxes: var(--chrome);
+  --loading-background: var(--theme-base-100);
 }
 
 /* browser specific tweaks */

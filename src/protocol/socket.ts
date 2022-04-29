@@ -1,4 +1,3 @@
-import { defer, makeInfallible } from "./utils";
 import {
   ProtocolClient,
   EventMethods,
@@ -9,13 +8,15 @@ import {
   CommandParams,
   CommandResult,
 } from "@recordreplay/protocol";
-import { setUnexpectedError } from "ui/actions/session";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { Action, Dispatch } from "redux";
-import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
+import { setUnexpectedError } from "ui/actions/session";
 import { UnexpectedError } from "ui/state/app";
-import { requiresWindow } from "../ssr";
+import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import { endMixpanelSession } from "ui/utils/mixpanel";
+
+import { requiresWindow } from "../ssr";
+
+import { makeInfallible } from "./utils";
 
 interface Message {
   id: number;
@@ -31,10 +32,25 @@ let gSocketOpen = false;
 let gPendingMessages: Message[] = [];
 let gNextMessageId = 1;
 
+type CommandResponse =
+  | {
+      id: number;
+      result: unknown;
+      error?: undefined;
+    }
+  | {
+      id: number;
+      result?: undefined;
+      error: {
+        code: number;
+        message: string;
+        data?: unknown;
+      };
+    };
+
 interface MessageWaiter {
   method: string;
-  resolve: (value: any) => void;
-  reject: (reason: any) => void;
+  resolve: (value: CommandResponse) => void;
 }
 
 const gMessageWaiters = new Map<number, MessageWaiter>();
@@ -93,7 +109,7 @@ export function sendMessage<M extends CommandMethods>(
   pauseId?: PauseId
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
-  const msg = { id, sessionId, pauseId, method, params };
+  const msg = { id, method, params, pauseId, sessionId };
 
   if (gSocketOpen) {
     doSend(msg);
@@ -101,10 +117,21 @@ export function sendMessage<M extends CommandMethods>(
     gPendingMessages.push(msg);
   }
 
-  const { promise, resolve, reject } = defer<any>();
-  gMessageWaiters.set(id, { method, resolve, reject });
+  return new Promise<CommandResponse>(resolve => gMessageWaiters.set(id, { method, resolve })).then(
+    response => {
+      if (response.error) {
+        const { code, data, message } = response.error;
+        console.warn("Message failed", method, { code, id, message }, data);
 
-  return promise;
+        const err = new Error(message) as any;
+        err.name = "CommandError";
+        err.code = code;
+        throw err;
+      }
+
+      return response.result as any;
+    }
+  );
 }
 
 const doSend = makeInfallible(msg => {
@@ -142,9 +169,9 @@ export function removeEventListener<M extends EventMethods>(event: M) {
 }
 
 export const client = new ProtocolClient({
-  sendCommand: sendMessage,
   addEventListener,
   removeEventListener,
+  sendCommand: sendMessage,
 });
 
 function onSocketMessage(evt: MessageEvent<any>) {
@@ -153,17 +180,12 @@ function onSocketMessage(evt: MessageEvent<any>) {
   const msg = JSON.parse(evt.data);
 
   if (msg.id) {
-    const { method, resolve, reject } = gMessageWaiters.get(msg.id)!;
+    const { method, resolve } = gMessageWaiters.get(msg.id)!;
     window.performance?.mark(`${method}_end`);
     window.performance?.measure(method, `${method}_start`, `${method}_end`);
 
     gMessageWaiters.delete(msg.id);
-    if (msg.error) {
-      console.warn("Message failed", method, msg.error, msg.data);
-      reject(msg.error);
-    } else {
-      resolve(msg.result);
-    }
+    resolve(msg);
   } else if (gEventListeners.has(msg.method)) {
     const handler = gEventListeners.get(msg.method)!;
     handler(msg.params);
@@ -181,9 +203,9 @@ export function triggerEvent(method: string, params: any) {
 export function getDisconnectionError(): UnexpectedError {
   endMixpanelSession("disconnected");
   return {
-    message: "Ready when you are!",
-    content: "Replays disconnect after 5 minutes to reduce server load.",
     action: "refresh",
+    content: "Replays disconnect after 5 minutes to reduce server load.",
+    message: "Ready when you are!",
   };
 }
 
@@ -208,19 +230,19 @@ function onSocketError(evt: Event, initial: boolean): UIThunkAction {
     if (initial) {
       dispatch(
         setUnexpectedError({
-          message: "Unable to establish socket connection",
+          action: "refresh",
           content:
             "A connection to our server could not be established. Please check your connection.",
-          action: "refresh",
+          message: "Unable to establish socket connection",
           ...evt,
         })
       );
     } else if (Date.now() - lastReceivedMessageTime < 300000) {
       dispatch(
         setUnexpectedError({
-          message: "Unexpected socket error",
-          content: "The socket has closed due to an error. Please refresh the page.",
           action: "refresh",
+          content: "The socket has closed due to an error. Please refresh the page.",
+          message: "Unexpected socket error",
           ...evt,
         })
       );
@@ -248,9 +270,9 @@ if (typeof window === "object") {
     }));
     return {
       messages,
-      time: Date.now() - gStartTime,
-      sent: gSentBytes,
       received: gReceivedBytes,
+      sent: gSentBytes,
+      time: Date.now() - gStartTime,
     };
   };
 

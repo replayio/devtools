@@ -1,66 +1,24 @@
-import { RecordingId } from "@recordreplay/protocol";
 import { gql, useMutation } from "@apollo/client";
-import { GET_COMMENTS } from "ui/graphql/comments";
 import { DeleteCommentReply, DeleteCommentReplyVariables } from "graphql/DeleteCommentReply";
 
 export default function useDeleteCommentReply() {
-  const [deleteCommentReply, { error }] = useMutation<
-    DeleteCommentReply,
-    DeleteCommentReplyVariables
-  >(
+  const [deleteCommentReply] = useMutation<DeleteCommentReply, DeleteCommentReplyVariables>(
     gql`
       mutation DeleteCommentReply($commentReplyId: ID!) {
         deleteCommentReply(input: { id: $commentReplyId }) {
           success
         }
       }
-    `
+    `,
+    {
+      refetchQueries: ["GetComments"],
+    }
   );
 
-  if (error) {
-    console.error("Apollo error while deleting a comment's reply:", error);
-  }
-
-  return (commentReplyId: string, recordingId: RecordingId) => {
-    deleteCommentReply({
+  return async (commentReplyId: string) => {
+    return deleteCommentReply({
+      awaitRefetchQueries: true,
       variables: { commentReplyId },
-      optimisticResponse: {
-        deleteCommentReply: { success: true, __typename: "DeleteCommentReply" },
-      },
-      update: cache => {
-        const data: any = cache.readQuery({
-          query: GET_COMMENTS,
-          variables: { recordingId },
-        });
-
-        const parentComment = data.recording.comments.find((c: any) =>
-          c.replies.find((r: any) => r.id === commentReplyId)
-        );
-        if (!parentComment) {
-          return;
-        }
-
-        const newParentComment = {
-          ...parentComment,
-          replies: parentComment.replies.filter((r: any) => r.id !== commentReplyId),
-        };
-        const newData = {
-          ...data,
-          recording: {
-            ...data.recording,
-            comments: [
-              ...data.recording.comments.filter((c: any) => c.id !== parentComment.id),
-              newParentComment,
-            ],
-          },
-        };
-
-        cache.writeQuery({
-          query: GET_COMMENTS,
-          variables: { recordingId },
-          data: newData,
-        });
-      },
     });
   };
 }

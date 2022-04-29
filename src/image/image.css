@@ -308,6 +308,9 @@ button.jump-definition {
 .img.rewind {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind.svg);
 }
+.img.rewind-rounded {
+  -webkit-mask-image: url(~devtools/client/debugger/images/rewind-rounded.svg);
+}
 .img.search {
   -webkit-mask-image: url(~devtools/client/debugger/images/search.svg);
 }

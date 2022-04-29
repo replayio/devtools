@@ -6,6 +6,7 @@ export function basicBindings() {
       sourceId: "mock-source",
       kind: "scriptSource",
       url: "https://mock.test/source.js",
+      contentHash: "cb502477dde2b1ceeb00c40cb27c13f4fe479cc4fd1d50d06a62e4801da9180a",
     },
     endpoint: {
       point: "100000",
@@ -48,6 +49,7 @@ export function basicMessageHandlers(): MockHandlerRecord {
     },
     "Session.listenForLoadChanges": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Session.loadedRegions", {
+        indexed: [],
         loaded: [
           {
             begin: { point: "0", time: 0 },

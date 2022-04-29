@@ -27,9 +27,9 @@ type Props = {};
 
 export default function ConsoleSearch({}: Props) {
   const actions = useContext(ActionsContext);
-  const state = useContext(StateContext);
+  const { index, query, results, visible } = useContext(StateContext);
 
-  if (!state.visible) {
+  if (!visible) {
     return null;
   }
 
@@ -48,18 +48,32 @@ export default function ConsoleSearch({}: Props) {
     actions.search(newQuery);
   };
 
+  let summaryMsg = null;
+  if (query) {
+    if (results.length > 0) {
+      if (results.length === 1) {
+        summaryMsg = "1 result";
+      } else {
+        summaryMsg = `${index + 1} of ${results.length} results`;
+      }
+    } else {
+      summaryMsg = "No results found";
+    }
+  }
+
   return (
     <div className={styles.SearchBar}>
       <SearchInput
         className={styles.SearchInput}
-        count={state.results.length}
+        count={results.length}
         handleClose={actions.hide}
         handleNext={actions.goToNext}
         handlePrev={actions.goToPrevious}
         onChange={onChange}
         onKeyDown={onKeyDown}
         placeholder="Find string in logs"
-        query={state.query}
+        query={query}
+        summaryMsg={summaryMsg}
       />
     </div>
   );

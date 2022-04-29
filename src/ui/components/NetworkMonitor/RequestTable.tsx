@@ -1,4 +1,8 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import { getLoadedRegions } from "ui/reducers/app";
+import { isTimeInRegions } from "ui/utils/timeline";
+
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 import { RequestSummary } from "./utils";
@@ -26,6 +30,8 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
+  const loadedRegions = useSelector(getLoadedRegions);
+
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
@@ -36,10 +42,7 @@ const RequestTable = ({
 
   return (
     <div
-      className={classNames(
-        "no-scrollbar min-w-full overflow-scroll bg-bodyBgcolor",
-        className
-      )}
+      className={classNames("no-scrollbar min-w-full overflow-scroll bg-bodyBgcolor", className)}
     >
       {/* Relative here helps with when the timeline goes past the last request*/}
       <div
@@ -58,12 +61,17 @@ const RequestTable = ({
               firstInFuture = true;
             }
 
+            const isInLoadedRegion = loadedRegions
+              ? isTimeInRegions(row.original.point.time, loadedRegions.loaded)
+              : false;
+
             prepareRow(row);
 
             return (
               <RequestRow
                 currentTime={currentTime}
                 isFirstInFuture={firstInFuture}
+                isInLoadedRegion={isInLoadedRegion}
                 isInPast={inPast}
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}

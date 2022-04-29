@@ -32,6 +32,10 @@
   pointer-events: none;
 }
 
+.new-breakpoint .CodeMirror-linenumber .line-action-button {
+  pointer-events: all;
+}
+
 .editor-wrapper
   :not(.empty-line):not(.new-breakpoint)
   > .CodeMirror-gutter-wrapper

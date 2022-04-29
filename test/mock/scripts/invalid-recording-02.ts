@@ -13,7 +13,7 @@ const user = { id: userId, uuid: userId };
 const graphqlMocks = [
   ...createUserSettingsMock(),
   ...createGetUserMock({ user }),
-  ...createGetRecordingMock({ recordingId }),
+  ...createGetRecordingMock({ recordingId, user }),
 ];
 const messageHandlers = basicMessageHandlers();
 const bindings = basicBindings();

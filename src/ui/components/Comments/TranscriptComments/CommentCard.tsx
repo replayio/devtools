@@ -5,6 +5,7 @@ import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
+import { formatRelativeTime } from "ui/utils/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
@@ -14,9 +15,7 @@ import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 
 import { AvatarImage } from "ui/components/Avatar";
-import { PENDING_COMMENT_ID } from "ui/reducers/comments";
 import { trackEvent } from "ui/utils/telemetry";
-import { commentKeys, formatRelativeTime } from "ui/utils/comments";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { features } from "ui/utils/prefs";
 import { getFocusRegion } from "ui/reducers/timeline";
@@ -29,6 +28,7 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 type PendingCommentProps = {
   comment: Comment;
   isFocused: boolean;
+  isUpdating: boolean;
   setIsEditorOpen: (isEditorOpen: boolean) => void;
   setHoveredComment: (id: string | null) => void;
   setIsFocused: (b: boolean) => void;
@@ -38,6 +38,7 @@ type PendingCommentProps = {
 function PendingCommentCard({
   comment,
   isFocused,
+  isUpdating,
   setHoveredComment,
   setIsFocused,
   setIsEditorOpen,
@@ -46,7 +47,7 @@ function PendingCommentCard({
   return (
     <div
       className={`group mx-auto w-full cursor-pointer border-b border-splitter bg-themeBase-90 transition`}
-      onMouseEnter={() => setHoveredComment(PENDING_COMMENT_ID)}
+      onMouseEnter={() => setHoveredComment(comment.id)}
       onMouseLeave={() => setHoveredComment(null)}
       onMouseDown={() => {
         trackEvent("comments.focus");
@@ -64,7 +65,12 @@ function PendingCommentCard({
               close: () => setIsEditorOpen(false),
             }}
           >
-            <NewCommentEditor data={{ type: "new_comment", comment }} onSubmit={onSubmit} />
+            <NewCommentEditor
+              data={{ comment, type: "new_comment" }}
+              editable={!isUpdating}
+              isUpdating={isUpdating}
+              onSubmit={onSubmit}
+            />
           </FocusContext.Provider>
         </div>
       </div>
@@ -95,12 +101,14 @@ function BorderBridge({
 
 function CommentItemHeader({
   comment,
-  showOptions,
   setIsEditing,
+  setIsUpdating,
+  showOptions,
 }: {
   comment: Comment | Reply;
-  showOptions: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  setIsUpdating: (value: boolean) => void;
+  showOptions: boolean;
 }) {
   const [relativeDate, setRelativeDate] = useState("");
 
@@ -131,6 +139,7 @@ function CommentItemHeader({
           comment={comment}
           isRoot={"replies" in comment}
           setIsEditing={setIsEditing}
+          setIsUpdating={setIsUpdating}
         />
       ) : null}
     </div>
@@ -141,10 +150,12 @@ function CommentItem({
   data,
   onSubmit,
   isUpdating,
+  setIsUpdating,
 }: {
   data: CommentData;
   onSubmit: (data: CommentData, inputValue: string) => void;
   isUpdating: boolean;
+  setIsUpdating: (value: boolean) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const { userId } = useGetUserId();
@@ -159,13 +170,15 @@ function CommentItem({
     <div className="group space-y-1.5">
       <CommentItemHeader
         comment={data.comment}
-        showOptions={!isEditing && !isUpdating && data.comment.user.id === userId}
         setIsEditing={maybeSetIsUpdating}
+        setIsUpdating={setIsUpdating}
+        showOptions={!isEditing && !isUpdating && data.comment.user.id === userId}
       />
       <ExistingCommentEditor
         data={data}
         onSubmit={onSubmit}
         isEditing={isEditing}
+        isUpdating={isUpdating}
         setIsEditing={maybeSetIsUpdating}
       />
     </div>
@@ -221,10 +234,9 @@ function CommentCard({
   const updateComment = hooks.useUpdateComment();
   const updateCommentReply = hooks.useUpdateCommentReply();
 
-  const replyKeys = commentKeys(comment.replies);
   const onAttachmentClick = () =>
     setModal("attachment", {
-      comment: { ...comment, content: "", parentId: comment.id, id: PENDING_COMMENT_ID },
+      comment: { ...comment, content: "", parentId: comment.id },
     });
 
   const onSubmit = async (data: CommentData, inputValue: string) => {
@@ -249,11 +261,12 @@ function CommentCard({
     clearPendingComment();
   };
 
-  if (comment.id === PENDING_COMMENT_ID) {
+  if (comment.isUnpublished) {
     return (
       <PendingCommentCard
         comment={comment}
         isFocused={isFocused}
+        isUpdating={isUpdating}
         setHoveredComment={setHoveredComment}
         setIsFocused={setIsFocused}
         setIsEditorOpen={setIsEditorOpen}
@@ -266,7 +279,8 @@ function CommentCard({
     <div
       className={classNames(
         `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor"
+        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor",
+        isUpdating ? "bg-themeBase-90" : ""
       )}
       onMouseDown={e => {
         seekToComment(comment);
@@ -289,14 +303,16 @@ function CommentCard({
           data={{ type: "comment", comment }}
           onSubmit={onSubmit}
           isUpdating={isUpdating}
+          setIsUpdating={setIsUpdating}
         />
 
-        {comment.replies?.map((reply: Reply, i: number) => (
-          <div key={replyKeys[i]}>
+        {comment.replies?.map((reply: Reply) => (
+          <div key={reply.id}>
             <CommentItem
               data={{ type: "reply", comment: reply }}
               onSubmit={onSubmit}
               isUpdating={isUpdating}
+              setIsUpdating={setIsUpdating}
             />
           </div>
         ))}
@@ -317,10 +333,12 @@ function CommentCard({
                   createdAt: new Date().toISOString(),
                   updatedAt: new Date().toISOString(),
                   content: "",
+                  isUnpublished: true,
                   parentId: comment.id,
-                  id: PENDING_COMMENT_ID,
                 },
               }}
+              editable={!isUpdating}
+              isUpdating={isUpdating}
               onSubmit={onSubmit}
             />
           </FocusContext.Provider>

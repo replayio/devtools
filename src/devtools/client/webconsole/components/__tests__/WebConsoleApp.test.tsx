@@ -1,18 +1,16 @@
-import React from "react";
-import { render, createTestStore, filterCommonTestWarnings, act, screen } from "test/testUtils";
 import userEvent from "@testing-library/user-event";
-import fs from "fs";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
-import { createSession } from "ui/actions/session";
 import { ThreadFront } from "protocol/thread";
+import React from "react";
+import { render, createTestStore, filterCommonTestWarnings } from "test/testUtils";
 
 import { websocketMessages } from "./fixtures/messageSetupActions";
 
 const useRouter = jest.spyOn(require("next/router"), "useRouter");
 
 useRouter.mockImplementation(() => ({
-  query: { id: "abcd" },
   asPath: "/recording/abcd",
+  query: { id: "abcd" },
 }));
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));

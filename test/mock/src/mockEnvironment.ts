@@ -44,7 +44,10 @@ export function doInstall(options: MockOptionsJSON) {
 
   const helpers = {
     Errors: {
-      InternalError: { code: 1, message: "Internal error" },
+      InternalError: {
+        code: 1,
+        message: "Whoops! Something went wrong, can you please try again?",
+      },
       MissingDescription: { code: 28, message: "No description added for recording" },
     },
     makeResult(result: any) {

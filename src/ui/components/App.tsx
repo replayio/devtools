@@ -1,20 +1,22 @@
 import React, { ReactNode, useEffect, createContext } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { actions } from "ui/actions";
+import { ModalType } from "ui/state/app";
+import { isTest } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 
 import AppErrors from "./shared/Error";
 import LoginModal from "./shared/LoginModal";
+import RenameReplayModal from "./shared/Modals/RenameReplayModal";
 import SharingModal from "./shared/SharingModal";
 import LaunchBrowserModal from "./shared/LaunchBrowserModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import UserSettingsModal from "./shared/UserSettingsModal";
 import OnboardingModal from "./shared/OnboardingModal/index";
-import { getSystemColorSchemePreference, isTest } from "ui/utils/environment";
 import * as selectors from "ui/reducers/app";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { UIState } from "ui/state";
-import { AppTheme, ModalType } from "ui/state/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "./shared/LoadingScreen";
@@ -32,11 +34,22 @@ import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
-import RenameReplayModal from "./shared/Modals/RenameReplayModal";
-import { updateTheme } from "ui/actions/app";
 
-function AppModal({ modal }: { modal: ModalType }) {
+function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
   const loadingFinished = useSelector(selectors.getLoadingFinished);
+
+  // Dismiss modal if the "Escape" key is pressed.
+  useEffect(() => {
+    const onDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        hideModal();
+      }
+    };
+    document.addEventListener("keydown", onDocumentKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onDocumentKeyDown);
+    };
+  }, [hideModal, loadingFinished]);
 
   if (!loadingFinished) {
     return null;
@@ -97,7 +110,7 @@ function AppModal({ modal }: { modal: ModalType }) {
   }
 }
 
-function App({ children, modal, quickOpenEnabled }: AppProps) {
+function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
@@ -153,7 +166,7 @@ function App({ children, modal, quickOpenEnabled }: AppProps) {
   return (
     <div id="app-container">
       {children}
-      {modal ? <AppModal modal={modal} /> : null}
+      {modal ? <AppModal hideModal={hideModal} modal={modal} /> : null}
       {quickOpenEnabled === true && <QuickOpenModal />}
       <ConfirmRenderer />
       <AppErrors />
@@ -161,11 +174,17 @@ function App({ children, modal, quickOpenEnabled }: AppProps) {
   );
 }
 
-const connector = connect((state: UIState) => ({
-  modal: selectors.getModal(state),
-  // Only read quick open state if it exists, to ensure safe loads
-  quickOpenEnabled: !!state.quickOpen && getQuickOpenEnabled(state),
-}));
-export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
+const connector = connect(
+  (state: UIState) => ({
+    modal: selectors.getModal(state),
+
+    // Only read quick open state if it exists, to ensure safe loads
+    quickOpenEnabled: !!state.quickOpen && getQuickOpenEnabled(state),
+  }),
+  {
+    hideModal: actions.hideModal,
+  }
+);
+export type AppProps = ConnectedProps<typeof connector> & { children?: ReactNode };
 
 export default connector(App);

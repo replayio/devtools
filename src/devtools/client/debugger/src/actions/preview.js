@@ -73,12 +73,14 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       result = createPrimitiveValueFront(undefined);
     }
 
-    const root = new ValueItem({
+    let root = new ValueItem({
       name: expression,
       path: expression,
       contents: result,
     });
     await root.loadChildren();
+    // recreate the ValueItem to update its loading state
+    root = root.recreate();
 
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should

@@ -12,6 +12,8 @@ import {
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
+import { isTimeInRegions } from "ui/utils/timeline";
+
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import { CanonicalRequestType, RequestSummary } from "./utils";
@@ -42,6 +44,7 @@ export const NetworkMonitor = ({
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const loadedRegions = useSelector(getLoadedRegions);
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -69,13 +72,6 @@ export const NetworkMonitor = ({
     }
   });
 
-  useEffect(() => {
-    // If the selected request has been filtered out by the focus region, unselect it.
-    if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) {
-      dispatch(hideRequestDetails());
-    }
-  }, [requests, selectedRequestId, dispatch]);
-
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
     return (
@@ -89,49 +85,51 @@ export const NetworkMonitor = ({
 
   return (
     <Table events={events} requests={requests} types={types}>
-      {({ table, data }: { table: any; data: RequestSummary[] }) => (
-        <div className="flex h-full min-h-0 flex-col" ref={container}>
-          <FilterBar types={types} toggleType={toggleType} table={table} />
-          <SplitBox
-            className="min-h-0 border-t border-splitter"
-            initialSize="350px"
-            minSize={selectedRequestId ? "30%" : "100%"}
-            maxSize={selectedRequestId ? "70%" : "100%"}
-            startPanel={
-              <RequestTable
-                table={table}
-                data={data}
-                currentTime={currentTime}
-                onRowSelect={row => {
-                  trackEvent("net_monitor.select_request_row");
-                  dispatch(fetchFrames(row.point));
+      {({ table, data }: { table: any; data: RequestSummary[] }) => {
+        let selectedRequest;
+        if (selectedRequestId) {
+          selectedRequest = data.find(request => request.id === selectedRequestId);
+        }
 
-                  if (row.hasResponseBody) {
-                    dispatch(fetchResponseBody(row.id, row.point.point));
-                  }
-                  if (row.hasRequestBody) {
-                    dispatch(fetchRequestBody(row.id, row.point.point));
-                  }
+        return (
+          <div className="flex h-full min-h-0 flex-col" ref={container}>
+            <FilterBar types={types} toggleType={toggleType} table={table} />
+            <SplitBox
+              className="min-h-0 border-t border-splitter"
+              initialSize="350px"
+              minSize={selectedRequest ? "30%" : "100%"}
+              maxSize={selectedRequest ? "70%" : "100%"}
+              startPanel={
+                <RequestTable
+                  table={table}
+                  data={data}
+                  currentTime={currentTime}
+                  onRowSelect={row => {
+                    trackEvent("net_monitor.select_request_row");
+                    dispatch(fetchFrames(row.point));
 
-                  dispatch(showRequestDetails(row.id));
-                }}
-                seek={seek}
-                selectedRequest={data.find(request => request.id === selectedRequestId)}
-              />
-            }
-            endPanel={
-              selectedRequestId ? (
-                <RequestDetails
-                  cx={cx}
-                  request={data.find(request => request.id === selectedRequestId)!}
+                    if (row.hasResponseBody) {
+                      dispatch(fetchResponseBody(row.id, row.point.point));
+                    }
+                    if (row.hasRequestBody) {
+                      dispatch(fetchRequestBody(row.id, row.point.point));
+                    }
+
+                    dispatch(showRequestDetails(row.id));
+                  }}
+                  seek={seek}
+                  selectedRequest={selectedRequest}
                 />
-              ) : null
-            }
-            splitterSize={2}
-            vert={vert}
-          />
-        </div>
-      )}
+              }
+              endPanel={
+                selectedRequest ? <RequestDetails cx={cx} request={selectedRequest} /> : null
+              }
+              splitterSize={2}
+              vert={vert}
+            />
+          </div>
+        );
+      }}
     </Table>
   );
 };

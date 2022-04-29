@@ -207,7 +207,7 @@ export function useHasNoRole() {
   return { hasNoRole: data?.recording?.userRole === "none", loading };
 }
 
-function convertRecording(rec: any): Recording | undefined {
+export function convertRecording(rec: any): Recording | undefined {
   if (!rec) {
     return undefined;
   }
