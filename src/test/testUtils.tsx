@@ -6,8 +6,8 @@ import React, { PropsWithChildren } from "react";
 import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import type { UIStore } from "ui/actions";
-import setupDevtools from "ui/setup/dynamic/devtools";
 import { bootstrapStore } from "ui/setup/store";
+import setupDevtools from "ui/setup/dynamic/devtools";
 import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
 
