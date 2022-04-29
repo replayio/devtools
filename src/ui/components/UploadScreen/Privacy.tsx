@@ -83,7 +83,7 @@ function PrivacyData({ icon, name, urls }: { icon: string; name: string; urls: s
 
 export function Privacy() {
   const { recording } = useGetRecording(getRecordingId());
-  const { operations } = recording!;
+  const { operations } = recording ?? {};
 
   return (
     <div className="relative flex h-full w-full overflow-hidden rounded-xl bg-jellyfishBgcolor p-5 shadow-xl">
@@ -100,19 +100,21 @@ export function Privacy() {
             </ExternalLink>
           </div>
         </div>
-        <div className="flex flex-col space-y-5 overflow-auto">
-          {operations.cookies ? (
-            <PrivacyData icon="cookie" name="Cookies" urls={operations.cookies} />
-          ) : null}
-          {operations.storage ? (
-            <PrivacyData icon="storage" name="Local Storage" urls={operations.storage} />
-          ) : null}
-          <PrivacyData
-            icon="insert_drive_file"
-            name="Executed Scripts"
-            urls={operations.scriptDomains}
-          />
-        </div>
+        {operations && (
+          <div className="flex flex-col space-y-5 overflow-auto">
+            {operations.cookies ? (
+              <PrivacyData icon="cookie" name="Cookies" urls={operations.cookies} />
+            ) : null}
+            {operations.storage ? (
+              <PrivacyData icon="storage" name="Local Storage" urls={operations.storage} />
+            ) : null}
+            <PrivacyData
+              icon="insert_drive_file"
+              name="Executed Scripts"
+              urls={operations.scriptDomains}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
