@@ -52,7 +52,7 @@ const usage = `
     --target TARGET: Only run tests using given TARGET
     --server ADDRESS: Set server to connect to (default wss://dispatch.replay.io).
     --long-timeout: Use longer timeouts when running tests.
-    --updateWebsocketLogs: Update fixture data used by Jest tests.
+    --update-fixtures: Update fixture data used by Jest tests.
 `;
 function processArgs(state, argv) {
   for (let i = 2; i < argv.length; i++) {
