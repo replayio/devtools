@@ -1,4 +1,5 @@
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
+const { patchWebpackConfig } = require("next-global-css");
 
 module.exports = {
   // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
@@ -87,6 +88,10 @@ module.exports = {
         })
       );
     }
+
+    // Allow CSS imported from `node_modules`, to work around an error
+    // from importing `<Editor>` from `@redux-devtools/ui`
+    patchWebpackConfig(config, { isServer });
 
     // handles build error from webpack/runtime/compat
     // https://github.com/vercel/next.js/issues/25484
