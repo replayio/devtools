@@ -20,18 +20,18 @@ table.requests {
   border-top: 2px solid var(--theme-toolbar-background);
 }
 
+.row.future {
+  color: var(--theme-base-80);
+}
+
+.row.unloaded {
+  color: var(--theme-base-90);
+}
+
 .row.selected {
   background: var(--primary-accent-hover);
   border-color: var(--primary-accent-hover);
   color: white;
-}
-
-.row.future {
-  color: var(--grey-10-a40);
-}
-
-.row.unloaded {
-  color: var(--grey-10-a20);
 }
 
 .row.current {
