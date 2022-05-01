@@ -123,7 +123,7 @@
     "@trunkio/launcher": "^1.0.5",
     "@types/classnames": "^2.2.11",
     "@types/codemirror": "^5.60.5",
-    "@types/cookie": "^0.4.1",
+    "@types/cookie": "^0.5.1",
     "@types/escape-html": "^1.0.1",
     "@types/fuzzaldrin-plus": "^0.6.2",
     "@types/jest": "^27.4.1",
