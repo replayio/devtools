@@ -161,7 +161,7 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "fake-indexeddb": "^3.1.7",
-    "fs-extra": "^10.0.1",
+    "fs-extra": "^10.1.0",
     "graphql": "15.8.0",
     "graphqurl": "^1.0.1",
     "identity-obj-proxy": "^3.0.0",
