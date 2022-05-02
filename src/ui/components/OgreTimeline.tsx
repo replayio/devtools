@@ -43,10 +43,10 @@ const Spans = ({
 };
 
 export default function OgreTimeline() {
-  const loadedRegions = useSelector(getLoadedRegions)!;
+  const loadedRegions = useSelector(getLoadedRegions);
   const { value: showAdvancedTimeline } = useFeature("advancedTimeline");
 
-  if (!showAdvancedTimeline) {
+  if (!showAdvancedTimeline || !loadedRegions) {
     return null;
   }
 
