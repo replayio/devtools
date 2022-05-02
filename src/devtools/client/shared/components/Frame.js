@@ -51,21 +51,15 @@ class Frame extends Component {
 
   static get defaultProps() {
     return {
-      showFunctionName: false,
       showAnonymousFunctionName: false,
-      showHost: false,
       showEmptyPathAsHost: false,
       showFullSourceUrl: false,
+      showFunctionName: false,
+      showHost: false,
     };
   }
 
-  constructor(props) {
-    super(props);
-    this._locationChanged = this._locationChanged.bind(this);
-    this.getSourceForClick = this.getSourceForClick.bind(this);
-  }
-
-  _locationChanged(isSourceMapped, url, line, column) {
+  _locationChanged = (isSourceMapped, url, line, column) => {
     const newState = {
       isSourceMapped,
     };
@@ -79,7 +73,7 @@ class Frame extends Component {
     }
 
     this.setState(newState);
-  }
+  };
 
   /**
    * Utility method to convert the Frame object model to the
@@ -87,7 +81,7 @@ class Frame extends Component {
    * @param Frame frame
    * @returns {{url: *, line: *, column: *, functionDisplayName: *}}
    */
-  getSourceForClick(frame) {
+  getSourceForClick = frame => {
     const { source, line, column, sourceId } = frame;
     return {
       url: source,
@@ -96,7 +90,7 @@ class Frame extends Component {
       functionDisplayName: this.props.frame.functionDisplayName,
       sourceId,
     };
-  }
+  };
 
   // eslint-disable-next-line complexity
   render() {

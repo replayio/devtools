@@ -10,6 +10,21 @@
 .img.aframe {
   background-image: url(~devtools/client/debugger/images/sources/aframe.svg) !important;
 }
+.img.unicorn {
+  background-image: url(~devtools/client/debugger/images/sources/unicorn.png) !important;
+  background-color: inherit;
+}
+
+.img.rocket {
+  background-image: url(~devtools/client/debugger/images/sources/rocket.png) !important;
+  background-color: inherit;
+}
+
+.img.target {
+  background-image: url(~devtools/client/debugger/images/sources/target.png) !important;
+  background-color: inherit;
+}
+
 .img.angular {
   background-image: url(~devtools/client/debugger/images/sources/angular.svg) !important;
 }

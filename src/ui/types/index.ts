@@ -21,6 +21,7 @@ export type LocalExperimentalUserSettings = {
   enableNetworkRequestComments: boolean;
   tenMinuteReplays: boolean;
   enableResolveRecording: boolean;
+  unicornConsole: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

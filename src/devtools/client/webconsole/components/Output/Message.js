@@ -4,6 +4,9 @@
 
 "use strict";
 
+const { MessageIcon } = require("devtools/client/webconsole/components/Output/MessageIcon");
+const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
+const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { getUserId } = require("ui/hooks/users");
 const { withAuth0 } = require("@auth0/auth0-react");
 const { withRouter } = require("next/router");
@@ -11,9 +14,6 @@ const React = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { actions } = require("ui/actions/index");
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
-const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
 const FrameView = require("devtools/client/shared/components/Frame");
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
@@ -107,6 +107,7 @@ class Message extends React.Component {
       this.props.isPaused !== nextProps.isPaused ||
       this.props.timestampsVisible !== nextProps.timestampsVisible ||
       this.props.open !== nextProps.open ||
+      this.props.prefixBadge !== nextProps.prefixBadge ||
       // This is a hack to work around the memoization limitations of this component.
       this.props.topLevelClasses.join(",") !== nextProps.topLevelClasses.join(",")
     );
@@ -176,7 +177,7 @@ class Message extends React.Component {
       return undefined;
     }
 
-    let overlayType, label;
+    let label, overlayType;
     let onRewindClick = () => {
       trackEvent("console.seek");
       dispatch(
@@ -190,8 +191,8 @@ class Message extends React.Component {
       trackEvent("console.add_comment");
       let userId = await getUserId();
       const opts = {
-        position: null,
         hasFrames: true,
+        position: null,
         sourceLocation: frame,
       };
 
@@ -243,9 +244,9 @@ class Message extends React.Component {
   }
 
   renderIcon() {
-    const { level, type } = this.props;
+    const { level, type, prefixBadge } = this.props;
 
-    return MessageIcon({ level, type });
+    return MessageIcon({ level, prefixBadge, type });
   }
 
   renderTimestamp() {
@@ -321,23 +322,24 @@ class Message extends React.Component {
     }
 
     const {
-      open,
-      collapsible,
       collapseTitle,
-      source,
-      type,
-      isPaused,
-      level,
-      indent,
-      topLevelClasses,
-      messageBody,
-      frame,
-      stacktrace,
+      collapsible,
       exceptionDocURL,
       executionPoint,
+      frame,
+      indent,
+      isPaused,
+      isPrimaryHighlighted,
+      level,
+      messageBody,
       messageId,
       notes,
-      isPrimaryHighlighted,
+      open,
+      prefixBadge,
+      source,
+      stacktrace,
+      topLevelClasses,
+      type,
     } = this.props;
 
     topLevelClasses.push("message", source, type, level);

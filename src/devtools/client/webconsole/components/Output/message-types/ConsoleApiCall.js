@@ -17,12 +17,12 @@ const Message = require("devtools/client/webconsole/components/Output/Message");
 
 ConsoleApiCall.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  isPrimaryHighlighted: PropTypes.bool.isRequired,
+  maybeScrollToBottom: PropTypes.func,
   message: PropTypes.object.isRequired,
   open: PropTypes.bool,
-  timestampsVisible: PropTypes.bool.isRequired,
-  maybeScrollToBottom: PropTypes.func,
-  isPrimaryHighlighted: PropTypes.bool.isRequired,
   shouldScrollIntoView: PropTypes.bool.isRequired,
+  timestampsVisible: PropTypes.bool.isRequired,
   topLevelClassName: PropTypes.string,
 };
 
@@ -33,17 +33,18 @@ ConsoleApiCall.defaultProps = {
 export default function ConsoleApiCall(props) {
   const {
     dispatch,
+    isFirstMessageForPoint,
+    isPaused,
+    isPrimaryHighlighted,
+    maybeScrollToBottom,
     message,
     open,
-    payload,
-    timestampsVisible,
-    repeat,
     pausedExecutionPoint,
-    isPaused,
-    maybeScrollToBottom,
-    isFirstMessageForPoint,
-    isPrimaryHighlighted,
+    payload,
+    prefixBadge,
+    repeat,
     shouldScrollIntoView,
+    timestampsVisible,
     topLevelClassName,
   } = props;
   const {
@@ -67,11 +68,11 @@ export default function ConsoleApiCall(props) {
   let messageBody;
   const messageBodyConfig = {
     dispatch,
+    maybeScrollToBottom,
     messageId,
     parameters,
-    userProvidedStyles,
     type,
-    maybeScrollToBottom,
+    userProvidedStyles,
   };
 
   if (type === "trace") {
@@ -136,34 +137,35 @@ export default function ConsoleApiCall(props) {
     topLevelClasses.push(topLevelClassName);
   }
   return React.createElement(Message, {
-    messageId,
-    executionPoint,
-    executionPointTime,
-    executionPointHasFrames,
-    pausedExecutionPoint,
-    isPaused,
-    open,
-    collapsible,
-    collapseTitle,
-    source,
-    type,
-    level,
-    topLevelClasses,
-    messageBody,
-    repeat,
-    frame,
-    stacktrace,
     attachment,
+    collapseTitle,
+    collapsible,
     dispatch,
+    executionPoint,
+    executionPointHasFrames,
+    executionPointTime,
+    frame,
     indent,
+    isFirstMessageForPoint,
+    isPaused,
+    isPrimaryHighlighted,
+    level,
+    maybeScrollToBottom,
+    message,
+    messageBody,
+    messageId,
+    open,
+    parameters,
+    pausedExecutionPoint,
+    prefixBadge,
+    repeat,
+    shouldScrollIntoView,
+    source,
+    stacktrace,
     timeStamp,
     timestampsVisible,
-    parameters,
-    message,
-    maybeScrollToBottom,
-    isFirstMessageForPoint,
-    isPrimaryHighlighted,
-    shouldScrollIntoView,
+    topLevelClasses,
+    type,
   });
 }
 
