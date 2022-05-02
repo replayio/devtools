@@ -75,11 +75,11 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
     return (
       <div
         style={{
-          ...style,
           backgroundColor: getBadgeColor(prefixBadge, theme, showEmpty),
-          borderRadius: "8px",
+          borderRadius: "16px",
           height: "16px",
           width: "16px",
+          ...style,
         }}
       />
     );
