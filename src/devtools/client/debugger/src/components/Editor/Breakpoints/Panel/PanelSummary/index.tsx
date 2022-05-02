@@ -1,26 +1,25 @@
+import classNames from "classnames";
 import React, { Dispatch, SetStateAction } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { PrefixBadge } from "ui/components/PrefixBadge";
-
-import CommentButton from "./CommentButton";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import Popup from "./Popup";
-import hooks from "ui/hooks";
-import { UIState } from "ui/state";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
-
-const { prefs } = require("ui/utils/prefs");
-
 import "reactjs-popup/dist/index.css";
-import Log from "./Log";
-import Condition from "./Condition";
-import useAuth0 from "ui/utils/useAuth0";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import { PrefixBadge } from "ui/components/PrefixBadge";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
-import classNames from "classnames";
-import { trackEvent } from "ui/utils/telemetry";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
 import { AnalysisPayload } from "ui/state/app";
+import { trackEvent } from "ui/utils/telemetry";
+import useAuth0 from "ui/utils/useAuth0";
+
+import CommentButton from "./CommentButton";
+import Condition from "./Condition";
+import Log from "./Log";
+import Popup from "./Popup";
+
+const { prefs } = require("ui/utils/prefs");
 
 export type Input = "condition" | "logValue";
 
@@ -40,6 +39,7 @@ function PanelSummary({
   createFloatingCodeComment,
   createFrameComment,
   currentTime,
+  enterFocusMode,
   executionPoint,
   isHot,
   pausedOnHit,
@@ -100,15 +100,13 @@ function PanelSummary({
           trigger={
             <div className="flex items-center space-x-2 overflow-hidden pl-2">
               <MaterialIcon className="text-xl">error</MaterialIcon>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-                Use {""}
-                <a
-                  href="https://www.notion.so/replayio/Viewer-26591deb256c473a946d0f64abb67859#bf19baaa57004b0d9282cc0a02b281f5"
-                  rel="noreferrer noopener"
-                  className="underline "
-                  target="_blank"
-                >{`Focus Mode`}</a>{" "}
-                to reduce the number of hits.
+              <span
+                className="cursor-pointer overflow-hidden overflow-ellipsis whitespace-pre"
+                onClick={() => {
+                  enterFocusMode();
+                }}
+              >
+                Use Focus Mode to reduce the number of hits.
               </span>
             </div>
           }
@@ -161,6 +159,7 @@ const connector = connect(
   {
     createFrameComment: actions.createFrameComment,
     createFloatingCodeComment: actions.createFloatingCodeComment,
+    enterFocusMode: actions.enterFocusMode,
   }
 );
 
