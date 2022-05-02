@@ -230,13 +230,11 @@ export function addBreakpointAtColumn(cx, location) {
 }
 
 export function setBreakpointPrefixBadge(breakpoint, prefixBadge) {
-  const newBreakpoint = {
-    ...breakpoint,
-    options: { ...breakpoint.options, prefixBadge },
-  };
-
   return {
-    breakpoint: newBreakpoint,
+    breakpoint: {
+      ...breakpoint,
+      options: { ...breakpoint.options, prefixBadge },
+    },
     type: "SET_BREAKPOINT",
   };
 }

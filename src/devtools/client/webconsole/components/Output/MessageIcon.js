@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { isColorPrefix, PREFIX_COLORS } from "ui/components/PrefixBadge";
+import { PrefixBadge } from "ui/components/PrefixBadge";
 
 const levels = {
   debug: "Debug",
@@ -39,32 +39,7 @@ export function MessageIcon(props) {
   }
 
   if (prefixBadge) {
-    if (isColorPrefix(prefixBadge)) {
-      return (
-        <div
-          style={{
-            backgroundColor: PREFIX_COLORS[prefixBadge],
-            borderRadius: "8px",
-            height: "16px",
-            marginLeft: "5px",
-            marginRight: "5px",
-            marginTop: "4px",
-            width: "16px",
-          }}
-        />
-      );
-    }
-
-    return (
-      <div
-        className={`img ${prefixBadge}`}
-        style={{
-          marginLeft: "5px",
-          marginRight: "5px",
-          marginTop: "4px",
-        }}
-      ></div>
-    );
+    return <PrefixBadge prefixBadge={prefixBadge} style={{ margin: "2px 5px 0 5px" }} />;
   }
 
   if (type) {

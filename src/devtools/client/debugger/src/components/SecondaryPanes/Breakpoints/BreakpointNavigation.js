@@ -8,7 +8,7 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import React, { useEffect, useState, useRef } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 const { trackEvent } = require("ui/utils/telemetry");
-import { PrefixBadgeButton } from "ui/components/PrefixBadge";
+import PrefixBadgeButton from "ui/components/PrefixBadge";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
@@ -21,7 +21,6 @@ function BreakpointNavigation({
   analysisPoints,
   editing,
   setShowCondition,
-  setBreakpointPrefixBadge,
   showCondition,
   setZoomedBreakpoint = () => {},
 }) {
@@ -60,10 +59,7 @@ function BreakpointNavigation({
     return (
       <div className="breakpoint-navigation">
         <div className="flex-grow" />
-        <PrefixBadgeButton
-          breakpoint={breakpoint}
-          setBreakpointPrefixBadge={setBreakpointPrefixBadge}
-        />
+        <PrefixBadgeButton breakpoint={breakpoint} showEmpty={true} />
         <button
           className={classnames(
             "h-5 w-5 rounded-full border p-px pt-0.5",
@@ -138,5 +134,4 @@ const mapStateToProps = (state, { breakpoint }) => ({
 
 export default connect(mapStateToProps, {
   seek: actions.seek,
-  setBreakpointPrefixBadge: actions.setBreakpointPrefixBadge,
 })(BreakpointNavigation);
