@@ -16,7 +16,7 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["import", "react", "prettier", "sort-keys-fix", "@typescript-eslint"],
+  "plugins": ["import", "react", "prettier", "@typescript-eslint"],
   "rules": {
     "curly": "error",
     "import/order": [
@@ -49,8 +49,6 @@
     "react/prop-types": 0,
     "react/react-in-jsx-scope": 0,
     "react/require-default-props": 0,
-    "sort-keys": "error",
-    "sort-keys-fix/sort-keys-fix": "error",
     "sort-vars": "error"
   },
   "settings": {
