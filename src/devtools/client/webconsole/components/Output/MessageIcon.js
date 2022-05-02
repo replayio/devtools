@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import { isColorPrefix, PREFIX_COLORS } from "ui/components/PrefixBadge";
 
 const levels = {
   debug: "Debug",
@@ -38,18 +39,11 @@ export function MessageIcon(props) {
   }
 
   if (prefixBadge) {
-    const colors = {
-      blue: "#01ACFD",
-      empty: "none",
-      pink: "#FF87DD",
-      yellow: "#FFE870",
-    };
-
-    if (["pink", "yellow", "blue", "empty"].includes(prefixBadge)) {
+    if (isColorPrefix(prefixBadge)) {
       return (
         <div
           style={{
-            backgroundColor: colors[prefixBadge],
+            backgroundColor: PREFIX_COLORS[prefixBadge],
             borderRadius: "8px",
             height: "16px",
             marginLeft: "5px",
