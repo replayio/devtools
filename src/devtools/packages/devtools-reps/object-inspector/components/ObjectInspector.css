@@ -10,6 +10,7 @@
 .tree.object-inspector .object-label,
 .tree.object-inspector .object-label * {
   color: var(--theme-highlight-blue);
+  flex-shrink: 0;
 }
 
 .tree.object-inspector .node .unavailable {
