@@ -155,7 +155,7 @@ export type BreakpointOptions = {
   logValue?: string | null;
   logGroupId?: string | null;
   shouldPause?: boolean;
-  prefixBadge?: "unicorn" | "rocket" | "target" | "blue" | "pink" | "yellow";
+  prefixBadge?: "unicorn" | "blue" | "pink" | "yellow" | "green";
 };
 export type BreakpointActor = {
   readonly actor: ActorId;

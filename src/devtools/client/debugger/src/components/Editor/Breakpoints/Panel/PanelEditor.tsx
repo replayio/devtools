@@ -4,6 +4,7 @@ const { connect } = require("devtools/client/debugger/src/utils/connect");
 const { getContext } = require("devtools/client/debugger/src/selectors");
 import PanelForm, { SubmitButton } from "./PanelForm";
 import actions from "devtools/client/debugger/src/actions";
+import { PrefixBadge } from "ui/components/PrefixBadge";
 import { UIState } from "ui/state";
 
 interface Props {
@@ -79,7 +80,7 @@ class PanelEditor extends PureComponent<Props, State> {
 
   render() {
     const { logSyntaxError, logValue, conditionSyntaxError, condition } = this.state;
-    const { toggleEditingOff, inputToFocus, showCondition } = this.props;
+    const { toggleEditingOff, inputToFocus, showCondition, breakpoint } = this.props;
 
     return (
       <div
@@ -90,6 +91,10 @@ class PanelEditor extends PureComponent<Props, State> {
           }
         )}
       >
+        <PrefixBadge
+          style={{ height: "21px", marginLeft: "10px", marginRight: "-4px" }}
+          prefixBadge={breakpoint.options.prefixBadge}
+        />
         <PanelForm
           {...{
             logSyntaxError,
