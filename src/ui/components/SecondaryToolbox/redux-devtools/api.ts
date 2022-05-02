@@ -2,35 +2,11 @@ import {
   CustomAction,
   DispatchAction as AppDispatchAction,
   LibConfig,
-  LIFTED_ACTION,
-  nonReduxDispatch,
-  REMOVE_INSTANCE,
-  SET_PERSIST,
   SetPersistAction,
-  stringifyJSON,
-  TOGGLE_PERSIST,
   UPDATE_STATE,
 } from "@redux-devtools/app";
-import syncOptions, {
-  Options,
-  OptionsMessage,
-  SyncOptions,
-} from "../../browser/extension/options/syncOptions";
-import openDevToolsWindow, {
-  DevToolsPosition,
-} from "../../browser/extension/background/openWindow";
-import { getReport } from "../../browser/extension/background/logging";
-import { Action, Dispatch, MiddlewareAPI } from "redux";
-import { ContentScriptToBackgroundMessage, SplitMessage } from "./contentScript";
-import {
-  ErrorMessage,
-  PageScriptToContentScriptMessageForwardedToMonitors,
-  PageScriptToContentScriptMessageWithoutDisconnectOrInitInstance,
-} from "./api";
 import { LiftedState } from "@redux-devtools/instrument";
-import { BackgroundAction, LiftedActionAction } from "../stores/backgroundStore";
-import { Position } from "../api/openWindow";
-import { BackgroundState } from "../reducers/background";
+import { Action, Dispatch, MiddlewareAPI } from "redux";
 
 interface TabMessageBase {
   readonly type: string;
@@ -174,20 +150,20 @@ interface SplitMessageBase {
 
 interface SplitMessageStart extends SplitMessageBase {
   readonly instanceId: number;
-  readonly source: typeof pageSource;
+  readonly source: any; // typeof pageSource;
   readonly split: "start";
 }
 
 interface SplitMessageChunk extends SplitMessageBase {
   readonly instanceId: number;
-  readonly source: typeof pageSource;
+  readonly source: any; // typeof pageSource;
   readonly split: "chunk";
   readonly chunk: [string, string];
 }
 
 interface SplitMessageEnd extends SplitMessageBase {
   readonly instanceId: number;
-  readonly source: typeof pageSource;
+  readonly source: any; // typeof pageSource;
   readonly split: "end";
 }
 
@@ -196,17 +172,15 @@ export type SplitMessage = SplitMessageStart | SplitMessageChunk | SplitMessageE
 export type TabMessage =
   | StartAction
   | StopAction
-  | OptionsMessage
   | DispatchAction
   | ImportAction
   | ActionAction
   | ExportAction;
 export type PanelMessage<S, A extends Action<unknown>> =
   | NAAction
-  | ErrorMessage
   | UpdateStateAction<S, A>
   | SetPersistAction;
-export type MonitorMessage = NAAction | ErrorMessage | EmptyUpdateStateAction | SetPersistAction;
+export type MonitorMessage = NAAction | EmptyUpdateStateAction | SetPersistAction;
 
 export const CONNECTED = "socket/CONNECTED";
 export const DISCONNECTED = "socket/DISCONNECTED";
@@ -218,45 +192,3 @@ export type PageScriptToContentScriptMessageForwardedToMonitors<S, A extends Act
   | SerializedExportMessage
   | SerializedActionMessage
   | SerializedStateMessage<S, A>;
-
-interface ImportMessage {
-  readonly message: "IMPORT";
-  readonly id: string | number;
-  readonly instanceId: string;
-  readonly state: string;
-  readonly action?: never;
-}
-
-type ToContentScriptMessage = ImportMessage | LiftedActionAction;
-
-function getReducerError() {
-  // @ts-ignore
-  const instancesState = window.store.getState().instances;
-  const payload = instancesState.states[instancesState.current];
-  const computedState = payload.computedStates[payload.currentStateIndex];
-  if (!computedState) {
-    return false;
-  }
-  return computedState.error;
-}
-
-interface OpenMessage {
-  readonly type: "OPEN";
-  readonly position: Position;
-}
-
-interface OpenOptionsMessage {
-  readonly type: "OPEN_OPTIONS";
-}
-
-interface GetOptionsMessage {
-  readonly type: "GET_OPTIONS";
-}
-
-export type SingleMessage = OpenMessage | OpenOptionsMessage | GetOptionsMessage;
-
-type BackgroundStoreMessage<S, A extends Action<unknown>> =
-  | PageScriptToContentScriptMessageWithoutDisconnectOrInitInstance<S, A>
-  | SplitMessage
-  | SingleMessage;
-type BackgroundStoreResponse = { readonly options: Options };
