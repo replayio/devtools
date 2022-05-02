@@ -1,25 +1,26 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { GetStaticProps } from "next/types";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useStore } from "react-redux";
-import { isTest } from "ui/utils/environment";
+import { setModal } from "ui/actions/app";
 import { getAccessibleRecording, setExpectedError } from "ui/actions/session";
-import { Recording as RecordingInfo } from "ui/types";
+import DevTools from "ui/components/DevTools";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
 import {
   getRecordingMetadata,
   useGetRecording,
   useGetRecordingId,
   useGetRawRecordingIdWithSlug,
 } from "ui/hooks/recordings";
-import { getRecordingURL } from "ui/utils/recording";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
-import Upload from "./upload";
-import DevTools from "ui/components/DevTools";
 import setup from "ui/setup/dynamic/devtools";
-import { GetStaticProps } from "next/types";
+import { Recording as RecordingInfo } from "ui/types";
+import { isTest } from "ui/utils/environment";
 import { extractIdAndSlug } from "ui/utils/helpers";
-import { setModal } from "ui/actions/app";
+import { getRecordingURL } from "ui/utils/recording";
 import useToken from "ui/utils/useToken";
+
+import Upload from "./upload";
 
 interface MetadataProps {
   metadata?: {
@@ -128,8 +129,8 @@ function RecordingPage({
     }
     if (!recordingId) {
       setExpectedError({
-        message: "Invalid ID",
         content: `"${rawRecordingId}" is not a valid recording ID`,
+        message: "Invalid ID",
       });
       return;
     }
@@ -189,18 +190,16 @@ export const getStaticProps: GetStaticProps = async function ({ params }) {
     props: {
       metadata: id ? await getRecordingMetadata(id) : null,
     },
-    revalidate: 360,
   };
 };
 
 export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
+  return { fallback: "blocking", paths: [] };
 }
 
 type SSRProps = MetadataProps & { headOnly?: boolean };
 
 export default function SSRRecordingPage({ headOnly, metadata }: SSRProps) {
-  const router = useRouter();
   let head: React.ReactNode = <RecordingHead metadata={metadata} />;
 
   if (headOnly) {

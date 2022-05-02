@@ -45,18 +45,22 @@ module.exports = {
   async headers() {
     return [
       {
-        source: "/(.*)",
         headers: [
           {
             key: "X-Frame-Options",
             value: "SAMEORIGIN",
           },
           {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
             key: "Content-Security-Policy",
             value:
-              "frame-ancestors 'self' https://*.replay.io/; report-uri https://o437061.ingest.sentry.io/api/5399075/security/?sentry_key=41c20dff316f42fea692ef4f0d055261",
+              "frame-ancestors 'self' https://*.replay.io/; report-to https://o437061.ingest.sentry.io/api/5399075/security/?sentry_key=41c20dff316f42fea692ef4f0d055261",
           },
         ],
+        source: "/(.*)",
       },
     ];
   },
