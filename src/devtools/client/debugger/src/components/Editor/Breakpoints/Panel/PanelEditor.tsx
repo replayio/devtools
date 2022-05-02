@@ -92,7 +92,7 @@ class PanelEditor extends PureComponent<Props, State> {
         )}
       >
         <PrefixBadge
-          style={{ height: "21px", marginLeft: "10px", marginRight: "-4px" }}
+          style={{ height: "21px", marginLeft: "10px", marginRight: "-4px", width: "21px" }}
           prefixBadge={breakpoint.options.prefixBadge}
         />
         <PanelForm
