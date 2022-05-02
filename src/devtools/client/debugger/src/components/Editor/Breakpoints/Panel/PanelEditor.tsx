@@ -47,11 +47,15 @@ class PanelEditor extends PureComponent<Props, State> {
       setShowCondition,
     } = this.props;
     const { logValue, condition } = this.state;
-    const newOptions: { logValue: string; condition?: string } = { logValue };
+    const newOptions: { logValue: string; condition?: string; prefixBadge?: string } = { logValue };
 
     // Bail if there is an error.
     if (this.hasError()) {
       return;
+    }
+
+    if (breakpoint.options.prefixBadge) {
+      newOptions.prefixBadge = breakpoint.options.prefixBadge;
     }
 
     if (condition && showCondition) {

@@ -1,6 +1,8 @@
 import classnames from "classnames";
+import { connect } from "devtools/client/debugger/src/utils/connect";
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
+import { actions } from "ui/actions";
 import { useFeature } from "ui/hooks/settings";
 
 export const PREFIX_COLORS = {
@@ -48,6 +50,43 @@ function EmojiBadge({ emoji, onSelect }) {
   );
 }
 
+function getBadgeColor(prefixBadge, showEmpty) {
+  if (!prefixBadge) {
+    return showEmpty ? PREFIX_COLORS.empty : "none";
+  }
+  return PREFIX_COLORS[prefixBadge];
+}
+
+export function PrefixBadge({ prefixBadge, style, showEmpty = false }) {
+  if (!prefixBadge) {
+    return null;
+  }
+
+  if (isColorPrefix(prefixBadge)) {
+    return (
+      <div
+        style={{
+          ...style,
+          backgroundColor: getBadgeColor(prefixBadge, showEmpty),
+          borderRadius: "8px",
+          height: "16px",
+          width: "16px",
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`img ${prefixBadge}`}
+      style={{
+        ...style,
+        marginTop: "4px",
+      }}
+    ></div>
+  );
+}
+
 function PrefixBadgePicker({ onSelect, pickerNode }) {
   const { top, left } = pickerNode ? pickerNode.getBoundingClientRect() : {};
 
@@ -71,13 +110,13 @@ function PrefixBadgePicker({ onSelect, pickerNode }) {
       <CircleBadge onSelect={onSelect} color="pink" />
       <CircleBadge onSelect={onSelect} color="yellow" />
       <CircleBadge onSelect={onSelect} color="blue" />
-      <CircleBadge onSelect={onSelect} color="empty" />
+      <CircleBadge onSelect={onSelect} color={undefined} />
     </div>,
     document.body
   );
 }
 
-export function PrefixBadgeButton({ breakpoint, setBreakpointPrefixBadge }) {
+function PrefixBadgeButton({ breakpoint, setBreakpointPrefixBadge }) {
   const [showPrefixBadge, setShowPrefixBadge] = useState(false);
   const pickerNode = useRef();
   const { value: enableUnicornConsole } = useFeature("unicornConsole");
@@ -124,3 +163,6 @@ export function PrefixBadgeButton({ breakpoint, setBreakpointPrefixBadge }) {
     </button>
   );
 }
+export default connect(null, {
+  setBreakpointPrefixBadge: actions.setBreakpointPrefixBadge,
+})(PrefixBadgeButton);

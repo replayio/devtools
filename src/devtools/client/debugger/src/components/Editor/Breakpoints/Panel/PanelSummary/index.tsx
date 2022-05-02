@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { PrefixBadge } from "ui/components/PrefixBadge";
 
 import CommentButton from "./CommentButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -124,6 +125,11 @@ function PanelSummary({
 
   return (
     <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
+      <PrefixBadge
+        style={{ marginLeft: "10px", marginRight: "-4px" }}
+        prefixBadge={breakpoint.options.prefixBadge}
+      />
+
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
