@@ -1,27 +1,27 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
 
-import { Location } from "@recordreplay/protocol";
-import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
-import React from "react";
 import { Dispatch } from "@reduxjs/toolkit";
+import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
+import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
+import constants from "devtools/client/webconsole/constants";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-
 import { actions } from "ui/actions";
-import { isVisible } from "ui/utils/dom";
 import { selectors } from "ui/reducers";
 import type { UIState } from "ui/state";
+import { isVisible } from "ui/utils/dom";
 
-import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
+import { Frame, Message } from "../../reducers/messages";
+import { StateContext } from "../Search";
+
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 
-import constants from "devtools/client/webconsole/constants";
-import { StateContext } from "../Search";
-import { Message } from "../../reducers/messages";
-
-function compareLocation(locA: SourceLocation, locB: SourceLocation) {
+function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
+  if (!locA) {
+    return false;
+  }
   return locA.sourceId == locB.sourceId && locA.line == locB.line && locA.column == locB.column;
 }
 
@@ -178,7 +178,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
       const matchingBreakpoint = breakpoints.find(bp =>
-        compareLocation(message.frame as Location, bp.location)
+        compareLocation(message.frame, bp.location)
       );
 
       const prefixBadge = matchingBreakpoint?.options.prefixBadge;
