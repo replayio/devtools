@@ -8,6 +8,7 @@ import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { ReduxDevToolsPanel } from "./ReduxDevTools";
+
 import { UIState } from "ui/state";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { Redacted } from "../Redacted";

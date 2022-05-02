@@ -1,9 +1,10 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
 import { Annotation } from "@recordreplay/protocol";
 import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import type { UIState } from "ui/state";
+
 import type {
   UpdateStateRequest,
   SplitMessage,

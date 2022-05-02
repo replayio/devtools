@@ -1,5 +1,5 @@
-const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 const { patchWebpackConfig } = require("next-global-css");
+const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
 module.exports = {
   // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
