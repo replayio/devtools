@@ -18,7 +18,7 @@ spawnSync("npm", ["run", "build"], {
   cwd: path.join(buildDir, APP_NAME),
   env: {
     ...process.env,
-    PUBLIC_URL: "http://localhost:8080/test/examples/cra/dist",
+    PUBLIC_URL: ".",
   },
   stdio: "inherit",
 });
