@@ -27,10 +27,6 @@ export function isColorPrefix(prefixBadge) {
 }
 
 function CircleBadge({ color, onSelect, theme }) {
-  if (!color) {
-    return <EmojiBadge emoji="picker" onSelect={onSelect} theme={theme} />;
-  }
-
   return (
     <div
       onClick={() => onSelect(color)}

@@ -16,7 +16,7 @@ img.unicorn-dark {
   background-color: transparent;
 }
 .img.picker-light,
-img.picker-dark {
+.img.picker-dark {
   background-image: url(~devtools/client/debugger/images/sources/prefix-picker.svg) !important;
   background-color: transparent;
 }

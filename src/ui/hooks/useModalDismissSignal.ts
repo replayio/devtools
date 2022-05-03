@@ -3,7 +3,8 @@ import { MutableRefObject, useEffect } from "react";
 export default function useModalDismissSignal(
   modalRef: MutableRefObject<HTMLDivElement>,
   dismissCallback: () => void,
-  dismissOnClickOutside: boolean = true
+  dismissOnClickOutside: boolean = true,
+  dismissOnScroll: boolean
 ) {
   useEffect(() => {
     if (modalRef.current === null) {
@@ -17,10 +18,7 @@ export default function useModalDismissSignal(
     };
 
     const handleDocumentClick = (event: MouseEvent) => {
-      if (
-        modalRef.current !== null &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      if (modalRef.current !== null && !modalRef.current.contains(event.target as Node)) {
         event.stopPropagation();
         event.preventDefault();
 
@@ -42,6 +40,9 @@ export default function useModalDismissSignal(
       ownerDocument.addEventListener("keydown", handleDocumentKeyDown);
       if (dismissOnClickOutside) {
         ownerDocument.addEventListener("click", handleDocumentClick, true);
+      }
+      if (dismissOnClickOutside) {
+        ownerDocument.addEventListener("scroll", dismissCallback, true);
       }
     }, 0);
 
