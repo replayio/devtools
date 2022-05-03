@@ -125,11 +125,6 @@ function PanelSummary({
 
   return (
     <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
-      <PrefixBadge
-        style={{ height: "21px", marginLeft: "10px", marginRight: "-4px", width: "21px" }}
-        prefixBadge={breakpoint.options.prefixBadge}
-      />
-
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition

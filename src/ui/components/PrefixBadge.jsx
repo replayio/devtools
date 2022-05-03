@@ -1,9 +1,9 @@
-import classnames from "classnames";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { useState, useRef } from "react";
-import { createPortal } from "react-dom";
 import { actions } from "ui/actions";
+import AppContainerPortal from "ui/components/shared/AppContainerPortal";
 import { useFeature } from "ui/hooks/settings";
+import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { selectors } from "ui/reducers";
 
 export const PREFIX_COLORS = {
@@ -58,7 +58,7 @@ function EmojiBadge({ emoji, theme, onSelect }) {
   );
 }
 
-function getBadgeColor(prefixBadge, theme, showEmpty) {
+export function getBadgeColor(prefixBadge, theme, showEmpty) {
   const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
   if (!prefixBadge) {
     return showEmpty ? colors.empty : "none";
@@ -101,31 +101,33 @@ export const PrefixBadge = connect(
   {}
 )(_PrefixBadge);
 
-function PrefixBadgePicker({ onSelect, pickerNode, theme }) {
+function PrefixBadgePicker({ onSelect, pickerNode, theme, onDismiss }) {
   const { top, left } = pickerNode ? pickerNode.getBoundingClientRect() : {};
+  const pickerRef = useRef();
+  useModalDismissSignal(pickerRef, onDismiss);
 
-  return createPortal(
-    <div
-      style={{
-        background: theme == "dark" ? "#474c52" : "#fff",
-        borderRadius: "12px",
-        boxShadow: "0px 1px 2px 0px #00000040",
-        display: "flex",
-        padding: "3px 5px",
-        position: "absolute",
-        right: `${left + 0}px`,
-        top: `${top - 3}px`,
-        zIndex: 100,
-      }}
-    >
-      <EmojiBadge onSelect={onSelect} theme={theme} emoji="unicorn" />
-      <CircleBadge onSelect={onSelect} theme={theme} color="pink" />
-      <CircleBadge onSelect={onSelect} theme={theme} color="green" />
-      <CircleBadge onSelect={onSelect} theme={theme} color="yellow" />
-      <CircleBadge onSelect={onSelect} theme={theme} color="blue" />
-      <CircleBadge onSelect={onSelect} theme={theme} color={undefined} />
-    </div>,
-    document.body
+  return (
+    <AppContainerPortal>
+      <div
+        style={{
+          background: theme == "dark" ? "#474c52" : "#fff",
+          borderRadius: "12px",
+          boxShadow: "0px 1px 2px 0px #00000040",
+          padding: "3px 5px",
+          left: `${left + 30}px`,
+          top: `${top - 3}px`,
+        }}
+        className="transform -translate-x-full flex absolute z-10"
+        ref={pickerRef}
+      >
+        <EmojiBadge onSelect={onSelect} theme={theme} emoji="unicorn" />
+        <CircleBadge onSelect={onSelect} theme={theme} color="pink" />
+        <CircleBadge onSelect={onSelect} theme={theme} color="green" />
+        <CircleBadge onSelect={onSelect} theme={theme} color="yellow" />
+        <CircleBadge onSelect={onSelect} theme={theme} color="blue" />
+        <CircleBadge onSelect={onSelect} theme={theme} color={undefined} />
+      </div>
+    </AppContainerPortal>
   );
 }
 
@@ -143,7 +145,7 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
   return (
     <button
-      className={`h-5 w-5 rounded-full p-px pt-0.5 ${
+      className={`h-5 w-5 rounded-full p-px ${
         prefixBadge == "unicorn" ? `img unicorn-${theme}` : ""
       }`}
       ref={pickerNode}
@@ -154,10 +156,7 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
           ? "var(--theme-text-field-bgcolor)"
           : "",
         borderRadius: "100%",
-        height: "1.25rem",
-        marginRight: "5px",
         position: "relative",
-        width: "21px",
       }}
       onClick={() => {
         setShowPrefixBadge(!showPrefixBadge);
@@ -167,6 +166,7 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
         <PrefixBadgePicker
           pickerNode={pickerNode.current}
           theme={theme}
+          onDismiss={() => setShowPrefixBadge(false)}
           onSelect={badge => {
             setShowPrefixBadge(false);
             setBreakpointPrefixBadge(breakpoint, badge);

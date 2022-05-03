@@ -1,11 +1,19 @@
 import { useSelector } from "react-redux";
-import { getIsIndexed } from "ui/reducers/app";
+import { getBadgeColor, isColorPrefix } from "ui/components/PrefixBadge";
+import { getIsIndexed, getTheme } from "ui/reducers/app";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";
 
-export function PanelStatus({ analysisPoints }: { analysisPoints: AnalysisPayload }) {
+export function PanelStatus({
+  analysisPoints,
+  prefixBadge,
+}: {
+  analysisPoints: AnalysisPayload;
+  prefixBadge: string;
+}) {
   const executionPoint = useSelector(getExecutionPoint);
   const isIndexed = useSelector(getIsIndexed);
+  const theme = useSelector(getTheme);
   let status = "";
   let maxStatusLength = 0;
 
@@ -26,9 +34,16 @@ export function PanelStatus({ analysisPoints }: { analysisPoints: AnalysisPayloa
     maxStatusLength = `${analysisPoints.data.length}/${analysisPoints.data.length}`.length;
   }
 
+  const style = isColorPrefix(prefixBadge)
+    ? { backgroundColor: getBadgeColor(prefixBadge, theme), color: "white" }
+    : {};
+
   return (
     <div className="breakpoint-navigation-status-container">
-      <div className="text-breakpointStatus rounded-2xl bg-breakpointStatusBG px-3 py-0.5">
+      <div
+        className="text-breakpointStatus rounded-2xl bg-breakpointStatusBG px-3 py-0.5"
+        style={style}
+      >
         <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
         {status}
       </div>
