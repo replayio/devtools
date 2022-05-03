@@ -1,11 +1,3 @@
-import { Location } from "@recordreplay/protocol";
-import { createSelector } from "@reduxjs/toolkit";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
-import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { AppActions } from "ui/actions/app";
-import { SessionActions } from "ui/actions/session";
-import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
-import { UIState } from "ui/state";
 import {
   AnalysisError,
   AnalysisPayload,
@@ -15,13 +7,21 @@ import {
   ProtocolError,
   ReplayEvent,
 } from "ui/state/app";
-import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
-import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { compareBigInt } from "ui/utils/helpers";
-import { prefs } from "ui/utils/prefs";
+import { AppActions } from "ui/actions/app";
+import { UIState } from "ui/state";
+import { SessionActions } from "ui/actions/session";
+import { Location } from "@recordreplay/protocol";
+import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
+import { compareBigInt } from "ui/utils/helpers";
+import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 
 import { getSelectedPanel, getViewMode } from "./layout";
+import { prefs } from "ui/utils/prefs";
+import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
+import { getSystemColorSchemePreference } from "ui/utils/environment";
+import { createSelector } from "@reduxjs/toolkit";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 
 export const initialAppState: AppState = {
   mode: "devtools",
