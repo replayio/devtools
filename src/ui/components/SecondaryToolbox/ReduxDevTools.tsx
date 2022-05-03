@@ -10,11 +10,25 @@ import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 
 type RDTAppStore = NonNullable<Root["store"]>;
 
+type RDTThemes = "light" | "dark" | "auto";
+
+const replayThemesToRDTThemes = {
+  light: "light",
+  dark: "dark",
+  system: "auto",
+} as const;
+
 export const ReduxDevToolsPanel = () => {
   const [ReduxDevToolsAppRoot, setRoot] = useState<typeof Root | null>(null);
   const rootRef = useRef<Root | null>(null);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
   const currentTimestamp = useSelector((state: UIState) => state.messages.pausedExecutionPointTime);
+  // Collect the current Replay app theme so we can apply it to the Redux DevTools
+  const appTheme = useSelector((state: UIState) => state.app.theme);
+  // Also save the current RDT theme in state, so we can do stupid syncing tricks
+  const [currentRDTTheme, setCurrentRDTTheme] = useState<RDTThemes>(
+    replayThemesToRDTThemes[appTheme]
+  );
 
   useLayoutEffect(() => {
     // Code-split and lazy-import the main Redux DevTools `<Root>` component.
@@ -23,6 +37,35 @@ export const ReduxDevToolsPanel = () => {
       setRoot(() => rdtapp.Root);
     });
   }, []);
+
+  useLayoutEffect(() => {
+    if (!rootRef.current) {
+      return;
+    }
+
+    const store = rootRef.current.store!;
+
+    const colorPreference = replayThemesToRDTThemes[appTheme];
+
+    store.dispatch({
+      type: "main/CHANGE_THEME",
+      theme: "default",
+      scheme: "default",
+      colorPreference,
+    });
+
+    // HACK The RDT store overwrites our initial dispatch when it reloads its own persisted prefs.
+    // By subscribing to the store, diffing that value, and setting React state,
+    // we can loop back through here and re-dispatch based on the Replay theme,
+    // thus effectively keeping them in sync.
+    // We unsubscribe and resubscribe every time to avoid leaks.
+    return store.subscribe(() => {
+      const updatedRDTTheme = store.getState().theme.colorPreference;
+      if (currentRDTTheme !== updatedRDTTheme) {
+        setCurrentRDTTheme(updatedRDTTheme);
+      }
+    });
+  }, [ReduxDevToolsAppRoot, appTheme, currentRDTTheme]);
 
   useLayoutEffect(() => {
     if (!rootRef.current) {
