@@ -58,6 +58,25 @@ export const createDevtoolsAction = <S, A extends Action<unknown>>(
     action.request.instanceId = instanceId;
   }
 
+  // @ts-ignore
+  if (request.libConfig) {
+    // Try to mark RDT features as "disabled", since these aren't relevant in Replay
+    // @ts-ignore
+    Object.assign(request.libConfig, {
+      lock: false,
+      export: false,
+      import: false,
+      persist: false,
+      pause: false,
+      reorder: false,
+      jump: false,
+      skip: false,
+      dispatch: false,
+      sync: false,
+      test: false,
+    });
+  }
+
   return action;
 };
 
