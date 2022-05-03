@@ -1093,6 +1093,8 @@ class _ThreadFront {
   // original or generated source and there is an alternative which users
   // can switch to, also returns that alternative.
   private _chooseSourceId(sourceIds: SourceId[]) {
+    const fallbackSourceId = sourceIds[0];
+
     // Ignore inline sources if we have an HTML source containing them.
     if (sourceIds.some(id => this.getSourceKind(id) == "html")) {
       sourceIds = sourceIds.filter(id => this.getSourceKind(id) != "inlineScript");
@@ -1131,7 +1133,9 @@ class _ThreadFront {
 
     if (!generatedId) {
       assert(originalId, "there should be an originalId");
-      return { sourceId: originalId };
+      // backend issues like #1310 may cause a situation where there is no originalId,
+      // in this case it's better to return some sourceId instead of undefined
+      return { sourceId: originalId || fallbackSourceId };
     }
 
     if (!originalId) {
