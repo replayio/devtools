@@ -29,7 +29,7 @@ pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.protocolTimeline", false);
-pref("devtools.features.unicornConsole", false);
+pref("devtools.features.unicornConsole", true);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],

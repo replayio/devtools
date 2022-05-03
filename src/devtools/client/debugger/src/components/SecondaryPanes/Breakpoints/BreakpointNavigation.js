@@ -1,17 +1,18 @@
 import classnames from "classnames";
-import findLast from "lodash/findLast";
-import find from "lodash/find";
-import { compareNumericStrings } from "protocol/utils";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
+import find from "lodash/find";
+import findLast from "lodash/findLast";
+import { compareNumericStrings } from "protocol/utils";
 import React, { useEffect, useState, useRef } from "react";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-const { trackEvent } = require("ui/utils/telemetry");
+import { actions } from "ui/actions";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { selectors } from "ui/reducers";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
+
+const { trackEvent } = require("ui/utils/telemetry");
 
 function BreakpointNavigation({
   executionPoint,
@@ -34,7 +35,7 @@ function BreakpointNavigation({
   };
   const isEmpty = analysisPoints && (analysisPoints.error || analysisPoints.data.length == 0);
 
-  let prev, next;
+  let next, prev;
 
   if (executionPoint && !analysisPoints?.error && analysisPoints?.data.length > 0) {
     prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
@@ -57,12 +58,11 @@ function BreakpointNavigation({
 
   if (editing) {
     return (
-      <div className="breakpoint-navigation">
-        <div className="flex-grow" />
+      <div className="breakpoint-navigation justify-end space-x-1 p-1.5 py-2">
         <PrefixBadgeButton breakpoint={breakpoint} showEmpty={true} />
         <button
           className={classnames(
-            "h-5 w-5 rounded-full border p-px pt-0.5",
+            "h-5 w-5 rounded-full border p-px",
             showCondition
               ? "border-primaryAccent text-primaryAccent"
               : "border-gray-500 text-gray-500"
@@ -77,7 +77,7 @@ function BreakpointNavigation({
   }
 
   return (
-    <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
+    <div className={classnames("breakpoint-navigation justify-between p-1.5", { empty: isEmpty })}>
       {!isEmpty ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
@@ -88,6 +88,7 @@ function BreakpointNavigation({
       )}
       <div className="text-center">
         <PanelStatus
+          prefixBadge={breakpoint.options.prefixBadge}
           indexed={indexed}
           executionPoint={lastExecutionPoint}
           analysisPoints={analysisPoints}
