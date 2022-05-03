@@ -14,7 +14,7 @@ import contextMenus from "ui/reducers/contextMenus";
 import reactDevTools from "ui/reducers/reactDevTools";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-const { setupApp, setupTimeline, setupReactDevTools } = actions;
+const { setupApp, setupTimeline } = actions;
 
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
@@ -169,7 +169,6 @@ export default async function DevTools(store: AppStore) {
   setupNetwork(store);
   setupLogpoints(store);
   setupExceptions(store);
-  setupReactDevTools(store);
 }
 
 function bindSelectors(obj: any) {

@@ -18,6 +18,7 @@ import {
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
+import { ReduxAnnotationsProvider } from "./SecondaryToolbox/redux-devtools/ReduxAnnotationsProvider";
 import useAuth0 from "ui/utils/useAuth0";
 import { KeyModifiers } from "./KeyModifiers";
 import Toolbar from "./Toolbar";
@@ -61,25 +62,27 @@ function Body() {
     <div className="vertical-panels pr-2">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar />
-        <SplitBox
-          startPanel={<SidePanel />}
-          endPanel={
-            viewMode === "dev" ? (
-              <React.Suspense fallback={<ViewLoader />}>
-                <Viewer />
-              </React.Suspense>
-            ) : (
-              <Video />
-            )
-          }
-          initialSize={prefs.sidePanelSize as `${number}px`}
-          maxSize={sidePanelCollapsed ? "0" : "80%"}
-          minSize={sidePanelCollapsed ? "0" : "240px"}
-          onControlledPanelResized={(num: number) => (prefs.sidePanelSize = `${num}px`)}
-          splitterSize={8}
-          style={{ width: "100%", overflow: "hidden" }}
-          vert={true}
-        />
+        <ReduxAnnotationsProvider>
+          <SplitBox
+            startPanel={<SidePanel />}
+            endPanel={
+              viewMode === "dev" ? (
+                <React.Suspense fallback={<ViewLoader />}>
+                  <Viewer />
+                </React.Suspense>
+              ) : (
+                <Video />
+              )
+            }
+            initialSize={prefs.sidePanelSize as `${number}px`}
+            maxSize={sidePanelCollapsed ? "0" : "80%"}
+            minSize={sidePanelCollapsed ? "0" : "240px"}
+            onControlledPanelResized={(num: number) => (prefs.sidePanelSize = `${num}px`)}
+            splitterSize={8}
+            style={{ width: "100%", overflow: "hidden" }}
+            vert={true}
+          />
+        </ReduxAnnotationsProvider>
       </div>
       <Timeline />
     </div>

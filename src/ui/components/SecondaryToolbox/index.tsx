@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
@@ -27,11 +27,13 @@ import { ShowVideoButton } from "./ToolboxButton";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getRecordingTarget } from "ui/reducers/app";
+import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 interface PanelButtonsProps {
   hasReactComponents: boolean;
+  hasReduxAnnotations: boolean;
   toolboxLayout: ToolboxLayout;
   isNode: boolean;
 }
@@ -65,7 +67,12 @@ const PanelButton: FC<PanelButtonProps> = ({ panel, children }) => {
   );
 };
 
-const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout, isNode }) => {
+const PanelButtons: FC<PanelButtonsProps> = ({
+  hasReactComponents,
+  hasReduxAnnotations,
+  toolboxLayout,
+  isNode,
+}) => {
   const { userSettings } = hooks.useGetUserSettings();
   const { showReact } = userSettings;
 
@@ -80,7 +87,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({ hasReactComponents, toolboxLayout
         </PanelButton>
       )}
       {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
-      <PanelButton panel="redux-devtools">Redux</PanelButton>
+      {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
       <PanelButton panel="network">Network</PanelButton>
     </div>
   );
@@ -127,6 +134,7 @@ export default function SecondaryToolbox() {
   const recordingTarget = useSelector(getRecordingTarget);
   const hasReactComponents = useSelector(selectors.hasReactComponents);
   const toolboxLayout = useSelector(getToolboxLayout);
+  const reduxAnnotations = useContext(ReduxAnnotationsContext);
   const dispatch = useDispatch();
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
@@ -135,12 +143,15 @@ export default function SecondaryToolbox() {
     dispatch(setSelectedPanel("console"));
   }
 
+  const hasReduxAnnotations = reduxAnnotations.length > 0;
+
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
       <header className="secondary-toolbox-header">
         <PanelButtons
           isNode={isNode}
           hasReactComponents={hasReactComponents}
+          hasReduxAnnotations={hasReduxAnnotations}
           toolboxLayout={toolboxLayout}
         />
         <div className="secondary-toolbox-right-buttons-container flex">
