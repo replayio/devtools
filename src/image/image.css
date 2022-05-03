@@ -10,13 +10,14 @@
 .img.aframe {
   background-image: url(~devtools/client/debugger/images/sources/aframe.svg) !important;
 }
-.img.unicorn-light {
-  background-image: url(~devtools/client/debugger/images/sources/unicorn-light.svg) !important;
+.img.unicorn-light,
+img.unicorn-dark {
+  background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
   background-color: transparent;
 }
-
-.img.unicorn-dark {
-  background-image: url(~devtools/client/debugger/images/sources/unicorn-dark.svg) !important;
+.img.picker-light,
+img.picker-dark {
+  background-image: url(~devtools/client/debugger/images/sources/prefix-picker.svg) !important;
   background-color: transparent;
 }
 
