@@ -19,6 +19,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "showReact",
   },
   {
+    label: "Redux DevTools",
+    description: "Inspect the Redux actions history",
+    key: "showRedux",
+  },
+  {
     label: "Event Link",
     description: "Jump from an event to a line of code",
     key: "enableEventLink",
@@ -103,6 +108,7 @@ export default function ExperimentalSettings({}) {
     useFeature("tenMinuteReplays");
   const { value: enableUnicornConsole, update: updateEnableUnicornConsole } =
     useFeature("unicornConsole");
+  const { value: enableReduxDevtools, update: updateEnableReduxDevtools } = useFeature("showRedux");
 
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
@@ -127,6 +133,8 @@ export default function ExperimentalSettings({}) {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key == "unicornConsole") {
       updateEnableUnicornConsole(!enableUnicornConsole);
+    } else if (key === "showRedux") {
+      updateEnableReduxDevtools(!enableReduxDevtools);
     }
   };
 
@@ -138,6 +146,7 @@ export default function ExperimentalSettings({}) {
     enableResolveRecording,
     tenMinuteReplays: enableTenMinuteReplays,
     unicornConsole: enableUnicornConsole,
+    showRedux: enableReduxDevtools,
   };
 
   const settings = { ...userSettings, ...localSettings };

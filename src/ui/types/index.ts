@@ -22,6 +22,7 @@ export type LocalExperimentalUserSettings = {
   tenMinuteReplays: boolean;
   enableResolveRecording: boolean;
   unicornConsole: boolean;
+  showRedux: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

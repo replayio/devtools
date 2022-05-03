@@ -3,6 +3,7 @@ import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
+import { useFeature } from "ui/hooks/settings";
 
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
@@ -73,6 +74,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   toolboxLayout,
   isNode,
 }) => {
+  const { value: showRedux } = useFeature("showRedux");
   const { userSettings } = hooks.useGetUserSettings();
   const { showReact } = userSettings;
 
@@ -87,7 +89,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
         </PanelButton>
       )}
       {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
-      {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
+      {hasReduxAnnotations && showRedux && <PanelButton panel="redux-devtools">Redux</PanelButton>}
       <PanelButton panel="network">Network</PanelButton>
     </div>
   );
