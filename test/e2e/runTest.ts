@@ -1,4 +1,4 @@
-import { Page } from "@recordreplay/playwright";
+import { Page } from "playwright";
 
 import config from "./config";
 import { getExampleRecordingId } from "./getExample";

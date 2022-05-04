@@ -1,4 +1,4 @@
-import { Page } from "@recordreplay/playwright";
+import { Page } from "playwright";
 
 declare global {
   const app: any;
