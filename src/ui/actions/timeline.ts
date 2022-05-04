@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId, TimeStampedPointRange } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { client, log, sendMessage } from "protocol/socket";
 import {

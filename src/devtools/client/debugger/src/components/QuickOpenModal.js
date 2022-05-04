@@ -17,6 +17,7 @@ import {
   getQuickOpenProject,
   getSelectedSource,
   getSourceContent,
+  getSourcesLoading,
   getSymbols,
   getTabs,
   getDisplayedSources,
@@ -106,7 +107,11 @@ export class QuickOpenModal extends Component {
   });
 
   searchSources = query => {
-    const { sourceList, tabs } = this.props;
+    const { sourceList, tabs, sourcesLoading } = this.props;
+
+    if (sourcesLoading) {
+      return null;
+    }
 
     const sources = this.formatSources(sourceList, tabs);
     const results = query == "" ? sources : filter(sources, this.dropGoto(query));
@@ -230,7 +235,7 @@ export class QuickOpenModal extends Component {
     if (this.isFunctionQuery() && !project) {
       return highlightLineRange({
         ...(item.location != null
-          ? { start: item.location.start.line, end: item.location.end.line }
+          ? { end: item.location.end.line, start: item.location.start.line }
           : {}),
         sourceId: selectedSource.id,
       });
@@ -258,9 +263,9 @@ export class QuickOpenModal extends Component {
       const selectedSourceId = selectedSource ? selectedSource.id : "";
       const sourceId = location.sourceId ? location.sourceId : selectedSourceId;
       selectSpecificLocation(cx, {
-        sourceId,
-        line: location.line,
         column: location.column,
+        line: location.line,
+        sourceId,
       });
 
       if (viewMode === "non-dev") {
@@ -327,11 +332,11 @@ export class QuickOpenModal extends Component {
   isSourceSearch = () => this.isSourcesQuery() || this.isGotoSourceQuery();
 
   /* eslint-disable react/no-danger */
-  renderHighlight(candidateString, query, name) {
+  renderHighlight(candidateString, query) {
     const options = {
       wrap: {
-        tagOpen: '<mark class="highlight">',
         tagClose: "</mark>",
+        tagOpen: '<mark class="highlight">',
       },
     };
     const html = fuzzyAldrin.wrap(candidateString, query, options);
@@ -434,38 +439,37 @@ export class QuickOpenModal extends Component {
   }
 }
 
-/* istanbul ignore next: ignoring testing of redux connection stuff */
 function mapStateToProps(state) {
   const selectedSource = getSelectedSource(state);
   const tabs = getTabs(state);
 
   return {
     cx: getContext(state),
-    enabled: getQuickOpenEnabled(state),
-    project: getQuickOpenProject(state),
-    sourceCount: getSourceCount(state),
-    sourceList: getSourceList(state),
     displayedSources: getDisplayedSources(state),
-    selectedSource,
+    enabled: getQuickOpenEnabled(state),
+    globalFunctions: getGlobalFunctions(state) || [],
+    globalFunctionsLoading: isGlobalFunctionsLoading(state),
+    project: getQuickOpenProject(state),
+    query: getQuickOpenQuery(state),
+    searchType: getQuickOpenType(state),
     selectedContentLoaded: selectedSource
       ? !!getSourceContent(state, selectedSource.id)
       : undefined,
+    selectedSource,
+    sourceCount: getSourceCount(state),
+    sourceList: getSourceList(state),
+    sourcesLoading: getSourcesLoading(state),
     symbols: formatSymbols(getSymbols(state, selectedSource)),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
-    query: getQuickOpenQuery(state),
-    searchType: getQuickOpenType(state),
-    globalFunctions: getGlobalFunctions(state) || [],
-    globalFunctionsLoading: isGlobalFunctionsLoading(state),
     tabs,
     viewMode: getViewMode(state),
   };
 }
 
-/* istanbul ignore next: ignoring testing of redux connection stuff */
 export default connect(mapStateToProps, {
+  closeQuickOpen: actions.closeQuickOpen,
+  highlightLineRange: actions.highlightLineRange,
   selectSpecificLocation: actions.selectSpecificLocation,
   setQuickOpenQuery: actions.setQuickOpenQuery,
-  highlightLineRange: actions.highlightLineRange,
-  closeQuickOpen: actions.closeQuickOpen,
   setViewMode,
 })(QuickOpenModal);

@@ -28,7 +28,7 @@ pref("devtools.features.tenMinuteReplays", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
-pref("devtools.features.advancedTimeline", false);
+pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.unicornConsole", false);
 pref("devtools.features.showRedux", false);
 
@@ -59,7 +59,7 @@ export const features = new PrefsHelper("devtools.features", {
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
   codeHeatMaps: ["Bool", "codeHeatMaps"],
   resolveRecording: ["Bool", "resolveRecording"],
-  advancedTimeline: ["Bool", "advancedTimeline"],
+  protocolTimeline: ["Bool", "protocolTimeline"],
   unicornConsole: ["Bool", "unicornConsole"],
   showRedux: ["Bool", "showRedux"],
 });

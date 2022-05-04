@@ -33,7 +33,6 @@
 .breakpoint-panel button {
   border-radius: 4px;
   align-self: center;
-  line-height: 16px;
 }
 
 .breakpoint-panel .paused-add-comment {
@@ -128,10 +127,6 @@ non-editing markup */
 }
 
 /* Breakpoint Navigation */
-
-.breakpoint-panel .breakpoint-navigation {
-  padding: 6px;
-}
 
 .breakpoint-panel .breakpoint-navigation-commands .img {
   background: var(--breakpoint-arrow);

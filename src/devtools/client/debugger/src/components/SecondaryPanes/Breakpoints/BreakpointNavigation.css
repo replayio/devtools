@@ -1,8 +1,6 @@
 .breakpoint-navigation {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  padding: 0px 8px 0px 0px;
   background-color: var(--theme-toolbar-background);
   align-items: center;
 }

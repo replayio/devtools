@@ -1,15 +1,18 @@
-import React, { useContext, useRef, useState } from "react";
 import { Editor } from "codemirror";
+import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { evaluateExpression, paywallExpression } from "../../actions/input";
-import EagerEvalFooter from "./EagerEvalFooter";
-import useEvaluationHistory from "./useEvaluationHistory";
-import { getIsInLoadedRegion, getPlayback } from "ui/reducers/timeline";
 import {
   EditorWithAutocomplete,
   Keys,
 } from "ui/components/shared/CodeEditor/EditorWithAutocomplete";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { getIsInLoadedRegion } from "ui/reducers/app";
+import { getPlayback } from "ui/reducers/timeline";
+
+import { evaluateExpression, paywallExpression } from "../../actions/input";
+
+import EagerEvalFooter from "./EagerEvalFooter";
+import useEvaluationHistory from "./useEvaluationHistory";
 
 const getJsTermApi = (
   editor: Editor,

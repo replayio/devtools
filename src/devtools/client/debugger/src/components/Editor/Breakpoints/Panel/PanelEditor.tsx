@@ -55,10 +55,6 @@ class PanelEditor extends PureComponent<Props, State> {
       return;
     }
 
-    if (breakpoint.options.prefixBadge) {
-      newOptions.prefixBadge = breakpoint.options.prefixBadge;
-    }
-
     if (condition && showCondition) {
       // Only save the condition if it's showing. If it's dismissed, then we'll assume
       // that the user didn't intend to save it.
@@ -68,8 +64,21 @@ class PanelEditor extends PureComponent<Props, State> {
       setShowCondition(false);
     }
 
-    setBreakpointOptions(cx, breakpoint.location, newOptions);
     toggleEditingOff();
+
+    // Bail if either the logValue or condition hasn't changed.
+    if (
+      newOptions.logValue === breakpoint.options.logValue &&
+      newOptions.condition === breakpoint.options.condition
+    ) {
+      return;
+    }
+
+    if (breakpoint.options.prefixBadge) {
+      newOptions.prefixBadge = breakpoint.options.prefixBadge;
+    }
+
+    setBreakpointOptions(cx, breakpoint.location, newOptions);
   };
 
   setLogValue = (value: string) => this.setState({ logValue: value });
@@ -85,16 +94,12 @@ class PanelEditor extends PureComponent<Props, State> {
     return (
       <div
         className={classnames(
-          "panel-editor items-top flex flex-row items-center space-x-2 rounded-sm bg-breakpointEditfieldActive",
+          "panel-editor items-top flex flex-row items-center rounded-sm bg-breakpointEditfieldActive",
           {
             conditional: showCondition,
           }
         )}
       >
-        <PrefixBadge
-          style={{ height: "21px", marginLeft: "10px", marginRight: "-4px", width: "21px" }}
-          prefixBadge={breakpoint.options.prefixBadge}
-        />
         <PanelForm
           {...{
             logSyntaxError,
@@ -111,7 +116,7 @@ class PanelEditor extends PureComponent<Props, State> {
           setCondition={this.setCondition}
           setConditionSyntaxError={this.setConditionSyntaxError}
         />
-        <div className="button-container flex items-center">
+        <div className="button-container flex items-center ml-2">
           <SubmitButton
             handleSetBreakpoint={this.handleSetBreakpoint}
             disabled={!!logSyntaxError || !!conditionSyntaxError}
