@@ -8,7 +8,7 @@ export type BrowserName = "firefox" | "chromium";
 
 export async function recordPlaywright(
   browserName: BrowserName,
-  script: (page: any) => Promise<void>
+  script: (page: playwright.Page) => Promise<void>
 ) {
   const browser = await (playwright as any)[browserName].launch({
     env: {
