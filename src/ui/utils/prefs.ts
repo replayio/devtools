@@ -29,7 +29,8 @@ pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.protocolTimeline", false);
-pref("devtools.features.unicornConsole", true);
+pref("devtools.features.unicornConsole", false);
+pref("devtools.features.showRedux", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -60,6 +61,7 @@ export const features = new PrefsHelper("devtools.features", {
   resolveRecording: ["Bool", "resolveRecording"],
   protocolTimeline: ["Bool", "protocolTimeline"],
   unicornConsole: ["Bool", "unicornConsole"],
+  showRedux: ["Bool", "showRedux"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

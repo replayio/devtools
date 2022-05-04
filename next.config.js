@@ -1,3 +1,4 @@
+const { patchWebpackConfig } = require("next-global-css");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
 module.exports = {
@@ -91,6 +92,10 @@ module.exports = {
         })
       );
     }
+
+    // Allow CSS imported from `node_modules`, to work around an error
+    // from importing `<Editor>` from `@redux-devtools/ui`
+    patchWebpackConfig(config, { isServer });
 
     // handles build error from webpack/runtime/compat
     // https://github.com/vercel/next.js/issues/25484

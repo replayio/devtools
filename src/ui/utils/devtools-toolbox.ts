@@ -9,7 +9,7 @@ import { DebuggerPanel } from "devtools/client/debugger/panel";
 import { Inspector } from "devtools/client/inspector/inspector";
 import Selection from "devtools/client/framework/selection";
 
-export type StartablePanelName = "debugger" | "inspector" | "react-components";
+export type StartablePanelName = "debugger" | "inspector" | "react-components" | "redux-devtools";
 
 declare global {
   const store: UIStore;
@@ -19,6 +19,7 @@ type Panels = {
   debugger: DebuggerPanel;
   inspector: Inspector;
   "react-components": any;
+  "redux-devtools": any;
   console: any;
   comments: any;
   viewer: any;
@@ -79,7 +80,7 @@ export class DevToolsToolbox {
   }
 
   startPanel = async (name: StartablePanelName) => {
-    if (name === "react-components") {
+    if (name === "react-components" || name === "redux-devtools") {
       return;
     }
 
