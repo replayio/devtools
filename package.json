@@ -74,7 +74,7 @@
     "react-canvas-confetti": "^1.3.0",
     "react-circular-progressbar": "^2.0.4",
     "react-codemirror2": "^7.2.1",
-    "react-devtools-inline": "^4.24.4",
+    "react-devtools-inline": "^4.24.5",
     "react-devtools-inline_4_17_0": "npm:react-devtools-inline@4.17.0",
     "react-dom": "^0.0.0-experimental-e7d0053e6-20220325",
     "react-dom-factories": "^1.0.2",
