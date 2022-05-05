@@ -4,8 +4,10 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
+
 import { OnboardingContent, OnboardingModalContainer } from "../Onboarding/index";
 import Spinner from "../Spinner";
+
 import DownloadReplayModal from "./DownloadReplayModal";
 
 function ModalLoader() {
@@ -84,7 +86,7 @@ function SingleInviteModal({ workspace }: SingleInviteModalProps) {
       {`You've been added to the team `}
       <strong>{name}</strong>
       {inviterEmail ? <strong>{` by ${inviterEmail}`}</strong> : null}
-      {`. Would you like to go that team, or download Replay?`}
+      {`. Would you like to go to that team, or download Replay?`}
     </DownloadReplayModal>
   );
 }
