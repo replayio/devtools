@@ -8,6 +8,7 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 import { findAutomatedTests } from "protocol/find-tests";
+import { findReactDevtoolsOperations } from "protocol/react-devtools";
 import { assert, waitForTime } from "protocol/utils";
 import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
@@ -157,6 +158,7 @@ export function createSession(recordingId: string): UIThunkAction {
         disableCache: !!window.app.prefs.disableCache,
         useMultipleControllers: !!window.app.features.tenMinuteReplays,
         multipleControllerUseSnapshots: !!window.app.features.tenMinuteReplays,
+        enablePersistentIDs: true,
       };
 
       dispatch(showLoadingProgress());
@@ -175,6 +177,7 @@ export function createSession(recordingId: string): UIThunkAction {
       dispatch(actions.setRecordingTarget(recordingTarget));
 
       findAutomatedTests();
+      findReactDevtoolsOperations();
 
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
