@@ -8,6 +8,7 @@
 // helps with adapting the devtools to the WRP.
 
 import {
+  Annotation,
   BreakpointId,
   ExecutionPoint,
   FrameId,
@@ -196,6 +197,9 @@ class _ThreadFront {
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
   breakpoints = new Map<BreakpointId, { location: Location }>();
 
+  // Wait for all the annotations in the recording.
+  private annotationsWaiter: Promise<Annotation[]> | undefined;
+
   // Any callback to invoke to adjust the point which we zoom to.
   warpCallback:
     | ((
@@ -306,10 +310,21 @@ class _ThreadFront {
   }
 
   async getAnnotations(onAnnotations: (annotations: annotations) => void) {
-    const sessionId = await this.waitForSession();
-
-    client.Session.addAnnotationsListener(onAnnotations);
-    await client.Session.findAnnotations({}, sessionId);
+    if (!this.annotationsWaiter) {
+      this.annotationsWaiter = new Promise(async (resolve, reject) => {
+        try {
+          const sessionId = await this.waitForSession();
+          const rv: Annotation[] = [];
+          client.Session.addAnnotationsListener(({ annotations }) => rv.push(...annotations));
+          await client.Session.findAnnotations({}, sessionId);
+          resolve(rv);
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+    const annotations = await this.annotationsWaiter;
+    onAnnotations({ annotations });
   }
 
   getRecordingTarget(): Promise<RecordingTarget> {
