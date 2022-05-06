@@ -121,7 +121,12 @@ function Panel({
               toggleEditingOn={toggleEditingOn}
             />
           )}
-          <BreakpointNavigation {...{ breakpoint, editing, showCondition, setShowCondition }} />
+          <BreakpointNavigation
+            breakpoint={breakpoint}
+            editing={editing}
+            showCondition={showCondition}
+            setShowCondition={setShowCondition}
+          />
         </div>
       </div>
     </Widget>

@@ -12,18 +12,19 @@ import {
   SessionId,
 } from "@recordreplay/protocol";
 import { sendMessage, addEventListener } from "protocol/socket";
+
 import { assert } from "./utils";
 
 export interface AnalysisParams {
-  mapper: string;
-  reducer?: string;
   effectful: boolean;
-  locations?: AnalysisLocation[];
-  functionEntryPoints?: FunctionEntryPoint[];
   eventHandlerEntryPoints?: EventHandlerEntryPoint[];
   exceptionPoints?: boolean;
-  randomPoints?: number;
+  functionEntryPoints?: FunctionEntryPoint[];
+  locations?: AnalysisLocation[];
+  mapper: string;
   points?: ExecutionPoint[];
+  randomPoints?: number;
+  reducer?: string;
   sessionId: SessionId;
 }
 
@@ -33,9 +34,9 @@ export type FunctionEntryPoint = Omit<addFunctionEntryPointsParameters, OmitPara
 export type EventHandlerEntryPoint = Omit<addEventHandlerEntryPointsParameters, OmitParams>;
 
 export interface AnalysisHandler<T> {
-  onAnalysisResult?: (result: AnalysisEntry[]) => void;
-  onAnalysisPoints?: (points: PointDescription[]) => void;
   onAnalysisError?: (error: string) => void;
+  onAnalysisPoints?: (points: PointDescription[]) => void;
+  onAnalysisResult?: (result: AnalysisEntry[]) => void;
   onFinished?(): T;
 }
 

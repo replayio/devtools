@@ -293,13 +293,8 @@ async function setMultiSourceLogpoint(
   try {
     await analysisManager.runAnalysis(params, handler);
   } catch (e: any) {
-    // Only save the error if we're only grabbing the points for a location.
-    // This means that we're not handling cases where the full analysis
-    // throws. We should add that as a follow-up.
-    if (!shouldGetResults) {
-      console.error("Cannot get analysis points", e);
-      saveAnalysisError(locations, condition, e?.code);
-    }
+    console.error("Cannot get analysis points", e);
+    saveAnalysisError(locations, condition, e?.code);
     return;
   }
 

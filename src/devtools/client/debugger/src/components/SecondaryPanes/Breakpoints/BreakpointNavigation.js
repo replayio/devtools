@@ -3,7 +3,7 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect } from "react";
 import { actions } from "ui/actions";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -15,18 +15,15 @@ import { PanelStatus } from "./PanelStatus";
 const { trackEvent } = require("ui/utils/telemetry");
 
 function BreakpointNavigation({
-  executionPoint,
-  indexed,
-  breakpoint,
-  seek,
   analysisPoints,
+  breakpoint,
   editing,
+  executionPoint,
+  seek,
   setShowCondition,
-  showCondition,
   setZoomedBreakpoint = () => {},
+  showCondition,
 }) {
-  const [lastExecutionPoint, setLastExecutionPoint] = useState(0);
-
   const navigateToPoint = point => {
     trackEvent("breakpoint.navigate");
     if (point) {
@@ -41,12 +38,6 @@ function BreakpointNavigation({
     prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = find(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
-
-  useEffect(() => {
-    if (executionPoint && lastExecutionPoint !== executionPoint) {
-      setLastExecutionPoint(executionPoint);
-    }
-  }, [executionPoint, lastExecutionPoint]);
 
   useEffect(() => {
     if (analysisPoints) {
@@ -78,7 +69,7 @@ function BreakpointNavigation({
 
   return (
     <div className={classnames("breakpoint-navigation justify-between p-1.5", { empty: isEmpty })}>
-      {!isEmpty ? (
+      {!isEmpty && !analysisPoints?.error ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
       {analysisPoints && !analysisPoints.error ? (
@@ -87,12 +78,7 @@ function BreakpointNavigation({
         <div className="flex-grow" />
       )}
       <div className="text-center">
-        <PanelStatus
-          prefixBadge={breakpoint.options.prefixBadge}
-          indexed={indexed}
-          executionPoint={lastExecutionPoint}
-          analysisPoints={analysisPoints}
-        />
+        <PanelStatus prefixBadge={breakpoint.options.prefixBadge} analysisPoints={analysisPoints} />
       </div>
     </div>
   );
@@ -129,7 +115,6 @@ const mapStateToProps = (state, { breakpoint }) => ({
     breakpoint.location,
     breakpoint.options.condition
   ),
-  indexed: selectors.getIsIndexed(state),
   executionPoint: selectors.getExecutionPoint(state),
 });
 
