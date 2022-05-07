@@ -6,7 +6,11 @@ import { ThreadFront } from "protocol/thread";
 
 import { ArrayMap } from "./utils";
 
-async function evaluateInTopFrame(point: ExecutionPoint, time: number, text: string): Promise<string | null> {
+async function evaluateInTopFrame(
+  point: ExecutionPoint,
+  time: number,
+  text: string
+): Promise<string | null> {
   const pause = ThreadFront.ensurePause(point, time);
   const frames = await pause.getFrames();
   if (!frames || !frames.length) {
@@ -99,11 +103,11 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     return false;
   }
 
-  function getDisplayName(type: any, fallbackName = 'Anonymous') {
+  function getDisplayName(type: any, fallbackName = "Anonymous") {
     let displayName = fallbackName;
-    if (typeof type.displayName === 'string') {
+    if (typeof type.displayName === "string") {
       displayName = type.displayName;
-    } else if (typeof type.name === 'string' && type.name !== '') {
+    } else if (typeof type.name === "string" && type.name !== "") {
       displayName = type.name;
     }
     return displayName;
@@ -554,11 +558,12 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   }
 }
 
-async function getFiberCommitOperations(
-  point: ExecutionPoint,
-  time: number
-): Promise<void> {
-  const rv = await evaluateInTopFrame(point, time, `(${getCommitOperations})(rendererID, root, priorityLevel)`);
+async function getFiberCommitOperations(point: ExecutionPoint, time: number): Promise<void> {
+  const rv = await evaluateInTopFrame(
+    point,
+    time,
+    `(${getCommitOperations})(rendererID, root, priorityLevel)`
+  );
   if (!rv) {
     throw new Error("Could not extract operations from fiber commit");
   }
@@ -587,7 +592,9 @@ export async function findReactDevtoolsOperations() {
     return;
   }
 
-  const renderers = await Promise.all(injects.map(({ point, time }) => getRendererInfo(point, time)));
+  const renderers = await Promise.all(
+    injects.map(({ point, time }) => getRendererInfo(point, time))
+  );
   for (const { version } of renderers) {
     if (!isSupportedReactVersion(version)) {
       console.log("UnsupportedReactVersion", version);
