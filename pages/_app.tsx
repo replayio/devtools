@@ -19,7 +19,7 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 import tokenManager from "ui/utils/tokenManager";
-import { ApolloWrapper } from "ui/utils/apolloClient";
+import { ApolloWrapper } from "ui/components/ApolloWrapper";
 
 import "image/image.css";
 import "image/icon.css";
