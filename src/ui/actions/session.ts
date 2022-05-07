@@ -1,3 +1,4 @@
+import { findReactDevtoolsOperations } from "protocol/react-devtools";
 import { sendMessage } from "protocol/socket";
 import { ExecutionPoint, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
@@ -8,7 +9,6 @@ import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 import { findAutomatedTests } from "protocol/find-tests";
-import { findReactDevtoolsOperations } from "protocol/react-devtools";
 import { assert, waitForTime } from "protocol/utils";
 import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
@@ -151,6 +151,7 @@ export function createSession(recordingId: string): UIThunkAction {
         disableCache?: boolean;
         useMultipleControllers: boolean;
         multipleControllerUseSnapshots: boolean;
+        enablePersistentIDs?: boolean;
       };
 
       const experimentalSettings: ExperimentalSettings = {
