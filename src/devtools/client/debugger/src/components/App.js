@@ -9,7 +9,7 @@ import { connect } from "../utils/connect";
 import { features } from "../utils/prefs";
 import { prefs } from "../../../../../ui/utils/prefs";
 import actions from "../actions";
-import { setUnexpectedError } from "ui/actions/session";
+import { setUnexpectedError } from "ui/actions/errors";
 import A11yIntention from "./A11yIntention";
 import { ShortcutsModal } from "./ShortcutsModal";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";

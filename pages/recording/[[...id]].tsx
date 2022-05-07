@@ -4,7 +4,8 @@ import { GetStaticProps } from "next/types";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useStore } from "react-redux";
 import { setModal } from "ui/actions/app";
-import { getAccessibleRecording, setExpectedError } from "ui/actions/session";
+import { setExpectedError } from "ui/actions/errors";
+import { getAccessibleRecording } from "ui/actions/session";
 import DevTools from "ui/components/DevTools";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import {

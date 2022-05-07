@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
-import { setExpectedError } from "ui/actions/session";
+import { setExpectedError } from "ui/actions/errors";
 import Login from "ui/components/shared/Login/Login";
 import hooks from "ui/hooks";
 import useAuth0 from "ui/utils/useAuth0";

@@ -14,7 +14,7 @@ import LogRocket from "ui/utils/logrocket";
 import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 
-import { ExpectedError, UnexpectedError } from "ui/state/app";
+import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
 import { getUserId, getUserInfo } from "ui/hooks/users";
@@ -26,12 +26,13 @@ import { getUserSettings } from "ui/hooks/settings";
 import { setViewMode } from "./layout";
 import { getSelectedPanel } from "ui/reducers/layout";
 import { videoReady } from "protocol/graphics";
+import type { SetExpectedErrorAction, SetUnexpectedErrorAction } from "./errors";
+import { setUnexpectedError, setExpectedError } from "./errors";
 
-export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
-  error: UnexpectedError;
-};
+export { setUnexpectedError, setExpectedError };
+
 export type SetTrialExpiredAction = Action<"set_trial_expired"> & { expired: boolean };
-export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
+
 export type ClearExpectedError = Action<"clear_expected_error">;
 export type SetCurrentPointAction = Action<"set_current_point"> & {
   currentPoint: ExecutionPoint | null;
@@ -253,45 +254,12 @@ export function onUploadedData({ uploaded, length }: uploadedData): UIThunkActio
   };
 }
 
-export function setExpectedError(error: ExpectedError): UIThunkAction {
-  return (dispatch, getState) => {
-    const state = getState();
-
-    sendTelemetryEvent("DevtoolsExpectedError", {
-      message: error.message,
-      action: error.action,
-      recordingId: getRecordingId(),
-      sessionId: selectors.getSessionId(state),
-      environment: isDevelopment() ? "dev" : "prod",
-    });
-
-    dispatch({ type: "set_expected_error", error });
-  };
-}
-
 export function setTrialExpired(expired = true): SetTrialExpiredAction {
   return { type: "set_trial_expired", expired };
 }
 
 export function clearTrialExpired(): UIThunkAction {
   return dispatch => dispatch(setTrialExpired(false));
-}
-
-export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
-  return (dispatch, getState) => {
-    const state = getState();
-
-    if (!skipTelemetry) {
-      sendTelemetryEvent("DevtoolsUnexpectedError", {
-        ...error,
-        recordingId: getRecordingId(),
-        sessionId: selectors.getSessionId(state),
-        environment: isDevelopment() ? "dev" : "prod",
-      });
-    }
-
-    dispatch({ type: "set_unexpected_error", error });
-  };
 }
 
 export function clearExpectedError(): UIThunkAction {
