@@ -6,7 +6,6 @@ import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
-import { client } from "./socket";
 import { UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
@@ -241,7 +240,8 @@ export function setupGraphics(store: UIStore) {
 
   Video.init(store);
 
-  ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
+  ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
+    const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {
       hasAllPaintPoints = true;
       await Promise.all(gPaintPromises);

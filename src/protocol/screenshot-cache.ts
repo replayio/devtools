@@ -1,6 +1,5 @@
 import { ThreadFront } from "./thread";
 import { defer } from "./utils";
-import { client } from "./socket";
 import { ScreenShot } from "@recordreplay/protocol";
 
 export class DownloadCancelledError extends Error {}
@@ -122,6 +121,7 @@ export class ScreenshotCache {
   }
 
   private async download(point: string, resizeHeight?: number): Promise<ScreenShot> {
+    const { client } = await import("./socket");
     const screen = (
       await client.Graphics.getPaintContents(
         { point, mimeType: "image/jpeg", resizeHeight },
