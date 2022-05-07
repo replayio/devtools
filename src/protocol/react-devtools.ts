@@ -6,6 +6,37 @@ import { ThreadFront } from "protocol/thread";
 
 import { ArrayMap } from "./utils";
 
+async function evaluateInTopFrame(point: ExecutionPoint, time: number, text: string): Promise<string | null> {
+  const pause = ThreadFront.ensurePause(point, time);
+  const frames = await pause.getFrames();
+  if (!frames || !frames.length) {
+    return null;
+  }
+
+  const topFrameId = frames[0].frameId;
+  const rv = await pause.evaluate(topFrameId, text, /* pure */ false);
+  return (rv?.returned as any)?.value;
+}
+
+type Renderer = any;
+
+function onRendererInject(renderer: Renderer) {
+  const rv = { version: renderer.version || "unknown" };
+  return JSON.stringify(rv);
+}
+
+interface RendererInfo {
+  version: string;
+}
+
+async function getRendererInfo(point: ExecutionPoint, time: number): Promise<RendererInfo> {
+  const str = await evaluateInTopFrame(point, time, `(${onRendererInject})(renderer)`);
+  if (!str) {
+    throw new Error("Could not get renderer information");
+  }
+  return JSON.parse(str);
+}
+
 type Fiber = any;
 type PriorityLevel = any;
 
@@ -15,7 +46,7 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     // @ts-ignore
     const id = __RECORD_REPLAY_PERSISTENT_ID__(fiber);
     if (!id || !id.startsWith("obj")) {
-      throw new Error(`Missing persistent ID for fiber ${fiber}`);
+      throw new Error(`Missing persistent ID for fiber ${fiber} ${fiber.constructor}`);
     }
     return +id.substring(3);
   }
@@ -25,16 +56,22 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   const TREE_OPERATION_REORDER_CHILDREN = 3;
   const TREE_OPERATION_SET_SUBTREE_MODE = 7;
 
+  const ElementTypeFunction = 5;
   const ElementTypeRoot = 11;
   const StrictMode = 1;
 
+  // For react 17.0.1+
   const ReactTypeOfWork = {
+    FunctionComponent: 0,
     HostRoot: 3,
+    HostComponent: 5,
+    Mode: 8,
     SuspenseComponent: 13,
     OffscreenComponent: 22,
   };
 
-  const StrictModeBits = 0;
+  // For react 18+
+  const StrictModeBits = 0b011000;
 
   const logMessages: string[] = [];
 
@@ -51,26 +88,57 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   function setRootPseudoKey(id: number, root: Fiber) {}
   function removeRootPseudoKey(id: number) {}
   function shouldFilterFiber(fiber: Fiber) {
+    // Note: This does not match what the backend does normally. shouldFilterFiber()
+    // is pretty complicated, so to cut corners this just tweaks things so that the
+    // same fibers will be filtered out on a simple react app.
+    switch (fiber.tag) {
+      case ReactTypeOfWork.Mode:
+      case ReactTypeOfWork.HostComponent:
+        return true;
+    }
     return false;
+  }
+
+  function getDisplayName(type: any, fallbackName = 'Anonymous') {
+    let displayName = fallbackName;
+    if (typeof type.displayName === 'string') {
+      displayName = type.displayName;
+    } else if (typeof type.name === 'string' && type.name !== '') {
+      displayName = type.name;
+    }
+    return displayName;
   }
 
   function getDisplayNameForFiber(fiber: Fiber) {
     const { elementType, type, tag } = fiber;
-    log(`GetDisplayNameForFiber ${elementType} ${type} ${tag}`);
+    switch (tag) {
+      case ReactTypeOfWork.FunctionComponent:
+        return getDisplayName(type);
+    }
+    log(`GetDisplayNameUnknownFiber ${typeof elementType} ${typeof type} ${tag}`);
     return "Fiber";
   }
 
   function getElementTypeForFiber(fiber: Fiber) {
     const { type, tag } = fiber;
-    log(`GetElementTypeForFiber ${type} ${tag}`);
+    switch (tag) {
+      case ReactTypeOfWork.FunctionComponent:
+        return ElementTypeFunction;
+    }
+    log(`GetElementTypeUnknownFiber ${typeof type} ${tag}`);
     return ElementTypeRoot;
   }
 
   function utfEncodeString(str: string) {
-    return str;
+    // FIXME
+    const rv: number[] = [];
+    for (let i = 0; i < str.length; i++) {
+      rv.push(str.charCodeAt(i));
+    }
+    return rv;
   }
 
-  const pendingStringTable: Map<string, { encodedString: string; id: number }> = new Map();
+  const pendingStringTable: Map<string, { encodedString: number[]; id: number }> = new Map();
   let pendingStringTableLength = 0;
 
   function getStringID(string: string | null) {
@@ -104,11 +172,14 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     const profilingFlags = 0;
 
     if (isRoot) {
+      log(`Operation AddRoot ${id}`);
+
       pushOperation(TREE_OPERATION_ADD);
       pushOperation(id);
       pushOperation(ElementTypeRoot);
       pushOperation((fiber.mode & StrictModeBits) !== 0 ? 1 : 0);
       pushOperation(profilingFlags);
+      // @ts-ignore
       pushOperation(StrictModeBits !== 0 ? 1 : 0);
       pushOperation(hasOwnerMetadata ? 1 : 0);
     } else {
@@ -123,6 +194,9 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
 
       const keyString = key === null ? null : String(key);
       const keyStringID = getStringID(keyString);
+
+      log(`Operation AddNode ${id} ${parentID}`);
+
       pushOperation(TREE_OPERATION_ADD);
       pushOperation(id);
       pushOperation(elementType);
@@ -132,6 +206,7 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
       pushOperation(keyStringID); // If this subtree has a new mode, let the frontend know.
 
       if ((fiber.mode & StrictModeBits) !== 0 && (parentFiber.mode & StrictModeBits) === 0) {
+        log(`Operation SetSubtreeMode ${id}`);
         pushOperation(TREE_OPERATION_SET_SUBTREE_MODE);
         pushOperation(id);
         pushOperation(StrictMode);
@@ -272,8 +347,12 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
       return;
     }
 
+    const id = getFiberID(fiber);
+
+    log(`Operation ReorderChildren ${id}`);
+
     pushOperation(TREE_OPERATION_REORDER_CHILDREN);
-    pushOperation(getFiberID(fiber));
+    pushOperation(id);
     pushOperation(numChildren);
 
     for (let i = 0; i < nextChildren.length; i++) {
@@ -471,26 +550,25 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     const operations = getOperations();
     return JSON.stringify({ logMessages, operations });
   } catch (e: any) {
-    return "Exception: " + e.toString();
+    return `Exception: ${e} ${e.stack}`;
   }
 }
 
 async function getFiberCommitOperations(
   point: ExecutionPoint,
   time: number
-): Promise<number[] | undefined> {
-  const pause = ThreadFront.ensurePause(point, time);
-  const frames = await pause.getFrames();
-  if (!frames || !frames.length) {
-    return;
+): Promise<void> {
+  const rv = await evaluateInTopFrame(point, time, `(${getCommitOperations})(rendererID, root, priorityLevel)`);
+  if (!rv) {
+    throw new Error("Could not extract operations from fiber commit");
   }
+  console.log("FiberCommit", rv);
+  return JSON.parse(rv);
+}
 
-  const text = `(${getCommitOperations})(rendererID, root, priorityLevel)`;
-
-  const topFrameId = frames[0].frameId;
-  const rv = await pause.evaluate(topFrameId, text, /* pure */ false);
-
-  console.log("FiberCommit", rv, (rv?.returned as any)?.value);
+// Constants in getCommitOperations are specialized for recent react versions.
+function isSupportedReactVersion(version: string) {
+  return version == "18.1.0";
 }
 
 export async function findReactDevtoolsOperations() {
@@ -504,6 +582,19 @@ export async function findReactDevtoolsOperations() {
     });
   });
 
+  const injects = hookAnnotations.map.get("inject");
+  if (!injects) {
+    return;
+  }
+
+  const renderers = await Promise.all(injects.map(({ point, time }) => getRendererInfo(point, time)));
+  for (const { version } of renderers) {
+    if (!isSupportedReactVersion(version)) {
+      console.log("UnsupportedReactVersion", version);
+      return;
+    }
+  }
+
   const fiberCommits = hookAnnotations.map.get("commit-fiber-root");
   if (!fiberCommits) {
     return;
@@ -512,6 +603,12 @@ export async function findReactDevtoolsOperations() {
   console.log("FiberCommits", fiberCommits);
 
   const commitOperations = await Promise.all(
-    fiberCommits.map(({ point, time }) => getFiberCommitOperations(point, time))
+    fiberCommits.map(({ point, time }, i) => {
+      if (i == 1) {
+        return getFiberCommitOperations(point, time);
+      }
+    })
   );
+
+  console.log("CommitOperations", commitOperations);
 }
