@@ -50,23 +50,18 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
 
   function setRootPseudoKey(id: number, root: Fiber) {}
   function removeRootPseudoKey(id: number) {}
-  function shouldFilterFiber(fiber: Fiber) { return false; }
+  function shouldFilterFiber(fiber: Fiber) {
+    return false;
+  }
 
   function getDisplayNameForFiber(fiber: Fiber) {
-    const {
-      elementType,
-      type,
-      tag
-    } = fiber;
+    const { elementType, type, tag } = fiber;
     log(`GetDisplayNameForFiber ${elementType} ${type} ${tag}`);
     return "Fiber";
   }
 
   function getElementTypeForFiber(fiber: Fiber) {
-    const {
-      type,
-      tag
-    } = fiber;
+    const { type, tag } = fiber;
     log(`GetElementTypeForFiber ${type} ${tag}`);
     return ElementTypeRoot;
   }
@@ -75,7 +70,7 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     return str;
   }
 
-  const pendingStringTable: Map<string, { encodedString: string, id: number }> = new Map();
+  const pendingStringTable: Map<string, { encodedString: string; id: number }> = new Map();
   let pendingStringTableLength = 0;
 
   function getStringID(string: string | null) {
@@ -94,7 +89,7 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
 
     pendingStringTable.set(string, {
       encodedString,
-      id
+      id,
     });
 
     pendingStringTableLength += encodedString.length + 1;
@@ -105,7 +100,7 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     const isRoot = fiber.tag === ReactTypeOfWork.HostRoot;
     const id = getFiberID(fiber);
 
-    const hasOwnerMetadata = fiber.hasOwnProperty('_debugOwner');
+    const hasOwnerMetadata = fiber.hasOwnProperty("_debugOwner");
     const profilingFlags = 0;
 
     if (isRoot) {
@@ -117,14 +112,10 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
       pushOperation(StrictModeBits !== 0 ? 1 : 0);
       pushOperation(hasOwnerMetadata ? 1 : 0);
     } else {
-      const {
-        key
-      } = fiber;
+      const { key } = fiber;
       const displayName = getDisplayNameForFiber(fiber);
       const elementType = getElementTypeForFiber(fiber);
-      const {
-        _debugOwner
-      } = fiber;
+      const { _debugOwner } = fiber;
 
       const ownerID = _debugOwner != null ? getFiberID(_debugOwner) : 0;
       const parentID = parentFiber ? getFiberID(parentFiber) : 0;
@@ -148,7 +139,11 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     }
   }
 
-  function mountFiberRecursively(firstChild: Fiber, parentFiber: Fiber | null, traverseSiblings: boolean) {
+  function mountFiberRecursively(
+    firstChild: Fiber,
+    parentFiber: Fiber | null,
+    traverseSiblings: boolean
+  ) {
     let fiber = firstChild;
 
     while (fiber !== null) {
@@ -215,7 +210,8 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   }
 
   function unmountFiberChildrenRecursively(fiber: Fiber) {
-    const isTimedOutSuspense = fiber.tag === ReactTypeOfWork.SuspenseComponent && fiber.memoizedState !== null;
+    const isTimedOutSuspense =
+      fiber.tag === ReactTypeOfWork.SuspenseComponent && fiber.memoizedState !== null;
     let child = fiber.child;
 
     if (isTimedOutSuspense) {
@@ -240,7 +236,8 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
       nextChildren.push(getFiberID(fiber));
     } else {
       let child = fiber.child;
-      const isTimedOutSuspense = fiber.tag === ReactTypeOfWork.SuspenseComponent && fiber.memoizedState !== null;
+      const isTimedOutSuspense =
+        fiber.tag === ReactTypeOfWork.SuspenseComponent && fiber.memoizedState !== null;
 
       if (isTimedOutSuspense) {
         const primaryChildFragment = fiber.child;
@@ -298,13 +295,21 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
       const prevFiberChild = prevFiber.child;
       const prevFallbackChildSet = prevFiberChild ? prevFiberChild.sibling : null;
 
-      if (nextFallbackChildSet != null && prevFallbackChildSet != null && updateFiberRecursively(nextFallbackChildSet, prevFallbackChildSet, nextFiber)) {
+      if (
+        nextFallbackChildSet != null &&
+        prevFallbackChildSet != null &&
+        updateFiberRecursively(nextFallbackChildSet, prevFallbackChildSet, nextFiber)
+      ) {
         shouldResetChildren = true;
       }
     } else if (prevDidTimeout && !nextDidTimeOut) {
       const nextPrimaryChildSet = nextFiber.child;
       if (nextPrimaryChildSet !== null) {
-        mountFiberRecursively(nextPrimaryChildSet, shouldIncludeInTree ? nextFiber : parentFiber, true);
+        mountFiberRecursively(
+          nextPrimaryChildSet,
+          shouldIncludeInTree ? nextFiber : parentFiber,
+          true
+        );
       }
       shouldResetChildren = true;
     } else if (!prevDidTimeout && nextDidTimeOut) {
@@ -312,7 +317,11 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
       const nextFiberChild = nextFiber.child;
       const nextFallbackChildSet = nextFiberChild ? nextFiberChild.sibling : null;
       if (nextFallbackChildSet != null) {
-        mountFiberRecursively(nextFallbackChildSet, shouldIncludeInTree ? nextFiber : parentFiber, true);
+        mountFiberRecursively(
+          nextFallbackChildSet,
+          shouldIncludeInTree ? nextFiber : parentFiber,
+          true
+        );
         shouldResetChildren = true;
       }
     } else {
@@ -322,7 +331,13 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
         while (nextChild) {
           if (nextChild.alternate) {
             const prevChild = nextChild.alternate;
-            if (updateFiberRecursively(nextChild, prevChild, shouldIncludeInTree ? nextFiber : parentFiber)) {
+            if (
+              updateFiberRecursively(
+                nextChild,
+                prevChild,
+                shouldIncludeInTree ? nextFiber : parentFiber
+              )
+            ) {
               shouldResetChildren = true;
             }
             if (prevChild !== prevChildAtSameIndex) {
@@ -371,10 +386,14 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
     currentRootID = getFiberID(current);
 
     if (alternate) {
-      const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null &&
-      alternate.memoizedState.isDehydrated !== true;
-      const isMounted = current.memoizedState != null && current.memoizedState.element != null &&
-      current.memoizedState.isDehydrated !== true;
+      const wasMounted =
+        alternate.memoizedState != null &&
+        alternate.memoizedState.element != null &&
+        alternate.memoizedState.isDehydrated !== true;
+      const isMounted =
+        current.memoizedState != null &&
+        current.memoizedState.element != null &&
+        current.memoizedState.isDehydrated !== true;
 
       if (!wasMounted && isMounted) {
         setRootPseudoKey(currentRootID, current);
@@ -392,15 +411,18 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   }
 
   function getOperations(): number[] {
-    const numUnmountIDs = pendingRealUnmountedIDs.length + pendingSimulatedUnmountedIDs.length + (pendingUnmountedRootID === null ? 0 : 1);
+    const numUnmountIDs =
+      pendingRealUnmountedIDs.length +
+      pendingSimulatedUnmountedIDs.length +
+      (pendingUnmountedRootID === null ? 0 : 1);
     const operations = new Array(
       2 + // [rendererID, rootFiberID]
-      1 + // [stringTableLength]
-      pendingStringTableLength +
-      // [TREE_OPERATION_REMOVE, removedIDLength, ...ids]
-      (numUnmountIDs > 0 ? 2 + numUnmountIDs : 0) +
-      // Regular operations
-      pendingOperations.length
+        1 + // [stringTableLength]
+        pendingStringTableLength +
+        // [TREE_OPERATION_REMOVE, removedIDLength, ...ids]
+        (numUnmountIDs > 0 ? 2 + numUnmountIDs : 0) +
+        // Regular operations
+        pendingOperations.length
     );
 
     let i = 0;
