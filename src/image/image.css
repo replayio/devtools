@@ -15,11 +15,16 @@ img.unicorn-dark {
   background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
   background-color: transparent;
 }
-.img.picker-light,
-.img.picker-dark {
-  background-image: url(~devtools/client/debugger/images/sources/prefix-picker.svg) !important;
+.img.picker-light {
+  background-image: url(~devtools/client/debugger/images/sources/prefix-picker-light.svg) !important;
   background-color: transparent;
 }
+
+.img.picker-dark {
+  background-image: url(~devtools/client/debugger/images/sources/prefix-picker-dark.svg) !important;
+  background-color: transparent;
+}
+
 
 .img.angular {
   background-image: url(~devtools/client/debugger/images/sources/angular.svg) !important;

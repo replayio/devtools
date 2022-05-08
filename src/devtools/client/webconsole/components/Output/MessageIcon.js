@@ -48,11 +48,11 @@ export function MessageIcon(props) {
             marginTop: "2px",
           }
         : {
-            height: "9px",
-            marginLeft: "8px",
-            marginRight: "11px",
-            marginTop: "6px",
-            width: "9px",
+            height: "7px",
+            marginLeft: "9px",
+            marginRight: "12px",
+            marginTop: "8px",
+            width: "7px",
           };
     return <PrefixBadge prefixBadge={prefixBadge} style={style} />;
   }
