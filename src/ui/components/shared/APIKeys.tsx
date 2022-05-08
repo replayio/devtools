@@ -31,10 +31,10 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
               onFocus={ev => ev.target.setSelectionRange(0, keyValue.length)}
             />
             {copied ? (
-              <div className="mx-3 text-primaryAccent">Copied!</div>
+              <div className="text-primaryAccent">Copied</div>
             ) : (
               <MaterialIcon
-                className="material-icons mx-2.5 w-5 text-primaryAccent"
+                className="material-icons w-5 cursor-pointer text-primaryAccent hover:text-primaryAccentHover"
                 iconSize="lg"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
