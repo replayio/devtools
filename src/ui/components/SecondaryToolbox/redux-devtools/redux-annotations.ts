@@ -84,7 +84,7 @@ export const processReduxAnnotations = (annotations: Annotation[]): ReduxActionA
   return annotations.map(annotation => {
     const { contents, kind, point, time } = annotation;
     // Parse the stringified data from the Redux DevTools on the backend
-    const message = JSON.parse(contents);
+    // const message = JSON.parse(contents);
     // Wrap that data in an action we can use to update the DevTools store in the panel
     const action = createDevtoolsAction(1, message)!;
     return { kind, point, time, action };

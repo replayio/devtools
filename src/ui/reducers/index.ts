@@ -11,6 +11,7 @@ import consoleReducers from "devtools/client/webconsole/reducers";
 import * as consoleSelectors from "devtools/client/webconsole/selectors";
 import * as debuggerSelectors from "devtools/client/debugger/src/selectors";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
+import { reducers as reduxDevtoolsReducers } from "@redux-devtools/app";
 
 export const reducers = {
   app,
@@ -23,6 +24,8 @@ export const reducers = {
   ...debuggerReducers,
   ...consoleReducers.reducers,
   ...inspectorReducers,
+  // probably state sanitize that out
+  reduxInstances: reduxDevtoolsReducers.instances,
 };
 
 export const selectors = {

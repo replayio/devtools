@@ -1,14 +1,24 @@
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { getActiveInstance } from "@redux-devtools/app/lib/cjs/reducers/instances";
-import { act } from "react-dom/test-utils";
+
+function ActionRow({ action }) {
+  const reduxAnnotations = useContext(ReduxAnnotationsContext);
+  const currentExecutionPoint = useSelector(getCurrentExecutionPoint);
+  const annotation = reduxAnnotations[action.id];
+  const executionPoint = annotation.executionPoint;
+  const isCurrentlyPaused = currentExecutionPoint == executionPoint;
+
+  return;
+  <div className={isCurrentlyPaused ? "redline" : ""}>{action.action.type}</div>;
+}
 
 function ActionsList({ liftedState }) {
   const actions = Object.values(liftedState.actionsById);
-  console.log(actions);
+
   return (
     <div>
       {actions.map(action => (
-        <div>{action.action.type}</div>
+        <ActionRow action={action} />
       ))}
     </div>
   );
