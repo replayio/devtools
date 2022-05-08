@@ -46,7 +46,12 @@ type Fiber = any;
 type PriorityLevel = any;
 
 // Much of the code in this function is based on or copied from the react devtools backend.
-function doBackendOperations(kind: string, rendererID: number, rootOrFiber: Fiber, priorityLevel: PriorityLevel) {
+function doBackendOperations(
+  kind: string,
+  rendererID: number,
+  rootOrFiber: Fiber,
+  priorityLevel: PriorityLevel
+) {
   function getPersistentID(obj: any): number {
     // @ts-ignore
     const id = __RECORD_REPLAY_PERSISTENT_ID__(obj);
@@ -586,7 +591,10 @@ interface OperationsInfo {
   operations: number[];
 }
 
-async function getFiberCommitOperations(point: ExecutionPoint, time: number): Promise<OperationsInfo> {
+async function getFiberCommitOperations(
+  point: ExecutionPoint,
+  time: number
+): Promise<OperationsInfo> {
   const rv = await evaluateInTopFrame(
     point,
     time,
@@ -600,7 +608,10 @@ async function getFiberCommitOperations(point: ExecutionPoint, time: number): Pr
   return { point, time, logMessages, operations };
 }
 
-async function getFiberUnmountOperations(point: ExecutionPoint, time: number): Promise<OperationsInfo> {
+async function getFiberUnmountOperations(
+  point: ExecutionPoint,
+  time: number
+): Promise<OperationsInfo> {
   const rv = await evaluateInTopFrame(
     point,
     time,
