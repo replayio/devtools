@@ -3,6 +3,7 @@
 
 import { Annotation, ExecutionPoint } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
+import { comparePoints } from "./execution-point-utils";
 
 import { ArrayMap } from "./utils";
 
@@ -45,14 +46,26 @@ type Fiber = any;
 type PriorityLevel = any;
 
 // Much of the code in this function is based on or copied from the react devtools backend.
-function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: PriorityLevel) {
-  function getFiberID(fiber: Fiber): number {
+function doBackendOperations(kind: string, rendererID: number, rootOrFiber: Fiber, priorityLevel: PriorityLevel) {
+  function getPersistentID(obj: any): number {
     // @ts-ignore
-    const id = __RECORD_REPLAY_PERSISTENT_ID__(fiber);
+    const id = __RECORD_REPLAY_PERSISTENT_ID__(obj);
     if (!id || !id.startsWith("obj")) {
-      throw new Error(`Missing persistent ID for fiber ${fiber} ${fiber.constructor}`);
+      throw new Error(`Missing persistent ID for fiber ${obj} ${obj.constructor}`);
     }
     return +id.substring(3);
+  }
+
+  function getFiberID(fiber: Fiber): number {
+    // Both a fiber and its alternate have the same ID. To handle this using
+    // persistent IDs, the ID of a fiber is the minimal persistent ID of itself
+    // and its alternate, if there is one.
+    const id = getPersistentID(fiber);
+    if (!fiber.alternate) {
+      return id;
+    }
+    const alternateId = getPersistentID(fiber.alternate);
+    return Math.min(id, alternateId);
   }
 
   const TREE_OPERATION_ADD = 1;
@@ -550,7 +563,15 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   }
 
   try {
-    handleCommitFiberRoot(root, priorityLevel);
+    switch (kind) {
+      case "commit":
+        handleCommitFiberRoot(rootOrFiber, priorityLevel);
+        break;
+      case "unmount":
+        recordUnmount(rootOrFiber, false);
+        break;
+    }
+
     const operations = getOperations();
     return JSON.stringify({ logMessages, operations });
   } catch (e: any) {
@@ -558,17 +579,39 @@ function getCommitOperations(rendererID: number, root: Fiber, priorityLevel: Pri
   }
 }
 
-async function getFiberCommitOperations(point: ExecutionPoint, time: number): Promise<void> {
+interface OperationsInfo {
+  point: ExecutionPoint;
+  time: number;
+  logMessages: string[];
+  operations: number[];
+}
+
+async function getFiberCommitOperations(point: ExecutionPoint, time: number): Promise<OperationsInfo> {
   const rv = await evaluateInTopFrame(
     point,
     time,
-    `(${getCommitOperations})(rendererID, root, priorityLevel)`
+    `(${doBackendOperations})("commit", rendererID, root, priorityLevel)`
   );
   if (!rv) {
     throw new Error("Could not extract operations from fiber commit");
   }
-  console.log("FiberCommit", rv);
-  return JSON.parse(rv);
+  console.log("FiberCommit", time, rv);
+  const { logMessages, operations } = JSON.parse(rv);
+  return { point, time, logMessages, operations };
+}
+
+async function getFiberUnmountOperations(point: ExecutionPoint, time: number): Promise<OperationsInfo> {
+  const rv = await evaluateInTopFrame(
+    point,
+    time,
+    `(${doBackendOperations})("unmount", rendererID, fiber)`
+  );
+  if (!rv) {
+    throw new Error("Could not extract operations from fiber commit");
+  }
+  console.log("FiberUnmount", time, rv);
+  const { logMessages, operations } = JSON.parse(rv);
+  return { point, time, logMessages, operations };
 }
 
 // Constants in getCommitOperations are specialized for recent react versions.
@@ -602,20 +645,37 @@ export async function findReactDevtoolsOperations() {
     }
   }
 
-  const fiberCommits = hookAnnotations.map.get("commit-fiber-root");
-  if (!fiberCommits) {
-    return;
-  }
-
-  console.log("FiberCommits", fiberCommits);
-
+  const fiberCommits = hookAnnotations.map.get("commit-fiber-root") || [];
   const commitOperations = await Promise.all(
-    fiberCommits.map(({ point, time }, i) => {
-      if (i == 1) {
-        return getFiberCommitOperations(point, time);
-      }
-    })
+    fiberCommits.map(({ point, time }) => getFiberCommitOperations(point, time))
   );
 
-  console.log("CommitOperations", commitOperations);
+  const fiberUnmounts = hookAnnotations.map.get("commit-fiber-unmount") || [];
+  const unmountOperations = await Promise.all(
+    fiberUnmounts.map(({ point, time }) => getFiberUnmountOperations(point, time))
+  );
+
+  let allOperations = [...commitOperations, ...unmountOperations];
+  allOperations.sort((a, b) => comparePoints(a.point, b.point));
+
+  // Unmounts will not know about the current root ID. Normally the backend will
+  // set this when flushing the unmount operations during the next onCommitFiberRoot
+  // call, but we can fill in the roots ourselves by looking for the next commit.
+  for (let i = 0; i < allOperations.length; i++) {
+    const { operations } = allOperations[i];
+    if (operations[1] === null) {
+      for (let j = i + 1; j < allOperations.length; j++) {
+        const { operations: laterOperations } = allOperations[j];
+        if (laterOperations[1] !== null && operations[0] === laterOperations[0]) {
+          operations[1] = laterOperations[1];
+          break;
+        }
+      }
+    }
+  }
+
+  // Filter out operations which don't include any changes.
+  allOperations = allOperations.filter(({ operations }) => operations.length > 3);
+
+  console.log("BackendOperations", allOperations);
 }
