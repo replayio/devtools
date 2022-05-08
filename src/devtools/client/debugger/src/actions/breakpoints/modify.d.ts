@@ -14,3 +14,14 @@ export function removeRequestedBreakpoint(
 ): Action<"REMOVE_REQUESTED_BREAKPOINT"> & {
   location: Omit<Location, "column">;
 };
+export function addBreakpoint(
+  cx: Context,
+  initialLocation: Location,
+  options?: unknown,
+  disabled?: boolean,
+  shouldTrack?: boolean,
+  shouldCancel?: () => boolean
+);
+export function enableBreakpoint(cx: Context, initialBreakpoint: Breakpoint);
+export function disableBreakpoint(cx: Context, initialBreakpoint: Breakpoint);
+export function runAnalysis(cx: Context, location: Location, options: unknown);

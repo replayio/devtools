@@ -8,7 +8,7 @@ import { setSymbols } from "../sources/symbols";
 import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpoint";
 
 import { getSource } from "../../selectors";
-import { addBreakpoint } from ".";
+import { addBreakpoint } from "./modify";
 
 async function findNewLocation(cx, { name, offset, index }, location, source, dispatch) {
   const symbols = await dispatch(setSymbols({ cx, source }));
