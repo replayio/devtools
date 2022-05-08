@@ -23,18 +23,18 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
     <>
       <div className="flex items-center justify-between space-x-3">
         <div className="w-0 flex-auto">
-          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-blue-50 px-2.5 text-primaryAccent">
+          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 text-themeTextFieldColor text-primaryAccent">
             <input
               readOnly
               value={keyValue}
-              className="flex-auto truncate bg-blue-50 focus:outline-none"
+              className="flex-auto truncate bg-themeTextFieldBgcolor focus:outline-none"
               onFocus={ev => ev.target.setSelectionRange(0, keyValue.length)}
             />
             {copied ? (
-              <div className="mx-3 text-primaryAccent">Copied!</div>
+              <div className="text-primaryAccent">Copied</div>
             ) : (
               <MaterialIcon
-                className="material-icons mx-2.5 w-5 text-primaryAccent"
+                className="material-icons w-5 cursor-pointer text-primaryAccent hover:text-primaryAccentHover"
                 iconSize="lg"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >

@@ -15,11 +15,11 @@ export const PREFIX_COLORS = {
 };
 
 export const DARK_PREFIX_COLORS = {
-  purple: "#8455a5",
+  purple: "#CC81FF",
   empty: "#a8a8a8",
-  green: "#099500",
-  orange: "#ad6404",
-  yellow: "#b19900",
+  green: "#69E261",
+  orange: "#FBAF4C",
+  yellow: "#FDEA3D",
 };
 
 export function isColorPrefix(prefixBadge) {
@@ -111,9 +111,8 @@ function PrefixBadgePicker({ onSelect, pickerNode, theme, onDismiss }) {
           padding: "3px 5px",
           left: `${left + 24}px`,
           top: `${top - 3}px`,
-          flexShrink: 0
         }}
-        className="transform -translate-x-full flex absolute z-10 space-x-1"
+        className="absolute z-10 flex -translate-x-full transform space-x-1"
         ref={pickerRef}
       >
         <EmojiBadge onSelect={onSelect} theme={theme} emoji="unicorn" />
@@ -136,16 +135,18 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
     return null;
   }
 
+  console.log({ showPrefixBadge });
+
   const prefixBadge = breakpoint.options.prefixBadge;
   const isColor = isColorPrefix(prefixBadge);
   const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
   return (
     <button
-      className={`h-5 w-5 rounded-full p-px   ${
+      className={`h-5 w-5 rounded-full p-px ${
         prefixBadge == "unicorn"
           ? `img unicorn-${theme}`
           : !prefixBadge
-          ? `img picker-${theme} border border-gray-500`
+          ? `img picker-${theme}`
           : ""
       }`}
       ref={pickerNode}
@@ -153,7 +154,7 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
         backgroundColor: isColor
           ? colors[prefixBadge]
           : !prefixBadge
-          ? ""
+          ? "var(--theme-base-100)"
           : "",
         borderRadius: "100%",
         position: "relative",
