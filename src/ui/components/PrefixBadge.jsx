@@ -112,7 +112,7 @@ function PrefixBadgePicker({ onSelect, pickerNode, theme, onDismiss }) {
           left: `${left + 24}px`,
           top: `${top - 3}px`,
         }}
-        className="transform -translate-x-full flex absolute z-10 space-x-1"
+        className="absolute z-10 flex -translate-x-full transform space-x-1"
         ref={pickerRef}
       >
         <EmojiBadge onSelect={onSelect} theme={theme} emoji="unicorn" />
@@ -154,7 +154,7 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
         backgroundColor: isColor
           ? colors[prefixBadge]
           : !prefixBadge
-          ? "var(--theme-text-field-bgcolor)"
+          ? "var(--theme-base-100)"
           : "",
         borderRadius: "100%",
         position: "relative",

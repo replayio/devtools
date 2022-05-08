@@ -11,7 +11,7 @@
   background-image: url(~devtools/client/debugger/images/sources/aframe.svg) !important;
 }
 .img.unicorn-light,
-img.unicorn-dark {
+.img.unicorn-dark {
   background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
   background-color: transparent;
 }
