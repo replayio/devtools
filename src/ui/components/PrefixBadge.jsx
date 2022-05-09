@@ -76,7 +76,7 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
     return (
       <div
         style={{
-          className: getBadgeClass(prefixBadge, theme, showEmpty),
+          className: "getBadgeColor(prefixBadge, theme, showEmpty)",
           borderRadius: "16px",
           height: "16px",
           width: "16px",

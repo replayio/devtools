@@ -41,10 +41,6 @@ export function PanelStatus({
     status = numberStatus(previousTimeIndex, analysisPoints.data.length);
   }
 
-  const style = isColorPrefix(prefixBadge)
-    ? { backgroundColor: getBadgeColor(prefixBadge, theme), color: "black" }
-    : {};
-
   return (
     <div className="breakpoint-navigation-status-container">
       <div
