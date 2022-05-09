@@ -35,21 +35,21 @@
 }
 
 :root:global(.theme-light) .orange {
-  background-color: #eba64d;
+  background-color: #da7c04;
   color: #fff;
 }
 
 :root:global(.theme-dark) .orange {
-  background-color: #fbaf4c;
+  background-color: #ff9a19;
   color: #fff;
 }
 
 :root:global(.theme-light) .yellow {
-  background-color: #f0cf56;
+  background-color: #e4cd00;
   color: rgb(99, 79, 5);
 }
 
 :root:global(.theme-dark) .yellow {
-  background-color: #fdea3d;
+  background-color: #fee608;
   color: rgb(99, 79, 5);
 }

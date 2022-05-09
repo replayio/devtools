@@ -31,10 +31,7 @@ function CircleBadge({ color, onSelect, theme }) {
   return (
     <div
       onClick={() => onSelect(color)}
-      className="h-5 w-5 cursor-pointer rounded-full"
-      style={{
-        backgroundColor: getBadgeColor(color, theme, true),
-      }}
+      className={`h-5 w-5 cursor-pointer rounded-full ${styles[color]}`}
     />
   );
 }
@@ -68,10 +65,11 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
   }
 
   if (isColorPrefix(prefixBadge)) {
+    console.log(prefixBadge);
     return (
       <div
+        className={`${styles[prefixBadge]}`}
         style={{
-          backgroundColor: getBadgeColor(prefixBadge, theme, showEmpty),
           borderRadius: "16px",
           height: "16px",
           width: "16px",
@@ -143,20 +141,15 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
   return (
     <button
-      className={`h-5 w-5 rounded-full p-px ${
+      className={`h-5 w-5 p-px ${
         prefixBadge == "unicorn"
           ? `img unicorn-${theme}`
           : !prefixBadge
           ? `img picker-${theme}`
           : ""
-      }`}
+      } ${styles[prefixBadge]}`}
       ref={pickerNode}
       style={{
-        backgroundColor: isColor
-          ? colors[prefixBadge]
-          : !prefixBadge
-          ? "var(--theme-base-100)"
-          : "",
         borderRadius: "100%",
         position: "relative",
         height: "20px",
