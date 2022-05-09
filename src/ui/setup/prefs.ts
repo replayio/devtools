@@ -1,8 +1,9 @@
+import { prefs as debuggerPrefs } from "devtools/client/debugger/src/utils/prefs";
+import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
-import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
   getConsoleFilterDrawerExpanded,
@@ -60,6 +61,7 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
 const updateStandardPrefs = createPrefsUpdater(prefs);
 const updateAsyncPrefs = createPrefsUpdater(asyncStore);
 const updateWebconsolePrefs = createPrefsUpdater(webconsolePrefs);
+const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
 
 const actualUpdatePrefs = (state: UIState, oldState: UIState) => {
   updateStandardPrefs(state, oldState, "viewMode", getViewMode);
@@ -69,20 +71,33 @@ const actualUpdatePrefs = (state: UIState, oldState: UIState) => {
     state,
     oldState,
     "eventListenerBreakpoints",
-    (state: UIState) => state.eventListenerBreakpoints
+    state => state.eventListenerBreakpoints
   );
-  updateAsyncPrefs(
-    state,
-    oldState,
-    "commandHistory",
-    (state: UIState) => state.messages?.commandHistory
-  );
+  updateAsyncPrefs(state, oldState, "commandHistory", state => state.messages?.commandHistory);
 
   // This is lazy-loaded, so it may not exist on startup
   if (state.consoleUI && oldState.consoleUI) {
-    updateWebconsolePrefs(state, oldState, "timestampsVisible", (state: UIState) => {
+    updateWebconsolePrefs(state, oldState, "timestampsVisible", state => {
       return state.consoleUI.timestampsVisible;
     });
+  }
+
+  if (state.ui && oldState.ui) {
+    updateDebuggerPrefs(
+      state,
+      oldState,
+      "frameworkGroupingOn",
+      state => state.ui.frameworkGroupingOn
+    );
+
+    updateDebuggerPrefs(
+      state,
+      oldState,
+      "startPanelCollapsed",
+      state => state.ui.startPanelCollapsed
+    );
+
+    updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
   }
   maybeUpdateReplaySessions(state);
 };
