@@ -108,7 +108,7 @@ export default function update(state = initial, action: AnyAction) {
       state = updateBreakpointHitCounts(state, action as SetSourceActorBreakpointHitCountsAction);
       break;
 
-    case "set_loaded_regions":
+    case "app/setLoadedRegions":
       state.values = clearBreakpointHitCounts(state);
       break;
 

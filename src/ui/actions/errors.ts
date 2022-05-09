@@ -1,17 +1,13 @@
-import type { Action } from "redux";
-
 import { UIThunkAction } from "ui/actions";
 import * as selectors from "ui/reducers/app";
-import { isDevelopment } from "ui/utils/environment";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
+import {
+  setExpectedError as setExpectedErrorAction,
+  setUnexpectedError as setUnexpectedErrorAction,
+} from "ui/reducers/app";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
+import { isDevelopment } from "ui/utils/environment";
 import { getRecordingId } from "ui/utils/recording";
-
-export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
-  error: UnexpectedError;
-};
-
-export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 export function setExpectedError(error: ExpectedError): UIThunkAction {
   return (dispatch, getState) => {
@@ -25,7 +21,7 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
       environment: isDevelopment() ? "dev" : "prod",
     });
 
-    dispatch({ type: "set_expected_error", error });
+    dispatch(setExpectedErrorAction(error));
   };
 }
 
@@ -42,6 +38,6 @@ export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false
       });
     }
 
-    dispatch({ type: "set_unexpected_error", error });
+    dispatch(setUnexpectedErrorAction(error));
   };
 }

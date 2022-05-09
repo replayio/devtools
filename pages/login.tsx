@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { clearExpectedError } from "ui/actions/session";
 import Login from "ui/components/shared/Login/Login";
+import { clearExpectedError } from "ui/reducers/app";
 
 export default function LoginPage() {
   const router = useRouter();

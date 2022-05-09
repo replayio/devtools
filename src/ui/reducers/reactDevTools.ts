@@ -2,7 +2,6 @@ import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { ReactDevToolsState } from "ui/state/reactDevTools";
 import { ReactDevToolsAction } from "ui/actions/reactDevTools";
-import { SetCurrentPointAction } from "ui/actions/session";
 
 export default function update(
   state = {
@@ -11,7 +10,7 @@ export default function update(
     reactInitPoint: null,
     protocolCheckFailed: false,
   },
-  action: ReactDevToolsAction | SetCurrentPointAction
+  action: ReactDevToolsAction
 ): ReactDevToolsState {
   switch (action.type) {
     case "add_annotations": {
@@ -31,7 +30,8 @@ export default function update(
       return { ...state, hasReactComponents: action.hasReactComponents };
     }
 
-    case "set_current_point": {
+    // @ts-ignore This comes from ui/reducers/app.ts
+    case "app/setCurrentPoint": {
       return {
         ...state,
         protocolCheckFailed: false,
