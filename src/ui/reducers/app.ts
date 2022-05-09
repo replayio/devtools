@@ -1,3 +1,5 @@
+import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
+
 import {
   AnalysisError,
   AnalysisPayload,
@@ -6,11 +8,18 @@ import {
   EventKind,
   ProtocolError,
   ReplayEvent,
+  UploadInfo,
+  LoadedRegions,
+  ExpectedError,
+  UnexpectedError,
+  ModalOptionsType,
+  ModalType,
+  Canvas,
+  SettingsTabTitle,
+  AppMode,
 } from "ui/state/app";
-import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
-import { SessionActions } from "ui/actions/session";
-import { Location } from "@recordreplay/protocol";
+import { Location, PointDescription } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 import { compareBigInt } from "ui/utils/helpers";
@@ -20,8 +29,10 @@ import { getSelectedPanel, getViewMode } from "./layout";
 import { prefs } from "ui/utils/prefs";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { createSelector } from "@reduxjs/toolkit";
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { PanelName } from "ui/state/layout";
+import { RecordingTarget } from "protocol/thread/thread";
+import { Workspace } from "ui/types";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -56,195 +67,196 @@ export const initialAppState: AppState = {
   currentPoint: null,
 };
 
-export default function update(
-  state: AppState = initialAppState,
-  action: AppActions | SessionActions
-): AppState {
-  switch (action.type) {
-    case "mouse_targets_loading": {
-      return { ...state, mouseTargetsLoading: action.loading };
-    }
-    case "set_recording_duration": {
-      return { ...state, recordingDuration: action.duration };
-    }
-
-    case "set_uploading": {
-      return { ...state, uploading: action.uploading };
-    }
-
-    case "set_awaiting_sourcemaps": {
-      return { ...state, awaitingSourcemaps: action.awaitingSourcemaps };
-    }
-
-    case "set_loaded_regions": {
+const appSlice = createSlice({
+  name: "app",
+  initialState: initialAppState,
+  reducers: {
+    setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
+      state.mouseTargetsLoading = action.payload;
+    },
+    setRecordingDuration(state, action: PayloadAction<number>) {
+      state.recordingDuration = action.payload;
+    },
+    setUploading(state, action: PayloadAction<UploadInfo | null>) {
+      state.uploading = action.payload;
+    },
+    setAwaitingSourcemaps(state, action: PayloadAction<boolean>) {
+      state.awaitingSourcemaps = true;
+    },
+    setLoadedRegions(state, action: PayloadAction<LoadedRegions>) {
       const recordingDuration = Math.max(
-        ...action.parameters.loading.map(r => r.end.time),
+        ...action.payload.loading.map(r => r.end.time),
         state.recordingDuration
       );
-      return {
-        ...state,
-        loadedRegions: action.parameters,
-        recordingDuration,
+      state.loadedRegions = action.payload;
+      state.recordingDuration = recordingDuration;
+    },
+    setExpectedError(state, action: PayloadAction<ExpectedError>) {
+      state.expectedError = action.payload;
+      state.modal = null;
+      state.modalOptions = null;
+    },
+    setUnexpectedError(state, action: PayloadAction<UnexpectedError>) {
+      state.unexpectedError = action.payload;
+      state.modal = null;
+      state.modalOptions = null;
+    },
+    clearExpectedError(state) {
+      state.expectedError = null;
+      state.modal = null;
+      state.modalOptions = null;
+    },
+    setTrialExpired(state, action: PayloadAction<boolean | undefined>) {
+      state.trialExpired = action.payload ?? true;
+    },
+    updateTheme(state, action: PayloadAction<AppTheme>) {
+      state.theme = action.payload;
+    },
+    setInitializedPanels(state, action: PayloadAction<PanelName>) {
+      state.initializedPanels.push(action.payload);
+    },
+    setLoading(state, action: PayloadAction<number>) {
+      state.loading = action.payload;
+    },
+    setDisplayedLoadingProgress(state, action: PayloadAction<number | null>) {
+      state.displayedLoadingProgress = action.payload;
+    },
+    setLoadingFinished(state, action: PayloadAction<boolean>) {
+      state.loadingFinished = action.payload;
+    },
+    setSessionId(state, action: PayloadAction<string>) {
+      state.sessionId = action.payload;
+    },
+    setModal: {
+      reducer(
+        state,
+        action: PayloadAction<{ modal: ModalType | null; options: ModalOptionsType }>
+      ) {
+        state.modal = action.payload.modal;
+        state.modalOptions = action.payload.options;
+      },
+      prepare(modal: ModalType | null, options: ModalOptionsType = null) {
+        return {
+          payload: { modal, options },
+        };
+      },
+    },
+    setAnalysisPoints(
+      state,
+      action: PayloadAction<{
+        analysisPoints: PointDescription[];
+        location: Location;
+        condition?: string;
+      }>
+    ) {
+      const { analysisPoints, location, condition = "" } = action.payload;
+      const id = getLocationAndConditionKey(location, condition);
+
+      state.analysisPoints[id] = {
+        data: analysisPoints,
+        error: null,
       };
-    }
+    },
+    setAnalysisError(
+      state,
+      action: PayloadAction<{
+        location: Location;
+        condition?: string;
+        errorKey?: number;
+      }>
+    ) {
+      const { location, condition = "", errorKey } = action.payload;
 
-    case "set_expected_error": {
-      return { ...state, expectedError: action.error, modal: null, modalOptions: null };
-    }
+      const id = getLocationAndConditionKey(location, condition);
 
-    case "set_unexpected_error": {
-      return { ...state, unexpectedError: action.error, modal: null, modalOptions: null };
-    }
-
-    case "clear_expected_error": {
-      return { ...state, expectedError: null, modal: null, modalOptions: null };
-    }
-
-    case "set_trial_expired": {
-      return { ...state, trialExpired: action.expired };
-    }
-
-    case "update_theme": {
-      return { ...state, theme: action.theme };
-    }
-
-    case "set_initialized_panels": {
-      return { ...state, initializedPanels: [...state.initializedPanels, action.panel] };
-    }
-
-    case "loading": {
-      return { ...state, loading: action.loading };
-    }
-
-    case "set_displayed_loading_progress": {
-      return { ...state, displayedLoadingProgress: action.progress };
-    }
-
-    case "set_loading_finished": {
-      return { ...state, loadingFinished: action.finished };
-    }
-
-    case "set_session_id": {
-      return { ...state, sessionId: action.sessionId };
-    }
-
-    case "set_modal": {
-      return { ...state, modal: action.modal, modalOptions: action.options };
-    }
-
-    case "set_analysis_points": {
-      const id = getLocationAndConditionKey(action.location, action.condition);
-
-      return {
-        ...state,
-        analysisPoints: {
-          ...state.analysisPoints,
-          [id]: {
-            data: action.analysisPoints,
-            error: null,
-          },
-        },
+      state.analysisPoints[id] = {
+        data: [],
+        error:
+          errorKey === ProtocolError.TooManyPoints
+            ? AnalysisError.TooManyPoints
+            : AnalysisError.Default,
       };
-    }
+    },
+    setEventsForType(
+      state,
+      action: PayloadAction<{
+        events: ReplayEvent[];
+        eventType: EventKind;
+      }>
+    ) {
+      const { events, eventType } = action.payload;
+      state.events[eventType] = events;
+    },
+    setHoveredLineNumberLocation(state, action: PayloadAction<Location | null>) {
+      state.hoveredLineNumberLocation = action.payload;
+    },
+    setIsNodePickerActive(state, action: PayloadAction<boolean>) {
+      state.isNodePickerActive = action.payload;
+    },
+    setIsNodePickerInitializing(state, action: PayloadAction<boolean>) {
+      state.isNodePickerInitializing = action.payload;
+    },
+    setCanvas(state, action: PayloadAction<Canvas>) {
+      state.canvas = action.payload;
+    },
+    setVideoUrl(state, action: PayloadAction<string>) {
+      state.videoUrl = action.payload;
+    },
+    setWorkspaceId(state, action: PayloadAction<string | null>) {
+      state.workspaceId = action.payload;
+    },
+    setDefaultSettingsTab(state, action: PayloadAction<SettingsTabTitle>) {
+      state.defaultSettingsTab = action.payload;
+    },
+    setRecordingTarget(state, action: PayloadAction<RecordingTarget>) {
+      state.recordingTarget = action.payload;
+    },
+    setRecordingWorkspace(state, action: PayloadAction<Workspace>) {
+      state.recordingWorkspace = action.payload;
+    },
+    setCurrentPoint(state, action: PayloadAction<string | null>) {
+      state.currentPoint = action.payload;
+    },
+    setAppMode(state, action: PayloadAction<AppMode>) {
+      state.mode = action.payload;
+    },
+  },
+});
 
-    case "set_analysis_error": {
-      const id = getLocationAndConditionKey(action.location, action.condition);
+export const {
+  clearExpectedError,
+  setMouseTargetsLoading,
+  setAnalysisError,
+  setAnalysisPoints,
+  setAppMode,
+  setAwaitingSourcemaps,
+  setCanvas,
+  setCurrentPoint,
+  setDefaultSettingsTab,
+  setDisplayedLoadingProgress,
+  setEventsForType,
+  setExpectedError,
+  setHoveredLineNumberLocation,
+  setInitializedPanels,
+  setIsNodePickerActive,
+  setIsNodePickerInitializing,
+  setLoadedRegions,
+  setLoading,
+  setLoadingFinished,
+  setModal,
+  setRecordingDuration,
+  setRecordingTarget,
+  setRecordingWorkspace,
+  setSessionId,
+  setTrialExpired,
+  setUnexpectedError,
+  setUploading,
+  setVideoUrl,
+  setWorkspaceId,
+  updateTheme,
+} = appSlice.actions;
 
-      return {
-        ...state,
-        analysisPoints: {
-          ...state.analysisPoints,
-          [id]: {
-            data: [],
-            error:
-              action.errorKey === ProtocolError.TooManyPoints
-                ? AnalysisError.TooManyPoints
-                : AnalysisError.Default,
-          },
-        },
-      };
-    }
-
-    case "set_events": {
-      return {
-        ...state,
-        events: {
-          ...state.events,
-          [action.eventType]: action.events,
-        },
-      };
-    }
-
-    case "set_hovered_line_number_location": {
-      return {
-        ...state,
-        hoveredLineNumberLocation: action.location,
-      };
-    }
-
-    case "set_is_node_picker_active": {
-      return {
-        ...state,
-        isNodePickerActive: action.active,
-      };
-    }
-
-    case "set_is_node_picker_initializing": {
-      return {
-        ...state,
-        isNodePickerInitializing: action.initializing,
-      };
-    }
-
-    case "set_canvas": {
-      return {
-        ...state,
-        canvas: action.canvas,
-      };
-    }
-
-    case "set_video_url": {
-      return {
-        ...state,
-        videoUrl: action.videoUrl,
-      };
-    }
-
-    case "set_workspace_id": {
-      return { ...state, workspaceId: action.workspaceId };
-    }
-
-    case "set_default_settings_tab": {
-      return { ...state, defaultSettingsTab: action.tabTitle };
-    }
-
-    case "set_recording_target": {
-      return { ...state, recordingTarget: action.recordingTarget };
-    }
-
-    case "set_recording_workspace": {
-      return { ...state, recordingWorkspace: action.workspace };
-    }
-
-    case "set_current_point": {
-      return {
-        ...state,
-        currentPoint: action.currentPoint,
-      };
-    }
-
-    case "set_app_mode": {
-      return {
-        ...state,
-        mode: action.mode,
-      };
-    }
-
-    default: {
-      return state;
-    }
-  }
-}
+export default appSlice.reducer;
 
 const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
   const focusRegion = getFocusRegion(state);

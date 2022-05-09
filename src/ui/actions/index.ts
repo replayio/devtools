@@ -10,10 +10,8 @@ import * as layoutActions from "./layout";
 import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
-import type { AppActions } from "./app";
 import type { TimelineActions } from "./timeline";
 import type { CommentsAction } from "./comments";
-import { SessionActions } from "./session";
 import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
@@ -27,14 +25,12 @@ import { LayoutAction } from "./layout";
 type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 
 export type UIAction =
-  | AppActions
   | CommentsAction
   | DebuggerAction
   | LayoutAction
   | MarkupAction
   | NetworkAction
   | ReactDevToolsAction
-  | SessionActions
   | TimelineActions
   | QuickOpenActions;
 
@@ -49,8 +45,10 @@ export type UIStore = AppStore & {
   userProperties?: UserProperties;
 };
 
+const { initialAppState, ...actualAppActions } = appActions;
+
 export const actions = {
-  ...appActions,
+  ...actualAppActions,
   ...commentsActions,
   ...consoleActions,
   ...debuggerActions,

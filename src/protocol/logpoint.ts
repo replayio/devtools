@@ -16,7 +16,7 @@ import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 import { UIStore } from "ui/actions";
-import { setAnalysisError, setAnalysisPoints } from "ui/actions/app";
+import { setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
 import { ProtocolError } from "ui/state/app";
 
@@ -119,13 +119,13 @@ function saveLogpointHits(
     );
   }
   for (const location of locations) {
-    store.dispatch(setAnalysisPoints(points, location, condition));
+    store.dispatch(setAnalysisPoints({ analysisPoints: points, location, condition }));
   }
 }
 
 function saveAnalysisError(locations: Location[], condition: string, errorKey?: number) {
   for (const location of locations) {
-    store.dispatch(setAnalysisError(location, condition, errorKey));
+    store.dispatch(setAnalysisError({ location, condition, errorKey }));
   }
 }
 

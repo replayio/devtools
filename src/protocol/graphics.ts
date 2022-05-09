@@ -8,7 +8,7 @@ import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordre
 import { decode } from "base64-arraybuffer";
 import { UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
-import { setCanvas, setEventsForType, setVideoUrl } from "ui/actions/app";
+import { setCanvas, setEventsForType, setVideoUrl } from "ui/reducers/app";
 import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { getVideoNode } from "./videoNode";
@@ -163,7 +163,7 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
     }
   });
 
-  store.dispatch(setEventsForType(gMouseClickEvents, "mousedown"));
+  store.dispatch(setEventsForType({ events: gMouseClickEvents, eventType: "mousedown" }));
 }
 
 class VideoPlayer {

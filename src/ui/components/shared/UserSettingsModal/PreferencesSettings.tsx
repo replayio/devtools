@@ -5,7 +5,7 @@ import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
 import { CheckboxRow } from "./CheckboxRow";
 import { getTheme, getThemePreference } from "ui/reducers/app";
-import { updateTheme } from "ui/actions/app";
+import { updateTheme } from "ui/reducers/app";
 import { SelectMenu } from "../Forms";
 import { AppTheme } from "ui/state/app";
 
