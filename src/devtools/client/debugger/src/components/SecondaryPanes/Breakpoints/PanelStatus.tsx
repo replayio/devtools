@@ -3,6 +3,7 @@ import { getBadgeColor, isColorPrefix } from "ui/components/PrefixBadge";
 import { getIsIndexed, getTheme } from "ui/reducers/app";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";
+import styles from "ui/components/PrefixBadge.module.css";
 
 export function PanelStatus({
   analysisPoints,
@@ -35,14 +36,13 @@ export function PanelStatus({
   }
 
   const style = isColorPrefix(prefixBadge)
-    ? { backgroundColor: getBadgeColor(prefixBadge, theme), color: "white" }
+    ? { backgroundColor: getBadgeColor(prefixBadge, theme), color: "black" }
     : {};
 
   return (
     <div className="breakpoint-navigation-status-container">
       <div
-        className="rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus"
-        style={style}
+        className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus ${styles[prefixBadge]}`}
       >
         <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
         {status}
