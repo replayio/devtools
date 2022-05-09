@@ -1,5 +1,10 @@
+import { Location, PointDescription } from "@recordreplay/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
-
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { RecordingTarget } from "protocol/thread/thread";
+import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { UIState } from "ui/state";
 import {
   AnalysisError,
   AnalysisPayload,
@@ -18,21 +23,15 @@ import {
   SettingsTabTitle,
   AppMode,
 } from "ui/state/app";
-import { UIState } from "ui/state";
-import { Location, PointDescription } from "@recordreplay/protocol";
-import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
-import { compareBigInt } from "ui/utils/helpers";
-import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
-
-import { getSelectedPanel, getViewMode } from "./layout";
-import { prefs } from "ui/utils/prefs";
+import { PanelName } from "ui/state/layout";
+import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
-import { PanelName } from "ui/state/layout";
-import { RecordingTarget } from "protocol/thread/thread";
-import { Workspace } from "ui/types";
+import { compareBigInt } from "ui/utils/helpers";
+import { prefs } from "ui/utils/prefs";
+import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
+
+import { getSelectedPanel, getViewMode } from "./layout";
 
 export const initialAppState: AppState = {
   mode: "devtools",

@@ -1,33 +1,31 @@
-import { sendMessage } from "protocol/socket";
+import { ApolloError } from "@apollo/client";
 import { ExecutionPoint, uploadedData } from "@recordreplay/protocol";
-import { Action } from "redux";
-
+import { findAutomatedTests } from "protocol/find-tests";
+import { videoReady } from "protocol/graphics";
+import { sendMessage } from "protocol/socket";
+import { ThreadFront } from "protocol/thread";
+import { assert, waitForTime } from "protocol/utils";
+import { getUserSettings } from "ui/hooks/settings";
+import { getUserId, getUserInfo } from "ui/hooks/users";
+import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
+import { getSelectedPanel } from "ui/reducers/layout";
+import { Recording } from "ui/types";
 import tokenManager from "ui/utils/tokenManager";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
-import { ThreadFront } from "protocol/thread";
-import { findAutomatedTests } from "protocol/find-tests";
-import { assert, waitForTime } from "protocol/utils";
 import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { extractGraphQLError } from "ui/utils/apolloClient";
-
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getRecordingId } from "ui/utils/recording";
-import { getUserId, getUserInfo } from "ui/hooks/users";
-import { jumpToInitialPausePoint } from "./timeline";
-import { Recording } from "ui/types";
+
 import { subscriptionExpired } from "ui/utils/workspace";
-import { ApolloError } from "@apollo/client";
-import { getUserSettings } from "ui/hooks/settings";
-import { setViewMode } from "./layout";
-import { getSelectedPanel } from "ui/reducers/layout";
-import { videoReady } from "protocol/graphics";
+
 import { setUnexpectedError, setExpectedError } from "./errors";
-import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
+import { setViewMode } from "./layout";
+import { jumpToInitialPausePoint } from "./timeline";
 
 export { setUnexpectedError, setExpectedError };
 

@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import hooks from "ui/hooks";
-import Checkbox from "../Forms/Checkbox";
 import { EmailSubscription } from "ui/hooks/users";
-import { CheckboxRow } from "./CheckboxRow";
 import { getTheme, getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/reducers/app";
-import { SelectMenu } from "../Forms";
 import { AppTheme } from "ui/state/app";
+
+import { SelectMenu } from "../Forms";
+import Checkbox from "../Forms/Checkbox";
+
+import { CheckboxRow } from "./CheckboxRow";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",

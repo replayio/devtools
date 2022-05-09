@@ -1,15 +1,13 @@
-import type { Action } from "redux";
-
 import { UIThunkAction } from "ui/actions";
 import * as selectors from "ui/reducers/app";
-import { isDevelopment } from "ui/utils/environment";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
-import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { getRecordingId } from "ui/utils/recording";
 import {
   setExpectedError as setExpectedErrorAction,
   setUnexpectedError as setUnexpectedErrorAction,
 } from "ui/reducers/app";
+import type { ExpectedError, UnexpectedError } from "ui/state/app";
+import { isDevelopment } from "ui/utils/environment";
+import { getRecordingId } from "ui/utils/recording";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 export function setExpectedError(error: ExpectedError): UIThunkAction {
   return (dispatch, getState) => {
