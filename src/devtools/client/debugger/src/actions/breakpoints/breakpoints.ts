@@ -1,8 +1,9 @@
 import { SourceId, Location } from "@recordreplay/protocol";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";
-import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { selectors } from "ui/reducers";
+import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -24,6 +25,7 @@ import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
 
+import { setBreakpointPositions } from "./breakpointPositions";
 import {
   _removeBreakpoint,
   removeBreakpointOption,
@@ -33,10 +35,6 @@ import {
   disableBreakpoint,
   runAnalysis,
 } from "./modify";
-
-import { setBreakpointPositions } from "./breakpointPositions";
-
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
