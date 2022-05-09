@@ -30,9 +30,10 @@ import {
 import { ContextError } from "../../utils/context";
 import { getRawSourceURL, isInlineScript } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
-import { selectLocation, setBreakableLines } from "../sources";
+import { selectLocation } from "../sources/select";
 
 import { toggleBlackBox } from "./blackbox";
+import { setBreakableLines } from "./breakableLines";
 import { loadSourceText } from "./loadSourceText";
 
 interface SourceData {
