@@ -10,7 +10,7 @@ import WelcomeBox from "../WelcomeBox";
 import { Redacted } from "ui/components/Redacted";
 import useWidthObserver from "ui/utils/useWidthObserver";
 import { waitForEditor } from "../../utils/editor/create-editor";
-import { setUnexpectedError } from "ui/actions/session";
+import { setUnexpectedError } from "ui/actions/errors";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { getSelectedSource } from "../../reducers/sources";

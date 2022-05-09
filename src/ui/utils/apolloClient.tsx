@@ -1,82 +1,19 @@
-import React, { ReactNode, useState, useEffect } from "react";
 import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
 import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import {
   ApolloClient,
-  ApolloProvider,
   InMemoryCache,
   NormalizedCacheObject,
   from,
   HttpLink,
   ApolloError,
 } from "@apollo/client";
-import { MockedProvider, MockedResponse, MockLink } from "@apollo/client/testing";
+import { MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
-import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
-import useToken from "ui/utils/useToken";
-import { PopupBlockedError } from "ui/components/shared/Error";
 
-let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
-
-export function ApolloWrapper({
-  children,
-  onAuthError,
-}: {
-  children: ReactNode;
-  onAuthError?: () => void;
-}) {
-  const { loading, token, error } = useToken();
-
-  const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
-
-  useEffect(() => {
-    async function waitForMocks() {
-      const mockEnvironment = await waitForMockEnvironment();
-      setMocks(mockEnvironment!.graphqlMocks);
-    }
-    if (isMock()) {
-      waitForMocks();
-    }
-  }, []);
-
-  if (isMock()) {
-    if (!mocks) {
-      return null;
-    }
-
-    const retryLink = createRetryLink();
-    const errorLink = createErrorLink(onAuthError);
-    const mockLink = createMockLink(mocks);
-
-    return (
-      <MockedProvider
-        link={from([retryLink, errorLink, mockLink])}
-        cache={createApolloCache()}
-        ref={mockRef => mockRef && clientWaiter.resolve(mockRef!.state.client)}
-      >
-        <>{children}</>
-      </MockedProvider>
-    );
-  }
-
-  if (!isTest() && loading) {
-    return null;
-  }
-
-  if (error) {
-    if (error.message === "Could not open popup") {
-      return <PopupBlockedError />;
-    } else {
-      return null;
-    }
-  }
-
-  return (
-    <ApolloProvider client={createApolloClient(token, onAuthError)}>{children}</ApolloProvider>
-  );
-}
+export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
   const apolloClient = await clientWaiter.promise;
@@ -136,7 +73,7 @@ export function extractGraphQLError(
   return (typeof graphQLError === "string" ? graphQLError : graphQLError?.message) || error.message;
 }
 
-function createApolloCache() {
+export function createApolloCache() {
   return new InMemoryCache({
     typePolicies: {
       Query: {
@@ -182,7 +119,7 @@ function createHttpLink(token: string | undefined) {
   });
 }
 
-function createErrorLink(onAuthError?: () => void) {
+export function createErrorLink(onAuthError?: () => void) {
   return onError(err => {
     const { graphQLErrors, networkError } = err;
     if (graphQLErrors) {
@@ -202,7 +139,7 @@ function createErrorLink(onAuthError?: () => void) {
   });
 }
 
-function createRetryLink() {
+export function createRetryLink() {
   return new RetryLink({
     attempts: {
       retryIf: error => {
@@ -214,6 +151,6 @@ function createRetryLink() {
   });
 }
 
-function createMockLink(mocks: MockedResponse<Record<string, any>>[]) {
+export function createMockLink(mocks: MockedResponse<Record<string, any>>[]) {
   return new MockLink(mocks);
 }

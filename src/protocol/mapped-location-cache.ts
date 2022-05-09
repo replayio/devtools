@@ -1,4 +1,3 @@
-import { client } from "./socket";
 import { defer } from "./utils";
 import { Location, MappedLocation } from "@recordreplay/protocol";
 import { ThreadFront } from "./thread";
@@ -26,6 +25,7 @@ export class MappedLocationCache {
 
     const { promise, resolve } = defer<MappedLocation>();
     this.runningRequests.set(cacheKey, promise);
+    const { client } = await import("./socket");
     const { mappedLocation } = await client.Debugger.getMappedLocation(
       { location },
       ThreadFront.sessionId!

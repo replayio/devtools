@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UnexpectedError } from "ui/state/app";
 import { getUnexpectedError } from "ui/reducers/app";
-import { setUnexpectedError } from "ui/actions/session";
+import { setUnexpectedError } from "ui/actions/errors";
 import { isDevelopment } from "ui/utils/environment";
 import { BlankViewportWrapper } from "./shared/Viewport";
 import * as Sentry from "@sentry/react";

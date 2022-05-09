@@ -13,7 +13,7 @@ import { PrimaryButton } from "./Button";
 import { useRouter } from "next/dist/client/router";
 import { BubbleViewportWrapper } from "./Viewport";
 import { getRecordingId } from "ui/utils/recording";
-import { setExpectedError } from "ui/actions/session";
+import { setExpectedError } from "ui/actions/errors";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
 
 export function PopupBlockedError() {

@@ -9,7 +9,7 @@ import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 import { removeUrlParameters } from "ui/utils/environment";
-import { setExpectedError } from "ui/actions/session";
+import { setExpectedError } from "ui/actions/errors";
 import LoadingScreen from "../shared/LoadingScreen";
 import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
