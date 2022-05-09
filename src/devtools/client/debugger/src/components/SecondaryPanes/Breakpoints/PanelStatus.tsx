@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { getBadgeColor, isColorPrefix } from "ui/components/PrefixBadge";
+import { isColorPrefix } from "ui/components/PrefixBadge";
 import { getIsIndexed, getTheme } from "ui/reducers/app";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";

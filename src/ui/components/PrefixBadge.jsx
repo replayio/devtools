@@ -51,14 +51,6 @@ function EmojiBadge({ emoji, onSelect, theme }) {
   );
 }
 
-export function getBadgeColor(prefixBadge, theme, showEmpty) {
-  const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
-  if (!prefixBadge) {
-    return showEmpty ? colors.empty : "none";
-  }
-  return colors[prefixBadge];
-}
-
 function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
   if (!prefixBadge) {
     return null;
