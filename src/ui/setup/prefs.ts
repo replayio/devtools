@@ -1,3 +1,4 @@
+import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
@@ -42,42 +43,52 @@ export function registerStoreObserver(
   });
 }
 
-export function updatePrefs(state: UIState, oldState: UIState) {
-  function updatePref(field: keyof typeof prefs, selector: Function) {
-    const newValue = selector(state);
+function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
+  return function updatePref(
+    newState: UIState,
+    oldState: UIState,
+    field: keyof typeof prefObj,
+    selector: (state: UIState) => T[typeof field]
+  ) {
+    const newValue = selector(newState);
     if (newValue != selector(oldState)) {
-      prefs[field] = newValue;
+      prefObj[field] = newValue;
     }
-  }
+  };
+}
 
-  function updateWebconsolePref(field: keyof typeof webconsolePrefs, selector: Function) {
-    const newValue = selector(state);
-    if (newValue != selector(oldState)) {
-      webconsolePrefs[field] = newValue;
-    }
-  }
+const updateStandardPrefs = createPrefsUpdater(prefs);
+const updateAsyncPrefs = createPrefsUpdater(asyncStore);
+const updateWebconsolePrefs = createPrefsUpdater(webconsolePrefs);
 
-  function updateAsyncPref(field: keyof typeof asyncStore, selector: Function) {
-    const newValue = selector(state);
-    if (newValue != selector(oldState)) {
-      asyncStore[field] = newValue;
-    }
-  }
+const actualUpdatePrefs = (state: UIState, oldState: UIState) => {
+  updateStandardPrefs(state, oldState, "viewMode", getViewMode);
+  updateStandardPrefs(state, oldState, "theme", getTheme);
 
-  updatePref("viewMode", getViewMode);
-  updatePref("theme", getTheme);
-
-  updateAsyncPref("eventListenerBreakpoints", (state: UIState) => state.eventListenerBreakpoints);
-  updateAsyncPref("commandHistory", (state: UIState) => state.messages?.commandHistory);
+  updateAsyncPrefs(
+    state,
+    oldState,
+    "eventListenerBreakpoints",
+    (state: UIState) => state.eventListenerBreakpoints
+  );
+  updateAsyncPrefs(
+    state,
+    oldState,
+    "commandHistory",
+    (state: UIState) => state.messages?.commandHistory
+  );
 
   // This is lazy-loaded, so it may not exist on startup
   if (state.consoleUI && oldState.consoleUI) {
-    updateWebconsolePref("timestampsVisible", (state: UIState) => {
+    updateWebconsolePrefs(state, oldState, "timestampsVisible", (state: UIState) => {
       return state.consoleUI.timestampsVisible;
     });
   }
   maybeUpdateReplaySessions(state);
-}
+};
+
+// Avoid a small bit of overhead of checking prefs after _every_ dispatch
+export const updatePrefs = debounce(actualUpdatePrefs, 50);
 
 async function getReplaySessions() {
   return await asyncStore.replaySessions;
