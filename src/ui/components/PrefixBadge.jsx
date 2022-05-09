@@ -31,7 +31,10 @@ function CircleBadge({ color, onSelect, theme }) {
   return (
     <div
       onClick={() => onSelect(color)}
-      className={`h-5 w-5 cursor-pointer rounded-full ${styles[color]}`}
+      className="h-5 w-5 cursor-pointer rounded-full"
+      style={{
+        backgroundColor: getBadgeColor(color, theme, true),
+      }}
     />
   );
 }
@@ -59,14 +62,6 @@ export function getBadgeColor(prefixBadge, theme, showEmpty) {
   return colors[prefixBadge];
 }
 
-export function getBadgeClass(prefixBadge, theme, showEmpty) {
-  const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
-  if (!prefixBadge) {
-    return showEmpty ? colors.empty : "none";
-  }
-  return colors[prefixBadge];
-}
-
 function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
   if (!prefixBadge) {
     return null;
@@ -76,7 +71,7 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
     return (
       <div
         style={{
-          className: "getBadgeColor(prefixBadge, theme, showEmpty)",
+          backgroundColor: getBadgeColor(prefixBadge, theme, showEmpty),
           borderRadius: "16px",
           height: "16px",
           width: "16px",
@@ -140,6 +135,8 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   if (!enableUnicornConsole) {
     return null;
   }
+
+  console.log({ showPrefixBadge });
 
   const prefixBadge = breakpoint.options.prefixBadge;
   const isColor = isColorPrefix(prefixBadge);
