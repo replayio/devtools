@@ -72,14 +72,19 @@ function QuickActions() {
   const dispatch = useDispatch();
 
   const snapStart = () => {
-    dispatch(actions.setFocusRegion({ ...focusRegion!, startTime: Math.max(currentTime - 10, 0) }));
+    dispatch(
+      actions.setFocusRegion({ ...focusRegion!, startTime: Math.max(currentTime - 10, 0) }, true)
+    );
   };
   const snapEnd = () => {
     dispatch(
-      actions.setFocusRegion({
-        ...focusRegion!,
-        endTime: Math.min(currentTime + 10, zoomRegion.endTime),
-      })
+      actions.setFocusRegion(
+        {
+          ...focusRegion!,
+          endTime: Math.min(currentTime + 10, zoomRegion.endTime),
+        },
+        true
+      )
     );
   };
 

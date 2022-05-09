@@ -27,7 +27,8 @@ export interface TimelineState {
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
   hoveredItem: HoveredItem | null;
-  focusRegion: { startTime: number; endTime: number } | null;
+  focusRegion: FocusRegion | null;
+  focusRegionHasBeenConfirmed: boolean;
 }
 
 export interface HoveredItem {

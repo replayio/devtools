@@ -8,7 +8,6 @@
 // graphics are currently being rendered.
 
 import { connect, ConnectedProps } from "react-redux";
-import { Component, MouseEventHandler } from "react";
 import type { PointDescription, Location } from "@recordreplay/protocol";
 import React from "react";
 import classnames from "classnames";
@@ -28,7 +27,7 @@ import EventMarker from "./EventMarker";
 
 import { getVisiblePosition, getFormattedTime } from "ui/utils/timeline";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-
+import { Component, createRef, MouseEventHandler } from "react";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
@@ -58,6 +57,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
   state = {
     isDragging: false,
   };
+  timelineRef = createRef();
 
   async componentDidMount() {
     // Used in the test harness for starting playback recording.
@@ -379,7 +379,7 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
 
     return (
       <>
-        <div className="timeline">
+        <div className="timeline" ref={this.timelineRef as React.RefObject<HTMLDivElement>}>
           {this.renderCommands()}
           <div className={classnames("progress-bar-container", { paused: true })}>
             <div
@@ -408,7 +408,10 @@ class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
                 <div className="progress-line-paused" style={{ left: `${percent}%` }} />
               ) : null}
               {isFocusing ? (
-                <Focuser setIsDragging={isDragging => this.setState({ isDragging })} />
+                <Focuser
+                  setIsDragging={isDragging => this.setState({ isDragging })}
+                  timelineRef={this.timelineRef as React.RefObject<HTMLDivElement>}
+                />
               ) : null}
               {isDragging ? (
                 <MouseDownMask

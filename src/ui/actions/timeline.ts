@@ -51,6 +51,7 @@ export type SetFocusRegionAction = Action<"set_trim_region"> & {
     startTime: number;
     endTime: number;
   };
+  focusRegionHasBeenConfirmed: boolean;
 };
 
 export type TimelineActions =
@@ -504,11 +505,14 @@ export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTime
   return { type: "set_playback_precached_time", time };
 }
 
-export function setFocusRegion(focusRegion: {
-  startTime: number;
-  endTime: number;
-}): SetFocusRegionAction {
-  return { type: "set_trim_region", focusRegion };
+export function setFocusRegion(
+  focusRegion: {
+    startTime: number;
+    endTime: number;
+  },
+  confirmed: boolean
+): SetFocusRegionAction {
+  return { type: "set_trim_region", focusRegion, focusRegionHasBeenConfirmed: confirmed };
 }
 
 export function setFocusAroundTime(time: number, maxTime: number): UIThunkAction {
@@ -520,7 +524,7 @@ export function setFocusAroundTime(time: number, maxTime: number): UIThunkAction
     const startTime = Math.max(time - maxTime / 2, 0);
     const endTime = Math.min(time + maxTime / 2, duration);
 
-    dispatch(setFocusRegion({ endTime, startTime }));
+    dispatch(setFocusRegion({ endTime, startTime }, true));
   };
 }
 
@@ -537,7 +541,7 @@ export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
     const minRegion = duration * 0.1;
     const { startTime, endTime } = focusRegion;
 
-    let value, type;
+    let type, value;
 
     if (operation === FocusOperation.resizeStart) {
       type = "startTime";
@@ -547,7 +551,7 @@ export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
       value = clamp(hoverTime, startTime + minRegion, duration);
     }
 
-    dispatch(setFocusRegion({ ...focusRegion, [type]: value }));
+    dispatch(setFocusRegion({ ...focusRegion, [type]: value }, true));
   };
 }
 
@@ -581,16 +585,28 @@ export function syncFocusedRegion(): UIThunkAction {
   };
 }
 
+const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
+const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
+
 export function enterFocusMode(instructions?: string): UIThunkAction {
   return (dispatch, getState) => {
     dispatch(setModal("focusing", { instructions }));
+
     const state = getState();
     const focusRegion = getFocusRegion(state);
-    const zoomRegion = getZoomRegion(state);
-
     if (!focusRegion) {
-      const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
-      dispatch(setFocusRegion(focusRegion));
+      const currentTime = getCurrentTime(state);
+      const zoomRegion = getZoomRegion(state);
+
+      const focusWindowSize = Math.min(
+        (zoomRegion.endTime - zoomRegion.startTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE,
+        DEFAULT_FOCUS_WINDOW_MAX_LENGTH
+      );
+
+      const startTime = Math.max(zoomRegion.startTime, currentTime - focusWindowSize / 2);
+      const endTime = Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2);
+
+      dispatch(setFocusRegion({ endTime, startTime }, false));
     }
   };
 }

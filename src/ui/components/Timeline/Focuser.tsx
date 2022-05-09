@@ -1,12 +1,12 @@
-import React, { FC, MouseEventHandler, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
+import { setFocusRegion, setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import clamp from "lodash/clamp";
-import { FocusOperation, ZoomRegion } from "ui/state/timeline";
+import { FocusOperation, FocusRegion, ZoomRegion } from "ui/state/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
 import classNames from "classnames";
-import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 import { MouseDownMask } from "./MouseDownMask";
 
@@ -111,34 +111,110 @@ function Span({
 
 function TrimSpan({
   dragging,
+  focusRegion,
   onDragStart,
+  zoomRegion,
 }: {
   dragging: boolean;
+  focusRegion: FocusRegion;
   onDragStart: (e: React.MouseEvent, target: FocusOperation) => void;
+  zoomRegion: ZoomRegion;
 }) {
+  const draggers = <Draggers {...{ dragging, onDragStart }} />;
+  const { startTime, endTime } = focusRegion;
+
+  return (
+    <Span draggers={draggers} endTime={endTime} startTime={startTime} zoomRegion={zoomRegion} />
+  );
+}
+
+export function Focuser({
+  setIsDragging,
+  timelineRef,
+}: {
+  setIsDragging: (isDragging: boolean) => void;
+  timelineRef: React.RefObject<HTMLDivElement>;
+}) {
+  const dispatch = useDispatch();
   const zoomRegion = useSelector(selectors.getZoomRegion);
   const focusRegion = useSelector(selectors.getFocusRegion);
+  const focusRegionHasBeenConfirmed = useSelector(selectors.getFocusRegionHasBeenConfirmed);
+  const [draggingTarget, setDraggingTarget] = useState<FocusOperation | null>(null);
+
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const bar = barRef.current;
+    const timeline = timelineRef.current;
+
+    if (!bar || !focusRegion || !timeline) {
+      return;
+    }
+
+    const onClick = () => {
+      dispatch(setFocusRegion(focusRegion, true));
+    };
+
+    const onMouseMove = (event: MouseEvent) => {
+      if (focusRegionHasBeenConfirmed) {
+        return;
+      }
+
+      const { movementX, pageX } = event;
+      if (movementX !== 0) {
+        // Drag offsets are relative to the smaller/inner "bar" element.
+        const rect = bar.getBoundingClientRect();
+
+        // Convert cursor X and DIV width to timestamp.
+        const x = pageX - rect.left;
+        const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+        const focusRegionDuration = focusRegion.endTime - focusRegion.startTime;
+        const time = zoomRegion.startTime + (x / rect.width) * zoomRegionDuration;
+
+        // Re-center the focus region around the mouse cursor.
+        let newEndTime = time + focusRegionDuration / 2;
+        let newStartTime = time - focusRegionDuration / 2;
+
+        // Make sure the new focus region is still within our zoom bounds.
+        if (newStartTime < zoomRegion.startTime) {
+          newEndTime += zoomRegion.startTime - newStartTime;
+          newStartTime = zoomRegion.startTime;
+        } else if (newEndTime > zoomRegion.endTime) {
+          newStartTime -= newEndTime - zoomRegion.endTime;
+          newEndTime = zoomRegion.endTime;
+        }
+
+        dispatch(
+          setFocusRegion(
+            {
+              endTime: newEndTime,
+              startTime: newStartTime,
+            },
+            false
+          )
+        );
+      }
+    };
+
+    // Listen to mouse move events on the larger/outer timeline container.
+    // This is the dominant visual element and doing this is a little more forgiving of small user drag errors.
+    timeline.addEventListener("click", onClick);
+    timeline.addEventListener("mousemove", onMouseMove);
+    return () => {
+      timeline.removeEventListener("click", onClick);
+      timeline.removeEventListener("mousemove", onMouseMove);
+    };
+  });
 
   if (!focusRegion) {
     return null;
   }
 
-  const draggers = <Draggers {...{ dragging, onDragStart }} />;
-  const { startTime, endTime } = focusRegion;
+  // TODO [bvaughn] Naming the FocusOperation param "target" and "draggingTarget" is confusing;
+  // these terms have meaning within the drag-and-drop space that aren't what we're using them for here.
+  const onDragStart = (event: React.MouseEvent, target: FocusOperation) => {
+    event.stopPropagation();
 
-  return <Span {...{ startTime, endTime, zoomRegion, draggers }} />;
-}
-
-export const Focuser: FC<{ setIsDragging: (isDragging: boolean) => void }> = ({
-  setIsDragging,
-}) => {
-  const dispatch = useDispatch();
-  const zoomRegion = useSelector(selectors.getZoomRegion);
-  const focusRegion = useSelector(selectors.getFocusRegion);
-  const [draggingTarget, setDraggingTarget] = useState<FocusOperation | null>(null);
-
-  const onDragStart = (e: React.MouseEvent, target: FocusOperation) => {
-    e.stopPropagation();
     setIsDragging(true);
     setDraggingTarget(target);
   };
@@ -147,32 +223,15 @@ export const Focuser: FC<{ setIsDragging: (isDragging: boolean) => void }> = ({
     setDraggingTarget(null);
   };
 
-  useEffect(() => {
-    if (!focusRegion) {
-      const focusRegion = { startTime: 0, endTime: zoomRegion.endTime };
-      dispatch(actions.setFocusRegion(focusRegion));
-    }
-
-    return () => {
-      dispatch(actions.syncFocusedRegion());
-      trackEvent("timeline.save_focus");
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className="relative top-0 left-0 h-full w-full">
-      {focusRegion ? (
-        <TrimSpan
-          {...{
-            focusRegion,
-            zoomRegion,
-            onDragStart,
-          }}
-          dragging={!!draggingTarget}
-        />
-      ) : null}
+    <div className="relative top-0 left-0 h-full w-full" ref={barRef}>
+      <TrimSpan
+        dragging={!!draggingTarget}
+        focusRegion={focusRegion}
+        onDragStart={onDragStart}
+        zoomRegion={zoomRegion}
+      />
       {draggingTarget ? <ResizeMask onDragEnd={onDragEnd} draggingTarget={draggingTarget} /> : null}
     </div>
   );
-};
+}

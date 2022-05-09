@@ -8,6 +8,7 @@ function initialTimelineState(): TimelineState {
   return {
     currentTime: 0,
     focusRegion: null,
+    focusRegionHasBeenConfirmed: false,
     hoverTime: null,
     hoveredItem: null,
     playback: null,
@@ -47,7 +48,11 @@ export default function update(
     }
 
     case "set_trim_region": {
-      return { ...state, focusRegion: action.focusRegion };
+      return {
+        ...state,
+        focusRegion: action.focusRegion,
+        focusRegionHasBeenConfirmed: action.focusRegionHasBeenConfirmed,
+      };
     }
 
     default: {
@@ -67,6 +72,8 @@ export const getTimelineDimensions = (state: UIState) => state.timeline.timeline
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
+export const getFocusRegionHasBeenConfirmed = (state: UIState) =>
+  state.timeline.focusRegionHasBeenConfirmed;
 export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
   (state.timeline.focusRegion.startTime !== 0 ||
