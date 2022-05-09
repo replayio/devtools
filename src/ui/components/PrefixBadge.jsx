@@ -5,6 +5,7 @@ import AppContainerPortal from "ui/components/shared/AppContainerPortal";
 import { useFeature } from "ui/hooks/settings";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { selectors } from "ui/reducers";
+import styles from "./PrefixBadge.module.css";
 
 export const PREFIX_COLORS = {
   purple: "#A973CD",
@@ -30,10 +31,7 @@ function CircleBadge({ color, onSelect, theme }) {
   return (
     <div
       onClick={() => onSelect(color)}
-      className="h-5 w-5 cursor-pointer rounded-full"
-      style={{
-        backgroundColor: getBadgeColor(color, theme, true),
-      }}
+      className={`h-5 w-5 cursor-pointer rounded-full ${styles[color]}`}
     />
   );
 }
@@ -61,6 +59,14 @@ export function getBadgeColor(prefixBadge, theme, showEmpty) {
   return colors[prefixBadge];
 }
 
+export function getBadgeClass(prefixBadge, theme, showEmpty) {
+  const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
+  if (!prefixBadge) {
+    return showEmpty ? colors.empty : "none";
+  }
+  return colors[prefixBadge];
+}
+
 function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
   if (!prefixBadge) {
     return null;
@@ -70,7 +76,7 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
     return (
       <div
         style={{
-          backgroundColor: getBadgeColor(prefixBadge, theme, showEmpty),
+          className: getBadgeClass(prefixBadge, theme, showEmpty),
           borderRadius: "16px",
           height: "16px",
           width: "16px",
@@ -134,8 +140,6 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   if (!enableUnicornConsole) {
     return null;
   }
-
-  console.log({ showPrefixBadge });
 
   const prefixBadge = breakpoint.options.prefixBadge;
   const isColor = isColorPrefix(prefixBadge);

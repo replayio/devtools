@@ -1,0 +1,55 @@
+:root:global(.theme-light) .empty {
+  background-color: #efefef;
+}
+
+:root:global(.theme-dark) .empty {
+  background-color: #a8a8a8;
+}
+
+:root:global(.theme-light) .undefined {
+  background-color: transparent;
+}
+
+:root:global(.theme-dark) .undefined {
+  background-color: transparent;
+}
+
+:root:global(.theme-light) .purple {
+  background-color: #a973cd;
+  color: #fff;
+}
+
+:root:global(.theme-dark) .purple {
+  background-color: #cc81ff;
+  color: #fff;
+}
+
+:root:global(.theme-light) .green {
+  background-color: #73cc6d;
+  color: #fff;
+}
+
+:root:global(.theme-dark) .green {
+  background-color: #69e261;
+  color: #050;
+}
+
+:root:global(.theme-light) .orange {
+  background-color: #eba64d;
+  color: #fff;
+}
+
+:root:global(.theme-dark) .orange {
+  background-color: #fbaf4c;
+  color: #fff;
+}
+
+:root:global(.theme-light) .yellow {
+  background-color: #f0cf56;
+  color: rgb(99, 79, 5);
+}
+
+:root:global(.theme-dark) .yellow {
+  background-color: #fdea3d;
+  color: rgb(99, 79, 5);
+}

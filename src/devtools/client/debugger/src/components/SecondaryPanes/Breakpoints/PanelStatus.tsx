@@ -4,6 +4,7 @@ import { getBadgeColor, isColorPrefix } from "ui/components/PrefixBadge";
 import { getIsIndexed, getTheme } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
+import styles from "ui/components/PrefixBadge.module.css";
 
 const numberStatus = (current: number, total: number): string => {
   return `${current}/${total}`;
@@ -41,14 +42,13 @@ export function PanelStatus({
   }
 
   const style = isColorPrefix(prefixBadge)
-    ? { backgroundColor: getBadgeColor(prefixBadge, theme), color: "white" }
+    ? { backgroundColor: getBadgeColor(prefixBadge, theme), color: "black" }
     : {};
 
   return (
     <div className="breakpoint-navigation-status-container">
       <div
-        className="rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus"
-        style={style}
+        className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus ${styles[prefixBadge]}`}
       >
         <div
           className="text-center"
