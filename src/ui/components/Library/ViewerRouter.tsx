@@ -13,8 +13,6 @@ import { BlankViewportWrapper } from "../shared/Viewport";
 import Base64Image from "../shared/Base64Image";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
-import { LibraryFilters } from "./Library";
-
 function ViewerLoader() {
   return (
     <div className="grid h-full w-full items-center justify-items-center bg-chrome">
@@ -23,7 +21,7 @@ function ViewerLoader() {
   );
 }
 
-function MyLibrary({ filters }: ViewerRouterProps) {
+function MyLibrary() {
   const { recordings, loading } = hooks.useGetPersonalRecordings();
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -31,7 +29,7 @@ function MyLibrary({ filters }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ filters, recordings, workspaceName: MY_LIBRARY }} />;
+  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
@@ -52,7 +50,7 @@ function TeamLibrary(props: ViewerRouterProps) {
   }
 }
 
-function NonPendingTeamLibrary({ currentWorkspaceId, filters }: ViewerRouterProps) {
+function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -65,7 +63,6 @@ function NonPendingTeamLibrary({ currentWorkspaceId, filters }: ViewerRouterProp
   return (
     <Viewer
       {...{
-        filters,
         recordings,
         workspaceName: workspace.logo ? (
           <Base64Image src={workspace.logo} className="max-h-12" />
@@ -77,9 +74,7 @@ function NonPendingTeamLibrary({ currentWorkspaceId, filters }: ViewerRouterProp
   );
 }
 
-type ViewerRouterProps = PropsFromRedux & {
-  filters: LibraryFilters;
-};
+type ViewerRouterProps = PropsFromRedux;
 
 function ViewerRouter(props: ViewerRouterProps) {
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
@@ -124,7 +119,7 @@ function ViewerRouter(props: ViewerRouterProps) {
   }
 
   if (currentWorkspaceId === null && features.library) {
-    return <MyLibrary {...props} />;
+    return <MyLibrary />;
   } else if (currentWorkspaceId) {
     return <TeamLibrary {...props} />;
   }

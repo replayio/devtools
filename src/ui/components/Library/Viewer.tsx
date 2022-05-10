@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import { Recording } from "ui/types";
 import { RecordingId } from "@recordreplay/protocol";
 import BatchActionDropdown from "./BatchActionDropdown";
 import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
-import { LibraryFilters } from "./Library";
 import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
@@ -12,14 +11,7 @@ import styles from "./Library.module.css";
 import { useSelector } from "react-redux";
 import { getWorkspaceId } from "ui/reducers/app";
 import TeamTrialEnd from "./TeamTrialEnd";
-
-const subStringInString = (subString: string, string: string | null) => {
-  if (!string) {
-    return false;
-  }
-
-  return string.toLowerCase().includes(subString.toLowerCase());
-};
+import { filterRecordings, LibraryFiltersContext } from "./Filter";
 
 function getErrorText() {
   if (isReplayBrowser()) {
@@ -48,38 +40,14 @@ function DownloadLinks() {
   );
 }
 
-const filterRecordings = (recordings: Recording[], filters: LibraryFilters) => {
-  const { searchString, qualifiers } = filters;
-  let filteredRecordings = recordings;
-
-  filteredRecordings = searchString
-    ? recordings.filter(
-        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
-      )
-    : recordings;
-  filteredRecordings =
-    qualifiers.target && qualifiers.target === "target:node"
-      ? filteredRecordings.filter(r => !r.user)
-      : filteredRecordings;
-  filteredRecordings =
-    (qualifiers.created && new Date(qualifiers.created))
-      ? filteredRecordings.filter(
-          r => new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
-        )
-      : filteredRecordings;
-
-  return filteredRecordings;
-};
-
 export default function Viewer({
   recordings,
   workspaceName,
-  filters,
 }: {
   recordings: Recording[];
   workspaceName: string | React.ReactNode;
-  filters: LibraryFilters;
 }) {
+  const filters = useContext(LibraryFiltersContext);
   const filteredRecordings = filterRecordings(recordings, filters);
 
   return (
