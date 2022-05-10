@@ -1,4 +1,5 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
+import { format } from "date-fns";
 import { clamp } from "lodash";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
@@ -117,22 +118,38 @@ export function getNewZoomRegion({
 }
 
 // Format a time value to mm:ss
-export function getFormattedTime(time: number, showMS: boolean = false) {
+export function getFormattedTime(time: number, showMilliseconds: boolean = false) {
   const date = new Date(time);
-  const seconds = date.getSeconds().toString().padStart(2, "0");
-  const minutes = date.getMinutes();
-  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
+  let minutes = date.getMinutes();
+  let seconds = date.getSeconds();
+  const milliseconds = date.getMilliseconds();
 
-  return `${minutes}:${seconds}${showMS ? `.${milliseconds}` : ""}`;
+  if (!showMilliseconds) {
+    if (milliseconds >= 500) {
+      seconds++;
+    }
+    if (seconds >= 60) {
+      seconds = 0;
+      minutes++;
+    }
+  }
+
+  if (showMilliseconds) {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}.${milliseconds
+      .toString()
+      .padStart(3, "0")}`;
+  } else {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
 }
 
 const TIME_REGEX = /^([0-9]+)(:[0-9]{0,2}){0,1}(\.[0-9]{0,3}){0,1}$/;
 
 export function isValidTimeString(formatted: string): boolean {
-  return TIME_REGEX.test(formatted) !== null;
+  return TIME_REGEX.test(formatted);
 }
 
-// Parse milliseconds from a formatted time string (mm:ss or mm:ss:ss)
+// Parse milliseconds from a formatted time string containing any combination of minutes, seconds, and milliseconds.
 export function getSecondsFromFormattedTime(formatted: string) {
   formatted = formatted.trim();
   if (!formatted) {
@@ -143,34 +160,33 @@ export function getSecondsFromFormattedTime(formatted: string) {
   let seconds = 0;
   let milliseconds = 0;
 
-  const minutesAndSeconds = formatted.split(":");
-  switch (minutesAndSeconds.length) {
-    case 1: {
-      seconds = parseInt(minutesAndSeconds[0]);
-      break;
-    }
-    case 2: {
-      minutes = parseInt(minutesAndSeconds[0]);
-      const secondsAndMilliseconds = minutesAndSeconds[1].split(".");
-      switch (secondsAndMilliseconds.length) {
-        case 1: {
-          seconds = parseInt(secondsAndMilliseconds[0]);
-          break;
-        }
-        case 2: {
-          seconds = parseInt(secondsAndMilliseconds[0]);
-          milliseconds = parseInt(secondsAndMilliseconds[1]);
-          break;
-        }
-        default: {
-          throw Error(`Unsupported time format "${formatted}"`);
-        }
+  if (formatted.includes(".")) {
+    const index = formatted.indexOf(".");
+    const millisecondsString = formatted.substring(index + 1);
+    switch (millisecondsString.length) {
+      case 1: {
+        milliseconds = parseInt(millisecondsString) * 100;
+        break;
       }
-      break;
+      case 2: {
+        milliseconds = parseInt(millisecondsString) * 10;
+        break;
+      }
+      case 3: {
+        milliseconds = parseInt(millisecondsString);
+        break;
+      }
     }
-    default: {
-      throw Error(`Unsupported time format "${formatted}"`);
-    }
+
+    formatted = formatted.substring(0, index);
+  }
+
+  if (formatted.includes(":")) {
+    const index = formatted.indexOf(":");
+    minutes = parseInt(formatted.substring(0, index));
+    seconds = parseInt(formatted.substring(index + 1));
+  } else {
+    seconds = parseInt(formatted);
   }
 
   return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
