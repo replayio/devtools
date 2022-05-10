@@ -340,7 +340,7 @@ function ReactDevtoolsPanel({
         {isReactDevToolsReady ? (
           <>
             <div>Mounting your React application...</div>
-            <div>Taking too long? Try picking a different point on the timeline.</div>
+            <div>Try picking a different point on the timeline.</div>
           </>
         ) : (
           <div>Loading React Developer Tools...</div>
