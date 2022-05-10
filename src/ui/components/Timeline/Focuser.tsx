@@ -1,7 +1,7 @@
-import clamp from "lodash/clamp";
+import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusRegion } from "ui/actions/timeline";
+import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
@@ -28,14 +28,15 @@ export default function ConditionalFocuser() {
 
 function Focuser() {
   const dispatch = useDispatch();
-  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
-  const prevFocusRegion = useSelector(selectors.getPrevFocusRegion);
+  const focusRegionBackup = useSelector(selectors.getFocusRegionBackup);
+  const zoomRegion = useSelector(selectors.getZoomRegion);
 
   // The first time we place a focus mode, it should automatically move to track the cursor.
   // If we're editing an existing focus mode, it should not.
   const [editMode, setEditMode] = useState<EditMode | null>(
-    prevFocusRegion === null ? { type: "move-auto" } : null
+    focusRegionBackup === null ? { type: "move-auto" } : null
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,6 +74,9 @@ function Focuser() {
           }
 
           setEditMode(null);
+
+          // Once dragging stops, reset the preview to the current time.
+          dispatch(setTimelineToTime(currentTime));
           break;
         }
       }
@@ -224,14 +228,24 @@ function Focuser() {
           className="absolute top-0 left-0 -ml-2 h-full w-2 transform cursor-ew-resize"
           onMouseDown={setEditModeToResizeStart}
         >
-          <div className="absolute right-0 h-full w-1 bg-themeFocuserBgcolor" />
+          <div
+            className={classNames("absolute right-0 h-full w-1", {
+              "bg-themeFocuserBgcolor": editMode?.type !== "resize-start",
+              "bg-secondaryAccent": editMode?.type === "resize-start",
+            })}
+          />
         </div>
 
         <div
           className="absolute top-0 right-0 -mr-2 h-full w-2 transform cursor-ew-resize"
           onMouseDown={setEditModeToResizeEnd}
         >
-          <div className="absolute left-0 h-full w-1 bg-themeFocuserBgcolor" />
+          <div
+            className={classNames("absolute left-0 h-full w-1", {
+              "bg-themeFocuserBgcolor": editMode?.type !== "resize-end",
+              "bg-secondaryAccent": editMode?.type === "resize-end",
+            })}
+          />
         </div>
       </div>
     </div>

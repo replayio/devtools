@@ -21,13 +21,7 @@ import {
   getFocusRegion,
   getZoomRegion,
 } from "ui/reducers/timeline";
-import {
-  TimelineState,
-  ZoomRegion,
-  HoveredItem,
-  FocusOperation,
-  FocusRegion,
-} from "ui/state/timeline";
+import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/timeline";
 
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
@@ -37,7 +31,6 @@ import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import clamp from "lodash/clamp";
 import { hideModal, setModal } from "./app";
 import { getIsFocusing } from "ui/reducers/app";
 import { trackEvent } from "ui/utils/telemetry";
@@ -53,9 +46,6 @@ export type SetHoveredItemAction = Action<"set_hovered_item"> & {
 export type SetPlaybackPrecachedTimeAction = Action<"set_playback_precached_time"> & {
   time: number;
 };
-export type SetPrevFocusRegionAction = Action<"set_prev_trim_region"> & {
-  focusRegion: FocusRegion;
-};
 export type SetFocusRegionAction = Action<"set_trim_region"> & {
   focusRegion: FocusRegion;
 };
@@ -66,8 +56,7 @@ export type TimelineActions =
   | SetZoomRegionAction
   | SetHoveredItemAction
   | SetPlaybackPrecachedTimeAction
-  | SetFocusRegionAction
-  | SetPrevFocusRegionAction;
+  | SetFocusRegionAction;
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
@@ -503,10 +492,6 @@ export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTime
   return { type: "set_playback_precached_time", time };
 }
 
-export function setPrevFocusRegion(focusRegion: FocusRegion): SetPrevFocusRegionAction {
-  return { type: "set_prev_trim_region", focusRegion };
-}
-
 export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
@@ -520,51 +505,64 @@ export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
 
     if (focusRegion !== null) {
       const zoomRegion = getZoomRegion(state);
+      const { endTime: prevEndTime, startTime: prevStartTime } = getFocusRegion(state) || {};
+
+      let { endTime, startTime } = focusRegion;
 
       // Basic bounds check.
-      if (focusRegion.startTime < zoomRegion.startTime) {
-        focusRegion = {
-          ...focusRegion,
-          startTime: zoomRegion.startTime,
-        };
+      if (startTime < zoomRegion.startTime) {
+        startTime = zoomRegion.startTime;
       }
-      if (focusRegion.endTime > zoomRegion.endTime) {
-        focusRegion = {
-          ...focusRegion,
-          endTime: zoomRegion.endTime,
-        };
+      if (endTime > zoomRegion.endTime) {
+        endTime = zoomRegion.endTime;
       }
 
       // Make sure our region is valid.
-      if (focusRegion.endTime < focusRegion.startTime) {
+      if (endTime < startTime) {
         // If we need to adjust a dimension, it's the most intuitive to adjust the one that's being updated.
-        const prevFocusRegion = getFocusRegion(state);
-        if (prevFocusRegion?.endTime === focusRegion.endTime) {
-          focusRegion = {
-            ...focusRegion,
-            startTime: focusRegion.endTime,
-          };
+        if (prevEndTime === endTime) {
+          startTime = endTime;
         } else {
-          focusRegion = {
-            ...focusRegion,
-            endTime: focusRegion.startTime,
-          };
+          endTime = startTime;
         }
       }
 
       // Make sure the current time stays within the bounds of our selected region.
-      if (currentTime < focusRegion.startTime) {
-        const minTime = focusRegion.startTime;
-        dispatch(setTimelineToTime(minTime));
-        dispatch(setTimelineState({ currentTime: minTime }));
-      } else if (currentTime > focusRegion.endTime) {
-        const maxTime = focusRegion.endTime;
-        dispatch(setTimelineToTime(maxTime));
-        dispatch(setTimelineState({ currentTime: maxTime }));
+      if (currentTime < startTime) {
+        dispatch(setTimelineState({ currentTime: startTime }));
+      } else if (currentTime > endTime) {
+        dispatch(setTimelineState({ currentTime: endTime }));
       }
-    }
 
-    dispatch({ type: "set_trim_region", focusRegion });
+      // Update the previous to match the handle that's being dragged.
+      if (startTime !== prevStartTime && endTime === prevEndTime) {
+        dispatch(setTimelineToTime(startTime));
+      } else if (startTime === prevStartTime && endTime !== prevEndTime) {
+        dispatch(setTimelineToTime(endTime));
+      } else {
+        // Else just make sure the preview time stays within the moving window.
+        const hoverTime = getHoverTime(state);
+        if (hoverTime !== null) {
+          if (hoverTime < startTime) {
+            dispatch(setTimelineToTime(startTime));
+          } else if (hoverTime > endTime) {
+            dispatch(setTimelineToTime(endTime));
+          }
+        } else {
+          dispatch(setTimelineToTime(currentTime));
+        }
+      }
+
+      dispatch({
+        type: "set_trim_region",
+        focusRegion: {
+          endTime,
+          startTime,
+        },
+      });
+    } else {
+      dispatch({ type: "set_trim_region", focusRegion: null });
+    }
   };
 }
 
@@ -603,14 +601,18 @@ export function enterFocusMode(instructions?: string): UIThunkAction {
     dispatch(setModal("focusing", { instructions }));
 
     const state = getState();
+    const currentTime = getCurrentTime(state);
     const focusRegion = getFocusRegion(state);
 
     if (focusRegion !== null) {
-      dispatch(setPrevFocusRegion(focusRegion));
+      dispatch(
+        setTimelineState({
+          focusRegionBackup: focusRegion,
+        })
+      );
     }
 
     if (!focusRegion) {
-      const currentTime = getCurrentTime(state);
       const zoomRegion = getZoomRegion(state);
 
       const focusWindowSize = Math.min(

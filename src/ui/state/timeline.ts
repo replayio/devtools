@@ -28,7 +28,7 @@ export interface TimelineState {
   shouldAnimate: boolean;
   hoveredItem: HoveredItem | null;
   focusRegion: FocusRegion | null;
-  prevFocusRegion: FocusRegion | null;
+  focusRegionBackup: FocusRegion | null;
 }
 
 export interface HoveredItem {

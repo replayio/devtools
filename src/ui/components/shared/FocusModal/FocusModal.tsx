@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hideModal as hideModalAction } from "ui/actions/app";
 import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
-import { getFocusRegion, getPrevFocusRegion } from "ui/reducers/timeline";
+import { getFocusRegion, getFocusRegionBackup } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../Button";
@@ -11,7 +11,7 @@ import MaterialIcon from "../MaterialIcon";
 export default function FocusingModal() {
   const dispatch = useDispatch();
   const focusRegion = useSelector(getFocusRegion);
-  const prevFocusRegion = useSelector(getPrevFocusRegion);
+  const focusRegionBackup = useSelector(getFocusRegionBackup);
 
   const didExplicitlyDismiss = useRef<boolean>(false);
 
@@ -27,7 +27,7 @@ export default function FocusingModal() {
   const discardFocusRegion = () => {
     didExplicitlyDismiss.current = true;
 
-    dispatch(setFocusRegion(prevFocusRegion));
+    dispatch(setFocusRegion(focusRegionBackup));
     dispatch(syncFocusedRegion());
     trackEvent("timeline.discard_focus_explicit");
 
@@ -37,12 +37,12 @@ export default function FocusingModal() {
   useEffect(
     () => () => {
       if (!didExplicitlyDismiss.current) {
-        dispatch(setFocusRegion(prevFocusRegion));
+        dispatch(setFocusRegion(focusRegionBackup));
         dispatch(syncFocusedRegion());
         trackEvent("timeline.discard_focus_implicit");
       }
     },
-    [dispatch, prevFocusRegion]
+    [dispatch, focusRegionBackup]
   );
 
   // TODO This is kind of a hack; can we use CSS for this?
@@ -52,9 +52,9 @@ export default function FocusingModal() {
   // Only show discard option if there are pending changes
   const showDiscardButton =
     focusRegion !== null &&
-    prevFocusRegion !== null &&
-    (prevFocusRegion.startTime !== focusRegion.startTime ||
-      prevFocusRegion.endTime !== focusRegion.endTime);
+    focusRegionBackup !== null &&
+    (focusRegionBackup.startTime !== focusRegion.startTime ||
+      focusRegionBackup.endTime !== focusRegion.endTime);
 
   return (
     <div className="pointer-events-none fixed z-50 grid h-full w-full items-center justify-center">
@@ -74,7 +74,7 @@ export default function FocusingModal() {
             </div>
             <div className="text-lg">Edit Focus Mode</div>
           </div>
-          {prevFocusRegion === null ? (
+          {focusRegionBackup === null ? (
             <>
               <div>Click anywhere in the timeline to focus your replay.</div>
               <div>

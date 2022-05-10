@@ -67,6 +67,7 @@ export default function Timeline() {
 
   const onMouseMove = (event: React.MouseEvent) => {
     const mouseTime = getTimeFromPosition(event.pageX, progressBarRef.current!, zoomRegion);
+    console.log(`<Timeline> onMouseMove() ${mouseTime}`);
     const isDragging = event.buttons === 1;
     const isOutsideFocusRegion =
       focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);

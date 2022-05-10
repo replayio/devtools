@@ -6,7 +6,12 @@ import { ThunkExtraArgs } from "ui/utils/thunk";
 import * as actions from "../actions/timeline";
 
 import appReducer from "./app";
-import timelineReducer, { getCurrentTime, getFocusRegion, getPlayback } from "./timeline";
+import timelineReducer, {
+  getCurrentTime,
+  getFocusRegion,
+  getHoverTime,
+  getPlayback,
+} from "./timeline";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
@@ -79,6 +84,52 @@ describe("Redux timeline state", () => {
         })
       );
       expect(getCurrentTime(store.getState())).toBe(75);
+    });
+
+    it("should update the hoverTime (and the time displayed in the video player) to match the handle being dragged", () => {
+      // If we are moving the whole focus region, seek to the current time.
+      dispatch(
+        actions.setFocusRegion({
+          startTime: 60,
+          endTime: 80,
+        })
+      );
+      expect(getHoverTime(store.getState())).toBe(75);
+
+      // If we are moving the startTime, seek to that point
+      dispatch(
+        actions.setFocusRegion({
+          startTime: 65,
+          endTime: 80,
+        })
+      );
+      expect(getHoverTime(store.getState())).toBe(65);
+
+      // If we are moving the endTime, seek to that point
+      dispatch(
+        actions.setFocusRegion({
+          startTime: 65,
+          endTime: 75,
+        })
+      );
+      expect(getHoverTime(store.getState())).toBe(75);
+
+      // Moving the entire range should not move the hover time,
+      // unless the time would otherwise be out of the new focused region.
+      dispatch(
+        actions.setFocusRegion({
+          startTime: 68,
+          endTime: 78,
+        })
+      );
+      expect(getHoverTime(store.getState())).toBe(75);
+      dispatch(
+        actions.setFocusRegion({
+          startTime: 80,
+          endTime: 90,
+        })
+      );
+      expect(getHoverTime(store.getState())).toBe(80);
     });
 
     it("should not allow an invalid focusRegion to be set", () => {
