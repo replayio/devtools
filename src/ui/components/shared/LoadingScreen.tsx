@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
   getAwaitingSourcemaps,
@@ -20,7 +20,7 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="bg-loadingBoxes relative flex w-96 flex-col items-center space-y-8 rounded-lg p-8 py-4 pb-8 shadow-md">
+      <div className="relative flex w-96 flex-col items-center space-y-8 rounded-lg bg-loadingBoxes p-8 py-4 pb-8 shadow-md">
         <div className="flex flex-col items-center space-y-2">
           <ReplayLogo wide size="lg" />
           {children}
@@ -33,11 +33,27 @@ export function LoadingScreenTemplate({
 
 // White progress screen used for showing the scanning progress of a replay
 export function ProgressBar({ progress }: { progress: number }) {
+  // We keep a low-water mark here, because it's possible for the amount that we
+  // have loaded to actually go *down* due to new unprocessed regions
+  const [minProgress, setMinProgress] = useState<number>(0);
+
+  const displayedProgress = useMemo(() => {
+    if (!progress) {
+      return minProgress;
+    }
+
+    if (progress > minProgress) {
+      setMinProgress(progress);
+    }
+
+    return Math.max(minProgress, progress);
+  }, [progress, minProgress]);
+
   return (
     <div className="relative h-1.5 w-full overflow-hidden rounded-lg bg-themeBase-90 p-0">
       <div
         className="t-0 absolute h-full bg-primaryAccent"
-        style={{ width: `${progress}%`, transitionDuration: "400ms" }}
+        style={{ width: `${displayedProgress}%`, transitionDuration: "400ms" }}
       />
     </div>
   );
