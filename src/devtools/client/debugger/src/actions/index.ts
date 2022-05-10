@@ -15,11 +15,13 @@ import * as tabs from "./tabs";
 import * as toolbox from "./toolbox";
 import * as preview from "./preview";
 
+const { MAX_LINE_HITS_TO_FETCH, ...sourcesActorsActions } = sourcesActors;
+
 export default {
   ...breakpoints,
   ...logExceptions,
   ...sources,
-  ...sourcesActors,
+  ...sourcesActorsActions,
   ...tabs,
   ...pause,
   ...ui,
