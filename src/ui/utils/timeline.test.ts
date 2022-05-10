@@ -67,6 +67,23 @@ describe("getSecondsFromFormattedTime", () => {
     expect(getSecondsFromFormattedTime("1:00.050")).toBe(60_050);
     expect(getSecondsFromFormattedTime("1:01.009")).toBe(61_009);
   });
+
+  it("should ignore leading and trailing spaces", () => {
+    // Weird formatting to prevent linter from "fixing" the strings
+    expect(getSecondsFromFormattedTime(" " + "61" + " ")).toBe(61_000);
+    expect(getSecondsFromFormattedTime(" " + "61.02" + " ")).toBe(61_020);
+    expect(getSecondsFromFormattedTime(" " + "1:11" + " ")).toBe(71_000);
+    expect(getSecondsFromFormattedTime(" " + "1:01.009" + " ")).toBe(61_009);
+  });
+
+  it("should throw on invalidate format", () => {
+    expect(() => getSecondsFromFormattedTime("a_61-b")).toThrow('Invalid format "a_61-b"');
+    expect(() => getSecondsFromFormattedTime("a#61.02-b")).toThrow('Invalid format "a#61.02-b"');
+    expect(() => getSecondsFromFormattedTime("/!1:11-b")).toThrow('Invalid format "/!1:11-b"');
+    expect(() => getSecondsFromFormattedTime("?1:01.009-C")).toThrow(
+      'Invalid format "?1:01.009-C"'
+    );
+  });
 });
 
 describe("isValidTimeString", () => {

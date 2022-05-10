@@ -1,5 +1,5 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { clamp } from "lodash";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
@@ -154,6 +154,10 @@ export function getSecondsFromFormattedTime(formatted: string) {
   formatted = formatted.trim();
   if (!formatted) {
     return 0;
+  }
+
+  if (!isValidTimeString(formatted)) {
+    throw Error(`Invalid format "${formatted}"`);
   }
 
   let minutes = 0;
