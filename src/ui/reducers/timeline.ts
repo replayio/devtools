@@ -1,18 +1,16 @@
-import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { TimelineActions } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { TimelineState } from "ui/state/timeline";
-import { isPointInRegions, overlap } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
     currentTime: 0,
     focusRegion: null,
-    focusRegionHasBeenConfirmed: false,
     hoverTime: null,
     hoveredItem: null,
     playback: null,
     playbackPrecachedTime: 0,
+    prevFocusRegion: null,
     recordingDuration: null,
     shouldAnimate: true,
     stalled: false,
@@ -51,7 +49,13 @@ export default function update(
       return {
         ...state,
         focusRegion: action.focusRegion,
-        focusRegionHasBeenConfirmed: action.focusRegionHasBeenConfirmed,
+      };
+    }
+
+    case "set_prev_trim_region": {
+      return {
+        ...state,
+        prevFocusRegion: action.focusRegion,
       };
     }
 
@@ -72,8 +76,7 @@ export const getTimelineDimensions = (state: UIState) => state.timeline.timeline
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
-export const getFocusRegionHasBeenConfirmed = (state: UIState) =>
-  state.timeline.focusRegionHasBeenConfirmed;
+export const getPrevFocusRegion = (state: UIState) => state.timeline.prevFocusRegion;
 export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
   (state.timeline.focusRegion.startTime !== 0 ||

@@ -1,208 +1,211 @@
-import React, { FC, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { actions } from "ui/actions";
-import { setFocusRegion, setTimelineState, setTimelineToTime } from "ui/actions/timeline";
-import { selectors } from "ui/reducers";
+import { react } from "@babel/types";
+import number from "devtools/packages/devtools-reps/reps/number";
 import clamp from "lodash/clamp";
-import { FocusOperation, FocusRegion, ZoomRegion } from "ui/state/timeline";
-import { getVisiblePosition } from "ui/utils/timeline";
-import classNames from "classnames";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
+import { selectors } from "ui/reducers";
+import { ZoomRegion } from "ui/state/timeline";
 import { trackEvent } from "ui/utils/telemetry";
-import { MouseDownMask } from "./MouseDownMask";
+import { getVisiblePosition } from "ui/utils/timeline";
 
-const getPosition = (time: number, zoom: ZoomRegion) => {
-  const position = getVisiblePosition({ time, zoom }) * 100;
-  return clamp(position, 0, 100);
+type EditMode = {
+  dragOffset?: number;
+  type: "move" | "move-auto" | "resize-end" | "resize-start";
 };
 
-function ResizeMask({
-  draggingTarget,
-  onDragEnd,
-}: {
-  onDragEnd: () => void;
-  draggingTarget: FocusOperation;
-}) {
-  const dispatch = useDispatch();
-  const hoverTime = useSelector(selectors.getHoverTime);
-  const currentTime = useSelector(selectors.getCurrentTime);
+type Props = { timelineRef: React.RefObject<HTMLDivElement> };
+
+// HACK: Limit the smallest focus region to be ~10% of the duration;
+// This avoids some known selection UI bugs.
+const MIN_FOCUS_WINDOW_PERCENTAGE = 0.1;
+
+function stopEvent(event: MouseEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+export default function ConditionalFocuser({ timelineRef }: Props) {
   const focusRegion = useSelector(selectors.getFocusRegion);
+  const isFocusing = useSelector(selectors.getIsFocusing);
 
-  const onMouseMove = () => {
-    dispatch(actions.updateFocusRegion(draggingTarget));
-  };
-  const onMouseUp = (e: MouseEvent) => {
-    e.stopPropagation();
-    onDragEnd();
+  if (!focusRegion || !isFocusing) {
+    return null;
+  }
 
-    if (
-      (draggingTarget === FocusOperation.resizeStart && currentTime < focusRegion!.startTime) ||
-      (draggingTarget === FocusOperation.resizeEnd && currentTime > focusRegion!.endTime)
-    ) {
-      dispatch(setTimelineState({ currentTime: hoverTime! }));
-      dispatch(setTimelineToTime(hoverTime));
-    }
-  };
-
-  return <MouseDownMask onMouseMove={onMouseMove} onMouseUp={onMouseUp} />;
+  return <Focuser timelineRef={timelineRef} />;
 }
 
-function Draggers({
-  dragging,
-  onDragStart,
-}: {
-  dragging: boolean;
-  onDragStart: (e: React.MouseEvent, target: FocusOperation) => void;
-}) {
-  const onStartMouseDown = (e: React.MouseEvent) => {
-    trackEvent("timeline.drag_start_marker");
-    onDragStart(e, FocusOperation.resizeStart);
-  };
-  const onEndMouseDown = (e: React.MouseEvent) => {
-    trackEvent("timeline.drag_start_marker");
-    onDragStart(e, FocusOperation.resizeEnd);
-  };
-
-  return (
-    <>
-      <div
-        className={classNames(
-          dragging ? "w-2" : "w-2",
-          "absolute top-0 left-0 h-full transform cursor-ew-resize rounded-l-sm bg-themeFocuserBgcolor group-hover:w-2"
-        )}
-        onMouseDown={onStartMouseDown}
-      />
-      <div
-        className={classNames(
-          dragging ? "w-2" : "w-2",
-          "absolute top-0 right-0 h-full transform cursor-ew-resize rounded-r-sm bg-themeFocuserBgcolor group-hover:w-2"
-        )}
-        onMouseDown={onEndMouseDown}
-      />
-    </>
-  );
-}
-
-function Span({
-  startTime,
-  endTime,
-  zoomRegion,
-  draggers,
-  onMouseDown,
-}: {
-  startTime: number;
-  endTime: number;
-  zoomRegion: ZoomRegion;
-  onMouseDown?: (e: React.MouseEvent) => void;
-  draggers?: JSX.Element;
-}) {
-  const left = getPosition(startTime, zoomRegion);
-  const right = getPosition(endTime, zoomRegion);
-
-  return (
-    <div className="group absolute h-full" style={{ left: `${left}%`, width: `${right - left}%` }}>
-      <div
-        className="h-full w-full rounded-sm bg-themeFocuserBgcolor opacity-50"
-        onMouseDown={onMouseDown}
-      />
-      {draggers}
-    </div>
-  );
-}
-
-function TrimSpan({
-  dragging,
-  focusRegion,
-  onDragStart,
-  zoomRegion,
-}: {
-  dragging: boolean;
-  focusRegion: FocusRegion;
-  onDragStart: (e: React.MouseEvent, target: FocusOperation) => void;
-  zoomRegion: ZoomRegion;
-}) {
-  const draggers = <Draggers {...{ dragging, onDragStart }} />;
-  const { startTime, endTime } = focusRegion;
-
-  return (
-    <Span draggers={draggers} endTime={endTime} startTime={startTime} zoomRegion={zoomRegion} />
-  );
-}
-
-export function Focuser({
-  setIsDragging,
-  timelineRef,
-}: {
-  setIsDragging: (isDragging: boolean) => void;
-  timelineRef: React.RefObject<HTMLDivElement>;
-}) {
+function Focuser({ timelineRef }: Props) {
   const dispatch = useDispatch();
   const zoomRegion = useSelector(selectors.getZoomRegion);
   const focusRegion = useSelector(selectors.getFocusRegion);
-  const focusRegionHasBeenConfirmed = useSelector(selectors.getFocusRegionHasBeenConfirmed);
-  const [draggingTarget, setDraggingTarget] = useState<FocusOperation | null>(null);
+  const prevFocusRegion = useSelector(selectors.getPrevFocusRegion);
 
-  const barRef = useRef<HTMLDivElement>(null);
+  // The first time we place a focus mode, it should automatically move to track the cursor.
+  // If we're editing an existing focus mode, it should not.
+  const [editMode, setEditMode] = useState<EditMode | null>(
+    prevFocusRegion === null ? { type: "move-auto" } : null
+  );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const draggableAreaRef = useRef<HTMLDivElement>(null);
+  const didDragRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const bar = barRef.current;
+    return () => {
+      // TODO The way this code was originally designed, the focus UI shows only when the "focusing" modal is active.
+      // When the "focusing" modal is closed, the currently selected focus region is applied.
+      // This coupling feels a bit awkward and we should revisit it.
+      dispatch(syncFocusedRegion());
+      trackEvent("timeline.save_focus");
+    };
+  });
+
+  useEffect(() => {
+    const div = containerRef.current;
     const timeline = timelineRef.current;
 
-    if (!bar || !focusRegion || !timeline) {
+    if (!div || !focusRegion || !editMode || !timeline) {
       return;
     }
 
-    const onClick = () => {
-      dispatch(setFocusRegion(focusRegion, true));
+    // Stop auto-tracking on "click"
+    const onTimelineClick = (event: MouseEvent) => {
+      if (editMode.type === "move-auto") {
+        // This click shouldn't bubble; we're handling
+        stopEvent(event);
+
+        setEditMode(null);
+      }
     };
 
-    const onMouseMove = (event: MouseEvent) => {
-      if (focusRegionHasBeenConfirmed) {
-        return;
+    // Stop dragging on "click"
+    const onWindowClick = (event: MouseEvent) => {
+      switch (editMode.type) {
+        case "move":
+        case "resize-end":
+        case "resize-start": {
+          // If this was a real click, we should allow this event to pass through to update the current time.
+          // If it is part of a drag operation, we shouldn't.
+          if (didDragRef.current) {
+            stopEvent(event);
+
+            didDragRef.current = false;
+          }
+
+          setEditMode(null);
+          break;
+        }
       }
+    };
+
+    const onWindowMouseMove = (event: MouseEvent) => {
+      stopEvent(event);
 
       const { movementX, pageX } = event;
       if (movementX !== 0) {
-        // Drag offsets are relative to the smaller/inner "bar" element.
-        const rect = bar.getBoundingClientRect();
+        didDragRef.current = true;
 
-        // Convert cursor X and DIV width to timestamp.
-        const x = pageX - rect.left;
-        const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-        const focusRegionDuration = focusRegion.endTime - focusRegion.startTime;
-        const time = zoomRegion.startTime + (x / rect.width) * zoomRegionDuration;
+        const relativeMouseX = pageX - (editMode.dragOffset || 0);
+        const mouseTime = getTimeFromPosition(relativeMouseX, div, zoomRegion);
 
-        // Re-center the focus region around the mouse cursor.
-        let newEndTime = time + focusRegionDuration / 2;
-        let newStartTime = time - focusRegionDuration / 2;
+        switch (editMode.type) {
+          case "move":
+          case "move-auto": {
+            // Re-center the focus region around the mouse cursor.
+            const focusRegionDuration = focusRegion.endTime - focusRegion.startTime;
+            let newEndTime = mouseTime + focusRegionDuration / 2;
+            let newStartTime = mouseTime - focusRegionDuration / 2;
 
-        // Make sure the new focus region is still within our zoom bounds.
-        if (newStartTime < zoomRegion.startTime) {
-          newEndTime += zoomRegion.startTime - newStartTime;
-          newStartTime = zoomRegion.startTime;
-        } else if (newEndTime > zoomRegion.endTime) {
-          newStartTime -= newEndTime - zoomRegion.endTime;
-          newEndTime = zoomRegion.endTime;
+            // Make sure the new focus region is still within our zoom bounds.
+            if (newStartTime < zoomRegion.startTime) {
+              newEndTime += zoomRegion.startTime - newStartTime;
+              newStartTime = zoomRegion.startTime;
+            } else if (newEndTime > zoomRegion.endTime) {
+              newStartTime -= newEndTime - zoomRegion.endTime;
+              newEndTime = zoomRegion.endTime;
+            }
+
+            dispatch(
+              setFocusRegion({
+                endTime: newEndTime,
+                startTime: newStartTime,
+              })
+            );
+            break;
+          }
+          case "resize-end": {
+            const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+            const minDuration = zoomRegionDuration * MIN_FOCUS_WINDOW_PERCENTAGE;
+            const endTime = Math.max(mouseTime, focusRegion.startTime + minDuration);
+            dispatch(
+              setFocusRegion({
+                endTime,
+                startTime: focusRegion.startTime,
+              })
+            );
+            break;
+          }
+          case "resize-start": {
+            const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+            const minDuration = zoomRegionDuration * MIN_FOCUS_WINDOW_PERCENTAGE;
+            const startTime = Math.min(mouseTime, focusRegion.endTime - minDuration);
+            dispatch(
+              setFocusRegion({
+                endTime: focusRegion.endTime,
+                startTime,
+              })
+            );
+            break;
+          }
         }
-
-        dispatch(
-          setFocusRegion(
-            {
-              endTime: newEndTime,
-              startTime: newStartTime,
-            },
-            false
-          )
-        );
       }
     };
 
-    // Listen to mouse move events on the larger/outer timeline container.
-    // This is the dominant visual element and doing this is a little more forgiving of small user drag errors.
-    timeline.addEventListener("click", onClick);
-    timeline.addEventListener("mousemove", onMouseMove);
+    // Stop all drag operations when the mouse leaves the window.
+    const onWindowMouseLeave = (event: MouseEvent) => {
+      switch (editMode.type) {
+        case "move":
+        case "resize-end":
+        case "resize-start": {
+          setEditMode(null);
+          break;
+        }
+      }
+    };
+
+    // Block "mouseup" events for drag-in-progress
+    const onWindowMouseUp = (event: MouseEvent) => {
+      switch (editMode.type) {
+        case "move":
+        case "resize-end":
+        case "resize-start": {
+          // If this was a real mouseup, we should allow this event to pass through to update the current time.
+          // If it is part of a drag operation, we shouldn't.
+          if (didDragRef.current) {
+            stopEvent(event);
+          }
+
+          // Don't reset the ref or edit mode during mouse-up.
+          // Wait until the subsequent "click" event so that we claim both.
+          break;
+        }
+      }
+    };
+
+    timeline.addEventListener("click", onTimelineClick);
+    window.addEventListener("click", onWindowClick, true);
+    window.addEventListener("mousemove", onWindowMouseMove, true);
+    window.addEventListener("mouseleave", onWindowMouseLeave, true);
+    window.addEventListener("mouseup", onWindowMouseUp, true);
+
     return () => {
-      timeline.removeEventListener("click", onClick);
-      timeline.removeEventListener("mousemove", onMouseMove);
+      timeline.removeEventListener("click", onTimelineClick);
+      window.removeEventListener("click", onWindowClick, true);
+      window.removeEventListener("mousemove", onWindowMouseMove, true);
+      window.removeEventListener("mouseleave", onWindowMouseLeave, true);
+      window.removeEventListener("mouseup", onWindowMouseUp, true);
     };
   });
 
@@ -210,28 +213,56 @@ export function Focuser({
     return null;
   }
 
-  // TODO [bvaughn] Naming the FocusOperation param "target" and "draggingTarget" is confusing;
-  // these terms have meaning within the drag-and-drop space that aren't what we're using them for here.
-  const onDragStart = (event: React.MouseEvent, target: FocusOperation) => {
-    event.stopPropagation();
+  const setEditModeMove = (event: React.MouseEvent) => {
+    const draggableArea = draggableAreaRef.current!;
+    const { left, width } = draggableArea.getBoundingClientRect();
+    const relativeMouseX = event.pageX - left;
+    const dragOffset = relativeMouseX - width / 2;
+    setEditMode({ dragOffset, type: "move" });
+  };
+  const setEditModeResizeEnd = () => setEditMode({ type: "resize-end" });
+  const setEditModeResizeStart = () => setEditMode({ type: "resize-start" });
 
-    setIsDragging(true);
-    setDraggingTarget(target);
-  };
-  const onDragEnd = () => {
-    setIsDragging(false);
-    setDraggingTarget(null);
-  };
+  const left = getPositionFromTime(focusRegion.startTime, zoomRegion);
+  const right = getPositionFromTime(focusRegion.endTime, zoomRegion);
 
   return (
-    <div className="relative top-0 left-0 h-full w-full" ref={barRef}>
-      <TrimSpan
-        dragging={!!draggingTarget}
-        focusRegion={focusRegion}
-        onDragStart={onDragStart}
-        zoomRegion={zoomRegion}
-      />
-      {draggingTarget ? <ResizeMask onDragEnd={onDragEnd} draggingTarget={draggingTarget} /> : null}
+    <div className="relative top-0 left-0 h-full w-full" ref={containerRef}>
+      <div
+        className="group absolute h-full"
+        ref={draggableAreaRef}
+        style={{
+          left: `${left}%`,
+          width: `${right - left}%`,
+        }}
+      >
+        <div
+          className="h-full w-full rounded-sm bg-themeFocuserBgcolor opacity-50"
+          onMouseDown={setEditModeMove}
+        />
+        <div
+          className="absolute top-0 left-0 h-full w-2 transform cursor-ew-resize rounded-l-sm bg-themeFocuserBgcolor group-hover:w-2"
+          onMouseDown={setEditModeResizeStart}
+        />
+        <div
+          className="absolute top-0 right-0 h-full w-2 transform cursor-ew-resize rounded-r-sm bg-themeFocuserBgcolor group-hover:w-2"
+          onMouseDown={setEditModeResizeEnd}
+        />
+      </div>
     </div>
   );
 }
+
+const getPositionFromTime = (time: number, zoomRegion: ZoomRegion) => {
+  const position = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
+  const clampedPosition = clamp(position, 0, 100);
+  return clampedPosition;
+};
+
+const getTimeFromPosition = (mouseX: number, target: HTMLElement, zoomRegion: ZoomRegion) => {
+  const rect = target.getBoundingClientRect();
+  const x = mouseX - rect.left;
+  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+  const time = zoomRegion.startTime + clamp(x / rect.width, 0, 100) * zoomRegionDuration;
+  return time;
+};

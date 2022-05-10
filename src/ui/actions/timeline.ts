@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId, TimeStampedPointRange } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { client, log, sendMessage } from "protocol/socket";
 import {
@@ -21,10 +21,17 @@ import {
   getFocusRegion,
   getZoomRegion,
 } from "ui/reducers/timeline";
+import {
+  TimelineState,
+  ZoomRegion,
+  HoveredItem,
+  FocusOperation,
+  FocusRegion,
+} from "ui/state/timeline";
+
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { TimelineState, ZoomRegion, HoveredItem, FocusOperation } from "ui/state/timeline";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
@@ -46,12 +53,11 @@ export type SetHoveredItemAction = Action<"set_hovered_item"> & {
 export type SetPlaybackPrecachedTimeAction = Action<"set_playback_precached_time"> & {
   time: number;
 };
+export type SetPrevFocusRegionAction = Action<"set_prev_trim_region"> & {
+  focusRegion: FocusRegion;
+};
 export type SetFocusRegionAction = Action<"set_trim_region"> & {
-  focusRegion: {
-    startTime: number;
-    endTime: number;
-  };
-  focusRegionHasBeenConfirmed: boolean;
+  focusRegion: FocusRegion;
 };
 
 export type TimelineActions =
@@ -60,14 +66,13 @@ export type TimelineActions =
   | SetZoomRegionAction
   | SetHoveredItemAction
   | SetPlaybackPrecachedTimeAction
-  | SetFocusRegionAction;
+  | SetFocusRegionAction
+  | SetPrevFocusRegionAction;
 
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);
-
-  window.addEventListener("resize", () => dispatch(updateTimelineDimensions()));
 
   const shortcuts = new KeyShortcuts({
     Left: ev => {
@@ -183,16 +188,6 @@ function setRecordingDescription(duration: number): UIThunkAction {
         zoomRegion: { ...zoomRegion, endTime: duration },
       })
     );
-  };
-}
-
-export function updateTimelineDimensions(): UIThunkAction {
-  return dispatch => {
-    const el = document.querySelector(".progress-bar");
-    const width = el ? el.clientWidth : 1;
-    const left = el ? el.getBoundingClientRect().left : 1;
-    const top = el ? el.getBoundingClientRect().top : 1;
-    dispatch(setTimelineState({ timelineDimensions: { width, left, top } }));
   };
 }
 
@@ -505,53 +500,26 @@ export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTime
   return { type: "set_playback_precached_time", time };
 }
 
-export function setFocusRegion(
-  focusRegion: {
-    startTime: number;
-    endTime: number;
-  },
-  confirmed: boolean
-): SetFocusRegionAction {
-  return { type: "set_trim_region", focusRegion, focusRegionHasBeenConfirmed: confirmed };
+export function setPrevFocusRegion(focusRegion: FocusRegion): SetPrevFocusRegionAction {
+  return { type: "set_prev_trim_region", focusRegion };
 }
 
-export function setFocusAroundTime(time: number, maxTime: number): UIThunkAction {
+export function setFocusRegion(focusRegion: FocusRegion): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
-    const zoomRegion = getZoomRegion(state);
+    const currentTime = getCurrentTime(state);
 
-    const duration = zoomRegion.endTime;
-    const startTime = Math.max(time - maxTime / 2, 0);
-    const endTime = Math.min(time + maxTime / 2, duration);
-
-    dispatch(setFocusRegion({ endTime, startTime }, true));
-  };
-}
-
-export function updateFocusRegion(operation: FocusOperation): UIThunkAction {
-  return (dispatch, getState) => {
-    const state = getState();
-    const hoverTime = getHoverTime(state)!;
-    const focusRegion = getFocusRegion(state)!;
-    const zoomRegion = getZoomRegion(state);
-
-    const duration = zoomRegion.endTime;
-    // To get around a handful of selection UI bugs, this limits the allowable trimmed
-    // region to 10% of the full duration of the replay.
-    const minRegion = duration * 0.1;
-    const { startTime, endTime } = focusRegion;
-
-    let type, value;
-
-    if (operation === FocusOperation.resizeStart) {
-      type = "startTime";
-      value = clamp(hoverTime, 0, endTime - minRegion);
-    } else {
-      type = "endTime";
-      value = clamp(hoverTime, startTime + minRegion, duration);
+    if (currentTime < focusRegion.startTime) {
+      const minTime = focusRegion.startTime;
+      dispatch(setTimelineToTime(minTime));
+      dispatch(setTimelineState({ currentTime: minTime }));
+    } else if (currentTime > focusRegion.endTime) {
+      const maxTime = focusRegion.endTime;
+      dispatch(setTimelineToTime(maxTime));
+      dispatch(setTimelineState({ currentTime: maxTime }));
     }
 
-    dispatch(setFocusRegion({ ...focusRegion, [type]: value }, true));
+    dispatch({ type: "set_trim_region", focusRegion });
   };
 }
 
@@ -594,6 +562,9 @@ export function enterFocusMode(instructions?: string): UIThunkAction {
 
     const state = getState();
     const focusRegion = getFocusRegion(state);
+
+    dispatch(setPrevFocusRegion(focusRegion));
+
     if (!focusRegion) {
       const currentTime = getCurrentTime(state);
       const zoomRegion = getZoomRegion(state);
@@ -606,7 +577,7 @@ export function enterFocusMode(instructions?: string): UIThunkAction {
       const startTime = Math.max(zoomRegion.startTime, currentTime - focusWindowSize / 2);
       const endTime = Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2);
 
-      dispatch(setFocusRegion({ endTime, startTime }, false));
+      dispatch(setFocusRegion({ endTime, startTime }));
     }
   };
 }

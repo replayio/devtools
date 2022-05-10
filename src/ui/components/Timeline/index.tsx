@@ -1,478 +1,137 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-"use strict";
-
-// React component which renders the devtools timeline and manages which
-// graphics are currently being rendered.
-
-import { connect, ConnectedProps } from "react-redux";
-import type { PointDescription, Location } from "@recordreplay/protocol";
-import React from "react";
-import classnames from "classnames";
-import clamp from "lodash/clamp";
-
-import Tooltip from "./Tooltip";
-import Comments from "../Comments";
-
-import { ThreadFront } from "protocol/thread";
-import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
-
-import { actions } from "ui/actions";
+import { clamp } from "lodash";
+import React, { useLayoutEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import Marker from "./Marker";
-import MessageMarker from "./MessageMarker";
-import EventMarker from "./EventMarker";
+import { ZoomRegion } from "ui/state/timeline";
+import { getFormattedTime, getVisiblePosition } from "ui/utils/timeline";
 
-import { getVisiblePosition, getFormattedTime } from "ui/utils/timeline";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { Component, createRef, MouseEventHandler } from "react";
-import { UIState } from "ui/state";
-import { HoveredItem } from "ui/state/timeline";
-import { prefs, features } from "ui/utils/prefs";
-import { Focuser } from "./Focuser";
-import { trackEvent } from "ui/utils/telemetry";
-import IndexingLoader from "../shared/IndexingLoader";
-import { EditFocusButton } from "./EditFocusButton";
-import { MouseDownMask } from "./MouseDownMask";
+import Comments from "../Comments";
 import ProtocolTimeline from "../ProtocolTimeline";
 
+import { EditFocusButton } from "./EditFocusButton";
+import Focuser from "./Focuser";
 import NonLoadingRegions from "./NonLoadingRegions";
+import PlayPauseButton from "./PlaybackControls";
+import PreviewMarkers from "./PreviewMarkers";
+import ProgressBars from "./ProgressBars";
+import Tooltip from "./Tooltip";
+import UnfocusedRegion from "./UnfocusedRegion";
 
-function getIsSecondaryHighlighted(
-  hoveredItem: HoveredItem | null,
-  location: Location | undefined
-) {
-  if (hoveredItem?.target == "console" || !location || !hoveredItem?.location) {
-    return false;
-  }
+export default function Timeline() {
+  const dispatch = useDispatch();
+  const currentTime = useSelector(selectors.getCurrentTime);
+  const focusRegion = useSelector(selectors.getFocusRegion);
+  const hoverTime = useSelector(selectors.getHoverTime);
+  const recordingDuration = useSelector(selectors.getRecordingDuration);
+  const timelineDimensions = useSelector(selectors.getTimelineDimensions);
+  const zoomRegion = useSelector(selectors.getZoomRegion);
 
-  return getLocationKey(hoveredItem.location) == getLocationKey(location);
-}
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
-class Timeline extends Component<PropsFromRedux, { isDragging: boolean }> {
-  $progressBar: HTMLDivElement | null = null;
-  hoverInterval: number | undefined;
-  state = {
-    isDragging: false,
-  };
-  timelineRef = createRef();
+  const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
+  const formattedTime = getFormattedTime(currentTime);
 
-  async componentDidMount() {
-    // Used in the test harness for starting playback recording.
-    gToolbox.timeline = this;
-    this.props.updateTimelineDimensions();
-  }
+  useLayoutEffect(() => {
+    const progressBar = progressBarRef.current;
 
-  get overlayWidth() {
-    return this.props.timelineDimensions.width;
-  }
+    const onWindowResize = () => {
+      const rect = progressBar!.getBoundingClientRect();
+      dispatch(
+        setTimelineState({
+          timelineDimensions: { width: rect.width, left: rect.left, top: rect.top },
+        })
+      );
+    };
 
-  // Get the time for a mouse event within the recording.
-  getMouseTime(e: MouseEvent | React.MouseEvent) {
-    const { startTime, endTime } = this.props.zoomRegion;
-    const { left, width } = this.$progressBar!.getBoundingClientRect();
-    const clickLeft = e.clientX;
+    // Set initial dimensions on-mount
+    onWindowResize();
 
-    const clickPosition = Math.min(1, Math.max((clickLeft - left) / width, 0));
-    return Math.ceil(startTime + (endTime - startTime) * clickPosition);
-  }
+    // Update dimensions when the browser resizes
+    window.addEventListener("resize", onWindowResize);
+    return () => {
+      window.removeEventListener("resize", onWindowResize);
+    };
+  }, [dispatch]);
 
-  hoverTimer = () => {
-    const { setTimelineToTime } = this.props;
-    if (!this.$progressBar) {
+  const onClick = (event: React.MouseEvent) => {
+    const mouseTime = getTimeFromPosition(event.pageX, progressBarRef.current!, zoomRegion);
+    const isOutsideFocusRegion =
+      focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
+
+    if (isOutsideFocusRegion) {
       return;
     }
-    const isHovered = window.elementIsHovered(this.$progressBar);
-    if (!isHovered) {
-      window.clearInterval(this.hoverInterval);
-      this.hoverInterval = undefined;
-      setTimelineToTime(null, false);
-    }
+
+    dispatch(setTimelineToTime(mouseTime, true));
+    dispatch(setTimelineState({ currentTime: mouseTime }));
   };
 
-  onPlayerMouseEnter: MouseEventHandler = async e => {
-    if (!this.hoverInterval) {
-      this.hoverInterval = window.setInterval(this.hoverTimer, 100);
-    }
-  };
+  const onMouseMove = (event: React.MouseEvent) => {
+    const mouseTime = getTimeFromPosition(event.pageX, progressBarRef.current!, zoomRegion);
+    const isDragging = event.buttons === 1;
+    const isOutsideFocusRegion =
+      focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
 
-  onPlayerMouseMove = (e: MouseEvent | React.MouseEvent) => {
-    const { hoverTime, setTimelineToTime, setTimelineState, isFocusing, focusRegion } = this.props;
-    const mouseTime = this.getMouseTime(e);
-    const isDragging = e.buttons === 1;
-    const hoveredOnUnfocusedRegion =
-      focusRegion &&
-      (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime) &&
-      !isFocusing;
-
-    if (hoveredOnUnfocusedRegion) {
+    if (isOutsideFocusRegion) {
       return;
     }
 
     if (hoverTime != mouseTime) {
-      setTimelineToTime(mouseTime, isDragging);
-    }
-    if (isDragging && !isFocusing) {
-      setTimelineState({ currentTime: mouseTime });
-    }
-  };
-
-  onPlayerMouseUp = (e: MouseEvent | React.MouseEvent) => {
-    const {
-      hoverTime,
-      isFocusing,
-      seek,
-      clearPendingComment,
-      setTimelineToTime,
-      setTimelineState,
-      currentTime,
-      focusRegion,
-      nonLoadingTimeRanges,
-      enterFocusMode,
-      setFocusAroundTime,
-    } = this.props;
-    const { isDragging } = this.state;
-    // if the user clicked on a comment marker, we already seek to the comment's
-    // execution point, so we don't want to seek a second time here
-    const clickedOnCommentMarker =
-      e.target instanceof Element && [...e.target.classList].includes("comment-marker");
-    const mouseTime = this.getMouseTime(e);
-    const clickedOnUnfocusedRegion =
-      focusRegion &&
-      (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime) &&
-      !isFocusing;
-    const clickedOnNonLoadingRegion = nonLoadingTimeRanges.some(
-      r => r.start <= mouseTime && r.end >= mouseTime
-    );
-
-    // We don't want the timeline to navigate when the user's dragging the focus handlebars, unless
-    // the currentTime is outside the new zoomRegion.
-    if (
-      isDragging &&
-      focusRegion &&
-      currentTime >= focusRegion.startTime &&
-      currentTime <= focusRegion.endTime
-    ) {
-      return;
+      dispatch(setTimelineToTime(mouseTime, isDragging));
     }
 
-    if (!isFocusing && clickedOnNonLoadingRegion) {
-      const msg =
-        "We're having difficulties with your replay. Please select a shorter range. 30 seconds or less works best!";
-      enterFocusMode(msg);
-      setFocusAroundTime(mouseTime, 30000);
-      return;
-    }
-
-    trackEvent("timeline.progress_select");
-    if (!(hoverTime === null || clickedOnCommentMarker || clickedOnUnfocusedRegion)) {
-      const event = mostRecentPaintOrMouseEvent(mouseTime);
-      if (event && event.point) {
-        if (!seek(event.point, mouseTime, false)) {
-          // if seeking to the new point failed because it is in an unloaded region,
-          // we reset the timeline to the current time
-          setTimelineToTime(ThreadFront.currentTime);
-          setTimelineState({ currentTime: ThreadFront.currentTime });
-        }
-        clearPendingComment();
-      }
+    if (isDragging) {
+      dispatch(setTimelineState({ currentTime: mouseTime }));
     }
   };
 
-  isHovering() {
-    return !!this.hoverInterval;
-  }
-
-  renderCommands() {
-    const {
-      playback,
-      recordingDuration,
-      currentTime,
-      startPlayback,
-      stopPlayback,
-      replayPlayback,
-      clearPendingComment,
-      videoUrl,
-      focusRegion,
-    } = this.props;
-    const disabled = !videoUrl && (features.videoPlayback as boolean);
-    const replay = () => {
-      if (disabled) {
-        return;
-      }
-      trackEvent("timeline.replay");
-      clearPendingComment();
-      replayPlayback();
-    };
-    const togglePlayback = () => {
-      if (disabled) {
-        return;
-      }
-
-      clearPendingComment();
-      if (playback) {
-        trackEvent("timeline.pause");
-        stopPlayback();
-      } else {
-        trackEvent("timeline.play");
-        startPlayback();
-      }
-    };
-
-    if (focusRegion ? currentTime === focusRegion.endTime : currentTime == recordingDuration) {
-      return (
-        <div className="commands">
-          <button className="relative" onClick={replay} disabled={disabled}>
-            <IndexingLoader />
-            <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-              <img className="m-auto h-6 w-6" src="/images/playback-refresh.svg" />
-            </div>
-          </button>
-        </div>
-      );
-    }
-
-    return (
+  return (
+    <div className="timeline" ref={timelineRef}>
       <div className="commands">
-        <button className="relative" onClick={togglePlayback} disabled={disabled}>
-          <IndexingLoader />
-          {playback ? (
-            <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-              <img className="m-auto h-6 w-6" src="/images/playback-pause.svg" />
-            </div>
-          ) : (
-            <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-              <img className="m-auto h-6 w-6" src="/images/playback-play.svg" />
-            </div>
-          )}
-        </button>
+        <PlayPauseButton />
       </div>
-    );
-  }
 
-  renderMessages() {
-    const { messages, hoveredItem } = this.props;
-    if (messages.length >= prefs.maxHitsDisplayed) {
-      return null;
-    }
-
-    return (
-      <div className="markers-container">
-        {messages.map((message: any, index: number) => {
-          const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
-          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, message.frame);
-
-          return (
-            <MessageMarker
-              key={index}
-              message={message}
-              isPrimaryHighlighted={isPrimaryHighlighted}
-              isSecondaryHighlighted={isSecondaryHighlighted}
-            />
-          );
-        })}
-      </div>
-    );
-  }
-
-  renderEvents() {
-    const { clickEvents, hoveredItem } = this.props;
-
-    return (
-      <div className="markers-container">
-        {clickEvents.map((event, index) => {
-          const isPrimaryHighlighted = hoveredItem?.point === event.point;
-          return (
-            <EventMarker key={index} event={event} isPrimaryHighlighted={isPrimaryHighlighted} />
-          );
-        })}
-      </div>
-    );
-  }
-
-  renderPreviewMarkers() {
-    const { pointsForHoveredLineNumber, currentTime, hoveredItem, zoomRegion } = this.props;
-
-    if (
-      !pointsForHoveredLineNumber ||
-      pointsForHoveredLineNumber.error ||
-      pointsForHoveredLineNumber.data.length > prefs.maxHitsDisplayed
-    ) {
-      return [];
-    }
-
-    return (
-      <div className="preview-markers-container">
-        {pointsForHoveredLineNumber.data.map((point: PointDescription, index: number) => {
-          const isPrimaryHighlighted = hoveredItem?.point === point.point;
-          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
-
-          return (
-            <Marker
-              key={index}
-              point={point.point}
-              time={point.time}
-              hasFrames={!!point.frame}
-              location={point.frame?.[0]}
-              currentTime={currentTime}
-              isPrimaryHighlighted={isPrimaryHighlighted}
-              isSecondaryHighlighted={isSecondaryHighlighted}
-              zoomRegion={zoomRegion}
-              overlayWidth={this.overlayWidth}
-            />
-          );
-        })}
-      </div>
-    );
-  }
-
-  renderUnfocusedRegion() {
-    const { focusRegion, zoomRegion } = this.props;
-
-    if (!focusRegion) {
-      return null;
-    }
-
-    const { startTime, endTime } = focusRegion;
-    const { endTime: duration } = zoomRegion;
-    const start = getVisiblePosition({ time: startTime, zoom: zoomRegion }) * 100;
-    const end = getVisiblePosition({ time: duration - endTime, zoom: zoomRegion }) * 100;
-
-    return (
-      <>
+      <div className="progress-bar-container">
         <div
-          className="unfocused-regions-container start"
-          title="This region is unfocused"
-          style={{
-            width: `${clamp(start, 0, 100)}%`,
-          }}
-          onClick={() => trackEvent("error.unfocused_timeline_click")}
+          className="progress-bar"
+          ref={progressBarRef}
+          onClick={onClick}
+          onMouseMove={onMouseMove}
         >
-          <div className="unfocused-regions" />
+          <ProtocolTimeline />
+          <ProgressBars />
+          <PreviewMarkers />
+          <Comments />
+          <NonLoadingRegions />
+          <UnfocusedRegion />
+          <div className="progress-line-paused" style={{ left: `${percent}%` }} />
+          <Focuser timelineRef={timelineRef} />
         </div>
-        <div
-          className="unfocused-regions-container end"
-          title="This region is unfocused"
-          style={{
-            width: `${clamp(end, 0, 100)}%`,
-          }}
-          onClick={() => trackEvent("error.unfocused_timeline_click")}
-        >
-          <div className="unfocused-regions" />
-        </div>
-      </>
-    );
-  }
 
-  render() {
-    const { zoomRegion, currentTime, hoverTime, precachedTime, recordingDuration, isFocusing } =
-      this.props;
-    const { isDragging } = this.state;
-    const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
-    const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
-    const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
-    const formattedTime = getFormattedTime(currentTime);
-    const showCurrentPauseMarker =
-      (this.isHovering() && percent >= 0 && percent <= 100) || isFocusing || isDragging;
+        <Tooltip timelineWidth={timelineDimensions.width} />
+      </div>
 
-    return (
-      <>
-        <div className="timeline" ref={this.timelineRef as React.RefObject<HTMLDivElement>}>
-          {this.renderCommands()}
-          <div className={classnames("progress-bar-container", { paused: true })}>
-            <div
-              className="progress-bar"
-              ref={node => (this.$progressBar = node)}
-              onMouseMove={e => this.onPlayerMouseMove(e)}
-              onMouseUp={e => this.onPlayerMouseUp(e)}
-              onMouseEnter={this.onPlayerMouseEnter}
-            >
-              <ProtocolTimeline />
-              <div className="progress-line full" />
-              <div
-                className="progress-line preview-max"
-                style={{ width: `${clamp(Math.max(hoverPercent, precachedPercent), 0, 100)}%` }}
-              />
-              <div
-                className="progress-line preview-min"
-                style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
-              />
-              <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
-              {this.renderPreviewMarkers()}
-              <Comments />
-              <NonLoadingRegions />
-              {this.renderUnfocusedRegion()}
-              {showCurrentPauseMarker ? (
-                <div className="progress-line-paused" style={{ left: `${percent}%` }} />
-              ) : null}
-              {isFocusing ? (
-                <Focuser
-                  setIsDragging={isDragging => this.setState({ isDragging })}
-                  timelineRef={this.timelineRef as React.RefObject<HTMLDivElement>}
-                />
-              ) : null}
-              {isDragging ? (
-                <MouseDownMask
-                  onMouseMove={this.onPlayerMouseMove}
-                  onMouseUp={this.onPlayerMouseUp}
-                />
-              ) : null}
-            </div>
-            <Tooltip timelineWidth={this.overlayWidth} />
-          </div>
-          <div
-            className="timeline-time text-right"
-            style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
-          >
-            <span className="time-current">{formattedTime}</span>
-            <span className="time-divider">/</span>
-            <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
-          </div>
-          <EditFocusButton />
-        </div>
-      </>
-    );
-  }
+      {/* TODO [bvaughn] Wrap this UI up in a component */}
+      <div
+        className="timeline-time text-right"
+        style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
+      >
+        <span className="time-current">{formattedTime}</span>
+        <span className="time-divider">/</span>
+        <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
+      </div>
+      <EditFocusButton />
+    </div>
+  );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    loadedRegions: selectors.getLoadedRegions(state)?.loaded,
-    zoomRegion: selectors.getZoomRegion(state),
-    currentTime: selectors.getCurrentTime(state),
-    hoverTime: selectors.getHoverTime(state),
-    precachedTime: selectors.getPlaybackPrecachedTime(state),
-    playback: selectors.getPlayback(state),
-    recordingDuration: selectors.getRecordingDuration(state),
-    timelineDimensions: selectors.getTimelineDimensions(state),
-    messages: selectors.getMessagesForTimeline(state),
-    viewMode: selectors.getViewMode(state),
-    selectedPanel: selectors.getSelectedPanel(state),
-    pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
-    hoveredItem: selectors.getHoveredItem(state),
-    hoveredComment: selectors.getHoveredComment(state),
-    clickEvents: selectors.getEventsForType(state, "mousedown"),
-    videoUrl: selectors.getVideoUrl(state),
-    isFocusing: selectors.getIsFocusing(state),
-    focusRegion: selectors.getFocusRegion(state),
-    nonLoadingTimeRanges: selectors.getNonLoadingTimeRanges(state),
-  }),
-  {
-    setTimelineToTime: actions.setTimelineToTime,
-    setTimelineState: actions.setTimelineState,
-    updateTimelineDimensions: actions.updateTimelineDimensions,
-    seek: actions.seek,
-    seekToTime: actions.seekToTime,
-    startPlayback: actions.startPlayback,
-    stopPlayback: actions.stopPlayback,
-    replayPlayback: actions.replayPlayback,
-    clearPendingComment: actions.clearPendingComment,
-    enterFocusMode: actions.enterFocusMode,
-    setFocusAroundTime: actions.setFocusAroundTime,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Timeline);
+// TODO [bvaughn] Don't repeat this code with Focuser
+const getTimeFromPosition = (pageX: number, target: HTMLElement, zoomRegion: ZoomRegion) => {
+  const rect = target.getBoundingClientRect();
+  const x = pageX - rect.left;
+  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+  const time = zoomRegion.startTime + clamp(x / rect.width, 0, 100) * zoomRegionDuration;
+  return time;
+};
