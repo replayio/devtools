@@ -2,6 +2,8 @@ import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
 import { LayoutAction } from "ui/actions/layout";
 
+import { sourcesDisplayed } from "devtools/client/debugger/src/reducers/ui";
+
 export const syncInitialLayoutState: LayoutState = {
   consoleFilterDrawerExpanded: true,
   showCommandPalette: false,
@@ -28,6 +30,10 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
 
     case "set_selected_primary_panel": {
       return { ...state, selectedPrimaryPanel: action.panel };
+    }
+
+    case sourcesDisplayed.type: {
+      return { ...state, selectedPrimaryPanel: "explorer" };
     }
 
     case "set_view_mode": {

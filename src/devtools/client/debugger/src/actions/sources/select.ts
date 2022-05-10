@@ -22,6 +22,7 @@ import { setBreakableLines } from "./breakableLines";
 
 import { createLocation } from "../../utils/location";
 import { getToolboxLayout } from "ui/reducers/layout";
+import { setShownSource } from "../../reducers/ui";
 import { setSelectedPanel } from "ui/actions/layout";
 import { trackEvent } from "ui/utils/telemetry";
 import { paused } from "../pause/paused";
@@ -184,8 +185,8 @@ export function selectLocation(
     await dispatch(setBreakableLines(cx, source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
-    dispatch({ type: "SHOW_SOURCE", source: null });
-    dispatch({ type: "SHOW_SOURCE", source });
+    dispatch(setShownSource(null));
+    dispatch(setShownSource(source));
 
     const loadedSource = getSource(getState(), source.id);
 

@@ -4,6 +4,28 @@
 
 //
 
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+// @ts-ignore no definition
+import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
+import type { UIThunkAction } from "ui/actions";
+
+import { selectSource, selectLocation } from "./sources/select";
+import { closeQuickOpen } from "../reducers/quick-open";
+import {
+  clearHighlightLineRange,
+  highlightLineRange,
+  toggleActiveSearch,
+  setPrimaryPaneTab,
+  setCursorPosition,
+  setViewport,
+  sourcesDisplayed,
+  sourcesPanelExpanded,
+  toggleStartPanel,
+  toggleSources,
+  SelectedPrimaryPaneTabType,
+  ActiveSearchType,
+  HighlightedRange,
+} from "../reducers/ui";
 import {
   getActiveSearch,
   getPaneCollapse,
@@ -15,30 +37,31 @@ import {
   selectedLocationHasScrolled,
   getSelectedLocation,
   getContext,
+  Source,
 } from "../selectors";
-import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { selectSource, selectLocation } from "../actions/sources/select";
-import { getEditor, getLocationsInViewport } from "../utils/editor";
-import { searchContents } from "./file-search";
-import { copyToTheClipboard } from "../utils/clipboard";
 import { isFulfilled } from "../utils/async-value";
-import { closeQuickOpen } from "../reducers/quick-open";
-
-import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
+import { copyToTheClipboard } from "../utils/clipboard";
+// @ts-ignore no definition
+import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
 
-export function setPrimaryPaneTab(tabName) {
-  return { type: "SET_PRIMARY_PANE_TAB", tabName };
-}
+import { searchContents } from "./file-search";
+
+export {
+  highlightLineRange,
+  clearHighlightLineRange,
+  toggleActiveSearch,
+  toggleFrameworkGrouping,
+  setPrimaryPaneTab,
+  setFulltextQuery,
+  focusFullTextInput,
+} from "../reducers/ui";
 
 export function closeActiveSearch() {
-  return {
-    type: "TOGGLE_ACTIVE_SEARCH",
-    value: null,
-  };
+  return toggleActiveSearch(null);
 }
 
-export function setActiveSearch(activeSearch) {
+export function setActiveSearch(activeSearch: ActiveSearchType): UIThunkAction {
   return (dispatch, getState) => {
     const activeSearchState = getActiveSearch(getState());
     if (activeSearchState === activeSearch) {
@@ -49,14 +72,11 @@ export function setActiveSearch(activeSearch) {
       dispatch(closeQuickOpen());
     }
 
-    dispatch({
-      type: "TOGGLE_ACTIVE_SEARCH",
-      value: activeSearch,
-    });
+    dispatch(toggleActiveSearch(activeSearch));
   };
 }
 
-export function updateActiveFileSearch(cx) {
+export function updateActiveFileSearch(cx: Context): UIThunkAction {
   return (dispatch, getState) => {
     const isFileSearchOpen = getActiveSearch(getState()) === "file";
     const fileSearchQuery = getFileSearchQuery(getState());
@@ -67,45 +87,14 @@ export function updateActiveFileSearch(cx) {
   };
 }
 
-export function toggleFrameworkGrouping(toggleValue) {
-  return (dispatch, getState) => {
-    dispatch({
-      type: "TOGGLE_FRAMEWORK_GROUPING",
-      value: toggleValue,
-    });
-  };
-}
+// Preserve existing export names
+export const ensureSourcesIsVisible = sourcesDisplayed;
+export const togglePaneCollapse = toggleStartPanel;
+export const toggleSourcesCollapse = toggleSources;
+export const expandSourcesPane = sourcesPanelExpanded;
+export const updateCursorPosition = setCursorPosition;
 
-export function ensureSourcesIsVisible() {
-  return (dispatch, getState) => {
-    // Make sure the explorer/pause information panel is open so that the user
-    // sees those panels
-    if (getPaneCollapse(getState())) {
-      dispatch({
-        type: "TOGGLE_PANE",
-        paneCollapsed: false,
-      });
-    }
-
-    // Make sure the explorer panel is selected so that the user
-    // sees the sources panel.
-    if (getSelectedPrimaryPanel(getState()) !== "explorer") {
-      dispatch({
-        type: "set_selected_primary_panel",
-        panel: "explorer",
-      });
-    }
-
-    if (getSourcesCollapsed(getState())) {
-      dispatch({
-        type: "TOGGLE_SOURCES",
-        sourcesCollapsed: false,
-      });
-    }
-  };
-}
-
-export function openSourceLink(sourceId, line, column) {
+export function openSourceLink(sourceId: string, line: number, column: number): UIThunkAction {
   return async (dispatch, getState) => {
     const cx = getContext(getState());
     const location = { sourceId, line, column };
@@ -115,7 +104,7 @@ export function openSourceLink(sourceId, line, column) {
   };
 }
 
-export function showSource(cx, sourceId, openSourcesTab = true) {
+export function showSource(cx: Context, sourceId: string, openSourcesTab = true): UIThunkAction {
   return (dispatch, getState) => {
     const source = getSource(getState(), sourceId);
 
@@ -124,71 +113,35 @@ export function showSource(cx, sourceId, openSourcesTab = true) {
     }
 
     dispatch(setPrimaryPaneTab("sources"));
+    // @ts-ignore apparently empty options is legal
     dispatch(selectSource(cx, source.id, {}, openSourcesTab));
   };
 }
 
-export function togglePaneCollapse() {
-  return (dispatch, getState) => {
-    const paneCollapsed = getPaneCollapse(getState());
-    dispatch({ type: "TOGGLE_PANE", paneCollapsed: !paneCollapsed });
-  };
-}
-
-export function toggleSourcesCollapse() {
-  return (dispatch, getState) => {
-    const sourcesCollapsed = getSourcesCollapsed(getState());
-    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: !sourcesCollapsed });
-  };
-}
-
-export function expandSourcesPane() {
-  return dispatch => {
-    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: false });
-  };
-}
-
-export function highlightLineRange(location) {
-  return {
-    type: "HIGHLIGHT_LINES",
-    location,
-  };
-}
-
-export function flashLineRange(location) {
+export function flashLineRange(location: HighlightedRange): UIThunkAction {
   return dispatch => {
     dispatch(highlightLineRange(location));
     setTimeout(() => dispatch(clearHighlightLineRange()), 200);
   };
 }
 
-export function clearHighlightLineRange() {
-  return {
-    type: "CLEAR_HIGHLIGHT_LINES",
+export function updateViewport(): UIThunkAction {
+  return dispatch => {
+    const viewport = getLocationsInViewport(getEditor());
+    dispatch(setViewport(viewport));
   };
 }
 
-export function updateViewport() {
-  return {
-    type: "SET_VIEWPORT",
-    viewport: getLocationsInViewport(getEditor()),
-  };
-}
-
-export function updateCursorPosition(cursorPosition) {
-  return { type: "SET_CURSOR_POSITION", cursorPosition };
-}
-
-export function copyToClipboard(source) {
+export function copyToClipboard(source: Source): UIThunkAction {
   return (dispatch, getState) => {
     const content = getSourceContent(getState(), source.id);
-    if (content && isFulfilled(content) && content.value.type === "text") {
-      copyToTheClipboard(content.value.value);
+    if (content && isFulfilled(content) && content.value!.type === "text") {
+      copyToTheClipboard(content.value!.value);
     }
   };
 }
 
-export function refreshCodeMirror() {
+export function refreshCodeMirror(): UIThunkAction {
   return (dispatch, getState) => {
     // CodeMirror does not update properly when it is hidden. This method has
     // a few workarounds to get the editor to behave as expected when switching
@@ -216,6 +169,7 @@ export function refreshCodeMirror() {
           const cx = getContext(getState());
 
           if (location) {
+            // @ts-ignore More location mismatches
             dispatch(selectLocation(cx, location));
           }
         }
@@ -225,12 +179,4 @@ export function refreshCodeMirror() {
     };
     codeMirror.on("refresh", handler);
   };
-}
-
-export function setFullTextQuery(query) {
-  return { type: "SET_FULLTEXT_SEARCH", query };
-}
-
-export function focusFullTextInput(focus) {
-  return { type: "FOCUS_FULLTEXT_SEARCH", focus };
 }

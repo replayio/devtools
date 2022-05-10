@@ -2,22 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { AnyAction } from "@reduxjs/toolkit";
+import type { Location } from "@recordreplay/protocol";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
-/**
- * UI reducer
- * @module reducers/ui
- */
-
 import { prefs } from "../utils/prefs";
+
+import { closeQuickOpen } from "./quick-open";
 import type { Source } from "./sources";
-import type { Location } from "@recordreplay/protocol";
 import type { Range } from "./types";
 
-type ActiveSearchType = "project" | "file";
+export type ActiveSearchType = "project" | "file";
 
-type SelectedPrimaryPaneTabType = "sources" | "outline";
+export type SelectedPrimaryPaneTabType = "sources" | "outline";
+
+export interface HighlightedRange {
+  start?: number;
+  end?: number;
+  sourceId?: number;
+}
 
 export interface UISliceState {
   selectedPrimaryPaneTab: SelectedPrimaryPaneTabType;
@@ -31,11 +34,7 @@ export interface UISliceState {
   frameworkGroupingOn: boolean;
   viewport?: Range | null;
   cursorPosition?: Location | null;
-  highlightedLineRange?: {
-    start?: number;
-    end?: number;
-    sourceId?: number;
-  };
+  highlightedLineRange?: HighlightedRange;
 }
 
 export const createUIState = (): UISliceState => ({
@@ -53,77 +52,98 @@ export const createUIState = (): UISliceState => ({
   cursorPosition: null,
 });
 
-function update(state = createUIState(), action: AnyAction) {
-  switch (action.type) {
-    case "TOGGLE_ACTIVE_SEARCH": {
-      return { ...state, activeSearch: action.value };
-    }
-
-    case "TOGGLE_FRAMEWORK_GROUPING": {
-      return { ...state, frameworkGroupingOn: action.value };
-    }
-
-    case "SHOW_SOURCE": {
-      return { ...state, shownSource: action.source };
-    }
-
-    case "TOGGLE_PANE": {
-      return { ...state, startPanelCollapsed: action.paneCollapsed };
-    }
-
-    case "set_selected_primary_panel": {
-      return { ...state, startPanelCollapsed: false };
-    }
-
-    case "TOGGLE_SOURCES": {
-      return { ...state, sourcesCollapsed: action.sourcesCollapsed };
-    }
-
-    case "HIGHLIGHT_LINES":
-      const { start, end, sourceId } = action.location;
-      let lineRange = {};
+const uiSlice = createSlice({
+  name: "debuggerUI",
+  initialState: createUIState,
+  reducers: {
+    toggleActiveSearch(state, action: PayloadAction<ActiveSearchType | null>) {
+      state.activeSearch = action.payload;
+    },
+    toggleFrameworkGrouping(state, action: PayloadAction<boolean>) {
+      state.frameworkGroupingOn = action.payload;
+    },
+    setShownSource(state, action: PayloadAction<Source | null>) {
+      state.shownSource = action.payload;
+    },
+    toggleStartPanel(state) {
+      state.startPanelCollapsed = !state.startPanelCollapsed;
+    },
+    toggleSources(state) {
+      state.sourcesCollapsed = !state.sourcesCollapsed;
+    },
+    sourcesPanelExpanded(state) {
+      state.sourcesCollapsed = false;
+    },
+    highlightLineRange(state, action: PayloadAction<HighlightedRange>) {
+      const { start, end, sourceId } = action.payload;
+      let lineRange: HighlightedRange = {};
 
       if (start && end && sourceId) {
         lineRange = { start, end, sourceId };
       }
-
-      return { ...state, highlightedLineRange: lineRange };
-
-    case "CLOSE_QUICK_OPEN":
-    case "CLEAR_HIGHLIGHT_LINES":
-      return { ...state, highlightedLineRange: {} };
-
-    case "SET_PRIMARY_PANE_TAB":
-      return { ...state, selectedPrimaryPaneTab: action.tabName };
-
-    case "SET_FULLTEXT_SEARCH": {
-      return { ...state, fullTextSearchQuery: action.query };
-    }
-
-    case "FOCUS_FULLTEXT_SEARCH": {
-      return { ...state, fullTextSearchFocus: action.focus };
-    }
-
-    case "CLOSE_PROJECT_SEARCH": {
+      state.highlightedLineRange = lineRange;
+    },
+    clearHighlightLineRange(state) {
+      state.highlightedLineRange = {};
+    },
+    setPrimaryPaneTab(state, action: PayloadAction<SelectedPrimaryPaneTabType>) {
+      state.selectedPrimaryPaneTab = action.payload;
+    },
+    setFulltextQuery(state, action: PayloadAction<string>) {
+      state.fullTextSearchQuery = action.payload;
+    },
+    focusFullTextInput(state, action: PayloadAction<boolean>) {
+      state.fullTextSearchFocus = action.payload;
+    },
+    closeProjectSearch(state) {
       if (state.activeSearch === "project") {
-        return { ...state, activeSearch: null };
+        state.activeSearch = null;
       }
-      return state;
-    }
+    },
+    setViewport(state, action: PayloadAction<Range | null>) {
+      state.viewport = action.payload;
+    },
+    setCursorPosition(state, action: PayloadAction<Location | null>) {
+      state.cursorPosition = action.payload;
+    },
+    // Need to ensure three pieces of UI are updated:
+    // Here: pause info panel is open, sources are open
+    // Layout reducer: selected primary panel is "explorer"
+    sourcesDisplayed(state) {
+      state.startPanelCollapsed = false;
+      state.sourcesCollapsed = false;
+    },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase("set_selected_primary_panel", state => {
+        state.startPanelCollapsed = false;
+      })
+      .addCase(closeQuickOpen, state => {
+        state.highlightedLineRange = {};
+      });
+  },
+});
 
-    case "SET_VIEWPORT": {
-      return { ...state, viewport: action.viewport };
-    }
+export const {
+  clearHighlightLineRange,
+  closeProjectSearch,
+  focusFullTextInput,
+  highlightLineRange,
+  setCursorPosition,
+  setFulltextQuery,
+  setPrimaryPaneTab,
+  setShownSource,
+  setViewport,
+  sourcesDisplayed,
+  sourcesPanelExpanded,
+  toggleActiveSearch,
+  toggleFrameworkGrouping,
+  toggleStartPanel,
+  toggleSources,
+} = uiSlice.actions;
 
-    case "SET_CURSOR_POSITION": {
-      return { ...state, cursorPosition: action.cursorPosition };
-    }
-
-    default: {
-      return state;
-    }
-  }
-}
+export default uiSlice.reducer;
 
 export const getSelectedPrimaryPaneTab = (state: UIState) => state.ui.selectedPrimaryPaneTab;
 export const getActiveSearch = (state: UIState) => state.ui.activeSearch;
@@ -136,5 +156,3 @@ export const getViewport = (state: UIState) => state.ui.viewport;
 export const getCursorPosition = (state: UIState) => state.ui.cursorPosition;
 export const getFullTextSearchQuery = (state: UIState) => state.ui.fullTextSearchQuery;
 export const getFullTextSearchFocus = (state: UIState) => state.ui.fullTextSearchFocus;
-
-export default update;

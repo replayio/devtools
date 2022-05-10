@@ -25,3 +25,4 @@ export function addBreakpoint(
 export function enableBreakpoint(cx: Context, initialBreakpoint: Breakpoint);
 export function disableBreakpoint(cx: Context, initialBreakpoint: Breakpoint);
 export function runAnalysis(cx: Context, location: Location, options: unknown);
+export function setBreakpointOptions(cx: Context, location: Location, options: unknown);
