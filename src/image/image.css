@@ -140,13 +140,19 @@
 .message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button::before {
   background-image: url(~devtools/client/themes/images/arrow-big.svg) !important;
 }
-button.jump-definition {
+.theme-dark button.jump-definition {
+  background-image: url(~devtools/client/shared/components/reps/images/jump-definition-light.svg) !important;
+}
+.theme-light button.jump-definition {
   background-image: url(~devtools/client/shared/components/reps/images/jump-definition-dark.svg) !important;
 }
 .img.column-marker {
   background-image: url(~devtools/client/debugger/images/column-marker.svg) !important;
 }
-.event-tooltip-debugger-icon {
+.theme-dark .event-tooltip-debugger-icon {
+  background-image: url(~devtools/client/shared/components/reps/images/jump-definition-light.svg) !important;
+}
+.theme-light .event-tooltip-debugger-icon {
   background-image: url(~devtools/client/shared/components/reps/images/jump-definition-dark.svg) !important;
 }
 .invoke-confirm .close-confirm-dialog-button::before {
