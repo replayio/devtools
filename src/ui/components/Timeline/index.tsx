@@ -1,16 +1,15 @@
-import { clamp } from "lodash";
 import React, { useLayoutEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { ZoomRegion } from "ui/state/timeline";
-import { getFormattedTime, getVisiblePosition } from "ui/utils/timeline";
+import { getTimeFromPosition, getVisiblePosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
 import ProtocolTimeline from "../ProtocolTimeline";
 
 import { EditFocusButton } from "./EditFocusButton";
 import Focuser from "./Focuser";
+import FocusInputs from "./FocusInputs";
 import NonLoadingRegions from "./NonLoadingRegions";
 import PlayPauseButton from "./PlaybackControls";
 import PreviewMarkers from "./PreviewMarkers";
@@ -23,7 +22,7 @@ export default function Timeline() {
   const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
   const hoverTime = useSelector(selectors.getHoverTime);
-  const recordingDuration = useSelector(selectors.getRecordingDuration);
+
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
 
@@ -31,7 +30,6 @@ export default function Timeline() {
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
-  const formattedTime = getFormattedTime(currentTime);
 
   useLayoutEffect(() => {
     const progressBar = progressBarRef.current;
@@ -113,25 +111,8 @@ export default function Timeline() {
         <Tooltip timelineWidth={timelineDimensions.width} />
       </div>
 
-      {/* TODO [bvaughn] Wrap this UI up in a component */}
-      <div
-        className="timeline-time text-right"
-        style={{ minWidth: `${formattedTime.length * 2 + 2}ch` }}
-      >
-        <span className="time-current">{formattedTime}</span>
-        <span className="time-divider">/</span>
-        <span className="time-total">{getFormattedTime(recordingDuration || 0)}</span>
-      </div>
+      <FocusInputs />
       <EditFocusButton />
     </div>
   );
 }
-
-// TODO [bvaughn] Don't repeat this code with Focuser
-const getTimeFromPosition = (pageX: number, target: HTMLElement, zoomRegion: ZoomRegion) => {
-  const rect = target.getBoundingClientRect();
-  const x = pageX - rect.left;
-  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-  const time = zoomRegion.startTime + clamp(x / rect.width, 0, 100) * zoomRegionDuration;
-  return time;
-};

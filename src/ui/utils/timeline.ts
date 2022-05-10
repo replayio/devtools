@@ -1,4 +1,5 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
+import { clamp } from "lodash";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
@@ -124,6 +125,42 @@ export function getFormattedTime(time: number, showMs = false) {
   return `${minutes}:${seconds}${showMs ? `.${date.getMilliseconds()}` : ""}`;
 }
 
+// Parse milliseconds from a formatted time string (mm:ss or mm:ss:ss)
+export function getSecondsFromFormattedTime(formatted: string) {
+  formatted = formatted.trim();
+  if (!formatted) {
+    return 0;
+  }
+
+  let minutes = 0;
+  let seconds = 0;
+  let milliseconds = 0;
+
+  const pieces = formatted.split(":");
+  switch (pieces.length) {
+    case 1: {
+      seconds = parseInt(pieces[0]);
+      break;
+    }
+    case 2: {
+      minutes = parseInt(pieces[0]);
+      seconds = parseInt(pieces[1]);
+      break;
+    }
+    case 3: {
+      minutes = parseInt(pieces[0]);
+      seconds = parseInt(pieces[1]);
+      milliseconds = parseInt(pieces[2]);
+      break;
+    }
+    default: {
+      throw Error(`Unsupported time format "${formatted}"`);
+    }
+  }
+
+  return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
+}
+
 export function isSameTimeStampedPointRange(
   range1: TimeStampedPointRange,
   range2: TimeStampedPointRange
@@ -165,3 +202,21 @@ export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) 
   });
   return overlapping;
 };
+
+export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
+  const position = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
+  const clampedPosition = clamp(position, 0, 100);
+  return clampedPosition;
+}
+
+export function getTimeFromPosition(
+  pageX: number,
+  target: HTMLElement,
+  zoomRegion: ZoomRegion
+): number {
+  const rect = target.getBoundingClientRect();
+  const x = pageX - rect.left;
+  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+  const time = zoomRegion.startTime + clamp(x / rect.width, 0, 100) * zoomRegionDuration;
+  return time;
+}

@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { ZoomRegion } from "ui/state/timeline";
-import { getVisiblePosition } from "ui/utils/timeline";
+import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
 type EditMode = {
   dragOffset?: number;
@@ -124,6 +123,7 @@ function Focuser({ timelineRef }: Props) {
           }
           case "resize-end": {
             const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+            // TODO [bvaughn] Move minDuration checking into action dispatcher to be shared (and tested).
             const minDuration = zoomRegionDuration * MIN_FOCUS_WINDOW_PERCENTAGE;
             const endTime = Math.max(mouseTime, focusRegion.startTime + minDuration);
             dispatch(
@@ -136,6 +136,7 @@ function Focuser({ timelineRef }: Props) {
           }
           case "resize-start": {
             const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+            // TODO [bvaughn] Move minDuration checking into action dispatcher to be shared (and tested).
             const minDuration = zoomRegionDuration * MIN_FOCUS_WINDOW_PERCENTAGE;
             const startTime = Math.min(mouseTime, focusRegion.endTime - minDuration);
             dispatch(
@@ -239,17 +240,3 @@ function Focuser({ timelineRef }: Props) {
     </div>
   );
 }
-
-const getPositionFromTime = (time: number, zoomRegion: ZoomRegion) => {
-  const position = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
-  const clampedPosition = clamp(position, 0, 100);
-  return clampedPosition;
-};
-
-const getTimeFromPosition = (mouseX: number, target: HTMLElement, zoomRegion: ZoomRegion) => {
-  const rect = target.getBoundingClientRect();
-  const x = mouseX - rect.left;
-  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-  const time = zoomRegion.startTime + clamp(x / rect.width, 0, 100) * zoomRegionDuration;
-  return time;
-};
