@@ -1,6 +1,5 @@
 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_11994_83759)">
-<rect width="20" height="20" fill="white"/>
+<g clip-path="url(#clip0_12008_75568)">
 <rect x="4" y="12" width="1" height="1" fill="#FCF1FE"/>
 <rect x="4.99622" y="12" width="1" height="1" fill="#FCF1FE"/>
 <rect x="6" y="12" width="1" height="1" fill="#FCF1FE"/>
@@ -63,19 +62,19 @@
 <rect x="12" y="19" width="1" height="1" fill="#FCF1FE"/>
 <rect x="17" y="19" width="1" height="1" fill="#EACEF2"/>
 <rect x="18" y="19" width="1" height="1" fill="#EACEF2"/>
-<rect x="9" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="12" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="12" y="9" width="1" height="1" fill="#F5F5F5"/>
-<rect x="12" y="10" width="1" height="1" fill="#F5F5F5"/>
-<rect x="10" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="9" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="10" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="7" width="1" height="1" fill="#F5F5F5"/>
-<rect x="11" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="11" y="9" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="7" width="1" height="1" fill="#F5F5F5"/>
+<rect x="9" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="12" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="12" y="9" width="1" height="1" fill="#CCCCCC"/>
+<rect x="12" y="10" width="1" height="1" fill="#CCCCCC"/>
+<rect x="10" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="9" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="10" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="7" width="1" height="1" fill="#CCCCCC"/>
+<rect x="11" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="11" y="9" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="7" width="1" height="1" fill="#CCCCCC"/>
 <rect x="6" y="4" width="1" height="1" fill="#EBC85B"/>
 <rect x="5" y="4" width="1" height="1" fill="#F2A642"/>
 <rect x="5" y="3" width="1" height="1" fill="#EBC85B"/>
@@ -88,53 +87,53 @@
 <rect x="9" y="7" width="1" height="1" fill="#C811A0"/>
 <rect x="7" y="8" width="1" height="1" fill="#C811A0"/>
 <rect x="8" y="8" width="1" height="1" fill="#C811A0"/>
-<rect x="9" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="12" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="12" y="9" width="1" height="1" fill="#F5F5F5"/>
-<rect x="12" y="10" width="1" height="1" fill="#F5F5F5"/>
-<rect x="10" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="9" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="10" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="10" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="13" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="13" width="1" height="1" fill="#F5F5F5"/>
-<rect x="16" y="13" width="1" height="1" fill="#F5F5F5"/>
-<rect x="17" y="13" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="11" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="11" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="11" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="14" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="14" width="1" height="1" fill="#F5F5F5"/>
-<rect x="16" y="14" width="1" height="1" fill="#F5F5F5"/>
-<rect x="17" y="14" width="1" height="1" fill="#F5F5F5"/>
-<rect x="18" y="14" width="1" height="1" fill="#F5F5F5"/>
-<rect x="19" y="14" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="12" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="12" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="12" width="1" height="1" fill="#F5F5F5"/>
-<rect x="16" y="12" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="15" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="15" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="16" width="1" height="1" fill="#F5F5F5"/>
-<rect x="15" y="17" width="1" height="1" fill="#F5F5F5"/>
-<rect x="16" y="15" width="1" height="1" fill="#F5F5F5"/>
-<rect x="16" y="16" width="1" height="1" fill="#F5F5F5"/>
-<rect x="16" y="17" width="1" height="1" fill="#F5F5F5"/>
-<rect x="17" y="15" width="1" height="1" fill="#F5F5F5"/>
-<rect x="17" y="16" width="1" height="1" fill="#F5F5F5"/>
-<rect x="17" y="17" width="1" height="1" fill="#F5F5F5"/>
-<rect x="18" y="15" width="1" height="1" fill="#F5F5F5"/>
-<rect x="18" y="16" width="1" height="1" fill="#F5F5F5"/>
-<rect x="19" y="15" width="1" height="1" fill="#F5F5F5"/>
-<rect x="19" y="17" width="1" height="1" fill="#F5F5F5"/>
-<rect x="19" y="16" width="1" height="1" fill="#F5F5F5"/>
-<rect x="19" y="18" width="1" height="1" fill="#F5F5F5"/>
-<rect x="13" y="7" width="1" height="1" fill="#F5F5F5"/>
-<rect x="11" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="11" y="9" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="8" width="1" height="1" fill="#F5F5F5"/>
-<rect x="14" y="7" width="1" height="1" fill="#F5F5F5"/>
+<rect x="9" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="12" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="12" y="9" width="1" height="1" fill="#CCCCCC"/>
+<rect x="12" y="10" width="1" height="1" fill="#CCCCCC"/>
+<rect x="10" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="9" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="10" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="10" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="13" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="13" width="1" height="1" fill="#CCCCCC"/>
+<rect x="16" y="13" width="1" height="1" fill="#CCCCCC"/>
+<rect x="17" y="13" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="11" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="11" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="11" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="14" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="14" width="1" height="1" fill="#CCCCCC"/>
+<rect x="16" y="14" width="1" height="1" fill="#CCCCCC"/>
+<rect x="17" y="14" width="1" height="1" fill="#CCCCCC"/>
+<rect x="18" y="14" width="1" height="1" fill="#CCCCCC"/>
+<rect x="19" y="14" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="12" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="12" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="12" width="1" height="1" fill="#CCCCCC"/>
+<rect x="16" y="12" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="15" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="15" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="16" width="1" height="1" fill="#CCCCCC"/>
+<rect x="15" y="17" width="1" height="1" fill="#CCCCCC"/>
+<rect x="16" y="15" width="1" height="1" fill="#CCCCCC"/>
+<rect x="16" y="16" width="1" height="1" fill="#CCCCCC"/>
+<rect x="16" y="17" width="1" height="1" fill="#CCCCCC"/>
+<rect x="17" y="15" width="1" height="1" fill="#CCCCCC"/>
+<rect x="17" y="16" width="1" height="1" fill="#CCCCCC"/>
+<rect x="17" y="17" width="1" height="1" fill="#CCCCCC"/>
+<rect x="18" y="15" width="1" height="1" fill="#CCCCCC"/>
+<rect x="18" y="16" width="1" height="1" fill="#CCCCCC"/>
+<rect x="19" y="15" width="1" height="1" fill="#CCCCCC"/>
+<rect x="19" y="17" width="1" height="1" fill="#CCCCCC"/>
+<rect x="19" y="16" width="1" height="1" fill="#CCCCCC"/>
+<rect x="19" y="18" width="1" height="1" fill="#CCCCCC"/>
+<rect x="13" y="7" width="1" height="1" fill="#CCCCCC"/>
+<rect x="11" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="11" y="9" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="8" width="1" height="1" fill="#CCCCCC"/>
+<rect x="14" y="7" width="1" height="1" fill="#CCCCCC"/>
 <rect x="9" y="8" width="1" height="1" fill="#F02D5E"/>
 <rect x="12" y="8" width="1" height="1" fill="#EACEF2"/>
 <rect x="12" y="9" width="1" height="1" fill="#D33824"/>
@@ -254,7 +253,7 @@
 <rect x="3" y="14" width="1" height="1" fill="#3D4552"/>
 </g>
 <defs>
-<clipPath id="clip0_11994_83759">
+<clipPath id="clip0_12008_75568">
 <rect width="20" height="20" fill="white"/>
 </clipPath>
 </defs>
